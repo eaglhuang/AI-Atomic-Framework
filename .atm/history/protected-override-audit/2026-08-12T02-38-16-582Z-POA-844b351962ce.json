@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-844b351962ce",
+  "recordedAt": "2026-08-12T02:38:16.582Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts,tests/cli/git-index-override-lease-consumption.test.ts --reason \"Add transaction recovery for post-hook index-lock release races and a regression test.\" --emergency-approval EMG-ATM-GOV-0345-e774083e2e --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-ATM-GOV-0345-e774083e2e",
+  "reason": "Add transaction recovery for post-hook index-lock release races and a regression test.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T02-38-16-580Z-EMG-ATM-GOV-0345-e774083e2e.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

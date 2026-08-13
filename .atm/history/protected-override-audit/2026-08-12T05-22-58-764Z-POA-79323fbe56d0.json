@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-79323fbe56d0",
+  "recordedAt": "2026-08-12T05:22:58.764Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0345",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0345 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/batch/implementation.ts,tests/cli/batch-checkpoint-runner-sync-recovery.test.ts --reason \"Repair released direction lock and add the narrowly coupled batch checkpoint recovery seam.\" --emergency-approval EMG-ATM-GOV-0345-8aaaf5b50d --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-ATM-GOV-0345-8aaaf5b50d",
+  "reason": "Repair released direction lock and add the narrowly coupled batch checkpoint recovery seam.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T05-22-58-761Z-EMG-ATM-GOV-0345-8aaaf5b50d.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
