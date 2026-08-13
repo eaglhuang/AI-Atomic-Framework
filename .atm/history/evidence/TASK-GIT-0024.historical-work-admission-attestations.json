@@ -651,6 +651,31 @@
       "attestedBy": "codex-gpt-5.4-mini",
       "attestedAt": "2026-08-13T11:42:02.467Z",
       "digest": "sha256:2d0e5cc3ac2d6f49577005295ae30b1d802623f4dd0a0cb4dfe3bd7e04289b87"
+    },
+    {
+      "schemaId": "atm.historicalWorkAdmissionAttestation.v1",
+      "commitSha": "c7bb2ec2ee5055ae9ba3da2925a78004cb13a956",
+      "parentCommitSha": "01a441e8ed32ac554e7ac9687db43d57f673f67b",
+      "treeSha": "2b2a620f2cec9fd11c50eb5c5fb767259baea4f8",
+      "provenance": {
+        "kind": "emergency",
+        "digest": "sha256:6315ccff4f54d81be1f6215eeba1e2a73bd66b840c7b82b82abb144c2eb40ed0",
+        "ref": ".atm/history/evidence/TASK-LANE-0023.runner-sync-receipt.json"
+      },
+      "reason": "Batch runner bootstrap: committed validated TASK-LANE-0023 lease-health source before checkpoint because frozen runner freshness requires committed source.",
+      "evidenceRefs": [
+        ".atm/history/evidence/TASK-LANE-0023.runner-sync-receipt.json"
+      ],
+      "emergencyClass": "batch-runner-bootstrap",
+      "scope": [
+        "packages/cli/src/commands/framework-development/runner-sync-lease-health.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-lease-health.test.ts"
+      ],
+      "taskId": "TASK-GIT-0024",
+      "laneSessionId": "lane-20260813114407-codex-gpt-5.4-mini-cec852bc9c",
+      "attestedBy": "codex-gpt-5.4-mini",
+      "attestedAt": "2026-08-13T11:48:40.641Z",
+      "digest": "sha256:04934947dafc4cacc0e42d99ae7464a15c9ff4dba074aaf0e82c6b69fb3f825c"
     }
   ]
 }
