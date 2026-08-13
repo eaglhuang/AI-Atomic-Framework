@@ -1,0 +1,264 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0366",
+  "title": "Disclose the owner-lane source in lane capability refusals",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 A blocked attempt reports the ledger record that decided it and a `nextCommand` that reads that record, with no task, actor or path special cases in the control flow.",
+    "ACC-2 No refusal payload contains the owner lane id or the claim's export hint, whatever actor string the attempt presents. It reports only that the hint exists and where to read it.",
+    "ACC-3 The gate is unchanged: every previously blocked attempt is still blocked, and the existing hard-gate regressions still pass.",
+    "ACC-4 The disclosure is derived from the same claim read that produces the decision and is carried on the decision, so no consumer re-reads the ledger to describe a decision it did not make (INV-ATM-012)."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/lane-session/capability-authority.ts",
+    "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-021.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/lane-session/capability-authority.ts",
+    "tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-021.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages/cli/src/commands/lane-session/redaction.ts",
+    "packages/cli/src/commands/lane-session/proxy-receipt.ts",
+    "packages/cli/src/commands/tasks/task-ledger-readers.ts"
+  ],
+  "nonGoals": [
+    "Weakening the lane capability gate. The refusal stays a refusal; only what it discloses changes.",
+    "Disclosing a lane capability value in any refusal payload. Location is disclosed; the capability is not.",
+    "Publishing the frozen runner. This card lands source and joins the pending publication batch."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Reverting restores a refusal that withholds the record deciding it. The gate itself is unchanged by this card, so reverting cannot re-open an authority hole.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.lane-capability-authority",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0366-disclose-the-owner-lane-source-in-lane-capability-refusals.task.md",
+    "sectionTitle": "ATM-GOV-0366",
+    "headingLine": 70,
+    "hash": "2be88500a353a1e7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0366-disclose-the-owner-lane-source-in-lane-capability-refusals.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:2be88500a353a1e73bb294845b207033e10655180721a4df7ce11490659a14e9",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T16:26:05.039Z"
+    }
+  },
+  "importedAt": "2026-08-13T16:26:05.039Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A refusal compares the executing lane against the owner lane but names neither the owner lane nor the record it read."
+    ],
+    "softRelations": [
+      "ATM-GOV-0365"
+    ],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [
+      "undisclosed-owner-lane-forces-probing"
+    ],
+    "parallelFrontierInputs": [
+      "lane-capability-authority"
+    ],
+    "validatorReferences": [
+      "borrowed-actor-authority-hard-gate",
+      "validate-cli"
+    ],
+    "phaseOwner": "governance-substrate"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0366_refusal_discloses_the_owner_lane_source",
+      "targetGroupId": "null",
+      "semanticKey": "a_lane_refusal_names_the_record_that_decides_it",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "undisclosed-owner-lane-forces-probing"
+      ],
+      "expectedRedPredicate": "the refusal reports neither the ledger record it read nor a next command, so the blocked actor can only guess among its own lane sessions",
+      "contributionResourceKey": "lane-capability-refusal-disclosure",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.laneCapabilityDecision.v1",
+      "resourceKey": "lane-capability-refusal-disclosure"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0366_refusal_discloses_the_owner_lane_source"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "claude-008-gov-0366",
+    "leaseId": "lease-225372a3bd32",
+    "claimedAt": "2026-08-13T16:13:32.080Z",
+    "heartbeatAt": "2026-08-13T16:33:56.454Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0366.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-021.json",
+      "packages/cli/src/commands/lane-session/capability-authority.ts",
+      "tests/cli/borrowed-actor-authority-hard-gate.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260813161332-claude-008-gov-0366-da46e02f26",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813161332-claude-008-gov-0366-da46e02f26\""
+    }
+  },
+  "owner": "claude-008-gov-0366",
+  "startedAt": "2026-08-13T16:13:32.080Z",
+  "startedBySessionId": "session-20260813161332-claude-008-gov-0366-ATM-GOV-0366-5a0f87bcbe",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0366",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0366.*",
+      ".atm/history/task-events/ATM-GOV-0366/**",
+      ".atm/history/tasks/ATM-GOV-0366.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-021.json",
+      "packages/cli/src/commands/lane-session/capability-authority.ts",
+      "tests/cli/borrowed-actor-authority-hard-gate.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "2b8a50690b266a8ca777d1befdaa0b7d2f4a6ba6b5fc7897dcdafa9b215c49e0",
+    "actorId": "claude-008-gov-0366",
+    "sessionId": "session-20260813161332-claude-008-gov-0366-ATM-GOV-0366-5a0f87bcbe",
+    "laneSession": {
+      "laneSessionId": "lane-20260813161332-claude-008-gov-0366-da46e02f26",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813161332-claude-008-gov-0366-da46e02f26\""
+    },
+    "createdAt": "2026-08-13T16:13:36.499Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-08-13T16-33-56-661Z-renew-a7f995b68e56",
+  "lastTransitionAt": "2026-08-13T16:33:56.661Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-9ea9df82e235e132",
+    "ticketDigest": "sha256:9ea9df82e235e1323ee1d82f3c860c497ca640b4b5ff048a658e00e1c09a61b4",
+    "taskId": "ATM-GOV-0366",
+    "origin": "claim",
+    "actorId": "claude-008-gov-0366",
+    "laneSessionId": "lane-20260813161332-claude-008-gov-0366-da46e02f26",
+    "claimGeneration": "lease-225372a3bd32",
+    "issuedAt": "2026-08-13T16:33:56.454Z",
+    "expiresAt": "2026-08-13T17:03:56.454Z",
+    "scopeDigest": "sha256:012f489bd5612e45f4ea98757ea833edfcbcd82e95cabd4f1d39317589543789",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-13T16:33:56.454Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0366.*",
+          ".atm/history/task-events/ATM-GOV-0366/**",
+          ".atm/history/tasks/ATM-GOV-0366.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-021.json",
+          "packages/cli/src/commands/lane-session/capability-authority.ts",
+          "tests/cli/borrowed-actor-authority-hard-gate.test.ts"
+        ],
+        "digest": "sha256:a2a05671b6054470dfed68dd7bccf46967df19cb91354d5a487802e84f027fe3"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  }
+}
