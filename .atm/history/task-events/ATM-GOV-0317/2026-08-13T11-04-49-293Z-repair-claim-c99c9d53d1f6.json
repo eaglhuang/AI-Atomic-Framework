@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T11-04-49-293Z-repair-claim-c99c9d53d1f6",
+  "taskId": "ATM-GOV-0317",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812131144-codex-gpt-5.4-mini-ATM-GOV-0317-270532d910",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0317.json",
+  "taskSha256": "sha256:111d3c4ade2e4c8bfc41d2deb921e9d1a382f663991d317cb04a8391bddfa7f5",
+  "createdAt": "2026-08-13T11:04:49.293Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0317 --actor codex-gpt-5.4-mini --write --reason \"release expired claim and dangling governance lock before runner publication takeover\" --json"
+}

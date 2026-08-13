@@ -1,1 +1,72 @@
-{"schemaId":"atm.fourPlanCertificate.v1","specVersion":"0.1.0","status":"proven","rows":[{"plan":"3.0","status":"proven","evidence":["governed-lifecycle"],"nonClaims":[]},{"plan":"3.1","status":"proven","evidence":["runner-sync"],"nonClaims":["runner-sync-is-not-product-approval"]},{"plan":"3.2","status":"proven","evidence":["quality","shadow","hostile-dogfood"],"nonClaims":["quality-vector-is-not-close-authority"]},{"plan":"4.0","status":"proven","evidence":["state-replay","adapter-parity","operator-regression"],"nonClaims":["legacy-retirement-remains-reversible"]}],"legacyAuthority":{"retired":false,"reversible":true},"unknownRows":[],"unresolvedRows":[],"resultDigest":"sha256:plan4-final-certification"}
+{
+  "schemaId": "atm.fourPlanCertificate.v1",
+  "specVersion": "0.2.0",
+  "status": "not-certified",
+  "decision": {
+    "rule": "certify only when every objective row is proven and the shared closure controls are proven",
+    "failClosed": true
+  },
+  "rows": [
+    {
+      "plan": "3.0",
+      "status": "not-certified",
+      "evidenceTuples": [
+        { "kind": "closure", "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json", "expectedTaskId": "ATM-GOV-0300" },
+        { "kind": "replay", "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json", "expectedTaskId": "ATM-GOV-0307" }
+      ],
+      "nonClaims": ["A closure packet is not the final objective replay; ATM-GOV-0333 must publish the current replay certificate."],
+      "blockers": ["current-plan-3.0-objective-replay"]
+    },
+    {
+      "plan": "3.1",
+      "status": "not-certified",
+      "evidenceTuples": [
+        { "kind": "regression-family", "source": ".atm/history/evidence/ATM-GOV-0305.closure-packet.json", "expectedTaskId": "ATM-GOV-0305" },
+        { "kind": "runner-publication", "source": ".atm/history/evidence/ATM-GOV-0316.runner-sync-receipt.json", "expectedTaskId": "ATM-GOV-0316" }
+      ],
+      "nonClaims": ["Runner publication is not product approval; ATM-GOV-0334 must publish the current objective replay."],
+      "blockers": ["current-plan-3.1-objective-replay"]
+    },
+    {
+      "plan": "3.2",
+      "status": "not-certified",
+      "evidenceTuples": [
+        { "kind": "quality-certificate", "source": ".atm/history/evidence/ATM-GOV-0312.closure-packet.json", "expectedTaskId": "ATM-GOV-0312" },
+        { "kind": "hostile-dogfood", "source": ".atm/history/evidence/ATM-GOV-0316.runner-sync-receipt.json", "expectedTaskId": "ATM-GOV-0316" }
+      ],
+      "nonClaims": ["Quality and hostile-dogfood receipts do not by themselves close the four-plan certificate."],
+      "blockers": ["shared-closure-controls"]
+    },
+    {
+      "plan": "4.0",
+      "status": "not-certified",
+      "evidenceTuples": [
+        { "kind": "shadow-comparison", "source": ".atm/history/evidence/ATM-GOV-0314.closure-packet.json", "expectedTaskId": "ATM-GOV-0314" },
+        { "kind": "adapter-parity", "source": ".atm/history/evidence/ATM-GOV-0315.closure-packet.json", "expectedTaskId": "ATM-GOV-0315" },
+        { "kind": "operator-regression", "source": ".atm/history/evidence/ATM-GOV-0324.closure-packet.json", "expectedTaskId": "ATM-GOV-0324" }
+      ],
+      "nonClaims": ["Completed component closures do not replace the independent final review."],
+      "blockers": ["independent-final-review"]
+    }
+  ],
+  "backlogCensus": {
+    "status": "missing",
+    "nonClaim": "No current machine-readable census proves that every open-like backlog item is resolved or explicitly authorized."
+  },
+  "releasePushProvenance": {
+    "status": "missing",
+    "nonClaim": "The final governed release and push receipt does not exist until the terminal wave is delivered."
+  },
+  "independentReview": {
+    "status": "missing",
+    "nonClaim": "No independent final reviewer receipt is attached to this certificate."
+  },
+  "legacyAuthority": {
+    "retired": false,
+    "reversible": true,
+    "retirementRule": "Retire only when the certificate decision is proven; otherwise retain legacy authority."
+  },
+  "unknownRows": [],
+  "unresolvedRows": ["3.0", "3.1", "3.2", "4.0"],
+  "resultDigest": null
+}

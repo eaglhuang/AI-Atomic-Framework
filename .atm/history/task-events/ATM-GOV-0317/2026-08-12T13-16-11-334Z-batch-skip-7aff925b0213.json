@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T13-16-11-334Z-batch-skip-7aff925b0213",
+  "taskId": "ATM-GOV-0317",
+  "action": "batch-skip",
+  "actorId": "codex-gpt-5.4-mini",
+  "batchId": "batch-2522d44aebb6",
+  "reason": "Terminal four-plan certificate correctly fails closed until later queue tasks publish Plan 3.0/3.1 replays, machine-readable backlog census, final release/push provenance, and independent review; proceeding now would create a false green.",
+  "batchIndex": 0,
+  "createdAt": "2026-08-12T13:16:11.334Z",
+  "command": "node atm.mjs batch skip --task ATM-GOV-0317 --batch batch-2522d44aebb6 --actor codex-gpt-5.4-mini --json"
+}

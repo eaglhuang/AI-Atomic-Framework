@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-12T19-49-03-839Z-scope-amendment-07eca62a4132",
+  "taskId": "ATM-GOV-0317",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0317.json",
+  "taskSha256": "sha256:9f6df4b534c041f070ecdfa64b06148111c5b3c18266300aed80e8d253c4229e",
+  "createdAt": "2026-08-12T19:49:03.839Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0317 --actor codex-gpt-5.4-mini --add \"docs/reports/plan-3x-4x-independent-certificate.json,docs/reports/plan-3x-4x-release-closeback.json,tests/cli/four-plan-independent-certificate.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
