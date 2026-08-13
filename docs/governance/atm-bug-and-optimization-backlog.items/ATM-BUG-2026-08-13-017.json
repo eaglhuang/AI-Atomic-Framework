@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-017",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Claim identity transitions are not atomic across ledger, runtime lock, direction lock, and admission ticket",
+  "finding": "Official import and takeover transitions can update only part of the claim identity aggregate. A successful takeover updated the ledger claim and runtime lock actor but retained an expired workAdmissionTicket for the predecessor and emitted a runtime lock without the taskDirectionLock required for scope amendment. Renew resealed the ticket, but could not reconstruct the missing direction-lock authority. The new owner was therefore recognized as active while the public scope-amendment and governed-commit seams still refused it.",
+  "expectedBehavior": "Every claim identity transition must commit one atomic aggregate: ledger claim, runtime lock, embedded direction lock, work-admission ticket, actor, lane session, lease generation, and authorized scope must either all move to the successor or all remain unchanged. Post-transition validation must fail closed and roll back before success is reported if any identity surface disagrees.",
+  "evidenceOrRepro": "ATM-GOV-0364 takeover succeeded at 2026-08-13T15:28:27Z, but the retained ticket still named the predecessor and the replacement runtime lock lacked taskDirectionLock. tasks scope add then returned ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK, its --claim-first recovery returned ATM_TASK_CLAIM_NOT_READY because the task was already running, and governed commit returned ATM_WORK_ADMISSION_DELIVERY_NOT_AUTHORIZED until tasks renew resealed the ticket. A related forced-import reproduction previously split the ledger leaseId from the runtime lock and dropped the ticket.",
+  "followUp": "Route import, takeover, renew, and repair through one claim-identity transaction deep module. Add table-driven transition tests that assert aggregate equality and rollback across every surface; do not add command-specific special cases."
+}
