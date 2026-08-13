@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T17-14-08-644Z-scope-amendment-fec4e9747b44",
+  "taskId": "ATM-GOV-0367",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0366",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0367.json",
+  "taskSha256": "sha256:262677afae0b1d829640cd67f5d084de09ad156e2962a96e1a0f7e0a66979fd0",
+  "createdAt": "2026-08-13T17:14:08.644Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0367 --actor claude-008-gov-0366 --add docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json --reason \"The emergency lane refused this card's own close for a reason that must be recorded before the card can close.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The emergency lane refused this card's own close for a reason that must be recorded before the card can close."
+  }
+}

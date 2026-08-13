@@ -13,7 +13,11 @@
     "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-024.json"
   ],
   "scopePaths": [
-    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-024.json"
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-024.json",
+    ".atm/history/evidence/ATM-GOV-0367.*",
+    ".atm/history/task-events/ATM-GOV-0367/**",
+    ".atm/history/tasks/ATM-GOV-0367.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json"
   ],
   "validators": [
     "node --strip-types scripts/validate-backlog-census.ts --mode validate"
@@ -130,8 +134,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T17-04-28-790Z-claim-6bc777c5c1fe",
-  "lastTransitionAt": "2026-08-13T17:04:28.790Z",
+  "lastTransitionId": "2026-08-13T17-14-10-666Z-renew-48d9115ec674",
+  "lastTransitionAt": "2026-08-13T17:14:10.666Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-008-gov-0366",
   "reservedAt": "2026-08-13T17:04:22.332Z",
@@ -140,14 +144,16 @@
     "actorId": "claude-008-gov-0366",
     "leaseId": "lease-b7c5594c613c",
     "claimedAt": "2026-08-13T17:04:22.351Z",
-    "heartbeatAt": "2026-08-13T17:04:22.351Z",
+    "heartbeatAt": "2026-08-13T17:14:10.304Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0367.*",
+      ".atm/history/task-events/ATM-GOV-0367/**",
       ".atm/history/tasks/ATM-GOV-0367.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-024.json"
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-024.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260813170422-claude-008-gov-0366-71263753d7",
       "status": "active",
@@ -160,31 +166,33 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-dda1e85bfd9fd96b",
-    "ticketDigest": "sha256:dda1e85bfd9fd96be367bcb5227782dedb9fcaa474c4b399fd5a8135bfd53a4d",
+    "ticketId": "wat-a71527c6bf1e560a",
+    "ticketDigest": "sha256:a71527c6bf1e560a3dddcad9e3c1ece7a550d290d8c357d3ca2a55567f2cb4be",
     "taskId": "ATM-GOV-0367",
     "origin": "claim",
     "actorId": "claude-008-gov-0366",
     "laneSessionId": "lane-20260813170422-claude-008-gov-0366-71263753d7",
     "claimGeneration": "lease-b7c5594c613c",
-    "issuedAt": "2026-08-13T17:04:22.351Z",
-    "expiresAt": "2026-08-13T17:34:22.351Z",
-    "scopeDigest": "sha256:380a73bc80e770b79277b458340aefd5041120d361e4825b00b7fd185c063e4f",
+    "issuedAt": "2026-08-13T17:14:10.304Z",
+    "expiresAt": "2026-08-13T17:44:10.304Z",
+    "scopeDigest": "sha256:a3a8873a9e5377e03c6c4a86e4eb29a7edcbb2469639045fae45f1aae05f3c2c",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T17:04:22.351Z"
+      "selectedAt": "2026-08-13T17:14:10.304Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0367.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0367/**",
           ".atm/history/tasks/ATM-GOV-0367.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-024.json"
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-024.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json"
         ],
-        "digest": "sha256:8afb9bc1803814cbbe37959dab4ace7a02034d0473cd2579ba096cfd23d5a502"
+        "digest": "sha256:4d7c37991248ef6f7027558a35891dec1f7202fc3b8a178b9e741cc135764908"
       },
       {
         "kind": "lifecycle-operation",
@@ -231,21 +239,29 @@
       ".atm/history/evidence/ATM-GOV-0367.*",
       ".atm/history/task-events/ATM-GOV-0367/**",
       ".atm/history/tasks/ATM-GOV-0367.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-024.json"
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-024.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0367-record-the-close-write-rollback-that-an-identical-retry-resolves.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0367-record-the-close-write-rollback-that-an-identical-retry-resolves.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "b122630ec3e97e059072b4ee86b543446b2ee1bdf84332087bfdcd348356053e",
     "actorId": "claude-008-gov-0366",
-    "sessionId": "session-20260813170422-claude-008-gov-0366-ATM-GOV-0367-a1be3dadb5",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260813170422-claude-008-gov-0366-71263753d7",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813170422-claude-008-gov-0366-71263753d7\""
     },
-    "createdAt": "2026-08-13T17:04:28.787Z",
+    "createdAt": "2026-08-13T17:04:28.855Z",
     "status": "active"
   }
 }

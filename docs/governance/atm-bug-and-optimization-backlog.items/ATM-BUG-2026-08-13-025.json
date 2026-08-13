@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-13-025",
+  "date": "2026-08-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "One command needing two emergency permissions cannot be authorized at all",
+  "finding": "tasks close with --allow-stale-runner and --historical-delivery selects two protected surfaces: the stale-runner path requires backend.runnerRecovery and the close itself requires backend.tasks.close. --emergency-approval binds exactly one lease, and each check reports only the permission it wanted, so every single-lease attempt is refused by whichever check the lease does not satisfy. Passing both leases does not help: the last one parsed wins and the other check fails. The emergency lane is therefore closed to any operation that legitimately needs two permissions, which is precisely the operation most likely to need it.",
+  "expectedBehavior": "--emergency-approval must accept a set of leases and satisfy each protected surface from whichever lease authorizes it, or an approve call must be able to grant a bounded permission set in one lease. Each permission must stay individually bounded to task, actor and flags, and the refusal must name every permission still unsatisfied rather than only the first one checked — an operator who is told one permission at a time cannot tell a two-permission command from a wrong lease.",
+  "evidenceOrRepro": "ATM-GOV-0367, 2026-08-13. Four leases were approved in sequence. EMG-ATM-GOV-0367-3ea985dbab (backend.tasks.close, --allow-stale-runner) refused with ATM_EMERGENCY_FLAG_NOT_APPROVED for --historical-delivery. EMG-ATM-GOV-0367-e3b96a26e7 (backend.tasks.close, both flags) refused with ATM_EMERGENCY_PERMISSION_MISMATCH: is for backend.tasks.close, not backend.runnerRecovery. EMG-ATM-GOV-0367-ba958cfa28 (backend.runnerRecovery, both flags) refused with the mirror image: is for backend.runnerRecovery, not backend.tasks.close. Passing ba958cfa28 and e3b96a26e7 together refused on whichever was named second. The card was delivered as 0cf861814 and could not be closed through this lane at all; the blocker was cleared by removing the stale-runner condition itself.",
+  "followUp": "Make the lease argument a set and resolve each protected surface independently, then report all unsatisfied permissions in one refusal. Until then the operational answer is to remove the second condition rather than to authorize it — republish the frozen runner so --allow-stale-runner is not needed — which is only available to an operator who can also take the release surface. Related to [ATM-BUG-2026-08-13-013], the bootstrap circularity that makes --allow-stale-runner necessary in the first place, and to [ATM-BUG-2026-08-13-021] in that both are refusals that disclose one side of a two-sided comparison."
+}
