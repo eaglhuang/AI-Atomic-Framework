@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0356",
   "title": "Repair standard profile fixtures and gate ordering diagnostics",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -199,21 +199,18 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T05-24-55-278Z-scope-amendment-5a69088c02f1",
-  "lastTransitionAt": "2026-08-13T05:24:55.278Z",
+  "lastTransitionId": "2026-08-13T11-23-40-738Z-lock-cleanup-acdaa0b7030d",
+  "lastTransitionAt": "2026-08-13T11:23:40.738Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-008-captain",
   "reservedAt": "2026-08-13T05:20:06.632Z",
   "promotedAt": "2026-08-13T05:20:06.636Z",
   "claim": {
-    "actorId": "claude-008-captain",
-    "leaseId": "lease-414a3155e7e3",
-    "claimedAt": "2026-08-13T05:20:06.641Z",
-    "heartbeatAt": "2026-08-13T05:20:06.641Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-c0475bd33fa0",
+    "claimedAt": "2026-08-13T11:20:15.201Z",
+    "heartbeatAt": "2026-08-13T11:23:40.559Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/evidence/ATM-GOV-0356.*",
-      ".atm/history/task-events/ATM-GOV-0356/**",
       ".atm/history/tasks/ATM-GOV-0356.json",
       "docs/governance/atm-bug-and-optimization-backlog.items",
       "docs/governance/handoff-2026-08-13-captain-claude-008.md",
@@ -221,44 +218,40 @@
       "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
       "packages/cli/src/commands/integration-hooks/implementation.ts",
       "packages/cli/src/commands/tasks/repairclose-orchestrator.ts",
-      "scripts/lib/validator-contract-subject.ts",
-      "scripts/validate-branch-commit-queue.ts",
-      "scripts/validate-bridge-minor.ts",
       "scripts/validate-broker-registry.ts",
       "scripts/validate-framework-development-governance.ts",
       "scripts/validate-framework-governance-repairs.ts",
       "scripts/validate-task-direction-governance/adopter-core.ts",
-      "scripts/validators/task-ledger/suite-impl/implementation.ts",
-      "tests/cli/validator-contract-subject.test.ts"
+      "scripts/validators/task-ledger/suite-impl/implementation.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+      "laneSessionId": "lane-20260813112015-codex-gpt-5.4-mini-c2e03576f5",
       "status": "active",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813051440-claude-008-captain-89e6f0395c\""
-    }
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813112015-codex-gpt-5.4-mini-c2e03576f5\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-13T05:20:06.641Z",
   "startedByActor": "claude-008-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-c7a041f5eee75ef6",
-    "ticketDigest": "sha256:c7a041f5eee75ef6d00b85e6c101882eb8d74bea85c5e59a0c6fa517645d676c",
+    "ticketId": "wat-00cacf8ad4b91315",
+    "ticketDigest": "sha256:00cacf8ad4b91315ab92aaea948320535d2f085f1982a8caeb4848a7f43e9955",
     "taskId": "ATM-GOV-0356",
     "origin": "claim",
-    "actorId": "claude-008-captain",
-    "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
-    "claimGeneration": "lease-414a3155e7e3",
-    "issuedAt": "2026-08-13T05:20:06.641Z",
-    "expiresAt": "2026-08-13T05:50:06.641Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260813112015-codex-gpt-5.4-mini-c2e03576f5",
+    "claimGeneration": "lease-c0475bd33fa0",
+    "issuedAt": "2026-08-13T11:20:15.201Z",
+    "expiresAt": "2026-08-13T11:50:15.201Z",
     "scopeDigest": "sha256:7053fb1676a5ab4faf9b0d7cda4f79e66a07713bc1bc14ead6d2b8d1d073a683",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T05:20:06.641Z"
+      "selectedAt": "2026-08-13T11:20:15.201Z"
     },
     "grants": [
       {
@@ -314,20 +307,33 @@
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
   },
-  "startedBySessionId": "session-20260813052006-claude-008-captain-ATM-GOV-0356-aba35e5d8f",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
+  "startedBySessionId": "session-20260813112015-codex-gpt-5.4-mini-ATM-GOV-0356-f3d3f679f4",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
     "taskId": "ATM-GOV-0356",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
-    "allowedFiles": [
-      ".atm/history/evidence/ATM-GOV-0356.*",
-      ".atm/history/task-events/ATM-GOV-0356/**",
+    "actorId": "claude-008-captain",
+    "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+    "dirtyPaths": [
+      ".atm/history/evidence/ATM-GOV-0356.live-index-reconciliation.json",
+      ".atm/history/task-events/ATM-GOV-0356/2026-08-13T05-13-57-558Z-import-ca8ed32bcac2.json",
+      ".atm/history/task-events/ATM-GOV-0356/2026-08-13T05-20-06-632Z-reserve-0c9c1f386730.json",
+      ".atm/history/task-events/ATM-GOV-0356/2026-08-13T05-20-06-636Z-promote-7ea6ed6b6568.json",
+      ".atm/history/task-events/ATM-GOV-0356/2026-08-13T05-20-11-278Z-claim-723c19fee69a.json",
+      ".atm/history/task-events/ATM-GOV-0356/2026-08-13T05-20-32-497Z-scope-amendment-c58f72de3d9c.json",
+      ".atm/history/task-events/ATM-GOV-0356/2026-08-13T05-24-55-278Z-scope-amendment-5a69088c02f1.json",
       ".atm/history/tasks/ATM-GOV-0356.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-09-005.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-09-008.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-002.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-004.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-001.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-002.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-004.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-005.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-006.json",
       "docs/governance/handoff-2026-08-13-captain-claude-008.md",
       "docs/multi-agent-compatibility-matrix.md",
       "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
@@ -343,26 +349,54 @@
       "scripts/validators/task-ledger/suite-impl/implementation.ts",
       "tests/cli/validator-contract-subject.test.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0356-repair-standard-profile-fixtures-and-gate-ordering-diagnostics.task.md"
+    "retainedAt": "2026-08-13T06:01:00.381Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0356",
+    "batchId": "batch-1dcfc14bbdbf",
+    "scopeKey": "tasks-ef550ed3c5c4",
+    "queueId": "queue-5b81a11a4fcde3d1",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0356.*",
+      ".atm/history/task-events/ATM-GOV-0356/**",
+      ".atm/history/tasks/ATM-GOV-0356.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items",
+      "docs/governance/handoff-2026-08-13-captain-claude-008.md",
+      "docs/multi-agent-compatibility-matrix.md",
+      "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
+      "packages/cli/src/commands/integration-hooks/implementation.ts",
+      "packages/cli/src/commands/tasks/repairclose-orchestrator.ts",
+      "scripts/validate-broker-registry.ts",
+      "scripts/validate-framework-development-governance.ts",
+      "scripts/validate-framework-governance-repairs.ts",
+      "scripts/validate-task-direction-governance/adopter-core.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts"
     ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0356-repair-standard-profile-fixtures-and-gate-ordering-diagnostics.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "c710bb993738ee80ab0c39878b760ff00ff7046be14eb4d10910f0cfc21f502e",
-    "actorId": "claude-008-captain",
-    "sessionId": null,
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260813112015-codex-gpt-5.4-mini-ATM-GOV-0356-f3d3f679f4",
     "laneSession": {
-      "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+      "laneSessionId": "lane-20260813112015-codex-gpt-5.4-mini-c2e03576f5",
       "status": "active",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813051440-claude-008-captain-89e6f0395c\""
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813112015-codex-gpt-5.4-mini-c2e03576f5\""
     },
-    "createdAt": "2026-08-13T05:20:11.345Z",
-    "status": "active"
-  }
+    "createdAt": "2026-08-13T11:20:20.621Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-13T11:23:40.736Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-13T11:23:40.559Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260813112015-codex-gpt-5.4-mini-ATM-GOV-0356-f3d3f679f4",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0356.closure-packet.json"
 }

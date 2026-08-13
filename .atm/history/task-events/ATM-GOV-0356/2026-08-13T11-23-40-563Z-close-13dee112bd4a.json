@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T11-23-40-563Z-close-13dee112bd4a",
+  "taskId": "ATM-GOV-0356",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260813112015-codex-gpt-5.4-mini-ATM-GOV-0356-f3d3f679f4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0356.json",
+  "taskSha256": "sha256:912b1cb215177c05519a9b0e5d23ecd3b21253e062ce5b754f7043110f59cfdc",
+  "createdAt": "2026-08-13T11:23:40.563Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0356 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-1dcfc14bbdbf --historical-delivery dc38ab7dfb8f2385e0dd7dc3e9dbc2f0033b8f95",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-1dcfc14bbdbf",
+    "sessionId": "session-20260813112015-codex-gpt-5.4-mini-ATM-GOV-0356-f3d3f679f4",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0356.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:broker-registry",
+      "validate:cli",
+      "validate:framework-development-governance",
+      "validate:framework-hook-scope-filtering",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-13T11:23:40.550Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0356.*",
+        ".atm/history/task-events/ATM-GOV-0356/**",
+        ".atm/history/tasks/ATM-GOV-0356.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items",
+        "docs/governance/handoff-2026-08-13-captain-claude-008.md",
+        "docs/multi-agent-compatibility-matrix.md",
+        "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
+        "packages/cli/src/commands/integration-hooks/implementation.ts",
+        "packages/cli/src/commands/tasks/repairclose-orchestrator.ts",
+        "scripts/validate-broker-registry.ts",
+        "scripts/validate-framework-development-governance.ts",
+        "scripts/validate-framework-governance-repairs.ts",
+        "scripts/validate-task-direction-governance/adopter-core.ts",
+        "scripts/validators/task-ledger/suite-impl/implementation.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
+        "packages/cli/src/commands/integration-hooks/implementation.ts",
+        "packages/cli/src/commands/tasks/repairclose-orchestrator.ts",
+        "scripts/validate-broker-registry.ts",
+        "scripts/validate-framework-development-governance.ts",
+        "scripts/validate-framework-governance-repairs.ts",
+        "scripts/validate-task-direction-governance/adopter-core.ts",
+        "scripts/validators/task-ledger/suite-impl/implementation.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

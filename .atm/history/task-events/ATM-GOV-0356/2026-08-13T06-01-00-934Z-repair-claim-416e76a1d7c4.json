@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T06-01-00-934Z-repair-claim-416e76a1d7c4",
+  "taskId": "ATM-GOV-0356",
+  "action": "repair-claim",
+  "actorId": "claude-008-captain",
+  "sessionId": "session-20260813052006-claude-008-captain-ATM-GOV-0356-aba35e5d8f",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0356.json",
+  "taskSha256": "sha256:2c4dfc53afe4d6ec88344d417a9f8399d1eabeb2853b4d4b9f4d7f34bb6c916d",
+  "createdAt": "2026-08-13T06:01:00.934Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0356 --actor claude-008-captain --write --reason \"release the duplicate same-file claim; deliverables already landed\" --json"
+}
