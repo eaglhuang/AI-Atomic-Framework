@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T15-27-12-035Z-scope-amendment-cab1ea2f818c",
+  "taskId": "ATM-GOV-0364",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0364",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0364.json",
+  "taskSha256": "sha256:279c360bdc193f576f97dd57b5863fa6884f9c443d0ab0b217df76a788e4ec3e",
+  "createdAt": "2026-08-13T15:27:12.035Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0364 --actor claude-008-gov-0364 --add \"packages/cli/src/commands/shared/command-spec-output.ts,packages/cli/src/commands/command-specs/tasks.spec.ts,packages/cli/src/atm.ts,tests/cli/governance-round-trip-cost.test.ts\" --reason \"subcommand-scoped help touches the spec surface, its one adopting spec, and the help dispatch\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "subcommand-scoped help touches the spec surface, its one adopting spec, and the help dispatch"
+  }
+}

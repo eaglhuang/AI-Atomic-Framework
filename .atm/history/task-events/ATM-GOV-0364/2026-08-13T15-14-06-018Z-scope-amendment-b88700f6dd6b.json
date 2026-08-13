@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T15-14-06-018Z-scope-amendment-b88700f6dd6b",
+  "taskId": "ATM-GOV-0364",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0364",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0364.json",
+  "taskSha256": "sha256:58572f6bacbfbcbc560aa2e36c8596a4bb22ae21018764a23fc1be90d822d6c3",
+  "createdAt": "2026-08-13T15:14:06.018Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0364 --actor claude-008-gov-0364 --add \"release/**,packages/cli/dist/**\" --reason \"the frozen runner must be republished so the scope-amendment and claim-preservation fixes take effect; taskflow close for ATM-GOV-0360 is refused until the runner is no longer older than framework source\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "the frozen runner must be republished so the scope-amendment and claim-preservation fixes take effect; taskflow close for ATM-GOV-0360 is refused until the runner is no longer older than framework source"
+  }
+}
