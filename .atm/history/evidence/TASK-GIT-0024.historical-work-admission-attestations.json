@@ -701,6 +701,33 @@
       "attestedBy": "codex-gpt-5.4-mini",
       "attestedAt": "2026-08-13T11:56:42.239Z",
       "digest": "sha256:295dbc3f310c137da7468c79da586b876daf728bda13283ec6fd3fca7e3bc604"
+    },
+    {
+      "schemaId": "atm.historicalWorkAdmissionAttestation.v1",
+      "commitSha": "1bc2a250faaedbb24dbb9af80ccd1d8877c0c4f9",
+      "parentCommitSha": "b969957bb9836ef94c57b322c2ae89a4aba6ef93",
+      "treeSha": "d7b84749f81f3944d7663984d77a32fe2858cb4b",
+      "provenance": {
+        "kind": "emergency",
+        "digest": "sha256:8a7b5e2d16ba9970056f62858f0d61291766cd5d89d4955d3f744147357e258a",
+        "ref": ".atm/history/evidence/ATM-GOV-0359.json"
+      },
+      "reason": "Taskflow governed delivery omitted the normal ticket trailer; forward-attest exact immutable commit before protected push.",
+      "evidenceRefs": [
+        ".atm/history/evidence/ATM-GOV-0359.json"
+      ],
+      "emergencyClass": "protected-push-recovery",
+      "scope": [
+        "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+        "scripts/compile-runbook-completion-evidence.ts",
+        "scripts/validate-runbook-completion-evidence.ts",
+        "tests/cli/runbook-completion-evidence.test.ts"
+      ],
+      "taskId": "TASK-GIT-0024",
+      "laneSessionId": "lane-20260813124844-codex-gpt-5.4-mini-f6e999d1e4",
+      "attestedBy": "codex-gpt-5.4-mini",
+      "attestedAt": "2026-08-13T13:17:12.945Z",
+      "digest": "sha256:123f6663c8de7e55bbdc8247f09ed1dcafa28077c4b3da23b492135ed20c8977"
     }
   ]
 }
