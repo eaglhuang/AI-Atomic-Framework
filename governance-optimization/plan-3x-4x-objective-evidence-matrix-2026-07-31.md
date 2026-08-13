@@ -1,17 +1,20 @@
 # Plan 3.0–4.0 Objective Evidence Matrix
 
-This matrix is a fail-closed certification input, not a completion claim. Each row
-names machine-readable evidence and its remaining non-claim. The certificate may
-become `proven` only when every row and every shared closure control is proven.
+This matrix is a fail-closed certification input. The verdict is recomputed from
+the referenced machine-readable reports; status labels are not trusted by
+themselves.
 
-| plan | evidence tuples | current verdict | explicit non-claim |
+| plan | exact row proof | verdict | explicit non-claim |
 |---|---|---|---|
-| 3.0 | `ATM-GOV-0300` closure; `ATM-GOV-0307` replay closure | not-certified | A final Plan 3.0 objective replay is still required. |
-| 3.1 | `ATM-GOV-0305` regression closure; `ATM-GOV-0316` runner publication | not-certified | Runner publication is not product approval; a final Plan 3.1 replay is still required. |
-| 3.2 | `ATM-GOV-0312` quality closure; `ATM-GOV-0316` hostile-dogfood receipt | not-certified | Component receipts do not close the four-plan certificate. |
-| 4.0 | `ATM-GOV-0314` shadow closure; `ATM-GOV-0315` adapter closure; `ATM-GOV-0324` operator closure | not-certified | An independent final review is still required. |
+| 3.0 | `plan-3-0-objective-replay.json`: 17/17 verified | proven | Objective replay does not replace backlog or release controls. |
+| 3.1 | `plan-3-1-objective-replay.json`: 23/23 verified | proven | Runner publication alone is not product approval. |
+| 3.2 | `plan-3-2-objective-replay.json`: 29/29 verified | proven | Component receipts alone do not close the plan. |
+| 4.0 | `plan-4-foundation-replay.json`: 17/17 plus independent objective verdict | proven | Foundation replay alone is not final certification. |
 
-Shared controls remain missing: a machine-readable backlog census, final governed
-release/push provenance, and an independent final-review receipt. Their absence
-keeps legacy authority active. This is reversible: a later certificate may retire
-that authority only after all controls and rows become `proven`.
+Shared controls are proven by the backlog census plus explicit deferred-waiver
+register, the remote-reachable release closeback, and the independent certificate.
+The waiver carries deferred bugs forward by digest and does not call them fixed.
+
+Legacy authority is retired reversibly. Any missing, stale, contradictory,
+unreachable, unresolved, or unknown input immediately restores it and changes
+the canonical certificate to `not-certified`.

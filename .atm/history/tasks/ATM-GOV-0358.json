@@ -1,0 +1,278 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0358",
+  "title": "Consume successor evidence in canonical four-plan certificate",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0341",
+    "ATM-GOV-0317"
+  ],
+  "acceptance": [
+    "ACC-1 Every plan row is derived from its current replay report and is `proven` only when the exact denominator is verified with no unresolved or unknown row.",
+    "ACC-2 Backlog, release, and independent-review controls reference their machine-readable reports and fail closed on missing, contradictory, stale, or unreachable evidence; authorized deferred backlog is not confused with silence.",
+    "ACC-3 The canonical certificate becomes `proven`, retires legacy authority reversibly, and its focused test independently recomputes that decision from the referenced reports instead of trusting caller-authored status labels."
+  ],
+  "deliverables": [
+    "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+    "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+    "tests/cli/plan4-final-certification.test.ts"
+  ],
+  "scopePaths": [
+    "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+    "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+    "tests/cli/plan4-final-certification.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-final-certification.test.ts",
+    "node --strip-types scripts/validate-four-plan-objectives.ts --mode validate",
+    "node --strip-types tests/cli/four-plan-independent-certificate.test.ts"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Regenerating the frozen runner",
+    "Re-running broad full-suite validation already proven by ATM-GOV-0341"
+  ],
+  "nonGoals": [
+    "Converting open backlog items into silent passes",
+    "Hard-coding a current commit SHA as the only acceptable release provenance"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert to fail-closed not-certified and retain legacy authority if any successor proof is stale, absent, contradictory, or no longer remote-reachable.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.independent-certification",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0358-consume-successor-evidence-in-canonical-four-plan-certificate.task.md",
+    "sectionTitle": "ATM-GOV-0358",
+    "headingLine": 68,
+    "hash": "56b9031cc193eb38",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0358-consume-successor-evidence-in-canonical-four-plan-certificate.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:56b9031cc193eb3815dae6789aabb0b291f43807733acc0942ecf02d25d74462",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T12:18:46.171Z"
+    }
+  },
+  "importedAt": "2026-08-13T12:18:46.171Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0341",
+      "ATM-GOV-0317"
+    ],
+    "startConditions": [
+      "The four plan replay reports, backlog disposition waiver register, release closeback, and independent certificate are proven and committed."
+    ],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "atm.fourPlanCertificate.v1"
+    ],
+    "causalImpactEdges": [
+      "successor-proof-to-canonical-certificate"
+    ],
+    "parallelFrontierInputs": [
+      "objective-replays",
+      "backlog-census",
+      "release-closeback",
+      "independent-certificate"
+    ],
+    "validatorReferences": [
+      "plan4-final-certification",
+      "validate-four-plan-objectives",
+      "four-plan-independent-certificate"
+    ],
+    "phaseOwner": "wave-10-independent-final-certification"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0358_successor_proof_consumption",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "canonical_certificate_consumes_proven_successor_evidence",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "successor-proof-to-canonical-certificate"
+      ],
+      "expectedRedPredicate": "successor reports are proven but the canonical certificate remains not-certified or accepts stale and missing evidence",
+      "contributionResourceKey": "four-plan-certificate",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0341",
+      "contractEdge": "atm.fourPlanCertificate.v1",
+      "resourceKey": "four-plan-certificate"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0358_successor_proof_consumption"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T12-19-12-784Z-claim-fc5d3e6033e9",
+  "lastTransitionAt": "2026-08-13T12:19:12.784Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-13T12:19:10.963Z",
+  "promotedAt": "2026-08-13T12:19:10.967Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-28b74636dea1",
+    "claimedAt": "2026-08-13T12:19:10.972Z",
+    "heartbeatAt": "2026-08-13T12:19:10.972Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0358.json",
+      ".atm/history/evidence/ATM-GOV-0358.*",
+      ".atm/history/task-events/ATM-GOV-0358/**",
+      "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+      "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+      "tests/cli/plan4-final-certification.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260813121856-codex-gpt-5.4-mini-60734ee738",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813121856-codex-gpt-5.4-mini-60734ee738\""
+    }
+  },
+  "startedAt": "2026-08-13T12:18:55.838Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260813121910-codex-gpt-5.4-mini-ATM-GOV-0358-0c44774974",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0358",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0358.*",
+      ".atm/history/task-events/ATM-GOV-0358/**",
+      ".atm/history/tasks/ATM-GOV-0358.json",
+      "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+      "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+      "tests/cli/plan4-final-certification.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f74825300fab3f9c0020e43bf7f1b8ca38763abf1be1abd922048c78e7065071",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260813121910-codex-gpt-5.4-mini-ATM-GOV-0358-0c44774974",
+    "laneSession": {
+      "laneSessionId": "lane-20260813121856-codex-gpt-5.4-mini-60734ee738",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813121856-codex-gpt-5.4-mini-60734ee738\""
+    },
+    "createdAt": "2026-08-13T12:19:12.783Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-7b993512d1acadbb",
+    "ticketDigest": "sha256:7b993512d1acadbbffb49479dab34c3a751b22f477deaf87357297b8d4fb3964",
+    "taskId": "ATM-GOV-0358",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260813121856-codex-gpt-5.4-mini-60734ee738",
+    "claimGeneration": "lease-28b74636dea1",
+    "issuedAt": "2026-08-13T12:19:10.972Z",
+    "expiresAt": "2026-08-13T12:49:10.972Z",
+    "scopeDigest": "sha256:d808ee6d307ed7bb84e8d6264bc4e7573f86440e0d73a5b77bfaf0178b7ffa6b",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-13T12:19:10.972Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0358.*",
+          ".atm/history/task-events/ATM-GOV-0358/**",
+          ".atm/history/tasks/ATM-GOV-0358.json",
+          "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+          "governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md",
+          "tests/cli/plan4-final-certification.test.ts"
+        ],
+        "digest": "sha256:fcfb9532b1b92a17c0152685e2ae955ff982c42fab48f93a69e5d8e47199b932"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

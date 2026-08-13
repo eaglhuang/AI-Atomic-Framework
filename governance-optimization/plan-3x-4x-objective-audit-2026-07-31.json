@@ -1,72 +1,75 @@
 {
   "schemaId": "atm.fourPlanCertificate.v1",
-  "specVersion": "0.2.0",
-  "status": "not-certified",
+  "specVersion": "0.3.0",
+  "status": "proven",
   "decision": {
-    "rule": "certify only when every objective row is proven and the shared closure controls are proven",
+    "rule": "certify only when every exact objective denominator and every shared closure control is independently recomputed as proven",
     "failClosed": true
   },
   "rows": [
     {
       "plan": "3.0",
-      "status": "not-certified",
+      "status": "proven",
+      "expectedObjectives": 17,
       "evidenceTuples": [
-        { "kind": "closure", "source": ".atm/history/evidence/ATM-GOV-0300.closure-packet.json", "expectedTaskId": "ATM-GOV-0300" },
-        { "kind": "replay", "source": ".atm/history/evidence/ATM-GOV-0307.closure-packet.json", "expectedTaskId": "ATM-GOV-0307" }
+        { "kind": "objective-replay", "source": "docs/reports/plan-3-0-objective-replay.json", "expectedSchemaId": "atm.planObjectiveReplay.v1", "expectedTaskId": "ATM-GOV-0333" }
       ],
-      "nonClaims": ["A closure packet is not the final objective replay; ATM-GOV-0333 must publish the current replay certificate."],
-      "blockers": ["current-plan-3.0-objective-replay"]
+      "nonClaims": ["The replay proves the 17 objective rows; backlog and release authority remain separate shared controls."],
+      "blockers": []
     },
     {
       "plan": "3.1",
-      "status": "not-certified",
+      "status": "proven",
+      "expectedObjectives": 23,
       "evidenceTuples": [
-        { "kind": "regression-family", "source": ".atm/history/evidence/ATM-GOV-0305.closure-packet.json", "expectedTaskId": "ATM-GOV-0305" },
-        { "kind": "runner-publication", "source": ".atm/history/evidence/ATM-GOV-0316.runner-sync-receipt.json", "expectedTaskId": "ATM-GOV-0316" }
+        { "kind": "objective-replay", "source": "docs/reports/plan-3-1-objective-replay.json", "expectedSchemaId": "atm.planObjectiveReplay.v1", "expectedTaskId": "ATM-GOV-0334" }
       ],
-      "nonClaims": ["Runner publication is not product approval; ATM-GOV-0334 must publish the current objective replay."],
-      "blockers": ["current-plan-3.1-objective-replay"]
+      "nonClaims": ["Runner publication alone is not approval; this verdict uses the 23-row replay."],
+      "blockers": []
     },
     {
       "plan": "3.2",
-      "status": "not-certified",
+      "status": "proven",
+      "expectedObjectives": 29,
       "evidenceTuples": [
-        { "kind": "quality-certificate", "source": ".atm/history/evidence/ATM-GOV-0312.closure-packet.json", "expectedTaskId": "ATM-GOV-0312" },
-        { "kind": "hostile-dogfood", "source": ".atm/history/evidence/ATM-GOV-0316.runner-sync-receipt.json", "expectedTaskId": "ATM-GOV-0316" }
+        { "kind": "objective-replay", "source": "docs/reports/plan-3-2-objective-replay.json", "expectedSchemaId": "atm.planObjectiveReplay.v1", "expectedTaskId": "ATM-GOV-0335" }
       ],
-      "nonClaims": ["Quality and hostile-dogfood receipts do not by themselves close the four-plan certificate."],
-      "blockers": ["shared-closure-controls"]
+      "nonClaims": ["Component quality receipts do not substitute for the exact 29-row replay."],
+      "blockers": []
     },
     {
       "plan": "4.0",
-      "status": "not-certified",
+      "status": "proven",
+      "expectedObjectives": 17,
       "evidenceTuples": [
-        { "kind": "shadow-comparison", "source": ".atm/history/evidence/ATM-GOV-0314.closure-packet.json", "expectedTaskId": "ATM-GOV-0314" },
-        { "kind": "adapter-parity", "source": ".atm/history/evidence/ATM-GOV-0315.closure-packet.json", "expectedTaskId": "ATM-GOV-0315" },
-        { "kind": "operator-regression", "source": ".atm/history/evidence/ATM-GOV-0324.closure-packet.json", "expectedTaskId": "ATM-GOV-0324" }
+        { "kind": "foundation-replay", "source": "docs/reports/plan-4-foundation-replay.json", "expectedSchemaId": "atm.plan4FoundationReplay.v1", "expectedTaskId": "ATM-GOV-0336" },
+        { "kind": "independent-objective-verdict", "source": "docs/reports/plan-3x-4x-independent-certificate.json", "expectedSchemaId": "atm.fourPlanIndependentCertificate.v1", "expectedTaskId": "ATM-GOV-0341" }
       ],
-      "nonClaims": ["Completed component closures do not replace the independent final review."],
-      "blockers": ["independent-final-review"]
+      "nonClaims": ["Foundation replay alone is not final certification; the independent objective verdict supplies the terminal authority."],
+      "blockers": []
     }
   ],
   "backlogCensus": {
-    "status": "missing",
-    "nonClaim": "No current machine-readable census proves that every open-like backlog item is resolved or explicitly authorized."
+    "status": "proven",
+    "sources": ["docs/reports/plan-3x-4x-backlog-disposition-census.json", "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json"],
+    "nonClaim": "Deferred items are explicitly waived into follow-up ownership; this does not claim that those bugs are fixed or retired."
   },
   "releasePushProvenance": {
-    "status": "missing",
-    "nonClaim": "The final governed release and push receipt does not exist until the terminal wave is delivered."
+    "status": "proven",
+    "source": "docs/reports/plan-3x-4x-release-closeback.json",
+    "nonClaim": "The bound release commit must remain an ancestor of origin/main; later unrelated commits do not invalidate its proven release surfaces."
   },
   "independentReview": {
-    "status": "missing",
-    "nonClaim": "No independent final reviewer receipt is attached to this certificate."
+    "status": "proven",
+    "source": "docs/reports/plan-3x-4x-independent-certificate.json",
+    "nonClaim": "The canonical certificate consumes the independent verdict but recomputes its required dimensions and reviewer count."
   },
   "legacyAuthority": {
-    "retired": false,
+    "retired": true,
     "reversible": true,
-    "retirementRule": "Retire only when the certificate decision is proven; otherwise retain legacy authority."
+    "retirementRule": "Any missing, stale, contradictory, unreachable, unresolved, or unknown input restores legacy authority and changes this certificate to not-certified."
   },
   "unknownRows": [],
-  "unresolvedRows": ["3.0", "3.1", "3.2", "4.0"],
-  "resultDigest": null
+  "unresolvedRows": [],
+  "resultDigest": "sha256:1e62b12c0a690b4e01d081b78c67b840abcb5f176e0109daaaf5a1bfdd9fef43"
 }
