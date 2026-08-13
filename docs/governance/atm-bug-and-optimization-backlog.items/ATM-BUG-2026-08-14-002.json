@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-14-002",
+  "date": "2026-08-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Critical",
+  "status": "Fixed in source; frozen publication pending",
+  "area": "Framework temporary-claim producer and pre-commit consumer authority split",
+  "finding": "framework-mode status correctly read a live ATM-FRAMEWORK-TEMP runtime lock and reported no blocker, but the temporary-index pre-commit hook still emitted active-framework-claim-required for the same covered generated files. The hook only used framework-temp allowed files after a separate task direction lock existed, and did not use that coverage to resolve the framework blocker.",
+  "expectedBehavior": "All consumers of framework temporary write authority must read the same TTL-aware authority projection. A live temporary claim whose allowed files fully cover the candidate suppresses only the matching framework-claim blocker; an expired, released, partial, or unrelated claim remains fail-closed.",
+  "evidenceOrRepro": "On 2026-08-14, node atm.mjs framework-mode claim acquired ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini for the exact 16 packages/cli/dist files that taskflow close was committing. framework-mode status listed that active lock with blockers: []. The same taskflow close pre-commit hook then failed twice with ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED and active-framework-claim-required. The focused framework-temp-lock-admission-parity test now verifies fresh acceptance and expired rejection.",
+  "followUp": "Publish the frozen runner containing the projection-backed hook repair. Consolidate framework temporary authority consumers behind one authority-snapshot deep module with a digestable decision result, then add producer/consumer parity tests for framework-mode status, pre-commit, runner publication, and taskflow temporary-index commits."
+}

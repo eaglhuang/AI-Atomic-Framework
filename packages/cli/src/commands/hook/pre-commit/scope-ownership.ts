@@ -12,6 +12,7 @@ import {
 } from '../../../../../core/src/broker/shared-write-provenance-policy.ts';
 import { inspectTrackedActorRegistryState } from '../../actor-registry.ts';
 import { readActiveCloseCommitWindows } from '../../framework-development.ts';
+import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.ts';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.ts';
 import { quoteCliValue, relativePathFrom } from '../../shared.ts';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.ts';
@@ -316,14 +317,11 @@ export function collectStagedBatchCheckpointScopeFiles(cwd: string, stagedFiles:
 }
 
 export function collectFrameworkTempClaimAllowedFiles(cwd: string): readonly string[] {
-  const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
-  if (!existsSync(lockRoot)) return [];
-  const allowedFiles: string[] = [];
-  for (const entry of readdirSync(lockRoot).filter((fileName) => fileName.startsWith('ATM-FRAMEWORK-TEMP-') && fileName.endsWith('.lock.json'))) {
-    const lock = readJsonFile(path.join(lockRoot, entry));
-    collectStringArrayField(lock?.files, allowedFiles);
-  }
-  return uniqueSorted(allowedFiles.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
+  return uniqueSorted(readFrameworkTempLockProjection(cwd)
+    .filter((lock) => lock.disposition === 'foreign-live')
+    .flatMap((lock) => lock.files)
+    .map(normalizeRelativePath)
+    .filter(isTaskDirectionPathCandidate));
 }
 
 export function collectCloseCommitWindowPlanningMirrorFiles(cwd: string): readonly string[] {
