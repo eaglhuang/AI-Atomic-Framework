@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0357",
   "title": "Land validator contract subject resolver deliverables",
-  "status": "running",
+  "status": "ready",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -144,8 +144,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T06-20-04-173Z-scope-amendment-99a0ee15b157",
-  "lastTransitionAt": "2026-08-13T06:20:04.173Z",
+  "lastTransitionId": "2026-08-13T12-37-45-944Z-repair-claim-1ff11032643f",
+  "lastTransitionAt": "2026-08-13T12:37:45.944Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-13T05:30:28.582Z",
   "promotedAt": "2026-08-13T05:30:28.586Z",
@@ -153,7 +153,7 @@
     "actorId": "claude-008-captain",
     "leaseId": "lease-7297c0d839c1",
     "claimedAt": "2026-08-13T06:09:55.057Z",
-    "heartbeatAt": "2026-08-13T06:09:55.057Z",
+    "heartbeatAt": "2026-08-13T12:37:44.937Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0357.*",
@@ -166,14 +166,14 @@
       "scripts/validate-bridge-minor.ts",
       "tests/cli/validator-contract-subject.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260813060058-claude-008-captain-bf95179b2a",
       "status": "active",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813060058-claude-008-captain-bf95179b2a\""
-    }
+    },
+    "reason": "expired Claude lease after verified delivery 0753f75c4 and backlog closeback aa5517339"
   },
   "startedAt": "2026-08-13T05:30:28.591Z",
   "startedByActor": "claude-008-captain",
@@ -246,73 +246,12 @@
     "schemaId": "atm.retainedWipOwnership.v1",
     "taskId": "ATM-GOV-0357",
     "actorId": "claude-008-captain",
-    "laneSessionId": "lane-20260813051440-claude-008-captain-89e6f0395c",
+    "laneSessionId": "lane-20260813060058-claude-008-captain-bf95179b2a",
     "dirtyPaths": [
       ".atm/history/evidence/ATM-GOV-0357.live-index-reconciliation.json",
-      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-30-24-136Z-import-7c2829b118ea.json",
-      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-30-28-582Z-reserve-5639758a892a.json",
-      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-30-28-586Z-promote-8e1bb48a30f2.json",
-      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-30-33-326Z-claim-2b4a8c5a8302.json",
-      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-37-24-354Z-scope-amendment-cd9dc4c9c436.json",
-      ".atm/history/task-events/ATM-GOV-0357/2026-08-13T05-55-43-614Z-scope-amendment-c9f1195b4544.json",
-      ".atm/history/tasks/ATM-GOV-0357.json",
-      "docs/governance/handoff-2026-08-13-captain-claude-008.md",
-      "scripts/lib/validator-contract-subject.ts",
-      "scripts/validate-branch-commit-queue.ts",
-      "scripts/validate-bridge-minor.ts",
-      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
-      "tests/cli/observed-evidence-production-callers.test.ts",
-      "tests/cli/plan-level-executor-live-loop.test.ts",
-      "tests/cli/plan4-final-certification.test.ts",
-      "tests/cli/runner-sync-self-hosting-loop.test.ts",
-      "tests/cli/six-editor-adapter-parity.test.ts",
-      "tests/cli/test-case-catalog-shards.test.ts",
-      "tests/cli/unified-patch-application.test.ts",
-      "tests/cli/validator-contract-subject.test.ts"
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json"
     ],
-    "retainedAt": "2026-08-13T06:01:40.364Z",
+    "retainedAt": "2026-08-13T12:37:44.937Z",
     "transitionClass": "release-wip-retained"
-  },
-  "owner": "claude-008-captain",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
-    "taskId": "ATM-GOV-0357",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
-    "allowedFiles": [
-      ".atm/history/evidence/ATM-GOV-0357.*",
-      ".atm/history/task-events/ATM-GOV-0357/**",
-      ".atm/history/tasks/ATM-GOV-0357.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items",
-      "docs/governance/handoff-2026-08-13-captain-claude-008.md",
-      "scripts/lib/validator-contract-subject.ts",
-      "scripts/validate-branch-commit-queue.ts",
-      "scripts/validate-bridge-minor.ts",
-      "tests/cli/validator-contract-subject.test.ts"
-    ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0357-land-validator-contract-subject-resolver-deliverables.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0357-land-validator-contract-subject-resolver-deliverables.task.md"
-    ],
-    "allowPlanningMirror": false,
-    "promptHash": "3c3c5a3d13b074999b887d71d65628d8f9c7daeaf3290fef931651943aad580d",
-    "actorId": "claude-008-captain",
-    "sessionId": null,
-    "laneSession": {
-      "laneSessionId": "lane-20260813060058-claude-008-captain-bf95179b2a",
-      "status": "active",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813060058-claude-008-captain-bf95179b2a\""
-    },
-    "createdAt": "2026-08-13T06:09:59.817Z",
-    "status": "active"
   }
 }

@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T12-37-49-745Z-repair-claim-3358d53efe55",
+  "taskId": "TASK-ERR-0014",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260811151327-claude-008-err-0014-TASK-ERR-0014-56192e6803",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0014.json",
+  "taskSha256": "sha256:9ba0f672dd545bc5692e7a4635a065f2c3bd9349a277aa1a46eba9c071c370b0",
+  "createdAt": "2026-08-13T12:37:49.745Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-ERR-0014 --actor codex-gpt-5.4-mini --write --reason \"expired Claude lease after verified delivery 8edd23226\" --json"
+}

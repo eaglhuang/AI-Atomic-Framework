@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T12-37-42-051Z-repair-claim-702d4cd2dcd4",
+  "taskId": "ATM-GOV-0355",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260813045736-claude-008-captain-ATM-GOV-0355-3045c0d64c",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0355.json",
+  "taskSha256": "sha256:01b9e3d0882af3b442dddcd371297a38c33069af16b3a6e67b41ef876dc41d12",
+  "createdAt": "2026-08-13T12:37:42.051Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0355 --actor codex-gpt-5.4-mini --write --reason \"expired Claude lease after verified delivery 8cef64b8f\" --json"
+}

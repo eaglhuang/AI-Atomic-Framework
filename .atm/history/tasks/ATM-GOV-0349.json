@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0349",
   "title": "Bridge batch checkpoint runner recovery through verified lease",
-  "status": "done",
+  "status": "ready",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -80,10 +80,10 @@
       "planningCommitSha": null,
       "contentDigest": "sha256:af5cf6c6210a45356e8dfc7406fa9c1813fa9aa72276299ed826cf658b29ea48",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-12T05:28:58.882Z"
+      "sealedAt": "2026-08-12T12:24:12.923Z"
     }
   },
-  "importedAt": "2026-08-12T05:28:58.882Z",
+  "importedAt": "2026-08-12T12:24:12.923Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "disabled",
@@ -163,22 +163,18 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-12T10-16-00-875Z-close-20b4b1f83e0d",
-  "lastTransitionAt": "2026-08-12T10:16:00.875Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-08-12T05:29:27.767Z",
-  "promotedAt": "2026-08-12T05:29:27.773Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-642a341964bd",
     "claimedAt": "2026-08-12T05:29:27.779Z",
-    "heartbeatAt": "2026-08-12T10:16:00.872Z",
+    "heartbeatAt": "2026-08-13T12:37:33.454Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0349.*",
       ".atm/history/task-events/ATM-GOV-0349/**",
       ".atm/history/tasks/ATM-GOV-0349.json",
+      "packages/cli/src/commands/batch/checkpoint-commit-window-policy.test.ts",
+      "packages/cli/src/commands/batch/checkpoint-commit-window-policy.ts",
       "packages/cli/src/commands/batch/implementation.ts",
       "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
       "packages/cli/src/commands/tasks/close-orchestrator.ts",
@@ -192,27 +188,30 @@
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145\""
     },
-    "reason": "closed"
+    "reason": "expired lease after verified delivery f3b7692ea; clear stale lifecycle before historical close"
   },
   "startedAt": "2026-08-12T05:29:27.779Z",
-  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260812052927-codex-gpt-5.4-mini-ATM-GOV-0349-4b9513c918",
+  "lastTransitionId": "2026-08-13T12-37-34-330Z-repair-claim-eecaa12b9519",
+  "lastTransitionAt": "2026-08-13T12:37:34.330Z",
+  "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-e6a539bbb7b43397",
-    "ticketDigest": "sha256:e6a539bbb7b43397a55b74e69efdba1be2130352d46b3c08a03af4fa30d217cd",
+    "ticketId": "wat-401f0e31b445e385",
+    "ticketDigest": "sha256:401f0e31b445e38558364e0bfeba8fc765be40f239945a1fa4d5d455c9b819da",
     "taskId": "ATM-GOV-0349",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145",
     "claimGeneration": "lease-642a341964bd",
-    "issuedAt": "2026-08-12T10:12:16.145Z",
-    "expiresAt": "2026-08-12T10:42:16.145Z",
-    "scopeDigest": "sha256:7d47f18e6f858f3d63fb291c57f53b667da897119b9de46c3b1a13f2da324a5f",
+    "issuedAt": "2026-08-12T15:00:38.873Z",
+    "expiresAt": "2026-08-12T15:30:38.873Z",
+    "scopeDigest": "sha256:a3592de53026922e17a6b3bdfd6a7b07fc895cb726328f90a95fa7705e8e323b",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-12T10:12:16.145Z"
+      "selectedAt": "2026-08-12T15:00:38.873Z"
     },
     "grants": [
       {
@@ -221,13 +220,15 @@
           ".atm/history/evidence/ATM-GOV-0349.*",
           ".atm/history/task-events/ATM-GOV-0349/**",
           ".atm/history/tasks/ATM-GOV-0349.json",
+          "packages/cli/src/commands/batch/checkpoint-commit-window-policy.test.ts",
+          "packages/cli/src/commands/batch/checkpoint-commit-window-policy.ts",
           "packages/cli/src/commands/batch/implementation.ts",
           "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
           "packages/cli/src/commands/tasks/close-orchestrator.ts",
           "packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
           "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
         ],
-        "digest": "sha256:dd53dc44695b19530cc1a3a3d52d2c9e28a47782e41d49ff957bfbe1c4f858a0"
+        "digest": "sha256:d6a0fa22eba3736b0a3ee808b7243073ccab2d885c52250d751aa212fc9b8493"
       },
       {
         "kind": "lifecycle-operation",
@@ -261,49 +262,25 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260812052927-codex-gpt-5.4-mini-ATM-GOV-0349-4b9513c918",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
     "taskId": "ATM-GOV-0349",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
-    "allowedFiles": [
-      ".atm/history/evidence/ATM-GOV-0349.*",
-      ".atm/history/task-events/ATM-GOV-0349/**",
-      ".atm/history/tasks/ATM-GOV-0349.json",
-      "packages/cli/src/commands/batch/implementation.ts",
-      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
-      "packages/cli/src/commands/tasks/close-orchestrator.ts",
-      "packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
-      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
-    ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0349-bridge-batch-checkpoint-runner-recovery-through-verified-lease.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0349-bridge-batch-checkpoint-runner-recovery-through-verified-lease.task.md"
-    ],
-    "allowPlanningMirror": false,
-    "promptHash": "ba8225647989777d7677add65c644906ff09acb2c388fce6776d97b7dc974d3f",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": null,
-    "laneSession": {
-      "laneSessionId": "lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145\""
-    },
-    "createdAt": "2026-08-12T05:29:41.901Z",
-    "status": "active"
-  },
-  "closedAt": "2026-08-12T10:16:00.872Z",
-  "closedByActor": "codex-gpt-5.4-mini",
-  "closedBySessionId": "session-20260812052927-codex-gpt-5.4-mini-ATM-GOV-0349-4b9513c918",
-  "closurePacket": ".atm/history/evidence/ATM-GOV-0349.closure-packet.json"
+    "laneSessionId": "lane-20260812052928-codex-gpt-5.4-mini-15bcb9c145",
+    "dirtyPaths": [
+      ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0349.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0349.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0349.seal-and-commit.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T10-16-00-875Z-close-20b4b1f83e0d.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T12-23-07-884Z-renew-4de57b88c1c9.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T12-24-13-153Z-import-4b1b414a207c.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T12-28-41-565Z-renew-04a7cf690972.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T15-00-28-605Z-scope-amendment-f196922b6261.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T15-00-39-553Z-renew-8322380e1ed3.json",
+      ".atm/history/tasks/ATM-GOV-0349.json"
+    ],
+    "retainedAt": "2026-08-13T12:37:33.454Z",
+    "transitionClass": "release-wip-retained"
+  }
 }

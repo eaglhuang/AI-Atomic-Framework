@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T12-37-34-330Z-repair-claim-eecaa12b9519",
+  "taskId": "ATM-GOV-0349",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260812052927-codex-gpt-5.4-mini-ATM-GOV-0349-4b9513c918",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0349.json",
+  "taskSha256": "sha256:826be8d1bcd44e108f143ead8fd6dff0e7643ab2617c45ee7e210848b41b1777",
+  "createdAt": "2026-08-13T12:37:34.330Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0349 --actor codex-gpt-5.4-mini --write --reason \"expired lease after verified delivery f3b7692ea; clear stale lifecycle before historical close\" --json"
+}

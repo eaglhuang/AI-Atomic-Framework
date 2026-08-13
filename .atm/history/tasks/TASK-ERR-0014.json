@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0014",
   "title": "Make live-index reconciliation exception safe, observable, and argv bounded",
-  "status": "running",
+  "status": "ready",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -201,17 +201,16 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-11T15-42-17-722Z-renew-a2a3c97d7665",
-  "lastTransitionAt": "2026-08-11T15:42:17.722Z",
+  "lastTransitionId": "2026-08-13T12-37-49-745Z-repair-claim-3358d53efe55",
+  "lastTransitionAt": "2026-08-13T12:37:49.745Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-008-err-0014",
   "reservedAt": "2026-08-11T15:13:27.599Z",
   "promotedAt": "2026-08-11T15:13:27.604Z",
   "claim": {
     "actorId": "claude-008-err-0014",
     "leaseId": "lease-5b74b03b7d79",
     "claimedAt": "2026-08-11T15:13:27.609Z",
-    "heartbeatAt": "2026-08-11T15:42:16.703Z",
+    "heartbeatAt": "2026-08-13T12:37:48.732Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-ERR-0014.json",
@@ -222,13 +221,14 @@
       "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260811151327-claude-008-err-0014-584feebd7d",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811151327-claude-008-err-0014-584feebd7d\""
-    }
+    },
+    "reason": "expired Claude lease after verified delivery 8edd23226"
   },
   "startedAt": "2026-08-11T15:13:27.609Z",
   "startedByActor": "claude-008-err-0014",
@@ -298,39 +298,5 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260811151327-claude-008-err-0014-TASK-ERR-0014-56192e6803",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
-    "taskId": "TASK-ERR-0014",
-    "batchId": null,
-    "scopeKey": "tasks-832d0e940d20",
-    "queueId": "queue-bb55ded28b22846b",
-    "queueIndex": null,
-    "allowedFiles": [
-      ".atm/history/evidence/TASK-ERR-0014.*",
-      ".atm/history/task-events/TASK-ERR-0014/**",
-      ".atm/history/tasks/TASK-ERR-0014.json",
-      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
-      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
-      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
-      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
-      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
-      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
-    ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
-    "allowPlanningMirror": false,
-    "promptHash": "c1e511e7d75e820698c524186a2f8fcec6d9710f318dd9650f5b7fd42185e1b4",
-    "actorId": "claude-008-err-0014",
-    "sessionId": "session-20260811151327-claude-008-err-0014-TASK-ERR-0014-56192e6803",
-    "laneSession": {
-      "laneSessionId": "lane-20260811151327-claude-008-err-0014-584feebd7d",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260811151327-claude-008-err-0014-584feebd7d\""
-    },
-    "createdAt": "2026-08-11T15:13:42.321Z",
-    "status": "active"
-  }
+  "startedBySessionId": "session-20260811151327-claude-008-err-0014-TASK-ERR-0014-56192e6803"
 }
