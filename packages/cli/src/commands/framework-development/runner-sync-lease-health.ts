@@ -25,6 +25,7 @@ export function resolveRunnerSyncLeaseHealth(cwd: string, taskId: string, now = 
     const status = String(record.status ?? '').trim().toLowerCase();
     if (status === 'done' || status === 'verified' || status === 'abandoned') return 'task-terminal';
     const claim = record.claim && typeof record.claim === 'object' ? record.claim as Record<string, unknown> : {};
+    if (!claim.state) return 'task-active';
     return claim.state === 'active' && isLiveLease(claim, now) ? 'task-active' : 'task-lease-expired';
   } catch { return 'task-missing'; }
 }

@@ -11,4 +11,6 @@ mkdirSync(path.dirname(taskPath), { recursive: true });
 writeFileSync(taskPath, JSON.stringify({ status: 'running', claim: { state: 'active', heartbeatAt: '2026-08-09T00:00:00.000Z', ttlSeconds: 60 } }), 'utf8');
 assert.equal(resolveRunnerSyncLeaseHealth(cwd, taskId, Date.parse('2026-08-09T00:00:30.000Z')), 'task-active');
 assert.equal(resolveRunnerSyncLeaseHealth(cwd, taskId, Date.parse('2026-08-09T00:01:01.000Z')), 'task-lease-expired');
+writeFileSync(taskPath, JSON.stringify({ status: 'running' }), 'utf8');
+assert.equal(resolveRunnerSyncLeaseHealth(cwd, taskId, Date.parse('2026-08-09T00:01:01.000Z')), 'task-active');
 console.log('runner-sync-lease-health: ok');
