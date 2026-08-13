@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0360",
   "title": "Bind the four-plan independent certificate to observed evidence and the live remote",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -92,14 +92,12 @@
       "planningCommitSha": "e6159f9aa37a826cc48baa245c247cf1b43536d2",
       "contentDigest": "sha256:38213ea4ef5c69bbf30531861c122cdb2d10243b65b1a335e31fb6997c539fbb",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-13T13:43:57.727Z"
+      "sealedAt": "2026-08-13T16:45:18.598Z"
     }
   },
-  "importedAt": "2026-08-13T13:43:57.727Z",
+  "importedAt": "2026-08-13T16:45:18.598Z",
   "workAdmission": {
-    "recoveryMode": "auto",
-    "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    "recoveryMode": "auto"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -236,95 +234,41 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-13T16-33-58-525Z-renew-72b338149028",
-  "lastTransitionAt": "2026-08-13T16:33:58.525Z",
+  "lastTransitionId": "2026-08-13T16-51-53-361Z-close-97742a7a5ffa",
+  "lastTransitionAt": "2026-08-13T16:51:53.361Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-08-13T13:44:07.902Z",
-  "promotedAt": "2026-08-13T13:44:07.906Z",
+  "reservedAt": "2026-08-13T16:46:24.324Z",
+  "promotedAt": "2026-08-13T16:46:24.328Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-b40afd19ee74",
-    "claimedAt": "2026-08-13T14:58:01.584Z",
-    "heartbeatAt": "2026-08-13T16:33:58.338Z",
+    "leaseId": "lease-88ab5d20a0df",
+    "claimedAt": "2026-08-13T16:46:24.332Z",
+    "heartbeatAt": "2026-08-13T16:51:53.358Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/ATM-GOV-0360.json"
+      ".atm/history/tasks/ATM-GOV-0360.json",
+      "docs/reports/plan-3x-4x-closeout-blocker-map.json",
+      "docs/reports/plan-3x-4x-independent-certificate.json",
+      "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+      "packages/core/src/evidence/four-plan-independent-certificate.ts",
+      "schemas/evidence/four-plan-independent-certificate.schema.json",
+      "scripts/compile-four-plan-independent-certificate.ts",
+      "tests/cli/four-plan-independent-certificate.test.ts",
+      "tests/cli/plan4-final-certification.test.ts"
     ],
-    "state": "active",
-    "reason": "Predecessor lease expired after source delivery eba4e74dc; continue governance-only closeout without modifying delivered certificate semantics."
-  },
-  "startedAt": "2026-08-13T13:45:10.420Z",
-  "startedByActor": "claude-008-gov-0360",
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-d64460335dc99149",
-    "ticketDigest": "sha256:d64460335dc99149bf8fcbcff86d91bc71f4ab45d8aaa4b8c6a28e9bed083957",
-    "taskId": "ATM-GOV-0360",
-    "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": null,
-    "claimGeneration": "lease-b40afd19ee74",
-    "issuedAt": "2026-08-13T16:33:58.338Z",
-    "expiresAt": "2026-08-13T17:03:58.338Z",
-    "scopeDigest": "sha256:71d91ceaaafd21e00ebec5fdf675e084ef6e46a5a4e08183ddb0cb199f6b03d0",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-13T16:33:58.338Z"
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260813164624-codex-gpt-5.4-mini-c7f2115976",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813164624-codex-gpt-5.4-mini-c7f2115976\""
     },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/history/evidence/ATM-GOV-0360.*",
-          ".atm/history/task-events/ATM-GOV-0360/**",
-          ".atm/history/tasks/ATM-GOV-0360.json",
-          "docs/reports/plan-3x-4x-closeout-blocker-map.json",
-          "docs/reports/plan-3x-4x-independent-certificate.json",
-          "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
-          "packages/core/src/evidence/four-plan-independent-certificate.ts",
-          "schemas/evidence/four-plan-independent-certificate.schema.json",
-          "scripts/compile-four-plan-independent-certificate.ts",
-          "tests/cli/four-plan-independent-certificate.test.ts",
-          "tests/cli/plan4-final-certification.test.ts"
-        ],
-        "digest": "sha256:66f8ddba75bce1be7395b100c16af00c4e8e74684301bbb2c0a21d63e6054773"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "enabled",
-      "reasons": [
-        "shared-surface"
-      ],
-      "maxSavePoints": 2,
-      "perTaskByteBudget": 16777216,
-      "repositoryByteBudget": 268435456,
-      "handoffTtlSeconds": 604800,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
-    }
+    "reason": "closed"
   },
-  "startedBySessionId": "session-20260813134510-claude-008-gov-0360-ATM-GOV-0360-24bd011ceb",
+  "startedAt": "2026-08-13T16:46:24.332Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260813164624-codex-gpt-5.4-mini-ATM-GOV-0360-b5b4995974",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -350,15 +294,19 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "687adf5a469e10ff6b3f9d057482aac115015c0f66f1e37dda9e69368b53d5e2",
-    "actorId": "claude-008-gov-0360",
-    "sessionId": "session-20260813134510-claude-008-gov-0360-ATM-GOV-0360-24bd011ceb",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260813164624-codex-gpt-5.4-mini-ATM-GOV-0360-b5b4995974",
     "laneSession": {
-      "laneSessionId": "lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc",
+      "laneSessionId": "lane-20260813164624-codex-gpt-5.4-mini-c7f2115976",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813134510-claude-008-gov-0360-ab2ef4cbcc\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813164624-codex-gpt-5.4-mini-c7f2115976\""
     },
-    "createdAt": "2026-08-13T13:45:11.718Z",
+    "createdAt": "2026-08-13T16:46:25.241Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-13T16:51:53.358Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260813164624-codex-gpt-5.4-mini-ATM-GOV-0360-b5b4995974",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0360.closure-packet.json"
 }

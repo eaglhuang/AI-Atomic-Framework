@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T16-44-41-970Z-repair-claim-403df565e9d4",
+  "taskId": "ATM-GOV-0360",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260813134510-claude-008-gov-0360-ATM-GOV-0360-24bd011ceb",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0360.json",
+  "taskSha256": "sha256:de730ea4a0a2320239e4ea19acedede68999a9760de3a0980bb0e4461dfe13c5",
+  "createdAt": "2026-08-13T16:44:41.970Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0360 --actor codex-gpt-5.4-mini --write --reason \"Repair expired takeover claim lineage so the task's declared delivery scope can be restored and committed; no foreign WIP or staged evidence is altered.\" --json"
+}
