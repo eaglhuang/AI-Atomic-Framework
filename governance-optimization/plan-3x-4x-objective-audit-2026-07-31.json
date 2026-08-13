@@ -12,9 +12,16 @@
       "status": "proven",
       "expectedObjectives": 17,
       "evidenceTuples": [
-        { "kind": "objective-replay", "source": "docs/reports/plan-3-0-objective-replay.json", "expectedSchemaId": "atm.planObjectiveReplay.v1", "expectedTaskId": "ATM-GOV-0333" }
+        {
+          "kind": "objective-replay",
+          "source": "docs/reports/plan-3-0-objective-replay.json",
+          "expectedSchemaId": "atm.planObjectiveReplay.v1",
+          "expectedTaskId": "ATM-GOV-0333"
+        }
       ],
-      "nonClaims": ["The replay proves the 17 objective rows; backlog and release authority remain separate shared controls."],
+      "nonClaims": [
+        "The replay proves the 17 objective rows; backlog and release authority remain separate shared controls."
+      ],
       "blockers": []
     },
     {
@@ -22,9 +29,16 @@
       "status": "proven",
       "expectedObjectives": 23,
       "evidenceTuples": [
-        { "kind": "objective-replay", "source": "docs/reports/plan-3-1-objective-replay.json", "expectedSchemaId": "atm.planObjectiveReplay.v1", "expectedTaskId": "ATM-GOV-0334" }
+        {
+          "kind": "objective-replay",
+          "source": "docs/reports/plan-3-1-objective-replay.json",
+          "expectedSchemaId": "atm.planObjectiveReplay.v1",
+          "expectedTaskId": "ATM-GOV-0334"
+        }
       ],
-      "nonClaims": ["Runner publication alone is not approval; this verdict uses the 23-row replay."],
+      "nonClaims": [
+        "Runner publication alone is not approval; this verdict uses the 23-row replay."
+      ],
       "blockers": []
     },
     {
@@ -32,9 +46,16 @@
       "status": "proven",
       "expectedObjectives": 29,
       "evidenceTuples": [
-        { "kind": "objective-replay", "source": "docs/reports/plan-3-2-objective-replay.json", "expectedSchemaId": "atm.planObjectiveReplay.v1", "expectedTaskId": "ATM-GOV-0335" }
+        {
+          "kind": "objective-replay",
+          "source": "docs/reports/plan-3-2-objective-replay.json",
+          "expectedSchemaId": "atm.planObjectiveReplay.v1",
+          "expectedTaskId": "ATM-GOV-0335"
+        }
       ],
-      "nonClaims": ["Component quality receipts do not substitute for the exact 29-row replay."],
+      "nonClaims": [
+        "Component quality receipts do not substitute for the exact 29-row replay."
+      ],
       "blockers": []
     },
     {
@@ -42,16 +63,31 @@
       "status": "proven",
       "expectedObjectives": 17,
       "evidenceTuples": [
-        { "kind": "foundation-replay", "source": "docs/reports/plan-4-foundation-replay.json", "expectedSchemaId": "atm.plan4FoundationReplay.v1", "expectedTaskId": "ATM-GOV-0336" },
-        { "kind": "independent-objective-verdict", "source": "docs/reports/plan-3x-4x-independent-certificate.json", "expectedSchemaId": "atm.fourPlanIndependentCertificate.v1", "expectedTaskId": "ATM-GOV-0341" }
+        {
+          "kind": "foundation-replay",
+          "source": "docs/reports/plan-4-foundation-replay.json",
+          "expectedSchemaId": "atm.plan4FoundationReplay.v1",
+          "expectedTaskId": "ATM-GOV-0336"
+        },
+        {
+          "kind": "independent-objective-verdict",
+          "source": "docs/reports/plan-3x-4x-independent-certificate.json",
+          "expectedSchemaId": "atm.fourPlanIndependentCertificate.v1",
+          "expectedTaskId": "ATM-GOV-0341"
+        }
       ],
-      "nonClaims": ["Foundation replay alone is not final certification; the independent objective verdict supplies the terminal authority."],
+      "nonClaims": [
+        "Foundation replay alone is not final certification; the independent objective verdict supplies the terminal authority."
+      ],
       "blockers": []
     }
   ],
   "backlogCensus": {
     "status": "proven",
-    "sources": ["docs/reports/plan-3x-4x-backlog-disposition-census.json", "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json"],
+    "sources": [
+      "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+      "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json"
+    ],
     "nonClaim": "Deferred items are explicitly waived into follow-up ownership; this does not claim that those bugs are fixed or retired."
   },
   "releasePushProvenance": {
@@ -76,15 +112,22 @@
     "appliedRule": "legacyAuthority.retirementRule",
     "reason": "The independent certificate this audit binds to was recompiled against observed evidence and the live remote and returned not-complete. Under this audit's own retirement rule a stale or contradictory input restores legacy authority and downgrades the certification, so the previous proven status and retired legacy authority no longer hold.",
     "blockers": [
-      "reviewer-digest-malformed: an unfinished review was recorded with the literal placeholder sha256:pending-self-digest",
-      "reviewer-output-self-reference: the second declared reviewer's only output was this certificate itself",
-      "reviewer-output-is-certified-evidence: the first declared reviewer's output is the release closeback it was meant to confirm",
-      "reviewer-input-digests-missing: neither declared reviewer recorded what it recomputed from",
-      "dimension-digest-unreproducible: the charter, freshness and objective dimension digests do not follow from the evidence they cite",
-      "release-digest-mismatch: origin-main, target-head and frozen-runner no longer match the surfaces this certification was granted over"
+      "dimension-digest-unreproducible:charter-verdict",
+      "dimension-digest-unreproducible:freshness-verdict",
+      "dimension-digest-unreproducible:objective-verdict",
+      "evidence-newer-than-certificate:release/atm-onefile/release-manifest.json",
+      "independent-reviewer-count-insufficient",
+      "release-digest-mismatch:frozen-runner",
+      "release-digest-mismatch:origin-main",
+      "release-digest-mismatch:target-head",
+      "reviewer-digest-malformed:codex-independent-recompute",
+      "reviewer-input-digests-missing:atm-validator-recompute",
+      "reviewer-input-digests-missing:codex-independent-recompute",
+      "reviewer-output-is-certified-evidence:atm-validator-recompute",
+      "reviewer-output-self-reference:codex-independent-recompute"
     ],
     "nonClaim": "This downgrade does not retract the objective denominators. Plan 3.0 17/17, Plan 3.1 23/23, Plan 3.2 29/29 and Plan 4.0 17/17 remain independently replayed; what is withdrawn is the final certification and the retirement of legacy authority.",
     "restoreCondition": "Two genuinely independent reviewer outputs, reproducible dimension digests, and a certificate recompiled against the remote at that moment, all recorded by scripts/compile-four-plan-independent-certificate.ts --mode write."
   },
-  "resultDigest": "sha256:3f69457adbc126ebd607a41e71cb47ce4ee614734478011c162de1c5c58568d9"
+  "resultDigest": "sha256:4c4230e08228e6f1ae5b91bd71c00a9df40bc210c1bc0c3279b7a724c8f9e409"
 }

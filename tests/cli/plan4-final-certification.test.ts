@@ -53,6 +53,7 @@ execFileSync('git', ['merge-base', '--is-ancestor', closeback.targetHead, 'origi
 
 const independent = readJson(audit.independentReview.source);
 assert.equal(independent.schemaId, 'atm.fourPlanIndependentCertificate.v1');
+const blockerMap = readJson('docs/reports/plan-3x-4x-closeout-blocker-map.json');
 
 // The audit binds itself to one certificate by digest. If that binding is
 // broken the audit is describing a certificate that no longer exists, which is
@@ -61,6 +62,11 @@ assert.equal(
   audit.resultDigest,
   independent.certificateDigest,
   'the canonical audit must be bound to the certificate it consumes'
+);
+assert.equal(
+  blockerMap.sourceReports.find((entry: any) => entry.path === audit.independentReview.source)?.digest,
+  independent.certificateDigest,
+  'the closeout blocker map must bind to the same certificate consumed by the canonical audit'
 );
 
 // An independent certificate only counts reviewers that survived its own

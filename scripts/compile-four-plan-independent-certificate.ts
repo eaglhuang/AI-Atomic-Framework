@@ -29,6 +29,8 @@ import {
 } from '../packages/core/src/evidence/four-plan-independent-certificate.ts';
 
 const CERTIFICATE_PATH = 'docs/reports/plan-3x-4x-independent-certificate.json';
+const OBJECTIVE_AUDIT_PATH = 'governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json';
+const BLOCKER_MAP_PATH = 'docs/reports/plan-3x-4x-closeout-blocker-map.json';
 const CLOSEBACK_PATH = 'docs/reports/plan-3x-4x-release-closeback.json';
 const REMOTE = 'origin';
 const BRANCH = 'main';
@@ -47,6 +49,12 @@ interface CompileOutcome {
   readonly certificate: FourPlanIndependentCertificate;
   readonly targetHead: string;
   readonly originMain: string;
+}
+
+interface CloseoutProjection {
+  readonly certificate: FourPlanIndependentCertificate;
+  readonly objectiveAudit: Record<string, any>;
+  readonly blockerMap: Record<string, any>;
 }
 
 function git(args: readonly string[]): string {
@@ -199,6 +207,91 @@ function compile(generatedAt: string): CompileOutcome {
   return { certificate, targetHead, originMain };
 }
 
+function certificateIsProven(certificate: FourPlanIndependentCertificate): boolean {
+  return certificate.status === 'proven'
+    && certificate.overallVerdict === 'complete'
+    && certificate.releaseAuthorized === true
+    && certificate.diagnostics.length === 0
+    && certificate.independentReviewerCount >= certificate.minimumIndependentReviewers
+    && ['objective-verdict', 'card-state-verdict', 'incident-verdict', 'freshness-verdict', 'charter-verdict', 'release-verdict']
+      .every((dimensionId) => certificate.dimensions.find((entry) => entry.dimensionId === dimensionId)?.status === 'proven');
+}
+
+/**
+ * The certificate has two consumers that bind to its digest.  Project all
+ * three artifacts from one observed certificate so a normal write can never
+ * leave a new producer beside stale consumer bindings.  This deliberately
+ * preserves the audit's objective evidence and the map's explanatory text:
+ * only the certificate-derived state is projected here.
+ */
+function projectCloseoutArtifacts(certificate: FourPlanIndependentCertificate, generatedAt: string): CloseoutProjection {
+  const objectiveAudit = JSON.parse(readFileSync(OBJECTIVE_AUDIT_PATH, 'utf8')) as Record<string, any>;
+  const blockerMap = JSON.parse(readFileSync(BLOCKER_MAP_PATH, 'utf8')) as Record<string, any>;
+  const independentReviewProven = certificateIsProven(certificate);
+  const sharedControls = [objectiveAudit.backlogCensus, objectiveAudit.releasePushProvenance]
+    .every((control) => control?.status === 'proven');
+  const rowsProven = Array.isArray(objectiveAudit.rows)
+    && objectiveAudit.rows.every((row: Record<string, any>) => row.status === 'proven');
+  const certificateCanBeProven = rowsProven
+    && (objectiveAudit.unknownRows ?? []).length === 0
+    && (objectiveAudit.unresolvedRows ?? []).length === 0
+    && sharedControls
+    && independentReviewProven
+    && objectiveAudit.legacyAuthority?.reversible === true;
+
+  objectiveAudit.resultDigest = certificate.certificateDigest;
+  objectiveAudit.independentReview = {
+    ...objectiveAudit.independentReview,
+    status: independentReviewProven ? 'proven' : 'not-complete'
+  };
+  objectiveAudit.status = certificateCanBeProven ? 'proven' : 'not-certified';
+  objectiveAudit.legacyAuthority = {
+    ...objectiveAudit.legacyAuthority,
+    retired: certificateCanBeProven
+  };
+  if (!certificateCanBeProven) {
+    objectiveAudit.supersession = {
+      ...objectiveAudit.supersession,
+      blockers: [...certificate.diagnostics]
+    };
+  }
+
+  blockerMap.generatedAt = generatedAt;
+  blockerMap.sourceReports = (blockerMap.sourceReports ?? []).map((entry: Record<string, any>) =>
+    entry.path === CERTIFICATE_PATH
+      ? { ...entry, digest: certificate.certificateDigest }
+      : entry
+  );
+  const certificateBlocker = (blockerMap.blockerClasses ?? []).find((entry: Record<string, any>) => entry.id === 'B5-release-certificate');
+  if (certificateBlocker) certificateBlocker.status = certificateIsProven(certificate) ? 'resolved' : 'open';
+  return { certificate, objectiveAudit, blockerMap };
+}
+
+function writeCloseoutProjection(projection: CloseoutProjection): void {
+  const targets = [
+    [CERTIFICATE_PATH, projection.certificate],
+    [OBJECTIVE_AUDIT_PATH, projection.objectiveAudit],
+    [BLOCKER_MAP_PATH, projection.blockerMap]
+  ] as const;
+  // Read and serialize every target before the first mutation: malformed or
+  // inaccessible consumers fail before this command changes any artifact.
+  const originals = targets.map(([path]) => [path, readFileSync(path, 'utf8')] as const);
+  const contents = targets.map(([path, value]) => [path, `${JSON.stringify(value, null, 2)}\n`] as const);
+  try {
+    for (const [path, content] of contents) writeFileSync(path, content, 'utf8');
+    const writtenAudit = JSON.parse(readFileSync(OBJECTIVE_AUDIT_PATH, 'utf8')) as Record<string, any>;
+    const writtenMap = JSON.parse(readFileSync(BLOCKER_MAP_PATH, 'utf8')) as Record<string, any>;
+    const certificateSource = (writtenMap.sourceReports ?? []).find((entry: Record<string, any>) => entry.path === CERTIFICATE_PATH);
+    if (writtenAudit.resultDigest !== projection.certificate.certificateDigest
+      || certificateSource?.digest !== projection.certificate.certificateDigest) {
+      throw new Error('closeout projection postcondition failed: certificate consumers do not bind the written digest');
+    }
+  } catch (error) {
+    for (const [path, original] of originals) writeFileSync(path, original, 'utf8');
+    throw error;
+  }
+}
+
 function main(): number {
   const argv = process.argv.slice(2);
   const modeIndex = argv.indexOf('--mode');
@@ -209,10 +302,11 @@ function main(): number {
   }
 
   if (mode === 'write') {
-    const { certificate, targetHead, originMain } = compile(new Date().toISOString());
-    writeFileSync(CERTIFICATE_PATH, `${JSON.stringify(certificate, null, 2)}\n`, 'utf8');
+    const generatedAt = new Date().toISOString();
+    const { certificate, targetHead, originMain } = compile(generatedAt);
+    writeCloseoutProjection(projectCloseoutArtifacts(certificate, generatedAt));
     process.stdout.write(
-      `wrote ${CERTIFICATE_PATH}\n`
+      `wrote canonical closeout projection rooted at ${CERTIFICATE_PATH}\n`
         + `  verdict: ${certificate.overallVerdict} (status ${certificate.status})\n`
         + `  observed ${REMOTE}/${BRANCH}: ${originMain} (local HEAD ${targetHead === originMain ? 'not used' : targetHead})\n`
         + `  independent reviewers: ${certificate.independentReviewerCount}/${certificate.minimumIndependentReviewers}\n`
