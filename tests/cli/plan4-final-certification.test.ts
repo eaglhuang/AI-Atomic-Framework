@@ -53,26 +53,63 @@ execFileSync('git', ['merge-base', '--is-ancestor', closeback.targetHead, 'origi
 
 const independent = readJson(audit.independentReview.source);
 assert.equal(independent.schemaId, 'atm.fourPlanIndependentCertificate.v1');
-assert.equal(independent.status, 'proven');
-assert.equal(independent.overallVerdict, 'complete');
-assert.equal(independent.releaseAuthorized, true);
-assert.ok(independent.reviewers.length >= independent.minimumIndependentReviewers);
-for (const dimension of ['objective-verdict', 'card-state-verdict', 'incident-verdict', 'freshness-verdict', 'charter-verdict', 'release-verdict']) {
-  assert.equal(independent.dimensions.find((entry: any) => entry.dimensionId === dimension)?.status, 'proven');
-}
 
+// The audit binds itself to one certificate by digest. If that binding is
+// broken the audit is describing a certificate that no longer exists, which is
+// the failure this file must catch rather than restate.
+assert.equal(
+  audit.resultDigest,
+  independent.certificateDigest,
+  'the canonical audit must be bound to the certificate it consumes'
+);
+
+// An independent certificate only counts reviewers that survived its own
+// independence checks. reviewers.length is a count of declarations, not of
+// reviews, and the difference is exactly how a placeholder review passed here.
+assert.ok(
+  independent.independentReviewerCount <= independent.reviewers.length,
+  'the certificate cannot count more independent reviewers than it declares'
+);
+const independentReviewProven = independent.status === 'proven'
+  && independent.overallVerdict === 'complete'
+  && independent.releaseAuthorized === true
+  && independent.diagnostics.length === 0
+  && independent.independentReviewerCount >= independent.minimumIndependentReviewers
+  && ['objective-verdict', 'card-state-verdict', 'incident-verdict', 'freshness-verdict', 'charter-verdict', 'release-verdict']
+    .every((dimension) => independent.dimensions.find((entry: any) => entry.dimensionId === dimension)?.status === 'proven');
+assert.equal(
+  audit.independentReview.status === 'proven',
+  independentReviewProven,
+  `the audit's independent-review control must agree with the certificate; certificate diagnostics: ${independent.diagnostics.join(', ') || 'none'}`
+);
+
+// Recompute the canonical verdict from the audit's own decision rule instead of
+// reading the status it stored. A stored status is a claim; this is the check.
 const sharedControls = [audit.backlogCensus, audit.releasePushProvenance, audit.independentReview];
 const certificateCanBeProven = audit.rows.every((row: any) => row.status === 'proven')
   && audit.unknownRows.length === 0
   && audit.unresolvedRows.length === 0
   && sharedControls.every((control: any) => control.status === 'proven')
+  && independentReviewProven
   && audit.legacyAuthority.reversible === true;
-assert.equal(certificateCanBeProven, true);
-assert.equal(audit.status, 'proven');
-assert.equal(audit.legacyAuthority.retired, true);
-assert.equal(audit.resultDigest, independent.certificateDigest);
+assert.equal(
+  audit.status === 'proven',
+  certificateCanBeProven,
+  `the canonical audit status must follow from its inputs, not be asserted over them; recomputed=${certificateCanBeProven}, stored=${audit.status}`
+);
+assert.equal(
+  audit.legacyAuthority.retired,
+  certificateCanBeProven,
+  'legacy authority may only be retired while the certification actually holds'
+);
+if (!certificateCanBeProven) {
+  assert.ok(
+    Array.isArray(audit.supersession?.blockers) && audit.supersession.blockers.length > 0,
+    'a downgraded canonical audit must record why, so the downgrade is auditable rather than silent'
+  );
+}
 
 const matrix = fs.readFileSync(path.join(root, 'governance-optimization/plan-3x-4x-objective-evidence-matrix-2026-07-31.md'), 'utf8');
 for (const plan of ['3.0', '3.1', '3.2', '4.0']) assert.ok(matrix.includes(`| ${plan} |`));
 assert.ok(matrix.includes('fail-closed certification input'));
-console.log('plan4 final certification: proven');
+console.log(`plan4 final certification: ${certificateCanBeProven ? 'proven' : 'not-certified'}`);

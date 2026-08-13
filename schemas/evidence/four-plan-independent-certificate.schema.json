@@ -6,12 +6,15 @@
     "schemaId",
     "specVersion",
     "certificateId",
+    "certificatePath",
     "generatedAt",
     "writerRole",
     "reviewers",
     "minimumIndependentReviewers",
+    "independentReviewerCount",
     "forbiddenReviewerRoles",
     "dimensions",
+    "evidenceObservations",
     "releaseSurfaces",
     "mutationControls",
     "status",
@@ -26,23 +29,43 @@
     "schemaId": { "const": "atm.fourPlanIndependentCertificate.v1" },
     "specVersion": { "const": "0.1.0" },
     "certificateId": { "type": "string", "minLength": 1 },
+    "certificatePath": { "type": "string" },
     "generatedAt": { "type": "string", "minLength": 1 },
     "writerRole": { "type": "string", "minLength": 1 },
     "reviewers": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["reviewerId", "roles", "outputPath", "digest"],
+        "required": ["reviewerId", "roles", "outputPath", "digest", "inputDigests"],
         "properties": {
           "reviewerId": { "type": "string" },
           "roles": { "type": "array", "items": { "type": "string" } },
           "outputPath": { "type": "string" },
-          "digest": { "type": "string" }
+          "digest": { "type": "string" },
+          "inputDigests": { "type": "array", "items": { "type": "string" } }
         },
         "additionalProperties": false
       }
     },
     "minimumIndependentReviewers": { "type": "integer", "minimum": 0 },
+    "independentReviewerCount": { "type": "integer", "minimum": 0 },
+    "evidenceObservations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "present", "digest", "tracked", "dirty", "lastCommit", "reachableFromTargetHead"],
+        "properties": {
+          "path": { "type": "string" },
+          "present": { "type": "boolean" },
+          "digest": { "type": "string" },
+          "tracked": { "type": "boolean" },
+          "dirty": { "type": "boolean" },
+          "lastCommit": { "type": "string" },
+          "reachableFromTargetHead": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
     "forbiddenReviewerRoles": { "type": "array", "items": { "type": "string" } },
     "dimensions": {
       "type": "array",

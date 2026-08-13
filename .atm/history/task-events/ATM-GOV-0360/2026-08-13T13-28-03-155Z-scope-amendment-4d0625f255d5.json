@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T13-28-03-155Z-scope-amendment-4d0625f255d5",
+  "taskId": "ATM-GOV-0360",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0360",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0360.json",
+  "taskSha256": "sha256:339f0364fb9bc06a6cf1f1172b2dab2da0a6b06944b9aa7c43e47d04c831ed0e",
+  "createdAt": "2026-08-13T13:28:03.155Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0360 --actor claude-008-gov-0360 --add docs/reports/plan-3x-4x-closeout-blocker-map.json --reason \"The blocker map pins the independent certificate by file digest and cross-asserts its release authorization; regenerating the certificate makes rebinding and downgrading the map to actionable-not-complete part of this card.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The blocker map pins the independent certificate by file digest and cross-asserts its release authorization; regenerating the certificate makes rebinding and downgrading the map to actionable-not-complete part of this card."
+  }
+}

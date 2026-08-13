@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T13-22-26-364Z-scope-amendment-3e653a46db72",
+  "taskId": "ATM-GOV-0360",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0360",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0360.json",
+  "taskSha256": "sha256:c18d158e3b5d6b115cfb4d74886152fbcb606fade140f1153ab2179865436ce9",
+  "createdAt": "2026-08-13T13:22:26.364Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0360 --actor claude-008-gov-0360 --add governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json --reason \"The canonical audit binds resultDigest to the independent certificate and its own retirementRule requires not-certified when any input is stale; regenerating the certificate makes applying that rule part of this card.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The canonical audit binds resultDigest to the independent certificate and its own retirementRule requires not-certified when any input is stale; regenerating the certificate makes applying that rule part of this card."
+  }
+}
