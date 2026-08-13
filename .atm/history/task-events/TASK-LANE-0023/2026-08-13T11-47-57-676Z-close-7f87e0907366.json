@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T11-47-57-676Z-close-7f87e0907366",
+  "taskId": "TASK-LANE-0023",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260813114407-codex-gpt-5.4-mini-TASK-LANE-0023-96e17662c7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0023.json",
+  "taskSha256": "sha256:6707465eaef12c792da02b5c9c397c69318b07c2f76f0c1c344241bc85a441c5",
+  "createdAt": "2026-08-13T11:47:57.676Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0023 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-1dcfc14bbdbf --historical-delivery c7bb2ec2ee5055ae9ba3da2925a78004cb13a956",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-1dcfc14bbdbf",
+    "sessionId": "session-20260813114407-codex-gpt-5.4-mini-TASK-LANE-0023-96e17662c7",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0023.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-13T11:47:57.663Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0023.*",
+        ".atm/history/task-events/TASK-LANE-0023/**",
+        ".atm/history/tasks/TASK-LANE-0023.json",
+        "packages/cli/src/commands/framework-development/**",
+        "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+        "packages/cli/src/commands/git-governance/__tests__/**",
+        "packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts",
+        "packages/cli/src/commands/git-governance/__tests__/work-admission-check.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+        "packages/cli/src/commands/git-governance/implementation/framework-commit-claim-guard.ts",
+        "packages/cli/src/commands/git-governance/work-admission-check.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/**",
+        "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+        "packages/cli/src/commands/git-governance/__tests__/**",
+        "packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts",
+        "packages/cli/src/commands/git-governance/__tests__/work-admission-check.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+        "packages/cli/src/commands/git-governance/implementation/framework-commit-claim-guard.ts",
+        "packages/cli/src/commands/git-governance/work-admission-check.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

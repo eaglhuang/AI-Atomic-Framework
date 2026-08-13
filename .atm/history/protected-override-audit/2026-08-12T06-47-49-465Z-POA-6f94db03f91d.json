@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-6f94db03f91d",
+  "recordedAt": "2026-08-12T06:47:49.465Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-LANE-0023",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task TASK-LANE-0023 --message \"wip: preserve expired lane handoff\n\nATM-Work-Admission: wat-e8a178d71281f5ac sha256:e8a178d71281f5ac37baad7cfb4898d7e45ad5b6ae2e33351e505c56da73c996\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-24b369d5fe",
+  "reason": "Frozen hook bootstrap circularity",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T06-47-32-351Z-EMG-GLOBAL-24b369d5fe.json",
+  "parentEventId": "POA-f40a5c249a7b",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}
