@@ -1,0 +1,275 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0361",
+  "title": "Independently recompute four-plan objective backlog and charter verdict",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0360"
+  ],
+  "acceptance": [
+    "ACC-1 Recompute 17/17, 23/23, 29/29 and 17/17 directly from the four replay files, including row identity, evidence tuple completeness and input digests.",
+    "ACC-2 Recompute backlog `open-like=0`, `unclassified=0`, waiver/deferred state, and current charter verdict from their canonical raw artifacts. Any missing, dirty, malformed, stale or contradictory input produces `not-proven`.",
+    "ACC-3 Emit a byte-stable review with reviewer identity, distinct output path, sorted input paths/digests, observed target SHA, findings, verdict and self-digest. Do not read or write the certificate or reviewer B output."
+  ],
+  "deliverables": [
+    "scripts/review-four-plan-objective-authority.ts",
+    "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+    "tests/cli/four-plan-objective-authority-review.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/review-four-plan-objective-authority.ts",
+    "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+    "tests/cli/four-plan-objective-authority-review.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/four-plan-objective-authority-review.test.ts",
+    "node --strip-types scripts/review-four-plan-objective-authority.ts --mode validate",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert reviewer A as one unit; never retain a report produced by a removed algorithm.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.independent-certification",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0361-independently-recompute-four-plan-objective-backlog-and-charter-verdict.task.md",
+    "sectionTitle": "ATM-GOV-0361",
+    "headingLine": 62,
+    "hash": "be1b8b1841e0d32b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0361-independently-recompute-four-plan-objective-backlog-and-charter-verdict.task.md",
+      "planningCommitSha": "b3030d450d4e28cb99d57b6ef693aac5ec88a4f6",
+      "contentDigest": "sha256:be1b8b1841e0d32b474c4d0355b6992c35f6e7ba2013718c68efa033c2a23a8a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T15:08:16.534Z"
+    }
+  },
+  "importedAt": "2026-08-13T15:08:16.534Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0360"
+    ],
+    "startConditions": [
+      "ATM-GOV-0360 has landed the fail-closed certificate contract and compiler."
+    ],
+    "softRelations": [
+      "ATM-GOV-0332",
+      "ATM-GOV-0340",
+      "ATM-GOV-0341"
+    ],
+    "changedPublicSeams": [
+      "atm.fourPlanIndependentReview.v1"
+    ],
+    "causalImpactEdges": [
+      "raw-objective-evidence-to-independent-review",
+      "backlog-census-to-independent-review",
+      "charter-verdict-to-independent-review"
+    ],
+    "parallelFrontierInputs": [
+      "four-objective-replays",
+      "backlog-census",
+      "waiver-register",
+      "charter-verdict"
+    ],
+    "validatorReferences": [
+      "four-plan-objective-authority-review"
+    ],
+    "phaseOwner": "wave-10-independent-review-a"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0361_independent_objective_authority_recompute",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "reviewer_a_recomputes_objectives_backlog_and_charter_without_reading_certificate_or_reviewer_b",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "raw-objective-evidence-to-independent-review",
+        "backlog-census-to-independent-review",
+        "charter-verdict-to-independent-review"
+      ],
+      "expectedRedPredicate": "missing objective rows or open backlog items can still produce a proven review",
+      "contributionResourceKey": "four-plan-independent-review-a",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0360",
+      "contractEdge": "atm.fourPlanIndependentReview.v1",
+      "resourceKey": "four-plan-independent-review-a"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0361_independent_objective_authority_recompute"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T17-18-01-865Z-claim-2d2f267623c8",
+  "lastTransitionAt": "2026-08-13T17:18:01.865Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-13T17:17:54.855Z",
+  "promotedAt": "2026-08-13T17:17:54.861Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-a81da35f88a3",
+    "claimedAt": "2026-08-13T17:17:54.870Z",
+    "heartbeatAt": "2026-08-13T17:17:54.870Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0361.json",
+      "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+      "scripts/review-four-plan-objective-authority.ts",
+      "tests/cli/four-plan-objective-authority-review.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260813171755-codex-gpt-5.4-mini-554dcc3dbb",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813171755-codex-gpt-5.4-mini-554dcc3dbb\""
+    }
+  },
+  "startedAt": "2026-08-13T17:17:54.870Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-2911d07135286e30",
+    "ticketDigest": "sha256:2911d07135286e3017e386c9ec66c7317e8ae925bbce70ae0ae556f4676d95f3",
+    "taskId": "ATM-GOV-0361",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260813171755-codex-gpt-5.4-mini-554dcc3dbb",
+    "claimGeneration": "lease-a81da35f88a3",
+    "issuedAt": "2026-08-13T17:17:54.870Z",
+    "expiresAt": "2026-08-13T17:47:54.870Z",
+    "scopeDigest": "sha256:02bd465bab9171bd333560b00ecfc795698e987c2ea2542cb0af50e1f1de4b01",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-13T17:17:54.870Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0361.*",
+          ".atm/history/task-events/ATM-GOV-0361/**",
+          ".atm/history/tasks/ATM-GOV-0361.json",
+          "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+          "scripts/review-four-plan-objective-authority.ts",
+          "tests/cli/four-plan-objective-authority-review.test.ts"
+        ],
+        "digest": "sha256:84ae29b08a61d21b0c2e2adcdc7ffca48747614204170feac83eae56bbf7c259"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260813171754-codex-gpt-5.4-mini-ATM-GOV-0361-81fdcfc2bd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0361",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0361.*",
+      ".atm/history/task-events/ATM-GOV-0361/**",
+      ".atm/history/tasks/ATM-GOV-0361.json",
+      "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+      "scripts/review-four-plan-objective-authority.ts",
+      "tests/cli/four-plan-objective-authority-review.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "6fd8704c7d3b55937962ec4611d385a06e0191ef01c322b1c19b6c179e8a56d4",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260813171754-codex-gpt-5.4-mini-ATM-GOV-0361-81fdcfc2bd",
+    "laneSession": {
+      "laneSessionId": "lane-20260813171755-codex-gpt-5.4-mini-554dcc3dbb",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813171755-codex-gpt-5.4-mini-554dcc3dbb\""
+    },
+    "createdAt": "2026-08-13T17:18:01.863Z",
+    "status": "active"
+  }
+}
