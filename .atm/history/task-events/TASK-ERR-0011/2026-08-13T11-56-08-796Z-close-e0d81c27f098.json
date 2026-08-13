@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T11-56-08-796Z-close-e0d81c27f098",
+  "taskId": "TASK-ERR-0011",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260813115143-codex-gpt-5.4-mini-TASK-ERR-0011-71fe4fa375",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0011.json",
+  "taskSha256": "sha256:8eedd54cc4ec117b6a70cc4f5864b8c66a2d84984a8fbe40f04fafbdf731ab42",
+  "createdAt": "2026-08-13T11:56:08.796Z",
+  "command": "node atm.mjs tasks close --task TASK-ERR-0011 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-1dcfc14bbdbf --historical-delivery 47c7c6229 --historical-delivery 75cca5385144f3e15394e1e68fb612bd424ed498",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-1dcfc14bbdbf",
+    "sessionId": "session-20260813115143-codex-gpt-5.4-mini-TASK-ERR-0011-71fe4fa375",
+    "closurePacketPath": ".atm/history/evidence/TASK-ERR-0011.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/pending-task-artifact-scope.test.ts",
+      "node --strip-types tests/cli/runner-publication-inventory-parity.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-13T11:56:08.785Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-ERR-0011.*",
+        ".atm/history/task-events/TASK-ERR-0011/**",
+        ".atm/history/tasks/TASK-ERR-0011.json",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-artifact-filesystem.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/pending-task-artifact-scope.test.ts",
+        "tests/cli/runner-publication-disposition-gate.test.ts",
+        "tests/cli/runner-publication-inventory-parity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-artifact-filesystem.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/pending-task-artifact-scope.test.ts",
+        "tests/cli/runner-publication-disposition-gate.test.ts",
+        "tests/cli/runner-publication-inventory-parity.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

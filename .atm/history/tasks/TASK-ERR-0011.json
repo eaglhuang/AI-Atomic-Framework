@@ -1,0 +1,292 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ERR-0011",
+  "title": "Bound runner publication inventory to generated output delta",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A sealed build inventory contains exactly paths whose index/worktree content changed because of that build, plus its receipt; it must not enumerate every tracked file under a release root.",
+    "ACC-2: A committed runner output delta reaches `published` even when an unrelated foreign dirty file exists within a publication root.",
+    "ACC-3: A dirty declared output still reaches `publication-pending`; the repair does not weaken detection of uncommitted generated artifacts.",
+    "ACC-4: Tests prove both the foreign-WIP counterexample and declared-output fail-closed path. No task-, actor-, filename-, or release-specific allowlist.",
+    "ACC-5: Claim admission treats a dirty file outside the candidate task's scope as foreign/unowned WIP unless it is explicitly evidenced as a deliverable of the candidate task; it must not silently add that file to the candidate scope or force an unrelated task-card amendment."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-build-output-inventory.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/runner-sync-incremental-build.ts",
+    "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "tests/cli/runner-publication-inventory-parity.test.ts",
+    "tests/cli/runner-publication-disposition-gate.test.ts",
+    "tests/cli/pending-task-artifact-scope.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-build-output-inventory.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/runner-sync-incremental-build.ts",
+    "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "tests/cli/runner-publication-inventory-parity.test.ts",
+    "tests/cli/runner-publication-disposition-gate.test.ts",
+    "tests/cli/pending-task-artifact-scope.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runner-publication-inventory-parity.test.ts",
+    "node --strip-types tests/cli/pending-task-artifact-scope.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert source and regenerated runner artifacts together; retain any publication-pending receipt for recovery instead of deleting it.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-publication-lifecycle",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-build-output-inventory",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/runner-build-output-inventory.ts",
+        "disposition": "inline",
+        "inlineReason": "The existing provider is the single owner of inventory membership and disposition policy; extracting a second facade would split one transaction boundary."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "tests/cli/runner-publication-inventory-parity.test.ts",
+        "tests/cli/runner-publication-disposition-gate.test.ts",
+        "tests/cli/pending-task-artifact-scope.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "error-governance/tasks/TASK-ERR-0011-bound-runner-publication-inventory-to-generated-output-delta.task.md",
+    "sectionTitle": "TASK-ERR-0011",
+    "headingLine": 93,
+    "hash": "788ca4729c511fbd",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "error-governance/tasks/TASK-ERR-0011-bound-runner-publication-inventory-to-generated-output-delta.task.md",
+      "planningCommitSha": "650dc4905ab6f6fa5a1c9b0f30e64c26e4956787",
+      "contentDigest": "sha256:788ca4729c511fbd20676f743f6768e71f43c6435525f65d1b23ead7729aff6e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-09T13:29:47.732Z"
+    }
+  },
+  "importedAt": "2026-08-09T13:29:47.732Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "runner-publication-pending-reproduced-with-foreign-dirty-wip"
+    ],
+    "softRelations": [
+      "ATM-GOV-0328-closeback-blocked-until-runner-publication-releases"
+    ],
+    "changedPublicSeams": [
+      "runner-build-output-inventory",
+      "runner-publication-disposition"
+    ],
+    "causalImpactEdges": [
+      "generated-output-delta-to-publication-membership",
+      "foreign-dirty-wip-to-nonblocking-publication"
+    ],
+    "parallelFrontierInputs": [
+      "runner-sync-steward-queue",
+      "foreign-active-wip"
+    ],
+    "validatorReferences": [
+      "test_runner_inventory_delta_0011",
+      "typecheck",
+      "validate-cli"
+    ],
+    "phaseOwner": "TASK-ERR-0011"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_runner_inventory_delta_0011",
+      "targetGroupId": null,
+      "semanticKey": "runner_publication_inventory_excludes_unchanged_and_foreign_dirty_files",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "generated-output-delta-to-publication-membership",
+        "foreign-dirty-wip-to-nonblocking-publication"
+      ],
+      "expectedRedPredicate": "a foreign dirty file within a release root makes an otherwise committed runner generation publication-pending",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "runner-publication-inventory",
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_pending_worktree_foreign_wip_0011",
+      "targetGroupId": null,
+      "semanticKey": "pending_worktree_does_not_reclassify_foreign_dirty_wip_as_candidate_scope_expansion",
+      "coversAcceptance": [
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "foreign-dirty-wip-to-nonblocking-publication"
+      ],
+      "expectedRedPredicate": "a foreign or unowned dirty tracked file outside the candidate task scope triggers TASK_SCOPE_EXPANSION_REQUIRED",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "pending-task-artifact-scope",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_runner_inventory_delta_0011",
+    "test_pending_worktree_foreign_wip_0011"
+  ],
+  "phaseTestCaseIds": [
+    "typecheck",
+    "validate:cli"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T11-56-08-993Z-lock-cleanup-9d322c6328dc",
+  "lastTransitionAt": "2026-08-13T11:56:08.993Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-13T11:51:43.160Z",
+  "promotedAt": "2026-08-13T11:51:43.164Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-3361b0480ca3",
+    "claimedAt": "2026-08-13T11:51:43.169Z",
+    "heartbeatAt": "2026-08-13T11:56:08.794Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-ERR-0011.*",
+      ".atm/history/task-events/TASK-ERR-0011/**",
+      ".atm/history/tasks/TASK-ERR-0011.json",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-artifact-filesystem.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "tests/cli/pending-task-artifact-scope.test.ts",
+      "tests/cli/runner-publication-disposition-gate.test.ts",
+      "tests/cli/runner-publication-inventory-parity.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260813115143-codex-gpt-5.4-mini-ada4896d7e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813115143-codex-gpt-5.4-mini-ada4896d7e\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-13T11:51:43.169Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260813115143-codex-gpt-5.4-mini-TASK-ERR-0011-71fe4fa375",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ERR-0011",
+    "batchId": "batch-1dcfc14bbdbf",
+    "scopeKey": "tasks-ef550ed3c5c4",
+    "queueId": "queue-c67eb7e6e3874202",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ERR-0011.*",
+      ".atm/history/task-events/TASK-ERR-0011/**",
+      ".atm/history/tasks/TASK-ERR-0011.json",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-artifact-filesystem.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "tests/cli/pending-task-artifact-scope.test.ts",
+      "tests/cli/runner-publication-disposition-gate.test.ts",
+      "tests/cli/runner-publication-inventory-parity.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0011-bound-runner-publication-inventory-to-generated-output-delta.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/error-governance/",
+      "docs/ai_atomic_framework/error-governance/tasks/",
+      "docs/ai_atomic_framework/error-governance/tasks/TASK-ERR-0011-bound-runner-publication-inventory-to-generated-output-delta.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "938e943ab2bddc57e73486797b65ed27ac1b1762abb2bfa00394f81416803a40",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260813115143-codex-gpt-5.4-mini-ada4896d7e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813115143-codex-gpt-5.4-mini-ada4896d7e\""
+    },
+    "createdAt": "2026-08-13T11:51:44.727Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-13T11:56:08.991Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-08-13T11:56:08.794Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260813115143-codex-gpt-5.4-mini-TASK-ERR-0011-71fe4fa375",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0011.closure-packet.json"
+}
