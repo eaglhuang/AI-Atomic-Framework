@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0366",
   "title": "Disclose the owner-lane source in lane capability refusals",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -150,7 +150,7 @@
     "actorId": "claude-008-gov-0366",
     "leaseId": "lease-225372a3bd32",
     "claimedAt": "2026-08-13T16:13:32.080Z",
-    "heartbeatAt": "2026-08-13T16:47:15.606Z",
+    "heartbeatAt": "2026-08-13T17:01:45.225Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0366.*",
@@ -162,13 +162,14 @@
       "packages/cli/src/commands/lane-session/capability-authority.ts",
       "tests/cli/borrowed-actor-authority-hard-gate.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260813161332-claude-008-gov-0366-da46e02f26",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813161332-claude-008-gov-0366-da46e02f26\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "claude-008-gov-0366",
   "startedAt": "2026-08-13T16:13:32.080Z",
@@ -213,8 +214,8 @@
     "createdAt": "2026-08-13T16:13:36.525Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-13T16-47-15-834Z-renew-a5b9b77b8a1a",
-  "lastTransitionAt": "2026-08-13T16:47:15.834Z",
+  "lastTransitionId": "2026-08-13T17-01-45-228Z-close-2b0e70b478b7",
+  "lastTransitionAt": "2026-08-13T17:01:45.228Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -280,5 +281,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
-  }
+  },
+  "closedAt": "2026-08-13T17:01:45.225Z",
+  "closedByActor": "claude-008-gov-0366",
+  "closedBySessionId": "session-20260813161332-claude-008-gov-0366-ATM-GOV-0366-5a0f87bcbe",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0366.closure-packet.json"
 }

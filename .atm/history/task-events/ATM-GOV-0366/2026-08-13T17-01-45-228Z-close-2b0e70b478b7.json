@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T17-01-45-228Z-close-2b0e70b478b7",
+  "taskId": "ATM-GOV-0366",
+  "action": "close",
+  "actorId": "claude-008-gov-0366",
+  "sessionId": "session-20260813161332-claude-008-gov-0366-ATM-GOV-0366-5a0f87bcbe",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0366.json",
+  "taskSha256": "sha256:14b94fe17c156cef5828ef4ceb6328aabf09588820449793a1e369db07abc70f",
+  "createdAt": "2026-08-13T17:01:45.228Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0366 --actor claude-008-gov-0366 --status done --historical-delivery 03c135e886447138ec88f4ae4ad0d45725055c8e --historical-delivery 3baf721bf717a828cd836a7514a61f27f9c10f45 --historical-delivery b0a11e66600bd7fef0e02681b7c11401bc7bead0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260813161332-claude-008-gov-0366-ATM-GOV-0366-5a0f87bcbe",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0366.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/borrowed-actor-authority-hard-gate.test.ts",
+      "typecheck",
+      "validate:backlog-census",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-13T17:01:45.220Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0366.*",
+        ".atm/history/task-events/ATM-GOV-0366/**",
+        ".atm/history/tasks/ATM-GOV-0366.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-021.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-022.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-023.json",
+        "packages/cli/src/commands/lane-session/capability-authority.ts",
+        "tests/cli/borrowed-actor-authority-hard-gate.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/lane-session/capability-authority.ts",
+        "tests/cli/borrowed-actor-authority-hard-gate.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
