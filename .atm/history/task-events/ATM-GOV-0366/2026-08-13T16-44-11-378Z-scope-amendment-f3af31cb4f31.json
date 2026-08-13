@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T16-44-11-378Z-scope-amendment-f3af31cb4f31",
+  "taskId": "ATM-GOV-0366",
+  "action": "scope-amendment",
+  "actorId": "claude-008-gov-0366",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0366.json",
+  "taskSha256": "sha256:70397500eff5d885e626eaecf6019d6d0240a075f2444f0da647b7914ee2eee9",
+  "createdAt": "2026-08-13T16:44:11.378Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0366 --actor claude-008-gov-0366 --add docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-023.json --reason \"The scope amendment for 022 exposed a third defect that must be recorded before close.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The scope amendment for 022 exposed a third defect that must be recorded before close."
+  }
+}
