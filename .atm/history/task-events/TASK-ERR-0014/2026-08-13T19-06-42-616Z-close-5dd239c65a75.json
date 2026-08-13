@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T19-06-42-616Z-close-5dd239c65a75",
+  "taskId": "TASK-ERR-0014",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260813190240-codex-gpt-5.4-mini-TASK-ERR-0014-da698e95e9",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0014.json",
+  "taskSha256": "sha256:dc27b9f2e64e0d9211175f36ee0df7c7c34fdf3e390fac724f9e689fe9fd20fc",
+  "createdAt": "2026-08-13T19:06:42.616Z",
+  "command": "node atm.mjs tasks close --task TASK-ERR-0014 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-fadd25dad86b --historical-delivery 8edd23226",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-fadd25dad86b",
+    "sessionId": "session-20260813190240-codex-gpt-5.4-mini-TASK-ERR-0014-da698e95e9",
+    "closurePacketPath": ".atm/history/evidence/TASK-ERR-0014.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+      "node --strip-types packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
+      "node --strip-types tests/cli/commit-attribution-concurrency-gates.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:module-boundaries"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-13T19:06:42.610Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-ERR-0014.*",
+        ".atm/history/task-events/TASK-ERR-0014/**",
+        ".atm/history/tasks/TASK-ERR-0014.json",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+        "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+        "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
