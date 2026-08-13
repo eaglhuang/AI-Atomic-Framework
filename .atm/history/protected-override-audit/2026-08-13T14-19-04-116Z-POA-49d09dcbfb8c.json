@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-49d09dcbfb8c",
+  "recordedAt": "2026-08-13T14:19:04.116Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0359",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0359 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/command-specs/taskflow.spec.ts,packages/cli/src/commands/taskflow/close-orchestration.ts,packages/cli/src/commands/taskflow/implementation.ts,tests/cli/taskflow-close-emergency-approval-forwarding.test.ts --reason \"Repair released direction-lock scope with the generalized taskflow emergency-approval forwarding seam required for ATM-GOV-0359 close.\" --emergency-approval EMG-ATM-GOV-0359-1bcd7bbf6b --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-ATM-GOV-0359-1bcd7bbf6b",
+  "reason": "Repair released direction-lock scope with the generalized taskflow emergency-approval forwarding seam required for ATM-GOV-0359 close.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-13T14-19-04-115Z-EMG-ATM-GOV-0359-1bcd7bbf6b.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
