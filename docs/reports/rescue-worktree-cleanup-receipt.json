@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.rescueWorktreeCleanupReceipt.v1",
+  "taskId": "TASK-TMP-0008",
+  "actorId": "codex-gpt-5.4-mini",
+  "completedAt": "2026-08-14T00:00:00+08:00",
+  "authority": {
+    "kind": "project-owner-approval",
+    "approval": "Owner granted all permissions required to repair and complete the Plan 3.0–4.0 closeout.",
+    "reason": "ATM has no owner-aware external rescue-worktree removal route; Git worktree registry removal was limited to this task's exact approved paths."
+  },
+  "archive": {
+    "auditPath": "docs/reports/plan-3x-4x-rescue-worktree-audit.json",
+    "auditSha256": "sha256:d9e6078055c041f128f8cd067f82ab3820318555688c48bb956b780fd74a8a0b",
+    "auditSchemaId": "atm.rescueWorktreeAudit.v1",
+    "headRecoveryAnchor": "Every removed worktree HEAD was reachable from a retained Git ref before removal; no unique unreachable commit was found.",
+    "generatedResiduePolicy": "Uncommitted closure-packet and git-head residue was recorded by the immutable audit and removable only after its source HEAD was proven reachable; no source-code-only or unique commit was discarded."
+  },
+  "preconditions": {
+    "expectedCount": 23,
+    "resolvedPathExactMatch": true,
+    "allRegisteredBeforeRemoval": true,
+    "allHeadsReachableBeforeRemoval": true,
+    "totalUniqueUnreachableCommitCount": 0,
+    "pathExpansion": "none",
+    "junctionTraversal": "none",
+    "operation": "git worktree remove --force -- <exact-resolved-path>"
+  },
+  "removed": [
+    { "path": "C:/Users/User/ATM-rescue-0287", "head": "3f401cc3d5ab49b02f49516e262994f0c0f4df97" },
+    { "path": "C:/Users/User/ATM-rescue-0288", "head": "6ec21a548b721cade920ecc22b35e6101c1c8f03" },
+    { "path": "C:/Users/User/ATM-rescue-0289", "head": "4fa69c38c0e8153daac735432b95b464d9d394ea" },
+    { "path": "C:/Users/User/ATM-rescue-0290", "head": "79a03601305ee68e7bfae87052148882dee413d2" },
+    { "path": "C:/Users/User/ATM-rescue-0291", "head": "5fa2682d863ba33140e3f117c2e0939c7ced5399" },
+    { "path": "C:/Users/User/ATM-rescue-0296", "head": "bdc02704ad20b4f92746fff06a80a10a392a18d6" },
+    { "path": "C:/Users/User/ATM-rescue-0297", "head": "8426c033ec4d13e340568da5d0d6eab5f010cb6d" },
+    { "path": "C:/Users/User/ATM-rescue-0298", "head": "92de98db24d9ba1f11db35fa0d166f03c5bbdcd0" },
+    { "path": "C:/Users/User/ATM-rescue-0299", "head": "708f8ee5fc05042dde875a10624633295ebd9a60" },
+    { "path": "C:/Users/User/ATM-rescue-0300", "head": "41f39b17a4355d420bd78b4f4c0f8ef147273ae6" },
+    { "path": "C:/Users/User/ATM-rescue-0302", "head": "7478e81a9929a3b273ef45a585bcf26ae427d143" },
+    { "path": "C:/Users/User/ATM-rescue-0303", "head": "c436dcd28b9e05ac48286dc5010e8aca5d5ef41f" },
+    { "path": "C:/Users/User/ATM-rescue-0305", "head": "78ce6f90979ada1a05538e28e47a57b678ab5448" },
+    { "path": "C:/Users/User/ATM-rescue-0307", "head": "10abe4204a7030ac138b17ec61da55826990610d" },
+    { "path": "C:/Users/User/ATM-rescue-0312", "head": "d03c81433aaec4fe1803eb8e276a35ce6185ada4" },
+    { "path": "C:/Users/User/ATM-rescue-0313", "head": "6b47e4bc55f1effee7add88c253fe16888bc46c7" },
+    { "path": "C:/Users/User/ATM-rescue-0314", "head": "b18c7ff6a441d7c8a0f5fd1e82a632ec69467d77" },
+    { "path": "C:/Users/User/ATM-rescue-0318", "head": "ab501515ccd896a174790bf7a748a71234a7c5b4" },
+    { "path": "C:/Users/User/ATM-rescue-0319", "head": "f4e48b4d051bd772f7617e58cff0f6a003b631e4" },
+    { "path": "C:/Users/User/ATM-rescue-0320", "head": "929deaafe13f4e5a103845407cff9887f7f3e5fc" },
+    { "path": "C:/Users/User/ATM-rescue-0321", "head": "8795447d50567fe9fad868606a47f4819a2b5549" },
+    { "path": "C:/Users/User/ATM-rescue-0322", "head": "2fb48a300c729926c624535f9a03321e2b8e7597" },
+    { "path": "C:/Users/User/ATM-rescue-SKL0037", "head": "e903e83bd3cf92086bc0beeaf1e30d5ee8cbca97" }
+  ],
+  "postconditions": {
+    "remainingApprovedPaths": 0,
+    "registeredRescueWorktrees": 0,
+    "mainNodeModulesExists": true,
+    "mainNodeModulesItemCount": 91,
+    "planningRootAmbiguityResolved": true,
+    "planningRootValidation": "node atm.mjs next --prompt \"verify planning root after approved rescue cleanup\" --json",
+    "validatedAgainstHead": "8656ecca1f377bf180c623c3897d7a93b45e53c9"
+  },
+  "result": "completed"
+}
