@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T05-24-55-278Z-scope-amendment-5a69088c02f1",
+  "taskId": "ATM-GOV-0356",
+  "action": "scope-amendment",
+  "actorId": "claude-008-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0356.json",
+  "taskSha256": "sha256:feeea19acabb698a460d3cb57e4019dfb0d135c353374b9ff3ae80aecea40631",
+  "createdAt": "2026-08-13T05:24:55.278Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0356 --actor claude-008-captain --add \"scripts/lib/validator-contract-subject.ts,scripts/validate-branch-commit-queue.ts,scripts/validate-bridge-minor.ts,tests/cli/validator-contract-subject.test.ts\" --reason \"ATM-GOV-0354 planning card lost its creation seal and cannot be re-imported without an emergency lease; its deliverables are the same standard-profile anchor repair this card owns\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ATM-GOV-0354 planning card lost its creation seal and cannot be re-imported without an emergency lease; its deliverables are the same standard-profile anchor repair this card owns"
+  }
+}
