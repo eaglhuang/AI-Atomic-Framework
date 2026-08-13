@@ -8,11 +8,12 @@ export const DEFAULT_PLANNING_ROOT = process.env.ATM_PLANNING_REPO_ROOT
   ? resolve(process.env.ATM_PLANNING_REPO_ROOT)
   : resolve('..', '3KLife');
 export const DEFAULT_OUTPUT = resolve('docs/reports/plan-3x-4x-runbook-completion-evidence.json');
+export const DEFAULT_CERTIFICATE = resolve('docs/reports/plan-3x-4x-independent-certificate.json');
 
 type EvidenceTuple = { command: string; exitCode: number; outputDigest: string; artifactPaths: string[]; observedAt: string; sourceCommit: string; evidenceOwner: string };
 type CompletionRow = { itemId: string; sourceLine: number; section: string; wave: string | null; requirement: string; requirementDigest: string; status: 'proven' | 'unproven'; evidence: EvidenceTuple[]; diagnostics: string[]; coverageOwners?: string[] };
 
-const digest = (value: string) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
+export const digestText = (value: string) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
 
 export function parseRunbook(source: string): { rows: CompletionRow[]; waveExits: CompletionRow[] } {
   const rows: CompletionRow[] = [];
@@ -29,12 +30,12 @@ export function parseRunbook(source: string): { rows: CompletionRow[]; waveExits
     const checkbox = /^- \[([ xX])\]\s+(.+)$/.exec(line);
     if (checkbox) {
       const requirement = checkbox[2].trim();
-      rows.push({ itemId: `RB-${String(rows.length + 1).padStart(3, '0')}`, sourceLine: index + 1, section, wave, requirement, requirementDigest: digest(requirement), status: 'unproven', evidence: [], diagnostics: ['missing-command-backed-evidence'] });
+      rows.push({ itemId: `RB-${String(rows.length + 1).padStart(3, '0')}`, sourceLine: index + 1, section, wave, requirement, requirementDigest: digestText(requirement), status: 'unproven', evidence: [], diagnostics: ['missing-command-backed-evidence'] });
     }
     const exit = /^退出條件：\s*(.+)$/.exec(line);
     if (exit) {
       const requirement = exit[1].trim();
-      waveExits.push({ itemId: `EXIT-${String(waveExits.length + 1).padStart(2, '0')}`, sourceLine: index + 1, section, wave, requirement, requirementDigest: digest(requirement), status: 'unproven', evidence: [], diagnostics: ['missing-independent-wave-exit-evidence'] });
+      waveExits.push({ itemId: `EXIT-${String(waveExits.length + 1).padStart(2, '0')}`, sourceLine: index + 1, section, wave, requirement, requirementDigest: digestText(requirement), status: 'unproven', evidence: [], diagnostics: ['missing-independent-wave-exit-evidence'] });
     }
   });
   return { rows, waveExits };
@@ -107,6 +108,7 @@ function isAncestor(sourceCommit: string, targetHead: string): boolean {
 function evidenceForContracts(contracts: CardContract[], targetHead: string): EvidenceTuple[] {
   const tuples: EvidenceTuple[] = [];
   const expectedCommands = new Set(contracts.flatMap((contract) => contract.validators));
+  const expectedOwners = new Set(contracts.map((contract) => contract.taskId));
   const cacheKey = `${targetHead}:${[...expectedCommands].sort().join('\u0000')}`;
   const cached = evidenceCache.get(cacheKey);
   if (cached) return cached;
@@ -114,6 +116,7 @@ function evidenceForContracts(contracts: CardContract[], targetHead: string): Ev
   if (!existsSync(evidenceDir)) return tuples;
   for (const file of readdirSync(evidenceDir).filter((name) => /^ATM-GOV-\d+\.json$/.test(name))) {
     const owner = file.replace(/\.json$/, '');
+    if (!expectedOwners.has(owner)) continue;
     const evidencePath = `.atm/history/evidence/${file}`;
     if (!existsSync(evidencePath)) continue;
     const record = JSON.parse(readFileSync(evidencePath, 'utf8'));
@@ -132,6 +135,14 @@ function evidenceForContracts(contracts: CardContract[], targetHead: string): Ev
   return tuples;
 }
 
+export function evidenceTupleKey(tuple: EvidenceTuple): string {
+  return [tuple.evidenceOwner, tuple.command, tuple.sourceCommit, tuple.outputDigest, ...tuple.artifactPaths].join('\u0000');
+}
+
+export function evidenceBelongsToContract(tuple: EvidenceTuple, contract: CardContract): boolean {
+  return tuple.evidenceOwner === contract.taskId && contract.validators.includes(tuple.command);
+}
+
 function hydrate(row: CompletionRow, contracts: CardContract[], targetHead: string): CompletionRow {
   const evidence = evidenceForContracts(contracts, targetHead);
   const owners = contracts.map((contract) => contract.taskId);
@@ -140,35 +151,126 @@ function hydrate(row: CompletionRow, contracts: CardContract[], targetHead: stri
   return { ...row, coverageOwners: owners, evidence, status: proven ? 'proven' : 'unproven', diagnostics: proven ? [] : [`missing-command-backed-evidence:${uncoveredOwners.join(',') || 'no-contract'}`] };
 }
 
-export function compileRunbookCompletion(source: string, planningHead: string, targetHead: string, originMain: string) {
+function observeFinalCertificate(): { proven: boolean; diagnostics: string[] } {
+  if (!existsSync(DEFAULT_CERTIFICATE)) return { proven: false, diagnostics: ['final-certificate-missing'] };
+  try {
+    const certificate = JSON.parse(readFileSync(DEFAULT_CERTIFICATE, 'utf8'));
+    const pending = JSON.stringify(certificate).includes('pending-self-digest');
+    const diagnostics = Array.isArray(certificate.diagnostics) ? certificate.diagnostics : ['final-certificate-diagnostics-invalid'];
+    const proven = certificate.status === 'proven'
+      && certificate.overallVerdict === 'complete'
+      && certificate.releaseAuthorized === true
+      && diagnostics.length === 0
+      && !pending;
+    return { proven, diagnostics: proven ? [] : ['final-certificate-not-proven', ...diagnostics] };
+  } catch {
+    return { proven: false, diagnostics: ['final-certificate-unreadable'] };
+  }
+}
+
+function requiresFinalCertificate(row: CompletionRow): boolean {
+  return row.wave === 'Wave 10'
+    || (row.section === 'Tests, backlog and release' && /runner sync queue|remote-reachable|closeback receipt|final certificate/.test(row.requirement));
+}
+
+export function compileRunbookCompletion(
+  source: string,
+  planningHead: string,
+  targetHead: string,
+  originMain: string,
+  finalCertificate = observeFinalCertificate(),
+  generatedAt = new Date().toISOString(),
+  authorityDiagnostics: string[] = []
+) {
   const parsed = parseRunbook(source);
   const contracts = discoverCardContracts(source);
-  parsed.rows = parsed.rows.map((row) => hydrate(row, contractsForRow(row, contracts), targetHead));
+  parsed.rows = parsed.rows.map((row) => {
+    const hydrated = hydrate(row, contractsForRow(row, contracts), targetHead);
+    return requiresFinalCertificate(row) && !finalCertificate.proven
+      ? { ...hydrated, status: 'unproven' as const, diagnostics: finalCertificate.diagnostics }
+      : hydrated;
+  });
   const rowsByWave = new Map<string, CompletionRow[]>();
   for (const row of parsed.rows) if (row.wave) rowsByWave.set(row.wave, [...(rowsByWave.get(row.wave) ?? []), row]);
   parsed.waveExits = parsed.waveExits.map((row) => {
     const basis = rowsByWave.get(row.wave ?? '') ?? [];
     const contractsForWave = contracts.filter((contract) => contract.wave === row.wave);
     const hydrated = hydrate(row, contractsForWave, targetHead);
-    const independentlySatisfied = (basis.length === 0 || basis.every((item) => item.status === 'proven')) && hydrated.status === 'proven';
+    const basisKeys = new Set(basis.flatMap((item) => item.evidence).map(evidenceTupleKey));
+    const independentEvidence = hydrated.evidence.filter((tuple) => !basisKeys.has(evidenceTupleKey(tuple)));
+    const uncoveredOwners = contractsForWave
+      .filter((contract) => !independentEvidence.some((tuple) => evidenceBelongsToContract(tuple, contract)))
+      .map((contract) => contract.taskId);
+    const independentlySatisfied = (basis.length === 0 || basis.every((item) => item.status === 'proven'))
+      && contractsForWave.length > 0
+      && uncoveredOwners.length === 0;
     return independentlySatisfied
-      ? { ...hydrated, diagnostics: hydrated.evidence.length ? [] : ['missing-independent-wave-exit-evidence'] }
-      : { ...hydrated, status: 'unproven' as const, diagnostics: ['wave-requirement-basis-not-proven'] };
+      ? { ...hydrated, evidence: independentEvidence, diagnostics: [] }
+      : { ...hydrated, evidence: independentEvidence, status: 'unproven' as const, diagnostics: [
+          ...(basis.some((item) => item.status !== 'proven') ? ['wave-requirement-basis-not-proven'] : []),
+          ...(uncoveredOwners.length ? [`missing-independent-wave-exit-evidence:${uncoveredOwners.join(',')}`] : [])
+        ] };
   });
+  if (authorityDiagnostics.length > 0) {
+    parsed.rows = parsed.rows.map((row) => ({ ...row, status: 'unproven' as const, diagnostics: [...new Set([...row.diagnostics, ...authorityDiagnostics])] }));
+    parsed.waveExits = parsed.waveExits.map((row) => ({ ...row, status: 'unproven' as const, diagnostics: [...new Set([...row.diagnostics, ...authorityDiagnostics])] }));
+  }
   const allRows = [...parsed.rows, ...parsed.waveExits];
   const unresolved = allRows.filter((row) => row.status !== 'proven').map((row) => row.itemId);
   const unknown = allRows.filter((row) => row.coverageOwners?.length && row.evidence.length === 0).map((row) => row.itemId);
   return {
-    schemaId: 'atm.runbookCompletionEvidence.v1', specVersion: '0.1.0', generatedAt: new Date().toISOString(),
-    authority: { planningPath: RUNBOOK_RELATIVE_PATH, planningHead, targetHead, originMain, sourceDigest: digest(source) },
+    schemaId: 'atm.runbookCompletionEvidence.v1', specVersion: '0.1.0', generatedAt,
+    authority: { planningPath: RUNBOOK_RELATIVE_PATH, planningHead, targetHead, originMain, sourceDigest: digestText(source), diagnostics: authorityDiagnostics },
     expectedItemCount: parsed.rows.length, rows: parsed.rows, waveExits: parsed.waveExits,
     unresolvedIds: unresolved, deferredIds: [], unknownIds: unknown, overallVerdict: unresolved.length ? 'not-complete' : 'complete'
   };
 }
 
 if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
+  const modeIndex = process.argv.indexOf('--mode');
+  const mode = modeIndex >= 0 ? process.argv[modeIndex + 1] : 'validate';
+  if (mode !== 'validate' && mode !== 'write') {
+    console.error(`[compile-runbook-completion-evidence] unknown --mode ${String(mode)}; expected validate or write`);
+    process.exitCode = 2;
+  } else {
   const source = readFileSync(resolve(DEFAULT_PLANNING_ROOT, RUNBOOK_RELATIVE_PATH), 'utf8');
-  const report = compileRunbookCompletion(source, process.env.ATM_PLANNING_HEAD ?? 'unknown', process.env.ATM_TARGET_HEAD ?? 'unknown', process.env.ATM_ORIGIN_MAIN ?? 'unknown');
-  writeFileSync(DEFAULT_OUTPUT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  const git = (cwd: string, args: string[]): string => {
+    try {
+      return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8' }).trim();
+    } catch {
+      return 'unknown';
+    }
+  };
+  const gitRaw = (cwd: string, args: string[]): string | null => {
+    try {
+      return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8' });
+    } catch {
+      return null;
+    }
+  };
+  const planningHead = process.env.ATM_PLANNING_HEAD ?? git(DEFAULT_PLANNING_ROOT, ['rev-parse', 'HEAD']);
+  const targetHead = process.env.ATM_TARGET_HEAD ?? git(resolve('.'), ['rev-parse', 'HEAD']);
+  const originMain = process.env.ATM_ORIGIN_MAIN ?? git(resolve('.'), ['ls-remote', 'origin', 'refs/heads/main']).split(/\s+/)[0] ?? 'unknown';
+  const committed = mode === 'validate' && existsSync(DEFAULT_OUTPUT)
+    ? JSON.parse(readFileSync(DEFAULT_OUTPUT, 'utf8'))
+    : null;
+  const generatedAt = mode === 'validate' ? String(committed?.generatedAt ?? '') : new Date().toISOString();
+  const planningSourceAtHead = gitRaw(DEFAULT_PLANNING_ROOT, ['show', `${planningHead}:${RUNBOOK_RELATIVE_PATH}`]);
+  const planningDirty = git(DEFAULT_PLANNING_ROOT, ['status', '--porcelain', '--', RUNBOOK_RELATIVE_PATH]);
+  const authorityDiagnostics = [
+    ...(planningDirty ? ['planning-runbook-dirty'] : []),
+    ...(planningSourceAtHead === null || digestText(planningSourceAtHead) !== digestText(source)
+      ? ['planning-runbook-head-digest-mismatch']
+      : [])
+  ];
+  const report = compileRunbookCompletion(source, planningHead, targetHead, originMain, observeFinalCertificate(), generatedAt, authorityDiagnostics);
+  const serialized = `${JSON.stringify(report, null, 2)}\n`;
+  if (mode === 'write') {
+    writeFileSync(DEFAULT_OUTPUT, serialized, 'utf8');
+  } else if (committed === null || readFileSync(DEFAULT_OUTPUT, 'utf8') !== serialized) {
+    console.error('[compile-runbook-completion-evidence] canonical report is stale; rerun with --mode write');
+    process.exitCode = 1;
+  }
   console.log(`[compile-runbook-completion-evidence] ${report.overallVerdict} rows=${report.rows.length} exits=${report.waveExits.length} unresolved=${report.unresolvedIds.length}`);
+  }
 }

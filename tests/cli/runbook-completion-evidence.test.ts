@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT } from '../../scripts/compile-runbook-completion-evidence.ts';
 import { validateReport } from '../../scripts/validate-runbook-completion-evidence.ts';
 
@@ -23,4 +25,47 @@ assert.throws(() => validateReport(omitted, source), /count drift/);
 const falseGreen = structuredClone(report);
 falseGreen.overallVerdict = 'complete';
 assert.throws(() => validateReport(falseGreen, source), /complete verdict/);
+
+const liveHead = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+const ownedTuple = {
+  command: 'node --strip-types tests/cli/example.test.ts',
+  exitCode: 0,
+  outputDigest: `sha256:${'b'.repeat(64)}`,
+  artifactPaths: ['scripts/compile-runbook-completion-evidence.ts'],
+  observedAt: '2026-08-13T00:00:00.000Z',
+  sourceCommit: liveHead,
+  evidenceOwner: 'ATM-GOV-TEST-A'
+};
+const foreignOwner = structuredClone(report);
+foreignOwner.authority.targetHead = liveHead;
+foreignOwner.rows[0].status = 'proven';
+foreignOwner.rows[0].coverageOwners = ['ATM-GOV-TEST-B'];
+foreignOwner.rows[0].evidence = [ownedTuple];
+foreignOwner.unresolvedIds = foreignOwner.unresolvedIds.filter((id: string) => id !== foreignOwner.rows[0].itemId);
+assert.throws(() => validateReport(foreignOwner, source), /foreign evidence owner/);
+
+const reusedWaveReceipt = structuredClone(report);
+reusedWaveReceipt.authority.targetHead = liveHead;
+reusedWaveReceipt.rows[0].status = 'proven';
+reusedWaveReceipt.rows[0].coverageOwners = ['ATM-GOV-TEST-A'];
+reusedWaveReceipt.rows[0].evidence = [ownedTuple];
+reusedWaveReceipt.waveExits[0].status = 'proven';
+reusedWaveReceipt.waveExits[0].coverageOwners = ['ATM-GOV-TEST-A'];
+reusedWaveReceipt.waveExits[0].evidence = [ownedTuple];
+reusedWaveReceipt.unresolvedIds = reusedWaveReceipt.unresolvedIds.filter((id: string) => ![reusedWaveReceipt.rows[0].itemId, reusedWaveReceipt.waveExits[0].itemId].includes(id));
+assert.throws(() => validateReport(reusedWaveReceipt, source), /wave exit reuses basis evidence/);
+const finalSource = ['## Wave 10 — Certification', '- [ ] final requirement', '退出條件：final exit'].join('\n');
+const finalReport = compileRunbookCompletion(finalSource, sha, sha, sha, { proven: false, diagnostics: ['final-certificate-not-proven'] });
+assert.deepEqual(finalReport.unresolvedIds, ['RB-001', 'EXIT-01']);
+assert.deepEqual(finalReport.rows[0].diagnostics, ['final-certificate-not-proven']);
+
+// Validation must compare against live inputs without rewriting the canonical
+// report. A green validator over a silently regenerated file is not freshness
+// evidence and recreates the false-green condition this runbook corrects.
+const canonicalPath = 'docs/reports/plan-3x-4x-runbook-completion-evidence.json';
+const beforeValidate = readFileSync(canonicalPath, 'utf8');
+execFileSync(process.execPath, ['--strip-types', 'scripts/compile-runbook-completion-evidence.ts', '--mode', 'validate'], {
+  stdio: 'pipe'
+});
+assert.equal(readFileSync(canonicalPath, 'utf8'), beforeValidate, 'validate mode must be read-only');
 console.log('[runbook-completion-evidence] ok');

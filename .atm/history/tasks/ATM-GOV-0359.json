@@ -1,0 +1,277 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0359",
+  "title": "Compile complete runbook item and wave-exit evidence",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0358"
+  ],
+  "acceptance": [
+    "ACC-1 Parse the authoritative planning-repository runbook and emit exactly one stable row for every checkbox, including source line, Wave/section, requirement digest, status, evidence tuples, and diagnostics.",
+    "ACC-2 Emit an independent verdict for every Wave exit condition. Missing, stale, contradictory, unavailable, deferred, unknown, or non-command-backed evidence must remain non-proven and keep the overall verdict `not-complete`.",
+    "ACC-3 The validator recomputes source coverage and evidence digests independently; it rejects count drift, duplicate/omitted rows, caller-authored green labels, pending digests, stale remote provenance, and any overall `complete` verdict with a non-proven row."
+  ],
+  "deliverables": [
+    "scripts/compile-runbook-completion-evidence.ts",
+    "scripts/validate-runbook-completion-evidence.ts",
+    "tests/cli/runbook-completion-evidence.test.ts",
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+  ],
+  "scopePaths": [
+    "scripts/compile-runbook-completion-evidence.ts",
+    "scripts/validate-runbook-completion-evidence.ts",
+    "tests/cli/runbook-completion-evidence.test.ts",
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+    "node --strip-types scripts/validate-runbook-completion-evidence.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Marking an item complete from prose, task status, or unchecked Markdown alone",
+    "Deleting rescue worktrees"
+  ],
+  "nonGoals": [
+    "Treating authorized deferred work as silently complete"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the compiler and keep the formal verdict NOT COMPLETE if any item-level evidence cannot be reconstructed.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.independent-certification",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0359-compile-runbook-item-and-wave-exit-evidence.task.md",
+    "sectionTitle": "ATM-GOV-0359",
+    "headingLine": 69,
+    "hash": "509b8fe4255f64ed",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0359-compile-runbook-item-and-wave-exit-evidence.task.md",
+      "planningCommitSha": "abeb6fa1dc71c3362286fdb96184356669b9bf66",
+      "contentDigest": "sha256:509b8fe4255f64edea9687fe8b7d66b32d12c330b84e56b85110cf488751ee2d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T12:48:37.938Z"
+    }
+  },
+  "importedAt": "2026-08-13T12:48:37.938Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0358"
+    ],
+    "startConditions": [
+      "The canonical objective certificate is proven, but the runbook checklist has no item-level command-backed coverage authority."
+    ],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "atm.runbookCompletionEvidence.v1",
+      "atm.waveExitVerdict.v1"
+    ],
+    "causalImpactEdges": [
+      "runbook-items-to-final-certificate",
+      "wave-exits-to-final-certificate"
+    ],
+    "parallelFrontierInputs": [
+      "runbook-source",
+      "target-receipts",
+      "current-remote-provenance"
+    ],
+    "validatorReferences": [
+      "validate-runbook-completion-evidence"
+    ],
+    "phaseOwner": "wave-10-independent-final-certification"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0359_runbook_items_are_command_bound",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "every_runbook_checkbox_and_wave_exit_is_fail_closed_and_evidence_bound",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "runbook-items-to-final-certificate",
+        "wave-exits-to-final-certificate"
+      ],
+      "expectedRedPredicate": "a certificate can be proven while one or more runbook checklist items have no command-backed evidence",
+      "contributionResourceKey": "four-plan-runbook-completion",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0358",
+      "contractEdge": "atm.runbookCompletionEvidence.v1",
+      "resourceKey": "four-plan-runbook-completion"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0359_runbook_items_are_command_bound"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-13T13-32-02-529Z-renew-aead31f4af8f",
+  "lastTransitionAt": "2026-08-13T13:32:02.529Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-13T12:48:44.093Z",
+  "promotedAt": "2026-08-13T12:48:44.097Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-4cc9be832130",
+    "claimedAt": "2026-08-13T12:48:44.102Z",
+    "heartbeatAt": "2026-08-13T13:32:02.278Z",
+    "ttlSeconds": 3600,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0359.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "scripts/compile-runbook-completion-evidence.ts",
+      "scripts/validate-runbook-completion-evidence.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260813124844-codex-gpt-5.4-mini-f6e999d1e4",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813124844-codex-gpt-5.4-mini-f6e999d1e4\""
+    }
+  },
+  "startedAt": "2026-08-13T12:48:44.102Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-03c247f9d783e652",
+    "ticketDigest": "sha256:03c247f9d783e652246f1d372949bea2717929b32cba9c322dc50052152738fe",
+    "taskId": "ATM-GOV-0359",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260813124844-codex-gpt-5.4-mini-f6e999d1e4",
+    "claimGeneration": "lease-4cc9be832130",
+    "issuedAt": "2026-08-13T13:32:02.278Z",
+    "expiresAt": "2026-08-13T14:32:02.278Z",
+    "scopeDigest": "sha256:9b3e0181642fe8b468a472d740b738010d7493fdf39bcdd08b007d179eb6500b",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-13T13:32:02.278Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0359.*",
+          ".atm/history/task-events/ATM-GOV-0359/**",
+          ".atm/history/tasks/ATM-GOV-0359.json",
+          "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+          "scripts/compile-runbook-completion-evidence.ts",
+          "scripts/validate-runbook-completion-evidence.ts",
+          "tests/cli/runbook-completion-evidence.test.ts"
+        ],
+        "digest": "sha256:50c8dd5f64fe9fc25f65f6429a6dc0c05665d3d4354f26abc3723d0ec84bb31b"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260813124844-codex-gpt-5.4-mini-ATM-GOV-0359-a19ca98515",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0359",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0359.*",
+      ".atm/history/task-events/ATM-GOV-0359/**",
+      ".atm/history/tasks/ATM-GOV-0359.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "scripts/compile-runbook-completion-evidence.ts",
+      "scripts/validate-runbook-completion-evidence.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1c1a3487df42758273f8c81816333af3fd5dcf9922bcce1b32cea91b7e9327b6",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260813124844-codex-gpt-5.4-mini-ATM-GOV-0359-a19ca98515",
+    "laneSession": {
+      "laneSessionId": "lane-20260813124844-codex-gpt-5.4-mini-f6e999d1e4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813124844-codex-gpt-5.4-mini-f6e999d1e4\""
+    },
+    "createdAt": "2026-08-13T12:48:48.506Z",
+    "status": "active"
+  }
+}
