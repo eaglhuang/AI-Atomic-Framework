@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T07-43-59-952Z-close-2ce69323e464",
+  "taskId": "ATM-GOV-0378",
+  "action": "close",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814073531-codex-captain-recovery-ATM-GOV-0378-c5b78e17db",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0378.json",
+  "taskSha256": "sha256:5cacca74ba69686edf91992cdf1b5eca0a56f214e58d91df0574fd5a1df44f53",
+  "createdAt": "2026-08-14T07:43:59.952Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0378 --actor codex-captain-recovery --status done --historical-delivery 59e162d23a50d4b1997be170fd9a983a804961d1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814073531-codex-captain-recovery-ATM-GOV-0378-c5b78e17db",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0378.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate",
+      "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T07:43:59.938Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0378.*",
+        ".atm/history/task-events/ATM-GOV-0378/**",
+        ".atm/history/tasks/ATM-GOV-0378.json",
+        "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+        "scripts/compile-runbook-completion-evidence.ts",
+        "tests/cli/runbook-completion-evidence.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/compile-runbook-completion-evidence.ts",
+        "tests/cli/runbook-completion-evidence.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
