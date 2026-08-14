@@ -1,0 +1,300 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0370",
+  "title": "Bind runner publication outputs to producer authority before taskflow close bundling",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 Producer authority is durable, digest-bound, and shared by publication capability, close-evidence discovery, and bundle assembly.",
+    "ACC-2 A foreign active, released, or framework-temp producer output remains byte-preserved and excluded from the consumer bundle.",
+    "ACC-3 The close preview emits one actionable ownership diagnostic rather than attempting a foreign commit; own output remains stageable."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
+    "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+    "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/current-task-close-evidence.ts",
+    "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+    "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+    ".atm/history/evidence/ATM-GOV-0370.*",
+    ".atm/history/task-events/ATM-GOV-0370/**",
+    ".atm/history/tasks/ATM-GOV-0370.json",
+    "packages/cli/src/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert producer authority filtering and the focused fixtures together; never delete foreign runner output as recovery.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-publication-output-authority",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0370-bind-runner-publication-outputs-to-producer-authority-before-taskflow-close-bundling.task.md",
+    "sectionTitle": "ATM-GOV-0370",
+    "headingLine": 72,
+    "hash": "b9dfaa60ceca50fc",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0370-bind-runner-publication-outputs-to-producer-authority-before-taskflow-close-bundling.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:b9dfaa60ceca50fcc9f325e7440a7db7c885191951e2b7088d56798ed54c2431",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T00:39:56.436Z"
+    }
+  },
+  "importedAt": "2026-08-14T00:39:56.436Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A taskflow close dry-run includes runner publication outputs not owned by the closing task."
+    ],
+    "softRelations": [
+      "ATM-GOV-0362",
+      "ATM-GOV-0363"
+    ],
+    "changedPublicSeams": [
+      "atm.runnerPublicationOutputAuthority.v1"
+    ],
+    "causalImpactEdges": [
+      "own-runner-output-enters-own-close-bundle",
+      "foreign-runner-output-is-preserved-and-excluded",
+      "close-diagnostic-shares-producer-snapshot"
+    ],
+    "parallelFrontierInputs": [
+      "runner-publication-receipt",
+      "framework-temp-lock",
+      "taskflow-close-bundle"
+    ],
+    "validatorReferences": [
+      "taskflow-close-runner-output-ownership"
+    ],
+    "phaseOwner": "wave-3-governance-substrate-recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0370_own_runner_output_is_bound_to_producer",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "own_runner_publication_output_is_accepted_from_canonical_producer_snapshot",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "own-runner-output-enters-own-close-bundle"
+      ],
+      "expectedRedPredicate": "own runner output cannot be attributed consistently across publication and close bundle consumers",
+      "contributionResourceKey": "runner-publication-output-authority",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0369",
+      "contractEdge": "atm.runnerPublicationOutputAuthority.v1",
+      "resourceKey": "taskflow-close-runner-output-ownership"
+    },
+    {
+      "caseId": "test_atm_gov_0370_foreign_runner_output_excluded",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "foreign_runner_publication_output_never_enters_consumer_close_bundle",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "foreign-runner-output-is-preserved-and-excluded",
+        "close-diagnostic-shares-producer-snapshot"
+      ],
+      "expectedRedPredicate": "foreign producer runner artifacts enter a consumer close bundle or are mutated",
+      "contributionResourceKey": "runner-publication-output-authority",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0369",
+      "contractEdge": "atm.runnerPublicationOutputAuthority.v1",
+      "resourceKey": "taskflow-close-runner-output-ownership"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0370_own_runner_output_is_bound_to_producer",
+    "test_atm_gov_0370_foreign_runner_output_excluded"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-f1853a625f0c",
+    "claimedAt": "2026-08-14T00:30:05.121Z",
+    "heartbeatAt": "2026-08-14T00:41:29.608Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0370.*",
+      ".atm/history/task-events/ATM-GOV-0370/**",
+      ".atm/history/tasks/ATM-GOV-0370.json",
+      "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+      "packages/cli/src/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/current-task-close-evidence.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1\""
+    }
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "startedAt": "2026-08-14T00:30:05.121Z",
+  "startedBySessionId": "session-20260814003005-codex-gpt-5.4-mini-ATM-GOV-0370-af5d2776b2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0370",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0370.*",
+      ".atm/history/task-events/ATM-GOV-0370/**",
+      ".atm/history/tasks/ATM-GOV-0370.json",
+      "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+      "packages/cli/src/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/current-task-close-evidence.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0370-bind-runner-publication-outputs-to-producer-authority-before-taskflow-close-bundling.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0370-bind-runner-publication-outputs-to-producer-authority-before-taskflow-close-bundling.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "a5868c51529ff646b2bf1efa7e2177a5bf114d8ec0a9e40cbc6d16779d9df592",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1\""
+    },
+    "createdAt": "2026-08-14T00:30:09.201Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-08-14T00-41-29-842Z-renew-ff71ad5967e8",
+  "lastTransitionAt": "2026-08-14T00:41:29.842Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-ca33dd70bd26bf08",
+    "ticketDigest": "sha256:ca33dd70bd26bf08ef153ed8a4fafcd1109dc94d4c72aa3e3e8750ad3edb7008",
+    "taskId": "ATM-GOV-0370",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1",
+    "claimGeneration": "lease-f1853a625f0c",
+    "issuedAt": "2026-08-14T00:41:29.608Z",
+    "expiresAt": "2026-08-14T01:11:29.608Z",
+    "scopeDigest": "sha256:8deb82f29baefda95311360f5b1737fcb2c689eaf3ea4f4020096e0d59b8bce4",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T00:41:29.608Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0370.*",
+          ".atm/history/task-events/ATM-GOV-0370/**",
+          ".atm/history/tasks/ATM-GOV-0370.json",
+          "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+          "packages/cli/src/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.ts",
+          "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+          "packages/cli/src/commands/taskflow/current-task-close-evidence.ts"
+        ],
+        "digest": "sha256:36ac040f24736985432582529f2aee6c390f320b5d71aa46e72b165d8c3e254a"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

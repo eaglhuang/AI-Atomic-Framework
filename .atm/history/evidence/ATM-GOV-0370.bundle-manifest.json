@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0370",
+  "updatedAt": "2026-08-14T00:40:42.076Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9e644186df8f4fd43f53471d8cbb51bc8d60ca77e29c7549e302166bb343ff11",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts"
+      ],
+      "generatedAt": "2026-08-14T00:40:31.378Z",
+      "startedAt": "2026-08-14T00:40:30.122Z",
+      "finishedAt": "2026-08-14T00:40:31.378Z",
+      "durationMs": 1256,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fc4c29d4a1483af5bb1c23677749e1a730b99247",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T00:40:42.075Z",
+      "startedAt": "2026-08-14T00:40:33.612Z",
+      "finishedAt": "2026-08-14T00:40:42.075Z",
+      "durationMs": 8463,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fc4c29d4a1483af5bb1c23677749e1a730b99247",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
