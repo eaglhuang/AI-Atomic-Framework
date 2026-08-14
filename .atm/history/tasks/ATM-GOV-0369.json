@@ -37,7 +37,9 @@
     "scripts/runner-sync-incremental-build.ts",
     "tests/cli/runner-sync-incremental-build.test.ts",
     "tests/cli/runner-sync-clean-close-pathway.test.ts",
-    "scripts/sealed-runner-artifact-lifecycle.ts"
+    "scripts/sealed-runner-artifact-lifecycle.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts"
   ],
   "validators": [
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
@@ -225,12 +227,14 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-fea9c9e8431b",
     "claimedAt": "2026-08-14T03:39:31.625Z",
-    "heartbeatAt": "2026-08-14T03:47:38.363Z",
+    "heartbeatAt": "2026-08-14T04:39:04.983Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0369.*",
       ".atm/history/task-events/ATM-GOV-0369/**",
       ".atm/history/tasks/ATM-GOV-0369.json",
+      "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
       "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
       "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
@@ -248,33 +252,33 @@
     "reason": "expired predecessor lease; source-first recovery to publish the runner ownership fix without losing retained WIP",
     "laneSession": {
       "laneSessionId": "lane-20260814033931-codex-captain-recovery-43b6225d2c",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814033931-codex-captain-recovery-43b6225d2c\""
     }
   },
   "startedAt": "2026-08-13T23:49:12.556Z",
   "startedBySessionId": "session-20260814033931-codex-captain-recovery-ATM-GOV-0369-f8c0b4bdf7",
-  "lastTransitionId": "2026-08-14T03-47-38-612Z-renew-0f12e888801a",
-  "lastTransitionAt": "2026-08-14T03:47:38.612Z",
+  "lastTransitionId": "2026-08-14T04-48-04-270Z-scope-amendment-f69d5a35eded",
+  "lastTransitionAt": "2026-08-14T04:48:04.270Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-73dab4458bc7e053",
-    "ticketDigest": "sha256:73dab4458bc7e05389e61fbdd406af9e370d6f288b47e90d57fdca58f6e096b8",
+    "ticketId": "wat-194ef4ef1c41ff39",
+    "ticketDigest": "sha256:194ef4ef1c41ff395485bc79cbe8e826435c85efc9384a1c619e75c9f982de96",
     "taskId": "ATM-GOV-0369",
     "origin": "claim",
     "actorId": "codex-captain-recovery",
     "laneSessionId": "lane-20260814033931-codex-captain-recovery-43b6225d2c",
     "claimGeneration": "lease-fea9c9e8431b",
-    "issuedAt": "2026-08-14T03:47:38.363Z",
-    "expiresAt": "2026-08-14T04:17:38.363Z",
+    "issuedAt": "2026-08-14T04:39:04.983Z",
+    "expiresAt": "2026-08-14T05:09:04.983Z",
     "scopeDigest": "sha256:b76664574f7e67f955232c0d02592ce2bcc2970e2a55e624722eb29d17eeff3b",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T03:47:38.363Z"
+      "selectedAt": "2026-08-14T04:39:04.983Z"
     },
     "grants": [
       {
@@ -345,6 +349,8 @@
       ".atm/history/evidence/ATM-GOV-0369.*",
       ".atm/history/task-events/ATM-GOV-0369/**",
       ".atm/history/tasks/ATM-GOV-0369.json",
+      "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts",
       "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
       "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",

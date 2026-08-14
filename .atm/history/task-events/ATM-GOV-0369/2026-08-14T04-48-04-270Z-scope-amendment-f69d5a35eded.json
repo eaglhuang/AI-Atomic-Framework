@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T04-48-04-270Z-scope-amendment-f69d5a35eded",
+  "taskId": "ATM-GOV-0369",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-recovery",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0369.json",
+  "taskSha256": "sha256:f6d4551e6c6432582f7f987ea0d0e1f3a75689561cacae6df4c71a1139fa15aa",
+  "createdAt": "2026-08-14T04:48:04.270Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0369 --actor codex-captain-recovery --add \"packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts,packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts\" --reason \"Runner publication receipt self-owner handoff excludes its own sealed outputs from the governed close bundle; linked close-handoff seam and its regression test are required.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Runner publication receipt self-owner handoff excludes its own sealed outputs from the governed close bundle; linked close-handoff seam and its regression test are required."
+  }
+}
