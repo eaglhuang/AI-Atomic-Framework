@@ -1,17 +1,19 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-14T09:56:53.814Z",
+  "updatedAt": "2026-08-14T12:28:39.790Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
     "lint:touched",
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
+    "node --strip-types tests/cli/plan4-final-certification.test.ts",
     "typecheck",
     "validate-backlog-census",
     "validate-four-plan-objectives",
     "validate-runner-reproducibility",
     "validate:cli",
+    "validate:four-plan-objectives",
     "validate:git-head-evidence",
     "validate:module-boundaries"
   ],
@@ -239,6 +241,38 @@
       "durationMs": 952,
       "runnerKind": "dev-source",
       "sourceCommit": "3c5dfd37670cf4ba88a21c8e41a7da7363b93979",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/plan4-final-certification.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:485059e2aa1ebe426bc1cee83e07fd655da7b5725c1bb19d0dbeb0b1313faa0e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan4-final-certification.test.ts"
+      ],
+      "generatedAt": "2026-08-14T12:27:25.245Z",
+      "startedAt": "2026-08-14T12:27:24.930Z",
+      "finishedAt": "2026-08-14T12:27:25.245Z",
+      "durationMs": 315,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:four-plan-objectives",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60ac6c3292191eeed4dedd58d975243fdec7a4632664a11f320798e29ca13d17",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:four-plan-objectives"
+      ],
+      "generatedAt": "2026-08-14T12:28:39.789Z",
+      "startedAt": "2026-08-14T12:28:39.140Z",
+      "finishedAt": "2026-08-14T12:28:39.789Z",
+      "durationMs": 649,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
       "cached": false
     }
   ],

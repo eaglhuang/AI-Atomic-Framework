@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-cb9bc90c4cec",
+  "recordedAt": "2026-08-14T12:25:17.802Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0341",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0341 --message \"fix(evidence): stabilize four-plan certification snapshots\n\nATM-Work-Admission: wat-a3004d9d4de98a17 sha256:a3004d9d4de98a1767e0dc26a6c88cae599d8b653051022c8c83d707d45409e9\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0341-d187c2e3bd",
+  "reason": "ATM pre-commit bootstrap hung before commit creation; task bundle validators and fixed-point replay passed.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T12-25-17-801Z-EMG-ATM-GOV-0341-d187c2e3bd.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
