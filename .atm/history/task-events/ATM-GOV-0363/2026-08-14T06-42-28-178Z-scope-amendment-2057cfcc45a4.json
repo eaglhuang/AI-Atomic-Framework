@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T06-42-28-178Z-scope-amendment-2057cfcc45a4",
+  "taskId": "ATM-GOV-0363",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-recovery",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0363.json",
+  "taskSha256": "sha256:d41e732b1dfe552b6e7a40f7672b61227a89a4b2dc37e97f4f8289fee7118273",
+  "createdAt": "2026-08-14T06:42:28.178Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0363 --actor codex-captain-recovery --add \"packages/cli/dist/commands/command-specs.js,packages/cli/dist/commands/taskflow/historical-close-preflight.js,release/atm-onefile/atm.mjs,release/atm-onefile/release-manifest.json,release/atm-root-drop/docs/reports/plan-3x-4x-closeout-blocker-map.json,release/atm-root-drop/docs/reports/plan-3x-4x-independent-certificate.json,release/atm-root-drop/packages/cli/dist/commands/command-specs.js,release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js,release/atm-root-drop/packages/cli/src/commands/command-specs.ts,release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts,release/atm-root-drop/release-manifest.json,release/atm-root-drop/scripts/diagnose-plan3-evidence-closure.ts,release/atm-root-drop/tests/cli-fixtures/help-snapshots/command-list.json\" --reason \"commit exact queue-head sealed publication outputs with their producing task\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "commit exact queue-head sealed publication outputs with their producing task"
+  }
+}

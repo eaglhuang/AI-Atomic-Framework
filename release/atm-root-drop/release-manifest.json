@@ -1194,6 +1194,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/budget.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/cache.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/candidates.spec.js",
+    "release/atm-root-drop/packages/cli/dist/commands/command-specs/cleanup.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/create-map.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/create.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/daemon.spec.js",
@@ -1939,6 +1940,7 @@
     "release/atm-root-drop/packages/cli/src/commands/command-specs/budget.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/cache.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/candidates.spec.ts",
+    "release/atm-root-drop/packages/cli/src/commands/command-specs/cleanup.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/create-map.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/create.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/daemon.spec.ts",
@@ -5340,8 +5342,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 631,
-    "unchanged": 4674,
+    "copied": 612,
+    "unchanged": 4695,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -5467,6 +5469,7 @@
       "packages/cli/src/commands/command-specs/budget.spec.ts",
       "packages/cli/src/commands/command-specs/cache.spec.ts",
       "packages/cli/src/commands/command-specs/candidates.spec.ts",
+      "packages/cli/src/commands/command-specs/cleanup.spec.ts",
       "packages/cli/src/commands/command-specs/create-map.spec.ts",
       "packages/cli/src/commands/command-specs/create.spec.ts",
       "packages/cli/src/commands/command-specs/daemon.spec.ts",
@@ -6742,7 +6745,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:fe06384bafbc9d8bafde05d8f7a760e9735dfa35cc6fd0a0723e642786da1344"
+    "digest": "sha256:76462541472dc02d65a4904345efe3d61f88b4f8f921ba0e30afad00da78f21e"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -7910,6 +7913,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/budget.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/cache.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/candidates.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/cleanup.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/create-map.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/create.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/daemon.spec.js",
@@ -8655,6 +8659,7 @@
       "release/atm-root-drop/packages/cli/src/commands/command-specs/budget.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/cache.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/candidates.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/cleanup.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/create-map.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/create.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/daemon.spec.ts",
@@ -12058,5 +12063,23 @@
     "requiresExplicitStaging": true,
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
+  },
+  "buildInputsTreeHash": "sha256:ce1fddb2b6555a714092c2b307ece307ee4955623d4b47ed83687559d02e0f14",
+  "sealedSourceCommit": "233a6e4be41a3a8193c5d180d1546a3150acc8c0",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "missing-previous-sealed-source",
+  "incrementalPlanDigest": "sha256:e7643ab294a533456e52f7e97f74935b257aac728d7575957cc6347069a7c769",
+  "tsBuildCacheDigest": "sha256:ffed31361b20dd746c3ab1c0278289d54fb5c8934f01bb1fa41ae30188e48ff4",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
+  "phaseTimingsMs": {
+    "inputHashCalculation": 34,
+    "skipDecision": 5,
+    "worktreeSetup": 9145,
+    "typescriptBuild": 8733,
+    "rootDropReleaseAssembly": 18441,
+    "onefileReleaseAssembly": 1908,
+    "artifactSync": 4587,
+    "cleanup": 0,
+    "totalElapsed": 50024
   }
 }
