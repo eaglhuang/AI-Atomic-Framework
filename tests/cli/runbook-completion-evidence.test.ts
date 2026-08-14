@@ -2,11 +2,12 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT } from '../../scripts/compile-runbook-completion-evidence.ts';
+import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, isPublicationOnlyDelta } from '../../scripts/compile-runbook-completion-evidence.ts';
 import { validateReport } from '../../scripts/validate-runbook-completion-evidence.ts';
 
 const sha = 'a'.repeat(40);
 assert.equal(DEFAULT_PLANNING_ROOT.endsWith('3KLife'), true);
+assert.equal(isPublicationOnlyDelta('invalid', 'also-invalid'), false, 'invalid publication snapshots must fail closed');
 // Use synthetic wave numbers so repository evidence cannot hydrate this isolated fixture.
 const source = ['## Wave 98 — Preserve', '- [ ] first requirement', '退出條件：first exit', '## Wave 99 — Restore', '- [x] second requirement', '退出條件：second exit'].join('\n');
 const report = compileRunbookCompletion(source, sha, sha, sha);

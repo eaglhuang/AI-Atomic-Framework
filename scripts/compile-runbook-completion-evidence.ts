@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { basename, dirname, resolve } from 'node:path';
+import { basename, dirname, relative, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 export const RUNBOOK_RELATIVE_PATH = 'docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md';
@@ -15,6 +15,26 @@ type EvidenceTuple = { command: string; exitCode: number; outputDigest: string; 
 type CompletionRow = { itemId: string; sourceLine: number; section: string; wave: string | null; requirement: string; requirementDigest: string; status: 'proven' | 'unproven'; evidence: EvidenceTuple[]; diagnostics: string[]; coverageOwners?: string[]; validatorContractIds?: string[] };
 
 export const digestText = (value: string) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
+
+/**
+ * A generated evidence artifact cannot bind to the commit that publishes the
+ * artifact: that commit necessarily changes HEAD.  Freshness is therefore
+ * measured against the observed input snapshot, while allowing only the
+ * artifact itself and durable governance receipts in the publication delta.
+ * Any source change still forces a fresh observation.
+ */
+export function isPublicationOnlyDelta(observedHead: string, currentHead: string): boolean {
+  if (!/^[0-9a-f]{40}$/.test(observedHead) || !/^[0-9a-f]{40}$/.test(currentHead)) return false;
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', observedHead, currentHead], { stdio: 'ignore' });
+    const changed = execFileSync('git', ['diff', '--name-only', `${observedHead}..${currentHead}`], { encoding: 'utf8' })
+      .split(/\r?\n/).filter(Boolean);
+    const outputPath = relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/');
+    return changed.every((path) => path === outputPath || path.startsWith('.atm/history/'));
+  } catch {
+    return false;
+  }
+}
 
 export function parseRunbook(source: string): { rows: CompletionRow[]; waveExits: CompletionRow[] } {
   const rows: CompletionRow[] = [];
@@ -273,11 +293,15 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
     }
   };
   const planningHead = process.env.ATM_PLANNING_HEAD ?? git(DEFAULT_PLANNING_ROOT, ['rev-parse', 'HEAD']);
-  const targetHead = process.env.ATM_TARGET_HEAD ?? git(resolve('.'), ['rev-parse', 'HEAD']);
+  const currentTargetHead = process.env.ATM_TARGET_HEAD ?? git(resolve('.'), ['rev-parse', 'HEAD']);
   const originMain = process.env.ATM_ORIGIN_MAIN ?? git(resolve('.'), ['ls-remote', 'origin', 'refs/heads/main']).split(/\s+/)[0] ?? 'unknown';
   const committed = mode === 'validate' && existsSync(DEFAULT_OUTPUT)
     ? JSON.parse(readFileSync(DEFAULT_OUTPUT, 'utf8'))
     : null;
+  const committedSnapshot = String(committed?.authority?.targetHead ?? '');
+  const targetHead = mode === 'validate' && isPublicationOnlyDelta(committedSnapshot, currentTargetHead)
+    ? committedSnapshot
+    : currentTargetHead;
   const generatedAt = mode === 'validate' ? String(committed?.generatedAt ?? '') : new Date().toISOString();
   const planningSourceAtHead = gitRaw(DEFAULT_PLANNING_ROOT, ['show', `${planningHead}:${RUNBOOK_RELATIVE_PATH}`]);
   const planningDirty = git(DEFAULT_PLANNING_ROOT, ['status', '--porcelain', '--', RUNBOOK_RELATIVE_PATH]);
