@@ -9,6 +9,7 @@ import {
   readCommittedTreeEntries,
   runWithSealedTaskScopedCommitIndex
 } from './sealed-commit-attribution.ts';
+import { withTaskScopedCommitIndex } from './git-index-transaction.ts';
 import { ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit } from './git-head-evidence-transaction.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-commit-parity-'));
@@ -89,6 +90,28 @@ assert.ok(ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
 assert.doesNotThrow(
   () => execFileSync('git', ['ls-files', '--error-unmatch', '.atm/history/evidence/git-head.jsonl'], { cwd: repo, env: candidateEnv, stdio: 'ignore' }),
   'ignored transaction-produced git-head evidence must be force-staged in the candidate index'
+);
+
+// The public transaction boundary must commit the producer-generated evidence,
+// not merely stage it in the ephemeral candidate index. This catches frozen
+// runner drift where a producer and its post-commit consumer disagree.
+const governedSourceBlob = execFileSync('git', ['hash-object', 'packages/core/example.ts'], { cwd: repo, encoding: 'utf8' }).trim();
+const governedSeal = sealCommitBundle({
+  entries: [{ path: 'packages/core/example.ts', mode: '100644', blobId: governedSourceBlob, provenance: 'task-scope', disposition: 'present' }]
+});
+withTaskScopedCommitIndex(
+  repo,
+  ['packages/core/example.ts'],
+  'validator',
+  'ATM-GOV-0371',
+  (env) => execFileSync('git', ['commit', '-m', 'commit generated provenance'], { cwd: repo, env, stdio: 'ignore' }),
+  { kind: 'sealed-bundle', bundle: governedSeal },
+);
+const provenanceCommitFiles = execFileSync('git', ['show', '--format=', '--name-only', 'HEAD'], { cwd: repo, encoding: 'utf8' });
+assert.match(
+  provenanceCommitFiles,
+  /\.atm\/history\/evidence\/git-head\.jsonl/,
+  'a governed transaction must include its generated git-head evidence in the final commit tree'
 );
 
 console.log('[sealed-commit-attribution] committed-tree mismatch fails closed.');
