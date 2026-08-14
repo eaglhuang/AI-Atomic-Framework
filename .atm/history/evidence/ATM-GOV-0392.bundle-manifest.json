@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0392",
-  "updatedAt": "2026-08-14T15:44:28.561Z",
+  "updatedAt": "2026-08-14T15:50:22.081Z",
   "updatedBy": "claude-008",
   "freshValidationPasses": [
     "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
@@ -73,6 +73,70 @@
       "durationMs": 2072,
       "runnerKind": "frozen-runner",
       "sourceCommit": "60e4daba481712972fd4fd34cf764575c05f2914",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4ce29749d20793bd37b93e7ab628626f87b21c47643ad3af41abddaff2f6174e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+      ],
+      "generatedAt": "2026-08-14T15:50:08.971Z",
+      "startedAt": "2026-08-14T15:50:07.849Z",
+      "finishedAt": "2026-08-14T15:50:08.971Z",
+      "durationMs": 1122,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1b58c4a2d2e4bcd3eac12bf8cdf03ca15b2400e0",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/skill-definition-vnext.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df20f8e8d56a808a02964714135c71c1da09ee0c69b30a4a9141a79ca7108829",
+      "stderrSha256": "sha256:0b51aeb316f8a9f6dc90b2665ed059ea6c9ce2fe8604346b5ee6e52ed71a2ca4",
+      "validators": [
+        "node --strip-types tests/cli/skill-definition-vnext.test.ts"
+      ],
+      "generatedAt": "2026-08-14T15:50:11.839Z",
+      "startedAt": "2026-08-14T15:50:11.450Z",
+      "finishedAt": "2026-08-14T15:50:11.839Z",
+      "durationMs": 389,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1b58c4a2d2e4bcd3eac12bf8cdf03ca15b2400e0",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:883fd34caa0fc8b25227e2ac491fc3f235c62ecbf6a3faed0c5deb73e64e15d4",
+      "stderrSha256": "sha256:cdd70da253ce82dd1a84c6a40135dbbe6f1a2cb294b1d3ed4de496aa0f65ef15",
+      "validators": [
+        "validate:skill-templates"
+      ],
+      "generatedAt": "2026-08-14T15:50:17.696Z",
+      "startedAt": "2026-08-14T15:50:14.226Z",
+      "finishedAt": "2026-08-14T15:50:17.696Z",
+      "durationMs": 3470,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1b58c4a2d2e4bcd3eac12bf8cdf03ca15b2400e0",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs integration verify claude-code --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:10e0707ee6d3c40c329c530c1c167dfc9fcee6f0b3602fb286eaf4fc2652067e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs integration verify claude-code --json"
+      ],
+      "generatedAt": "2026-08-14T15:50:22.081Z",
+      "startedAt": "2026-08-14T15:50:20.052Z",
+      "finishedAt": "2026-08-14T15:50:22.081Z",
+      "durationMs": 2029,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "1b58c4a2d2e4bcd3eac12bf8cdf03ca15b2400e0",
       "cached": false
     }
   ],

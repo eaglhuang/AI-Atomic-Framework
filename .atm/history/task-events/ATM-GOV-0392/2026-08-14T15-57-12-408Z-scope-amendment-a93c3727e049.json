@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T15-57-12-408Z-scope-amendment-a93c3727e049",
+  "taskId": "ATM-GOV-0392",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0392.json",
+  "taskSha256": "sha256:d3193abdc7dca5efef5970798bb54d0391505d5e3daf53ee2279f848b0be2b39",
+  "createdAt": "2026-08-14T15:57:12.408Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0392 --actor claude-008 --add \"docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-012.json,docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-013.json\" --reason \"ACC-5 requires this card to record its backlog outcomes on the existing items rather than duplicating them\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ACC-5 requires this card to record its backlog outcomes on the existing items rather than duplicating them"
+  }
+}
