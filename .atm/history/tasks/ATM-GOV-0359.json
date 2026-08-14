@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0359",
   "title": "Compile complete runbook item and wave-exit evidence",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0358"
@@ -58,7 +58,7 @@
       "field": "atomizationImpact",
       "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
       "candidates": [
-        "docs/reports/plan-3x-4x-runbook-completion-evidence.json (7041 lines)"
+        "docs/reports/plan-3x-4x-runbook-completion-evidence.json (7083 lines)"
       ]
     }
   ],
@@ -74,17 +74,15 @@
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0359-compile-runbook-item-and-wave-exit-evidence.task.md",
-      "planningCommitSha": "5c00430ddc09b30b303dfc0805d01355567e7f18",
+      "planningCommitSha": "2f9c718b97f8bee290b5ee5052be04b6cbd68e86",
       "contentDigest": "sha256:d164275edfd0a1e3782956e1501c6f32801ad59c97ec82ffbf4d1f1a84feaf9f",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-14T04:12:27.305Z"
+      "sealedAt": "2026-08-14T04:27:00.558Z"
     }
   },
-  "importedAt": "2026-08-14T04:12:27.305Z",
+  "importedAt": "2026-08-14T04:27:00.558Z",
   "workAdmission": {
-    "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "recoveryMode": "auto"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -158,18 +156,17 @@
     ],
     "findings": []
   },
-  "reopenedAt": "2026-08-14T04:12:27.413Z",
-  "lastTransitionId": "2026-08-14T04-20-54-759Z-renew-e9817ae0d6eb",
-  "lastTransitionAt": "2026-08-14T04:20:54.759Z",
+  "lastTransitionId": "2026-08-14T04-28-25-454Z-close-b18bbe94f5b4",
+  "lastTransitionAt": "2026-08-14T04:28:25.454Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-recovery",
-  "reservedAt": "2026-08-14T04:14:06.675Z",
-  "promotedAt": "2026-08-14T04:14:06.679Z",
+  "reservedAt": "2026-08-14T04:27:09.969Z",
+  "promotedAt": "2026-08-14T04:27:09.973Z",
   "claim": {
     "actorId": "codex-captain-recovery",
-    "leaseId": "lease-41e5aa99ec2f",
-    "claimedAt": "2026-08-14T04:14:06.684Z",
-    "heartbeatAt": "2026-08-14T04:20:54.532Z",
+    "leaseId": "lease-9c2411b54b69",
+    "claimedAt": "2026-08-14T04:27:09.980Z",
+    "heartbeatAt": "2026-08-14T04:28:25.452Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0359.json",
@@ -178,17 +175,18 @@
       "scripts/validate-runbook-completion-evidence.ts",
       "tests/cli/runbook-completion-evidence.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260814041406-codex-captain-recovery-e759e5369e",
-      "status": "adopted",
+      "laneSessionId": "lane-20260814042710-codex-captain-recovery-f4adb2613e",
+      "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814041406-codex-captain-recovery-e759e5369e\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814042710-codex-captain-recovery-f4adb2613e\""
+    },
+    "reason": "closed"
   },
-  "startedAt": "2026-08-14T04:14:06.684Z",
+  "startedAt": "2026-08-14T04:27:09.980Z",
   "startedByActor": "codex-captain-recovery",
-  "startedBySessionId": "session-20260814041406-codex-captain-recovery-ATM-GOV-0359-fcb9297897",
+  "startedBySessionId": "session-20260814042709-codex-captain-recovery-ATM-GOV-0359-a51c8134a8",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -211,78 +209,18 @@
     "allowPlanningMirror": false,
     "promptHash": "1c1a3487df42758273f8c81816333af3fd5dcf9922bcce1b32cea91b7e9327b6",
     "actorId": "codex-captain-recovery",
-    "sessionId": "session-20260814041406-codex-captain-recovery-ATM-GOV-0359-fcb9297897",
+    "sessionId": "session-20260814042709-codex-captain-recovery-ATM-GOV-0359-a51c8134a8",
     "laneSession": {
-      "laneSessionId": "lane-20260814041406-codex-captain-recovery-e759e5369e",
+      "laneSessionId": "lane-20260814042710-codex-captain-recovery-f4adb2613e",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814041406-codex-captain-recovery-e759e5369e\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814042710-codex-captain-recovery-f4adb2613e\""
     },
-    "createdAt": "2026-08-14T04:14:07.597Z",
+    "createdAt": "2026-08-14T04:27:10.762Z",
     "status": "active"
   },
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-def17986cecd5872",
-    "ticketDigest": "sha256:def17986cecd587238d0dd85a7c9936883c1391869d576f7b16593df941ed78c",
-    "taskId": "ATM-GOV-0359",
-    "origin": "claim",
-    "actorId": "codex-captain-recovery",
-    "laneSessionId": "lane-20260814041406-codex-captain-recovery-e759e5369e",
-    "claimGeneration": "lease-41e5aa99ec2f",
-    "issuedAt": "2026-08-14T04:20:54.532Z",
-    "expiresAt": "2026-08-14T04:50:54.532Z",
-    "scopeDigest": "sha256:9b3e0181642fe8b468a472d740b738010d7493fdf39bcdd08b007d179eb6500b",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T04:20:54.532Z"
-    },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/history/evidence/ATM-GOV-0359.*",
-          ".atm/history/task-events/ATM-GOV-0359/**",
-          ".atm/history/tasks/ATM-GOV-0359.json",
-          "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
-          "scripts/compile-runbook-completion-evidence.ts",
-          "scripts/validate-runbook-completion-evidence.ts",
-          "tests/cli/runbook-completion-evidence.test.ts"
-        ],
-        "digest": "sha256:50c8dd5f64fe9fc25f65f6429a6dc0c05665d3d4354f26abc3723d0ec84bb31b"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "disabled",
-      "reasons": [
-        "low-risk-task"
-      ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
-    }
-  }
+  "closedAt": "2026-08-14T04:28:25.452Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814042709-codex-captain-recovery-ATM-GOV-0359-a51c8134a8",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0359.closure-packet.json"
 }
