@@ -1,11 +1,12 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0377",
-  "updatedAt": "2026-08-14T07:29:41.882Z",
+  "updatedAt": "2026-08-14T07:30:55.015Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate",
-    "typecheck"
+    "typecheck",
+    "validate:cli"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -37,6 +38,22 @@
       "startedAt": "2026-08-14T07:29:33.939Z",
       "finishedAt": "2026-08-14T07:29:41.882Z",
       "durationMs": 7943,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:8b49ddfc1a14d0d8d8c0688d9db5a4b9721655c2ecea5737ec44babd62cb08b6",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-14T07:30:55.015Z",
+      "startedAt": "2026-08-14T07:30:35.782Z",
+      "finishedAt": "2026-08-14T07:30:55.015Z",
+      "durationMs": 19233,
       "runnerKind": "frozen-runner",
       "sourceCommit": null,
       "cached": false
