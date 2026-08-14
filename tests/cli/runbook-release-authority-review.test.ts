@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
-import { mkdtempSync } from 'node:fs';
+import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { inspectCompletion } from '../../scripts/review-runbook-release-authority.ts';
@@ -32,4 +31,10 @@ assert.equal(report.remote.error, 'remote-observation-disabled');
 assert.equal(report.remote.remoteHeadAfterReview, undefined);
 assert.equal(report.completion.parseable, inspectCompletion(readFileSync('docs/reports/plan-3x-4x-runbook-completion-evidence.json', 'utf8')).parseable);
 assert.ok(report.nonClaims.includes('does-not-read-independent-certificate'));
+
+// A sealed timestamp may be replayed, but its declared authority inputs may
+// never be replayed from an altered projection.
+report.inputDigests[0].digest = 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
+writeFileSync(temporaryOutput, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+assert.throws(() => execFileSync(process.execPath, [...reviewArgs, '--mode', 'validate'], { stdio: 'pipe' }));
 console.log('runbook-release-authority-review.test.ts: ok');

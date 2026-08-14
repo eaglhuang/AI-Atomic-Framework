@@ -147,19 +147,18 @@ function upstream(): { remoteName: string; remoteRef: string; branch: string } {
   };
 }
 
-function observeRemote(offline = false): RecordLike {
+function observeRemote(targetHead: string, offline = false): RecordLike {
   if (offline) return { fetched: false, pushVerdict: 'not-proven', error: 'remote-observation-disabled' };
   try {
     // Freshness must never make the review wait indefinitely. A timeout is a
     // failed observation, not evidence that the remote is reachable.
     const configuredUpstream = upstream();
     git(['fetch', configuredUpstream.remoteName, configuredUpstream.branch], 5_000);
-    const localHead = git(['rev-parse', 'HEAD']);
     const remoteHead = git(['rev-parse', configuredUpstream.remoteRef]);
-    const aheadBehind = git(['rev-list', '--left-right', '--count', `${configuredUpstream.remoteRef}...HEAD`]).split(/\s+/).map(Number);
-    const localContainsRemote = isAncestor(remoteHead, localHead);
-    const remoteContainsLocal = isAncestor(localHead, remoteHead);
-    return { fetched: true, configuredUpstream, localHead, remoteHead, behind: aheadBehind[0], ahead: aheadBehind[1], localContainsRemote, remoteContainsLocal,
+    const aheadBehind = git(['rev-list', '--left-right', '--count', `${configuredUpstream.remoteRef}...${targetHead}`]).split(/\s+/).map(Number);
+    const localContainsRemote = isAncestor(remoteHead, targetHead);
+    const remoteContainsLocal = isAncestor(targetHead, remoteHead);
+    return { fetched: true, configuredUpstream, localHead: targetHead, remoteHead, behind: aheadBehind[0], ahead: aheadBehind[1], localContainsRemote, remoteContainsLocal,
       pushVerdict: aheadBehind[1] === 0 && localContainsRemote ? 'already-published' : 'not-proven' };
   }
   catch (error) {
@@ -167,7 +166,7 @@ function observeRemote(offline = false): RecordLike {
   }
 }
 
-export function compileReview(offline = false): RecordLike {
+export function compileReview(offline = false, sealedTargetHead?: string): RecordLike {
   const completionAbsolute = path.join(root, completionPath);
   const runbookAbsolute = path.resolve(root, runbookPath);
   if (!existsSync(completionAbsolute)) throw new Error(`missing completion evidence: ${completionPath}`);
@@ -175,14 +174,15 @@ export function compileReview(offline = false): RecordLike {
   const raw = readFileSync(completionAbsolute, 'utf8').replace(/^\uFEFF/, '');
   // Offline mode exists only for deterministic local regression tests. It
   // intentionally has no Git ancestry or remote-release authority.
-  const targetHead = offline ? 'offline-unverified' : git(['rev-parse', 'HEAD']);
+  const targetHead = offline ? 'offline-unverified' : sealedTargetHead ?? git(['rev-parse', 'HEAD']);
+  if (!offline && !/^[0-9a-f]{7,64}$/i.test(targetHead)) throw new Error('sealed review target must be a Git commit SHA');
+  if (!offline && !isAncestor(targetHead, git(['rev-parse', 'HEAD']))) throw new Error('sealed review target is not an ancestor of the current HEAD');
   const inspected = inspectCompletion(raw, readFileSync(runbookAbsolute, 'utf8'), targetHead);
-  const remote = observeRemote(offline);
-  const headAfterRemote = offline ? targetHead : git(['rev-parse', 'HEAD']);
+  const remote = observeRemote(targetHead, offline);
+  const headAfterRemote = targetHead;
   const findings = [...inspected.findings];
   if (!inspected.parseable) findings.push('completion-report-unparseable');
   if (remote.pushVerdict !== 'already-published') findings.push('remote-release-not-proven');
-  if (headAfterRemote !== targetHead) findings.push('target-head-moved-during-review');
   if (!offline && remote.fetched) {
     try {
       const remoteHeadAfterReview = git(['ls-remote', remote.configuredUpstream.remoteName, `refs/heads/${remote.configuredUpstream.branch}`], 5_000).split(/\s+/)[0];
@@ -216,12 +216,23 @@ function outputPathFromArgs(): string {
   return value;
 }
 
+function sealedTargetHeadFromProjection(absoluteOutput: string): string | undefined {
+  if (!existsSync(absoluteOutput)) throw new Error('runbook release authority review is missing; rerun with --mode write');
+  const prior = JSON.parse(readFileSync(absoluteOutput, 'utf8')) as RecordLike;
+  if (typeof prior.targetHead !== 'string') throw new Error('runbook release authority review lacks a sealed targetHead; rerun with --mode write');
+  return prior.targetHead;
+}
+
 function main(): void {
   const mode = process.argv.includes('--mode') ? process.argv[process.argv.indexOf('--mode') + 1] : 'validate';
   if (mode !== 'validate' && mode !== 'write') throw new Error(`unknown --mode ${String(mode)}; expected validate or write`);
-  const report = compileReview(process.argv.includes('--offline'));
-  const serialized = `${JSON.stringify(report, null, 2)}\n`;
   const absoluteOutput = path.resolve(root, outputPathFromArgs());
+  const offline = process.argv.includes('--offline');
+  // The evidence commit that stores this report is necessarily newer than its
+  // target. Validation therefore replays the sealed target, while still
+  // rejecting any change to the declared input digests or remote snapshot.
+  const report = compileReview(offline, mode === 'validate' ? sealedTargetHeadFromProjection(absoluteOutput) : undefined);
+  const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (mode === 'write') { mkdirSync(path.dirname(absoluteOutput), { recursive: true }); writeFileSync(absoluteOutput, serialized, 'utf8'); }
   else if (!existsSync(absoluteOutput) || readFileSync(absoluteOutput, 'utf8') !== serialized) throw new Error('runbook release authority review is stale; rerun with --mode write');
   console.log(`[review-runbook-release-authority] ${report.verdict} findings=${report.findings.length} digest=${report.reviewDigest}`);
