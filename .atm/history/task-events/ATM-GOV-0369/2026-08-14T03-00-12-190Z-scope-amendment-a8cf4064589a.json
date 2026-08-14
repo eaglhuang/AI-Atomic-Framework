@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T03-00-12-190Z-scope-amendment-a8cf4064589a",
+  "taskId": "ATM-GOV-0369",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0369.json",
+  "taskSha256": "sha256:e198ef14e57b09e736d304f546d9735bd79454a0ea5dcabb03a2c286886df2f4",
+  "createdAt": "2026-08-14T03:00:12.190Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0369 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/next/__tests__/foreign-dirty-wip-admission.test.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

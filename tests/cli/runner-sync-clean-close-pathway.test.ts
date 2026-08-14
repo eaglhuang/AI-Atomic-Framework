@@ -68,6 +68,27 @@ try {
   assert.equal(valid.receiptRef, receiptRef);
   assert.equal(valid.receiptDigest, digest);
 
+  const recoveryReceiptRef = writeRunnerSyncReceipt({
+    cwd: repo,
+    admission,
+    actorId: 'captain-a',
+    sealedSourceSha: 'sha256:source-a',
+    buildTarget: 'full',
+    buildInputsTreeHash: 'sha256:inputs-recovery',
+    buildDecision: 'cacheHitSkip',
+    decisionReason: 'foreign generated output retained',
+    publicationDisposition: 'recovery-retained',
+    timings
+  });
+  assert.doesNotThrow(() => validateRunnerSyncReleaseReceipt({
+    cwd: repo,
+    queue,
+    taskId: 'TASK-A',
+    stewardWorkId: 'runner-sync-fixture',
+    receiptRef: recoveryReceiptRef,
+    receiptDigest: null
+  }), 'a receipt-backed recovery-retained outcome is terminal enough to release the short runner queue');
+
   assert.throws(() => validateRunnerSyncReleaseReceipt({
     cwd: repo,
     queue,

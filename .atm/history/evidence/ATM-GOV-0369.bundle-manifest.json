@@ -1,11 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0369",
-  "updatedAt": "2026-08-14T00:12:25.048Z",
+  "updatedAt": "2026-08-14T00:15:25.956Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
-    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts"
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+    "node --strip-types scripts/run-sealed-runner-build.test.ts",
+    "typecheck",
+    "validate:onefile-release"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -37,6 +40,54 @@
       "startedAt": "2026-08-14T00:12:24.716Z",
       "finishedAt": "2026-08-14T00:12:25.047Z",
       "durationMs": 331,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/run-sealed-runner-build.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcaec12986e271d969fca23ee2d351d4e40a33bfa000db1cad21dc1fc3124047",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/run-sealed-runner-build.test.ts"
+      ],
+      "generatedAt": "2026-08-14T00:14:07.724Z",
+      "startedAt": "2026-08-14T00:14:07.033Z",
+      "finishedAt": "2026-08-14T00:14:07.724Z",
+      "durationMs": 691,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T00:14:18.003Z",
+      "startedAt": "2026-08-14T00:14:09.509Z",
+      "finishedAt": "2026-08-14T00:14:18.003Z",
+      "durationMs": 8494,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-08-14T00:15:25.955Z",
+      "startedAt": "2026-08-14T00:14:19.784Z",
+      "finishedAt": "2026-08-14T00:15:25.955Z",
+      "durationMs": 66171,
       "runnerKind": "frozen-runner",
       "sourceCommit": null,
       "cached": false
