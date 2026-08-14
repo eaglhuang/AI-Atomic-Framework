@@ -18,12 +18,14 @@ function sameStringSet(left, right) {
  */
 function resolveAuthorizedProducerTaskIds(input) {
     const linkedTaskIds = normalizedStringSet(input.receipt.linkedTaskIds);
-    if (!linkedTaskIds.includes(input.closingTaskId)) {
-        return { producerTaskIds: [], reason: 'runner-sync receipt does not durably link this closing task to its producer group' };
-    }
     const memberTaskIds = normalizedStringSet(input.receipt.memberTaskIds);
     if (memberTaskIds.length === 0) {
         return { producerTaskIds: [], reason: 'runner-sync receipt has no producer member attribution' };
+    }
+    const receiptTaskId = typeof input.receipt.taskId === 'string' ? input.receipt.taskId.trim() : '';
+    const directOwner = receiptTaskId === input.closingTaskId && memberTaskIds.includes(input.closingTaskId);
+    if (!directOwner && !linkedTaskIds.includes(input.closingTaskId)) {
+        return { producerTaskIds: [], reason: 'runner-sync receipt does not durably link this closing task to its producer group' };
     }
     const groupManifest = input.receipt.groupManifest;
     const groupMembers = groupManifest && typeof groupManifest === 'object' && !Array.isArray(groupManifest)

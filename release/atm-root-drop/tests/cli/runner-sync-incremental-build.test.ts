@@ -132,6 +132,31 @@ const receipt = buildRunnerSyncReceipt({
 assert.equal(receipt.tsBuildCache?.gitPolicy.rawCacheCommitted, false);
 assert.match(receipt.treatmentTelemetry.tsBuildCacheDigest ?? '', /^sha256:[a-f0-9]{64}$/);
 
+const recoveryReceipt = buildRunnerSyncReceipt({
+  admission: {
+    queueHeadOwnership: {
+      waitingTasks: ['ATM-GOV-0191'],
+      stewardWorkId: 'runner-sync-fixture'
+    },
+    runnerSyncSteward: {
+      requestedSurfaces: ['release/atm-onefile/atm.mjs']
+    }
+  } as any,
+  actorId: 'test-actor',
+  sealedSourceSha: gitHead(repo),
+  buildTarget: 'full',
+  buildInputsTreeHash: 'sha256:' + '2'.repeat(64),
+  buildDecision: 'incrementalBuild',
+  decisionReason: 'foreign output retained',
+  publicationDisposition: 'recovery-retained',
+  timings: timings()
+});
+assert.equal(
+  recoveryReceipt.publicationDisposition,
+  'recovery-retained',
+  'a receipt must describe retained foreign output as a terminal recovery, never as publication'
+);
+
 console.log('[runner-sync-incremental-build.test] ok');
 
 function writeManifest(relativePath: string): void {

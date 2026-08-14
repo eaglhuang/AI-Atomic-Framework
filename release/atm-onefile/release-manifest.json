@@ -2,11 +2,11 @@
   "schemaVersion": "atm.onefileRelease.v0.2",
   "generatedAt": "1970-01-01T00:00:00.000Z",
   "entrypoint": "atm.mjs",
-  "payloadSha256": "bd1b0b2cf274e84298c3e47459cc59d0a692fbfe46bcbbf2e4fbafc37a5e0177",
-  "payloadInputManifestHash": "sha256:db5e0621227c1ad6b5c82f4ac3d5d4d780e5a5458639ca7266fdbd87ccd8a031",
+  "payloadSha256": "8ec937b8241b54244dd9e061921a398f1cae3e3f77f37c6eeb95e4ae23946b9c",
+  "payloadInputManifestHash": "sha256:1b3f0721df2a429aa10605cd3178d0c5d1f4c1fef031380890da58db1bb9b4d5",
   "payloadReuse": false,
   "sourceRoot": "release/atm-root-drop",
-  "fileCount": 1846,
+  "fileCount": 1852,
   "generatedFiles": [
     "release/atm-onefile/README.onefile.md",
     "release/atm-onefile/atm.mjs",
@@ -24,35 +24,5 @@
     "contractSurface": "release-manifest.json",
     "dependsOnRootDropManifest": "release/atm-root-drop/release-manifest.json",
     "rationale": "release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list."
-  },
-  "buildInputsTreeHash": "sha256:181fed5c6162e4fa0a8f669110cde315fc4304cbc5abb0e9dfb0bebd19fbc553",
-  "sealedSourceCommit": "293b25682cc084b0328d9f3440a9532d13181fd5",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:b9d57869a3b3127359fbc3074ba77c5a09dbb63f0a904b4c54a84053bc0b02f4",
-  "tsBuildCacheDigest": "sha256:f22aba102db252378e8d0ed0b2604e614c02c7300e7454774ff0612e2408599a",
-  "rawTelemetryPolicy": "gitignored-runtime-only",
-  "dominantPhaseSummary": {
-    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "rootDropReleaseAssembly",
-    "dominantPhaseMs": 17748,
-    "totalElapsedMs": 47263,
-    "dominanceRatio": 0.3755,
-    "phaseMedianMs": 1898,
-    "phaseP95Ms": 17748,
-    "measuredPhaseCount": 8,
-    "optimizationVerdict": "inconclusive",
-    "basis": "single-run"
-  },
-  "phaseTimingsMs": {
-    "inputHashCalculation": 42,
-    "skipDecision": 36,
-    "worktreeSetup": 9355,
-    "typescriptBuild": 8891,
-    "rootDropReleaseAssembly": 17748,
-    "onefileReleaseAssembly": 1898,
-    "artifactSync": 4861,
-    "cleanup": 0,
-    "totalElapsed": 47263
   }
 }

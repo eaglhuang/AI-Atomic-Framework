@@ -16,6 +16,7 @@ import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '.
 import { normalizeRelativePath, runGit, runGitScalar } from '../git-index-diagnostics.js';
 import { normalizeOptionalText, readJsonText } from '../commit-range-guard.js';
 import { readStagedFiles } from './input-state.js';
+import { resolveCommittedTaskContext } from './committed-task-context.js';
 export const INVARIANT_TASK_AUDIT_CODES = new Set(['ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST']);
 const textFileExtensions = new Set(['.cjs', '.css', '.html', '.js', '.json', '.jsx', '.md', '.mjs', '.ps1', '.sh', '.ts', '.tsx', '.txt', '.yaml', '.yml']);
 export function isResolutionAuthorizedCurrentTask(cwd, taskId, conflictTaskId) {
@@ -327,9 +328,10 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
         }
         const taskId = taskIds[0];
         const context = contexts.get(taskId);
-        decisions.set(file, context?.ledger || context?.event
+        const committedContext = context?.ledger || context?.event ? null : resolveCommittedTaskContext(cwd, taskId);
+        decisions.set(file, context?.ledger || context?.event || committedContext?.ok
             ? { ok: true, taskId, reason: null }
-            : { ok: false, taskId, reason: 'evidence-without-staged-task-context' });
+            : { ok: false, taskId, reason: committedContext?.reason ?? 'evidence-without-staged-task-context' });
     }
     return { contexts, decisions };
 }

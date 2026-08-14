@@ -11,7 +11,7 @@ import { CliError, relativePathFrom, resolveValue } from '../shared.ts';
 import { findActiveTaskQueue, writeTaskDirectionLock, type TaskDirectionLock } from '../task-direction.ts';
 import type { LaneSessionResolution } from '../lane-session/resolve.ts';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.ts';
-import { createClaimRecord, isClaimExpired } from './task-ledger-readers.ts';
+import { createClaimRecord, isLiveActiveClaim } from './task-ledger-readers.ts';
 import { readLatestGitHeadReceiptTaskId } from '../git-head-evidence.ts';
 
 interface ClaimLifecyclePhase {
@@ -37,7 +37,7 @@ export function restoreReleasedDirectionLockForRenewal(input: {
   readonly taskDocument: Record<string, unknown>;
   readonly nowIso: string;
 }): RenewalDirectionLockRecovery {
-  if (input.claim.state !== 'active' || isClaimExpired(input.claim, input.nowIso)) {
+  if (!isLiveActiveClaim(input.claim, input.nowIso)) {
     return { status: 'not-needed', directionLock: null };
   }
   const lockPath = path.join(input.cwd, '.atm', 'runtime', 'locks', `${input.taskId}.lock.json`);

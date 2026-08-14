@@ -21,8 +21,22 @@ function writeLock(root, actorId, body) {
         ...body
     }, null, 2));
 }
-function writeTask(root, taskId, status) {
-    writeFileSync(path.join(root, '.atm', 'history', 'tasks', `${taskId}.json`), JSON.stringify({ id: taskId, workItemId: taskId, status }, null, 2));
+function writeTask(root, taskId, status, extras = {}) {
+    writeFileSync(path.join(root, '.atm', 'history', 'tasks', `${taskId}.json`), JSON.stringify({ id: taskId, workItemId: taskId, status, ...extras }, null, 2));
+}
+function writeLiveDirectionTask(root, taskId, laneSessionId) {
+    writeTask(root, taskId, 'running', {
+        claim: {
+            actorId: 'agent-one',
+            leaseId: `lease-${taskId}`,
+            claimedAt: new Date().toISOString(),
+            state: 'active',
+            heartbeatAt: new Date().toISOString(),
+            ttlSeconds: 3600,
+            files: ['x.ts'],
+            laneSession: { laneSessionId, status: 'adopted', source: 'test', exportHint: 'test' }
+        }
+    });
 }
 function initializeGitRoot(root) {
     execFileSync('git', ['init', '--quiet', root]);
@@ -51,7 +65,7 @@ function writeDirectionLock(root, taskId, actorId, laneSessionId) {
             promptHash: null,
             actorId,
             sessionId: null,
-            laneSession: { laneSessionId, status: 'active', source: 'test', exportHint: 'test' },
+            ...(laneSessionId ? { laneSession: { laneSessionId, status: 'active', source: 'test', exportHint: 'test' } } : {}),
             createdAt: '2026-08-10T00:00:00.000Z',
             status: 'active'
         }
@@ -155,8 +169,8 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
         heartbeatAt: new Date().toISOString(),
         ttlSeconds: 3600
     });
-    writeTask(root, 'TASK-A', 'running');
-    writeTask(root, 'TASK-B', 'running');
+    writeLiveDirectionTask(root, 'TASK-A', 'lane-a');
+    writeLiveDirectionTask(root, 'TASK-B', 'lane-b');
     assert.equal(classifyFrameworkStaleLock(root, 'agent-one', { laneSessionId: 'lane-a' }), null, 'stale-lock audit must resolve the task inside the lock lane instead of treating other lanes as ambiguous');
 }
 {
@@ -169,8 +183,8 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
         heartbeatAt: new Date().toISOString(),
         ttlSeconds: 3600
     });
-    writeTask(root, 'TASK-A', 'running');
-    writeTask(root, 'TASK-B', 'running');
+    writeLiveDirectionTask(root, 'TASK-A', 'lane-a');
+    writeLiveDirectionTask(root, 'TASK-B', 'lane-b');
     const legacyLock = classifyFrameworkStaleLock(root, 'agent-one');
     assert.equal(legacyLock?.kind, 'still-active');
     assert.equal(legacyLock?.currentTaskId, null);
@@ -180,6 +194,7 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
     const root = tempRoot();
     initializeGitRoot(root);
     writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
+    writeLiveDirectionTask(root, 'TASK-A', 'lane-a');
     const result = await runFrameworkTempClaim(root, 'agent-one', ['x.ts'], 'unit test', 'TASK-A', 'lane-a');
     assert.equal(result.ok, true);
     assert.equal(result.evidence.linkedTaskId, 'TASK-A');
@@ -187,7 +202,34 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
 {
     const root = tempRoot();
     initializeGitRoot(root);
+    writeDirectionLock(root, 'TASK-EXACT', 'agent-one', '');
+    writeTask(root, 'TASK-EXACT', 'running', {
+        claim: {
+            actorId: 'agent-one',
+            leaseId: 'lease-TASK-EXACT',
+            claimedAt: new Date().toISOString(),
+            state: 'active',
+            heartbeatAt: new Date().toISOString(),
+            ttlSeconds: 3600,
+            files: ['x.ts'],
+            laneSession: { laneSessionId: 'lane-a', status: 'adopted', source: 'test', exportHint: 'test' }
+        }
+    });
+    const result = await runFrameworkTempClaim(root, 'agent-one', ['x.ts'], 'unit test', 'TASK-EXACT', 'lane-a');
+    assert.equal(result.evidence.linkedTaskId, 'TASK-EXACT', 'the live claim must complete a legacy direction projection into the exact canonical authority snapshot');
+}
+{
+    const root = tempRoot();
+    initializeGitRoot(root);
+    writeDirectionLock(root, 'TASK-MISMATCHED', 'agent-one', 'lane-b');
+    writeLiveDirectionTask(root, 'TASK-MISMATCHED', 'lane-a');
+    await assert.rejects(() => runFrameworkTempClaim(root, 'agent-one', ['x.ts'], 'unit test', 'TASK-MISMATCHED', 'lane-a'), (error) => Boolean(error && typeof error === 'object' && error.code === 'ATM_FRAMEWORK_TEMP_CLAIM_TASK_BINDING_INVALID'), 'a projection that disagrees with the live claim lane must fail closed');
+}
+{
+    const root = tempRoot();
+    initializeGitRoot(root);
     writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
+    writeLiveDirectionTask(root, 'TASK-A', 'lane-a');
     await assert.rejects(async () => await runFrameworkMode(['claim', '--cwd', root, '--actor', 'agent-one', '--task', 'TASK-B', '--files', 'x.ts', '--lane-session', 'lane-a']), (error) => Boolean(error && typeof error === 'object' && error.code === 'ATM_FRAMEWORK_TEMP_CLAIM_TASK_BINDING_INVALID'), 'an explicit task must be proved by the actor and lane rather than trusted blindly');
 }
 {
@@ -195,6 +237,8 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
     initializeGitRoot(root);
     writeDirectionLock(root, 'TASK-A', 'agent-one', 'lane-a');
     writeDirectionLock(root, 'TASK-B', 'agent-one', 'lane-a');
+    writeLiveDirectionTask(root, 'TASK-A', 'lane-a');
+    writeLiveDirectionTask(root, 'TASK-B', 'lane-a');
     await assert.rejects(() => runFrameworkTempClaim(root, 'agent-one', ['x.ts'], 'unit test', null, 'lane-a'), (error) => Boolean(error && typeof error === 'object' && error.code === 'ATM_FRAMEWORK_TEMP_CLAIM_TASK_BINDING_AMBIGUOUS'), 'multiple active tasks in one lane must fail closed rather than choose by recency');
 }
 {
@@ -207,8 +251,8 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
         heartbeatAt: new Date().toISOString(),
         ttlSeconds: 3600
     });
-    writeTask(root, 'TASK-A', 'running');
-    writeTask(root, 'TASK-B', 'running');
+    writeLiveDirectionTask(root, 'TASK-A', 'lane-a');
+    writeLiveDirectionTask(root, 'TASK-B', 'lane-a');
     const report = createFrameworkModeStatus({
         cwd: root,
         files: ['packages/cli/src/atm.ts'],

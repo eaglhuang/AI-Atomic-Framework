@@ -26,6 +26,7 @@ import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '.
 import { normalizeRelativePath, runGit, runGitScalar } from '../git-index-diagnostics.ts';
 import { normalizeOptionalText, readJsonText } from '../commit-range-guard.ts';
 import { readStagedFiles } from './input-state.ts';
+import { resolveCommittedTaskContext } from './committed-task-context.ts';
 export const INVARIANT_TASK_AUDIT_CODES = new Set([ 'ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST' ]);
 const textFileExtensions = new Set([ '.cjs', '.css', '.html', '.js', '.json', '.jsx', '.md', '.mjs', '.ps1', '.sh', '.ts', '.tsx', '.txt', '.yaml', '.yml' ]);
 export function isResolutionAuthorizedCurrentTask(cwd, taskId, conflictTaskId) { const artifactPath = normalizeOptionalText(process.env.ATM_COMMIT_BROKER_CONFLICT_RESOLUTION);
@@ -204,9 +205,11 @@ const decisions = new Map();
 const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat()]);
 for (const [file, taskIds] of evidenceByPath) { const isIndependentRunnerWitness = lockBackedRunnerReceipts.has(file) && taskIds.length === 1 && Boolean(contexts.get(taskIds[0])?.event); if (bundleTaskIds.size > 1 && !isIndependentRunnerWitness) { decisions.set(file, { ok: false, taskId: null, reason: 'bundle-with-ambiguous-task-ids' }); continue; }
 if (taskIds.length !== 1) { decisions.set(file, { ok: false, taskId: null, reason: taskIds.length === 0 ? 'evidence-without-semantic-task-id' : 'evidence-with-ambiguous-task-ids' }); continue; }
-const taskId = taskIds[0]; const context = contexts.get(taskId); decisions.set(file, context?.ledger || context?.event
+const taskId = taskIds[0]; const context = contexts.get(taskId);
+const committedContext = context?.ledger || context?.event ? null : resolveCommittedTaskContext(cwd, taskId);
+decisions.set(file, context?.ledger || context?.event || committedContext?.ok
 ? { ok: true, taskId, reason: null }
-: { ok: false, taskId, reason: 'evidence-without-staged-task-context' }); }
+: { ok: false, taskId, reason: committedContext?.reason ?? 'evidence-without-staged-task-context' }); }
 return { contexts, decisions };
 }
 

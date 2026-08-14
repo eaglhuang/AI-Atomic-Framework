@@ -9,7 +9,7 @@ import { upsertActorWorkSession } from '../actor-session.js';
 import { CliError, relativePathFrom, resolveValue } from '../shared.js';
 import { findActiveTaskQueue, writeTaskDirectionLock } from '../task-direction.js';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.js';
-import { createClaimRecord, isClaimExpired } from './task-ledger-readers.js';
+import { createClaimRecord, isLiveActiveClaim } from './task-ledger-readers.js';
 import { readLatestGitHeadReceiptTaskId } from '../git-head-evidence.js';
 /**
  * Restores only a released runtime direction lock that still belongs to a
@@ -17,7 +17,7 @@ import { readLatestGitHeadReceiptTaskId } from '../git-head-evidence.js';
  * boundary additionally refuses expired or non-active claims.
  */
 export function restoreReleasedDirectionLockForRenewal(input) {
-    if (input.claim.state !== 'active' || isClaimExpired(input.claim, input.nowIso)) {
+    if (!isLiveActiveClaim(input.claim, input.nowIso)) {
         return { status: 'not-needed', directionLock: null };
     }
     const lockPath = path.join(input.cwd, '.atm', 'runtime', 'locks', `${input.taskId}.lock.json`);

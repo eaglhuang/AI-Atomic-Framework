@@ -23,3 +23,4 @@ export * from './team-agents/index.js';
 export * from './batch/plan-run-journal.js';
 export * from './lane/lane-capability-provider.js';
 export * from './lane/wip-ownership-transition.js';
+export * from './governance/operation-cleanup-contract.js';

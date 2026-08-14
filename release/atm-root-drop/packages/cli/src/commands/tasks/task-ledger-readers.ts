@@ -92,6 +92,21 @@ export function isClaimExpired(claim: TaskClaimRecord, nowIso: string): boolean 
   return nowEpoch > heartbeatEpoch + claim.ttlSeconds * 1000;
 }
 
+/**
+ * A heartbeat is lease freshness only; it is not authority by itself.  A
+ * released or handoff claim may intentionally retain a heartbeat as durable
+ * provenance, so every lifecycle consumer must combine state and TTL through
+ * this canonical predicate rather than reconstructing a partial rule.
+ */
+export function isLiveActiveClaim(claim: TaskClaimRecord, nowIso: string): boolean {
+  return claim.state === 'active' && !isClaimExpired(claim, nowIso);
+}
+
+/** A successor may take over only when the predecessor is not a live lease. */
+export function isTakeoverEligibleClaim(claim: TaskClaimRecord, nowIso: string): boolean {
+  return !isLiveActiveClaim(claim, nowIso);
+}
+
 export function listRuntimeLockTaskIds(cwd: string): readonly string[] {
   const ids = new Set<string>();
   for (const root of [

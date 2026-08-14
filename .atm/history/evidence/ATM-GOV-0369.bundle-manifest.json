@@ -1,8 +1,8 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0369",
-  "updatedAt": "2026-08-14T00:15:25.956Z",
-  "updatedBy": "codex-gpt-5.4-mini",
+  "updatedAt": "2026-08-14T04:53:14.473Z",
+  "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
@@ -90,6 +90,54 @@
       "durationMs": 66171,
       "runnerKind": "frozen-runner",
       "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1589b7874a904975a2a0aba6f8129a1d26c75a346ac06f56529d23097ac27155",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts"
+      ],
+      "generatedAt": "2026-08-14T04:53:10.003Z",
+      "startedAt": "2026-08-14T04:53:09.054Z",
+      "finishedAt": "2026-08-14T04:53:10.003Z",
+      "durationMs": 949,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fc8916dda6c1953b888b6c5ff52a4cc74590fb11",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:74e057e699c55ef4630de31cd9bb083058049e0f64b8ccd0560691cb4eb3d232",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts"
+      ],
+      "generatedAt": "2026-08-14T04:53:12.088Z",
+      "startedAt": "2026-08-14T04:53:11.792Z",
+      "finishedAt": "2026-08-14T04:53:12.088Z",
+      "durationMs": 296,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fc8916dda6c1953b888b6c5ff52a4cc74590fb11",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/run-sealed-runner-build.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcaec12986e271d969fca23ee2d351d4e40a33bfa000db1cad21dc1fc3124047",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/run-sealed-runner-build.test.ts"
+      ],
+      "generatedAt": "2026-08-14T04:53:14.473Z",
+      "startedAt": "2026-08-14T04:53:13.801Z",
+      "finishedAt": "2026-08-14T04:53:14.473Z",
+      "durationMs": 672,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fc8916dda6c1953b888b6c5ff52a4cc74590fb11",
       "cached": false
     }
   ],

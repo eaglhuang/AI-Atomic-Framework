@@ -59,6 +59,7 @@ import { runMapCapsule } from './commands/map-capsule.js';
 import { runRescue } from './commands/rescue.js';
 import { runDaemon } from './commands/daemon.js';
 import { runCache } from './commands/cache.js';
+import { runCleanup } from './commands/cleanup/index.js';
 import { runHealthReport } from './commands/health-report.js';
 import { runTaskflow } from './commands/taskflow.js';
 import { runTaskView } from './commands/task-view.js';
@@ -132,6 +133,7 @@ export const cliCommandRunners = {
     rescue: runRescue,
     daemon: runDaemon,
     cache: runCache,
+    cleanup: runCleanup,
     'health-report': runHealthReport,
     identity: runIdentity,
     taskflow: runTaskflow,

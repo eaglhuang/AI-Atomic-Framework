@@ -111,7 +111,8 @@ export type RunnerSyncReceipt = {
   readonly schemaId: 'atm.runnerSyncReceipt.v1';
   readonly specVersion: '0.1.0';
   readonly taskId: string;
-  readonly publicationDisposition: 'published';
+  /** Published sealed output or a receipt-backed retention of foreign output. */
+  readonly publicationDisposition: 'published' | 'recovery-retained';
   readonly actorId: string;
   readonly actorIdentity: {
     readonly actorId: string;
@@ -260,6 +261,7 @@ export function buildRunnerSyncReceipt(input: {
   readonly buildInputsTreeHash: string;
   readonly buildDecision: BuildDecision;
   readonly decisionReason?: string;
+  readonly publicationDisposition?: RunnerSyncReceipt['publicationDisposition'];
   readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
   readonly runtimeTelemetryRef?: string | null;
   readonly tsBuildCache?: TsBuildCacheSummary | null;
@@ -295,7 +297,7 @@ export function buildRunnerSyncReceipt(input: {
     schemaId: 'atm.runnerSyncReceipt.v1',
     specVersion: '0.1.0',
     taskId,
-    publicationDisposition: 'published',
+    publicationDisposition: input.publicationDisposition ?? 'published',
     actorId: input.actorId,
     actorIdentity: {
       actorId: input.actorId,
@@ -460,6 +462,7 @@ export function writeRunnerSyncReceipt(input: {
   readonly buildInputsTreeHash: string;
   readonly buildDecision: BuildDecision;
   readonly decisionReason?: string;
+  readonly publicationDisposition?: RunnerSyncReceipt['publicationDisposition'];
   readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
   readonly runtimeTelemetryRef?: string | null;
   readonly tsBuildCache?: TsBuildCacheSummary | null;
