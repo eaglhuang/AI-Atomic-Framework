@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T04-35-15-169Z-scope-amendment-78bfc71ddaf4",
+  "taskId": "ATM-GOV-0363",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-recovery",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0363.json",
+  "taskSha256": "sha256:1b57627e4e299daf2c32223bc524cb8b418465602ac4a6e4c0dc29a737bd8df2",
+  "createdAt": "2026-08-14T04:35:15.169Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0363 --actor codex-captain-recovery --add \"packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts,packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts\" --reason \"Lifecycle receipt must be idempotent across repeated close attempts; this is the concrete producer seam for the task's owned-transient-residue acceptance.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Lifecycle receipt must be idempotent across repeated close attempts; this is the concrete producer seam for the task's owned-transient-residue acceptance."
+  }
+}

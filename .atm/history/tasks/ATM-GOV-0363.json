@@ -44,7 +44,11 @@
     "tests/cli/transient-artifact-lifecycle.test.ts",
     ".atm/history/evidence/ATM-GOV-0363.*",
     ".atm/history/task-events/ATM-GOV-0363/**",
-    ".atm/history/tasks/ATM-GOV-0363.json"
+    ".atm/history/tasks/ATM-GOV-0363.json",
+    "packages/cli/src/commands/cleanup/index.ts",
+    "packages/cli/src/commands/cleanup/run.ts",
+    "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts"
   ],
   "validators": [
     "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
@@ -193,8 +197,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T03-51-44-116Z-renew-53346407f42b",
-  "lastTransitionAt": "2026-08-14T03:51:44.116Z",
+  "lastTransitionId": "2026-08-14T04-35-15-169Z-scope-amendment-78bfc71ddaf4",
+  "lastTransitionAt": "2026-08-14T04:35:15.169Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-14T02:49:03.878Z",
   "promotedAt": "2026-08-14T02:49:03.882Z",
@@ -202,12 +206,17 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-f79e68a375a3",
     "claimedAt": "2026-08-14T03:27:18.541Z",
-    "heartbeatAt": "2026-08-14T03:51:43.853Z",
+    "heartbeatAt": "2026-08-14T04:34:33.343Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0363.*",
+      ".atm/history/task-events/ATM-GOV-0363/**",
+      ".atm/history/tasks/ATM-GOV-0363.json",
       "packages/cli/src/atm.ts",
       "packages/cli/src/commands/cleanup/index.ts",
       "packages/cli/src/commands/cleanup/run.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
       "packages/core/src/governance/operation-cleanup-contract.test.ts",
       "packages/core/src/governance/operation-cleanup-contract.ts",
       "packages/core/src/index.ts",
@@ -217,7 +226,7 @@
     "reason": "source-first regression: successor must receive a live claim and replace retained WIP ownership",
     "laneSession": {
       "laneSessionId": "lane-20260814032718-codex-captain-recovery-f3a77231a2",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814032718-codex-captain-recovery-f3a77231a2\""
     }
@@ -227,20 +236,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-31aa6fe642e9b68a",
-    "ticketDigest": "sha256:31aa6fe642e9b68a5f4cca47b5d6b187be82bbe600ef58dabf3cb965d42dbecd",
+    "ticketId": "wat-96adc75f82e41b84",
+    "ticketDigest": "sha256:96adc75f82e41b84f7b596fbae40a20eef6f3e833c9db6164d19b950d7ff8543",
     "taskId": "ATM-GOV-0363",
     "origin": "claim",
     "actorId": "codex-captain-recovery",
     "laneSessionId": "lane-20260814032718-codex-captain-recovery-f3a77231a2",
     "claimGeneration": "lease-f79e68a375a3",
-    "issuedAt": "2026-08-14T03:51:43.853Z",
-    "expiresAt": "2026-08-14T04:21:43.853Z",
+    "issuedAt": "2026-08-14T04:34:33.343Z",
+    "expiresAt": "2026-08-14T05:04:33.343Z",
     "scopeDigest": "sha256:3680b728389be0440f17e10fd70c631d22a064f775413b3a46f2de56f3c2ffca",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T03:51:43.853Z"
+      "selectedAt": "2026-08-14T04:34:33.343Z"
     },
     "grants": [
       {
@@ -308,6 +317,8 @@
       "packages/cli/src/atm.ts",
       "packages/cli/src/commands/cleanup/index.ts",
       "packages/cli/src/commands/cleanup/run.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
       "packages/core/src/governance/operation-cleanup-contract.test.ts",
       "packages/core/src/governance/operation-cleanup-contract.ts",
       "packages/core/src/index.ts",

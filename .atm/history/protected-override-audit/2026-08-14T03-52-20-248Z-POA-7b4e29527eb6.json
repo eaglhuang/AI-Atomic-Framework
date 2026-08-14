@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-7b4e29527eb6",
+  "recordedAt": "2026-08-14T03:52:20.248Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0363",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0363 --message \"fix(governance): clean transient operation residue\n\nATM-Work-Admission: wat-31aa6fe642e9b68a sha256:31aa6fe642e9b68a5f4cca47b5d6b187be82bbe600ef58dabf3cb965d42dbecd\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0363-f85398dcc2",
+  "reason": "focused transient-residue validators pass; normal hook has unrelated live CLI registry drift",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T03-52-17-062Z-EMG-ATM-GOV-0363-f85398dcc2.json",
+  "parentEventId": "POA-07aab11d5914",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}
