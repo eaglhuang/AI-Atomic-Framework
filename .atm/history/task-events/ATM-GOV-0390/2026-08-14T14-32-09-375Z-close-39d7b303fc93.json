@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T14-32-09-375Z-close-39d7b303fc93",
+  "taskId": "ATM-GOV-0390",
+  "action": "close",
+  "actorId": "claude-008-gov-0366",
+  "sessionId": "session-20260814142520-claude-008-gov-0366-ATM-GOV-0390-deccaf53de",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0390.json",
+  "taskSha256": "sha256:594ae3a92cedf63ca47eaef70f734829030801bb4a9e3e85e1dfe45e4f46821c",
+  "createdAt": "2026-08-14T14:32:09.375Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0390 --actor claude-008-gov-0366 --status done --historical-delivery 701569dc89ddf5ede9909ac1351b57bb834aa606",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814142520-claude-008-gov-0366-ATM-GOV-0390-deccaf53de",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0390.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:backlog-census",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "validate:backlog-census"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T14:32:09.363Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0390.*",
+        ".atm/history/task-events/ATM-GOV-0390/**",
+        ".atm/history/tasks/ATM-GOV-0390.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-013.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-014.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-015.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-019.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-020.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-002.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-003.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "validate:backlog-census"
+      ]
+    }
+  }
+}

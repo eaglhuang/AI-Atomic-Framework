@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-79607ff32b10",
+  "recordedAt": "2026-08-14T14:32:00.383Z",
+  "actorId": "claude-008-gov-0366",
+  "taskId": "ATM-GOV-0390",
+  "surface": "tasks close stale-runner recovery",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0390 --actor claude-008-gov-0366 --allow-stale-runner --json",
+  "flags": [
+    "--allow-stale-runner"
+  ],
+  "permission": "backend.runnerRecovery",
+  "leaseId": "EMG-ATM-GOV-0390-f56fdb3812,EMG-ATM-GOV-0390-6bd9442605",
+  "reason": "Stale frozen runner recovery for a governed close.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.runnerRecovery"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T14-32-00-382Z-EMG-ATM-GOV-0390-f56fdb3812.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
