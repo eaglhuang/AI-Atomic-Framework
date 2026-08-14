@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { createFrameworkModeStatus, requiredValidationPassesForClosure } from '../framework-development.ts';
+import { createFrameworkModeStatus } from '../framework-development.ts';
 import { resolveTaskRunnerArbitration } from '../validate.ts';
 import {
   canonicalizeValidatorIdentity,
@@ -390,27 +390,23 @@ export function computeMissingValidatorReport(
     ? (taskDocument.scopePaths as unknown[]).filter((p): p is string => typeof p === 'string')
     : [];
 
-  // ATM-BUG-2026-07-12-155 (TASK-AAO-FABLE-003): the close --write closure
-  // packet requires `requiredValidationPassesForClosure(frameworkGates,
-  // changedFiles)` unconditionally, while this readiness report previously
-  // applied scope-conditional exemptions (validate:cli / git-head-evidence)
-  // via isClosureRequiredValidator. That drift let pre-close and close
-  // dry-run report "ready" and then fail at write with
-  // ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID. Readiness now consumes the exact
-  // same write-side set so both surfaces expose one validator contract; the
-  // write path stays authoritative and is not weakened.
+  // The task validation contract is the sole task-close authority. Framework
+  // requiredGates belong to phase/release consumers; promoting them here made
+  // evidence-only cards run unrelated suites and split preflight from the
+  // task-card contract. Missing/empty task validators stays fail-closed via
+  // the caller's validation-contract gate rather than falling back to broad
+  // framework validation.
   const declaredChangedFiles = uniqueStrings([
     ...scopePaths,
     ...(Array.isArray(taskDocument?.deliverables)
       ? (taskDocument.deliverables as unknown[]).filter((p): p is string => typeof p === 'string')
       : [])
   ]);
-  const writeRequiredSet = new Set(requiredValidationPassesForClosure(frameworkGates, declaredChangedFiles));
 
   for (const gate of allGates) {
     const state = classifyValidatorEvidenceState(bundleRecords, gate);
     const tier = classifyValidatorTier(gate);
-    const closureRequired = taskDeclaredValidators.includes(gate) || writeRequiredSet.has(gate);
+    const closureRequired = taskDeclaredValidators.includes(gate);
     catalogEntries.push({
       name: gate,
       tier,
