@@ -14,7 +14,7 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -26,6 +26,7 @@ import {
   captureLiveIndexSnapshot,
   readLiveIndexReconciliationFromError,
   reconcileLiveIndexAfterCommitAttempt
+  ,recordLiveIndexReconciliation
 } from './live-index-reconciliation.ts';
 
 function git(cwd: string, args: readonly string[], env?: NodeJS.ProcessEnv): string {
@@ -96,6 +97,33 @@ function commit(
     assert.deepEqual(outcome.liveIndexReconciliation.retainedPaths, []);
     assert.equal(git(root, ['diff', '--cached', '--name-only', '--', 'owned.txt']), '');
     assert.equal(git(root, ['rev-parse', ':foreign.txt']), foreignBlob, 'foreign staged bytes must survive');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+// A retained foreign entry is state, not a new delivery on every later task
+// event. Re-recording the same unresolved state must leave the receipt bytes
+// unchanged so a task can commit it once and then close.
+{
+  const root = repository();
+  try {
+    const reconciliation = {
+      schemaId: LIVE_INDEX_RECONCILIATION_SCHEMA_ID as typeof LIVE_INDEX_RECONCILIATION_SCHEMA_ID,
+      headAdvanced: true,
+      reconciledPaths: ['.atm/history/task-events/TASK-OWN/renew.json'],
+      retainedPaths: [{ path: '.atm/history/evidence/git-head.jsonl', reason: 'worktree-diverged' as const }],
+      clean: false,
+      failure: null
+    };
+    const receipt = recordLiveIndexReconciliation(root, 'TASK-OWN', reconciliation);
+    assert.ok(receipt);
+    const before = readFileSync(path.join(root, receipt), 'utf8');
+    recordLiveIndexReconciliation(root, 'TASK-OWN', {
+      ...reconciliation,
+      reconciledPaths: ['.atm/history/task-events/TASK-OWN/renew-again.json']
+    });
+    assert.equal(readFileSync(path.join(root, receipt), 'utf8'), before, 'unchanged retained state must not create post-commit receipt drift');
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

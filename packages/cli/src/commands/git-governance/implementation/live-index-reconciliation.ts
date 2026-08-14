@@ -23,7 +23,7 @@
  * for why the stdin pathspec route is not an option in this repository.
  */
 
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -280,6 +280,29 @@ export function recordLiveIndexReconciliation(
   if (!taskId || reconciliation.clean !== false) return null;
   const relativePath = `.atm/history/evidence/${taskId}.live-index-reconciliation.json`;
   const absolutePath = path.join(cwd, relativePath);
+  // This is a state receipt, not an append-only attempt log.  A repeated
+  // governed commit can reconcile a fresh task-event while retaining exactly
+  // the same foreign index entry. Rewriting this file in that case creates a
+  // new task-scoped dirty file after every commit and makes close impossible.
+  // The task-event ledger already preserves attempt history; keep this receipt
+  // byte-stable until the unresolved reconciliation state actually changes.
+  if (existsSync(absolutePath)) {
+    try {
+      const existing = JSON.parse(readFileSync(absolutePath, 'utf8')) as Record<string, unknown>;
+      // The receipt path already binds task identity.  Retention is the sole
+      // unresolved state that requires a durable recovery receipt; successful
+      // reconciled paths are attempt telemetry and live in task-events.
+      if (
+        existing.schemaId === LIVE_INDEX_RECONCILIATION_SCHEMA_ID
+        && existing.clean === false
+        && JSON.stringify(existing.retainedPaths) === JSON.stringify(reconciliation.retainedPaths)
+        && JSON.stringify(existing.failure ?? null) === JSON.stringify(reconciliation.failure ?? null)
+      ) return relativePath;
+    } catch {
+      // A malformed prior receipt is replaced with the current attributable
+      // state; leaving it in place would make recovery unverifiable.
+    }
+  }
   mkdirSync(path.dirname(absolutePath), { recursive: true });
   writeFileSync(
     absolutePath,

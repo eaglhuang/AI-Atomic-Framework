@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T06-22-02-751Z-scope-amendment-32771d8f785d",
+  "taskId": "ATM-GOV-0363",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-recovery",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0363.json",
+  "taskSha256": "sha256:78a1e71b94549ff1a6abda68e6a802938c227ce98299607d7ce4803d6681370c",
+  "createdAt": "2026-08-14T06:22:02.751Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0363 --actor codex-captain-recovery --add \"packages/cli/src/commands/command-specs.ts,packages/cli/src/commands/command-specs/cleanup.spec.ts,tests/cli-fixtures/help-snapshots/command-list.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

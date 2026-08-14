@@ -15,6 +15,7 @@ import batchSpec from './command-specs/batch.spec.ts';
 import bootstrapSpec from './command-specs/bootstrap.spec.ts';
 import budgetSpec from './command-specs/budget.spec.ts';
 import cacheSpec from './command-specs/cache.spec.ts';
+import cleanupSpec from './command-specs/cleanup.spec.ts';
 import candidatesSpec from './command-specs/candidates.spec.ts';
 import createSpec from './command-specs/create.spec.ts';
 import atmChartSpec from './command-specs/atm-chart.spec.ts';
@@ -92,6 +93,7 @@ export const commandSpecs = Object.freeze({
   bootstrap: bootstrapSpec,
   budget: budgetSpec,
   cache: cacheSpec,
+  cleanup: cleanupSpec,
   candidates: candidatesSpec,
   create: createSpec,
   'create-map': createMapSpec,
