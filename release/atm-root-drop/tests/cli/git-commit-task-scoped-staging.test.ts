@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { resolveTaskScopedCommitBundle, runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
+import { classifyProtectedEvidenceBundle } from '../../packages/cli/src/commands/hook/pre-commit/support.ts';
 import { createBrokerConflictResolutionArtifact } from '../../packages/core/src/team-runtime/permission-broker.ts';
 import {
   assertBranchCommitQueueSchema,
@@ -13,7 +14,10 @@ import {
 } from './git-commit-task-scoped-staging/fixture.ts';
 import { runIndexLeaseTransactionScenarios } from './git-commit-task-scoped-staging/index-lease-transaction-scenarios.ts';
 
+const inheritedLaneSessionId = process.env.ATM_LANE_SESSION_ID;
+
 try {
+  delete process.env.ATM_LANE_SESSION_ID;
   const { taskId, foreignTaskId, foreignActiveTaskId, scopedFile, sessionId, taskDocument } = await createFixtureRepository();
 
   const unstagedCommit = expectCliError(
@@ -540,6 +544,28 @@ try {
   assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(unrelatedStagedFile), true);
 
   runGit(tempDir, ['restore', '--staged', '--', unrelatedStagedFile]);
+
+  const stagedManifestPath = `.atm/history/evidence/${taskId}.bundle-manifest.json`;
+  writeJson(path.join(tempDir, stagedManifestPath), {
+    schemaId: 'atm.evidenceBundleManifest.v1',
+    taskId,
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'fixture-agent',
+    freshValidationPasses: [],
+    staleValidationPasses: [],
+    commandRuns: [],
+    artifactPaths: []
+  });
+  runGit(tempDir, ['add', '.atm/history/tasks/' + taskId + '.json', stagedManifestPath]);
+  writeJson(path.join(tempDir, stagedManifestPath), { schemaId: 'atm.evidenceBundleManifest.v1' });
+  const stagedManifestDecision = classifyProtectedEvidenceBundle(tempDir, [
+    `.atm/history/tasks/${taskId}.json`,
+    stagedManifestPath
+  ]).decisions.get(stagedManifestPath.toLowerCase());
+  assert.equal(stagedManifestDecision?.ok, true, 'protected evidence must use the staged manifest blob, not divergent worktree bytes');
+  runGit(tempDir, ['restore', '--staged', '--worktree', '--', `.atm/history/tasks/${taskId}.json`]);
+  rmSync(path.join(tempDir, stagedManifestPath), { force: true });
+
   await runIndexLeaseTransactionScenarios({
     taskId,
     foreignActiveTaskId,
@@ -550,6 +576,8 @@ try {
 
   console.log('[git-commit-task-scoped-staging] ok');
 } finally {
+  if (inheritedLaneSessionId === undefined) delete process.env.ATM_LANE_SESSION_ID;
+  else process.env.ATM_LANE_SESSION_ID = inheritedLaneSessionId;
   if (existsSync(tempDir)) {
     rmSync(tempDir, { recursive: true, force: true });
   }

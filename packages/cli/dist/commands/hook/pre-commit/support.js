@@ -14,7 +14,7 @@ import { buildPendingCheckpointCommitWindow } from '../../batch.js';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.js';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../../tasks/task-import-validators.js';
 import { normalizeRelativePath, runGit, runGitScalar } from '../git-index-diagnostics.js';
-import { normalizeOptionalText, readJsonText } from '../commit-range-guard.js';
+import { normalizeOptionalText, readGitObjectText, readJsonText } from '../commit-range-guard.js';
 import { readStagedFiles } from './input-state.js';
 import { resolveCommittedTaskContext } from './committed-task-context.js';
 export const INVARIANT_TASK_AUDIT_CODES = new Set(['ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST']);
@@ -286,21 +286,22 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
         const normalized = normalizeRelativePath(entry);
         const lower = normalized.toLowerCase();
         const absolutePath = path.join(cwd, normalized);
+        const stagedJson = readStagedJsonFile(cwd, normalized);
         const ledgerMatch = normalized.match(/^\.atm\/history\/tasks\/([^/]+)\.json$/i);
         if (ledgerMatch) {
-            const ledger = readJsonFile(absolutePath);
+            const ledger = stagedJson;
             markContext(typeof ledger?.workItemId === 'string' ? ledger.workItemId : ledgerMatch[1], 'ledger');
             continue;
         }
         const eventMatch = normalized.match(/^\.atm\/history\/task-events\/([^/]+)\//i);
         if (eventMatch) {
-            const event = readJsonFile(absolutePath);
+            const event = stagedJson;
             markContext(typeof event?.taskId === 'string' ? event.taskId : eventMatch[1], 'event');
             continue;
         }
         if (!lower.startsWith('.atm/history/evidence/') || lower.startsWith('.atm/history/evidence/historical-batches/'))
             continue;
-        const evidence = readJsonFile(absolutePath);
+        const evidence = stagedJson;
         const taskIds = new Set();
         if (typeof evidence?.taskId === 'string')
             taskIds.add(linkedRunnerReceiptTaskId(normalized, evidence, evidence.taskId));
@@ -313,6 +314,17 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
                 if (typeof task?.taskId === 'string')
                     taskIds.add(task.taskId);
         evidenceByPath.set(lower, [...taskIds].sort((left, right) => left.localeCompare(right)));
+    }
+    function readStagedJsonFile(cwd, relativePath) {
+        const stagedText = readGitObjectText(cwd, `:${normalizeRelativePath(relativePath)}`);
+        if (!stagedText)
+            return null;
+        try {
+            return JSON.parse(stagedText);
+        }
+        catch {
+            return null;
+        }
     }
     const decisions = new Map();
     const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat()]);

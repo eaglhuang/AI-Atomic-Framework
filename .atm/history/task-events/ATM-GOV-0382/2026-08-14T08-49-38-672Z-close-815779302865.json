@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T08-49-38-672Z-close-815779302865",
+  "taskId": "ATM-GOV-0382",
+  "action": "close",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814083143-codex-captain-recovery-ATM-GOV-0382-521d620e65",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0382.json",
+  "taskSha256": "sha256:1ab846f8da03ca404414074533beab4a72dec22da64e61d1e006270cd8e90892",
+  "createdAt": "2026-08-14T08:49:38.672Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0382 --actor codex-captain-recovery --status done --historical-delivery 0c5d461c96b50a70bf1408d59f170a7930e93ae9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814083143-codex-captain-recovery-ATM-GOV-0382-521d620e65",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0382.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/evidence-bundle-manifest.test.ts",
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T08:49:38.661Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0382.*",
+        ".atm/history/task-events/ATM-GOV-0382/**",
+        ".atm/history/tasks/ATM-GOV-0382.json",
+        "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "tests/cli/evidence-bundle-manifest.test.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "tests/cli/evidence-bundle-manifest.test.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

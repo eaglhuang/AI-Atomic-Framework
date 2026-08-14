@@ -24,7 +24,7 @@ import { buildPendingCheckpointCommitWindow } from '../../batch.ts';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.ts';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../../tasks/task-import-validators.ts';
 import { normalizeRelativePath, runGit, runGitScalar } from '../git-index-diagnostics.ts';
-import { normalizeOptionalText, readJsonText } from '../commit-range-guard.ts';
+import { normalizeOptionalText, readGitObjectText, readJsonText } from '../commit-range-guard.ts';
 import { readStagedFiles } from './input-state.ts';
 import { resolveCommittedTaskContext } from './committed-task-context.ts';
 export const INVARIANT_TASK_AUDIT_CODES = new Set([ 'ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST' ]);
@@ -190,16 +190,24 @@ return taskId;
 const markContext = (taskId, field) => { const normalizedTaskId = normalizeOptionalText(taskId); if (!normalizedTaskId) return;
 const context = contexts.get(normalizedTaskId) ?? { ledger: false, event: false }; context[field] = true; contexts.set(normalizedTaskId, context); };
 for (const entry of stagedFiles) { const normalized = normalizeRelativePath(entry); const lower = normalized.toLowerCase(); const absolutePath = path.join(cwd, normalized);
+const stagedJson = readStagedJsonFile(cwd, normalized);
 const ledgerMatch = normalized.match(/^\.atm\/history\/tasks\/([^/]+)\.json$/i);
-if (ledgerMatch) { const ledger = readJsonFile(absolutePath); markContext(typeof ledger?.workItemId === 'string' ? ledger.workItemId : ledgerMatch[1], 'ledger'); continue; }
+if (ledgerMatch) { const ledger = stagedJson; markContext(typeof ledger?.workItemId === 'string' ? ledger.workItemId : ledgerMatch[1], 'ledger'); continue; }
 const eventMatch = normalized.match(/^\.atm\/history\/task-events\/([^/]+)\//i);
-if (eventMatch) { const event = readJsonFile(absolutePath); markContext(typeof event?.taskId === 'string' ? event.taskId : eventMatch[1], 'event'); continue; }
+if (eventMatch) { const event = stagedJson; markContext(typeof event?.taskId === 'string' ? event.taskId : eventMatch[1], 'event'); continue; }
 if (!lower.startsWith('.atm/history/evidence/') || lower.startsWith('.atm/history/evidence/historical-batches/')) continue;
-const evidence = readJsonFile(absolutePath); const taskIds = new Set();
+const evidence = stagedJson; const taskIds = new Set();
 if (typeof evidence?.taskId === 'string') taskIds.add(linkedRunnerReceiptTaskId(normalized, evidence, evidence.taskId));
 if (Array.isArray(evidence?.attestations)) for (const attestation of evidence.attestations) if (typeof attestation?.taskId === 'string') taskIds.add(attestation.taskId);
 if (Array.isArray(evidence?.tasks)) for (const task of evidence.tasks) if (typeof task?.taskId === 'string') taskIds.add(task.taskId);
 evidenceByPath.set(lower, [...taskIds].sort((left, right) => left.localeCompare(right)));
+}
+
+function readStagedJsonFile(cwd, relativePath) {
+const stagedText = readGitObjectText(cwd, `:${normalizeRelativePath(relativePath)}`);
+if (!stagedText) return null;
+try { return JSON.parse(stagedText); }
+catch { return null; }
 }
 const decisions = new Map();
 const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat()]);
