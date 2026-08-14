@@ -12,19 +12,20 @@
   "deliverables": [
     "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
     "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
-    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop"
   ],
   "scopePaths": [
     "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
     "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
     "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
-    ".atm/history/evidence/ATM-GOV-0371.*",
-    ".atm/history/task-events/ATM-GOV-0371/**",
-    ".atm/history/tasks/ATM-GOV-0371.json",
     "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
     "release/atm-onefile/atm.mjs",
-    "release/atm-root-drop",
-    "release/atm-onefile/release-manifest.json"
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
@@ -53,20 +54,20 @@
   "source": {
     "planPath": "governance-optimization/tasks/ATM-GOV-0371-fail-closed-when-governed-commit-tree-diverges-from-sealed-candidate.task.md",
     "sectionTitle": "ATM-GOV-0371",
-    "headingLine": 59,
-    "hash": "f159f5e436f2e943",
+    "headingLine": 67,
+    "hash": "87c53d4296b331a5",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0371-fail-closed-when-governed-commit-tree-diverges-from-sealed-candidate.task.md",
       "planningCommitSha": null,
-      "contentDigest": "sha256:f159f5e436f2e943eb84276cab367fcf68f787d9accddfad7851eb27a729693a",
+      "contentDigest": "sha256:87c53d4296b331a51b66e74948a52b4c640a0380fbba6aa48c0b3bf90598b2b1",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-14T00:48:21.151Z"
+      "sealedAt": "2026-08-14T01:20:55.017Z"
     }
   },
-  "importedAt": "2026-08-14T00:48:21.151Z",
+  "importedAt": "2026-08-14T01:20:55.017Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "disabled",
@@ -142,17 +143,11 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T01-16-16-329Z-scope-amendment-3b04bd832d28",
-  "lastTransitionAt": "2026-08-14T01:16:16.329Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-08-14T00:48:35.876Z",
-  "promotedAt": "2026-08-14T00:48:35.881Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-c1156f8883f3",
     "claimedAt": "2026-08-14T00:48:35.886Z",
-    "heartbeatAt": "2026-08-14T01:04:19.520Z",
+    "heartbeatAt": "2026-08-14T01:21:23.762Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0371.*",
@@ -174,75 +169,8 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814004836-codex-gpt-5.4-mini-7bead8f467\""
     }
   },
+  "owner": "codex-gpt-5.4-mini",
   "startedAt": "2026-08-14T00:48:35.886Z",
-  "startedByActor": "codex-gpt-5.4-mini",
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-5950ab5d868cf8b2",
-    "ticketDigest": "sha256:5950ab5d868cf8b209008b4eeb8081cf098a1389e3a07f1cd0136551abb46c6f",
-    "taskId": "ATM-GOV-0371",
-    "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260814004836-codex-gpt-5.4-mini-7bead8f467",
-    "claimGeneration": "lease-c1156f8883f3",
-    "issuedAt": "2026-08-14T01:04:19.520Z",
-    "expiresAt": "2026-08-14T01:34:19.520Z",
-    "scopeDigest": "sha256:83f2451fd59871884d325daa1640f7a1fb9563b76f715cf7ae79c61a8c946505",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T01:04:19.520Z"
-    },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/history/evidence/ATM-GOV-0371.*",
-          ".atm/history/evidence/git-head.jsonl",
-          ".atm/history/task-events/ATM-GOV-0371/**",
-          ".atm/history/tasks/ATM-GOV-0371.json",
-          "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
-          "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
-          "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
-          "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
-          "release/atm-onefile/atm.mjs",
-          "release/atm-root-drop"
-        ],
-        "digest": "sha256:f7bcda2fd3f99f7ec7c2dc18726d6e65119c75f48774ca909a73b0da9520e4ed"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "disabled",
-      "reasons": [
-        "low-risk-task"
-      ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
-    }
-  },
   "startedBySessionId": "session-20260814004835-codex-gpt-5.4-mini-ATM-GOV-0371-6c445c4251",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
@@ -278,5 +206,76 @@
     },
     "createdAt": "2026-08-14T00:48:39.882Z",
     "status": "active"
+  },
+  "lastTransitionId": "2026-08-14T01-21-23-961Z-renew-1780981100a0",
+  "lastTransitionAt": "2026-08-14T01:21:23.961Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-269e5fc6b68e562f",
+    "ticketDigest": "sha256:269e5fc6b68e562fa358d667579e0541da3521a94877f30c29885fbf2e304520",
+    "taskId": "ATM-GOV-0371",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260814004836-codex-gpt-5.4-mini-7bead8f467",
+    "claimGeneration": "lease-c1156f8883f3",
+    "issuedAt": "2026-08-14T01:21:23.762Z",
+    "expiresAt": "2026-08-14T01:51:23.762Z",
+    "scopeDigest": "sha256:bee0ef9da7e2f89ed4fd8b27043a018afb1354656d94a9edb70479bfb7308954",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T01:21:23.762Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0371.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/task-events/ATM-GOV-0371/**",
+          ".atm/history/tasks/ATM-GOV-0371.json",
+          "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop"
+        ],
+        "digest": "sha256:bc8f8705fd22caa2bd03ed2b181e5f666a7fbf2090c88af658e976b588fbb4ec"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
   }
 }

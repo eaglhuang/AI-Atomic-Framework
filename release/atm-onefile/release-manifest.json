@@ -2,8 +2,8 @@
   "schemaVersion": "atm.onefileRelease.v0.2",
   "generatedAt": "1970-01-01T00:00:00.000Z",
   "entrypoint": "atm.mjs",
-  "payloadSha256": "239fc3d04c7e8b1ab65ce0fd461362cc8ad7d96a35034b23248f8a10995d14ed",
-  "payloadInputManifestHash": "sha256:a88e86351cf33c05e0b28a1a4f0076506b8fd8c0637bdfc14b46f8ca183a6d2d",
+  "payloadSha256": "56cecf2a6a9fd457ace51e61fc48ae069d096e543ea26fe21c4144641dbe41a9",
+  "payloadInputManifestHash": "sha256:a2339391f93dc7bf33e1924dbba4029266eb49f78e42e37522530e59da3ae0b7",
   "payloadReuse": false,
   "sourceRoot": "release/atm-root-drop",
   "fileCount": 1846,
@@ -24,35 +24,5 @@
     "contractSurface": "release-manifest.json",
     "dependsOnRootDropManifest": "release/atm-root-drop/release-manifest.json",
     "rationale": "release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list."
-  },
-  "buildInputsTreeHash": "sha256:8969704875921aea6df0fea65f40b9a84bf1b77f6c1eda6feb8a0175dce5a7d6",
-  "sealedSourceCommit": "50e806e85d8166cda1961d170bc4f6f16de3c8bd",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:542f7cf6802a305232abc8449a10a8abfb679c4acfe4a3a8517272746cd0b9b6",
-  "tsBuildCacheDigest": "sha256:63cbf63ab2ae21a96e3862039c8abc4d1b6f50a244c6caa94f639728a850f567",
-  "rawTelemetryPolicy": "gitignored-runtime-only",
-  "dominantPhaseSummary": {
-    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "rootDropReleaseAssembly",
-    "dominantPhaseMs": 24270,
-    "totalElapsedMs": 68729,
-    "dominanceRatio": 0.3531,
-    "phaseMedianMs": 2316,
-    "phaseP95Ms": 24270,
-    "measuredPhaseCount": 8,
-    "optimizationVerdict": "inconclusive",
-    "basis": "single-run"
-  },
-  "phaseTimingsMs": {
-    "inputHashCalculation": 43,
-    "skipDecision": 41,
-    "worktreeSetup": 18194,
-    "typescriptBuild": 12848,
-    "rootDropReleaseAssembly": 24270,
-    "onefileReleaseAssembly": 2316,
-    "artifactSync": 7274,
-    "cleanup": 0,
-    "totalElapsed": 68729
   }
 }
