@@ -342,7 +342,7 @@ export function isIncidentStillActive(
   block: CrossTaskMutationBlock,
   currentTaskId: string | null = null
 ): boolean {
-  if (detectCrossTaskMutation(cwd, currentTaskId, 'incident-review')) {
+  if (detectCrossTaskMutation(cwd, currentTaskId, 'incident-review', block.conflictFiles)) {
     return true;
   }
 
@@ -356,6 +356,22 @@ export function isIncidentStillActive(
     }
   }
   return false;
+}
+
+function reconcileIncidentBlock(
+  cwd: string,
+  block: CrossTaskMutationBlock,
+  currentTaskId: string | null
+): CrossTaskMutationBlock | null {
+  const current = detectCrossTaskMutation(cwd, currentTaskId, 'incident-review', block.conflictFiles);
+  if (current) return current;
+
+  const conflictTaskIds = collectIncidentConflictTaskIds(block);
+  if (hasActiveBrokerIntentForTasks(cwd, conflictTaskIds)) return block;
+  for (const taskId of conflictTaskIds) {
+    if (hasActiveLockForTask(cwd, taskId)) return block;
+  }
+  return null;
 }
 
 function archiveResolvedIncident(cwd: string, fileName: string, report: Record<string, unknown>): void {
@@ -401,8 +417,16 @@ export function reconcileStaleIncidents(cwd: string, currentTaskId: string | nul
     try {
       const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as { block?: CrossTaskMutationBlock | null };
       const block = parsed.block ?? null;
-      if (!block || !isIncidentStillActive(cwd, block, currentTaskId)) {
+      const reconciledBlock = block ? reconcileIncidentBlock(cwd, block, currentTaskId) : null;
+      if (!block || !reconciledBlock) {
         archiveResolvedIncident(cwd, fileName, parsed as Record<string, unknown>);
+        reconciled = true;
+      } else if (JSON.stringify(reconciledBlock) !== JSON.stringify(block)) {
+        writeFileSync(
+          filePath,
+          JSON.stringify({ ...parsed, block: reconciledBlock, reconciledAt: new Date().toISOString() }, null, 2),
+          'utf8'
+        );
         reconciled = true;
       }
     } catch {

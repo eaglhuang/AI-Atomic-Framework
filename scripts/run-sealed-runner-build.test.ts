@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { syncGeneratedArtifacts } from './run-sealed-runner-build.ts';
+import { captureSealedRunnerPublicationSnapshot } from './sealed-runner-publication.ts';
 
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-sync-'));
 const source = path.join(root, 'source');
@@ -21,4 +23,38 @@ try {
   console.log('[sealed-runner-build] preserves pre-existing generated WIP');
 } finally {
   rmSync(root, { recursive: true, force: true });
+}
+
+const publicationRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-publication-snapshot-'));
+try {
+  execFileSync('git', ['init'], { cwd: publicationRoot, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'test'], { cwd: publicationRoot, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.invalid'], { cwd: publicationRoot, stdio: 'ignore' });
+  const taskId = 'TASK-PUBLICATION-0001';
+  mkdirSync(path.join(publicationRoot, 'release/atm-onefile'), { recursive: true });
+  mkdirSync(path.join(publicationRoot, 'packages/cli/dist'), { recursive: true });
+  writeFileSync(path.join(publicationRoot, 'package.json'), '{}\n');
+  writeFileSync(path.join(publicationRoot, 'release/atm-onefile/atm.mjs'), 'baseline runner\n', { encoding: 'utf8', flag: 'w' });
+  writeFileSync(path.join(publicationRoot, 'packages/cli/dist/foreign.js'), 'baseline foreign\n', { encoding: 'utf8', flag: 'w' });
+  mkdirSync(path.join(publicationRoot, '.atm/history/tasks'), { recursive: true });
+  mkdirSync(path.join(publicationRoot, '.atm/runtime/locks'), { recursive: true });
+  writeFileSync(path.join(publicationRoot, `.atm/history/tasks/${taskId}.json`), JSON.stringify({
+    workItemId: taskId,
+    status: 'running',
+    claim: { actorId: 'steward', state: 'active', heartbeatAt: new Date().toISOString(), ttlSeconds: 600, files: ['release/atm-onefile/atm.mjs'] }
+  }));
+  writeFileSync(path.join(publicationRoot, `.atm/runtime/locks/${taskId}.lock.json`), JSON.stringify({
+    workItemId: taskId,
+    actorId: 'steward', lockedAt: new Date().toISOString(), heartbeatAt: new Date().toISOString(), ttlSeconds: 600, files: ['release/atm-onefile/atm.mjs']
+  }));
+  execFileSync('git', ['add', '.'], { cwd: publicationRoot, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'fixture'], { cwd: publicationRoot, stdio: 'ignore' });
+  writeFileSync(path.join(publicationRoot, 'release/atm-onefile/atm.mjs'), 'task candidate\n');
+  writeFileSync(path.join(publicationRoot, 'packages/cli/dist/foreign.js'), 'foreign candidate\n');
+  const snapshot = captureSealedRunnerPublicationSnapshot({ cwd: publicationRoot, stewardActorId: 'steward', buildTarget: 'full', publicationTaskId: taskId });
+  assert.ok(!snapshot.preexistingDirtyPaths.includes('release/atm-onefile/atm.mjs'), 'own publication surface must be excluded before the private build');
+  assert.ok(snapshot.preexistingDirtyPaths.includes('packages/cli/dist/foreign.js'), 'foreign generated output remains in the immutable pre-build snapshot');
+  console.log('[sealed-runner-build] captures task-scoped pre-build publication snapshot');
+} finally {
+  rmSync(publicationRoot, { recursive: true, force: true });
 }

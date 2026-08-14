@@ -26,6 +26,7 @@ export function resolveSealedRunnerPublication(input: {
   readonly sealedSourceSha: string;
   readonly buildTarget: RunnerBuildOutputTarget;
   readonly publicationTaskId?: string | null;
+  readonly beforeBuildSnapshot?: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
 }): {
   readonly admission: RunnerSyncAdmissionReport;
   readonly currentTaskId: string | null;
@@ -45,7 +46,7 @@ export function resolveSealedRunnerPublication(input: {
       actorId: input.stewardActorId,
       now: new Date().toISOString()
     });
-  const beforeBuildSnapshot = captureRunnerBuildOutputSnapshot({
+  const beforeBuildSnapshot = input.beforeBuildSnapshot ?? captureRunnerBuildOutputSnapshot({
     cwd: input.cwd,
     buildTarget: input.buildTarget,
     currentTaskId,
@@ -62,6 +63,40 @@ export function resolveSealedRunnerPublication(input: {
       snapshot: beforeBuildSnapshot
     })
   };
+}
+
+/**
+ * Capture the live publication surface before private candidate generation.
+ * This deliberately resolves the same task authority as the later publication
+ * boundary without acquiring the queue; it keeps queue residency minimal while
+ * making a digest-bound takeover receipt stable across the private build.
+ */
+export function captureSealedRunnerPublicationSnapshot(input: {
+  readonly cwd: string;
+  readonly stewardActorId: string;
+  readonly buildTarget: RunnerBuildOutputTarget;
+  readonly publicationTaskId?: string | null;
+}): ReturnType<typeof captureRunnerBuildOutputSnapshot> {
+  const currentTaskId = resolveActiveRunnerPublicationTask({
+    cwd: input.cwd,
+    actorId: input.stewardActorId,
+    now: new Date().toISOString(),
+    taskId: input.publicationTaskId
+  });
+  const currentTask = getActiveTasks(input.cwd).find((entry) => entry.taskId === currentTaskId.toUpperCase());
+  const currentTaskAllowedFiles = currentTask?.allowedFiles
+    ?? readActivePublicationLockFiles({
+      cwd: input.cwd,
+      taskId: currentTaskId,
+      actorId: input.stewardActorId,
+      now: new Date().toISOString()
+    });
+  return captureRunnerBuildOutputSnapshot({
+    cwd: input.cwd,
+    buildTarget: input.buildTarget,
+    currentTaskId,
+    currentTaskAllowedFiles
+  });
 }
 
 /**

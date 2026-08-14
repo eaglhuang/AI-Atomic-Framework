@@ -1,0 +1,362 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0369",
+  "title": "Make cross-task mutation ownership require current authority snapshots",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A terminal task with a released claim and released lock is absent from the live source-owner set, even if historical scope, claim files, or a direction-lock record names the current candidate path.",
+    "ACC-2: A candidate containing `.atm/history/evidence`, `task-events`, or `tasks` for a different known task remains blocked, including if terminal.",
+    "ACC-3: An incident recorded under an old false active-scope classification reconciles when current authority snapshots prove its source owners terminal; the repair never mutates foreign staged bytes.",
+    "ACC-4: Publish the frozen runner after source-focused checks and prove its doctor output removes the false `active-task-scope` conflicts while retaining real foreign task-history conflicts."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/cross-task-mutation-guard.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/run-sealed-runner-build.test.ts",
+    "packages/cli/dist/atm.js",
+    "release/atm-onefile/atm.mjs"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/cross-task-mutation-guard.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/run-sealed-runner-build.test.ts",
+    "packages/cli/dist/atm.js",
+    "release/atm-onefile/atm.mjs",
+    ".atm/history/evidence/ATM-GOV-0369.*",
+    ".atm/history/task-events/ATM-GOV-0369/**",
+    ".atm/history/tasks/ATM-GOV-0369.json",
+    "scripts/sealed-runner-publication.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+    "node --strip-types scripts/run-sealed-runner-build.test.ts",
+    "node atm.dev.mjs doctor --json",
+    "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+    "node atm.mjs doctor --json"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert authority-snapshot consumption and focused tests together; never delete foreign task-history evidence for a green doctor.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cross-task-mutation-authority-snapshot",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0369-make-cross-task-mutation-ownership-require-current-authority-snapshots.task.md",
+    "sectionTitle": "ATM-GOV-0369",
+    "headingLine": 116,
+    "hash": "5bb87c21a98310a3",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0369-make-cross-task-mutation-ownership-require-current-authority-snapshots.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:5bb87c21a98310a3669398e897025a062945975c933da80fe7423778b32bf553",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-13T23:57:01.707Z"
+    }
+  },
+  "importedAt": "2026-08-13T23:57:01.707Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Frozen runner reports active-task-scope conflicts backed only by terminal/released ledger records."
+    ],
+    "softRelations": [
+      "ATM-GOV-0351",
+      "ATM-GOV-0362",
+      "ATM-GOV-0363"
+    ],
+    "changedPublicSeams": [
+      "atm.crossTaskMutationAuthoritySnapshot.v1"
+    ],
+    "causalImpactEdges": [
+      "terminal-task-does-not-own-source",
+      "live-foreign-task-history-remains-protected",
+      "stale-incident-reconciles-after-authority-change",
+      "frozen-runner-publication",
+      "publication-takeover-uses-prebuild-snapshot"
+    ],
+    "parallelFrontierInputs": [
+      "task-ledger",
+      "scope-lock",
+      "broker-intent",
+      "staged-index-candidate"
+    ],
+    "validatorReferences": [
+      "cross-task-mutation-guard",
+      "cross-task-mutation-candidate-index",
+      "frozen-runner-doctor"
+    ],
+    "phaseOwner": "wave-3-governance-substrate-recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0369_terminal_scope_not_live_owner",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "terminal_released_task_scope_is_not_live_ownership",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "terminal-task-does-not-own-source",
+        "stale-incident-reconciles-after-authority-change"
+      ],
+      "expectedRedPredicate": "a terminal released ledger record can keep a staged source path blocked as active-task-scope",
+      "contributionResourceKey": "cross-task-mutation-authority-snapshot",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.crossTaskMutationAuthoritySnapshot.v1",
+      "resourceKey": "cross-task-mutation-guard"
+    },
+    {
+      "caseId": "test_atm_gov_0369_foreign_task_history_still_blocks",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "foreign_task_history_evidence_remains_fail_closed",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "live-foreign-task-history-remains-protected"
+      ],
+      "expectedRedPredicate": "a foreign task history path can be committed merely because its task is terminal",
+      "contributionResourceKey": "cross-task-mutation-authority-snapshot",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.crossTaskMutationAuthoritySnapshot.v1",
+      "resourceKey": "cross-task-mutation-guard"
+    },
+    {
+      "caseId": "test_atm_gov_0369_frozen_runner_publishes_current_authority_rule",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "frozen_runner_uses_current_authority_snapshot",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "frozen-runner-publication"
+      ],
+      "expectedRedPredicate": "frozen runner keeps reporting historical terminal scopes as live owners after source contract is green",
+      "contributionResourceKey": "cross-task-mutation-authority-snapshot",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.crossTaskMutationAuthoritySnapshot.v1",
+      "resourceKey": "frozen-runner-doctor"
+    },
+    {
+      "caseId": "test_atm_gov_0369_publication_takeover_binds_prebuild_snapshot",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "publication_takeover_consumes_immutable_prebuild_snapshot",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "publication-takeover-uses-prebuild-snapshot"
+      ],
+      "expectedRedPredicate": "a valid pre-build takeover receipt is rejected after the build creates its sealed outputs",
+      "contributionResourceKey": "sealed-runner-publication",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.crossTaskMutationAuthoritySnapshot.v1",
+      "resourceKey": "sealed-runner-build"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0369_terminal_scope_not_live_owner",
+    "test_atm_gov_0369_foreign_task_history_still_blocks",
+    "test_atm_gov_0369_frozen_runner_publishes_current_authority_rule",
+    "test_atm_gov_0369_publication_takeover_binds_prebuild_snapshot"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-14e50bd2944a",
+    "claimedAt": "2026-08-13T23:49:12.556Z",
+    "heartbeatAt": "2026-08-14T00:03:23.176Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0369.*",
+      ".atm/history/task-events/ATM-GOV-0369/**",
+      ".atm/history/tasks/ATM-GOV-0369.json",
+      "packages/cli/dist/atm.js",
+      "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+      "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "release/atm-onefile/atm.mjs",
+      "scripts/run-sealed-runner-build.test.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/sealed-runner-publication.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260813234912-codex-gpt-5.4-mini-86db79a673",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813234912-codex-gpt-5.4-mini-86db79a673\""
+    }
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "startedAt": "2026-08-13T23:49:12.556Z",
+  "startedBySessionId": "session-20260813234912-codex-gpt-5.4-mini-ATM-GOV-0369-589164e146",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0369",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0369.*",
+      ".atm/history/task-events/ATM-GOV-0369/**",
+      ".atm/history/tasks/ATM-GOV-0369.json",
+      "packages/cli/dist/atm.js",
+      "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+      "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "release/atm-onefile/atm.mjs",
+      "scripts/run-sealed-runner-build.test.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/sealed-runner-publication.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0369-make-cross-task-mutation-ownership-require-current-authority-snapshots.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0369-make-cross-task-mutation-ownership-require-current-authority-snapshots.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "5b207594ffe60bde970f87173c47244c3a7a4b373e9a019888d6279c412567cc",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260813234912-codex-gpt-5.4-mini-86db79a673",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813234912-codex-gpt-5.4-mini-86db79a673\""
+    },
+    "createdAt": "2026-08-13T23:49:16.688Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-08-14T00-03-23-406Z-renew-59c712a9ed14",
+  "lastTransitionAt": "2026-08-14T00:03:23.406Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-49629d70891c3dbe",
+    "ticketDigest": "sha256:49629d70891c3dbe7b02308f1f7c48051c16f22aecc2902368e9588ff1d78351",
+    "taskId": "ATM-GOV-0369",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260813234912-codex-gpt-5.4-mini-86db79a673",
+    "claimGeneration": "lease-14e50bd2944a",
+    "issuedAt": "2026-08-14T00:03:23.176Z",
+    "expiresAt": "2026-08-14T00:33:23.176Z",
+    "scopeDigest": "sha256:c9fcbb0aa52d758d6481e365d1c010d9309712ab40624419463018da996fdbe2",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T00:03:23.176Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0369.*",
+          ".atm/history/task-events/ATM-GOV-0369/**",
+          ".atm/history/tasks/ATM-GOV-0369.json",
+          "packages/cli/dist/atm.js",
+          "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+          "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+          "packages/core/src/broker/cross-task-mutation-guard.ts",
+          "release/atm-onefile/atm.mjs",
+          "scripts/run-sealed-runner-build.test.ts",
+          "scripts/run-sealed-runner-build.ts",
+          "scripts/sealed-runner-publication.ts"
+        ],
+        "digest": "sha256:9369cc5262d95f23eb258160346413074089947ad23da9bf92ec1175e911e063"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  }
+}
