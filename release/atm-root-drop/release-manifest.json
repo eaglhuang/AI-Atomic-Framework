@@ -1643,6 +1643,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/deliver-close-orchestrator.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/generated-residue-policy.test.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-reset-open-ux.spec.js",
@@ -1695,6 +1696,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gate.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gates.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/generated-residue-policy.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/import-orchestrator.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/import-planning-authority.js",
@@ -5348,8 +5350,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 602,
-    "unchanged": 4711,
+    "copied": 608,
+    "unchanged": 4707,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6751,7 +6753,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:0791b269384f160ba0dc1a9e40616577435b09ec16d4309330f62f6c28e8be0e"
+    "digest": "sha256:06495ec9797bca9b74174b4ad77fce885649716975add676f5509c0445fd2745"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -8368,6 +8370,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/deliver-close-orchestrator.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/generated-residue-policy.test.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-reset-open-ux.spec.js",
@@ -8420,6 +8423,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gate.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/dependency-gates.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/generated-residue-policy.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/import-orchestrator.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/import-planning-authority.js",
@@ -12076,22 +12080,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:e65f52757ae30c0dcb39d946bde60c06d8f32475cef1815ec1f8b783f6a52d07",
-  "sealedSourceCommit": "0b1ab54a603261df07bfb1fc25295c4ae2a37490",
+  "buildInputsTreeHash": "sha256:e97dd72b80195d7dc0ebcdd2e9a18335bbb576fd1f939c2d504202d1ba985d36",
+  "sealedSourceCommit": "660df5b7b87bc2eb0011052634f9b1f047beb027",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:a819b1d94931bc7e1dcfbf88d5ac9331a97faaa71d75596795d7f7b3a9c9d77d",
-  "tsBuildCacheDigest": "sha256:5ee4304044f106091dbcc4fd334c84d60e52164ed6b769981d4d11a3b670c7cb",
+  "incrementalPlanDigest": "sha256:2317493a922046f233958e959909bae0ad061ac916299c195194a50732049711",
+  "tsBuildCacheDigest": "sha256:f4cd437091045f905e07d4e01cc48bcc1b31ea85e5f165789a672161b5b27b07",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 40,
-    "skipDecision": 44,
-    "worktreeSetup": 9159,
-    "typescriptBuild": 9287,
-    "rootDropReleaseAssembly": 23528,
-    "onefileReleaseAssembly": 1871,
-    "artifactSync": 4634,
+    "inputHashCalculation": 33,
+    "skipDecision": 37,
+    "worktreeSetup": 8850,
+    "typescriptBuild": 16359,
+    "rootDropReleaseAssembly": 20441,
+    "onefileReleaseAssembly": 1799,
+    "artifactSync": 4816,
     "cleanup": 0,
-    "totalElapsed": 56078
+    "totalElapsed": 59400
   }
 }
