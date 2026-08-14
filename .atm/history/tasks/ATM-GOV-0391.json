@@ -1,0 +1,363 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0391",
+  "title": "Make root-drop runner builds incrementally overlay verified base releases",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A package-only source change with a verified compatible base produces an overlay release whose complete inventory/tree digest and final onefile payload are byte-equivalent to a full rebuild.",
+    "ACC-2: Unchanged base entries are hydrated rather than recopied; the focused receipt exposes overlay mode, base identity, changed closure, and elapsed phase timings.",
+    "ACC-3: Missing base, unsupported schema, compatibility mismatch, base-entry digest mismatch, unknown changed input, incomplete provenance, or unknown delete/rename set produces a visible `fullRebuild` reason and never an overlay.",
+    "ACC-4: Deletion and rename fixtures remove obsolete release entries and still match a full rebuild.",
+    "ACC-5: The implementation does not weaken sealed-source validation, artifact inventory verification, reproducibility, ownership admission, or broker queue rules.",
+    "ACC-6: Before frozen runner publication, the broker identifies this lane as queue head. Publication uses a short shared-write window and produces a digest-bound receipt."
+  ],
+  "deliverables": [
+    "scripts/build-root-drop-release.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/runner-sync-incremental-build.ts",
+    "tests/cli/root-drop-release-incremental-overlay.test.ts",
+    "tests/cli/root-drop-release-manifest-integrity.test.ts",
+    "tests/cli/runner-sync-incremental-build.test.ts",
+    "tests/cli/sealed-runner-build-input-cache.test.ts",
+    "atomic_workbench/maps/atm-release-build/map.spec.json"
+  ],
+  "scopePaths": [
+    "scripts/build-root-drop-release.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/runner-sync-incremental-build.ts",
+    "tests/cli/root-drop-release-incremental-overlay.test.ts",
+    "tests/cli/root-drop-release-manifest-integrity.test.ts",
+    "tests/cli/runner-sync-incremental-build.test.ts",
+    "tests/cli/sealed-runner-build-input-cache.test.ts",
+    "atomic_workbench/maps/atm-release-build/map.spec.json"
+  ],
+  "validators": [
+    "node --experimental-strip-types tests/cli/root-drop-release-incremental-overlay.test.ts",
+    "node --experimental-strip-types tests/cli/root-drop-release-manifest-integrity.test.ts",
+    "node --experimental-strip-types tests/cli/runner-sync-incremental-build.test.ts",
+    "node --experimental-strip-types tests/cli/sealed-runner-build-input-cache.test.ts",
+    "node --experimental-strip-types scripts/run-sealed-runner-build.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the manifest/inventory schema and overlay caller together. The previous fullRebuild path remains the correctness circuit breaker; do not delete base release evidence or foreign artifacts.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-build-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-release-build/map.spec.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0391-make-root-drop-runner-builds-incrementally-overlay-verified-base-releases.task.md",
+    "sectionTitle": "ATM-GOV-0391",
+    "headingLine": 129,
+    "hash": "c30fd0d3e734d4dc",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0391-make-root-drop-runner-builds-incrementally-overlay-verified-base-releases.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:c30fd0d3e734d4dc05f5a5f9dfcab580f783a9a38fc406dfb82c634dced0636d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T14:47:59.347Z"
+    }
+  },
+  "importedAt": "2026-08-14T14:47:59.347Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A previous sealed root-drop release and manifest are available for read-only eligibility verification.",
+      "The runner-sync broker grants a short queue-head publication window before any shared release write."
+    ],
+    "softRelations": [
+      "ATM-GOV-0201",
+      "ATM-GOV-0369"
+    ],
+    "changedPublicSeams": [
+      "atm.rootDropIncrementalOverlay.v1"
+    ],
+    "causalImpactEdges": [
+      "verified-base-release-hydration",
+      "provenance-driven-changed-input-overlay",
+      "deletion-and-rename-tombstones",
+      "unsafe-overlay-falls-back-to-full-rebuild",
+      "full-and-incremental-release-tree-equivalence"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-base-release",
+      "root-drop-manifest",
+      "runner-input-graph",
+      "runner-sync-broker-ticket"
+    ],
+    "validatorReferences": [
+      "root-drop-release-incremental-overlay",
+      "runner-sync-incremental-build",
+      "sealed-runner-build-input-cache",
+      "runner-reproducibility"
+    ],
+    "phaseOwner": "wave-3-governance-substrate-recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0391_verified_base_overlay_equivalence",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "verified_root_drop_base_overlay_matches_full_tree",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "verified-base-release-hydration",
+        "provenance-driven-changed-input-overlay",
+        "full-and-incremental-release-tree-equivalence"
+      ],
+      "expectedRedPredicate": "An overlay from a valid base produces a different release inventory or tree digest than a full rebuild.",
+      "contributionResourceKey": "root-drop-release-incremental-overlay",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.rootDropIncrementalOverlay.v1",
+      "resourceKey": "atom-build-root-drop-release"
+    },
+    {
+      "caseId": "test_atm_gov_0391_untrusted_base_falls_back",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "unsafe_base_or_unmapped_input_never_overlays",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "unsafe-overlay-falls-back-to-full-rebuild"
+      ],
+      "expectedRedPredicate": "A missing, incompatible, digest-mismatched, or unmapped base or input is reused by overlay mode.",
+      "contributionResourceKey": "root-drop-release-manifest-integrity",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.rootDropIncrementalOverlay.v1",
+      "resourceKey": "atom-validator-root-drop-release"
+    },
+    {
+      "caseId": "test_atm_gov_0391_delete_rename_tombstone",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "overlay_removes_obsolete_release_entries",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "deletion-and-rename-tombstones"
+      ],
+      "expectedRedPredicate": "A deleted or renamed input leaves an obsolete release entry after overlay.",
+      "contributionResourceKey": "root-drop-release-incremental-overlay",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.rootDropIncrementalOverlay.v1",
+      "resourceKey": "atom-build-root-drop-release"
+    },
+    {
+      "caseId": "test_atm_gov_0391_integrity_and_publication_boundary",
+      "targetGroupId": "test_group_plan4_governance_substrate",
+      "semanticKey": "overlay_preserves_integrity_and_defers_shared_publication",
+      "coversAcceptance": [
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [],
+      "expectedRedPredicate": "An overlay weakens release integrity validation or performs a shared publication before a broker queue-head receipt.",
+      "contributionResourceKey": "runner-sync-incremental-build",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.rootDropIncrementalOverlay.v1",
+      "resourceKey": "atom-build-release"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0391_verified_base_overlay_equivalence",
+    "test_atm_gov_0391_untrusted_base_falls_back",
+    "test_atm_gov_0391_delete_rename_tombstone",
+    "test_atm_gov_0391_integrity_and_publication_boundary"
+  ],
+  "phaseTestCaseIds": [
+    "test_group_plan4_governance_substrate"
+  ],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T14-48-36-773Z-claim-3eac70fa0e12",
+  "lastTransitionAt": "2026-08-14T14:48:36.773Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-recovery",
+  "reservedAt": "2026-08-14T14:48:33.950Z",
+  "promotedAt": "2026-08-14T14:48:33.954Z",
+  "claim": {
+    "actorId": "codex-captain-recovery",
+    "leaseId": "lease-bca11b8ce58f",
+    "claimedAt": "2026-08-14T14:48:33.960Z",
+    "heartbeatAt": "2026-08-14T14:48:33.960Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0391.json",
+      "atomic_workbench/maps/atm-release-build/map.spec.json",
+      "scripts/build-root-drop-release.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "tests/cli/root-drop-release-incremental-overlay.test.ts",
+      "tests/cli/root-drop-release-manifest-integrity.test.ts",
+      "tests/cli/runner-sync-incremental-build.test.ts",
+      "tests/cli/sealed-runner-build-input-cache.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260814144834-codex-captain-recovery-6ff8aa6a89",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814144834-codex-captain-recovery-6ff8aa6a89\""
+    }
+  },
+  "startedAt": "2026-08-14T14:48:33.960Z",
+  "startedByActor": "codex-captain-recovery",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-f54b1962c3dbe2c2",
+    "ticketDigest": "sha256:f54b1962c3dbe2c2c42328ec895046d41a4b7a76a0d81764ec819b5a9d825400",
+    "taskId": "ATM-GOV-0391",
+    "origin": "claim",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814144834-codex-captain-recovery-6ff8aa6a89",
+    "claimGeneration": "lease-bca11b8ce58f",
+    "issuedAt": "2026-08-14T14:48:33.960Z",
+    "expiresAt": "2026-08-14T15:18:33.960Z",
+    "scopeDigest": "sha256:b4da2c0eb3cfa26307b200a13bcf750d389b5f93121d7b7a4ccb1f49257b53b9",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T14:48:33.960Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0391.*",
+          ".atm/history/task-events/ATM-GOV-0391/**",
+          ".atm/history/tasks/ATM-GOV-0391.json",
+          "atomic_workbench/maps/atm-release-build/map.spec.json",
+          "scripts/build-root-drop-release.ts",
+          "scripts/run-sealed-runner-build.ts",
+          "scripts/runner-sync-incremental-build.ts",
+          "tests/cli/root-drop-release-incremental-overlay.test.ts",
+          "tests/cli/root-drop-release-manifest-integrity.test.ts",
+          "tests/cli/runner-sync-incremental-build.test.ts",
+          "tests/cli/sealed-runner-build-input-cache.test.ts"
+        ],
+        "digest": "sha256:bb068129368a2e4c83e6e596e83b69b9453c6d2535aa8eb7e2cf3717d2a9465f"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260814144833-codex-captain-recovery-ATM-GOV-0391-6e4be3333a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0391",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0391.*",
+      ".atm/history/task-events/ATM-GOV-0391/**",
+      ".atm/history/tasks/ATM-GOV-0391.json",
+      "atomic_workbench/maps/atm-release-build/map.spec.json",
+      "scripts/build-root-drop-release.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts",
+      "tests/cli/root-drop-release-incremental-overlay.test.ts",
+      "tests/cli/root-drop-release-manifest-integrity.test.ts",
+      "tests/cli/runner-sync-incremental-build.test.ts",
+      "tests/cli/sealed-runner-build-input-cache.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a3e8e49b7fd59fc4f4f88d57615655195f949ee186f5d6fbf05e8f02483b7083",
+    "actorId": "codex-captain-recovery",
+    "sessionId": "session-20260814144833-codex-captain-recovery-ATM-GOV-0391-6e4be3333a",
+    "laneSession": {
+      "laneSessionId": "lane-20260814144834-codex-captain-recovery-6ff8aa6a89",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814144834-codex-captain-recovery-6ff8aa6a89\""
+    },
+    "createdAt": "2026-08-14T14:48:36.773Z",
+    "status": "active"
+  }
+}
