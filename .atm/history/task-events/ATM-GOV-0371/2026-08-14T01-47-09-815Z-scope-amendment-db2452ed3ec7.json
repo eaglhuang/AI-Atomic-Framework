@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T01-47-09-815Z-scope-amendment-db2452ed3ec7",
+  "taskId": "ATM-GOV-0371",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0371.json",
+  "taskSha256": "sha256:3ea34a2151b29c214f2ed62a7150ac20304a6b5c0eafa28013170062ea2b36a4",
+  "createdAt": "2026-08-14T01:47:09.815Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0371 --actor codex-gpt-5.4-mini --add \"scripts/build-root-drop-release.ts,scripts/validate-root-drop-release.ts\" --reason \"Root-drop release validator is a required 0371 close gate; add the minimal fixture-baseline repair and its generator boundary.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Root-drop release validator is a required 0371 close gate; add the minimal fixture-baseline repair and its generator boundary."
+  }
+}

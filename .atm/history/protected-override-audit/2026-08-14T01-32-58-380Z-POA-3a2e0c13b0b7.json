@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-3a2e0c13b0b7",
+  "recordedAt": "2026-08-14T01:32:58.380Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0371",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0371 --message \"build(runner): publish candidate tombstone repair\n\nATM-Work-Admission: wat-5e1f272bf10529b5 sha256:5e1f272bf10529b55d5ceb01188da91685bdffa8dddbb20f6e4cc1f04c959406\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0371-d5023dc3c9",
+  "reason": "Queue-head runner publication; bypass only the known global hook false blocker for foreign released staged evidence.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T01-32-58-379Z-EMG-ATM-GOV-0371-d5023dc3c9.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
