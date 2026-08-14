@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, isDeclaredPublicationDelta, isPublicationOnlyDelta, semanticTaskCardDigest } from '../../scripts/compile-runbook-completion-evidence.ts';
@@ -87,7 +86,7 @@ const testContract = {
   contractId: ownedTuple.validatorContractId,
   taskId: 'ATM-GOV-9999',
   taskCardPath: 'scripts/compile-runbook-completion-evidence.ts',
-  taskCardDigest: `sha256:${createHash('sha256').update(readFileSync('scripts/compile-runbook-completion-evidence.ts', 'utf8')).digest('hex')}`,
+  taskCardDigest: semanticTaskCardDigest(readFileSync('scripts/compile-runbook-completion-evidence.ts', 'utf8')),
   command: ownedTuple.command
 };
 const foreignOwner = structuredClone(report);
@@ -124,4 +123,7 @@ execFileSync(process.execPath, ['--strip-types', 'scripts/compile-runbook-comple
   stdio: 'pipe'
 });
 assert.equal(readFileSync(canonicalPath, 'utf8'), beforeValidate, 'validate mode must be read-only');
+execFileSync(process.execPath, ['--strip-types', 'scripts/validate-runbook-completion-evidence.ts'], {
+  stdio: 'pipe'
+});
 console.log('[runbook-completion-evidence] ok');

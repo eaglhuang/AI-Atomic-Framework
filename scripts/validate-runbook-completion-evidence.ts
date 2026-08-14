@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { DEFAULT_OUTPUT, DEFAULT_PLANNING_ROOT, RUNBOOK_RELATIVE_PATH, digestText, evidenceTupleKey, parseRunbook } from './compile-runbook-completion-evidence.ts';
+import { DEFAULT_OUTPUT, DEFAULT_PLANNING_ROOT, RUNBOOK_RELATIVE_PATH, digestText, evidenceTupleKey, parseRunbook, semanticTaskCardDigest } from './compile-runbook-completion-evidence.ts';
 
 export function validateReport(report: any, source: string): void {
   const ancestry = new Map<string, boolean>();
@@ -19,7 +19,7 @@ export function validateReport(report: any, source: string): void {
       || !/^sha256:[0-9a-f]{64}$/.test(String(contract?.taskCardDigest ?? ''))
       || typeof contract?.taskCardPath !== 'string') throw new Error('invalid validator contract');
     if (validatorContracts.has(contract.contractId)) throw new Error(`duplicate validator contract ${contract.contractId}`);
-    if (!existsSync(contract.taskCardPath) || digestText(readFileSync(contract.taskCardPath, 'utf8')) !== contract.taskCardDigest) {
+    if (!existsSync(contract.taskCardPath) || semanticTaskCardDigest(readFileSync(contract.taskCardPath, 'utf8')) !== contract.taskCardDigest) {
       throw new Error(`validator contract task card drift ${contract.contractId}`);
     }
     validatorContracts.set(contract.contractId, contract);
