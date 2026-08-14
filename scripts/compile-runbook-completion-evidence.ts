@@ -9,12 +9,28 @@ export const DEFAULT_PLANNING_ROOT = process.env.ATM_PLANNING_REPO_ROOT
   : resolve('..', '3KLife');
 export const DEFAULT_OUTPUT = resolve('docs/reports/plan-3x-4x-runbook-completion-evidence.json');
 export const DEFAULT_CERTIFICATE = resolve('docs/reports/plan-3x-4x-independent-certificate.json');
+const REPORT_ARTIFACT_PREFIX = 'docs/reports/';
+const DURABLE_RECEIPT_PREFIX = '.atm/history/';
 
 type ValidatorContract = { contractId: string; taskId: string; taskCardPath: string; taskCardDigest: string; command: string };
 type EvidenceTuple = { command: string; exitCode: number; outputDigest: string; artifactPaths: string[]; observedAt: string; sourceCommit: string; evidenceOwner: string; validatorContractId?: string };
 type CompletionRow = { itemId: string; sourceLine: number; section: string; wave: string | null; requirement: string; requirementDigest: string; status: 'proven' | 'unproven'; evidence: EvidenceTuple[]; diagnostics: string[]; coverageOwners?: string[]; validatorContractIds?: string[] };
 
 export const digestText = (value: string) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
+
+function normalizePublicationArtifacts(paths: string[]): string[] | null {
+  const normalized = [...new Set(paths.map((path) => path.replace(/\\/g, '/').replace(/^\.\//, '')))].sort();
+  return normalized.length > 0
+    && normalized.every((path) => path.startsWith(REPORT_ARTIFACT_PREFIX) && !path.includes('..') && !path.startsWith('/'))
+    ? normalized
+    : null;
+}
+
+export function isDeclaredPublicationDelta(changedPaths: string[], declaredArtifacts: string[]): boolean {
+  const allowedArtifacts = normalizePublicationArtifacts(declaredArtifacts);
+  return allowedArtifacts !== null
+    && changedPaths.every((path) => path.startsWith(DURABLE_RECEIPT_PREFIX) || allowedArtifacts.includes(path));
+}
 
 /**
  * A generated evidence artifact cannot bind to the commit that publishes the
@@ -23,14 +39,13 @@ export const digestText = (value: string) => `sha256:${createHash('sha256').upda
  * artifact itself and durable governance receipts in the publication delta.
  * Any source change still forces a fresh observation.
  */
-export function isPublicationOnlyDelta(observedHead: string, currentHead: string): boolean {
+export function isPublicationOnlyDelta(observedHead: string, currentHead: string, declaredArtifacts = [relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/')]): boolean {
   if (!/^[0-9a-f]{40}$/.test(observedHead) || !/^[0-9a-f]{40}$/.test(currentHead)) return false;
   try {
     execFileSync('git', ['merge-base', '--is-ancestor', observedHead, currentHead], { stdio: 'ignore' });
     const changed = execFileSync('git', ['diff', '--name-only', `${observedHead}..${currentHead}`], { encoding: 'utf8' })
       .split(/\r?\n/).filter(Boolean);
-    const outputPath = relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/');
-    return changed.every((path) => path === outputPath || path.startsWith('.atm/history/'));
+    return isDeclaredPublicationDelta(changed, declaredArtifacts);
   } catch {
     return false;
   }
@@ -222,8 +237,11 @@ export function compileRunbookCompletion(
   originMain: string,
   finalCertificate = observeFinalCertificate(),
   generatedAt = new Date().toISOString(),
-  authorityDiagnostics: string[] = []
+  authorityDiagnostics: string[] = [],
+  publicationArtifacts = [relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/')]
 ) {
+  const normalizedPublicationArtifacts = normalizePublicationArtifacts(publicationArtifacts);
+  if (normalizedPublicationArtifacts === null) throw new Error('publication artifacts must be non-empty project report paths');
   const parsed = parseRunbook(source);
   const contracts = discoverCardContracts(source);
   parsed.rows = parsed.rows.map((row) => {
@@ -262,7 +280,10 @@ export function compileRunbookCompletion(
   const unknown = allRows.filter((row) => row.coverageOwners?.length && row.evidence.length === 0).map((row) => row.itemId);
   return {
     schemaId: 'atm.runbookCompletionEvidence.v1', specVersion: '0.1.0', generatedAt,
-    authority: { planningPath: RUNBOOK_RELATIVE_PATH, planningHead, targetHead, originMain, sourceDigest: digestText(source), diagnostics: authorityDiagnostics },
+    authority: {
+      planningPath: RUNBOOK_RELATIVE_PATH, planningHead, targetHead, originMain, sourceDigest: digestText(source), diagnostics: authorityDiagnostics,
+      publicationBundle: { schemaId: 'atm.sealedProjectionPublicationBundle.v1', artifactPaths: normalizedPublicationArtifacts }
+    },
     expectedItemCount: parsed.rows.length,
     validatorContracts: contracts.flatMap((contract) => contract.validators),
     rows: parsed.rows, waveExits: parsed.waveExits,
@@ -299,7 +320,12 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
     ? JSON.parse(readFileSync(DEFAULT_OUTPUT, 'utf8'))
     : null;
   const committedSnapshot = String(committed?.authority?.targetHead ?? '');
-  const targetHead = mode === 'validate' && isPublicationOnlyDelta(committedSnapshot, currentTargetHead)
+  const requestedPublicationArtifacts = process.argv.flatMap((arg, index) => arg === '--publication-artifact' ? [process.argv[index + 1] ?? ''] : []);
+  const defaultPublicationArtifact = relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/');
+  const publicationArtifacts = mode === 'validate'
+    ? (committed?.authority?.publicationBundle?.artifactPaths ?? [defaultPublicationArtifact])
+    : [defaultPublicationArtifact, ...requestedPublicationArtifacts];
+  const targetHead = mode === 'validate' && isPublicationOnlyDelta(committedSnapshot, currentTargetHead, publicationArtifacts)
     ? committedSnapshot
     : currentTargetHead;
   const generatedAt = mode === 'validate' ? String(committed?.generatedAt ?? '') : new Date().toISOString();
@@ -311,7 +337,7 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
       ? ['planning-runbook-head-digest-mismatch']
       : [])
   ];
-  const report = compileRunbookCompletion(source, planningHead, targetHead, originMain, observeFinalCertificate(), generatedAt, authorityDiagnostics);
+  const report = compileRunbookCompletion(source, planningHead, targetHead, originMain, observeFinalCertificate(), generatedAt, authorityDiagnostics, publicationArtifacts);
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (mode === 'write') {
     writeFileSync(DEFAULT_OUTPUT, serialized, 'utf8');

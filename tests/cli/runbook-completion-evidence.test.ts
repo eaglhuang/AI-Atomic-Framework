@@ -2,12 +2,32 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, isPublicationOnlyDelta } from '../../scripts/compile-runbook-completion-evidence.ts';
+import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, isDeclaredPublicationDelta, isPublicationOnlyDelta } from '../../scripts/compile-runbook-completion-evidence.ts';
 import { validateReport } from '../../scripts/validate-runbook-completion-evidence.ts';
 
 const sha = 'a'.repeat(40);
 assert.equal(DEFAULT_PLANNING_ROOT.endsWith('3KLife'), true);
 assert.equal(isPublicationOnlyDelta('invalid', 'also-invalid'), false, 'invalid publication snapshots must fail closed');
+assert.equal(
+  isDeclaredPublicationDelta([
+    'docs/reports/plan-3x-4x-runbook-completion-evidence.json',
+    'docs/reports/reviews/plan-3x-4x-runbook-release-review.json',
+    '.atm/history/evidence/ATM-GOV-0376.json'
+  ], [
+    'docs/reports/plan-3x-4x-runbook-completion-evidence.json',
+    'docs/reports/reviews/plan-3x-4x-runbook-release-review.json'
+  ]),
+  true,
+  'a sealed publication bundle may replay its declared outputs and durable receipts'
+);
+assert.equal(
+  isDeclaredPublicationDelta([
+    'docs/reports/plan-3x-4x-runbook-completion-evidence.json',
+    'scripts/compile-runbook-completion-evidence.ts'
+  ], ['docs/reports/plan-3x-4x-runbook-completion-evidence.json']),
+  false,
+  'an undeclared source change must invalidate a publication snapshot'
+);
 // Use synthetic wave numbers so repository evidence cannot hydrate this isolated fixture.
 const source = ['## Wave 98 — Preserve', '- [ ] first requirement', '退出條件：first exit', '## Wave 99 — Restore', '- [x] second requirement', '退出條件：second exit'].join('\n');
 const report = compileRunbookCompletion(source, sha, sha, sha);
@@ -17,6 +37,26 @@ assert.equal(report.overallVerdict, 'not-complete');
 assert.deepEqual(report.unresolvedIds, ['RB-001', 'RB-002', 'EXIT-01', 'EXIT-02']);
 assert.deepEqual(report.unknownIds, []);
 validateReport(report, source);
+const declaredBundle = compileRunbookCompletion(source, sha, sha, sha, undefined, undefined, [], [
+  'docs/reports/plan-3x-4x-runbook-completion-evidence.json',
+  'docs/reports/reviews/plan-3x-4x-runbook-release-review.json'
+]);
+assert.deepEqual(
+  declaredBundle.authority.publicationBundle,
+  {
+    schemaId: 'atm.sealedProjectionPublicationBundle.v1',
+    artifactPaths: [
+      'docs/reports/plan-3x-4x-runbook-completion-evidence.json',
+      'docs/reports/reviews/plan-3x-4x-runbook-release-review.json'
+    ]
+  },
+  'publication authority must persist an exact data-declared artifact bundle'
+);
+assert.throws(
+  () => compileRunbookCompletion(source, sha, sha, sha, undefined, undefined, [], ['scripts/not-a-report.ts']),
+  /publication artifacts/,
+  'publication declarations must reject non-report paths'
+);
 
 const forged = structuredClone(report);
 forged.rows[0].status = 'proven';

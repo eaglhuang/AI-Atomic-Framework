@@ -1,0 +1,288 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0376",
+  "title": "Seal projection publication bundles for freshness validation",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0374",
+    "ATM-GOV-0375"
+  ],
+  "acceptance": [
+    "ACC-1 The projection schema records a sealed, data-declared publication bundle of every generated artifact that the publication transaction owns. Validation replays the observed target snapshot when and only when the descendant changes are inside that bundle or are durable governance receipts.",
+    "ACC-2 A focused negative/positive regression proves that a declared bundle artifact plus `.atm/history/**` validates, while an undeclared source or authority input change remains stale and fails closed.",
+    "ACC-3 Regenerated current output remains `not-complete` until the underlying 112 rows, 11 exits, independent review, and remote release conditions are genuinely proven."
+  ],
+  "deliverables": [
+    "scripts/compile-runbook-completion-evidence.ts",
+    "tests/cli/runbook-completion-evidence.test.ts",
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+  ],
+  "scopePaths": [
+    "scripts/compile-runbook-completion-evidence.ts",
+    "tests/cli/runbook-completion-evidence.test.ts",
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+    "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Marking any runbook row, Wave exit, certificate dimension, or release verdict as complete.",
+    "Whitelisting a task id, commit SHA, or arbitrary report path in freshness control flow."
+  ],
+  "nonGoals": [
+    "Making the four-plan verdict proven."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the bundle contract and its generated projection together; never widen freshness acceptance for undeclared paths.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.independent-certification",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runbook-completion-evidence-projection",
+        "pattern": "Generated projection artifact",
+        "source": "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+        "disposition": "inline",
+        "inlineReason": "Generated evidence is an output of the sealed publication bundle, not an implementation module; extracting it would create a competing authority."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0376-seal-projection-publication-bundles-for-freshness-validation.task.md",
+    "sectionTitle": "ATM-GOV-0376",
+    "headingLine": 72,
+    "hash": "68c5d8d3079c7e4b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0376-seal-projection-publication-bundles-for-freshness-validation.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:68c5d8d3079c7e4be5594f366617656d3264d2e46e5104c76ffdbefd3d18745a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T07:09:57.690Z"
+    }
+  },
+  "importedAt": "2026-08-14T07:09:57.690Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0374",
+      "ATM-GOV-0375"
+    ],
+    "startConditions": [
+      "A generated projection becomes stale after a closeback that changes only generated projections and durable governance receipts."
+    ],
+    "softRelations": [
+      "ATM-GOV-0360"
+    ],
+    "changedPublicSeams": [
+      "atm.runbookCompletionEvidence.v1",
+      "atm.sealedProjectionPublicationBundle.v1"
+    ],
+    "causalImpactEdges": [
+      "publication-only-freshness",
+      "projection-consumer-snapshot-parity",
+      "closeback-revalidation"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-observation-head",
+      "declared-publication-artifacts",
+      "durable-governance-receipts"
+    ],
+    "validatorReferences": [
+      "compile-runbook-completion-evidence",
+      "validate-runbook-completion-evidence"
+    ],
+    "phaseOwner": "wave-10-independent-final-certification"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0376_publication_bundle_replays_closeback_delta",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "declared_publication_bundle_allows_only_its_own_closeback_delta",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "publication-only-freshness",
+        "projection-consumer-snapshot-parity",
+        "closeback-revalidation"
+      ],
+      "expectedRedPredicate": "a projection validation rejects a descendant that contains only declared generated artifacts and durable governance receipts",
+      "contributionResourceKey": "runbook-projection-publication-bundle",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0374",
+      "contractEdge": "atm.sealedProjectionPublicationBundle.v1",
+      "resourceKey": "runbook-projection-publication-bundle"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0376_publication_bundle_replays_closeback_delta"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T07-21-51-143Z-renew-e99a859606e0",
+  "lastTransitionAt": "2026-08-14T07:21:51.143Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-recovery",
+  "reservedAt": "2026-08-14T07:17:31.838Z",
+  "promotedAt": "2026-08-14T07:17:31.841Z",
+  "claim": {
+    "actorId": "codex-captain-recovery",
+    "leaseId": "lease-a8831368856a",
+    "claimedAt": "2026-08-14T07:17:31.846Z",
+    "heartbeatAt": "2026-08-14T07:21:50.448Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0376.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "scripts/compile-runbook-completion-evidence.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814071732-codex-captain-recovery-f93daaff94",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814071732-codex-captain-recovery-f93daaff94\""
+    }
+  },
+  "startedAt": "2026-08-14T07:17:31.846Z",
+  "startedByActor": "codex-captain-recovery",
+  "startedBySessionId": "session-20260814071731-codex-captain-recovery-ATM-GOV-0376-6f3393c76d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0376",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0376.*",
+      ".atm/history/task-events/ATM-GOV-0376/**",
+      ".atm/history/tasks/ATM-GOV-0376.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "scripts/compile-runbook-completion-evidence.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ab150fd937c954951e962fcf32ad62aaca7f3e8940a0af784f825fdb5253c685",
+    "actorId": "codex-captain-recovery",
+    "sessionId": "session-20260814071731-codex-captain-recovery-ATM-GOV-0376-6f3393c76d",
+    "laneSession": {
+      "laneSessionId": "lane-20260814071732-codex-captain-recovery-f93daaff94",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814071732-codex-captain-recovery-f93daaff94\""
+    },
+    "createdAt": "2026-08-14T07:17:35.734Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-efedd5a3a7e55946",
+    "ticketDigest": "sha256:efedd5a3a7e5594682d6f37e5576b9b38caf3a94e30be6dd4a4f49b302f9a6bc",
+    "taskId": "ATM-GOV-0376",
+    "origin": "claim",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814071732-codex-captain-recovery-f93daaff94",
+    "claimGeneration": "lease-a8831368856a",
+    "issuedAt": "2026-08-14T07:21:50.448Z",
+    "expiresAt": "2026-08-14T07:51:50.448Z",
+    "scopeDigest": "sha256:a3830b021650084e2deeb620524c33202924f0a727a2bfcf8349669b24e4c2ae",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T07:21:50.448Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0376.*",
+          ".atm/history/task-events/ATM-GOV-0376/**",
+          ".atm/history/tasks/ATM-GOV-0376.json",
+          "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+          "scripts/compile-runbook-completion-evidence.ts",
+          "tests/cli/runbook-completion-evidence.test.ts"
+        ],
+        "digest": "sha256:221b719bc8c497d9cb317c633443d461ce5188559b8766fe66410b8e6304ced8"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}
