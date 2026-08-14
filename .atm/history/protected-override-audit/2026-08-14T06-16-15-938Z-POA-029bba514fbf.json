@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-029bba514fbf",
+  "recordedAt": "2026-08-14T06:16:15.938Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0374",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0374 --message \"docs(evidence): refresh runbook projections\n\nATM-Work-Admission: wat-89064cc0db72ef6a sha256:89064cc0db72ef6afcff4896a3b4c7528961d8e4fd3a712802102fe07b1b74cb\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0374-f247a15c01",
+  "reason": "Normal governed pre-commit hook reproducibly timed out; sealed generated projection bundle was verified.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T06-16-13-059Z-EMG-ATM-GOV-0374-f247a15c01.json",
+  "parentEventId": "POA-c4eb4ac2cc74",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

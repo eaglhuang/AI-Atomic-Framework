@@ -1,12 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0374",
-  "updatedAt": "2026-08-14T06:15:35.645Z",
+  "updatedAt": "2026-08-14T06:18:28.349Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate",
+    "node --strip-types scripts/review-runbook-release-authority.ts --json",
     "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
     "node --strip-types tests/cli/runbook-release-authority-review.test.ts",
+    "typecheck",
     "validate:runbook-completion-evidence"
   ],
   "staleValidationPasses": [],
@@ -135,6 +137,38 @@
       "durationMs": 595,
       "runnerKind": "dev-source",
       "sourceCommit": "ca716104c8752ef6a073fe908403ba90023ef528",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/review-runbook-release-authority.ts --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9cf984585114007119397c98a8d9586cfebafccd9f4787487d0f0d8407dff787",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/review-runbook-release-authority.ts --json"
+      ],
+      "generatedAt": "2026-08-14T06:16:46.205Z",
+      "startedAt": "2026-08-14T06:16:43.976Z",
+      "finishedAt": "2026-08-14T06:16:46.205Z",
+      "durationMs": 2229,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T06:18:28.349Z",
+      "startedAt": "2026-08-14T06:18:20.195Z",
+      "finishedAt": "2026-08-14T06:18:28.349Z",
+      "durationMs": 8154,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
       "cached": false
     }
   ],
