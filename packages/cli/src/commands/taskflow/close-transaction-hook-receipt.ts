@@ -18,6 +18,7 @@ export function issueCloseTransactionHookReceipt(input: {
   readonly root: string;
   readonly taskId: string;
   readonly actorId: string;
+  readonly invocationNonce: string;
   readonly closeWindowLock: CloseWindowStagedIndexLockRecord;
   readonly stageFiles: readonly string[];
   readonly parentHead: string;
@@ -33,6 +34,8 @@ export function issueCloseTransactionHookReceipt(input: {
       root: input.root,
       taskId: input.taskId,
       actorId: input.actorId,
+      invocationNonce: input.invocationNonce,
+      commitSurface: 'taskflow-close-governance-followup',
       closeWindowLock: input.closeWindowLock,
       parentHead: input.parentHead,
       candidateDigest: digest

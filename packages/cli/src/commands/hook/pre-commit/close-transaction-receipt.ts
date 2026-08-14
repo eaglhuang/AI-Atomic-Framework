@@ -13,6 +13,8 @@ export interface CloseTransactionHookReceipt {
   readonly receiptId: string;
   readonly taskId: string;
   readonly actorId: string;
+  readonly invocationNonce: string;
+  readonly commitSurface: 'taskflow-close-governance-followup';
   readonly closeWindowAcquiredAt: string;
   readonly parentHead: string;
   readonly candidateDigest: string;
@@ -66,6 +68,8 @@ export function writeCloseTransactionHookReceipt(input: {
   readonly root: string;
   readonly taskId: string;
   readonly actorId: string;
+  readonly invocationNonce: string;
+  readonly commitSurface: 'taskflow-close-governance-followup';
   readonly closeWindowLock: CloseWindowStagedIndexLockRecord;
   readonly parentHead: string;
   readonly candidateDigest: string;
@@ -74,6 +78,7 @@ export function writeCloseTransactionHookReceipt(input: {
   if (input.closeWindowLock.status !== 'active'
     || normalizeTaskId(input.closeWindowLock.taskId) !== normalizeTaskId(input.taskId)
     || input.closeWindowLock.actorId !== input.actorId
+    || !input.invocationNonce
     || !input.parentHead
     || !input.candidateDigest) return null;
   const now = input.nowMs ?? Date.now();
@@ -82,6 +87,8 @@ export function writeCloseTransactionHookReceipt(input: {
     receiptId: randomUUID(),
     taskId: normalizeTaskId(input.taskId),
     actorId: input.actorId,
+    invocationNonce: input.invocationNonce,
+    commitSurface: input.commitSurface,
     closeWindowAcquiredAt: input.closeWindowLock.acquiredAt,
     parentHead: input.parentHead.toLowerCase(),
     candidateDigest: input.candidateDigest,
@@ -98,13 +105,15 @@ export function consumeCloseTransactionHookReceipt(input: {
   readonly root: string;
   readonly taskId: string | null;
   readonly actorId: string | null;
+  readonly invocationNonce: string | null;
+  readonly commitSurface: string | null;
   readonly scopedIndexActive: boolean;
   readonly closeWindowLock: CloseWindowStagedIndexLockRecord | null;
   readonly stagedFiles: readonly string[];
   readonly nowMs?: number;
 }): { readonly reusable: boolean; readonly reason: string } {
   if (!input.scopedIndexActive) return { reusable: false, reason: 'live-index commits cannot consume close-transaction receipts' };
-  if (!input.taskId || !input.actorId || !input.closeWindowLock || input.closeWindowLock.status !== 'active') return { reusable: false, reason: 'task, actor, or active close-window lock is missing' };
+  if (!input.taskId || !input.actorId || !input.invocationNonce || input.commitSurface !== 'taskflow-close-governance-followup' || !input.closeWindowLock || input.closeWindowLock.status !== 'active') return { reusable: false, reason: 'task, actor, invocation capability, or active close-window lock is missing' };
   const target = receiptPath(input.root);
   if (!existsSync(target)) return { reusable: false, reason: 'close-transaction receipt is missing' };
   let receipt: CloseTransactionHookReceipt;
@@ -119,6 +128,8 @@ export function consumeCloseTransactionHookReceipt(input: {
   const valid = receipt.schemaId === CLOSE_TRANSACTION_HOOK_RECEIPT_SCHEMA_ID
     && normalizeTaskId(receipt.taskId) === normalizeTaskId(input.taskId)
     && receipt.actorId === input.actorId
+    && receipt.invocationNonce === input.invocationNonce
+    && receipt.commitSurface === input.commitSurface
     && receipt.closeWindowAcquiredAt === input.closeWindowLock.acquiredAt
     && receipt.parentHead === parentHead
     && receipt.candidateDigest === candidateDigest

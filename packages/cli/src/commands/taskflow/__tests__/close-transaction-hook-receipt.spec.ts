@@ -10,6 +10,7 @@ import { issueCloseTransactionHookReceipt } from '../close-transaction-hook-rece
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-close-hook-receipt-test-'));
 const taskId = 'ATM-GOV-0389';
 const actorId = 'receipt-test-captain';
+const invocationNonce = 'receipt-test-invocation-nonce';
 const lock = {
   schemaId: 'atm.closeWindowStagedIndexLock.v1' as const,
   specVersion: '0.1.0' as const,
@@ -42,7 +43,7 @@ try {
   writeFileSync(path.join(root, 'governance.json'), '{"verified":true}\n');
   const parentHead = git(['rev-parse', 'HEAD']);
 
-  const issued = issueCloseTransactionHookReceipt({ root, taskId, actorId, closeWindowLock: lock, stageFiles: ['governance.json'], parentHead });
+  const issued = issueCloseTransactionHookReceipt({ root, taskId, actorId, invocationNonce, closeWindowLock: lock, stageFiles: ['governance.json'], parentHead });
   assert.ok(issued, 'producer must create a receipt from a sealed temporary index');
 
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-close-hook-receipt-index-'));
@@ -53,12 +54,14 @@ try {
     process.env.GIT_INDEX_FILE = env.GIT_INDEX_FILE;
     process.env.ATM_COMMIT_TASK_ID = taskId;
     process.env.ATM_COMMIT_ACTOR_ID = actorId;
-    const wrongActor = consumeCloseTransactionHookReceipt({ root, taskId, actorId: 'different-captain', scopedIndexActive: true, closeWindowLock: lock, stagedFiles: ['governance.json'] });
+    const wrongActor = consumeCloseTransactionHookReceipt({ root, taskId, actorId: 'different-captain', invocationNonce, commitSurface: 'taskflow-close-governance-followup', scopedIndexActive: true, closeWindowLock: lock, stagedFiles: ['governance.json'] });
     assert.equal(wrongActor.reusable, false, 'actor substitution must fail closed without consuming the receipt');
-    const accepted = consumeCloseTransactionHookReceipt({ root, taskId, actorId, scopedIndexActive: true, closeWindowLock: lock, stagedFiles: ['governance.json'] });
+    const wrongInvocation = consumeCloseTransactionHookReceipt({ root, taskId, actorId, invocationNonce: 'other-invocation', commitSurface: 'taskflow-close-governance-followup', scopedIndexActive: true, closeWindowLock: lock, stagedFiles: ['governance.json'] });
+    assert.equal(wrongInvocation.reusable, false, 'invocation substitution must fail closed without consuming the receipt');
+    const accepted = consumeCloseTransactionHookReceipt({ root, taskId, actorId, invocationNonce, commitSurface: 'taskflow-close-governance-followup', scopedIndexActive: true, closeWindowLock: lock, stagedFiles: ['governance.json'] });
     assert.equal(accepted.reusable, true, accepted.reason);
 
-    const rejected = consumeCloseTransactionHookReceipt({ root, taskId, actorId, scopedIndexActive: true, closeWindowLock: lock, stagedFiles: ['governance.json'] });
+    const rejected = consumeCloseTransactionHookReceipt({ root, taskId, actorId, invocationNonce, commitSurface: 'taskflow-close-governance-followup', scopedIndexActive: true, closeWindowLock: lock, stagedFiles: ['governance.json'] });
     assert.equal(rejected.reusable, false, 'receipt must be single-use');
   } finally {
     rmSync(tempDir, { recursive: true, force: true });

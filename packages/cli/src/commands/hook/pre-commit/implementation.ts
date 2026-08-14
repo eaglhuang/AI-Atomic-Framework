@@ -226,6 +226,8 @@ export function runPreCommitHook(cwd: string) {
     root,
     taskId: committingTaskIdForHook,
     actorId: typeof process.env.ATM_COMMIT_ACTOR_ID === 'string' ? process.env.ATM_COMMIT_ACTOR_ID.trim() || null : null,
+    invocationNonce: typeof process.env.ATM_CLOSE_TRANSACTION_RECEIPT_NONCE === 'string' ? process.env.ATM_CLOSE_TRANSACTION_RECEIPT_NONCE.trim() || null : null,
+    commitSurface: typeof process.env.ATM_CLOSE_TRANSACTION_RECEIPT_SURFACE === 'string' ? process.env.ATM_CLOSE_TRANSACTION_RECEIPT_SURFACE.trim() || null : null,
     scopedIndexActive,
     closeWindowLock: readActiveCloseCommitWindows(root).find((entry) => entry.taskId === committingTaskIdForHook) ?? null,
     stagedFiles
