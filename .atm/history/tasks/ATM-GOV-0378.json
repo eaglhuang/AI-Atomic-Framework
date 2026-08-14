@@ -1,0 +1,282 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0378",
+  "title": "Seal semantic planning inputs for projection freshness",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0377"
+  ],
+  "acceptance": [
+    "ACC-1 The projection seals a canonical semantic planning snapshot containing the runbook source and each discovered task-card contract. Lifecycle-only status/closeback changes do not stale it; any requirement, validator, acceptance, dependency, scope, deliverable, or contract change does.",
+    "ACC-2 A focused positive/negative test proves both cases and the regenerated output remains `not-complete` until real runbook evidence is complete."
+  ],
+  "deliverables": [
+    "scripts/compile-runbook-completion-evidence.ts",
+    "tests/cli/runbook-completion-evidence.test.ts",
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+  ],
+  "scopePaths": [
+    "scripts/compile-runbook-completion-evidence.ts",
+    "tests/cli/runbook-completion-evidence.test.ts",
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+    "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Ignoring changes to runbook requirements, validators, acceptance, dependencies, scope, deliverables, or task-card contract fields.",
+    "Changing the four-plan verdict."
+  ],
+  "nonGoals": [
+    "Treating arbitrary planning HEAD changes as safe without semantic comparison."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert semantic snapshot contract and projection together; never treat a semantic task-card change as lifecycle-only.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runbook-completion-evidence-projection",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runbook-planning-semantic-snapshot",
+        "pattern": "Planning authority semantic snapshot",
+        "source": "scripts/compile-runbook-completion-evidence.ts",
+        "disposition": "inline",
+        "inlineReason": "The compact snapshot is a private projection compiler seam; a separate module is unnecessary until another consumer needs it."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0378-seal-semantic-planning-inputs-for-projection-freshness.task.md",
+    "sectionTitle": "ATM-GOV-0378",
+    "headingLine": 72,
+    "hash": "7324428503a8932b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0378-seal-semantic-planning-inputs-for-projection-freshness.task.md",
+      "planningCommitSha": "685ed7740a8cfe559cedd236caafed75c0ced53b",
+      "contentDigest": "sha256:7324428503a8932bd91593d7e9c2f19795373c3d94c9555b3254a9aac4812017",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T07:35:25.744Z"
+    }
+  },
+  "importedAt": "2026-08-14T07:35:25.744Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0377"
+    ],
+    "startConditions": [
+      "Planning closeback changes only lifecycle fields or durable task events after a projection publication."
+    ],
+    "softRelations": [
+      "ATM-GOV-0376"
+    ],
+    "changedPublicSeams": [
+      "atm.runbookCompletionEvidence.v1",
+      "atm.planningSemanticSnapshot.v1"
+    ],
+    "causalImpactEdges": [
+      "planning-closeback-snapshot-parity",
+      "semantic-contract-freshness"
+    ],
+    "parallelFrontierInputs": [
+      "runbook-source",
+      "task-card-semantic-contracts",
+      "planning-closeback-receipts"
+    ],
+    "validatorReferences": [
+      "compile-runbook-completion-evidence",
+      "runbook-completion-evidence"
+    ],
+    "phaseOwner": "wave-10-independent-final-certification"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0378_semantic_planning_snapshot_ignores_lifecycle_closeback",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "planning_lifecycle_only_closeback_does_not_stale_projection",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "planning-closeback-snapshot-parity",
+        "semantic-contract-freshness"
+      ],
+      "expectedRedPredicate": "a planning task card lifecycle-only status update invalidates an otherwise sealed projection",
+      "contributionResourceKey": "runbook-planning-semantic-snapshot",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0377",
+      "contractEdge": "atm.planningSemanticSnapshot.v1",
+      "resourceKey": "runbook-planning-semantic-snapshot"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0378_semantic_planning_snapshot_ignores_lifecycle_closeback"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T07-41-17-732Z-renew-585b912aa11b",
+  "lastTransitionAt": "2026-08-14T07:41:17.732Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-recovery",
+  "reservedAt": "2026-08-14T07:35:31.279Z",
+  "promotedAt": "2026-08-14T07:35:31.283Z",
+  "claim": {
+    "actorId": "codex-captain-recovery",
+    "leaseId": "lease-51eca6df2e0d",
+    "claimedAt": "2026-08-14T07:35:31.287Z",
+    "heartbeatAt": "2026-08-14T07:41:17.027Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0378.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "scripts/compile-runbook-completion-evidence.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814073531-codex-captain-recovery-d5d49c9681",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814073531-codex-captain-recovery-d5d49c9681\""
+    }
+  },
+  "startedAt": "2026-08-14T07:35:31.287Z",
+  "startedByActor": "codex-captain-recovery",
+  "startedBySessionId": "session-20260814073531-codex-captain-recovery-ATM-GOV-0378-c5b78e17db",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0378",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0378.*",
+      ".atm/history/task-events/ATM-GOV-0378/**",
+      ".atm/history/tasks/ATM-GOV-0378.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "scripts/compile-runbook-completion-evidence.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "84f2529eb55ca35c03ecf0f7dc5324aa6e44cd357e4d316dc16fbd2b9ce024fb",
+    "actorId": "codex-captain-recovery",
+    "sessionId": "session-20260814073531-codex-captain-recovery-ATM-GOV-0378-c5b78e17db",
+    "laneSession": {
+      "laneSessionId": "lane-20260814073531-codex-captain-recovery-d5d49c9681",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814073531-codex-captain-recovery-d5d49c9681\""
+    },
+    "createdAt": "2026-08-14T07:35:32.937Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-96898e307e072bb1",
+    "ticketDigest": "sha256:96898e307e072bb1947ee620895eca75851c557aa12b231f8565bbc9d287a6c5",
+    "taskId": "ATM-GOV-0378",
+    "origin": "claim",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814073531-codex-captain-recovery-d5d49c9681",
+    "claimGeneration": "lease-51eca6df2e0d",
+    "issuedAt": "2026-08-14T07:41:17.027Z",
+    "expiresAt": "2026-08-14T08:11:17.027Z",
+    "scopeDigest": "sha256:46bb04fc95ec67b4fb213955760454920013eaf4108bb2a3c79f1f4ad62c21e2",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T07:41:17.027Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0378.*",
+          ".atm/history/task-events/ATM-GOV-0378/**",
+          ".atm/history/tasks/ATM-GOV-0378.json",
+          "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+          "scripts/compile-runbook-completion-evidence.ts",
+          "tests/cli/runbook-completion-evidence.test.ts"
+        ],
+        "digest": "sha256:00e75fb1eae4226af7b0430c90cd2636f12bed42297790b8292b93afccb798b3"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

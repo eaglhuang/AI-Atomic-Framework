@@ -2,12 +2,16 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, isDeclaredPublicationDelta, isPublicationOnlyDelta } from '../../scripts/compile-runbook-completion-evidence.ts';
+import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, isDeclaredPublicationDelta, isPublicationOnlyDelta, semanticTaskCardDigest } from '../../scripts/compile-runbook-completion-evidence.ts';
 import { validateReport } from '../../scripts/validate-runbook-completion-evidence.ts';
 
 const sha = 'a'.repeat(40);
 assert.equal(DEFAULT_PLANNING_ROOT.endsWith('3KLife'), true);
 assert.equal(isPublicationOnlyDelta('invalid', 'also-invalid'), false, 'invalid publication snapshots must fail closed');
+const planningContract = 'task_id: ATM-GOV-9999\nstatus: planned\nvalidators:\n  - npm run typecheck\nscopePaths:\n  - scripts/example.ts\n';
+const lifecycleOnlyCloseback = 'task_id: ATM-GOV-9999\nstatus: done\nvalidators:\n  - npm run typecheck\nscopePaths:\n  - scripts/example.ts\ncompleted_at: "2026-08-14T00:00:00Z"\ndelivery_commit: deadbeef\n';
+assert.equal(semanticTaskCardDigest(planningContract), semanticTaskCardDigest(lifecycleOnlyCloseback), 'lifecycle-only closeback must not change the planning contract snapshot');
+assert.notEqual(semanticTaskCardDigest(planningContract), semanticTaskCardDigest(planningContract.replace('npm run typecheck', 'npm run validate:cli')), 'validator changes must invalidate the planning contract snapshot');
 assert.equal(
   isDeclaredPublicationDelta([
     'docs/reports/plan-3x-4x-runbook-completion-evidence.json',

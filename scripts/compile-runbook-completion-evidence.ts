@@ -18,6 +18,19 @@ type CompletionRow = { itemId: string; sourceLine: number; section: string; wave
 
 export const digestText = (value: string) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
 
+const TASK_CARD_LIFECYCLE_FIELDS = new Set([
+  'status', 'completed_at', 'completed_by_agent', 'closedAt', 'closedByActor',
+  'closedByCommand', 'lastTransitionId', 'lastTransitionAt', 'delivery_commit'
+]);
+
+export function semanticTaskCardDigest(source: string): string {
+  const semanticLines = source.split(/\r?\n/).filter((line) => {
+    const key = /^([A-Za-z][A-Za-z0-9_]*):/.exec(line)?.[1];
+    return key === undefined || !TASK_CARD_LIFECYCLE_FIELDS.has(key);
+  });
+  return digestText(semanticLines.join('\n'));
+}
+
 function normalizePublicationArtifacts(paths: string[]): string[] | null {
   const normalized = [...new Set(paths.map((path) => path.replace(/\\/g, '/').replace(/^\.\//, '')))].sort();
   return normalized.length > 0
@@ -95,7 +108,7 @@ function discoverCardContracts(runbookSource: string): CardContract[] {
     const waveNumber = /wave-(\d+)/i.exec(phase)?.[1];
     const block = /^validators:\s*\r?\n((?:\s+- .+\r?\n)+)/m.exec(source)?.[1] ?? '';
     const taskCardPath = resolve(taskDir, name);
-    const taskCardDigest = digestText(source);
+    const taskCardDigest = semanticTaskCardDigest(source);
     const validators = [...block.matchAll(/^\s+-\s+(.+)$/gm)].map((match) => {
       const command = match[1].trim();
       return {
@@ -108,6 +121,22 @@ function discoverCardContracts(runbookSource: string): CardContract[] {
     });
     return [{ taskId, wave: waveNumber ? `Wave ${Number(waveNumber)}` : null, phase, validators }];
   });
+}
+
+export function planningSemanticSnapshot(runbookSource: string) {
+  const contracts = discoverCardContracts(runbookSource);
+  const contractsDigest = digestText(JSON.stringify(contracts.map((contract) => ({
+    taskId: contract.taskId,
+    wave: contract.wave,
+    phase: contract.phase,
+    validators: contract.validators.map(({ contractId, taskCardDigest, command }) => ({ contractId, taskCardDigest, command }))
+  })).sort((left, right) => left.taskId.localeCompare(right.taskId))));
+  return {
+    schemaId: 'atm.planningSemanticSnapshot.v1',
+    runbookDigest: digestText(runbookSource),
+    contractsDigest,
+    digest: digestText(`${digestText(runbookSource)}\n${contractsDigest}`)
+  };
 }
 
 function contractsForRow(row: CompletionRow, contracts: CardContract[]): CardContract[] {
@@ -244,6 +273,7 @@ export function compileRunbookCompletion(
   if (normalizedPublicationArtifacts === null) throw new Error('publication artifacts must be non-empty project report paths');
   const parsed = parseRunbook(source);
   const contracts = discoverCardContracts(source);
+  const planningSnapshot = planningSemanticSnapshot(source);
   parsed.rows = parsed.rows.map((row) => {
     const hydrated = hydrate(row, contractsForRow(row, contracts), targetHead);
     return requiresFinalCertificate(row) && !finalCertificate.proven
@@ -282,6 +312,7 @@ export function compileRunbookCompletion(
     schemaId: 'atm.runbookCompletionEvidence.v1', specVersion: '0.1.0', generatedAt,
     authority: {
       planningPath: RUNBOOK_RELATIVE_PATH, planningHead, targetHead, originMain, sourceDigest: digestText(source), diagnostics: authorityDiagnostics,
+      planningSemanticSnapshot: planningSnapshot,
       publicationBundle: { schemaId: 'atm.sealedProjectionPublicationBundle.v1', artifactPaths: normalizedPublicationArtifacts }
     },
     expectedItemCount: parsed.rows.length,
@@ -313,13 +344,17 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
       return null;
     }
   };
-  const planningHead = process.env.ATM_PLANNING_HEAD ?? git(DEFAULT_PLANNING_ROOT, ['rev-parse', 'HEAD']);
+  const observedPlanningHead = process.env.ATM_PLANNING_HEAD ?? git(DEFAULT_PLANNING_ROOT, ['rev-parse', 'HEAD']);
   const currentTargetHead = process.env.ATM_TARGET_HEAD ?? git(resolve('.'), ['rev-parse', 'HEAD']);
   const originMain = process.env.ATM_ORIGIN_MAIN ?? git(resolve('.'), ['ls-remote', 'origin', 'refs/heads/main']).split(/\s+/)[0] ?? 'unknown';
   const committed = mode === 'validate' && existsSync(DEFAULT_OUTPUT)
     ? JSON.parse(readFileSync(DEFAULT_OUTPUT, 'utf8'))
     : null;
   const committedSnapshot = String(committed?.authority?.targetHead ?? '');
+  const currentPlanningSnapshot = planningSemanticSnapshot(source);
+  const planningHead = mode === 'validate' && committed?.authority?.planningSemanticSnapshot?.digest === currentPlanningSnapshot.digest
+    ? String(committed.authority.planningHead)
+    : observedPlanningHead;
   const requestedPublicationArtifacts = process.argv.flatMap((arg, index) => arg === '--publication-artifact' ? [process.argv[index + 1] ?? ''] : []);
   const defaultPublicationArtifact = relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/');
   const publicationArtifacts = mode === 'validate'
