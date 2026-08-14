@@ -1,0 +1,309 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0393",
+  "title": "Make scope amendments atomically reseal delivery authority",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A successful normal `tasks scope add` reseals the active work-admission ticket from the same canonical amended scope snapshot used for the ledger, claim, and direction lock.",
+    "ACC-2: A governed commit after an amendment includes an added delivery path when that path is in the amended task scope; the commit result cannot report unqualified success with a candidate narrower than the active ticket.",
+    "ACC-3: The test reproduces the historical sequence (`claim -> amend scope -> write an added file -> governed commit`) and proves red before the repair and green after it.",
+    "ACC-4: If ticket resealing, transition writing, or direction-lock projection fails, `tasks scope add` fails closed and leaves all authority representations at the same prior generation; no partial success receipt is written.",
+    "ACC-5: The repair is generic over task ids, actors, paths, and lane ids; it reuses the existing `ATM_WRITE_TICKET_SCOPE_VIOLATION` contract rather than adding task-specific branches."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+    "packages/cli/src/commands/tasks/claim-work-admission.ts",
+    "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/legacy/implementation.ts",
+    "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+    "packages/cli/src/commands/tasks/claim-work-admission.ts",
+    "packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+    "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+    "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-scope-authority-projection",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.task-scope-authority-projection",
+        "pattern": "Transaction Script",
+        "source": "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+        "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+        "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0393-make-scope-amendments-atomically-reseal-delivery-authority.task.md",
+    "sectionTitle": "ATM-GOV-0393",
+    "headingLine": 83,
+    "hash": "015967af3eb4efdd",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0393-make-scope-amendments-atomically-reseal-delivery-authority.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:015967af3eb4efddce4bd9f3e386ed8720835e71e41824e19d748f8c70276b55",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T15:17:49.541Z"
+    }
+  },
+  "importedAt": "2026-08-14T15:17:49.541Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "tasks-scope-add",
+      "work-admission-ticket",
+      "task-scoped-delivery-bundle"
+    ],
+    "causalImpactEdges": [
+      "scope-amendment -> canonical-authority-snapshot -> work-admission-ticket -> delivery-bundle"
+    ],
+    "parallelFrontierInputs": [
+      "Does not touch runner publication, release mirrors, or shared git index policy"
+    ],
+    "validatorReferences": [
+      "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+    ],
+    "phaseOwner": "Wave-1-framework-foundation"
+  },
+  "testContributions": [
+    {
+      "caseId": "scope_amendment_reseals_ticket_atomically_0393",
+      "targetGroupId": null,
+      "semanticKey": "scope-amendment-authority-projection",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "scope-amendment -> canonical-authority-snapshot -> work-admission-ticket -> delivery-bundle"
+      ],
+      "expectedRedPredicate": "an added in-scope delivery path changes scope authority but remains absent from the ticket and governed bundle",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "tasks-scope-add",
+      "resourceKey": null
+    },
+    {
+      "caseId": "scope_amendment_partial_projection_fails_closed_0393",
+      "targetGroupId": null,
+      "semanticKey": "scope-amendment-no-partial-authority",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "scope-amendment -> canonical-authority-snapshot -> work-admission-ticket -> delivery-bundle"
+      ],
+      "expectedRedPredicate": "a ticket reseal failure leaves ledger or direction-lock scope changed while the command reports success",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "work-admission-ticket",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "scope_amendment_reseals_ticket_atomically_0393",
+    "scope_amendment_partial_projection_fails_closed_0393"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T15-19-45-146Z-claim-a2fe2bb16c50",
+  "lastTransitionAt": "2026-08-14T15:19:45.146Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-captain",
+  "reservedAt": "2026-08-14T15:19:38.713Z",
+  "promotedAt": "2026-08-14T15:19:38.720Z",
+  "claim": {
+    "actorId": "cursor-captain",
+    "leaseId": "lease-96378881ce81",
+    "claimedAt": "2026-08-14T15:19:38.726Z",
+    "heartbeatAt": "2026-08-14T15:19:38.726Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0393.json",
+      "packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+      "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260814151939-cursor-captain-5f0422e933",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814151939-cursor-captain-5f0422e933\""
+    }
+  },
+  "startedAt": "2026-08-14T15:19:38.726Z",
+  "startedByActor": "cursor-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-c4ed569d4478e825",
+    "ticketDigest": "sha256:c4ed569d4478e825ad5c53421291dc0dce86e0216c4db54d9fd649e12e17c6dd",
+    "taskId": "ATM-GOV-0393",
+    "origin": "claim",
+    "actorId": "cursor-captain",
+    "laneSessionId": "lane-20260814151939-cursor-captain-5f0422e933",
+    "claimGeneration": "lease-96378881ce81",
+    "issuedAt": "2026-08-14T15:19:38.726Z",
+    "expiresAt": "2026-08-14T15:49:38.726Z",
+    "scopeDigest": "sha256:4f093506e8df5776caca64d12c6ac55bfcd8b801aa5f3f2e8aa3bbf8fed2313a",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T15:19:38.726Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0393.*",
+          ".atm/history/task-events/ATM-GOV-0393/**",
+          ".atm/history/tasks/ATM-GOV-0393.json",
+          "packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+          "packages/cli/src/commands/tasks/claim-work-admission.ts",
+          "packages/cli/src/commands/tasks/legacy/implementation.ts",
+          "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+          "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+        ],
+        "digest": "sha256:5b8d976f57b6ac97d19521e6aae550e8137a109aa8e12d543f6e997d9f07442a"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0393",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0393.*",
+      ".atm/history/task-events/ATM-GOV-0393/**",
+      ".atm/history/tasks/ATM-GOV-0393.json",
+      "packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+      "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "364adddb3c954f0a6fc49ced220fcde8d0960698ae71d809774d98e06fa6d0f6",
+    "actorId": "cursor-captain",
+    "sessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+    "laneSession": {
+      "laneSessionId": "lane-20260814151939-cursor-captain-5f0422e933",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814151939-cursor-captain-5f0422e933\""
+    },
+    "createdAt": "2026-08-14T15:19:45.145Z",
+    "status": "active"
+  }
+}

@@ -1,0 +1,297 @@
+{
+  "taskId": "ATM-GOV-0393",
+  "updatedAt": "2026-08-14T15:28:49.530Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-captain",
+      "sessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+      "createdAt": "2026-08-14T15:28:20.526Z",
+      "details": {
+        "actorId": "cursor-captain",
+        "sessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-scope-authority-projection",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:94767bffb3f40949f6198ece2f09cbfa870635ddf488ca0f02774666db0e4053",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-14T15:28:19.254Z",
+            "finishedAt": "2026-08-14T15:28:20.525Z",
+            "durationMs": 1271,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9d6550ae762d583ef56e1c2ee0574620bb8db0bc",
+            "cacheKey": "sha256:992e3adafdf616f594b34442587c595ce46ac25a59c939fb1c3073f2c2fd7b08",
+            "generatedAt": "2026-08-14T15:28:20.525Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:992e3adafdf616f594b34442587c595ce46ac25a59c939fb1c3073f2c2fd7b08",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-14T15:28:20.525Z",
+              "observedAt": "2026-08-14T15:28:20.525Z",
+              "startedAt": "2026-08-14T15:28:19.254Z",
+              "finishedAt": "2026-08-14T15:28:20.525Z",
+              "durationMs": 1271,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:cebf3e0ef2f5ba17a21d4ee20a0346b8e4efc40539484abbe356672bc6496035",
+              "outputDigest": "sha256:62889a9138bc333f1fbffb5080da93d9c78998a7d4b4999f41040200c77a3159",
+              "cache": {
+                "key": "sha256:992e3adafdf616f594b34442587c595ce46ac25a59c939fb1c3073f2c2fd7b08",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "9d6550ae762d583ef56e1c2ee0574620bb8db0bc",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:866c04fb1f27acecf763fa194ec90915b9acb801d06ab4b41b17a232d2c645f3",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-captain",
+      "sessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+      "createdAt": "2026-08-14T15:28:35.501Z",
+      "details": {
+        "actorId": "cursor-captain",
+        "sessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-scope-authority-projection",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:977f8733ea5b46e94e0ec28e384cc33be19d335d4a739925f0a89555c2bda2bb",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-14T15:28:34.078Z",
+            "finishedAt": "2026-08-14T15:28:35.500Z",
+            "durationMs": 1422,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9d6550ae762d583ef56e1c2ee0574620bb8db0bc",
+            "cacheKey": "sha256:c9a635db4c4f3115b6b1261d26e66e96cfb4dc0b3ce4189075c5442653b717cf",
+            "generatedAt": "2026-08-14T15:28:35.500Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:c9a635db4c4f3115b6b1261d26e66e96cfb4dc0b3ce4189075c5442653b717cf",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-14T15:28:35.500Z",
+              "observedAt": "2026-08-14T15:28:35.500Z",
+              "startedAt": "2026-08-14T15:28:34.078Z",
+              "finishedAt": "2026-08-14T15:28:35.500Z",
+              "durationMs": 1422,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:456ba7bb68c1eab944b8f5ad68d440e941610e7976d865aaf2aa0a685d24e649",
+              "outputDigest": "sha256:693e39b0d2a435cede0b8edf72a40963d679622398abfe6e731535f483dd8b19",
+              "cache": {
+                "key": "sha256:c9a635db4c4f3115b6b1261d26e66e96cfb4dc0b3ce4189075c5442653b717cf",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "9d6550ae762d583ef56e1c2ee0574620bb8db0bc",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:82883dde91bcf2835b3014fa08546fb55f102213f847e4ef6d6cdb8e25525920",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-captain",
+      "sessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+      "createdAt": "2026-08-14T15:28:49.530Z",
+      "details": {
+        "actorId": "cursor-captain",
+        "sessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-scope-authority-projection",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-14T15:28:34.078Z",
+            "finishedAt": "2026-08-14T15:28:49.530Z",
+            "durationMs": 15452,
+            "cached": false,
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9d6550ae762d583ef56e1c2ee0574620bb8db0bc",
+            "cacheKey": "sha256:8714dbb3f5288ad7e11a7058330f8b7f2de3a03663148f88936758e2fff29b3e",
+            "generatedAt": "2026-08-14T15:28:49.530Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:8714dbb3f5288ad7e11a7058330f8b7f2de3a03663148f88936758e2fff29b3e",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-14T15:28:49.530Z",
+              "observedAt": "2026-08-14T15:28:49.530Z",
+              "startedAt": "2026-08-14T15:28:34.078Z",
+              "finishedAt": "2026-08-14T15:28:49.530Z",
+              "durationMs": 15452,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:a8ca5d9cc3b5de8abfa4ae1f33663e307cf3f26e3ca51882ec3cc664f292008f",
+              "outputDigest": "sha256:cb6206dcd66e4f4792c0bf9aa91e2996183c1e272e5c9c01f8b74d9e4162ac1d",
+              "cache": {
+                "key": "sha256:8714dbb3f5288ad7e11a7058330f8b7f2de3a03663148f88936758e2fff29b3e",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run typecheck",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "9d6550ae762d583ef56e1c2ee0574620bb8db0bc",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:77178a9ef1c3105f10eec58f083339da35e7c8c6809c531cbdf3ed7396519c0d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

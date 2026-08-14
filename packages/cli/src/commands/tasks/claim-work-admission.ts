@@ -202,6 +202,18 @@ export async function completeTaskClaimWithWorkAdmission(input: {
   return { claim, ticket, session: sessionRecord.session, transitionPath, taskDirectionLock: directionLock };
 }
 
+/** Rebinds the work-admission ticket from the current task-document authority snapshot. */
+export function resealWorkAdmissionTicket(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly taskDocument: Record<string, unknown>;
+  readonly claim: TaskClaimRecord;
+  readonly nowIso: string;
+}): WorkAdmissionTicket {
+  return resealWorkAdmissionTicketForRenewal(input);
+}
+
 /** Rebinds a claim ticket whenever a governed renew changes its validity window. */
 export function resealWorkAdmissionTicketForRenewal(input: {
   readonly cwd: string;
