@@ -143,12 +143,20 @@ export function buildRunnerSourceSeal(repositoryRoot: string, sourceFiles: reado
   const files = sourceFiles
     .filter((relativePath) => classifyAtmCorePath(scopeManifest, relativePath).kind === 'atm-core')
     .sort();
+  const trackedBlobIds = readCleanTrackedBlobIds(repositoryRoot);
   const hash = createHash('sha256');
   for (const relativePath of files) {
-    const content = readFileSync(path.join(repositoryRoot, relativePath));
-    // Length-prefix every field so different path/content boundaries cannot collide.
+    const blobId = trackedBlobIds.get(relativePath);
+    // A clean Git index blob is a content identity.  Avoid rereading thousands of
+    // unchanged files during an incremental sealed build; dirty and generated
+    // inputs deliberately fall back to direct byte hashing.
     hash.update(String(Buffer.byteLength(relativePath))).update(':').update(relativePath);
-    hash.update(String(content.byteLength)).update(':').update(content);
+    if (blobId) {
+      hash.update('git:').update(blobId);
+    } else {
+      const content = readFileSync(path.join(repositoryRoot, relativePath));
+      hash.update(String(content.byteLength)).update(':').update(content);
+    }
   }
   return {
     schemaId: 'atm.runnerSourceSeal.v1',
@@ -157,6 +165,26 @@ export function buildRunnerSourceSeal(repositoryRoot: string, sourceFiles: reado
     digest: `sha256:${hash.digest('hex')}`
   };
 }
+
+function readCleanTrackedBlobIds(repositoryRoot: string): ReadonlyMap<string, string> {
+  const dirty = new Set(runGitLines(repositoryRoot, ['diff', '--name-only']).map(normalizePath));
+  const blobs = new Map<string, string>();
+  for (const line of runGitLines(repositoryRoot, ['ls-files', '-s'])) {
+    const match = line.match(/^\d+\s+([0-9a-f]+)\s+\d+\t(.+)$/);
+    if (!match) continue;
+    const relativePath = normalizePath(match[2]);
+    if (!dirty.has(relativePath)) blobs.set(relativePath, match[1]);
+  }
+  return blobs;
+}
+
+function runGitLines(repositoryRoot: string, args: readonly string[]): readonly string[] {
+  const result = spawnSync('git', args, { cwd: repositoryRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  if ((result.status ?? 1) !== 0) throw new Error(`git ${args.join(' ')} failed while sealing root-drop source: ${result.stderr || result.stdout}`);
+  return String(result.stdout).split(/\r?\n/).filter(Boolean);
+}
+
+function normalizePath(value: string): string { return value.replace(/\\/g, '/'); }
 
 export function listReleaseSourceFiles(repositoryRoot: string) {
   const result = spawnSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], {
