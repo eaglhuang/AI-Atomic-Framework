@@ -1,0 +1,264 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0381",
+  "title": "Verify sealed Wave 0 freeze artifact",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0380"
+  ],
+  "acceptance": [
+    "ACC-1 Malformed, missing, digest-inconsistent, or semantically promoted artifacts fail with actionable diagnostics.",
+    "ACC-2 The committed Wave 0 artifact validates quickly and yields independent, command-backed evidence for the Wave 0 completion mapping without rerunning the collector."
+  ],
+  "deliverables": [
+    "scripts/validate-false-green-evidence-freeze.ts",
+    "tests/cli/validate-false-green-evidence-freeze.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/validate-false-green-evidence-freeze.ts",
+    "tests/cli/validate-false-green-evidence-freeze.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/validate-false-green-evidence-freeze.test.ts",
+    "node --strip-types scripts/validate-false-green-evidence-freeze.ts --mode validate"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Re-running the heavy freeze collector.",
+    "Reclassifying remain-open, unavailable, timeout, or non-zero observations as pass."
+  ],
+  "nonGoals": [
+    "Declaring Wave 0 or the four plans complete."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the verifier; retain the raw freeze artifact and its negative facts.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-integrity",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0381-verify-sealed-wave-0-freeze-artifact.task.md",
+    "sectionTitle": "ATM-GOV-0381",
+    "headingLine": 65,
+    "hash": "fb8fe2ce45a9a855",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0381-verify-sealed-wave-0-freeze-artifact.task.md",
+      "planningCommitSha": "d1589ace4b4975e4222f058bdcdcd27e3c4170e4",
+      "contentDigest": "sha256:fb8fe2ce45a9a855781ac8f0d6cfdcb627a236dba8ce3fc6d3ba81efa1614cb0",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T08:18:51.686Z"
+    }
+  },
+  "importedAt": "2026-08-14T08:18:51.686Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0380"
+    ],
+    "startConditions": [
+      "A current-head Wave 0 freeze artifact exists and is governedly committed."
+    ],
+    "softRelations": [
+      "ATM-GOV-0325"
+    ],
+    "changedPublicSeams": [
+      "atm.falseGreenEvidenceFreeze.v1"
+    ],
+    "causalImpactEdges": [
+      "sealed-freeze-artifact-verification",
+      "wave-0-evidence-consumption"
+    ],
+    "parallelFrontierInputs": [
+      "false-green-evidence-freeze"
+    ],
+    "validatorReferences": [
+      "validate-false-green-evidence-freeze"
+    ],
+    "phaseOwner": "correction-wave-0"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0381_sealed_freeze_artifact_verifier",
+      "targetGroupId": "test_group_plan3x4x_wave_0",
+      "semanticKey": "sealed_false_green_freeze_artifact",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "sealed-freeze-artifact-verification",
+        "wave-0-evidence-consumption"
+      ],
+      "expectedRedPredicate": "malformed receipts, missing required observations, digest mismatch, or a non-remain-open verdict fail validation",
+      "contributionResourceKey": "false-green-evidence-freeze",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0380",
+      "contractEdge": "atm.falseGreenEvidenceFreeze.v1",
+      "resourceKey": "false-green-evidence-freeze"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0381_sealed_freeze_artifact_verifier"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T08-22-14-474Z-renew-35123e2bc442",
+  "lastTransitionAt": "2026-08-14T08:22:14.474Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-recovery",
+  "reservedAt": "2026-08-14T08:18:56.084Z",
+  "promotedAt": "2026-08-14T08:18:56.088Z",
+  "claim": {
+    "actorId": "codex-captain-recovery",
+    "leaseId": "lease-50e2d7304a92",
+    "claimedAt": "2026-08-14T08:18:56.093Z",
+    "heartbeatAt": "2026-08-14T08:22:13.757Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0381.json",
+      "scripts/validate-false-green-evidence-freeze.ts",
+      "tests/cli/validate-false-green-evidence-freeze.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814081856-codex-captain-recovery-b2d8916f7b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814081856-codex-captain-recovery-b2d8916f7b\""
+    }
+  },
+  "startedAt": "2026-08-14T08:18:56.093Z",
+  "startedByActor": "codex-captain-recovery",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-52819728e8d02037",
+    "ticketDigest": "sha256:52819728e8d02037776948525732a7bb2e882c339ad11b07d018e60c7aa9119c",
+    "taskId": "ATM-GOV-0381",
+    "origin": "claim",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814081856-codex-captain-recovery-b2d8916f7b",
+    "claimGeneration": "lease-50e2d7304a92",
+    "issuedAt": "2026-08-14T08:22:13.757Z",
+    "expiresAt": "2026-08-14T08:52:13.757Z",
+    "scopeDigest": "sha256:099f424c535ce74fee096326fdfd85daf767804829bad4eb8d66488c222f9311",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T08:22:13.757Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0381.*",
+          ".atm/history/task-events/ATM-GOV-0381/**",
+          ".atm/history/tasks/ATM-GOV-0381.json",
+          "scripts/validate-false-green-evidence-freeze.ts",
+          "tests/cli/validate-false-green-evidence-freeze.test.ts"
+        ],
+        "digest": "sha256:4e8e6df08f6983d5ebab2c7dd9ba6d529269840755cec5588c39dfc0c4e798d5"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260814081856-codex-captain-recovery-ATM-GOV-0381-8c1cefb63a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0381",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0381.*",
+      ".atm/history/task-events/ATM-GOV-0381/**",
+      ".atm/history/tasks/ATM-GOV-0381.json",
+      "scripts/validate-false-green-evidence-freeze.ts",
+      "tests/cli/validate-false-green-evidence-freeze.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "890a70c95b58cbd91f011b5f0caddc9632931a2267a17ba5e63f27f28b19914d",
+    "actorId": "codex-captain-recovery",
+    "sessionId": "session-20260814081856-codex-captain-recovery-ATM-GOV-0381-8c1cefb63a",
+    "laneSession": {
+      "laneSessionId": "lane-20260814081856-codex-captain-recovery-b2d8916f7b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814081856-codex-captain-recovery-b2d8916f7b\""
+    },
+    "createdAt": "2026-08-14T08:19:00.586Z",
+    "status": "active"
+  }
+}
