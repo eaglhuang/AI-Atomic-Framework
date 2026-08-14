@@ -1,11 +1,16 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0363",
-  "updatedAt": "2026-08-14T06:22:40.476Z",
+  "updatedAt": "2026-08-14T06:46:08.275Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
+    "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
+    "node --strip-types tests/cli/transient-artifact-lifecycle.test.ts",
     "typecheck",
-    "validate:cli"
+    "validate:charter",
+    "validate:cli",
+    "validate:skill-templates",
+    "validate:transient-artifact-lifecycle"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -39,6 +44,86 @@
       "durationMs": 19595,
       "runnerKind": "frozen-runner",
       "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e269da75a86a04db8554edbd45b5fb9eb43fdee584f64bf2f654df198bacf9d2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts"
+      ],
+      "generatedAt": "2026-08-14T06:45:22.332Z",
+      "startedAt": "2026-08-14T06:45:22.089Z",
+      "finishedAt": "2026-08-14T06:45:22.332Z",
+      "durationMs": 243,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3dd5b60e6561858007768ffa3a5529dfb0953583",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/transient-artifact-lifecycle.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9df73e6b830580757e3285ce116bee212fe2ce4718c95993f49423ffbd579150",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/transient-artifact-lifecycle.test.ts"
+      ],
+      "generatedAt": "2026-08-14T06:45:37.103Z",
+      "startedAt": "2026-08-14T06:45:36.668Z",
+      "finishedAt": "2026-08-14T06:45:37.103Z",
+      "durationMs": 435,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3dd5b60e6561858007768ffa3a5529dfb0953583",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-transient-artifact-lifecycle.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c35d5f853b55e45c0eab0a60eddb165805e7b45f6bb94ad86a36c645e18b86a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:transient-artifact-lifecycle"
+      ],
+      "generatedAt": "2026-08-14T06:45:45.272Z",
+      "startedAt": "2026-08-14T06:45:44.682Z",
+      "finishedAt": "2026-08-14T06:45:45.272Z",
+      "durationMs": 590,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3dd5b60e6561858007768ffa3a5529dfb0953583",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:charter",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:35f7c060f358008b76472bbef5fc46642ef08e3f367c78ea123f918c593259f4",
+      "stderrSha256": "sha256:315f260be964d9ce6b13463662f301c3087c22c7cf5d86774ba928d5da18c005",
+      "validators": [
+        "validate:charter"
+      ],
+      "generatedAt": "2026-08-14T06:46:01.577Z",
+      "startedAt": "2026-08-14T06:45:59.315Z",
+      "finishedAt": "2026-08-14T06:46:01.577Z",
+      "durationMs": 2262,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-skill-templates.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6966c5f0078df7dc6a0064cb1f205c1df998aba90891e17773332781d4544c08",
+      "stderrSha256": "sha256:62db8036e803b150fa32f0b193b257144e94ed506bdacec1be880a2236a16e38",
+      "validators": [
+        "validate:skill-templates"
+      ],
+      "generatedAt": "2026-08-14T06:46:08.274Z",
+      "startedAt": "2026-08-14T06:46:04.330Z",
+      "finishedAt": "2026-08-14T06:46:08.274Z",
+      "durationMs": 3944,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3dd5b60e6561858007768ffa3a5529dfb0953583",
       "cached": false
     }
   ],
