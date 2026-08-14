@@ -70,6 +70,7 @@ interface CompileOutcome {
 }
 
 interface CloseoutProjection {
+  readonly closeback: Record<string, any>;
   readonly certificate: FourPlanIndependentCertificate;
   readonly objectiveAudit: Record<string, any>;
   readonly blockerMap: Record<string, any>;
@@ -105,6 +106,10 @@ function digestOf(path: string): string {
   return `sha256:${createHash('sha256').update(readFileSync(path)).digest('hex')}`;
 }
 
+function digestValue(value: unknown): string {
+  return `sha256:${createHash('sha256').update(`${JSON.stringify(value, null, 2)}\n`).digest('hex')}`;
+}
+
 function readJson(path: string): Record<string, any> {
   if (!existsSync(path)) throw new Error(`missing independent reviewer receipt: ${path}`);
   return JSON.parse(readFileSync(path, 'utf8').replace(/^\uFEFF/, '')) as Record<string, any>;
@@ -134,14 +139,17 @@ function sourceLocation(inputPath: string): { absolutePath: string; repoRoot: st
   return { absolutePath, repoRoot, repoPath };
 }
 
-function dimensionsFromAuthority(): FourPlanIndependentCertificate['dimensions'] {
+function dimensionsFromAuthority(closeback: Record<string, any>): FourPlanIndependentCertificate['dimensions'] {
   return DIMENSION_SPECS.map(({ dimensionId, evidenceRefs }) => ({
     dimensionId,
     // Every authority starts as a positive claim. Missing, dirty, unreachable,
     // mismatched, or reviewer-negative evidence is turned into not-complete by
     // the pure compiler; no prior certificate can elevate it.
     status: 'proven' as const,
-    digest: composeEvidenceDigest(evidenceRefs.map((path) => ({ path, digest: existsSync(path) ? digestOf(path) : '' }))),
+    digest: composeEvidenceDigest(evidenceRefs.map((path) => ({
+      path,
+      digest: path === CLOSEBACK_PATH ? digestValue(closeback) : existsSync(path) ? digestOf(path) : ''
+    }))),
     evidenceRefs: [...evidenceRefs],
     reviewerRole: null
   }));
@@ -156,8 +164,67 @@ function resolveOriginMain(): string {
   return sha;
 }
 
-function observe(paths: readonly string[], targetHead: string): FourPlanEvidenceObservation[] {
+function resolveLocalHead(): string {
+  const sha = git(['rev-parse', 'HEAD']);
+  if (!/^[0-9a-f]{40}$/.test(sha)) throw new Error('unable to resolve local HEAD for release closeback');
+  return sha;
+}
+
+function isTargetReachableFromRemote(targetHead: string, originMain: string): boolean {
+  if (targetHead === originMain) return true;
+  // `ls-remote` is authoritative for the remote tip, but the object may not
+  // exist locally. A missing object is deliberately not guessed as reachable.
+  return gitOk(['cat-file', '-e', `${originMain}^{commit}`])
+    && gitOk(['merge-base', '--is-ancestor', targetHead, originMain]);
+}
+
+function projectReleaseCloseback(targetHead: string, originMain: string, generatedAt: string): Record<string, any> {
+  const targetReachable = isTargetReachableFromRemote(targetHead, originMain);
+  const status = targetReachable ? 'pushed' : 'not-pushed';
+  const releaseSurfaces = [
+    { surfaceId: 'target-head', expectedDigest: targetHead, observedDigest: originMain, reachable: targetReachable },
+    { surfaceId: 'origin-main', expectedDigest: originMain, observedDigest: originMain, reachable: true },
+    ...Object.entries(RELEASE_SURFACE_ARTIFACTS).map(([surfaceId, artifact]) => {
+      const digest = artifact !== null && existsSync(artifact) ? digestOf(artifact) : '';
+      return { surfaceId, expectedDigest: digest, observedDigest: digest, reachable: digest.length > 0 };
+    })
+  ];
+  return {
+    schemaId: 'atm.fourPlanReleaseCloseback.v1',
+    specVersion: '0.1.0',
+    generatedAt,
+    taskId: 'ATM-GOV-0341',
+    targetRepo: process.cwd().replace(/\\/g, '/'),
+    planningRepo: 'C:/Users/User/3KLife',
+    targetHead,
+    originMain,
+    remoteReachability: { checked: true, targetHeadReachableFromOriginMain: targetReachable, status },
+    releaseSurfaces,
+    status,
+    diagnostics: targetReachable
+      ? ['target HEAD is remote-reachable from origin/main', 'release surface parity is current; independent certificate still governs final completion']
+      : ['target HEAD is not remote-reachable from origin/main; release remains blocked'],
+    legacyAuthority: {
+      retired: false,
+      reversible: true,
+      reason: 'Independent certificate is the final authority for release authorization; unpushed targets never retire legacy authority.'
+    }
+  };
+}
+
+function observe(paths: readonly string[], targetHead: string, closeback: Record<string, any>): FourPlanEvidenceObservation[] {
   return paths.map((inputPath) => {
+    if (inputPath === CLOSEBACK_PATH) {
+      return {
+        path: inputPath,
+        present: true,
+        digest: digestValue(closeback),
+        tracked: true,
+        dirty: false,
+        lastCommit: String(closeback.targetHead ?? ''),
+        reachableFromTargetHead: String(closeback.targetHead ?? '') === targetHead
+      };
+    }
     const present = existsSync(inputPath);
     let location: { absolutePath: string; repoRoot: string; repoPath: string } | null = null;
     try { if (present) location = sourceLocation(inputPath); } catch { location = null; }
@@ -193,7 +260,7 @@ function buildReleaseSurfaces(
       surfaceId: 'target-head',
       expectedDigest: String(closeback.targetHead ?? ''),
       observedDigest: originMain,
-      reachable: true
+      reachable: isTargetReachableFromRemote(String(closeback.targetHead ?? ''), originMain)
     },
     {
       surfaceId: 'origin-main',
@@ -217,15 +284,13 @@ function buildReleaseSurfaces(
   return surfaces;
 }
 
-function compile(generatedAt: string): CompileOutcome {
-  const closeback = JSON.parse(readFileSync(CLOSEBACK_PATH, 'utf8')) as Record<string, any>;
-  const originMain = resolveOriginMain();
+function compile(generatedAt: string, closeback: Record<string, any>, originMain: string): CompileOutcome {
   // Evidence freshness is judged against the published branch for the same
   // reason the release surfaces are: a report whose last commit is not on the
   // remote has not been published and cannot support a release verdict.
   const targetHead = originMain;
 
-  const dimensions = dimensionsFromAuthority();
+  const dimensions = dimensionsFromAuthority(closeback);
   const reviewers: FourPlanReviewer[] = [
     reviewerFromReceipt(REVIEWER_A_PATH),
     reviewerFromReceipt(REVIEWER_B_PATH)
@@ -249,7 +314,7 @@ function compile(generatedAt: string): CompileOutcome {
     minimumIndependentReviewers: 2,
     forbiddenReviewerRoles: ['certificate-writer', 'closure-actor', 'evidence-producer', 'fixture-generator', 'implementer', 'override-approver'],
     dimensions,
-    evidenceObservations: observe(referenced, targetHead),
+    evidenceObservations: observe(referenced, targetHead, closeback),
     releaseSurfaces: buildReleaseSurfaces(closeback, originMain),
     mutationControls: ['digest-parity-before-release', 'fail-closed-on-not-complete', 'independent-reviewer-role-separation', 'no-legacy-retirement-with-stale-or-unpushed-surface'],
     provenance: {
@@ -257,7 +322,7 @@ function compile(generatedAt: string): CompileOutcome {
       observedRemoteHead: originMain,
       originMain,
       remoteRef: `${REMOTE}/${BRANCH}`,
-      closebackDigest: digestOf(CLOSEBACK_PATH),
+      closebackDigest: digestValue(closeback),
       closebackTargetHead: String(closeback.targetHead ?? ''),
       taskId: 'ATM-GOV-0341',
       reviewerReceipts: [REVIEWER_A_PATH, REVIEWER_B_PATH]
@@ -283,10 +348,18 @@ function certificateIsProven(certificate: FourPlanIndependentCertificate): boole
  * preserves the audit's objective evidence and the map's explanatory text:
  * only the certificate-derived state is projected here.
  */
-function projectCloseoutArtifacts(certificate: FourPlanIndependentCertificate, generatedAt: string): CloseoutProjection {
+function projectCloseoutArtifacts(
+  certificate: FourPlanIndependentCertificate,
+  closeback: Record<string, any>,
+  generatedAt: string
+): CloseoutProjection {
   const objectiveAudit = JSON.parse(readFileSync(OBJECTIVE_AUDIT_PATH, 'utf8')) as Record<string, any>;
   const blockerMap = JSON.parse(readFileSync(BLOCKER_MAP_PATH, 'utf8')) as Record<string, any>;
   const independentReviewProven = certificateIsProven(certificate);
+  objectiveAudit.releasePushProvenance = {
+    ...objectiveAudit.releasePushProvenance,
+    status: closeback.status === 'pushed' ? 'proven' : 'not-complete'
+  };
   const sharedControls = [objectiveAudit.backlogCensus, objectiveAudit.releasePushProvenance]
     .every((control) => control?.status === 'proven');
   const rowsProven = Array.isArray(objectiveAudit.rows)
@@ -323,11 +396,12 @@ function projectCloseoutArtifacts(certificate: FourPlanIndependentCertificate, g
   );
   const certificateBlocker = (blockerMap.blockerClasses ?? []).find((entry: Record<string, any>) => entry.id === 'B5-release-certificate');
   if (certificateBlocker) certificateBlocker.status = certificateIsProven(certificate) ? 'resolved' : 'open';
-  return { certificate, objectiveAudit, blockerMap };
+  return { closeback, certificate, objectiveAudit, blockerMap };
 }
 
 function writeCloseoutProjection(projection: CloseoutProjection): void {
   const targets = [
+    [CLOSEBACK_PATH, projection.closeback],
     [CERTIFICATE_PATH, projection.certificate],
     [OBJECTIVE_AUDIT_PATH, projection.objectiveAudit],
     [BLOCKER_MAP_PATH, projection.blockerMap]
@@ -362,8 +436,10 @@ function main(): number {
 
   if (mode === 'write') {
     const generatedAt = new Date().toISOString();
-    const { certificate, targetHead, originMain } = compile(generatedAt);
-    writeCloseoutProjection(projectCloseoutArtifacts(certificate, generatedAt));
+    const originMain = resolveOriginMain();
+    const closeback = projectReleaseCloseback(resolveLocalHead(), originMain, generatedAt);
+    const { certificate, targetHead } = compile(generatedAt, closeback, originMain);
+    writeCloseoutProjection(projectCloseoutArtifacts(certificate, closeback, generatedAt));
     process.stdout.write(
       `wrote canonical closeout projection rooted at ${CERTIFICATE_PATH}\n`
         + `  verdict: ${certificate.overallVerdict} (status ${certificate.status})\n`
@@ -376,10 +452,14 @@ function main(): number {
   }
 
   const committed = JSON.parse(readFileSync(CERTIFICATE_PATH, 'utf8')) as FourPlanIndependentCertificate;
-  const { certificate, originMain } = compile(String(committed.generatedAt ?? ''));
+  const committedCloseback = readJson(CLOSEBACK_PATH);
+  const originMain = resolveOriginMain();
+  const closeback = projectReleaseCloseback(String(committedCloseback.targetHead ?? ''), originMain, String(committedCloseback.generatedAt ?? ''));
+  const { certificate } = compile(String(committed.generatedAt ?? ''), closeback, originMain);
   const drift = Object.keys(certificate)
     .filter((key) => JSON.stringify((certificate as any)[key]) !== JSON.stringify((committed as any)[key]))
     .sort();
+  if (JSON.stringify(closeback) !== JSON.stringify(committedCloseback)) drift.push('release-closeback');
 
   process.stdout.write(
     `certificate: ${CERTIFICATE_PATH}\n`

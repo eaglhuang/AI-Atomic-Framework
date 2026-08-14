@@ -47,9 +47,20 @@ assert.equal(waiver.waiverAuthority.followUpRequired, true);
 
 const closeback = readJson(audit.releasePushProvenance.source);
 assert.equal(closeback.schemaId, 'atm.fourPlanReleaseCloseback.v1');
-assert.equal(closeback.status, 'pushed');
-assert.equal(closeback.targetHead, closeback.originMain);
-execFileSync('git', ['merge-base', '--is-ancestor', closeback.targetHead, 'origin/main'], { stdio: 'ignore' });
+const targetReachable = closeback.targetHead === closeback.originMain
+  || (() => {
+    try {
+      execFileSync('git', ['merge-base', '--is-ancestor', closeback.targetHead, 'origin/main'], { stdio: 'ignore' });
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+assert.equal(closeback.remoteReachability?.checked, true);
+assert.equal(closeback.remoteReachability?.targetHeadReachableFromOriginMain, targetReachable);
+assert.equal(closeback.remoteReachability?.status, targetReachable ? 'pushed' : 'not-pushed');
+assert.equal(closeback.status, targetReachable ? 'pushed' : 'not-pushed');
+assert.equal(audit.releasePushProvenance.status === 'proven', targetReachable);
 
 const independent = readJson(audit.independentReview.source);
 assert.equal(independent.schemaId, 'atm.fourPlanIndependentCertificate.v1');
