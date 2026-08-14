@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-df30908659b9",
+  "recordedAt": "2026-08-14T13:03:43.270Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0341",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task ATM-GOV-0341 --actor codex-captain-recovery --add packages/cli/src/commands/broker/steward-queues.ts,packages/cli/src/commands/next/route-resolution/pending-worktree.ts,packages/cli/src/commands/taskflow/historical-close-preflight.ts --reason \"Repair missing active direction lock and include global lint blockers.\" --emergency-approval EMG-ATM-GOV-0341-0cca96beda --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-ATM-GOV-0341-0cca96beda",
+  "reason": "Repair missing active direction lock and include global lint blockers.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T13-03-43-268Z-EMG-ATM-GOV-0341-0cca96beda.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
