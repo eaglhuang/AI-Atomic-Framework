@@ -36,12 +36,13 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["reviewerId", "roles", "outputPath", "digest", "inputDigests"],
+        "required": ["reviewerId", "roles", "outputPath", "digest", "inputPaths", "inputDigests"],
         "properties": {
           "reviewerId": { "type": "string" },
           "roles": { "type": "array", "items": { "type": "string" } },
           "outputPath": { "type": "string" },
           "digest": { "type": "string" },
+          "inputPaths": { "type": "array", "items": { "type": "string" } },
           "inputDigests": { "type": "array", "items": { "type": "string" } }
         },
         "additionalProperties": false

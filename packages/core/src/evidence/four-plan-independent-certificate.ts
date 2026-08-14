@@ -34,6 +34,9 @@ export interface FourPlanReviewer {
   readonly roles: readonly string[];
   readonly outputPath: string;
   readonly digest: string;
+  /** Paths actually recomputed by this reviewer.  Digests alone cannot bind a
+   * review to observable evidence or prove that the reviewer read it. */
+  readonly inputPaths?: readonly string[];
   /**
    * Digests of the artifacts this reviewer recomputed from. A review that
    * cannot say what it read is a signature, not a review.
@@ -145,6 +148,7 @@ export function compileFourPlanIndependentCertificate(input: FourPlanIndependent
     const label = reviewer.reviewerId || 'unknown';
     if (!reviewer.reviewerId || !reviewer.outputPath || !reviewer.digest) push(`reviewer-incomplete:${label}`, 'contradictory');
     if (!DIGEST_SHAPE.test(reviewer.digest)) push(`reviewer-digest-malformed:${label}`, 'contradictory');
+    if (reviewer.inputPaths.length === 0) push(`reviewer-input-paths-missing:${label}`, 'contradictory');
     if (reviewer.inputDigests.length === 0) push(`reviewer-input-digests-missing:${label}`, 'contradictory');
     for (const inputDigest of reviewer.inputDigests) {
       if (!DIGEST_SHAPE.test(inputDigest)) push(`reviewer-input-digest-malformed:${label}`, 'contradictory');
@@ -160,6 +164,18 @@ export function compileFourPlanIndependentCertificate(input: FourPlanIndependent
     if (reviewer.reviewerId === normalized.writerRole) push(`reviewer-identity-collides-with-writer:${label}`, 'contradictory');
     if (certifiedEvidence.has(reviewer.outputPath)) {
       push(`reviewer-output-is-certified-evidence:${label}`, 'contradictory');
+    }
+    const observedInputs = reviewer.inputPaths.map((path) => observations.get(path) ?? null);
+    if (observedInputs.some((entry) => entry === null)) {
+      push(`reviewer-input-observation-missing:${label}`, 'blocked');
+    } else {
+      const observedDigests = observedInputs
+        .filter((entry): entry is FourPlanEvidenceObservation => entry !== null)
+        .map((entry) => entry.digest)
+        .sort();
+      if (JSON.stringify(observedDigests) !== JSON.stringify(reviewer.inputDigests)) {
+        push(`reviewer-input-digests-unreproducible:${label}`, 'stale');
+      }
     }
     const forbidden = reviewer.roles.filter((role) => normalized.forbiddenReviewerRoles.includes(role) || role === normalized.writerRole);
     for (const role of forbidden) push(`reviewer-role-not-independent:${reviewer.reviewerId}:${role}`, 'contradictory');
@@ -306,6 +322,7 @@ function normalize(input: FourPlanIndependentCertificateInput) {
       roles: [...(reviewer.roles ?? [])].map(String).sort(),
       outputPath: normalizePath(reviewer.outputPath),
       digest: String(reviewer.digest ?? '').trim(),
+      inputPaths: [...(reviewer.inputPaths ?? [])].map(normalizePath).sort(),
       inputDigests: [...(reviewer.inputDigests ?? [])].map((entry) => String(entry ?? '').trim()).sort()
     })).sort((left, right) => left.reviewerId.localeCompare(right.reviewerId)),
     minimumIndependentReviewers: Math.max(0, Number(input.minimumIndependentReviewers ?? 0)),

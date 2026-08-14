@@ -42,6 +42,7 @@ const base = {
       roles: ['independent-reviewer'],
       outputPath: 'docs/reports/reviewer-a.json',
       digest: evidenceDigests['docs/reports/reviewer-a.json'],
+      inputPaths: ['docs/reports/objectives.json'],
       inputDigests: [evidenceDigests['docs/reports/objectives.json']]
     },
     {
@@ -49,6 +50,7 @@ const base = {
       roles: ['independent-reviewer'],
       outputPath: 'docs/reports/reviewer-b.json',
       digest: evidenceDigests['docs/reports/reviewer-b.json'],
+      inputPaths: ['docs/reports/cards.json'],
       inputDigests: [evidenceDigests['docs/reports/cards.json']]
     }
   ],
@@ -135,9 +137,16 @@ assert.ok(reviewsOwnEvidence.diagnostics.includes('reviewer-output-is-certified-
 
 const noInputs = compileFourPlanIndependentCertificate({
   ...base,
-  reviewers: [{ ...base.reviewers[0], inputDigests: [] }, base.reviewers[1]]
+  reviewers: [{ ...base.reviewers[0], inputPaths: [], inputDigests: [] }, base.reviewers[1]]
 });
 assert.ok(noInputs.diagnostics.includes('reviewer-input-digests-missing:reviewer-a'));
+assert.ok(noInputs.diagnostics.includes('reviewer-input-paths-missing:reviewer-a'));
+
+const mismatchedInputs = compileFourPlanIndependentCertificate({
+  ...base,
+  reviewers: [{ ...base.reviewers[0], inputDigests: [evidenceDigests['docs/reports/cards.json']] }, base.reviewers[1]]
+});
+assert.ok(mismatchedInputs.diagnostics.includes('reviewer-input-digests-unreproducible:reviewer-a'));
 
 const copiedItsOwnOutput = compileFourPlanIndependentCertificate({
   ...base,

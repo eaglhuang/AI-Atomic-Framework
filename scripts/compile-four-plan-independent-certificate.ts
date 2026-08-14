@@ -169,14 +169,26 @@ function compile(generatedAt: string): CompileOutcome {
     reviewerId: String(reviewer.reviewerId ?? ''),
     roles: (reviewer.roles ?? []).map(String),
     outputPath: String(reviewer.outputPath ?? ''),
-    digest: String(reviewer.digest ?? ''),
-    inputDigests: (reviewer.inputDigests ?? []).map(String)
+    // Re-observe every reviewer receipt and every declared input.  Prior
+    // certificate values are configuration only; they are never accepted as
+    // evidence digests for the next certificate.
+    // A certificate cannot be a reviewer receipt for itself.  Do not hash the
+    // output certificate here: that creates a changing self-input and makes a
+    // rejected declaration destabilise otherwise reproducible validation.
+    digest: String(reviewer.outputPath ?? '') !== CERTIFICATE_PATH && existsSync(String(reviewer.outputPath))
+      ? digestOf(String(reviewer.outputPath))
+      : '',
+    inputPaths: (reviewer.inputPaths ?? []).map(String),
+    inputDigests: (reviewer.inputPaths ?? [])
+      .map(String)
+      .filter((path: string) => existsSync(path))
+      .map((path: string) => digestOf(path))
   }));
 
   const referenced = [
     ...new Set<string>([
       ...dimensions.flatMap((dimension: { evidenceRefs: string[] }) => dimension.evidenceRefs),
-      ...reviewers.map((reviewer) => reviewer.outputPath)
+      ...reviewers.flatMap((reviewer) => [reviewer.outputPath, ...(reviewer.inputPaths ?? [])])
     ])
   ]
     .filter((path) => path.length > 0 && path !== CERTIFICATE_PATH)
