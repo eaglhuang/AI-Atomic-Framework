@@ -1,0 +1,263 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0387",
+  "title": "Observe the current Wave 0 freeze artifact independently",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A frozen-runner command receipt from this task independently validates the current sealed freeze artifact and is bound to its executed source commit."
+  ],
+  "deliverables": [
+    "docs/reports/plan-3x-4x-false-green-evidence-freeze.json"
+  ],
+  "scopePaths": [
+    "docs/reports/plan-3x-4x-false-green-evidence-freeze.json"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-false-green-evidence-freeze.ts --file docs/reports/plan-3x-4x-false-green-evidence-freeze.json"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Replaying the heavy collector",
+    "declaring any plan complete",
+    "converting negative observations into pass"
+  ],
+  "nonGoals": [
+    "Replacing the primary Wave 0 evidence receipt"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "discard-observation-receipt",
+  "rollbackNotes": "Never alter the freeze artifact to obtain an observer pass.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-integrity",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0387-observe-current-wave-0-freeze-independently.task.md",
+    "sectionTitle": "ATM-GOV-0387",
+    "headingLine": 57,
+    "hash": "042db6bc49efdf75",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0387-observe-current-wave-0-freeze-independently.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:042db6bc49efdf75859f356e6ac8a30d8acf8a934f62e361f85a9f788a4341e5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T10:59:30.348Z"
+    }
+  },
+  "importedAt": "2026-08-14T10:59:30.348Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A current-head Wave 0 freeze artifact with source-provenance receipts exists."
+    ],
+    "softRelations": [
+      "ATM-GOV-0380",
+      "ATM-GOV-0381",
+      "ATM-GOV-0386"
+    ],
+    "changedPublicSeams": [
+      "atm.falseGreenEvidenceFreeze.v1"
+    ],
+    "causalImpactEdges": [
+      "independent-wave-0-exit-observation"
+    ],
+    "parallelFrontierInputs": [
+      "false-green-evidence-freeze"
+    ],
+    "validatorReferences": [
+      "validate-false-green-evidence-freeze"
+    ],
+    "phaseOwner": "correction-wave-0"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0387_wave_0_independent_observer",
+      "targetGroupId": "test_group_plan3x4x_wave_0",
+      "semanticKey": "wave_0_current_freeze_independent_observer",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "independent-wave-0-exit-observation"
+      ],
+      "expectedRedPredicate": "malformed, stale, missing-provenance, or falsely-complete freeze artifact fails independently",
+      "contributionResourceKey": "false-green-evidence-freeze",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0386",
+      "contractEdge": "atm.falseGreenEvidenceFreeze.v1",
+      "resourceKey": "false-green-evidence-freeze"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0387_wave_0_independent_observer"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T12-13-34-675Z-renew-9d61e0e71ba1",
+  "lastTransitionAt": "2026-08-14T12:13:34.675Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-08-14T10:59:35.078Z",
+  "promotedAt": "2026-08-14T10:59:35.083Z",
+  "claim": {
+    "actorId": "codex-captain-recovery",
+    "leaseId": "lease-0a34453d26cc",
+    "claimedAt": "2026-08-14T12:12:57.958Z",
+    "heartbeatAt": "2026-08-14T12:13:34.143Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0387.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.json"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814121258-codex-captain-recovery-491b76fd0e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814121258-codex-captain-recovery-491b76fd0e\""
+    }
+  },
+  "startedAt": "2026-08-14T10:59:35.089Z",
+  "startedByActor": "codex-captain-recovery",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-717d1696b1a27510",
+    "ticketDigest": "sha256:717d1696b1a27510faa6ccfefe0996022f7e0fa3cd1097ce8731a08aba9e71fa",
+    "taskId": "ATM-GOV-0387",
+    "origin": "claim",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814121258-codex-captain-recovery-491b76fd0e",
+    "claimGeneration": "lease-0a34453d26cc",
+    "issuedAt": "2026-08-14T12:13:34.143Z",
+    "expiresAt": "2026-08-14T12:43:34.143Z",
+    "scopeDigest": "sha256:944c8d15f0f16fbf6caa267a33f4761e515c0c27dff774ff30b3c79b26b82a52",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T12:13:34.143Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0387.*",
+          ".atm/history/task-events/ATM-GOV-0387/**",
+          ".atm/history/tasks/ATM-GOV-0387.json",
+          "docs/reports/plan-3x-4x-false-green-evidence-freeze.json"
+        ],
+        "digest": "sha256:6bc6e7a512a15cc077ab17608d9dd8788a3b71ae9fca96e5d5e45a34184e69f0"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260814121257-codex-captain-recovery-ATM-GOV-0387-f92fd37e3f",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0387",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814105935-codex-captain-recovery-e49ef2a220",
+    "dirtyPaths": [
+      ".atm/history/tasks/ATM-GOV-0387.json"
+    ],
+    "retainedAt": "2026-08-14T12:12:49.491Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-captain-recovery",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0387",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0387.*",
+      ".atm/history/task-events/ATM-GOV-0387/**",
+      ".atm/history/tasks/ATM-GOV-0387.json",
+      "docs/reports/plan-3x-4x-false-green-evidence-freeze.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "cebee086137091454f86c4a595028a7183cbeb61ffefbba1ef4c99f1541356d2",
+    "actorId": "codex-captain-recovery",
+    "sessionId": "session-20260814121257-codex-captain-recovery-ATM-GOV-0387-f92fd37e3f",
+    "laneSession": {
+      "laneSessionId": "lane-20260814121258-codex-captain-recovery-491b76fd0e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814121258-codex-captain-recovery-491b76fd0e\""
+    },
+    "createdAt": "2026-08-14T12:13:02.948Z",
+    "status": "active"
+  }
+}

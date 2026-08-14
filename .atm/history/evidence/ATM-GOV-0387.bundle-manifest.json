@@ -1,0 +1,29 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0387",
+  "updatedAt": "2026-08-14T10:59:51.654Z",
+  "updatedBy": "codex-captain-recovery",
+  "freshValidationPasses": [
+    "validate:false-green-evidence-freeze"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-false-green-evidence-freeze.ts --file docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:53f3e54ccbb129901a0134655088776e5deb54b681f62ea0258527dba083f962",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:false-green-evidence-freeze"
+      ],
+      "generatedAt": "2026-08-14T10:59:51.653Z",
+      "startedAt": "2026-08-14T10:59:51.369Z",
+      "finishedAt": "2026-08-14T10:59:51.653Z",
+      "durationMs": 284,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "d4c8f05c1f194048be5041f708ab9e3770e86eac",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
