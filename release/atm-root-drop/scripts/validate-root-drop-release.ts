@@ -42,6 +42,16 @@ function runGit(cwd: any, args: any) {
   return result.stdout.trim();
 }
 
+/**
+ * A copied root-drop is an install baseline, not generated residue.  Commit it
+ * before exercising doctor so subsequent runtime output is measured against
+ * the package the adopter actually received.
+ */
+function commitReleaseFixtureBaseline(cwd: string) {
+  runGit(cwd, ['add', '-A']);
+  runGit(cwd, ['-c', 'user.name=ATM root-drop validator', '-c', 'user.email=validator@example.invalid', 'commit', '-m', 'test: establish root-drop fixture baseline']);
+}
+
 function tryReadHeadCommitSha(cwd: any) {
   const result = spawnSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' });
   return result.status === 0 ? result.stdout.trim() : null;
@@ -115,6 +125,7 @@ try {
   mkdirSync(bundleRepo, { recursive: true });
   cpSync(release.releaseRoot, bundleRepo, { recursive: true });
   initializeGitRepository(bundleRepo);
+  commitReleaseFixtureBaseline(bundleRepo);
   installFrameworkHooks(bundleRepo, 'release bundle');
 
   const bundleDoctor = runAtm(bundleRepo, ['doctor', '--json']);
@@ -158,6 +169,7 @@ try {
   mkdirSync(blankRepo, { recursive: true });
   cpSync(release.releaseRoot, blankRepo, { recursive: true });
   initializeGitRepository(blankRepo);
+  commitReleaseFixtureBaseline(blankRepo);
 
   const nextBeforeBootstrap = runAtm(blankRepo, ['next', '--json']);
   assert(nextBeforeBootstrap.exitCode === 1, 'blank root-drop repo next must exit 1 before bootstrap');
