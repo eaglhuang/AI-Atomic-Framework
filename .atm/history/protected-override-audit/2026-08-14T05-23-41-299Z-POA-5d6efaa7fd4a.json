@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-5d6efaa7fd4a",
+  "recordedAt": "2026-08-14T05:23:41.299Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0325",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0325 --message \"fix(evidence): freeze current false-green baseline\n\nATM-Work-Admission: wat-abade84a960f2879 sha256:abade84a960f2879a98b19908d02df2ea8d05ba1c67c8af1fda6c00844be6cf9\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0325-6e187fd43f",
+  "reason": "ATM_GOVERNED_COMMIT_TIMEOUT: verified Wave 0 baseline; frozen hook exceeded bounded commit window",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T05-23-41-298Z-EMG-ATM-GOV-0325-6e187fd43f.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

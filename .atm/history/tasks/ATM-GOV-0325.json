@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0325",
   "title": "Freeze false-green evidence and establish reproducible baseline",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -203,8 +203,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T05-04-08-480Z-scope-amendment-4213567684f9",
-  "lastTransitionAt": "2026-08-14T05:04:08.480Z",
+  "lastTransitionId": "2026-08-14T05-43-58-108Z-close-2ed60aaaff03",
+  "lastTransitionAt": "2026-08-14T05:43:58.108Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-recovery",
   "reservedAt": "2026-08-13T23:24:11.092Z",
@@ -213,7 +213,7 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-c679500d1126",
     "claimedAt": "2026-08-14T05:03:33.586Z",
-    "heartbeatAt": "2026-08-14T05:03:33.586Z",
+    "heartbeatAt": "2026-08-14T05:43:58.107Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0325.*",
@@ -224,15 +224,14 @@
       "scripts/analyze-captain-parallel-ledger.ts",
       "scripts/diagnose-plan3-evidence-closure.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
+    "reason": "closed",
     "laneSession": {
       "laneSessionId": "lane-20260814033931-codex-captain-recovery-43b6225d2c",
       "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814033931-codex-captain-recovery-43b6225d2c\""
-    },
-    "reason": "Expired predecessor lease on Wave 0 evidence-freeze owner; preserve retained task-scoped WIP and rebuild current baseline receipts."
+    }
   },
   "startedAt": "2026-08-13T23:24:11.100Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -272,26 +271,27 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-abade84a960f2879",
-    "ticketDigest": "sha256:abade84a960f2879a98b19908d02df2ea8d05ba1c67c8af1fda6c00844be6cf9",
+    "ticketId": "wat-d12669b53a4d4102",
+    "ticketDigest": "sha256:d12669b53a4d4102ffa77592b4845523e8028c5090bffaf86c29a65f003e67db",
     "taskId": "ATM-GOV-0325",
     "origin": "claim",
     "actorId": "codex-captain-recovery",
     "laneSessionId": "lane-20260814033931-codex-captain-recovery-43b6225d2c",
     "claimGeneration": "lease-c679500d1126",
-    "issuedAt": "2026-08-14T05:03:33.586Z",
-    "expiresAt": "2026-08-14T05:33:33.586Z",
-    "scopeDigest": "sha256:7c28a2d8b714961a27aaf5c5e5e823c945930bbb49996083763e84580581b810",
+    "issuedAt": "2026-08-14T05:43:39.043Z",
+    "expiresAt": "2026-08-14T06:13:39.043Z",
+    "scopeDigest": "sha256:a93798ea024ac7cca590fee43458fb6708ff1e54c41facc8e3d0ace333e58b24",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T05:03:33.586Z"
+      "selectedAt": "2026-08-14T05:43:39.043Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0325.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0325/**",
           ".atm/history/tasks/ATM-GOV-0325.json",
           "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
@@ -299,7 +299,7 @@
           "scripts/analyze-captain-parallel-ledger.ts",
           "scripts/diagnose-plan3-evidence-closure.ts"
         ],
-        "digest": "sha256:6f66020d7cfea04f946d5fdc6307b8d05d1701bfb85839e697f9f2d9fb2121cf"
+        "digest": "sha256:401dbe26e6b392885fb0faa0ea590457e6308bc6d1cd0f46b6afc9a1991bc4aa"
       },
       {
         "kind": "lifecycle-operation",
@@ -332,5 +332,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  }
+  },
+  "closedAt": "2026-08-14T05:43:58.107Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814050333-codex-captain-recovery-ATM-GOV-0325-117345758d",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0325.closure-packet.json"
 }
