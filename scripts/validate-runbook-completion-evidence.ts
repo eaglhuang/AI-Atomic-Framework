@@ -1,6 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { DEFAULT_OUTPUT, DEFAULT_PLANNING_ROOT, RUNBOOK_RELATIVE_PATH, digestText, evidenceTupleKey, parseRunbook, semanticTaskCardDigest } from './compile-runbook-completion-evidence.ts';
 

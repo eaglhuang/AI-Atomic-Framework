@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T12-52-56-679Z-scope-amendment-f236c89b6b2e",
+  "taskId": "ATM-GOV-0341",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-recovery",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0341.json",
+  "taskSha256": "sha256:c4bdab05fc17b109145a7b522903c45f3ac1cc481b2c2749923142859679bfd3",
+  "createdAt": "2026-08-14T12:52:56.679Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0341 --actor codex-captain-recovery --add scripts/validate-runbook-completion-evidence.ts --reason \"Fix task-owned runbook validator lint defect discovered by required pre-close validation.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Fix task-owned runbook validator lint defect discovered by required pre-close validation."
+  }
+}

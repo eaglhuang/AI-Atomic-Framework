@@ -91,7 +91,8 @@
     "schemas/evidence/four-plan-independent-certificate.schema.json",
     "scripts/compile-runbook-completion-evidence.ts",
     "tests/cli/runbook-completion-evidence.test.ts",
-    "package.json"
+    "package.json",
+    "scripts/validate-runbook-completion-evidence.ts"
   ],
   "validators": [
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
@@ -316,7 +317,7 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-976ab6f1f870",
     "claimedAt": "2026-08-14T12:18:02.080Z",
-    "heartbeatAt": "2026-08-14T12:36:47.760Z",
+    "heartbeatAt": "2026-08-14T12:52:58.094Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0341.*",
@@ -361,6 +362,7 @@
       "scripts/review-runbook-release-authority.ts",
       "scripts/validate-backlog-census.ts",
       "scripts/validate-four-plan-objectives.ts",
+      "scripts/validate-runbook-completion-evidence.ts",
       "scripts/validate-runner-reproducibility.ts",
       "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
       "tests/cli/four-plan-independent-certificate.test.ts",
@@ -379,26 +381,26 @@
   },
   "startedAt": "2026-08-14T09:50:24.347Z",
   "startedBySessionId": "session-20260814121802-codex-captain-recovery-ATM-GOV-0341-0dc0d0c355",
-  "lastTransitionId": "2026-08-14T12-36-48-353Z-renew-146862cef848",
-  "lastTransitionAt": "2026-08-14T12:36:48.353Z",
+  "lastTransitionId": "2026-08-14T12-52-58-619Z-renew-7bba47c37b8b",
+  "lastTransitionAt": "2026-08-14T12:52:58.619Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-a1b8014766fd0d92",
-    "ticketDigest": "sha256:a1b8014766fd0d9231df66be488fbc4c26b514d2cf7c0cf447b563ba827aea31",
+    "ticketId": "wat-1d64bd8f8849abc3",
+    "ticketDigest": "sha256:1d64bd8f8849abc3612e6224c69e82dfb7f1f4d0fe3dae7c5d9a425af3837085",
     "taskId": "ATM-GOV-0341",
     "origin": "claim",
     "actorId": "codex-captain-recovery",
     "laneSessionId": "lane-20260814121802-codex-captain-recovery-2683c73c43",
     "claimGeneration": "lease-976ab6f1f870",
-    "issuedAt": "2026-08-14T12:36:47.760Z",
-    "expiresAt": "2026-08-14T13:06:47.760Z",
-    "scopeDigest": "sha256:00c7d1dd38aebd76db459b3adfacd7e9f3265fda21d414a3a5b527fd5c4c12b4",
+    "issuedAt": "2026-08-14T12:52:58.094Z",
+    "expiresAt": "2026-08-14T13:22:58.094Z",
+    "scopeDigest": "sha256:7188fec07c49ba2d08d0adb2e9b3d3e60020a3260de5b2e3daab122b62ee75c2",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T12:36:47.760Z"
+      "selectedAt": "2026-08-14T12:52:58.094Z"
     },
     "grants": [
       {
@@ -447,6 +449,7 @@
           "scripts/review-runbook-release-authority.ts",
           "scripts/validate-backlog-census.ts",
           "scripts/validate-four-plan-objectives.ts",
+          "scripts/validate-runbook-completion-evidence.ts",
           "scripts/validate-runner-reproducibility.ts",
           "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
           "tests/cli/four-plan-independent-certificate.test.ts",
@@ -455,7 +458,7 @@
           "tests/cli/runbook-completion-evidence.test.ts",
           "tests/cli/runbook-release-authority-review.test.ts"
         ],
-        "digest": "sha256:9cf980b989ffd238eda3a0e03fc6270d29c4b6446cfeb601f036999d545fd3d8"
+        "digest": "sha256:bc6352dfc3746faf0d9e5ea76f3f6ac4d6f66460e05fdc9d6c29aece363523f4"
       },
       {
         "kind": "lifecycle-operation",
@@ -566,6 +569,7 @@
       "scripts/review-runbook-release-authority.ts",
       "scripts/validate-backlog-census.ts",
       "scripts/validate-four-plan-objectives.ts",
+      "scripts/validate-runbook-completion-evidence.ts",
       "scripts/validate-runner-reproducibility.ts",
       "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
       "tests/cli/four-plan-independent-certificate.test.ts",

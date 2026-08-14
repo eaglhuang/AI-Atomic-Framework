@@ -8,11 +8,11 @@
     "actorId": "codex-captain-recovery",
     "source": "ATM_ACTOR_ID"
   },
-  "stewardWorkId": "runner-sync-dfbe4a1c",
-  "sealedSourceSha": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
+  "stewardWorkId": "runner-sync-19465648",
+  "sealedSourceSha": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
   "outputInventory": {
     "schemaId": "atm.runnerBuildOutputInventory.v1",
-    "sealedSourceSha": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
+    "sealedSourceSha": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
     "entries": [
       {
         "path": ".atm/history/evidence/ATM-GOV-0341.runner-sync-receipt.json",
@@ -46,6 +46,12 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0341",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-onefile/atm.mjs",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0341",
         "ownerActorId": null
@@ -94,6 +100,12 @@
       },
       {
         "path": "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0341",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/package.json",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0341",
         "ownerActorId": null
@@ -165,12 +177,6 @@
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/scripts/compile-four-plan-independent-certificate.ts",
-        "disposition": "owned-current",
-        "ownerTaskId": "ATM-GOV-0341",
-        "ownerActorId": null
-      },
-      {
         "path": "release/atm-root-drop/scripts/compile-runbook-completion-evidence.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0341",
@@ -189,7 +195,7 @@
         "ownerActorId": null
       }
     ],
-    "digest": "sha256:a44e8e6251ac414d3052f496db00b710fc0ca4e02b2986b99f36fcb74ca3225f"
+    "digest": "sha256:dbdae633f7555af195ee59a6fb3c3257afb2b8b4edba755e3cb2f326e1485a3c"
   },
   "memberTaskIds": [
     "ATM-GOV-0341"
@@ -197,8 +203,8 @@
   "linkedTaskIds": [],
   "groupManifest": {
     "schemaId": "atm.runnerSyncCoalescedGroupManifest.v1",
-    "stewardWorkId": "runner-sync-dfbe4a1c",
-    "sealedSourceSha": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
+    "stewardWorkId": "runner-sync-19465648",
+    "sealedSourceSha": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
     "members": [
       {
         "taskId": "ATM-GOV-0341",
@@ -208,29 +214,29 @@
           "release/atm-onefile/atm.mjs",
           "release/atm-root-drop"
         ],
-        "requestDigest": "sha256:48692f8f6d690d3657629c161a8d64a94cfe062c04215f088474bd3c0477bc03"
+        "requestDigest": "sha256:9e75d328ed4324079cee7c634d5fc58f72021b999748aab9b672ba6096a98827"
       }
     ],
     "memberTaskIds": [
       "ATM-GOV-0341"
     ],
-    "sharedSealedInputDigest": "sha256:0175d9d7bc02f863d36b7e41650a42131a23c95b0323071447bddab8e6c08be6",
-    "sharedOutputDigest": "sha256:068e431bc45899079a5b1ce69f03d067201f09596746970ac34939e7ad08fd77",
-    "manifestDigest": "sha256:daaf2152c83847dc7bf20b493faacc97c927c1b994cee30ddff13cd7666ab92b",
-    "createdAt": "2026-08-14T12:35:10.814Z"
+    "sharedSealedInputDigest": "sha256:a669a9d436f0844f9f893e2aebae4e1790617199e6d8e7bed0843bcfdc8ae808",
+    "sharedOutputDigest": "sha256:9363250b68d52f6c78d74a7822f1a8041059ea0014090b347d3408e941e21e55",
+    "manifestDigest": "sha256:b5a80e9775dcfdea8a5630e6e4180d3ed8a97dd5fd5212438d5f461712960185",
+    "createdAt": "2026-08-14T12:44:34.224Z"
   },
   "childReceipts": [
     {
       "schemaId": "atm.runnerSyncChildReceipt.v1",
       "taskId": "ATM-GOV-0341",
-      "parentStewardWorkId": "runner-sync-dfbe4a1c",
-      "groupManifestDigest": "sha256:daaf2152c83847dc7bf20b493faacc97c927c1b994cee30ddff13cd7666ab92b",
-      "memberRequestDigest": "sha256:48692f8f6d690d3657629c161a8d64a94cfe062c04215f088474bd3c0477bc03",
-      "sealedSourceSha": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
-      "sharedSealedInputDigest": "sha256:0175d9d7bc02f863d36b7e41650a42131a23c95b0323071447bddab8e6c08be6",
-      "sharedOutputDigest": "sha256:068e431bc45899079a5b1ce69f03d067201f09596746970ac34939e7ad08fd77",
-      "receiptDigest": "sha256:c5cb3591bfa4ea81a6d8f9e8f70e1e1a342b96029fbb5417ba3410c77f9d110c",
-      "issuedAt": "2026-08-14T12:35:10.814Z"
+      "parentStewardWorkId": "runner-sync-19465648",
+      "groupManifestDigest": "sha256:b5a80e9775dcfdea8a5630e6e4180d3ed8a97dd5fd5212438d5f461712960185",
+      "memberRequestDigest": "sha256:9e75d328ed4324079cee7c634d5fc58f72021b999748aab9b672ba6096a98827",
+      "sealedSourceSha": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
+      "sharedSealedInputDigest": "sha256:a669a9d436f0844f9f893e2aebae4e1790617199e6d8e7bed0843bcfdc8ae808",
+      "sharedOutputDigest": "sha256:9363250b68d52f6c78d74a7822f1a8041059ea0014090b347d3408e941e21e55",
+      "receiptDigest": "sha256:ec9a071f9bb2db6bd461789cf0122143ee91dfabb09df36a0739c5374213e237",
+      "issuedAt": "2026-08-14T12:44:34.224Z"
     }
   ],
   "childAttribution": {
@@ -241,7 +247,7 @@
         "taskId": "ATM-GOV-0341",
         "actorId": "codex-captain-recovery",
         "laneFingerprint": null,
-        "childReceiptDigest": "sha256:c5cb3591bfa4ea81a6d8f9e8f70e1e1a342b96029fbb5417ba3410c77f9d110c"
+        "childReceiptDigest": "sha256:ec9a071f9bb2db6bd461789cf0122143ee91dfabb09df36a0739c5374213e237"
       }
     ],
     "missingTaskIds": []
@@ -263,11 +269,11 @@
     "finalizable": true,
     "recoveryCommand": null
   },
-  "runnerInputTreeHash": "sha256:0175d9d7bc02f863d36b7e41650a42131a23c95b0323071447bddab8e6c08be6",
+  "runnerInputTreeHash": "sha256:a669a9d436f0844f9f893e2aebae4e1790617199e6d8e7bed0843bcfdc8ae808",
   "runnerInputGraph": {
     "schemaId": "atm.runnerInputGraph.v1",
-    "sealedSourceSha": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
-    "aggregateInputTreeHash": "sha256:0175d9d7bc02f863d36b7e41650a42131a23c95b0323071447bddab8e6c08be6",
+    "sealedSourceSha": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
+    "aggregateInputTreeHash": "sha256:a669a9d436f0844f9f893e2aebae4e1790617199e6d8e7bed0843bcfdc8ae808",
     "nodes": [
       {
         "segment": "packages",
@@ -282,12 +288,12 @@
           "tsconfig.build.json",
           "tsconfig.json"
         ],
-        "inputDigest": "sha256:0175d9d7bc02f863d36b7e41650a42131a23c95b0323071447bddab8e6c08be6",
+        "inputDigest": "sha256:a669a9d436f0844f9f893e2aebae4e1790617199e6d8e7bed0843bcfdc8ae808",
         "outputEntries": [
           "release/atm-onefile/atm.mjs",
           "release/atm-root-drop"
         ],
-        "outputDigest": "sha256:8c50e26c83e42982b4950e9c309293ed00cf21773a0e5093b59ebd434737fffd"
+        "outputDigest": "sha256:b49491247ed4b534f6d2d6cc629f6e7ac245bdfcff4c7d4d6d58e453d4cf213f"
       }
     ]
   },
@@ -296,15 +302,17 @@
     "release/atm-root-drop"
   ],
   "buildTarget": "full",
-  "buildInputsTreeHash": "sha256:0175d9d7bc02f863d36b7e41650a42131a23c95b0323071447bddab8e6c08be6",
+  "buildInputsTreeHash": "sha256:a669a9d436f0844f9f893e2aebae4e1790617199e6d8e7bed0843bcfdc8ae808",
   "buildDecision": "fullRebuild",
-  "decisionReason": "missing-previous-sealed-source",
+  "decisionReason": "root-config-change",
   "incrementalPlan": {
     "schemaId": "atm.runnerIncrementalBuildPlan.v1",
     "specVersion": "0.1.0",
-    "previousSealedSourceSha": null,
-    "currentSealedSourceSha": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
-    "changedPaths": [],
+    "previousSealedSourceSha": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
+    "currentSealedSourceSha": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
+    "changedPaths": [
+      "package.json"
+    ],
     "affectedPackages": [],
     "affectedGroups": {
       "packages": [],
@@ -312,15 +320,17 @@
       "templates": [],
       "schemas": [],
       "atomicWorkbench": [],
-      "rootConfig": [],
+      "rootConfig": [
+        "package.json"
+      ],
       "unknown": []
     },
     "incrementalEligible": false,
     "unsafeReasons": [
-      "missing-previous-sealed-source"
+      "root-config-change"
     ]
   },
-  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-08-14T12-35-07-959Z-runner-sync.jsonl",
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-08-14T12-44-31-741Z-runner-sync.jsonl",
   "tsBuildCache": {
     "schemaId": "atm.runnerTsBuildCacheSummary.v1",
     "cacheRoot": ".atm/runtime/runner-sync-build-cache/typescript",
@@ -337,7 +347,7 @@
     }
   },
   "brokerTicket": {
-    "ticketId": "runner-sync-dfbe4a1c:b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
+    "ticketId": "runner-sync-19465648:ba299de58ca8fbf478ceb48876cf78bfeea5a758",
     "waitedMs": 0,
     "position": 1,
     "headOwner": "ATM-GOV-0341"
@@ -345,11 +355,11 @@
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "rootDropReleaseAssembly",
-    "dominantPhaseMs": 20573,
-    "totalElapsedMs": 62044,
-    "dominanceRatio": 0.3316,
-    "phaseMedianMs": 1836,
-    "phaseP95Ms": 20573,
+    "dominantPhaseMs": 18960,
+    "totalElapsedMs": 56051,
+    "dominanceRatio": 0.3383,
+    "phaseMedianMs": 2061,
+    "phaseP95Ms": 18960,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
@@ -357,26 +367,26 @@
   "buildObservation": {
     "schemaId": "atm.runnerSyncBuildObservation.v1",
     "buildDecision": "fullRebuild",
-    "decisionReason": "missing-previous-sealed-source",
+    "decisionReason": "root-config-change",
     "brokerTicket": {
-      "ticketId": "runner-sync-dfbe4a1c:b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
+      "ticketId": "runner-sync-19465648:ba299de58ca8fbf478ceb48876cf78bfeea5a758",
       "waitedMs": 0,
       "position": 1,
       "headOwner": "ATM-GOV-0341"
     },
-    "changedPathCount": 0,
+    "changedPathCount": 1,
     "affectedPackageCount": 0,
     "unsafeReasons": [
-      "missing-previous-sealed-source"
+      "root-config-change"
     ],
     "dominantPhaseSummary": {
       "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
       "dominantPhase": "rootDropReleaseAssembly",
-      "dominantPhaseMs": 20573,
-      "totalElapsedMs": 62044,
-      "dominanceRatio": 0.3316,
-      "phaseMedianMs": 1836,
-      "phaseP95Ms": 20573,
+      "dominantPhaseMs": 18960,
+      "totalElapsedMs": 56051,
+      "dominanceRatio": 0.3383,
+      "phaseMedianMs": 2061,
+      "phaseP95Ms": 18960,
       "measuredPhaseCount": 8,
       "optimizationVerdict": "inconclusive",
       "basis": "single-run"
@@ -384,14 +394,14 @@
   },
   "phaseTimingsMs": {
     "inputHashCalculation": 40,
-    "skipDecision": 4,
-    "worktreeSetup": 15018,
-    "typescriptBuild": 11108,
-    "rootDropReleaseAssembly": 20573,
-    "onefileReleaseAssembly": 1836,
-    "artifactSync": 6278,
+    "skipDecision": 34,
+    "worktreeSetup": 13429,
+    "typescriptBuild": 9288,
+    "rootDropReleaseAssembly": 18960,
+    "onefileReleaseAssembly": 2061,
+    "artifactSync": 5852,
     "cleanup": 0,
-    "totalElapsed": 62044
+    "totalElapsed": 56051
   },
   "atomicWrite": {
     "schemaId": "atm.runnerSyncAtomicWrite.v1",
@@ -399,7 +409,7 @@
     "platform": "win32",
     "maxAttempts": 4
   },
-  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"ATM-GOV-0341\" --steward-work-id \"runner-sync-dfbe4a1c\" --receipt-ref \".atm/history/evidence/ATM-GOV-0341.runner-sync-receipt.json\" --json",
+  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"ATM-GOV-0341\" --steward-work-id \"runner-sync-19465648\" --receipt-ref \".atm/history/evidence/ATM-GOV-0341.runner-sync-receipt.json\" --json",
   "treatmentTelemetry": {
     "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
     "executionMode": "command-executed",
@@ -409,17 +419,17 @@
     "buildDecision": "fullRebuild",
     "phaseTimingsMs": {
       "inputHashCalculation": 40,
-      "skipDecision": 4,
-      "worktreeSetup": 15018,
-      "typescriptBuild": 11108,
-      "rootDropReleaseAssembly": 20573,
-      "onefileReleaseAssembly": 1836,
-      "artifactSync": 6278,
+      "skipDecision": 34,
+      "worktreeSetup": 13429,
+      "typescriptBuild": 9288,
+      "rootDropReleaseAssembly": 18960,
+      "onefileReleaseAssembly": 2061,
+      "artifactSync": 5852,
       "cleanup": 0,
-      "totalElapsed": 62044
+      "totalElapsed": 56051
     },
     "rawTelemetryPolicy": "gitignored-runtime-only",
     "tsBuildCacheDigest": "sha256:dcced0663f4ac0f2eb56b2fc59c063c62510bc612898a13f48eca4864fda0e59"
   },
-  "publishedAt": "2026-08-14T12:35:10.815Z"
+  "publishedAt": "2026-08-14T12:44:34.224Z"
 }

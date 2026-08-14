@@ -1,21 +1,24 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-14T12:28:39.790Z",
+  "updatedAt": "2026-08-14T12:52:14.423Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
     "lint:touched",
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
     "node --strip-types tests/cli/plan4-final-certification.test.ts",
+    "tasks-audit",
     "typecheck",
     "validate-backlog-census",
     "validate-four-plan-objectives",
     "validate-runner-reproducibility",
+    "validate:backlog-census",
     "validate:cli",
     "validate:four-plan-objectives",
     "validate:git-head-evidence",
-    "validate:module-boundaries"
+    "validate:module-boundaries",
+    "validate:test-facade"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -273,6 +276,70 @@
       "durationMs": 649,
       "runnerKind": "dev-source",
       "sourceCommit": "b99ed6bf2e1ee7fdc17682d9b8aa4cbfd3e6282a",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:four-plan-objectives",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60ac6c3292191eeed4dedd58d975243fdec7a4632664a11f320798e29ca13d17",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:four-plan-objectives"
+      ],
+      "generatedAt": "2026-08-14T12:45:34.840Z",
+      "startedAt": "2026-08-14T12:45:34.186Z",
+      "finishedAt": "2026-08-14T12:45:34.840Z",
+      "durationMs": 654,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs tasks audit --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dcfda456a91106989833c864ee7375c59ff0f433324e3db255e91ca7320c4dab",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "tasks-audit"
+      ],
+      "generatedAt": "2026-08-14T12:47:19.087Z",
+      "startedAt": "2026-08-14T12:47:15.865Z",
+      "finishedAt": "2026-08-14T12:47:19.087Z",
+      "durationMs": 3222,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-backlog-census.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bef2232139c9c38315de5f95e1628995b63e11ecaf7d7a0e044153556bd451ff",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:backlog-census"
+      ],
+      "generatedAt": "2026-08-14T12:49:06.324Z",
+      "startedAt": "2026-08-14T12:49:06.034Z",
+      "finishedAt": "2026-08-14T12:49:06.324Z",
+      "durationMs": 290,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:test-facade",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8ff7eebf013676e940b88b591179b7730add9769632b51fc3a9af55717be4903",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:test-facade"
+      ],
+      "generatedAt": "2026-08-14T12:52:14.422Z",
+      "startedAt": "2026-08-14T12:51:56.632Z",
+      "finishedAt": "2026-08-14T12:52:14.422Z",
+      "durationMs": 17790,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
       "cached": false
     }
   ],
