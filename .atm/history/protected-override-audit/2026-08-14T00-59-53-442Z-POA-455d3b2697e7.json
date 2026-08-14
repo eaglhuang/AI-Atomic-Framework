@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-455d3b2697e7",
+  "recordedAt": "2026-08-14T00:59:53.442Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0371",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0371 --message \"fix(git): stage transaction evidence in sealed candidate\n\nATM-Work-Admission: wat-a76e22c9d037cf49 sha256:a76e22c9d037cf49d20209e2083b08aafa9b22297ab9c179ecf4e89e2baf681e\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0371-f831270431",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T00-59-53-441Z-EMG-ATM-GOV-0371-f831270431.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

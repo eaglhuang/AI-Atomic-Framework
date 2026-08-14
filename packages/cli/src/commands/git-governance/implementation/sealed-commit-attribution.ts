@@ -42,6 +42,8 @@ import {
 const QUIET_STDIO = ['ignore', 'pipe', 'pipe'] as const;
 /** `<mode> <objectId> <stage>\t<path>` as emitted by `git ls-files -s`. */
 const LS_FILES_STAGE_PATTERN = /^(\d+) ([0-9a-f]+) \d+\t(.+)$/i;
+/** `<mode> blob <objectId>\t<path>` as emitted by `git ls-tree -r`. */
+const LS_TREE_PATTERN = /^(\d+) blob ([0-9a-f]+)\t(.+)$/i;
 /** `:<srcMode> <dstMode> <srcSha> <dstSha> <status>\t<path>` from diff plumbing. */
 const RAW_DIFF_PATTERN = /^:(\d+) (\d+) ([0-9a-f]+) ([0-9a-f]+) ([A-Z])\d*\t(.+)$/i;
 const NULL_OBJECT_ID = /^0+$/;
@@ -291,9 +293,31 @@ export function readCandidateTreeEntries(input: {
   return [...entries.values()].sort((left, right) => left.path.localeCompare(right.path));
 }
 
-/** Post-image entries actually recorded by a commit that already exists. */
-export function readCommittedTreeEntries(cwd: string, commitSha: string): readonly CommitTreeEntry[] {
-  return parseRawDiffEntries(runGitCommand(cwd, ['diff-tree', '--no-commit-id', '--raw', '-r', '-M', commitSha]));
+/**
+ * Post-image entries recorded by an existing commit, projected to the sealed
+ * paths plus any changed intruders. A diff alone cannot represent a sealed
+ * path inherited unchanged from the parent; the committed tree is therefore
+ * authoritative for sealed paths, while the diff remains authoritative for
+ * unsealed additions, modifications, and deletions.
+ */
+export function readCommittedTreeEntries(
+  cwd: string,
+  commitSha: string,
+  sealedPaths: readonly string[] = []
+): readonly CommitTreeEntry[] {
+  const normalizedSealedPaths = [...new Set(sealedPaths.map(normalizePath).filter(Boolean))].sort();
+  const entries = new Map<string, CommitTreeEntry>();
+  if (normalizedSealedPaths.length > 0) {
+    for (const line of splitLines(runGitCommand(cwd, ['ls-tree', '-r', commitSha, '--', ...normalizedSealedPaths]))) {
+      const match = line.match(LS_TREE_PATTERN);
+      if (!match) continue;
+      entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2], disposition: 'present' });
+    }
+  }
+  for (const entry of parseRawDiffEntries(runGitCommand(cwd, ['diff-tree', '--no-commit-id', '--raw', '-r', '-M', commitSha]))) {
+    if (!entries.has(entry.path)) entries.set(entry.path, entry);
+  }
+  return [...entries.values()].sort((left, right) => left.path.localeCompare(right.path));
 }
 
 export function proveCommitAttribution(input: {
@@ -469,7 +493,7 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
     }
     const committedProof = assertCommitAttribution({
       sealed: bundle,
-      actual: readCommittedTreeEntries(input.cwd, committedHead),
+      actual: readCommittedTreeEntries(input.cwd, committedHead, bundle.entries.map((entry) => entry.path)),
       surface: `${input.surface} post-commit tree`,
       actorId: input.actorId,
       taskId: input.taskId

@@ -29,6 +29,16 @@ assert.throws(() => assertCommitAttribution({
   surface: 'test post-commit tree parity', actorId: 'validator', taskId: 'ATM-GOV-0371'
 }), (error: unknown) => (error as { code?: string }).code === 'ATM_COMMIT_ATTRIBUTION_MISMATCH');
 
+// A sealed path may be inherited unchanged from the parent. The verifier must
+// inspect the resulting tree, not mistake a no-op diff for a missing path.
+execFileSync('git', ['commit', '--allow-empty', '-m', 'unchanged candidate entry'], { cwd: repo, stdio: 'ignore' });
+const inheritedCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+assert.doesNotThrow(() => assertCommitAttribution({
+  sealed: sealCommitBundle({ entries: [{ path: 'src/expected.ts', mode: '100644', blobId: expectedBlob, provenance: 'task-scope', disposition: 'present' }] }),
+  actual: readCommittedTreeEntries(repo, inheritedCommit, ['src/expected.ts']),
+  surface: 'test inherited post-commit tree parity', actorId: 'validator', taskId: 'ATM-GOV-0371'
+}));
+
 // A commit can move HEAD before the wrapper regains control. The transaction
 // must still fail closed instead of returning a success receipt for a tree
 // that differs from its sealed candidate.

@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0371",
-  "updatedAt": "2026-08-14T00:57:24.595Z",
+  "updatedAt": "2026-08-14T01:01:45.561Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
@@ -71,6 +71,38 @@
       "durationMs": 8325,
       "runnerKind": "dev-source",
       "sourceCommit": "d12ea46fc547f4b4d7c6b8f457d8d50b6a4379dd",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2954f51d2fb279fa76b460201b5a0ef8e7d6c29190ab719bb9675fd6d51c950f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
+      ],
+      "generatedAt": "2026-08-14T01:01:34.724Z",
+      "startedAt": "2026-08-14T01:01:32.996Z",
+      "finishedAt": "2026-08-14T01:01:34.724Z",
+      "durationMs": 1728,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c17089a0c88c55ea8e1adadc3bcf6c03a6ccd450",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T01:01:45.560Z",
+      "startedAt": "2026-08-14T01:01:37.112Z",
+      "finishedAt": "2026-08-14T01:01:45.560Z",
+      "durationMs": 8448,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c17089a0c88c55ea8e1adadc3bcf6c03a6ccd450",
       "cached": false
     }
   ],
