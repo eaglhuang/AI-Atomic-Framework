@@ -23,6 +23,8 @@ execFileSync(process.execPath, ['--strip-types', 'scripts/review-runbook-release
 const report = JSON.parse(readFileSync('docs/reports/reviews/plan-3x-4x-runbook-release-review.json', 'utf8'));
 assert.equal(report.schemaId, 'atm.fourPlanIndependentReleaseReview.v1');
 assert.equal(report.verdict, 'not-proven');
+assert.equal(report.remote.error, 'remote-observation-disabled');
+assert.equal(report.remote.remoteHeadAfterReview, undefined);
 assert.equal(report.completion.parseable, inspectCompletion(readFileSync('docs/reports/plan-3x-4x-runbook-completion-evidence.json', 'utf8')).parseable);
 assert.ok(report.nonClaims.includes('does-not-read-independent-certificate'));
 console.log('runbook-release-authority-review.test.ts: ok');

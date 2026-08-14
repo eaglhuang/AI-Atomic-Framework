@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-13T18-17-00-031Z-repair-claim-5354071f65f7",
+  "taskId": "ATM-GOV-0362",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260813173727-codex-gpt-5.4-mini-ATM-GOV-0362-603affa9dd",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0362.json",
+  "taskSha256": "sha256:ca59ade5e142ed30fb1d95b02780467d9a13b7a254d207a1a21e5f71d7cd0394",
+  "createdAt": "2026-08-13T18:17:00.031Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0362 --actor codex-gpt-5.4-mini --write --reason \"Repair expired same-owner lane aggregate and scope drift so independently verified 0362 can continue governed closeout.\" --json"
+}
