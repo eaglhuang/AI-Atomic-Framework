@@ -9,6 +9,7 @@ import {
   readCommittedTreeEntries,
   runWithSealedTaskScopedCommitIndex
 } from './sealed-commit-attribution.ts';
+import { ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit } from './git-head-evidence-transaction.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-commit-parity-'));
 execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
@@ -54,6 +55,30 @@ assert.notEqual(
   execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim(),
   headBeforeMismatchedTransaction,
   'fixture must prove that the transaction detects a post-commit mismatch after HEAD advances'
+);
+
+// Transaction-produced governance evidence is intentionally ignored by the
+// live worktree. Its producer must force-stage it into the sealed candidate,
+// otherwise the consumer seals a path that Git never commits.
+writeFileSync(path.join(repo, '.gitignore'), '.atm/\n');
+execFileSync('git', ['add', '.gitignore'], { cwd: repo, stdio: 'ignore' });
+execFileSync('git', ['commit', '-m', 'ignore runtime'], { cwd: repo, stdio: 'ignore' });
+mkdirSync(path.join(repo, 'packages', 'core'), { recursive: true });
+writeFileSync(path.join(repo, 'packages', 'core', 'example.ts'), 'export const candidate = true;\n');
+const candidateDir = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-candidate-'));
+const candidateEnv = { ...process.env, GIT_INDEX_FILE: path.join(candidateDir, 'index') };
+execFileSync('git', ['read-tree', 'HEAD'], { cwd: repo, env: candidateEnv, stdio: 'ignore' });
+execFileSync('git', ['add', '--', 'packages/core/example.ts'], { cwd: repo, env: candidateEnv, stdio: 'ignore' });
+assert.ok(ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
+  repo,
+  'validator',
+  'ATM-GOV-0371',
+  ['packages/core/example.ts'],
+  candidateEnv
+));
+assert.doesNotThrow(
+  () => execFileSync('git', ['ls-files', '--error-unmatch', '.atm/history/evidence/git-head.jsonl'], { cwd: repo, env: candidateEnv, stdio: 'ignore' }),
+  'ignored transaction-produced git-head evidence must be force-staged in the candidate index'
 );
 
 console.log('[sealed-commit-attribution] committed-tree mismatch fails closed.');

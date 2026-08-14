@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-e6faa0280e44",
+  "recordedAt": "2026-08-14T00:54:02.754Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0371",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0371 --message \"fix(git): fail closed on sealed commit tree divergence\n\nATM-Work-Admission: wat-4dfd92bfea408ef8 sha256:4dfd92bfea408ef8d99425bf6eec2898c0cba3ef4aea6be7570e5a6ff44296e2\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0371-3b5c3ae9cb",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T00-54-02-752Z-EMG-ATM-GOV-0371-3b5c3ae9cb.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

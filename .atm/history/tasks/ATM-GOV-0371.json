@@ -20,7 +20,8 @@
     "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
     ".atm/history/evidence/ATM-GOV-0371.*",
     ".atm/history/task-events/ATM-GOV-0371/**",
-    ".atm/history/tasks/ATM-GOV-0371.json"
+    ".atm/history/tasks/ATM-GOV-0371.json",
+    "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
@@ -138,8 +139,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T00-48-39-892Z-scope-amendment-aae4e3a391f2",
-  "lastTransitionAt": "2026-08-14T00:48:39.892Z",
+  "lastTransitionId": "2026-08-14T00-59-10-313Z-renew-bf586f912c0d",
+  "lastTransitionAt": "2026-08-14T00:59:10.313Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-08-14T00:48:35.876Z",
@@ -148,18 +149,18 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-c1156f8883f3",
     "claimedAt": "2026-08-14T00:48:35.886Z",
-    "heartbeatAt": "2026-08-14T00:48:35.886Z",
+    "heartbeatAt": "2026-08-14T00:59:10.053Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0371.*",
       ".atm/history/task-events/ATM-GOV-0371/**",
       ".atm/history/tasks/ATM-GOV-0371.json",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
       "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260814004836-codex-gpt-5.4-mini-7bead8f467",
       "status": "active",
@@ -172,33 +173,35 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-4dfd92bfea408ef8",
-    "ticketDigest": "sha256:4dfd92bfea408ef8d99425bf6eec2898c0cba3ef4aea6be7570e5a6ff44296e2",
+    "ticketId": "wat-a76e22c9d037cf49",
+    "ticketDigest": "sha256:a76e22c9d037cf49d20209e2083b08aafa9b22297ab9c179ecf4e89e2baf681e",
     "taskId": "ATM-GOV-0371",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260814004836-codex-gpt-5.4-mini-7bead8f467",
     "claimGeneration": "lease-c1156f8883f3",
-    "issuedAt": "2026-08-14T00:48:35.886Z",
-    "expiresAt": "2026-08-14T01:18:35.886Z",
-    "scopeDigest": "sha256:049750c3730de3d69feda4d1d4a265ffe2f972c39d50a2ac5a2bce77a8d54fd7",
+    "issuedAt": "2026-08-14T00:59:10.053Z",
+    "expiresAt": "2026-08-14T01:29:10.053Z",
+    "scopeDigest": "sha256:ab541e664a9c7b08be94d3fd0240c9ea8393d776470cd4a639e6b6a3ee6d3dd4",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T00:48:35.886Z"
+      "selectedAt": "2026-08-14T00:59:10.053Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0371.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0371/**",
           ".atm/history/tasks/ATM-GOV-0371.json",
+          "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
           "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
           "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
           "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
         ],
-        "digest": "sha256:15514f0370c3d9b331086b497b2b804bd48e06412ffec4fd112f7f6ab83a7264"
+        "digest": "sha256:c746fe94b7853ccac327384efafa05a5bd4f9aaf132f550058e29ee25815cac6"
       },
       {
         "kind": "lifecycle-operation",
@@ -245,6 +248,7 @@
       ".atm/history/evidence/ATM-GOV-0371.*",
       ".atm/history/task-events/ATM-GOV-0371/**",
       ".atm/history/tasks/ATM-GOV-0371.json",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
       "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
