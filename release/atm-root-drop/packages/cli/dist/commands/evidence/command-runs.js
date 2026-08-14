@@ -99,11 +99,16 @@ export function normalizeEvidenceCommandRuns(input) {
         ...input.fileRuns
     ].map((run) => {
         const runnerKind = normalizeRunnerKind(run.runnerKind ?? input.runnerKind ?? inferRunnerKindFromCommand(run.command));
+        // A receipt must name the exact source it observed, independently of the
+        // local runner packaging. Only explicitly external executions lack a
+        // repository-local HEAD that we can truthfully attest.
+        const resolvedSourceCommit = run.sourceCommit
+            ?? (runnerKind === 'external' ? undefined : sourceCommit ?? undefined);
         const normalized = {
             ...run,
             cwd: run.cwd ?? '.',
             runnerKind,
-            sourceCommit: run.sourceCommit ?? (runnerKind === 'dev-source' ? sourceCommit ?? undefined : undefined),
+            sourceCommit: resolvedSourceCommit,
             cacheKey: run.cacheKey ?? computeCommandRunCacheKey({
                 command: run.command,
                 cwd: run.cwd ?? '.',
@@ -111,7 +116,7 @@ export function normalizeEvidenceCommandRuns(input) {
                 stdoutSha256: run.stdoutSha256,
                 stderrSha256: run.stderrSha256,
                 runnerKind,
-                sourceCommit: run.sourceCommit ?? (runnerKind === 'dev-source' ? sourceCommit ?? undefined : undefined)
+                sourceCommit: resolvedSourceCommit
             }),
             cached: run.cached === true,
             generatedAt: run.generatedAt ?? run.finishedAt ?? new Date().toISOString()

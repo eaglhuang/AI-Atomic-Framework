@@ -1,10 +1,16 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildFrameworkStaleCleanupCommand, buildFrameworkTempClaimCommand, classifyFrameworkStaleLock, isFrameworkStaleLockReleasable, runFrameworkTempClaim } from '../temp-claim.js';
 import { createFrameworkModeStatus, runFrameworkMode } from '../closure-packet-schema.js';
+import { createLocalGovernanceAdapter } from '../../../../../plugin-governance-local/dist/index.js';
+// This standalone fixture creates its own actors, tasks, and lanes.  Do not let
+// the invoking captain's live session change which fixture lock is resolved.
+delete process.env.ATM_ACTOR_ID;
+delete process.env.ATM_TASK_ID;
+delete process.env.ATM_LANE_SESSION_ID;
 function tempRoot() {
     const root = mkdtempSync(path.join(os.tmpdir(), 'atm-temp-claim-'));
     mkdirSync(path.join(root, '.atm', 'runtime', 'locks'), { recursive: true });
@@ -50,6 +56,10 @@ function initializeFrameworkRoot(root) {
 }
 function writeDirectionLock(root, taskId, actorId, laneSessionId) {
     writeFileSync(path.join(root, '.atm', 'runtime', 'locks', `${taskId}.lock.json`), JSON.stringify({
+        actorId,
+        lockedBy: actorId,
+        status: 'active',
+        files: ['x.ts'],
         taskDirectionLock: {
             schemaId: 'atm.taskDirectionLock.v1',
             specVersion: '0.1.0',
@@ -261,4 +271,13 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
     });
     assert.deepEqual(report.activeLocks, ['.atm/runtime/locks/TASK-A.lock.json']);
     assert.equal(report.staleLocks.length, 0, 'a known committing task must not be blocked by another active task direction');
+}
+{
+    const root = tempRoot();
+    writeDirectionLock(root, 'TASK-PROJECTION', 'agent-one', 'lane-a');
+    const adapter = createLocalGovernanceAdapter({ repositoryRoot: root });
+    await adapter.stores.lockStore.acquireLock({ workItemId: 'TASK-PROJECTION', title: 'projection', status: 'running' }, ['y.ts'], 'agent-one');
+    const refreshed = JSON.parse(readFileSync(path.join(root, '.atm', 'runtime', 'locks', 'TASK-PROJECTION.lock.json'), 'utf8'));
+    assert.equal(refreshed.taskDirectionLock.taskId, 'TASK-PROJECTION', 'same-owner lock refresh must retain embedded task-direction authority');
+    assert.deepEqual(refreshed.files, ['y.ts'], 'the short-lived scope projection may refresh without replacing canonical direction authority');
 }

@@ -1305,6 +1305,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/critical-path-gate.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/historical-delivery-provenance.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/sha256-normalization.spec.js",
+    "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.d.ts",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/build-release-hygiene-hints.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema.js",
@@ -5348,7 +5349,7 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 622,
+    "copied": 623,
     "unchanged": 4691,
     "removed": 0
   },
@@ -6751,7 +6752,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:3fc493ce0c342cb3e23a24fdbb93810f1b98098b8ae7b7f3a8d567a3824349c3"
+    "digest": "sha256:c6e5d7e2508ff93bbdc250bce78b22025e5bd16382265660f78072219acb226c"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -8030,6 +8031,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/critical-path-gate.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/historical-delivery-provenance.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/sha256-normalization.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.d.ts",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/build-release-hygiene-hints.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema.js",
@@ -12076,22 +12078,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:58cdf3ad0e4217eb0f690b9c7b4233bfe9d57b9e5e143ae263b579c7422a703a",
-  "sealedSourceCommit": "c48893b562760b6d2d3561613a29ba3db53d584e",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:4d5f6fa242cd5d26941fb51f5e98b62c7cd42b0154b884754b090721a724d66d",
-  "tsBuildCacheDigest": "sha256:dcced0663f4ac0f2eb56b2fc59c063c62510bc612898a13f48eca4864fda0e59",
+  "buildInputsTreeHash": "sha256:2c70d3bca50aadb4bde09819e0c39bdb6f276d2647b25deb12bf4fc25f23e9db",
+  "sealedSourceCommit": "1a21c6bcea77f1b0fb71a57ef874a6f53357c60f",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:3c49e3ea680afc5e4cfcf883e2f949395f4253e6c229cf5688718d610bf2ae3a",
+  "tsBuildCacheDigest": "sha256:b5004382e3576cce2d8eb8e2341d117064ea0185d89ba441bbd144b758bc2f63",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 36,
-    "skipDecision": 37,
-    "worktreeSetup": 13694,
-    "typescriptBuild": 9274,
-    "rootDropReleaseAssembly": 20211,
-    "onefileReleaseAssembly": 1917,
-    "artifactSync": 5641,
+    "skipDecision": 35,
+    "worktreeSetup": 14429,
+    "typescriptBuild": 14300,
+    "rootDropReleaseAssembly": 20536,
+    "onefileReleaseAssembly": 2006,
+    "artifactSync": 6345,
     "cleanup": 0,
-    "totalElapsed": 57191
+    "totalElapsed": 66231
   }
 }

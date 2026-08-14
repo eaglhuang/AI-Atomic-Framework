@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0372",
   "title": "Unify direction-lock authority snapshots for framework publication",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -193,8 +193,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T13-14-58-779Z-renew-27023f4b84f4",
-  "lastTransitionAt": "2026-08-14T13:14:58.779Z",
+  "lastTransitionId": "2026-08-14T13-25-48-116Z-close-c1a24a3880c2",
+  "lastTransitionAt": "2026-08-14T13:25:48.116Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-recovery",
   "reservedAt": "2026-08-14T02:17:34.586Z",
@@ -203,7 +203,7 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-2d1f06a26415",
     "claimedAt": "2026-08-14T13:04:01.501Z",
-    "heartbeatAt": "2026-08-14T13:14:58.202Z",
+    "heartbeatAt": "2026-08-14T13:25:48.114Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0372.*",
@@ -217,8 +217,8 @@
       "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
       "packages/plugin-governance-local/src/stores.ts"
     ],
-    "state": "active",
-    "reason": "Predecessor lease expired; runner publication and scope repair reproduce the card's direction-lock authority split-brain.",
+    "state": "released",
+    "reason": "closed",
     "laneSession": {
       "laneSessionId": "lane-20260814121802-codex-captain-recovery-2683c73c43",
       "status": "adopted",
@@ -331,5 +331,9 @@
     },
     "createdAt": "2026-08-14T13:04:02.068Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-14T13:25:48.114Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814130401-codex-captain-recovery-ATM-GOV-0372-60f973745c",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0372.closure-packet.json"
 }

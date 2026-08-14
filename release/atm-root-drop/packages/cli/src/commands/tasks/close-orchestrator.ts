@@ -407,7 +407,7 @@ export async function runTasksClose(argv: string[]) {
     });
   }
   const preparedClosurePacket = prepareClosurePacket({
-    // Contract marker: requiredValidationPassesForClosure(frameworkStatus.requiredGates, closePacketChangedFiles)
+    // Contract marker: task-card validation contract is the sole task-close authority.
     options,
     taskDocument,
     actorId,

@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T13-25-48-116Z-close-c1a24a3880c2",
+  "taskId": "ATM-GOV-0372",
+  "action": "close",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814130401-codex-captain-recovery-ATM-GOV-0372-60f973745c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0372.json",
+  "taskSha256": "sha256:49b902e8a5989018ebeaa9cf0d83e01548a5814b3d3611b8c8a900ae17694650",
+  "createdAt": "2026-08-14T13:25:48.116Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0372 --actor codex-captain-recovery --status done --historical-delivery 1a21c6bcea77f1b0fb71a57ef874a6f53357c60f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814130401-codex-captain-recovery-ATM-GOV-0372-60f973745c",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0372.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T13:25:48.110Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0372.*",
+        ".atm/history/task-events/ATM-GOV-0372/**",
+        ".atm/history/tasks/ATM-GOV-0372.json",
+        "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "packages/cli/src/commands/lock.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/task-direction/active-locks.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+        "packages/plugin-governance-local/src/stores.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "packages/cli/src/commands/lock.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/task-direction/active-locks.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+        "packages/plugin-governance-local/src/stores.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

@@ -1,10 +1,24 @@
 import path from 'node:path';
-import { createFrameworkModeStatus, requiredValidationPassesForClosure } from '../framework-development.js';
+import { createFrameworkModeStatus } from '../framework-development.js';
 import { resolveTaskRunnerArbitration } from '../validate.js';
-import { canonicalizeValidatorIdentity, classifyValidatorTier, resolveValidatorExpectedCommand } from './validator-classification.js';
+import { canonicalizeValidatorIdentity, classifyValidatorTier, looksLikeLiteralValidatorCommand, resolveValidatorExpectedCommand } from './validator-classification.js';
 import { collectRecordCommandRuns, readRecordValidationPasses, readRecordFreshness, uniqueStrings } from './command-runs.js';
 import { isRecord, isCommandRunProof } from './shared-utils.js';
 import { readEvidenceBundle, readTaskDocument, buildAutoEvidenceRequiredCommand } from './evidence-store.js';
+/** Keep executable task-card commands attached to their canonical evidence gate. */
+export function resolveTaskDeclaredValidatorCommands(taskDocument) {
+    const commands = new Map();
+    const declared = Array.isArray(taskDocument?.validators)
+        ? taskDocument.validators.filter((entry) => typeof entry === 'string' && entry.trim().length > 0)
+        : [];
+    for (const entry of declared) {
+        const gate = canonicalizeValidatorIdentity(entry);
+        if (!gate || commands.has(gate))
+            continue;
+        commands.set(gate, looksLikeLiteralValidatorCommand(entry) ? entry.trim() : resolveValidatorExpectedCommand(gate));
+    }
+    return commands;
+}
 function normalizeEvidencePath(value) {
     return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
@@ -180,8 +194,7 @@ export function classifyValidatorEvidenceState(bundle, gate) {
         return 'failed-run';
     return bestPositive ?? 'absent';
 }
-export function buildMissingValidatorFinding(gate, state, taskId, actor, runnerKind) {
-    const expectedCommand = resolveValidatorExpectedCommand(gate);
+export function buildMissingValidatorFinding(gate, state, taskId, actor, runnerKind, expectedCommand = resolveValidatorExpectedCommand(gate)) {
     const requiredCommand = buildAutoEvidenceRequiredCommand(taskId, actor, expectedCommand, gate, runnerKind);
     if (state === 'absent') {
         return {
@@ -223,12 +236,8 @@ export function computeMissingValidatorReport(cwd, taskId, actorId) {
     const frameworkGates = frameworkStatus.requiredGates;
     // 2. 取得 task card 宣告的 validators
     const taskDocument = readTaskDocument(resolvedCwd, resolvedTaskId);
-    const taskDeclaredValidators = Array.isArray(taskDocument?.validators)
-        ? taskDocument.validators
-            .filter((v) => typeof v === 'string' && v.trim().length > 0)
-            .map((v) => canonicalizeValidatorIdentity(v.trim()))
-            .filter(Boolean)
-        : [];
+    const taskDeclaredValidatorCommands = resolveTaskDeclaredValidatorCommands(taskDocument);
+    const taskDeclaredValidators = [...taskDeclaredValidatorCommands.keys()];
     // 3. 合併並去重
     const allGates = uniqueStrings([...frameworkGates, ...taskDeclaredValidators]);
     // 4. 讀取 evidence bundle
@@ -247,35 +256,32 @@ export function computeMissingValidatorReport(cwd, taskId, actorId) {
     const scopePaths = Array.isArray(taskDocument?.scopePaths)
         ? taskDocument.scopePaths.filter((p) => typeof p === 'string')
         : [];
-    // ATM-BUG-2026-07-12-155 (TASK-AAO-FABLE-003): the close --write closure
-    // packet requires `requiredValidationPassesForClosure(frameworkGates,
-    // changedFiles)` unconditionally, while this readiness report previously
-    // applied scope-conditional exemptions (validate:cli / git-head-evidence)
-    // via isClosureRequiredValidator. That drift let pre-close and close
-    // dry-run report "ready" and then fail at write with
-    // ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID. Readiness now consumes the exact
-    // same write-side set so both surfaces expose one validator contract; the
-    // write path stays authoritative and is not weakened.
+    // The task validation contract is the sole task-close authority. Framework
+    // requiredGates belong to phase/release consumers; promoting them here made
+    // evidence-only cards run unrelated suites and split preflight from the
+    // task-card contract. Missing/empty task validators stays fail-closed via
+    // the caller's validation-contract gate rather than falling back to broad
+    // framework validation.
     const declaredChangedFiles = uniqueStrings([
         ...scopePaths,
         ...(Array.isArray(taskDocument?.deliverables)
             ? taskDocument.deliverables.filter((p) => typeof p === 'string')
             : [])
     ]);
-    const writeRequiredSet = new Set(requiredValidationPassesForClosure(frameworkGates, declaredChangedFiles));
     for (const gate of allGates) {
         const state = classifyValidatorEvidenceState(bundleRecords, gate);
         const tier = classifyValidatorTier(gate);
-        const closureRequired = taskDeclaredValidators.includes(gate) || writeRequiredSet.has(gate);
+        const closureRequired = taskDeclaredValidators.includes(gate);
+        const expectedCommand = taskDeclaredValidatorCommands.get(gate) ?? resolveValidatorExpectedCommand(gate);
         catalogEntries.push({
             name: gate,
             tier,
             closureRequired,
-            expectedCommand: resolveValidatorExpectedCommand(gate),
+            expectedCommand,
             evidenceState: state
         });
         if (state !== 'pass') {
-            const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId, runnerArbitration.preferredRunnerKind);
+            const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId, runnerArbitration.preferredRunnerKind, expectedCommand);
             if (closureRequired) {
                 requiredFindings.push(finding);
                 if (state === 'absent')

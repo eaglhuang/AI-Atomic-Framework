@@ -2,9 +2,9 @@ import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { CliError } from '../../shared.ts';
 import { computeMissingValidatorReport } from '../../evidence.ts';
+import { canonicalizeValidatorIdentity } from '../../evidence/validator-classification.ts';
 import {
   createClosurePacket,
-  requiredValidationPassesForClosure,
   type ClosurePacket,
   validateClosurePacket
 } from '../../framework-development.ts';
@@ -77,6 +77,11 @@ export function prepareClosurePacket(input: {
     };
   }
   const closePacketChangedFiles = deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles;
+  const taskRequiredGates = Array.isArray(taskDocument.validators)
+    ? uniqueStrings(taskDocument.validators
+      .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+      .map((entry) => canonicalizeValidatorIdentity(entry)))
+    : [];
   assertAcceptanceEvidenceClosureGate({ taskId: options.taskId, taskDocument });
   const pendingClosurePacket = createClosurePacket({
     cwd: options.cwd,
@@ -89,7 +94,7 @@ export function prepareClosurePacket(input: {
         ...historicalBatchSlice.taskSpecificValidationPasses,
         ...historicalBatchSlice.batchWideValidationPasses
       ])
-      : requiredValidationPassesForClosure(frameworkStatus.requiredGates, closePacketChangedFiles),
+      : taskRequiredGates,
     changedFiles: closePacketChangedFiles,
     frameworkStatus,
     validationPasses: historicalBatchSlice?.okToCloseTask === true
