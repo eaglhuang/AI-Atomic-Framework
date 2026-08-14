@@ -115,7 +115,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   // A takeover receipt authorizes the pre-existing live surface. Capture it
   // before the private build writes generated candidate outputs; recapturing
   // after that work would make every valid receipt fail its own CAS check.
-  const preBuildPublicationSnapshot = captureSealedRunnerPublicationSnapshot({
+  const preBuildPublicationSnapshots = captureSealedRunnerPublicationSnapshot({
     cwd: repoRoot,
     stewardActorId: actorId,
     buildTarget,
@@ -135,7 +135,8 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       sealedSourceSha,
       buildTarget,
       publicationTaskId,
-      beforeBuildSnapshot: preBuildPublicationSnapshot
+      beforeBuildSnapshot: preBuildPublicationSnapshots.scopedSnapshot,
+      beforeBuildTakeoverSnapshot: preBuildPublicationSnapshots.takeoverSnapshot
     });
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     const dominantPhaseSummary = summarizeDominantPhase(timings);
@@ -221,7 +222,8 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       sealedSourceSha,
       buildTarget,
       publicationTaskId,
-      beforeBuildSnapshot: preBuildPublicationSnapshot
+      beforeBuildSnapshot: preBuildPublicationSnapshots.scopedSnapshot,
+      beforeBuildTakeoverSnapshot: preBuildPublicationSnapshots.takeoverSnapshot
     });
     const artifactSync = timePhase(
       timings,

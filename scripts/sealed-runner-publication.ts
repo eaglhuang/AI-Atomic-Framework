@@ -27,6 +27,8 @@ export function resolveSealedRunnerPublication(input: {
   readonly buildTarget: RunnerBuildOutputTarget;
   readonly publicationTaskId?: string | null;
   readonly beforeBuildSnapshot?: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
+  /** Physical output surface used to validate a producer takeover receipt. */
+  readonly beforeBuildTakeoverSnapshot?: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
 }): {
   readonly admission: RunnerSyncAdmissionReport;
   readonly currentTaskId: string | null;
@@ -52,6 +54,16 @@ export function resolveSealedRunnerPublication(input: {
     currentTaskId,
     currentTaskAllowedFiles
   });
+  // A takeover receipt authorizes the physical generated surface.  It must not
+  // inherit the scoped preservation filter: that filter deliberately omits
+  // current-task outputs, whereas a producer may need to attest those outputs
+  // before the consumer replaces them.
+  const beforeBuildTakeoverSnapshot = input.beforeBuildTakeoverSnapshot ?? captureRunnerBuildOutputSnapshot({
+    cwd: input.cwd,
+    buildTarget: input.buildTarget,
+    currentTaskId: null,
+    currentTaskAllowedFiles: []
+  });
   return {
     admission,
     currentTaskId,
@@ -60,7 +72,7 @@ export function resolveSealedRunnerPublication(input: {
       cwd: input.cwd,
       taskId: currentTaskId,
       sealedSourceSha: input.sealedSourceSha,
-      snapshot: beforeBuildSnapshot
+      snapshot: beforeBuildTakeoverSnapshot
     })
   };
 }
@@ -76,7 +88,10 @@ export function captureSealedRunnerPublicationSnapshot(input: {
   readonly stewardActorId: string;
   readonly buildTarget: RunnerBuildOutputTarget;
   readonly publicationTaskId?: string | null;
-}): ReturnType<typeof captureRunnerBuildOutputSnapshot> {
+}): {
+  readonly scopedSnapshot: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
+  readonly takeoverSnapshot: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
+} {
   const currentTaskId = resolveActiveRunnerPublicationTask({
     cwd: input.cwd,
     actorId: input.stewardActorId,
@@ -91,12 +106,20 @@ export function captureSealedRunnerPublicationSnapshot(input: {
       actorId: input.stewardActorId,
       now: new Date().toISOString()
     });
-  return captureRunnerBuildOutputSnapshot({
-    cwd: input.cwd,
-    buildTarget: input.buildTarget,
-    currentTaskId,
-    currentTaskAllowedFiles
-  });
+  return {
+    scopedSnapshot: captureRunnerBuildOutputSnapshot({
+      cwd: input.cwd,
+      buildTarget: input.buildTarget,
+      currentTaskId,
+      currentTaskAllowedFiles
+    }),
+    takeoverSnapshot: captureRunnerBuildOutputSnapshot({
+      cwd: input.cwd,
+      buildTarget: input.buildTarget,
+      currentTaskId: null,
+      currentTaskAllowedFiles: []
+    })
+  };
 }
 
 /**

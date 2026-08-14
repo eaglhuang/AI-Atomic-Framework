@@ -51,10 +51,12 @@ try {
   execFileSync('git', ['commit', '-m', 'fixture'], { cwd: publicationRoot, stdio: 'ignore' });
   writeFileSync(path.join(publicationRoot, 'release/atm-onefile/atm.mjs'), 'task candidate\n');
   writeFileSync(path.join(publicationRoot, 'packages/cli/dist/foreign.js'), 'foreign candidate\n');
-  const snapshot = captureSealedRunnerPublicationSnapshot({ cwd: publicationRoot, stewardActorId: 'steward', buildTarget: 'full', publicationTaskId: taskId });
-  assert.ok(!snapshot.preexistingDirtyPaths.includes('release/atm-onefile/atm.mjs'), 'own publication surface must be excluded before the private build');
-  assert.ok(snapshot.preexistingDirtyPaths.includes('packages/cli/dist/foreign.js'), 'foreign generated output remains in the immutable pre-build snapshot');
-  console.log('[sealed-runner-build] captures task-scoped pre-build publication snapshot');
+  const snapshots = captureSealedRunnerPublicationSnapshot({ cwd: publicationRoot, stewardActorId: 'steward', buildTarget: 'full', publicationTaskId: taskId });
+  assert.ok(!snapshots.scopedSnapshot.preexistingDirtyPaths.includes('release/atm-onefile/atm.mjs'), 'own publication surface must be excluded from scoped preservation');
+  assert.ok(snapshots.scopedSnapshot.preexistingDirtyPaths.includes('packages/cli/dist/foreign.js'), 'foreign generated output remains in the scoped preservation snapshot');
+  assert.ok(snapshots.takeoverSnapshot.preexistingDirtyPaths.includes('release/atm-onefile/atm.mjs'), 'physical takeover snapshot must include current-task generated output');
+  assert.ok(snapshots.takeoverSnapshot.preexistingDirtyPaths.includes('packages/cli/dist/foreign.js'), 'physical takeover snapshot must include foreign generated output');
+  console.log('[sealed-runner-build] separates scoped preservation from physical takeover snapshots');
 } finally {
   rmSync(publicationRoot, { recursive: true, force: true });
 }
