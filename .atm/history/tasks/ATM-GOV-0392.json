@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0392",
   "title": "Make skill template source discovery fail closed and trackable",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -195,8 +195,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T15-59-51-146Z-renew-2d02b078f6ac",
-  "lastTransitionAt": "2026-08-14T15:59:51.146Z",
+  "lastTransitionId": "2026-08-14T16-57-24-722Z-close-b4f3867143e2",
+  "lastTransitionAt": "2026-08-14T16:57:24.722Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-008",
   "reservedAt": "2026-08-14T15:24:25.252Z",
@@ -205,7 +205,7 @@
     "actorId": "claude-008",
     "leaseId": "lease-a8a2e3665b22",
     "claimedAt": "2026-08-14T15:24:25.263Z",
-    "heartbeatAt": "2026-08-14T15:59:50.316Z",
+    "heartbeatAt": "2026-08-14T16:57:24.720Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0392.*",
@@ -224,13 +224,14 @@
       "tests/cli/skill-corpus-canary-rewrite.test.ts",
       "tests/cli/skill-definition-vnext.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260814152425-claude-008-3ce0c25fd2",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814152425-claude-008-3ce0c25fd2\""
-    }
+    },
+    "reason": "Owner-approved close-only emergency: source repair committed and validated; card forbids runner build/enqueue"
   },
   "startedAt": "2026-08-14T15:24:25.263Z",
   "startedByActor": "claude-008",
@@ -285,20 +286,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-38590dda3d073b64",
-    "ticketDigest": "sha256:38590dda3d073b640168fd5ada33fbafa5cde085ea192a1aaca8d1ac927fc925",
+    "ticketId": "wat-de34f27a8005eeaf",
+    "ticketDigest": "sha256:de34f27a8005eeaf211f371a1fa9464a0f328d2cc9335a48708bb48a38796147",
     "taskId": "ATM-GOV-0392",
     "origin": "claim",
     "actorId": "claude-008",
     "laneSessionId": "lane-20260814152425-claude-008-3ce0c25fd2",
     "claimGeneration": "lease-a8a2e3665b22",
-    "issuedAt": "2026-08-14T15:59:50.316Z",
-    "expiresAt": "2026-08-14T16:29:50.316Z",
+    "issuedAt": "2026-08-14T16:56:10.251Z",
+    "expiresAt": "2026-08-14T17:26:10.251Z",
     "scopeDigest": "sha256:517a96d36308a14473f03695fd8b7f01e8ea3aa090a36b6c731561173fbf8eb1",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T15:59:50.316Z"
+      "selectedAt": "2026-08-14T16:56:10.251Z"
     },
     "grants": [
       {
@@ -355,5 +356,10 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
-  }
+  },
+  "closedAt": "2026-08-14T16:57:24.720Z",
+  "closedByActor": "claude-008",
+  "closedBySessionId": "session-20260814152425-claude-008-ATM-GOV-0392-ad9bae1e58",
+  "closeReason": "Owner-approved close-only emergency: source repair committed and validated; card forbids runner build/enqueue",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0392.closure-packet.json"
 }

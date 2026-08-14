@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T16-57-24-722Z-close-b4f3867143e2",
+  "taskId": "ATM-GOV-0392",
+  "action": "close",
+  "actorId": "claude-008",
+  "sessionId": "session-20260814152425-claude-008-ATM-GOV-0392-ad9bae1e58",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0392.json",
+  "taskSha256": "sha256:7f543b5091c66da195dc66f4afa2261c7fd169876194a13e0b3f53cc98264577",
+  "createdAt": "2026-08-14T16:57:24.722Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0392 --actor claude-008 --status done --historical-delivery 50ba3852686043cc4bf18997a58f8fcad95cba04",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814152425-claude-008-ATM-GOV-0392-ad9bae1e58",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0392.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "node --strip-types tests/cli/skill-definition-vnext.test.ts",
+      "node atm.mjs integration add claude-code --force --json",
+      "node atm.mjs integration verify claude-code --json",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "node --strip-types tests/cli/skill-definition-vnext.test.ts",
+      "node atm.mjs integration add claude-code --force --json",
+      "node atm.mjs integration verify claude-code --json",
+      "validate:skill-templates"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T16:57:24.712Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0392.*",
+        ".atm/history/task-events/ATM-GOV-0392/**",
+        ".atm/history/tasks/ATM-GOV-0392.json",
+        ".claude/skills/atm-framework-quickfix/SKILL.md",
+        ".claude/skills/atm-residue-cleanup/SKILL.md",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-012.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-013.json",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "packages/integrations-core/src/index.ts",
+        "scripts/audit-skill-corpus.ts",
+        "scripts/validate-skill-templates.ts",
+        "templates/skills/atm-framework-quickfix.skill.md",
+        "templates/skills/atm-residue-cleanup.skill.md",
+        "tests/cli/skill-corpus-canary-rewrite.test.ts",
+        "tests/cli/skill-definition-vnext.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "packages/integrations-core/src/index.ts",
+        "scripts/audit-skill-corpus.ts",
+        "scripts/validate-skill-templates.ts",
+        "tests/cli/skill-corpus-canary-rewrite.test.ts",
+        "tests/cli/skill-definition-vnext.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+        "node --strip-types tests/cli/skill-definition-vnext.test.ts",
+        "node atm.mjs integration add claude-code --force --json",
+        "node atm.mjs integration verify claude-code --json",
+        "validate:skill-templates"
+      ]
+    }
+  }
+}
