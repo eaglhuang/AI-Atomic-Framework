@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-95f6997ee742",
+  "recordedAt": "2026-08-14T04:24:38.310Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0359",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0359 --message \"fix(evidence): permit publication-only freshness delta\n\nATM-Work-Admission: wat-def17986cecd5872 sha256:def17986cecd587238d0dd85a7c9936883c1391869d576f7b16593df941ed78c\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0359-508918ceb4",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T04-24-38-309Z-EMG-ATM-GOV-0359-508918ceb4.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
