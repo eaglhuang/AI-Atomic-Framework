@@ -3,7 +3,7 @@ import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/src/index.ts';
 import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../../../../core/src/broker/lifecycle.ts';
 import { resolveActorId } from '../actor-registry.ts';
-import { upsertActorWorkSession, updateActorWorkSessionState } from '../actor-session.ts';
+import { updateActorWorkSessionState } from '../actor-session.ts';
 import { buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, assessCloseoutProvenanceGap } from './closeout-provenance.ts';
 import { findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from './dependency-gates.ts';
 import { evaluateTaskClaimAdmission } from './lifecycle-state.ts';
@@ -12,7 +12,7 @@ import { findActiveTaskQueue, writeTaskDirectionLock } from '../task-direction.t
 import { normalizeWorkItemStatus } from './task-transition-helpers.ts';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.ts';
 import { taskPathFor } from './task-file-io-helpers.ts';
-import { parseClaimRecord, createClaimRecord, isClaimExpired } from './task-ledger-readers.ts';
+import { parseClaimRecord, isTakeoverEligibleClaim } from './task-ledger-readers.ts';
 import { parseClaimLifecycleOptions } from './task-option-parsers.ts';
 import { resolveTaskClaimIntent } from './claim-intent.ts';
 import { completeTaskClaimWithWorkAdmission, resealWorkAdmissionTicketForRenewal, restoreReleasedDirectionLockForRenewal } from './claim-work-admission.ts';
@@ -481,7 +481,7 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
   if (!options.reason || options.reason.trim().length === 0) {
     throw new CliError('ATM_CLI_USAGE', 'tasks takeover requires --reason <text>.', { exitCode: 2 });
   }
-  if (!isClaimExpired(currentClaim, nowIso)) {
+  if (!isTakeoverEligibleClaim(currentClaim, nowIso)) {
     throw new CliError('ATM_TASKS_TAKEOVER_NOT_ALLOWED', `Claim for ${options.taskId} is still active under ${currentClaim.actorId}.`, {
       exitCode: 1,
       details: {
@@ -492,32 +492,45 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       }
     });
   }
-  await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
-  const takeoverClaim: TaskClaimRecord = {
-    ...createClaimRecord({
-      taskId: options.taskId,
-      actorId,
-      files,
-      ttlSeconds: options.ttlSeconds,
-      timestamp: nowIso
-    }),
-    reason: options.reason ?? `takeover from ${currentClaim.actorId}`
-  };
-  await resolveValue(adapter.stores.lockStore.acquireLock(taskRef, files, actorId));
-  taskDocument.claim = { ...takeoverClaim, state: 'taken_over' };
-  taskDocument.owner = actorId;
-  const sessionRecord = upsertActorWorkSession({
+  // A takeover replaces an expired or released lease.  It must use the same
+  // constructor as an ordinary claim so the successor has a live lane,
+  // admission ticket, session, and direction lock.  `taken_over` belongs in
+  // the append-only transition/evidence history, not in claim.state: consumers
+  // treat only `active` as live authority.
+  await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, currentClaim.actorId));
+  const laneSession = resolveLaneSession({
     cwd: options.cwd,
     actorId,
     taskId: options.taskId,
-    claimLeaseId: takeoverClaim.leaseId,
-    status: 'taken_over',
-    taskPath: relativeTaskPath,
-    reason: options.reason ?? `takeover from ${currentClaim.actorId}`,
-    timestamp: nowIso
+    command: `node atm.mjs tasks takeover --task ${options.taskId} --actor ${actorId} --json`
   });
   const previousStatus = String(taskDocument.status ?? '');
-  taskDocument.status = 'running';
+  const claimCompletion = await completeTaskClaimWithWorkAdmission({
+    cwd: options.cwd,
+    taskId: options.taskId,
+    actorId,
+    taskPath,
+    taskRef,
+    taskDocument,
+    files,
+    ttlSeconds: options.ttlSeconds,
+    claimIntent: options.claimIntent,
+    laneSession,
+    previousStatus,
+    planningReadOnlyPaths: Array.isArray(taskDocument.planningReadOnlyPaths) ? taskDocument.planningReadOnlyPaths as string[] : [],
+    planningMirrorPaths: Array.isArray(taskDocument.planningMirrorPaths) ? taskDocument.planningMirrorPaths as string[] : [],
+    allowPlanningMirror: taskDocument.allowPlanningMirror === true,
+    nowIso,
+    phases: claimLifecyclePhases
+  });
+  // The successor active claim is now the sole live authority for these paths;
+  // retaining the predecessor's released-WIP marker would create split-brain.
+  delete taskDocument.wipOwnership;
+  const takeoverClaim: TaskClaimRecord = {
+    ...claimCompletion.claim,
+    reason: options.reason
+  };
+  taskDocument.claim = takeoverClaim;
   const transitionPath = writeTaskDocumentWithTransition({
     cwd: options.cwd,
     taskPath,
@@ -525,8 +538,8 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
     taskDocument,
     action,
     actorId,
-    sessionId: sessionRecord.session.sessionId,
-    previousStatus
+    sessionId: claimCompletion.session.sessionId,
+    previousStatus: 'running'
   });
   writeTakeoverEvidence(options.cwd, options.taskId, actorId, currentClaim, takeoverClaim);
   return makeResult({
@@ -546,8 +559,11 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       claim: takeoverClaim,
       evidencePath: `.atm/history/evidence/${options.taskId}.json`,
       transitionPath,
-      sessionId: sessionRecord.session.sessionId,
-      session: sessionRecord.session
+      sessionId: claimCompletion.session.sessionId,
+      session: claimCompletion.session,
+      laneSession: laneSession.envelope,
+      workAdmissionTicket: claimCompletion.ticket,
+      taskDirectionLock: claimCompletion.taskDirectionLock
     }
   });
 }
