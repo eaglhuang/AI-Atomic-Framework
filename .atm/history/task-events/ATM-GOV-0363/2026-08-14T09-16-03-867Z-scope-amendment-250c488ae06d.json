@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T09-16-03-867Z-scope-amendment-250c488ae06d",
+  "taskId": "ATM-GOV-0363",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-recovery",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0363.json",
+  "taskSha256": "sha256:6a27e37d69f331ccdc8f17880364e4d3c2fdeb22776a390028d4b59d2e39fcb8",
+  "createdAt": "2026-08-14T09:16:03.867Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0363 --actor codex-captain-recovery --add \".atm/charter/atomic-charter.md,.atm/charter/charter-invariants.json,fixtures/charter/default-charter.json,templates/root-drop/.atm/charter/charter-invariants.template.json,templates/skills/atm-dispatch.skill.md,docs/governance/transient-artifact-lifecycle-charter.md,tests/cli/transient-artifact-lifecycle.test.ts\" --reason \"Restore task-card declared delivery paths omitted from the live claim grant so governed auto-stage can deliver the actual charter, lifecycle documentation, and regression test.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Restore task-card declared delivery paths omitted from the live claim grant so governed auto-stage can deliver the actual charter, lifecycle documentation, and regression test."
+  }
+}

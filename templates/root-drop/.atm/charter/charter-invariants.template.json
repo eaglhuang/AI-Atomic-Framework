@@ -4,10 +4,10 @@
   "specVersion": "0.1.0",
   "migration": {
     "strategy": "none",
-    "fromVersion": "2.3.0",
-    "notes": "Add single canonical worktree and compose-first shared writes as INV-ATM-010."
+    "fromVersion": "2.6.0",
+    "notes": "Add fail-fast control-plane and transactional-capability rule as INV-ATM-013."
   },
-  "charterVersion": "2.4.0",
+  "charterVersion": "2.7.0",
   "projectName": "{{PROJECT_NAME}}",
   "lastAmendedAt": "{{LAST_AMENDED_DATE}}",
   "charterHash": "{{ATOMIC_CHARTER_SHA256}}",
@@ -183,6 +183,33 @@
         "governance"
       ],
       "rationale": "Logical intent and compose evidence, not Git topology or path-only locking, are the basis for safe parallel work. A single canonical worktree preserves comparable code state while a neutral steward prevents concurrent physical writes from losing attribution or updates."
+    },
+    {
+      "id": "INV-ATM-011",
+      "title": "Minimum queue residency",
+      "rule": "Queueing is a scarce-resource boundary, never a work-ownership model. Every queue design must minimize residency to the irreducible interval during which a specific shared resource cannot be safely parallelized, composed, deferred, or made private. All separable preparation, computation, validation, and staging must occur outside that interval before a worker joins the queue. The design must make the boundary observable and prove it is minimal: admission binds a ready candidate to current state, the shared transition has explicit success and failure outcomes, and completion or invalidation releases capacity immediately. A queue may not substitute for polling, long-lived reservation, or avoidable serialization.",
+      "enforcement": "doctor",
+      "breakingChange": false,
+      "tags": ["parallel", "critical-section", "queue", "lease", "residency"],
+      "rationale": "Queue ownership during parallelizable work creates artificial serialization and false blocking."
+    },
+    {
+      "id": "INV-ATM-012",
+      "title": "Canonical authority snapshots",
+      "rule": "Whenever a governed decision depends on authority, ATM must resolve that fact once through a canonical authority-snapshot module. Every consumer must consume the same immutable, attributable, scoped, TTL-aware where applicable, digestable decision or verify its digest. Consumers must not independently recreate approximate authority rules; recovery commands must be generated from the same snapshot that the next consumer accepts. Missing, expired, partial, ambiguous, changed, or unverifiable authority remains fail-closed. New consumers require parity coverage for absent, live exact, live partial, expired, released, actor/lane-mismatched, delegated, and concurrent-change cases.",
+      "enforcement": "doctor",
+      "breakingChange": false,
+      "tags": ["authority", "snapshot", "split-brain", "parity", "governance"],
+      "rationale": "A canonical authority fact prevents one ATM surface from authorizing work that another surface rejects."
+    },
+    {
+      "id": "INV-ATM-013",
+      "title": "Fail fast before irreversible or expensive work",
+      "rule": "Every non-optional precondition for an ATM CLI operation must be evaluated before expensive validation, build, lock acquisition, queue admission, lease consumption, staging, or any local/cross-repository write. A failed precondition must immediately return one precise error code, the observed blocking fact, and an executable recovery command. Control-plane commands (routing, status, preflight, admission, recovery diagnosis) have a five-second response budget. Large declared test suites, builds, and external I/O are execution-plane exceptions, but must be explicitly classified before they start and expose a ticket, progress receipt, or bounded completion result. A lease, override, lock, or queue slot is consumed only after every prerequisite that can be checked without that capability has passed.",
+      "enforcement": "doctor",
+      "breakingChange": false,
+      "tags": ["fail-fast", "performance", "control-plane", "transactional-capability"],
+      "rationale": "Late validation wastes time and capability leases; a fail-fast preflight preserves responsive, recoverable CLI behavior."
     }
   ]
 }

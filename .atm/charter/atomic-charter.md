@@ -5,8 +5,8 @@
 > resolved through a governed charter waiver proposal (`behavior.evolve` +
 > `charterWaiver` + `HumanReviewDecision`), not by silent override.
 
-**Charter version**: 2.5.0
-**Last amended**: 2026-08-10T14:20:00.000Z
+**Charter version**: 2.8.0
+**Last amended**: 2026-08-14T00:00:00.000Z
 **Machine-readable invariants**: `.atm/charter/charter-invariants.json`
 **Normative design schedule**: `.atm/charter/atm-first-principles.md` (version 1.0.0)
 **Schedule SHA-256**: `sha256:4936539324d5c04a3275eda735a75f9af6bf8bdce83cb5584420fdf43d33f7e2`
@@ -56,6 +56,9 @@ See `charter-invariants.json` for the machine-readable form used by ATM guards.
 | INV-ATM-009 | Generalized repair and data-driven policy | doctor |
 | INV-ATM-010 | Single canonical worktree and compose-first shared writes | doctor |
 | INV-ATM-011 | Minimum queue residency | doctor |
+| INV-ATM-012 | Canonical authority snapshots | doctor |
+| INV-ATM-013 | Fail fast before irreversible or expensive work | doctor |
+| INV-ATM-014 | Operation-owned transient artifact lifecycle | doctor |
 
 ### INV-ATM-008 — Broker tickets, not refusals (parallel governance principle)
 
@@ -118,6 +121,61 @@ success and failure outcomes, and completion or invalidation releases capacity
 immediately. A queue may not substitute for polling, long-lived reservation,
 or avoidable serialization. A particular broker, lock, lease, publish flow, or
 commit mechanism is only one implementation of this invariant, not its meaning.
+
+### INV-ATM-012 — Canonical authority snapshots, never inferred authority
+
+Whenever a governed decision depends on authority — including claim, lock,
+lease, lane, broker receipt, candidate scope, expiry, or release entitlement — ATM
+must resolve that fact once through a canonical authority-snapshot module. The
+snapshot must be immutable for the candidate operation, attributable, scoped,
+TTL-aware where applicable, and digestable.
+
+Every consumer — such as status, admission, hook, queue, runner publication,
+taskflow, recovery guidance, and evidence validation — must consume the same
+decision or verify its digest. A consumer must not independently rescan ledger,
+runtime locks, receipts, or paths and recreate an approximate authority rule.
+Recovery commands must be generated from the same snapshot that the next
+consumer accepts. Any missing, expired, partial, ambiguous, changed, or
+unverifiable authority remains fail-closed.
+
+This invariant forbids producer/consumer split-brain: a state that one ATM
+surface reports as authorized must not be rejected by another surface for the
+same actor, candidate, and snapshot. New authority consumers require a parity
+matrix covering absent, live exact, live partial, expired, released,
+actor/lane-mismatched, delegated, and concurrent-change cases.
+
+### INV-ATM-013 — Fail fast before irreversible or expensive work
+
+Every non-optional precondition for an ATM CLI operation must be evaluated
+before expensive validation, build, lock acquisition, queue admission, lease
+consumption, staging, or any local/cross-repository write. If a precondition
+is false, the command must immediately return one precise error code, the
+observed blocking fact, and an executable recovery command; it must not perform
+work that cannot make the operation admissible.
+
+Control-plane commands (routing, status, preflight, admission, and recovery
+diagnosis) have a five-second response budget. Large declared test suites,
+builds, and external I/O are execution-plane exceptions, but must be explicitly
+classified before they start and expose a ticket, progress receipt, or bounded
+completion result. Capability use is transactional: a lease, override, lock,
+or queue slot is consumed only after all prerequisites that can be checked
+without that capability have passed.
+
+### INV-ATM-014 — Operation-owned transient artifact lifecycle
+
+Every governed operation owns the full lifecycle of transient artifacts it
+creates. On success, failure, timeout, or cancellation it must either restore
+the exact pre-operation state or retain one durable, owner-bound and
+digest-verifiable recovery receipt. No operation may release its claim, lock,
+queue reservation, or other scarce capability while it leaves unowned
+transient residue behind.
+
+Cleanup is a distinct outcome, never a conversion of a failed primary action
+into success. Automatic cleanup may touch only receipt-listed transient paths
+whose ownership and current bytes still match. User-authored source, staged
+foreign work, and active-owner artifacts remain fail-closed. When automatic
+cleanup cannot finish, ATM must expose a normal diagnostic and resumable
+cleanup route rather than requiring raw shell repair.
 
 ---
 

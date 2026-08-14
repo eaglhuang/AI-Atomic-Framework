@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0363",
-  "updatedAt": "2026-08-14T09:12:50.122Z",
+  "updatedAt": "2026-08-14T09:15:09.387Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -1474,6 +1474,323 @@
           "runCount": 1,
           "sourcePath": null
         }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Historical batch evidence hist-batch-2026-08-14T09-15-09-387Z for ATM-GOV-0363.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-15-09-387Z.json",
+        "packages/cli/dist/commands/hook/pre-commit/support.d.ts"
+      ],
+      "evidenceFreshness": "historical-reference",
+      "producedBy": "codex-captain-recovery",
+      "sessionId": null,
+      "createdAt": "2026-08-14T09:15:09.387Z",
+      "details": {
+        "actorId": "codex-captain-recovery",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "historical-reference",
+        "historicalBatch": {
+          "schemaId": "atm.historicalBatchTaskSlice.v1",
+          "batchId": "hist-batch-2026-08-14T09-15-09-387Z",
+          "commits": [
+            "61ae02310a0916b2faab35fa4b5839bda3714d74",
+            "91ca2fbad2646b293a1abea87e9d8ae4dfeaf8b9",
+            "e954748cd0737abf585e7ca5c14cbbcb720b432c"
+          ],
+          "matchedCommits": [
+            "e954748cd0737abf585e7ca5c14cbbcb720b432c"
+          ],
+          "matchedFiles": [
+            "packages/cli/dist/commands/hook/pre-commit/support.d.ts"
+          ],
+          "outOfScopeFiles": [],
+          "taskSliceOk": true,
+          "declaredDeliverables": [
+            ".atm/charter/atomic-charter.md",
+            ".atm/charter/charter-invariants.json",
+            "templates/root-drop/.atm/charter/charter-invariants.template.json",
+            "fixtures/charter/default-charter.json",
+            "docs/governance/transient-artifact-lifecycle-charter.md",
+            "packages/core/src/governance/operation-cleanup-contract.ts",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "packages/cli/src/commands/cleanup/index.ts",
+            "packages/cli/src/commands/cleanup/run.ts",
+            "templates/skills/atm-residue-cleanup.skill.md",
+            "templates/skills/atm-dispatch.skill.md",
+            "scripts/validate-transient-artifact-lifecycle.ts",
+            "tests/cli/transient-artifact-lifecycle.test.ts"
+          ],
+          "declaredScopeFiles": [
+            ".atm/charter/atomic-charter.md",
+            ".atm/charter/charter-invariants.json",
+            "templates/root-drop/.atm/charter/charter-invariants.template.json",
+            "fixtures/charter/default-charter.json",
+            "docs/governance/transient-artifact-lifecycle-charter.md",
+            "packages/core/src/governance/operation-cleanup-contract.ts",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "packages/core/src/index.ts",
+            "packages/cli/src/commands/cleanup/**",
+            "packages/cli/src/atm.ts",
+            "templates/skills/atm-residue-cleanup.skill.md",
+            "templates/skills/atm-dispatch.skill.md",
+            "scripts/validate-transient-artifact-lifecycle.ts",
+            "tests/cli/transient-artifact-lifecycle.test.ts",
+            ".atm/history/evidence/ATM-GOV-0363.*",
+            ".atm/history/task-events/ATM-GOV-0363/**",
+            ".atm/history/tasks/ATM-GOV-0363.json",
+            "packages/cli/src/commands/cleanup/index.ts",
+            "packages/cli/src/commands/cleanup/run.ts",
+            "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+            "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+            "packages/cli/src/commands/command-specs.ts",
+            "packages/cli/src/commands/command-specs/cleanup.spec.ts",
+            "tests/cli-fixtures/help-snapshots/command-list.json",
+            "scripts/run-sealed-runner-build.test.ts",
+            "scripts/sealed-runner-publication.ts",
+            "packages/cli/dist/commands/command-specs.js",
+            "packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+            "release/atm-onefile/atm.mjs",
+            "release/atm-onefile/release-manifest.json",
+            "release/atm-root-drop/docs/reports/plan-3x-4x-closeout-blocker-map.json",
+            "release/atm-root-drop/docs/reports/plan-3x-4x-independent-certificate.json",
+            "release/atm-root-drop/packages/cli/dist/commands/command-specs.js",
+            "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+            "release/atm-root-drop/packages/cli/src/commands/command-specs.ts",
+            "release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+            "release/atm-root-drop/release-manifest.json",
+            "release/atm-root-drop/scripts/diagnose-plan3-evidence-closure.ts",
+            "release/atm-root-drop/tests/cli-fixtures/help-snapshots/command-list.json",
+            "packages/cli/dist/commands/hook/pre-commit/support.d.ts",
+            "release/atm-root-drop/docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+            "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/support.d.ts",
+            "release/atm-root-drop/scripts/validate-runbook-completion-evidence.ts",
+            "release/atm-root-drop/tests/cli/runbook-completion-evidence.test.ts"
+          ],
+          "matchedDeliverables": [],
+          "missingCoverage": [
+            ".atm/charter/atomic-charter.md",
+            ".atm/charter/charter-invariants.json",
+            "templates/root-drop/.atm/charter/charter-invariants.template.json",
+            "fixtures/charter/default-charter.json",
+            "docs/governance/transient-artifact-lifecycle-charter.md",
+            "packages/core/src/governance/operation-cleanup-contract.ts",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "packages/cli/src/commands/cleanup/index.ts",
+            "packages/cli/src/commands/cleanup/run.ts",
+            "templates/skills/atm-residue-cleanup.skill.md",
+            "templates/skills/atm-dispatch.skill.md",
+            "scripts/validate-transient-artifact-lifecycle.ts",
+            "tests/cli/transient-artifact-lifecycle.test.ts"
+          ],
+          "coverageStatus": "blocked",
+          "validatorClaims": [
+            {
+              "gate": "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
+              "kind": "taskSpecific",
+              "satisfied": false,
+              "requiredForClose": true
+            },
+            {
+              "gate": "node --strip-types tests/cli/transient-artifact-lifecycle.test.ts",
+              "kind": "taskSpecific",
+              "satisfied": false,
+              "requiredForClose": true
+            },
+            {
+              "gate": "typecheck",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:charter",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:cli",
+              "kind": "batchWide",
+              "satisfied": true,
+              "requiredForClose": false
+            },
+            {
+              "gate": "validate:skill-templates",
+              "kind": "taskSpecific",
+              "satisfied": false,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:transient-artifact-lifecycle",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            }
+          ],
+          "atomHealthClaims": [
+            {
+              "atomOrMapId": "atm.governed-operation-lifecycle",
+              "kind": "owner",
+              "generatedByTask": false,
+              "validatorHealthy": false
+            }
+          ],
+          "okToRecordEvidence": true,
+          "okToCloseTask": false,
+          "diagnosticOnly": true
+        },
+        "validationPasses": [
+          "typecheck",
+          "validate:charter",
+          "validate:transient-artifact-lifecycle"
+        ],
+        "batchWideValidationPasses": [
+          "validate:cli"
+        ],
+        "advisoryValidationPasses": [],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-transient-artifact-lifecycle.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:7c35d5f853b55e45c0eab0a60eddb165805e7b45f6bb94ad86a36c645e18b86a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:transient-artifact-lifecycle"
+            ],
+            "generatedAt": "2026-08-14T09:15:09.946Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-08-14T09:15:17.972Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:charter",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:35f7c060f358008b76472bbef5fc46642ef08e3f367c78ea123f918c593259f4",
+            "stderrSha256": "sha256:315f260be964d9ce6b13463662f301c3087c22c7cf5d86774ba928d5da18c005",
+            "validators": [
+              "validate:charter"
+            ],
+            "generatedAt": "2026-08-14T09:15:18.653Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+            "stderrSha256": "sha256:35f510ee82d079cc462921d5b2417b2eb98e344f15b0ed34f0988f424e94205b",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-08-14T09:15:37.494Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Fresh validator attestation slice hist-batch-2026-08-14T09-15-09-387Z for ATM-GOV-0363.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-15-09-387Z.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain-recovery",
+      "sessionId": null,
+      "createdAt": "2026-08-14T09:15:09.387Z",
+      "details": {
+        "actorId": "codex-captain-recovery",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck",
+          "validate:charter",
+          "validate:cli",
+          "validate:transient-artifact-lifecycle"
+        ],
+        "historicalBatchValidatorAttestation": {
+          "schemaId": "atm.historicalBatchValidatorAttestation.v1",
+          "batchId": "hist-batch-2026-08-14T09-15-09-387Z",
+          "batchPath": ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-15-09-387Z.json",
+          "taskId": "ATM-GOV-0363",
+          "taskSpecificValidationPasses": [
+            "typecheck",
+            "validate:charter",
+            "validate:transient-artifact-lifecycle"
+          ],
+          "batchWideValidationPasses": [
+            "validate:cli"
+          ],
+          "advisoryValidationPasses": []
+        },
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-transient-artifact-lifecycle.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:7c35d5f853b55e45c0eab0a60eddb165805e7b45f6bb94ad86a36c645e18b86a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:transient-artifact-lifecycle"
+            ],
+            "generatedAt": "2026-08-14T09:15:09.946Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-08-14T09:15:17.972Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:charter",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:35f7c060f358008b76472bbef5fc46642ef08e3f367c78ea123f918c593259f4",
+            "stderrSha256": "sha256:315f260be964d9ce6b13463662f301c3087c22c7cf5d86774ba928d5da18c005",
+            "validators": [
+              "validate:charter"
+            ],
+            "generatedAt": "2026-08-14T09:15:18.653Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+            "stderrSha256": "sha256:35f510ee82d079cc462921d5b2417b2eb98e344f15b0ed34f0988f424e94205b",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-08-14T09:15:37.494Z",
+            "runnerKind": "unknown"
+          }
+        ]
       }
     }
   ]
