@@ -10,6 +10,20 @@ export function validateReport(report: any, source: string): void {
   if (report.schemaId !== 'atm.runbookCompletionEvidence.v1') throw new Error('wrong schema');
   if (report.authority?.sourceDigest !== digestText(source)) throw new Error('planning source digest drift');
   if (report.authority?.diagnostics?.length) throw new Error(`planning authority not proven: ${report.authority.diagnostics.join(',')}`);
+  if (!Array.isArray(report.validatorContracts)) throw new Error('missing validator contract registry');
+  const validatorContracts = new Map<string, any>();
+  for (const contract of report.validatorContracts) {
+    if (!/^atm\.taskCardValidator\/ATM-GOV-\d+\/([0-9a-f]{64})$/.test(String(contract?.contractId ?? ''))
+      || !/^ATM-GOV-\d+$/.test(String(contract?.taskId ?? ''))
+      || typeof contract?.command !== 'string'
+      || !/^sha256:[0-9a-f]{64}$/.test(String(contract?.taskCardDigest ?? ''))
+      || typeof contract?.taskCardPath !== 'string') throw new Error('invalid validator contract');
+    if (validatorContracts.has(contract.contractId)) throw new Error(`duplicate validator contract ${contract.contractId}`);
+    if (!existsSync(contract.taskCardPath) || digestText(readFileSync(contract.taskCardPath, 'utf8')) !== contract.taskCardDigest) {
+      throw new Error(`validator contract task card drift ${contract.contractId}`);
+    }
+    validatorContracts.set(contract.contractId, contract);
+  }
   if (report.rows.length !== parsed.rows.length || report.expectedItemCount !== parsed.rows.length) throw new Error('runbook item count drift');
   if (new Set(report.rows.map((row: any) => row.itemId)).size !== report.rows.length) throw new Error('duplicate item IDs');
   for (const expected of parsed.rows) {
@@ -22,6 +36,10 @@ export function validateReport(report: any, source: string): void {
       if (!tuple.artifactPaths?.length || tuple.artifactPaths.some((path: string) => !existsSync(path))) throw new Error(`missing durable artifact ${row.itemId}`);
       if (!/^[0-9a-f]{40}$/.test(tuple.sourceCommit)) throw new Error(`invalid source commit ${row.itemId}`);
       if (!row.coverageOwners?.includes(tuple.evidenceOwner)) throw new Error(`foreign evidence owner ${row.itemId}:${String(tuple.evidenceOwner)}`);
+      const contract = validatorContracts.get(tuple.validatorContractId);
+      if (!contract || contract.taskId !== tuple.evidenceOwner || contract.command !== tuple.command) {
+        throw new Error(`unregistered validator contract ${row.itemId}:${String(tuple.validatorContractId)}`);
+      }
       try {
         const key = `${tuple.sourceCommit}:${report.authority.targetHead}`;
         if (!ancestry.has(key)) {

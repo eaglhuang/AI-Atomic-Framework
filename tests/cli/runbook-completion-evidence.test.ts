@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT } from '../../scripts/compile-runbook-completion-evidence.ts';
@@ -34,23 +35,33 @@ const ownedTuple = {
   artifactPaths: ['scripts/compile-runbook-completion-evidence.ts'],
   observedAt: '2026-08-13T00:00:00.000Z',
   sourceCommit: liveHead,
-  evidenceOwner: 'ATM-GOV-TEST-A'
+  evidenceOwner: 'ATM-GOV-9999',
+  validatorContractId: 'atm.taskCardValidator/ATM-GOV-9999/' + 'c'.repeat(64)
+};
+const testContract = {
+  contractId: ownedTuple.validatorContractId,
+  taskId: 'ATM-GOV-9999',
+  taskCardPath: 'scripts/compile-runbook-completion-evidence.ts',
+  taskCardDigest: `sha256:${createHash('sha256').update(readFileSync('scripts/compile-runbook-completion-evidence.ts', 'utf8')).digest('hex')}`,
+  command: ownedTuple.command
 };
 const foreignOwner = structuredClone(report);
 foreignOwner.authority.targetHead = liveHead;
+foreignOwner.validatorContracts = [testContract];
 foreignOwner.rows[0].status = 'proven';
-foreignOwner.rows[0].coverageOwners = ['ATM-GOV-TEST-B'];
+foreignOwner.rows[0].coverageOwners = ['ATM-GOV-9998'];
 foreignOwner.rows[0].evidence = [ownedTuple];
 foreignOwner.unresolvedIds = foreignOwner.unresolvedIds.filter((id: string) => id !== foreignOwner.rows[0].itemId);
 assert.throws(() => validateReport(foreignOwner, source), /foreign evidence owner/);
 
 const reusedWaveReceipt = structuredClone(report);
 reusedWaveReceipt.authority.targetHead = liveHead;
+reusedWaveReceipt.validatorContracts = [testContract];
 reusedWaveReceipt.rows[0].status = 'proven';
-reusedWaveReceipt.rows[0].coverageOwners = ['ATM-GOV-TEST-A'];
+reusedWaveReceipt.rows[0].coverageOwners = ['ATM-GOV-9999'];
 reusedWaveReceipt.rows[0].evidence = [ownedTuple];
 reusedWaveReceipt.waveExits[0].status = 'proven';
-reusedWaveReceipt.waveExits[0].coverageOwners = ['ATM-GOV-TEST-A'];
+reusedWaveReceipt.waveExits[0].coverageOwners = ['ATM-GOV-9999'];
 reusedWaveReceipt.waveExits[0].evidence = [ownedTuple];
 reusedWaveReceipt.unresolvedIds = reusedWaveReceipt.unresolvedIds.filter((id: string) => ![reusedWaveReceipt.rows[0].itemId, reusedWaveReceipt.waveExits[0].itemId].includes(id));
 assert.throws(() => validateReport(reusedWaveReceipt, source), /wave exit reuses basis evidence/);

@@ -10,8 +10,9 @@ export const DEFAULT_PLANNING_ROOT = process.env.ATM_PLANNING_REPO_ROOT
 export const DEFAULT_OUTPUT = resolve('docs/reports/plan-3x-4x-runbook-completion-evidence.json');
 export const DEFAULT_CERTIFICATE = resolve('docs/reports/plan-3x-4x-independent-certificate.json');
 
-type EvidenceTuple = { command: string; exitCode: number; outputDigest: string; artifactPaths: string[]; observedAt: string; sourceCommit: string; evidenceOwner: string };
-type CompletionRow = { itemId: string; sourceLine: number; section: string; wave: string | null; requirement: string; requirementDigest: string; status: 'proven' | 'unproven'; evidence: EvidenceTuple[]; diagnostics: string[]; coverageOwners?: string[] };
+type ValidatorContract = { contractId: string; taskId: string; taskCardPath: string; taskCardDigest: string; command: string };
+type EvidenceTuple = { command: string; exitCode: number; outputDigest: string; artifactPaths: string[]; observedAt: string; sourceCommit: string; evidenceOwner: string; validatorContractId?: string };
+type CompletionRow = { itemId: string; sourceLine: number; section: string; wave: string | null; requirement: string; requirementDigest: string; status: 'proven' | 'unproven'; evidence: EvidenceTuple[]; diagnostics: string[]; coverageOwners?: string[]; validatorContractIds?: string[] };
 
 export const digestText = (value: string) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
 
@@ -45,7 +46,7 @@ const NON_SEMANTIC_COMMANDS = new Set(['npm run typecheck', 'npm run validate:cl
 const ancestryCache = new Map<string, boolean>();
 const evidenceCache = new Map<string, EvidenceTuple[]>();
 
-type CardContract = { taskId: string; wave: string | null; phase: string; validators: string[] };
+type CardContract = { taskId: string; wave: string | null; phase: string; validators: ValidatorContract[] };
 
 function discoverCardContracts(runbookSource: string): CardContract[] {
   const taskDir = resolve(DEFAULT_PLANNING_ROOT, dirname(RUNBOOK_RELATIVE_PATH), 'tasks');
@@ -58,7 +59,18 @@ function discoverCardContracts(runbookSource: string): CardContract[] {
     const phase = /^\s*phaseOwner:\s*(\S+)/m.exec(source)?.[1] ?? '';
     const waveNumber = /wave-(\d+)/i.exec(phase)?.[1];
     const block = /^validators:\s*\r?\n((?:\s+- .+\r?\n)+)/m.exec(source)?.[1] ?? '';
-    const validators = [...block.matchAll(/^\s+-\s+(.+)$/gm)].map((match) => match[1].trim());
+    const taskCardPath = resolve(taskDir, name);
+    const taskCardDigest = digestText(source);
+    const validators = [...block.matchAll(/^\s+-\s+(.+)$/gm)].map((match) => {
+      const command = match[1].trim();
+      return {
+        contractId: `atm.taskCardValidator/${taskId}/${digestText(command).slice('sha256:'.length)}`,
+        taskId,
+        taskCardPath,
+        taskCardDigest,
+        command
+      };
+    });
     return [{ taskId, wave: waveNumber ? `Wave ${Number(waveNumber)}` : null, phase, validators }];
   });
 }
@@ -107,7 +119,7 @@ function isAncestor(sourceCommit: string, targetHead: string): boolean {
 
 function evidenceForContracts(contracts: CardContract[], targetHead: string): EvidenceTuple[] {
   const tuples: EvidenceTuple[] = [];
-  const expectedCommands = new Set(contracts.flatMap((contract) => contract.validators));
+  const expectedCommands = new Set(contracts.flatMap((contract) => contract.validators.map((validator) => validator.command)));
   const expectedOwners = new Set(contracts.map((contract) => contract.taskId));
   const cacheKey = `${targetHead}:${[...expectedCommands].sort().join('\u0000')}`;
   const cached = evidenceCache.get(cacheKey);
@@ -127,7 +139,9 @@ function evidenceForContracts(contracts: CardContract[], targetHead: string): Ev
         if (!outputDigest) continue;
         const sourceCommit = run.sourceCommit ?? 'unknown';
         if (!/^[0-9a-f]{40}$/.test(sourceCommit) || !isAncestor(sourceCommit, targetHead)) continue;
-        tuples.push({ command: run.command, exitCode: run.exitCode, outputDigest, artifactPaths: [evidencePath, ...(entry.artifactPaths ?? [])], observedAt: run.finishedAt ?? entry.createdAt, sourceCommit, evidenceOwner: owner });
+        const validator = contracts.find((contract) => contract.taskId === owner)?.validators.find((candidate) => candidate.command === run.command);
+        if (!validator) continue;
+        tuples.push({ command: run.command, exitCode: run.exitCode, outputDigest, artifactPaths: [evidencePath, ...(entry.artifactPaths ?? [])], observedAt: run.finishedAt ?? entry.createdAt, sourceCommit, evidenceOwner: owner, validatorContractId: validator.contractId });
       }
     }
   }
@@ -140,7 +154,8 @@ export function evidenceTupleKey(tuple: EvidenceTuple): string {
 }
 
 export function evidenceBelongsToContract(tuple: EvidenceTuple, contract: CardContract): boolean {
-  return tuple.evidenceOwner === contract.taskId && contract.validators.includes(tuple.command);
+  return tuple.evidenceOwner === contract.taskId
+    && contract.validators.some((validator) => validator.command === tuple.command && validator.contractId === tuple.validatorContractId);
 }
 
 function hydrate(row: CompletionRow, contracts: CardContract[], targetHead: string): CompletionRow {
@@ -148,7 +163,14 @@ function hydrate(row: CompletionRow, contracts: CardContract[], targetHead: stri
   const owners = contracts.map((contract) => contract.taskId);
   const uncoveredOwners = contracts.filter((contract) => evidenceForContracts([contract], targetHead).length === 0).map((contract) => contract.taskId);
   const proven = contracts.length > 0 && uncoveredOwners.length === 0;
-  return { ...row, coverageOwners: owners, evidence, status: proven ? 'proven' : 'unproven', diagnostics: proven ? [] : [`missing-command-backed-evidence:${uncoveredOwners.join(',') || 'no-contract'}`] };
+  return {
+    ...row,
+    coverageOwners: owners,
+    validatorContractIds: [...new Set(evidence.map((tuple) => tuple.validatorContractId).filter((value): value is string => Boolean(value)))],
+    evidence,
+    status: proven ? 'proven' : 'unproven',
+    diagnostics: proven ? [] : [`missing-command-backed-evidence:${uncoveredOwners.join(',') || 'no-contract'}`]
+  };
 }
 
 function observeFinalCertificate(): { proven: boolean; diagnostics: string[] } {
@@ -221,7 +243,9 @@ export function compileRunbookCompletion(
   return {
     schemaId: 'atm.runbookCompletionEvidence.v1', specVersion: '0.1.0', generatedAt,
     authority: { planningPath: RUNBOOK_RELATIVE_PATH, planningHead, targetHead, originMain, sourceDigest: digestText(source), diagnostics: authorityDiagnostics },
-    expectedItemCount: parsed.rows.length, rows: parsed.rows, waveExits: parsed.waveExits,
+    expectedItemCount: parsed.rows.length,
+    validatorContracts: contracts.flatMap((contract) => contract.validators),
+    rows: parsed.rows, waveExits: parsed.waveExits,
     unresolvedIds: unresolved, deferredIds: [], unknownIds: unknown, overallVerdict: unresolved.length ? 'not-complete' : 'complete'
   };
 }
