@@ -13,6 +13,12 @@ import {
 import { createFrameworkModeStatus, runFrameworkMode } from '../closure-packet-schema.ts';
 import { createLocalGovernanceAdapter } from '../../../../../plugin-governance-local/src/index.ts';
 
+// This standalone fixture creates its own actors, tasks, and lanes.  Do not let
+// the invoking captain's live session change which fixture lock is resolved.
+delete process.env.ATM_ACTOR_ID;
+delete process.env.ATM_TASK_ID;
+delete process.env.ATM_LANE_SESSION_ID;
+
 function tempRoot(): string {
   const root = mkdtempSync(path.join(os.tmpdir(), 'atm-temp-claim-'));
   mkdirSync(path.join(root, '.atm', 'runtime', 'locks'), { recursive: true });

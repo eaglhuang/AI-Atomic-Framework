@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0372",
-  "updatedAt": "2026-08-14T13:04:02.076Z",
+  "updatedAt": "2026-08-14T13:19:31.888Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -150,6 +150,103 @@
             "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814121802-codex-captain-recovery-2683c73c43\""
           },
           "reason": "Predecessor lease expired; runner publication and scope repair reproduce the card's direction-lock authority split-brain."
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: $env:ATM_ACTOR_ID=$null; $env:ATM_TASK_ID=$null; $env:ATM_LANE_SESSION_ID=$null; node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain-recovery",
+      "sessionId": "session-20260814130401-codex-captain-recovery-ATM-GOV-0372-60f973745c",
+      "createdAt": "2026-08-14T13:19:31.888Z",
+      "details": {
+        "actorId": "codex-captain-recovery",
+        "sessionId": "session-20260814130401-codex-captain-recovery-ATM-GOV-0372-60f973745c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-direction-authority",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "$env:ATM_ACTOR_ID=$null; $env:ATM_TASK_ID=$null; $env:ATM_LANE_SESSION_ID=$null; node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-14T13:19:30.532Z",
+            "finishedAt": "2026-08-14T13:19:31.887Z",
+            "durationMs": 1355,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "c4d7f525a5615aeda4500829f135e12443aa1e5f",
+            "cacheKey": "sha256:91bb3d5c1432abf08d3c3a5320009427386a63b2801430d07673dc94347900af",
+            "generatedAt": "2026-08-14T13:19:31.887Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:91bb3d5c1432abf08d3c3a5320009427386a63b2801430d07673dc94347900af",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-14T13:19:31.887Z",
+              "observedAt": "2026-08-14T13:19:31.887Z",
+              "startedAt": "2026-08-14T13:19:30.532Z",
+              "finishedAt": "2026-08-14T13:19:31.887Z",
+              "durationMs": 1355,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:3ad37eb0a94ae0507f9421a31c8971682eb7147428787c15a3338479c5e21734",
+              "outputDigest": "sha256:73b4db795a7055d8fd5aadf94d2963333f0d33cd9a13d51041d00710dad53e5b",
+              "cache": {
+                "key": "sha256:91bb3d5c1432abf08d3c3a5320009427386a63b2801430d07673dc94347900af",
+                "hit": false
+              },
+              "extensions": {
+                "command": "$env:ATM_ACTOR_ID=$null; $env:ATM_TASK_ID=$null; $env:ATM_LANE_SESSION_ID=$null; node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "c4d7f525a5615aeda4500829f135e12443aa1e5f",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:2d1733e85c94c8715d7ab6bef8c86779f36c73cfdd12608ff73ae28d72784231",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
         }
       }
     }

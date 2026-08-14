@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-70f21b86c6f5",
+  "recordedAt": "2026-08-14T13:09:34.838Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0372",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0372 --message \"fix(lock): preserve direction authority across same-owner refresh\n\nATM-Work-Admission: wat-1d2eb6d00ad17fc3 sha256:1d2eb6d00ad17fc3e92df286d1d492924bd0720dd58ef5ec105fd041e53f15eb\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0372-a295f19847",
+  "reason": "Frozen pre-commit hook fails on unrelated duplicate imports; task-scoped authority repair independently validated.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T13-09-31-851Z-EMG-ATM-GOV-0372-a295f19847.json",
+  "parentEventId": "POA-e2b2c6c47b6a",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}
