@@ -253,6 +253,7 @@ function runFreezeCurrentHead(): void {
   const receipts = commands.map((entry) => captureCommand(entry.id, entry.command, entry.commandCwd ?? cwd, entry.timeoutMs ?? 5 * 60 * 1000));
   const rescueReceipt = receipts.find((receipt) => receipt.id === 'worktree-registry');
   const rescueWorktrees = parseRescueWorktrees(rescueReceipt?.stdout ?? '');
+  const rescueWorktreeAvailability = rescueWorktrees.length > 0 ? 'observed' : 'unavailable';
   const currentHeads = Object.fromEntries(receipts
     .filter((receipt) => ['target-head', 'origin-main-head', 'planning-head'].includes(receipt.id))
     .map((receipt) => [receipt.id, receipt.stdout.trim() || null]));
@@ -268,7 +269,11 @@ function runFreezeCurrentHead(): void {
       planningHead: currentHeads['planning-head'],
       planningRoot,
       sourceDigestStatus: 'present',
-      sourceDigestReason: 'Every current-head census and validator result is embedded as a raw, hashed receipt in commandReceipts.'
+      sourceDigestReason: 'Every current-head census and validator result is embedded as a raw, hashed receipt in commandReceipts.',
+      rescueWorktreeAvailability,
+      rescueWorktreeReason: rescueWorktreeAvailability === 'observed'
+        ? 'Current Git worktree registry contains rescue entries, each retained with its observed HEAD.'
+        : 'Current Git worktree registry contains no ATM-rescue-* entries; the required historical 23-entry evidence-hold manifest is unavailable from this live source and remains a Wave 0 blocker.'
     },
     commandReceipts: receipts,
     rescueWorktrees,
@@ -329,7 +334,8 @@ function renderFreezeMarkdown(freeze: FalseGreenEvidenceFreeze): string {
     `- Verdict: **${freeze.verdict}**`,
     `- Window: ${freeze.receiptWindow.startedAt} → ${freeze.receiptWindow.finishedAt}`,
     `- Raw receipt count: ${freeze.commandReceipts.length}`,
-    `- Rescue worktrees held: ${freeze.rescueWorktrees.length}`,
+    `- Rescue worktrees: **${String(freeze.scope.rescueWorktreeAvailability ?? 'unknown')}** (${freeze.rescueWorktrees.length} observed)`,
+    `- Rescue worktree source: ${String(freeze.scope.rescueWorktreeReason ?? 'unknown')}`,
     '',
     '## Command receipts',
     '',

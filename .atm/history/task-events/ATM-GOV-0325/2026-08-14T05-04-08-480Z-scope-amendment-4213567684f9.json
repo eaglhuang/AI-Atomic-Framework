@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T05-04-08-480Z-scope-amendment-4213567684f9",
+  "taskId": "ATM-GOV-0325",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-recovery",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0325.json",
+  "taskSha256": "sha256:b0ee754ebf082b71283c034aefd38059fffcfd19926ef0fd0ba7bbeec7de2d9b",
+  "createdAt": "2026-08-14T05:04:08.480Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0325 --actor codex-captain-recovery --add \"scripts/diagnose-plan3-evidence-closure.ts,scripts/analyze-captain-parallel-ledger.ts,docs/reports/plan-3x-4x-false-green-evidence-freeze.json,docs/reports/plan-3x-4x-false-green-evidence-freeze.md\" --reason \"Takeover restored a ledger-only direction lock; task-card-declared Wave 0 collector and freeze artifacts require the canonical scope lock for observed-data repair.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Takeover restored a ledger-only direction lock; task-card-declared Wave 0 collector and freeze artifacts require the canonical scope lock for observed-data repair."
+  }
+}

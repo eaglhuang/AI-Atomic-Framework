@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0325",
-  "updatedAt": "2026-08-09T08:31:45.841Z",
+  "updatedAt": "2026-08-14T05:03:33.835Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -484,6 +484,58 @@
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0325: codex-gpt-5.4-mini -> codex-captain-recovery.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0325.json"
+      ],
+      "producedBy": "codex-captain-recovery",
+      "createdAt": "2026-08-14T05:03:33.835Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "codex-gpt-5.4-mini",
+          "leaseId": "lease-c9e2d80bc83f",
+          "claimedAt": "2026-08-13T23:24:11.100Z",
+          "heartbeatAt": "2026-08-13T23:24:11.100Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0325.json",
+            "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+            "docs/reports/plan-3x-4x-false-green-evidence-freeze.md",
+            "scripts/analyze-captain-parallel-ledger.ts",
+            "scripts/diagnose-plan3-evidence-closure.ts"
+          ],
+          "state": "active",
+          "laneSession": {
+            "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
+            "status": "adopted",
+            "source": "env",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5\""
+          }
+        },
+        "newClaim": {
+          "actorId": "codex-captain-recovery",
+          "leaseId": "lease-c679500d1126",
+          "claimedAt": "2026-08-14T05:03:33.586Z",
+          "heartbeatAt": "2026-08-14T05:03:33.586Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0325.json"
+          ],
+          "state": "active",
+          "intent": "write",
+          "laneSession": {
+            "laneSessionId": "lane-20260814033931-codex-captain-recovery-43b6225d2c",
+            "status": "adopted",
+            "source": "env",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814033931-codex-captain-recovery-43b6225d2c\""
+          },
+          "reason": "Expired predecessor lease on Wave 0 evidence-freeze owner; preserve retained task-scoped WIP and rebuild current baseline receipts."
         }
       }
     }
