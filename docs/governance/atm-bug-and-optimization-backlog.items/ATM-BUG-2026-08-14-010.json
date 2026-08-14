@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-14-010",
+  "date": "2026-08-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P0",
+  "status": "Open",
+  "area": "Framework temporary claim / governed commit facade",
+  "finding": "framework-mode claim creates a valid path lock but no commit-addressable task record. The normal governed commit facade therefore rejects the minted temporary task id with ATM_TASK_NOT_FOUND, even when the source change is fully within the temporary lock.",
+  "expectedBehavior": "Every supported temporary write capability must be consumable by the normal governed commit path, or framework-mode must expose an equivalently governed temporary-commit facade. A valid temporary claim must not require raw Git or a hook-bypass emergency lease merely to persist its own locked files.",
+  "evidenceOrRepro": "2026-08-14 P0 pre-commit latency quickfix: framework-mode claim created ATM-FRAMEWORK-TEMP-codex-perf-hotfix for packages/cli/src/commands/hook/pre-commit/implementation.ts. node atm.mjs git commit --task ATM-FRAMEWORK-TEMP-codex-perf-hotfix was rejected with ATM_TASK_NOT_FOUND because no matching .atm/history/tasks record existed. The owner-authorized, path-bounded emergency commit 7e7573c5149a2f83e84b9424aee2ea4c00216718 was the only safe persistence route.",
+  "followUp": "Implement a capability-bound temporary commit transaction that shares the normal sealed-bundle, attribution, receipt, and cleanup semantics without requiring a durable planning task. Add an end-to-end regression: temporary claim -> governed temporary commit -> exact path verification -> lock release, with no emergency permission."
+}
