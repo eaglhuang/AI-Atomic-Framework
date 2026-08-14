@@ -74,7 +74,9 @@
     "release/atm-root-drop/tests/cli/runbook-completion-evidence.test.ts",
     "release/atm-root-drop/fixtures/charter/default-charter.json",
     "release/atm-root-drop/templates/root-drop/.atm/charter/charter-invariants.template.json",
-    "release/atm-root-drop/templates/skills/atm-dispatch.skill.md"
+    "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
+    "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+    "packages/cli/src/commands/tasks/historical-delivery.ts"
   ],
   "validators": [
     "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
@@ -223,8 +225,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T09-25-40-680Z-renew-31dd3c42fc95",
-  "lastTransitionAt": "2026-08-14T09:25:40.680Z",
+  "lastTransitionId": "2026-08-14T09-36-21-389Z-renew-9740254ea2f4",
+  "lastTransitionAt": "2026-08-14T09:36:21.389Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-14T02:49:03.878Z",
   "promotedAt": "2026-08-14T02:49:03.882Z",
@@ -232,7 +234,7 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-f79e68a375a3",
     "claimedAt": "2026-08-14T03:27:18.541Z",
-    "heartbeatAt": "2026-08-14T09:25:39.978Z",
+    "heartbeatAt": "2026-08-14T09:36:20.749Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/charter/atomic-charter.md",
@@ -252,6 +254,8 @@
       "packages/cli/src/commands/command-specs/cleanup.spec.ts",
       "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
       "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+      "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
       "packages/core/src/governance/operation-cleanup-contract.test.ts",
       "packages/core/src/governance/operation-cleanup-contract.ts",
       "packages/core/src/index.ts",
@@ -296,20 +300,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-fe878e3c95ab6215",
-    "ticketDigest": "sha256:fe878e3c95ab6215521363f58b96f74d53c1529fc27dad82075c9b7bc2e927a0",
+    "ticketId": "wat-7e030d87368574d0",
+    "ticketDigest": "sha256:7e030d87368574d098f75fb27013f785a13f40f94e43fa9543920f1c56515b34",
     "taskId": "ATM-GOV-0363",
     "origin": "claim",
     "actorId": "codex-captain-recovery",
     "laneSessionId": "lane-20260814032718-codex-captain-recovery-f3a77231a2",
     "claimGeneration": "lease-f79e68a375a3",
-    "issuedAt": "2026-08-14T09:25:39.978Z",
-    "expiresAt": "2026-08-14T09:55:39.978Z",
-    "scopeDigest": "sha256:abe86fdf55c3b721ad72bb45e696019911d01a5f35611a520dc936075adb7195",
+    "issuedAt": "2026-08-14T09:36:20.749Z",
+    "expiresAt": "2026-08-14T10:06:20.749Z",
+    "scopeDigest": "sha256:dae00e7a903abfe4e8f5d11edd70c6991ea8723747578688b941664938d8835c",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T09:25:39.978Z"
+      "selectedAt": "2026-08-14T09:36:20.749Z"
     },
     "grants": [
       {
@@ -318,7 +322,6 @@
           ".atm/charter/atomic-charter.md",
           ".atm/charter/charter-invariants.json",
           ".atm/history/evidence/ATM-GOV-0363.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0363/**",
           ".atm/history/tasks/ATM-GOV-0363.json",
           "docs/governance/transient-artifact-lifecycle-charter.md",
@@ -333,6 +336,8 @@
           "packages/cli/src/commands/command-specs/cleanup.spec.ts",
           "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
           "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+          "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+          "packages/cli/src/commands/tasks/historical-delivery.ts",
           "packages/core/src/governance/operation-cleanup-contract.test.ts",
           "packages/core/src/governance/operation-cleanup-contract.ts",
           "packages/core/src/index.ts",
@@ -363,7 +368,7 @@
           "tests/cli-fixtures/help-snapshots/command-list.json",
           "tests/cli/transient-artifact-lifecycle.test.ts"
         ],
-        "digest": "sha256:901d85d2668ea3a4d6954edb46d6724e9ba80e1ced65203aa3fd1e9466ac5a77"
+        "digest": "sha256:39b87f1dd3ce9a98f07529acb18de5ee15b07a47f330f7df623d0ff0cd9ce8b9"
       },
       {
         "kind": "lifecycle-operation",
@@ -426,6 +431,8 @@
       "packages/cli/src/commands/command-specs/cleanup.spec.ts",
       "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
       "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+      "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
       "packages/core/src/governance/operation-cleanup-contract.test.ts",
       "packages/core/src/governance/operation-cleanup-contract.ts",
       "packages/core/src/index.ts",

@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0363",
-  "updatedAt": "2026-08-14T09:12:50.122Z",
+  "updatedAt": "2026-08-14T09:30:48.054Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
@@ -240,6 +240,22 @@
       "durationMs": 8150,
       "runnerKind": "dev-source",
       "sourceCommit": "91ca2fbad2646b293a1abea87e9d8ae4dfeaf8b9",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-transient-artifact-lifecycle.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c35d5f853b55e45c0eab0a60eddb165805e7b45f6bb94ad86a36c645e18b86a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:transient-artifact-lifecycle"
+      ],
+      "generatedAt": "2026-08-14T09:30:48.052Z",
+      "startedAt": "2026-08-14T09:30:47.470Z",
+      "finishedAt": "2026-08-14T09:30:48.052Z",
+      "durationMs": 582,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
       "cached": false
     }
   ],
