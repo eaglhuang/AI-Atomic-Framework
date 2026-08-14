@@ -460,6 +460,20 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
         })
       );
     }
+    const committedHead = readHeadCommit(input.cwd);
+    if (!committedHead) {
+      throw new CliError(ATM_COMMIT_ATTRIBUTION_MISMATCH, 'Post-commit attribution cannot resolve the committed HEAD.', {
+        exitCode: 1,
+        details: { surface: `${input.surface} post-commit tree`, actorId: input.actorId ?? null, taskId: input.taskId ?? null }
+      });
+    }
+    const committedProof = assertCommitAttribution({
+      sealed: bundle,
+      actual: readCommittedTreeEntries(input.cwd, committedHead),
+      surface: `${input.surface} post-commit tree`,
+      actorId: input.actorId,
+      taskId: input.taskId
+    });
     const liveIndexReconciliation = reconcileLiveIndexAfterCommitAttempt({
       cwd: input.cwd,
       snapshot: liveIndexSnapshot,
@@ -468,7 +482,7 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
     return {
       result,
       bundle,
-      proof,
+      proof: committedProof,
       sealSource: sealSource.kind,
       liveIndexSealDiagnostic: sealSource.kind === 'live-index-diagnostic' ? { reason: sealSource.reason } : null,
       liveIndexReconciliation
