@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0381",
   "title": "Verify sealed Wave 0 freeze artifact",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0380"
@@ -141,8 +141,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T08-51-55-711Z-renew-cd4be5de1a96",
-  "lastTransitionAt": "2026-08-14T08:51:55.711Z",
+  "lastTransitionId": "2026-08-14T08-53-52-633Z-close-a620d35f7880",
+  "lastTransitionAt": "2026-08-14T08:53:52.633Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-recovery",
   "reservedAt": "2026-08-14T08:18:56.084Z",
@@ -151,20 +151,21 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-50e2d7304a92",
     "claimedAt": "2026-08-14T08:18:56.093Z",
-    "heartbeatAt": "2026-08-14T08:51:54.942Z",
+    "heartbeatAt": "2026-08-14T08:53:52.630Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0381.json",
       "scripts/validate-false-green-evidence-freeze.ts",
       "tests/cli/validate-false-green-evidence-freeze.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260814081856-codex-captain-recovery-b2d8916f7b",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814081856-codex-captain-recovery-b2d8916f7b\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-14T08:18:56.093Z",
   "startedByActor": "codex-captain-recovery",
@@ -261,5 +262,9 @@
     "sessionId": "session-20260814081856-codex-captain-recovery-ATM-GOV-0381-8c1cefb63a",
     "createdAt": "2026-08-14T08:51:55.430Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-14T08:53:52.630Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814081856-codex-captain-recovery-ATM-GOV-0381-8c1cefb63a",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0381.closure-packet.json"
 }

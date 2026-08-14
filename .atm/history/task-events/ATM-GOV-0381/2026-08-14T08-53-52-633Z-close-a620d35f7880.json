@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T08-53-52-633Z-close-a620d35f7880",
+  "taskId": "ATM-GOV-0381",
+  "action": "close",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814081856-codex-captain-recovery-ATM-GOV-0381-8c1cefb63a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0381.json",
+  "taskSha256": "sha256:b8f75e51c622563d4ae0dced0429cedb1491cccfdd041e7a719d0525c86a5986",
+  "createdAt": "2026-08-14T08:53:52.633Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0381 --actor codex-captain-recovery --status done --historical-delivery 63a9ca25f6993faa7ca7b6b12ab0bd7d2ee7fe7e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814081856-codex-captain-recovery-ATM-GOV-0381-8c1cefb63a",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0381.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/validate-false-green-evidence-freeze.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:false-green-evidence-freeze",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T08:53:52.622Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0381.*",
+        ".atm/history/task-events/ATM-GOV-0381/**",
+        ".atm/history/tasks/ATM-GOV-0381.json",
+        "scripts/validate-false-green-evidence-freeze.ts",
+        "tests/cli/validate-false-green-evidence-freeze.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-false-green-evidence-freeze.ts",
+        "tests/cli/validate-false-green-evidence-freeze.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
