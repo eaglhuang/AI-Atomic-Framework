@@ -104,7 +104,7 @@ withTaskScopedCommitIndex(
   ['packages/core/example.ts'],
   'validator',
   'ATM-GOV-0371',
-  (env) => execFileSync('git', ['commit', '-m', 'commit generated provenance'], { cwd: repo, env, stdio: 'ignore' }),
+  (env: NodeJS.ProcessEnv) => execFileSync('git', ['commit', '-m', 'commit generated provenance'], { cwd: repo, env, stdio: 'ignore' }),
   { kind: 'sealed-bundle', bundle: governedSeal },
 );
 const provenanceCommitFiles = execFileSync('git', ['show', '--format=', '--name-only', 'HEAD'], { cwd: repo, encoding: 'utf8' });
