@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0363",
-  "updatedAt": "2026-08-14T06:48:12.889Z",
+  "updatedAt": "2026-08-14T06:49:32.735Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
@@ -10,6 +10,7 @@
     "validate:charter",
     "validate:cli",
     "validate:git-head-evidence",
+    "validate:integration-adapter",
     "validate:skill-templates",
     "validate:transient-artifact-lifecycle"
   ],
@@ -141,6 +142,22 @@
       "durationMs": 54520,
       "runnerKind": "dev-source",
       "sourceCommit": "52f9349fdb30a4c86336308208fb3e27daeda964",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:integration-adapter",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19063ae4e9017f3439a6036376ae04f39f88e27233b4bfbda0a594b4f7348d3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:integration-adapter"
+      ],
+      "generatedAt": "2026-08-14T06:49:32.734Z",
+      "startedAt": "2026-08-14T06:49:22.427Z",
+      "finishedAt": "2026-08-14T06:49:32.734Z",
+      "durationMs": 10307,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1ce77de83fa4682cf3b2ffcb1e50aaed04f7eb73",
       "cached": false
     }
   ],
