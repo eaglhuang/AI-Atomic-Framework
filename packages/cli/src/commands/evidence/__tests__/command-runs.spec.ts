@@ -57,6 +57,26 @@ try {
     sourceCommit: null
   });
   assert.equal(frozenNormalized[0]?.runnerKind, 'frozen-runner');
+  assert.match(frozenNormalized[0]?.sourceCommit ?? '', /^[0-9a-f]{40}$/);
+
+  const explicitSourceCommit = 'f'.repeat(40);
+  const explicitNormalized = normalizeEvidenceCommandRuns({
+    cwd: process.cwd(),
+    inlineRun: { ...fileRuns[0]!, sourceCommit: explicitSourceCommit },
+    fileRuns: [],
+    runnerKind: 'frozen-runner',
+    sourceCommit: null
+  });
+  assert.equal(explicitNormalized[0]?.sourceCommit, explicitSourceCommit);
+
+  const externalNormalized = normalizeEvidenceCommandRuns({
+    cwd: process.cwd(),
+    inlineRun: null,
+    fileRuns,
+    runnerKind: 'external',
+    sourceCommit: null
+  });
+  assert.equal(externalNormalized[0]?.sourceCommit, undefined);
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }
