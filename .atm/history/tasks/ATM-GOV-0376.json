@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0376",
   "title": "Seal projection publication bundles for freshness validation",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0374",
@@ -162,8 +162,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T07-21-51-143Z-renew-e99a859606e0",
-  "lastTransitionAt": "2026-08-14T07:21:51.143Z",
+  "lastTransitionId": "2026-08-14T07-24-35-154Z-close-06573345328c",
+  "lastTransitionAt": "2026-08-14T07:24:35.154Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-recovery",
   "reservedAt": "2026-08-14T07:17:31.838Z",
@@ -172,7 +172,7 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-a8831368856a",
     "claimedAt": "2026-08-14T07:17:31.846Z",
-    "heartbeatAt": "2026-08-14T07:21:50.448Z",
+    "heartbeatAt": "2026-08-14T07:24:35.152Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0376.json",
@@ -180,13 +180,14 @@
       "scripts/compile-runbook-completion-evidence.ts",
       "tests/cli/runbook-completion-evidence.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260814071732-codex-captain-recovery-f93daaff94",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814071732-codex-captain-recovery-f93daaff94\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-14T07:17:31.846Z",
   "startedByActor": "codex-captain-recovery",
@@ -284,5 +285,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  }
+  },
+  "closedAt": "2026-08-14T07:24:35.152Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814071731-codex-captain-recovery-ATM-GOV-0376-6f3393c76d",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0376.closure-packet.json"
 }
