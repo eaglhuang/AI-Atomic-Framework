@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { isTombstone } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
 import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.ts';
 
 const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-foreign-residue-'));
@@ -176,4 +177,31 @@ const narrowedBundle = resolveTaskScopedCommitBundle({
 assert.ok(!narrowedBundle.stageFiles.includes('src/declared-but-unclaimed.ts'));
 assert.ok(!narrowedBundle.commitFiles.includes('src/declared-but-unclaimed.ts'));
 assert.ok(narrowedBundle.skippedExternalDirtyFiles.includes('src/declared-but-unclaimed.ts'));
+
+// Auto-stage must express a task-owned worktree deletion in the same sealed
+// candidate that the commit transaction consumes.  Otherwise a staged path can
+// disappear between candidate reporting and the actual commit tree.
+const deletePath = path.join(cwd, 'src', 'delete-me.ts');
+writeFileSync(deletePath, 'export const removeMe = true;\n');
+execFileSync('git', ['add', '--', 'src/delete-me.ts'], { cwd });
+execFileSync('git', ['commit', '-qm', 'add deletion fixture'], { cwd });
+rmSync(deletePath);
+const deletionTask = JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-CURRENT.json'), 'utf8'));
+deletionTask.scopePaths.push('src/delete-me.ts');
+deletionTask.claim.files.push('src/delete-me.ts');
+const deletionBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: 'TASK-CURRENT',
+  actorId: 'test-actor',
+  taskDocument: deletionTask,
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.ok(deletionBundle.stageFiles.includes('src/delete-me.ts'));
+assert.ok(isTombstone(deletionBundle.sealedBundle.entries.find((entry: { path: string }) => entry.path === 'src/delete-me.ts')!), 'auto-staged deletion must be sealed as a tombstone');
 console.log('commit-bundle-resolution: foreign released residue preserved');

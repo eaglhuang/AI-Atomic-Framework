@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-1120e39ab8c1",
+  "recordedAt": "2026-08-14T01:21:55.177Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0371",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0371 --message \"build(release): complete runner output reconciliation\n\nATM-Work-Admission: wat-269e5fc6b68e562f sha256:269e5fc6b68e562fa358d667579e0541da3521a94877f30c29885fbf2e304520\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0371-63c2d7657b",
+  "reason": "Commit the exact verified candidate while normal hook misclassifies foreign released index residue.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T01-21-55-176Z-EMG-ATM-GOV-0371-63c2d7657b.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

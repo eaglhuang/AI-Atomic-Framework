@@ -127,10 +127,14 @@ function readStagedDeletionEntries(input: {
   readonly cwd: string;
   readonly paths: readonly string[];
   readonly baseRef: string;
+  readonly env?: NodeJS.ProcessEnv;
+  readonly provenance?: SealedCommitEntryProvenance;
 }): readonly SealedCommitBundleEntry[] {
   const entries: SealedCommitBundleEntry[] = [];
   for (const line of splitLines(
-    runGitCommand(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths])
+    input.env
+      ? runGitCommandWithEnv(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths], input.env, [...QUIET_STDIO])
+      : runGitCommand(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths])
   )) {
     const match = line.match(RAW_DIFF_PATTERN);
     if (!match) continue;
@@ -138,7 +142,7 @@ function readStagedDeletionEntries(input: {
       path: normalizePath(match[6]),
       mode: match[1],
       blobId: '',
-      provenance: 'task-scope',
+      provenance: input.provenance ?? 'task-scope',
       disposition: 'deleted'
     });
   }
@@ -562,6 +566,15 @@ export function sealCommitBundleFromCandidateIndex(input: {
       blobId: match[2],
       provenance: 'governance-evidence'
     });
+  }
+  for (const entry of readStagedDeletionEntries({
+    cwd: input.cwd,
+    paths,
+    baseRef: 'HEAD',
+    env: input.env,
+    provenance: 'governance-evidence'
+  })) {
+    entries.push(entry);
   }
   return sealCommitBundle({ entries });
 }

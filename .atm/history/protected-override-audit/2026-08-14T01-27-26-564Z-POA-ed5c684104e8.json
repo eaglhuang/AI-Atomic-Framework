@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-ed5c684104e8",
+  "recordedAt": "2026-08-14T01:27:26.564Z",
+  "actorId": null,
+  "taskId": "ATM-GOV-0371",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\governance-optimization\\tasks\\ATM-GOV-0371-fail-closed-when-governed-commit-tree-diverges-from-sealed-candidate.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-ATM-GOV-0371-9fe6391c62",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T01-27-26-563Z-EMG-ATM-GOV-0371-9fe6391c62.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
