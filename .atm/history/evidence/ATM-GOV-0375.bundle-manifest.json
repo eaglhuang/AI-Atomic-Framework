@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0375",
+  "updatedAt": "2026-08-14T06:04:08.251Z",
+  "updatedBy": "codex-captain-recovery",
+  "freshValidationPasses": [
+    "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
+    "node --strip-types tests/cli/runbook-release-authority-review.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/runbook-release-authority-review.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:53428fd94a63c9159b5248e44fa4b2cea996db8f84e9e4241d9924fdb5ca3a6d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/runbook-release-authority-review.test.ts"
+      ],
+      "generatedAt": "2026-08-14T06:04:04.279Z",
+      "startedAt": "2026-08-14T06:04:03.827Z",
+      "finishedAt": "2026-08-14T06:04:04.279Z",
+      "durationMs": 452,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a19d3ec56e2cb7a2d7a3efe01369d6663f4b91fe",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:02dee56491bea558be4f566ebff30b004d0e76518e8f7a9dc26fd64285b791b3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/review-runbook-release-authority.ts --mode validate"
+      ],
+      "generatedAt": "2026-08-14T06:04:08.250Z",
+      "startedAt": "2026-08-14T06:04:06.034Z",
+      "finishedAt": "2026-08-14T06:04:08.250Z",
+      "durationMs": 2216,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a19d3ec56e2cb7a2d7a3efe01369d6663f4b91fe",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

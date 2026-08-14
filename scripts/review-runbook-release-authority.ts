@@ -208,12 +208,20 @@ export function compileReview(offline = false): RecordLike {
   return { ...unsigned, reviewDigest: stableDigest(unsigned) };
 }
 
+function outputPathFromArgs(): string {
+  const outputIndex = process.argv.indexOf('--output');
+  if (outputIndex < 0) return outputPath;
+  const value = process.argv[outputIndex + 1];
+  if (!value || value.startsWith('--')) throw new Error('--output requires a path');
+  return value;
+}
+
 function main(): void {
   const mode = process.argv.includes('--mode') ? process.argv[process.argv.indexOf('--mode') + 1] : 'validate';
   if (mode !== 'validate' && mode !== 'write') throw new Error(`unknown --mode ${String(mode)}; expected validate or write`);
   const report = compileReview(process.argv.includes('--offline'));
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
-  const absoluteOutput = path.join(root, outputPath);
+  const absoluteOutput = path.resolve(root, outputPathFromArgs());
   if (mode === 'write') { mkdirSync(path.dirname(absoluteOutput), { recursive: true }); writeFileSync(absoluteOutput, serialized, 'utf8'); }
   else if (!existsSync(absoluteOutput) || readFileSync(absoluteOutput, 'utf8') !== serialized) throw new Error('runbook release authority review is stale; rerun with --mode write');
   console.log(`[review-runbook-release-authority] ${report.verdict} findings=${report.findings.length} digest=${report.reviewDigest}`);

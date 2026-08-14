@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { inspectCompletion } from '../../scripts/review-runbook-release-authority.ts';
 
 const broken = '{"rows":[{"itemId":"RB-001","status":"proven"}],"waveExits":[{"itemId":"EXIT-01"}],';
@@ -18,9 +21,11 @@ assert.ok(duplicateInspection.findings.includes('rows-array-invalid'));
 assert.ok(duplicateInspection.findings.includes('wave-exits-array-invalid'));
 assert.ok(duplicateInspection.findings.includes('proven-without-evidence:RB-001'));
 
-execFileSync(process.execPath, ['--strip-types', 'scripts/review-runbook-release-authority.ts', '--mode', 'write', '--offline'], { stdio: 'pipe' });
-execFileSync(process.execPath, ['--strip-types', 'scripts/review-runbook-release-authority.ts', '--mode', 'validate', '--offline'], { stdio: 'pipe' });
-const report = JSON.parse(readFileSync('docs/reports/reviews/plan-3x-4x-runbook-release-review.json', 'utf8'));
+const temporaryOutput = join(mkdtempSync(join(tmpdir(), 'atm-release-review-')), 'review.json');
+const reviewArgs = ['--strip-types', 'scripts/review-runbook-release-authority.ts', '--offline', '--output', temporaryOutput];
+execFileSync(process.execPath, [...reviewArgs, '--mode', 'write'], { stdio: 'pipe' });
+execFileSync(process.execPath, [...reviewArgs, '--mode', 'validate'], { stdio: 'pipe' });
+const report = JSON.parse(readFileSync(temporaryOutput, 'utf8'));
 assert.equal(report.schemaId, 'atm.fourPlanIndependentReleaseReview.v1');
 assert.equal(report.verdict, 'not-proven');
 assert.equal(report.remote.error, 'remote-observation-disabled');

@@ -1,0 +1,279 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0375",
+  "title": "Make release-review validation replay the sealed projection snapshot",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 Write mode stamps a projection once; validate mode replays the committed projection timestamp only when every declared authority input is identical. Any changed input remains stale and requires write mode.",
+    "ACC-2 A focused regression proves delayed validation succeeds after write, while an altered input is rejected as stale."
+  ],
+  "deliverables": [
+    "scripts/review-runbook-release-authority.ts",
+    "tests/cli/runbook-release-authority-review.test.ts",
+    "docs/reports/reviews/plan-3x-4x-runbook-release-review.json"
+  ],
+  "scopePaths": [
+    "scripts/review-runbook-release-authority.ts",
+    "tests/cli/runbook-release-authority-review.test.ts",
+    "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+    ".atm/history/evidence/ATM-GOV-0375.*",
+    ".atm/history/task-events/ATM-GOV-0375/**",
+    ".atm/history/tasks/ATM-GOV-0375.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runbook-release-authority-review.test.ts",
+    "node --strip-types scripts/review-runbook-release-authority.ts --mode validate"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Accepting a changed completion report, runbook, target HEAD, or remote observation without regeneration.",
+    "Altering runbook row completion semantics."
+  ],
+  "nonGoals": [
+    "Making the release verdict proven."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the timestamp replay change and report regeneration together; do not relax stale detection for changed inputs.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.independent-certification",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0375-make-release-review-validation-replay-the-sealed-projection-snapshot.task.md",
+    "sectionTitle": "ATM-GOV-0375",
+    "headingLine": 64,
+    "hash": "f9f9210d57eafefd",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0375-make-release-review-validation-replay-the-sealed-projection-snapshot.task.md",
+      "planningCommitSha": "3d69b58f7b2b0a5600f6fde30618eab5e02ddc3a",
+      "contentDigest": "sha256:f9f9210d57eafefd2c9be525bafc7319a106f7f661bfb9d3775993013c94174f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T06:03:00.560Z"
+    }
+  },
+  "importedAt": "2026-08-14T06:03:00.560Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Release-review validation is stale solely because it regenerates a new timestamp instead of replaying its sealed projection snapshot."
+    ],
+    "softRelations": [
+      "ATM-GOV-0374"
+    ],
+    "changedPublicSeams": [
+      "atm.fourPlanIndependentReleaseReview.v1"
+    ],
+    "causalImpactEdges": [
+      "release-review-determinism",
+      "independent-release-verdict-freshness"
+    ],
+    "parallelFrontierInputs": [
+      "completion-projection",
+      "runbook-source",
+      "observed-remote-head"
+    ],
+    "validatorReferences": [
+      "runbook-release-authority-review"
+    ],
+    "phaseOwner": "wave-10-independent-final-certification"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0375_release_review_validate_replays_sealed_timestamp",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "release_review_validate_is_time_invariant_for_a_sealed_snapshot",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "release-review-determinism",
+        "independent-release-verdict-freshness"
+      ],
+      "expectedRedPredicate": "a projection written at one timestamp fails validation later despite unchanged declared inputs",
+      "contributionResourceKey": "four-plan-release-review-determinism",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.fourPlanIndependentReleaseReview.v1",
+      "resourceKey": "four-plan-release-review-determinism"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0375_release_review_validate_replays_sealed_timestamp"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T06-04-46-484Z-scope-amendment-d8d404ff8def",
+  "lastTransitionAt": "2026-08-14T06:04:46.484Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-recovery",
+  "reservedAt": "2026-08-14T06:03:03.612Z",
+  "promotedAt": "2026-08-14T06:03:03.616Z",
+  "claim": {
+    "actorId": "codex-captain-recovery",
+    "leaseId": "lease-0d50c82494e6",
+    "claimedAt": "2026-08-14T06:03:03.620Z",
+    "heartbeatAt": "2026-08-14T06:03:03.620Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0375.*",
+      ".atm/history/task-events/ATM-GOV-0375/**",
+      ".atm/history/tasks/ATM-GOV-0375.json",
+      "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+      "scripts/review-runbook-release-authority.ts",
+      "tests/cli/runbook-release-authority-review.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260814060303-codex-captain-recovery-f654786781",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814060303-codex-captain-recovery-f654786781\""
+    }
+  },
+  "startedAt": "2026-08-14T06:03:03.620Z",
+  "startedByActor": "codex-captain-recovery",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-f554e65b7a544aec",
+    "ticketDigest": "sha256:f554e65b7a544aec0969e8df75743aac72274e2d908145f9ad36b32e28048e8b",
+    "taskId": "ATM-GOV-0375",
+    "origin": "claim",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814060303-codex-captain-recovery-f654786781",
+    "claimGeneration": "lease-0d50c82494e6",
+    "issuedAt": "2026-08-14T06:03:03.620Z",
+    "expiresAt": "2026-08-14T06:33:03.620Z",
+    "scopeDigest": "sha256:a9b6bfd5d4cf9a3d2b50737733dd51161f11aa55f514079812d9e8a0dfc26728",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T06:03:03.620Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0375.*",
+          ".atm/history/task-events/ATM-GOV-0375/**",
+          ".atm/history/tasks/ATM-GOV-0375.json",
+          "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+          "scripts/review-runbook-release-authority.ts",
+          "tests/cli/runbook-release-authority-review.test.ts"
+        ],
+        "digest": "sha256:916ef7bf8ea77a9eb0f383ba6775eb798346fca5a8b429af66e32e4d5078bc3e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260814060303-codex-captain-recovery-ATM-GOV-0375-a0a15ce4ee",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0375",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0375.*",
+      ".atm/history/task-events/ATM-GOV-0375/**",
+      ".atm/history/tasks/ATM-GOV-0375.json",
+      "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+      "scripts/review-runbook-release-authority.ts",
+      "tests/cli/runbook-release-authority-review.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0375-make-release-review-validation-replay-the-sealed-projection-snapshot.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0375-make-release-review-validation-replay-the-sealed-projection-snapshot.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "a46fd46a0d0f1c50b87427334206348403330501a9012c196087ddbe79e1bf79",
+    "actorId": "codex-captain-recovery",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260814060303-codex-captain-recovery-f654786781",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814060303-codex-captain-recovery-f654786781\""
+    },
+    "createdAt": "2026-08-14T06:03:06.141Z",
+    "status": "active"
+  }
+}
