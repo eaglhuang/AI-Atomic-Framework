@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T12-04-25-901Z-repair-claim-cfff48752653",
+  "taskId": "ATM-GOV-0386",
+  "action": "repair-claim",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814104548-codex-captain-recovery-ATM-GOV-0386-081a1dcc86",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0386.json",
+  "taskSha256": "sha256:8fd642cfb8e61f8d046813f4ca9aa7a98c5f2fb86dd27fc505084beda78cdeb9",
+  "createdAt": "2026-08-14T12:04:25.901Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0386 --actor codex-captain-recovery --write --reason \"Repair expired same-actor claim and dangling locks before Wave 0 closeout.\" --json"
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0386",
+  "updatedAt": "2026-08-14T11:13:23.677Z",
+  "updatedBy": "codex-captain-recovery",
+  "freshValidationPasses": [
+    "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --output docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+    "validate:charter",
+    "validate:false-green-evidence-freeze",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-charter.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f95d46d7ade0e91ddc83ac61305664761c5da9c13323866ff16fb02d9cebfe6f",
+      "stderrSha256": "sha256:315f260be964d9ce6b13463662f301c3087c22c7cf5d86774ba928d5da18c005",
+      "validators": [
+        "validate:charter"
+      ],
+      "generatedAt": "2026-08-14T10:47:08.706Z",
+      "startedAt": "2026-08-14T10:47:08.303Z",
+      "finishedAt": "2026-08-14T10:47:08.706Z",
+      "durationMs": 403,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "da5eb5c10b0754e92112576ac1adfc9713f1a2fd",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-14T10:48:04.510Z",
+      "startedAt": "2026-08-14T10:47:17.153Z",
+      "finishedAt": "2026-08-14T10:48:04.510Z",
+      "durationMs": 47357,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "da5eb5c10b0754e92112576ac1adfc9713f1a2fd",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --output docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7336536f1de1f3b37ee7f51c0cef406039c28cefeb33dd9c195717f988c6e3d2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/diagnose-plan3-evidence-closure.ts --output docs/reports/plan-3x-4x-false-green-evidence-freeze.json"
+      ],
+      "generatedAt": "2026-08-14T10:57:19.159Z",
+      "startedAt": "2026-08-14T10:57:18.553Z",
+      "finishedAt": "2026-08-14T10:57:19.159Z",
+      "durationMs": 606,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "d4c8f05c1f194048be5041f708ab9e3770e86eac",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-false-green-evidence-freeze.ts --file docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:53f3e54ccbb129901a0134655088776e5deb54b681f62ea0258527dba083f962",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:false-green-evidence-freeze"
+      ],
+      "generatedAt": "2026-08-14T11:13:23.676Z",
+      "startedAt": "2026-08-14T11:13:23.414Z",
+      "finishedAt": "2026-08-14T11:13:23.676Z",
+      "durationMs": 262,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "6f70c7343504dc37bd50ed5146d7adc946fc4041",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
