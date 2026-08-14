@@ -1,0 +1,332 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0372",
+  "title": "Unify direction-lock authority snapshots for framework publication",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 A renewed or taken-over task has one canonical direction-lock authority snapshot that the framework temporary-claim binding consumes without reconstructing a separate rule.",
+    "ACC-2 With multiple active tasks for the same actor and lane, an explicit requested task with an exact live direction lock binds successfully; the implementation never selects a different task by iteration order.",
+    "ACC-3 Missing, expired, actor-mismatched, lane-mismatched, or ambiguous authority fails closed with an actionable recovery path; it cannot authorize runner publication.",
+    "ACC-4 Focused parity tests, `npm run typecheck`, and a command-backed reproduction show that ATM-GOV-0362 can bind its framework publication claim only after ACC-1 through ACC-3 hold."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+    "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+    "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+    ".atm/history/evidence/ATM-GOV-0372.*",
+    ".atm/history/task-events/ATM-GOV-0372/**",
+    ".atm/history/tasks/ATM-GOV-0372.json",
+    "packages/cli/src/commands/task-direction/active-locks.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the canonical snapshot adapter and its parity tests together; never restore divergent ledger-only/runtime-only readers.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-direction-authority",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.task-direction-authority-snapshot",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0372-unify-direction-lock-authority-snapshots-for-framework-publication.task.md",
+    "sectionTitle": "ATM-GOV-0372",
+    "headingLine": 78,
+    "hash": "5c1b3b7c678ee6df",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0372-unify-direction-lock-authority-snapshots-for-framework-publication.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:5c1b3b7c678ee6dff37c02ba63093a604bc6293d7f18fc0616d335868fafd001",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T02:17:31.169Z"
+    }
+  },
+  "importedAt": "2026-08-14T02:17:31.169Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "ATM-GOV-0362 delivery commit exists and its runner publication gate reproduces the task-binding failure."
+    ],
+    "softRelations": [
+      "ATM-GOV-0325",
+      "ATM-GOV-0362",
+      "ATM-BUG-2026-08-14-005"
+    ],
+    "changedPublicSeams": [
+      "atm.taskDirectionAuthoritySnapshot.v1",
+      "atm.frameworkTempClaimTaskBinding.v1"
+    ],
+    "causalImpactEdges": [
+      "renew-to-framework-claim-parity",
+      "takeover-to-framework-claim-parity",
+      "authority-snapshot-to-runner-publication"
+    ],
+    "parallelFrontierInputs": [
+      "task-ledger",
+      "task-direction-lock",
+      "lane-session",
+      "framework-temp-claim"
+    ],
+    "validatorReferences": [
+      "temp-claim",
+      "scope-lock-diagnostics"
+    ],
+    "phaseOwner": "wave-0-authority-reconciliation"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0372_exact_task_direction_authority_snapshot",
+      "targetGroupId": "test_group_plan4_foundation",
+      "semanticKey": "exact_live_task_direction_lock_binds_framework_claim_even_with_other_same_actor_lanes",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "renew-to-framework-claim-parity",
+        "authority-snapshot-to-runner-publication"
+      ],
+      "expectedRedPredicate": "a renewed exact task is rejected because a different same-actor task is chosen",
+      "contributionResourceKey": "task-direction-authority-snapshot",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.taskDirectionAuthoritySnapshot.v1",
+      "resourceKey": "task-direction-authority-snapshot"
+    },
+    {
+      "caseId": "test_atm_gov_0372_task_direction_snapshot_rejects_invalid_authority",
+      "targetGroupId": "test_group_plan4_foundation",
+      "semanticKey": "stale_or_mismatched_task_direction_authority_fails_closed",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "takeover-to-framework-claim-parity"
+      ],
+      "expectedRedPredicate": "stale_or_actor_lane_mismatched authority can bind a framework claim",
+      "contributionResourceKey": "task-direction-authority-snapshot",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.frameworkTempClaimTaskBinding.v1",
+      "resourceKey": "task-direction-authority-snapshot"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0372_exact_task_direction_authority_snapshot",
+    "test_atm_gov_0372_task_direction_snapshot_rejects_invalid_authority"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T02-26-03-863Z-renew-8a84d10b0e16",
+  "lastTransitionAt": "2026-08-14T02:26:03.863Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-14T02:17:34.586Z",
+  "promotedAt": "2026-08-14T02:17:34.590Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-73d92abf46f5",
+    "claimedAt": "2026-08-14T02:17:34.595Z",
+    "heartbeatAt": "2026-08-14T02:26:03.665Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0372.*",
+      ".atm/history/task-events/ATM-GOV-0372/**",
+      ".atm/history/tasks/ATM-GOV-0372.json",
+      "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/task-direction/active-locks.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5\""
+    }
+  },
+  "startedAt": "2026-08-14T02:17:34.595Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-f6edcb9230bed9ad",
+    "ticketDigest": "sha256:f6edcb9230bed9ad223225fb09389cd4514fca7ad2d6719cd6a547c002e3514e",
+    "taskId": "ATM-GOV-0372",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
+    "claimGeneration": "lease-73d92abf46f5",
+    "issuedAt": "2026-08-14T02:26:03.665Z",
+    "expiresAt": "2026-08-14T02:56:03.665Z",
+    "scopeDigest": "sha256:6836290ce7463a683ee27b5a6f0ce9ccbd4a7fc5f44f165e3604dd173b1f6b51",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T02:26:03.665Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0372.*",
+          ".atm/history/task-events/ATM-GOV-0372/**",
+          ".atm/history/tasks/ATM-GOV-0372.json",
+          "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+          "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+          "packages/cli/src/commands/task-direction.ts",
+          "packages/cli/src/commands/task-direction/active-locks.ts",
+          "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+        ],
+        "digest": "sha256:ffc0f16d54d6d3a1b3de7daa3b97e620f482ab273db460551de4c4fb03d38576"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260814021734-codex-gpt-5.4-mini-ATM-GOV-0372-cd61961da1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0372",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0372.*",
+      ".atm/history/task-events/ATM-GOV-0372/**",
+      ".atm/history/tasks/ATM-GOV-0372.json",
+      "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/task-direction/active-locks.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0372-unify-direction-lock-authority-snapshots-for-framework-publication.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0372-unify-direction-lock-authority-snapshots-for-framework-publication.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "48e9e0f1d5081fbed09248415a447e6e3b02a7acf414986e73e0f2839a26f584",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5\""
+    },
+    "createdAt": "2026-08-14T02:17:38.725Z",
+    "status": "active"
+  }
+}
