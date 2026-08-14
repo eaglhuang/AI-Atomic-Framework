@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0369",
+  "updatedAt": "2026-08-14T00:12:25.048Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1589b7874a904975a2a0aba6f8129a1d26c75a346ac06f56529d23097ac27155",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts"
+      ],
+      "generatedAt": "2026-08-14T00:12:22.854Z",
+      "startedAt": "2026-08-14T00:12:21.884Z",
+      "finishedAt": "2026-08-14T00:12:22.854Z",
+      "durationMs": 970,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:74e057e699c55ef4630de31cd9bb083058049e0f64b8ccd0560691cb4eb3d232",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts"
+      ],
+      "generatedAt": "2026-08-14T00:12:25.047Z",
+      "startedAt": "2026-08-14T00:12:24.716Z",
+      "finishedAt": "2026-08-14T00:12:25.047Z",
+      "durationMs": 331,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
