@@ -45,7 +45,7 @@ try {
   }));
   writeFileSync(path.join(publicationRoot, `.atm/runtime/locks/${taskId}.lock.json`), JSON.stringify({
     workItemId: taskId,
-    actorId: 'steward', lockedAt: new Date().toISOString(), heartbeatAt: new Date().toISOString(), ttlSeconds: 600, files: ['release/atm-onefile/atm.mjs']
+    actorId: 'steward', lockedAt: new Date().toISOString(), heartbeatAt: new Date().toISOString(), ttlSeconds: 600, files: ['release/atm-onefile/atm.mjs', 'packages/cli/dist/foreign.js']
   }));
   execFileSync('git', ['add', '.'], { cwd: publicationRoot, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'fixture'], { cwd: publicationRoot, stdio: 'ignore' });
@@ -53,7 +53,7 @@ try {
   writeFileSync(path.join(publicationRoot, 'packages/cli/dist/foreign.js'), 'foreign candidate\n');
   const snapshots = captureSealedRunnerPublicationSnapshot({ cwd: publicationRoot, stewardActorId: 'steward', buildTarget: 'full', publicationTaskId: taskId });
   assert.ok(!snapshots.scopedSnapshot.preexistingDirtyPaths.includes('release/atm-onefile/atm.mjs'), 'own publication surface must be excluded from scoped preservation');
-  assert.ok(snapshots.scopedSnapshot.preexistingDirtyPaths.includes('packages/cli/dist/foreign.js'), 'foreign generated output remains in the scoped preservation snapshot');
+  assert.ok(!snapshots.scopedSnapshot.preexistingDirtyPaths.includes('packages/cli/dist/foreign.js'), 'current producer publication-lock scope supplements task scope for generated outputs');
   assert.ok(snapshots.takeoverSnapshot.preexistingDirtyPaths.includes('release/atm-onefile/atm.mjs'), 'physical takeover snapshot must include current-task generated output');
   assert.ok(snapshots.takeoverSnapshot.preexistingDirtyPaths.includes('packages/cli/dist/foreign.js'), 'physical takeover snapshot must include foreign generated output');
   console.log('[sealed-runner-build] separates scoped preservation from physical takeover snapshots');

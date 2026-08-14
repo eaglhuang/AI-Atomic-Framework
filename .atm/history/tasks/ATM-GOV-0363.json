@@ -51,7 +51,9 @@
     "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
     "packages/cli/src/commands/command-specs.ts",
     "packages/cli/src/commands/command-specs/cleanup.spec.ts",
-    "tests/cli-fixtures/help-snapshots/command-list.json"
+    "tests/cli-fixtures/help-snapshots/command-list.json",
+    "scripts/run-sealed-runner-build.test.ts",
+    "scripts/sealed-runner-publication.ts"
   ],
   "validators": [
     "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
@@ -200,8 +202,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T06-24-29-768Z-renew-8b16553a7b36",
-  "lastTransitionAt": "2026-08-14T06:24:29.768Z",
+  "lastTransitionId": "2026-08-14T06-32-16-684Z-renew-31ee48b1de27",
+  "lastTransitionAt": "2026-08-14T06:32:16.684Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-14T02:49:03.878Z",
   "promotedAt": "2026-08-14T02:49:03.882Z",
@@ -209,7 +211,7 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-f79e68a375a3",
     "claimedAt": "2026-08-14T03:27:18.541Z",
-    "heartbeatAt": "2026-08-14T06:24:29.571Z",
+    "heartbeatAt": "2026-08-14T06:32:16.386Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0363.*",
@@ -225,6 +227,8 @@
       "packages/core/src/governance/operation-cleanup-contract.test.ts",
       "packages/core/src/governance/operation-cleanup-contract.ts",
       "packages/core/src/index.ts",
+      "scripts/run-sealed-runner-build.test.ts",
+      "scripts/sealed-runner-publication.ts",
       "scripts/validate-transient-artifact-lifecycle.ts",
       "tests/cli-fixtures/help-snapshots/command-list.json"
     ],
@@ -242,26 +246,27 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-413ce0fdf0bf2534",
-    "ticketDigest": "sha256:413ce0fdf0bf2534795e27b574210ed96503381fcc3453c9f8a8f9fe6776df84",
+    "ticketId": "wat-2d3f35048a273eba",
+    "ticketDigest": "sha256:2d3f35048a273ebaf22cbf8661d604fba0684f89395c336ba19dcdf4f490987c",
     "taskId": "ATM-GOV-0363",
     "origin": "claim",
     "actorId": "codex-captain-recovery",
     "laneSessionId": "lane-20260814032718-codex-captain-recovery-f3a77231a2",
     "claimGeneration": "lease-f79e68a375a3",
-    "issuedAt": "2026-08-14T06:24:29.571Z",
-    "expiresAt": "2026-08-14T06:54:29.571Z",
-    "scopeDigest": "sha256:a653e3e84e4f96d87806a7ce6b765a29ced83e247a5f1726695194417074d885",
+    "issuedAt": "2026-08-14T06:32:16.386Z",
+    "expiresAt": "2026-08-14T07:02:16.386Z",
+    "scopeDigest": "sha256:c2693a06444b3c912463f2d8d59ec59b154095326c2917d22f088c34dea8165e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T06:24:29.571Z"
+      "selectedAt": "2026-08-14T06:32:16.386Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0363.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0363/**",
           ".atm/history/tasks/ATM-GOV-0363.json",
           "packages/cli/src/atm.ts",
@@ -274,10 +279,12 @@
           "packages/core/src/governance/operation-cleanup-contract.test.ts",
           "packages/core/src/governance/operation-cleanup-contract.ts",
           "packages/core/src/index.ts",
+          "scripts/run-sealed-runner-build.test.ts",
+          "scripts/sealed-runner-publication.ts",
           "scripts/validate-transient-artifact-lifecycle.ts",
           "tests/cli-fixtures/help-snapshots/command-list.json"
         ],
-        "digest": "sha256:220ca0a6f5239cc86b3ad31dc4627ea3d3d030f023d828e6aa597e1ec3aadd28"
+        "digest": "sha256:4ea8af3d08072793424e05e57aaeb974d5e87b55322d559d419aea6a93f47093"
       },
       {
         "kind": "lifecycle-operation",
@@ -336,6 +343,8 @@
       "packages/core/src/governance/operation-cleanup-contract.test.ts",
       "packages/core/src/governance/operation-cleanup-contract.ts",
       "packages/core/src/index.ts",
+      "scripts/run-sealed-runner-build.test.ts",
+      "scripts/sealed-runner-publication.ts",
       "scripts/validate-transient-artifact-lifecycle.ts",
       "tests/cli-fixtures/help-snapshots/command-list.json"
     ],

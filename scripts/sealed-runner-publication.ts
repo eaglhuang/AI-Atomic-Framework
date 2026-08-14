@@ -41,13 +41,15 @@ export function resolveSealedRunnerPublication(input: {
   const currentTask = currentTaskId
     ? getActiveTasks(input.cwd).find((entry) => entry.taskId === currentTaskId.toUpperCase())
     : null;
-  const currentTaskAllowedFiles = currentTask?.allowedFiles
-    ?? readActivePublicationLockFiles({
+  const currentTaskAllowedFiles = mergePublicationAuthorityScopes(
+    currentTask?.allowedFiles,
+    readActivePublicationLockFiles({
       cwd: input.cwd,
       taskId: currentTaskId,
       actorId: input.stewardActorId,
       now: new Date().toISOString()
-    });
+    }),
+  );
   const beforeBuildSnapshot = input.beforeBuildSnapshot ?? captureRunnerBuildOutputSnapshot({
     cwd: input.cwd,
     buildTarget: input.buildTarget,
@@ -99,13 +101,15 @@ export function captureSealedRunnerPublicationSnapshot(input: {
     taskId: input.publicationTaskId
   });
   const currentTask = getActiveTasks(input.cwd).find((entry) => entry.taskId === currentTaskId.toUpperCase());
-  const currentTaskAllowedFiles = currentTask?.allowedFiles
-    ?? readActivePublicationLockFiles({
+  const currentTaskAllowedFiles = mergePublicationAuthorityScopes(
+    currentTask?.allowedFiles,
+    readActivePublicationLockFiles({
       cwd: input.cwd,
       taskId: currentTaskId,
       actorId: input.stewardActorId,
       now: new Date().toISOString()
-    });
+    }),
+  );
   return {
     scopedSnapshot: captureRunnerBuildOutputSnapshot({
       cwd: input.cwd,
@@ -156,6 +160,20 @@ export function readActivePublicationLockFiles(input: {
   } catch {
     return undefined;
   }
+}
+
+/**
+ * A normal task claim and its bounded framework-publication lock describe the
+ * same current producer from different authority surfaces. Both must be
+ * honoured: using either as a fallback makes an authorised generated output
+ * look foreign and turns one failed publication into a per-file retry loop.
+ */
+export function mergePublicationAuthorityScopes(
+  taskAllowedFiles: readonly string[] | undefined,
+  publicationLockFiles: readonly string[] | undefined,
+): readonly string[] {
+  return [...new Set([...(taskAllowedFiles ?? []), ...(publicationLockFiles ?? [])])]
+    .sort((left, right) => left.localeCompare(right));
 }
 
 /**
