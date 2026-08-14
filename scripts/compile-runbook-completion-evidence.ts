@@ -103,6 +103,7 @@ export type CardContract = {
   publicSeams: string[];
   deliverables: string[];
   causalDependencies: string[];
+  observationDependencies: string[];
 };
 
 function yamlInlineList(source: string, key: string): string[] {
@@ -113,6 +114,15 @@ function yamlInlineList(source: string, key: string): string[] {
 function yamlListBlock(source: string, key: string): string[] {
   const match = new RegExp(`^${key}:\\s*\\r?\\n((?:\\s+- .+\\r?\\n)+)`, 'm').exec(source);
   return [...(match?.[1].matchAll(/^\s+-\s+(.+)$/gm) ?? [])].map((entry) => entry[1].trim());
+}
+
+/** Test contribution dependency edges express evidence consumption without
+ * imposing a lifecycle dependency, so independent observers may run in
+ * parallel once their input artifact exists. */
+function testContributionDependencies(source: string): string[] {
+  return [...source.matchAll(/^\s+dependencyEdge:\s*(ATM-GOV-\d+)\s*$/gm)]
+    .map((match) => match[1])
+    .filter(Boolean);
 }
 
 function discoverCardContracts(runbookSource: string): CardContract[] {
@@ -146,7 +156,8 @@ function discoverCardContracts(runbookSource: string): CardContract[] {
       registered: registeredIds.has(taskId),
       publicSeams: yamlInlineList(source, 'changedPublicSeams'),
       deliverables: yamlListBlock(source, 'deliverables'),
-      causalDependencies: yamlInlineList(source, 'causalDependencies')
+      causalDependencies: yamlInlineList(source, 'causalDependencies'),
+      observationDependencies: testContributionDependencies(source)
     }];
   });
 }
@@ -162,8 +173,19 @@ export function effectiveEvidenceContracts(primary: CardContract[], all: CardCon
     const candidates = all.filter((candidate) => !candidate.registered
       && candidate.wave === contract.wave
       && sharesValue(candidate.publicSeams, contract.publicSeams)
-      && sharesValue(candidate.deliverables, contract.deliverables));
-    return candidates.length === 1 ? candidates[0] : contract;
+      && sharesValue(candidate.deliverables, contract.deliverables)
+      // Consumers may observe the same artifact but cannot replace its
+      // producer contract. A replacement must continue at least one of the
+      // primary validator contracts as well as the seam and deliverable.
+      && sharesValue(candidate.validators.map((validator) => validator.command), contract.validators.map((validator) => validator.command)));
+    // A replay chain may legitimately contain more than one candidate.  The
+    // canonical replacement is its unique downstream leaf, never whichever
+    // directory entry happens to be read first.  Branching remains ambiguous
+    // and therefore preserves the original contract fail-closed.
+    const leaves = candidates.filter((candidate) => !candidates.some((other) =>
+      other.taskId !== candidate.taskId && other.causalDependencies.includes(candidate.taskId)
+    ));
+    return leaves.length === 1 ? leaves[0] : contract;
   });
 }
 
@@ -175,7 +197,8 @@ export function independentExitContracts(effective: CardContract[], all: CardCon
     && candidate.wave === wave
     && !effectiveIds.has(candidate.taskId)
     && sharesValue(candidate.publicSeams, seams)
-    && candidate.causalDependencies.some((dependency) => effectiveIds.has(dependency)));
+    && [...candidate.causalDependencies, ...candidate.observationDependencies]
+      .some((dependency) => effectiveIds.has(dependency)));
 }
 
 export function planningSemanticSnapshot(runbookSource: string) {
@@ -188,7 +211,8 @@ export function planningSemanticSnapshot(runbookSource: string) {
     registered: contract.registered,
     publicSeams: contract.publicSeams,
     deliverables: contract.deliverables,
-    causalDependencies: contract.causalDependencies
+    causalDependencies: contract.causalDependencies,
+    observationDependencies: contract.observationDependencies
   })).sort((left, right) => left.taskId.localeCompare(right.taskId))));
   return {
     schemaId: 'atm.planningSemanticSnapshot.v1',
@@ -425,7 +449,13 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
   const targetHead = mode === 'validate' && isPublicationOnlyDelta(committedSnapshot, currentTargetHead, publicationArtifacts)
     ? committedSnapshot
     : currentTargetHead;
-  const generatedAt = mode === 'validate' ? String(committed?.generatedAt ?? '') : new Date().toISOString();
+  // A sealed evidence projection must be reproducible for an unchanged target
+  // tree.  Wall-clock generation time would alter Reviewer B's input digest on
+  // every write and create a matrix -> review -> certificate -> matrix loop.
+  // Bind the observation timestamp to the sealed target commit instead.
+  const generatedAt = mode === 'validate'
+    ? String(committed?.generatedAt ?? '')
+    : git(resolve('.'), ['show', '-s', '--format=%cI', currentTargetHead]);
   const planningSourceAtHead = gitRaw(DEFAULT_PLANNING_ROOT, ['show', `${planningHead}:${RUNBOOK_RELATIVE_PATH}`]);
   const planningDirty = git(DEFAULT_PLANNING_ROOT, ['status', '--porcelain', '--', RUNBOOK_RELATIVE_PATH]);
   const authorityDiagnostics = [

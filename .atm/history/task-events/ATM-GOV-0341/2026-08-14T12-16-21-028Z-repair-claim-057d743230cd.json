@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T12-16-21-028Z-repair-claim-057d743230cd",
+  "taskId": "ATM-GOV-0341",
+  "action": "repair-claim",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814095024-codex-captain-recovery-ATM-GOV-0341-edf34d79ed",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0341.json",
+  "taskSha256": "sha256:c214eb6bb5985f9f967705461f9cb03ac86112e1ec306efc0b1888ff56355623",
+  "createdAt": "2026-08-14T12:16:21.028Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0341 --actor codex-captain-recovery --write --reason \"Repair expired same-actor certification claim before regenerating canonical 112-row evidence and independent certificate.\" --json"
+}

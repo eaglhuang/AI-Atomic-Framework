@@ -435,8 +435,12 @@ function main(): number {
   }
 
   if (mode === 'write') {
-    const generatedAt = new Date().toISOString();
     const originMain = resolveOriginMain();
+    // Keep the certificate a deterministic statement about its remote release
+    // snapshot.  A wall-clock value changes reviewer-bound projection bytes on
+    // every write, which prevents a self-contained evidence chain from ever
+    // reaching a fixed point.
+    const generatedAt = git(['show', '-s', '--format=%cI', originMain]);
     const closeback = projectReleaseCloseback(resolveLocalHead(), originMain, generatedAt);
     const { certificate, targetHead } = compile(generatedAt, closeback, originMain);
     writeCloseoutProjection(projectCloseoutArtifacts(certificate, closeback, generatedAt));

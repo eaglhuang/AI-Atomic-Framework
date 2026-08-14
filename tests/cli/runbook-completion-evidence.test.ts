@@ -31,20 +31,30 @@ assert.equal(
   false,
   'an undeclared source change must invalidate a publication snapshot'
 );
+const validator = (command: string) => ({ contractId: `fixture/${command}`, taskId: 'fixture', taskCardPath: 'fixture', taskCardDigest: 'fixture', command });
 const primaryContract = {
-  taskId: 'ATM-GOV-9000', wave: 'Wave 0', phase: 'correction-wave-0', validators: [], registered: true,
-  publicSeams: ['atm.example.v1'], deliverables: ['docs/reports/example.json'], causalDependencies: []
+  taskId: 'ATM-GOV-9000', wave: 'Wave 0', phase: 'correction-wave-0', validators: [validator('node replay.ts')], registered: true,
+  publicSeams: ['atm.example.v1'], deliverables: ['docs/reports/example.json'], causalDependencies: [], observationDependencies: []
 };
 const replayContract = {
-  taskId: 'ATM-GOV-9001', wave: 'Wave 0', phase: 'correction-wave-0', validators: [], registered: false,
-  publicSeams: ['atm.example.v1'], deliverables: ['docs/reports/example.json'], causalDependencies: []
+  taskId: 'ATM-GOV-9001', wave: 'Wave 0', phase: 'correction-wave-0', validators: [validator('node replay.ts')], registered: false,
+  publicSeams: ['atm.example.v1'], deliverables: ['docs/reports/example.json'], causalDependencies: [], observationDependencies: []
+};
+const replaySuccessorContract = {
+  taskId: 'ATM-GOV-9003', wave: 'Wave 0', phase: 'correction-wave-0', validators: [validator('node replay.ts')], registered: false,
+  publicSeams: ['atm.example.v1'], deliverables: ['docs/reports/example.json'], causalDependencies: ['ATM-GOV-9001'], observationDependencies: []
 };
 const exitContract = {
-  taskId: 'ATM-GOV-9002', wave: 'Wave 0', phase: 'correction-wave-0', validators: [], registered: false,
-  publicSeams: ['atm.example.v1'], deliverables: ['tests/example.test.ts'], causalDependencies: ['ATM-GOV-9001']
+  taskId: 'ATM-GOV-9002', wave: 'Wave 0', phase: 'correction-wave-0', validators: [validator('node observe.ts')], registered: false,
+  publicSeams: ['atm.example.v1'], deliverables: ['tests/example.test.ts'], causalDependencies: [], observationDependencies: ['ATM-GOV-9001']
 };
 const effectiveContracts = effectiveEvidenceContracts([primaryContract], [primaryContract, replayContract, exitContract]);
 assert.deepEqual(effectiveContracts.map((contract) => contract.taskId), ['ATM-GOV-9001'], 'only a unique same-seam artifact replay may replace a stale primary receipt');
+assert.deepEqual(
+  effectiveEvidenceContracts([primaryContract], [primaryContract, replayContract, replaySuccessorContract, exitContract]).map((contract) => contract.taskId),
+  ['ATM-GOV-9003'],
+  'a replay chain must select its unique causal leaf rather than fail due to multiple historical candidates'
+);
 assert.deepEqual(
   independentExitContracts(effectiveContracts, [primaryContract, replayContract, exitContract], 'Wave 0').map((contract) => contract.taskId),
   ['ATM-GOV-9002'],

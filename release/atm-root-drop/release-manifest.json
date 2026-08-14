@@ -597,6 +597,7 @@
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-003.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-004.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-007.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-009.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
     "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
     "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -5347,8 +5348,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 605,
-    "unchanged": 4707,
+    "copied": 621,
+    "unchanged": 4692,
     "removed": 0
   },
   "runnerSourceSeal": {
@@ -6750,7 +6751,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:06495ec9797bca9b74174b4ad77fce885649716975add676f5509c0445fd2745"
+    "digest": "sha256:74d64cd629559996eddd65d474c36512dcbfc1b82f159512bb033ed663d1b782"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -7321,6 +7322,7 @@
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-003.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-004.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-007.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-009.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
       "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
       "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -12073,23 +12075,5 @@
     "requiresExplicitStaging": true,
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
-  },
-  "buildInputsTreeHash": "sha256:2cc225d60db47f500b0e20650771418dabbd2b078012ddaf17d8b9af294bc1bf",
-  "sealedSourceCommit": "a058700a830a2677ba2744f6f7e76461b63a435b",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:b47d63fca3421d22a3ae2775d9e8b3e0a4c255ac20ca4bfea37c990cfcd40045",
-  "tsBuildCacheDigest": "sha256:97e886ff650c143a2a1d03ce9a1bfc9c687ee83a400638d4709c7782893febca",
-  "rawTelemetryPolicy": "gitignored-runtime-only",
-  "phaseTimingsMs": {
-    "inputHashCalculation": 42,
-    "skipDecision": 39,
-    "worktreeSetup": 9296,
-    "typescriptBuild": 8388,
-    "rootDropReleaseAssembly": 18376,
-    "onefileReleaseAssembly": 1641,
-    "artifactSync": 4450,
-    "cleanup": 0,
-    "totalElapsed": 48452
   }
 }

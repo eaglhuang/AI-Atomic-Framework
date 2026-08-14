@@ -88,7 +88,9 @@
     "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
     "docs/reports/plan-4-foundation-replay.json",
     "docs/reports/plan4-successor-wave-objective-map.json",
-    "schemas/evidence/four-plan-independent-certificate.schema.json"
+    "schemas/evidence/four-plan-independent-certificate.schema.json",
+    "scripts/compile-runbook-completion-evidence.ts",
+    "tests/cli/runbook-completion-evidence.test.ts"
   ],
   "validators": [
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
@@ -311,14 +313,14 @@
   },
   "claim": {
     "actorId": "codex-captain-recovery",
-    "leaseId": "lease-ef5f5f28f721",
-    "claimedAt": "2026-08-14T09:50:24.347Z",
-    "heartbeatAt": "2026-08-14T10:07:26.739Z",
+    "leaseId": "lease-976ab6f1f870",
+    "claimedAt": "2026-08-14T12:18:02.080Z",
+    "heartbeatAt": "2026-08-14T12:18:20.866Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/tasks/ATM-GOV-0341.json",
       ".atm/history/evidence/ATM-GOV-0341.*",
       ".atm/history/task-events/ATM-GOV-0341/**",
-      ".atm/history/tasks/ATM-GOV-0341.json",
       "atm.mjs",
       "docs/reports/plan-3-0-objective-replay.json",
       "docs/reports/plan-3-1-objective-replay.json",
@@ -352,6 +354,7 @@
       "release/atm-root-drop/release-manifest.json",
       "schemas/evidence/four-plan-independent-certificate.schema.json",
       "scripts/compile-four-plan-independent-certificate.ts",
+      "scripts/compile-runbook-completion-evidence.ts",
       "scripts/review-four-plan-objective-authority.ts",
       "scripts/review-runbook-release-authority.ts",
       "scripts/validate-backlog-census.ts",
@@ -361,19 +364,153 @@
       "tests/cli/four-plan-independent-certificate.test.ts",
       "tests/cli/four-plan-objective-authority-review.test.ts",
       "tests/cli/plan4-final-certification.test.ts",
+      "tests/cli/runbook-completion-evidence.test.ts",
       "tests/cli/runbook-release-authority-review.test.ts"
     ],
     "state": "active",
     "laneSession": {
-      "laneSessionId": "lane-20260814095024-codex-captain-recovery-c440ec065c",
-      "status": "adopted",
+      "laneSessionId": "lane-20260814121802-codex-captain-recovery-2683c73c43",
+      "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814095024-codex-captain-recovery-c440ec065c\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814121802-codex-captain-recovery-2683c73c43\""
     }
   },
-  "owner": "codex-captain-recovery",
   "startedAt": "2026-08-14T09:50:24.347Z",
-  "startedBySessionId": "session-20260814095024-codex-captain-recovery-ATM-GOV-0341-edf34d79ed",
+  "startedBySessionId": "session-20260814121802-codex-captain-recovery-ATM-GOV-0341-0dc0d0c355",
+  "lastTransitionId": "2026-08-14T12-18-21-401Z-renew-aac9d99203d5",
+  "lastTransitionAt": "2026-08-14T12:18:21.401Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-a3004d9d4de98a17",
+    "ticketDigest": "sha256:a3004d9d4de98a1767e0dc26a6c88cae599d8b653051022c8c83d707d45409e9",
+    "taskId": "ATM-GOV-0341",
+    "origin": "claim",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814121802-codex-captain-recovery-2683c73c43",
+    "claimGeneration": "lease-976ab6f1f870",
+    "issuedAt": "2026-08-14T12:18:20.866Z",
+    "expiresAt": "2026-08-14T12:48:20.866Z",
+    "scopeDigest": "sha256:d6e612e1c8f7b6a818b8266aa352153c8e96c9c225e652180fac3c1eac1f432d",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T12:18:20.866Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0341.*",
+          ".atm/history/task-events/ATM-GOV-0341/**",
+          ".atm/history/tasks/ATM-GOV-0341.json",
+          "atm.mjs",
+          "docs/reports/plan-3-0-objective-replay.json",
+          "docs/reports/plan-3-1-objective-replay.json",
+          "docs/reports/plan-3-2-objective-replay.json",
+          "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json",
+          "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+          "docs/reports/plan-3x-4x-charter-current-verdict.json",
+          "docs/reports/plan-3x-4x-closeout-blocker-map.json",
+          "docs/reports/plan-3x-4x-independent-certificate.json",
+          "docs/reports/plan-3x-4x-release-closeback.json",
+          "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+          "docs/reports/plan-4-foundation-replay.json",
+          "docs/reports/plan4-successor-wave-objective-map.json",
+          "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+          "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+          "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+          "packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.d.ts",
+          "packages/cli/dist/commands/tasks/historical-delivery.d.ts",
+          "packages/core/src/evidence/four-plan-independent-certificate.ts",
+          "packages/core/src/evidence/oracle-adjudication.ts",
+          "packages/core/src/evidence/quality-authority.ts",
+          "packages/core/src/evidence/quality-vector.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop/docs/reports/plan-3x-4x-closeout-blocker-map.json",
+          "release/atm-root-drop/docs/reports/plan-3x-4x-independent-certificate.json",
+          "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+          "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+          "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.d.ts",
+          "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.d.ts",
+          "release/atm-root-drop/release-manifest.json",
+          "schemas/evidence/four-plan-independent-certificate.schema.json",
+          "scripts/compile-four-plan-independent-certificate.ts",
+          "scripts/compile-runbook-completion-evidence.ts",
+          "scripts/review-four-plan-objective-authority.ts",
+          "scripts/review-runbook-release-authority.ts",
+          "scripts/validate-backlog-census.ts",
+          "scripts/validate-four-plan-objectives.ts",
+          "scripts/validate-runner-reproducibility.ts",
+          "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
+          "tests/cli/four-plan-independent-certificate.test.ts",
+          "tests/cli/four-plan-objective-authority-review.test.ts",
+          "tests/cli/plan4-final-certification.test.ts",
+          "tests/cli/runbook-completion-evidence.test.ts",
+          "tests/cli/runbook-release-authority-review.test.ts"
+        ],
+        "digest": "sha256:31d1d1cd42201e082884062bf9077faa4a4476db1262191a2a7ad337ebebd3d5"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0341",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814095024-codex-captain-recovery-c440ec065c",
+    "dirtyPaths": [
+      ".atm/history/task-events/ATM-GOV-0341/2026-08-14T10-20-06-776Z-renew-ff396ba68cd0.json",
+      ".atm/history/task-events/ATM-GOV-0341/2026-08-14T10-20-30-885Z-scope-amendment-163b4bfda272.json",
+      ".atm/history/tasks/ATM-GOV-0341.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/reports/plan-3x-4x-closeout-blocker-map.json",
+      "release/atm-root-drop/docs/reports/plan-3x-4x-independent-certificate.json",
+      "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+      "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/compile-runbook-completion-evidence.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
+    ],
+    "retainedAt": "2026-08-14T12:16:20.331Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-captain-recovery",
+  "startedByActor": "codex-captain-recovery",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -419,6 +556,7 @@
       "release/atm-root-drop/release-manifest.json",
       "schemas/evidence/four-plan-independent-certificate.schema.json",
       "scripts/compile-four-plan-independent-certificate.ts",
+      "scripts/compile-runbook-completion-evidence.ts",
       "scripts/review-four-plan-objective-authority.ts",
       "scripts/review-runbook-release-authority.ts",
       "scripts/validate-backlog-census.ts",
@@ -428,136 +566,22 @@
       "tests/cli/four-plan-independent-certificate.test.ts",
       "tests/cli/four-plan-objective-authority-review.test.ts",
       "tests/cli/plan4-final-certification.test.ts",
+      "tests/cli/runbook-completion-evidence.test.ts",
       "tests/cli/runbook-release-authority-review.test.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0341-produce-independent-four-plan-certification-and-governed-release.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0341-produce-independent-four-plan-certification-and-governed-release.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "2f4249b1d9ff1963bbbf0fbf2674275589094f85da728a7b785875b4e66b2a27",
     "actorId": "codex-captain-recovery",
-    "sessionId": null,
+    "sessionId": "session-20260814121802-codex-captain-recovery-ATM-GOV-0341-0dc0d0c355",
     "laneSession": {
-      "laneSessionId": "lane-20260814095024-codex-captain-recovery-c440ec065c",
+      "laneSessionId": "lane-20260814121802-codex-captain-recovery-2683c73c43",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814095024-codex-captain-recovery-c440ec065c\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814121802-codex-captain-recovery-2683c73c43\""
     },
-    "createdAt": "2026-08-14T09:50:29.791Z",
+    "createdAt": "2026-08-14T12:18:04.377Z",
     "status": "active"
-  },
-  "lastTransitionId": "2026-08-14T10-07-27-439Z-renew-76a305880d1b",
-  "lastTransitionAt": "2026-08-14T10:07:27.439Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-1451d18757bbc67e",
-    "ticketDigest": "sha256:1451d18757bbc67e0740f664cbf16bf5501a233a72c65045e30d99004dce5ebb",
-    "taskId": "ATM-GOV-0341",
-    "origin": "claim",
-    "actorId": "codex-captain-recovery",
-    "laneSessionId": "lane-20260814095024-codex-captain-recovery-c440ec065c",
-    "claimGeneration": "lease-ef5f5f28f721",
-    "issuedAt": "2026-08-14T10:07:26.739Z",
-    "expiresAt": "2026-08-14T10:37:26.739Z",
-    "scopeDigest": "sha256:55af94c63a6aa44b896be4b58d0ff5957ef01878934f7f5b8f862a4e0e8feba3",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T10:07:26.739Z"
-    },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/history/evidence/ATM-GOV-0341.*",
-          ".atm/history/evidence/git-head.jsonl",
-          ".atm/history/task-events/ATM-GOV-0341/**",
-          ".atm/history/tasks/ATM-GOV-0341.json",
-          "atm.mjs",
-          "docs/reports/plan-3-0-objective-replay.json",
-          "docs/reports/plan-3-1-objective-replay.json",
-          "docs/reports/plan-3-2-objective-replay.json",
-          "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json",
-          "docs/reports/plan-3x-4x-backlog-disposition-census.json",
-          "docs/reports/plan-3x-4x-charter-current-verdict.json",
-          "docs/reports/plan-3x-4x-closeout-blocker-map.json",
-          "docs/reports/plan-3x-4x-independent-certificate.json",
-          "docs/reports/plan-3x-4x-release-closeback.json",
-          "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
-          "docs/reports/plan-4-foundation-replay.json",
-          "docs/reports/plan4-successor-wave-objective-map.json",
-          "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
-          "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
-          "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
-          "packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.d.ts",
-          "packages/cli/dist/commands/tasks/historical-delivery.d.ts",
-          "packages/core/src/evidence/four-plan-independent-certificate.ts",
-          "packages/core/src/evidence/oracle-adjudication.ts",
-          "packages/core/src/evidence/quality-authority.ts",
-          "packages/core/src/evidence/quality-vector.ts",
-          "release/atm-onefile/atm.mjs",
-          "release/atm-onefile/release-manifest.json",
-          "release/atm-root-drop/docs/reports/plan-3x-4x-closeout-blocker-map.json",
-          "release/atm-root-drop/docs/reports/plan-3x-4x-independent-certificate.json",
-          "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
-          "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
-          "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.d.ts",
-          "release/atm-root-drop/packages/cli/dist/commands/tasks/historical-delivery.d.ts",
-          "release/atm-root-drop/release-manifest.json",
-          "schemas/evidence/four-plan-independent-certificate.schema.json",
-          "scripts/compile-four-plan-independent-certificate.ts",
-          "scripts/review-four-plan-objective-authority.ts",
-          "scripts/review-runbook-release-authority.ts",
-          "scripts/validate-backlog-census.ts",
-          "scripts/validate-four-plan-objectives.ts",
-          "scripts/validate-runner-reproducibility.ts",
-          "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
-          "tests/cli/four-plan-independent-certificate.test.ts",
-          "tests/cli/four-plan-objective-authority-review.test.ts",
-          "tests/cli/plan4-final-certification.test.ts",
-          "tests/cli/runbook-release-authority-review.test.ts"
-        ],
-        "digest": "sha256:130da98c76a3ed0fe236ad51543c86e02236c7f18033b3f6bde20c15f2e4e180"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "enabled",
-      "reasons": [
-        "complex-task",
-        "shared-surface"
-      ],
-      "maxSavePoints": 2,
-      "perTaskByteBudget": 16777216,
-      "repositoryByteBudget": 268435456,
-      "handoffTtlSeconds": 604800,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
-    }
   }
 }
