@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T11-59-11-360Z-close-131e7a30694c",
+  "taskId": "ATM-GOV-0388",
+  "action": "close",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814114639-codex-captain-recovery-ATM-GOV-0388-5fca85450b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0388.json",
+  "taskSha256": "sha256:68ca1585a994fa766f96e9edabad5fe3c74a28ed3c06e1441ca13af53bd1b36e",
+  "createdAt": "2026-08-14T11:59:11.360Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0388 --actor codex-captain-recovery --status done --historical-delivery 82f17c1adca80cccf6ee0ccb3b9cfa9d89ff73bb",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814114639-codex-captain-recovery-ATM-GOV-0388-5fca85450b",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0388.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/evidence/__tests__/missing.spec.ts",
+      "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+      "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/evidence/__tests__/missing.spec.ts",
+      "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+      "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T11:59:11.343Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0388.*",
+        ".atm/history/task-events/ATM-GOV-0388/**",
+        ".atm/history/tasks/ATM-GOV-0388.json",
+        "packages/cli/src/commands/evidence/missing-report.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+        "tests/cli/closure-required-gates-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence/missing-report.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+        "tests/cli/closure-required-gates-contract.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types packages/cli/src/commands/evidence/__tests__/missing.spec.ts",
+        "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+        "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
