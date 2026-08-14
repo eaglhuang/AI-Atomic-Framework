@@ -49,6 +49,7 @@ export function resolveSealedRunnerPublication(input: {
       actorId: input.stewardActorId,
       now: new Date().toISOString()
     }),
+    readLinkedTemporaryPublicationLockFiles(input.cwd, currentTaskId, input.stewardActorId),
   );
   const beforeBuildSnapshot = input.beforeBuildSnapshot ?? captureRunnerBuildOutputSnapshot({
     cwd: input.cwd,
@@ -109,6 +110,7 @@ export function captureSealedRunnerPublicationSnapshot(input: {
       actorId: input.stewardActorId,
       now: new Date().toISOString()
     }),
+    readLinkedTemporaryPublicationLockFiles(input.cwd, currentTaskId, input.stewardActorId),
   );
   return {
     scopedSnapshot: captureRunnerBuildOutputSnapshot({
@@ -171,9 +173,21 @@ export function readActivePublicationLockFiles(input: {
 export function mergePublicationAuthorityScopes(
   taskAllowedFiles: readonly string[] | undefined,
   publicationLockFiles: readonly string[] | undefined,
+  temporaryPublicationLockFiles: readonly string[] | undefined = [],
 ): readonly string[] {
-  return [...new Set([...(taskAllowedFiles ?? []), ...(publicationLockFiles ?? [])])]
+  return [...new Set([...(taskAllowedFiles ?? []), ...(publicationLockFiles ?? []), ...(temporaryPublicationLockFiles ?? [])])]
     .sort((left, right) => left.localeCompare(right));
+}
+
+function readLinkedTemporaryPublicationLockFiles(
+  cwd: string,
+  taskId: string | null,
+  actorId: string,
+): readonly string[] {
+  if (!taskId) return [];
+  return readFrameworkTempLockProjection(cwd)
+    .filter((lock) => lock.actorId === actorId && lock.linkedTaskId === taskId && lock.leaseFresh === true)
+    .flatMap((lock) => lock.files);
 }
 
 /**

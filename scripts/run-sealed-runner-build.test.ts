@@ -47,6 +47,10 @@ try {
     workItemId: taskId,
     actorId: 'steward', lockedAt: new Date().toISOString(), heartbeatAt: new Date().toISOString(), ttlSeconds: 600, files: ['release/atm-onefile/atm.mjs', 'packages/cli/dist/foreign.js']
   }));
+  writeFileSync(path.join(publicationRoot, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-steward.lock.json'), JSON.stringify({
+    workItemId: 'ATM-FRAMEWORK-TEMP-steward', linkedTaskId: taskId,
+    actorId: 'steward', lockedAt: new Date().toISOString(), heartbeatAt: new Date().toISOString(), ttlSeconds: 600, files: ['packages/cli/dist/foreign.js']
+  }));
   execFileSync('git', ['add', '.'], { cwd: publicationRoot, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'fixture'], { cwd: publicationRoot, stdio: 'ignore' });
   writeFileSync(path.join(publicationRoot, 'release/atm-onefile/atm.mjs'), 'task candidate\n');
