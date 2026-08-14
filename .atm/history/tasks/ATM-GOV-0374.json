@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0374",
   "title": "Refresh runbook evidence projections after canonical closeout changes",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0359",
@@ -161,8 +161,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T07-00-17-333Z-renew-fd8abd6a5cb0",
-  "lastTransitionAt": "2026-08-14T07:00:17.333Z",
+  "lastTransitionId": "2026-08-14T07-06-17-131Z-close-d142ba280c0f",
+  "lastTransitionAt": "2026-08-14T07:06:17.131Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-recovery",
   "reservedAt": "2026-08-14T05:55:41.375Z",
@@ -171,20 +171,21 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-54341d48d1e3",
     "claimedAt": "2026-08-14T05:55:41.383Z",
-    "heartbeatAt": "2026-08-14T07:00:16.635Z",
+    "heartbeatAt": "2026-08-14T07:06:17.129Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0374.json",
       "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
       "docs/reports/reviews/plan-3x-4x-runbook-release-review.json"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260814055541-codex-captain-recovery-e6c6cd5f05",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814055541-codex-captain-recovery-e6c6cd5f05\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-14T05:55:41.383Z",
   "startedByActor": "codex-captain-recovery",
@@ -280,5 +281,9 @@
     },
     "createdAt": "2026-08-14T05:55:43.281Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-14T07:06:17.130Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814055541-codex-captain-recovery-ATM-GOV-0374-c9598e5cba",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0374.closure-packet.json"
 }
