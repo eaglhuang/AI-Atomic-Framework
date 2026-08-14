@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0362",
-  "updatedAt": "2026-08-13T17:41:54.658Z",
+  "updatedAt": "2026-08-14T02:09:54.638Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
@@ -90,6 +90,38 @@
       "durationMs": 54420,
       "runnerKind": "dev-source",
       "sourceCommit": "b5d7f4bf4bf00c17a4b6e3ae61dde6e7ec3074c0",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/runbook-release-authority-review.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:53428fd94a63c9159b5248e44fa4b2cea996db8f84e9e4241d9924fdb5ca3a6d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/runbook-release-authority-review.test.ts"
+      ],
+      "generatedAt": "2026-08-14T02:09:40.223Z",
+      "startedAt": "2026-08-14T02:09:39.741Z",
+      "finishedAt": "2026-08-14T02:09:40.223Z",
+      "durationMs": 482,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6e138352a8543b134c5229df418161b55d249d18",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T02:09:54.638Z",
+      "startedAt": "2026-08-14T02:09:46.153Z",
+      "finishedAt": "2026-08-14T02:09:54.638Z",
+      "durationMs": 8485,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6e138352a8543b134c5229df418161b55d249d18",
       "cached": false
     }
   ],
