@@ -223,8 +223,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T09-22-38-525Z-scope-amendment-2c93c4f32567",
-  "lastTransitionAt": "2026-08-14T09:22:38.525Z",
+  "lastTransitionId": "2026-08-14T09-25-40-680Z-renew-31dd3c42fc95",
+  "lastTransitionAt": "2026-08-14T09:25:40.680Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-14T02:49:03.878Z",
   "promotedAt": "2026-08-14T02:49:03.882Z",
@@ -232,7 +232,7 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-f79e68a375a3",
     "claimedAt": "2026-08-14T03:27:18.541Z",
-    "heartbeatAt": "2026-08-14T09:16:11.020Z",
+    "heartbeatAt": "2026-08-14T09:25:39.978Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/charter/atomic-charter.md",
@@ -278,6 +278,7 @@
       "scripts/validate-transient-artifact-lifecycle.ts",
       "templates/root-drop/.atm/charter/charter-invariants.template.json",
       "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-residue-cleanup.skill.md",
       "tests/cli-fixtures/help-snapshots/command-list.json",
       "tests/cli/transient-artifact-lifecycle.test.ts"
     ],
@@ -295,20 +296,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-52840abcfa7eda96",
-    "ticketDigest": "sha256:52840abcfa7eda9672e9b58b561057eb9cb922aaf38cbe74ef71cbd1adf803c8",
+    "ticketId": "wat-fe878e3c95ab6215",
+    "ticketDigest": "sha256:fe878e3c95ab6215521363f58b96f74d53c1529fc27dad82075c9b7bc2e927a0",
     "taskId": "ATM-GOV-0363",
     "origin": "claim",
     "actorId": "codex-captain-recovery",
     "laneSessionId": "lane-20260814032718-codex-captain-recovery-f3a77231a2",
     "claimGeneration": "lease-f79e68a375a3",
-    "issuedAt": "2026-08-14T09:16:11.020Z",
-    "expiresAt": "2026-08-14T09:46:11.020Z",
-    "scopeDigest": "sha256:14253392cc9fa18b0739907317bcfc5a72db911c3b7c0e737ebfadf3b100a8fc",
+    "issuedAt": "2026-08-14T09:25:39.978Z",
+    "expiresAt": "2026-08-14T09:55:39.978Z",
+    "scopeDigest": "sha256:abe86fdf55c3b721ad72bb45e696019911d01a5f35611a520dc936075adb7195",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T09:16:11.020Z"
+      "selectedAt": "2026-08-14T09:25:39.978Z"
     },
     "grants": [
       {
@@ -340,6 +341,7 @@
           "release/atm-root-drop/docs/reports/plan-3x-4x-closeout-blocker-map.json",
           "release/atm-root-drop/docs/reports/plan-3x-4x-independent-certificate.json",
           "release/atm-root-drop/docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+          "release/atm-root-drop/fixtures/charter/default-charter.json",
           "release/atm-root-drop/packages/cli/dist/commands/command-specs.js",
           "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/support.d.ts",
           "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
@@ -348,6 +350,8 @@
           "release/atm-root-drop/release-manifest.json",
           "release/atm-root-drop/scripts/diagnose-plan3-evidence-closure.ts",
           "release/atm-root-drop/scripts/validate-runbook-completion-evidence.ts",
+          "release/atm-root-drop/templates/root-drop/.atm/charter/charter-invariants.template.json",
+          "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
           "release/atm-root-drop/tests/cli-fixtures/help-snapshots/command-list.json",
           "release/atm-root-drop/tests/cli/runbook-completion-evidence.test.ts",
           "scripts/run-sealed-runner-build.test.ts",
@@ -355,10 +359,11 @@
           "scripts/validate-transient-artifact-lifecycle.ts",
           "templates/root-drop/.atm/charter/charter-invariants.template.json",
           "templates/skills/atm-dispatch.skill.md",
+          "templates/skills/atm-residue-cleanup.skill.md",
           "tests/cli-fixtures/help-snapshots/command-list.json",
           "tests/cli/transient-artifact-lifecycle.test.ts"
         ],
-        "digest": "sha256:834ca1d313049de43bc58323b3c17674cc613a4f4bb2b98da62d52063e113cfb"
+        "digest": "sha256:901d85d2668ea3a4d6954edb46d6724e9ba80e1ced65203aa3fd1e9466ac5a77"
       },
       {
         "kind": "lifecycle-operation",
@@ -447,6 +452,7 @@
       "scripts/validate-transient-artifact-lifecycle.ts",
       "templates/root-drop/.atm/charter/charter-invariants.template.json",
       "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-residue-cleanup.skill.md",
       "tests/cli-fixtures/help-snapshots/command-list.json",
       "tests/cli/transient-artifact-lifecycle.test.ts"
     ],

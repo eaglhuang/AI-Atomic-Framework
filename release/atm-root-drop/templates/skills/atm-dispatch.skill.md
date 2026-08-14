@@ -92,6 +92,15 @@ bound. The closed exceptions are emergency/anomaly recovery, historical
 read-only discrimination, and non-development sealed packaging, each with a
 named receipt. A safe same-file compose may have zero queue residency.
 
+## Fail-fast control-plane rule (INV-ATM-013)
+
+Dispatch mandatory, cheap admission checks before asking a worker to acquire a
+queue slot, lease, lock, or write ticket. A known failed prerequisite must stop
+the route immediately with a precise recovery command; do not spend shared
+capacity or run work that cannot change admission. Normal routing and status
+commands have a five-second response budget; declared tests, builds, and
+external I/O must instead report a progress or completion receipt.
+
 ## Cohesion-First Split Rule
 
 TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
