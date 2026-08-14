@@ -52,6 +52,16 @@ If `node atm.mjs framework-mode status --json` reports `mode: not-required`,
 this route does not apply — either you are not in the framework repo, or the
 change does not intersect framework-critical files.
 
+## Fail-fast control-plane rule (INV-ATM-013)
+
+Before a command claims a lock, queue slot, lease, override, staging
+transaction, or cross-repository write, run its cheap mandatory admission and
+freshness checks first. A failed condition must return immediately with its
+code and recovery command; do not spend a capability or start a build/validator
+that cannot make the operation admissible. Normal control-plane steps have a
+five-second response budget. Declared large tests, builds, and external I/O are
+execution-plane work and must expose progress or a bounded receipt.
+
 ## Cohesion-First Split Rule
 
 TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
@@ -154,7 +164,26 @@ Structured evidence: reservation entry in the runner-sync steward queue.
 
 ### 5. Governed commit boundaries and sealed rebuild
 
-Framework temp claim commits are governed exactly like task commits:
+Framework temp claim commits use the normal governed commit transaction, but
+their authority is the live temporary lock rather than a task-ledger record.
+Invoke the taskless facade below; **do not pass the minted
+`ATM-FRAMEWORK-TEMP-*` id to `--task`**. That id names a lock, not a ledger
+task, so `--task` routes through ordinary task admission and can fail with
+`ATM_TASK_NOT_FOUND`.
+
+```bash
+node atm.mjs git commit \
+  --actor <ACTOR> \
+  --message "<summary>" \
+  --auto-stage \
+  --json
+```
+
+The facade resolves exactly one current, actor-bound temporary claim and uses
+only its allowed files. If no live claim is found, it must fail closed with the
+returned `framework-mode claim` recovery command.
+
+After that authority distinction, retain the normal delivery rules:
 
 - One delivery commit per scoped change (source + tests + docs).
 - Release artifacts are rebuilt from the committed HEAD and either amended into
