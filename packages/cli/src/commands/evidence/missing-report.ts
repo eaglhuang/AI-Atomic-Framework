@@ -4,6 +4,7 @@ import { resolveTaskRunnerArbitration } from '../validate.ts';
 import {
   canonicalizeValidatorIdentity,
   classifyValidatorTier,
+  looksLikeLiteralValidatorCommand,
   resolveValidatorExpectedCommand,
   type ValidatorEvidenceState,
   type ValidatorTier
@@ -38,6 +39,20 @@ export interface ValidatorCatalogEntry {
   readonly closureRequired: boolean;
   readonly expectedCommand: string;
   readonly evidenceState: ValidatorEvidenceState;
+}
+
+/** Keep executable task-card commands attached to their canonical evidence gate. */
+export function resolveTaskDeclaredValidatorCommands(taskDocument: Record<string, unknown> | null | undefined): ReadonlyMap<string, string> {
+  const commands = new Map<string, string>();
+  const declared = Array.isArray(taskDocument?.validators)
+    ? taskDocument.validators.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+    : [];
+  for (const entry of declared) {
+    const gate = canonicalizeValidatorIdentity(entry);
+    if (!gate || commands.has(gate)) continue;
+    commands.set(gate, looksLikeLiteralValidatorCommand(entry) ? entry.trim() : resolveValidatorExpectedCommand(gate));
+  }
+  return commands;
 }
 
 export type EvidenceFreshnessVerdictStatus = 'fresh' | 'stale' | 'partially-stale' | 'missing';
@@ -306,9 +321,9 @@ export function buildMissingValidatorFinding(
   state: Exclude<ValidatorEvidenceState, 'pass'>,
   taskId: string,
   actor: string,
-  runnerKind: 'dev-source' | 'frozen-runner'
+  runnerKind: 'dev-source' | 'frozen-runner',
+  expectedCommand = resolveValidatorExpectedCommand(gate)
 ): MissingValidatorFinding {
-  const expectedCommand = resolveValidatorExpectedCommand(gate);
   const requiredCommand = buildAutoEvidenceRequiredCommand(taskId, actor, expectedCommand, gate, runnerKind);
   if (state === 'absent') {
     return {
@@ -358,12 +373,8 @@ export function computeMissingValidatorReport(
 
   // 2. 取得 task card 宣告的 validators
   const taskDocument = readTaskDocument(resolvedCwd, resolvedTaskId);
-  const taskDeclaredValidators: string[] = Array.isArray(taskDocument?.validators)
-    ? (taskDocument.validators as unknown[])
-        .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
-        .map((v) => canonicalizeValidatorIdentity(v.trim()))
-        .filter(Boolean)
-    : [];
+  const taskDeclaredValidatorCommands = resolveTaskDeclaredValidatorCommands(taskDocument);
+  const taskDeclaredValidators = [...taskDeclaredValidatorCommands.keys()];
 
   // 3. 合併並去重
   const allGates = uniqueStrings([...frameworkGates, ...taskDeclaredValidators]);
@@ -407,15 +418,16 @@ export function computeMissingValidatorReport(
     const state = classifyValidatorEvidenceState(bundleRecords, gate);
     const tier = classifyValidatorTier(gate);
     const closureRequired = taskDeclaredValidators.includes(gate);
+    const expectedCommand = taskDeclaredValidatorCommands.get(gate) ?? resolveValidatorExpectedCommand(gate);
     catalogEntries.push({
       name: gate,
       tier,
       closureRequired,
-      expectedCommand: resolveValidatorExpectedCommand(gate),
+      expectedCommand,
       evidenceState: state
     });
     if (state !== 'pass') {
-      const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId, runnerArbitration.preferredRunnerKind);
+      const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId, runnerArbitration.preferredRunnerKind, expectedCommand);
       if (closureRequired) {
         requiredFindings.push(finding);
         if (state === 'absent') absent.push(gate);

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0388",
+  "updatedAt": "2026-08-14T11:18:57.996Z",
+  "updatedBy": "codex-captain-recovery",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/missing.spec.ts",
+    "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+    "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:68fc80f9c22eb41382faa227133369c33567386c2cb48b5c88fb4874439f14da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/closure-required-gates-contract.test.ts"
+      ],
+      "generatedAt": "2026-08-14T11:18:34.442Z",
+      "startedAt": "2026-08-14T11:18:34.073Z",
+      "finishedAt": "2026-08-14T11:18:34.442Z",
+      "durationMs": 369,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6f70c7343504dc37bd50ed5146d7adc946fc4041",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/evidence/__tests__/missing.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7eaf48ff3e0dc3c0ec0a498304b74ea1eecad389eadef0f2b1d2c2eac19aa2d7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/evidence/__tests__/missing.spec.ts"
+      ],
+      "generatedAt": "2026-08-14T11:18:42.313Z",
+      "startedAt": "2026-08-14T11:18:37.252Z",
+      "finishedAt": "2026-08-14T11:18:42.313Z",
+      "durationMs": 5061,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6f70c7343504dc37bd50ed5146d7adc946fc4041",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9a4828caf8512e699455e729bdcf96748f378ba610ecb86862d22147494256e1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts"
+      ],
+      "generatedAt": "2026-08-14T11:18:45.700Z",
+      "startedAt": "2026-08-14T11:18:45.263Z",
+      "finishedAt": "2026-08-14T11:18:45.700Z",
+      "durationMs": 437,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6f70c7343504dc37bd50ed5146d7adc946fc4041",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T11:18:57.995Z",
+      "startedAt": "2026-08-14T11:18:48.527Z",
+      "finishedAt": "2026-08-14T11:18:57.995Z",
+      "durationMs": 9468,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6f70c7343504dc37bd50ed5146d7adc946fc4041",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

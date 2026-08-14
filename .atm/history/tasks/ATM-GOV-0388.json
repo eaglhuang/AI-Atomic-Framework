@@ -1,0 +1,273 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0388",
+  "title": "Unify task-close validation contract consumers",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: Ordinary task pre-close blocks exactly missing or stale validators declared by that task card, while empty/malformed task contracts remain fail-closed.",
+    "ACC-2: The ordinary closure packet carries the same canonical validator identities as the task card; historical-batch and phase/release policies retain their own explicit contracts.",
+    "ACC-3: The regression test fails if either consumer again substitutes framework-wide required gates for the task contract."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/evidence/missing-report.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+    "tests/cli/closure-required-gates-contract.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/evidence/missing-report.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator.ts",
+    "tests/cli/closure-required-gates-contract.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/closure-required-gates-contract.test.ts",
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/missing.spec.ts",
+    "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Weakening release or phase validation policy",
+    "treating missing task validators as a pass",
+    "closing a task without its declared evidence"
+  ],
+  "nonGoals": [
+    "Changing validator execution semantics",
+    "adding task-specific allowlists"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-delivery-commit",
+  "rollbackNotes": "Restore the prior shared consumer only by reverting the delivery commit; do not reintroduce a second validator selection rule.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-integrity",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0388-unify-task-close-validation-contract-consumers.task.md",
+    "sectionTitle": "ATM-GOV-0388",
+    "headingLine": 63,
+    "hash": "79a0f5644838bca8",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0388-unify-task-close-validation-contract-consumers.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:79a0f5644838bca826fb800c4bc3918b6cd7d91603c626e3182912fb79806bf8",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T11:06:35.343Z"
+    }
+  },
+  "importedAt": "2026-08-14T11:06:35.343Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A task has fresh command-backed evidence for every validator declared by its card."
+    ],
+    "softRelations": [
+      "ATM-GOV-0386",
+      "ATM-GOV-0387"
+    ],
+    "changedPublicSeams": [
+      "atm.taskCloseValidationContract.v1"
+    ],
+    "causalImpactEdges": [
+      "task-close-contract-consumer-parity"
+    ],
+    "parallelFrontierInputs": [
+      "task-validator-contract"
+    ],
+    "validatorReferences": [
+      "closure-required-gates-contract"
+    ],
+    "phaseOwner": "correction-wave-0"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0388_task_close_contract_consumer_parity",
+      "targetGroupId": "test_group_taskflow_close_contract",
+      "semanticKey": "declared_task_validators_are_the_only_ordinary_task_close_requirement",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "task-close-contract-consumer-parity"
+      ],
+      "expectedRedPredicate": "an unrelated framework-wide validator blocks or is embedded in an ordinary task closure packet",
+      "contributionResourceKey": "task-close-validation-contract",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.taskCloseValidationContract.v1",
+      "resourceKey": "task-close-validation-contract"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0388_task_close_contract_consumer_parity"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T11-09-31-199Z-claim-f7079b3c5739",
+  "lastTransitionAt": "2026-08-14T11:09:31.199Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-recovery",
+  "reservedAt": "2026-08-14T11:09:26.142Z",
+  "promotedAt": "2026-08-14T11:09:26.149Z",
+  "claim": {
+    "actorId": "codex-captain-recovery",
+    "leaseId": "lease-0740f6da1de2",
+    "claimedAt": "2026-08-14T11:09:26.155Z",
+    "heartbeatAt": "2026-08-14T11:09:26.155Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0388.json",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+      "tests/cli/closure-required-gates-contract.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814110926-codex-captain-recovery-64d5d28f6b",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814110926-codex-captain-recovery-64d5d28f6b\""
+    }
+  },
+  "startedAt": "2026-08-14T11:09:26.155Z",
+  "startedByActor": "codex-captain-recovery",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-0c8b8952d0c30fd5",
+    "ticketDigest": "sha256:0c8b8952d0c30fd521f56dba29cf208939215c0ae2d839fd878ae04f2721f439",
+    "taskId": "ATM-GOV-0388",
+    "origin": "claim",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814110926-codex-captain-recovery-64d5d28f6b",
+    "claimGeneration": "lease-0740f6da1de2",
+    "issuedAt": "2026-08-14T11:09:26.155Z",
+    "expiresAt": "2026-08-14T11:39:26.155Z",
+    "scopeDigest": "sha256:fadf9464de7d814f60004c72e0d161dac350f685bca4fdb6e0800e117a24ab07",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T11:09:26.155Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0388.*",
+          ".atm/history/task-events/ATM-GOV-0388/**",
+          ".atm/history/tasks/ATM-GOV-0388.json",
+          "packages/cli/src/commands/evidence/missing-report.ts",
+          "packages/cli/src/commands/tasks/close-orchestrator.ts",
+          "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+          "tests/cli/closure-required-gates-contract.test.ts"
+        ],
+        "digest": "sha256:b2c6a01ba47f62aa51f8f1c15b1103f8db8c34d645da620f0a91804e6c7aa9ef"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260814110926-codex-captain-recovery-ATM-GOV-0388-a5ca1c64b0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0388",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0388.*",
+      ".atm/history/task-events/ATM-GOV-0388/**",
+      ".atm/history/tasks/ATM-GOV-0388.json",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+      "tests/cli/closure-required-gates-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "17728cd12efd8541d7ec38d5b0714e16cc439453de686136e123c62c9bcc4a4a",
+    "actorId": "codex-captain-recovery",
+    "sessionId": "session-20260814110926-codex-captain-recovery-ATM-GOV-0388-a5ca1c64b0",
+    "laneSession": {
+      "laneSessionId": "lane-20260814110926-codex-captain-recovery-64d5d28f6b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814110926-codex-captain-recovery-64d5d28f6b\""
+    },
+    "createdAt": "2026-08-14T11:09:31.198Z",
+    "status": "active"
+  }
+}
