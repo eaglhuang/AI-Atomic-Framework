@@ -20,7 +20,9 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 import {
+  composeEvidenceDigest,
   compileFourPlanIndependentCertificate,
   type FourPlanEvidenceObservation,
   type FourPlanIndependentCertificate,
@@ -32,8 +34,24 @@ const CERTIFICATE_PATH = 'docs/reports/plan-3x-4x-independent-certificate.json';
 const OBJECTIVE_AUDIT_PATH = 'governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json';
 const BLOCKER_MAP_PATH = 'docs/reports/plan-3x-4x-closeout-blocker-map.json';
 const CLOSEBACK_PATH = 'docs/reports/plan-3x-4x-release-closeback.json';
+const REVIEWER_A_PATH = 'docs/reports/reviews/plan-3x-4x-objective-authority-review.json';
+const REVIEWER_B_PATH = 'docs/reports/reviews/plan-3x-4x-runbook-release-review.json';
 const REMOTE = 'origin';
 const BRANCH = 'main';
+
+/**
+ * Certificate inputs are declared authority, not fields copied from the last
+ * certificate.  The latter makes a bad reviewer graph self-perpetuating:
+ * refreshing a certificate would merely preserve its old self-reference.
+ */
+const DIMENSION_SPECS = [
+  { dimensionId: 'objective-verdict', evidenceRefs: ['docs/reports/plan-3-0-objective-replay.json', 'docs/reports/plan-3-1-objective-replay.json', 'docs/reports/plan-3-2-objective-replay.json', 'docs/reports/plan4-successor-wave-objective-map.json'] },
+  { dimensionId: 'card-state-verdict', evidenceRefs: ['.atm/history/tasks/ATM-GOV-0340.json', '.atm/history/tasks/ATM-GOV-0341.json'] },
+  { dimensionId: 'incident-verdict', evidenceRefs: ['docs/reports/plan-3x-4x-backlog-disposition-census.json', 'docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json'] },
+  { dimensionId: 'freshness-verdict', evidenceRefs: ['release/atm-onefile/release-manifest.json', 'scripts/validate-runner-reproducibility.ts'] },
+  { dimensionId: 'charter-verdict', evidenceRefs: ['docs/reports/plan-3x-4x-charter-current-verdict.json'] },
+  { dimensionId: 'release-verdict', evidenceRefs: [CLOSEBACK_PATH] }
+] as const;
 
 /**
  * Which artifact backs each release surface. A surface with no declared
@@ -70,8 +88,63 @@ function gitOk(args: readonly string[]): boolean {
   }
 }
 
+function gitAt(repoRoot: string, args: readonly string[]): string {
+  return execFileSync('git', ['-C', repoRoot, ...args], { encoding: 'utf8' }).trim();
+}
+
+function gitOkAt(repoRoot: string, args: readonly string[]): boolean {
+  try {
+    execFileSync('git', ['-C', repoRoot, ...args], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function digestOf(path: string): string {
   return `sha256:${createHash('sha256').update(readFileSync(path)).digest('hex')}`;
+}
+
+function readJson(path: string): Record<string, any> {
+  if (!existsSync(path)) throw new Error(`missing independent reviewer receipt: ${path}`);
+  return JSON.parse(readFileSync(path, 'utf8').replace(/^\uFEFF/, '')) as Record<string, any>;
+}
+
+function reviewerFromReceipt(path: string): FourPlanReviewer {
+  const receipt = readJson(path);
+  const inputDigests = Array.isArray(receipt.inputDigests) ? receipt.inputDigests : [];
+  return {
+    reviewerId: String(receipt.reviewerId ?? ''),
+    roles: [String(receipt.reviewerRole ?? '')].filter(Boolean),
+    outputPath: path,
+    // The certificate binds the observable receipt bytes. `reviewDigest` is a
+    // reviewer-internal semantic signature and deliberately excludes itself,
+    // so it cannot prove that the declared output path still contains that
+    // receipt.
+    digest: digestOf(path),
+    inputPaths: inputDigests.map((entry: Record<string, any>) => String(entry.path ?? '')).filter(Boolean),
+    inputDigests: inputDigests.map((entry: Record<string, any>) => String(entry.digest ?? '')).filter(Boolean)
+  };
+}
+
+function sourceLocation(inputPath: string): { absolutePath: string; repoRoot: string; repoPath: string } {
+  const absolutePath = path.resolve(inputPath);
+  const repoRoot = gitAt(path.dirname(absolutePath), ['rev-parse', '--show-toplevel']);
+  const repoPath = path.relative(repoRoot, absolutePath).replace(/\\/g, '/');
+  return { absolutePath, repoRoot, repoPath };
+}
+
+function dimensionsFromAuthority(): FourPlanIndependentCertificate['dimensions'] {
+  return DIMENSION_SPECS.map(({ dimensionId, evidenceRefs }) => ({
+    dimensionId,
+    // Every authority starts as a positive claim. Missing, dirty, unreachable,
+    // mismatched, or reviewer-negative evidence is turned into not-complete by
+    // the pure compiler; no prior certificate can elevate it.
+    status: 'proven' as const,
+    digest: composeEvidenceDigest(evidenceRefs.map((path) => ({ path, digest: existsSync(path) ? digestOf(path) : '' }))),
+    evidenceRefs: [...evidenceRefs],
+    reviewerRole: null
+  }));
 }
 
 function resolveOriginMain(): string {
@@ -84,27 +157,22 @@ function resolveOriginMain(): string {
 }
 
 function observe(paths: readonly string[], targetHead: string): FourPlanEvidenceObservation[] {
-  const tracked = new Set(
-    paths.filter((path) => gitOk(['ls-files', '--error-unmatch', '--', path]))
-  );
-  const dirty = new Set(
-    git(['status', '--porcelain', '--', ...paths])
-      .split(/\r?\n/)
-      .filter((line) => line.trim().length > 0)
-      .map((line) => line.slice(3).replace(/^"|"$/g, '').replace(/\\/g, '/').trim())
-  );
-  return paths.map((path) => {
-    const present = existsSync(path);
-    const lastCommit = tracked.has(path) ? git(['log', '-1', '--format=%H', '--', path]) : '';
+  return paths.map((inputPath) => {
+    const present = existsSync(inputPath);
+    let location: { absolutePath: string; repoRoot: string; repoPath: string } | null = null;
+    try { if (present) location = sourceLocation(inputPath); } catch { location = null; }
+    const tracked = location !== null && gitOkAt(location.repoRoot, ['ls-files', '--error-unmatch', '--', location.repoPath]);
+    const dirty = tracked && location !== null && gitAt(location.repoRoot, ['status', '--porcelain', '--', location.repoPath]).trim().length > 0;
+    const lastCommit = tracked && location !== null ? gitAt(location.repoRoot, ['log', '-1', '--format=%H', '--', location.repoPath]) : '';
     return {
-      path,
+      path: inputPath,
       present,
-      digest: present ? digestOf(path) : '',
-      tracked: tracked.has(path),
-      dirty: dirty.has(path),
+      digest: present ? digestOf(inputPath) : '',
+      tracked,
+      dirty,
       lastCommit,
       reachableFromTargetHead:
-        lastCommit.length === 40 && gitOk(['merge-base', '--is-ancestor', lastCommit, targetHead])
+        lastCommit.length === 40 && location !== null && gitOkAt(location.repoRoot, ['merge-base', '--is-ancestor', lastCommit, targetHead])
     };
   });
 }
@@ -150,7 +218,6 @@ function buildReleaseSurfaces(
 }
 
 function compile(generatedAt: string): CompileOutcome {
-  const prior = JSON.parse(readFileSync(CERTIFICATE_PATH, 'utf8')) as Record<string, any>;
   const closeback = JSON.parse(readFileSync(CLOSEBACK_PATH, 'utf8')) as Record<string, any>;
   const originMain = resolveOriginMain();
   // Evidence freshness is judged against the published branch for the same
@@ -158,36 +225,15 @@ function compile(generatedAt: string): CompileOutcome {
   // remote has not been published and cannot support a release verdict.
   const targetHead = originMain;
 
-  const dimensions = (prior.dimensions ?? []).map((dimension: Record<string, any>) => ({
-    dimensionId: String(dimension.dimensionId ?? ''),
-    status: dimension.status,
-    digest: String(dimension.digest ?? ''),
-    evidenceRefs: (dimension.evidenceRefs ?? []).map(String),
-    reviewerRole: dimension.reviewerRole ?? null
-  }));
-  const reviewers: FourPlanReviewer[] = (prior.reviewers ?? []).map((reviewer: Record<string, any>) => ({
-    reviewerId: String(reviewer.reviewerId ?? ''),
-    roles: (reviewer.roles ?? []).map(String),
-    outputPath: String(reviewer.outputPath ?? ''),
-    // Re-observe every reviewer receipt and every declared input.  Prior
-    // certificate values are configuration only; they are never accepted as
-    // evidence digests for the next certificate.
-    // A certificate cannot be a reviewer receipt for itself.  Do not hash the
-    // output certificate here: that creates a changing self-input and makes a
-    // rejected declaration destabilise otherwise reproducible validation.
-    digest: String(reviewer.outputPath ?? '') !== CERTIFICATE_PATH && existsSync(String(reviewer.outputPath))
-      ? digestOf(String(reviewer.outputPath))
-      : '',
-    inputPaths: (reviewer.inputPaths ?? []).map(String),
-    inputDigests: (reviewer.inputPaths ?? [])
-      .map(String)
-      .filter((path: string) => existsSync(path))
-      .map((path: string) => digestOf(path))
-  }));
+  const dimensions = dimensionsFromAuthority();
+  const reviewers: FourPlanReviewer[] = [
+    reviewerFromReceipt(REVIEWER_A_PATH),
+    reviewerFromReceipt(REVIEWER_B_PATH)
+  ];
 
   const referenced = [
     ...new Set<string>([
-      ...dimensions.flatMap((dimension: { evidenceRefs: string[] }) => dimension.evidenceRefs),
+      ...dimensions.flatMap((dimension: { evidenceRefs: readonly string[] }) => dimension.evidenceRefs),
       ...reviewers.flatMap((reviewer) => [reviewer.outputPath, ...(reviewer.inputPaths ?? [])])
     ])
   ]
@@ -195,17 +241,17 @@ function compile(generatedAt: string): CompileOutcome {
     .sort();
 
   const certificate = compileFourPlanIndependentCertificate({
-    certificateId: String(prior.certificateId ?? ''),
+    certificateId: 'ATM-GOV-0341-independent-four-plan-certificate',
     certificatePath: CERTIFICATE_PATH,
     generatedAt,
-    writerRole: String(prior.writerRole ?? ''),
+    writerRole: 'certificate-writer',
     reviewers,
-    minimumIndependentReviewers: Number(prior.minimumIndependentReviewers ?? 0),
-    forbiddenReviewerRoles: (prior.forbiddenReviewerRoles ?? []).map(String),
+    minimumIndependentReviewers: 2,
+    forbiddenReviewerRoles: ['certificate-writer', 'closure-actor', 'evidence-producer', 'fixture-generator', 'implementer', 'override-approver'],
     dimensions,
     evidenceObservations: observe(referenced, targetHead),
     releaseSurfaces: buildReleaseSurfaces(closeback, originMain),
-    mutationControls: (prior.mutationControls ?? []).map(String),
+    mutationControls: ['digest-parity-before-release', 'fail-closed-on-not-complete', 'independent-reviewer-role-separation', 'no-legacy-retirement-with-stale-or-unpushed-surface'],
     provenance: {
       compiledBy: 'scripts/compile-four-plan-independent-certificate.ts',
       observedRemoteHead: originMain,
@@ -213,7 +259,8 @@ function compile(generatedAt: string): CompileOutcome {
       remoteRef: `${REMOTE}/${BRANCH}`,
       closebackDigest: digestOf(CLOSEBACK_PATH),
       closebackTargetHead: String(closeback.targetHead ?? ''),
-      taskId: 'ATM-GOV-0360'
+      taskId: 'ATM-GOV-0341',
+      reviewerReceipts: [REVIEWER_A_PATH, REVIEWER_B_PATH]
     }
   });
   return { certificate, targetHead, originMain };
