@@ -1,4 +1,48 @@
 import { validateRunnerBuildOutputInventory } from '../../../../core/dist/broker/runner-build-output-inventory.js';
+function normalizedStringSet(value) {
+    if (!Array.isArray(value))
+        return [];
+    return [...new Set(value
+            .filter((entry) => typeof entry === 'string')
+            .map((entry) => entry.trim())
+            .filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+function sameStringSet(left, right) {
+    return JSON.stringify([...left].sort()) === JSON.stringify([...right].sort());
+}
+/**
+ * A durable receipt may be owned by the delivery task while its sealed build
+ * outputs are attributed to its coalesced framework-temp producer(s).  The
+ * receipt is the authority after publication; a live lease is deliberately
+ * not, because it may correctly have been released before closeout.
+ */
+function resolveAuthorizedProducerTaskIds(input) {
+    const linkedTaskIds = normalizedStringSet(input.receipt.linkedTaskIds);
+    if (!linkedTaskIds.includes(input.closingTaskId)) {
+        return { producerTaskIds: [], reason: 'runner-sync receipt does not durably link this closing task to its producer group' };
+    }
+    const memberTaskIds = normalizedStringSet(input.receipt.memberTaskIds);
+    if (memberTaskIds.length === 0) {
+        return { producerTaskIds: [], reason: 'runner-sync receipt has no producer member attribution' };
+    }
+    const groupManifest = input.receipt.groupManifest;
+    const groupMembers = groupManifest && typeof groupManifest === 'object' && !Array.isArray(groupManifest)
+        ? normalizedStringSet(groupManifest.memberTaskIds)
+        : [];
+    if (!sameStringSet(memberTaskIds, groupMembers)) {
+        return { producerTaskIds: [], reason: 'runner-sync receipt producer group attribution is missing or inconsistent' };
+    }
+    const childAttribution = input.receipt.childAttribution;
+    const attributedMembers = childAttribution && typeof childAttribution === 'object' && !Array.isArray(childAttribution)
+        ? normalizedStringSet(childAttribution.members?.map((entry) => (entry && typeof entry === 'object' && !Array.isArray(entry) ? entry.taskId : null)))
+        : [];
+    const attributionComplete = childAttribution && typeof childAttribution === 'object' && !Array.isArray(childAttribution)
+        && childAttribution.complete === true;
+    if (!attributionComplete || !sameStringSet(memberTaskIds, attributedMembers)) {
+        return { producerTaskIds: [], reason: 'runner-sync receipt child attribution is incomplete or inconsistent' };
+    }
+    return { producerTaskIds: memberTaskIds, reason: null };
+}
 /** Converts a sealed receipt into an exact, task-owned close bundle. */
 export function resolveRunnerPublicationCloseHandoff(input) {
     if (!input.receipt || input.receipt.schemaId !== 'atm.runnerSyncReceipt.v1') {
@@ -11,9 +55,14 @@ export function resolveRunnerPublicationCloseHandoff(input) {
     if (!validated.ok || !validated.inventory) {
         return { ok: false, stageFiles: [], reason: 'runner-sync receipt output inventory is invalid' };
     }
-    const foreign = validated.inventory.entries.filter((entry) => entry.disposition !== 'owned-current' || entry.ownerTaskId !== input.taskId);
+    const producers = resolveAuthorizedProducerTaskIds({ closingTaskId: input.taskId, receipt: input.receipt });
+    if (producers.reason) {
+        return { ok: false, stageFiles: [], reason: producers.reason };
+    }
+    const authorizedOwners = new Set([input.taskId, ...producers.producerTaskIds]);
+    const foreign = validated.inventory.entries.filter((entry) => entry.disposition !== 'owned-current' || !entry.ownerTaskId || !authorizedOwners.has(entry.ownerTaskId));
     if (foreign.length > 0) {
-        return { ok: false, stageFiles: [], reason: 'runner-sync receipt inventory contains output not owned by the closing task' };
+        return { ok: false, stageFiles: [], reason: 'runner-sync receipt inventory contains output not owned by the closing task or its attested producer group' };
     }
     return {
         ok: true,

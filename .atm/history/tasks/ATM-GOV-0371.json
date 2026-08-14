@@ -16,6 +16,13 @@
     "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
     "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
     "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "packages/cli/dist/commands/emergency/__tests__/gate.test.d.ts",
+    "packages/cli/dist/commands/emergency/gate.d.ts",
+    "packages/cli/dist/commands/framework-development/runner-publication-close-handoff.js",
+    "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+    "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
+    "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+    "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
     "release/atm-onefile/atm.mjs",
     "release/atm-onefile/release-manifest.json",
     "release/atm-root-drop"
@@ -27,9 +34,19 @@
     "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
     "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
     "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "packages/cli/dist/commands/emergency/__tests__/gate.test.d.ts",
+    "packages/cli/dist/commands/emergency/gate.d.ts",
+    "packages/cli/dist/commands/framework-development/runner-publication-close-handoff.js",
+    "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+    "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
+    "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+    "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
     "release/atm-onefile/atm.mjs",
     "release/atm-onefile/release-manifest.json",
-    "release/atm-root-drop"
+    "release/atm-root-drop",
+    ".atm/history/evidence/ATM-GOV-0371.*",
+    ".atm/history/task-events/ATM-GOV-0371/**",
+    ".atm/history/tasks/ATM-GOV-0371.json"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
@@ -58,24 +75,24 @@
   "source": {
     "planPath": "governance-optimization/tasks/ATM-GOV-0371-fail-closed-when-governed-commit-tree-diverges-from-sealed-candidate.task.md",
     "sectionTitle": "ATM-GOV-0371",
-    "headingLine": 71,
-    "hash": "b512eb565998c94a",
+    "headingLine": 85,
+    "hash": "ed5d4ddb02925203",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0371-fail-closed-when-governed-commit-tree-diverges-from-sealed-candidate.task.md",
       "planningCommitSha": null,
-      "contentDigest": "sha256:b512eb565998c94a41ce8da4056181e7b9723f142ee9981c2524f145ca63e964",
+      "contentDigest": "sha256:ed5d4ddb02925203b4c89113f4ec56db42ddf05eed163d805c656f3ab50b6c1f",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-14T01:27:26.363Z"
+      "sealedAt": "2026-08-14T01:32:06.795Z"
     }
   },
-  "importedAt": "2026-08-14T01:27:26.363Z",
+  "importedAt": "2026-08-14T01:32:06.795Z",
   "workAdmission": {
     "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -151,12 +168,19 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-c1156f8883f3",
     "claimedAt": "2026-08-14T00:48:35.886Z",
-    "heartbeatAt": "2026-08-14T01:27:33.860Z",
+    "heartbeatAt": "2026-08-14T01:32:18.910Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0371.*",
       ".atm/history/task-events/ATM-GOV-0371/**",
       ".atm/history/tasks/ATM-GOV-0371.json",
+      "packages/cli/dist/commands/emergency/__tests__/gate.test.d.ts",
+      "packages/cli/dist/commands/emergency/gate.d.ts",
+      "packages/cli/dist/commands/framework-development/runner-publication-close-handoff.js",
+      "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+      "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
+      "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
       "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
@@ -190,6 +214,13 @@
       ".atm/history/evidence/ATM-GOV-0371.*",
       ".atm/history/task-events/ATM-GOV-0371/**",
       ".atm/history/tasks/ATM-GOV-0371.json",
+      "packages/cli/dist/commands/emergency/__tests__/gate.test.d.ts",
+      "packages/cli/dist/commands/emergency/gate.d.ts",
+      "packages/cli/dist/commands/framework-development/runner-publication-close-handoff.js",
+      "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+      "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
+      "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
       "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
@@ -215,26 +246,26 @@
     "createdAt": "2026-08-14T00:48:39.882Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-14T01-27-34-095Z-renew-ca6a725c4c96",
-  "lastTransitionAt": "2026-08-14T01:27:34.095Z",
+  "lastTransitionId": "2026-08-14T01-32-19-189Z-renew-9002f3bca9dd",
+  "lastTransitionAt": "2026-08-14T01:32:19.189Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d95c92e7b1529c33",
-    "ticketDigest": "sha256:d95c92e7b1529c33965f4db67e0f8d89b34297be979c991cc8aee7c2d20e82c5",
+    "ticketId": "wat-5e1f272bf10529b5",
+    "ticketDigest": "sha256:5e1f272bf10529b55d5ceb01188da91685bdffa8dddbb20f6e4cc1f04c959406",
     "taskId": "ATM-GOV-0371",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260814004836-codex-gpt-5.4-mini-7bead8f467",
     "claimGeneration": "lease-c1156f8883f3",
-    "issuedAt": "2026-08-14T01:27:33.860Z",
-    "expiresAt": "2026-08-14T01:57:33.860Z",
-    "scopeDigest": "sha256:b67dfbebbb2cf112b69fbac69272a787ce3869061fc6066eaf501022cb0fdeb4",
+    "issuedAt": "2026-08-14T01:32:18.910Z",
+    "expiresAt": "2026-08-14T02:02:18.910Z",
+    "scopeDigest": "sha256:ec19aa045da39b0d7fbe818a949885f0eb8137eede1eb6da4e9b1d850c7aceb0",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T01:27:33.860Z"
+      "selectedAt": "2026-08-14T01:32:18.910Z"
     },
     "grants": [
       {
@@ -244,6 +275,13 @@
           ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0371/**",
           ".atm/history/tasks/ATM-GOV-0371.json",
+          "packages/cli/dist/commands/emergency/__tests__/gate.test.d.ts",
+          "packages/cli/dist/commands/emergency/gate.d.ts",
+          "packages/cli/dist/commands/framework-development/runner-publication-close-handoff.js",
+          "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+          "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
+          "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+          "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
           "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
@@ -254,7 +292,7 @@
           "release/atm-onefile/release-manifest.json",
           "release/atm-root-drop"
         ],
-        "digest": "sha256:2b81d81d1950efcbd27cf2490df97d07f6178a98cf0595daad1f0dedf6f3a463"
+        "digest": "sha256:332fad8da58a750c0cd85028a6b7746bf46b94e97aaa7c837c50316846a324de"
       },
       {
         "kind": "lifecycle-operation",
@@ -276,16 +314,16 @@
     "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
-      "resolvedMode": "disabled",
+      "resolvedMode": "enabled",
       "reasons": [
-        "low-risk-task"
+        "complex-task"
       ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
   }
 }

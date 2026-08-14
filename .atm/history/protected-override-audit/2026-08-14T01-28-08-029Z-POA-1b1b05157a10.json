@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-1b1b05157a10",
+  "recordedAt": "2026-08-14T01:28:08.029Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0371",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0371 --message \"fix(git): seal staged deletions in candidate bundle\n\nATM-Work-Admission: wat-d95c92e7b1529c33 sha256:d95c92e7b1529c33965f4db67e0f8d89b34297be979c991cc8aee7c2d20e82c5\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0371-655d473f05",
+  "reason": "Bootstrap self-hosted repair; released foreign staged evidence triggers the currently overbroad hook outside the sealed task bundle.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T01-28-08-028Z-EMG-ATM-GOV-0371-655d473f05.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
