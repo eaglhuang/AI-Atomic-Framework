@@ -1,0 +1,157 @@
+{
+  "taskId": "ATM-GOV-0372",
+  "updatedAt": "2026-08-14T13:04:02.076Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260814021734-codex-gpt-5.4-mini-ATM-GOV-0372-cd61961da1",
+      "createdAt": "2026-08-14T02:30:00.609Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260814021734-codex-gpt-5.4-mini-ATM-GOV-0372-cd61961da1",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-direction-authority",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:62a2b267d47ab9fec9c128a5cee0d1b6d071f4dd91ae247185d38a868dee6a0c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-14T02:30:00.191Z",
+            "finishedAt": "2026-08-14T02:30:00.608Z",
+            "durationMs": 417,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "cacheKey": "sha256:133036c32ca5f4bbca44ca08860cac4481560f4ba16f074cc5526a2791f9045e",
+            "generatedAt": "2026-08-14T02:30:00.608Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:133036c32ca5f4bbca44ca08860cac4481560f4ba16f074cc5526a2791f9045e",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-14T02:30:00.608Z",
+              "observedAt": "2026-08-14T02:30:00.608Z",
+              "startedAt": "2026-08-14T02:30:00.191Z",
+              "finishedAt": "2026-08-14T02:30:00.608Z",
+              "durationMs": 417,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:26f9de9c6dc2e16a31bd84f8f36476dff474cbb0548ee1791bf82e03d4403cb6",
+              "outputDigest": "sha256:cc35fbd6b00368e50d8509d2af0c7a6cec5753a2e93e3a2648d5a6ea32f4a59d",
+              "cache": {
+                "key": "sha256:133036c32ca5f4bbca44ca08860cac4481560f4ba16f074cc5526a2791f9045e",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": null,
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1d6ba5aeb15c3ac6ca0e9cb12f32b4ee87b0c81a72536c86c06056930564a0fa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0372: codex-gpt-5.4-mini -> codex-captain-recovery.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0372.json"
+      ],
+      "producedBy": "codex-captain-recovery",
+      "createdAt": "2026-08-14T13:04:02.076Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "codex-gpt-5.4-mini",
+          "leaseId": "lease-73d92abf46f5",
+          "claimedAt": "2026-08-14T02:17:34.595Z",
+          "heartbeatAt": "2026-08-14T02:26:03.665Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/evidence/ATM-GOV-0372.*",
+            ".atm/history/task-events/ATM-GOV-0372/**",
+            ".atm/history/tasks/ATM-GOV-0372.json",
+            "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+            "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+            "packages/cli/src/commands/task-direction.ts",
+            "packages/cli/src/commands/task-direction/active-locks.ts",
+            "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+          ],
+          "state": "active",
+          "laneSession": {
+            "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
+            "status": "adopted",
+            "source": "env",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5\""
+          }
+        },
+        "newClaim": {
+          "actorId": "codex-captain-recovery",
+          "leaseId": "lease-2d1f06a26415",
+          "claimedAt": "2026-08-14T13:04:01.501Z",
+          "heartbeatAt": "2026-08-14T13:04:01.501Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0372.json"
+          ],
+          "state": "active",
+          "intent": "write",
+          "laneSession": {
+            "laneSessionId": "lane-20260814121802-codex-captain-recovery-2683c73c43",
+            "status": "adopted",
+            "source": "env",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814121802-codex-captain-recovery-2683c73c43\""
+          },
+          "reason": "Predecessor lease expired; runner publication and scope repair reproduce the card's direction-lock authority split-brain."
+        }
+      }
+    }
+  ]
+}

@@ -162,8 +162,23 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
       if (existsSync(filePath)) {
         const existing = readJsonFile(filePath) as Record<string, unknown>;
         if (isReleasedLockRecord(existing) || existing.lockedBy === actor || existing.actorId === actor) {
-          writeJsonFile(filePath, record);
-          return record;
+          // A same-owner acquire refreshes the short-lived scope projection. It
+          // must not erase a live task-direction authority embedded by the
+          // lifecycle writer: that would leave the ledger and runtime views of
+          // one task disagreeing after an ordinary renew/lock operation.
+          // Released records deliberately do not carry this authority forward;
+          // a later governed claim materializes a fresh direction lock.
+          const taskDirectionLock = !isReleasedLockRecord(existing)
+            && existing.taskDirectionLock
+            && typeof existing.taskDirectionLock === 'object'
+            && !Array.isArray(existing.taskDirectionLock)
+            ? existing.taskDirectionLock
+            : null;
+          const refreshed = taskDirectionLock
+            ? { ...record, taskDirectionLock }
+            : record;
+          writeJsonFile(filePath, refreshed);
+          return refreshed;
         }
         throw createLockConflictError(workItem.workItemId, existing);
       }

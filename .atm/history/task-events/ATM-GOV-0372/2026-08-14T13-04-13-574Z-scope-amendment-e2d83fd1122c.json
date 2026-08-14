@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T13-04-13-574Z-scope-amendment-e2d83fd1122c",
+  "taskId": "ATM-GOV-0372",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-recovery",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0372.json",
+  "taskSha256": "sha256:2be4582864f4c29bcdea94c4ab70f8170fe9cb405987f18483152079678d7ace",
+  "createdAt": "2026-08-14T13:04:13.574Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0372 --actor codex-captain-recovery --add \"packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts,packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts,packages/cli/src/commands/task-direction.ts,packages/cli/src/commands/task-direction/active-locks.ts,packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts\" --reason \"Synchronize active direction lock with already-issued task ticket scope after governed takeover.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Synchronize active direction lock with already-issued task ticket scope after governed takeover."
+  }
+}

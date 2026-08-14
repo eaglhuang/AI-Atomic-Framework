@@ -25,7 +25,9 @@
     ".atm/history/evidence/ATM-GOV-0372.*",
     ".atm/history/task-events/ATM-GOV-0372/**",
     ".atm/history/tasks/ATM-GOV-0372.json",
-    "packages/cli/src/commands/task-direction/active-locks.ts"
+    "packages/cli/src/commands/task-direction/active-locks.ts",
+    "packages/cli/src/commands/lock.ts",
+    "packages/plugin-governance-local/src/stores.ts"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
@@ -191,17 +193,17 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T02-26-03-863Z-renew-8a84d10b0e16",
-  "lastTransitionAt": "2026-08-14T02:26:03.863Z",
+  "lastTransitionId": "2026-08-14T13-08-40-964Z-renew-a43160faa413",
+  "lastTransitionAt": "2026-08-14T13:08:40.964Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
+  "owner": "codex-captain-recovery",
   "reservedAt": "2026-08-14T02:17:34.586Z",
   "promotedAt": "2026-08-14T02:17:34.590Z",
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-73d92abf46f5",
-    "claimedAt": "2026-08-14T02:17:34.595Z",
-    "heartbeatAt": "2026-08-14T02:26:03.665Z",
+    "actorId": "codex-captain-recovery",
+    "leaseId": "lease-2d1f06a26415",
+    "claimedAt": "2026-08-14T13:04:01.501Z",
+    "heartbeatAt": "2026-08-14T13:08:40.518Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0372.*",
@@ -209,16 +211,19 @@
       ".atm/history/tasks/ATM-GOV-0372.json",
       "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
       "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/lock.ts",
       "packages/cli/src/commands/task-direction.ts",
       "packages/cli/src/commands/task-direction/active-locks.ts",
-      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "packages/plugin-governance-local/src/stores.ts"
     ],
     "state": "active",
+    "reason": "Predecessor lease expired; runner publication and scope repair reproduce the card's direction-lock authority split-brain.",
     "laneSession": {
-      "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
+      "laneSessionId": "lane-20260814121802-codex-captain-recovery-2683c73c43",
       "status": "adopted",
       "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814121802-codex-captain-recovery-2683c73c43\""
     }
   },
   "startedAt": "2026-08-14T02:17:34.595Z",
@@ -226,20 +231,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-f6edcb9230bed9ad",
-    "ticketDigest": "sha256:f6edcb9230bed9ad223225fb09389cd4514fca7ad2d6719cd6a547c002e3514e",
+    "ticketId": "wat-1d2eb6d00ad17fc3",
+    "ticketDigest": "sha256:1d2eb6d00ad17fc3e92df286d1d492924bd0720dd58ef5ec105fd041e53f15eb",
     "taskId": "ATM-GOV-0372",
     "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
-    "claimGeneration": "lease-73d92abf46f5",
-    "issuedAt": "2026-08-14T02:26:03.665Z",
-    "expiresAt": "2026-08-14T02:56:03.665Z",
-    "scopeDigest": "sha256:6836290ce7463a683ee27b5a6f0ce9ccbd4a7fc5f44f165e3604dd173b1f6b51",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814121802-codex-captain-recovery-2683c73c43",
+    "claimGeneration": "lease-2d1f06a26415",
+    "issuedAt": "2026-08-14T13:08:40.518Z",
+    "expiresAt": "2026-08-14T13:38:40.518Z",
+    "scopeDigest": "sha256:87b182d52696892c39a0e00c5f73ac6edb735ff637f37ff9ae0caa44d9f4e20e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T02:26:03.665Z"
+      "selectedAt": "2026-08-14T13:08:40.518Z"
     },
     "grants": [
       {
@@ -250,11 +255,13 @@
           ".atm/history/tasks/ATM-GOV-0372.json",
           "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
           "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+          "packages/cli/src/commands/lock.ts",
           "packages/cli/src/commands/task-direction.ts",
           "packages/cli/src/commands/task-direction/active-locks.ts",
-          "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+          "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+          "packages/plugin-governance-local/src/stores.ts"
         ],
-        "digest": "sha256:ffc0f16d54d6d3a1b3de7daa3b97e620f482ab273db460551de4c4fb03d38576"
+        "digest": "sha256:764604daa13ab53d76c42971086be9af6d0ca99c3e1bc6e2b826bcba928e9ca8"
       },
       {
         "kind": "lifecycle-operation",
@@ -288,7 +295,7 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260814021734-codex-gpt-5.4-mini-ATM-GOV-0372-cd61961da1",
+  "startedBySessionId": "session-20260814130401-codex-captain-recovery-ATM-GOV-0372-60f973745c",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -303,30 +310,25 @@
       ".atm/history/tasks/ATM-GOV-0372.json",
       "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
       "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/lock.ts",
       "packages/cli/src/commands/task-direction.ts",
       "packages/cli/src/commands/task-direction/active-locks.ts",
-      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "packages/plugin-governance-local/src/stores.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0372-unify-direction-lock-authority-snapshots-for-framework-publication.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0372-unify-direction-lock-authority-snapshots-for-framework-publication.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
-    "promptHash": "48e9e0f1d5081fbed09248415a447e6e3b02a7acf414986e73e0f2839a26f584",
-    "actorId": "codex-gpt-5.4-mini",
-    "sessionId": null,
+    "promptHash": "2e05e3017cf8f122916d27b5775aa1bd39037de1b3eeb0489a4adea5ab2294bb",
+    "actorId": "codex-captain-recovery",
+    "sessionId": "session-20260814130401-codex-captain-recovery-ATM-GOV-0372-60f973745c",
     "laneSession": {
-      "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
+      "laneSessionId": "lane-20260814121802-codex-captain-recovery-2683c73c43",
       "status": "adopted",
       "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814121802-codex-captain-recovery-2683c73c43\""
     },
-    "createdAt": "2026-08-14T02:17:38.725Z",
+    "createdAt": "2026-08-14T13:04:02.068Z",
     "status": "active"
   }
 }
