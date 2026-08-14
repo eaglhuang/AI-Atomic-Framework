@@ -1,11 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0375",
-  "updatedAt": "2026-08-14T06:12:56.732Z",
+  "updatedAt": "2026-08-14T07:12:14.428Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
-    "node --strip-types tests/cli/runbook-release-authority-review.test.ts"
+    "node --strip-types tests/cli/runbook-release-authority-review.test.ts",
+    "typecheck",
+    "validate:cli"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -71,6 +73,38 @@
       "durationMs": 2145,
       "runnerKind": "dev-source",
       "sourceCommit": "0aa1d1399ab0817e328171bf39ea8d33524c4802",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T07:11:20.022Z",
+      "startedAt": "2026-08-14T07:11:11.626Z",
+      "finishedAt": "2026-08-14T07:11:20.022Z",
+      "durationMs": 8396,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ba2a55361300bf54085f81507be151d7a713e1fa",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:377fddb0fdaf79a765d4c66e9562821d44c6eeecb9506065ae7507a625d26c4c",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-14T07:12:14.427Z",
+      "startedAt": "2026-08-14T07:11:55.171Z",
+      "finishedAt": "2026-08-14T07:12:14.427Z",
+      "durationMs": 19256,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ba2a55361300bf54085f81507be151d7a713e1fa",
       "cached": false
     }
   ],

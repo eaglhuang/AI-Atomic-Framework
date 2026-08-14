@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-e7d22f650e23",
+  "recordedAt": "2026-08-14T06:13:35.719Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0375",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0375 --message \"fix(review): replay sealed release projection\n\nATM-Work-Admission: wat-f554e65b7a544aec sha256:f554e65b7a544aec0969e8df75743aac72274e2d908145f9ad36b32e28048e8b\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0375-4bf2a5e594",
+  "reason": "Normal governed pre-commit hook reproducibly timed out; sealed replay fix and fresh evidence were verified.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T06-13-35-718Z-EMG-ATM-GOV-0375-4bf2a5e594.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
