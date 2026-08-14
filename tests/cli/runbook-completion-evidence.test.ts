@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, isDeclaredPublicationDelta, isPublicationOnlyDelta, semanticTaskCardDigest } from '../../scripts/compile-runbook-completion-evidence.ts';
+import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, effectiveEvidenceContracts, independentExitContracts, isDeclaredPublicationDelta, isPublicationOnlyDelta, semanticTaskCardDigest } from '../../scripts/compile-runbook-completion-evidence.ts';
 import { validateReport } from '../../scripts/validate-runbook-completion-evidence.ts';
 
 const sha = 'a'.repeat(40);
@@ -30,6 +30,25 @@ assert.equal(
   ], ['docs/reports/plan-3x-4x-runbook-completion-evidence.json']),
   false,
   'an undeclared source change must invalidate a publication snapshot'
+);
+const primaryContract = {
+  taskId: 'ATM-GOV-9000', wave: 'Wave 0', phase: 'correction-wave-0', validators: [], registered: true,
+  publicSeams: ['atm.example.v1'], deliverables: ['docs/reports/example.json'], causalDependencies: []
+};
+const replayContract = {
+  taskId: 'ATM-GOV-9001', wave: 'Wave 0', phase: 'correction-wave-0', validators: [], registered: false,
+  publicSeams: ['atm.example.v1'], deliverables: ['docs/reports/example.json'], causalDependencies: []
+};
+const exitContract = {
+  taskId: 'ATM-GOV-9002', wave: 'Wave 0', phase: 'correction-wave-0', validators: [], registered: false,
+  publicSeams: ['atm.example.v1'], deliverables: ['tests/example.test.ts'], causalDependencies: ['ATM-GOV-9001']
+};
+const effectiveContracts = effectiveEvidenceContracts([primaryContract], [primaryContract, replayContract, exitContract]);
+assert.deepEqual(effectiveContracts.map((contract) => contract.taskId), ['ATM-GOV-9001'], 'only a unique same-seam artifact replay may replace a stale primary receipt');
+assert.deepEqual(
+  independentExitContracts(effectiveContracts, [primaryContract, replayContract, exitContract], 'Wave 0').map((contract) => contract.taskId),
+  ['ATM-GOV-9002'],
+  'a Wave exit must consume a downstream observer rather than reuse the replay receipt'
 );
 // Use synthetic wave numbers so repository evidence cannot hydrate this isolated fixture.
 const source = ['## Wave 98 — Preserve', '- [ ] first requirement', '退出條件：first exit', '## Wave 99 — Restore', '- [x] second requirement', '退出條件：second exit'].join('\n');

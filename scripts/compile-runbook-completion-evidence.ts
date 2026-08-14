@@ -94,7 +94,26 @@ const NON_SEMANTIC_COMMANDS = new Set(['npm run typecheck', 'npm run validate:cl
 const ancestryCache = new Map<string, boolean>();
 const evidenceCache = new Map<string, EvidenceTuple[]>();
 
-type CardContract = { taskId: string; wave: string | null; phase: string; validators: ValidatorContract[] };
+export type CardContract = {
+  taskId: string;
+  wave: string | null;
+  phase: string;
+  validators: ValidatorContract[];
+  registered: boolean;
+  publicSeams: string[];
+  deliverables: string[];
+  causalDependencies: string[];
+};
+
+function yamlInlineList(source: string, key: string): string[] {
+  const match = new RegExp(`^\\s*${key}:\\s*\\[([^\\]]*)\\]`, 'm').exec(source);
+  return match?.[1].split(',').map((value) => value.trim()).filter(Boolean) ?? [];
+}
+
+function yamlListBlock(source: string, key: string): string[] {
+  const match = new RegExp(`^${key}:\\s*\\r?\\n((?:\\s+- .+\\r?\\n)+)`, 'm').exec(source);
+  return [...(match?.[1].matchAll(/^\s+-\s+(.+)$/gm) ?? [])].map((entry) => entry[1].trim());
+}
 
 function discoverCardContracts(runbookSource: string): CardContract[] {
   const taskDir = resolve(DEFAULT_PLANNING_ROOT, dirname(RUNBOOK_RELATIVE_PATH), 'tasks');
@@ -103,7 +122,7 @@ function discoverCardContracts(runbookSource: string): CardContract[] {
   return readdirSync(taskDir).filter((name) => /^ATM-GOV-\d+-.+\.task\.md$/.test(name)).flatMap((name) => {
     const source = readFileSync(resolve(taskDir, name), 'utf8');
     const taskId = /^task_id:\s*(\S+)/m.exec(source)?.[1];
-    if (!taskId || !registeredIds.has(taskId) || !source.includes(`related_plan: governance-optimization/${basename(RUNBOOK_RELATIVE_PATH)}`)) return [];
+    if (!taskId || !source.includes(`related_plan: governance-optimization/${basename(RUNBOOK_RELATIVE_PATH)}`)) return [];
     const phase = /^\s*phaseOwner:\s*(\S+)/m.exec(source)?.[1] ?? '';
     const waveNumber = /wave-(\d+)/i.exec(phase)?.[1];
     const block = /^validators:\s*\r?\n((?:\s+- .+\r?\n)+)/m.exec(source)?.[1] ?? '';
@@ -119,8 +138,44 @@ function discoverCardContracts(runbookSource: string): CardContract[] {
         command
       };
     });
-    return [{ taskId, wave: waveNumber ? `Wave ${Number(waveNumber)}` : null, phase, validators }];
+    return [{
+      taskId,
+      wave: waveNumber ? `Wave ${Number(waveNumber)}` : null,
+      phase,
+      validators,
+      registered: registeredIds.has(taskId),
+      publicSeams: yamlInlineList(source, 'changedPublicSeams'),
+      deliverables: yamlListBlock(source, 'deliverables'),
+      causalDependencies: yamlInlineList(source, 'causalDependencies')
+    }];
   });
+}
+
+function sharesValue(left: string[], right: string[]): boolean {
+  const values = new Set(left);
+  return right.some((value) => values.has(value));
+}
+
+/** A replay replaces a primary only when its planning contract proves seam and artifact continuity. */
+export function effectiveEvidenceContracts(primary: CardContract[], all: CardContract[]): CardContract[] {
+  return primary.map((contract) => {
+    const candidates = all.filter((candidate) => !candidate.registered
+      && candidate.wave === contract.wave
+      && sharesValue(candidate.publicSeams, contract.publicSeams)
+      && sharesValue(candidate.deliverables, contract.deliverables));
+    return candidates.length === 1 ? candidates[0] : contract;
+  });
+}
+
+/** A Wave exit needs a downstream observer, never a second use of basis receipts. */
+export function independentExitContracts(effective: CardContract[], all: CardContract[], wave: string | null): CardContract[] {
+  const effectiveIds = new Set(effective.map((contract) => contract.taskId));
+  const seams = effective.flatMap((contract) => contract.publicSeams);
+  return all.filter((candidate) => !candidate.registered
+    && candidate.wave === wave
+    && !effectiveIds.has(candidate.taskId)
+    && sharesValue(candidate.publicSeams, seams)
+    && candidate.causalDependencies.some((dependency) => effectiveIds.has(dependency)));
 }
 
 export function planningSemanticSnapshot(runbookSource: string) {
@@ -129,7 +184,11 @@ export function planningSemanticSnapshot(runbookSource: string) {
     taskId: contract.taskId,
     wave: contract.wave,
     phase: contract.phase,
-    validators: contract.validators.map(({ contractId, taskCardDigest, command }) => ({ contractId, taskCardDigest, command }))
+    validators: contract.validators.map(({ contractId, taskCardDigest, command }) => ({ contractId, taskCardDigest, command })),
+    registered: contract.registered,
+    publicSeams: contract.publicSeams,
+    deliverables: contract.deliverables,
+    causalDependencies: contract.causalDependencies
   })).sort((left, right) => left.taskId.localeCompare(right.taskId))));
   return {
     schemaId: 'atm.planningSemanticSnapshot.v1',
@@ -140,28 +199,29 @@ export function planningSemanticSnapshot(runbookSource: string) {
 }
 
 function contractsForRow(row: CompletionRow, contracts: CardContract[]): CardContract[] {
-  if (row.wave) return contracts.filter((contract) => contract.wave === row.wave);
+  const registered = contracts.filter((contract) => contract.registered);
+  if (row.wave) return registered.filter((contract) => contract.wave === row.wave);
   const requirement = row.requirement;
-  if (row.section === 'Authority and governance') return contracts.filter((contract) => /^correction-wave-[0-2]$/.test(contract.phase));
+  if (row.section === 'Authority and governance') return registered.filter((contract) => /^correction-wave-[0-2]$/.test(contract.phase));
   if (row.section === 'Objective evidence') {
-    if (/Plan 3\.0/.test(requirement)) return contracts.filter((contract) => contract.phase.endsWith('plan30'));
-    if (/Plan 3\.1/.test(requirement)) return contracts.filter((contract) => contract.phase.endsWith('plan31'));
-    if (/Plan 3\.2/.test(requirement)) return contracts.filter((contract) => contract.phase.endsWith('plan32'));
-    if (/Plan 4\.0/.test(requirement)) return contracts.filter((contract) => contract.phase === 'closeout-wave-7');
-    if (/86\/86/.test(requirement)) return contracts.filter((contract) => /^closeout-wave-6-|^correction-wave-5$|^closeout-wave-7$/.test(contract.phase));
-    return contracts.filter((contract) => /^correction-wave-4-|^closeout-wave-7$/.test(contract.phase));
+    if (/Plan 3\.0/.test(requirement)) return registered.filter((contract) => contract.phase.endsWith('plan30'));
+    if (/Plan 3\.1/.test(requirement)) return registered.filter((contract) => contract.phase.endsWith('plan31'));
+    if (/Plan 3\.2/.test(requirement)) return registered.filter((contract) => contract.phase.endsWith('plan32'));
+    if (/Plan 4\.0/.test(requirement)) return registered.filter((contract) => contract.phase === 'closeout-wave-7');
+    if (/86\/86/.test(requirement)) return registered.filter((contract) => /^closeout-wave-6-|^correction-wave-5$|^closeout-wave-7$/.test(contract.phase));
+    return registered.filter((contract) => /^correction-wave-4-|^closeout-wave-7$/.test(contract.phase));
   }
   if (row.section === 'Real execution and dashboard') {
-    if (/shadow/.test(requirement)) return contracts.filter((contract) => contract.phase.endsWith('shadow'));
-    if (/六 adapter/.test(requirement)) return contracts.filter((contract) => contract.phase.endsWith('adapters'));
-    if (/hostile|A\/A|AB\/BA/.test(requirement)) return contracts.filter((contract) => contract.phase.endsWith('dogfood'));
-    return contracts.filter((contract) => contract.phase === 'correction-wave-5');
+    if (/shadow/.test(requirement)) return registered.filter((contract) => contract.phase.endsWith('shadow'));
+    if (/六 adapter/.test(requirement)) return registered.filter((contract) => contract.phase.endsWith('adapters'));
+    if (/hostile|A\/A|AB\/BA/.test(requirement)) return registered.filter((contract) => contract.phase.endsWith('dogfood'));
+    return registered.filter((contract) => contract.phase === 'correction-wave-5');
   }
   if (row.section === 'Tests, backlog and release') {
-    if (/timeout|120 秒|hash-placeholder/.test(requirement)) return contracts.filter((contract) => contract.phase === 'correction-wave-3-performance');
-    if (/catalog|neutrality|coverage/.test(requirement)) return contracts.filter((contract) => contract.phase === 'correction-wave-3-ci');
-    if (/backlog|2026-/.test(requirement)) return contracts.filter((contract) => contract.phase === 'closeout-wave-9');
-    return contracts.filter((contract) => contract.phase === 'closeout-wave-10');
+    if (/timeout|120 秒|hash-placeholder/.test(requirement)) return registered.filter((contract) => contract.phase === 'correction-wave-3-performance');
+    if (/catalog|neutrality|coverage/.test(requirement)) return registered.filter((contract) => contract.phase === 'correction-wave-3-ci');
+    if (/backlog|2026-/.test(requirement)) return registered.filter((contract) => contract.phase === 'closeout-wave-9');
+    return registered.filter((contract) => contract.phase === 'closeout-wave-10');
   }
   return [];
 }
@@ -185,7 +245,7 @@ function evidenceForContracts(contracts: CardContract[], targetHead: string): Ev
   const tuples: EvidenceTuple[] = [];
   const expectedCommands = new Set(contracts.flatMap((contract) => contract.validators.map((validator) => validator.command)));
   const expectedOwners = new Set(contracts.map((contract) => contract.taskId));
-  const cacheKey = `${targetHead}:${[...expectedCommands].sort().join('\u0000')}`;
+  const cacheKey = `${targetHead}:${[...expectedOwners].sort().join('\u0000')}:${[...expectedCommands].sort().join('\u0000')}`;
   const cached = evidenceCache.get(cacheKey);
   if (cached) return cached;
   const evidenceDir = resolve('.atm/history/evidence');
@@ -275,7 +335,7 @@ export function compileRunbookCompletion(
   const contracts = discoverCardContracts(source);
   const planningSnapshot = planningSemanticSnapshot(source);
   parsed.rows = parsed.rows.map((row) => {
-    const hydrated = hydrate(row, contractsForRow(row, contracts), targetHead);
+    const hydrated = hydrate(row, effectiveEvidenceContracts(contractsForRow(row, contracts), contracts), targetHead);
     return requiresFinalCertificate(row) && !finalCertificate.proven
       ? { ...hydrated, status: 'unproven' as const, diagnostics: finalCertificate.diagnostics }
       : hydrated;
@@ -284,7 +344,9 @@ export function compileRunbookCompletion(
   for (const row of parsed.rows) if (row.wave) rowsByWave.set(row.wave, [...(rowsByWave.get(row.wave) ?? []), row]);
   parsed.waveExits = parsed.waveExits.map((row) => {
     const basis = rowsByWave.get(row.wave ?? '') ?? [];
-    const contractsForWave = contracts.filter((contract) => contract.wave === row.wave);
+    const primaryForWave = contracts.filter((contract) => contract.registered && contract.wave === row.wave);
+    const effectiveForWave = effectiveEvidenceContracts(primaryForWave, contracts);
+    const contractsForWave = independentExitContracts(effectiveForWave, contracts, row.wave);
     const hydrated = hydrate(row, contractsForWave, targetHead);
     const basisKeys = new Set(basis.flatMap((item) => item.evidence).map(evidenceTupleKey));
     const independentEvidence = hydrated.evidence.filter((tuple) => !basisKeys.has(evidenceTupleKey(tuple)));
@@ -298,7 +360,7 @@ export function compileRunbookCompletion(
       ? { ...hydrated, evidence: independentEvidence, diagnostics: [] }
       : { ...hydrated, evidence: independentEvidence, status: 'unproven' as const, diagnostics: [
           ...(basis.some((item) => item.status !== 'proven') ? ['wave-requirement-basis-not-proven'] : []),
-          ...(uncoveredOwners.length ? [`missing-independent-wave-exit-evidence:${uncoveredOwners.join(',')}`] : [])
+          ...(uncoveredOwners.length ? [`missing-independent-wave-exit-evidence:${uncoveredOwners.join(',')}`] : ['missing-independent-wave-exit-contract'])
         ] };
   });
   if (authorityDiagnostics.length > 0) {
