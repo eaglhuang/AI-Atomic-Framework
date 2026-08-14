@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-35c191c8daba",
+  "recordedAt": "2026-08-14T16:57:17.024Z",
+  "actorId": "claude-008",
+  "taskId": "ATM-GOV-0392",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0392 --actor claude-008 --status done --json",
+  "flags": [
+    "--allow-stale-runner",
+    "--historical-delivery"
+  ],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-ATM-GOV-0392-bf55b87e01,EMG-ATM-GOV-0392-85ce0d8beb",
+  "reason": "Owner-approved close-only emergency: source repair committed and validated; card forbids runner build/enqueue",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.close"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T16-57-17-022Z-EMG-ATM-GOV-0392-bf55b87e01.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
