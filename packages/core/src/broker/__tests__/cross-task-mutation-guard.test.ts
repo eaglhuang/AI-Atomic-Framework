@@ -56,8 +56,14 @@ writeJson(path.join(repo, '.atm/history/tasks/TASK-B.json'), {
     files: ['src/b.ts', '.atm/history/evidence/TASK-B.*']
   }
 });
+writeJson(path.join(repo, '.atm/history/tasks/TASK-PLANNED.json'), {
+  workItemId: 'TASK-PLANNED',
+  status: 'planned',
+  scopePaths: ['src/planned.ts']
+});
 writeText(path.join(repo, 'src/a.ts'), 'export const a = 1;\n');
 writeText(path.join(repo, 'src/b.ts'), 'export const b = 1;\n');
+writeText(path.join(repo, 'src/planned.ts'), 'export const planned = 1;\n');
 writeText(path.join(repo, '.atm/history/evidence/TASK-B.json'), '{}\n');
 execFileSync('git', ['add', '.'], { cwd: repo, stdio: 'ignore' });
 execFileSync('git', ['commit', '-m', 'fixture'], { cwd: repo, stdio: 'ignore' });
@@ -88,6 +94,15 @@ execFileSync('git', ['reset', '--hard', 'HEAD'], { cwd: repo, stdio: 'ignore' })
 writeText(path.join(repo, 'src/b.ts'), 'export const b = 3;\n');
 assert.equal(detectCrossTaskMutation(repo, 'TASK-A', 'pre-commit'), null);
 assert.ok(detectCrossTaskMutation(repo, 'TASK-A', 'restore'), 'destructive command families inspect unstaged mutations');
+
+execFileSync('git', ['reset', '--hard', 'HEAD'], { cwd: repo, stdio: 'ignore' });
+writeText(path.join(repo, 'src/planned.ts'), 'export const planned = 2;\n');
+execFileSync('git', ['add', 'src/planned.ts'], { cwd: repo, stdio: 'ignore' });
+assert.equal(
+  detectCrossTaskMutation(repo, 'TASK-A', 'pre-commit'),
+  null,
+  'a planned task without a live claim or lock must not become a ghost scope owner'
+);
 
 const incidentRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-cross-task-incident-'));
 execFileSync('git', ['init'], { cwd: incidentRepo, stdio: 'ignore' });
