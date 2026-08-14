@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-4136ed80b4c2",
+  "recordedAt": "2026-08-14T01:50:24.617Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0371",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0371 --message \"build(runner): publish root-drop fixture repair\n\nATM-Work-Admission: wat-d4d89e410d3b350b sha256:d4d89e410d3b350bef141f75cb317deca40873c028a18018a0addc9df201f658\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0371-5659aa51a6",
+  "reason": "Queue-head publication bundle; only known global hook false blocker is bypassed.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T01-50-24-615Z-EMG-ATM-GOV-0371-5659aa51a6.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

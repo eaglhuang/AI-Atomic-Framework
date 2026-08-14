@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0371",
   "title": "Fail closed when governed commit tree diverges from sealed candidate",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -169,7 +169,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-c1156f8883f3",
     "claimedAt": "2026-08-14T00:48:35.886Z",
-    "heartbeatAt": "2026-08-14T01:47:40.027Z",
+    "heartbeatAt": "2026-08-14T02:02:47.100Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0371.*",
@@ -194,13 +194,14 @@
       "scripts/build-root-drop-release.ts",
       "scripts/validate-root-drop-release.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260814004836-codex-gpt-5.4-mini-7bead8f467",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814004836-codex-gpt-5.4-mini-7bead8f467\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-gpt-5.4-mini",
   "startedAt": "2026-08-14T00:48:35.886Z",
@@ -251,8 +252,8 @@
     "createdAt": "2026-08-14T00:48:39.882Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-14T01-47-40-292Z-renew-2ec5a765a6bf",
-  "lastTransitionAt": "2026-08-14T01:47:40.292Z",
+  "lastTransitionId": "2026-08-14T02-02-47-102Z-close-eb0a3a34c8de",
+  "lastTransitionAt": "2026-08-14T02:02:47.102Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -332,5 +333,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
-  }
+  },
+  "closedAt": "2026-08-14T02:02:47.100Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260814004835-codex-gpt-5.4-mini-ATM-GOV-0371-6c445c4251",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0371.closure-packet.json"
 }
