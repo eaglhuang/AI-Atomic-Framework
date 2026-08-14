@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0363",
-  "updatedAt": "2026-08-14T06:54:08.528Z",
+  "updatedAt": "2026-08-14T09:12:50.122Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
@@ -192,6 +192,54 @@
       "durationMs": 106750,
       "runnerKind": "dev-source",
       "sourceCommit": "65689da910caadf1a16eb756aa1d6552c26f413a",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:charter",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:35f7c060f358008b76472bbef5fc46642ef08e3f367c78ea123f918c593259f4",
+      "stderrSha256": "sha256:315f260be964d9ce6b13463662f301c3087c22c7cf5d86774ba928d5da18c005",
+      "validators": [
+        "validate:charter"
+      ],
+      "generatedAt": "2026-08-14T09:12:33.668Z",
+      "startedAt": "2026-08-14T09:12:32.979Z",
+      "finishedAt": "2026-08-14T09:12:33.668Z",
+      "durationMs": 689,
+      "runnerKind": "dev-source",
+      "sourceCommit": "91ca2fbad2646b293a1abea87e9d8ae4dfeaf8b9",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-skill-templates.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6966c5f0078df7dc6a0064cb1f205c1df998aba90891e17773332781d4544c08",
+      "stderrSha256": "sha256:62db8036e803b150fa32f0b193b257144e94ed506bdacec1be880a2236a16e38",
+      "validators": [
+        "validate:skill-templates"
+      ],
+      "generatedAt": "2026-08-14T09:12:39.740Z",
+      "startedAt": "2026-08-14T09:12:35.973Z",
+      "finishedAt": "2026-08-14T09:12:39.740Z",
+      "durationMs": 3767,
+      "runnerKind": "dev-source",
+      "sourceCommit": "91ca2fbad2646b293a1abea87e9d8ae4dfeaf8b9",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T09:12:50.121Z",
+      "startedAt": "2026-08-14T09:12:41.971Z",
+      "finishedAt": "2026-08-14T09:12:50.121Z",
+      "durationMs": 8150,
+      "runnerKind": "dev-source",
+      "sourceCommit": "91ca2fbad2646b293a1abea87e9d8ae4dfeaf8b9",
       "cached": false
     }
   ],
