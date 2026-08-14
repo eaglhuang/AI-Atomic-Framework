@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-00e4dfc52ddd",
+  "recordedAt": "2026-08-14T05:52:05.163Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0360",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0360 --message \"chore(certificate): record projection reconciliation\n\nATM-Work-Admission: wat-340f97ec4b54945d sha256:340f97ec4b54945d7d0b24559cbaa24845e7e66be5a5a09e5686fd9d4f7d9639\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0360-5ba61c41a6",
+  "reason": "Normal governed reconciliation commit excluded its pre-close-required receipt; scope parity repaired through official task scope amendment.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T05-52-05-162Z-EMG-ATM-GOV-0360-5ba61c41a6.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T05-52-38-894Z-close-fd0e36e0c5f3",
+  "taskId": "ATM-GOV-0360",
+  "action": "close",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814040358-codex-captain-recovery-ATM-GOV-0360-d4bb605238",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0360.json",
+  "taskSha256": "sha256:6660eb85124870b61dd57cc76448e9c5399d32249f4bdd699bff6e46995e9bfd",
+  "createdAt": "2026-08-14T05:52:38.894Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0360 --actor codex-captain-recovery --status done --historical-delivery 09adc42a182e372bd79d5685133dbe151fd36cef",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814040358-codex-captain-recovery-ATM-GOV-0360-d4bb605238",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0360.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/compile-four-plan-independent-certificate.ts --mode validate",
+      "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
+      "node --strip-types tests/cli/plan4-final-certification.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T05:52:38.888Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0360.*",
+        ".atm/history/evidence/ATM-GOV-0360.live-index-reconciliation.json",
+        ".atm/history/task-events/ATM-GOV-0360/**",
+        ".atm/history/tasks/ATM-GOV-0360.json",
+        "docs/reports/plan-3x-4x-closeout-blocker-map.json",
+        "docs/reports/plan-3x-4x-independent-certificate.json",
+        "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+        "packages/core/src/evidence/four-plan-independent-certificate.ts",
+        "schemas/evidence/four-plan-independent-certificate.schema.json",
+        "scripts/compile-four-plan-independent-certificate.ts",
+        "tests/cli/four-plan-independent-certificate.test.ts",
+        "tests/cli/plan4-final-certification.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/four-plan-independent-certificate.ts",
+        "schemas/evidence/four-plan-independent-certificate.schema.json",
+        "scripts/compile-four-plan-independent-certificate.ts",
+        "tests/cli/four-plan-independent-certificate.test.ts",
+        "tests/cli/plan4-final-certification.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
