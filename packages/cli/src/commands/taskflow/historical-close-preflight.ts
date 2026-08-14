@@ -193,12 +193,18 @@ function buildUnexpectedStagedTasks(input: {
   const planningUnexpected = input.planningRepoRoot && input.planningRepoRoot !== input.targetRepoRoot
     ? readStagedFiles(input.planningRepoRoot).filter((filePath) => !expectedPlanning.has(filePath))
     : [];
-  for (const filePath of planningUnexpected) {
-    const foreignTaskId = extractGovernanceTaskId(filePath);
-    if (!foreignTaskId || foreignTaskId === normalizeTaskId(input.taskId)) continue;
-    const bucket = grouped.get(foreignTaskId) ?? [];
-    bucket.push(filePath);
-    grouped.set(foreignTaskId, bucket);
+  if (input.planningRepoRoot && planningUnexpected.length > 0) {
+    const planningOwnership = inspectGitIndexOwnership({
+      cwd: input.planningRepoRoot,
+      taskId: input.taskId,
+      stagedFiles: planningUnexpected
+    });
+    for (const entry of planningOwnership.foreignActiveStaged) {
+      if (!entry.ownerTaskId) continue;
+      const bucket = grouped.get(entry.ownerTaskId) ?? [];
+      bucket.push(entry.path);
+      grouped.set(entry.ownerTaskId, bucket);
+    }
   }
   return [...grouped.entries()].map(([foreignTaskId, files]) => ({
     taskId: foreignTaskId,
@@ -232,7 +238,7 @@ function buildUnexpectedNonBundleStagedFiles(input: {
   for (const repo of repos) {
     const expected = new Set(existingBundleFiles(repo.repoRoot, repo.stageFiles));
     const stagedFiles = readStagedFiles(repo.repoRoot);
-    const deferredForeignFiles = listForeignActiveFiles(input.targetRepoRoot, input.taskId, stagedFiles);
+    const deferredForeignFiles = listForeignActiveFiles(repo.repoRoot, input.taskId, stagedFiles);
     const ownership = inspectGitIndexOwnership({
       cwd: repo.repoRoot,
       taskId: input.taskId,
