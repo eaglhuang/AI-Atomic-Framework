@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T07-17-04-429Z-close-3b4f62b33dcd",
+  "taskId": "ATM-GOV-0375",
+  "action": "close",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814071012-codex-captain-recovery-ATM-GOV-0375-098a9136d8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0375.json",
+  "taskSha256": "sha256:facfe30338614e5b1259eea0dc9956d7fa1e658afea8c13c30f03c2e2f3dee86",
+  "createdAt": "2026-08-14T07:17:04.429Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0375 --actor codex-captain-recovery --status done --historical-delivery ca716104c8752ef6a073fe908403ba90023ef528",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814071012-codex-captain-recovery-ATM-GOV-0375-098a9136d8",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0375.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
+      "node --strip-types tests/cli/runbook-release-authority-review.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T07:17:04.420Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0375.*",
+        ".atm/history/task-events/ATM-GOV-0375/**",
+        ".atm/history/tasks/ATM-GOV-0375.json",
+        "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+        "scripts/review-runbook-release-authority.ts",
+        "tests/cli/runbook-release-authority-review.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/review-runbook-release-authority.ts",
+        "tests/cli/runbook-release-authority-review.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

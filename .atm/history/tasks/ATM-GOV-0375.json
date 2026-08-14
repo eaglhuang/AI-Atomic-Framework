@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0375",
   "title": "Make release-review validation replay the sealed projection snapshot",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -143,8 +143,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T07-11-09-134Z-renew-a4b368feddf1",
-  "lastTransitionAt": "2026-08-14T07:11:09.134Z",
+  "lastTransitionId": "2026-08-14T07-17-04-429Z-close-3b4f62b33dcd",
+  "lastTransitionAt": "2026-08-14T07:17:04.429Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain-recovery",
   "reservedAt": "2026-08-14T07:10:12.472Z",
@@ -153,7 +153,7 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-e72341b8495c",
     "claimedAt": "2026-08-14T07:10:12.482Z",
-    "heartbeatAt": "2026-08-14T07:11:08.452Z",
+    "heartbeatAt": "2026-08-14T07:17:04.428Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0375.json",
@@ -163,13 +163,14 @@
       "scripts/review-runbook-release-authority.ts",
       "tests/cli/runbook-release-authority-review.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260814071012-codex-captain-recovery-7416f94d8c",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814071012-codex-captain-recovery-7416f94d8c\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-14T06:03:03.620Z",
   "startedByActor": "codex-captain-recovery",
@@ -267,5 +268,9 @@
     },
     "createdAt": "2026-08-14T07:10:13.665Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-14T07:17:04.428Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814071012-codex-captain-recovery-ATM-GOV-0375-098a9136d8",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0375.closure-packet.json"
 }
