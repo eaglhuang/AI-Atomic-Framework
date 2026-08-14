@@ -43,6 +43,7 @@ import {
   type RecordCommitBlockBridgeAuthorization
 } from '../../git-governance/record-only-block-lifecycle-bridge.ts';
 import { resolvePreCommitResidueCandidates } from './residue-candidates.ts';
+import { consumeCloseTransactionHookReceipt } from './close-transaction-receipt.ts';
 import { buildTeamGateFindings } from './team-gate-findings.ts';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../../tasks/task-import-validators.ts';
 import { hookContractVersion, hookProvider } from '../git-hooks-installer.ts';
@@ -221,6 +222,14 @@ export function runPreCommitHook(cwd: string) {
   // the candidates without mutating the live worktree or index.
   const autoCleanedResidue: readonly unknown[] = [];
   const stagedFiles = readStagedFiles(root).filter((entry) => entry !== gitHeadEvidencePaths.legacyJson && entry !== gitHeadEvidencePaths.jsonl);
+  const closeTransactionReceiptReuse = consumeCloseTransactionHookReceipt({
+    root,
+    taskId: committingTaskIdForHook,
+    actorId: typeof process.env.ATM_COMMIT_ACTOR_ID === 'string' ? process.env.ATM_COMMIT_ACTOR_ID.trim() || null : null,
+    scopedIndexActive,
+    closeWindowLock: readActiveCloseCommitWindows(root).find((entry) => entry.taskId === committingTaskIdForHook) ?? null,
+    stagedFiles
+  });
   const actionableResidueFindings = selectActionableResidueFindings({
     findings: [...transactionReconciledResidueReport.blockAndExplain, ...transactionReconciledResidueReport.manualReview.filter((entry) => isActionableManualResidue(entry.path))],
     stagedFiles,
@@ -409,11 +418,13 @@ export function runPreCommitHook(cwd: string) {
     : blockingFrameworkIssues.includes('framework-stale-lock-cleanup-required') && releasableStaleLock
       ? buildFrameworkStaleCleanupCommand(releasableStaleLock, frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit')
     : null;
-  const crossFileConsistencyFindings = checkStageTimeCrossFileConsistency({
-    root,
-    stagedFiles,
-    isBrokerResolutionAuthorizedDependencyDeferral
-  });
+  const crossFileConsistencyFindings = closeTransactionReceiptReuse.reusable
+    ? []
+    : checkStageTimeCrossFileConsistency({
+      root,
+      stagedFiles,
+      isBrokerResolutionAuthorizedDependencyDeferral
+    });
   const blockingTaskAuditFindings: readonly unknown[] = [];
   const baseOk = encodingReport.ok
     && gitIndexDiagnostic.ok
@@ -498,6 +509,7 @@ export function runPreCommitHook(cwd: string) {
           evidencePath: evidenceWrite?.evidencePath ?? null,
           scopedIndexActive,
           commitIndexFinalized,
+          closeTransactionReceiptReuse,
           advisoryTreeWideFindingsCount: advisoryFindings.length
         })
         : message(
@@ -574,6 +586,7 @@ export function runPreCommitHook(cwd: string) {
       emergencyUseAuditReport,
       taskCardStatusReport,
       sameFileClaimReport,
+      closeTransactionReceiptReuse,
       taskAudit: {
         executionPlane: 'deferred',
         requiredBy: ['taskflow auto-evidence', 'pre-push', 'CI'],
