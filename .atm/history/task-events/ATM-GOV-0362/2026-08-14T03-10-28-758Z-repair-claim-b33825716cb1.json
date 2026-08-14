@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T03-10-28-758Z-repair-claim-b33825716cb1",
+  "taskId": "ATM-GOV-0362",
+  "action": "repair-claim",
+  "actorId": "codex-captain-repair",
+  "sessionId": "session-20260813181708-codex-gpt-5.4-mini-ATM-GOV-0362-9e7ca4d3d5",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0362.json",
+  "taskSha256": "sha256:a738e6f67c005463e5becfe15976a7c2022930afa4999133a2099d08c9800a11",
+  "createdAt": "2026-08-14T03:10:28.758Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0362 --actor codex-captain-repair --write --reason \"Repair official takeover lifecycle drift: normalize active claim, governance lock, and orphaned session before governed 0362 evidence closeout.\" --json"
+}

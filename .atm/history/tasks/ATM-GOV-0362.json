@@ -146,16 +146,16 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T02-08-44-831Z-renew-a16990630d95",
-  "lastTransitionAt": "2026-08-14T02:08:44.831Z",
+  "lastTransitionId": "2026-08-14T03-10-43-983Z-claim-f647afee6d9a",
+  "lastTransitionAt": "2026-08-14T03:10:43.983Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-13T17:37:27.018Z",
   "promotedAt": "2026-08-13T17:37:27.022Z",
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-37c3f4c427a1",
-    "claimedAt": "2026-08-13T18:17:08.671Z",
-    "heartbeatAt": "2026-08-14T02:08:44.623Z",
+    "actorId": "codex-captain-repair",
+    "leaseId": "lease-0be4efc8ec71",
+    "claimedAt": "2026-08-14T03:10:43.117Z",
+    "heartbeatAt": "2026-08-14T03:10:43.117Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0362.json",
@@ -164,11 +164,12 @@
       "tests/cli/runbook-release-authority-review.test.ts"
     ],
     "state": "active",
+    "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
-      "status": "adopted",
+      "laneSessionId": "lane-20260814031043-codex-captain-repair-98ef7cd465",
+      "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814031043-codex-captain-repair-98ef7cd465\""
     }
   },
   "startedAt": "2026-08-13T17:37:27.027Z",
@@ -176,20 +177,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-a0676682178bfe51",
-    "ticketDigest": "sha256:a0676682178bfe5188ed4b165567e78692b1d779bd45cef14950786cc8898a1f",
+    "ticketId": "wat-7d7478fe492f7796",
+    "ticketDigest": "sha256:7d7478fe492f77964d7efa46b2614c1e43a7f5f3408a5790e78a013becd2b11b",
     "taskId": "ATM-GOV-0362",
     "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
-    "claimGeneration": "lease-37c3f4c427a1",
-    "issuedAt": "2026-08-14T02:08:44.623Z",
-    "expiresAt": "2026-08-14T02:38:44.623Z",
+    "actorId": "codex-captain-repair",
+    "laneSessionId": "lane-20260814031043-codex-captain-repair-98ef7cd465",
+    "claimGeneration": "lease-0be4efc8ec71",
+    "issuedAt": "2026-08-14T03:10:43.117Z",
+    "expiresAt": "2026-08-14T03:40:43.117Z",
     "scopeDigest": "sha256:8a19904aa17c227967ea1983cb7335e652882cd9f8036ae14fc10d320b25c452",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T02:08:44.623Z"
+      "selectedAt": "2026-08-14T03:10:43.117Z"
     },
     "grants": [
       {
@@ -236,7 +237,7 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260813181708-codex-gpt-5.4-mini-ATM-GOV-0362-9e7ca4d3d5",
+  "startedBySessionId": "session-20260814031043-codex-captain-repair-ATM-GOV-0362-7f39862310",
   "wipOwnership": {
     "schemaId": "atm.retainedWipOwnership.v1",
     "taskId": "ATM-GOV-0362",
@@ -251,7 +252,7 @@
     "retainedAt": "2026-08-13T18:16:59.590Z",
     "transitionClass": "release-wip-retained"
   },
-  "owner": "codex-gpt-5.4-mini",
+  "owner": "codex-captain-repair",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -272,9 +273,15 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "9ff5b0cc2c1ffa63b43371ba64f6fd61d2faf43c03cde9cb34aac9892de71193",
-    "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260813181708-codex-gpt-5.4-mini-ATM-GOV-0362-9e7ca4d3d5",
-    "createdAt": "2026-08-14T02:08:44.781Z",
+    "actorId": "codex-captain-repair",
+    "sessionId": "session-20260814031043-codex-captain-repair-ATM-GOV-0362-7f39862310",
+    "laneSession": {
+      "laneSessionId": "lane-20260814031043-codex-captain-repair-98ef7cd465",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814031043-codex-captain-repair-98ef7cd465\""
+    },
+    "createdAt": "2026-08-14T03:10:43.982Z",
     "status": "active"
   }
 }

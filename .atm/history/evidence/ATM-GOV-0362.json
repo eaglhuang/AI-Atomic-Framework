@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0362",
-  "updatedAt": "2026-08-14T02:09:54.638Z",
+  "updatedAt": "2026-08-14T03:07:19.554Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -678,6 +678,55 @@
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0362: codex-gpt-5.4-mini -> codex-captain-repair.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0362.json"
+      ],
+      "producedBy": "codex-captain-repair",
+      "createdAt": "2026-08-14T03:07:19.554Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "codex-gpt-5.4-mini",
+          "leaseId": "lease-37c3f4c427a1",
+          "claimedAt": "2026-08-13T18:17:08.671Z",
+          "heartbeatAt": "2026-08-14T02:20:56.663Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0362.json",
+            "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+            "scripts/review-runbook-release-authority.ts",
+            "tests/cli/runbook-release-authority-review.test.ts"
+          ],
+          "state": "active",
+          "laneSession": {
+            "laneSessionId": "lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5",
+            "status": "adopted",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260813181708-codex-gpt-5.4-mini-af280ba8e5\""
+          }
+        },
+        "newClaim": {
+          "actorId": "codex-captain-repair",
+          "leaseId": "lease-1486d77bc036",
+          "claimedAt": "2026-08-14T03:07:19.486Z",
+          "heartbeatAt": "2026-08-14T03:07:19.486Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0362.json",
+            "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+            "scripts/review-runbook-release-authority.ts",
+            "tests/cli/runbook-release-authority-review.test.ts",
+            "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+            "docs/reports/plan-3x-4x-independent-certificate.json"
+          ],
+          "state": "active",
+          "reason": "Take over expired 0362 claim to recompute stale completion evidence, independent certificate, and current remote release verdict."
         }
       }
     }
