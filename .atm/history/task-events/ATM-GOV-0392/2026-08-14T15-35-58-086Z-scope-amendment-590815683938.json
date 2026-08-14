@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T15-35-58-086Z-scope-amendment-590815683938",
+  "taskId": "ATM-GOV-0392",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0392.json",
+  "taskSha256": "sha256:e4abe2c3cc387395582bc9b219aafdc11388b8d3198590c89475e27500c947c9",
+  "createdAt": "2026-08-14T15:35:58.086Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0392 --actor claude-008 --add \"packages/integrations-core/src/index.ts,templates/skills/atm-residue-cleanup.skill.md\" --reason \"The corpus gate must be reachable from the package entrypoint, and it reports one pre-existing contract violation the card's own validator must now pass\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The corpus gate must be reachable from the package entrypoint, and it reports one pre-existing contract violation the card's own validator must now pass"
+  }
+}

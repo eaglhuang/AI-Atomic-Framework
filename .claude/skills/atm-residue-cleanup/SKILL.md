@@ -1,23 +1,12 @@
 ---
-schemaId: atm.skillTemplate
-specVersion: 0.1.0
-id: atm-residue-cleanup
-title: ATM Residue Cleanup
-summary: Diagnose and safely reconcile operation-owned transient ATM residue.
-command: node atm.mjs cleanup diagnose --json
-firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
+name: atm-residue-cleanup
+description: Diagnose and safely reconcile operation-owned transient ATM residue.
+argument-hint: "<ATM context>"
 charter-invariants-injected: true
-handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
-owner: atm-framework
-tier: specialist
-installProfiles: [framework-full, role-oriented]
-invocationPolicy: model-or-user
-companionFiles: []
-adapterCapabilityRequirements:
-  - "*:charter-injection"
 ---
 
-# {{title}}
+
+# ATM Residue Cleanup
 
 Use this skill after a governed operation creates transient artifacts or ends
 outside its normal success path.

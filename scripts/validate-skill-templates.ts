@@ -261,6 +261,26 @@ assert(Array.isArray(corpusSnapshot.ignoredSourceTemplatePaths), 'full skill cor
 assert(renderedCharter.fallbackReason === null, 'validator fixture repo must have readable charter invariants');
 assert(renderedCharter.text.includes('INV-ATM-001'), 'rendered charter invariants must include seeded invariant text');
 
+// ATM-GOV-0392: every discovered source file must be able to reach an adapter,
+// and must satisfy the same schema the minimum entry templates do. Before this
+// gate a source template could be counted by the corpus, dropped by profile
+// filtering, and reported ok by both this validator and integration verify,
+// because the projection and the installation were equally missing it.
+const discoveryFindings = packageModule.collectSkillCorpusDiscoveryFindings(path.join(root, 'templates', 'skills'));
+for (const finding of discoveryFindings) {
+  fail(`undeliverable source template ${finding.sourcePath} (${finding.reason}): ${finding.recovery}`);
+}
+for (const corpusTemplate of corpusSnapshot.templates) {
+  assert(
+    validateFrontmatter(corpusTemplate.frontmatter) === true,
+    `${corpusTemplate.sourcePath} frontmatter schema mismatch: ${formatErrors(validateFrontmatter.errors)}`
+  );
+}
+const untrackedSourceTemplates = collectUntrackedSourceTemplates(path.join(root, 'templates', 'skills'));
+for (const untrackedPath of untrackedSourceTemplates) {
+  console.warn(`[skill-templates:${mode}] advisory untracked source template: ${untrackedPath} — a source template outside version control exists only on this workstation; commit it so the corpus is the same for every collaborator`);
+}
+
 const templatesById = new Map(templates.map((template: any) => [template.frontmatter.id, template]));
 for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
   const template = templatesById.get(entryDefinition.id) as any;
@@ -405,6 +425,20 @@ function countCompanionFiles(directoryPath: string): number {
     }
     return entry.isFile() ? total + 1 : total;
   }, 0);
+}
+
+function collectUntrackedSourceTemplates(directoryPath: string): readonly string[] {
+  const tracked = listTrackedFilesUnder(directoryPath);
+  if (!tracked) {
+    return [];
+  }
+  const trackedSet = new Set(tracked.map((entry) => path.resolve(entry)));
+  return readdirSync(directoryPath, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.skill.md'))
+    .map((entry) => path.join(directoryPath, entry.name))
+    .filter((absolutePath) => !trackedSet.has(path.resolve(absolutePath)))
+    .map((absolutePath) => path.relative(root, absolutePath).replace(/\\/g, '/'))
+    .sort();
 }
 
 function listTrackedFilesUnder(directoryPath: string): readonly string[] | null {

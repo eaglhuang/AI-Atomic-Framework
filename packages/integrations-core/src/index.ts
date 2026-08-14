@@ -34,7 +34,9 @@ export type {
   SkillCorpusSourceFile,
   SkillCorpusSourceSnapshot,
   SkillCorpusAdapterDescriptor,
-  SkillCorpusProjection
+  SkillCorpusProjection,
+  SkillCorpusDiscoveryReason,
+  SkillCorpusDiscoveryFinding
 } from './compiler/skill-templates.ts';
 export {
   minimumAtmEntrySkillDefinitions,
@@ -44,6 +46,7 @@ export {
   loadSkillTemplatesForProfile,
   loadMinimumAtmSkillTemplates,
   loadSkillCorpusSourceSnapshot,
+  collectSkillCorpusDiscoveryFindings,
   compileSkillCorpus
 } from './compiler/skill-templates.ts';
 

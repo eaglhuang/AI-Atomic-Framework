@@ -1,0 +1,349 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0392",
+  "title": "Make skill template source discovery fail closed and trackable",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: Every discovered `templates/skills/*.skill.md` candidate either becomes a valid `atm.skillTemplate` corpus member or causes `validate:skill-templates` to fail with its source path and missing/invalid contract fields. It must never be silently counted only in `ignoredSourceTemplatePaths` while the validator reports success.",
+    "ACC-2: `templates/skills/atm-framework-quickfix.skill.md` uses the canonical `atm.skillTemplate` frontmatter and is present in the corpus. Its existing body remains byte-identical apart from any mechanically required template interpolation normalization.",
+    "ACC-3: A forced Claude adapter bake derives `.claude/skills/atm-framework-quickfix/SKILL.md` from the tracked canonical template. `integration verify claude-code` passes, and the baked skill body matches the canonical `.agents` skill body.",
+    "ACC-4: Regression coverage proves both malformed-template rejection and valid-template bake parity without relying on a local `.git/info/exclude` configuration, a hardcoded skill filename, or a manually copied derived artifact.",
+    "ACC-5: The worker records two backlog outcomes through the official backlog route: (a) silent malformed-template omission, fixed by this card; (b) local excludes hiding source templates, dispositioned with a general discoverability guard or an explicitly scoped successor. Do not duplicate an existing item; update it when one already exists."
+  ],
+  "deliverables": [
+    "templates/skills/atm-framework-quickfix.skill.md",
+    ".claude/skills/atm-framework-quickfix/SKILL.md",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "scripts/audit-skill-corpus.ts",
+    "scripts/validate-skill-templates.ts",
+    "tests/cli/skill-corpus-canary-rewrite.test.ts"
+  ],
+  "scopePaths": [
+    "templates/skills/atm-framework-quickfix.skill.md",
+    ".claude/skills/atm-framework-quickfix/SKILL.md",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "scripts/audit-skill-corpus.ts",
+    "scripts/validate-skill-templates.ts",
+    "tests/cli/skill-corpus-canary-rewrite.test.ts",
+    "tests/cli/skill-definition-vnext.test.ts",
+    ".atm/history/evidence/ATM-GOV-0392.*",
+    ".atm/history/task-events/ATM-GOV-0392/**",
+    ".atm/history/tasks/ATM-GOV-0392.json",
+    "packages/integrations-core/src/index.ts",
+    "templates/skills/atm-residue-cleanup.skill.md",
+    ".claude/skills/atm-residue-cleanup/SKILL.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+    "node --strip-types tests/cli/skill-definition-vnext.test.ts",
+    "npm run validate:skill-templates",
+    "node atm.mjs integration add claude-code --force --json",
+    "node atm.mjs integration verify claude-code --json"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.integration-skill-template-corpus",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.integration-skill-template-corpus",
+        "pattern": "Policy Object",
+        "source": "packages/integrations-core/src/compiler/skill-templates.ts",
+        "disposition": "inline",
+        "inlineReason": "Existing compiler module is below the extraction threshold; retain one discovery-and-diagnostic boundary rather than create a second corpus authority."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "templates/skills/atm-framework-quickfix.skill.md",
+        ".claude/skills/atm-framework-quickfix/SKILL.md",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "scripts/audit-skill-corpus.ts",
+        "scripts/validate-skill-templates.ts",
+        "tests/cli/skill-corpus-canary-rewrite.test.ts",
+        "tests/cli/skill-definition-vnext.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0392-make-skill-template-source-discovery-fail-closed-and-trackable.task.md",
+    "sectionTitle": "ATM-GOV-0392",
+    "headingLine": 90,
+    "hash": "b988ae48dc3859dd",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0392-make-skill-template-source-discovery-fail-closed-and-trackable.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:b988ae48dc3859dd023030a97ef48bdc053dcef15abcbc0c25af19bc1fc1d97e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T15:23:05.538Z"
+    }
+  },
+  "importedAt": "2026-08-14T15:23:05.538Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "skill-template-corpus-discovery",
+      "skill-template-validation-contract"
+    ],
+    "causalImpactEdges": [
+      "source-template-path -> corpus-snapshot -> adapter-bake -> installed-skill",
+      "malformed-or-untracked-source -> explicit-fail-closed-diagnostic"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0391 runner publication is unrelated and must not be touched"
+    ],
+    "validatorReferences": [
+      "tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "npm run validate:skill-templates"
+    ],
+    "phaseOwner": "Wave-1-framework-foundation"
+  },
+  "testContributions": [
+    {
+      "caseId": "skill_template_source_discovery_fail_closed_0392",
+      "targetGroupId": "null",
+      "semanticKey": "malformed-template-is-not-silently-ignored",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "source-template-path -> corpus-snapshot -> adapter-bake -> installed-skill",
+        "malformed-or-untracked-source -> explicit-fail-closed-diagnostic"
+      ],
+      "expectedRedPredicate": "a malformed discovered template is reported as a validation failure, not omitted from the corpus",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "skill-template-corpus-discovery",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "skill_template_bake_source_parity_0392",
+      "targetGroupId": "null",
+      "semanticKey": "canonical-template-bakes-to-derived-skill",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "source-template-path -> corpus-snapshot -> adapter-bake -> installed-skill"
+      ],
+      "expectedRedPredicate": "a corpus member missing required source identity cannot produce a green adapter verification",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "skill-template-validation-contract",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "skill_template_source_discovery_fail_closed_0392",
+    "skill_template_bake_source_parity_0392"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T15-46-14-423Z-renew-71738cb1eed3",
+  "lastTransitionAt": "2026-08-14T15:46:14.423Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008",
+  "reservedAt": "2026-08-14T15:24:25.252Z",
+  "promotedAt": "2026-08-14T15:24:25.257Z",
+  "claim": {
+    "actorId": "claude-008",
+    "leaseId": "lease-a8a2e3665b22",
+    "claimedAt": "2026-08-14T15:24:25.263Z",
+    "heartbeatAt": "2026-08-14T15:46:13.580Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0392.*",
+      ".atm/history/task-events/ATM-GOV-0392/**",
+      ".atm/history/tasks/ATM-GOV-0392.json",
+      ".claude/skills/atm-framework-quickfix/SKILL.md",
+      ".claude/skills/atm-residue-cleanup/SKILL.md",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "packages/integrations-core/src/index.ts",
+      "scripts/audit-skill-corpus.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-framework-quickfix.skill.md",
+      "templates/skills/atm-residue-cleanup.skill.md",
+      "tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "tests/cli/skill-definition-vnext.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814152425-claude-008-3ce0c25fd2",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814152425-claude-008-3ce0c25fd2\""
+    }
+  },
+  "startedAt": "2026-08-14T15:24:25.263Z",
+  "startedByActor": "claude-008",
+  "startedBySessionId": "session-20260814152425-claude-008-ATM-GOV-0392-ad9bae1e58",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0392",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0392.*",
+      ".atm/history/task-events/ATM-GOV-0392/**",
+      ".atm/history/tasks/ATM-GOV-0392.json",
+      ".claude/skills/atm-framework-quickfix/SKILL.md",
+      ".claude/skills/atm-residue-cleanup/SKILL.md",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "packages/integrations-core/src/index.ts",
+      "scripts/audit-skill-corpus.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-framework-quickfix.skill.md",
+      "templates/skills/atm-residue-cleanup.skill.md",
+      "tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "tests/cli/skill-definition-vnext.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0392-make-skill-template-source-discovery-fail-closed-and-trackable.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0392-make-skill-template-source-discovery-fail-closed-and-trackable.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "84f8c97be8b899558e8aa7d4648ce7c7133044a93155be4f1267b700f5caa5fa",
+    "actorId": "claude-008",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260814152425-claude-008-3ce0c25fd2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814152425-claude-008-3ce0c25fd2\""
+    },
+    "createdAt": "2026-08-14T15:24:27.427Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-46083e677f0beb99",
+    "ticketDigest": "sha256:46083e677f0beb99ba4cc4c81c5a41974235d374dd1ba31980bb2fbc22c9fc3c",
+    "taskId": "ATM-GOV-0392",
+    "origin": "claim",
+    "actorId": "claude-008",
+    "laneSessionId": "lane-20260814152425-claude-008-3ce0c25fd2",
+    "claimGeneration": "lease-a8a2e3665b22",
+    "issuedAt": "2026-08-14T15:46:13.580Z",
+    "expiresAt": "2026-08-14T16:16:13.580Z",
+    "scopeDigest": "sha256:1ba2ca360c2527416451b087a507f16cf9002a0e745af2e388572edcc3e4fcb2",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T15:46:13.580Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0392.*",
+          ".atm/history/task-events/ATM-GOV-0392/**",
+          ".atm/history/tasks/ATM-GOV-0392.json",
+          ".claude/skills/atm-framework-quickfix/SKILL.md",
+          ".claude/skills/atm-residue-cleanup/SKILL.md",
+          "packages/integrations-core/src/compiler/skill-templates.ts",
+          "packages/integrations-core/src/index.ts",
+          "scripts/audit-skill-corpus.ts",
+          "scripts/validate-skill-templates.ts",
+          "templates/skills/atm-framework-quickfix.skill.md",
+          "templates/skills/atm-residue-cleanup.skill.md",
+          "tests/cli/skill-corpus-canary-rewrite.test.ts",
+          "tests/cli/skill-definition-vnext.test.ts"
+        ],
+        "digest": "sha256:b29c020d62efbc0e1edc8867b95a02778fcce296c63ba2b3b638d581018d6095"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  }
+}
