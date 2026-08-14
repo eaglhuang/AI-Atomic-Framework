@@ -1,0 +1,287 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0373",
+  "title": "Allow committed task context for evidence-only closeback",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A staged evidence-only closeback for exactly one semantic task is accepted when `HEAD` contains a parseable authoritative ledger for the same `workItemId`; the resolver returns attributable committed-context facts rather than a boolean guessed from a path.",
+    "ACC-2: Missing ledger, malformed ledger, ledger/evidence identity mismatch, multiple semantic task ids, and mixed staged task contexts remain rejected by the same hook finding family.",
+    "ACC-3: Existing staged-ledger/staged-event and nested-evidence behavior remains green; the focused command is command-backed evidence for the card.",
+    "ACC-4: `ATM-GOV-0372` can commit its evidence-only closeback bundle through the normal governed commit path after this repair; no raw index edit, `--no-verify`, task-id allowlist, or direct task close is used."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/hook/pre-commit/committed-task-context.ts",
+    "packages/cli/src/commands/hook/pre-commit/support.ts",
+    "scripts/validate-hook-batch-evidence-context.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/hook/pre-commit/committed-task-context.ts",
+    "packages/cli/src/commands/hook/pre-commit/support.ts",
+    "scripts/validate-hook-batch-evidence-context.ts"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-hook-batch-evidence-context.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo_plus_planning_closeback",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the committed-context resolver and its hook integration together; evidence-only closeback then remains fail-closed.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.protected-evidence-context",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.committed-task-context-resolver",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/hook/pre-commit/committed-task-context.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "scripts/validate-hook-batch-evidence-context.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0373-allow-committed-task-context-for-evidence-only-closeback.task.md",
+    "sectionTitle": "ATM-GOV-0373",
+    "headingLine": 65,
+    "hash": "9d704e4ec096ce41",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0373-allow-committed-task-context-for-evidence-only-closeback.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:9d704e4ec096ce41d0d471076042505c4ad556d7c8f899f8938edefc5ecc0d2b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T02:36:30.003Z"
+    }
+  },
+  "importedAt": "2026-08-14T02:36:30.003Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The historical delivery commit and the committed task ledger are available for a Git-backed closeback fixture."
+    ],
+    "softRelations": [
+      "ATM-GOV-0350",
+      "ATM-GOV-0362"
+    ],
+    "changedPublicSeams": [
+      "atm.protectedEvidenceContext.v1"
+    ],
+    "causalImpactEdges": [
+      "historical-closeback-to-evidence-commit",
+      "committed-context-to-hook-admission"
+    ],
+    "parallelFrontierInputs": [
+      "historical-delivery-commit",
+      "evidence-only-closeback-bundle"
+    ],
+    "validatorReferences": [
+      "hook-batch-evidence-context"
+    ],
+    "phaseOwner": "wave-3-closeback-recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_committed_task_context_allows_evidence_only_closeback_0373",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "committed_task_context_allows_only_exact_single_task_evidence_closeback",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "historical-closeback-to-evidence-commit",
+        "committed-context-to-hook-admission"
+      ],
+      "expectedRedPredicate": "evidence-only closeback with a valid committed task context is rejected, or a missing/mismatched/multi-task context is admitted.",
+      "contributionResourceKey": "protected-evidence-context",
+      "responsibility": "task-required",
+      "dependencyEdge": "historical-closeback-context",
+      "contractEdge": "atm.protectedEvidenceContext.v1",
+      "resourceKey": "protected-evidence-context"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_committed_task_context_allows_evidence_only_closeback_0373"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T02-36-37-487Z-claim-8f1c00bbfcf5",
+  "lastTransitionAt": "2026-08-14T02:36:37.487Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-14T02:36:33.451Z",
+  "promotedAt": "2026-08-14T02:36:33.456Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-a250fe130781",
+    "claimedAt": "2026-08-14T02:36:33.460Z",
+    "heartbeatAt": "2026-08-14T02:36:33.460Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0373.json",
+      "packages/cli/src/commands/hook/pre-commit/committed-task-context.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "scripts/validate-hook-batch-evidence-context.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260814023633-codex-gpt-5.4-mini-ff15be4af8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814023633-codex-gpt-5.4-mini-ff15be4af8\""
+    }
+  },
+  "startedAt": "2026-08-14T02:36:33.460Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-64488f1e6ec87300",
+    "ticketDigest": "sha256:64488f1e6ec87300339bd621f5d502ab83405ebf2548846a85d492ac428a6bb0",
+    "taskId": "ATM-GOV-0373",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260814023633-codex-gpt-5.4-mini-ff15be4af8",
+    "claimGeneration": "lease-a250fe130781",
+    "issuedAt": "2026-08-14T02:36:33.460Z",
+    "expiresAt": "2026-08-14T03:06:33.460Z",
+    "scopeDigest": "sha256:834556237de8c9ef84a709b64dddf411fd673bc6a7f18f70db3481d915ab5733",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T02:36:33.460Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0373.*",
+          ".atm/history/task-events/ATM-GOV-0373/**",
+          ".atm/history/tasks/ATM-GOV-0373.json",
+          "packages/cli/src/commands/hook/pre-commit/committed-task-context.ts",
+          "packages/cli/src/commands/hook/pre-commit/support.ts",
+          "scripts/validate-hook-batch-evidence-context.ts"
+        ],
+        "digest": "sha256:d066e9f0060fa4a0899135692f363a4cb7aefafd3699c5ccc20d412cb5243f0e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260814023633-codex-gpt-5.4-mini-ATM-GOV-0373-e676a55121",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0373",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0373.*",
+      ".atm/history/task-events/ATM-GOV-0373/**",
+      ".atm/history/tasks/ATM-GOV-0373.json",
+      "packages/cli/src/commands/hook/pre-commit/committed-task-context.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "scripts/validate-hook-batch-evidence-context.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9d1dce43f6a9774a62c84da306384fa5b8a401e643e040f475c4f08e75d09f7b",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260814023633-codex-gpt-5.4-mini-ATM-GOV-0373-e676a55121",
+    "laneSession": {
+      "laneSessionId": "lane-20260814023633-codex-gpt-5.4-mini-ff15be4af8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814023633-codex-gpt-5.4-mini-ff15be4af8\""
+    },
+    "createdAt": "2026-08-14T02:36:37.486Z",
+    "status": "active"
+  }
+}
