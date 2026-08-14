@@ -454,3 +454,4 @@ export * from './team-agents/index.ts';
 export * from './batch/plan-run-journal.ts';
 export * from './lane/lane-capability-provider.ts';
 export * from './lane/wip-ownership-transition.ts';
+export * from './governance/operation-cleanup-contract.ts';

@@ -59,6 +59,7 @@ import { runMapCapsule } from './commands/map-capsule.ts';
 import { runRescue } from './commands/rescue.ts';
 import { runDaemon } from './commands/daemon.ts';
 import { runCache } from './commands/cache.ts';
+import { runCleanup } from './commands/cleanup/index.ts';
 import { runHealthReport } from './commands/health-report.ts';
 import { runTaskflow } from './commands/taskflow.ts';
 import { runTaskView } from './commands/task-view.ts';
@@ -133,6 +134,7 @@ export const cliCommandRunners: Record<string, (argv: string[]) => Promise<Comma
   rescue: runRescue,
   daemon: runDaemon,
   cache: runCache,
+  cleanup: runCleanup,
   'health-report': runHealthReport,
   identity: runIdentity,
   taskflow: runTaskflow,

@@ -1,0 +1,125 @@
+{
+  "taskId": "ATM-GOV-0363",
+  "updatedAt": "2026-08-14T03:27:18.814Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0363: codex-gpt-5.4-mini -> codex-captain-repair.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0363.json"
+      ],
+      "producedBy": "codex-captain-repair",
+      "createdAt": "2026-08-14T03:23:09.086Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "codex-gpt-5.4-mini",
+          "leaseId": "lease-d154246d9a4a",
+          "claimedAt": "2026-08-14T02:49:03.886Z",
+          "heartbeatAt": "2026-08-14T03:19:20.278Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0363.json",
+            ".atm/charter/atomic-charter.md",
+            ".atm/charter/charter-invariants.json",
+            ".atm/history/evidence/ATM-GOV-0363.*",
+            ".atm/history/task-events/ATM-GOV-0363/**",
+            "docs/governance/transient-artifact-lifecycle-charter.md",
+            "fixtures/charter/default-charter.json",
+            "packages/cli/src/atm.ts",
+            "packages/cli/src/commands/cleanup/**",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "packages/core/src/governance/operation-cleanup-contract.ts",
+            "packages/core/src/index.ts",
+            "scripts/validate-transient-artifact-lifecycle.ts",
+            "templates/root-drop/.atm/charter/charter-invariants.template.json",
+            "templates/skills/atm-dispatch.skill.md",
+            "templates/skills/atm-residue-cleanup.skill.md",
+            "tests/cli/transient-artifact-lifecycle.test.ts"
+          ],
+          "state": "released",
+          "reason": "Repair expired ATM-GOV-0363 claim and dangling governance lock before continuing the operation-residue lifecycle delivery.",
+          "laneSession": {
+            "laneSessionId": "lane-20260814024903-codex-gpt-5.4-mini-d233b7ce65",
+            "status": "active",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814024903-codex-gpt-5.4-mini-d233b7ce65\""
+          }
+        },
+        "newClaim": {
+          "actorId": "codex-captain-repair",
+          "leaseId": "lease-231cbdc73a5c",
+          "claimedAt": "2026-08-14T03:23:09.024Z",
+          "heartbeatAt": "2026-08-14T03:23:09.024Z",
+          "ttlSeconds": 1800,
+          "files": [
+            "packages/cli/src/atm.ts",
+            "packages/cli/src/commands/cleanup/index.ts",
+            "packages/cli/src/commands/cleanup/run.ts",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "packages/core/src/governance/operation-cleanup-contract.ts",
+            "packages/core/src/index.ts",
+            "scripts/validate-transient-artifact-lifecycle.ts"
+          ],
+          "state": "active",
+          "reason": "Emergency source-first recovery: transfer retained WIP after released claim was incorrectly blocked by fresh provenance heartbeat."
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0363: codex-captain-repair -> codex-captain-recovery.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0363.json"
+      ],
+      "producedBy": "codex-captain-recovery",
+      "createdAt": "2026-08-14T03:27:18.814Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "codex-captain-repair",
+          "leaseId": "lease-231cbdc73a5c",
+          "claimedAt": "2026-08-14T03:23:09.024Z",
+          "heartbeatAt": "2026-08-14T03:23:09.024Z",
+          "ttlSeconds": 1800,
+          "files": [
+            "packages/cli/src/atm.ts",
+            "packages/cli/src/commands/cleanup/index.ts",
+            "packages/cli/src/commands/cleanup/run.ts",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "packages/core/src/governance/operation-cleanup-contract.ts",
+            "packages/core/src/index.ts",
+            "scripts/validate-transient-artifact-lifecycle.ts"
+          ],
+          "state": "taken_over",
+          "reason": "Emergency source-first recovery: transfer retained WIP after released claim was incorrectly blocked by fresh provenance heartbeat."
+        },
+        "newClaim": {
+          "actorId": "codex-captain-recovery",
+          "leaseId": "lease-f79e68a375a3",
+          "claimedAt": "2026-08-14T03:27:18.541Z",
+          "heartbeatAt": "2026-08-14T03:27:18.541Z",
+          "ttlSeconds": 1800,
+          "files": [
+            "packages/cli/src/atm.ts",
+            "packages/cli/src/commands/cleanup/index.ts",
+            "packages/cli/src/commands/cleanup/run.ts",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "packages/core/src/governance/operation-cleanup-contract.ts",
+            "packages/core/src/index.ts",
+            "scripts/validate-transient-artifact-lifecycle.ts"
+          ],
+          "state": "active",
+          "intent": "write",
+          "laneSession": {
+            "laneSessionId": "lane-20260814032718-codex-captain-recovery-f3a77231a2",
+            "status": "active",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814032718-codex-captain-recovery-f3a77231a2\""
+          },
+          "reason": "source-first regression: successor must receive a live claim and replace retained WIP ownership"
+        }
+      }
+    }
+  ]
+}
