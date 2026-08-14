@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0390",
+  "title": "Record publication verification evidence on the pending backlog items",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 Each of the eight items records the commit its fix landed in and the ancestry check against the sealed source commit the published runner declares.",
+    "ACC-2 Items whose commit was inferred rather than cited say so explicitly, and ATM-BUG-2026-08-14-003 records that its fix is not runner-carried.",
+    "ACC-3 No item's `status` changes, and the backlog census stays green with `unclassified` zero."
+  ],
+  "deliverables": [
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-013.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-014.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-015.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-019.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-020.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-002.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-003.json"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-013.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-014.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-015.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-019.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-020.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-002.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-003.json"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-backlog-census.ts --mode validate"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "packages",
+    "scripts",
+    "release"
+  ],
+  "nonGoals": [
+    "Changing any item's status. Whether a published fix now behaves correctly is its owner's call, not this card's.",
+    "Editing any item outside the eight that carry a pending-publication claim."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Reverting removes verification evidence from records whose status is unchanged. Nothing else depends on it.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.governance-lifecycle",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0390-record-publication-verification-evidence-on-the-pending-backlog-items.task.md",
+    "sectionTitle": "ATM-GOV-0390",
+    "headingLine": 76,
+    "hash": "7410605aa395bcc4",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0390-record-publication-verification-evidence-on-the-pending-backlog-items.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:7410605aa395bcc4873e9cdef8d328e0eab22c60c21bf0f7c88a889bfa10afbb",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T14:25:14.226Z"
+    }
+  },
+  "importedAt": "2026-08-14T14:25:14.226Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Eight items claim their fix awaits frozen publication, but none records how that claim could be checked."
+    ],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [
+      "unverifiable-publication-claim-forces-recurring-archaeology"
+    ],
+    "parallelFrontierInputs": [
+      "round-trip-backlog"
+    ],
+    "validatorReferences": [
+      "validate-backlog-census"
+    ],
+    "phaseOwner": "governance-substrate"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0390_publication_claims_carry_their_own_check",
+      "targetGroupId": "null",
+      "semanticKey": "a_publication_claim_records_how_to_verify_it",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "unverifiable-publication-claim-forces-recurring-archaeology"
+      ],
+      "expectedRedPredicate": "an item says its fix awaits publication without naming the commit, so every reader must re-derive the answer from file history",
+      "contributionResourceKey": "governance-round-trip-dispositions",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.governanceBacklogItem.v1",
+      "resourceKey": "governance-round-trip-dispositions"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0390_publication_claims_carry_their_own_check"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T14-25-25-571Z-claim-797a50edb040",
+  "lastTransitionAt": "2026-08-14T14:25:25.571Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008-gov-0366",
+  "reservedAt": "2026-08-14T14:25:20.583Z",
+  "promotedAt": "2026-08-14T14:25:20.590Z",
+  "claim": {
+    "actorId": "claude-008-gov-0366",
+    "leaseId": "lease-bdb5d5103f38",
+    "claimedAt": "2026-08-14T14:25:20.594Z",
+    "heartbeatAt": "2026-08-14T14:25:20.594Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0390.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-013.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-014.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-015.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-019.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-020.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-002.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-003.json"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260814142520-claude-008-gov-0366-6282e3ef5e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814142520-claude-008-gov-0366-6282e3ef5e\""
+    }
+  },
+  "startedAt": "2026-08-14T14:25:20.594Z",
+  "startedByActor": "claude-008-gov-0366",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-46050ba9db9d60be",
+    "ticketDigest": "sha256:46050ba9db9d60be25adb263d3c1448aa79b5bd804f6f62264bfe3584a1a18d1",
+    "taskId": "ATM-GOV-0390",
+    "origin": "claim",
+    "actorId": "claude-008-gov-0366",
+    "laneSessionId": "lane-20260814142520-claude-008-gov-0366-6282e3ef5e",
+    "claimGeneration": "lease-bdb5d5103f38",
+    "issuedAt": "2026-08-14T14:25:20.594Z",
+    "expiresAt": "2026-08-14T14:55:20.594Z",
+    "scopeDigest": "sha256:a4904568eee0ec4fb670856067cb7cfb825850fae032af76c400f5715901488d",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T14:25:20.594Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0390.*",
+          ".atm/history/task-events/ATM-GOV-0390/**",
+          ".atm/history/tasks/ATM-GOV-0390.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-013.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-014.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-015.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-019.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-020.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-002.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-003.json"
+        ],
+        "digest": "sha256:f3e50c9ce86d648d991ee3d3465c7f9f04d05db59afc3bb0554f27b15648769e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260814142520-claude-008-gov-0366-ATM-GOV-0390-deccaf53de",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0390",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0390.*",
+      ".atm/history/task-events/ATM-GOV-0390/**",
+      ".atm/history/tasks/ATM-GOV-0390.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-013.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-014.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-015.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-019.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-020.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-002.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-003.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f6951309dd6a2f2912f6ea0a76a4f931fdbcd8cc7881ab546768c60ae7e8d76b",
+    "actorId": "claude-008-gov-0366",
+    "sessionId": "session-20260814142520-claude-008-gov-0366-ATM-GOV-0390-deccaf53de",
+    "laneSession": {
+      "laneSessionId": "lane-20260814142520-claude-008-gov-0366-6282e3ef5e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814142520-claude-008-gov-0366-6282e3ef5e\""
+    },
+    "createdAt": "2026-08-14T14:25:25.570Z",
+    "status": "active"
+  }
+}
