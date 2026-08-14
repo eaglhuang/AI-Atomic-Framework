@@ -1,0 +1,269 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0379",
+  "title": "Rebase canonical projection after semantic snapshot delivery",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0378"
+  ],
+  "acceptance": [
+    "ACC-1 The regenerated projection observes the committed `ATM-GOV-0378` producer head and `compile-runbook-completion-evidence --mode validate` succeeds after governed publication and closeback.",
+    "ACC-2 The projection remains `not-complete`; no requirement, Wave exit, certificate dimension, or release conclusion is promoted."
+  ],
+  "deliverables": [
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+  ],
+  "scopePaths": [
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+  ],
+  "validators": [
+    "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Changing source, test, certificate, row, Wave exit, or release verdict.",
+    "Treating source delivery as a publication-only delta."
+  ],
+  "nonGoals": [
+    "Making the four-plan verdict proven."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the regenerated projection; never treat source delivery as a publication-only freshness exception.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runbook-completion-evidence-projection",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runbook-completion-evidence-projection",
+        "pattern": "Generated canonical projection",
+        "source": "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+        "disposition": "inline",
+        "inlineReason": "The report is a sealed generated projection, not an implementation module; extraction would create a competing publication authority."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0379-rebase-canonical-projection-after-semantic-snapshot-delivery.task.md",
+    "sectionTitle": "ATM-GOV-0379",
+    "headingLine": 67,
+    "hash": "bbe08d9e49b502db",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0379-rebase-canonical-projection-after-semantic-snapshot-delivery.task.md",
+      "planningCommitSha": "5a851af9e27565aa4686c81f3a8a0f32a15e76b2",
+      "contentDigest": "sha256:bbe08d9e49b502db51edfaf8c8877e259aa91737c9eebaa51ccdaef406399c82",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T07:46:09.088Z"
+    }
+  },
+  "importedAt": "2026-08-14T07:46:09.088Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "ATM-GOV-0378"
+    ],
+    "startConditions": [
+      "The semantic planning-snapshot producer is committed and the preceding projection is correctly stale only because it predates that delivery."
+    ],
+    "softRelations": [
+      "ATM-GOV-0376",
+      "ATM-GOV-0377"
+    ],
+    "changedPublicSeams": [
+      "atm.runbookCompletionEvidence.v1"
+    ],
+    "causalImpactEdges": [
+      "post-semantic-snapshot-delivery-projection-rebase",
+      "semantic-snapshot-convergence"
+    ],
+    "parallelFrontierInputs": [
+      "source-delivery-head",
+      "sealed-semantic-planning-snapshot"
+    ],
+    "validatorReferences": [
+      "compile-runbook-completion-evidence"
+    ],
+    "phaseOwner": "wave-10-independent-final-certification"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0379_post_semantic_snapshot_projection_rebase",
+      "targetGroupId": "test_group_plan4_final_certification",
+      "semanticKey": "canonical_projection_observes_committed_semantic_snapshot_producer",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "post-semantic-snapshot-delivery-projection-rebase",
+        "semantic-snapshot-convergence"
+      ],
+      "expectedRedPredicate": "a canonical projection whose observed head predates the semantic-snapshot producer delivery fails freshness validation",
+      "contributionResourceKey": "runbook-projection-publication-bundle",
+      "responsibility": "task-required",
+      "dependencyEdge": "ATM-GOV-0378",
+      "contractEdge": "atm.planningSemanticSnapshot.v1",
+      "resourceKey": "runbook-projection-publication-bundle"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0379_post_semantic_snapshot_projection_rebase"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-14T07-47-41-143Z-renew-1499dc810e81",
+  "lastTransitionAt": "2026-08-14T07:47:41.143Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-recovery",
+  "reservedAt": "2026-08-14T07:46:13.110Z",
+  "promotedAt": "2026-08-14T07:46:13.116Z",
+  "claim": {
+    "actorId": "codex-captain-recovery",
+    "leaseId": "lease-93682df52fb7",
+    "claimedAt": "2026-08-14T07:46:13.121Z",
+    "heartbeatAt": "2026-08-14T07:47:40.395Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0379.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814074613-codex-captain-recovery-42f40abd93",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814074613-codex-captain-recovery-42f40abd93\""
+    }
+  },
+  "startedAt": "2026-08-14T07:46:13.121Z",
+  "startedByActor": "codex-captain-recovery",
+  "startedBySessionId": "session-20260814074613-codex-captain-recovery-ATM-GOV-0379-11817347d6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0379",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0379.*",
+      ".atm/history/task-events/ATM-GOV-0379/**",
+      ".atm/history/tasks/ATM-GOV-0379.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d2551885b934be6b9c6e9338f43389d83ab00a30a6421e01f3ecdf19cb4d3f96",
+    "actorId": "codex-captain-recovery",
+    "sessionId": "session-20260814074613-codex-captain-recovery-ATM-GOV-0379-11817347d6",
+    "laneSession": {
+      "laneSessionId": "lane-20260814074613-codex-captain-recovery-42f40abd93",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814074613-codex-captain-recovery-42f40abd93\""
+    },
+    "createdAt": "2026-08-14T07:46:14.896Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-cb9cb05a16059028",
+    "ticketDigest": "sha256:cb9cb05a16059028c7dd19fd14d060739f110489d9aba7843c19c97ce636f898",
+    "taskId": "ATM-GOV-0379",
+    "origin": "claim",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814074613-codex-captain-recovery-42f40abd93",
+    "claimGeneration": "lease-93682df52fb7",
+    "issuedAt": "2026-08-14T07:47:40.395Z",
+    "expiresAt": "2026-08-14T08:17:40.395Z",
+    "scopeDigest": "sha256:5d7188514e36cbd876846aa0828fbe763a73c40f1493dc457ecd679656b40ba0",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-14T07:47:40.395Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0379.*",
+          ".atm/history/task-events/ATM-GOV-0379/**",
+          ".atm/history/tasks/ATM-GOV-0379.json",
+          "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+        ],
+        "digest": "sha256:4ef59f0066fe75bd6bbe2e6a2c4b99bcbda73eb1619f34d0522aa6eb574f0b18"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}
