@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0386",
   "title": "Replay Wave 0 freeze receipts with current source provenance",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -154,25 +154,26 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-3cbd1d69615d",
     "claimedAt": "2026-08-14T12:04:37.157Z",
-    "heartbeatAt": "2026-08-14T12:05:55.047Z",
+    "heartbeatAt": "2026-08-14T12:12:19.473Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0386.json",
       "docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
       "docs/reports/plan-3x-4x-false-green-evidence-freeze.md"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260814120437-codex-captain-recovery-18547358d0",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814120437-codex-captain-recovery-18547358d0\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-14T10:45:48.490Z",
   "startedBySessionId": "session-20260814120437-codex-captain-recovery-ATM-GOV-0386-e6b0bf9c14",
-  "lastTransitionId": "2026-08-14T12-05-55-943Z-renew-b686bf50bd0a",
-  "lastTransitionAt": "2026-08-14T12:05:55.943Z",
+  "lastTransitionId": "2026-08-14T12-12-19-475Z-close-e82346979d71",
+  "lastTransitionAt": "2026-08-14T12:12:19.475Z",
   "ledgerContractVersion": "task-ledger/v1",
   "wipOwnership": {
     "schemaId": "atm.retainedWipOwnership.v1",
@@ -278,5 +279,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  }
+  },
+  "closedAt": "2026-08-14T12:12:19.473Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814120437-codex-captain-recovery-ATM-GOV-0386-e6b0bf9c14",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0386.closure-packet.json"
 }
