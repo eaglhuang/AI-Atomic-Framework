@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-f183be99e7e0",
+  "recordedAt": "2026-08-14T01:02:39.038Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0371",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0371 --message \"fix(git): verify sealed commit trees from canonical HEAD\n\nATM-Work-Admission: wat-a76e22c9d037cf49 sha256:a76e22c9d037cf49d20209e2083b08aafa9b22297ab9c179ecf4e89e2baf681e\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0371-ba5aa291f2",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T01-02-39-037Z-EMG-ATM-GOV-0371-ba5aa291f2.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

@@ -66,7 +66,11 @@ export function captureRunnerBuildOutputSnapshot(input) {
 export function planRunnerPublicationTakeover(input) {
     const entries = uniquePaths(input.snapshot.preexistingDirtyPaths)
         .map((entry) => ({ path: entry, observedDigest: input.snapshot.members[entry] ?? 'missing' }));
-    if (entries.some((entry) => !isRunnerPublicationArtifactPath(entry.path) || entry.observedDigest === 'missing')) {
+    // `missing` is an observed pre-build state, not an absent observation.  The
+    // snapshot digest binds it just as strongly as a content digest, allowing a
+    // sealed publication to restore a deleted generated member without
+    // weakening the exact-path takeover boundary.
+    if (entries.some((entry) => !isRunnerPublicationArtifactPath(entry.path))) {
         throw new Error('Runner publication takeover can only name pre-existing generated publication members with an observed digest.');
     }
     const sealedSourceSha = input.sealedSourceSha.trim();

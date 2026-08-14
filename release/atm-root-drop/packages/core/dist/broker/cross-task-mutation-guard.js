@@ -302,7 +302,7 @@ function hasActiveBrokerIntentForTasks(cwd, taskIds) {
     return false;
 }
 export function isIncidentStillActive(cwd, block, currentTaskId = null) {
-    if (detectCrossTaskMutation(cwd, currentTaskId, 'incident-review')) {
+    if (detectCrossTaskMutation(cwd, currentTaskId, 'incident-review', block.conflictFiles)) {
         return true;
     }
     const conflictTaskIds = collectIncidentConflictTaskIds(block);
@@ -315,6 +315,19 @@ export function isIncidentStillActive(cwd, block, currentTaskId = null) {
         }
     }
     return false;
+}
+function reconcileIncidentBlock(cwd, block, currentTaskId) {
+    const current = detectCrossTaskMutation(cwd, currentTaskId, 'incident-review', block.conflictFiles);
+    if (current)
+        return current;
+    const conflictTaskIds = collectIncidentConflictTaskIds(block);
+    if (hasActiveBrokerIntentForTasks(cwd, conflictTaskIds))
+        return block;
+    for (const taskId of conflictTaskIds) {
+        if (hasActiveLockForTask(cwd, taskId))
+            return block;
+    }
+    return null;
 }
 function archiveResolvedIncident(cwd, fileName, report) {
     const incidentsDir = path.join(cwd, '.atm', 'runtime', 'incidents');
@@ -351,8 +364,13 @@ export function reconcileStaleIncidents(cwd, currentTaskId = null) {
         try {
             const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
             const block = parsed.block ?? null;
-            if (!block || !isIncidentStillActive(cwd, block, currentTaskId)) {
+            const reconciledBlock = block ? reconcileIncidentBlock(cwd, block, currentTaskId) : null;
+            if (!block || !reconciledBlock) {
                 archiveResolvedIncident(cwd, fileName, parsed);
+                reconciled = true;
+            }
+            else if (JSON.stringify(reconciledBlock) !== JSON.stringify(block)) {
+                writeFileSync(filePath, JSON.stringify({ ...parsed, block: reconciledBlock, reconciledAt: new Date().toISOString() }, null, 2), 'utf8');
                 reconciled = true;
             }
         }

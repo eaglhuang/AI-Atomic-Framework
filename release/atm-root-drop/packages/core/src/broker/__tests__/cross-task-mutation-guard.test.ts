@@ -174,4 +174,37 @@ writeJson(path.join(incidentRepo, '.atm/runtime/locks/TASK-B.lock.json'), {
 });
 assert.equal(readIncidentFlag(incidentRepo), null, 'released locks allow incident auto-clear');
 
+writeJson(path.join(incidentRepo, '.atm/history/tasks/TASK-C.json'), {
+  workItemId: 'TASK-C',
+  status: 'done',
+  claim: { actorId: 'actor-c', state: 'released' }
+});
+const mixedIncident = {
+  conflictTaskId: 'TASK-B',
+  conflictFiles: ['src/b.ts', '.atm/history/evidence/TASK-C.json'],
+  commandFamily: 'pre-commit',
+  recoveryLane: 'Stop write-path work.',
+  conflicts: [
+    {
+      conflictTaskId: 'TASK-B',
+      conflictFiles: ['src/b.ts'],
+      owner: 'actor-b',
+      surface: 'active-task-scope' as const
+    },
+    {
+      conflictTaskId: 'TASK-C',
+      conflictFiles: ['.atm/history/evidence/TASK-C.json'],
+      owner: 'TASK-C',
+      surface: 'task-history' as const
+    }
+  ]
+};
+recordIncidentFlag(incidentRepo, mixedIncident);
+const reconciledMixedIncident = readIncidentFlag(incidentRepo);
+assert.deepEqual(
+  reconciledMixedIncident?.conflicts.map((entry) => [entry.conflictTaskId, entry.surface, entry.conflictFiles]),
+  [['TASK-C', 'task-history', ['.atm/history/evidence/TASK-C.json']]],
+  'reconciliation must retain only the still-live subset instead of resurrecting a terminal source owner'
+);
+
 console.log('[cross-task-mutation-guard.test] ok');

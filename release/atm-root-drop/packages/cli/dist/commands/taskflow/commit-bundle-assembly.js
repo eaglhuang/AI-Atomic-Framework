@@ -421,7 +421,7 @@ export function buildTaskflowCommitBundle(input) {
         metadataFailClosed = true;
         failClosedReason = `Touched-file physical line budget failed: ${lineBudgetReport.hardViolations.map((entry) => `${entry.file}:${entry.lines}`).join(', ')}. Reproduce: ${lineBudgetReport.reproduceCommand}`;
     }
-    const targetStageFiles = uniqueSorted([...finalDeliveryFiles, ...targetGovernanceFiles, ...runnerPublicationFiles, ...(input.runnerPublicationFiles ?? [])]);
+    const targetStageFiles = uniqueSorted([...finalDeliveryFiles, ...targetGovernanceFiles, ...runnerPublicationFiles]);
     const planning = resolvePlanningPath(targetRepoRoot, input.planningMirrorPath);
     const planningStageFiles = planning.repoRoot && planning.relativePath ? uniqueSorted([planning.relativePath,
         ...(input.extraPlanningStageFiles ?? []), ...(input.rosterIndexPath ? [normalizeRepoRelativePath(planning.repoRoot, path.isAbsolute(input.rosterIndexPath) ? input.rosterIndexPath : path.resolve(planning.repoRoot, input.rosterIndexPath))] : [])]) : [];

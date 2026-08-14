@@ -56,7 +56,11 @@ const outputInventory = deriveRunnerBuildOutputInventory({
 const receipt = {
   schemaId: 'atm.runnerSyncReceipt.v1',
   taskId: 'ATM-GOV-0344',
-  outputInventory
+  outputInventory,
+  linkedTaskIds: ['ATM-GOV-0344'],
+  memberTaskIds: ['ATM-GOV-0344'],
+  groupManifest: { memberTaskIds: ['ATM-GOV-0344'] },
+  childAttribution: { complete: true, members: [{ taskId: 'ATM-GOV-0344' }] }
 };
 assert.equal(authorizesRunnerPublicationCloseCommit({
   taskId: 'ATM-GOV-0344',
@@ -68,6 +72,31 @@ assert.equal(authorizesRunnerPublicationCloseCommit({
   receipt,
   criticalChangedFiles: ['packages/cli/dist/atm.js', 'release/foreign.mjs']
 }), false);
+
+const linkedProducerInventory = deriveRunnerBuildOutputInventory({
+  sealedSourceSha: 'a'.repeat(40),
+  observedPaths: ['packages/cli/dist/atm.js'],
+  currentTaskId: 'ATM-FRAMEWORK-TEMP-producer',
+  ownership: [{ path: 'packages/cli/dist/atm.js', ownerTaskId: 'ATM-FRAMEWORK-TEMP-producer' }]
+});
+const linkedProducerReceipt = {
+  schemaId: 'atm.runnerSyncReceipt.v1',
+  taskId: 'ATM-GOV-0344',
+  linkedTaskIds: ['ATM-GOV-0344'],
+  memberTaskIds: ['ATM-FRAMEWORK-TEMP-producer'],
+  groupManifest: { memberTaskIds: ['ATM-FRAMEWORK-TEMP-producer'] },
+  childAttribution: { complete: true, members: [{ taskId: 'ATM-FRAMEWORK-TEMP-producer' }] },
+  outputInventory: linkedProducerInventory
+};
+assert.equal(resolveRunnerPublicationCloseHandoff({ taskId: 'ATM-GOV-0344', receipt: linkedProducerReceipt }).ok, true, 'durably linked, completely attributed producer output is closeable after its temporary lease is released');
+assert.equal(resolveRunnerPublicationCloseHandoff({
+  taskId: 'ATM-GOV-0344',
+  receipt: { ...linkedProducerReceipt, childAttribution: { complete: false, members: [{ taskId: 'ATM-FRAMEWORK-TEMP-producer' }] } }
+}).ok, false, 'incomplete producer attribution must remain fail-closed');
+assert.equal(resolveRunnerPublicationCloseHandoff({
+  taskId: 'ATM-GOV-0344',
+  receipt: { ...linkedProducerReceipt, linkedTaskIds: ['ATM-GOV-OTHER'] }
+}).ok, false, 'a producer group cannot be reused by an unrelated closing task');
 assert.equal(authorizesRunnerPublicationCloseCommit({
   taskId: 'ATM-GOV-OTHER',
   receipt,

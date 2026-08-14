@@ -26,7 +26,7 @@ import {
 import { scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
-import { resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
+import { captureSealedRunnerPublicationSnapshot, resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
 export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
@@ -112,6 +112,15 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   const publicationTaskId = process.env.ATM_RUNNER_PUBLICATION_TASK?.trim() || null;
   const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
   if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
+  // A takeover receipt authorizes the pre-existing live surface. Capture it
+  // before the private build writes generated candidate outputs; recapturing
+  // after that work would make every valid receipt fail its own CAS check.
+  const preBuildPublicationSnapshots = captureSealedRunnerPublicationSnapshot({
+    cwd: repoRoot,
+    stewardActorId: actorId,
+    buildTarget,
+    publicationTaskId
+  });
 
   const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
   const cacheDecision = timePhase(timings, 'skipDecisionMs', () => inspectBuildCache({
@@ -125,7 +134,9 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       stewardActorId: actorId,
       sealedSourceSha,
       buildTarget,
-      publicationTaskId
+      publicationTaskId,
+      beforeBuildSnapshot: preBuildPublicationSnapshots.scopedSnapshot,
+      beforeBuildTakeoverSnapshot: preBuildPublicationSnapshots.takeoverSnapshot
     });
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     const dominantPhaseSummary = summarizeDominantPhase(timings);
@@ -210,7 +221,9 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       stewardActorId: actorId,
       sealedSourceSha,
       buildTarget,
-      publicationTaskId
+      publicationTaskId,
+      beforeBuildSnapshot: preBuildPublicationSnapshots.scopedSnapshot,
+      beforeBuildTakeoverSnapshot: preBuildPublicationSnapshots.takeoverSnapshot
     });
     const artifactSync = timePhase(
       timings,

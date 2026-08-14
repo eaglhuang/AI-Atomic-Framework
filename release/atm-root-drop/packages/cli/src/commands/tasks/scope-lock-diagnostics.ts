@@ -158,6 +158,11 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   const allowedAdvisoryGovernanceFiles = new Set(
     uniqueStrings((input.allowedAdvisoryGovernanceFiles ?? []).map(normalizeRelativePath).filter(Boolean))
   );
+  // Git-head provenance is a shared append-only observation surface, not a
+  // closeback artifact owned by whichever task happens to be closing.  A
+  // A parseable newest receipt is advisory only to the task that owns it.
+  // Foreign, malformed, and unowned receipts remain blocking: otherwise a
+  // close could silently accept provenance it neither produced nor verified.
   if (readLatestGitHeadReceiptTaskId(input.cwd) === input.taskId) {
     allowedAdvisoryGovernanceFiles.add(gitHeadEvidencePath);
   }
