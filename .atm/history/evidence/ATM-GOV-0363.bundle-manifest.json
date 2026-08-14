@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0363",
-  "updatedAt": "2026-08-14T06:49:32.735Z",
+  "updatedAt": "2026-08-14T06:54:08.528Z",
   "updatedBy": "codex-captain-recovery",
   "freshValidationPasses": [
     "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
@@ -11,6 +11,8 @@
     "validate:cli",
     "validate:git-head-evidence",
     "validate:integration-adapter",
+    "validate:onefile-release",
+    "validate:root-drop-release",
     "validate:skill-templates",
     "validate:transient-artifact-lifecycle"
   ],
@@ -158,6 +160,38 @@
       "durationMs": 10307,
       "runnerKind": "dev-source",
       "sourceCommit": "1ce77de83fa4682cf3b2ffcb1e50aaed04f7eb73",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-08-14T06:52:06.345Z",
+      "startedAt": "2026-08-14T06:50:58.313Z",
+      "finishedAt": "2026-08-14T06:52:06.345Z",
+      "durationMs": 68032,
+      "runnerKind": "dev-source",
+      "sourceCommit": "65689da910caadf1a16eb756aa1d6552c26f413a",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:root-drop-release"
+      ],
+      "generatedAt": "2026-08-14T06:54:08.527Z",
+      "startedAt": "2026-08-14T06:52:21.777Z",
+      "finishedAt": "2026-08-14T06:54:08.527Z",
+      "durationMs": 106750,
+      "runnerKind": "dev-source",
+      "sourceCommit": "65689da910caadf1a16eb756aa1d6552c26f413a",
       "cached": false
     }
   ],
