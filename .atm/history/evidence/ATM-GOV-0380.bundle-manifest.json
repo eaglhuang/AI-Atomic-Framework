@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0380",
+  "updatedAt": "2026-08-14T08:14:23.901Z",
+  "updatedBy": "codex-captain-recovery",
+  "freshValidationPasses": [
+    "typecheck",
+    "validate:charter",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-14T08:13:44.694Z",
+      "startedAt": "2026-08-14T08:12:55.608Z",
+      "finishedAt": "2026-08-14T08:13:44.694Z",
+      "durationMs": 49086,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-charter.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f95d46d7ade0e91ddc83ac61305664761c5da9c13323866ff16fb02d9cebfe6f",
+      "stderrSha256": "sha256:315f260be964d9ce6b13463662f301c3087c22c7cf5d86774ba928d5da18c005",
+      "validators": [
+        "validate:charter"
+      ],
+      "generatedAt": "2026-08-14T08:13:47.439Z",
+      "startedAt": "2026-08-14T08:13:47.054Z",
+      "finishedAt": "2026-08-14T08:13:47.439Z",
+      "durationMs": 385,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T08:14:23.901Z",
+      "startedAt": "2026-08-14T08:14:15.313Z",
+      "finishedAt": "2026-08-14T08:14:23.901Z",
+      "durationMs": 8588,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
