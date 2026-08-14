@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0387",
   "title": "Observe the current Wave 0 freeze artifact independently",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -132,8 +132,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T12-13-34-675Z-renew-9d61e0e71ba1",
-  "lastTransitionAt": "2026-08-14T12:13:34.675Z",
+  "lastTransitionId": "2026-08-14T12-15-03-223Z-close-4900c2f5fbd7",
+  "lastTransitionAt": "2026-08-14T12:15:03.223Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-14T10:59:35.078Z",
   "promotedAt": "2026-08-14T10:59:35.083Z",
@@ -141,19 +141,20 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-0a34453d26cc",
     "claimedAt": "2026-08-14T12:12:57.958Z",
-    "heartbeatAt": "2026-08-14T12:13:34.143Z",
+    "heartbeatAt": "2026-08-14T12:15:03.221Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0387.json",
       "docs/reports/plan-3x-4x-false-green-evidence-freeze.json"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260814121258-codex-captain-recovery-491b76fd0e",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814121258-codex-captain-recovery-491b76fd0e\""
-    }
+    },
+    "reason": "The historical Wave 0 delivery commit contains the independently observed freeze artifact together with sibling task files; this waiver accepts only the task-scoped matched artifact and does not convert a negative result into pass."
   },
   "startedAt": "2026-08-14T10:59:35.089Z",
   "startedByActor": "codex-captain-recovery",
@@ -259,5 +260,10 @@
     },
     "createdAt": "2026-08-14T12:13:02.948Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-14T12:15:03.221Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814121257-codex-captain-recovery-ATM-GOV-0387-f92fd37e3f",
+  "closeReason": "The historical Wave 0 delivery commit contains the independently observed freeze artifact together with sibling task files; this waiver accepts only the task-scoped matched artifact and does not convert a negative result into pass.",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0387.closure-packet.json"
 }
