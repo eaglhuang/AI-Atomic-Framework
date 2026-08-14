@@ -57,7 +57,7 @@ const receipt = {
   schemaId: 'atm.runnerSyncReceipt.v1',
   taskId: 'ATM-GOV-0344',
   outputInventory,
-  linkedTaskIds: ['ATM-GOV-0344'],
+  linkedTaskIds: [],
   memberTaskIds: ['ATM-GOV-0344'],
   groupManifest: { memberTaskIds: ['ATM-GOV-0344'] },
   childAttribution: { complete: true, members: [{ taskId: 'ATM-GOV-0344' }] }
@@ -67,6 +67,7 @@ assert.equal(authorizesRunnerPublicationCloseCommit({
   receipt,
   criticalChangedFiles: ['packages/cli/dist/atm.js', 'release/atm-onefile/atm.mjs']
 }), true);
+assert.equal(resolveRunnerPublicationCloseHandoff({ taskId: 'ATM-GOV-0344', receipt }).ok, true, 'a task may close its own completely attributed runner publication without a redundant cross-task link');
 assert.equal(authorizesRunnerPublicationCloseCommit({
   taskId: 'ATM-GOV-0344',
   receipt,
