@@ -48,11 +48,12 @@ function commitAll(cwd: string, message: string) {
   return git(cwd, ['rev-parse', 'HEAD']);
 }
 
-const declaredFiles = ['src/task-owned.ts', 'release/atm-onefile/atm.mjs'];
+const declaredFiles = ['src/task-owned.ts', '.atm/charter/atomic-charter.md', 'release/atm-onefile/atm.mjs'];
 const buckets = categorizeHistoricalCommitFiles({
   taskId: 'TASK-HIST',
   changedFiles: [
     'src/task-owned.ts',
+    '.atm/charter/atomic-charter.md',
     '.atm/history/evidence/TASK-HIST.json',
     '.atm/history/evidence/OTHER.json',
     'release/atm-onefile/atm.mjs',
@@ -61,6 +62,7 @@ const buckets = categorizeHistoricalCommitFiles({
   declaredFiles
 });
 assert(buckets.taskMatchedFiles.includes('src/task-owned.ts'), 'task-owned source must be task-matched');
+assert(buckets.taskMatchedFiles.includes('.atm/charter/atomic-charter.md'), 'explicit canonical charter must be task-matched');
 assert(buckets.governanceFiles.includes('.atm/history/evidence/TASK-HIST.json'), 'same-task evidence must be governance');
 assert(buckets.allowedRunnerOutputFiles.includes('release/atm-onefile/atm.mjs'), 'declared runner output must be allowed');
 assert(buckets.outOfScopeSourceFiles.includes('src/unrelated.ts'), 'unrelated source must be out of scope');

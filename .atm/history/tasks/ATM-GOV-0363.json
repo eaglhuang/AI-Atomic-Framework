@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0363",
   "title": "Make governed operations own and clean their transient residue",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -225,8 +225,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T09-36-21-389Z-renew-9740254ea2f4",
-  "lastTransitionAt": "2026-08-14T09:36:21.389Z",
+  "lastTransitionId": "2026-08-14T09-45-15-441Z-close-aa34ec9fed8b",
+  "lastTransitionAt": "2026-08-14T09:45:15.441Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-14T02:49:03.878Z",
   "promotedAt": "2026-08-14T02:49:03.882Z",
@@ -234,7 +234,7 @@
     "actorId": "codex-captain-recovery",
     "leaseId": "lease-f79e68a375a3",
     "claimedAt": "2026-08-14T03:27:18.541Z",
-    "heartbeatAt": "2026-08-14T09:36:20.749Z",
+    "heartbeatAt": "2026-08-14T09:45:15.439Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/charter/atomic-charter.md",
@@ -286,8 +286,8 @@
       "tests/cli-fixtures/help-snapshots/command-list.json",
       "tests/cli/transient-artifact-lifecycle.test.ts"
     ],
-    "state": "active",
-    "reason": "source-first regression: successor must receive a live claim and replace retained WIP ownership",
+    "state": "released",
+    "reason": "closed",
     "laneSession": {
       "laneSessionId": "lane-20260814032718-codex-captain-recovery-f3a77231a2",
       "status": "adopted",
@@ -477,5 +477,9 @@
     },
     "createdAt": "2026-08-14T03:27:18.805Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-14T09:45:15.439Z",
+  "closedByActor": "codex-captain-recovery",
+  "closedBySessionId": "session-20260814032718-codex-captain-recovery-ATM-GOV-0363-55bd345f22",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0363.closure-packet.json"
 }

@@ -64,6 +64,11 @@ export function categorizeHistoricalCommitFiles(input: {
     const normalized = normalizeRelativePath(filePath);
     if (!normalized) continue;
 
+    if (isDeclaredCanonicalCharterDeliverable(normalized, input.declaredFiles)) {
+      taskMatchedFiles.push(normalized);
+      continue;
+    }
+
     if (normalized.startsWith('.atm/')) {
       if (isTaskCloseGovernanceCriticalPath(normalized, input.taskId)) {
         governanceFiles.push(normalized);
@@ -403,7 +408,15 @@ export function pathMatchesTaskScope(filePath: string, scope: string): boolean {
 }
 
 export function isDeliverableGateCandidate(filePath: string, declaredFiles: readonly string[]): boolean {
-  return isRealDeliverablePath(filePath) || isDeclaredRunnerOutputPath(filePath, declaredFiles);
+  return isRealDeliverablePath(filePath)
+    || isDeclaredCanonicalCharterDeliverable(filePath, declaredFiles)
+    || isDeclaredRunnerOutputPath(filePath, declaredFiles);
+}
+
+function isDeclaredCanonicalCharterDeliverable(filePath: string, declaredFiles: readonly string[]): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  return normalized.startsWith('.atm/charter/')
+    && declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared));
 }
 
 function isRealDeliverablePath(filePath: string): boolean {
