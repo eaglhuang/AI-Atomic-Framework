@@ -1,0 +1,53 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T07-33-36-173Z-close-ec2d69d55c65",
+  "taskId": "ATM-GOV-0377",
+  "action": "close",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814072700-codex-captain-recovery-ATM-GOV-0377-5398cb8e68",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0377.json",
+  "taskSha256": "sha256:7e166374b775ae5fccf2bf6cccd1c6bb7929b477b9339d32da2af270555b6a6e",
+  "createdAt": "2026-08-14T07:33:36.173Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0377 --actor codex-captain-recovery --status done --historical-delivery 48eaddec79f106f2dcad3192edc036547004a81c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814072700-codex-captain-recovery-ATM-GOV-0377-5398cb8e68",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0377.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-14T07:33:36.164Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0377.*",
+        ".atm/history/task-events/ATM-GOV-0377/**",
+        ".atm/history/tasks/ATM-GOV-0377.json",
+        "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
