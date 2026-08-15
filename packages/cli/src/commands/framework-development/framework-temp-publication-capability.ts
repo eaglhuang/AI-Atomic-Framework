@@ -61,18 +61,50 @@ export function resolveFrameworkTempPublicationCapability(input: {
   const taskId = input.taskId?.trim();
   const actorId = input.actorId?.trim() ?? '';
   const laneSessionId = input.laneSessionId?.trim() ?? '';
-  const candidates = readFrameworkTempLockProjection(input.cwd, input.now).filter(
+  const owned = readFrameworkTempLockProjection(input.cwd, input.now).filter(
     (candidate) =>
       (!taskId || candidate.workItemId === taskId) &&
       (!actorId || candidate.actorId === actorId) &&
-      (!laneSessionId || candidate.laneSessionId === laneSessionId) &&
       candidate.disposition === 'foreign-live',
   );
+  // ATM-GOV-0395: a lane matches only on an explicitly recorded lane. A lock
+  // whose producer never recorded one is of unknown lane, not of a different
+  // lane, so it cannot be silently excluded — that is what left an actor
+  // unable to use a claim it was holding. It is equally unsafe to trust: the
+  // reconciliation below admits it only when the actor's ownership is
+  // unambiguous, and anything ambiguous stays out and fails closed upstream.
+  const candidates = laneSessionId
+    ? admitLaneBoundCandidates(owned, laneSessionId)
+    : owned;
   // A task id already provides a canonical authority key.  A taskless
   // publication must instead be unique after lane binding; guessing among an
   // actor's other live claims would permit receipt/lock identity drift.
   const lock = candidates.length === 1 ? candidates[0] : null;
   return lock ? toCapability(input.cwd, lock) : null;
+}
+
+/**
+ * ATM-GOV-0395 — reconcile a caller's lane against locks of mixed provenance.
+ *
+ * Locks that recorded this lane are admitted outright. Legacy locks, which
+ * recorded no lane at all, are admitted only when the caller's own recorded
+ * locks say nothing that contradicts them: if any lock already binds this
+ * actor to this lane, the legacy one is a leftover and must not compete. That
+ * keeps a single unambiguous owner in every case, and leaves ambiguity — more
+ * than one surviving candidate — to fail closed at the single-candidate rule
+ * below, rather than being resolved by guessing.
+ */
+function admitLaneBoundCandidates(
+  owned: readonly FrameworkTempLockProjection[],
+  laneSessionId: string
+): readonly FrameworkTempLockProjection[] {
+  const recordedForThisLane = owned.filter(
+    (candidate) => candidate.laneProvenance === 'recorded' && candidate.laneSessionId === laneSessionId
+  );
+  if (recordedForThisLane.length > 0) return recordedForThisLane;
+  const recordedForAnotherLane = owned.some((candidate) => candidate.laneProvenance === 'recorded');
+  if (recordedForAnotherLane) return [];
+  return owned.filter((candidate) => candidate.laneProvenance === 'unrecorded-legacy');
 }
 
 export function frameworkTempPublicationCapabilityCovers(

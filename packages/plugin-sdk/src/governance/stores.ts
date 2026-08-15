@@ -23,7 +23,14 @@ export interface TaskStore extends StoreLifecycle {
 }
 
 export interface LockStore extends StoreLifecycle {
-  acquireLock(workItem: WorkItemRef, files: readonly string[], actor: string): Promise<ScopeLockRecord> | ScopeLockRecord;
+  /**
+   * ATM-GOV-0395: `laneSessionId` is the durable owner of a lane-bound claim.
+   * A caller that knows its lane must record it here; encoding the lane into
+   * the work item id instead leaves readers with nothing to match against.
+   * Optional so existing implementations stay valid, but omitting it produces
+   * a lock of legacy provenance that consumers must reconcile before trusting.
+   */
+  acquireLock(workItem: WorkItemRef, files: readonly string[], actor: string, laneSessionId?: string | null): Promise<ScopeLockRecord> | ScopeLockRecord;
   getLock(workItemId: string): Promise<ScopeLockRecord | null> | ScopeLockRecord | null;
   releaseLock(workItemId: string, actor: string): Promise<CapabilityResult> | CapabilityResult;
 }

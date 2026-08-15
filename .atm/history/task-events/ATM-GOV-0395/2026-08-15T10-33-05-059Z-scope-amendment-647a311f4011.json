@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-15T10-33-05-059Z-scope-amendment-647a311f4011",
+  "taskId": "ATM-GOV-0395",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0395.json",
+  "taskSha256": "sha256:9a7c62a9220d8c815c499dd00864410b438d2107e92beff7aa35061d9f6288a2",
+  "createdAt": "2026-08-15T10:33:05.059Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0395 --actor claude-008 --add packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts --reason \"Focused regression for the producer/reader/consumer lane ownership transaction\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Focused regression for the producer/reader/consumer lane ownership transaction"
+  }
+}

@@ -13,8 +13,21 @@ export interface FrameworkTempLockProjection {
   readonly disposition: FrameworkTempLockDisposition;
   readonly linkedTaskId: string | null;
   readonly laneSessionId: string | null;
+  /**
+   * ATM-GOV-0395: how the lane above was established.
+   *
+   * `recorded` — the producer wrote an explicit `laneSessionId`, so comparing
+   * it against a caller's lane is meaningful in both directions.
+   * `unrecorded-legacy` — the lock predates that guarantee. Its lane is
+   * unknown, not different: treating the absence as a mismatch is what made a
+   * live claim unusable by its own owner. Consumers must reconcile such a lock
+   * before trusting it, and must fail closed while it stays ambiguous.
+   */
+  readonly laneProvenance: FrameworkTempLockLaneProvenance;
   readonly files: readonly string[];
 }
+
+export type FrameworkTempLockLaneProvenance = 'recorded' | 'unrecorded-legacy';
 
 export function readFrameworkTempLockProjection(cwd: string, now = Date.now()): readonly FrameworkTempLockProjection[] {
   const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
@@ -44,6 +57,7 @@ export function readFrameworkTempLockProjection(cwd: string, now = Date.now()): 
             : 'stale-recovery-input',
           linkedTaskId: text(parsed.linkedTaskId ?? parsed.taskId),
           laneSessionId: text(parsed.laneSessionId),
+          laneProvenance: text(parsed.laneSessionId) ? 'recorded' : 'unrecorded-legacy',
           files: uniqueStrings(Array.isArray(parsed.files) ? parsed.files : [])
         }];
       } catch {
