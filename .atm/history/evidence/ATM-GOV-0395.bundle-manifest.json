@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0395",
+  "updatedAt": "2026-08-15T10:58:20.950Z",
+  "updatedBy": "claude-008",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b85d18d2f3ea31af8c6151b5cca5a37cc62342016047f4cc3f748e3072d5e7dd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-15T10:58:01.569Z",
+      "startedAt": "2026-08-15T10:58:01.172Z",
+      "finishedAt": "2026-08-15T10:58:01.569Z",
+      "durationMs": 397,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c3f24bf9565060b73777d8bb89d0e3cd97e82587",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts"
+      ],
+      "generatedAt": "2026-08-15T10:58:05.995Z",
+      "startedAt": "2026-08-15T10:58:04.500Z",
+      "finishedAt": "2026-08-15T10:58:05.995Z",
+      "durationMs": 1495,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c3f24bf9565060b73777d8bb89d0e3cd97e82587",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-15T10:58:20.949Z",
+      "startedAt": "2026-08-15T10:58:08.853Z",
+      "finishedAt": "2026-08-15T10:58:20.949Z",
+      "durationMs": 12096,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c3f24bf9565060b73777d8bb89d0e3cd97e82587",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
