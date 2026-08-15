@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0370",
   "title": "Bind runner publication outputs to producer authority before taskflow close bundling",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -173,7 +173,7 @@
     "actorId": "cursor-captain",
     "leaseId": "lease-a31b717fc08d",
     "claimedAt": "2026-08-15T00:50:12.562Z",
-    "heartbeatAt": "2026-08-15T09:07:38.676Z",
+    "heartbeatAt": "2026-08-15T09:09:26.023Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0370.*",
@@ -187,8 +187,8 @@
       "release/atm-root-drop",
       "tests/cli/runner-sync-framework-temp-hotfix.test.ts"
     ],
-    "state": "active",
-    "reason": "The recorded active claim heartbeat is 2026-08-14T00:41:29Z with TTL 1800s; wall-clock expiry is established, no current owner activity is evidenced, and runner publication authority is the shared Q2 blocker.",
+    "state": "released",
+    "reason": "closed",
     "laneSession": {
       "laneSessionId": "lane-20260815005012-cursor-captain-7dc44390cd",
       "status": "adopted",
@@ -234,8 +234,8 @@
     "createdAt": "2026-08-15T00:50:13.503Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-15T09-07-39-492Z-renew-7334f4f44c51",
-  "lastTransitionAt": "2026-08-15T09:07:39.492Z",
+  "lastTransitionId": "2026-08-15T09-09-26-025Z-close-1c85408cdec0",
+  "lastTransitionAt": "2026-08-15T09:09:26.025Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -304,5 +304,9 @@
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
   },
-  "startedByActor": "cursor-captain"
+  "startedByActor": "cursor-captain",
+  "closedAt": "2026-08-15T09:09:26.023Z",
+  "closedByActor": "cursor-captain",
+  "closedBySessionId": "session-20260815005012-cursor-captain-ATM-GOV-0370-927a99aa83",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0370.closure-packet.json"
 }

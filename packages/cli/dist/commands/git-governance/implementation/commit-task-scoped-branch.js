@@ -1,0 +1,159 @@
+/**
+ * git-governance/implementation/commit-task-scoped-branch.ts
+ *
+ * ATM-GOV-0394 — the task-scoped lifecycle branch of a governed commit.
+ *
+ * Extracted from commit-command.ts alongside the framework branch, so the
+ * command file routes between named branches instead of containing them. This
+ * branch owns one decision: given a live task claim, which files does the
+ * task's scope authorize this commit to carry, and is this request a preview.
+ *
+ * It never executes a commit. It returns either a preview result, or the
+ * resolved bundle plus any deferred foreign-staged snapshot for the caller.
+ */
+import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.js';
+import { CliError, makeResult, message, quoteCliValue } from '../../shared.js';
+import { cleanupDeferredForeignStagedSnapshot } from './git-index-transaction.js';
+import { inspectTaskScopedStagedGovernanceBundle, inspectTaskScopedUnstagedCommit } from './task-scope-staging.js';
+export function routeTaskScopedCommitBranch(input) {
+    const { options, actorId, taskDocument, claim, claimForTrailers, session, laneSessionId } = input;
+    let taskScopedBundleReport = null;
+    let deferredForeignStagedSnapshotPath = null;
+    const bundleReport = resolveTaskScopedCommitBundle({
+        cwd: options.cwd,
+        taskId: options.taskId,
+        taskDocument,
+        apply: !options.dryRun && (options.autoStage || options.deferForeignStaged),
+        autoStage: options.autoStage,
+        deferForeignStaged: options.deferForeignStaged,
+        stageOverrideLease: options.stageOverrideLease,
+        brokerConflictResolutionPath: options.brokerConflictResolutionPath,
+        message: options.message,
+        actorId,
+        trailers: [
+            `ATM-Actor: ${actorId}`,
+            `ATM-Task: ${options.taskId}`,
+            ...(options.wip
+                ? [
+                    "ATM-WIP: true",
+                    "ATM-Delivery: false",
+                    "ATM-Closeout-Eligible: false",
+                    ...(options.overrideReason
+                        ? [`ATM-Reason: ${options.overrideReason}`]
+                        : []),
+                ]
+                : []),
+            ...(claimForTrailers?.leaseId
+                ? [`ATM-Claim: ${claimForTrailers.leaseId}`]
+                : []),
+            ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : []),
+            ...(laneSessionId ? [`ATM-Lane-Session: ${laneSessionId}`] : []),
+        ],
+    });
+    taskScopedBundleReport = bundleReport;
+    deferredForeignStagedSnapshotPath =
+        bundleReport.deferredForeignStagedSnapshot;
+    const copyableCommitCommand = bundleReport.copyableCommitCommand;
+    if (options.dryRun) {
+        return { kind: "preview", result: makeResult({
+                ok: bundleReport.ok,
+                command: "git",
+                cwd: options.cwd,
+                messages: [
+                    bundleReport.ok
+                        ? message("info", "ATM_GIT_COMMIT_BUNDLE_DRY_RUN", `git commit dry-run for ${options.taskId} resolved a task-scoped bundle without mutating the index.`, {
+                            taskId: options.taskId,
+                            stageFiles: bundleReport.stageFiles,
+                            skippedExternalDirtyFiles: bundleReport.skippedExternalDirtyFiles,
+                        })
+                        : message("error", bundleReport.blockedCode ?? "ATM_GIT_COMMIT_BUNDLE_BLOCKED", bundleReport.blockedSummary ??
+                            "Task-scoped commit bundle resolver blocked the commit.", { commitBundle: bundleReport }),
+                ],
+                evidence: {
+                    action: "commit",
+                    dryRun: true,
+                    actorId,
+                    taskId: options.taskId,
+                    sessionId: session?.sessionId ?? null,
+                    commitBundle: bundleReport,
+                    laneSessionId,
+                    copyableCommitCommand,
+                },
+            }) };
+    }
+    if (!bundleReport.ok) {
+        cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
+        throw new CliError(bundleReport.blockedCode ?? "ATM_GIT_COMMIT_BUNDLE_BLOCKED", bundleReport.blockedSummary ??
+            "Task-scoped commit bundle resolver blocked the commit.", {
+            exitCode: 1,
+            details: {
+                actorId,
+                taskId: options.taskId,
+                sessionId: session?.sessionId ?? null,
+                commitBundle: bundleReport,
+                copyableCommitCommand,
+                unexpectedStagedTasks: bundleReport.unexpectedStagedTasks,
+                skippedExternalDirtyFiles: bundleReport.skippedExternalDirtyFiles,
+                requiredCommand: bundleReport.blockedCode ===
+                    "ATM_GIT_COMMIT_CLOSEOUT_ONLY_MUTATION"
+                    ? `node atm.mjs next --claim --actor ${quoteCliValue(actorId)} --task ${quoteCliValue(options.taskId)} --claim-intent write --json`
+                    : null,
+            },
+        });
+    }
+    // `--auto-stage` assembles and verifies the bundle in a sealed candidate
+    // index. Re-staging it in the shared index is redundant and lets foreign
+    // lanes contend on bytes this commit will never consume.
+    const stagedBundleInspection = options.autoStage
+        ? { ok: true, code: '', summary: '', warnings: [], details: {} }
+        : inspectTaskScopedStagedGovernanceBundle(options.cwd, options.taskId, taskDocument);
+    if (!stagedBundleInspection.ok) {
+        cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
+        throw new CliError(stagedBundleInspection.code, stagedBundleInspection.summary, {
+            exitCode: 1,
+            details: {
+                actorId,
+                taskId: options.taskId,
+                sessionId: session?.sessionId ?? null,
+                ...stagedBundleInspection.details,
+                copyableCommitCommand,
+                governanceBundleWarnings: stagedBundleInspection.warnings,
+            },
+        });
+    }
+    const stagingInspection = options.autoStage
+        ? null
+        : inspectTaskScopedUnstagedCommit(options.cwd, options.taskId, taskDocument);
+    if (stagingInspection?.kind === "staging-required") {
+        cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
+        throw new CliError("ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED", `git commit for ${options.taskId} requires staged task-scoped files before the wrapper can create a governed commit.`, {
+            exitCode: 1,
+            details: {
+                actorId,
+                taskId: options.taskId,
+                sessionId: session?.sessionId ?? null,
+                inScopeDirtyFiles: stagingInspection.inScopeDirtyFiles,
+                skippedExternalDirtyFiles: stagingInspection.skippedExternalDirtyFiles,
+                requiredCommand: stagingInspection.requiredCommand,
+                autoStageCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)} --task ${quoteCliValue(options.taskId)} --message ${quoteCliValue(options.message)} --auto-stage --json`,
+                copyableCommitCommand,
+            },
+        });
+    }
+    if (stagingInspection?.kind === "mixed-scope") {
+        cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
+        throw new CliError("ATM_GIT_COMMIT_TASK_SCOPED_STAGING_AMBIGUOUS", `git commit for ${options.taskId} found out-of-scope files already staged with task-scoped work; defer foreign staged files or stage only in-scope files manually before retrying.`, {
+            exitCode: 1,
+            details: {
+                actorId,
+                taskId: options.taskId,
+                sessionId: session?.sessionId ?? null,
+                inScopeDirtyFiles: stagingInspection.inScopeDirtyFiles,
+                outOfScopeStagedFiles: stagingInspection.outOfScopeStagedFiles,
+                deferForeignStagedCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)} --task ${quoteCliValue(options.taskId)} --message ${quoteCliValue(options.message)} --defer-foreign-staged --json`,
+                copyableCommitCommand,
+            },
+        });
+    }
+    return { kind: "resolved", taskScopedBundleReport, deferredForeignStagedSnapshotPath };
+}
