@@ -243,8 +243,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-15T14-10-25-041Z-scope-amendment-90d92bf67dd7",
-  "lastTransitionAt": "2026-08-15T14:10:25.041Z",
+  "lastTransitionId": "2026-08-15T15-06-09-869Z-renew-a64d4253f130",
+  "lastTransitionAt": "2026-08-15T15:06:09.869Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-captain",
   "reservedAt": "2026-08-15T14:04:16.216Z",
@@ -253,7 +253,7 @@
     "actorId": "cursor-captain",
     "leaseId": "lease-d0f4e6a9ca73",
     "claimedAt": "2026-08-15T14:04:16.227Z",
-    "heartbeatAt": "2026-08-15T14:04:16.227Z",
+    "heartbeatAt": "2026-08-15T15:06:09.073Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0398.*",
@@ -267,10 +267,9 @@
       "scripts/validate-governance-commands/implementation.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260815140416-cursor-captain-893604fe79",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815140416-cursor-captain-893604fe79\""
     }
@@ -280,26 +279,27 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-53915768266375c0",
-    "ticketDigest": "sha256:53915768266375c013657d7eef17110432b27d9bf5cdb4055b1a51b87da24e7f",
+    "ticketId": "wat-d60e22dbbf95b953",
+    "ticketDigest": "sha256:d60e22dbbf95b953a4e747d5a7987a5724ece10dd77e0344b15b2d42d603209f",
     "taskId": "ATM-GOV-0398",
     "origin": "claim",
     "actorId": "cursor-captain",
     "laneSessionId": "lane-20260815140416-cursor-captain-893604fe79",
     "claimGeneration": "lease-d0f4e6a9ca73",
-    "issuedAt": "2026-08-15T14:10:24.900Z",
-    "expiresAt": "2026-08-15T14:40:24.900Z",
-    "scopeDigest": "sha256:f3050ef52199534b276463f7414042899e6cf883a18090fe2a0ee3063d411689",
+    "issuedAt": "2026-08-15T15:06:09.073Z",
+    "expiresAt": "2026-08-15T15:36:09.073Z",
+    "scopeDigest": "sha256:ac9d916798c5f10bbe07337b562759ddd34bc8af56a7b21fade4144e25d61cb1",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-15T14:10:24.900Z"
+      "selectedAt": "2026-08-15T15:06:09.073Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0398.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0398/**",
           ".atm/history/tasks/ATM-GOV-0398.json",
           "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
@@ -309,7 +309,7 @@
           "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
           "scripts/validate-governance-commands/implementation.ts"
         ],
-        "digest": "sha256:6e501c13615d38fabc1ac6f012a652f4b1aa217a91d9ff5ad4ed1cff8ce4736b"
+        "digest": "sha256:b0de7b3b74d8b5eef276123ef27763c55972d9588b1fa4f69f688385c38f0ed9"
       },
       {
         "kind": "lifecycle-operation",
