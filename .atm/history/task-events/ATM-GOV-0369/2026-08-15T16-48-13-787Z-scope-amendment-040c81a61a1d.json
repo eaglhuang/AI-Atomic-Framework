@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-15T16-48-13-787Z-scope-amendment-040c81a61a1d",
+  "taskId": "ATM-GOV-0369",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0369.json",
+  "taskSha256": "sha256:b030bac982c8127fcef926ffa00eecb362f6c2800f4aa50da0013129fbf3b56a",
+  "createdAt": "2026-08-15T16:48:13.787Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0369 --actor claude-008 --add \"packages/core/src/broker/cross-task-mutation-guard.ts,packages/cli/src/commands/git-governance/implementation/commit-execution.ts,packages/cli/src/commands/hook/pre-commit/implementation.ts,packages/cli/src/commands/git-governance/implementation/index-restoration.ts,packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts,tests/cli/git-commit-failure-index-restoration.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

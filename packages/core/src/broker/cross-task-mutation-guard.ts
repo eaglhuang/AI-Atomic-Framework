@@ -3,6 +3,10 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { readBrokerLifecycleState } from './lifecycle.ts';
 import { classifyTerminalLifecycleOwnership } from './historical-work-admission-attestation.ts';
+import {
+  hasReconciliationEntitlement,
+  type TerminalHistoryOwnershipState
+} from './terminal-history-entitlement.ts';
 
 export interface CrossTaskMutationBlock {
   readonly conflictTaskId: string;
@@ -17,6 +21,12 @@ export interface CrossTaskMutationConflict {
   readonly conflictFiles: readonly string[];
   readonly owner: string;
   readonly surface: 'task-history' | 'active-task-scope';
+  /**
+   * ATM-GOV-0369 amendment 1: what the authority snapshot actually reported
+   * about the owner. A refusal may only describe an ownership state that was
+   * read; it must never call an owner active without having evaluated it.
+   */
+  readonly ownershipState?: TerminalHistoryOwnershipState;
 }
 
 export interface ActiveTaskInfo {
@@ -180,6 +190,62 @@ export function getActiveTasks(cwd: string): readonly ActiveTaskInfo[] {
   return activeTasks;
 }
 
+/**
+ * ATM-GOV-0369 amendment 1: the one authority question the task-history surface
+ * used to skip. Answers from the same ledger facts `getActiveTasks` reads —
+ * status, claim state, and lock release — so both surfaces agree about what a
+ * task currently owns. An unreadable record stays `live`, which fails closed.
+ */
+export function readTaskWriteAuthority(cwd: string, taskId: string): 'live' | 'terminal' {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return 'live';
+  try {
+    const doc = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    const claim = doc.claim && typeof doc.claim === 'object' && !Array.isArray(doc.claim)
+      ? doc.claim as Record<string, unknown>
+      : null;
+    const claimState = claim?.state;
+    const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+    let lockReleased = true;
+    if (existsSync(lockPath)) {
+      try {
+        const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+        lockReleased = lock.released === true || lock.status === 'released';
+      } catch {
+        lockReleased = false;
+      }
+    }
+    const lifecycle = classifyTerminalLifecycleOwnership({ status: doc.status, claimState, lockReleased });
+    const hasLiveWriteAuthority = claimState === 'active' || !lockReleased;
+    return lifecycle.decision === 'terminal' && !hasLiveWriteAuthority ? 'terminal' : 'live';
+  } catch {
+    return 'live';
+  }
+}
+
+/**
+ * ATM-GOV-0369 amendment 1: resolve one history path against its owner.
+ *
+ * `live` keeps the original protection unchanged. `terminal-unentitled` keeps
+ * it too — a closed task's records are not public property. Only
+ * `terminal-entitled`, where a governed admission granted this writer this
+ * exact path, opens the door.
+ */
+function resolveTaskHistoryOwnership(
+  cwd: string,
+  ownerTaskId: string,
+  writerWorkItemId: string | null,
+  candidateFile: string
+): TerminalHistoryOwnershipState {
+  if (readTaskWriteAuthority(cwd, ownerTaskId) === 'live') return 'live';
+  const entitled = hasReconciliationEntitlement(cwd, {
+    writerWorkItemId,
+    candidateFile,
+    isLiveTask: (taskId) => readTaskWriteAuthority(cwd, taskId) === 'live'
+  });
+  return entitled ? 'terminal-entitled' : 'terminal-unentitled';
+}
+
 export function detectCrossTaskMutation(
   cwd: string,
   currentTaskId: string | null,
@@ -245,13 +311,25 @@ export function detectCrossTaskMutation(
     if (evidenceMatch) {
       const ownerTaskId = evidenceMatch[1].toUpperCase();
       if (isKnownTaskId(cwd, ownerTaskId) && normCurrentTaskId !== ownerTaskId) {
-        taskHistoryConflict = true;
-        addConflict({
-          conflictTaskId: ownerTaskId,
-          conflictFiles: [file],
-          owner: ownerTaskId,
-          surface: 'task-history'
-        });
+        // The file name identifies the owner; it does not establish that the
+        // owner still holds anything. Ask the authority snapshot before
+        // refusing, and record what it said.
+        const ownershipState = resolveTaskHistoryOwnership(cwd, ownerTaskId, currentTaskId, file);
+        if (ownershipState !== 'terminal-entitled') {
+          taskHistoryConflict = true;
+          addConflict({
+            conflictTaskId: ownerTaskId,
+            conflictFiles: [file],
+            owner: ownerTaskId,
+            surface: 'task-history',
+            ownershipState
+          });
+        } else {
+          // An entitled reconciliation is this path's governed writer. It must
+          // not fall through to the source-scope loop below, where the same
+          // path would be re-examined as if unowned.
+          continue;
+        }
       }
     }
     if (taskHistoryConflict) continue;
