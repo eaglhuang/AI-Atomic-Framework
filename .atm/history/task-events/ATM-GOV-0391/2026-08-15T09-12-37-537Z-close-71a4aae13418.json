@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-15T09-12-37-537Z-close-71a4aae13418",
+  "taskId": "ATM-GOV-0391",
+  "action": "close",
+  "actorId": "cursor-captain",
+  "sessionId": "session-20260815010227-cursor-captain-ATM-GOV-0391-3b4d3369e3",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0391.json",
+  "taskSha256": "sha256:3d3352c00e415c6423d8aa49ca46d300b5a0e6acc4cd371d3691f548c3a8d4e9",
+  "createdAt": "2026-08-15T09:12:37.537Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0391 --actor cursor-captain --status done --historical-delivery 1827ae5924ffd1dce94c60501a221889afb1dc62",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260815010227-cursor-captain-ATM-GOV-0391-3b4d3369e3",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0391.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --experimental-strip-types scripts/run-sealed-runner-build.test.ts",
+      "node --experimental-strip-types tests/cli/root-drop-release-incremental-overlay.test.ts",
+      "node --experimental-strip-types tests/cli/root-drop-release-manifest-integrity.test.ts",
+      "node --experimental-strip-types tests/cli/runner-sync-incremental-build.test.ts",
+      "node --experimental-strip-types tests/cli/sealed-runner-build-input-cache.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --experimental-strip-types scripts/run-sealed-runner-build.test.ts",
+      "node --experimental-strip-types tests/cli/root-drop-release-incremental-overlay.test.ts",
+      "node --experimental-strip-types tests/cli/root-drop-release-manifest-integrity.test.ts",
+      "node --experimental-strip-types tests/cli/runner-sync-incremental-build.test.ts",
+      "node --experimental-strip-types tests/cli/sealed-runner-build-input-cache.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-15T09:12:37.527Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0391.*",
+        ".atm/history/task-events/ATM-GOV-0391/**",
+        ".atm/history/tasks/ATM-GOV-0391.json",
+        "atomic_workbench/maps/atm-release-build/map.spec.json",
+        "scripts/build-root-drop-release.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/root-drop-release-incremental-overlay.test.ts",
+        "tests/cli/root-drop-release-manifest-integrity.test.ts",
+        "tests/cli/runner-sync-incremental-build.test.ts",
+        "tests/cli/sealed-runner-build-input-cache.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-root-drop-release.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts",
+        "tests/cli/root-drop-release-incremental-overlay.test.ts",
+        "tests/cli/root-drop-release-manifest-integrity.test.ts",
+        "tests/cli/runner-sync-incremental-build.test.ts",
+        "tests/cli/sealed-runner-build-input-cache.test.ts"
+      ],
+      "requiredGates": [
+        "node --experimental-strip-types scripts/run-sealed-runner-build.test.ts",
+        "node --experimental-strip-types tests/cli/root-drop-release-incremental-overlay.test.ts",
+        "node --experimental-strip-types tests/cli/root-drop-release-manifest-integrity.test.ts",
+        "node --experimental-strip-types tests/cli/runner-sync-incremental-build.test.ts",
+        "node --experimental-strip-types tests/cli/sealed-runner-build-input-cache.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

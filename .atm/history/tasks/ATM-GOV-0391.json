@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0391",
   "title": "Make root-drop runner builds incrementally overlay verified base releases",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -221,8 +221,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-15T09-10-33-714Z-renew-1cf07e343ec5",
-  "lastTransitionAt": "2026-08-15T09:10:33.714Z",
+  "lastTransitionId": "2026-08-15T09-12-37-537Z-close-71a4aae13418",
+  "lastTransitionAt": "2026-08-15T09:12:37.537Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-captain",
   "reservedAt": "2026-08-14T14:48:33.950Z",
@@ -231,13 +231,13 @@
     "actorId": "cursor-captain",
     "leaseId": "lease-b9e361b6a850",
     "claimedAt": "2026-08-15T01:02:27.637Z",
-    "heartbeatAt": "2026-08-15T09:10:32.949Z",
+    "heartbeatAt": "2026-08-15T09:12:37.535Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0391.json"
     ],
-    "state": "active",
-    "reason": "ATM-GOV-0370 source repair is complete and validated; ATM-GOV-0391's recorded active claim heartbeat has exceeded its TTL with no current delivery activity evidenced. Taking over only to validate the existing source delivery and prepare the single shared runner-publication transaction.",
+    "state": "released",
+    "reason": "closed",
     "laneSession": {
       "laneSessionId": "lane-20260815010227-cursor-captain-599e30f364",
       "status": "adopted",
@@ -335,5 +335,9 @@
     },
     "createdAt": "2026-08-15T01:02:28.583Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-15T09:12:37.535Z",
+  "closedByActor": "cursor-captain",
+  "closedBySessionId": "session-20260815010227-cursor-captain-ATM-GOV-0391-3b4d3369e3",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0391.closure-packet.json"
 }
