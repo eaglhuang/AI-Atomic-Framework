@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-15-001",
+  "date": "2026-08-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P0",
+  "status": "Open",
+  "area": "Runner-sync publication takeover admission is circular after recovery-retained release",
+  "finding": "broker runner-sync takeover-publication required an active queue-head even when the steward queue was empty. A recovery-retained sealed build correctly releases the queue so foreign generated outputs are not silently published, but the next official recovery command then fails with ATM_RUNNER_PUBLICATION_PENDING. Operators cannot authorize the same generated members without enqueueing first, and enqueueing without takeover is what the publication authority contract forbids.",
+  "expectedBehavior": "When the steward queue is empty, takeover-publication must admit if the actor holds the live recovery claim and the sealed source SHA matches HEAD. Queue-head plus exact SHA remains required when a reservation already exists. Wrong actor, foreign SHA, or a different queue-head must stay fail-closed.",
+  "evidenceOrRepro": "ATM-GOV-0370 second publication window, 2026-08-15. After runner-sync-06365e10 published recovery-retained and released the queue, `node atm.mjs broker runner-sync takeover-publication --task ATM-GOV-0370 --actor cursor-captain --sealed-source-sha 91ade92dcf2275391f56253fcc78e36331f0a865 --surface full --json` returned ATM_RUNNER_PUBLICATION_PENDING. Saved at .atm/history/evidence/ATM-GOV-0370.takeover-publication-refusal.json. Owner forbade a further enqueue before a complete takeover plan.",
+  "followUp": "Source repair in packages/cli/src/commands/broker/steward-queues.ts plus empty-queue red/green coverage in tests/cli/runner-sync-framework-temp-hotfix.test.ts. Frozen publication of this repair is a later runner-sync window; do not treat focused green as Plan complete."
+}
