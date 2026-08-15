@@ -35,7 +35,8 @@ import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleas
 import { loadComposeProposals, relativeStorePath, resolveBrokerRunEvidenceDir, normalizeEvidencePath } from './parser.ts';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.ts';
 import { appendLaneSessionEvent } from '../lane-session/events.ts';
-import { authorizeRunnerPublicationTakeover, evaluateRunnerPublicationContinuation, inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.ts';
+import { evaluateRunnerPublicationContinuation, inspectRunnerPublicationDisposition, reconcileReceiptOnlyRunnerPublicationResidue } from '../framework-development/runner-publication-lifecycle.ts';
+import { runRunnerSyncTakeoverPublication } from './publication-takeover-admission.ts';
 
 
 export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context: BrokerCommandContext) {
@@ -238,19 +239,14 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
       if (!['full', 'packages', 'root-drop', 'onefile'].includes(buildTarget)) {
         throw new CliError('ATM_CLI_USAGE', 'takeover-publication surface must be one of: full, packages, root-drop, onefile.', { exitCode: 2 });
       }
-      const queue = readRunnerSyncStewardQueue(runnerSyncQueuePath);
-      const sealedSourceSha = resolveFullGitCommitSha(options.cwd, options.sealedSourceSha);
-      const head = queue.groups[0];
-      if (!head || head.sealedSourceSha !== sealedSourceSha || !head.waitingTasks.includes(options.task)) {
-        throw new CliError('ATM_RUNNER_PUBLICATION_PENDING', 'Publication takeover requires the active queue-head task and its exact sealed source SHA.', { exitCode: 1 });
-      }
-      const plan = authorizeRunnerPublicationTakeover({ cwd: options.cwd, taskId: options.task, sealedSourceSha, buildTarget: buildTarget as 'full' | 'packages' | 'root-drop' | 'onefile', currentTaskAllowedFiles });
-      return makeResult({
-        ok: true,
-        command: 'broker',
+      return runRunnerSyncTakeoverPublication({
         cwd: options.cwd,
-        messages: [message('info', 'ATM_BROKER_RUNNER_PUBLICATION_TAKEOVER_AUTHORIZED', `Authorized ${plan.entries.length} exact generated publication member(s) for the queue-head sealed build.`, { planDigest: plan.digest })],
-        evidence: { plan, receiptPath: `.atm/history/evidence/${options.task}.runner-publication-takeover.json` }
+        taskId: options.task,
+        sealedSourceSha: resolveFullGitCommitSha(options.cwd, options.sealedSourceSha),
+        currentHeadSha: resolveFullGitCommitSha(options.cwd, 'HEAD'),
+        surface: buildTarget,
+        queue: readRunnerSyncStewardQueue(runnerSyncQueuePath),
+        currentTaskAllowedFiles
       });
     }
 

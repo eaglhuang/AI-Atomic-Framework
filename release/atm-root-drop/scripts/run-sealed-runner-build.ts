@@ -21,6 +21,7 @@ import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/fra
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 import { captureSealedRunnerPublicationSnapshot, resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
 import { hydrateSealedPackageDist, releaseSealedRunnerSteward, syncSealedBuildArtifacts, writeSealedBuildMetadata } from './sealed-runner-artifact-lifecycle.ts';
+import { hydrateVerifiedRootDropBase } from './build-root-drop-release.ts';
 export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 
 export type BuildTarget = 'full' | 'packages' | 'root-drop' | 'onefile';
@@ -197,16 +198,23 @@ function runSealedBuild(buildTarget: BuildTarget): void {
   removeTreeWithoutFollowingLinks(worktreeRoot);
   mkdirSync(path.dirname(worktreeRoot), { recursive: true });
   let tsBuildCache: TsBuildCacheSummary | null = null;
+  let rootDropOverlayReady = false;
   try {
     timePhase(timings, 'worktreeSetupMs', () => runGit(repoRoot, ['worktree', 'add', '--detach', worktreeRoot, sealedSourceSha]));
     linkNodeModules(worktreeRoot);
     if (buildDecision === 'incrementalBuild') {
       hydrateSealedPackageDist({ cwd: repoRoot, worktreeRoot, removeTree: removeTreeWithoutFollowingLinks });
+      rootDropOverlayReady = hydrateVerifiedRootDropBase({
+        sourceReleaseRoot: path.join(repoRoot, 'release', 'atm-root-drop'),
+        targetReleaseRoot: path.join(worktreeRoot, 'release', 'atm-root-drop'),
+        previousSealedSourceSha: incrementalPlan.previousSealedSourceSha,
+        removeTree: removeTreeWithoutFollowingLinks
+      });
     }
     if (buildTarget === 'full' || buildTarget === 'packages') {
       tsBuildCache = prepareTsBuildCache({ cwd: repoRoot, worktreeRoot });
     }
-    runTimedInnerBuild(worktreeRoot, buildTarget, timings, buildDecision === 'incrementalBuild' ? incrementalPlan : null);
+    runTimedInnerBuild(worktreeRoot, buildTarget, timings, rootDropOverlayReady ? incrementalPlan : null);
     tsBuildCache = persistTsBuildCache({ cwd: repoRoot, worktreeRoot, summary: tsBuildCache });
     // The detached worktree build is intentionally queue-free.  The queue is a
     // publication mutex, not a build reservation: only acquire/revalidate it
@@ -344,7 +352,8 @@ function runTimedInnerBuild(
   if (buildTarget === 'full') {
     const packageArgs = incrementalPlan?.affectedPackages.length ? ['--packages', incrementalPlan.affectedPackages.join(',')] : [];
     timePhase(timings, 'typescriptBuildMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'packages', ...packageArgs]));
-    timePhase(timings, 'rootDropAssemblyMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'root-drop']));
+    const overlayArgs = incrementalPlan ? ['--overlay-paths', JSON.stringify(incrementalPlan.changedPaths), '--previous-sealed-source', incrementalPlan.previousSealedSourceSha ?? ''] : [];
+    timePhase(timings, 'rootDropAssemblyMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'root-drop', ...overlayArgs]));
     timePhase(timings, 'onefileAssemblyMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'onefile']));
     return;
   }
@@ -459,7 +468,10 @@ function runInnerBuild(buildTarget: BuildTarget): void {
     runNode(process.cwd(), ['--strip-types', 'scripts/build-package-dist.ts', ...packageArgs]);
   }
   if (buildTarget === 'full' || buildTarget === 'root-drop') {
-    runNode(process.cwd(), ['--strip-types', 'scripts/build-root-drop-release.ts']);
+    const overlayIndex = process.argv.indexOf('--overlay-paths');
+    const previousIndex = process.argv.indexOf('--previous-sealed-source');
+    const overlayArgs = overlayIndex >= 0 ? ['--overlay-paths', process.argv[overlayIndex + 1] || '[]', '--previous-sealed-source', previousIndex >= 0 ? process.argv[previousIndex + 1] || '' : ''] : [];
+    runNode(process.cwd(), ['--strip-types', 'scripts/build-root-drop-release.ts', ...overlayArgs]);
   }
   if (buildTarget === 'full' || buildTarget === 'onefile') {
     runNode(process.cwd(), ['--strip-types', 'scripts/build-onefile-release.ts']);

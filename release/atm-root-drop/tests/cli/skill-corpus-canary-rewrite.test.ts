@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {
+  collectSkillCorpusDiscoveryFindings,
   compileSkillCorpus,
   loadSkillCorpusSourceSnapshot
 } from '../../packages/integrations-core/src/compiler/skill-templates.ts';
@@ -87,6 +89,152 @@ for (const templatePath of snapshot.ignoredSourceTemplatePaths) {
     `ignored template path must be declared as a source template path: ${templatePath}`
   );
 }
+
+// ATM-GOV-0392 fixtures. Names are deliberately arbitrary: discovery must be
+// decided by declared contract fields, never by a known skill id or filename.
+const canonicalFixtureFrontmatter = (id: string, profiles: string) => [
+  '---',
+  'schemaId: atm.skillTemplate',
+  'specVersion: 0.1.0',
+  `id: ${id}`,
+  `title: Fixture ${id}`,
+  `summary: Fixture template for corpus discovery coverage.`,
+  'command: node atm.mjs next --prompt "$ARGUMENTS" --json',
+  'firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json',
+  'charter-invariants-injected: true',
+  'handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json',
+  'owner: atm-framework',
+  'tier: specialist',
+  `installProfiles: [${profiles}]`,
+  'invocationPolicy: model-or-user',
+  'companionFiles: []',
+  'adapterCapabilityRequirements:',
+  '  - "*:charter-injection"',
+  '---',
+  '',
+  '# {{title}}',
+  '',
+  '{{CHARTER_INVARIANTS}}',
+  ''
+].join('\n');
+
+const derivedShapeFixture = [
+  '---',
+  'name: some-derived-looking-template',
+  'description: Frontmatter copied from a built adapter artifact rather than the source contract.',
+  'argument-hint: "<context>"',
+  'charter-invariants-injected: true',
+  '---',
+  '',
+  '# Some Derived Looking Template',
+  ''
+].join('\n');
+
+function withFixtureCorpus<T>(files: Readonly<Record<string, string>>, run: (directory: string) => T): T {
+  const directory = mkdtempSync(path.join(os.tmpdir(), 'atm-gov-0392-'));
+  try {
+    for (const [fileName, content] of Object.entries(files)) {
+      writeFileSync(path.join(directory, fileName), content, 'utf8');
+    }
+    return run(directory);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+}
+
+// caseId: skill_template_source_discovery_fail_closed_0392
+// A discovered source file that cannot become a corpus member must be reported,
+// never dropped. Two distinct ways to fall out of every adapter are covered:
+// frontmatter that does not declare the canonical contract at all, and a
+// declared contract that names no install profile.
+withFixtureCorpus({
+  'first.skill.md': canonicalFixtureFrontmatter('atm-fixture-first', 'framework-full, role-oriented'),
+  'second.skill.md': derivedShapeFixture,
+  'third.skill.md': canonicalFixtureFrontmatter('atm-fixture-third', '')
+}, (directory) => {
+  const findings = collectSkillCorpusDiscoveryFindings(directory);
+  const byFile = new Map(findings.map((finding) => [path.basename(finding.sourcePath), finding]));
+
+  assert.equal(findings.length, 2, 'exactly the two undeliverable sources must be reported');
+  assert.equal(byFile.has('first.skill.md'), false, 'a contract-satisfying source must produce no finding');
+
+  const derived = byFile.get('second.skill.md');
+  assert(derived, 'a source whose frontmatter is not the canonical contract must be reported');
+  assert.equal(derived.reason, 'missing-contract-fields');
+  for (const requiredField of ['schemaId', 'id', 'title', 'summary', 'tier', 'installProfiles']) {
+    assert(
+      derived.missingFields.includes(requiredField),
+      `finding must name the missing contract field ${requiredField}`
+    );
+  }
+
+  const profileless = byFile.get('third.skill.md');
+  assert(profileless, 'a source belonging to no install profile must be reported');
+  assert.equal(profileless.reason, 'no-install-profile');
+
+  for (const finding of findings) {
+    assert(finding.sourcePath.endsWith('.skill.md'), 'finding must name the discovered source path');
+    assert(finding.recovery.length > 0, 'finding must state a recovery action the author can take');
+  }
+});
+
+// caseId: skill_template_bake_source_parity_0392
+// The corpus and the adapter bake must describe the same source set: a member
+// that never reaches a profile cannot be certified green just because the
+// projection and the installation are equally missing it.
+withFixtureCorpus({
+  'first.skill.md': canonicalFixtureFrontmatter('atm-fixture-first', 'framework-full, role-oriented'),
+  'second.skill.md': canonicalFixtureFrontmatter('atm-fixture-second', 'framework-full')
+}, (directory) => {
+  const fixtureSnapshot = loadSkillCorpusSourceSnapshot(directory);
+  const fixtureProjection = compileSkillCorpus({
+    sourceSnapshot: fixtureSnapshot,
+    adapterDescriptor: {
+      adapterId: 'claude-code',
+      diagnostics: [],
+      project: ({ templates }) => compileSkillTemplatesForAdapter('claude-code', templates, { repositoryRoot: root })
+    }
+  });
+  const bakedIds = fixtureProjection.files
+    .map((file) => file.relativePath.replace(/\\/g, '/').split('/')[0]);
+
+  assert.deepEqual(collectSkillCorpusDiscoveryFindings(directory), [], 'a fully canonical corpus must report no findings');
+  for (const template of fixtureSnapshot.templates) {
+    assert(
+      bakedIds.includes(template.frontmatter.id),
+      `every discovered corpus member must bake to a derived skill: ${template.frontmatter.id}`
+    );
+  }
+});
+
+withFixtureCorpus({
+  'first.skill.md': canonicalFixtureFrontmatter('atm-fixture-first', 'framework-full, role-oriented'),
+  'second.skill.md': derivedShapeFixture
+}, (directory) => {
+  const partialSnapshot = loadSkillCorpusSourceSnapshot(directory);
+  const partialProjection = compileSkillCorpus({
+    sourceSnapshot: partialSnapshot,
+    adapterDescriptor: {
+      adapterId: 'claude-code',
+      diagnostics: [],
+      project: ({ templates }) => compileSkillTemplatesForAdapter(
+        'claude-code',
+        templates.filter((template) => Boolean(template.frontmatter.id)),
+        { repositoryRoot: root }
+      )
+    }
+  });
+  const bakedCount = partialProjection.files
+    .filter((file) => file.relativePath.replace(/\\/g, '/').endsWith('/SKILL.md')).length;
+
+  assert.equal(partialSnapshot.templateCount, 2, 'the discovered source count stays complete');
+  assert.equal(bakedCount, 1, 'the malformed source silently disappears from the bake');
+  assert.equal(
+    collectSkillCorpusDiscoveryFindings(directory).length,
+    1,
+    'that disappearance must surface as a discovery finding rather than as a matching count'
+  );
+});
 
 const generatedPath = path.join(root, 'artifacts', 'generated', 'skill-corpus-audit.json');
 if (existsSync(generatedPath)) {

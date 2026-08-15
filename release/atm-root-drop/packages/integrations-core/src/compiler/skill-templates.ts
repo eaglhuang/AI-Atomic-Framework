@@ -14,6 +14,7 @@ import type { AdapterCapabilityRequirement, SkillInvocationPolicy } from '../dis
 import {
   type SkillInstallProfileId,
   type SkillTier,
+  defaultSkillInstallProfiles,
   getSkillInstallProfile,
   skillBelongsToProfile
 } from '../distribution/install-profile.ts';
@@ -316,6 +317,80 @@ export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTe
   };
 }
 
+/**
+ * Why a discovered source file could not become a corpus member every adapter
+ * can bake. These are the ways a file can exist on disk, look like a template,
+ * and still reach no installation.
+ */
+export type SkillCorpusDiscoveryReason =
+  | 'unparsable-frontmatter'
+  | 'missing-contract-fields'
+  | 'no-install-profile';
+
+export interface SkillCorpusDiscoveryFinding {
+  readonly sourcePath: string;
+  readonly reason: SkillCorpusDiscoveryReason;
+  /** Contract fields that are absent or hold a value the contract does not allow. */
+  readonly missingFields: readonly string[];
+  readonly recovery: string;
+}
+
+/**
+ * Report every discovered `*.skill.md` that cannot reach an adapter.
+ *
+ * Discovery is decided only by the declared contract, never by a known skill
+ * id, filename, or workstation path. A source file that satisfies the contract
+ * and belongs to at least one install profile produces no finding; anything
+ * else must be reported here rather than disappearing between the corpus count
+ * and the bake.
+ */
+export function collectSkillCorpusDiscoveryFindings(
+  templateDirectory = defaultSkillTemplateDirectory
+): readonly SkillCorpusDiscoveryFinding[] {
+  const findings: SkillCorpusDiscoveryFinding[] = [];
+  for (const entryName of readdirSync(templateDirectory).filter((entry) => entry.endsWith('.skill.md')).sort()) {
+    const templatePath = path.join(templateDirectory, entryName);
+    const sourcePath = path.relative(integrationsCoreRepoRoot, templatePath).replace(/\\/g, '/');
+    let template: AtmSkillTemplate;
+    try {
+      template = parseSkillTemplate(readFileSync(templatePath, 'utf8'), sourcePath);
+    } catch (error) {
+      findings.push({
+        sourcePath,
+        reason: 'unparsable-frontmatter',
+        missingFields: [],
+        recovery: `Repair the frontmatter block so it parses as an ${skillTemplateSchemaId} template: ${(error as Error).message}`
+      });
+      continue;
+    }
+    const unsatisfied = collectUnsatisfiedContractFields(template.frontmatter);
+    if (unsatisfied.length > 0) {
+      findings.push({
+        sourcePath,
+        reason: 'missing-contract-fields',
+        missingFields: unsatisfied,
+        recovery: `Declare the ${skillTemplateSchemaId} contract fields ${unsatisfied.join(', ')} in this template's frontmatter. Source templates use the template contract, not the frontmatter shape of a built adapter artifact.`
+      });
+      continue;
+    }
+    const reachableProfiles = defaultSkillInstallProfiles.filter((profile) => skillBelongsToProfile({
+      skillId: template.frontmatter.id,
+      tier: template.frontmatter.tier,
+      installProfiles: template.frontmatter.installProfiles,
+      profile
+    }));
+    if (reachableProfiles.length === 0) {
+      findings.push({
+        sourcePath,
+        reason: 'no-install-profile',
+        missingFields: ['installProfiles'],
+        recovery: `Template ${template.frontmatter.id} (tier ${template.frontmatter.tier}) belongs to no install profile, so no adapter can bake it. Name a profile whose includeTiers admit its tier: ${defaultSkillInstallProfiles.map((profile) => profile.id).join(', ')}.`
+      });
+    }
+  }
+  return findings;
+}
+
 export function compileSkillCorpus<TProjectionFile>(
   input: {
     readonly sourceSnapshot: SkillCorpusSourceSnapshot;
@@ -411,6 +486,33 @@ function parseAdapterCapabilityRequirements(value: unknown, sourcePath: string):
 
 function sha256Text(content: string): `sha256:${string}` {
   return `sha256:${createHash('sha256').update(content).digest('hex')}`;
+}
+
+const skillTemplateSchemaId = 'atm.skillTemplate';
+const skillTemplateSpecVersion = '0.1.0';
+
+function collectUnsatisfiedContractFields(frontmatter: AtmSkillTemplateFrontmatter): readonly string[] {
+  const declared = frontmatter as unknown as Record<string, unknown>;
+  const unsatisfied: string[] = [];
+  const requireText = (field: string) => {
+    const value = declared[field];
+    if (typeof value !== 'string' || value.trim().length === 0) unsatisfied.push(field);
+  };
+  if (declared.schemaId !== skillTemplateSchemaId) unsatisfied.push('schemaId');
+  if (declared.specVersion !== skillTemplateSpecVersion) unsatisfied.push('specVersion');
+  for (const field of ['id', 'title', 'summary', 'command', 'firstCommand', 'handoffs', 'owner', 'invocationPolicy']) {
+    requireText(field);
+  }
+  if (declared['charter-invariants-injected'] !== true) unsatisfied.push('charter-invariants-injected');
+  // Tier drives profile membership, so it must be one the profiles can admit.
+  // Derived from the profiles themselves rather than restated here.
+  const admissibleTiers = new Set(defaultSkillInstallProfiles.flatMap((profile) => profile.includeTiers));
+  if (typeof declared.tier !== 'string' || !admissibleTiers.has(declared.tier as SkillTier)) unsatisfied.push('tier');
+  // Declaring the field is the contract; declaring one that no profile accepts
+  // is reported separately as no-install-profile.
+  if (!Array.isArray(declared.installProfiles)) unsatisfied.push('installProfiles');
+  if (!Array.isArray(declared.companionFiles)) unsatisfied.push('companionFiles');
+  return unsatisfied;
 }
 
 function collectIgnoredSkillTemplatePaths(templateDirectory: string): readonly string[] {

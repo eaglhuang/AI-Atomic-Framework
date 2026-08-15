@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -9,7 +10,8 @@ import {
   isPreCommitBaselineFinding,
   isPreCommitEnvironmentFinding,
   summarizePreCommitFailureEnvelope,
-  selectActionableResidueFindings
+  selectActionableResidueFindings,
+  runPreCommitHook
 } from '../pre-commit.ts';
 import { inspectGitIndexAccess } from '../git-index-diagnostics.ts';
 import {
@@ -172,6 +174,31 @@ assert.equal(selectActionableResidueFindings({
   hasActiveClaim: () => false,
   hasTerminalOwner: () => true
 }).length, 1);
+
+// Pre-commit may classify released generated output, but it is an observer:
+// no hook run may delete a file solely from that classification.
+const residueHookRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-pre-commit-residue-'));
+try {
+  execFileSync('git', ['init'], { cwd: residueHookRoot, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'test'], { cwd: residueHookRoot, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.invalid'], { cwd: residueHookRoot, stdio: 'ignore' });
+  writeFileSync(path.join(residueHookRoot, 'README.md'), 'fixture\n', 'utf8');
+  mkdirSync(path.join(residueHookRoot, '.atm', 'history', 'tasks'), { recursive: true });
+  writeFileSync(path.join(residueHookRoot, '.atm', 'history', 'tasks', 'TASK-DONE.json'), JSON.stringify({
+    workItemId: 'TASK-DONE', status: 'done', claim: { state: 'released' }
+  }), 'utf8');
+  execFileSync('git', ['add', '.'], { cwd: residueHookRoot, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'fixture'], { cwd: residueHookRoot, stdio: 'ignore' });
+  const residuePath = path.join(residueHookRoot, '.atm', 'history', 'evidence', 'TASK-DONE.bundle-manifest.json');
+  mkdirSync(path.dirname(residuePath), { recursive: true });
+  writeFileSync(residuePath, '{"generated":true}\n', 'utf8');
+  writeFileSync(path.join(residueHookRoot, 'README.md'), 'fixture changed\n', 'utf8');
+  execFileSync('git', ['add', 'README.md'], { cwd: residueHookRoot, stdio: 'ignore' });
+  runPreCommitHook(residueHookRoot);
+  assert.equal(existsSync(residuePath), true, 'pre-commit must not delete classified foreign generated residue');
+} finally {
+  rmSync(residueHookRoot, { recursive: true, force: true });
+}
 
 const repairRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-governance-repair-'));
 try {

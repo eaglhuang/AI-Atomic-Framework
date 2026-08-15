@@ -28,7 +28,10 @@
     "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-001.json",
     "packages/cli/src/commands/broker/publication-takeover-admission.ts",
     "packages/cli/src/commands/broker/steward-queues.ts",
-    "tests/cli/runner-sync-framework-temp-hotfix.test.ts"
+    "tests/cli/runner-sync-framework-temp-hotfix.test.ts",
+    "packages/cli/dist",
+    "release/atm-onefile",
+    "release/atm-root-drop"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
@@ -170,15 +173,18 @@
     "actorId": "cursor-captain",
     "leaseId": "lease-a31b717fc08d",
     "claimedAt": "2026-08-15T00:50:12.562Z",
-    "heartbeatAt": "2026-08-15T08:34:53.379Z",
+    "heartbeatAt": "2026-08-15T09:07:38.676Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0370.*",
       ".atm/history/task-events/ATM-GOV-0370/**",
       ".atm/history/tasks/ATM-GOV-0370.json",
       "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-001.json",
+      "packages/cli/dist",
       "packages/cli/src/commands/broker/publication-takeover-admission.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
+      "release/atm-onefile",
+      "release/atm-root-drop",
       "tests/cli/runner-sync-framework-temp-hotfix.test.ts"
     ],
     "state": "active",
@@ -206,8 +212,11 @@
       ".atm/history/task-events/ATM-GOV-0370/**",
       ".atm/history/tasks/ATM-GOV-0370.json",
       "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-001.json",
+      "packages/cli/dist",
       "packages/cli/src/commands/broker/publication-takeover-admission.ts",
       "packages/cli/src/commands/broker/steward-queues.ts",
+      "release/atm-onefile",
+      "release/atm-root-drop",
       "tests/cli/runner-sync-framework-temp-hotfix.test.ts"
     ],
     "planningReadOnlyPaths": [],
@@ -225,41 +234,43 @@
     "createdAt": "2026-08-15T00:50:13.503Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-15T08-34-54-262Z-renew-1296e3a6ad78",
-  "lastTransitionAt": "2026-08-15T08:34:54.262Z",
+  "lastTransitionId": "2026-08-15T09-07-39-492Z-renew-7334f4f44c51",
+  "lastTransitionAt": "2026-08-15T09:07:39.492Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-b96b3797f187a3dd",
-    "ticketDigest": "sha256:b96b3797f187a3dd5b7ff035fff0ddaca2b6e0257cf28d33de0bc2515157caea",
+    "ticketId": "wat-bffd478d186f4f18",
+    "ticketDigest": "sha256:bffd478d186f4f186ff88086bc476253a98f5a6553a8a9e5b94d80ca84c4f917",
     "taskId": "ATM-GOV-0370",
     "origin": "claim",
     "actorId": "cursor-captain",
     "laneSessionId": "lane-20260815005012-cursor-captain-7dc44390cd",
     "claimGeneration": "lease-a31b717fc08d",
-    "issuedAt": "2026-08-15T08:34:53.379Z",
-    "expiresAt": "2026-08-15T09:04:53.379Z",
-    "scopeDigest": "sha256:b193f9eb5e2e9bae5077fbe4d1a43b51f2c3cad83bb9288b15686e126222cb4f",
+    "issuedAt": "2026-08-15T09:07:38.676Z",
+    "expiresAt": "2026-08-15T09:37:38.676Z",
+    "scopeDigest": "sha256:515e6cf7e298924da528ec6768cc6038ccb13ca7367273a5a13af6f28a26a6a4",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-15T08:34:53.379Z"
+      "selectedAt": "2026-08-15T09:07:38.676Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0370.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0370/**",
           ".atm/history/tasks/ATM-GOV-0370.json",
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-001.json",
+          "packages/cli/dist",
           "packages/cli/src/commands/broker/publication-takeover-admission.ts",
           "packages/cli/src/commands/broker/steward-queues.ts",
+          "release/atm-onefile",
+          "release/atm-root-drop",
           "tests/cli/runner-sync-framework-temp-hotfix.test.ts"
         ],
-        "digest": "sha256:9563c01813165d3952ff0aa5ccaaef7c8b591f9bb75c1792c39cecbcffa988bf"
+        "digest": "sha256:ffca16e4676b7d09fc82f11487a6544a86948d9961bc0cd687b2f258cc18a523"
       },
       {
         "kind": "lifecycle-operation",

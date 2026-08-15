@@ -118,6 +118,107 @@ try {
     'framework-temp takeover must remain actor-bound'
   );
 
+  writeJson('.atm/runtime/runner-sync-steward-queue.json', {
+    schemaId: 'atm.runnerSyncStewardQueue.v1',
+    specVersion: '0.1.0',
+    stewardKey: 'atm.runner-sync.coalescing-steward',
+    updatedAt: now,
+    groups: []
+  });
+  writeJson('release/atm-onefile/release-manifest.json', { stale: true, afterRelease: true });
+  const emptyQueueTakeover = await runBroker([
+    'runner-sync',
+    'takeover-publication',
+    '--cwd', repo,
+    '--task', taskId,
+    '--actor', actorId,
+    '--sealed-source-sha', sealedSourceSha,
+    '--surface', 'full'
+  ]) as any;
+  assert.equal(emptyQueueTakeover.ok, true, 'empty steward queue must still authorize takeover when the actor holds the live claim and the sealed SHA matches HEAD');
+  assert.deepEqual(emptyQueueTakeover.evidence.plan.entries.map((entry: any) => entry.path), ['release/atm-onefile/release-manifest.json']);
+
+  await assert.rejects(
+    () => runBroker([
+      'runner-sync',
+      'takeover-publication',
+      '--cwd', repo,
+      '--task', taskId,
+      '--actor', actorId,
+      '--sealed-source-sha', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      '--surface', 'full'
+    ]),
+    /empty steward queue requires the sealed source SHA to match HEAD/,
+    'empty-queue takeover must not bind a sealed SHA other than HEAD'
+  );
+
+  await assert.rejects(
+    () => runBroker([
+      'runner-sync',
+      'takeover-publication',
+      '--cwd', repo,
+      '--task', taskId,
+      '--actor', 'foreign-actor',
+      '--sealed-source-sha', sealedSourceSha,
+      '--surface', 'full'
+    ]),
+    /not foreign-actor/,
+    'empty-queue takeover must remain actor-bound'
+  );
+
+  writeJson('.atm/runtime/runner-sync-steward-queue.json', {
+    schemaId: 'atm.runnerSyncStewardQueue.v1',
+    specVersion: '0.1.0',
+    stewardKey: 'atm.runner-sync.coalescing-steward',
+    updatedAt: now,
+    groups: [
+      {
+        stewardWorkId: 'runner-sync-other-head',
+        sealedSourceSha,
+        waveId: null,
+        surfaceFamily: 'runner-sync:release',
+        queuePosition: 1,
+        status: 'queue-head',
+        queueHeadHealth: 'task-active',
+        createdAt: now,
+        updatedAt: now,
+        requestedSurfaces: ['release/atm-onefile/atm.mjs'],
+        waitingTasks: ['ATM-FRAMEWORK-TEMP-other-head'],
+        suggestedNextAction: 'wait',
+        requests: [
+          {
+            taskId: 'ATM-FRAMEWORK-TEMP-other-head',
+            actorId: 'other-steward',
+            sealedSourceSha,
+            requestedSurfaces: ['release/atm-onefile/atm.mjs'],
+            waveId: null,
+            surfaceFamily: 'runner-sync:release',
+            validators: [],
+            createdAt: now,
+            heartbeatAt: now,
+            ttlSeconds: 1800,
+            expiresAt: now,
+            queuePosition: 1,
+            suggestedNextAction: 'wait'
+          }
+        ]
+      }
+    ]
+  });
+  await assert.rejects(
+    () => runBroker([
+      'runner-sync',
+      'takeover-publication',
+      '--cwd', repo,
+      '--task', taskId,
+      '--actor', actorId,
+      '--sealed-source-sha', sealedSourceSha,
+      '--surface', 'full'
+    ]),
+    /active queue-head task and its exact sealed source SHA/,
+    'occupied steward queue must not fall back to empty-queue HEAD admission'
+  );
+
   const missingTempAdmission = inspectRunnerSyncAdmission({
     cwd: repo,
     stewardActorId: actorId,

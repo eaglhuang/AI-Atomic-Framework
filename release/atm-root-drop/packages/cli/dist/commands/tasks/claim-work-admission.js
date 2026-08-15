@@ -160,6 +160,10 @@ export async function completeTaskClaimWithWorkAdmission(input) {
     input.phases.push({ phase: 'task-transition-write', durationMs: Date.now() - transitionStartedAt });
     return { claim, ticket, session: sessionRecord.session, transitionPath, taskDirectionLock: directionLock };
 }
+/** Rebinds the work-admission ticket from the current task-document authority snapshot. */
+export function resealWorkAdmissionTicket(input) {
+    return resealWorkAdmissionTicketForRenewal(input);
+}
 /** Rebinds a claim ticket whenever a governed renew changes its validity window. */
 export function resealWorkAdmissionTicketForRenewal(input) {
     const laneSession = readRecord(input.claim.laneSession);

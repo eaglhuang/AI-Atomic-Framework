@@ -1,3 +1,5 @@
+import { applyAtomicScopeAmendment } from '../scope-amendment/implementation.js';
+import { resealWorkAdmissionTicketForRenewal } from '../claim-work-admission.js';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -183,13 +185,12 @@ catch {
     throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `Lock file for ${options.taskId} does not contain an embedded taskDirectionLock.`, { exitCode: 1, details: { ...preconditionResolution, taskId: options.taskId, requiredCommand: preconditionResolution.claimFirstScopeAddCommand, claimCommand: preconditionResolution.claimCommand } });
 } const embeddedLockRecord = embeddedLock; const existingAllowed = sanitizeTaskDirectionAllowedFiles(Array.isArray(embeddedLockRecord.allowedFiles) ? embeddedLockRecord.allowedFiles : []); const requestedPaths = sanitizeTaskDirectionAllowedFiles(options.addPaths); const addedPaths = requestedPaths.filter((p) => !existingAllowed.includes(p)); const alreadyPresent = requestedPaths.filter((p) => existingAllowed.includes(p)); const mergedAllowed = sanitizeTaskDirectionAllowedFiles([...existingAllowed, ...requestedPaths]); const taskPath = taskPathFor(options.cwd, options.taskId); const amendmentMetadata = { amendmentClass: options.amendmentClass ?? 'linked-surface', amendmentPhase: options.amendmentPhase ?? 'during-implementation', amendmentMode: 'normal', ...(options.reason ? { reason: options.reason } : {}) }; if (existsSync(taskPath)) {
     const taskDocument = readJsonRecord(taskPath);
-    syncScopeAmendmentState({ taskDocument, outerLock, embeddedLockRecord, mergedAllowed });
-    writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
     if (preconditionResolution.resolvedBy === 'claim-first') {
         appendTaskTransitionEvent({ cwd: options.cwd, taskId: options.taskId, action: 'scope-amendment.claim-first-resolved', actorId, fromStatus: String(taskDocument.status ?? 'running'), toStatus: String(taskDocument.status ?? 'running'), taskPath, taskDocument, command: preconditionResolution.claimCommand });
     }
     const commandLine = buildScopeAmendmentCommand({ mode: 'normal', taskId: options.taskId, actorId, addPaths: options.addPaths, amendmentClass: options.amendmentClass, amendmentPhase: options.amendmentPhase, reason: options.reason });
-    persistScopeAmendmentTransition({ cwd: options.cwd, taskId: options.taskId, actorId, taskPath, taskDocument, command: commandLine, amendmentMetadata });
+    applyAtomicScopeAmendment({ taskDocument, outerLock, embeddedLockRecord, mergedAllowed, taskId: options.taskId, actorId, ports: { resealTicket: (document) => { const claim = document.claim; if (!claim || typeof claim !== 'object' || Array.isArray(claim))
+                return; resealWorkAdmissionTicketForRenewal({ cwd: options.cwd, taskId: options.taskId, actorId, taskDocument: document, claim: claim, nowIso: new Date().toISOString() }); }, writeLock: (lock) => { writeFileSync(lockPath, `${JSON.stringify(lock, null, 2)}\n`, 'utf8'); }, persistLedger: (document) => { persistScopeAmendmentTransition({ cwd: options.cwd, taskId: options.taskId, actorId, taskPath, taskDocument: document, command: commandLine, amendmentMetadata }); } } });
 }
 else {
     syncScopeAmendmentRuntimeLock({ outerLock, embeddedLockRecord, mergedAllowed });
@@ -218,10 +219,9 @@ catch {
     throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `Lock file for ${options.taskId} does not contain an embedded taskDirectionLock.`, { exitCode: 1, details: { taskId: options.taskId } });
 } const embeddedLockRecord = embeddedLock; const existingAllowed = sanitizeTaskDirectionAllowedFiles(Array.isArray(embeddedLockRecord.allowedFiles) ? embeddedLockRecord.allowedFiles : []); const requestedPaths = sanitizeTaskDirectionAllowedFiles(options.addPaths); const addedPaths = requestedPaths.filter((p) => !existingAllowed.includes(p)); const alreadyPresent = requestedPaths.filter((p) => existingAllowed.includes(p)); const mergedAllowed = sanitizeTaskDirectionAllowedFiles([...existingAllowed, ...requestedPaths]); const taskPath = taskPathFor(options.cwd, options.taskId); const amendmentMetadata = { amendmentClass: 'linked-surface', amendmentPhase: 'during-implementation', amendmentMode: 'repair', reason: options.reason }; if (existsSync(taskPath)) {
     const taskDocument = readJsonRecord(taskPath);
-    syncScopeAmendmentState({ taskDocument, outerLock, embeddedLockRecord, mergedAllowed });
-    writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
     const commandLine = buildScopeAmendmentCommand({ mode: 'repair', taskId: options.taskId, actorId, addPaths: options.addPaths, reason: options.reason, emergencyApproval: options.emergencyApproval });
-    persistScopeAmendmentTransition({ cwd: options.cwd, taskId: options.taskId, actorId, taskPath, taskDocument, command: commandLine, amendmentMetadata });
+    applyAtomicScopeAmendment({ taskDocument, outerLock, embeddedLockRecord, mergedAllowed, taskId: options.taskId, actorId, ports: { resealTicket: (document) => { const claim = document.claim; if (!claim || typeof claim !== 'object' || Array.isArray(claim))
+                return; resealWorkAdmissionTicketForRenewal({ cwd: options.cwd, taskId: options.taskId, actorId, taskDocument: document, claim: claim, nowIso: new Date().toISOString() }); }, writeLock: (lock) => { writeFileSync(lockPath, `${JSON.stringify(lock, null, 2)}\n`, 'utf8'); }, persistLedger: (document) => { persistScopeAmendmentTransition({ cwd: options.cwd, taskId: options.taskId, actorId, taskPath, taskDocument: document, command: commandLine, amendmentMetadata }); } } });
 }
 else {
     syncScopeAmendmentRuntimeLock({ outerLock, embeddedLockRecord, mergedAllowed });

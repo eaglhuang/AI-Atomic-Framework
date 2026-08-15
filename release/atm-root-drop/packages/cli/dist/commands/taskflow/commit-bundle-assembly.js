@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -7,7 +7,7 @@ import { buildTaskflowCommitMessage } from './commit-messages.js';
 import { withCloseTransactionMutex } from './close-transaction-mutex.js';
 import { expandDirectoryDeliverableDeclarations } from '../tasks/historical-delivery.js';
 import { loadTaskDocumentOrThrow } from '../tasks/public-surface.js';
-import { assertCloseWindowStagingAllowed } from '../tasks/close-window-lock.js';
+import { assertCloseWindowStagingAllowed, readCloseWindowStagedIndexLockReport } from '../tasks/close-window-lock.js';
 import { validateStrictPathHeuristic } from '../tasks/task-import-validators.js';
 import { listCurrentTaskCloseEvidenceFiles } from './current-task-close-evidence.js';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.js';
@@ -22,6 +22,7 @@ import { normalizeMarkdownPathDeclaration } from './markdown-paths.js';
 import { buildGitIndexLeaseParkPlan, inspectGitIndexOwnership, parkGitIndexLease, restoreGitIndexLease } from '../git-index-ownership.js';
 import { executeTaskScopedCommitTransaction } from '../git-governance/task-scoped-commit-transaction.js';
 import { recordGitIndexRestoreFailure } from '../git-governance/implementation/git-index-transaction.js';
+import { issueCloseTransactionHookReceipt } from './close-transaction-hook-receipt.js';
 import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.js';
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
@@ -62,6 +63,7 @@ function tryGitScalar(cwd, args) { try {
 catch {
     return null;
 } }
+function isImmediateTaskflowDeliveryParent(cwd, taskId) { const message = tryGitScalar(cwd, ['log', '-1', '--format=%B']); return message?.includes(`chore(taskflow): deliver ${taskId} source bundle`) === true; }
 function runGitOrThrow(cwd, args) { execFileSync('git', [...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }); }
 function runGitWithEnv(cwd, args, env) { execFileSync('git', [...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env }); }
 const GIT_PATHSPEC_ARGV_BUDGET = 8_000;
@@ -523,6 +525,14 @@ function commitRepoWithTemporaryIndex(input) {
         runGitWithEnv(input.repoRoot, ['read-tree', 'HEAD'], env);
         if (input.stageFiles.length > 0) {
             stageGitPathspecs(input.repoRoot, input.stageFiles, env);
+        }
+        const closeWindowLock = input.taskId ? readCloseWindowStagedIndexLockReport(input.repoRoot) : null;
+        const isGovernanceFollowUp = Boolean(input.taskId && closeWindowLock?.status === 'active' && closeWindowLock.taskId === input.taskId && isImmediateTaskflowDeliveryParent(input.repoRoot, input.taskId) && input.stageFiles.some((filePath) => filePath === `.atm/history/tasks/${input.taskId}.json` || filePath === `.atm/history/evidence/${input.taskId}.json`));
+        if (isGovernanceFollowUp && input.taskId && input.actorId && closeWindowLock) {
+            const invocationNonce = randomUUID();
+            env.ATM_CLOSE_TRANSACTION_RECEIPT_NONCE = invocationNonce;
+            env.ATM_CLOSE_TRANSACTION_RECEIPT_SURFACE = 'taskflow-close-governance-followup';
+            issueCloseTransactionHookReceipt({ root: input.repoRoot, taskId: input.taskId, actorId: input.actorId, invocationNonce, closeWindowLock, stageFiles: input.stageFiles, parentHead: tryGitScalar(input.repoRoot, ['rev-parse', '--verify', 'HEAD']) ?? '' });
         }
         runGitWithEnv(input.repoRoot, input.args, env);
         if (input.stageFiles.length > 0) {

@@ -140,10 +140,12 @@ export function getActiveTasks(cwd: string): readonly ActiveTaskInfo[] {
         }
         const lifecycle = classifyTerminalLifecycleOwnership({ status, claimState, lockReleased });
         
-        // A terminal task must not become a ghost owner merely because an old
-        // projection survived. Conversely, an inconsistent terminal record
-        // remains conservatively active until repair resolves it.
-        if (lifecycle.decision !== 'terminal' && (status === 'open' || claimState === 'active' || lifecycle.decision === 'inconsistent')) {
+        // A scope declaration is not write authority. Only a live claim or an
+        // unreleased lock can block another writer. This still fails closed for
+        // terminal/inconsistent records whose lock survived, while allowing a
+        // planned or released task with no live authority to remain inert.
+        const hasLiveWriteAuthority = claimState === 'active' || !lockReleased;
+        if (lifecycle.decision !== 'terminal' && hasLiveWriteAuthority) {
           const allowedPathsSet = new Set<string>();
           collectTaskFileValues(doc.scopePaths, allowedPathsSet);
           collectTaskFileValues(doc.deliverables, allowedPathsSet);
