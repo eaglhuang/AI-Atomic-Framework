@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-15T08-13-33-081Z-scope-amendment-97605211d2a8",
+  "taskId": "ATM-GOV-0394",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0394.json",
+  "taskSha256": "sha256:bebea892a652f3f32b50bd765af8ff391509032cac366c4a0d3b3245c0638429",
+  "createdAt": "2026-08-15T08:13:33.081Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0394 --actor claude-008 --add tests/cli/git-commit-task-scoped-staging/dry-run-purity-scenarios.ts --reason \"The focused regression lives in a sibling scenario module so the suite file stays within its size budget, matching the existing index-lease-transaction-scenarios pattern\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The focused regression lives in a sibling scenario module so the suite file stays within its size budget, matching the existing index-lease-transaction-scenarios pattern"
+  }
+}

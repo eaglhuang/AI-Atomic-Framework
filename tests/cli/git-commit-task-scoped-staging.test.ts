@@ -13,6 +13,7 @@ import {
   writeJson
 } from './git-commit-task-scoped-staging/fixture.ts';
 import { runIndexLeaseTransactionScenarios } from './git-commit-task-scoped-staging/index-lease-transaction-scenarios.ts';
+import { runDryRunPurityScenarios } from './git-commit-task-scoped-staging/dry-run-purity-scenarios.ts';
 
 const inheritedLaneSessionId = process.env.ATM_LANE_SESSION_ID;
 
@@ -573,6 +574,8 @@ try {
     sessionId,
     taskDocument
   });
+
+  await runDryRunPurityScenarios({ tempDir, taskId, sessionId, runGit, runAtmGit });
 
   console.log('[git-commit-task-scoped-staging] ok');
 } finally {

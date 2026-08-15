@@ -1160,6 +1160,20 @@
       "capability": "ATM-GOV-0193 regression coverage for canonical registry, runtime scratch emission, watermark seal, sealed report, unique block counting, and unchanged opt-in telemetry status.",
       "coverage_status": "active",
       "source_task": "ATM-GOV-0193"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/git-governance/implementation/commit-*.ts",
+      "atom_id": "atom-cli-router",
+      "capability": "governed commit routing family: commit-command routes between named lifecycle branches (commit-task-scoped-branch, commit-framework-branch) under the dry-run-purity contract, so no branch owns the purity decision",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0394"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/git-governance/implementation/dry-run-purity.ts",
+      "atom_id": "atom-cli-router",
+      "capability": "dry-run purity contract for governed commits: resolved from the request before branch selection and asserted at the single executor call site",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0394"
     }
   ]
 }

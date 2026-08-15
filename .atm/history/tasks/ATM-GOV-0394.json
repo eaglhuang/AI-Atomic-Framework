@@ -1,0 +1,323 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0394",
+  "title": "Guarantee dry-run purity across every lifecycle branch",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A `--dry-run` invocation leaves HEAD, the index, the worktree, the task ledger, emergency lease consumption counts, and evidence receipts byte-identical, on every lifecycle branch — task-claimed, framework-claimed, and unresolved — and with and without `--auto-stage`.",
+    "ACC-2: Purity is decided from the flag before branch selection, so a future branch cannot reintroduce the gap by omitting a local guard. No test or implementation names a task id, actor, file path, or closed-state check.",
+    "ACC-3: An invocation whose authority resolves to no branch fails closed with an error code naming the missing claim, rather than committing or reporting an empty success.",
+    "ACC-4: `dry_run_never_mutates_on_any_lifecycle_branch_0394` is red before the fix against the reproduction above and green after; `60ced0732` is cited in the test as the observed regression."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    ".atm/history/evidence/ATM-GOV-0394.*",
+    ".atm/history/task-events/ATM-GOV-0394/**",
+    ".atm/history/tasks/ATM-GOV-0394.json",
+    "tests/cli/git-commit-task-scoped-staging/dry-run-purity-scenarios.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "packages/cli/src/commands/git-governance/implementation/commit-framework-branch.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+    "packages/cli/src/commands/git-governance/implementation/dry-run-purity.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "release",
+    "templates"
+  ],
+  "nonGoals": [
+    "Changing which claims authorize a commit. This card changes only whether --dry-run can mutate, never who may commit.",
+    "Repairing the closed-task residue that exposed the defect; that is ATM-GOV-0395."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-commit",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.git-governance-commit",
+        "pattern": "Guard Clause",
+        "source": "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+        "disposition": "inline",
+        "inlineReason": "The repair is to evaluate one existing flag before branch selection rather than to add a second commit authority."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0394-guarantee-dry-run-purity-across-every-lifecycle-branch.task.md",
+    "sectionTitle": "ATM-GOV-0394",
+    "headingLine": 85,
+    "hash": "2db7d1749949ab6f",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0394-guarantee-dry-run-purity-across-every-lifecycle-branch.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:2db7d1749949ab6fb3fe989f58271271d55bc9d4188e8b3853a34612c8f57ce5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-15T08:06:18.119Z"
+    }
+  },
+  "importedAt": "2026-08-15T08:06:18.119Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A governed commit dry-run created a real commit because the branch it fell through to never evaluated the flag."
+    ],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "governed-commit-dry-run-contract"
+    ],
+    "causalImpactEdges": [
+      "dry-run-flag -> lifecycle-branch-selection -> repository-mutation",
+      "unauthorized-dry-run-mutation -> explicit-fail-closed-refusal"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0370 and ATM-GOV-0391 publication work is unrelated and must not be touched"
+    ],
+    "validatorReferences": [
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "Wave-1-framework-foundation"
+  },
+  "testContributions": [
+    {
+      "caseId": "dry_run_never_mutates_on_any_lifecycle_branch_0394",
+      "targetGroupId": "null",
+      "semanticKey": "dry-run-is-pure-on-every-branch",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "dry-run-flag -> lifecycle-branch-selection -> repository-mutation"
+      ],
+      "expectedRedPredicate": "a dry-run invocation that matches no live claim reaches the commit executor and advances HEAD",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "governed-commit-dry-run-contract",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "dry_run_without_authority_fails_closed_0394",
+      "targetGroupId": "null",
+      "semanticKey": "authorityless-dry-run-is-refused-not-executed",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "unauthorized-dry-run-mutation -> explicit-fail-closed-refusal"
+      ],
+      "expectedRedPredicate": "an invocation with no resolvable claim reports a commit result instead of naming the missing authority",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "governed-commit-dry-run-contract",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "dry_run_never_mutates_on_any_lifecycle_branch_0394",
+    "dry_run_without_authority_fails_closed_0394"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-15T08-48-41-088Z-renew-3da68a8eb17d",
+  "lastTransitionAt": "2026-08-15T08:48:41.088Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008",
+  "reservedAt": "2026-08-15T08:06:40.511Z",
+  "promotedAt": "2026-08-15T08:06:40.517Z",
+  "claim": {
+    "actorId": "claude-008",
+    "leaseId": "lease-f2e13e18eaf0",
+    "claimedAt": "2026-08-15T08:06:40.523Z",
+    "heartbeatAt": "2026-08-15T08:48:40.237Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0394.*",
+      ".atm/history/task-events/ATM-GOV-0394/**",
+      ".atm/history/tasks/ATM-GOV-0394.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-framework-branch.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+      "packages/cli/src/commands/git-governance/implementation/dry-run-purity.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-commit-task-scoped-staging/dry-run-purity-scenarios.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260815080640-claude-008-a026250359",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815080640-claude-008-a026250359\""
+    }
+  },
+  "startedAt": "2026-08-15T08:06:40.523Z",
+  "startedByActor": "claude-008",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-490f5560168fb5b3",
+    "ticketDigest": "sha256:490f5560168fb5b37b75a48d7dd0bad1954930dca10922866b84a71a7d2d25d3",
+    "taskId": "ATM-GOV-0394",
+    "origin": "claim",
+    "actorId": "claude-008",
+    "laneSessionId": "lane-20260815080640-claude-008-a026250359",
+    "claimGeneration": "lease-f2e13e18eaf0",
+    "issuedAt": "2026-08-15T08:48:40.237Z",
+    "expiresAt": "2026-08-15T09:18:40.237Z",
+    "scopeDigest": "sha256:bd58178caa568224a1a0e8a938803af8f60a1dfc2b86deea9afd42c596178057",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-15T08:48:40.237Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0394.*",
+          ".atm/history/task-events/ATM-GOV-0394/**",
+          ".atm/history/tasks/ATM-GOV-0394.json",
+          "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+          "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+          "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-framework-branch.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+          "packages/cli/src/commands/git-governance/implementation/dry-run-purity.ts",
+          "tests/cli/git-commit-task-scoped-staging.test.ts",
+          "tests/cli/git-commit-task-scoped-staging/dry-run-purity-scenarios.ts"
+        ],
+        "digest": "sha256:b7d4e2015c46210a63b40c468fd4e68745c5c2157b8bd3525afe74884bda6fbc"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260815080640-claude-008-ATM-GOV-0394-331bb054bb",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0394",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0394.*",
+      ".atm/history/task-events/ATM-GOV-0394/**",
+      ".atm/history/tasks/ATM-GOV-0394.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-framework-branch.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+      "packages/cli/src/commands/git-governance/implementation/dry-run-purity.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-commit-task-scoped-staging/dry-run-purity-scenarios.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0394-guarantee-dry-run-purity-across-every-lifecycle-branch.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0394-guarantee-dry-run-purity-across-every-lifecycle-branch.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "effaa03cdae7aecece371f826e8fe589c43f8611aafd356e1be0ce48abf33e6e",
+    "actorId": "claude-008",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260815080640-claude-008-a026250359",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815080640-claude-008-a026250359\""
+    },
+    "createdAt": "2026-08-15T08:06:46.686Z",
+    "status": "active"
+  }
+}
