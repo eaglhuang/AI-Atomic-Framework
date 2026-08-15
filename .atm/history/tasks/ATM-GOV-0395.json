@@ -27,7 +27,10 @@
     "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
     "packages/plugin-governance-local/src/stores.ts",
     "packages/plugin-sdk/src/governance/stores.ts",
-    "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts"
+    "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
@@ -88,8 +91,8 @@
   "importedAt": "2026-08-15T08:57:30.531Z",
   "workAdmission": {
     "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -177,8 +180,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-15T10-36-01-124Z-renew-16c37f10d238",
-  "lastTransitionAt": "2026-08-15T10:36:01.124Z",
+  "lastTransitionId": "2026-08-15T10-53-55-653Z-scope-amendment-f27fd614d7ae",
+  "lastTransitionAt": "2026-08-15T10:53:55.653Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-008",
   "reservedAt": "2026-08-15T10:20:37.881Z",
@@ -193,6 +196,9 @@
       ".atm/history/evidence/ATM-GOV-0395.*",
       ".atm/history/task-events/ATM-GOV-0395/**",
       ".atm/history/tasks/ATM-GOV-0395.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
       "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
       "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
       "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
@@ -224,6 +230,9 @@
       ".atm/history/evidence/ATM-GOV-0395.*",
       ".atm/history/task-events/ATM-GOV-0395/**",
       ".atm/history/tasks/ATM-GOV-0395.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
       "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
       "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
       "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
@@ -257,28 +266,32 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-224f8d6170af44e7",
-    "ticketDigest": "sha256:224f8d6170af44e7f634630009996e77f00d35a3cfb43ceb042c437942ada912",
+    "ticketId": "wat-b9a8e92c13adf787",
+    "ticketDigest": "sha256:b9a8e92c13adf7877ded855b803ea152a44277aab104350e3ceacbc645f17d64",
     "taskId": "ATM-GOV-0395",
     "origin": "claim",
     "actorId": "claude-008",
     "laneSessionId": "lane-20260815102038-claude-008-955b69ad0b",
     "claimGeneration": "lease-238195303293",
-    "issuedAt": "2026-08-15T10:36:00.415Z",
-    "expiresAt": "2026-08-15T11:06:00.415Z",
-    "scopeDigest": "sha256:6facbec152502613d36f1588702b7cf22b8cd3f2d22024bb5aae3efcb4b5cc36",
+    "issuedAt": "2026-08-15T10:53:55.504Z",
+    "expiresAt": "2026-08-15T11:23:55.504Z",
+    "scopeDigest": "sha256:d97e106208b9c47c57edbcefb4a4c10e94fb87c660a0dd5ba149158942a968c6",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-15T10:36:00.415Z"
+      "selectedAt": "2026-08-15T10:53:55.504Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0395.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0395/**",
           ".atm/history/tasks/ATM-GOV-0395.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
+          "docs/governance/atm-bug-and-optimization-backlog.md",
           "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
           "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
           "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
@@ -287,7 +300,7 @@
           "packages/plugin-governance-local/src/stores.ts",
           "packages/plugin-sdk/src/governance/stores.ts"
         ],
-        "digest": "sha256:af9157dc45416a4b1e09d6fff09cd50718e66a0e8dcf4150761ea25405e9b5f3"
+        "digest": "sha256:48e43eaa91e0b979ab42dd12eca64f4997a76b633e4ea1db942919af5d5cf0dd"
       },
       {
         "kind": "lifecycle-operation",
@@ -309,16 +322,17 @@
     "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
-      "resolvedMode": "disabled",
+      "resolvedMode": "enabled",
       "reasons": [
-        "low-risk-task"
+        "complex-task",
+        "shared-surface"
       ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
   }
 }
