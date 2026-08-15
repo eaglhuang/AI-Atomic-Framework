@@ -1,0 +1,388 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0398",
+  "title": "Repair the remaining declared validator regressions behind ATM-GOV-0331 evidence",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: After takeover, successor `claim.state` is `active`, ownership is transferred, and takeover is recorded in transition id and/or evidence. `npm run validate:governance-commands` exits 0.",
+    "ACC-2: Close-owned non-runner tracked delivery dirty is not `ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY`. `taskflow close --write` remains atomic for that payload. `npm run validate:taskflow-close-atomicity` exits 0.",
+    "ACC-3: Runner-affecting tracked dirty still emits `ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY`.",
+    "ACC-4: Each original declared validator has a command-backed tuple (command, exit code 0, output digest, artifact, observed time, source SHA). 0331 historical evidence is not rewritten as never-red.",
+    "ACC-5: No build, enqueue, formal close, or runner publication from this card."
+  ],
+  "deliverables": [
+    "scripts/validate-governance-commands/implementation.ts",
+    "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts"
+  ],
+  "scopePaths": [
+    "scripts/validate-governance-commands/implementation.ts",
+    "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+    "packages/cli/src/commands/taskflow/close-preflight.ts",
+    "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+    ".atm/history/evidence/ATM-GOV-0398.*",
+    ".atm/history/task-events/ATM-GOV-0398/**",
+    ".atm/history/tasks/ATM-GOV-0398.json",
+    "packages/cli/src/commands/taskflow/implementation.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+    "npm run validate:governance-commands",
+    "npm run validate:taskflow-close-atomicity"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "release",
+    "templates",
+    "Reopening or rewriting ATM-GOV-0331 ledger or historical evidence as never-red",
+    "Runner build, runner-sync enqueue, or joint publication"
+  ],
+  "nonGoals": [
+    "Special-casing ATM-GOV-0331, any task id, actor, or live filename",
+    "Putting taken_over back into live claim.state",
+    "Treating timeout or retry as pass",
+    "Formal close or runner publication of this card"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-close-preflight",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.taskflow-close-owned-delivery-dirty-admission",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/validate-governance-commands/implementation.ts",
+        "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0398-repair-the-remaining-declared-validator-regressions-behind-atm-gov-0331-evidence.task.md",
+    "sectionTitle": "ATM-GOV-0398",
+    "headingLine": 132,
+    "hash": "7741b257b2f075d1",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0398-repair-the-remaining-declared-validator-regressions-behind-atm-gov-0331-evidence.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:7741b257b2f075d15192a348be215feb47734d785a8d71091e164ca98e6c78cd",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-15T14:01:09.349Z"
+    }
+  },
+  "importedAt": "2026-08-15T14:01:09.349Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "ATM-GOV-0331 is already done; its historical evidence recorded two declared validators red and must not be rewritten as never-red",
+      "npm run validate:governance-commands fails on takeover live-claim-state drift",
+      "npm run validate:taskflow-close-atomicity fails on ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY for close-owned tracked delivery dirty"
+    ],
+    "softRelations": [
+      "ATM-GOV-0331 historical evidence remains the reproduction record, not a live green certificate",
+      "ATM-GOV-0397 owns cross-task mutation and commit-failure index restore; overlapping files require broker resolve"
+    ],
+    "changedPublicSeams": [
+      "tasks-takeover-live-claim-state",
+      "taskflow-close-owned-non-runner-delivery-dirty-admission"
+    ],
+    "causalImpactEdges": [
+      "takeover-successor-live-authority -> claim-state-active-and-takeover-in-transition-evidence",
+      "close-owned-non-runner-tracked-delivery-dirty -> not-preclose-scope-tracked-dirty-blocker",
+      "accepted-publication-plus-runner-affecting-dirty -> keep-preclose-scope-tracked-dirty",
+      "two-declared-validators-now-green -> distinct-from-0331-historical-red-evidence"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0397 must not share-write the same files; broker resolve on overlap",
+      "ATM-GOV-0341 remains claimed elsewhere and must not be closed or rewritten",
+      "Do not build, enqueue, or runner-publish; joint publication with 0397 comes later"
+    ],
+    "validatorReferences": [
+      "npm run validate:governance-commands",
+      "npm run validate:taskflow-close-atomicity",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts"
+    ],
+    "phaseOwner": "Wave-1-framework-foundation"
+  },
+  "testContributions": [
+    {
+      "caseId": "takeover_successor_claim_state_is_live_active_0398",
+      "targetGroupId": "null",
+      "semanticKey": "takeover-live-claim-state",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "takeover-successor-live-authority -> claim-state-active-and-takeover-in-transition-evidence"
+      ],
+      "expectedRedPredicate": "governance-commands asserts claim.state === taken_over after a successful takeover",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "tasks-takeover-live-claim-state",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "close_owned_non_runner_tracked_delivery_dirty_is_not_preclose_blocker_0398",
+      "targetGroupId": "null",
+      "semanticKey": "close-owned-delivery-dirty-admission",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "close-owned-non-runner-tracked-delivery-dirty -> not-preclose-scope-tracked-dirty-blocker"
+      ],
+      "expectedRedPredicate": "tracked in-scope non-runner delivery dirty that the close bundle already owns still emits ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "taskflow-close-owned-non-runner-delivery-dirty-admission",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "runner_affecting_tracked_dirty_keeps_preclose_blocker_0398",
+      "targetGroupId": "null",
+      "semanticKey": "runner-affecting-dirty-remains-blocked",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "accepted-publication-plus-runner-affecting-dirty -> keep-preclose-scope-tracked-dirty"
+      ],
+      "expectedRedPredicate": "runner-affecting tracked dirty is admitted as close-owned payload and drops ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "taskflow-close-owned-non-runner-delivery-dirty-admission",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "declared_validators_green_tuple_distinct_from_0331_history_0398",
+      "targetGroupId": "null",
+      "semanticKey": "current-green-is-not-historical-rewrite",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "two-declared-validators-now-green -> distinct-from-0331-historical-red-evidence"
+      ],
+      "expectedRedPredicate": "a green validator run is written back onto ATM-GOV-0331 historical evidence as if it had never been red",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "tasks-takeover-live-claim-state",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "takeover_successor_claim_state_is_live_active_0398",
+    "close_owned_non_runner_tracked_delivery_dirty_is_not_preclose_blocker_0398",
+    "runner_affecting_tracked_dirty_keeps_preclose_blocker_0398",
+    "declared_validators_green_tuple_distinct_from_0331_history_0398"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-15T14-10-25-041Z-scope-amendment-90d92bf67dd7",
+  "lastTransitionAt": "2026-08-15T14:10:25.041Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-captain",
+  "reservedAt": "2026-08-15T14:04:16.216Z",
+  "promotedAt": "2026-08-15T14:04:16.221Z",
+  "claim": {
+    "actorId": "cursor-captain",
+    "leaseId": "lease-d0f4e6a9ca73",
+    "claimedAt": "2026-08-15T14:04:16.227Z",
+    "heartbeatAt": "2026-08-15T14:04:16.227Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0398.*",
+      ".atm/history/task-events/ATM-GOV-0398/**",
+      ".atm/history/tasks/ATM-GOV-0398.json",
+      "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+      "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+      "scripts/validate-governance-commands/implementation.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260815140416-cursor-captain-893604fe79",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815140416-cursor-captain-893604fe79\""
+    }
+  },
+  "startedAt": "2026-08-15T14:04:16.227Z",
+  "startedByActor": "cursor-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-53915768266375c0",
+    "ticketDigest": "sha256:53915768266375c013657d7eef17110432b27d9bf5cdb4055b1a51b87da24e7f",
+    "taskId": "ATM-GOV-0398",
+    "origin": "claim",
+    "actorId": "cursor-captain",
+    "laneSessionId": "lane-20260815140416-cursor-captain-893604fe79",
+    "claimGeneration": "lease-d0f4e6a9ca73",
+    "issuedAt": "2026-08-15T14:10:24.900Z",
+    "expiresAt": "2026-08-15T14:40:24.900Z",
+    "scopeDigest": "sha256:f3050ef52199534b276463f7414042899e6cf883a18090fe2a0ee3063d411689",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-15T14:10:24.900Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0398.*",
+          ".atm/history/task-events/ATM-GOV-0398/**",
+          ".atm/history/tasks/ATM-GOV-0398.json",
+          "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+          "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+          "packages/cli/src/commands/taskflow/close-preflight.ts",
+          "packages/cli/src/commands/taskflow/implementation.ts",
+          "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+          "scripts/validate-governance-commands/implementation.ts"
+        ],
+        "digest": "sha256:6e501c13615d38fabc1ac6f012a652f4b1aa217a91d9ff5ad4ed1cff8ce4736b"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260815140416-cursor-captain-ATM-GOV-0398-5d7054f60a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0398",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0398.*",
+      ".atm/history/task-events/ATM-GOV-0398/**",
+      ".atm/history/tasks/ATM-GOV-0398.json",
+      "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+      "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+      "scripts/validate-governance-commands/implementation.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0398-repair-the-remaining-declared-validator-regressions-behind-atm-gov-0331-evidence.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0398-repair-the-remaining-declared-validator-regressions-behind-atm-gov-0331-evidence.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "1df3ec1500f109a3d45c7b62384bbff31bf7a15e132b8fbb0f55d35c4a7570f7",
+    "actorId": "cursor-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260815140416-cursor-captain-893604fe79",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815140416-cursor-captain-893604fe79\""
+    },
+    "createdAt": "2026-08-15T14:04:21.760Z",
+    "status": "active"
+  }
+}
