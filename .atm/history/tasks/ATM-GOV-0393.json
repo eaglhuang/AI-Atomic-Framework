@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0393",
   "title": "Make scope amendments atomically reseal delivery authority",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -176,8 +176,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-15T09-13-16-252Z-renew-63fe9612754f",
-  "lastTransitionAt": "2026-08-15T09:13:16.252Z",
+  "lastTransitionId": "2026-08-15T09-14-47-224Z-close-b9b052edad02",
+  "lastTransitionAt": "2026-08-15T09:14:47.224Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-captain",
   "reservedAt": "2026-08-14T15:19:38.713Z",
@@ -186,7 +186,7 @@
     "actorId": "cursor-captain",
     "leaseId": "lease-96378881ce81",
     "claimedAt": "2026-08-14T15:19:38.726Z",
-    "heartbeatAt": "2026-08-15T09:13:15.545Z",
+    "heartbeatAt": "2026-08-15T09:14:47.222Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0393.json",
@@ -196,13 +196,14 @@
       "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
       "tests/cli/scope-amendment-work-admission-ticket.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260814151939-cursor-captain-5f0422e933",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814151939-cursor-captain-5f0422e933\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-14T15:19:38.726Z",
   "startedByActor": "cursor-captain",
@@ -304,5 +305,9 @@
     },
     "createdAt": "2026-08-14T15:19:45.145Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-15T09:14:47.222Z",
+  "closedByActor": "cursor-captain",
+  "closedBySessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0393.closure-packet.json"
 }

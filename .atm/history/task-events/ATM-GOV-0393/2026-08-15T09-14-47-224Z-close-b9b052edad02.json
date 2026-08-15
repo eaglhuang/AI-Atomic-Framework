@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-15T09-14-47-224Z-close-b9b052edad02",
+  "taskId": "ATM-GOV-0393",
+  "action": "close",
+  "actorId": "cursor-captain",
+  "sessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0393.json",
+  "taskSha256": "sha256:f2d61d1a2d6542e91cb330ea3f49eab31ef5fd58fe41f5180968a7568c7acd51",
+  "createdAt": "2026-08-15T09:14:47.224Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0393 --actor cursor-captain --status done --historical-delivery 60e4daba481712972fd4fd34cf764575c05f2914",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260814151938-cursor-captain-ATM-GOV-0393-8743dacb8a",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0393.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+      "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+      "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-15T09:14:47.215Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0393.*",
+        ".atm/history/task-events/ATM-GOV-0393/**",
+        ".atm/history/tasks/ATM-GOV-0393.json",
+        "packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+        "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+        "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+        "packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "packages/cli/src/commands/tasks/scope-amendment/implementation.ts",
+        "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-amendment-work-admission-ticket.test.ts",
+        "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
