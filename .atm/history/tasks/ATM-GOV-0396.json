@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0396",
   "title": "Do not forward stale-runner emergency arguments after runner publication is accepted",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -191,27 +191,28 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-15T10-15-09-222Z-renew-e0e9e5266f70",
-  "lastTransitionAt": "2026-08-15T10:15:09.222Z",
+  "lastTransitionId": "2026-08-15T10-19-39-644Z-close-d26f99c13b97",
+  "lastTransitionAt": "2026-08-15T10:19:39.644Z",
   "ledgerContractVersion": "task-ledger/v1",
   "claim": {
     "actorId": "cursor-captain",
     "leaseId": "lease-aadde0d42db0",
     "claimedAt": "2026-08-15T08:57:39.954Z",
-    "heartbeatAt": "2026-08-15T10:15:08.460Z",
+    "heartbeatAt": "2026-08-15T10:19:39.642Z",
     "ttlSeconds": 3600,
     "files": [
       ".atm/history/tasks/ATM-GOV-0396.json",
       "packages/cli/src/commands/taskflow/runner-recovery-forwarding.ts",
       "tests/cli/taskflow-emergency-approval-forwarding.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260815085740-cursor-captain-e0ab016494",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815085740-cursor-captain-e0ab016494\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "cursor-captain",
   "startedAt": "2026-08-15T08:57:39.954Z",
@@ -308,5 +309,9 @@
     },
     "createdAt": "2026-08-15T08:57:45.088Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-15T10:19:39.642Z",
+  "closedByActor": "cursor-captain",
+  "closedBySessionId": "session-20260815085739-cursor-captain-ATM-GOV-0396-e073a4679d",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0396.closure-packet.json"
 }
