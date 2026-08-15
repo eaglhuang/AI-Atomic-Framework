@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.runnerPublicationTakeoverRefusal.v1",
+  "capturedAt": "2026-08-15T08:04:00.000Z",
+  "taskId": "ATM-GOV-0370",
+  "actorId": "cursor-captain",
+  "sealedSourceSha": "91ade92dcf2275391f56253fcc78e36331f0a865",
+  "surface": "full",
+  "command": "node atm.mjs broker runner-sync takeover-publication --task ATM-GOV-0370 --actor cursor-captain --sealed-source-sha 91ade92dcf2275391f56253fcc78e36331f0a865 --surface full --json",
+  "ok": false,
+  "code": "ATM_RUNNER_PUBLICATION_PENDING",
+  "text": "Publication takeover requires the active queue-head task and its exact sealed source SHA.",
+  "observedQueue": {
+    "groups": [],
+    "position": null
+  },
+  "priorReceipt": {
+    "path": ".atm/history/evidence/ATM-GOV-0370.runner-sync-receipt.json",
+    "publicationDisposition": "recovery-retained",
+    "stewardWorkId": "runner-sync-06365e10"
+  },
+  "classification": "circular-admission: takeover-publication requires queue-head, but recovery-retained publication already released the steward queue. Owner forbids enqueue before a complete takeover plan. Stop enqueue/build; treat as P0 framework defect.",
+  "stopped": {
+    "enqueue": true,
+    "build": true
+  }
+}

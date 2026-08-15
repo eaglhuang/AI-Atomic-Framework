@@ -24,7 +24,11 @@
     ".atm/history/evidence/ATM-GOV-0370.*",
     ".atm/history/task-events/ATM-GOV-0370/**",
     ".atm/history/tasks/ATM-GOV-0370.json",
-    "packages/cli/src/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.ts"
+    "packages/cli/src/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-001.json",
+    "packages/cli/src/commands/broker/publication-takeover-admission.ts",
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "tests/cli/runner-sync-framework-temp-hotfix.test.ts"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
@@ -163,32 +167,32 @@
     "findings": []
   },
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-f1853a625f0c",
-    "claimedAt": "2026-08-14T00:30:05.121Z",
-    "heartbeatAt": "2026-08-14T00:41:29.608Z",
+    "actorId": "cursor-captain",
+    "leaseId": "lease-a31b717fc08d",
+    "claimedAt": "2026-08-15T00:50:12.562Z",
+    "heartbeatAt": "2026-08-15T08:27:21.704Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0370.*",
       ".atm/history/task-events/ATM-GOV-0370/**",
       ".atm/history/tasks/ATM-GOV-0370.json",
-      "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
-      "packages/cli/src/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.ts",
-      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
-      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-      "packages/cli/src/commands/taskflow/current-task-close-evidence.ts"
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-001.json",
+      "packages/cli/src/commands/broker/publication-takeover-admission.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "tests/cli/runner-sync-framework-temp-hotfix.test.ts"
     ],
     "state": "active",
+    "reason": "The recorded active claim heartbeat is 2026-08-14T00:41:29Z with TTL 1800s; wall-clock expiry is established, no current owner activity is evidenced, and runner publication authority is the shared Q2 blocker.",
     "laneSession": {
-      "laneSessionId": "lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1",
-      "status": "active",
+      "laneSessionId": "lane-20260815005012-cursor-captain-7dc44390cd",
+      "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815005012-cursor-captain-7dc44390cd\""
     }
   },
-  "owner": "codex-gpt-5.4-mini",
+  "owner": "cursor-captain",
   "startedAt": "2026-08-14T00:30:05.121Z",
-  "startedBySessionId": "session-20260814003005-codex-gpt-5.4-mini-ATM-GOV-0370-af5d2776b2",
+  "startedBySessionId": "session-20260815005012-cursor-captain-ATM-GOV-0370-927a99aa83",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -201,54 +205,46 @@
       ".atm/history/evidence/ATM-GOV-0370.*",
       ".atm/history/task-events/ATM-GOV-0370/**",
       ".atm/history/tasks/ATM-GOV-0370.json",
-      "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
-      "packages/cli/src/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.ts",
-      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
-      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-      "packages/cli/src/commands/taskflow/current-task-close-evidence.ts"
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-001.json",
+      "packages/cli/src/commands/broker/publication-takeover-admission.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "tests/cli/runner-sync-framework-temp-hotfix.test.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0370-bind-runner-publication-outputs-to-producer-authority-before-taskflow-close-bundling.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0370-bind-runner-publication-outputs-to-producer-authority-before-taskflow-close-bundling.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
-    "promptHash": "a5868c51529ff646b2bf1efa7e2177a5bf114d8ec0a9e40cbc6d16779d9df592",
-    "actorId": "codex-gpt-5.4-mini",
-    "sessionId": null,
+    "promptHash": "6a5390461b41094bfe0609d2c3da9b74534e98ec251638457b00f755b932e3b8",
+    "actorId": "cursor-captain",
+    "sessionId": "session-20260815005012-cursor-captain-ATM-GOV-0370-927a99aa83",
     "laneSession": {
-      "laneSessionId": "lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1",
+      "laneSessionId": "lane-20260815005012-cursor-captain-7dc44390cd",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815005012-cursor-captain-7dc44390cd\""
     },
-    "createdAt": "2026-08-14T00:30:09.201Z",
+    "createdAt": "2026-08-15T00:50:13.503Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-14T00-41-29-842Z-renew-ff71ad5967e8",
-  "lastTransitionAt": "2026-08-14T00:41:29.842Z",
+  "lastTransitionId": "2026-08-15T08-27-33-337Z-scope-amendment-c0989fe75db1",
+  "lastTransitionAt": "2026-08-15T08:27:33.337Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-ca33dd70bd26bf08",
-    "ticketDigest": "sha256:ca33dd70bd26bf08ef153ed8a4fafcd1109dc94d4c72aa3e3e8750ad3edb7008",
+    "ticketId": "wat-9ea0f1e9e9439be7",
+    "ticketDigest": "sha256:9ea0f1e9e9439be771f459072cd41c7bde85fc450747ee4ee167dd9a3697b71e",
     "taskId": "ATM-GOV-0370",
     "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260814003005-codex-gpt-5.4-mini-3c1917e5b1",
-    "claimGeneration": "lease-f1853a625f0c",
-    "issuedAt": "2026-08-14T00:41:29.608Z",
-    "expiresAt": "2026-08-14T01:11:29.608Z",
-    "scopeDigest": "sha256:8deb82f29baefda95311360f5b1737fcb2c689eaf3ea4f4020096e0d59b8bce4",
+    "actorId": "cursor-captain",
+    "laneSessionId": "lane-20260815005012-cursor-captain-7dc44390cd",
+    "claimGeneration": "lease-a31b717fc08d",
+    "issuedAt": "2026-08-15T08:27:21.704Z",
+    "expiresAt": "2026-08-15T08:57:21.704Z",
+    "scopeDigest": "sha256:d97bb54fd1fd5d8b2e88017474ce9a5f465b3ea92dfa211af06f2d5302df7277",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T00:41:29.608Z"
+      "selectedAt": "2026-08-15T08:27:21.704Z"
     },
     "grants": [
       {
@@ -256,14 +252,9 @@
         "values": [
           ".atm/history/evidence/ATM-GOV-0370.*",
           ".atm/history/task-events/ATM-GOV-0370/**",
-          ".atm/history/tasks/ATM-GOV-0370.json",
-          "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
-          "packages/cli/src/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.ts",
-          "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
-          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-          "packages/cli/src/commands/taskflow/current-task-close-evidence.ts"
+          ".atm/history/tasks/ATM-GOV-0370.json"
         ],
-        "digest": "sha256:36ac040f24736985432582529f2aee6c390f320b5d71aa46e72b165d8c3e254a"
+        "digest": "sha256:7d44e616ff92743161e114721c7e5ecb31b0f2eaa1f9269cc4e7aa150a7fd8b9"
       },
       {
         "kind": "lifecycle-operation",
@@ -296,5 +287,6 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  }
+  },
+  "startedByActor": "cursor-captain"
 }

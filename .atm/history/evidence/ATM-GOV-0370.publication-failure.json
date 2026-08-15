@@ -1,0 +1,29 @@
+{
+  "schemaId": "atm.runnerPublicationFailure.v1",
+  "capturedAt": "2026-08-15T01:09:46.302Z",
+  "taskId": "ATM-GOV-0370",
+  "stewardWorkId": "runner-sync-06365e10",
+  "sealedSourceSha": "91ade92dcf2275391f56253fcc78e36331f0a865",
+  "exitCode": 1,
+  "error": "Runner publication requires exactly one active release-surface claim for codex-gpt-5.4-mini; found 0.",
+  "sourceFile": "scripts/sealed-runner-publication.ts:299",
+  "observedActorFromEnv": {
+    "ATM_ACTOR_ID": null,
+    "AGENT_IDENTITY": "codex-gpt-5.4-mini"
+  },
+  "classification": "precondition-fail then publication-incomplete",
+  "inputManifestRef": ".atm/history/evidence/ATM-GOV-0370.publication-input-manifest.json",
+  "officialRetry": {
+    "env": {
+      "ATM_ACTOR_ID": "cursor-captain",
+      "ATM_RUNNER_PUBLICATION_TASK": "ATM-GOV-0370",
+      "ATM_RETAIN_RELEASE_ARTIFACTS": "1"
+    },
+    "exitCode": 1,
+    "publicationDisposition": "recovery-retained",
+    "receiptRef": ".atm/history/evidence/ATM-GOV-0370.runner-sync-receipt.json",
+    "error": "Runner publication incomplete: preserved foreign generated outputs were not replaced by sealed build 91ade92dcf2275391f56253fcc78e36331f0a865",
+    "queueReleasedByBuildScript": true,
+    "stewardWorkId": "runner-sync-06365e10"
+  }
+}

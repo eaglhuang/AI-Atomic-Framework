@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-15T08-27-33-337Z-scope-amendment-c0989fe75db1",
+  "taskId": "ATM-GOV-0370",
+  "action": "scope-amendment",
+  "actorId": "cursor-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0370.json",
+  "taskSha256": "sha256:cdfc24d6ca3e5917ab996e05cc0973e9e6f4af12a0902a0b2f2c2cf164f58073",
+  "createdAt": "2026-08-15T08:27:33.337Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0370 --actor cursor-captain --add \"packages/cli/src/commands/broker/steward-queues.ts,packages/cli/src/commands/broker/publication-takeover-admission.ts,tests/cli/runner-sync-framework-temp-hotfix.test.ts,docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-001.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
