@@ -191,25 +191,24 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-15T08-57-45-089Z-claim-bdad38d4fb29",
-  "lastTransitionAt": "2026-08-15T08:57:45.089Z",
+  "lastTransitionId": "2026-08-15T10-15-09-222Z-renew-e0e9e5266f70",
+  "lastTransitionAt": "2026-08-15T10:15:09.222Z",
   "ledgerContractVersion": "task-ledger/v1",
   "claim": {
     "actorId": "cursor-captain",
     "leaseId": "lease-aadde0d42db0",
     "claimedAt": "2026-08-15T08:57:39.954Z",
-    "heartbeatAt": "2026-08-15T08:57:39.954Z",
-    "ttlSeconds": 1800,
+    "heartbeatAt": "2026-08-15T10:15:08.460Z",
+    "ttlSeconds": 3600,
     "files": [
       ".atm/history/tasks/ATM-GOV-0396.json",
       "packages/cli/src/commands/taskflow/runner-recovery-forwarding.ts",
       "tests/cli/taskflow-emergency-approval-forwarding.test.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260815085740-cursor-captain-e0ab016494",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815085740-cursor-captain-e0ab016494\""
     }
@@ -220,20 +219,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-697e2a1dd86baf93",
-    "ticketDigest": "sha256:697e2a1dd86baf932e52ee7f0179d978f12cb27df42abdb5de42ffa314f4422f",
+    "ticketId": "wat-81cd541d66f46436",
+    "ticketDigest": "sha256:81cd541d66f46436bb78ff67062fb7bd19d2533d77e0da962dd69f704db9d787",
     "taskId": "ATM-GOV-0396",
     "origin": "claim",
     "actorId": "cursor-captain",
     "laneSessionId": "lane-20260815085740-cursor-captain-e0ab016494",
     "claimGeneration": "lease-aadde0d42db0",
-    "issuedAt": "2026-08-15T08:57:39.954Z",
-    "expiresAt": "2026-08-15T09:27:39.954Z",
+    "issuedAt": "2026-08-15T10:15:08.460Z",
+    "expiresAt": "2026-08-15T11:15:08.460Z",
     "scopeDigest": "sha256:0bb2a8ef1f2cd951739ad57aaa74d4de4e6be76b953603e8e142478b77292223",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-15T08:57:39.954Z"
+      "selectedAt": "2026-08-15T10:15:08.460Z"
     },
     "grants": [
       {

@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0396",
+  "updatedAt": "2026-08-15T10:15:46.901Z",
+  "updatedBy": "cursor-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/taskflow-emergency-approval-forwarding.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/taskflow-emergency-approval-forwarding.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ebea92fec03da5070ecb0577f90388d06cc69773c3be195a77e2d46dc1c1cd98",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/taskflow-emergency-approval-forwarding.test.ts"
+      ],
+      "generatedAt": "2026-08-15T10:15:28.003Z",
+      "startedAt": "2026-08-15T10:15:27.714Z",
+      "finishedAt": "2026-08-15T10:15:28.003Z",
+      "durationMs": 289,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "22df706026ca59b41c981b8d3cd1960f0253e6a3",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-15T10:15:46.901Z",
+      "startedAt": "2026-08-15T10:15:37.696Z",
+      "finishedAt": "2026-08-15T10:15:46.901Z",
+      "durationMs": 9205,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "22df706026ca59b41c981b8d3cd1960f0253e6a3",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
