@@ -1,9 +1,10 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0391",
-  "updatedAt": "2026-08-14T14:59:51.462Z",
-  "updatedBy": "codex-captain-recovery",
+  "updatedAt": "2026-08-15T09:11:40.376Z",
+  "updatedBy": "cursor-captain",
   "freshValidationPasses": [
+    "node --experimental-strip-types scripts/run-sealed-runner-build.test.ts",
     "node --experimental-strip-types tests/cli/root-drop-release-incremental-overlay.test.ts",
     "node --experimental-strip-types tests/cli/root-drop-release-manifest-integrity.test.ts",
     "node --experimental-strip-types tests/cli/runner-sync-incremental-build.test.ts",
@@ -90,6 +91,22 @@
       "durationMs": 9085,
       "runnerKind": "dev-source",
       "sourceCommit": "79896c2e2fc1e4c2cf76c7f63007fe51ee9b445b",
+      "cached": false
+    },
+    {
+      "command": "node --experimental-strip-types scripts/run-sealed-runner-build.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcaec12986e271d969fca23ee2d351d4e40a33bfa000db1cad21dc1fc3124047",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --experimental-strip-types scripts/run-sealed-runner-build.test.ts"
+      ],
+      "generatedAt": "2026-08-15T09:11:40.375Z",
+      "startedAt": "2026-08-15T09:11:39.657Z",
+      "finishedAt": "2026-08-15T09:11:40.375Z",
+      "durationMs": 718,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "9fe80ab4ac41fa6f644fb53e91b98a3971125b12",
       "cached": false
     }
   ],
