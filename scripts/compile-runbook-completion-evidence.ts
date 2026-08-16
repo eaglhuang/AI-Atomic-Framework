@@ -7,6 +7,7 @@ import {
   digestWaveExitObserverPolicy,
   loadWaveExitObserverPolicy,
   readCanonicalWaveExitReceipt,
+  resolveWaveExitBasisProducer,
   type WaveExitObserverPolicy
 } from '../packages/core/src/evidence/wave-exit-observer-receipt.ts';
 
@@ -360,24 +361,6 @@ function requiresFinalCertificate(row: CompletionRow): boolean {
     || (row.section === 'Tests, backlog and release' && /runner sync queue|remote-reachable|closeback receipt|final certificate/.test(row.requirement));
 }
 
-function deriveBasisActorsFromCoverageOwners(owners: readonly string[], repoRoot: string): string[] {
-  const actors: string[] = [];
-  for (const owner of owners) {
-    const evidencePath = resolve(repoRoot, '.atm', 'history', 'evidence', `${owner}.json`);
-    if (!existsSync(evidencePath)) continue;
-    try {
-      const record = JSON.parse(readFileSync(evidencePath, 'utf8')) as { evidence?: Array<{ producedBy?: unknown; details?: { actorId?: unknown } }> };
-      for (const entry of record.evidence ?? []) {
-        const actor = entry.details?.actorId ?? entry.producedBy;
-        if (typeof actor === 'string' && actor.trim()) actors.push(actor.trim());
-      }
-    } catch {
-      continue;
-    }
-  }
-  return [...new Set(actors)];
-}
-
 function digestInputsAtHead(paths: readonly string[], compilationHead: string, repoRoot: string): Record<string, string> {
   const digests: Record<string, string> = {};
   for (const inputPath of paths) {
@@ -455,7 +438,7 @@ export function compileRunbookCompletion(
       const currentInputDigests = observerOptions.currentInputDigests
         ?? (exitPolicy ? digestInputsAtHead(exitPolicy.inputs, targetHead, repoRoot) : {});
       const derivedActors = observerOptions.basisActorsByWave?.[row.wave ?? '']
-        ?? deriveBasisActorsFromCoverageOwners(basis.flatMap((item) => item.coverageOwners ?? []), repoRoot);
+        ?? resolveWaveExitBasisProducer({ repoRoot, policy: observerPolicy }).actorIds;
       const verdict = consumeWaveExitObserverReceipt({
         receipt: receiptSource,
         policy: observerPolicy,

@@ -4,7 +4,8 @@ import {
   canonicalWaveExitReceiptPath,
   consumeWaveExitObserverReceipt,
   digestText,
-  digestWaveExitObserverPolicy,
+  digestWaveExitObserverPolicySource,
+  WAVE_EXIT_OBSERVER_POLICY_PATH,
   WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID,
   type DerivedBasisIdentity,
   type WaveExitObserverDiagnostic,
@@ -242,6 +243,15 @@ export function writeWaveExitObserverReceipt(
     }
     currentInputDigests[inputPath] = digestText(body);
   }
+  const policySource = input.readObservedInput(WAVE_EXIT_OBSERVER_POLICY_PATH);
+  if (policySource == null) {
+    throw new WaveExitObserverWriteError(
+      'ATM_WAVE_EXIT_OBSERVER_DIGEST_DRIFT',
+      `Observed policy ${WAVE_EXIT_OBSERVER_POLICY_PATH} is missing at HEAD.`,
+      { diagnostics: ['receipt-stale'], details: { path: WAVE_EXIT_OBSERVER_POLICY_PATH } }
+    );
+  }
+  const policyDigest = digestWaveExitObserverPolicySource(policySource);
   if (input.claimedInputDigests) {
     for (const [path, digest] of Object.entries(input.claimedInputDigests)) {
       if (currentInputDigests[path] !== digest) {
@@ -263,7 +273,6 @@ export function writeWaveExitObserverReceipt(
     );
   }
 
-  const policyDigest = digestWaveExitObserverPolicy(input.policy);
   const receipt: WaveExitObserverReceipt = {
     schemaId: WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID,
     schemaVersion: input.policy.specVersion,

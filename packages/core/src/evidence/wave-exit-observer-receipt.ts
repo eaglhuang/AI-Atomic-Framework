@@ -70,12 +70,24 @@ export interface WaveExitObserverExitPolicy {
   readonly forbiddenFlags: readonly string[];
 }
 
+export type WaveExitBasisActorResolution = 'active-claim-holder' | 'unique-evidence-actor';
+
+export interface WaveExitObserverPolicyDigestSpec {
+  readonly encoding: 'utf8';
+  readonly newline: 'lf';
+  readonly source: 'git-show';
+  readonly path: typeof WAVE_EXIT_OBSERVER_POLICY_PATH;
+}
+
 export interface WaveExitObserverPolicy {
   readonly schemaId: typeof WAVE_EXIT_OBSERVER_POLICY_SCHEMA_ID;
   readonly specVersion: string;
   readonly canonicalReceiptDir: string;
   readonly compilerCommandPath: string;
   readonly basisProducerRole: string;
+  readonly basisEvidenceOwners: readonly string[];
+  readonly basisActorResolution: WaveExitBasisActorResolution;
+  readonly policyDigest: WaveExitObserverPolicyDigestSpec;
   readonly roles: Readonly<Record<string, WaveExitObserverRole>>;
   readonly exits: Readonly<Record<string, WaveExitObserverExitPolicy>>;
 }
@@ -127,16 +139,93 @@ export function digestText(value: string): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
-export function digestWaveExitObserverPolicy(policy: WaveExitObserverPolicy): string {
-  return digestText(JSON.stringify(policy));
+export function normalizeWaveExitObserverPolicySource(source: string): string {
+  return source.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
+}
+
+export function digestWaveExitObserverPolicySource(source: string): string {
+  return digestText(normalizeWaveExitObserverPolicySource(source));
+}
+
+export function readWaveExitObserverPolicySource(repoRoot = '.'): string {
+  return readFileSync(join(repoRoot, WAVE_EXIT_OBSERVER_POLICY_PATH), 'utf8');
+}
+
+/** Compact JSON.stringify(policy) is not the sealed digest. Observers must hash git-show bytes. */
+export function digestWaveExitObserverPolicy(
+  policy: WaveExitObserverPolicy,
+  source = readWaveExitObserverPolicySource()
+): string {
+  if (policy.schemaId !== WAVE_EXIT_OBSERVER_POLICY_SCHEMA_ID) {
+    throw new Error('wave-exit observer policy schema mismatch');
+  }
+  return digestWaveExitObserverPolicySource(source);
 }
 
 export function loadWaveExitObserverPolicy(repoRoot = '.'): WaveExitObserverPolicy {
-  const raw = JSON.parse(readFileSync(join(repoRoot, WAVE_EXIT_OBSERVER_POLICY_PATH), 'utf8')) as WaveExitObserverPolicy;
+  const raw = JSON.parse(readWaveExitObserverPolicySource(repoRoot)) as WaveExitObserverPolicy;
   if (raw.schemaId !== WAVE_EXIT_OBSERVER_POLICY_SCHEMA_ID) {
     throw new Error('wave-exit observer policy schema mismatch');
   }
+  if (!Array.isArray(raw.basisEvidenceOwners) || raw.basisEvidenceOwners.length === 0 || raw.basisEvidenceOwners.some((owner) => !isNonEmptyString(owner))) {
+    throw new Error('wave-exit observer policy is missing basisEvidenceOwners');
+  }
+  if (raw.basisActorResolution !== 'active-claim-holder' && raw.basisActorResolution !== 'unique-evidence-actor') {
+    throw new Error('wave-exit observer policy is missing basisActorResolution');
+  }
+  if (raw.policyDigest?.source !== 'git-show' || raw.policyDigest?.newline !== 'lf' || raw.policyDigest?.path !== WAVE_EXIT_OBSERVER_POLICY_PATH) {
+    throw new Error('wave-exit observer policy digest spec is not git-show LF');
+  }
   return raw;
+}
+
+export function readClaimHolderActor(repoRoot: string, taskId: string): string | null {
+  const taskPath = join(repoRoot, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return null;
+  try {
+    const record = JSON.parse(readFileSync(taskPath, 'utf8')) as { claim?: { actorId?: unknown } };
+    return isNonEmptyString(record.claim?.actorId) ? record.claim.actorId.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+export function readEvidenceProducerActors(repoRoot: string, taskId: string): string[] {
+  const evidencePath = join(repoRoot, '.atm', 'history', 'evidence', `${taskId}.json`);
+  if (!existsSync(evidencePath)) return [];
+  try {
+    const record = JSON.parse(readFileSync(evidencePath, 'utf8')) as {
+      evidence?: Array<{ producedBy?: unknown; details?: { actorId?: unknown } }>;
+    };
+    const actors: string[] = [];
+    for (const entry of record.evidence ?? []) {
+      const actor = entry.details?.actorId ?? entry.producedBy;
+      if (isNonEmptyString(actor)) actors.push(actor.trim());
+    }
+    return [...new Set(actors)];
+  } catch {
+    return [];
+  }
+}
+
+export function resolveWaveExitBasisProducer(input: {
+  readonly repoRoot: string;
+  readonly policy: WaveExitObserverPolicy;
+  readonly readClaimHolder?: (taskId: string) => string | null;
+  readonly readEvidenceActors?: (taskId: string) => readonly string[];
+}): DerivedBasisIdentity {
+  const owners = input.policy.basisEvidenceOwners;
+  const readClaim = input.readClaimHolder ?? ((taskId: string) => readClaimHolderActor(input.repoRoot, taskId));
+  const readEvidence = input.readEvidenceActors ?? ((taskId: string) => readEvidenceProducerActors(input.repoRoot, taskId));
+  if (input.policy.basisActorResolution === 'active-claim-holder') {
+    const actors = owners.map((owner) => readClaim(owner)).filter((actor): actor is string => isNonEmptyString(actor));
+    return { actorIds: [...new Set(actors)], producerRole: input.policy.basisProducerRole };
+  }
+  const actors = owners.flatMap((owner) => [...readEvidence(owner)]);
+  return deriveBasisIdentityFromEvidence({
+    producerActors: actors,
+    producerRole: input.policy.basisProducerRole
+  });
 }
 
 export function canonicalWaveExitReceiptPath(policy: WaveExitObserverPolicy, exitItemId: string): string {

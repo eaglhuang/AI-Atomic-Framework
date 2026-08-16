@@ -7,12 +7,11 @@ import {
   exclusiveAtomicCreate,
   writeWaveExitObserverReceipt,
   WaveExitObserverWriteError,
-  deriveBasisActorsFromEvidenceOwners,
   WAVE_EXIT_OBSERVER_WRITE_COMMAND
 } from '../../../../../core/src/evidence/wave-exit-observer-receipt-writer.ts';
 import {
-  deriveBasisIdentityFromEvidence,
-  loadWaveExitObserverPolicy
+  loadWaveExitObserverPolicy,
+  resolveWaveExitBasisProducer
 } from '../../../../../core/src/evidence/wave-exit-observer-receipt.ts';
 
 const ALLOWED_FLAGS = new Set([
@@ -55,7 +54,15 @@ export function runWaveExitObserver(argv: string[], deps: WaveExitObserverCliDep
   }
   const policy = (deps.loadPolicy ?? loadWaveExitObserverPolicy)(options.cwd);
   const observedHead = (deps.resolveHead ?? resolveGitHead)(options.cwd);
-  const derivedActors = deriveBasisActorsFromEvidenceOwners(options.cwd, options.basisOwners);
+  const sealedOwners = [...policy.basisEvidenceOwners].sort();
+  const requestedOwners = options.basisOwners.length > 0 ? [...options.basisOwners].sort() : sealedOwners;
+  if (requestedOwners.join('\0') !== sealedOwners.join('\0')) {
+    throw new CliError('ATM_WAVE_EXIT_OBSERVER_CALLER_OVERRIDE', 'Caller --basis-owners must match the sealed policy owners.', {
+      exitCode: 1,
+      details: { requestedOwners, sealedOwners }
+    });
+  }
+  const derivedBasis = resolveWaveExitBasisProducer({ repoRoot: options.cwd, policy });
   try {
     const written = writeWaveExitObserverReceipt({
       repoRoot: options.cwd,
@@ -69,10 +76,7 @@ export function runWaveExitObserver(argv: string[], deps: WaveExitObserverCliDep
       policy,
       observedHead,
       observedAt: (deps.now ?? (() => new Date().toISOString()))(),
-      derivedBasis: deriveBasisIdentityFromEvidence({
-        producerActors: derivedActors,
-        producerRole: policy.basisProducerRole
-      }),
+      derivedBasis,
       isAncestor: (ancestor, descendant) => (deps.isAncestor ?? gitIsAncestor)(options.cwd, ancestor, descendant),
       readObservedInput: (relativePath) => (deps.readObservedInput ?? gitShowAtHead)(options.cwd, observedHead, relativePath),
       executeApprovedCommand: (command) => (deps.executeApprovedCommand ?? runSealedNodeCommand)(options.cwd, command),
@@ -155,9 +159,6 @@ function parseWaveExitObserverArgv(argv: readonly string[]) {
 
   if (!exitItemId) throw new CliError('ATM_CLI_USAGE', 'evidence wave-exit-observer requires --exit EXIT-NN', { exitCode: 2 });
   if (!observerRole) throw new CliError('ATM_CLI_USAGE', 'evidence wave-exit-observer requires --observer-role <sealed-role>', { exitCode: 2 });
-  if (basisOwners.length === 0) {
-    throw new CliError('ATM_CLI_USAGE', 'evidence wave-exit-observer requires --basis-owners <task-id[,task-id]>', { exitCode: 2 });
-  }
 
   return {
     cwd: path.resolve(cwd),

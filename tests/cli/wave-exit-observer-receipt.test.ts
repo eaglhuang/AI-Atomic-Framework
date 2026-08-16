@@ -10,7 +10,9 @@ import {
   deriveBasisIdentityFromEvidence,
   digestText,
   digestWaveExitObserverPolicy,
+  digestWaveExitObserverPolicySource,
   loadWaveExitObserverPolicy,
+  resolveWaveExitBasisProducer,
   WAVE_EXIT_OBSERVER_POLICY_PATH,
   WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID,
   WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_PATH
@@ -21,7 +23,31 @@ const commit = (seed: string): string => seed.repeat(40).slice(0, 40);
 const observedHead = commit('1');
 const compilationHead = commit('2');
 const policy = loadWaveExitObserverPolicy();
-const policyDigest = digestWaveExitObserverPolicy(policy);
+const policySource = readFileSync(WAVE_EXIT_OBSERVER_POLICY_PATH, 'utf8');
+const policyDigest = digestWaveExitObserverPolicy(policy, policySource);
+assert.equal(policy.basisActorResolution, 'active-claim-holder');
+assert.deepEqual([...policy.basisEvidenceOwners], ['ATM-GOV-0341']);
+assert.notEqual(
+  digestText(JSON.stringify(policy)),
+  policyDigest,
+  'compact JSON.stringify(policy) is not the sealed git-show digest'
+);
+assert.equal(digestWaveExitObserverPolicySource(policySource), policyDigest);
+
+const claimHolder = resolveWaveExitBasisProducer({
+  repoRoot: '.',
+  policy,
+  readClaimHolder: () => 'cursor-captain',
+  readEvidenceActors: () => ['codex-gpt-5.4-mini', 'codex-captain-recovery', 'cursor-captain']
+});
+assert.deepEqual(claimHolder.actorIds, ['cursor-captain']);
+
+const unionActors = resolveWaveExitBasisProducer({
+  repoRoot: '.',
+  policy: { ...policy, basisActorResolution: 'unique-evidence-actor' },
+  readEvidenceActors: () => ['codex-gpt-5.4-mini', 'codex-captain-recovery', 'cursor-captain']
+});
+assert.equal(unionActors.actorIds.length, 3);
 const inputPath = policy.exits['EXIT-02'].inputs[0];
 const inputDigest = hex('a');
 
@@ -185,4 +211,4 @@ assert.equal(illegalExit?.status, 'unproven');
 assert.ok(illegalExit?.diagnostics.includes('compiler-command-forbidden'));
 
 assert.equal(readFileSync(WAVE_EXIT_OBSERVER_POLICY_PATH, 'utf8').includes('"EXIT-02"'), true);
-console.log('wave-exit-observer-receipt fixtures: legal proven, illegal fail-closed');
+console.log(`wave-exit-observer-receipt fixtures: legal proven, illegal fail-closed; sealedPolicyDigest=${policyDigest}`);

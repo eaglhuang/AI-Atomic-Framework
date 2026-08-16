@@ -12,12 +12,14 @@ import {
   canonicalWaveExitReceiptPath,
   digestWaveExitObserverPolicy,
   loadWaveExitObserverPolicy,
+  WAVE_EXIT_OBSERVER_POLICY_PATH,
   type WaveExitObserverPolicy
 } from '../../packages/core/src/evidence/wave-exit-observer-receipt.ts';
 
 const hex = (seed: string): string => seed.repeat(40).slice(0, 40);
 const observedHead = hex('1');
 const policy = loadWaveExitObserverPolicy();
+const policySource = readFileSync(WAVE_EXIT_OBSERVER_POLICY_PATH, 'utf8');
 const files = new Map<string, string>();
 
 function clonePolicy(overrides: Partial<WaveExitObserverPolicy> = {}): WaveExitObserverPolicy {
@@ -51,7 +53,9 @@ function baseInput(overrides: Record<string, unknown> = {}) {
       producerRole: policy.basisProducerRole
     },
     isAncestor: (ancestor: string, descendant: string) => ancestor === descendant && ancestor === observedHead,
-    readObservedInput: (relativePath: string) => inputBodies[relativePath] ?? null,
+    readObservedInput: (relativePath: string) => (
+      relativePath === WAVE_EXIT_OBSERVER_POLICY_PATH ? policySource : inputBodies[relativePath] ?? null
+    ),
     executeApprovedCommand: () => ({ exitCode: 0, stdout: 'ok\n', stderr: '' }),
     receiptExists: (absolutePath: string) => files.has(absolutePath.replace(/\\/g, '/')),
     createExclusiveFile: (absolutePath: string, contents: string) => {
@@ -112,6 +116,12 @@ fail(baseInput({
   policy: clonePolicy({ canonicalReceiptDir: 'docs/reports/../../packages/core' })
 }), 'ATM_WAVE_EXIT_OBSERVER_PATH_TRAVERSAL');
 fail(baseInput({ claimedArtifactPath: 'docs/reports/plan-3x-4x-independent-certificate.json' }), 'ATM_WAVE_EXIT_OBSERVER_PATH_TRAVERSAL');
+fail(baseInput({
+  derivedBasis: {
+    actorIds: ['codex-gpt-5.4-mini', 'codex-captain-recovery', 'cursor-captain'],
+    producerRole: policy.basisProducerRole
+  }
+}), 'ATM_WAVE_EXIT_OBSERVER_BASIS_UNRESOLVED');
 fail(baseInput({ extraFlags: ['--write'], exitItemId: 'EXIT-10', observerRole: 'wave-exit-observer.gemini' }), 'ATM_WAVE_EXIT_OBSERVER_FORBIDDEN_FLAG');
 fail(baseInput({ executeApprovedCommand: () => ({ exitCode: 2, stdout: '', stderr: 'nope' }) }), 'ATM_WAVE_EXIT_OBSERVER_NONZERO_EXIT');
 
@@ -124,19 +134,29 @@ assert.throws(
 
 const tmp = mkdtempSync(join(tmpdir(), 'atm-wave-exit-writer-'));
 mkdirSync(join(tmp, '.atm', 'history', 'evidence'), { recursive: true });
+mkdirSync(join(tmp, '.atm', 'history', 'tasks'), { recursive: true });
 writeFileSync(join(tmp, '.atm', 'history', 'evidence', 'ATM-GOV-0341.json'), JSON.stringify({
-  evidence: [{ producedBy: 'wave-1-basis-producer' }]
+  evidence: [
+    { producedBy: 'codex-gpt-5.4-mini' },
+    { producedBy: 'codex-captain-recovery' },
+    { producedBy: 'cursor-captain' }
+  ]
+}), 'utf8');
+writeFileSync(join(tmp, '.atm', 'history', 'tasks', 'ATM-GOV-0341.json'), JSON.stringify({
+  claim: { actorId: 'wave-1-basis-producer' }
 }), 'utf8');
 const inputBodies: Record<string, string> = {};
 for (const path of policy.exits['EXIT-02'].inputs) inputBodies[path] = `live:${path}`;
 
 const cliOk = runWaveExitObserver(
-  ['--cwd', tmp, '--exit', 'EXIT-02', '--actor', 'gemini-wave-exit-observer', '--observer-role', 'wave-exit-observer.gemini', '--basis-owners', 'ATM-GOV-0341', '--json'],
+  ['--cwd', tmp, '--exit', 'EXIT-02', '--actor', 'gemini-wave-exit-observer', '--observer-role', 'wave-exit-observer.gemini', '--json'],
   {
     loadPolicy: () => policy,
     resolveHead: () => observedHead,
     isAncestor: (_cwd, ancestor, descendant) => ancestor === descendant,
-    readObservedInput: (_cwd, _head, relativePath) => inputBodies[relativePath] ?? null,
+    readObservedInput: (_cwd, _head, relativePath) => (
+      relativePath === WAVE_EXIT_OBSERVER_POLICY_PATH ? policySource : inputBodies[relativePath] ?? null
+    ),
     executeApprovedCommand: () => ({ exitCode: 0, stdout: 'cli-ok\n', stderr: '' }),
     now: () => '2026-08-16T00:00:00.000Z'
   }
@@ -146,6 +166,7 @@ const writtenPath = join(tmp, 'docs', 'reports', 'wave-exit-observer-receipts', 
 const disk = JSON.parse(readFileSync(writtenPath, 'utf8'));
 assert.equal(disk.schemaId, 'atm.waveExitObserverReceipt.v1');
 assert.equal(disk.observerActor, 'gemini-wave-exit-observer');
+assert.equal(disk.declaredBasisActor, 'wave-1-basis-producer');
 
 assert.throws(
   () => runWaveExitObserver(
