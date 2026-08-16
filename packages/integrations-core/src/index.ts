@@ -36,7 +36,18 @@ export type {
   SkillCorpusAdapterDescriptor,
   SkillCorpusProjection,
   SkillCorpusDiscoveryReason,
-  SkillCorpusDiscoveryFinding
+  SkillCorpusDiscoveryFinding,
+  LoadSkillCorpusSourceSnapshotOptions,
+  SkillSourceTrackingState,
+  SkillSourceTrackingProbe,
+  SkillSourceUniverse,
+  SkillSourceUniverseEntry,
+  SkillSourceUniverseFinding,
+  ProjectionMetadataFinding,
+  InstalledProjectionDisposition,
+  InstalledProjectionDispositionRule,
+  InstalledProjectionParityFinding,
+  InstalledProjectionParityReport
 } from './compiler/skill-templates.ts';
 export {
   minimumAtmEntrySkillDefinitions,
@@ -47,7 +58,11 @@ export {
   loadMinimumAtmSkillTemplates,
   loadSkillCorpusSourceSnapshot,
   collectSkillCorpusDiscoveryFindings,
-  compileSkillCorpus
+  compileSkillCorpus,
+  sealSkillSourceUniverse,
+  collectSkillSourceUniverseFindings,
+  collectProjectionMetadataFindings,
+  evaluateInstalledProjectionParity
 } from './compiler/skill-templates.ts';
 
 // Distribution submodule

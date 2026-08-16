@@ -1,0 +1,368 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0038",
+  "title": "Enforce sealed skill source universe and projection parity",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-SKL-0028"
+  ],
+  "acceptance": [
+    "The audit distinguishes tracked formal source templates, untracked source candidates, ignored candidates, and installed-only residue.  An untracked or ignored formal source template is a hard finding with an executable recovery, not an advisory-only success.",
+    "The compiler consumes a sealed source-universe snapshot and never re-evaluates local Git tracked, ignored, or `.git/info/exclude` state during projection compilation.",
+    "`atm-diagnostic-loop` has one explicit disposition.  If admitted, it is tracked and included in the sealed corpus before any projection refresh; if rejected, the audit records a finite governed disposition and no installed copy may impersonate it as source.",
+    "Every projection records sourceDigest, compilerVersion, manifestDigest, and degradationDiagnostics.  Parity compares the expected compiled projection instead of confusing source placeholders with compiler output.",
+    "Every installed-copy mismatch is synchronised, covered by an approved baseline or explicit waiver, or fails closed.  No unbounded advisory drift remains.",
+    "Focused fixtures prove that missing tracking, ignored source, stale projection metadata, undeclared installed drift, and a mismatched manifest digest all fail closed; a valid sealed projection passes.",
+    "The implementation does not mutate task, claim, receipt, close, runner-sync, release, or adapter production architecture semantics.",
+    "Delivery contains only task-scoped files and preserves every foreign residue byte-for-byte."
+  ],
+  "deliverables": [
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "packages/integrations-core/src/index.ts",
+    "scripts/audit-skill-corpus.ts",
+    "scripts/validate-skill-templates.ts",
+    "scripts/validate-integration-adapter.ts",
+    "tests/cli/skill-corpus-canary-rewrite.test.ts",
+    "templates/skills/atm-diagnostic-loop.skill.md",
+    "artifacts/generated/skill-corpus-audit.json"
+  ],
+  "scopePaths": [
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "packages/integrations-core/src/index.ts",
+    "scripts/audit-skill-corpus.ts",
+    "scripts/validate-skill-templates.ts",
+    "scripts/validate-integration-adapter.ts",
+    "tests/cli/skill-corpus-canary-rewrite.test.ts",
+    "templates/skills/atm-diagnostic-loop.skill.md",
+    "artifacts/generated/skill-corpus-audit.json",
+    ".atm/history/evidence/TASK-SKL-0038.*",
+    ".atm/history/task-events/TASK-SKL-0038/**",
+    ".atm/history/tasks/TASK-SKL-0038.json",
+    "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+    "packages/integrations-core/src/compiler/skill-source-universe.ts"
+  ],
+  "validators": [
+    "npm run validate:skill-templates",
+    "npm run validate:integration-adapter",
+    "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "ATM task, claim, receipt, close, runner-sync, and release semantics.",
+    "Full-corpus refreshes or adapter architecture rewrites.",
+    "Manual changes to .atm/runtime, .atm/history, .gitignore, or .git/info/exclude.",
+    "Foreign installed copies, source templates, or dirty WIP not explicitly admitted after audit."
+  ],
+  "nonGoals": [
+    "Treating an installed copy as a source of truth.",
+    "Force-adding an ignored template or masking source tracking failures.",
+    "Changing Plan 3.1 or unrelated active delivery surfaces."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.skill-corpus-auditor",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0038-enforce-sealed-skill-source-universe-and-projection-parity.task.md",
+    "sectionTitle": "TASK-SKL-0038",
+    "headingLine": 84,
+    "hash": "ffa947c7ee9f460c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0038-enforce-sealed-skill-source-universe-and-projection-parity.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ffa947c7ee9f460c5ab7f00a36497abad660efcc11c64f7803420ce1710dff0a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-16T13:48:06.985Z"
+    }
+  },
+  "importedAt": "2026-08-16T13:48:06.985Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "relationship=extends-sealed-corpus-boundary; taskId=TASK-SKL-0028"
+    ],
+    "startConditions": [
+      "condition=The SKL planning card is imported through the target ATM CLI and has one active owner.",
+      "condition=The owner has captured a read-only tracked, untracked, ignored, and installed-projection inventory."
+    ],
+    "softRelations": [
+      "relationship=consumes-skill-projections-but-does-not-change-lifecycle-semantics; taskId=TASK-SKL-0029"
+    ],
+    "changedPublicSeams": [
+      "owner=compileSkillCorpus; seam=sealed-skill-source-universe",
+      "owner=skill-template-validator; seam=skill-projection-parity-disposition"
+    ],
+    "causalImpactEdges": [
+      "effect=A projection may be refreshed only from a tracked, sealed source snapshot.; from=sealed-skill-source-universe; to=adapter-projection-manifest",
+      "effect=Unresolved installed-copy drift cannot remain an indefinite advisory.; from=skill-projection-parity-disposition; to=adapter-verification"
+    ],
+    "parallelFrontierInputs": [
+      "input=Read-only foreign-residue inventory; requiredFor=source-universe admission"
+    ],
+    "validatorReferences": [
+      "npm run validate:skill-templates",
+      "npm run validate:integration-adapter",
+      "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+    ],
+    "phaseOwner": "skill-corpus-integrity"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.skill.templates",
+      "command": "npm run validate:skill-templates",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.integration.adapter",
+      "command": "npm run validate:integration-adapter",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.skill.corpus.canary.rewrite.test.ts",
+      "command": "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-16T14-23-53-769Z-scope-amendment-c796615e0963",
+  "lastTransitionAt": "2026-08-16T14:23:53.769Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008",
+  "reservedAt": "2026-08-16T13:54:19.287Z",
+  "promotedAt": "2026-08-16T13:54:19.293Z",
+  "claim": {
+    "actorId": "claude-008",
+    "leaseId": "lease-d98c8177a113",
+    "claimedAt": "2026-08-16T13:54:19.302Z",
+    "heartbeatAt": "2026-08-16T13:54:19.302Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-SKL-0038.*",
+      ".atm/history/task-events/TASK-SKL-0038/**",
+      ".atm/history/tasks/TASK-SKL-0038.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+      "packages/integrations-core/src/compiler/skill-source-universe.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "packages/integrations-core/src/index.ts",
+      "scripts/audit-skill-corpus.ts",
+      "scripts/validate-integration-adapter.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-diagnostic-loop.skill.md",
+      "tests/cli/skill-corpus-canary-rewrite.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260816135419-claude-008-64a204eaf6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816135419-claude-008-64a204eaf6\""
+    }
+  },
+  "startedAt": "2026-08-16T13:54:19.302Z",
+  "startedByActor": "claude-008",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d0c08553e4ea6d23",
+    "ticketDigest": "sha256:d0c08553e4ea6d231a900773b628062dfd659f40216d3b8d0026e2b1a453f835",
+    "taskId": "TASK-SKL-0038",
+    "origin": "claim",
+    "actorId": "claude-008",
+    "laneSessionId": "lane-20260816135419-claude-008-64a204eaf6",
+    "claimGeneration": "lease-d98c8177a113",
+    "issuedAt": "2026-08-16T14:23:53.669Z",
+    "expiresAt": "2026-08-16T14:53:53.669Z",
+    "scopeDigest": "sha256:32b780c1daff5a902c689b244b213fcbbc5c297b69c8a35083137823221fa904",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-16T14:23:53.669Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-SKL-0038.*",
+          ".atm/history/task-events/TASK-SKL-0038/**",
+          ".atm/history/tasks/TASK-SKL-0038.json",
+          "artifacts/generated/skill-corpus-audit.json",
+          "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+          "packages/integrations-core/src/compiler/skill-source-universe.ts",
+          "packages/integrations-core/src/compiler/skill-templates.ts",
+          "packages/integrations-core/src/index.ts",
+          "scripts/audit-skill-corpus.ts",
+          "scripts/validate-integration-adapter.ts",
+          "scripts/validate-skill-templates.ts",
+          "templates/skills/atm-diagnostic-loop.skill.md",
+          "tests/cli/skill-corpus-canary-rewrite.test.ts"
+        ],
+        "digest": "sha256:5e26faa45e0254f178c15fb92e8b153a0bde181b776becc8a235ca9714b09fec"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260816135419-claude-008-TASK-SKL-0038-0ab1c3c35e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0038",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0038.*",
+      ".atm/history/task-events/TASK-SKL-0038/**",
+      ".atm/history/tasks/TASK-SKL-0038.json",
+      "artifacts/generated/skill-corpus-audit.json",
+      "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+      "packages/integrations-core/src/compiler/skill-source-universe.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "packages/integrations-core/src/index.ts",
+      "scripts/audit-skill-corpus.ts",
+      "scripts/validate-integration-adapter.ts",
+      "scripts/validate-skill-templates.ts",
+      "templates/skills/atm-diagnostic-loop.skill.md",
+      "tests/cli/skill-corpus-canary-rewrite.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0038-enforce-sealed-skill-source-universe-and-projection-parity.task.md",
+      "C:/Users/User/AI-Atomic-Framework/artifacts/generated/skill-corpus-audit.json"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0038-enforce-sealed-skill-source-universe-and-projection-parity.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "32820839fa8a19c204dbb460c7db6c694508dde405d6feb462ec84a8bc354348",
+    "actorId": "claude-008",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260816135419-claude-008-64a204eaf6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816135419-claude-008-64a204eaf6\""
+    },
+    "createdAt": "2026-08-16T13:54:26.917Z",
+    "status": "active"
+  }
+}

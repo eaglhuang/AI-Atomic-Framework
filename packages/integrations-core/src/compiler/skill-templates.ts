@@ -6,11 +6,17 @@
  * ATM skill template parser, loader, and minimum entry skill definitions.
  * No dependencies on manifest or verify submodules.
  */
-import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import type { AdapterCapabilityRequirement, SkillInvocationPolicy } from '../distribution/skill-catalog.ts';
+import {
+  type SkillSourceUniverse,
+  type SkillSourceUniverseFinding,
+  collectSkillSourceUniverseFindings,
+  defaultSkillTemplateDirectory,
+  integrationsCoreRepoRoot,
+  sha256Text
+} from './skill-source-universe.ts';
 import {
   type SkillInstallProfileId,
   type SkillTier,
@@ -19,9 +25,29 @@ import {
   skillBelongsToProfile
 } from '../distribution/install-profile.ts';
 
-// Private: repo root is 4 levels above packages/integrations-core/src/compiler/
-const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
-export const defaultSkillTemplateDirectory = path.join(integrationsCoreRepoRoot, 'templates', 'skills');
+// The source root, its digest helper, and the sealed tracking universe live in
+// skill-source-universe.ts. They are re-exported here so the compiler's public
+// surface keeps its original shape.
+export {
+  defaultSkillTemplateDirectory,
+  sealSkillSourceUniverse,
+  collectSkillSourceUniverseFindings
+} from './skill-source-universe.ts';
+export type {
+  SkillSourceTrackingState,
+  SkillSourceTrackingProbe,
+  SkillSourceUniverse,
+  SkillSourceUniverseEntry,
+  SkillSourceUniverseFinding
+} from './skill-source-universe.ts';
+export { evaluateInstalledProjectionParity, collectProjectionMetadataFindings } from './skill-projection-parity.ts';
+export type {
+  ProjectionMetadataFinding,
+  InstalledProjectionDisposition,
+  InstalledProjectionDispositionRule,
+  InstalledProjectionParityFinding,
+  InstalledProjectionParityReport
+} from './skill-projection-parity.ts';
 
 export type SkillTemplateAdapterTarget = 'claude-code' | 'copilot' | 'cursor' | 'gemini' | 'codex';
 
@@ -183,6 +209,15 @@ export interface SkillCorpusSourceSnapshot {
   readonly templates: readonly AtmSkillTemplate[];
   readonly sourceFiles: readonly SkillCorpusSourceFile[];
   readonly sourceDigest: `sha256:${string}`;
+  /**
+   * Whether a source universe was sealed for this snapshot at audit time.
+   * An unsealed snapshot is admissible only for in-memory fixture corpora,
+   * where there is no version-control universe to seal in the first place.
+   */
+  readonly sourceUniverseSealed: boolean;
+  readonly sourceUniverseDigest: `sha256:${string}` | null;
+  readonly sourceUniverseFindings: readonly SkillSourceUniverseFinding[];
+  readonly untrackedSourceTemplatePaths: readonly string[];
   readonly ignoredSourceTemplatePaths: readonly string[];
 }
 
@@ -202,6 +237,8 @@ export interface SkillCorpusProjection<TProjectionFile = unknown> {
   readonly compilerVersion: '0.1.0';
   readonly adapterId: SkillTemplateAdapterTarget;
   readonly sourceDigest: `sha256:${string}`;
+  /** Which sealed source universe this projection was allowed to compile from. */
+  readonly sourceUniverseDigest: `sha256:${string}` | null;
   readonly manifestDigest: `sha256:${string}`;
   readonly degradationDiagnostics: readonly string[];
   readonly files: readonly TProjectionFile[];
@@ -288,7 +325,21 @@ export function loadSkillTemplatesForProfile(
     }));
 }
 
-export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTemplateDirectory): SkillCorpusSourceSnapshot {
+export interface LoadSkillCorpusSourceSnapshotOptions {
+  /**
+   * The version-control universe sealed for this corpus at audit time. It is
+   * the only channel through which tracking state may reach the compiler: the
+   * compiler never asks the local repository what is tracked, ignored, or
+   * excluded, so a projection cannot mean two different things on two
+   * workstations that hold the same bytes.
+   */
+  readonly sourceUniverse?: SkillSourceUniverse;
+}
+
+export function loadSkillCorpusSourceSnapshot(
+  templateDirectory = defaultSkillTemplateDirectory,
+  options: LoadSkillCorpusSourceSnapshotOptions = {}
+): SkillCorpusSourceSnapshot {
   const templates = loadSkillTemplates(templateDirectory);
   const sourceFiles = templates.map((template) => {
     const absolutePath = path.join(integrationsCoreRepoRoot, template.sourcePath);
@@ -304,6 +355,8 @@ export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTe
     sourcePath: file.sourcePath,
     sourceDigest: file.sourceDigest
   }))));
+  const universe = options.sourceUniverse ?? null;
+  const findings = universe ? collectSkillSourceUniverseFindings(universe) : [];
   return {
     schemaId: 'atm.skillCorpusSourceSnapshot.v1',
     compilerVersion: '0.1.0',
@@ -313,7 +366,11 @@ export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTe
     templates,
     sourceFiles,
     sourceDigest,
-    ignoredSourceTemplatePaths: collectIgnoredSkillTemplatePaths(templateDirectory)
+    sourceUniverseSealed: universe !== null,
+    sourceUniverseDigest: universe?.universeDigest ?? null,
+    sourceUniverseFindings: findings,
+    untrackedSourceTemplatePaths: findings.filter((finding) => finding.trackingState === 'untracked').map((finding) => finding.sourcePath),
+    ignoredSourceTemplatePaths: findings.filter((finding) => finding.trackingState === 'ignored').map((finding) => finding.sourcePath)
   };
 }
 
@@ -397,18 +454,40 @@ export function compileSkillCorpus<TProjectionFile>(
     readonly adapterDescriptor: SkillCorpusAdapterDescriptor<TProjectionFile>;
   }
 ): SkillCorpusProjection<TProjectionFile> {
+  // Fail closed before any adapter work: a corpus whose source universe still
+  // holds an untracked or ignored formal template is not a corpus anyone else
+  // can reproduce, so it must not reach a projection at all.
+  const universeFindings = input.sourceSnapshot.sourceUniverseFindings;
+  if (universeFindings.length > 0) {
+    throw new Error(
+      `sealed source universe rejects this corpus: ${universeFindings
+        .map((finding) => `${finding.sourcePath} is ${finding.trackingState} — ${finding.recovery}`)
+        .join('; ')}`
+    );
+  }
   const files = input.adapterDescriptor.project({
     adapterId: input.adapterDescriptor.adapterId,
     templates: input.sourceSnapshot.templates,
     sourceSnapshot: input.sourceSnapshot
   });
   const degradationDiagnostics = [...(input.adapterDescriptor.diagnostics ?? [])].sort();
+  const computedManifestDigest = sha256Text(JSON.stringify(files));
+  const declaredManifestDigest = input.adapterDescriptor.manifestDigest;
+  // A declared digest is a claim about the compiled files, so it is checked
+  // rather than republished. Otherwise a stale manifest could travel forward
+  // attached to output it no longer describes.
+  if (declaredManifestDigest && declaredManifestDigest !== computedManifestDigest) {
+    throw new Error(
+      `adapter ${input.adapterDescriptor.adapterId} declared manifest digest ${declaredManifestDigest} but the compiled files digest to ${computedManifestDigest}`
+    );
+  }
   return {
     schemaId: 'atm.skillCorpusProjection.v1',
     compilerVersion: input.sourceSnapshot.compilerVersion,
     adapterId: input.adapterDescriptor.adapterId,
     sourceDigest: input.sourceSnapshot.sourceDigest,
-    manifestDigest: input.adapterDescriptor.manifestDigest ?? sha256Text(JSON.stringify(files)),
+    sourceUniverseDigest: input.sourceSnapshot.sourceUniverseDigest,
+    manifestDigest: computedManifestDigest,
     degradationDiagnostics,
     files
   };
@@ -484,10 +563,6 @@ function parseAdapterCapabilityRequirements(value: unknown, sourcePath: string):
   });
 }
 
-function sha256Text(content: string): `sha256:${string}` {
-  return `sha256:${createHash('sha256').update(content).digest('hex')}`;
-}
-
 const skillTemplateSchemaId = 'atm.skillTemplate';
 const skillTemplateSpecVersion = '0.1.0';
 
@@ -513,23 +588,4 @@ function collectUnsatisfiedContractFields(frontmatter: AtmSkillTemplateFrontmatt
   if (!Array.isArray(declared.installProfiles)) unsatisfied.push('installProfiles');
   if (!Array.isArray(declared.companionFiles)) unsatisfied.push('companionFiles');
   return unsatisfied;
-}
-
-function collectIgnoredSkillTemplatePaths(templateDirectory: string): readonly string[] {
-  const ignoredPaths = new Set<string>();
-  const localExcludePath = path.join(integrationsCoreRepoRoot, '.git', 'info', 'exclude');
-  const localExclude = existsSync(localExcludePath) ? readFileSync(localExcludePath, 'utf8') : '';
-  for (const line of localExclude.split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    if (!trimmed.includes('templates/skills')) continue;
-    const normalized = trimmed.replace(/^\/+/, '').replace(/\\/g, '/');
-    if (normalized.endsWith('.skill.md')) {
-      ignoredPaths.add(normalized);
-    }
-  }
-  const relativeDirectory = path.relative(integrationsCoreRepoRoot, templateDirectory).replace(/\\/g, '/');
-  return [...ignoredPaths]
-    .filter((entry) => entry.startsWith(relativeDirectory))
-    .sort((left, right) => left.localeCompare(right));
 }

@@ -144,12 +144,6 @@ const requiredGovernanceFlowTermsByTemplate: Record<string, readonly string[]> =
   ]
 };
 
-interface InstalledSkillDriftFinding {
-  readonly templateId: string;
-  readonly installedPath: string;
-  readonly summary: string;
-}
-
 function fail(message: string) {
   console.error(`[skill-templates:${mode}] ${message}`);
   process.exitCode = 1;
@@ -172,59 +166,6 @@ function isPrimaryCompiledEntry(relativePath: string): boolean {
     || normalizedPath.endsWith('.instructions.md')
     || normalizedPath.endsWith('.prompt.md')
     || normalizedPath.endsWith('.toml');
-}
-
-function normalizeSkillContentForDrift(content: string, renderedCharterText: string): string {
-  return content
-    .replaceAll('\r\n', '\n')
-    .replaceAll(renderedCharterText, '{{CHARTER_INVARIANTS}}')
-    .split('\n')
-    .map((line) => line.replace(/[ \t]+$/g, ''))
-    .join('\n')
-    .trimEnd();
-}
-
-function summarizeFirstDrift(expected: string, actual: string): string {
-  const expectedLines = expected.split('\n');
-  const actualLines = actual.split('\n');
-  const maxLength = Math.max(expectedLines.length, actualLines.length);
-  for (let index = 0; index < maxLength; index += 1) {
-    if ((expectedLines[index] ?? '') !== (actualLines[index] ?? '')) {
-      return `first differing line ${index + 1}: expected ${JSON.stringify(expectedLines[index] ?? '<missing>')}, installed ${JSON.stringify(actualLines[index] ?? '<missing>')}`;
-    }
-  }
-  return 'content differs after normalization';
-}
-
-export function collectInstalledSkillDriftFindings(input: {
-  readonly compiledClaudeFiles: readonly { readonly relativePath: string; readonly content: string }[];
-  readonly installedSkillRoot: string;
-  readonly renderedCharterText: string;
-  readonly readFile?: (filePath: string) => string;
-  readonly fileExists?: (filePath: string) => boolean;
-}): readonly InstalledSkillDriftFinding[] {
-  const readText = input.readFile ?? ((filePath: string) => readFileSync(filePath, 'utf8'));
-  const hasFile = input.fileExists ?? existsSync;
-  const findings: InstalledSkillDriftFinding[] = [];
-  for (const compiledFile of input.compiledClaudeFiles) {
-    const normalizedRelativePath = compiledFile.relativePath.replace(/\\/g, '/');
-    if (!normalizedRelativePath.endsWith('/SKILL.md')) continue;
-    const [templateId] = normalizedRelativePath.split('/');
-    if (!templateId) continue;
-    const installedPath = path.join(input.installedSkillRoot, templateId, 'SKILL.md');
-    // Scope limit: this dogfood drift patrol compares only templates that
-    // already have an installed .agents/skills copy in this repository.
-    if (!hasFile(installedPath)) continue;
-    const expected = normalizeSkillContentForDrift(compiledFile.content, input.renderedCharterText);
-    const actual = normalizeSkillContentForDrift(readText(installedPath), input.renderedCharterText);
-    if (expected === actual) continue;
-    findings.push({
-      templateId,
-      installedPath,
-      summary: summarizeFirstDrift(expected, actual)
-    });
-  }
-  return findings;
 }
 
 function readJson(relativePath: string) {
@@ -251,12 +192,28 @@ addFormats(ajv);
 const schema = readJson(schemaPath);
 assert(ajv.validateSchema(schema) === true, `skill template schema is invalid: ${formatErrors(ajv.errors)}`);
 const validateFrontmatter = ajv.compile(schema);
-const templates = packageModule.loadMinimumAtmSkillTemplates(path.join(root, 'templates', 'skills'));
-const corpusSnapshot = packageModule.loadSkillCorpusSourceSnapshot(path.join(root, 'templates', 'skills'));
+const skillTemplateDirectory = path.join(root, 'templates', 'skills');
+const templates = packageModule.loadMinimumAtmSkillTemplates(skillTemplateDirectory);
+
+// Seal the source universe once, here, from the audit stage's Git probe. Every
+// later step reasons about that sealed record, so nothing below re-asks the
+// local repository what it tracks, ignores, or excludes.
+const sourceUniverse = packageModule.sealSkillSourceUniverse({
+  templateDirectory: skillTemplateDirectory,
+  probe: auditModule.probeSkillSourceTracking(skillTemplateDirectory)
+});
+for (const finding of packageModule.collectSkillSourceUniverseFindings(sourceUniverse)) {
+  fail(`${finding.trackingState} formal source template ${finding.sourcePath}: ${finding.recovery}`);
+}
+
+const corpusSnapshot = packageModule.loadSkillCorpusSourceSnapshot(skillTemplateDirectory, { sourceUniverse });
 const renderedCharter = packageModule.renderCharterInvariantsBlock(root);
 assert(templates.length === requiredTemplateIds.length, 'minimum ATM skill template count mismatch');
 assert(corpusSnapshot.templateCount >= templates.length, 'full skill corpus must include at least every minimum entry template');
 assert(corpusSnapshot.sourceDigest.startsWith('sha256:'), 'full skill corpus snapshot must carry a source digest');
+assert(corpusSnapshot.sourceUniverseSealed === true, 'full skill corpus snapshot must consume a sealed source universe');
+assert(corpusSnapshot.sourceUniverseDigest === sourceUniverse.universeDigest, 'corpus snapshot must carry the sealed universe digest');
+assert(Array.isArray(corpusSnapshot.untrackedSourceTemplatePaths), 'full skill corpus snapshot must report untracked source template paths');
 assert(Array.isArray(corpusSnapshot.ignoredSourceTemplatePaths), 'full skill corpus snapshot must report ignored source template paths');
 assert(renderedCharter.fallbackReason === null, 'validator fixture repo must have readable charter invariants');
 assert(renderedCharter.text.includes('INV-ATM-001'), 'rendered charter invariants must include seeded invariant text');
@@ -276,11 +233,6 @@ for (const corpusTemplate of corpusSnapshot.templates) {
     `${corpusTemplate.sourcePath} frontmatter schema mismatch: ${formatErrors(validateFrontmatter.errors)}`
   );
 }
-const untrackedSourceTemplates = collectUntrackedSourceTemplates(path.join(root, 'templates', 'skills'));
-for (const untrackedPath of untrackedSourceTemplates) {
-  console.warn(`[skill-templates:${mode}] advisory untracked source template: ${untrackedPath} — a source template outside version control exists only on this workstation; commit it so the corpus is the same for every collaborator`);
-}
-
 const templatesById = new Map(templates.map((template: any) => [template.frontmatter.id, template]));
 for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
   const template = templatesById.get(entryDefinition.id) as any;
@@ -372,41 +324,68 @@ assert(claudeFiles.filter((compiledFile: any) => isPrimaryCompiledEntry(compiled
 assert(codexFiles.filter((compiledFile: any) => isPrimaryCompiledEntry(compiledFile.relativePath)).every((compiledFile: any) => compiledFile.content.includes('charter-invariants-injected: true')), 'Codex output must carry charter injection frontmatter on primary entries');
 assert(geminiFiles.filter((compiledFile: any) => isPrimaryCompiledEntry(compiledFile.relativePath)).every((compiledFile: any) => compiledFile.content.includes('charter_invariants_injected = true')), 'Gemini output must carry charter injection field on primary entries');
 
-const driftRegressionClean = collectInstalledSkillDriftFindings({
-  compiledClaudeFiles: [{ relativePath: 'atm-next/SKILL.md', content: `alpha\n${renderedCharter.text}\n` }],
+// Parity regression: an installed copy that matches the compiled projection is
+// clean, and one that does not is reported against the projection itself
+// rather than against the uncompiled template source.
+const parityRegressionClean = packageModule.evaluateInstalledProjectionParity({
+  compiledProjectionFiles: [{ relativePath: 'atm-next/SKILL.md', content: `alpha\n${renderedCharter.text}\n` }],
   installedSkillRoot: '.agents/skills',
-  renderedCharterText: renderedCharter.text,
-  fileExists: (filePath) => filePath.replace(/\\/g, '/').endsWith('.agents/skills/atm-next/SKILL.md'),
-  readFile: () => `alpha\n{{CHARTER_INVARIANTS}}\n`
+  fileExists: (filePath: string) => filePath.replace(/\\/g, '/').endsWith('.agents/skills/atm-next/SKILL.md'),
+  readFile: () => `alpha\n${renderedCharter.text}\n`
 });
-assert(driftRegressionClean.length === 0, 'installed skill drift regression must treat matching normalized content as clean');
-const driftRegressionDirty = collectInstalledSkillDriftFindings({
-  compiledClaudeFiles: [{ relativePath: 'atm-next/SKILL.md', content: 'alpha\n' }],
+assert(parityRegressionClean.failClosed.length === 0, 'parity must treat an installed copy equal to the projection as clean');
+assert(parityRegressionClean.findings[0]?.disposition === 'sync', 'a matching installed copy must be dispositioned as sync');
+const parityRegressionDirty = packageModule.evaluateInstalledProjectionParity({
+  compiledProjectionFiles: [{ relativePath: 'atm-next/SKILL.md', content: 'alpha\n' }],
   installedSkillRoot: '.agents/skills',
-  renderedCharterText: renderedCharter.text,
-  fileExists: (filePath) => filePath.replace(/\\/g, '/').endsWith('.agents/skills/atm-next/SKILL.md'),
+  fileExists: (filePath: string) => filePath.replace(/\\/g, '/').endsWith('.agents/skills/atm-next/SKILL.md'),
   readFile: () => 'beta\n'
 });
-assert(driftRegressionDirty.length === 1, 'installed skill drift regression must report exactly one diverged installed copy');
-assert(driftRegressionDirty[0]?.templateId === 'atm-next', 'installed skill drift regression must name the diverged template id');
+assert(parityRegressionDirty.failClosed.length === 1, 'undeclared installed drift must fail closed exactly once');
+assert(parityRegressionDirty.failClosed[0]?.templateId === 'atm-next', 'fail-closed parity must name the diverged template id');
 
-const installedSkillDriftFindings = collectInstalledSkillDriftFindings({
-  compiledClaudeFiles: claudeFiles,
-  installedSkillRoot: path.join(root, '.agents', 'skills'),
-  renderedCharterText: renderedCharter.text
+// The live parity gate compares the full sealed corpus projection, not just
+// the minimum entry set, so no installed copy can hide behind profile
+// filtering.
+const corpusProjectionForParity = packageModule.compileSkillCorpus({
+  sourceSnapshot: corpusSnapshot,
+  adapterDescriptor: {
+    adapterId: 'claude-code',
+    diagnostics: [],
+    project: ({ templates: corpusTemplates }: any) => packageModule.compileSkillTemplatesForAdapter('claude-code', corpusTemplates, { repositoryRoot: root })
+  }
 });
+for (const finding of packageModule.collectProjectionMetadataFindings(corpusProjectionForParity, corpusSnapshot)) {
+  fail(`stale projection metadata: ${finding.summary}`);
+}
+const installedParity = packageModule.evaluateInstalledProjectionParity({
+  compiledProjectionFiles: corpusProjectionForParity.files,
+  installedSkillRoot: path.join(root, '.agents', 'skills'),
+  dispositions: auditModule.installedProjectionDispositions
+});
+for (const finding of installedParity.failClosed) {
+  fail(`installed-copy drift without a governed disposition: ${finding.templateId} (${path.relative(root, finding.installedPath).replace(/\\/g, '/')}) ${finding.summary}. Resolve it by syncing the installed copy, pinning an approved baseline, or declaring an explicit waiver in scripts/audit-skill-corpus.ts.`);
+}
 const corpusAudit = auditModule.buildSkillCorpusAudit();
 assert(corpusAudit.schemaId === 'atm.skillCorpusAudit.v1', 'skill corpus audit must use the expected schema');
 assert(corpusAudit.sourceSnapshot.sourceDigest === corpusSnapshot.sourceDigest, 'skill corpus audit must match current source snapshot digest');
 assert(corpusAudit.deepModuleReviews.map((review: any) => review.baselineFingerprint).includes('deep-module-review:52470e9f'), 'skill corpus audit must record source-snapshot deep-module baseline');
 assert(corpusAudit.deepModuleReviews.map((review: any) => review.baselineFingerprint).includes('deep-module-review:52b3cbe6'), 'skill corpus audit must record projection deep-module baseline');
-for (const finding of installedSkillDriftFindings) {
-  console.warn(`[skill-templates:${mode}] advisory installed-copy drift: ${finding.templateId} (${path.relative(root, finding.installedPath).replace(/\\/g, '/')}) ${finding.summary}`);
-}
+assert(
+  corpusAudit.installedProjectionParity.failClosed.length === 0,
+  'skill corpus audit must record zero undisposed installed-copy drift'
+);
+assert(
+  corpusAudit.sourceUniverse.universeDigest === sourceUniverse.universeDigest,
+  'skill corpus audit must seal the same source universe this validator sealed'
+);
 
 if (!process.exitCode) {
-  const driftScope = 'installed-copy drift advisory compares only templates with .agents/skills/<id>/SKILL.md in this repo';
-  console.log(`[skill-templates:${mode}] ok (${templates.length} source templates, schema, 5 adapter compilers, ${installedSkillDriftFindings.length} installed-copy drift advisory finding(s); ${driftScope})`);
+  const counts = installedParity.findings.reduce((totals: Record<string, number>, finding: any) => {
+    totals[finding.disposition] = (totals[finding.disposition] ?? 0) + 1;
+    return totals;
+  }, {});
+  console.log(`[skill-templates:${mode}] ok (${templates.length} minimum entry templates, ${corpusSnapshot.templateCount} sealed source templates, schema, 5 adapter compilers; installed-copy parity ${JSON.stringify(counts)})`);
 }
 
 function countCompanionFiles(directoryPath: string): number {
@@ -425,20 +404,6 @@ function countCompanionFiles(directoryPath: string): number {
     }
     return entry.isFile() ? total + 1 : total;
   }, 0);
-}
-
-function collectUntrackedSourceTemplates(directoryPath: string): readonly string[] {
-  const tracked = listTrackedFilesUnder(directoryPath);
-  if (!tracked) {
-    return [];
-  }
-  const trackedSet = new Set(tracked.map((entry) => path.resolve(entry)));
-  return readdirSync(directoryPath, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith('.skill.md'))
-    .map((entry) => path.join(directoryPath, entry.name))
-    .filter((absolutePath) => !trackedSet.has(path.resolve(absolutePath)))
-    .map((absolutePath) => path.relative(root, absolutePath).replace(/\\/g, '/'))
-    .sort();
 }
 
 function listTrackedFilesUnder(directoryPath: string): readonly string[] | null {

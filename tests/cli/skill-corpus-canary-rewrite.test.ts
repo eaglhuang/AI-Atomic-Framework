@@ -1,14 +1,19 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
+  collectProjectionMetadataFindings,
   collectSkillCorpusDiscoveryFindings,
+  collectSkillSourceUniverseFindings,
   compileSkillCorpus,
-  loadSkillCorpusSourceSnapshot
+  evaluateInstalledProjectionParity,
+  loadSkillCorpusSourceSnapshot,
+  sealSkillSourceUniverse
 } from '../../packages/integrations-core/src/compiler/skill-templates.ts';
 import { compileSkillTemplatesForAdapter } from '../../packages/integrations-core/src/compiler/compile.ts';
-import { buildSkillCorpusAudit } from '../../scripts/audit-skill-corpus.ts';
+import { buildSkillCorpusAudit, probeSkillSourceTracking } from '../../scripts/audit-skill-corpus.ts';
 
 const root = process.cwd();
 const canaryOrder = [
@@ -20,7 +25,18 @@ const canaryOrder = [
   'atm-framework-temp-claim'
 ];
 
-const snapshot = loadSkillCorpusSourceSnapshot(path.join(root, 'templates', 'skills'));
+const templateDirectory = path.join(root, 'templates', 'skills');
+const sourceUniverse = sealSkillSourceUniverse({
+  templateDirectory,
+  probe: probeSkillSourceTracking(templateDirectory)
+});
+assert.deepEqual(
+  collectSkillSourceUniverseFindings(sourceUniverse).map((finding) => `${finding.trackingState}:${finding.sourcePath}`),
+  [],
+  'every formal source template in this repository must be version-controlled before the corpus may be sealed'
+);
+const snapshot = loadSkillCorpusSourceSnapshot(templateDirectory, { sourceUniverse });
+assert.equal(snapshot.sourceUniverseSealed, true);
 assert.equal(snapshot.schemaId, 'atm.skillCorpusSourceSnapshot.v1');
 assert(snapshot.templateCount >= 21, 'corpus snapshot must include the complete source template corpus');
 assert.equal(snapshot.templates.length, snapshot.sourceFiles.length);
@@ -62,6 +78,19 @@ assert.equal(audit.sourceSnapshot.sourceDigest, snapshot.sourceDigest);
 assert.deepEqual(audit.canaryOrder, canaryOrder);
 assert.equal(audit.ignoredTemplateRegression.incidentTaskId, 'TASK-SKL-0027');
 assert.equal(audit.ignoredTemplateRegression.locked, true);
+assert.equal(audit.sourceUniverse.sealed, true, 'the audit must seal the source universe it hands the compiler');
+assert.deepEqual(audit.sourceUniverse.untrackedSourceTemplatePaths, []);
+assert.deepEqual(audit.sourceUniverse.ignoredSourceTemplatePaths, []);
+assert.equal(audit.sourceUniverse.universeDigest, sourceUniverse.universeDigest);
+assert(
+  snapshot.templates.some((template) => template.frontmatter.id === 'atm-diagnostic-loop'),
+  'atm-diagnostic-loop is admitted as a formal tracked source template'
+);
+assert.deepEqual(
+  audit.installedProjectionParity.failClosed,
+  [],
+  'no installed copy may sit outside the four finite dispositions'
+);
 assert.deepEqual(
   audit.deepModuleReviews.map((review) => review.baselineFingerprint),
   ['deep-module-review:52470e9f', 'deep-module-review:52b3cbe6']
@@ -235,6 +264,205 @@ withFixtureCorpus({
     'that disappearance must surface as a discovery finding rather than as a matching count'
   );
 });
+
+// ── TASK-SKL-0038 sealed source universe and projection parity ─────────────
+//
+// The seal stage is the only place Git tracking state may be consulted. Every
+// case below hands that state to the compiler as sealed data, so none of these
+// fixtures depend on the tracking state of the workstation running them.
+
+const universeFixtureFiles = {
+  'first.skill.md': canonicalFixtureFrontmatter('atm-fixture-first', 'framework-full, role-oriented'),
+  'second.skill.md': canonicalFixtureFrontmatter('atm-fixture-second', 'framework-full')
+};
+
+// caseId: skill_source_universe_untracked_fail_closed_0038
+// An untracked formal source template is a hard finding with an executable
+// recovery, never an advisory the corpus can be green alongside.
+withFixtureCorpus(universeFixtureFiles, (directory) => {
+  const universe = sealSkillSourceUniverse({
+    templateDirectory: directory,
+    probe: { trackedPaths: ['first.skill.md'], ignoredPaths: [] }
+  });
+  const findings = collectSkillSourceUniverseFindings(universe);
+  assert.equal(findings.length, 1, 'exactly the untracked formal source must be reported');
+  assert.equal(findings[0].trackingState, 'untracked');
+  assert(findings[0].sourcePath.endsWith('second.skill.md'));
+  assert(findings[0].recovery.includes('git add'), 'recovery must be an executable tracking command');
+
+  assert.throws(
+    () => compileSkillCorpus({
+      sourceSnapshot: loadSkillCorpusSourceSnapshot(directory, { sourceUniverse: universe }),
+      adapterDescriptor: {
+        adapterId: 'claude-code',
+        diagnostics: [],
+        project: ({ templates }) => compileSkillTemplatesForAdapter('claude-code', templates, { repositoryRoot: root })
+      }
+    }),
+    /source universe/i,
+    'projection must fail closed while a formal source template is untracked'
+  );
+});
+
+// caseId: skill_source_universe_ignored_fail_closed_0038
+// An ignored formal source template fails closed the same way, and the
+// recovery must never be to force-add it past the ignore rule.
+withFixtureCorpus(universeFixtureFiles, (directory) => {
+  const universe = sealSkillSourceUniverse({
+    templateDirectory: directory,
+    probe: { trackedPaths: ['first.skill.md'], ignoredPaths: ['second.skill.md'] }
+  });
+  const findings = collectSkillSourceUniverseFindings(universe);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].trackingState, 'ignored');
+  assert(!/-f\b|--force/.test(findings[0].recovery), 'recovery must not tell the author to force-add an ignored source');
+  assert(
+    findings[0].recovery.includes('.gitignore') || findings[0].recovery.includes('exclude'),
+    'ignored recovery must name the ignore rule to remove'
+  );
+});
+
+// caseId: skill_sealed_projection_valid_0038
+// A fully tracked sealed universe compiles, and the projection carries every
+// parity field the adapter verification depends on.
+withFixtureCorpus(universeFixtureFiles, (directory) => {
+  const universe = sealSkillSourceUniverse({
+    templateDirectory: directory,
+    probe: { trackedPaths: ['first.skill.md', 'second.skill.md'], ignoredPaths: [] }
+  });
+  assert.deepEqual(collectSkillSourceUniverseFindings(universe), []);
+  assert(universe.universeDigest.startsWith('sha256:'));
+
+  const sealedSnapshot = loadSkillCorpusSourceSnapshot(directory, { sourceUniverse: universe });
+  assert.equal(sealedSnapshot.sourceUniverseSealed, true);
+  assert.equal(sealedSnapshot.sourceUniverseDigest, universe.universeDigest);
+  assert.deepEqual(sealedSnapshot.untrackedSourceTemplatePaths, []);
+  assert.deepEqual(sealedSnapshot.ignoredSourceTemplatePaths, []);
+
+  const sealedProjection = compileSkillCorpus({
+    sourceSnapshot: sealedSnapshot,
+    adapterDescriptor: {
+      adapterId: 'claude-code',
+      diagnostics: [],
+      project: ({ templates }) => compileSkillTemplatesForAdapter('claude-code', templates, { repositoryRoot: root })
+    }
+  });
+  assert.equal(sealedProjection.sourceDigest, sealedSnapshot.sourceDigest);
+  assert.equal(sealedProjection.sourceUniverseDigest, universe.universeDigest);
+  assert.equal(sealedProjection.compilerVersion, sealedSnapshot.compilerVersion);
+  assert(sealedProjection.manifestDigest.startsWith('sha256:'));
+  assert.deepEqual(sealedProjection.degradationDiagnostics, []);
+
+  // caseId: skill_projection_metadata_stale_fail_closed_0038
+  // A projection whose recorded provenance no longer matches the snapshot it
+  // claims to come from is stale, and must be reported rather than trusted.
+  const staleFindings = collectProjectionMetadataFindings(
+    { ...sealedProjection, sourceDigest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000' },
+    sealedSnapshot
+  );
+  assert.equal(staleFindings.length, 1, 'a stale source digest must be reported exactly once');
+  assert.equal(staleFindings[0].field, 'sourceDigest');
+  assert.deepEqual(collectProjectionMetadataFindings(sealedProjection, sealedSnapshot), []);
+
+  // caseId: skill_projection_manifest_digest_mismatch_0038
+  // A declared manifest digest that does not describe the compiled files is a
+  // compile-time failure, not a value the projection may simply republish.
+  assert.throws(
+    () => compileSkillCorpus({
+      sourceSnapshot: sealedSnapshot,
+      adapterDescriptor: {
+        adapterId: 'claude-code',
+        diagnostics: [],
+        manifestDigest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+        project: ({ templates }) => compileSkillTemplatesForAdapter('claude-code', templates, { repositoryRoot: root })
+      }
+    }),
+    /manifest digest/i,
+    'a declared manifest digest that does not match the compiled files must fail closed'
+  );
+});
+
+// caseId: skill_installed_copy_drift_disposition_0038
+// Installed copies are derived artifacts. Parity compares them against the
+// compiled projection, and every mismatch resolves to exactly one of the four
+// finite dispositions.
+{
+  const compiledProjectionFiles = [
+    { relativePath: 'atm-fixture-first/SKILL.md', content: 'compiled first\n' },
+    { relativePath: 'atm-fixture-second/SKILL.md', content: 'compiled second\n' },
+    { relativePath: 'atm-fixture-third/SKILL.md', content: 'compiled third\n' },
+    { relativePath: 'atm-fixture-fourth/SKILL.md', content: 'compiled fourth\n' }
+  ];
+  const installedContentById: Record<string, string> = {
+    'atm-fixture-first': 'compiled first\n',
+    'atm-fixture-second': 'locally edited second\n',
+    'atm-fixture-third': 'locally edited third\n',
+    'atm-fixture-fourth': 'approved baseline fourth\n'
+  };
+  const parity = evaluateInstalledProjectionParity({
+    compiledProjectionFiles,
+    installedSkillRoot: '.agents/skills',
+    dispositions: [
+      {
+        templateId: 'atm-fixture-third',
+        disposition: 'explicit-waiver',
+        reason: 'fixture waiver',
+        owningTaskId: 'TASK-SKL-0038'
+      },
+      {
+        templateId: 'atm-fixture-fourth',
+        disposition: 'approved-baseline',
+        reason: 'fixture baseline',
+        owningTaskId: 'TASK-SKL-0038',
+        expectedInstalledDigest: createHash('sha256').update('approved baseline fourth\n').digest('hex')
+      }
+    ],
+    fileExists: () => true,
+    readFile: (filePath) => installedContentById[filePath.replace(/\\/g, '/').split('/').at(-2) as string] ?? ''
+  });
+
+  const byId = new Map(parity.findings.map((finding) => [finding.templateId, finding]));
+  assert.equal(byId.get('atm-fixture-first')?.disposition, 'sync', 'a matching installed copy is in sync');
+  assert.equal(byId.get('atm-fixture-second')?.disposition, 'fail-closed', 'undeclared installed drift must fail closed');
+  assert.equal(byId.get('atm-fixture-third')?.disposition, 'explicit-waiver', 'declared drift resolves to its waiver');
+  assert.equal(byId.get('atm-fixture-third')?.owningTaskId, 'TASK-SKL-0038');
+  assert.equal(byId.get('atm-fixture-fourth')?.disposition, 'approved-baseline', 'digest-pinned drift resolves to its baseline');
+  assert.deepEqual(
+    parity.failClosed.map((finding) => finding.templateId),
+    ['atm-fixture-second'],
+    'only undeclared drift may reach the fail-closed set'
+  );
+
+  // A baseline is finite because it pins bytes: once the installed copy moves
+  // off the pinned digest the baseline stops covering it and parity fails
+  // closed again, forcing a fresh decision instead of an endless advisory.
+  const movedBaseline = evaluateInstalledProjectionParity({
+    compiledProjectionFiles: [{ relativePath: 'atm-fixture-fourth/SKILL.md', content: 'compiled fourth\n' }],
+    installedSkillRoot: '.agents/skills',
+    dispositions: [
+      {
+        templateId: 'atm-fixture-fourth',
+        disposition: 'approved-baseline',
+        reason: 'fixture baseline',
+        owningTaskId: 'TASK-SKL-0038',
+        expectedInstalledDigest: createHash('sha256').update('approved baseline fourth\n').digest('hex')
+      }
+    ],
+    fileExists: () => true,
+    readFile: () => 'baseline moved on\n'
+  });
+  assert.deepEqual(
+    movedBaseline.failClosed.map((finding) => finding.templateId),
+    ['atm-fixture-fourth'],
+    'an installed copy that left its pinned baseline must fail closed'
+  );
+  for (const disposition of parity.findings.map((finding) => finding.disposition)) {
+    assert(
+      ['sync', 'approved-baseline', 'explicit-waiver', 'fail-closed'].includes(disposition),
+      `disposition must stay inside the finite set: ${disposition}`
+    );
+  }
+}
 
 const generatedPath = path.join(root, 'artifacts', 'generated', 'skill-corpus-audit.json');
 if (existsSync(generatedPath)) {

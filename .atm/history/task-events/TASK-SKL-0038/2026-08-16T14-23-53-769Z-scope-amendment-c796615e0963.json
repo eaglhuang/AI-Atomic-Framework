@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-16T14-23-53-769Z-scope-amendment-c796615e0963",
+  "taskId": "TASK-SKL-0038",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0038.json",
+  "taskSha256": "sha256:457b28e829916a0190c4a6275be7d0c98327e8422ff6c9d624b2ad74687098e7",
+  "createdAt": "2026-08-16T14:23:53.769Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0038 --actor claude-008 --add \"packages/integrations-core/src/compiler/skill-source-universe.ts,packages/integrations-core/src/compiler/skill-projection-parity.ts\" --reason \"Extract sealed source universe and installed-copy parity into their own modules so skill-templates.ts stays inside the 600-line physical budget and the audit/seal concern is separated from template parse/compile.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Extract sealed source universe and installed-copy parity into their own modules so skill-templates.ts stays inside the 600-line physical budget and the audit/seal concern is separated from template parse/compile."
+  }
+}
