@@ -1,0 +1,272 @@
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+export const WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID = 'atm.waveExitObserverReceipt.v1' as const;
+export const WAVE_EXIT_OBSERVER_POLICY_SCHEMA_ID = 'atm.waveExitObserverPolicy.v1' as const;
+export const WAVE_EXIT_OBSERVER_POLICY_PATH = 'schemas/evidence/wave-exit-observer-policy.json';
+export const WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_PATH = 'schemas/evidence/wave-exit-observer-receipt.schema.json';
+export const CANONICAL_WAVE_EXIT_RECEIPT_DIR = 'docs/reports/wave-exit-observer-receipts';
+
+const DIGEST_SHAPE = /^sha256:[a-f0-9]{64}$/;
+const COMMIT_SHAPE = /^[0-9a-f]{40}$/;
+const EXIT_ID_SHAPE = /^EXIT-[0-9]{2}$/;
+
+export type WaveExitObserverDiagnostic =
+  | 'missing-field'
+  | 'schema-mismatch'
+  | 'unapproved-command'
+  | 'compiler-command-forbidden'
+  | 'observer-basis-actor-conflict'
+  | 'declared-basis-actor-mismatch'
+  | 'observer-role-mismatch'
+  | 'target-head-unreachable'
+  | 'receipt-stale'
+  | 'input-digest-drift'
+  | 'basis-actor-unresolved'
+  | 'wave-mismatch'
+  | 'exit-unmapped'
+  | 'nonzero-exit'
+  | 'artifact-path-mismatch'
+  | 'independence-verdict-invalid';
+
+export interface WaveExitObserverInputDigest {
+  readonly path: string;
+  readonly digest: string;
+}
+
+export interface WaveExitObserverReceipt {
+  readonly schemaId: typeof WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID;
+  readonly schemaVersion: string;
+  readonly exitItemId: string;
+  readonly wave: string;
+  readonly observerActor: string;
+  readonly observerRole: string;
+  readonly declaredBasisActor: string;
+  readonly independenceVerdict: 'independent';
+  readonly command: string;
+  readonly exitCode: number;
+  readonly stdoutDigest: string;
+  readonly stderrDigest: string;
+  readonly observedAt: string;
+  readonly observedHead: string;
+  readonly policyDigest: string;
+  readonly inputDigests: readonly WaveExitObserverInputDigest[];
+  readonly artifactPath: string;
+}
+
+export interface WaveExitObserverRole {
+  readonly kind: 'basis' | 'observer' | 'not-observer';
+  readonly executor?: string;
+}
+
+export interface WaveExitObserverExitPolicy {
+  readonly wave: string;
+  readonly observerRole: string;
+  readonly command: string;
+  readonly commandPath: string;
+  readonly inputs: readonly string[];
+  readonly sideEffects: string;
+  readonly forbiddenFlags: readonly string[];
+}
+
+export interface WaveExitObserverPolicy {
+  readonly schemaId: typeof WAVE_EXIT_OBSERVER_POLICY_SCHEMA_ID;
+  readonly specVersion: string;
+  readonly canonicalReceiptDir: string;
+  readonly compilerCommandPath: string;
+  readonly basisProducerRole: string;
+  readonly roles: Readonly<Record<string, WaveExitObserverRole>>;
+  readonly exits: Readonly<Record<string, WaveExitObserverExitPolicy>>;
+}
+
+export interface DerivedBasisIdentity {
+  readonly actorIds: readonly string[];
+  readonly producerRole: string;
+}
+
+export interface ConsumeWaveExitObserverReceiptInput {
+  readonly receipt: unknown;
+  readonly policy: WaveExitObserverPolicy;
+  readonly compilationHead: string;
+  readonly derivedBasis: DerivedBasisIdentity;
+  readonly currentInputDigests: Readonly<Record<string, string>>;
+  readonly isAncestor: (ancestor: string, descendant: string) => boolean;
+  readonly policyDigestAtCompilationHead: string;
+}
+
+export interface WaveExitObserverVerdict {
+  readonly ok: boolean;
+  readonly status: 'proven' | 'unproven';
+  readonly diagnostics: readonly WaveExitObserverDiagnostic[];
+  readonly receipt: WaveExitObserverReceipt | null;
+  readonly canonicalArtifactPath: string | null;
+}
+
+const REQUIRED_RECEIPT_FIELDS = [
+  'schemaId',
+  'schemaVersion',
+  'exitItemId',
+  'wave',
+  'observerActor',
+  'observerRole',
+  'declaredBasisActor',
+  'independenceVerdict',
+  'command',
+  'exitCode',
+  'stdoutDigest',
+  'stderrDigest',
+  'observedAt',
+  'observedHead',
+  'policyDigest',
+  'inputDigests',
+  'artifactPath'
+] as const;
+
+export function digestText(value: string): string {
+  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+export function digestWaveExitObserverPolicy(policy: WaveExitObserverPolicy): string {
+  return digestText(JSON.stringify(policy));
+}
+
+export function loadWaveExitObserverPolicy(repoRoot = '.'): WaveExitObserverPolicy {
+  const raw = JSON.parse(readFileSync(join(repoRoot, WAVE_EXIT_OBSERVER_POLICY_PATH), 'utf8')) as WaveExitObserverPolicy;
+  if (raw.schemaId !== WAVE_EXIT_OBSERVER_POLICY_SCHEMA_ID) {
+    throw new Error('wave-exit observer policy schema mismatch');
+  }
+  return raw;
+}
+
+export function canonicalWaveExitReceiptPath(policy: WaveExitObserverPolicy, exitItemId: string): string {
+  return `${policy.canonicalReceiptDir.replace(/\\/g, '/')}/${exitItemId}.json`;
+}
+
+export function deriveBasisIdentityFromEvidence(input: {
+  readonly producerActors: readonly string[];
+  readonly producerRole: string;
+}): DerivedBasisIdentity {
+  const actorIds = [...new Set(input.producerActors.map((actor) => actor.trim()).filter(Boolean))].sort();
+  return { actorIds, producerRole: input.producerRole };
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function readReceipt(value: unknown): { receipt: Partial<WaveExitObserverReceipt> | null; missing: boolean } {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return { receipt: null, missing: true };
+  const record = value as Record<string, unknown>;
+  const missing = REQUIRED_RECEIPT_FIELDS.some((field) => record[field] === undefined || record[field] === null);
+  return { receipt: record as Partial<WaveExitObserverReceipt>, missing };
+}
+
+export function consumeWaveExitObserverReceipt(input: ConsumeWaveExitObserverReceiptInput): WaveExitObserverVerdict {
+  const diagnostics = new Set<WaveExitObserverDiagnostic>();
+  const { policy, compilationHead, derivedBasis, currentInputDigests, isAncestor, policyDigestAtCompilationHead } = input;
+  const parsed = readReceipt(input.receipt);
+  if (!parsed.receipt || parsed.missing) {
+    return {
+      ok: false,
+      status: 'unproven',
+      diagnostics: ['missing-field'],
+      receipt: null,
+      canonicalArtifactPath: null
+    };
+  }
+  const receipt = parsed.receipt;
+  if (receipt.schemaId !== WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID || !isNonEmptyString(receipt.schemaVersion)) {
+    diagnostics.add('schema-mismatch');
+  }
+  if (!isNonEmptyString(receipt.exitItemId) || !EXIT_ID_SHAPE.test(receipt.exitItemId)) diagnostics.add('missing-field');
+  const exitPolicy = isNonEmptyString(receipt.exitItemId) ? policy.exits[receipt.exitItemId] : undefined;
+  if (!exitPolicy) diagnostics.add('exit-unmapped');
+  const canonicalPath = exitPolicy && isNonEmptyString(receipt.exitItemId)
+    ? canonicalWaveExitReceiptPath(policy, receipt.exitItemId)
+    : null;
+  if (!isNonEmptyString(receipt.wave) || (exitPolicy && receipt.wave !== exitPolicy.wave)) diagnostics.add('wave-mismatch');
+  if (!isNonEmptyString(receipt.observerActor) || !isNonEmptyString(receipt.observerRole) || !isNonEmptyString(receipt.declaredBasisActor)) {
+    diagnostics.add('missing-field');
+  }
+  if (receipt.independenceVerdict !== 'independent') diagnostics.add('independence-verdict-invalid');
+  if (!isNonEmptyString(receipt.command)) diagnostics.add('missing-field');
+  if (typeof receipt.exitCode !== 'number' || !Number.isInteger(receipt.exitCode)) diagnostics.add('missing-field');
+  else if (receipt.exitCode !== 0) diagnostics.add('nonzero-exit');
+  if (!isNonEmptyString(receipt.stdoutDigest) || !DIGEST_SHAPE.test(receipt.stdoutDigest)) diagnostics.add('missing-field');
+  if (!isNonEmptyString(receipt.stderrDigest) || !DIGEST_SHAPE.test(receipt.stderrDigest)) diagnostics.add('missing-field');
+  if (!isNonEmptyString(receipt.observedAt) || Number.isNaN(Date.parse(receipt.observedAt))) diagnostics.add('missing-field');
+  if (!isNonEmptyString(receipt.observedHead) || !COMMIT_SHAPE.test(receipt.observedHead)) diagnostics.add('missing-field');
+  if (!COMMIT_SHAPE.test(compilationHead)) diagnostics.add('target-head-unreachable');
+  if (!isNonEmptyString(receipt.policyDigest) || !DIGEST_SHAPE.test(receipt.policyDigest)) diagnostics.add('missing-field');
+  if (!Array.isArray(receipt.inputDigests)) diagnostics.add('missing-field');
+  if (!isNonEmptyString(receipt.artifactPath)) diagnostics.add('missing-field');
+
+  if (isNonEmptyString(receipt.command) && isNonEmptyString(policy.compilerCommandPath) && receipt.command.includes(policy.compilerCommandPath)) {
+    diagnostics.add('compiler-command-forbidden');
+    diagnostics.add('unapproved-command');
+  }
+  if (exitPolicy && isNonEmptyString(receipt.command) && receipt.command !== exitPolicy.command) {
+    diagnostics.add('unapproved-command');
+  }
+  if (exitPolicy && isNonEmptyString(receipt.observerRole) && receipt.observerRole !== exitPolicy.observerRole) {
+    diagnostics.add('observer-role-mismatch');
+  }
+  const observerKind = isNonEmptyString(receipt.observerRole) ? policy.roles[receipt.observerRole]?.kind : undefined;
+  if (observerKind !== 'observer') diagnostics.add('observer-role-mismatch');
+
+  const uniqueBasisActors = [...new Set(derivedBasis.actorIds.filter(Boolean))];
+  if (uniqueBasisActors.length !== 1) diagnostics.add('basis-actor-unresolved');
+  const derivedBasisActor = uniqueBasisActors[0];
+  if (derivedBasis.producerRole !== policy.basisProducerRole) diagnostics.add('observer-role-mismatch');
+  if (derivedBasisActor && isNonEmptyString(receipt.declaredBasisActor) && receipt.declaredBasisActor !== derivedBasisActor) {
+    diagnostics.add('declared-basis-actor-mismatch');
+  }
+  if (derivedBasisActor && isNonEmptyString(receipt.observerActor) && receipt.observerActor === derivedBasisActor) {
+    diagnostics.add('observer-basis-actor-conflict');
+  }
+
+  if (isNonEmptyString(receipt.observedHead) && COMMIT_SHAPE.test(receipt.observedHead) && COMMIT_SHAPE.test(compilationHead)) {
+    // Ancestry is required; equality is a valid ancestor and must not be demanded or rejected.
+    if (!isAncestor(receipt.observedHead, compilationHead)) diagnostics.add('target-head-unreachable');
+  }
+  if (isNonEmptyString(receipt.policyDigest) && receipt.policyDigest !== policyDigestAtCompilationHead) {
+    diagnostics.add('receipt-stale');
+  }
+  if (canonicalPath && isNonEmptyString(receipt.artifactPath) && receipt.artifactPath.replace(/\\/g, '/') !== canonicalPath) {
+    diagnostics.add('artifact-path-mismatch');
+  }
+
+  if (exitPolicy && Array.isArray(receipt.inputDigests)) {
+    const observed = new Map(
+      receipt.inputDigests
+        .filter((entry) => entry && typeof entry === 'object')
+        .map((entry) => [String(entry.path ?? '').replace(/\\/g, '/'), String(entry.digest ?? '')])
+    );
+    for (const path of exitPolicy.inputs) {
+      const expected = currentInputDigests[path];
+      const got = observed.get(path);
+      if (!expected || !got || got !== expected || !DIGEST_SHAPE.test(got)) diagnostics.add('input-digest-drift');
+    }
+    for (const path of observed.keys()) {
+      if (!exitPolicy.inputs.includes(path)) diagnostics.add('input-digest-drift');
+    }
+  }
+
+  const uniqueDiagnostics = [...diagnostics];
+  const ok = uniqueDiagnostics.length === 0 && parsed.receipt.schemaId === WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID;
+  return {
+    ok,
+    status: ok ? 'proven' : 'unproven',
+    diagnostics: uniqueDiagnostics,
+    receipt: ok ? parsed.receipt as WaveExitObserverReceipt : null,
+    canonicalArtifactPath: canonicalPath
+  };
+}
+
+export function readCanonicalWaveExitReceipt(repoRoot: string, policy: WaveExitObserverPolicy, exitItemId: string): unknown | null {
+  const relativePath = canonicalWaveExitReceiptPath(policy, exitItemId);
+  const absolutePath = join(repoRoot, relativePath);
+  if (!existsSync(absolutePath)) return null;
+  return JSON.parse(readFileSync(absolutePath, 'utf8'));
+}

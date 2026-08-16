@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-16T11-46-38-939Z-scope-amendment-1181fcc5e765",
+  "taskId": "ATM-GOV-0341",
+  "action": "scope-amendment",
+  "actorId": "cursor-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0341.json",
+  "taskSha256": "sha256:89df1835630b7b83d6c7b5a7eac128d8aea4deab7b3307ff80a679f9ab8c4115",
+  "createdAt": "2026-08-16T11:46:38.939Z",
+  "command": "node atm.mjs tasks scope remove --task ATM-GOV-0341 --actor cursor-captain --remove .atm/history/evidence/ATM-GOV-0341.*,docs/reports/plan-3x-4x-runbook-completion-evidence.json --json",
+  "amendmentMetadata": {
+    "amendmentClass": "scope-shrink",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Exclude dirty generated 0341 evidence glob and completion report from this consumer commit."
+  }
+}
