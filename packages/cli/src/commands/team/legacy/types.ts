@@ -48,6 +48,20 @@ export type TeamRecipe = {
 
 export type TeamLevel = 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
 
+export type TeamProposalRecoveryContract = {
+  schemaId: 'atm.patchProposal.v1';
+  hotFiles: string[];
+  runtimeWritten: false;
+  teamRunMinted: false;
+  writeLeaseGranted: false;
+  brokerSubject?: unknown;
+  requiredCommands: {
+    planPreview: string;
+    teamStart: string;
+    brokerActivate?: string;
+  };
+};
+
 export type PermissionFinding = {
   level: 'error' | 'warning';
   code: string;
@@ -58,6 +72,7 @@ export type PermissionFinding = {
   agentIds?: string[];
   paths?: string[];
   suggestedFix: string;
+  recovery?: TeamProposalRecoveryContract;
 };
 
 export type PermissionLease = {
