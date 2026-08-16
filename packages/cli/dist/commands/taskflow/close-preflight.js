@@ -7,6 +7,7 @@ import { evaluatePhaseSuitePromotion } from '../../../../core/dist/evidence/phas
 import { inspectStandardsSpecReviewReceipt } from '../../../../plugin-review-advisory/dist/index.js';
 import { ATM_INDEX_FOREIGN_ACTIVE_STAGED } from '../git-index-ownership.js';
 import { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers } from './historical-close-preflight.js';
+import { applyCloseOwnedNonRunnerDeliveryDirtyAdmission, extractCloseOwnedDeliveryFiles } from './close-owned-delivery-dirty-admission.js';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { resolveTaskflowDeclaredFiles } from './task-scope.js';
 import { quoteCliValue } from '../shared.js';
@@ -124,7 +125,10 @@ export function buildTaskflowClosePreflight(input) {
     // The historical preflight delegates target-repo staged ownership to the
     // canonical index provider. This layer only consumes that result, so a
     // canonical empty result cannot revive a filename-derived false blocker.
-    const summary = historicalSummary;
+    const summary = applyCloseOwnedNonRunnerDeliveryDirtyAdmission({
+        preflight: historicalSummary,
+        closeOwnedDeliveryFiles: extractCloseOwnedDeliveryFiles(input.previewCommitBundle)
+    });
     const standardsSpecBlocker = buildStandardsSpecReviewReceiptBlocker({
         cwd: input.cwd,
         taskId: input.taskId,

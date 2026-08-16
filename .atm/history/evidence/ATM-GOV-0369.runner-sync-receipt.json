@@ -3,16 +3,16 @@
   "specVersion": "0.1.0",
   "taskId": "ATM-GOV-0369",
   "publicationDisposition": "published",
-  "actorId": "codex-captain-recovery",
+  "actorId": "cursor-captain",
   "actorIdentity": {
-    "actorId": "codex-captain-recovery",
+    "actorId": "cursor-captain",
     "source": "ATM_ACTOR_ID"
   },
-  "stewardWorkId": "runner-sync-a9f81bc1",
-  "sealedSourceSha": "1b97a2c71972b79dda79820f579189dc4d17084e",
+  "stewardWorkId": "runner-sync-aabfb2df",
+  "sealedSourceSha": "1bea12f108df1826f3bb311f783daba3d2ea47e2",
   "outputInventory": {
     "schemaId": "atm.runnerBuildOutputInventory.v1",
-    "sealedSourceSha": "1b97a2c71972b79dda79820f579189dc4d17084e",
+    "sealedSourceSha": "1bea12f108df1826f3bb311f783daba3d2ea47e2",
     "entries": [
       {
         "path": ".atm/history/evidence/ATM-GOV-0369.runner-sync-receipt.json",
@@ -21,55 +21,517 @@
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/atm.js",
+        "path": "packages/cli/dist/commands/__tests__/actor-adopt.spec.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.js",
+        "path": "packages/cli/dist/commands/__tests__/git-hook-bypass-broker-conflict.spec.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/framework-development/runner-publication-close-handoff.js",
+        "path": "packages/cli/dist/commands/__tests__/task-direction-queue.test.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+        "path": "packages/cli/dist/commands/actor-registry.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/hook/pre-commit/support.js",
+        "path": "packages/cli/dist/commands/actor-session.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+        "path": "packages/cli/dist/commands/actor.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/tasks/claim-orchestrator.js",
+        "path": "packages/cli/dist/commands/batch/plan-executor.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/tasks/claim-work-admission.js",
+        "path": "packages/cli/dist/commands/broker/steward-queues.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/tasks/task-ledger-readers.js",
+        "path": "packages/cli/dist/commands/create-map.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/create.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/framework-temp-lock-projection.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/framework-temp-lock-projection.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/framework-temp-publication-capability.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/__tests__/framework-temp-publication-capability.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/__tests__/work-admission-check.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/broker-hook-bypass-preflight.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/broker-hook-bypass-preflight.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/dry-run-purity.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/framework-commit-claim-guard.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/index-restoration.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/index-restoration.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/work-admission-check.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/pre-commit/cross-task-admission.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/pre-commit/cross-task-admission.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/pre-commit/implementation.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/identity.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/integration-hooks/implementation.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/integration/bootstrap.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/__tests__/events.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/__tests__/store.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/adopt-rebind.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/capability-authority.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/events.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/mutation-authority-adapter.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/mutation-status-command.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/proxy-receipt.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/resolve.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/store.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next-active-batch.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/next-action-assembly.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/task-scoped-claim-command.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/claim-helpers.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/claim-lane-session.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/match-and-sort.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/next-action-assembly.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/playbook-projection/legacy-guidance.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/police.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/quickfix.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/registry-shared.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/registry.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/replacement-lane.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/status.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/task-direction.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/task-direction/active-locks.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/task-direction/scope-policy.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/task-direction/support.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/close-owned-delivery-dirty-admission.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/close-owned-delivery-dirty-admission.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/close-preflight.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/implementation.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/runner-recovery-forwarding.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/task-scope.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/claim-takeover-admission.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/claim-ownership.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/takeover-evidence.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/task-git-helpers.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/task-ledger-readers.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/composer.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/legacy/crew-decision-policy.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/legacy/plan-orchestration.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/legacy/planning-context.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/legacy/team-run-runtime.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/upgrade-map-propose.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/upgrade/proposal/guided-legacy.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/verify.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/work-channels.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/write-ticket.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/index.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
@@ -93,145 +555,1045 @@
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/docs/reports/plan-3x-4x-closeout-blocker-map.json",
+        "path": "release/atm-root-drop/packages/adapter-local-git/dist/index.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/docs/reports/plan-3x-4x-false-green-evidence-freeze.json",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/actor-adopt.spec.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/docs/reports/plan-3x-4x-false-green-evidence-freeze.md",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/git-hook-bypass-broker-conflict.spec.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/docs/reports/plan-3x-4x-independent-certificate.json",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/task-direction-queue.test.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/atm.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/actor-registry.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/actor-session.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-close-handoff.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/actor.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/batch/plan-executor.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/support.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/broker/steward-queues.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/create-map.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-orchestrator.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/create.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-work-admission.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/task-ledger-readers.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-temp-lock-projection.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/atm.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-temp-lock-projection.js",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/framework-temp-publication-capability.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/__tests__/framework-temp-publication-capability.test.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/__tests__/work-admission-check.test.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/broker-hook-bypass-preflight.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/broker-hook-bypass-preflight.test.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-execution.js",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/commands/tasks/claim-work-admission.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/dry-run-purity.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/commands/tasks/task-ledger-readers.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/framework-commit-claim-guard.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/core/dist/index.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/index-restoration.d.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/core/src/index.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/index-restoration.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/work-admission-check.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/cross-task-admission.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/cross-task-admission.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/identity.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/integration-hooks/implementation.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/integration/bootstrap.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/__tests__/events.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/__tests__/store.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/adopt-rebind.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/capability-authority.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/events.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/mutation-authority-adapter.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/mutation-status-command.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/proxy-receipt.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/resolve.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/store.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next-active-batch.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/next-action-assembly.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/task-scoped-claim-command.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/claim-helpers.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/claim-lane-session.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/match-and-sort.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/next-action-assembly.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection/legacy-guidance.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/police.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/quickfix.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/registry-shared.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/registry.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/replacement-lane.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/status.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/task-direction.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/task-direction/active-locks.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/task-direction/scope-policy.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/task-direction/support.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-owned-delivery-dirty-admission.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-owned-delivery-dirty-admission.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-preflight.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/runner-recovery-forwarding.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/task-scope.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/claim-takeover-admission.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-ownership.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/takeover-evidence.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/task-git-helpers.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/task-ledger-readers.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/composer.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/legacy/crew-decision-policy.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/legacy/plan-orchestration.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/legacy/planning-context.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/legacy/team-run-runtime.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/upgrade-map-propose.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/upgrade/proposal/guided-legacy.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/verify.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/work-channels.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/write-ticket.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/close-preflight.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/candidate-bridge.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/cross-task-mutation-candidate-index.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/cross-task-mutation-guard.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/cross-task-mutation-terminal-entitlement.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/cross-task-mutation-terminal-entitlement.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/patch-envelope.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/steward-arbitration.test.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/cross-task-mutation-guard.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/cross-task-mutation-guard.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/terminal-history-entitlement.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/terminal-history-entitlement.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/governance/scope-lock.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/manager/atom-generator.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/manager/map-generator.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/manager/map-generator/runtime-support.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/manager/map-generator/spec-support.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/manager/map-generator/types.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/decomposition-plan.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/map-hash.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/map-registry.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/registry-migration.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/registry.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/registry/entry.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/registry/validation.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/replacement-lane.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/replacement-lane/evidence.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/replacement-lane/target.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/replacement-lane/transition.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/replacement-lane/validation.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/rollback-map.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/rollback-proof.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/rollback-registry-helpers.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/rollback-types.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/rollback.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/status-machine.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/status-migration.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/upgrade/propose.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/upgrade/propose/gates.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/src/broker/cross-task-mutation-guard.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/src/broker/terminal-history-entitlement.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/language-csharp/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/language-js/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-behavior-pack/dist/evolve.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-behavior-pack/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-experience-loop/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-governance-local/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-governance-local/dist/stores.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-governance-local/dist/versioning.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-governance-local/src/stores.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-human-review/dist/decision-log.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-human-review/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-review-advisory/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-rule-guard/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/atomization-planning.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/behavior-registry.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/behavior.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/capability.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/conversation/conversation-evidence-extractor.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/conversation/conversation-feedback-loop.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/conversation/conversation-patch-draft-bridge.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/conversation/conversation-review-finding.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/conversation/conversation-transcript-reviewer.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/conversation/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/detector/evidence-pattern-detector.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/detector/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/effect-node.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/injector-plugin.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/language-adapter.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/lifecycle.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/police.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-GOV-0369",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/src/governance/stores.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
@@ -243,49 +1605,19 @@
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/scripts/diagnose-plan3-evidence-closure.ts",
+        "path": "release/atm-root-drop/scripts/validate-governance-commands/implementation.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/scripts/run-sealed-runner-build.ts",
-        "disposition": "owned-current",
-        "ownerTaskId": "ATM-GOV-0369",
-        "ownerActorId": null
-      },
-      {
-        "path": "release/atm-root-drop/scripts/runner-sync-incremental-build.ts",
-        "disposition": "owned-current",
-        "ownerTaskId": "ATM-GOV-0369",
-        "ownerActorId": null
-      },
-      {
-        "path": "release/atm-root-drop/scripts/validate-hook-batch-evidence-context.ts",
-        "disposition": "owned-current",
-        "ownerTaskId": "ATM-GOV-0369",
-        "ownerActorId": null
-      },
-      {
-        "path": "release/atm-root-drop/tests/cli/planning-index-released-residue-parity.test.ts",
-        "disposition": "owned-current",
-        "ownerTaskId": "ATM-GOV-0369",
-        "ownerActorId": null
-      },
-      {
-        "path": "release/atm-root-drop/tests/cli/runner-sync-clean-close-pathway.test.ts",
-        "disposition": "owned-current",
-        "ownerTaskId": "ATM-GOV-0369",
-        "ownerActorId": null
-      },
-      {
-        "path": "release/atm-root-drop/tests/cli/runner-sync-incremental-build.test.ts",
+        "path": "release/atm-root-drop/tests/cli/git-commit-failure-index-restoration.test.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-GOV-0369",
         "ownerActorId": null
       }
     ],
-    "digest": "sha256:b890488c4227f3190c7c3115c7a5c34bf000ee410cd5bdaca81cbbbfcb9b37b7"
+    "digest": "sha256:3fff1fe58ae4900a5a0203b717cd8d53f97f67f25f990271aff2255b0d1f4352"
   },
   "memberTaskIds": [
     "ATM-GOV-0369"
@@ -293,40 +1625,40 @@
   "linkedTaskIds": [],
   "groupManifest": {
     "schemaId": "atm.runnerSyncCoalescedGroupManifest.v1",
-    "stewardWorkId": "runner-sync-a9f81bc1",
-    "sealedSourceSha": "1b97a2c71972b79dda79820f579189dc4d17084e",
+    "stewardWorkId": "runner-sync-aabfb2df",
+    "sealedSourceSha": "1bea12f108df1826f3bb311f783daba3d2ea47e2",
     "members": [
       {
         "taskId": "ATM-GOV-0369",
-        "actorId": "codex-captain-recovery",
+        "actorId": "cursor-captain",
         "laneFingerprint": null,
         "requestedSurfaces": [
-          "packages/cli/dist/atm.js",
-          "release/atm-onefile/atm.mjs"
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop"
         ],
-        "requestDigest": "sha256:b069219b1be440557bccd2a2b6a93cfd8431e15660fe46fec458a339f908f8d3"
+        "requestDigest": "sha256:c46d3fc51df987c87e5ada22a154fe0bc5feade13448f2ed2df40c8fbe650bd2"
       }
     ],
     "memberTaskIds": [
       "ATM-GOV-0369"
     ],
-    "sharedSealedInputDigest": "sha256:091995a148af2ad96c9cb7e3b3ff8c5b6cedd3f3e371ac08d2adfb58113dbf32",
-    "sharedOutputDigest": "sha256:74f4af1a1f26f15a29199f66b3c9d4319588fb34ef0779862b4287dafdf10c7f",
-    "manifestDigest": "sha256:290b7bd2466ae3cc65ee62de11c8544b3d46d239b68bead73116a713dae147b7",
-    "createdAt": "2026-08-14T05:40:18.249Z"
+    "sharedSealedInputDigest": "sha256:71a6f2a8ac4af7cf7873737884736f6bc5f2aebeca8d1e6212cb715fc4478c1d",
+    "sharedOutputDigest": "sha256:cb3a901b4a8ab1fc3a8885a07aacacfb9dfaaa965621134883337ea2f5bbe06d",
+    "manifestDigest": "sha256:63640a20c79c2db70b243a0afffc10517707a9ae5b3e60143d62411a78e66931",
+    "createdAt": "2026-08-16T01:04:11.326Z"
   },
   "childReceipts": [
     {
       "schemaId": "atm.runnerSyncChildReceipt.v1",
       "taskId": "ATM-GOV-0369",
-      "parentStewardWorkId": "runner-sync-a9f81bc1",
-      "groupManifestDigest": "sha256:290b7bd2466ae3cc65ee62de11c8544b3d46d239b68bead73116a713dae147b7",
-      "memberRequestDigest": "sha256:b069219b1be440557bccd2a2b6a93cfd8431e15660fe46fec458a339f908f8d3",
-      "sealedSourceSha": "1b97a2c71972b79dda79820f579189dc4d17084e",
-      "sharedSealedInputDigest": "sha256:091995a148af2ad96c9cb7e3b3ff8c5b6cedd3f3e371ac08d2adfb58113dbf32",
-      "sharedOutputDigest": "sha256:74f4af1a1f26f15a29199f66b3c9d4319588fb34ef0779862b4287dafdf10c7f",
-      "receiptDigest": "sha256:13e2d66a609ad23944281c7553e27861bcba51248d067604131b47c273206dc5",
-      "issuedAt": "2026-08-14T05:40:18.249Z"
+      "parentStewardWorkId": "runner-sync-aabfb2df",
+      "groupManifestDigest": "sha256:63640a20c79c2db70b243a0afffc10517707a9ae5b3e60143d62411a78e66931",
+      "memberRequestDigest": "sha256:c46d3fc51df987c87e5ada22a154fe0bc5feade13448f2ed2df40c8fbe650bd2",
+      "sealedSourceSha": "1bea12f108df1826f3bb311f783daba3d2ea47e2",
+      "sharedSealedInputDigest": "sha256:71a6f2a8ac4af7cf7873737884736f6bc5f2aebeca8d1e6212cb715fc4478c1d",
+      "sharedOutputDigest": "sha256:cb3a901b4a8ab1fc3a8885a07aacacfb9dfaaa965621134883337ea2f5bbe06d",
+      "receiptDigest": "sha256:a054b98342f0ccd738a1005cc2eb77e45e65057a0a8634da4683a4fc35373ef8",
+      "issuedAt": "2026-08-16T01:04:11.326Z"
     }
   ],
   "childAttribution": {
@@ -335,9 +1667,9 @@
     "members": [
       {
         "taskId": "ATM-GOV-0369",
-        "actorId": "codex-captain-recovery",
+        "actorId": "cursor-captain",
         "laneFingerprint": null,
-        "childReceiptDigest": "sha256:13e2d66a609ad23944281c7553e27861bcba51248d067604131b47c273206dc5"
+        "childReceiptDigest": "sha256:a054b98342f0ccd738a1005cc2eb77e45e65057a0a8634da4683a4fc35373ef8"
       }
     ],
     "missingTaskIds": []
@@ -359,11 +1691,11 @@
     "finalizable": true,
     "recoveryCommand": null
   },
-  "runnerInputTreeHash": "sha256:091995a148af2ad96c9cb7e3b3ff8c5b6cedd3f3e371ac08d2adfb58113dbf32",
+  "runnerInputTreeHash": "sha256:71a6f2a8ac4af7cf7873737884736f6bc5f2aebeca8d1e6212cb715fc4478c1d",
   "runnerInputGraph": {
     "schemaId": "atm.runnerInputGraph.v1",
-    "sealedSourceSha": "1b97a2c71972b79dda79820f579189dc4d17084e",
-    "aggregateInputTreeHash": "sha256:091995a148af2ad96c9cb7e3b3ff8c5b6cedd3f3e371ac08d2adfb58113dbf32",
+    "sealedSourceSha": "1bea12f108df1826f3bb311f783daba3d2ea47e2",
+    "aggregateInputTreeHash": "sha256:71a6f2a8ac4af7cf7873737884736f6bc5f2aebeca8d1e6212cb715fc4478c1d",
     "nodes": [
       {
         "segment": "packages",
@@ -378,33 +1710,65 @@
           "tsconfig.build.json",
           "tsconfig.json"
         ],
-        "inputDigest": "sha256:091995a148af2ad96c9cb7e3b3ff8c5b6cedd3f3e371ac08d2adfb58113dbf32",
+        "inputDigest": "sha256:71a6f2a8ac4af7cf7873737884736f6bc5f2aebeca8d1e6212cb715fc4478c1d",
         "outputEntries": [
-          "packages/cli/dist/atm.js",
-          "release/atm-onefile/atm.mjs"
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop"
         ],
-        "outputDigest": "sha256:04f75c6b8b33d651f5c8fa6e5f7f47a76d1b6b37daa62c94a479e5f8a29387b1"
+        "outputDigest": "sha256:22ee9f4cfab99290b92da212e3b4582c0b71aab489fd72f5b7ba55dff1a52368"
       }
     ]
   },
   "requestedSurfaces": [
-    "packages/cli/dist/atm.js",
-    "release/atm-onefile/atm.mjs"
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
   ],
   "buildTarget": "full",
-  "buildInputsTreeHash": "sha256:091995a148af2ad96c9cb7e3b3ff8c5b6cedd3f3e371ac08d2adfb58113dbf32",
+  "buildInputsTreeHash": "sha256:71a6f2a8ac4af7cf7873737884736f6bc5f2aebeca8d1e6212cb715fc4478c1d",
   "buildDecision": "fullRebuild",
-  "decisionReason": "missing-previous-sealed-source",
+  "decisionReason": "build-script-change",
   "incrementalPlan": {
     "schemaId": "atm.runnerIncrementalBuildPlan.v1",
     "specVersion": "0.1.0",
-    "previousSealedSourceSha": null,
-    "currentSealedSourceSha": "1b97a2c71972b79dda79820f579189dc4d17084e",
-    "changedPaths": [],
-    "affectedPackages": [],
+    "previousSealedSourceSha": "3d01b963dbc1523ad75db90845660352790a78b3",
+    "currentSealedSourceSha": "1bea12f108df1826f3bb311f783daba3d2ea47e2",
+    "changedPaths": [
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
+      "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+      "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+      "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+      "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/terminal-history-entitlement.ts",
+      "scripts/validate-governance-commands/implementation.ts"
+    ],
+    "affectedPackages": [
+      "packages/cli",
+      "packages/core"
+    ],
     "affectedGroups": {
-      "packages": [],
-      "scripts": [],
+      "packages": [
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
+        "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+        "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+        "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "packages/core/src/broker/terminal-history-entitlement.ts"
+      ],
+      "scripts": [
+        "scripts/validate-governance-commands/implementation.ts"
+      ],
       "templates": [],
       "schemas": [],
       "atomicWorkbench": [],
@@ -413,18 +1777,18 @@
     },
     "incrementalEligible": false,
     "unsafeReasons": [
-      "missing-previous-sealed-source"
+      "build-script-change"
     ]
   },
-  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-08-14T05-40-16-039Z-runner-sync.jsonl",
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-08-16T01-04-06-746Z-runner-sync.jsonl",
   "tsBuildCache": {
     "schemaId": "atm.runnerTsBuildCacheSummary.v1",
     "cacheRoot": ".atm/runtime/runner-sync-build-cache/typescript",
     "tsBuildInfoPath": ".atm/runtime/runner-sync-build-cache/typescript/tsconfig.build.tsbuildinfo",
     "existedBefore": true,
     "existsAfter": true,
-    "digestBefore": "sha256:2a4b47d2c67e46ab259bb6d5316f75259050f0c1bb49795e19d246891790c952",
-    "digestAfter": "sha256:2a4b47d2c67e46ab259bb6d5316f75259050f0c1bb49795e19d246891790c952",
+    "digestBefore": "sha256:bf2118ab4f163f804f3e61855f41194475ba1cd98f8b8032e9a2dd7df667417e",
+    "digestAfter": "sha256:c05126bbcdda95a81907c9c17e33b7913b4403c8922e3606d3f8b2b590593de3",
     "restoredBeforeBuild": true,
     "persistedAfterBuild": true,
     "gitPolicy": {
@@ -433,7 +1797,7 @@
     }
   },
   "brokerTicket": {
-    "ticketId": "runner-sync-a9f81bc1:1b97a2c71972b79dda79820f579189dc4d17084e",
+    "ticketId": "runner-sync-aabfb2df:1bea12f108df1826f3bb311f783daba3d2ea47e2",
     "waitedMs": 0,
     "position": 1,
     "headOwner": "ATM-GOV-0369"
@@ -441,11 +1805,11 @@
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "rootDropReleaseAssembly",
-    "dominantPhaseMs": 17954,
-    "totalElapsedMs": 46772,
-    "dominanceRatio": 0.3839,
-    "phaseMedianMs": 1979,
-    "phaseP95Ms": 17954,
+    "dominantPhaseMs": 30479,
+    "totalElapsedMs": 96859,
+    "dominanceRatio": 0.3147,
+    "phaseMedianMs": 1584,
+    "phaseP95Ms": 30479,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
@@ -453,41 +1817,41 @@
   "buildObservation": {
     "schemaId": "atm.runnerSyncBuildObservation.v1",
     "buildDecision": "fullRebuild",
-    "decisionReason": "missing-previous-sealed-source",
+    "decisionReason": "build-script-change",
     "brokerTicket": {
-      "ticketId": "runner-sync-a9f81bc1:1b97a2c71972b79dda79820f579189dc4d17084e",
+      "ticketId": "runner-sync-aabfb2df:1bea12f108df1826f3bb311f783daba3d2ea47e2",
       "waitedMs": 0,
       "position": 1,
       "headOwner": "ATM-GOV-0369"
     },
-    "changedPathCount": 0,
-    "affectedPackageCount": 0,
+    "changedPathCount": 13,
+    "affectedPackageCount": 2,
     "unsafeReasons": [
-      "missing-previous-sealed-source"
+      "build-script-change"
     ],
     "dominantPhaseSummary": {
       "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
       "dominantPhase": "rootDropReleaseAssembly",
-      "dominantPhaseMs": 17954,
-      "totalElapsedMs": 46772,
-      "dominanceRatio": 0.3839,
-      "phaseMedianMs": 1979,
-      "phaseP95Ms": 17954,
+      "dominantPhaseMs": 30479,
+      "totalElapsedMs": 96859,
+      "dominanceRatio": 0.3147,
+      "phaseMedianMs": 1584,
+      "phaseP95Ms": 30479,
       "measuredPhaseCount": 8,
       "optimizationVerdict": "inconclusive",
       "basis": "single-run"
     }
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 35,
-    "skipDecision": 6,
-    "worktreeSetup": 8689,
-    "typescriptBuild": 8454,
-    "rootDropReleaseAssembly": 17954,
-    "onefileReleaseAssembly": 1979,
-    "artifactSync": 4573,
+    "inputHashCalculation": 42,
+    "skipDecision": 57,
+    "worktreeSetup": 22957,
+    "typescriptBuild": 20930,
+    "rootDropReleaseAssembly": 30479,
+    "onefileReleaseAssembly": 1584,
+    "artifactSync": 10380,
     "cleanup": 0,
-    "totalElapsed": 46772
+    "totalElapsed": 96859
   },
   "atomicWrite": {
     "schemaId": "atm.runnerSyncAtomicWrite.v1",
@@ -495,7 +1859,7 @@
     "platform": "win32",
     "maxAttempts": 4
   },
-  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"ATM-GOV-0369\" --steward-work-id \"runner-sync-a9f81bc1\" --receipt-ref \".atm/history/evidence/ATM-GOV-0369.runner-sync-receipt.json\" --json",
+  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"ATM-GOV-0369\" --steward-work-id \"runner-sync-aabfb2df\" --receipt-ref \".atm/history/evidence/ATM-GOV-0369.runner-sync-receipt.json\" --json",
   "treatmentTelemetry": {
     "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
     "executionMode": "command-executed",
@@ -504,18 +1868,18 @@
     "receiptValidity": "valid",
     "buildDecision": "fullRebuild",
     "phaseTimingsMs": {
-      "inputHashCalculation": 35,
-      "skipDecision": 6,
-      "worktreeSetup": 8689,
-      "typescriptBuild": 8454,
-      "rootDropReleaseAssembly": 17954,
-      "onefileReleaseAssembly": 1979,
-      "artifactSync": 4573,
+      "inputHashCalculation": 42,
+      "skipDecision": 57,
+      "worktreeSetup": 22957,
+      "typescriptBuild": 20930,
+      "rootDropReleaseAssembly": 30479,
+      "onefileReleaseAssembly": 1584,
+      "artifactSync": 10380,
       "cleanup": 0,
-      "totalElapsed": 46772
+      "totalElapsed": 96859
     },
     "rawTelemetryPolicy": "gitignored-runtime-only",
-    "tsBuildCacheDigest": "sha256:c1b55d5abe6863b63276f8d13d30c2312fbe670bf577087fd37269cbb5adff18"
+    "tsBuildCacheDigest": "sha256:1893b90c2f41273510519e874ed725ad9493b75dfa88c4edc7a0ad01e23f403d"
   },
-  "publishedAt": "2026-08-14T05:40:18.250Z"
+  "publishedAt": "2026-08-16T01:04:11.326Z"
 }

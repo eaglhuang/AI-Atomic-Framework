@@ -32,6 +32,7 @@ export function readFrameworkTempLockProjection(cwd, now = Date.now()) {
                         : 'stale-recovery-input',
                     linkedTaskId: text(parsed.linkedTaskId ?? parsed.taskId),
                     laneSessionId: text(parsed.laneSessionId),
+                    laneProvenance: text(parsed.laneSessionId) ? 'recorded' : 'unrecorded-legacy',
                     files: uniqueStrings(Array.isArray(parsed.files) ? parsed.files : [])
                 }];
         }

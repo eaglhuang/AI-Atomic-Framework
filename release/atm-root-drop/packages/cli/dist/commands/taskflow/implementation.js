@@ -423,7 +423,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     const observedTaskEvidence = inspectObservedTaskEvidence(cwd, taskId);
     const rawHistoricalClosePreflight = buildTaskflowClosePreflight({ cwd, taskId, actorId: actorId || '<actor>', taskDocument, previewCommitBundle, historicalDeliveryRefs, deferForeignStaged, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason });
     let writeReadinessHint = buildTaskflowCloseWriteReadinessHint({ cwd, taskId, actorId, taskDocument, declaredFiles, closebackPlan, previewCommitBundle,
-        historicalDeliveryRefs, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason, planningAuthorityDeliveryGate });
+        historicalDeliveryRefs, deferForeignStaged, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason, planningAuthorityDeliveryGate });
     const runnerGateEvidence = buildTaskflowRunnerGateDecision(uniqueSorted([...declaredFiles, ...previewCommitBundle.targetDeliveryFiles, ...previewCommitBundle.targetGovernanceFiles]));
     const runnerReceiptPublicationClosure = inspectRunnerReceiptPublicationClosure({ cwd, taskId });
     const historicalClosePreflight = applyRunnerReceiptPublicationClosureDirtyException({ taskId, preflight: rawHistoricalClosePreflight, closure: runnerReceiptPublicationClosure });

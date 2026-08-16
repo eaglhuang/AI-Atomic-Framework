@@ -41,6 +41,7 @@ import {
 } from "../../shared.ts";
 import { withBranchCommitQueueLock } from './branch-commit-window.ts';
 import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, rollbackNewlyStagedLiveIndexResidue } from './git-index-transaction.ts';
+import { captureIndexRestorationSnapshot, restoreIndexToSnapshot } from './index-restoration.ts';
 import { isHeadRaceCommitFailure, readHeadBranchRef, readHeadCommitSha } from './push-command.ts';
 import { prepareCommitCandidate, assertGovernedCommitPhysicalLineBudget } from './commit-candidate-preparation.ts';
 import { executeCommitAttempt } from './commit-attempt-boundary.ts';
@@ -51,6 +52,10 @@ export { assertGovernedCommitPhysicalLineBudget };
 
 export function executeGitCommit(options: LegacyValue, context: LegacyValue) {
 let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers } = context;
+// ATM-GOV-0369 amendment 1: the boundary that can fail owns its own
+// pre-operation snapshot, so restoration never depends on a caller
+// remembering to take one.
+const indexRestorationSnapshotBeforeCommitAttempt = captureIndexRestorationSnapshot(options.cwd);
 try {
     withBranchCommitQueueLock(
       {
@@ -137,10 +142,21 @@ try {
       options.cwd,
       deferredForeignStagedSnapshotPath,
     );
-    const liveIndexResidueRollback = rollbackNewlyStagedLiveIndexResidue(
-      options.cwd,
-      liveIndexSnapshotBeforeCommitAttempt,
-    );
+    // ATM-GOV-0369 amendment 1: name-based rollback cannot see a staged
+    // deletion, so restore against the full pre-attempt index snapshot first
+    // and keep the legacy pass only for what it still covers.
+    const indexRestoration = indexRestorationSnapshotBeforeCommitAttempt
+      ? restoreIndexToSnapshot(options.cwd, indexRestorationSnapshotBeforeCommitAttempt)
+      : null;
+    const liveIndexResidueRollback = Array.from(
+      new Set([
+        ...(indexRestoration?.restoredPaths ?? []),
+        ...rollbackNewlyStagedLiveIndexResidue(
+          options.cwd,
+          liveIndexSnapshotBeforeCommitAttempt,
+        ),
+      ]),
+    ).sort();
     const nodeChildError: LegacyValue = error;
     const isCommitTimeoutFailure = Boolean(
       nodeChildError &&

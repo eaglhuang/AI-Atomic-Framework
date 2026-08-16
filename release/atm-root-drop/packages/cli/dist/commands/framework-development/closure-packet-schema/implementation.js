@@ -105,7 +105,7 @@ export async function runFrameworkTempClaim(cwd, actor, files, reason, linkedTas
         throw new CliError('ATM_FRAMEWORK_LOCK_OCCUPIED', staleLock.detail, { exitCode: 1, details: details });
     }
     throw new CliError('ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED', staleLock.detail, { exitCode: 1, details: details });
-} const taskId = frameworkTempTaskId(actorId, currentLaneSessionId); const adapter = createLocalGovernanceAdapter({ repositoryRoot: root }); const task = { workItemId: taskId, title: reason?.trim() || 'Temporary ATM framework-development claim', status: 'running' }; const lock = await resolveValue(adapter.stores.lockStore.acquireLock(task, scopedFiles, actorId)); const resolvedLinkedTaskId = currentTaskId; if (resolvedLinkedTaskId) {
+} const taskId = frameworkTempTaskId(actorId, currentLaneSessionId); const adapter = createLocalGovernanceAdapter({ repositoryRoot: root }); const task = { workItemId: taskId, title: reason?.trim() || 'Temporary ATM framework-development claim', status: 'running' }; const lock = await resolveValue(adapter.stores.lockStore.acquireLock(task, scopedFiles, actorId, laneSessionId)); const resolvedLinkedTaskId = currentTaskId; if (resolvedLinkedTaskId) {
     try {
         const lockPath = path.join(root, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
         const existing = readJsonIfExists(lockPath);
@@ -118,7 +118,7 @@ export async function runFrameworkTempClaim(cwd, actor, files, reason, linkedTas
     claimMessages.push(message('warn', 'ATM_FRAMEWORK_STAGED_RESIDUE_DETECTED', `Warning: Staged residue detected outside claimed scope: ${stagedResidues.join(', ')}. Please adopt, stash, or widen the scope.`, { stagedResidues }));
 } return makeResult({ ok: true, command: 'framework-mode', cwd: root, messages: claimMessages, evidence: { action: 'claim', taskId, actorId, laneSessionId: currentLaneSessionId, reason: reason ?? null, linkedTaskId: resolvedLinkedTaskId, files: scopedFiles, lock } }); }
 async function runFrameworkTempClaimWithAutoReconcile(input) { const adapter = createLocalGovernanceAdapter({ repositoryRoot: input.root }); const releaseResult = await resolveValue(adapter.stores.lockStore.releaseLock(input.staleLock.lockTaskId, input.actorId)); const taskId = frameworkTempTaskId(input.actorId, input.laneSessionId); const task = { workItemId: taskId, title: input.reason?.trim() || 'Temporary ATM framework-development claim', status: 'running' }; let lock; let autoReconcileEvidence = null; try {
-    lock = await resolveValue(adapter.stores.lockStore.acquireLock(task, input.scopedFiles, input.actorId));
+    lock = await resolveValue(adapter.stores.lockStore.acquireLock(task, input.scopedFiles, input.actorId, input.laneSessionId ?? null));
     autoReconcileEvidence = writeFrameworkLockAutoReconcileEvidence(input.root, { actorId: input.actorId, staleLock: input.staleLock, releasedAt: new Date().toISOString(), releaseResult, reclaimTaskId: taskId, scopedFiles: input.scopedFiles, reason: input.reason ?? null, outcome: 'reclaimed', claimFailure: null });
 }
 catch (error) {

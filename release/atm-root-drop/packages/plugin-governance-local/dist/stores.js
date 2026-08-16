@@ -60,7 +60,7 @@ export function createLocalGovernanceStores(config) {
     const lockStore = {
         initialize: () => initializeStore('lock store'),
         healthCheck: () => capabilityResult(`Lock store is ready at ${layout.lockStorePath}.`),
-        acquireLock(workItem, files, actor) {
+        acquireLock(workItem, files, actor, laneSessionId) {
             ensureAllDirectories();
             const filePath = path.join(absoluteLayout.lockStorePath, `${workItem.workItemId}.lock.json`);
             const timestamp = now();
@@ -81,6 +81,10 @@ export function createLocalGovernanceStores(config) {
                 leaseEpoch,
                 heartbeatAt: timestamp,
                 ttlSeconds: 1800,
+                // ATM-GOV-0395: record the lane explicitly when the caller knows it.
+                // Readers must be able to tell 'bound to another lane' from 'lane was
+                // never recorded'; a null here means the latter, never the former.
+                laneSessionId: typeof laneSessionId === 'string' && laneSessionId.trim().length > 0 ? laneSessionId.trim() : null,
                 files: Array.from(new Set(files.map((filePath) => normalizeRelativePath(filePath)).filter(Boolean)))
             };
             if (existsSync(filePath)) {
