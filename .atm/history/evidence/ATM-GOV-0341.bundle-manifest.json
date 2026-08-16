@@ -1,8 +1,8 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-14T12:52:14.423Z",
-  "updatedBy": "codex-captain-recovery",
+  "updatedAt": "2026-08-16T15:58:04.982Z",
+  "updatedBy": "cursor-captain",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
     "lint:touched",
@@ -18,6 +18,7 @@
     "validate:four-plan-objectives",
     "validate:git-head-evidence",
     "validate:module-boundaries",
+    "validate:runbook-completion-evidence",
     "validate:test-facade"
   ],
   "staleValidationPasses": [],
@@ -341,7 +342,159 @@
       "runnerKind": "dev-source",
       "sourceCommit": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
       "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-runbook-completion-evidence.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cdfed886cdef314fc2cd6318fab1a34e5025e0b3c7d40918de0f9eca1e809077",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:runbook-completion-evidence"
+      ],
+      "generatedAt": "2026-08-15T10:29:25.423Z",
+      "startedAt": "2026-08-15T10:29:24.267Z",
+      "finishedAt": "2026-08-15T10:29:25.423Z",
+      "durationMs": 1156,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "103dfc3756214ef00adf426b4ab4630facf6f1b6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/compile-four-plan-independent-certificate.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7e04ee020eb8de4cb79f6115624a9e6fe81944b8dff842fdab754d57ed01f649",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-15T10:33:23.199Z",
+      "startedAt": "2026-08-15T10:33:18.870Z",
+      "finishedAt": "2026-08-15T10:33:23.199Z",
+      "durationMs": 4329,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "103dfc3756214ef00adf426b4ab4630facf6f1b6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-runbook-completion-evidence.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cdfed886cdef314fc2cd6318fab1a34e5025e0b3c7d40918de0f9eca1e809077",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:runbook-completion-evidence"
+      ],
+      "generatedAt": "2026-08-15T10:33:28.536Z",
+      "startedAt": "2026-08-15T10:33:27.531Z",
+      "finishedAt": "2026-08-15T10:33:28.536Z",
+      "durationMs": 1005,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "103dfc3756214ef00adf426b4ab4630facf6f1b6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/review-four-plan-objective-authority.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c0110f6deaadeb5cf38bc8c0913fdd851e5502d897d65ab03bd064547f7f8e66",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-16T14:13:08.398Z",
+      "startedAt": "2026-08-16T14:13:08.010Z",
+      "finishedAt": "2026-08-16T14:13:08.398Z",
+      "durationMs": 388,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d3ada7383071e504cdc057ea3dc6b852c54b3a0e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4cf0730bb85c4736417089b45b2af3a1a669dd783e8b5f0450e5eae192f68171",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-16T14:13:26.346Z",
+      "startedAt": "2026-08-16T14:13:20.431Z",
+      "finishedAt": "2026-08-16T14:13:26.346Z",
+      "durationMs": 5915,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d3ada7383071e504cdc057ea3dc6b852c54b3a0e",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-16T15:54:16.025Z",
+      "startedAt": "2026-08-16T15:54:04.342Z",
+      "finishedAt": "2026-08-16T15:54:16.025Z",
+      "durationMs": 11683,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1a256431a0f53b19b0d37e3cb3a1ba9adec4f065",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-runbook-completion-evidence.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cdfed886cdef314fc2cd6318fab1a34e5025e0b3c7d40918de0f9eca1e809077",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:runbook-completion-evidence"
+      ],
+      "generatedAt": "2026-08-16T15:54:34.691Z",
+      "startedAt": "2026-08-16T15:54:33.538Z",
+      "finishedAt": "2026-08-16T15:54:34.691Z",
+      "durationMs": 1153,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1a256431a0f53b19b0d37e3cb3a1ba9adec4f065",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f1af7d2e06a5ce0a4efab1d8ee873e656d993f10e0e661ec009d3bbf663fffbe",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-16T15:54:37.948Z",
+      "startedAt": "2026-08-16T15:54:33.541Z",
+      "finishedAt": "2026-08-16T15:54:37.948Z",
+      "durationMs": 4407,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1a256431a0f53b19b0d37e3cb3a1ba9adec4f065",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-16T15:57:46.542Z",
+      "startedAt": "2026-08-16T15:57:33.795Z",
+      "finishedAt": "2026-08-16T15:57:46.542Z",
+      "durationMs": 12747,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1a256431a0f53b19b0d37e3cb3a1ba9adec4f065",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f1af7d2e06a5ce0a4efab1d8ee873e656d993f10e0e661ec009d3bbf663fffbe",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-16T15:58:04.981Z",
+      "startedAt": "2026-08-16T15:58:00.789Z",
+      "finishedAt": "2026-08-16T15:58:04.981Z",
+      "durationMs": 4192,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1a256431a0f53b19b0d37e3cb3a1ba9adec4f065",
+      "cached": false
     }
   ],
-  "artifactPaths": []
+  "artifactPaths": [
+    ".atm/history/evidence/ATM-GOV-0341.publication-preflight.json"
+  ]
 }

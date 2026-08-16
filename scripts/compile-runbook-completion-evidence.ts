@@ -24,6 +24,12 @@ type ValidatorContract = { contractId: string; taskId: string; taskCardPath: str
 type EvidenceTuple = { command: string; exitCode: number; outputDigest: string; artifactPaths: string[]; observedAt: string; sourceCommit: string; evidenceOwner: string; validatorContractId?: string };
 type CompletionRow = { itemId: string; sourceLine: number; section: string; wave: string | null; requirement: string; requirementDigest: string; status: 'proven' | 'unproven'; evidence: EvidenceTuple[]; diagnostics: string[]; coverageOwners?: string[]; validatorContractIds?: string[] };
 
+export function sealValidatorContractIds(candidates: ReadonlyArray<string | undefined>, coverageOwners: readonly string[] = [], requireComplete = false) {
+  const holes = candidates.some((id) => typeof id !== 'string' || id.length === 0);
+  const validatorContractIds = [...new Set(candidates.filter((id): id is string => typeof id === 'string' && id.length > 0))];
+  return { validatorContractIds, diagnostics: coverageOwners.length > 0 && (requireComplete ? holes : validatorContractIds.length === 0) ? ['missing-validator-contract-id'] : [] };
+}
+
 export const digestText = (value: string) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
 
 const TASK_CARD_LIFECYCLE_FIELDS = new Set([
@@ -329,13 +335,14 @@ function hydrate(row: CompletionRow, contracts: CardContract[], targetHead: stri
   const owners = contracts.map((contract) => contract.taskId);
   const uncoveredOwners = contracts.filter((contract) => evidenceForContracts([contract], targetHead).length === 0).map((contract) => contract.taskId);
   const proven = contracts.length > 0 && uncoveredOwners.length === 0;
+  const sealed = sealValidatorContractIds(evidence.map((tuple) => tuple.validatorContractId), owners);
   return {
     ...row,
     coverageOwners: owners,
-    validatorContractIds: [...new Set(evidence.map((tuple) => tuple.validatorContractId).filter((value): value is string => Boolean(value)))],
+    validatorContractIds: sealed.validatorContractIds,
     evidence,
-    status: proven ? 'proven' : 'unproven',
-    diagnostics: proven ? [] : [`missing-command-backed-evidence:${uncoveredOwners.join(',') || 'no-contract'}`]
+    status: proven && sealed.diagnostics.length === 0 ? 'proven' : 'unproven',
+    diagnostics: [...(proven ? [] : [`missing-command-backed-evidence:${uncoveredOwners.join(',') || 'no-contract'}`]), ...sealed.diagnostics]
   };
 }
 
@@ -459,13 +466,16 @@ export function compileRunbookCompletion(
           evidenceOwner: `wave-exit-observer:${row.itemId}`,
           validatorContractId: `atm.waveExitObserverReceipt/${row.itemId}`
         };
+        const coverageOwners = [...new Set([...(hydrated.coverageOwners ?? []), receiptTuple.evidenceOwner])];
+        const sealed = sealValidatorContractIds([...(hydrated.validatorContractIds ?? []), receiptTuple.validatorContractId], coverageOwners, true);
+        const failClosed = sealed.diagnostics.length > 0;
         return {
           ...hydrated,
-          status: 'proven' as const,
-          evidence: [...independentEvidence, receiptTuple],
-          diagnostics: [],
-          coverageOwners: [...new Set([...(hydrated.coverageOwners ?? []), receiptTuple.evidenceOwner])],
-          validatorContractIds: [...new Set([...(hydrated.validatorContractIds ?? []), receiptTuple.validatorContractId])]
+          evidence: failClosed ? independentEvidence : [...independentEvidence, receiptTuple],
+          status: failClosed ? 'unproven' as const : 'proven' as const,
+          diagnostics: failClosed ? [...new Set([...contractDiagnostics, ...sealed.diagnostics])] : [],
+          coverageOwners,
+          validatorContractIds: sealed.validatorContractIds
         };
       }
       return {
