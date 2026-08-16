@@ -30,7 +30,13 @@
     "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
     "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
     "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
-    "docs/governance/atm-bug-and-optimization-backlog.md"
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    ".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json",
+    ".atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json",
+    "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
+    "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+    "packages/core/src/broker/terminal-history-entitlement.ts"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
@@ -92,7 +98,7 @@
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -180,44 +186,41 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-15T11-02-43-859Z-renew-9c20a21d20fc",
-  "lastTransitionAt": "2026-08-15T11:02:43.859Z",
+  "lastTransitionId": "2026-08-16T04-24-34-831Z-renew-77b048e69585",
+  "lastTransitionAt": "2026-08-16T04:24:34.831Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-008",
+  "owner": "cursor-captain",
   "reservedAt": "2026-08-15T10:20:37.881Z",
   "promotedAt": "2026-08-15T10:20:37.886Z",
   "claim": {
-    "actorId": "claude-008",
-    "leaseId": "lease-238195303293",
-    "claimedAt": "2026-08-15T10:20:37.891Z",
-    "heartbeatAt": "2026-08-15T11:02:43.076Z",
+    "actorId": "cursor-captain",
+    "leaseId": "lease-97675254cf2c",
+    "claimedAt": "2026-08-16T01:12:49.103Z",
+    "heartbeatAt": "2026-08-16T04:24:34.047Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json",
       ".atm/history/evidence/ATM-GOV-0395.*",
       ".atm/history/task-events/ATM-GOV-0395/**",
       ".atm/history/tasks/ATM-GOV-0395.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
-      "docs/governance/atm-bug-and-optimization-backlog.md",
-      "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
-      "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
-      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
-      "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
-      "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
-      "packages/plugin-governance-local/src/stores.ts",
-      "packages/plugin-sdk/src/governance/stores.ts"
+      "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
+      "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+      "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+      "packages/core/src/broker/terminal-history-entitlement.ts"
     ],
     "state": "active",
+    "reason": "Predecessor lease expired; owner authorized 0395 residue reconciliation after joint publication.",
     "laneSession": {
-      "laneSessionId": "lane-20260815102038-claude-008-955b69ad0b",
+      "laneSessionId": "lane-20260816011249-cursor-captain-3a3db9e611",
       "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815102038-claude-008-955b69ad0b\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816011249-cursor-captain-3a3db9e611\""
     }
   },
   "startedAt": "2026-08-15T10:20:37.891Z",
   "startedByActor": "claude-008",
-  "startedBySessionId": "session-20260815102037-claude-008-ATM-GOV-0395-f7c2376afd",
+  "startedBySessionId": "session-20260816011249-cursor-captain-ATM-GOV-0395-c0406217fb",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -227,79 +230,64 @@
     "queueId": null,
     "queueIndex": null,
     "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json",
       ".atm/history/evidence/ATM-GOV-0395.*",
       ".atm/history/task-events/ATM-GOV-0395/**",
       ".atm/history/tasks/ATM-GOV-0395.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
-      "docs/governance/atm-bug-and-optimization-backlog.md",
-      "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
-      "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
-      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
-      "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
-      "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
-      "packages/plugin-governance-local/src/stores.ts",
-      "packages/plugin-sdk/src/governance/stores.ts"
+      "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
+      "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+      "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+      "packages/core/src/broker/terminal-history-entitlement.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0395-give-closed-task-generated-residue-one-governed-reconciliation-entry.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0395-give-closed-task-generated-residue-one-governed-reconciliation-entry.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "32d1ed61e8a6518227fa383bee9c08b84a139c89d293aa26fab1ec3223751873",
-    "actorId": "claude-008",
-    "sessionId": null,
+    "actorId": "cursor-captain",
+    "sessionId": "session-20260816011249-cursor-captain-ATM-GOV-0395-c0406217fb",
     "laneSession": {
-      "laneSessionId": "lane-20260815102038-claude-008-955b69ad0b",
+      "laneSessionId": "lane-20260816011249-cursor-captain-3a3db9e611",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815102038-claude-008-955b69ad0b\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816011249-cursor-captain-3a3db9e611\""
     },
-    "createdAt": "2026-08-15T10:20:43.812Z",
+    "createdAt": "2026-08-16T01:12:49.879Z",
     "status": "active"
   },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-942bcdd239bc6b63",
-    "ticketDigest": "sha256:942bcdd239bc6b63594ede25d22bb7d3207d0a094aaa9be0134850e66fa79dcd",
+    "ticketId": "wat-5e1df28626077ddd",
+    "ticketDigest": "sha256:5e1df28626077ddd069fbefd5fc1f3791884cd49cad7d68ca548deaf5092ce43",
     "taskId": "ATM-GOV-0395",
     "origin": "claim",
-    "actorId": "claude-008",
-    "laneSessionId": "lane-20260815102038-claude-008-955b69ad0b",
-    "claimGeneration": "lease-238195303293",
-    "issuedAt": "2026-08-15T11:02:43.076Z",
-    "expiresAt": "2026-08-15T11:32:43.076Z",
-    "scopeDigest": "sha256:474cf04ac5a9c2bfb8b78c89968ad5901e9403d3882c7d8a126f58f158c64292",
+    "actorId": "cursor-captain",
+    "laneSessionId": "lane-20260816011249-cursor-captain-3a3db9e611",
+    "claimGeneration": "lease-97675254cf2c",
+    "issuedAt": "2026-08-16T04:24:34.047Z",
+    "expiresAt": "2026-08-16T04:54:34.047Z",
+    "scopeDigest": "sha256:9cb5bf10f53f172787eb7cbbde005576a89ae03ec42f1324087fe81996643ed2",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-15T11:02:43.076Z"
+      "selectedAt": "2026-08-16T04:24:34.047Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
+          ".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json",
+          ".atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json",
           ".atm/history/evidence/ATM-GOV-0395.*",
           ".atm/history/task-events/ATM-GOV-0395/**",
           ".atm/history/tasks/ATM-GOV-0395.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
-          "docs/governance/atm-bug-and-optimization-backlog.md",
-          "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
-          "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
-          "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
-          "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
-          "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
-          "packages/plugin-governance-local/src/stores.ts",
-          "packages/plugin-sdk/src/governance/stores.ts"
+          "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
+          "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+          "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+          "packages/core/src/broker/terminal-history-entitlement.ts"
         ],
-        "digest": "sha256:c196bccb4a004bed77deda14377bbe4d879f97f4e2a14a74296f5fec267da13d"
+        "digest": "sha256:76d6e05623b7567fce3321bcd4d6c95c5d5ba0ee292f1cd06b799384ab3822f8"
       },
       {
         "kind": "lifecycle-operation",
@@ -323,7 +311,6 @@
       "requestedMode": "auto",
       "resolvedMode": "enabled",
       "reasons": [
-        "complex-task",
         "shared-surface"
       ],
       "maxSavePoints": 2,
@@ -331,7 +318,7 @@
       "repositoryByteBudget": 268435456,
       "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
   }
 }

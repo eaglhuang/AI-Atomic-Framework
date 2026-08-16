@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-16T03-52-25-789Z-scope-amendment-ef91d97f6310",
+  "taskId": "ATM-GOV-0395",
+  "action": "scope-amendment",
+  "actorId": "cursor-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0395.json",
+  "taskSha256": "sha256:bc956f12fcf9888cdbc1af3be1dab521cd465497cba669c88e9e72eb413c1b64",
+  "createdAt": "2026-08-16T03:52:25.789Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0395 --actor cursor-captain --add \"packages/core/src/broker/terminal-history-entitlement.ts,packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts,packages/cli/src/commands/git-governance/protected-governance-state.ts,packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

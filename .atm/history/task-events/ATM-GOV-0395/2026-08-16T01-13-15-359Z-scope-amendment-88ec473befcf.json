@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-16T01-13-15-359Z-scope-amendment-88ec473befcf",
+  "taskId": "ATM-GOV-0395",
+  "action": "scope-amendment",
+  "actorId": "cursor-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0395.json",
+  "taskSha256": "sha256:289421197329ca99f23f97d8c6f2b35f633a6277f7c543dbe2defb42dbf5d5bf",
+  "createdAt": "2026-08-16T01:13:15.359Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0395 --actor cursor-captain --add \".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json,.atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json,.atm/history/evidence/ATM-GOV-0395.*,.atm/history/task-events/ATM-GOV-0395/**\" --reason \"ACC-5 closing demonstration: admit bounded 0392 residue paths onto live 0395 successor claim.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ACC-5 closing demonstration: admit bounded 0392 residue paths onto live 0395 successor claim."
+  }
+}

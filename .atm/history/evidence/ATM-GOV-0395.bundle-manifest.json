@@ -1,8 +1,8 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0395",
-  "updatedAt": "2026-08-15T10:58:20.950Z",
-  "updatedBy": "claude-008",
+  "updatedAt": "2026-08-16T04:22:41.317Z",
+  "updatedBy": "cursor-captain",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
     "typecheck"
@@ -53,6 +53,94 @@
       "durationMs": 12096,
       "runnerKind": "dev-source",
       "sourceCommit": "c3f24bf9565060b73777d8bb89d0e3cd97e82587",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ff4351d1ef0589396c76a522e2c3528d7bec856a9ed68e583cf55723762aebec",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-16T03:54:33.269Z",
+      "startedAt": "2026-08-16T03:54:32.574Z",
+      "finishedAt": "2026-08-16T03:54:33.269Z",
+      "durationMs": 695,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ccbe4f37d0c09e80e3e65de8d7d460995a1a6f3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ed085d85484d3c1c6ccdfabfe1ef722080877751010cafdeeca2bd7059e729c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-16T04:04:09.194Z",
+      "startedAt": "2026-08-16T04:04:08.242Z",
+      "finishedAt": "2026-08-16T04:04:09.194Z",
+      "durationMs": 952,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ccbe4f37d0c09e80e3e65de8d7d460995a1a6f3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ff4351d1ef0589396c76a522e2c3528d7bec856a9ed68e583cf55723762aebec",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-16T04:04:09.335Z",
+      "startedAt": "2026-08-16T04:04:08.451Z",
+      "finishedAt": "2026-08-16T04:04:09.335Z",
+      "durationMs": 884,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ccbe4f37d0c09e80e3e65de8d7d460995a1a6f3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts"
+      ],
+      "generatedAt": "2026-08-16T04:10:09.367Z",
+      "startedAt": "2026-08-16T04:10:07.766Z",
+      "finishedAt": "2026-08-16T04:10:09.367Z",
+      "durationMs": 1601,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ccbe4f37d0c09e80e3e65de8d7d460995a1a6f3",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-16T04:10:17.568Z",
+      "startedAt": "2026-08-16T04:10:07.766Z",
+      "finishedAt": "2026-08-16T04:10:17.568Z",
+      "durationMs": 9802,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ccbe4f37d0c09e80e3e65de8d7d460995a1a6f3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ed085d85484d3c1c6ccdfabfe1ef722080877751010cafdeeca2bd7059e729c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-16T04:22:41.316Z",
+      "startedAt": "2026-08-16T04:22:40.527Z",
+      "finishedAt": "2026-08-16T04:22:41.316Z",
+      "durationMs": 789,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9ccbe4f37d0c09e80e3e65de8d7d460995a1a6f3",
       "cached": false
     }
   ],
