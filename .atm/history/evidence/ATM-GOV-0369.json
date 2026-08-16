@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0369",
-  "updatedAt": "2026-08-16T00:59:07.643Z",
+  "updatedAt": "2026-08-16T04:38:51.016Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -1495,6 +1495,103 @@
             "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816005906-cursor-captain-5efa9d3284\""
           },
           "reason": "Owner authorized joint publication after 0369 source 1bea12f10; predecessor lease expired with no live delivery. Takeover to enqueue queue-head sealed runner publication and close."
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008",
+      "sessionId": "session-20260816032340-claude-008-ATM-GOV-0369-b5def5623b",
+      "createdAt": "2026-08-16T04:38:51.016Z",
+      "details": {
+        "actorId": "claude-008",
+        "sessionId": "session-20260816032340-claude-008-ATM-GOV-0369-b5def5623b",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.cross-task-mutation-authority-snapshot",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:ff4351d1ef0589396c76a522e2c3528d7bec856a9ed68e583cf55723762aebec",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-16T04:38:50.217Z",
+            "finishedAt": "2026-08-16T04:38:51.015Z",
+            "durationMs": 798,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "fff40ff96b65b41260ce0ca551882f46a82e088b",
+            "cacheKey": "sha256:7228c1cd07e1b49ec8e0e0889054cfa95fda92b286cc1a99d07097beb1e17650",
+            "generatedAt": "2026-08-16T04:38:51.015Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:7228c1cd07e1b49ec8e0e0889054cfa95fda92b286cc1a99d07097beb1e17650",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-16T04:38:51.015Z",
+              "observedAt": "2026-08-16T04:38:51.015Z",
+              "startedAt": "2026-08-16T04:38:50.217Z",
+              "finishedAt": "2026-08-16T04:38:51.015Z",
+              "durationMs": 798,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:56e095b38efb8d0faf2bf04720b02882ff59a0a5e65f8f8bafbe5092fa34bb94",
+              "outputDigest": "sha256:2cd564b8756df5da378c7197b6df851ab31d0b75f4af4c762cf0d505826dd27b",
+              "cache": {
+                "key": "sha256:7228c1cd07e1b49ec8e0e0889054cfa95fda92b286cc1a99d07097beb1e17650",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "fff40ff96b65b41260ce0ca551882f46a82e088b",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c81686dfbeaa151f332ff8976f12ae632d450a253be6214243b1e63c73e54d71",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
         }
       }
     }

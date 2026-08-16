@@ -170,4 +170,73 @@ stage(RESIDUE, '{"seed":true}\n');
   );
 }
 
+/**
+ * The three cases below separate what the entitlement rule must keep apart. A
+ * proposal reviewed on 2026-08-16 would have short-circuited the rule to admit
+ * any writer whose own work-item id names a live card, on the reasoning that
+ * such a card is already its own review surface. These cases pin the contract
+ * ACC-5 actually states — admitted paths *and* a declared answerable task — so
+ * that adopting that reasoning has to be a recorded amendment rather than a
+ * silent relaxation.
+ */
+
+// caseId: test_atm_gov_0369_live_card_writer_still_declares_its_reconciliation
+// A writer that is itself a live card, admitted for the exact bounded path, but
+// declaring nothing. Scope admission proves which bytes were considered; it
+// does not record on whose behalf they are being rewritten. Being live is not
+// the same as being answerable, so this stays blocked.
+{
+  const LIVE_CARD_WRITER = 'ATM-GOV-9004';
+  writeTask(OWNER, { status: 'done', claimState: 'released' });
+  writeTask(LIVE_CARD_WRITER, { status: 'running', claimState: 'active' });
+  writeLock(OWNER, { released: true, files: [`.atm/history/evidence/${OWNER}.*`] });
+  writeLock(LIVE_CARD_WRITER, { released: false, files: [RESIDUE], linkedTaskId: null });
+
+  const block = detectCrossTaskMutation(repo, LIVE_CARD_WRITER, 'pre-commit');
+  assert(
+    block,
+    'a live card admitted for the path but declaring no reconciliation target must not be entitled by its own liveness'
+  );
+  const conflict = block.conflicts.find((entry) => entry.surface === 'task-history');
+  assert(conflict, 'the refusal must name the task-history surface');
+  assert.equal(
+    conflict.ownershipState,
+    'terminal-unentitled',
+    'the owner is terminal and the writer unentitled; the refusal may not describe either state it did not read'
+  );
+}
+
+// caseId: test_atm_gov_0369_framework_writer_without_linkage_blocks
+// The same omission from a framework temporary claim. A framework work item can
+// never resemble a card id, so this path is the one that made the old rule
+// unsatisfiable; it must open on a declared linkage, and on nothing else.
+{
+  writeTask(OWNER, { status: 'done', claimState: 'released' });
+  writeLock(OWNER, { released: true, files: [`.atm/history/evidence/${OWNER}.*`] });
+  writeLock(WRITER, { released: false, files: [RESIDUE], linkedTaskId: null });
+
+  assert(
+    detectCrossTaskMutation(repo, WRITER, 'pre-commit'),
+    'a live framework claim admitted for the path but linked to no card carries no entitlement'
+  );
+}
+
+// caseId: test_atm_gov_0369_declared_successor_reconciliation_admitted
+// The lawful shape, stated once more against a live card writer so the previous
+// two cases fail for the reason claimed — the missing declaration — rather than
+// because a live card writer is refused on principle.
+{
+  const LIVE_CARD_WRITER = 'ATM-GOV-9004';
+  writeTask(OWNER, { status: 'done', claimState: 'released' });
+  writeTask(LIVE_CARD_WRITER, { status: 'running', claimState: 'active' });
+  writeLock(OWNER, { released: true, files: [`.atm/history/evidence/${OWNER}.*`] });
+  writeLock(LIVE_CARD_WRITER, { released: false, files: [RESIDUE], linkedTaskId: SUCCESSOR });
+
+  assert.equal(
+    detectCrossTaskMutation(repo, LIVE_CARD_WRITER, 'pre-commit'),
+    null,
+    'admitted for the exact path and declaring a live card to answer for it is the entitled shape'
+  );
+}
+
 console.log('[cross-task-mutation-terminal-entitlement] ok');

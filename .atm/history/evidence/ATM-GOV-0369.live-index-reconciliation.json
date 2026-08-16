@@ -1,13 +1,22 @@
 {
   "schemaId": "atm.liveIndexReconciliation.v1",
   "headAdvanced": true,
-  "reconciledPaths": [],
-  "retainedPaths": [],
+  "reconciledPaths": [
+    ".atm/history/evidence/ATM-GOV-0369.live-index-reconciliation.json",
+    ".atm/history/task-events/ATM-GOV-0369/2026-08-16T03-41-06-081Z-scope-amendment-f32f762b48b7.json",
+    ".atm/history/tasks/ATM-GOV-0369.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-004.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-005.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "retainedPaths": [
+    {
+      "path": ".atm/history/evidence/git-head.jsonl",
+      "reason": "worktree-diverged"
+    }
+  ],
   "clean": false,
-  "failure": {
-    "code": "ATM_LIVE_INDEX_RECONCILIATION_FAILED",
-    "message": "Command failed: C:\\Program Files\\Git\\cmd\\git.exe update-index --add --cacheinfo 100644,f953b579b75e7b3485b6e539cf1088690d122231,.atm/history/task-events/ATM-GOV-0369/2026-08-16T03-23-40-047Z-promote-ee9f8fa6ff0c.json\nfatal: Unable to create 'C:/Users/User/AI-Atomic-Framework/.git/index.lock': File exists.\n\nAnother git process seems to be running in this repository, e.g.\nan editor opened by 'git commit'. Please make sure all processes\nare terminated then try again. If it still fails, a git process\nmay have crashed in this repository earlier:\nremove the file manually to continue.\n"
-  },
+  "failure": null,
   "taskId": "ATM-GOV-0369",
-  "createdAt": "2026-08-16T03:35:22.953Z"
+  "createdAt": "2026-08-16T03:42:22.393Z"
 }

@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-16T04-39-18-473Z-scope-amendment-eaef2323f43d",
+  "taskId": "ATM-GOV-0369",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0369.json",
+  "taskSha256": "sha256:700781b0e3331407df3aeb7e4cae3758021fcaaf55a5cfea28582e7921e9714d",
+  "createdAt": "2026-08-16T04:39:18.473Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0369 --actor claude-008 --add packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
