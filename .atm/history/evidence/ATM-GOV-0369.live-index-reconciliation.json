@@ -1,24 +1,13 @@
 {
   "schemaId": "atm.liveIndexReconciliation.v1",
   "headAdvanced": true,
-  "reconciledPaths": [
-    ".atm/history/evidence/ATM-GOV-0369.live-index-reconciliation.json",
-    ".atm/history/evidence/ATM-GOV-0369.runner-publication-takeover.json",
-    ".atm/history/evidence/ATM-GOV-0369.runner-sync-receipt.json",
-    ".atm/history/protected-override-audit/2026-08-14T03-51-03-084Z-POA-8575696f53fd.json",
-    ".atm/history/protected-override-audit/2026-08-14T03-51-13-866Z-POA-942d417fe1b0.json",
-    ".atm/history/task-events/ATM-GOV-0369/2026-08-14T04-39-05-246Z-renew-ae6d380529de.json",
-    ".atm/history/task-events/ATM-GOV-0369/2026-08-14T04-48-04-270Z-scope-amendment-f69d5a35eded.json",
-    ".atm/history/tasks/ATM-GOV-0369.json"
-  ],
-  "retainedPaths": [
-    {
-      "path": ".atm/history/evidence/git-head.jsonl",
-      "reason": "worktree-diverged"
-    }
-  ],
+  "reconciledPaths": [],
+  "retainedPaths": [],
   "clean": false,
-  "failure": null,
+  "failure": {
+    "code": "ATM_LIVE_INDEX_RECONCILIATION_FAILED",
+    "message": "Command failed: C:\\Program Files\\Git\\cmd\\git.exe update-index --add --cacheinfo 100644,f953b579b75e7b3485b6e539cf1088690d122231,.atm/history/task-events/ATM-GOV-0369/2026-08-16T03-23-40-047Z-promote-ee9f8fa6ff0c.json\nfatal: Unable to create 'C:/Users/User/AI-Atomic-Framework/.git/index.lock': File exists.\n\nAnother git process seems to be running in this repository, e.g.\nan editor opened by 'git commit'. Please make sure all processes\nare terminated then try again. If it still fails, a git process\nmay have crashed in this repository earlier:\nremove the file manually to continue.\n"
+  },
   "taskId": "ATM-GOV-0369",
-  "createdAt": "2026-08-14T04:48:57.704Z"
+  "createdAt": "2026-08-16T03:35:22.953Z"
 }
