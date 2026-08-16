@@ -193,6 +193,7 @@ export async function runTeam(argv: string[]) {
       throw new CliError('ATM_ACTOR_ID_MISSING', 'team start requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
     }
     if (!ok) {
+      const proposalFinding = validation.findings.find((finding) => finding.code === 'proposal-first-required');
       return makeResult({
         ok: false,
         command: 'team',
@@ -201,7 +202,8 @@ export async function runTeam(argv: string[]) {
           message('error', 'ATM_TEAM_START_BLOCKED', 'Team start blocked by permission validation findings.', {
             taskId,
             recipeId: recipe.recipeId,
-            findingCount: validation.findings.length
+            findingCount: validation.findings.length,
+            proposalFirstRecovery: proposalFinding?.recovery ?? null
           })
         ],
         evidence: {
@@ -212,6 +214,7 @@ export async function runTeam(argv: string[]) {
           recipe,
           validation,
           teamPlan,
+          proposalFirstRecovery: proposalFinding?.recovery ?? null,
           brokerLane: teamPlan.brokerLane,
           sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
           runtimeContract,
@@ -314,6 +317,7 @@ export async function runTeam(argv: string[]) {
     });
   }
 
+  const proposalFinding = validation.findings.find((finding) => finding.code === 'proposal-first-required');
   return makeResult({
     ok,
     command: 'team',
@@ -328,7 +332,8 @@ export async function runTeam(argv: string[]) {
         recipeId: recipe.recipeId,
         findingCount: validation.findings.length,
         readOnly: readOnlyPlan,
-        actorId: planningActorId
+        actorId: planningActorId,
+        proposalFirstRecovery: proposalFinding?.recovery ?? null
       })
     ],
     evidence: {
@@ -344,6 +349,7 @@ export async function runTeam(argv: string[]) {
       permissionCatalog: teamPermissionCatalog,
       validation,
       teamPlan,
+      proposalFirstRecovery: proposalFinding?.recovery ?? null,
       governanceRuntime: teamPlan.governanceRuntime,
       runtimeContract,
       runtimeBackendReadiness,
