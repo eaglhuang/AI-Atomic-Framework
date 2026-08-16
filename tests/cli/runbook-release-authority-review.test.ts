@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { inspectCompletion } from '../../scripts/review-runbook-release-authority.ts';
+import { inspectCompletion, sealedRemotePublishVerdict } from '../../scripts/review-runbook-release-authority.ts';
 
 const broken = '{"rows":[{"itemId":"RB-001","status":"proven"}],"waveExits":[{"itemId":"EXIT-01"}],';
 const inspection = inspectCompletion(broken);
@@ -31,6 +31,12 @@ assert.equal(report.remote.error, 'remote-observation-disabled');
 assert.equal(report.remote.remoteHeadAfterReview, undefined);
 assert.equal(report.completion.parseable, inspectCompletion(readFileSync('docs/reports/plan-3x-4x-runbook-completion-evidence.json', 'utf8')).parseable);
 assert.ok(report.nonClaims.includes('does-not-read-independent-certificate'));
+
+const parent = execFileSync('git', ['rev-parse', 'HEAD~1'], { encoding: 'utf8' }).trim();
+const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+assert.equal(sealedRemotePublishVerdict(parent, head), 'already-published');
+assert.equal(sealedRemotePublishVerdict(head, head), 'already-published');
+assert.equal(sealedRemotePublishVerdict(head, parent), 'not-proven');
 
 // A sealed timestamp may be replayed, but its declared authority inputs may
 // never be replayed from an altered projection.

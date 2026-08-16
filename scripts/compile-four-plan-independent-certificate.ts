@@ -175,15 +175,17 @@ function isTargetReachableFromRemote(targetHead: string, originMain: string): bo
   // `ls-remote` is authoritative for the remote tip, but the object may not
   // exist locally. A missing object is deliberately not guessed as reachable.
   return gitOk(['cat-file', '-e', `${originMain}^{commit}`])
+    && gitOk(['cat-file', '-e', `${targetHead}^{commit}`])
     && gitOk(['merge-base', '--is-ancestor', targetHead, originMain]);
 }
 
-function projectReleaseCloseback(targetHead: string, originMain: string, generatedAt: string): Record<string, any> {
-  const targetReachable = isTargetReachableFromRemote(targetHead, originMain);
+function projectReleaseCloseback(targetHead: string, recordedOriginMain: string, liveOriginMain: string, generatedAt: string): Record<string, any> {
+  const targetReachable = isTargetReachableFromRemote(targetHead, liveOriginMain);
+  const originContinuity = isTargetReachableFromRemote(recordedOriginMain, liveOriginMain);
   const status = targetReachable ? 'pushed' : 'not-pushed';
   const releaseSurfaces = [
-    { surfaceId: 'target-head', expectedDigest: targetHead, observedDigest: originMain, reachable: targetReachable },
-    { surfaceId: 'origin-main', expectedDigest: originMain, observedDigest: originMain, reachable: true },
+    { surfaceId: 'target-head', expectedDigest: targetHead, observedDigest: recordedOriginMain, reachable: targetReachable },
+    { surfaceId: 'origin-main', expectedDigest: recordedOriginMain, observedDigest: recordedOriginMain, reachable: originContinuity },
     ...Object.entries(RELEASE_SURFACE_ARTIFACTS).map(([surfaceId, artifact]) => {
       const digest = artifact !== null && existsSync(artifact) ? digestOf(artifact) : '';
       return { surfaceId, expectedDigest: digest, observedDigest: digest, reachable: digest.length > 0 };
@@ -197,7 +199,7 @@ function projectReleaseCloseback(targetHead: string, originMain: string, generat
     targetRepo: process.cwd().replace(/\\/g, '/'),
     planningRepo: 'C:/Users/User/3KLife',
     targetHead,
-    originMain,
+    originMain: recordedOriginMain,
     remoteReachability: { checked: true, targetHeadReachableFromOriginMain: targetReachable, status },
     releaseSurfaces,
     status,
@@ -222,7 +224,7 @@ function observe(paths: readonly string[], targetHead: string, closeback: Record
         tracked: true,
         dirty: false,
         lastCommit: String(closeback.targetHead ?? ''),
-        reachableFromTargetHead: String(closeback.targetHead ?? '') === targetHead
+        reachableFromTargetHead: isTargetReachableFromRemote(String(closeback.targetHead ?? ''), targetHead)
       };
     }
     const present = existsSync(inputPath);
@@ -255,18 +257,19 @@ function buildReleaseSurfaces(
   originMain: string
 ): FourPlanReleaseSurface[] {
   const declared: readonly Record<string, any>[] = Array.isArray(closeback.releaseSurfaces) ? closeback.releaseSurfaces : [];
+  const recordedOriginMain = String(closeback.originMain ?? '');
   const surfaces: FourPlanReleaseSurface[] = [
     {
       surfaceId: 'target-head',
       expectedDigest: String(closeback.targetHead ?? ''),
-      observedDigest: originMain,
+      observedDigest: recordedOriginMain,
       reachable: isTargetReachableFromRemote(String(closeback.targetHead ?? ''), originMain)
     },
     {
       surfaceId: 'origin-main',
-      expectedDigest: String(closeback.originMain ?? ''),
-      observedDigest: originMain,
-      reachable: true
+      expectedDigest: recordedOriginMain,
+      observedDigest: recordedOriginMain,
+      reachable: isTargetReachableFromRemote(recordedOriginMain, originMain)
     }
   ];
   for (const entry of declared) {
@@ -284,11 +287,12 @@ function buildReleaseSurfaces(
   return surfaces;
 }
 
-function compile(generatedAt: string, closeback: Record<string, any>, originMain: string): CompileOutcome {
-  // Evidence freshness is judged against the published branch for the same
-  // reason the release surfaces are: a report whose last commit is not on the
-  // remote has not been published and cannot support a release verdict.
-  const targetHead = originMain;
+function compile(generatedAt: string, closeback: Record<string, any>, liveOriginMain: string): CompileOutcome {
+  // Evidence freshness is judged against the live published tip so a
+  // governance successor commit can remain reachable. Certificate identity
+  // stays bound to the sealed origin snapshot in closeback.
+  const targetHead = liveOriginMain;
+  const recordedOriginMain = String(closeback.originMain ?? liveOriginMain);
 
   const dimensions = dimensionsFromAuthority(closeback);
   const reviewers: FourPlanReviewer[] = [
@@ -315,12 +319,12 @@ function compile(generatedAt: string, closeback: Record<string, any>, originMain
     forbiddenReviewerRoles: ['certificate-writer', 'closure-actor', 'evidence-producer', 'fixture-generator', 'implementer', 'override-approver'],
     dimensions,
     evidenceObservations: observe(referenced, targetHead, closeback),
-    releaseSurfaces: buildReleaseSurfaces(closeback, originMain),
+    releaseSurfaces: buildReleaseSurfaces(closeback, liveOriginMain),
     mutationControls: ['digest-parity-before-release', 'fail-closed-on-not-complete', 'independent-reviewer-role-separation', 'no-legacy-retirement-with-stale-or-unpushed-surface'],
     provenance: {
       compiledBy: 'scripts/compile-four-plan-independent-certificate.ts',
-      observedRemoteHead: originMain,
-      originMain,
+      observedRemoteHead: recordedOriginMain,
+      originMain: recordedOriginMain,
       remoteRef: `${REMOTE}/${BRANCH}`,
       closebackDigest: digestValue(closeback),
       closebackTargetHead: String(closeback.targetHead ?? ''),
@@ -328,7 +332,7 @@ function compile(generatedAt: string, closeback: Record<string, any>, originMain
       reviewerReceipts: [REVIEWER_A_PATH, REVIEWER_B_PATH]
     }
   });
-  return { certificate, targetHead, originMain };
+  return { certificate, targetHead, originMain: recordedOriginMain };
 }
 
 function certificateIsProven(certificate: FourPlanIndependentCertificate): boolean {
@@ -441,7 +445,7 @@ function main(): number {
     // every write, which prevents a self-contained evidence chain from ever
     // reaching a fixed point.
     const generatedAt = git(['show', '-s', '--format=%cI', originMain]);
-    const closeback = projectReleaseCloseback(resolveLocalHead(), originMain, generatedAt);
+    const closeback = projectReleaseCloseback(resolveLocalHead(), originMain, originMain, generatedAt);
     const { certificate, targetHead } = compile(generatedAt, closeback, originMain);
     writeCloseoutProjection(projectCloseoutArtifacts(certificate, closeback, generatedAt));
     process.stdout.write(
@@ -458,7 +462,12 @@ function main(): number {
   const committed = JSON.parse(readFileSync(CERTIFICATE_PATH, 'utf8')) as FourPlanIndependentCertificate;
   const committedCloseback = readJson(CLOSEBACK_PATH);
   const originMain = resolveOriginMain();
-  const closeback = projectReleaseCloseback(String(committedCloseback.targetHead ?? ''), originMain, String(committedCloseback.generatedAt ?? ''));
+  const closeback = projectReleaseCloseback(
+    String(committedCloseback.targetHead ?? ''),
+    String(committedCloseback.originMain ?? ''),
+    originMain,
+    String(committedCloseback.generatedAt ?? '')
+  );
   const { certificate } = compile(String(committed.generatedAt ?? ''), closeback, originMain);
   const drift = Object.keys(certificate)
     .filter((key) => JSON.stringify((certificate as any)[key]) !== JSON.stringify((committed as any)[key]))

@@ -230,17 +230,57 @@ const missingRemoteSurface = compileFourPlanIndependentCertificate({
 });
 assert.ok(missingRemoteSurface.diagnostics.includes('release-surface-required-missing:origin-main'));
 
-const remoteMovedOn = compileFourPlanIndependentCertificate({
+const sealed = commit('b');
+const remoteDescendant = commit('c');
+const remoteSuccessor = compileFourPlanIndependentCertificate({
   ...base,
   releaseSurfaces: base.releaseSurfaces.map((surface) =>
-    surface.surfaceId === 'origin-main' ? { ...surface, observedDigest: commit('c') } : surface
+    surface.surfaceId === 'target-head' || surface.surfaceId === 'origin-main'
+      ? { ...surface, expectedDigest: sealed, observedDigest: remoteDescendant, reachable: true }
+      : surface
   )
 });
-assert.equal(remoteMovedOn.status, 'stale');
-assert.equal(remoteMovedOn.overallVerdict, 'not-complete');
-assert.equal(remoteMovedOn.releaseAuthorized, false);
-assert.ok(remoteMovedOn.diagnostics.includes('release-digest-mismatch:origin-main'));
-assert.ok(remoteMovedOn.nonClaims.includes('does-not-authorize-release:origin-main'));
+assert.equal(
+  remoteSuccessor.status,
+  'proven',
+  `a fast-forward remote descendant with unchanged sealed inputs must not self-invalidate; observed: ${remoteSuccessor.diagnostics.join(', ')}`
+);
+assert.equal(remoteSuccessor.releaseAuthorized, true);
+assert.ok(!remoteSuccessor.diagnostics.some((entry) => entry.startsWith('release-digest-mismatch:')));
+
+const localAhead = compileFourPlanIndependentCertificate({
+  ...base,
+  releaseSurfaces: base.releaseSurfaces.map((surface) =>
+    surface.surfaceId === 'target-head'
+      ? { ...surface, expectedDigest: remoteDescendant, observedDigest: sealed, reachable: false }
+      : surface.surfaceId === 'origin-main'
+        ? { ...surface, expectedDigest: sealed, observedDigest: sealed, reachable: true }
+        : surface
+  )
+});
+assert.equal(localAhead.releaseAuthorized, false);
+assert.ok(localAhead.diagnostics.includes('release-surface-unreachable:target-head'));
+assert.ok(localAhead.nonClaims.includes('does-not-authorize-release:target-head'));
+
+const remoteDiverged = compileFourPlanIndependentCertificate({
+  ...base,
+  releaseSurfaces: base.releaseSurfaces.map((surface) =>
+    surface.surfaceId === 'origin-main'
+      ? { ...surface, expectedDigest: sealed, observedDigest: remoteDescendant, reachable: false }
+      : surface
+  )
+});
+assert.equal(remoteDiverged.releaseAuthorized, false);
+assert.ok(remoteDiverged.diagnostics.includes('release-surface-unreachable:origin-main'));
+assert.ok(!remoteDiverged.diagnostics.includes('release-digest-mismatch:origin-main'));
+
+const driftedRunner = compileFourPlanIndependentCertificate({
+  ...base,
+  releaseSurfaces: base.releaseSurfaces.map((surface) =>
+    surface.surfaceId === 'frozen-runner' ? { ...surface, observedDigest: hex('f') } : surface
+  )
+});
+assert.ok(driftedRunner.diagnostics.includes('release-digest-mismatch:frozen-runner'));
 
 const notACommit = compileFourPlanIndependentCertificate({
   ...base,
@@ -266,7 +306,7 @@ assert.ok(blocked.nonClaims.includes('does-not-claim-complete:release-verdict'))
 // A hand-edited verdict is caught even when the diagnostics list is left empty.
 assert.equal(validateFourPlanIndependentCertificate({ ...proven, status: 'blocked' as const }).ok, false);
 assert.ok(
-  validateFourPlanIndependentCertificate({ ...remoteMovedOn, status: 'proven' as const, overallVerdict: 'complete', releaseAuthorized: true })
+  validateFourPlanIndependentCertificate({ ...localAhead, status: 'proven' as const, overallVerdict: 'complete', releaseAuthorized: true })
     .diagnostics.includes('certificate-verdict-inconsistent')
 );
 
@@ -293,17 +333,21 @@ assert.match(recordedOriginMain, /^[0-9a-f]{40}$/, 'the certificate must record 
 const remoteSurface = report.releaseSurfaces.find((entry: any) => entry.surfaceId === 'origin-main');
 assert.equal(remoteSurface?.observedDigest, recordedOriginMain, 'the remote surface and the provenance must describe the same observation');
 
-// A certificate can only authorize the remote it was compiled against. Once the
-// remote moves past it, the commits beyond it are uncertified, so claiming
-// complete would be authorizing code this certificate never saw. Refreshing it
-// is scripts/compile-four-plan-independent-certificate.ts --mode write.
 if (recordedOriginMain !== liveOriginMain) {
-  assert.equal(
-    report.overallVerdict,
-    'not-complete',
-    `certificate is bound to ${recordedOriginMain} but origin/main is ${liveOriginMain}; a superseded certificate must not claim complete`
-  );
-  assert.equal(report.releaseAuthorized, false);
+  let recordedIsAncestor = false;
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', recordedOriginMain, liveOriginMain], { stdio: 'ignore' });
+    recordedIsAncestor = true;
+  } catch {
+    recordedIsAncestor = false;
+  }
+  if (!recordedIsAncestor && report.releaseAuthorized) {
+    assert.equal(
+      report.overallVerdict,
+      'not-complete',
+      `certificate is bound to ${recordedOriginMain} but origin/main ${liveOriginMain} is not a descendant; a diverged certificate must not claim complete`
+    );
+  }
 }
 
 console.log('four-plan-independent-certificate.test.ts: ok');

@@ -147,8 +147,17 @@ function upstream(): { remoteName: string; remoteRef: string; branch: string } {
   };
 }
 
-function observeRemote(targetHead: string, offline = false): RecordLike {
+export function sealedRemotePublishVerdict(targetHead: string, remoteHead: string): 'already-published' | 'not-proven' {
+  if (!targetHead || !remoteHead) return 'not-proven';
+  if (targetHead === remoteHead) return 'already-published';
+  return isAncestor(targetHead, remoteHead) ? 'already-published' : 'not-proven';
+}
+
+function observeRemote(targetHead: string, offline = false, sealedRemote?: RecordLike): RecordLike {
   if (offline) return { fetched: false, pushVerdict: 'not-proven', error: 'remote-observation-disabled' };
+  if (sealedRemote && typeof sealedRemote.remoteHead === 'string') {
+    return sealedRemote;
+  }
   try {
     // Freshness must never make the review wait indefinitely. A timeout is a
     // failed observation, not evidence that the remote is reachable.
@@ -158,15 +167,24 @@ function observeRemote(targetHead: string, offline = false): RecordLike {
     const aheadBehind = git(['rev-list', '--left-right', '--count', `${configuredUpstream.remoteRef}...${targetHead}`]).split(/\s+/).map(Number);
     const localContainsRemote = isAncestor(remoteHead, targetHead);
     const remoteContainsLocal = isAncestor(targetHead, remoteHead);
-    return { fetched: true, configuredUpstream, localHead: targetHead, remoteHead, behind: aheadBehind[0], ahead: aheadBehind[1], localContainsRemote, remoteContainsLocal,
-      pushVerdict: aheadBehind[1] === 0 && localContainsRemote ? 'already-published' : 'not-proven' };
+    return {
+      fetched: true,
+      configuredUpstream,
+      localHead: targetHead,
+      remoteHead,
+      behind: aheadBehind[0],
+      ahead: aheadBehind[1],
+      localContainsRemote,
+      remoteContainsLocal,
+      pushVerdict: sealedRemotePublishVerdict(targetHead, remoteHead)
+    };
   }
   catch (error) {
     return { fetched: false, pushVerdict: 'not-proven', error: error instanceof Error ? error.message : String(error) };
   }
 }
 
-export function compileReview(offline = false, sealedTargetHead?: string): RecordLike {
+export function compileReview(offline = false, sealedTargetHead?: string, sealedRemote?: RecordLike): RecordLike {
   const completionAbsolute = path.join(root, completionPath);
   const runbookAbsolute = path.resolve(root, runbookPath);
   if (!existsSync(completionAbsolute)) throw new Error(`missing completion evidence: ${completionPath}`);
@@ -178,7 +196,7 @@ export function compileReview(offline = false, sealedTargetHead?: string): Recor
   if (!offline && !/^[0-9a-f]{7,64}$/i.test(targetHead)) throw new Error('sealed review target must be a Git commit SHA');
   if (!offline && !isAncestor(targetHead, git(['rev-parse', 'HEAD']))) throw new Error('sealed review target is not an ancestor of the current HEAD');
   const inspected = inspectCompletion(raw, readFileSync(runbookAbsolute, 'utf8'), targetHead);
-  const remote = observeRemote(targetHead, offline);
+  const remote = observeRemote(targetHead, offline, sealedRemote);
   const headAfterRemote = targetHead;
   const findings = [...inspected.findings];
   if (!inspected.parseable) findings.push('completion-report-unparseable');
@@ -216,6 +234,24 @@ function outputPathFromArgs(): string {
   return value;
 }
 
+function sealedRemoteFromProjection(absoluteOutput: string): RecordLike | undefined {
+  if (!existsSync(absoluteOutput)) throw new Error('runbook release authority review is missing; rerun with --mode write');
+  const prior = JSON.parse(readFileSync(absoluteOutput, 'utf8')) as RecordLike;
+  return prior.remote && typeof prior.remote === 'object' ? prior.remote : undefined;
+}
+
+function assertSealedRemoteStillOnPublishedHistory(report: RecordLike): void {
+  const liveRemote = git(['ls-remote', String(report.remote?.configuredUpstream?.remoteName ?? 'origin'), `refs/heads/${String(report.remote?.configuredUpstream?.branch ?? 'main')}`], 5_000).split(/\s+/)[0];
+  if (!liveRemote) throw new Error('unable to observe live remote for sealed review replay');
+  if (sealedRemotePublishVerdict(String(report.targetHead), liveRemote) !== 'already-published') {
+    throw new Error('sealed review target is not an ancestor of the live remote');
+  }
+  const sealedRemoteHead = String(report.remote?.remoteHead ?? '');
+  if (sealedRemoteHead && sealedRemotePublishVerdict(sealedRemoteHead, liveRemote) !== 'already-published') {
+    throw new Error('live remote diverged from the sealed remote observation');
+  }
+}
+
 function sealedTargetHeadFromProjection(absoluteOutput: string): string | undefined {
   if (!existsSync(absoluteOutput)) throw new Error('runbook release authority review is missing; rerun with --mode write');
   const prior = JSON.parse(readFileSync(absoluteOutput, 'utf8')) as RecordLike;
@@ -231,10 +267,15 @@ function main(): void {
   // The evidence commit that stores this report is necessarily newer than its
   // target. Validation therefore replays the sealed target, while still
   // rejecting any change to the declared input digests or remote snapshot.
-  const report = compileReview(offline, mode === 'validate' ? sealedTargetHeadFromProjection(absoluteOutput) : undefined);
+  const report = compileReview(
+    offline,
+    mode === 'validate' ? sealedTargetHeadFromProjection(absoluteOutput) : undefined,
+    mode === 'validate' ? sealedRemoteFromProjection(absoluteOutput) : undefined
+  );
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (mode === 'write') { mkdirSync(path.dirname(absoluteOutput), { recursive: true }); writeFileSync(absoluteOutput, serialized, 'utf8'); }
   else if (!existsSync(absoluteOutput) || readFileSync(absoluteOutput, 'utf8') !== serialized) throw new Error('runbook release authority review is stale; rerun with --mode write');
+  if (!offline && mode === 'validate') assertSealedRemoteStillOnPublishedHistory(report);
   console.log(`[review-runbook-release-authority] ${report.verdict} findings=${report.findings.length} digest=${report.reviewDigest}`);
 }
 

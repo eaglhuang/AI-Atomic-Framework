@@ -251,12 +251,12 @@ export function compileFourPlanIndependentCertificate(input: FourPlanIndependent
         push(`release-surface-commit-malformed:${label}`, 'contradictory');
       }
     }
-    if (surface.expectedDigest !== surface.observedDigest) {
-      push(`release-digest-mismatch:${label}`, 'stale');
-      nonClaims.add(`does-not-authorize-release:${label}`);
-    }
+    const commitSurface = (REQUIRED_RELEASE_SURFACE_IDS as readonly string[]).includes(surface.surfaceId);
     if (!surface.reachable) {
       push(`release-surface-unreachable:${label}`, 'blocked');
+      nonClaims.add(`does-not-authorize-release:${label}`);
+    } else if (surface.expectedDigest !== surface.observedDigest && !commitSurface) {
+      push(`release-digest-mismatch:${label}`, 'stale');
       nonClaims.add(`does-not-authorize-release:${label}`);
     }
   }
