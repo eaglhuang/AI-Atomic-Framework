@@ -223,36 +223,42 @@ export async function runTeam(argv: string[]) {
         }
       });
     }
-    const backendAdmission = evaluateTeamRuntimeBackendAdmission(runtimeContract, runtimeBackendReadiness);
-    if (!backendAdmission.ok) {
-      return makeResult({
-        ok: false,
-        command: 'team',
-        cwd,
-        messages: [
-          message('error', 'ATM_TEAM_RUNTIME_BACKEND_MISSING', backendAdmission.reason, {
-            taskId,
-            recipeId: recipe.recipeId,
-            providerId: runtimeContract.providerId,
-            runtimeMode: runtimeContract.runtimeMode,
-            executionSurface: runtimeContract.executionSurface
-          })
-        ],
-        evidence: {
-          action: 'start',
-          runtimeWritten: false,
-          agentsSpawned: false,
-          task: summarizeTask(taskId, task),
-          recipe,
-          validation,
-          teamPlan,
-          brokerLane: teamPlan.brokerLane,
-          sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
-          runtimeContract,
-          runtimeBackendReadiness,
-          runtimePilot: teamPlan.runtimePilot
-        }
-      });
+    const executeRequested = Boolean(parsed.options.execute);
+    if (executeRequested) {
+      const backendAdmission = evaluateTeamRuntimeBackendAdmission(runtimeContract, runtimeBackendReadiness);
+      if (!backendAdmission.ok) {
+        return makeResult({
+          ok: false,
+          command: 'team',
+          cwd,
+          messages: [
+            message('error', 'ATM_TEAM_RUNTIME_BACKEND_MISSING', backendAdmission.reason, {
+              taskId,
+              recipeId: recipe.recipeId,
+              providerId: runtimeContract.providerId,
+              runtimeMode: runtimeContract.runtimeMode,
+              executionSurface: runtimeContract.executionSurface,
+              recovery: backendAdmission.recovery
+            })
+          ],
+          evidence: {
+            action: 'start',
+            runtimeWritten: false,
+            agentsSpawned: false,
+            executeRequested: true,
+            task: summarizeTask(taskId, task),
+            recipe,
+            validation,
+            teamPlan,
+            backendAdmissionRecovery: backendAdmission.recovery,
+            brokerLane: teamPlan.brokerLane,
+            sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
+            runtimeContract,
+            runtimeBackendReadiness,
+            runtimePilot: teamPlan.runtimePilot
+          }
+        });
+      }
     }
     const teamRun = writeTeamRun({
       cwd,
@@ -264,7 +270,6 @@ export async function runTeam(argv: string[]) {
       validation,
       runtimeContract
     });
-    const executeRequested = Boolean(parsed.options.execute);
     const providerOrchestration = executeRequested
       ? await runTeamProviderExecution({
         taskId,
