@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-16T14-41-36-591Z-scope-amendment-bc9f80b77a1a",
+  "taskId": "TASK-SKL-0038",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0038.json",
+  "taskSha256": "sha256:0b62f9bc7ea6b2789cb30b93a9c7e97d3568630a94e5d729e913ef16afc2a8b6",
+  "createdAt": "2026-08-16T14:41:36.591Z",
+  "command": "node atm.mjs tasks scope add --task TASK-SKL-0038 --actor claude-008 --add \"release/atm-onefile/atm.mjs,release/atm-root-drop,packages/cli/dist\" --reason \"This card changed framework source under packages/integrations-core, so ATM_TASKFLOW_PRECLOSE_STALE_RUNNER requires republishing the frozen runner from the delivery commit. Runner publication resolves the release-surface owner from this task's own scope lock, and a framework-temp lane is not admissible while this governed card is active.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "This card changed framework source under packages/integrations-core, so ATM_TASKFLOW_PRECLOSE_STALE_RUNNER requires republishing the frozen runner from the delivery commit. Runner publication resolves the release-surface owner from this task's own scope lock, and a framework-temp lane is not admissible while this governed card is active."
+  }
+}

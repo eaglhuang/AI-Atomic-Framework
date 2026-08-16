@@ -1,9 +1,10 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-SKL-0038",
-  "updatedAt": "2026-08-16T14:17:06.240Z",
+  "updatedAt": "2026-08-16T14:47:59.871Z",
   "updatedBy": "claude-008",
   "freshValidationPasses": [
+    "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
     "validate:integration-adapter",
     "validate:skill-templates"
   ],
@@ -53,6 +54,38 @@
       "durationMs": 4450,
       "runnerKind": "dev-source",
       "sourceCommit": "d3ada7383071e504cdc057ea3dc6b852c54b3a0e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c9a2521036041a7bcb7807650ad36145ca54f3521a9c14f3cf465a1a46b6e5f3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+      ],
+      "generatedAt": "2026-08-16T14:46:37.617Z",
+      "startedAt": "2026-08-16T14:46:34.601Z",
+      "finishedAt": "2026-08-16T14:46:37.617Z",
+      "durationMs": 3016,
+      "runnerKind": "dev-source",
+      "sourceCommit": "81712257a64d8575c912db25a29836c0c8ae0aa6",
+      "cached": false
+    },
+    {
+      "command": "git diff --check -- packages/integrations-core/src/compiler/skill-templates.ts packages/integrations-core/src/compiler/skill-source-universe.ts packages/integrations-core/src/compiler/skill-projection-parity.ts packages/integrations-core/src/index.ts scripts/audit-skill-corpus.ts scripts/validate-skill-templates.ts tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:skill-templates"
+      ],
+      "generatedAt": "2026-08-16T14:47:59.871Z",
+      "startedAt": "2026-08-16T14:47:59.595Z",
+      "finishedAt": "2026-08-16T14:47:59.871Z",
+      "durationMs": 276,
+      "runnerKind": "dev-source",
+      "sourceCommit": "81712257a64d8575c912db25a29836c0c8ae0aa6",
       "cached": false
     }
   ],

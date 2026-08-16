@@ -1,4 +1,7 @@
 import { execFileSync } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { hasReconciliationEntitlement } from '../../../../core/dist/broker/terminal-history-entitlement.js';
 export const ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE = 'ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE';
 function normalizeRelativePath(filePath) {
     return filePath.trim().replace(/\\/g, '/').replace(/^\.\/+/, '');
@@ -44,6 +47,8 @@ export function inspectProtectedGovernanceStateDestructiveChanges(input) {
         const classification = classifyProtectedGovernanceStatePath(filePath);
         if (!classification)
             continue;
+        if (isEntitledGeneratedResidueDeletion(input.cwd, input.taskId, filePath))
+            continue;
         violations.push({
             path: filePath,
             pathClass: classification.pathClass,
@@ -61,4 +66,71 @@ export function inspectProtectedGovernanceStateDestructiveChanges(input) {
             : null,
         violations
     };
+}
+/**
+ * Generated bundle-manifests are disposable close byproducts. A live writer
+ * admitted for that exact history path may converge the deletion; every other
+ * protected history deletion stays fail-closed.
+ */
+function isEntitledGeneratedResidueDeletion(cwd, writerWorkItemId, filePath) {
+    const normalized = normalizeRelativePath(filePath);
+    if (!/^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/i.test(normalized))
+        return false;
+    const isLiveTask = (taskId) => isLiveLedgerTask(cwd, taskId);
+    return listEntitlementWriterIds(cwd, writerWorkItemId).some((candidateId) => hasReconciliationEntitlement(cwd, {
+        writerWorkItemId: candidateId,
+        candidateFile: normalized,
+        isLiveTask
+    }));
+}
+/**
+ * A live successor card may hold the residue in its own lock, or a linked
+ * framework-temp claim may be the admitted writer. Entitlement still comes
+ * from that writer's lock; this only enumerates who to ask.
+ */
+function listEntitlementWriterIds(cwd, writerWorkItemId) {
+    const ids = [writerWorkItemId];
+    const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
+    if (!existsSync(lockRoot))
+        return ids;
+    for (const name of readdirSync(lockRoot)) {
+        if (!/^ATM-FRAMEWORK-TEMP-.*\.lock\.json$/i.test(name))
+            continue;
+        try {
+            const lock = JSON.parse(readFileSync(path.join(lockRoot, name), 'utf8'));
+            if (lock.released === true || lock.status === 'released')
+                continue;
+            const linked = typeof lock.linkedTaskId === 'string' ? lock.linkedTaskId.trim() : '';
+            if (linked !== writerWorkItemId)
+                continue;
+            const workItemId = typeof lock.workItemId === 'string' && lock.workItemId.trim()
+                ? lock.workItemId.trim()
+                : name.replace(/\.lock\.json$/i, '');
+            if (workItemId && !ids.includes(workItemId))
+                ids.push(workItemId);
+        }
+        catch {
+            continue;
+        }
+    }
+    return ids;
+}
+function isLiveLedgerTask(cwd, taskId) {
+    const ledgerPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (!existsSync(ledgerPath))
+        return false;
+    try {
+        const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8'));
+        const status = typeof ledger.status === 'string' ? ledger.status.trim().toLowerCase() : '';
+        if (status === 'done' || status === 'abandoned' || status === 'blocked')
+            return false;
+        const claim = ledger.claim && typeof ledger.claim === 'object' && !Array.isArray(ledger.claim)
+            ? ledger.claim
+            : null;
+        const claimState = typeof claim?.state === 'string' ? claim.state.trim().toLowerCase() : '';
+        return status === 'running' || status === 'open' || claimState === 'active' || claimState === 'handoff';
+    }
+    catch {
+        return false;
+    }
 }

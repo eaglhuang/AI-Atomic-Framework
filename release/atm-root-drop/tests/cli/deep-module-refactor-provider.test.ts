@@ -92,6 +92,12 @@ assert.equal(validateTemplate({
   firstCommand: 'node atm.mjs next --prompt "$ARGUMENTS" --json',
   'charter-invariants-injected': true,
   handoffs: 'node atm.mjs handoff summarize --task "$ARGUMENTS" --json',
+  owner: 'atm-framework',
+  tier: 'specialist',
+  installProfiles: ['framework-full', 'role-oriented'],
+  invocationPolicy: 'model-or-user',
+  companionFiles: ['templates/skills/atm-deep-module-refactor.files/**'],
+  adapterCapabilityRequirements: [{ adapterId: '*', requires: ['charter-injection'] }],
   skillDefinition: definition
 }), true);
 assert.equal(definition.provider.license, 'MIT');

@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-SKL-0038",
-  "updatedAt": "2026-08-16T14:17:06.240Z",
+  "updatedAt": "2026-08-16T14:47:59.871Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -279,6 +279,200 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:30b368fd1c415fd5ba04b3f9e76a0a505e94bdb594193d4c23c3c0f9235c3205",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008",
+      "sessionId": "session-20260816143740-claude-008-TASK-SKL-0038-af1c19ec7d",
+      "createdAt": "2026-08-16T14:46:37.618Z",
+      "details": {
+        "actorId": "claude-008",
+        "sessionId": "session-20260816143740-claude-008-TASK-SKL-0038-af1c19ec7d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.skill-corpus-auditor",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c9a2521036041a7bcb7807650ad36145ca54f3521a9c14f3cf465a1a46b6e5f3",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-16T14:46:34.601Z",
+            "finishedAt": "2026-08-16T14:46:37.617Z",
+            "durationMs": 3016,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "81712257a64d8575c912db25a29836c0c8ae0aa6",
+            "cacheKey": "sha256:7ea4c0c30c477548aef47d277c7e13901c0f7ed37280aae6a982bf399cf7c5f1",
+            "generatedAt": "2026-08-16T14:46:37.617Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:7ea4c0c30c477548aef47d277c7e13901c0f7ed37280aae6a982bf399cf7c5f1",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-16T14:46:37.617Z",
+              "observedAt": "2026-08-16T14:46:37.617Z",
+              "startedAt": "2026-08-16T14:46:34.601Z",
+              "finishedAt": "2026-08-16T14:46:37.617Z",
+              "durationMs": 3016,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:db6952e0cd1b1da077a13c28c2a19d8124c8969c50b130c5b1d1e804ca614cc4",
+              "outputDigest": "sha256:3bf9622e9fa10051f019ed3712a5f5bb66cef5965daef196b4e7fc0a32d24dbe",
+              "cache": {
+                "key": "sha256:7ea4c0c30c477548aef47d277c7e13901c0f7ed37280aae6a982bf399cf7c5f1",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "81712257a64d8575c912db25a29836c0c8ae0aa6",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:fb425c8a4461391f40dac970842e3e71949fa3ad8b4f374bcf2cf0b2007c3ef6",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check -- packages/integrations-core/src/compiler/skill-templates.ts packages/integrations-core/src/compiler/skill-source-universe.ts packages/integrations-core/src/compiler/skill-projection-parity.ts packages/integrations-core/src/index.ts scripts/audit-skill-corpus.ts scripts/validate-skill-templates.ts tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008",
+      "sessionId": "session-20260816143740-claude-008-TASK-SKL-0038-af1c19ec7d",
+      "createdAt": "2026-08-16T14:47:59.871Z",
+      "details": {
+        "actorId": "claude-008",
+        "sessionId": "session-20260816143740-claude-008-TASK-SKL-0038-af1c19ec7d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:skill-templates"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.skill-corpus-auditor",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check -- packages/integrations-core/src/compiler/skill-templates.ts packages/integrations-core/src/compiler/skill-source-universe.ts packages/integrations-core/src/compiler/skill-projection-parity.ts packages/integrations-core/src/index.ts scripts/audit-skill-corpus.ts scripts/validate-skill-templates.ts tests/cli/skill-corpus-canary-rewrite.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-16T14:47:59.595Z",
+            "finishedAt": "2026-08-16T14:47:59.871Z",
+            "durationMs": 276,
+            "cached": false,
+            "validators": [
+              "validate:skill-templates"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "81712257a64d8575c912db25a29836c0c8ae0aa6",
+            "cacheKey": "sha256:cd5f13d5060ff936653ac643ea08b46cf1b34cc3ee4c9eb68080d993035bfbc2",
+            "generatedAt": "2026-08-16T14:47:59.871Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:cd5f13d5060ff936653ac643ea08b46cf1b34cc3ee4c9eb68080d993035bfbc2",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-16T14:47:59.871Z",
+              "observedAt": "2026-08-16T14:47:59.871Z",
+              "startedAt": "2026-08-16T14:47:59.595Z",
+              "finishedAt": "2026-08-16T14:47:59.871Z",
+              "durationMs": 276,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:6a4808a6af57117684949faad6790e6daae421cd3a5a8a3347de3ec0845cc776",
+              "outputDigest": "sha256:73b4db795a7055d8fd5aadf94d2963333f0d33cd9a13d51041d00710dad53e5b",
+              "cache": {
+                "key": "sha256:cd5f13d5060ff936653ac643ea08b46cf1b34cc3ee4c9eb68080d993035bfbc2",
+                "hit": false
+              },
+              "extensions": {
+                "command": "git diff --check -- packages/integrations-core/src/compiler/skill-templates.ts packages/integrations-core/src/compiler/skill-source-universe.ts packages/integrations-core/src/compiler/skill-projection-parity.ts packages/integrations-core/src/index.ts scripts/audit-skill-corpus.ts scripts/validate-skill-templates.ts tests/cli/skill-corpus-canary-rewrite.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:skill-templates"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "81712257a64d8575c912db25a29836c0c8ae0aa6",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:00ca8d09ba6b0a66137c14a12923d23522b38dd3fc312ff057d12795645d8971",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

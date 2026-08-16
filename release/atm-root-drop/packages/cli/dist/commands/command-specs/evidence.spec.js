@@ -4,7 +4,7 @@ export default defineCommandSpec({
     name: 'evidence',
     summary: 'Run validators as governed evidence, add raw/manual evidence for close/commit/PR gates, author diagnostic-loop receipts, author historical-batch envelopes that feed taskflow close, or finalize diagnostic historical-batch slices. Successful fresh evidence updates the per-task bundle manifest at .atm/history/evidence/<taskId>.bundle-manifest.json.',
     positional: [
-        { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing | diagnose | historical-batch | historical-batch-finalize', required: true }
+        { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing | diagnose | historical-batch | historical-batch-finalize | wave-exit-observer', required: true }
     ],
     options: [
         commonCwdOption,
@@ -25,7 +25,11 @@ export default defineCommandSpec({
         { flag: '--hypothesis', value: 'id|summary|prediction|command|matched', summary: 'Diagnostic-loop only: repeatable falsifiable hypothesis and one-variable experiment result.' },
         { flag: '--winning-hypothesis', value: 'id', summary: 'Diagnostic-loop only: hypothesis id whose experiment matched.' },
         { flag: '--regression-case-id', value: 'id', summary: 'Diagnostic-loop only: regression test case id added or selected for the repair.' },
-        { flag: '--exit-code', value: 'number', summary: 'Raw evidence add only: exit code paired with --command evidence.' },
+        { flag: '--exit', value: 'EXIT-NN', summary: 'wave-exit-observer only: sealed EXIT id from the observer policy. The writer selects the command; callers cannot pass a command.' },
+        { flag: '--observer-role', value: 'role', summary: 'wave-exit-observer only: sealed observer role such as wave-exit-observer.gemini or wave-exit-observer.claude.' },
+        { flag: '--basis-owners', value: 'csv', summary: 'wave-exit-observer only: evidence owner task ids used to derive the basis producer actor. Not an actor override.' },
+        { flag: '--declared-basis-actor', value: 'id', summary: 'wave-exit-observer only: optional cross-check against the derived basis actor. Mismatch fails closed.' },
+        { flag: '--exit-code', value: 'number', summary: 'Raw evidence add only: exit code paired with --command evidence. Forbidden for wave-exit-observer.' },
         { flag: '--stdout-sha256', value: 'sha256', summary: 'Raw evidence add only: stdout digest paired with --command evidence.' },
         { flag: '--stderr-sha256', value: 'sha256', summary: 'Raw evidence add only: stderr digest paired with --command evidence.' },
         { flag: '--runner-kind', value: 'kind', summary: 'Runner kind for command proof: dev-source|frozen-runner|external.' },
@@ -63,7 +67,9 @@ export default defineCommandSpec({
         'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validator-command "npm run validate:cli" --dry-run --json',
         'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validators typecheck --validator-command "npm run typecheck" --write --json',
         'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123 --actor codex-main --validator-command "npm test" --allow-unmatched --approved-by captain --approval-reason "diagnostic backfill" --write --json',
-        'node atm.mjs evidence historical-batch-finalize --task TASK-B --batch hist-batch-2026-06-16T01-40-43-634Z --actor codex-main --disposition keep-diagnostic --reason "partial slice kept for audit only" --write --json'
+        'node atm.mjs evidence historical-batch-finalize --task TASK-B --batch hist-batch-2026-06-16T01-40-43-634Z --actor codex-main --disposition keep-diagnostic --reason "partial slice kept for audit only" --write --json',
+        'node atm.mjs evidence wave-exit-observer --exit EXIT-02 --actor gemini-wave-exit-observer --observer-role wave-exit-observer.gemini --basis-owners ATM-GOV-0341 --json',
+        'node atm.mjs evidence wave-exit-observer --exit EXIT-04 --actor claude-wave-exit-observer --observer-role wave-exit-observer.claude --basis-owners ATM-GOV-0341 --json'
     ],
     help: {
         audience: 'agent',
@@ -71,7 +77,8 @@ export default defineCommandSpec({
             { when: 'Recording governed evidence for one task', flags: ['--task', '--actor'] },
             { when: 'Running a command-backed validator', flags: ['run', '--command'] },
             { when: 'Writing a diagnostic historical batch with unmatched tasks', flags: ['--allow-unmatched', '--approved-by', '--approval-reason'] },
-            { when: 'Finalizing a diagnostic historical-batch slice', flags: ['historical-batch-finalize', '--task', '--batch', '--actor', '--disposition', '--reason'] }
+            { when: 'Finalizing a diagnostic historical-batch slice', flags: ['historical-batch-finalize', '--task', '--batch', '--actor', '--disposition', '--reason'] },
+            { when: 'Writing a sealed wave-exit observer receipt', flags: ['wave-exit-observer', '--exit', '--actor', '--observer-role', '--basis-owners'] }
         ],
         relatedCommands: [
             'node atm.mjs evidence validators --list --task TASK-ABC-0001 --json',
@@ -83,13 +90,15 @@ export default defineCommandSpec({
             'Using raw evidence add as a substitute for fresh command-backed validation when the task requires validators.',
             'Writing historical-batch evidence without checking whether the matched commits actually cover the task deliverables.',
             'Trying to use historical-batch-finalize on a close-ready slice; close-ready slices must go through taskflow close.',
-            'Treating git-head-backfill as a protected-push requirement instead of a repair/diagnostic tool for legacy HEAD evidence.'
+            'Treating git-head-backfill as a protected-push requirement instead of a repair/diagnostic tool for legacy HEAD evidence.',
+            'Hand-writing docs/reports/wave-exit-observer-receipts/<EXIT-id>.json or passing --command/--artifact-path to invent an observer receipt.'
         ],
         playbookNotes: [
             'evidence validators --list is the fastest way to see what a task still needs before closeout.',
             'Use --recent-run when a matching cached command run already exists and you only need to re-link it into the current evidence update.',
             'Use historical-batch-finalize to explicitly keep, abandon, or remove diagnostic-only historical-batch residue without changing task lifecycle state.',
-            'git-head-backfill is retained for repair and audit trails; same-commit governed provenance should normally come from node atm.mjs git commit instead of a follow-up backfill.'
+            'git-head-backfill is retained for repair and audit trails; same-commit governed provenance should normally come from node atm.mjs git commit instead of a follow-up backfill.',
+            'evidence wave-exit-observer is the only official writer for canonical wave-exit observer receipts. It never writes certificates, completion evidence, or release verdicts.'
         ]
     }
 });

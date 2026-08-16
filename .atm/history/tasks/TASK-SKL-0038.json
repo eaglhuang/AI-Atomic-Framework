@@ -40,7 +40,10 @@
     ".atm/history/task-events/TASK-SKL-0038/**",
     ".atm/history/tasks/TASK-SKL-0038.json",
     "packages/integrations-core/src/compiler/skill-projection-parity.ts",
-    "packages/integrations-core/src/compiler/skill-source-universe.ts"
+    "packages/integrations-core/src/compiler/skill-source-universe.ts",
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
   ],
   "validators": [
     "npm run validate:skill-templates",
@@ -210,27 +213,29 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-16T14-23-53-769Z-scope-amendment-c796615e0963",
-  "lastTransitionAt": "2026-08-16T14:23:53.769Z",
+  "lastTransitionId": "2026-08-16T14-41-36-591Z-scope-amendment-bc9f80b77a1a",
+  "lastTransitionAt": "2026-08-16T14:41:36.591Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-008",
   "reservedAt": "2026-08-16T13:54:19.287Z",
   "promotedAt": "2026-08-16T13:54:19.293Z",
   "claim": {
     "actorId": "claude-008",
-    "leaseId": "lease-d98c8177a113",
-    "claimedAt": "2026-08-16T13:54:19.302Z",
-    "heartbeatAt": "2026-08-16T13:54:19.302Z",
+    "leaseId": "lease-811467594acd",
+    "claimedAt": "2026-08-16T14:37:40.002Z",
+    "heartbeatAt": "2026-08-16T14:37:40.002Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-SKL-0038.*",
       ".atm/history/task-events/TASK-SKL-0038/**",
       ".atm/history/tasks/TASK-SKL-0038.json",
       "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist",
       "packages/integrations-core/src/compiler/skill-projection-parity.ts",
       "packages/integrations-core/src/compiler/skill-source-universe.ts",
       "packages/integrations-core/src/compiler/skill-templates.ts",
       "packages/integrations-core/src/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop",
       "scripts/audit-skill-corpus.ts",
       "scripts/validate-integration-adapter.ts",
       "scripts/validate-skill-templates.ts",
@@ -240,10 +245,10 @@
     "state": "active",
     "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260816135419-claude-008-64a204eaf6",
+      "laneSessionId": "lane-20260816143740-claude-008-d823c863f5",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816135419-claude-008-64a204eaf6\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816143740-claude-008-d823c863f5\""
     }
   },
   "startedAt": "2026-08-16T13:54:19.302Z",
@@ -251,40 +256,44 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d0c08553e4ea6d23",
-    "ticketDigest": "sha256:d0c08553e4ea6d231a900773b628062dfd659f40216d3b8d0026e2b1a453f835",
+    "ticketId": "wat-0a6d4cad78b0f760",
+    "ticketDigest": "sha256:0a6d4cad78b0f760f204f3e03e63d8bf878f1772f4836e62e451924041b2d75e",
     "taskId": "TASK-SKL-0038",
     "origin": "claim",
     "actorId": "claude-008",
-    "laneSessionId": "lane-20260816135419-claude-008-64a204eaf6",
-    "claimGeneration": "lease-d98c8177a113",
-    "issuedAt": "2026-08-16T14:23:53.669Z",
-    "expiresAt": "2026-08-16T14:53:53.669Z",
-    "scopeDigest": "sha256:32b780c1daff5a902c689b244b213fcbbc5c297b69c8a35083137823221fa904",
+    "laneSessionId": "lane-20260816143740-claude-008-d823c863f5",
+    "claimGeneration": "lease-811467594acd",
+    "issuedAt": "2026-08-16T14:41:36.484Z",
+    "expiresAt": "2026-08-16T15:11:36.484Z",
+    "scopeDigest": "sha256:342e5f0ec34ab7345fab37b9ebfee537855dcc0433c3b1a3e996291b4d254eba",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-16T14:23:53.669Z"
+      "selectedAt": "2026-08-16T14:41:36.484Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-SKL-0038.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-SKL-0038/**",
           ".atm/history/tasks/TASK-SKL-0038.json",
           "artifacts/generated/skill-corpus-audit.json",
+          "packages/cli/dist",
           "packages/integrations-core/src/compiler/skill-projection-parity.ts",
           "packages/integrations-core/src/compiler/skill-source-universe.ts",
           "packages/integrations-core/src/compiler/skill-templates.ts",
           "packages/integrations-core/src/index.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop",
           "scripts/audit-skill-corpus.ts",
           "scripts/validate-integration-adapter.ts",
           "scripts/validate-skill-templates.ts",
           "templates/skills/atm-diagnostic-loop.skill.md",
           "tests/cli/skill-corpus-canary-rewrite.test.ts"
         ],
-        "digest": "sha256:5e26faa45e0254f178c15fb92e8b153a0bde181b776becc8a235ca9714b09fec"
+        "digest": "sha256:110de55cc16a37cc7d8cb221fd50a647ce4b32c7304edafd888f42331f8d91fd"
       },
       {
         "kind": "lifecycle-operation",
@@ -318,7 +327,19 @@
       "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
   },
-  "startedBySessionId": "session-20260816135419-claude-008-TASK-SKL-0038-0ab1c3c35e",
+  "startedBySessionId": "session-20260816143740-claude-008-TASK-SKL-0038-af1c19ec7d",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "TASK-SKL-0038",
+    "actorId": "claude-008",
+    "laneSessionId": "lane-20260816135419-claude-008-64a204eaf6",
+    "dirtyPaths": [
+      ".atm/history/evidence/TASK-SKL-0038.live-index-reconciliation.json"
+    ],
+    "retainedAt": "2026-08-16T14:37:00.715Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "claude-008",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -332,10 +353,13 @@
       ".atm/history/task-events/TASK-SKL-0038/**",
       ".atm/history/tasks/TASK-SKL-0038.json",
       "artifacts/generated/skill-corpus-audit.json",
+      "packages/cli/dist",
       "packages/integrations-core/src/compiler/skill-projection-parity.ts",
       "packages/integrations-core/src/compiler/skill-source-universe.ts",
       "packages/integrations-core/src/compiler/skill-templates.ts",
       "packages/integrations-core/src/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop",
       "scripts/audit-skill-corpus.ts",
       "scripts/validate-integration-adapter.ts",
       "scripts/validate-skill-templates.ts",
@@ -357,12 +381,12 @@
     "actorId": "claude-008",
     "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20260816135419-claude-008-64a204eaf6",
+      "laneSessionId": "lane-20260816143740-claude-008-d823c863f5",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816135419-claude-008-64a204eaf6\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816143740-claude-008-d823c863f5\""
     },
-    "createdAt": "2026-08-16T13:54:26.917Z",
+    "createdAt": "2026-08-16T14:37:45.337Z",
     "status": "active"
   }
 }

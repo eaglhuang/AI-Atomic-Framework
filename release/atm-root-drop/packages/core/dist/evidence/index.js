@@ -46,3 +46,4 @@ export * from './shadow-comparison.js';
 export * from './adapter-parity.js';
 export * from './hostile-dogfood.js';
 export * from './four-plan-independent-certificate.js';
+export * from './wave-exit-observer-receipt.js';

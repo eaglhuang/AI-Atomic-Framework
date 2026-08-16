@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-16T14-37-01-299Z-repair-claim-fc0de3872340",
+  "taskId": "TASK-SKL-0038",
+  "action": "repair-claim",
+  "actorId": "claude-008",
+  "sessionId": "session-20260816135419-claude-008-TASK-SKL-0038-0ab1c3c35e",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0038.json",
+  "taskSha256": "sha256:c6c32f6f9f97407a3fd6f7c2643ac2e83d47ac70f1c5248c3070bc1ce6d86be3",
+  "createdAt": "2026-08-16T14:37:01.299Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-SKL-0038 --actor claude-008 --write --reason \"Own lease expired mid-delivery after the extraction pass; delivery commit 81712257a64d8575c912db25a29836c0c8ae0aa6 is already landed by this same actor and the lane must be reattached to finish runner-sync and close.\" --json"
+}

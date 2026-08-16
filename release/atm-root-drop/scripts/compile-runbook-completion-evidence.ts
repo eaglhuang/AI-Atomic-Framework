@@ -2,6 +2,14 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, relative, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import {
+  consumeWaveExitObserverReceipt,
+  digestWaveExitObserverPolicy,
+  loadWaveExitObserverPolicy,
+  readCanonicalWaveExitReceipt,
+  resolveWaveExitBasisProducer,
+  type WaveExitObserverPolicy
+} from '../packages/core/src/evidence/wave-exit-observer-receipt.ts';
 
 export const RUNBOOK_RELATIVE_PATH = 'docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md';
 export const DEFAULT_PLANNING_ROOT = process.env.ATM_PLANNING_REPO_ROOT
@@ -93,6 +101,16 @@ export function parseRunbook(source: string): { rows: CompletionRow[]; waveExits
 const NON_SEMANTIC_COMMANDS = new Set(['npm run typecheck', 'npm run validate:cli', 'npm run validate:git-head-evidence']);
 const ancestryCache = new Map<string, boolean>();
 const evidenceCache = new Map<string, EvidenceTuple[]>();
+
+export type WaveExitObserverCompileOptions = {
+  readonly receipts?: Readonly<Record<string, unknown>>;
+  readonly policy?: WaveExitObserverPolicy;
+  readonly currentInputDigests?: Readonly<Record<string, string>>;
+  readonly policyDigestAtCompilationHead?: string;
+  readonly basisActorsByWave?: Readonly<Record<string, readonly string[]>>;
+  readonly repoRoot?: string;
+  readonly isAncestor?: (ancestor: string, descendant: string) => boolean;
+};
 
 export type CardContract = {
   taskId: string;
@@ -343,6 +361,23 @@ function requiresFinalCertificate(row: CompletionRow): boolean {
     || (row.section === 'Tests, backlog and release' && /runner sync queue|remote-reachable|closeback receipt|final certificate/.test(row.requirement));
 }
 
+function digestInputsAtHead(paths: readonly string[], compilationHead: string, repoRoot: string): Record<string, string> {
+  const digests: Record<string, string> = {};
+  for (const inputPath of paths) {
+    try {
+      const body = execFileSync('git', ['show', `${compilationHead}:${inputPath.replace(/\\/g, '/')}`], {
+        cwd: repoRoot,
+        encoding: 'buffer',
+        stdio: ['ignore', 'pipe', 'ignore']
+      });
+      digests[inputPath] = digestText(Buffer.isBuffer(body) ? body.toString('utf8') : String(body));
+    } catch {
+      // Missing path at compilation HEAD stays absent so the consumer fail-closes on drift.
+    }
+  }
+  return digests;
+}
+
 export function compileRunbookCompletion(
   source: string,
   planningHead: string,
@@ -351,7 +386,8 @@ export function compileRunbookCompletion(
   finalCertificate = observeFinalCertificate(),
   generatedAt = new Date().toISOString(),
   authorityDiagnostics: string[] = [],
-  publicationArtifacts = [relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/')]
+  publicationArtifacts = [relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/')],
+  observerOptions: WaveExitObserverCompileOptions = {}
 ) {
   const normalizedPublicationArtifacts = normalizePublicationArtifacts(publicationArtifacts);
   if (normalizedPublicationArtifacts === null) throw new Error('publication artifacts must be non-empty project report paths');
@@ -366,6 +402,13 @@ export function compileRunbookCompletion(
   });
   const rowsByWave = new Map<string, CompletionRow[]>();
   for (const row of parsed.rows) if (row.wave) rowsByWave.set(row.wave, [...(rowsByWave.get(row.wave) ?? []), row]);
+  const repoRoot = observerOptions.repoRoot ?? resolve('.');
+  const observerPolicy = observerOptions.policy ?? (existsSync(resolve(repoRoot, 'schemas/evidence/wave-exit-observer-policy.json'))
+    ? loadWaveExitObserverPolicy(repoRoot)
+    : null);
+  const observerPolicyDigest = observerPolicy
+    ? (observerOptions.policyDigestAtCompilationHead ?? digestWaveExitObserverPolicy(observerPolicy))
+    : null;
   parsed.waveExits = parsed.waveExits.map((row) => {
     const basis = rowsByWave.get(row.wave ?? '') ?? [];
     const primaryForWave = contracts.filter((contract) => contract.registered && contract.wave === row.wave);
@@ -377,15 +420,64 @@ export function compileRunbookCompletion(
     const uncoveredOwners = contractsForWave
       .filter((contract) => !independentEvidence.some((tuple) => evidenceBelongsToContract(tuple, contract)))
       .map((contract) => contract.taskId);
-    const independentlySatisfied = (basis.length === 0 || basis.every((item) => item.status === 'proven'))
+    const basisProven = basis.length === 0 || basis.every((item) => item.status === 'proven');
+    const independentlySatisfied = basisProven
       && contractsForWave.length > 0
       && uncoveredOwners.length === 0;
-    return independentlySatisfied
-      ? { ...hydrated, evidence: independentEvidence, diagnostics: [] }
-      : { ...hydrated, evidence: independentEvidence, status: 'unproven' as const, diagnostics: [
+    const contractDiagnostics = independentlySatisfied
+      ? []
+      : [
           ...(basis.some((item) => item.status !== 'proven') ? ['wave-requirement-basis-not-proven'] : []),
           ...(uncoveredOwners.length ? [`missing-independent-wave-exit-evidence:${uncoveredOwners.join(',')}`] : ['missing-independent-wave-exit-contract'])
-        ] };
+        ];
+    const receiptSource = observerPolicy
+      ? (observerOptions.receipts?.[row.itemId] ?? readCanonicalWaveExitReceipt(repoRoot, observerPolicy, row.itemId))
+      : null;
+    if (receiptSource != null && observerPolicy && observerPolicyDigest) {
+      const exitPolicy = observerPolicy.exits[row.itemId];
+      const currentInputDigests = observerOptions.currentInputDigests
+        ?? (exitPolicy ? digestInputsAtHead(exitPolicy.inputs, targetHead, repoRoot) : {});
+      const derivedActors = observerOptions.basisActorsByWave?.[row.wave ?? '']
+        ?? resolveWaveExitBasisProducer({ repoRoot, policy: observerPolicy }).actorIds;
+      const verdict = consumeWaveExitObserverReceipt({
+        receipt: receiptSource,
+        policy: observerPolicy,
+        compilationHead: targetHead,
+        derivedBasis: { actorIds: derivedActors, producerRole: observerPolicy.basisProducerRole },
+        currentInputDigests,
+        isAncestor: observerOptions.isAncestor ?? isAncestor,
+        policyDigestAtCompilationHead: observerPolicyDigest
+      });
+      if (verdict.ok && basisProven && verdict.receipt) {
+        const receiptTuple: EvidenceTuple = {
+          command: verdict.receipt.command,
+          exitCode: verdict.receipt.exitCode,
+          outputDigest: verdict.receipt.stdoutDigest,
+          artifactPaths: [verdict.receipt.artifactPath],
+          observedAt: verdict.receipt.observedAt,
+          sourceCommit: verdict.receipt.observedHead,
+          evidenceOwner: `wave-exit-observer:${row.itemId}`,
+          validatorContractId: `atm.waveExitObserverReceipt/${row.itemId}`
+        };
+        return {
+          ...hydrated,
+          status: 'proven' as const,
+          evidence: [...independentEvidence, receiptTuple],
+          diagnostics: [],
+          coverageOwners: [...new Set([...(hydrated.coverageOwners ?? []), receiptTuple.evidenceOwner])],
+          validatorContractIds: [...new Set([...(hydrated.validatorContractIds ?? []), receiptTuple.validatorContractId])]
+        };
+      }
+      return {
+        ...hydrated,
+        evidence: independentEvidence,
+        status: 'unproven' as const,
+        diagnostics: [...new Set([...contractDiagnostics, ...verdict.diagnostics])]
+      };
+    }
+    return independentlySatisfied
+      ? { ...hydrated, evidence: independentEvidence, diagnostics: [] }
+      : { ...hydrated, evidence: independentEvidence, status: 'unproven' as const, diagnostics: contractDiagnostics };
   });
   if (authorityDiagnostics.length > 0) {
     parsed.rows = parsed.rows.map((row) => ({ ...row, status: 'unproven' as const, diagnostics: [...new Set([...row.diagnostics, ...authorityDiagnostics])] }));

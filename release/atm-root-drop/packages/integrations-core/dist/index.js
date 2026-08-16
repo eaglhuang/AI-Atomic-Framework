@@ -19,7 +19,7 @@ export const atmFirstCommand = 'node atm.mjs next --prompt "$ARGUMENTS" --json';
 export const atmPromptScopedFirstCommand = 'node atm.mjs next --prompt "$ARGUMENTS" --json';
 export const atmIntentScopedFirstCommand = 'node atm.mjs next --intent .atm/runtime/task-intent.json --json';
 export const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
-export { minimumAtmEntrySkillDefinitions, defaultSkillTemplateDirectory, parseSkillTemplate, loadSkillTemplates, loadSkillTemplatesForProfile, loadMinimumAtmSkillTemplates, loadSkillCorpusSourceSnapshot, collectSkillCorpusDiscoveryFindings, compileSkillCorpus } from './compiler/skill-templates.js';
+export { minimumAtmEntrySkillDefinitions, defaultSkillTemplateDirectory, parseSkillTemplate, loadSkillTemplates, loadSkillTemplatesForProfile, loadMinimumAtmSkillTemplates, loadSkillCorpusSourceSnapshot, collectSkillCorpusDiscoveryFindings, compileSkillCorpus, sealSkillSourceUniverse, collectSkillSourceUniverseFindings, collectProjectionMetadataFindings, evaluateInstalledProjectionParity } from './compiler/skill-templates.js';
 export { defaultSkillInstallProfiles, getSkillInstallProfile, selectDefaultSkillInstallProfile, skillBelongsToProfile } from './distribution/install-profile.js';
 export { buildCanonicalSkillCatalog, inferCompanionFiles } from './distribution/skill-catalog.js';
 export { resolveSkillInstallationPlan, digestSkillInstallationPlan } from './distribution/skill-distribution-manager.js';
