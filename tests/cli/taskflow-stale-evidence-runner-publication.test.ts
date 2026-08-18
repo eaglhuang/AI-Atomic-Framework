@@ -104,3 +104,30 @@ test('assessEvidenceFreshness accepts matching published runner receipt without 
   assert.equal(result.status, 'fresh');
   assert.equal(result.validators[0]?.status, 'fresh');
 });
+
+test('runner sync receipt bridge: unpublished/draft receipt fails closed as stale/absent', () => {
+  const draftBundle = [
+    {
+      evidenceKind: 'validation',
+      evidenceFreshness: 'draft',
+      details: {
+        kind: 'test',
+        freshness: 'draft',
+        validationPasses: ['build'],
+        commandRuns: [
+          {
+            command: 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build',
+            exitCode: 1,
+            stdoutSha256: 'a1b2c3d4',
+            stderrSha256: 'e5f6g7h8',
+            validators: ['build']
+          }
+        ]
+      }
+    }
+  ];
+
+  const state = classifyValidatorEvidenceState(draftBundle, 'build');
+  assert.notEqual(state, 'pass');
+});
+
