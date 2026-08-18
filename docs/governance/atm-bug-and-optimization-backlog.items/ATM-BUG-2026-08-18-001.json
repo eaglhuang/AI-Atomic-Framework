@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-18-001",
+  "date": "2026-08-18",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Fixed in quickfix / 8a2d9f12",
+  "area": "Taskflow historical close preflight ignores valid published runner sync receipts, demanding duplicate second builds",
+  "finding": "When a task closure requires the build validator (e.g. ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build) and a valid, durable published runner sync receipt (atm.runnerSyncReceipt.v1) already exists for the task or its covering producer group, computeMissingValidatorReport only checked the task local evidence bundle. Because the runner sync receipt is stored as a distinct durable evidence file, classifyValidatorEvidenceState and assessEvidenceFreshness classified the build validator as absent/stale, raising ATM_TASKFLOW_PRECLOSE_STALE_EVIDENCE and requiring a duplicate build even when the runner publication closure was verified and accepted. An earlier quickfix (aa5d12ba) only addressed the env-var prefix formatting for literal validator commands, leaving the receipt bridge unlinked.",
+  "expectedBehavior": "Taskflow evidence freshness and missing validator reporting must consult verified runner sync receipts. A published receipt (publicationDisposition: published) with verified sealed source ancestry, matching runner input tree hash, and intact task attribution satisfies the build validator, avoiding redundant rebuilds. Non-published receipts, draft states, or mismatched hashes/attribution must fail closed.",
+  "evidenceOrRepro": "Observed on ATM-GOV-0369: source commit dfb21e771 was covered by ATM-GOV-0341 published runner sync receipt with sealed source 194c7670 and syncRequired: false. Despite taskflow recognizing the runner receipt publication closure, taskflow pre-close rejected the task with ATM_TASKFLOW_PRECLOSE_STALE_EVIDENCE for the build gate and suggested running npm run build again. Fixed in commit 8a2d9f12 by bridging readTaskRunnerSyncReceipt into computeMissingValidatorReport bundle evaluation.",
+  "followUp": "Maintain regression coverage in tests/cli/taskflow-stale-evidence-runner-publication.test.ts to ensure published runner receipts satisfy the build gate while draft/unverified receipts fail closed."
+}
