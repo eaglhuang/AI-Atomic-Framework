@@ -437,6 +437,13 @@ function commitF81Shape(root: string) {
     assert.equal(git(root, ['rev-parse', ':foreign.txt']), foreignBlob);
     assert.ok(written.evidencePath);
     assert.equal(existsSync(path.join(root, written.evidencePath!)), true);
+
+    write(root, 'later.txt', 'unrelated later commit\n');
+    git(root, ['add', '--', 'later.txt']);
+    git(root, ['commit', '--quiet', '-m', 'later unrelated']);
+    const laterDry = recoverLiveIndexAfterSuccessfulCommit({ cwd: root, commitSha, dryRun: true });
+    assert.equal(laterDry.mutated, false);
+    assert.ok(laterDry.reconciledPaths.includes('owned.txt') || laterDry.alreadyAlignedPaths.includes('owned.txt'));
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

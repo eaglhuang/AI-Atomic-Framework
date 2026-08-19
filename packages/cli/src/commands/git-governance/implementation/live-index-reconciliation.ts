@@ -365,6 +365,23 @@ function resolveParentSha(cwd: string, commitSha: string): string {
   }
 }
 
+function assertNamedCommitIsCurrentOrAncestor(cwd: string, commitSha: string, headSha: string | null): void {
+  if (headSha === commitSha) return;
+  try {
+    if (headSha) {
+      runGitCommand(cwd, ['merge-base', '--is-ancestor', commitSha, headSha], QUIET_STDIO);
+      return;
+    }
+  } catch {
+    // One mismatch code for both unreachable commits and a missing HEAD.
+  }
+  throw new CliError(
+    'ATM_LIVE_INDEX_RECOVERY_HEAD_MISMATCH',
+    'Historical live-index recovery requires HEAD to equal the named commit, or to be a descendant that has not rewritten those paths.',
+    { exitCode: 1, details: { commitSha, headSha } }
+  );
+}
+
 function listCommitPaths(cwd: string, parentSha: string, commitSha: string): readonly string[] {
   const output = runGitCommand(
     cwd,
@@ -407,19 +424,14 @@ export function recoverLiveIndexAfterSuccessfulCommit(input: {
 }): LiveIndexHistoricalRecovery {
   const commitSha = resolveCommitSha(input.cwd, input.commitSha);
   const headSha = readHeadCommit(input.cwd);
-  if (headSha !== commitSha) {
-    throw new CliError(
-      'ATM_LIVE_INDEX_RECOVERY_HEAD_MISMATCH',
-      'Historical live-index recovery requires HEAD to equal the named commit.',
-      { exitCode: 1, details: { commitSha, headSha } }
-    );
-  }
+  assertNamedCommitIsCurrentOrAncestor(input.cwd, commitSha, headSha);
   const parentSha = resolveParentSha(input.cwd, commitSha);
   const paths = listCommitPaths(input.cwd, parentSha, commitSha);
   const budgetBytes = input.budgetBytes;
   const current = readIndexEntries(input.cwd, paths, undefined, budgetBytes);
   const parent = readTreeEntries(input.cwd, parentSha, paths, budgetBytes);
   const head = readTreeEntries(input.cwd, commitSha, paths, budgetBytes);
+  const liveHead = headSha ? readTreeEntries(input.cwd, headSha, paths, budgetBytes) : head;
   const worktree = readWorktreeEntries(input.cwd, paths, head, budgetBytes);
   const alreadyAlignedPaths: string[] = [];
   const reconciledPaths: string[] = [];
@@ -427,6 +439,10 @@ export function recoverLiveIndexAfterSuccessfulCommit(input: {
   const unprovenPaths: string[] = [];
 
   for (const filePath of paths) {
+    if (!sameEntry(liveHead[filePath], head[filePath])) {
+      unprovenPaths.push(filePath);
+      continue;
+    }
     if (sameEntry(current[filePath], head[filePath]) && sameEntry(worktree[filePath], head[filePath])) {
       alreadyAlignedPaths.push(filePath);
       continue;
