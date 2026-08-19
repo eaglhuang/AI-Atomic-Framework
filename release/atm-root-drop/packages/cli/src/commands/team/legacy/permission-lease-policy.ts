@@ -33,13 +33,37 @@ export function buildProposalFirstParityFindings(input: {
     return [];
   }
   const hotFiles = Array.isArray(admission.hotFiles) ? admission.hotFiles.map((entry) => String(entry)) : [];
+  const decision = input.brokerLaneResult.evidence?.decision;
+  const brokerSubject = decision ? {
+    taskId: decision.taskId,
+    verdict: decision.verdict,
+    lane: decision.lane,
+    reason: decision.reason
+  } : undefined;
+  const planPreviewCommand = `node atm.mjs team plan --task ${input.taskId} --broker-proposal-file <proposal.json> --json`;
+  const teamStartCommand = `node atm.mjs team start --task ${input.taskId} --broker-proposal-file <proposal.json> --json`;
+  const brokerActivateCommand = 'node atm.mjs broker runtime activate --proposal-file <proposal.json> --json';
+
   return [buildPermissionFinding({
     level: input.advisoryOnly ? 'warning' : 'error',
     code: 'proposal-first-required',
     detail: input.advisoryOnly
-      ? `Read-only team plan projection: hot shared surface would require a validated bounded proposal (schema atm.patchProposal.v1) before team start. Author the proposal, then rerun: node atm.mjs team plan --task ${input.taskId} --broker-proposal-file <proposal.json> --json and node atm.mjs team start --task ${input.taskId} --broker-proposal-file <proposal.json> --json. This read-only projection did not persist broker registry state.`
-      : `Hot shared surface requires a validated bounded proposal (schema atm.patchProposal.v1) before this team may plan or start. Author the proposal, then rerun: node atm.mjs team plan --task ${input.taskId} --broker-proposal-file <proposal.json> --json (readiness preview) and node atm.mjs team start --task ${input.taskId} --broker-proposal-file <proposal.json> --json (fail-closed execution). To pre-activate through the Broker instead: node atm.mjs broker runtime activate --proposal-file <proposal.json> --json.`,
-    paths: hotFiles
+      ? `Read-only team plan projection: hot shared surface would require a validated bounded proposal (schema atm.patchProposal.v1) before team start. Author the proposal, then rerun: ${planPreviewCommand} and ${teamStartCommand}. This read-only projection did not persist broker registry state.`
+      : `Hot shared surface requires a validated bounded proposal (schema atm.patchProposal.v1) before this team may plan or start. Author the proposal, then rerun: ${planPreviewCommand} (readiness preview) and ${teamStartCommand} (fail-closed execution). To pre-activate through the Broker instead: ${brokerActivateCommand}.`,
+    paths: hotFiles,
+    recovery: {
+      schemaId: 'atm.patchProposal.v1',
+      hotFiles,
+      runtimeWritten: false,
+      teamRunMinted: false,
+      writeLeaseGranted: false,
+      brokerSubject,
+      requiredCommands: {
+        planPreview: planPreviewCommand,
+        teamStart: teamStartCommand,
+        brokerActivate: brokerActivateCommand
+      }
+    }
   })];
 }
 
@@ -51,6 +75,7 @@ export function buildPermissionFinding(input: {
   agentIds?: string[];
   paths?: string[];
   role?: string;
+  recovery?: PermissionFinding['recovery'];
 }): PermissionFinding {
   return {
     level: input.level,
@@ -61,7 +86,8 @@ export function buildPermissionFinding(input: {
     permission: input.permission,
     agentIds: input.agentIds,
     paths: input.paths,
-    suggestedFix: permissionFindingSuggestedFix(input)
+    suggestedFix: permissionFindingSuggestedFix(input),
+    ...(input.recovery ? { recovery: input.recovery } : {})
   };
 }
 

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, effectiveEvidenceContracts, independentExitContracts, isDeclaredPublicationDelta, isPublicationOnlyDelta, semanticTaskCardDigest } from '../../scripts/compile-runbook-completion-evidence.ts';
+import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, effectiveEvidenceContracts, independentExitContracts, isDeclaredPublicationDelta, isPublicationOnlyDelta, sealValidatorContractIds, semanticTaskCardDigest } from '../../scripts/compile-runbook-completion-evidence.ts';
 import { validateReport } from '../../scripts/validate-runbook-completion-evidence.ts';
 
 const sha = 'a'.repeat(40);
@@ -89,6 +89,15 @@ assert.throws(
   /publication artifacts/,
   'publication declarations must reject non-report paths'
 );
+
+const sealedIds = sealValidatorContractIds(['atm.waveExitObserverReceipt/EXIT-02', undefined, ''], ['wave-exit-observer:EXIT-02'], true);
+assert.deepEqual(sealedIds.validatorContractIds, ['atm.waveExitObserverReceipt/EXIT-02']);
+assert.equal(sealedIds.validatorContractIds.every((id) => typeof id === 'string' && id.length > 0), true);
+assert.deepEqual(sealedIds.diagnostics, ['missing-validator-contract-id']);
+assert.deepEqual(sealValidatorContractIds(['atm.waveExitObserverReceipt/EXIT-02'], ['wave-exit-observer:EXIT-02'], true).diagnostics, []);
+for (const row of [...report.rows, ...report.waveExits]) {
+  for (const id of row.validatorContractIds ?? []) assert.equal(typeof id, 'string');
+}
 
 const forged = structuredClone(report);
 forged.rows[0].status = 'proven';

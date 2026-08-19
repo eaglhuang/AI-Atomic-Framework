@@ -27,7 +27,7 @@ export const teamSpecCommandSurface = {
         { flag: '--execute', summary: 'Execute governed provider orchestration for selected Team roles after runtime state is written. Defaults off.' },
         { flag: '--executor', value: 'mode', summary: 'For team wave plan/dispatch: executor mode auto, local-lanes, editor-subagents, team-agents, or manual.' },
         { flag: '--team', value: 'id', summary: 'Team run id for status or patrol.' },
-        { flag: '--broker-proposal-file', value: 'path', summary: 'Validated broker proposal consumed by team plan (readiness preview) and a matching hot Team start; mismatched, stale, or out-of-scope proposals fail closed on both surfaces.' },
+        { flag: '--broker-proposal-file', value: 'path', summary: 'Validated broker proposal consumed by team plan (readiness preview) and a matching hot Team start. Proposal-first rejections emit a machine-actionable recovery contract (schema atm.patchProposal.v1); mismatched, stale, or out-of-scope proposals fail closed on both surfaces.' },
         { flag: '--read-only', summary: 'team plan only: read-only projection mode. Skips broker-registry cleanup persistence and downgrades proposal-first-required to a warning so diagnostics such as indexLane still return. Does not change team start fail-closed semantics.' },
         { flag: '--permission', value: 'id', summary: 'Permission id for team lease or release.' },
         { flag: '--paths', value: 'csv', summary: 'Comma-separated lease paths for team lease.' },

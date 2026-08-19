@@ -30,6 +30,15 @@ function sha256(value: string | Buffer): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
+function isAncestor(ancestor: string, descendant: string): boolean {
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', ancestor, descendant], { cwd: root, stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function stableDigest(value: unknown): string {
   return sha256(JSON.stringify(value, (_, item) => item && typeof item === 'object' && !Array.isArray(item)
     ? Object.fromEntries(Object.entries(item).sort(([left], [right]) => left.localeCompare(right)))
@@ -93,7 +102,7 @@ function evaluateCharter(report: JsonRecord): string[] {
   return findings;
 }
 
-export function compileReview(): JsonRecord {
+export function compileReview(sealedTargetHead?: string): JsonRecord {
   const findings: string[] = [];
   const inputs = [...objectiveSources.map((entry) => entry.path), ...otherSources].sort();
   const inputDigests = inputs.map((relativePath) => ({ path: relativePath, digest: sha256(readFileSync(path.join(root, relativePath))) }));
@@ -107,7 +116,11 @@ export function compileReview(): JsonRecord {
   const backlogFindings = evaluateBacklog(readJson(otherSources[0]), readJson(otherSources[1]));
   const charterFindings = evaluateCharter(readJson(otherSources[2]));
   findings.push(...backlogFindings, ...charterFindings);
-  const targetHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+  const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+  const targetHead = sealedTargetHead ?? head;
+  if (sealedTargetHead && !isAncestor(sealedTargetHead, head)) {
+    throw new Error('sealed review target is not an ancestor of the current HEAD');
+  }
   // A review is a function of its sealed source snapshot.  Wall-clock time
   // would make byte-stable replay impossible, so use the observed HEAD's
   // commit time as the stable timestamp of that snapshot.
@@ -122,12 +135,19 @@ export function compileReview(): JsonRecord {
   return { ...unsigned, reviewDigest: stableDigest(unsigned) };
 }
 
+function sealedTargetHeadFromProjection(absoluteOutput: string): string | undefined {
+  if (!existsSync(absoluteOutput)) throw new Error('objective authority review is missing; rerun with --mode write');
+  const prior = JSON.parse(readFileSync(absoluteOutput, 'utf8')) as JsonRecord;
+  if (typeof prior.targetHead !== 'string') throw new Error('objective authority review lacks a sealed targetHead; rerun with --mode write');
+  return prior.targetHead;
+}
+
 function main(): void {
   const mode = process.argv.includes('--mode') ? process.argv[process.argv.indexOf('--mode') + 1] : 'validate';
   if (mode !== 'validate' && mode !== 'write') throw new Error(`unknown --mode ${String(mode)}; expected validate or write`);
-  const report = compileReview();
-  const serialized = `${JSON.stringify(report, null, 2)}\n`;
   const absoluteOutput = path.join(root, outputPath);
+  const report = compileReview(mode === 'validate' ? sealedTargetHeadFromProjection(absoluteOutput) : undefined);
+  const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (mode === 'write') {
     mkdirSync(path.dirname(absoluteOutput), { recursive: true });
     writeFileSync(absoluteOutput, serialized, 'utf8');

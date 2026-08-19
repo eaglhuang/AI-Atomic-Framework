@@ -193,6 +193,7 @@ export async function runTeam(argv: string[]) {
       throw new CliError('ATM_ACTOR_ID_MISSING', 'team start requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
     }
     if (!ok) {
+      const proposalFinding = validation.findings.find((finding) => finding.code === 'proposal-first-required');
       return makeResult({
         ok: false,
         command: 'team',
@@ -201,7 +202,8 @@ export async function runTeam(argv: string[]) {
           message('error', 'ATM_TEAM_START_BLOCKED', 'Team start blocked by permission validation findings.', {
             taskId,
             recipeId: recipe.recipeId,
-            findingCount: validation.findings.length
+            findingCount: validation.findings.length,
+            proposalFirstRecovery: proposalFinding?.recovery ?? null
           })
         ],
         evidence: {
@@ -212,6 +214,7 @@ export async function runTeam(argv: string[]) {
           recipe,
           validation,
           teamPlan,
+          proposalFirstRecovery: proposalFinding?.recovery ?? null,
           brokerLane: teamPlan.brokerLane,
           sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
           runtimeContract,
@@ -220,36 +223,42 @@ export async function runTeam(argv: string[]) {
         }
       });
     }
-    const backendAdmission = evaluateTeamRuntimeBackendAdmission(runtimeContract, runtimeBackendReadiness);
-    if (!backendAdmission.ok) {
-      return makeResult({
-        ok: false,
-        command: 'team',
-        cwd,
-        messages: [
-          message('error', 'ATM_TEAM_RUNTIME_BACKEND_MISSING', backendAdmission.reason, {
-            taskId,
-            recipeId: recipe.recipeId,
-            providerId: runtimeContract.providerId,
-            runtimeMode: runtimeContract.runtimeMode,
-            executionSurface: runtimeContract.executionSurface
-          })
-        ],
-        evidence: {
-          action: 'start',
-          runtimeWritten: false,
-          agentsSpawned: false,
-          task: summarizeTask(taskId, task),
-          recipe,
-          validation,
-          teamPlan,
-          brokerLane: teamPlan.brokerLane,
-          sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
-          runtimeContract,
-          runtimeBackendReadiness,
-          runtimePilot: teamPlan.runtimePilot
-        }
-      });
+    const executeRequested = Boolean(parsed.options.execute);
+    if (executeRequested) {
+      const backendAdmission = evaluateTeamRuntimeBackendAdmission(runtimeContract, runtimeBackendReadiness);
+      if (!backendAdmission.ok) {
+        return makeResult({
+          ok: false,
+          command: 'team',
+          cwd,
+          messages: [
+            message('error', 'ATM_TEAM_RUNTIME_BACKEND_MISSING', backendAdmission.reason, {
+              taskId,
+              recipeId: recipe.recipeId,
+              providerId: runtimeContract.providerId,
+              runtimeMode: runtimeContract.runtimeMode,
+              executionSurface: runtimeContract.executionSurface,
+              recovery: backendAdmission.recovery
+            })
+          ],
+          evidence: {
+            action: 'start',
+            runtimeWritten: false,
+            agentsSpawned: false,
+            executeRequested: true,
+            task: summarizeTask(taskId, task),
+            recipe,
+            validation,
+            teamPlan,
+            backendAdmissionRecovery: backendAdmission.recovery,
+            brokerLane: teamPlan.brokerLane,
+            sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
+            runtimeContract,
+            runtimeBackendReadiness,
+            runtimePilot: teamPlan.runtimePilot
+          }
+        });
+      }
     }
     const teamRun = writeTeamRun({
       cwd,
@@ -261,7 +270,6 @@ export async function runTeam(argv: string[]) {
       validation,
       runtimeContract
     });
-    const executeRequested = Boolean(parsed.options.execute);
     const providerOrchestration = executeRequested
       ? await runTeamProviderExecution({
         taskId,
@@ -314,6 +322,7 @@ export async function runTeam(argv: string[]) {
     });
   }
 
+  const proposalFinding = validation.findings.find((finding) => finding.code === 'proposal-first-required');
   return makeResult({
     ok,
     command: 'team',
@@ -328,7 +337,8 @@ export async function runTeam(argv: string[]) {
         recipeId: recipe.recipeId,
         findingCount: validation.findings.length,
         readOnly: readOnlyPlan,
-        actorId: planningActorId
+        actorId: planningActorId,
+        proposalFirstRecovery: proposalFinding?.recovery ?? null
       })
     ],
     evidence: {
@@ -344,6 +354,7 @@ export async function runTeam(argv: string[]) {
       permissionCatalog: teamPermissionCatalog,
       validation,
       teamPlan,
+      proposalFirstRecovery: proposalFinding?.recovery ?? null,
       governanceRuntime: teamPlan.governanceRuntime,
       runtimeContract,
       runtimeBackendReadiness,

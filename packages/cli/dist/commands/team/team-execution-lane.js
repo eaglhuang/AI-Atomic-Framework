@@ -23,7 +23,8 @@ export function runtimeBackendAdmissionForTeam(input) {
     if (input.runtimeMode === 'broker-only') {
         return {
             ok: true,
-            reason: 'broker-only mode is governed by Team Broker and does not require a declared runtime backend.'
+            reason: 'broker-only mode is governed by Team Broker and does not require a declared runtime backend.',
+            recovery: null
         };
     }
     const providerId = input.providerId ?? '';
@@ -36,11 +37,30 @@ export function runtimeBackendAdmissionForTeam(input) {
     if (matchingCapability) {
         return {
             ok: true,
-            reason: `Runtime backend declared by ${matchingCapability.manifestPath}.`
+            reason: `Runtime backend declared by ${matchingCapability.manifestPath}.`,
+            recovery: null
         };
     }
+    const supportedCapabilities = input.capabilities
+        .filter((c) => c.status !== 'unavailable')
+        .map((c) => ({
+        providerId: c.providerId,
+        runtimeModes: c.runtimeModes,
+        executionSurfaces: c.executionSurfaces,
+        manifestPath: c.manifestPath
+    }));
     return {
         ok: false,
-        reason: `Team runtime start requires an integration manifest teamRuntimeCapabilities entry for provider ${providerId || '(missing)'}, mode ${input.runtimeMode}, and surface ${input.executionSurface}. Installed editor integrations are not runtime backends unless their manifest declares this capability.`
+        reason: `Team runtime start requires an integration manifest teamRuntimeCapabilities entry for provider ${providerId || '(missing)'}, mode ${input.runtimeMode}, and surface ${input.executionSurface}. Installed editor integrations are not runtime backends unless their manifest declares this capability.`,
+        recovery: {
+            schemaId: 'atm.teamRuntimeBackendRecovery.v1',
+            requested: {
+                providerId: input.providerId ?? null,
+                runtimeMode: input.runtimeMode,
+                executionSurface: input.executionSurface
+            },
+            supportedCapabilities,
+            guidance: 'State-only start does not require an execution backend (omit --execute). For --execute, install an adapter declaring teamRuntimeCapabilities for the target provider and runtimeMode, or switch to a supported installed capability.'
+        }
     };
 }
