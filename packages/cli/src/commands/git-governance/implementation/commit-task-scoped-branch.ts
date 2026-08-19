@@ -50,6 +50,7 @@ export function routeTaskScopedCommitBranch(input: {
       deferForeignStaged: options.deferForeignStaged,
       stageOverrideLease: options.stageOverrideLease,
       brokerConflictResolutionPath: options.brokerConflictResolutionPath,
+      deliverySliceManifestPath: options.deliverySliceManifestPath,
       message: options.message,
       actorId,
       trailers: [

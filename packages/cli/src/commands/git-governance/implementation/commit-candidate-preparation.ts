@@ -30,6 +30,7 @@ export function prepareCommitCandidate(input: LegacyValue): CommitCandidatePrepa
             deferForeignStaged: input.options.deferForeignStaged,
             stageOverrideLease: input.options.stageOverrideLease,
             brokerConflictResolutionPath: input.options.brokerConflictResolutionPath,
+            deliverySliceManifestPath: input.options.deliverySliceManifestPath,
             message: input.options.message,
             actorId: input.actorId,
             trailers: input.trailers,

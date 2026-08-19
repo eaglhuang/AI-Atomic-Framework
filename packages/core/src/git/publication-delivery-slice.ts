@@ -1,0 +1,197 @@
+import {
+  evaluateRunnerPublicationDisposition,
+  validateRunnerBuildOutputInventory,
+} from '../broker/runner-build-output-inventory.ts';
+
+export const PUBLICATION_DELIVERY_SLICE_MANIFEST_SCHEMA_ID =
+  'atm.publicationDeliverySliceManifest.v1' as const;
+
+export interface PublicationDeliverySliceManifest {
+  readonly schemaId: typeof PUBLICATION_DELIVERY_SLICE_MANIFEST_SCHEMA_ID;
+  readonly receiptPath: string;
+  readonly expectedSealedSourceSha: string;
+  readonly expectedInventoryDigest: string;
+}
+
+export type PublicationDeliverySliceRejectionCode =
+  | 'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID'
+  | 'ATM_GIT_COMMIT_DELIVERY_SLICE_NOT_PUBLISHED'
+  | 'ATM_GIT_COMMIT_DELIVERY_SLICE_MANIFEST_MISMATCH'
+  | 'ATM_GIT_COMMIT_DELIVERY_SLICE_OUT_OF_SCOPE'
+  | 'ATM_GIT_COMMIT_DELIVERY_SLICE_FOREIGN_DIRTY';
+
+export type PublicationDeliverySliceResult =
+  | {
+      readonly ok: true;
+      readonly code: null;
+      readonly reason: null;
+      readonly inventoryMembers: readonly string[];
+      readonly requiredRecords: readonly string[];
+      readonly stageFiles: readonly string[];
+    }
+  | {
+      readonly ok: false;
+      readonly code: PublicationDeliverySliceRejectionCode;
+      readonly reason: string;
+      readonly inventoryMembers: readonly string[];
+      readonly requiredRecords: readonly string[];
+      readonly stageFiles: readonly string[];
+    };
+
+function normalizePath(value: string): string {
+  return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+
+function uniqueSorted(paths: readonly string[]): string[] {
+  return [...new Set(paths.map(normalizePath).filter(Boolean))].sort((left, right) =>
+    left.localeCompare(right),
+  );
+}
+
+export function parsePublicationDeliverySliceManifest(
+  value: unknown,
+): PublicationDeliverySliceManifest | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const raw = value as Record<string, unknown>;
+  if (raw.schemaId !== PUBLICATION_DELIVERY_SLICE_MANIFEST_SCHEMA_ID) return null;
+  const receiptPath = typeof raw.receiptPath === 'string' ? normalizePath(raw.receiptPath) : '';
+  const expectedSealedSourceSha =
+    typeof raw.expectedSealedSourceSha === 'string' ? raw.expectedSealedSourceSha.trim() : '';
+  const expectedInventoryDigest =
+    typeof raw.expectedInventoryDigest === 'string' ? raw.expectedInventoryDigest.trim() : '';
+  if (!receiptPath || !expectedSealedSourceSha || !expectedInventoryDigest) return null;
+  return {
+    schemaId: PUBLICATION_DELIVERY_SLICE_MANIFEST_SCHEMA_ID,
+    receiptPath,
+    expectedSealedSourceSha,
+    expectedInventoryDigest,
+  };
+}
+
+function requiredRecordPaths(receiptPath: string, receiptTaskId: string): readonly string[] {
+  const taskId = receiptTaskId.trim();
+  if (!taskId) return [receiptPath];
+  return uniqueSorted([
+    receiptPath,
+    `.atm/history/tasks/${taskId}.json`,
+    `.atm/history/evidence/${taskId}.runner-sync-receipt.json`,
+    `.atm/history/evidence/${taskId}.runner-publication-takeover.json`,
+  ]);
+}
+
+function isRequiredRecord(filePath: string, receiptPath: string, receiptTaskId: string): boolean {
+  const normalized = normalizePath(filePath);
+  const taskId = receiptTaskId.trim();
+  if (requiredRecordPaths(receiptPath, taskId).includes(normalized)) return true;
+  return Boolean(taskId) && normalized.startsWith(`.atm/history/task-events/${taskId}/`);
+}
+
+export function resolvePublicationDeliverySlice(input: {
+  readonly manifest: unknown;
+  readonly receipt: unknown;
+  readonly dirtyPaths: readonly string[];
+  readonly allowedScope: readonly string[];
+  readonly pathMatchesScope: (filePath: string, scope: string) => boolean;
+}): PublicationDeliverySliceResult {
+  const empty = {
+    inventoryMembers: [] as string[],
+    requiredRecords: [] as string[],
+    stageFiles: [] as string[],
+  };
+  const fail = (
+    code: PublicationDeliverySliceRejectionCode,
+    reason: string,
+    extra?: Partial<typeof empty>,
+  ): PublicationDeliverySliceResult => ({
+    ok: false,
+    code,
+    reason,
+    ...empty,
+    ...extra,
+  });
+
+  const manifest = parsePublicationDeliverySliceManifest(input.manifest);
+  if (!manifest) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID',
+      'delivery-slice manifest must declare schemaId atm.publicationDeliverySliceManifest.v1 with receiptPath, expectedSealedSourceSha, and expectedInventoryDigest',
+    );
+  }
+  if (!input.receipt || typeof input.receipt !== 'object' || Array.isArray(input.receipt)) {
+    return fail('ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID', 'runner-sync receipt is missing or not an object');
+  }
+  const receipt = input.receipt as Record<string, unknown>;
+  if (receipt.schemaId !== 'atm.runnerSyncReceipt.v1') {
+    return fail('ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID', 'runner-sync receipt schemaId is invalid');
+  }
+  if (String(receipt.publicationDisposition ?? '').trim() !== 'published') {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_NOT_PUBLISHED',
+      'runner-sync receipt publicationDisposition must be published',
+    );
+  }
+  const sealedSourceSha = typeof receipt.sealedSourceSha === 'string' ? receipt.sealedSourceSha.trim() : '';
+  if (sealedSourceSha !== manifest.expectedSealedSourceSha) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_MANIFEST_MISMATCH',
+      'delivery-slice expectedSealedSourceSha does not match the receipt sealedSourceSha',
+    );
+  }
+  const validated = validateRunnerBuildOutputInventory(receipt.outputInventory);
+  if (!validated.ok || !validated.inventory) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID',
+      validated.reason ?? 'runner-sync receipt output inventory is invalid',
+    );
+  }
+  if (validated.inventory.digest !== manifest.expectedInventoryDigest) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_MANIFEST_MISMATCH',
+      'delivery-slice expectedInventoryDigest does not match the receipt inventory digest',
+    );
+  }
+  if (validated.inventory.sealedSourceSha !== sealedSourceSha) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_MANIFEST_MISMATCH',
+      'receipt inventory sealedSourceSha does not match the receipt sealedSourceSha',
+    );
+  }
+
+  const dirtyPaths = uniqueSorted(input.dirtyPaths);
+  const disposition = evaluateRunnerPublicationDisposition({
+    inventory: validated.inventory,
+    dirtyPaths,
+    terminalDisposition: 'published',
+  });
+  if (disposition.extraOutputPaths.length > 0) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_FOREIGN_DIRTY',
+      `publication dirty paths are not exact inventory members: ${disposition.extraOutputPaths.join(', ')}`,
+    );
+  }
+
+  const inScope = (filePath: string) =>
+    input.allowedScope.some((scope) => input.pathMatchesScope(filePath, scope));
+  const outOfScopeMembers = disposition.dirtyInventoryPaths.filter((filePath) => !inScope(filePath));
+  if (outOfScopeMembers.length > 0) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_OUT_OF_SCOPE',
+      `inventory dirty members are outside the active allowed scope: ${outOfScopeMembers.join(', ')}`,
+      { inventoryMembers: [...disposition.dirtyInventoryPaths] },
+    );
+  }
+
+  const receiptTaskId = typeof receipt.taskId === 'string' ? receipt.taskId.trim() : '';
+  const requiredRecords = uniqueSorted(
+    dirtyPaths.filter((filePath) => isRequiredRecord(filePath, manifest.receiptPath, receiptTaskId) && inScope(filePath)),
+  );
+  const inventoryMembers = uniqueSorted(disposition.dirtyInventoryPaths);
+  return {
+    ok: true,
+    code: null,
+    reason: null,
+    inventoryMembers,
+    requiredRecords,
+    stageFiles: uniqueSorted([...inventoryMembers, ...requiredRecords]),
+  };
+}

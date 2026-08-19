@@ -37,6 +37,7 @@ export function parseGitOptions(argv: LegacyValue) {
     overrideReason: null,
     checkTrailers: true,
     autoStage: false,
+    deliverySliceManifestPath: null,
     deferForeignStaged: false,
     stageOverrideLease: null,
     dryRun: false,
@@ -168,6 +169,15 @@ export function parseGitOptions(argv: LegacyValue) {
     }
     if (arg === "--auto-stage") {
       options.autoStage = true;
+      continue;
+    }
+    if (arg === "--delivery-slice-manifest") {
+      options.deliverySliceManifestPath = requireValue(
+        argv,
+        index,
+        "--delivery-slice-manifest",
+      );
+      index += 1;
       continue;
     }
     if (arg === "--defer-foreign-staged") {
