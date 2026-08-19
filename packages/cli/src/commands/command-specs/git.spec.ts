@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'git',
   summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts or a human-confirmed stale index lock, create governed commits with actor-scoped author env vars, create narrow record-only commits for low-risk .atm/history maintenance, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt plus live branch queue and stuck stdin pathspec staging diagnostics, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
   positional: [
-    { name: 'action', summary: 'prepare | admit | push | recover-push-fail | recover-index-lock | check | commit | record-commit | commit-status | attest', required: true }
+    { name: 'action', summary: 'prepare | admit | push | recover-push-fail | recover-index-lock | reconcile-live-index | check | commit | record-commit | commit-status | attest', required: true }
   ],
   options: [
     commonCwdOption,
@@ -36,13 +36,13 @@ export default defineCommandSpec({
     { flag: '--no-verify', summary: 'Emergency-only pass-through to git commit; requires --emergency-approval with backend.gitHookBypass permission and cannot override Team Broker conflicts by itself.' },
     { flag: '--wip', summary: 'For git commit: commit staged files with non-delivery ATM-WIP trailers and bypass full repository-wide typecheck.' },
     { flag: '--emergency-approval', value: 'leaseId', summary: 'Required when --no-verify is used; must authorize backend.gitHookBypass.' },
-    { flag: '--force-index-lock-recovery', summary: 'For git recover-index-lock: confirms the human has verified no active Git writer; requires backend.gitIndexLockRecovery approval.' },
+    { flag: '--write', summary: 'For git reconcile-live-index: apply proven parent-blob residue after a dry-run; omitted or combined with --dry-run never mutates the index.' },
     { flag: '--broker-conflict-override', value: 'leaseId', summary: 'High-authority override for Team Broker cross-task conflicts; must authorize backend.brokerConflictOverride and be paired with --broker-conflict-resolution.' },
     { flag: '--broker-conflict-resolution', value: 'path', summary: 'Paper-style Team Broker conflict-resolution artifact proving conflict task id, shared paths, resolution order, and validator plan.' },
     { flag: '--reason', value: 'text', summary: 'Human-readable reason for the governed hook bypass when using --no-verify.' },
     { flag: '--no-trailers', summary: 'Skip trailer checks in git check (identity/owner checks still run).' },
     { flag: '--timeout-ms', value: 'ms', summary: 'For git commit: override the default 420000ms timeout for the underlying git commit spawn (also settable via ATM_GIT_COMMIT_TIMEOUT_MS); a hung pre-commit hook fails as a retryable timeout instead of hanging forever. Commit also fails fast when a git add --pathspec-from-file=- helper is already waiting on stdin.' },
-    { flag: '--commit', value: 'sha', summary: 'For git attest: immutable historical commit to cover with a forward attestation.' },
+    { flag: '--commit', value: 'sha', summary: 'For git attest: immutable historical commit to cover with a forward attestation. For git reconcile-live-index: the already-successful commit whose parent-tree residue may still occupy the live index.' },
     { flag: '--lane', value: 'lane-id', summary: 'For git attest: lane/session id that reviewed and produced the forward attestation.' },
     { flag: '--provenance-kind', value: 'ticket|emergency', summary: 'For git attest: provenance class for the forward attestation.' },
     { flag: '--provenance-ref', value: 'ref', summary: 'For git attest: immutable evidence file or git:<sha> commit message used as provenance.' },
@@ -67,6 +67,8 @@ export default defineCommandSpec({
     'node atm.mjs git admit --actor codex-main --branch main --remote origin --apply-to-working-tree --json',
     'node atm.mjs git recover-push-fail --actor codex-main --branch main --remote origin --json',
     'node atm.mjs git recover-index-lock --task ATM-GOV-0105 --actor codex-main --force-index-lock-recovery --emergency-approval <lease-id> --reason "human-confirmed stale lock" --json',
+    'node atm.mjs git reconcile-live-index --commit <sha> --dry-run --json',
+    'node atm.mjs git reconcile-live-index --commit <sha> --write --json',
     'node atm.mjs git check --task ATM-GOV-0105 --actor codex-main --json',
     'node atm.mjs git check --actor codex-main --json',
     'node atm.mjs git commit --actor codex-main --task TASK-AAO-0036 --message "atm: sync TASK-AAO-0036 ledger mirror" --json',

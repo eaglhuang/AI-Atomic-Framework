@@ -27,10 +27,12 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import os from 'node:os';
 import path from 'node:path';
 
+import { CliError } from '../../shared.ts';
 import { runGitCommand, runGitCommandWithEnv } from './git-process-port.ts';
 import { forEachPathspecBatch, planPathspecBatches } from './pathspec-argv-batching.ts';
 
 export const LIVE_INDEX_RECONCILIATION_SCHEMA_ID = 'atm.liveIndexReconciliation.v1';
+export const LIVE_INDEX_HISTORICAL_RECOVERY_SCHEMA_ID = 'atm.liveIndexHistoricalRecovery.v1';
 
 const QUIET_STDIO = ['ignore', 'pipe', 'pipe'] as const;
 const INDEX_ENTRY = /^(\d+) ([0-9a-f]+) \d+\t(.+)$/i;
@@ -112,19 +114,36 @@ function readIndexEntries(
   return entries;
 }
 
+function readTreeEntries(
+  cwd: string,
+  treeish: string,
+  paths: readonly string[],
+  budgetBytes: number | undefined
+): Readonly<Record<string, Entry>> {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-live-index-tree-'));
+  const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
+  try {
+    runGitCommandWithEnv(cwd, ['read-tree', treeish], env, QUIET_STDIO);
+    return readIndexEntries(cwd, paths, env, budgetBytes);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
 function readHeadEntries(
   cwd: string,
   paths: readonly string[],
   budgetBytes: number | undefined
 ): Readonly<Record<string, Entry>> {
-  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-live-index-head-'));
-  const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
-  try {
-    runGitCommandWithEnv(cwd, ['read-tree', 'HEAD'], env, QUIET_STDIO);
-    return readIndexEntries(cwd, paths, env, budgetBytes);
-  } finally {
-    rmSync(tempDir, { recursive: true, force: true });
+  return readTreeEntries(cwd, 'HEAD', paths, budgetBytes);
+}
+
+function applyLiveIndexHeadEntry(cwd: string, filePath: string, target: Entry): void {
+  if (target === null) {
+    runGitCommand(cwd, ['update-index', '--force-remove', '--', filePath], QUIET_STDIO);
+    return;
   }
+  runGitCommand(cwd, ['update-index', '--add', '--cacheinfo', `${target.mode},${target.blobId},${filePath}`], QUIET_STDIO);
 }
 
 function readWorktreeEntries(
@@ -192,12 +211,7 @@ export function reconcileCommittedPathsInLiveIndex(input: {
       retainedPaths.push({ path: filePath, reason: 'worktree-diverged' });
       continue;
     }
-    const target = head[filePath];
-    if (target === null) {
-      runGitCommand(cwd, ['update-index', '--force-remove', '--', filePath], QUIET_STDIO);
-    } else {
-      runGitCommand(cwd, ['update-index', '--add', '--cacheinfo', `${target.mode},${target.blobId},${filePath}`], QUIET_STDIO);
-    }
+    applyLiveIndexHeadEntry(cwd, filePath, head[filePath]);
     reconciledPaths.push(filePath);
   }
 
@@ -310,6 +324,146 @@ export function recordLiveIndexReconciliation(
     'utf8'
   );
   return relativePath;
+}
+
+export interface LiveIndexHistoricalRecovery {
+  readonly schemaId: typeof LIVE_INDEX_HISTORICAL_RECOVERY_SCHEMA_ID;
+  readonly commitSha: string;
+  readonly parentSha: string;
+  readonly headSha: string;
+  readonly dryRun: boolean;
+  readonly mutated: boolean;
+  readonly alreadyAlignedPaths: readonly string[];
+  readonly reconciledPaths: readonly string[];
+  readonly retainedPaths: readonly LiveIndexRetainedPath[];
+  readonly unprovenPaths: readonly string[];
+  readonly clean: boolean;
+  readonly evidencePath: string | null;
+}
+
+function resolveCommitSha(cwd: string, commitSha: string): string {
+  try {
+    return runGitCommand(cwd, ['rev-parse', '--verify', `${commitSha}^{commit}`], QUIET_STDIO).trim();
+  } catch {
+    throw new CliError(
+      'ATM_LIVE_INDEX_RECOVERY_COMMIT_INVALID',
+      'Historical live-index recovery requires a resolvable commit object.',
+      { exitCode: 1, details: { commitSha } }
+    );
+  }
+}
+
+function resolveParentSha(cwd: string, commitSha: string): string {
+  try {
+    return runGitCommand(cwd, ['rev-parse', '--verify', `${commitSha}^`], QUIET_STDIO).trim();
+  } catch {
+    throw new CliError(
+      'ATM_LIVE_INDEX_RECOVERY_PARENT_MISSING',
+      'Historical live-index recovery requires the named commit to have a parent tree as the proven pre-state.',
+      { exitCode: 1, details: { commitSha } }
+    );
+  }
+}
+
+function listCommitPaths(cwd: string, parentSha: string, commitSha: string): readonly string[] {
+  const output = runGitCommand(
+    cwd,
+    ['diff-tree', '--no-commit-id', '--name-only', '-r', parentSha, commitSha],
+    QUIET_STDIO
+  );
+  return output
+    .split(/\r?\n/)
+    .map((filePath) => normalizePath(filePath))
+    .filter(Boolean)
+    .sort();
+}
+
+function recordHistoricalLiveIndexRecovery(
+  cwd: string,
+  recovery: Omit<LiveIndexHistoricalRecovery, 'evidencePath'>
+): string {
+  const relativePath = `.atm/history/evidence/live-index-reconciliation.${recovery.commitSha}.json`;
+  const absolutePath = path.join(cwd, relativePath);
+  mkdirSync(path.dirname(absolutePath), { recursive: true });
+  writeFileSync(
+    absolutePath,
+    `${JSON.stringify({ ...recovery, evidencePath: relativePath, createdAt: new Date().toISOString() }, null, 2)}\n`,
+    'utf8'
+  );
+  return relativePath;
+}
+
+/**
+ * Recover a live index that still holds parent-tree blobs after a commit
+ * already moved HEAD. The proven pre-state is the parent tree of the named
+ * commit, not a task id or actor. Only paths whose live index still equals
+ * that parent tree and whose worktree equals the committed HEAD are aligned.
+ */
+export function recoverLiveIndexAfterSuccessfulCommit(input: {
+  readonly cwd: string;
+  readonly commitSha: string;
+  readonly dryRun: boolean;
+  readonly budgetBytes?: number;
+}): LiveIndexHistoricalRecovery {
+  const commitSha = resolveCommitSha(input.cwd, input.commitSha);
+  const headSha = readHeadCommit(input.cwd);
+  if (headSha !== commitSha) {
+    throw new CliError(
+      'ATM_LIVE_INDEX_RECOVERY_HEAD_MISMATCH',
+      'Historical live-index recovery requires HEAD to equal the named commit.',
+      { exitCode: 1, details: { commitSha, headSha } }
+    );
+  }
+  const parentSha = resolveParentSha(input.cwd, commitSha);
+  const paths = listCommitPaths(input.cwd, parentSha, commitSha);
+  const budgetBytes = input.budgetBytes;
+  const current = readIndexEntries(input.cwd, paths, undefined, budgetBytes);
+  const parent = readTreeEntries(input.cwd, parentSha, paths, budgetBytes);
+  const head = readTreeEntries(input.cwd, commitSha, paths, budgetBytes);
+  const worktree = readWorktreeEntries(input.cwd, paths, head, budgetBytes);
+  const alreadyAlignedPaths: string[] = [];
+  const reconciledPaths: string[] = [];
+  const retainedPaths: LiveIndexRetainedPath[] = [];
+  const unprovenPaths: string[] = [];
+
+  for (const filePath of paths) {
+    if (sameEntry(current[filePath], head[filePath]) && sameEntry(worktree[filePath], head[filePath])) {
+      alreadyAlignedPaths.push(filePath);
+      continue;
+    }
+    if (sameEntry(current[filePath], parent[filePath]) && sameEntry(worktree[filePath], head[filePath])) {
+      if (!input.dryRun) {
+        applyLiveIndexHeadEntry(input.cwd, filePath, head[filePath]);
+      }
+      reconciledPaths.push(filePath);
+      continue;
+    }
+    if (!sameEntry(current[filePath], parent[filePath])) {
+      retainedPaths.push({ path: filePath, reason: 'concurrent-index-change' });
+      unprovenPaths.push(filePath);
+      continue;
+    }
+    retainedPaths.push({ path: filePath, reason: 'worktree-diverged' });
+    unprovenPaths.push(filePath);
+  }
+
+  const report: Omit<LiveIndexHistoricalRecovery, 'evidencePath'> = {
+    schemaId: LIVE_INDEX_HISTORICAL_RECOVERY_SCHEMA_ID,
+    commitSha,
+    parentSha,
+    headSha,
+    dryRun: input.dryRun,
+    mutated: !input.dryRun && reconciledPaths.length > 0,
+    alreadyAlignedPaths,
+    reconciledPaths,
+    retainedPaths,
+    unprovenPaths,
+    clean: retainedPaths.length === 0
+  };
+  return {
+    ...report,
+    evidencePath: input.dryRun ? null : recordHistoricalLiveIndexRecovery(input.cwd, report)
+  };
 }
 
 const RECONCILIATION_ON_ERROR = Symbol.for('atm.liveIndexReconciliation');

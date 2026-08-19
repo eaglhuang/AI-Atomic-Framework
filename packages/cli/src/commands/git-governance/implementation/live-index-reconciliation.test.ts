@@ -14,19 +14,23 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
 import { sealCommitBundle } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
 import { runWithSealedTaskScopedCommitIndex } from './sealed-commit-attribution.ts';
 import { withTaskScopedCommitIndex } from './git-index-transaction.ts';
+import { applyLiveIndexRollbackAfterCommitError } from './commit-execution.ts';
+import { captureIndexRestorationSnapshot, restoreIndexToSnapshot } from './index-restoration.ts';
 import {
+  LIVE_INDEX_HISTORICAL_RECOVERY_SCHEMA_ID,
   LIVE_INDEX_RECONCILIATION_SCHEMA_ID,
   captureLiveIndexSnapshot,
   readLiveIndexReconciliationFromError,
-  reconcileLiveIndexAfterCommitAttempt
-  ,recordLiveIndexReconciliation
+  reconcileLiveIndexAfterCommitAttempt,
+  recoverLiveIndexAfterSuccessfulCommit,
+  recordLiveIndexReconciliation
 } from './live-index-reconciliation.ts';
 
 function git(cwd: string, args: readonly string[], env?: NodeJS.ProcessEnv): string {
@@ -305,6 +309,162 @@ function commit(
 
     const single = captureLiveIndexSnapshot(root, paths);
     assert.deepEqual(snapshot.entries, single.entries, 'batched and single-invocation snapshots must be equivalent');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+function f81ShapedRepository(): string {
+  const root = repository();
+  write(root, 'gone.txt', 'will be deleted\n');
+  git(root, ['add', '--', 'gone.txt']);
+  git(root, ['commit', '--quiet', '-m', 'parent with deletion candidate']);
+  write(root, 'foreign.txt', 'staged foreign\n');
+  git(root, ['add', '--', 'foreign.txt']);
+  write(root, 'owned.txt', 'committed\n');
+  unlinkSync(path.join(root, 'gone.txt'));
+  return root;
+}
+
+function commitF81Shape(root: string) {
+  const ownedBlob = git(root, ['hash-object', '-w', '--', 'owned.txt']);
+  const deletionBundle = sealCommitBundle({
+    entries: [
+      { path: 'owned.txt', mode: '100644', blobId: ownedBlob, provenance: 'task-scope' },
+      { path: 'gone.txt', mode: '100644', blobId: '', provenance: 'task-scope', disposition: 'deleted' }
+    ]
+  });
+  return runWithSealedTaskScopedCommitIndex({
+    cwd: root,
+    paths: ['owned.txt', 'gone.txt'],
+    provenance: 'task-scope',
+    surface: 'f81-shaped residue',
+    sealSource: { kind: 'sealed-bundle', bundle: deletionBundle },
+    run: (env) => {
+      git(root, ['commit', '--quiet', '-m', 'task commit'], env);
+    }
+  });
+}
+
+{
+  const root = f81ShapedRepository();
+  try {
+    const foreignBlob = git(root, ['rev-parse', ':foreign.txt']);
+    const parentOwned = git(root, ['rev-parse', ':owned.txt']);
+    const parentGone = git(root, ['rev-parse', ':gone.txt']);
+    const outcome = commitF81Shape(root);
+    assert.equal(git(root, ['rev-parse', ':owned.txt']), git(root, ['rev-parse', 'HEAD:owned.txt']));
+    assert.equal(git(root, ['ls-files', '--', 'gone.txt']), '');
+    assert.equal(git(root, ['rev-parse', ':foreign.txt']), foreignBlob);
+    assert.ok(outcome.liveIndexReconciliation.reconciledPaths.includes('owned.txt'));
+    assert.ok(outcome.liveIndexReconciliation.reconciledPaths.includes('gone.txt'));
+    assert.notEqual(parentOwned, git(root, ['rev-parse', 'HEAD:owned.txt']));
+    assert.equal(parentGone.length, 40);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+{
+  const root = f81ShapedRepository();
+  try {
+    const foreignBlob = git(root, ['rev-parse', ':foreign.txt']);
+    const parentOwned = git(root, ['rev-parse', ':owned.txt']);
+    const snapshot = captureIndexRestorationSnapshot(root);
+    commitF81Shape(root);
+    assert.equal(git(root, ['rev-parse', ':owned.txt']), git(root, ['rev-parse', 'HEAD:owned.txt']));
+    assert.equal(git(root, ['ls-files', '--', 'gone.txt']), '');
+
+    restoreIndexToSnapshot(root, snapshot);
+    assert.equal(git(root, ['rev-parse', ':owned.txt']), parentOwned, 'unguarded outer restore must replay parent blobs');
+    assert.equal(git(root, ['rev-parse', ':gone.txt']), git(root, ['rev-parse', 'HEAD^:gone.txt']));
+    assert.equal(git(root, ['rev-parse', ':foreign.txt']), foreignBlob);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+{
+  const root = f81ShapedRepository();
+  try {
+    const foreignBlob = git(root, ['rev-parse', ':foreign.txt']);
+    const snapshot = captureIndexRestorationSnapshot(root);
+    commitF81Shape(root);
+    const rollback = applyLiveIndexRollbackAfterCommitError({
+      cwd: root,
+      headAdvancedDuringAttempt: true,
+      indexRestorationSnapshot: snapshot,
+      liveIndexSnapshotBeforeAttempt: ['owned.txt', 'gone.txt', 'foreign.txt']
+    });
+    assert.equal(rollback.indexRestoration, null);
+    assert.deepEqual(rollback.liveIndexResidueRollback, []);
+    assert.equal(git(root, ['rev-parse', ':owned.txt']), git(root, ['rev-parse', 'HEAD:owned.txt']));
+    assert.equal(git(root, ['ls-files', '--', 'gone.txt']), '');
+    assert.equal(git(root, ['rev-parse', ':foreign.txt']), foreignBlob);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+{
+  const root = f81ShapedRepository();
+  try {
+    const foreignBlob = git(root, ['rev-parse', ':foreign.txt']);
+    const ownedBlob = git(root, ['hash-object', '-w', '--', 'owned.txt']);
+    const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-f81-candidate-'));
+    const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
+    git(root, ['read-tree', 'HEAD'], env);
+    git(root, ['update-index', '--add', '--cacheinfo', `100644,${ownedBlob},owned.txt`], env);
+    git(root, ['update-index', '--force-remove', '--', 'gone.txt'], env);
+    git(root, ['commit', '--quiet', '-m', 'candidate commit'], env);
+    rmSync(tempDir, { recursive: true, force: true });
+
+    const commitSha = git(root, ['rev-parse', 'HEAD']);
+    const indexBefore = git(root, ['ls-files', '-s']);
+    const dry = recoverLiveIndexAfterSuccessfulCommit({ cwd: root, commitSha, dryRun: true });
+    assert.equal(dry.schemaId, LIVE_INDEX_HISTORICAL_RECOVERY_SCHEMA_ID);
+    assert.equal(dry.dryRun, true);
+    assert.equal(dry.mutated, false);
+    assert.equal(dry.evidencePath, null);
+    assert.equal(git(root, ['ls-files', '-s']), indexBefore, 'dry-run must not mutate the live index');
+    assert.ok(dry.reconciledPaths.includes('owned.txt'));
+    assert.ok(dry.reconciledPaths.includes('gone.txt'));
+
+    const written = recoverLiveIndexAfterSuccessfulCommit({ cwd: root, commitSha, dryRun: false });
+    assert.equal(written.mutated, true);
+    assert.equal(git(root, ['rev-parse', ':owned.txt']), git(root, ['rev-parse', 'HEAD:owned.txt']));
+    assert.equal(git(root, ['ls-files', '--', 'gone.txt']), '');
+    assert.equal(git(root, ['rev-parse', ':foreign.txt']), foreignBlob);
+    assert.ok(written.evidencePath);
+    assert.equal(existsSync(path.join(root, written.evidencePath!)), true);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+{
+  const root = f81ShapedRepository();
+  try {
+    const concurrentBlob = git(root, ['hash-object', '-w', '--stdin']).trim();
+    const ownedBlob = git(root, ['hash-object', '-w', '--', 'owned.txt']);
+    const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-f81-retain-'));
+    const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
+    git(root, ['read-tree', 'HEAD'], env);
+    git(root, ['update-index', '--add', '--cacheinfo', `100644,${ownedBlob},owned.txt`], env);
+    git(root, ['update-index', '--force-remove', '--', 'gone.txt'], env);
+    git(root, ['commit', '--quiet', '-m', 'candidate commit'], env);
+    rmSync(tempDir, { recursive: true, force: true });
+    git(root, ['update-index', '--add', '--cacheinfo', `100644,${concurrentBlob},owned.txt`]);
+    write(root, 'gone.txt', 'worktree divergence\n');
+
+    const commitSha = git(root, ['rev-parse', 'HEAD']);
+    const ownedIndexBefore = git(root, ['rev-parse', ':owned.txt']);
+    const goneWorktreeBefore = readFileSync(path.join(root, 'gone.txt'), 'utf8');
+    const report = recoverLiveIndexAfterSuccessfulCommit({ cwd: root, commitSha, dryRun: false });
+    assert.equal(git(root, ['rev-parse', ':owned.txt']), ownedIndexBefore);
+    assert.equal(readFileSync(path.join(root, 'gone.txt'), 'utf8'), goneWorktreeBefore);
+    assert.ok(report.retainedPaths.some((entry) => entry.path === 'owned.txt' && entry.reason === 'concurrent-index-change'));
+    assert.ok(report.retainedPaths.some((entry) => entry.path === 'gone.txt' && entry.reason === 'worktree-diverged'));
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
