@@ -161,7 +161,7 @@ export function proposeAtomicUpgrade(request) {
         toVersion,
         lifecycleMode: 'evolution',
         behaviorId,
-        target,
+        target: serializeTarget(target),
         decompositionDecision,
         reviewTemplate: resolveReviewTemplate(decompositionDecision),
         automatedGates: {
@@ -255,6 +255,11 @@ function normalizeTarget(target) {
         normalized.mapId = target.mapId;
     }
     return normalized;
+}
+function serializeTarget(target) {
+    return target.kind === 'map'
+        ? { kind: 'map', mapId: target.mapId }
+        : { kind: 'atom' };
 }
 function normalizeRequestedReplacementMode(value, target) {
     if (value == null) {

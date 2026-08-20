@@ -11,12 +11,13 @@ import { cleanupPreviousBatchQueueLocks } from './claim-cleanup.ts';
 import { assertClaimRunnerWriteAuthority, assertRunnerRecoveryClaimPreflight } from './runner-recovery-claim-authorization.ts';
 import { inspectIntegrationBootstrap } from '../integration.ts';
 import { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
-import { classifyTaskDelivery } from '../task-intent.ts';
 import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../../core/src/broker/lifecycle.ts';
 import { abandonTaskQueue, buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, isTaskDirectionPathCandidate, partitionTaskScope, readActiveTaskDirectionLocks, type TaskQueueRecord, writeTaskDirectionLock } from '../task-direction.ts';
 import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfixPrompt, isPathAllowedByScope, listActiveBatchRuns, readActiveBatchRun, repairBatchRunFromQueue, writeBatchRun, writeQuickfixLock } from '../work-channels.ts';
 import { buildTeamKnowledgeSummary } from '../team-knowledge.ts'; import { decideActiveBatchClaimTask, preservesExplicitTaskClaim } from '../next-active-batch.ts';
 import { runClaimParallelPreflight } from './claim-parallel-preflight.ts'; import { buildPlanScopedRoutingPreflight } from './plan-scoped-preflight.ts';
+import { assertClaimScopeExpansionAdmission } from './claim-scope-expansion-admission.ts';
+import { assertClaimDeliveryAdmission } from './claim-delivery-admission.ts';
 import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.ts'; import { CliError, makeResult, message, parseJsonText } from '../shared.ts';
 import { prepareImportedTaskForClaim, registerPreClaimBrokerTransaction } from './claim-helpers.ts';
 import { runTasks, findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from '../tasks/public-surface.ts';
@@ -253,39 +254,16 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, claimAllowedFiles, { taskId: claimableTask.workItemId, actorId: resolvedActor.actorId, gate: 'claim' });
   const oversizedExtractionAdmission = assertClaimLineBudgetOrExtractionAdmission({ cwd: input.cwd, taskId: claimableTask.workItemId, taskPath: taskPathFor(input.cwd, claimableTask.workItemId), report: lineBudgetReport });
   claimLatencyPhases.push({ phase: 'parallel-preflight', durationMs: Date.now() - parallelStartedAt });
-  const claimDeliveryClassification = classifyTaskDelivery({
-    cwd: input.cwd,
-    task: {
-      workItemId: claimableTask.workItemId,
-      status: claimableTask.status,
-      targetRepo: claimableTask.targetRepo,
-      closureAuthority: claimableTask.closureAuthority,
-      planningRepo: claimableTask.planningRepo,
-      sourcePlanPath: claimableTask.sourcePlanPath,
-      taskPath: claimableTask.taskPath
-    }
-  });
-  if (claimDeliveryClassification.intent === 'mirror-sync-only') {
-    const sourcePath = claimableTask.sourcePlanPath ?? '<source-task-card-path>';
-    const requiredCommand = `node atm.mjs tasks import --from ${quoteCliValue(sourcePath)} --write --force --json`;
-    throw new CliError('ATM_NEXT_CLAIM_MIRROR_SYNC_REQUIRED', `Task ${claimableTask.workItemId} is a planning-only mirror in this repo; sync the ledger from the source task card instead of claiming a delivery.`, {
-      exitCode: 1,
-      details: {
-        taskId: claimableTask.workItemId,
-        targetRepo: claimDeliveryClassification.targetRepo,
-        closureAuthority: claimDeliveryClassification.closureAuthority,
-        planningRepo: claimDeliveryClassification.planningRepo,
-        sourceStatus: claimDeliveryClassification.sourceStatus,
-        ledgerStatus: claimDeliveryClassification.ledgerStatus,
-        statusDivergence: claimDeliveryClassification.statusDivergence,
-        requiredCommand,
-        deliveryClassification: claimDeliveryClassification
-      }
-    });
-  }
+  assertClaimDeliveryAdmission({ cwd: input.cwd, task: claimableTask });
   const scopeDiagnostic = checkPendingTaskArtifactScopeExpansion({
     cwd: input.cwd,
     task: claimableTask
+  });
+  assertClaimScopeExpansionAdmission({
+    taskId: claimableTask.workItemId,
+    actorId: resolvedActor.actorId,
+    allowedFiles: claimAllowedFiles,
+    scopeDiagnostic
   });
   const brokerClaimCheck = inspectBrokerClaimLifecycle({
     cwd: input.cwd,

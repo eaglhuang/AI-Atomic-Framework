@@ -6,6 +6,7 @@ import path from 'node:path';
 import { buildResidueReconcileReport } from '../../residue.ts';
 import { runNext } from '../../next.ts';
 import { runTaskflow } from '../../taskflow.ts';
+import { runTasksClaimLifecycle } from '../../tasks.ts';
 import { runTasksClose } from '../../tasks/close-orchestrator.ts';
 
 function writeJson(filePath: string, value: unknown) {
@@ -340,17 +341,48 @@ try {
   );
 
   const targetHeadBeforeReconcile = git(killFixture.targetRepo, ['rev-parse', 'HEAD']);
+  assert.match(
+    planningCardAfterKill,
+    /completed_by_agent:\s*["']?validator["']?/,
+    `post-crash planning mirror must retain closeback actor metadata:\n${planningCardAfterKill}`
+  );
+  assert.match(
+    planningCardAfterKill,
+    /completed_at:\s*["']?[^\n]+/,
+    `post-crash planning mirror must retain closeback time metadata:\n${planningCardAfterKill}`
+  );
+  const recordedDeliveryCommit = /delivery_commit:\s*["']?([0-9a-f]{40})["']?/i.exec(planningCardAfterKill)?.[1] ?? null;
+  assert.ok(recordedDeliveryCommit, `post-crash planning mirror must retain an addressable delivery reference:\n${planningCardAfterKill}`);
   const deliveredContentBeforeReconcile = readFileSync(path.join(killFixture.targetRepo, 'src/deliver.txt'), 'utf8');
-  const reconcileResult = await runTaskflow([
-    'close',
-    '--cwd', killFixture.targetRepo,
-    '--profile', killFixture.profilePath,
-    '--task', killFixture.taskId,
-    '--actor', 'validator',
-    '--historical-delivery', targetCommitAfterCrash,
-    '--write',
-    '--json'
-  ]);
+  const priorLaneSessionId = process.env.ATM_LANE_SESSION_ID;
+  process.env.ATM_LANE_SESSION_ID = killFixture.laneSessionId;
+  let reconcileResult;
+  try {
+    const renewedClaim = await runTasksClaimLifecycle('renew', [
+      '--cwd', killFixture.targetRepo,
+      '--actor', 'validator',
+      '--task', killFixture.taskId,
+      '--json'
+    ]);
+    assert.equal(
+      renewedClaim.ok,
+      true,
+      `post-crash reconciliation must renew the fixture owner claim before writing: ${JSON.stringify(renewedClaim.evidence ?? renewedClaim)}`
+    );
+    reconcileResult = await runTaskflow([
+      'close',
+      '--cwd', killFixture.targetRepo,
+      '--profile', killFixture.profilePath,
+      '--task', killFixture.taskId,
+      '--actor', 'validator',
+      '--historical-delivery', recordedDeliveryCommit,
+      '--write',
+      '--json'
+    ]);
+  } finally {
+    if (priorLaneSessionId === undefined) delete process.env.ATM_LANE_SESSION_ID;
+    else process.env.ATM_LANE_SESSION_ID = priorLaneSessionId;
+  }
   assert.equal(
     reconcileResult.ok,
     true,

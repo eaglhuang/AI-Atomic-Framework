@@ -14,7 +14,7 @@ import {
   countTokenOverlap
 } from '../match-and-sort.ts';
 import { buildPromptScopedQueueClaimCommand } from '../prompt-scope-resolution.ts';
-import { readConfiguredPlanningRoots } from '../../planning-repo-root.ts';
+import { readConfiguredPlanningRoots, shouldReportPlanningRootMissing } from '../../planning-repo-root.ts';
 import { resolveCandidatePlanningRoots } from '../planning-root-preference.ts';
 import { bootstrapTaskId } from '../../governance-runtime.ts';
 import { CliError, parseJsonText, quoteCliValue } from '../../shared.ts';
@@ -73,13 +73,13 @@ import {
   uniqueInOrder,
   uniqueSorted
 } from '../view-projections.ts';
-import { shouldReportPlanningRootMissing } from '../../planning-repo-root.ts';
 import { extractPathLikeStringsFromText, resolveQuickfixScope } from './artifact-scope.ts';
 
 interface PendingTaskArtifactScopeDiagnostic {
   readonly schemaId: 'atm.taskArtifactScopeDiagnostic.v1';
   readonly ignoredUntrackedFiles: readonly string[];
   readonly advisoryTrackedFiles: readonly string[];
+  readonly scopeExpansionRequiredFiles: readonly string[];
   readonly staleRecoveryInputFiles: readonly string[];
   readonly deferredForeignResidue: readonly ForeignGeneratedResidueProvenance[];
 }
@@ -138,7 +138,8 @@ export function checkPendingTaskArtifactScopeExpansion(input: {
   return {
     schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
     ignoredUntrackedFiles: untrackedExpansion,
-    advisoryTrackedFiles: uniqueSorted([...advisoryTrackedFiles, ...trackedForeignWip]),
+    advisoryTrackedFiles: uniqueSorted(advisoryTrackedFiles),
+    scopeExpansionRequiredFiles: uniqueSorted(trackedForeignWip),
     staleRecoveryInputFiles,
     deferredForeignResidue
   };

@@ -6,6 +6,7 @@ import path from 'node:path';
 import { buildResidueReconcileReport } from '../../residue.js';
 import { runNext } from '../../next.js';
 import { runTaskflow } from '../../taskflow.js';
+import { runTasksClaimLifecycle } from '../../tasks.js';
 import { runTasksClose } from '../../tasks/close-orchestrator.js';
 function writeJson(filePath, value) {
     mkdirSync(path.dirname(filePath), { recursive: true });
@@ -311,17 +312,39 @@ try {
     assert.match(committedPlanningCardAfterKill, /status:\s*running/, 'planning closeback must not be committed after the injected kill');
     assert.match(planningCardAfterKill, /status:\s*done/, 'planning closeback worktree may be dirty after the injected kill and must be converged by reconcile');
     const targetHeadBeforeReconcile = git(killFixture.targetRepo, ['rev-parse', 'HEAD']);
+    assert.match(planningCardAfterKill, /completed_by_agent:\s*["']?validator["']?/, `post-crash planning mirror must retain closeback actor metadata:\n${planningCardAfterKill}`);
+    assert.match(planningCardAfterKill, /completed_at:\s*["']?[^\n]+/, `post-crash planning mirror must retain closeback time metadata:\n${planningCardAfterKill}`);
+    const recordedDeliveryCommit = /delivery_commit:\s*["']?([0-9a-f]{40})["']?/i.exec(planningCardAfterKill)?.[1] ?? null;
+    assert.ok(recordedDeliveryCommit, `post-crash planning mirror must retain an addressable delivery reference:\n${planningCardAfterKill}`);
     const deliveredContentBeforeReconcile = readFileSync(path.join(killFixture.targetRepo, 'src/deliver.txt'), 'utf8');
-    const reconcileResult = await runTaskflow([
-        'close',
-        '--cwd', killFixture.targetRepo,
-        '--profile', killFixture.profilePath,
-        '--task', killFixture.taskId,
-        '--actor', 'validator',
-        '--historical-delivery', targetCommitAfterCrash,
-        '--write',
-        '--json'
-    ]);
+    const priorLaneSessionId = process.env.ATM_LANE_SESSION_ID;
+    process.env.ATM_LANE_SESSION_ID = killFixture.laneSessionId;
+    let reconcileResult;
+    try {
+        const renewedClaim = await runTasksClaimLifecycle('renew', [
+            '--cwd', killFixture.targetRepo,
+            '--actor', 'validator',
+            '--task', killFixture.taskId,
+            '--json'
+        ]);
+        assert.equal(renewedClaim.ok, true, `post-crash reconciliation must renew the fixture owner claim before writing: ${JSON.stringify(renewedClaim.evidence ?? renewedClaim)}`);
+        reconcileResult = await runTaskflow([
+            'close',
+            '--cwd', killFixture.targetRepo,
+            '--profile', killFixture.profilePath,
+            '--task', killFixture.taskId,
+            '--actor', 'validator',
+            '--historical-delivery', recordedDeliveryCommit,
+            '--write',
+            '--json'
+        ]);
+    }
+    finally {
+        if (priorLaneSessionId === undefined)
+            delete process.env.ATM_LANE_SESSION_ID;
+        else
+            process.env.ATM_LANE_SESSION_ID = priorLaneSessionId;
+    }
     assert.equal(reconcileResult.ok, true, `kill-after-target commit should converge dirty planning closeback: ${JSON.stringify(reconcileResult.evidence?.closeWriteTransaction ?? reconcileResult.evidence, null, 2)}`);
     assert.equal(readFileSync(path.join(killFixture.targetRepo, 'src/deliver.txt'), 'utf8'), deliveredContentBeforeReconcile);
     assert.equal(git(killFixture.targetRepo, ['rev-parse', 'HEAD~1']), targetHeadBeforeReconcile);

@@ -85,6 +85,26 @@ export async function runClaimParallelPreflight(input) {
                             insufficientMutationIntent,
                             overlappingAtomIdCount: overlappingAtomIds.length
                         });
+                        if (!shouldBlockPerCid) {
+                            if (!parallelAdvisory) {
+                                parallelAdvisory = {
+                                    ...finding,
+                                    verdict: 'parallel-safe-with-cid-overlap-advisory',
+                                    conflictWithTaskId: candidate.taskId,
+                                    conflictClaimActorId: conflictActorId,
+                                    conflictClaimLaneSessionId: conflictLaneSessionId,
+                                    currentActorId: input.actorId,
+                                    currentLaneSessionId,
+                                    ownerComparisonMode: ownerComparison.mode,
+                                    admitted: true,
+                                    admissionReason: input.claimIntent === 'closeout-only'
+                                        ? 'closeout-only-claim-intent'
+                                        : 'cid-overlap-without-active-write-claim',
+                                    cidVerdict
+                                };
+                            }
+                            continue;
+                        }
                         const resolutionAuthorizedForeignTaskIds = collectResolutionAuthorizedForeignTaskIds(input.cwd, input.claimableTask.workItemId);
                         const queueAdmission = evaluateBrokerQueueAdmission({
                             cwd: input.cwd,

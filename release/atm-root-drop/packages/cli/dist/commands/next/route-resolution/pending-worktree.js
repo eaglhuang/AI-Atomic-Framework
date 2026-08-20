@@ -57,7 +57,8 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
     return {
         schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
         ignoredUntrackedFiles: untrackedExpansion,
-        advisoryTrackedFiles: uniqueSorted([...advisoryTrackedFiles, ...trackedForeignWip]),
+        advisoryTrackedFiles: uniqueSorted(advisoryTrackedFiles),
+        scopeExpansionRequiredFiles: uniqueSorted(trackedForeignWip),
         staleRecoveryInputFiles,
         deferredForeignResidue
     };

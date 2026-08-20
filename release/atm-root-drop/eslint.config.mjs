@@ -9,6 +9,7 @@ export default [
       '.types/**',
       '.atm/**',
       '.atm-temp/**',
+      '.atm-runtime-cache/**',
       'release/**',
       '.turbo/**',
       'coverage/**',

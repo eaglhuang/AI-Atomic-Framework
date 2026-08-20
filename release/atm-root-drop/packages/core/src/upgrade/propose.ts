@@ -247,7 +247,7 @@ export function proposeAtomicUpgrade(request: ProposalRequest) {
     toVersion,
     lifecycleMode: 'evolution',
     behaviorId,
-    target,
+    target: serializeTarget(target),
     decompositionDecision,
     reviewTemplate: resolveReviewTemplate(decompositionDecision),
     automatedGates: {
@@ -351,6 +351,12 @@ function normalizeTarget(target: { kind?: string; mapId?: string } | null | unde
     normalized.mapId = target.mapId;
   }
   return normalized;
+}
+
+function serializeTarget(target: { kind: 'atom' | 'map'; mapId: string }): { kind: 'atom' } | { kind: 'map'; mapId: string } {
+  return target.kind === 'map'
+    ? { kind: 'map', mapId: target.mapId }
+    : { kind: 'atom' };
 }
 
 function normalizeRequestedReplacementMode(value: string | null | undefined, target: { kind: string; mapId: string }) {

@@ -1,16 +1,16 @@
 import { createHash } from 'node:crypto';
 import { calculateBrokerDecision } from '../broker/decision.ts';
 import { loadRegistry, cleanupStale } from '../broker/registry.ts';
-import { brokerAdapterMigration } from '../broker/types.ts';
-import type {
-  ActiveWriteIntent,
-  BrokerDecision,
-  ConflictKey,
-  MutationRequest,
-  ProposalAdmissionTrigger,
-  WriteBrokerRegistryDocument,
-  WriteIntent,
-  WriteIntentAtomRef
+import {
+  brokerAdapterMigration,
+  type ActiveWriteIntent,
+  type BrokerDecision,
+  type ConflictKey,
+  type MutationRequest,
+  type ProposalAdmissionTrigger,
+  type WriteBrokerRegistryDocument,
+  type WriteIntent,
+  type WriteIntentAtomRef
 } from '../broker/types.ts';
 import { readBrokerLifecycleState } from '../broker/lifecycle.ts';
 import {

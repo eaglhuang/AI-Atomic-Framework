@@ -121,6 +121,21 @@ try {
   }
 
   {
+    const { local } = setupRemoteScenario('local-only-fast-path');
+    writeText(path.join(local, 'local-only.txt'), 'governed local delta\n');
+    runGit(local, ['add', 'local-only.txt']);
+    runGit(local, ['commit', '-m', 'feat: local-only delta']);
+    const result = await runAdmission(local);
+    assert.equal(result.ok, true);
+    assert.equal((result.evidence as any).outcome, 'allow');
+    assert.equal(
+      (result.evidence as any).local.bridged[0]?.adapterId,
+      'fallback-file-lock',
+      'without remote divergence admission must retain conservative file keys without per-file content scans'
+    );
+  }
+
+  {
     const { remote, local } = setupRemoteScenario('push-wrapper');
     const beforeRemote = remoteHead(remote);
     writeText(path.join(local, 'pushed-by-wrapper.txt'), 'governed push\n');
