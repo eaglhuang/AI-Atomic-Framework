@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-20T22:46:35.459Z",
+  "updatedAt": "2026-08-20T22:49:27.566Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
@@ -750,6 +750,24 @@
       "durationMs": 640,
       "runnerKind": "dev-source",
       "sourceCommit": "da2b67ce2ef919697d95de03d2f64ab36ad30922",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bc6e63db30bc6292b2448f30f96025426ab9ee1790eece01c6efbe5e346d3117",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
+        "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-20T22:49:27.565Z",
+      "startedAt": "2026-08-20T22:49:26.884Z",
+      "finishedAt": "2026-08-20T22:49:27.565Z",
+      "durationMs": 681,
+      "runnerKind": "dev-source",
+      "sourceCommit": "71aac841a45a19a8d9318ed3371a231bf3bb3c1d",
       "cached": false
     }
   ],

@@ -129,6 +129,8 @@ const completionInput = 'docs/reports/plan-3x-4x-runbook-completion-evidence.jso
 const selfProjectedBase = JSON.stringify({
   generatedAt: '2026-08-21T00:00:00.000Z',
   overallVerdict: 'not-complete',
+  authority: { targetHead: commit('3'), originMain: commit('3'), planningHead: commit('4') },
+  validatorContracts: [{ contractId: 'atm.waveExitObserverReceipt/EXIT-11', policyDigest: hex('1') }],
   unresolvedIds: ['RB-001', 'EXIT-11'],
   deferredIds: [],
   unknownIds: [],
@@ -140,6 +142,8 @@ const selfProjectedBase = JSON.stringify({
 const selfProjectedAfterConsumption = JSON.stringify({
   generatedAt: '2026-08-21T00:01:00.000Z',
   overallVerdict: 'complete',
+  authority: { targetHead: commit('5'), originMain: commit('5'), planningHead: commit('4') },
+  validatorContracts: [{ contractId: 'atm.waveExitObserverReceipt/EXIT-11', policyDigest: hex('2') }],
   unresolvedIds: ['RB-001'],
   deferredIds: [],
   unknownIds: [],

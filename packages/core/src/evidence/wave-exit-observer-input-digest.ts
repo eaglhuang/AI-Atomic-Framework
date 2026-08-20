@@ -8,7 +8,7 @@ function digestText(value: string): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
-/** Project only the receipt-derived result of the current exit out of a compiler-owned input. */
+/** Project only compiler-derived metadata and the current exit result out of a compiler-owned input. */
 export function digestWaveExitObserverInput(
   exitItemId: string,
   exitPolicy: WaveExitObserverExitPolicy,
@@ -25,10 +25,22 @@ export function digestWaveExitObserverInput(
       const { status, evidence, diagnostics, coverageOwners, validatorContractIds, ...identity } = row;
       return identity;
     });
+    const authority = report.authority && typeof report.authority === 'object'
+      ? { ...(report.authority as Record<string, unknown>), targetHead: '<compiler-target-head>', originMain: '<compiler-origin-main>' }
+      : report.authority;
+    const validatorContracts = Array.isArray(report.validatorContracts)
+      ? report.validatorContracts.map((entry) => {
+          if (!entry || typeof entry !== 'object') return entry;
+          const { policyDigest, ...contract } = entry as Record<string, unknown>;
+          return contract;
+        })
+      : report.validatorContracts;
     const projection = {
       ...report,
       generatedAt: '<compiler-projection-time>',
       overallVerdict: '<derived-from-all-exits>',
+      authority,
+      validatorContracts,
       unresolvedIds: Array.isArray(report.unresolvedIds) ? report.unresolvedIds.filter((id) => id !== exitItemId) : report.unresolvedIds,
       deferredIds: Array.isArray(report.deferredIds) ? report.deferredIds.filter((id) => id !== exitItemId) : report.deferredIds,
       unknownIds: Array.isArray(report.unknownIds) ? report.unknownIds.filter((id) => id !== exitItemId) : report.unknownIds,
