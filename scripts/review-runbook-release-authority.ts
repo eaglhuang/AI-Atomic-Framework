@@ -275,7 +275,10 @@ export function compileReview(offline = false, sealedTargetHead?: string, sealed
   const findings = [...inspected.findings];
   if (!inspected.parseable) findings.push('completion-report-unparseable');
   if (remote.pushVerdict !== 'already-published') findings.push('remote-release-not-proven');
-  if (!offline && remote.fetched) {
+  // Validation replays a sealed remote observation.  Its live ancestry check
+  // happens below, after serialization; recording a new remote head here
+  // would mutate the projection whenever any later governance commit lands.
+  if (!offline && remote.fetched && sealedRemote === undefined) {
     try {
       const remoteHeadAfterReview = git(['ls-remote', remote.configuredUpstream.remoteName, `refs/heads/${remote.configuredUpstream.branch}`], 5_000).split(/\s+/)[0];
       remote.remoteHeadAfterReview = remoteHeadAfterReview || null;

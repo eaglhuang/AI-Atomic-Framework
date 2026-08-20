@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { inspectCompletion, isValidValidatorContract, sealedRemotePublishVerdict } from '../../scripts/review-runbook-release-authority.ts';
+import { compileReview, inspectCompletion, isValidValidatorContract, sealedRemotePublishVerdict } from '../../scripts/review-runbook-release-authority.ts';
 import { semanticTaskCardDigest } from '../../scripts/task-card-contract-digest.ts';
 
 const broken = '{"rows":[{"itemId":"RB-001","status":"proven"}],"waveExits":[{"itemId":"EXIT-01"}],';
@@ -60,6 +60,19 @@ const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).tr
 assert.equal(sealedRemotePublishVerdict(parent, head), 'already-published');
 assert.equal(sealedRemotePublishVerdict(head, head), 'already-published');
 assert.equal(sealedRemotePublishVerdict(head, parent), 'not-proven');
+const sealedRemote = {
+  fetched: true,
+  configuredUpstream: { remoteName: 'origin', remoteRef: 'origin/main', branch: 'main' },
+  localHead: parent,
+  remoteHead: parent,
+  remoteHeadAfterReview: parent,
+  pushVerdict: 'already-published'
+};
+assert.deepEqual(
+  compileReview(false, parent, sealedRemote).remote,
+  sealedRemote,
+  'sealed review replay must not rewrite its remote observation after a later commit'
+);
 
 // A sealed timestamp may be replayed, but its declared authority inputs may
 // never be replayed from an altered projection.
