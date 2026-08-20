@@ -7,6 +7,7 @@ import {
   composeEvidenceDigest,
   validateFourPlanIndependentCertificate
 } from '../../packages/core/src/evidence/four-plan-independent-certificate.ts';
+import { selectCertificateEvidenceTarget } from '../../scripts/compile-four-plan-independent-certificate.ts';
 
 const hex = (seed: string): string => `sha256:${seed.repeat(64).slice(0, 64)}`;
 const commit = (seed: string): string => seed.repeat(40).slice(0, 40);
@@ -232,6 +233,16 @@ assert.ok(missingRemoteSurface.diagnostics.includes('release-surface-required-mi
 
 const sealed = commit('b');
 const remoteDescendant = commit('c');
+assert.equal(
+  selectCertificateEvidenceTarget(sealed, remoteDescendant, true),
+  sealed,
+  'a reachable sealed remote snapshot must remain the certificate evidence target after its own publication'
+);
+assert.equal(
+  selectCertificateEvidenceTarget(sealed, remoteDescendant, false),
+  remoteDescendant,
+  'an unreachable sealed snapshot must not be trusted as an evidence target'
+);
 const remoteSuccessor = compileFourPlanIndependentCertificate({
   ...base,
   releaseSurfaces: base.releaseSurfaces.map((surface) =>

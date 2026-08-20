@@ -179,6 +179,17 @@ function isTargetReachableFromRemote(targetHead: string, originMain: string): bo
     && gitOk(['merge-base', '--is-ancestor', targetHead, originMain]);
 }
 
+/**
+ * A certificate is published in a successor commit, so validation must retain
+ * its sealed remote snapshot while that snapshot remains reachable from the
+ * live remote.  The live remote still drives release-surface reachability; it
+ * must not, by itself, make every certificate observe its own publication as
+ * newer evidence.
+ */
+export function selectCertificateEvidenceTarget(sealedOriginMain: string, liveOriginMain: string, sealedOriginReachable: boolean): string {
+  return sealedOriginReachable ? sealedOriginMain : liveOriginMain;
+}
+
 function projectReleaseCloseback(targetHead: string, recordedOriginMain: string, liveOriginMain: string, generatedAt: string): Record<string, any> {
   const targetReachable = isTargetReachableFromRemote(targetHead, liveOriginMain);
   const originContinuity = isTargetReachableFromRemote(recordedOriginMain, liveOriginMain);
@@ -288,11 +299,16 @@ function buildReleaseSurfaces(
 }
 
 function compile(generatedAt: string, closeback: Record<string, any>, liveOriginMain: string): CompileOutcome {
-  // Evidence freshness is judged against the live published tip so a
-  // governance successor commit can remain reachable. Certificate identity
-  // stays bound to the sealed origin snapshot in closeback.
-  const targetHead = liveOriginMain;
   const recordedOriginMain = String(closeback.originMain ?? liveOriginMain);
+  // Keep observation identity at the sealed remote when it is still an
+  // ancestor of the live remote.  Any changed evidence still fails because
+  // its last commit is not reachable from the sealed snapshot; release
+  // surfaces below independently prove the live remote relationship.
+  const targetHead = selectCertificateEvidenceTarget(
+    recordedOriginMain,
+    liveOriginMain,
+    isTargetReachableFromRemote(recordedOriginMain, liveOriginMain)
+  );
 
   const dimensions = dimensionsFromAuthority(closeback);
   const reviewers: FourPlanReviewer[] = [
@@ -494,4 +510,6 @@ function main(): number {
   return 0;
 }
 
-process.exit(main());
+if (process.argv[1]?.endsWith('compile-four-plan-independent-certificate.ts')) {
+  process.exit(main());
+}
