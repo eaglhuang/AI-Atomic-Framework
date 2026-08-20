@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-20T15-48-59-870Z-scope-amendment-bf26276d7b1b",
+  "taskId": "TASK-ERR-0015",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-ERR-0015.json",
+  "taskSha256": "sha256:800b9709861983203351112ba625d96d522520f8e500f3d22046778a0f8c153e",
+  "createdAt": "2026-08-20T15:48:59.870Z",
+  "command": "node atm.mjs tasks scope add --task TASK-ERR-0015 --actor codex-captain --add \"packages/core/src/error-code-registry.generated.ts,tests/cli/taskflow-close-error-code-registry.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "taskId": "TASK-ERR-0015",
+  "updatedAt": "2026-08-20T15:49:09.289Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/taskflow-close-error-code-registry.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260820154551-codex-captain-TASK-ERR-0015-e0d5e3af51",
+      "createdAt": "2026-08-20T15:49:09.289Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260820154551-codex-captain-TASK-ERR-0015-e0d5e3af51",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "generate:error-codes",
+          "node --strip-types tests/cli/taskflow-close-error-code-registry.test.ts",
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.error-code-registry",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/taskflow-close-error-code-registry.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b9c825ff70809b360f997f7eb3f3eeea321734f2270e6308c7e56077292a805a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-20T15:49:08.997Z",
+            "finishedAt": "2026-08-20T15:49:09.288Z",
+            "durationMs": 291,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/taskflow-close-error-code-registry.test.ts",
+              "generate:error-codes",
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "cbaf778e50a2b8f1623656a1b4a0e97d0fa5102e",
+            "cacheKey": "sha256:deae0269a26bedc514aee9c99764742b2e4967b16901be36711b9b01342daf7a",
+            "generatedAt": "2026-08-20T15:49:09.288Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:deae0269a26bedc514aee9c99764742b2e4967b16901be36711b9b01342daf7a",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-20T15:49:09.288Z",
+              "observedAt": "2026-08-20T15:49:09.288Z",
+              "startedAt": "2026-08-20T15:49:08.997Z",
+              "finishedAt": "2026-08-20T15:49:09.288Z",
+              "durationMs": 291,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:2d7524a0b0d642a352de64265879ea5af87c25f8cc6e711179d37fb7e2786fc7",
+              "outputDigest": "sha256:559458d64b9613c5017274c804362da839e8d1aaa601d412feb3abda5b4e8cd6",
+              "cache": {
+                "key": "sha256:deae0269a26bedc514aee9c99764742b2e4967b16901be36711b9b01342daf7a",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/taskflow-close-error-code-registry.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/taskflow-close-error-code-registry.test.ts",
+                  "generate:error-codes",
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "cbaf778e50a2b8f1623656a1b4a0e97d0fa5102e",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:48e4dbac2a24073ac3a2a8c4917260f0acbe5bfe7fb1c7c2dc1fcd729ba3bb6a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

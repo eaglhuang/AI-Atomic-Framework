@@ -2309,6 +2309,48 @@
       "requiresHumanApproval": false,
       "relatedCommands": ["node atm.mjs tasks repair-claim --task <task-id> --actor <actor> --json"],
       "sourceOwner": "packages/core/src/broker/historical-work-admission-attestation.ts"
+    },
+    {
+      "code": "ATM_TASKFLOW_PRECLOSE_BLOCKED",
+      "category": "taskflow",
+      "shortDescription": "Taskflow pre-close found one or more named readiness blockers.",
+      "trigger": "A pre-close evaluation cannot establish every condition required before taskflow close may write.",
+      "commonCauses": ["The task write ticket, evidence, runner, or owned-delivery state is not current.", "A named downstream gate has not produced its required artifact."],
+      "remediation": ["Inspect each named blocker and execute that blocker's own required command.", "Do not treat a successful pre-close of a different task or a generic renewal as proof that this blocker is resolved."],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": ["node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json"],
+      "statusCommand": "node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json",
+      "registryOwner": "TASK-ERR-0015",
+      "sourceOwner": "packages/cli/src/commands/taskflow/implementation.ts"
+    },
+    {
+      "code": "ATM_TASKFLOW_CLOSE_WRITE_NOT_READY",
+      "category": "taskflow",
+      "shortDescription": "Taskflow close dry-run found one or more write-readiness blockers.",
+      "trigger": "A taskflow close dry-run cannot prove that its write path is currently safe and complete.",
+      "commonCauses": ["A named pre-close blocker remains unresolved.", "The evidence, runner, ticket, or delivery state changed after prior validation."],
+      "remediation": ["Inspect the named write-readiness blocker and execute only its own registry-derived recovery.", "Rerun taskflow close dry-run after the named condition is resolved."],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": ["node atm.mjs taskflow close --task <task-id> --actor <actor> --json"],
+      "statusCommand": "node atm.mjs taskflow close --task <task-id> --actor <actor> --json",
+      "registryOwner": "TASK-ERR-0015",
+      "sourceOwner": "packages/cli/src/commands/taskflow/implementation.ts"
+    },
+    {
+      "code": "ATM_TASKFLOW_CLOSE_OWNED_DIRTY_PENDING",
+      "category": "taskflow",
+      "shortDescription": "Taskflow close found task-owned files that the canonical dirty authority snapshot classifies as blocking.",
+      "trigger": "The same canonical dirty authority snapshot identifies one or more task-owned files as blocking delivery residue.",
+      "commonCauses": ["Task-owned delivery bytes have not been committed or reconciled.", "A generated output has no applicable producer receipt or governed delivery route."],
+      "remediation": ["Inspect the named owned blocking files and use their applicable governed delivery or reconciliation route.", "Advisory files are not blockers and must not be promoted into this code."],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": ["node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json"],
+      "statusCommand": "node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json",
+      "registryOwner": "TASK-ERR-0015",
+      "sourceOwner": "packages/cli/src/commands/taskflow/implementation.ts"
     }
   ],
   "prefixRules": [

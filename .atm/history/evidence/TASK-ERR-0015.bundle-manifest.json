@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-ERR-0015",
+  "updatedAt": "2026-08-20T15:49:09.289Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "generate:error-codes",
+    "node --strip-types tests/cli/taskflow-close-error-code-registry.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-error-code-registry.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b9c825ff70809b360f997f7eb3f3eeea321734f2270e6308c7e56077292a805a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/taskflow-close-error-code-registry.test.ts",
+        "generate:error-codes",
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-20T15:49:09.288Z",
+      "startedAt": "2026-08-20T15:49:08.997Z",
+      "finishedAt": "2026-08-20T15:49:09.288Z",
+      "durationMs": 291,
+      "runnerKind": "dev-source",
+      "sourceCommit": "cbaf778e50a2b8f1623656a1b4a0e97d0fa5102e",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
