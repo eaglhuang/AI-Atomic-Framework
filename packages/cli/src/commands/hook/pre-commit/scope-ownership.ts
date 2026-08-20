@@ -141,8 +141,12 @@ export function inspectSameFileClaimOwnership(input: {
     const writeClaimTaskIds = uniqueSorted(coveringWriteLocks.map((lock) => lock.taskId));
     if (writeClaimTaskIds.length > 1) {
       multiClaimFiles.push({ file: normalized, writeClaimTaskIds });
-      // Shared canonical write: owning one of the claims proves nothing. The
-      // shared verifier decides admission from consumed steward receipts only.
+      // A task may commit a path that its own active claim explicitly covers.
+      // Other claimants remain observable in the report, but do not turn the
+      // owner's isolated staged path into a foreign mutation. Mixed staged
+      // ownership is still rejected by the branches below.
+      if (committingTaskId && writeClaimTaskIds.includes(committingTaskId)) continue;
+      // Without an owning committing task, shared-write provenance is required.
       sharedObservations.push({
         path: normalized,
         writeClaimTaskIds,

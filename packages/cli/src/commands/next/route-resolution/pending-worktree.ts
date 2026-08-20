@@ -79,6 +79,7 @@ interface PendingTaskArtifactScopeDiagnostic {
   readonly schemaId: 'atm.taskArtifactScopeDiagnostic.v1';
   readonly ignoredUntrackedFiles: readonly string[];
   readonly advisoryTrackedFiles: readonly string[];
+  readonly scopeExpansionRequiredFiles: readonly string[];
   readonly staleRecoveryInputFiles: readonly string[];
   readonly deferredForeignResidue: readonly ForeignGeneratedResidueProvenance[];
 }
@@ -137,7 +138,8 @@ export function checkPendingTaskArtifactScopeExpansion(input: {
   return {
     schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
     ignoredUntrackedFiles: untrackedExpansion,
-    advisoryTrackedFiles: uniqueSorted([...advisoryTrackedFiles, ...trackedForeignWip]),
+    advisoryTrackedFiles: uniqueSorted(advisoryTrackedFiles),
+    scopeExpansionRequiredFiles: uniqueSorted(trackedForeignWip),
     staleRecoveryInputFiles,
     deferredForeignResidue
   };

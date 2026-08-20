@@ -8,6 +8,7 @@ export type EmergencyUseAuditReport = any;
 export type PreCommitBlockingFinding = any;
 export type ExpectedGitIdentity = any;
 export type PreCommitFailureEnvelope = any;
+export { inspectSameFileClaimOwnership } from './scope-ownership.ts';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -38,74 +39,14 @@ return artifact.schemaId === 'atm.brokerConflictResolution.v1' && String(artifac
 }
 }
 
-export function inspectSameFileClaimOwnership(input) { const inferredTaskIds = inferTaskIdsFromStagedFiles(input.stagedFiles);
-const committingTaskId = normalizeOptionalText(process.env.ATM_COMMIT_TASK_ID) ?? (inferredTaskIds.length === 1 ? inferredTaskIds[0] : null);
-const claimIntentByTaskId = new Map();
-const readClaimIntent = (taskId) => { const cached = claimIntentByTaskId.get(taskId);
-if (cached) return cached;
-const taskDocument = readJsonFile(path.join(input.cwd, '.atm', 'history', 'tasks', `${taskId}.json`));
-const claim = taskDocument?.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim) ? taskDocument.claim : null;
-const intent = normalizeOptionalText(claim?.intent) ?? 'write';
-claimIntentByTaskId.set(taskId, intent);
-return intent;
-};
-const writeLocks = input.activeDirectionLocks.filter((lock) => readClaimIntent(lock.taskId) !== 'closeout-only');
-const committingClaimIntent = committingTaskId ? readClaimIntent(committingTaskId) : null;
-const stewardCoveredFiles = collectStewardBrokerCoveredFiles(input.cwd);
-const stewardCoveredSet = new Set(stewardCoveredFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
-const findings = [];
-const multiClaimFiles = [];
-const sharedObservations = [];
-for (const stagedFile of input.stagedFiles) { const normalized = normalizeRelativePath(stagedFile);
-if (!normalized || normalized.startsWith('.atm/')) continue;
-if (isTaskDirectionPreCommitExempt(normalized)) continue;
-if (input.exemptAllowedFileSets.some((allowed) => allowed.length > 0 && isPathAllowedByTaskDirection(normalized, allowed))) continue;
-const coveringWriteLocks = writeLocks.filter((lock) => isPathAllowedByTaskDirection(normalized, lock.allowedFiles));
-if (coveringWriteLocks.length === 0) { if (committingClaimIntent === 'closeout-only' && input.activeDirectionLocks.some((lock) => lock.taskId === committingTaskId && isPathAllowedByTaskDirection(normalized, lock.allowedFiles))) { findings.push({ code: 'ATM_PRE_COMMIT_CLOSEOUT_ONLY_CLAIM_MUTATION', file: normalized, committingTaskId, writeClaimTaskIds: [], detail: `Task ${committingTaskId} holds a closeout-only / no-more-mutation claim but stages source mutation ${normalized}. Re-claim with a write intent before shipping new source changes.`, requiredCommand: committingTaskId ? `node atm.mjs next --claim --actor <id> --task ${committingTaskId} --claim-intent write --json` : null });
-} continue;
-} const writeClaimTaskIds = uniqueSorted(coveringWriteLocks.map((lock) => lock.taskId));
-if (writeClaimTaskIds.length > 1) { multiClaimFiles.push({ file: normalized, writeClaimTaskIds });
-// Shared canonical write: owning one claim proves nothing. Admission is
-// decided by the shared verifier from consumed steward receipts only.
-sharedObservations.push({ path: normalized, writeClaimTaskIds, stagedBlobDigest: readStagedBlobDigest(input.cwd, normalized) });
-continue;
-} const committingOwnsFile = Boolean(committingTaskId) && writeClaimTaskIds.includes(committingTaskId);
-if (committingOwnsFile) continue;
-const ambiguous = committingTaskId ? writeClaimTaskIds.length >= 1 : writeClaimTaskIds.length >= 2;
-if (!ambiguous) continue;
-if (stewardCoveredSet.has(normalized.toLowerCase())) continue;
-findings.push({ code: 'ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS', file: normalized, committingTaskId, writeClaimTaskIds, detail: committingTaskId ? `Staged file ${normalized} belongs to active write claim(s) ${writeClaimTaskIds.join(', ')} but the committing task ${committingTaskId} does not own it, and no steward/broker evidence covers it. Remove it from this commit or route it through the steward lane.` : `Staged file ${normalized} is covered by multiple active write claims (${writeClaimTaskIds.join(', ')}) and ATM cannot prove which task owns this commit. Commit through node atm.mjs git commit --task <id> or provide steward/broker evidence.`, requiredCommand: 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json' });
-} // Evidence-local adapter boundary: gather digests/receipts only; all
-// admission rules live in the shared policy core.
-const headSha = runGitScalar(input.cwd, ['rev-parse', 'HEAD']) ?? '';
-const sharedWriteAdmission = sharedObservations.length > 0 ? evaluateSharedWriteAdmission({ canonicalRoot: normalizeRelativePath(input.cwd) || input.cwd, baseSha: headSha, headSha, committingTaskId, files: sharedObservations, receipts: collectSharedWriteProvenanceReceipts(input.cwd) }) : null;
-for (const finding of sharedWriteAdmission?.findings ?? []) { findings.push({ code: finding.code, file: finding.file, committingTaskId, writeClaimTaskIds: finding.writeClaimTaskIds, detail: finding.detail, requiredCommand: finding.requiredCommand });
-} return { ok: findings.length === 0, committingTaskId, committingClaimIntent, multiClaimFiles, stewardCoveredFiles, sharedWriteAdmission, findings };
-} function readStagedBlobDigest(cwd, file) { const staged = runGitScalar(cwd, ['rev-parse', `:${file}`]);
-return staged ? `git-blob:${staged}` : null;
-} function collectSharedWriteProvenanceReceipts(cwd) { const evidenceDir = path.join(cwd, '.atm', 'history', 'evidence');
-if (!existsSync(evidenceDir)) return [];
-const receipts = [];
-let entries = [];
-try { entries = readdirSync(evidenceDir);
-} catch { return [];
-} for (const entry of entries) { if (!entry.toLowerCase().endsWith('.shared-write-provenance.json')) continue;
-const document = readJsonFile(path.join(evidenceDir, entry));
-if (document && document.schemaId === SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID) receipts.push(document);
-} return receipts;
-} export function selectRelevantDirectionLocksForCommit(input) { const currentTaskAllowedFiles = uniqueSorted([ ...input.taskGovernedCommitAllowedFiles, ...input.closeCommitWindowAllowedFiles, ...input.closeCommitWindowPlanningMirrorFiles ]);
+export function selectRelevantDirectionLocksForCommit(input) { const currentTaskAllowedFiles = uniqueSorted([ ...input.taskGovernedCommitAllowedFiles, ...input.closeCommitWindowAllowedFiles, ...input.closeCommitWindowPlanningMirrorFiles ]);
 return input.activeDirectionLocks.filter((lock) => { if (input.committingTaskId && taskIdsEqual(lock.taskId, input.committingTaskId)) { return true;
 } return input.stagedFiles.some((entry) => { if (isTaskDirectionPreCommitExempt(entry)) return false;
 if (currentTaskAllowedFiles.length > 0 && isPathAllowedByTaskDirection(entry, currentTaskAllowedFiles)) { return false;
 } return isPathAllowedByTaskDirection(entry, lock.allowedFiles) || isPlanningMirrorPath(entry, lock.planningMirrorPaths ?? []);
 });
 });
-} function collectStewardBrokerCoveredFiles(cwd) { try { const state = readBrokerLifecycleState(cwd);
-return uniqueSorted(state.activeIntents .filter((intent) => intent.lane === 'neutral-steward' || intent.lane === 'deterministic-composer') .flatMap((intent) => intent.resourceKeys?.files ?? []) .map((entry) => normalizeRelativePath(entry)) .filter(Boolean));
-} catch { return [];
 }
-}
-
 export function isTaskDirectionPreCommitExempt(value) { const normalized = normalizeRelativePath(value).toLowerCase();
 return normalized.startsWith('.atm/history/task-events/') || normalized.startsWith('.atm/history/evidence/') || normalized.startsWith('.atm/runtime/locks/') || normalized.startsWith('.atm/runtime/task-queues/') || normalized.startsWith('.atm/runtime/batch-runs/') || normalized.startsWith('.atm/runtime/task-direction-locks/');
 } export function collectStagedBatchCheckpointScopeFiles(cwd, stagedFiles) { const stagedSet = new Set(stagedFiles.map((entry) => normalizeRelativePath(entry)));
