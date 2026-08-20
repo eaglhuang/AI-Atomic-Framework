@@ -20,12 +20,12 @@ export function assertClaimDeliveryAdmission(input: {
     cwd: input.cwd,
     task: {
       workItemId: input.task.workItemId,
-      status: input.task.status,
-      targetRepo: input.task.targetRepo,
-      closureAuthority: input.task.closureAuthority,
-      planningRepo: input.task.planningRepo,
-      sourcePlanPath: input.task.sourcePlanPath,
-      taskPath: input.task.taskPath
+      status: input.task.status ?? 'unknown',
+      targetRepo: input.task.targetRepo ?? null,
+      closureAuthority: input.task.closureAuthority ?? null,
+      planningRepo: input.task.planningRepo ?? null,
+      sourcePlanPath: input.task.sourcePlanPath ?? null,
+      taskPath: input.task.taskPath ?? input.task.sourcePlanPath ?? input.task.workItemId
     }
   });
   if (classification.intent !== 'mirror-sync-only') return;

@@ -2,7 +2,6 @@ import { CliError, quoteCliValue } from '../shared.ts';
 
 interface ScopeExpansionDiagnostic {
   readonly scopeExpansionRequiredFiles: readonly string[];
-  readonly [key: string]: unknown;
 }
 
 /**

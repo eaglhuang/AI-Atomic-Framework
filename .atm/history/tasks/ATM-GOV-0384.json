@@ -20,7 +20,12 @@
   "scopePaths": [
     "scripts/compile-runbook-completion-evidence.ts",
     "tests/cli/runbook-completion-evidence.test.ts",
-    "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+    ".atm/history/evidence/ATM-GOV-0384.*",
+    ".atm/history/task-events/ATM-GOV-0384/**",
+    ".atm/history/tasks/ATM-GOV-0384.json",
+    "packages/cli/src/commands/next/claim-delivery-admission.ts",
+    "packages/cli/src/commands/next/claim-scope-expansion-admission.ts"
   ],
   "validators": [
     "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
@@ -162,31 +167,32 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-14T10-27-50-114Z-claim-00493da987c1",
-  "lastTransitionAt": "2026-08-14T10:27:50.114Z",
+  "lastTransitionId": "2026-08-20T20-47-08-207Z-claim-3073f18542b8",
+  "lastTransitionAt": "2026-08-20T20:47:08.207Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-captain-recovery",
   "reservedAt": "2026-08-14T10:27:46.312Z",
   "promotedAt": "2026-08-14T10:27:46.316Z",
   "claim": {
-    "actorId": "codex-captain-recovery",
-    "leaseId": "lease-6c2cef992f20",
-    "claimedAt": "2026-08-14T10:27:46.322Z",
-    "heartbeatAt": "2026-08-14T10:27:46.322Z",
+    "actorId": "codex-captain",
+    "leaseId": "lease-493e93a9e8c1",
+    "claimedAt": "2026-08-20T20:47:06.285Z",
+    "heartbeatAt": "2026-08-20T20:47:06.285Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0384.json",
       "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
       "scripts/compile-runbook-completion-evidence.ts",
-      "tests/cli/runbook-completion-evidence.test.ts"
+      "tests/cli/runbook-completion-evidence.test.ts",
+      "packages/cli/src/commands/next/claim-delivery-admission.ts",
+      "packages/cli/src/commands/next/claim-scope-expansion-admission.ts"
     ],
     "state": "active",
     "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260814095024-codex-captain-recovery-c440ec065c",
+      "laneSessionId": "lane-20260820203806-codex-captain-f4c0c1362f",
       "status": "adopted",
       "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814095024-codex-captain-recovery-c440ec065c\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820203806-codex-captain-f4c0c1362f\""
     }
   },
   "startedAt": "2026-08-14T10:27:46.322Z",
@@ -194,20 +200,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-68330d62f64b311d",
-    "ticketDigest": "sha256:68330d62f64b311d04ca5f756161793e1567198dfd174f5dbfa9591d60b7d4dd",
+    "ticketId": "wat-0e7651f67fa99cbb",
+    "ticketDigest": "sha256:0e7651f67fa99cbbbe9645df27303be0b21ce569cabb2e19ec3eeb973f87d5cc",
     "taskId": "ATM-GOV-0384",
     "origin": "claim",
-    "actorId": "codex-captain-recovery",
-    "laneSessionId": "lane-20260814095024-codex-captain-recovery-c440ec065c",
-    "claimGeneration": "lease-6c2cef992f20",
-    "issuedAt": "2026-08-14T10:27:46.322Z",
-    "expiresAt": "2026-08-14T10:57:46.322Z",
-    "scopeDigest": "sha256:0aca08e2a2de34f51c4a47b790428ea1fe1f4974a487d2155cf6efd57b4ce60e",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260820203806-codex-captain-f4c0c1362f",
+    "claimGeneration": "lease-493e93a9e8c1",
+    "issuedAt": "2026-08-20T20:47:06.285Z",
+    "expiresAt": "2026-08-20T21:17:06.285Z",
+    "scopeDigest": "sha256:c81220bd91bd9488c6e50d54dd468221994ec6227f95362cd90c25d7cc92dd93",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-14T10:27:46.322Z"
+      "selectedAt": "2026-08-20T20:47:06.285Z"
     },
     "grants": [
       {
@@ -217,10 +223,12 @@
           ".atm/history/task-events/ATM-GOV-0384/**",
           ".atm/history/tasks/ATM-GOV-0384.json",
           "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+          "packages/cli/src/commands/next/claim-delivery-admission.ts",
+          "packages/cli/src/commands/next/claim-scope-expansion-admission.ts",
           "scripts/compile-runbook-completion-evidence.ts",
           "tests/cli/runbook-completion-evidence.test.ts"
         ],
-        "digest": "sha256:039348df2098f35c327ad035775fb0f4972427156c54d406b7b629cfd4790eb0"
+        "digest": "sha256:b0c39afec4599eb72574f9b8dd4e21bc73c90c89083afdede08ca13400e923b7"
       },
       {
         "kind": "lifecycle-operation",
@@ -254,7 +262,22 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260814102746-codex-captain-recovery-ATM-GOV-0384-4e523d732f",
+  "startedBySessionId": "session-20260820204706-codex-captain-ATM-GOV-0384-24135ff334",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0384",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814095024-codex-captain-recovery-c440ec065c",
+    "dirtyPaths": [
+      ".atm/history/tasks/ATM-GOV-0384.json",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "scripts/compile-runbook-completion-evidence.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
+    ],
+    "retainedAt": "2026-08-16T16:04:13.428Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-captain",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -268,6 +291,8 @@
       ".atm/history/task-events/ATM-GOV-0384/**",
       ".atm/history/tasks/ATM-GOV-0384.json",
       "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "packages/cli/src/commands/next/claim-delivery-admission.ts",
+      "packages/cli/src/commands/next/claim-scope-expansion-admission.ts",
       "scripts/compile-runbook-completion-evidence.ts",
       "tests/cli/runbook-completion-evidence.test.ts"
     ],
@@ -275,15 +300,15 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "644a863ab921ccfc10e55b2c2f1f7b618c2a1dc1f5684601013f6068f884b993",
-    "actorId": "codex-captain-recovery",
-    "sessionId": "session-20260814102746-codex-captain-recovery-ATM-GOV-0384-4e523d732f",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260820204706-codex-captain-ATM-GOV-0384-24135ff334",
     "laneSession": {
-      "laneSessionId": "lane-20260814095024-codex-captain-recovery-c440ec065c",
+      "laneSessionId": "lane-20260820203806-codex-captain-f4c0c1362f",
       "status": "adopted",
       "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814095024-codex-captain-recovery-c440ec065c\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820203806-codex-captain-f4c0c1362f\""
     },
-    "createdAt": "2026-08-14T10:27:50.113Z",
+    "createdAt": "2026-08-20T20:47:08.206Z",
     "status": "active"
   }
 }

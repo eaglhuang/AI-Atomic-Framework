@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-20T20-44-00-104Z-scope-amendment-7d32a16623f1",
+  "taskId": "ATM-GOV-0384",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0384.json",
+  "taskSha256": "sha256:05a676b6b444ae55e586cc74ceba0d932c7c41aefcc0188c9c0b2c41e14c756b",
+  "createdAt": "2026-08-20T20:44:00.104Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0384 --actor codex-captain --add \"packages/cli/src/commands/next/claim-delivery-admission.ts,packages/cli/src/commands/next/claim-scope-expansion-admission.ts\" --reason \"Required repository typecheck is blocked by the two claim-admission type contracts; add the minimal linked validator surface.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Required repository typecheck is blocked by the two claim-admission type contracts; add the minimal linked validator surface."
+  }
+}
