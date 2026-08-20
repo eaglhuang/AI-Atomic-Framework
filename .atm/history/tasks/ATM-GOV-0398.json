@@ -243,8 +243,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-20T15-52-32-673Z-scope-amendment-76b63c52a653",
-  "lastTransitionAt": "2026-08-20T15:52:32.673Z",
+  "lastTransitionId": "2026-08-20T17-04-07-395Z-renew-0bb65869ba00",
+  "lastTransitionAt": "2026-08-20T17:04:07.395Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-08-15T14:04:16.216Z",
@@ -253,7 +253,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-d4b3923ce31e",
     "claimedAt": "2026-08-20T15:52:23.557Z",
-    "heartbeatAt": "2026-08-20T15:52:23.557Z",
+    "heartbeatAt": "2026-08-20T17:04:06.557Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0398.*",
@@ -267,34 +267,33 @@
       "scripts/validate-governance-commands/implementation.ts"
     ],
     "state": "active",
-    "intent": "write",
+    "reason": "Owner-directed internal takeover after external delegation ended; prior claim is stale and no retained in-scope WIP is being adopted.",
     "laneSession": {
       "laneSessionId": "lane-20260820155223-codex-captain-a592f74239",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820155223-codex-captain-a592f74239\""
-    },
-    "reason": "Owner-directed internal takeover after external delegation ended; prior claim is stale and no retained in-scope WIP is being adopted."
+    }
   },
   "startedAt": "2026-08-15T14:04:16.227Z",
   "startedByActor": "cursor-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-afcac18b516ca8ea",
-    "ticketDigest": "sha256:afcac18b516ca8ea737ca61f02800abf2a73cd176c05770df5f794f2ef2d462f",
+    "ticketId": "wat-4e4bf47f7fa03ea9",
+    "ticketDigest": "sha256:4e4bf47f7fa03ea930518d385504fe5f8a0d802ba1a246c6111aff39063465a8",
     "taskId": "ATM-GOV-0398",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260820155223-codex-captain-a592f74239",
     "claimGeneration": "lease-d4b3923ce31e",
-    "issuedAt": "2026-08-20T15:52:32.581Z",
-    "expiresAt": "2026-08-20T16:22:32.581Z",
+    "issuedAt": "2026-08-20T17:04:06.557Z",
+    "expiresAt": "2026-08-20T17:34:06.557Z",
     "scopeDigest": "sha256:f3050ef52199534b276463f7414042899e6cf883a18090fe2a0ee3063d411689",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-20T15:52:32.581Z"
+      "selectedAt": "2026-08-20T17:04:06.557Z"
     },
     "grants": [
       {
