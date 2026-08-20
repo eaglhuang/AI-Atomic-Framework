@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-20T17-18-50-024Z-close-99a9d06e0bec",
+  "taskId": "ATM-GOV-0394",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260820160832-codex-captain-ATM-GOV-0394-689164b641",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0394.json",
+  "taskSha256": "sha256:96e0d18bea99b14204d4ac6bab431625862fa3caa6c63f6eb3b4ba1905b1d1d8",
+  "createdAt": "2026-08-20T17:18:50.024Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0394 --actor codex-captain --status done --historical-delivery 81a7d6619f1ed74c13e0373febba79488de68424",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260820160832-codex-captain-ATM-GOV-0394-689164b641",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0394.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-20T17:18:50.012Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0394.*",
+        ".atm/history/task-events/ATM-GOV-0394/**",
+        ".atm/history/tasks/ATM-GOV-0394.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-framework-branch.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+        "packages/cli/src/commands/git-governance/implementation/dry-run-purity.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/git-commit-task-scoped-staging/dry-run-purity-scenarios.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-framework-branch.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+        "packages/cli/src/commands/git-governance/implementation/dry-run-purity.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/git-commit-task-scoped-staging/dry-run-purity-scenarios.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
