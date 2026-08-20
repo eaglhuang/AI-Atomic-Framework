@@ -1,11 +1,21 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, effectiveEvidenceContracts, independentExitContracts, isDeclaredPublicationDelta, isPublicationOnlyDelta, sealValidatorContractIds, semanticTaskCardDigest, summarizeFinalCertificate } from '../../scripts/compile-runbook-completion-evidence.ts';
+import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, effectiveEvidenceContracts, independentExitContracts, isDeclaredPublicationDelta, isPublicationOnlyDelta, sealValidatorContractIds, selectCompletionObservationOrigin, semanticTaskCardDigest, summarizeFinalCertificate } from '../../scripts/compile-runbook-completion-evidence.ts';
 import { validateReport } from '../../scripts/validate-runbook-completion-evidence.ts';
 
 const sha = 'a'.repeat(40);
 assert.equal(DEFAULT_PLANNING_ROOT.endsWith('3KLife'), true);
+assert.equal(
+  selectCompletionObservationOrigin('b'.repeat(40), 'c'.repeat(40), 'a'.repeat(40), 'a'.repeat(40)),
+  'b'.repeat(40),
+  'a declared projection delta replays its sealed origin snapshot'
+);
+assert.equal(
+  selectCompletionObservationOrigin('invalid', 'c'.repeat(40), 'a'.repeat(40), 'a'.repeat(40)),
+  'c'.repeat(40),
+  'an invalid sealed origin must fail back to the live observation'
+);
 assert.deepEqual(
   summarizeFinalCertificate({ status: 'proven', overallVerdict: 'complete', releaseAuthorized: true, diagnostics: [] }),
   { proven: true, diagnostics: [] },

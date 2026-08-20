@@ -82,6 +82,12 @@ export function isPublicationOnlyDelta(observedHead: string, currentHead: string
   }
 }
 
+export function selectCompletionObservationOrigin(committedOrigin: string, liveOrigin: string, sealedTarget: string, committedSnapshot: string): string {
+  return sealedTarget === committedSnapshot && /^[0-9a-f]{40}$/i.test(committedOrigin)
+    ? committedOrigin
+    : liveOrigin;
+}
+
 export function parseRunbook(source: string): { rows: CompletionRow[]; waveExits: CompletionRow[] } {
   const rows: CompletionRow[] = [];
   const waveExits: CompletionRow[] = [];
@@ -536,7 +542,7 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
   };
   const observedPlanningHead = process.env.ATM_PLANNING_HEAD ?? git(DEFAULT_PLANNING_ROOT, ['rev-parse', 'HEAD']);
   const currentTargetHead = process.env.ATM_TARGET_HEAD ?? git(resolve('.'), ['rev-parse', 'HEAD']);
-  const originMain = process.env.ATM_ORIGIN_MAIN ?? git(resolve('.'), ['ls-remote', 'origin', 'refs/heads/main']).split(/\s+/)[0] ?? 'unknown';
+   const liveOriginMain = process.env.ATM_ORIGIN_MAIN ?? git(resolve('.'), ['ls-remote', 'origin', 'refs/heads/main']).split(/\s+/)[0] ?? 'unknown';
   const committed = mode === 'validate' && existsSync(DEFAULT_OUTPUT)
     ? JSON.parse(readFileSync(DEFAULT_OUTPUT, 'utf8'))
     : null;
@@ -550,9 +556,15 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
   const publicationArtifacts = mode === 'validate'
     ? (committed?.authority?.publicationBundle?.artifactPaths ?? [defaultPublicationArtifact])
     : [defaultPublicationArtifact, ...requestedPublicationArtifacts];
-  const targetHead = mode === 'validate' && isPublicationOnlyDelta(committedSnapshot, currentTargetHead, publicationArtifacts)
-    ? committedSnapshot
-    : currentTargetHead;
+   const targetHead = mode === 'validate' && isPublicationOnlyDelta(committedSnapshot, currentTargetHead, publicationArtifacts)
+     ? committedSnapshot
+     : currentTargetHead;
+   const originMain = selectCompletionObservationOrigin(
+     String(committed?.authority?.originMain ?? ''),
+     liveOriginMain,
+     targetHead,
+     committedSnapshot
+   );
   // A sealed evidence projection must be reproducible for an unchanged target
   // tree.  Wall-clock generation time would alter Reviewer B's input digest on
   // every write and create a matrix -> review -> certificate -> matrix loop.
