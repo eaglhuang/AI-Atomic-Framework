@@ -68,6 +68,38 @@ export function parsePublicationDeliverySliceManifest(
   };
 }
 
+/**
+ * Creates the narrow delivery selector from the immutable publication receipt
+ * itself.  This removes an operator-maintained copy of the sealed SHA and
+ * inventory digest while leaving the downstream resolver responsible for
+ * validating the receipt and its inventory fail-closed.
+ */
+export function derivePublicationDeliverySliceManifest(input: {
+  readonly receiptPath: string;
+  readonly receipt: unknown;
+}): PublicationDeliverySliceManifest | null {
+  if (!input.receipt || typeof input.receipt !== 'object' || Array.isArray(input.receipt)) {
+    return null;
+  }
+  const receipt = input.receipt as Record<string, unknown>;
+  const sealedSourceSha =
+    typeof receipt.sealedSourceSha === 'string' ? receipt.sealedSourceSha.trim() : '';
+  const rawInventory = receipt.outputInventory;
+  const expectedInventoryDigest =
+    rawInventory && typeof rawInventory === 'object' && !Array.isArray(rawInventory)
+      && typeof (rawInventory as Record<string, unknown>).digest === 'string'
+      ? String((rawInventory as Record<string, unknown>).digest).trim()
+      : '';
+  const receiptPath = normalizePath(input.receiptPath);
+  if (!receiptPath || !sealedSourceSha || !expectedInventoryDigest) return null;
+  return {
+    schemaId: PUBLICATION_DELIVERY_SLICE_MANIFEST_SCHEMA_ID,
+    receiptPath,
+    expectedSealedSourceSha: sealedSourceSha,
+    expectedInventoryDigest,
+  };
+}
+
 function requiredRecordPaths(receiptPath: string, receiptTaskId: string): readonly string[] {
   const taskId = receiptTaskId.trim();
   if (!taskId) return [receiptPath];

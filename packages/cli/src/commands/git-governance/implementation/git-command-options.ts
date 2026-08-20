@@ -38,6 +38,7 @@ export function parseGitOptions(argv: LegacyValue) {
     checkTrailers: true,
     autoStage: false,
     deliverySliceManifestPath: null,
+    deliverySliceReceiptPath: null,
     deferForeignStaged: false,
     stageOverrideLease: null,
     dryRun: false,
@@ -187,6 +188,15 @@ export function parseGitOptions(argv: LegacyValue) {
         argv,
         index,
         "--delivery-slice-manifest",
+      );
+      index += 1;
+      continue;
+    }
+    if (arg === "--delivery-slice-receipt") {
+      options.deliverySliceReceiptPath = requireValue(
+        argv,
+        index,
+        "--delivery-slice-receipt",
       );
       index += 1;
       continue;

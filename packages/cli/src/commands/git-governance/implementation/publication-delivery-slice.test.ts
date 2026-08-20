@@ -195,4 +195,38 @@ assert.ok(bundle.stageFiles.includes('packages/cli/dist/gone.d.ts'));
 assert.ok(bundle.stageFiles.includes('release/atm-onefile/atm.mjs'));
 assert.ok(!bundle.stageFiles.includes('docs/reports/plan-closeback.json'));
 
+const receiptDerivedBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: TASK_ID,
+  actorId: 'test-actor',
+  taskDocument: JSON.parse(readFileSync(path.join(cwd, `.atm/history/tasks/${TASK_ID}.json`), 'utf8')),
+  message: 'fixture',
+  trailers: [],
+  apply: false,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+  deliverySliceReceiptPath: `.atm/history/evidence/${TASK_ID}.runner-sync-receipt.json`,
+});
+assert.equal(receiptDerivedBundle.ok, true, `${receiptDerivedBundle.blockedCode} ${receiptDerivedBundle.blockedSummary}`);
+assert.deepEqual(receiptDerivedBundle.stageFiles, bundle.stageFiles);
+
+const foreignReceiptBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: TASK_ID,
+  actorId: 'test-actor',
+  taskDocument: JSON.parse(readFileSync(path.join(cwd, `.atm/history/tasks/${TASK_ID}.json`), 'utf8')),
+  message: 'fixture',
+  trailers: [],
+  apply: false,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+  deliverySliceReceiptPath: '.atm/history/evidence/FOREIGN.runner-sync-receipt.json',
+});
+assert.equal(foreignReceiptBundle.ok, false);
+assert.equal(foreignReceiptBundle.blockedCode, 'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID');
+
 rmSync(cwd, { recursive: true, force: true });
