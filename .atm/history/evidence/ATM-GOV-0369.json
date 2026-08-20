@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0369",
-  "updatedAt": "2026-08-16T04:38:51.016Z",
+  "updatedAt": "2026-08-20T16:58:26.178Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -1589,6 +1589,180 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:c81686dfbeaa151f332ff8976f12ae632d450a253be6214243b1e63c73e54d71",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0369: claude-008 -> codex-captain.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0369.json"
+      ],
+      "producedBy": "codex-captain",
+      "createdAt": "2026-08-20T15:59:58.001Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "claude-008",
+          "leaseId": "lease-ddd621457884",
+          "claimedAt": "2026-08-16T03:23:40.057Z",
+          "heartbeatAt": "2026-08-18T13:59:26.026Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/evidence/ATM-GOV-0369.*",
+            ".atm/history/evidence/ATM-GOV-0369.runner-publication-takeover.json",
+            ".atm/history/evidence/ATM-GOV-0369.runner-sync-receipt.json",
+            ".atm/history/task-events/ATM-GOV-0369/**",
+            ".atm/history/tasks/ATM-GOV-0369.json",
+            "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-001.json",
+            "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-002.json",
+            "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-003.json",
+            "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-004.json",
+            "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-005.json",
+            "docs/governance/atm-bug-and-optimization-backlog.md",
+            "packages/cli/dist",
+            "packages/cli/dist/atm.js",
+            "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+            "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+            "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
+            "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
+            "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+            "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
+            "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+            "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+            "packages/core/src/broker/cross-task-mutation-guard.ts",
+            "packages/core/src/broker/terminal-history-entitlement.ts",
+            "release/atm-onefile/atm.mjs",
+            "release/atm-onefile/release-manifest.json",
+            "release/atm-root-drop",
+            "release/atm-root-drop/release-manifest.json",
+            "scripts/run-sealed-runner-build.test.ts",
+            "scripts/run-sealed-runner-build.ts",
+            "tests/cli/git-commit-failure-index-restoration.test.ts"
+          ],
+          "state": "active",
+          "laneSession": {
+            "laneSessionId": "lane-20260816032340-claude-008-9341749b23",
+            "status": "adopted",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816032340-claude-008-9341749b23\""
+          }
+        },
+        "newClaim": {
+          "actorId": "codex-captain",
+          "leaseId": "lease-7e5f84ea5d8e",
+          "claimedAt": "2026-08-20T15:59:57.087Z",
+          "heartbeatAt": "2026-08-20T15:59:57.087Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0369.json"
+          ],
+          "state": "active",
+          "intent": "write",
+          "laneSession": {
+            "laneSessionId": "lane-20260820155957-codex-captain-0528407a38",
+            "status": "active",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820155957-codex-captain-0528407a38\""
+          },
+          "reason": "Owner-directed internal takeover after external delegation ended; source is delivered and this takeover prepares governed post-publication closeout."
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:runner-reproducibility",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260820155957-codex-captain-ATM-GOV-0369-c180af2ef9",
+      "createdAt": "2026-08-20T16:58:26.178Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260820155957-codex-captain-ATM-GOV-0369-c180af2ef9",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:runner-reproducibility"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.cross-task-mutation-authority-snapshot",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:runner-reproducibility",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b122270d061d0eed1a752c11e0bda29f66f123032c0fc9202c5f91fdb9c17c02",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-20T16:57:36.274Z",
+            "finishedAt": "2026-08-20T16:58:26.177Z",
+            "durationMs": 49903,
+            "cached": false,
+            "validators": [
+              "validate:runner-reproducibility"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "39a4bad9d9f39c63d647a7cc48f93aafeeeebf26",
+            "cacheKey": "sha256:0ac4a3f92767d1e5ea3238206e2501f9038c45f88ab45862ba35d7905e70c787",
+            "generatedAt": "2026-08-20T16:58:26.177Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:0ac4a3f92767d1e5ea3238206e2501f9038c45f88ab45862ba35d7905e70c787",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-20T16:58:26.177Z",
+              "observedAt": "2026-08-20T16:58:26.177Z",
+              "startedAt": "2026-08-20T16:57:36.274Z",
+              "finishedAt": "2026-08-20T16:58:26.177Z",
+              "durationMs": 49903,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:86878ce841b74adc0081dc0e24477bc7755190c1366f376367bd94c9fad97ff8",
+              "outputDigest": "sha256:d8fab0db205069d68c43e4e344becaa642560fb3d7887fadc906ebfb1c1f9481",
+              "cache": {
+                "key": "sha256:0ac4a3f92767d1e5ea3238206e2501f9038c45f88ab45862ba35d7905e70c787",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run validate:runner-reproducibility",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:runner-reproducibility"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "39a4bad9d9f39c63d647a7cc48f93aafeeeebf26",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ed26d5c693ebbe7f23a77a1bf55507f0c0fe1f10946ac6ee414f691eb1429761",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

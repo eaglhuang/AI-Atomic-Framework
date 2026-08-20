@@ -9,7 +9,7 @@
     "ACC-1: A terminal task with a released claim and released lock is absent from the live source-owner set, even if historical scope, claim files, or a direction-lock record names the current candidate path.",
     "ACC-2 (amended): A candidate under `.atm/history/{evidence,task-events,tasks}` belonging to a different task is blocked whenever the authority snapshot shows that task holds live write authority, and is also blocked when the owner is terminal but the writer holds no reconciliation entitlement. Ownership on this surface must be resolved by the same authority snapshot used for source paths, never by the task id embedded in the filename.",
     "ACC-3: An incident recorded under an old false active-scope classification reconciles when current authority snapshots prove its source owners terminal; the repair never mutates foreign staged bytes.",
-    "ACC-4: Publish the frozen runner after source-focused checks and prove its doctor output removes the false `active-task-scope` conflicts while retaining real foreign task-history conflicts.",
+    "ACC-4: Publish the frozen runner after source-focused checks and prove the sealed runner is reproducible and carries the current authority rule while retaining real foreign task-history conflicts. A repository-global doctor result is advisory for this card: unrelated adapter, backlog, or stale-lock findings must not invalidate this task's focused authority evidence.",
     "ACC-5 (added by amendment 1): A writer holding an explicit governed reconciliation entitlement over a terminal task's history paths is admitted. The entitlement is proven from the writer's own claim — the paths it was admitted for, and the task it declares it is reconciling — and must not be inferred from a task id, a file name, a path glob, a lane suffix, or any resemblance between the writer's work-item id and the owner's task id. A refusal may describe an ownership state only after that state has actually been read: it may not call an owner \"active\" without having evaluated its status, claim state, and lock state.",
     "ACC-6 (added by amendment 1): After any admission or pre-commit failure, the index and worktree are restored blob by blob to their exact pre-operation state. Restoration covers staged deletions, staged modifications, and unstaged modifications the operation created, and preserves foreign staged entries it did not create exactly as they were. An unchanged HEAD is not accepted as evidence that nothing was left behind; any residue that cannot be restored is retained under a durable owner-bound recovery receipt."
   ],
@@ -23,9 +23,7 @@
     "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
     "tests/cli/git-commit-failure-index-restoration.test.ts",
     "scripts/run-sealed-runner-build.ts",
-    "scripts/run-sealed-runner-build.test.ts",
-    "packages/cli/dist/atm.js",
-    "release/atm-onefile/atm.mjs"
+    "scripts/run-sealed-runner-build.test.ts"
   ],
   "scopePaths": [
     "packages/core/src/broker/cross-task-mutation-guard.ts",
@@ -37,27 +35,7 @@
     "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
     "tests/cli/git-commit-failure-index-restoration.test.ts",
     "scripts/run-sealed-runner-build.ts",
-    "scripts/run-sealed-runner-build.test.ts",
-    "packages/cli/dist/atm.js",
-    "release/atm-onefile/atm.mjs",
-    ".atm/history/evidence/ATM-GOV-0369.*",
-    ".atm/history/task-events/ATM-GOV-0369/**",
-    ".atm/history/tasks/ATM-GOV-0369.json",
-    "packages/core/src/broker/terminal-history-entitlement.ts",
-    "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
-    "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
-    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-001.json",
-    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-002.json",
-    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-003.json",
-    "docs/governance/atm-bug-and-optimization-backlog.md",
-    "release/atm-onefile/release-manifest.json",
-    "release/atm-root-drop",
-    "release/atm-root-drop/release-manifest.json",
-    ".atm/history/evidence/ATM-GOV-0369.runner-publication-takeover.json",
-    ".atm/history/evidence/ATM-GOV-0369.runner-sync-receipt.json",
-    "packages/cli/dist",
-    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-004.json",
-    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-005.json"
+    "scripts/run-sealed-runner-build.test.ts"
   ],
   "validators": [
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
@@ -66,9 +44,8 @@
     "node --strip-types tests/cli/git-commit-failure-index-restoration.test.ts",
     "npm run typecheck",
     "node --strip-types scripts/run-sealed-runner-build.test.ts",
-    "node atm.dev.mjs doctor --json",
     "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
-    "node atm.mjs doctor --json"
+    "npm run validate:runner-reproducibility"
   ],
   "planningRepo": "docs",
   "targetRepo": "AI-Atomic-Framework",
@@ -87,40 +64,30 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "importDiagnostics": [
-    {
-      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
-      "severity": "warning",
-      "field": "atomizationImpact",
-      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
-      "candidates": [
-        "packages/cli/src/commands/hook/pre-commit/implementation.ts (608 lines)"
-      ]
-    }
-  ],
+  "importDiagnostics": [],
   "tags": [],
   "notes": null,
   "source": {
     "planPath": "governance-optimization/tasks/ATM-GOV-0369-make-cross-task-mutation-ownership-require-current-authority-snapshots.task.md",
     "sectionTitle": "ATM-GOV-0369",
-    "headingLine": 151,
-    "hash": "3fb8c689af7fc595",
+    "headingLine": 146,
+    "hash": "664ea498e9268262",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0369-make-cross-task-mutation-ownership-require-current-authority-snapshots.task.md",
       "planningCommitSha": null,
-      "contentDigest": "sha256:3fb8c689af7fc595b1ba31f14b7f6f4029d9e4c6a3b4bb5ce51a292c7dc3c540",
+      "contentDigest": "sha256:664ea498e9268262934fb357ebdab7a430485a05a4ee61378d39d178e97e6294",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-15T16:17:58.338Z"
+      "sealedAt": "2026-08-20T16:56:57.180Z"
     }
   },
-  "importedAt": "2026-08-15T16:17:58.338Z",
+  "importedAt": "2026-08-20T16:56:57.180Z",
   "workAdmission": {
     "recoveryMode": "auto",
-    "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -293,54 +260,26 @@
     "findings": []
   },
   "claim": {
-    "actorId": "claude-008",
-    "leaseId": "lease-ddd621457884",
-    "claimedAt": "2026-08-16T03:23:40.057Z",
-    "heartbeatAt": "2026-08-16T11:30:38.555Z",
+    "actorId": "codex-captain",
+    "leaseId": "lease-7e5f84ea5d8e",
+    "claimedAt": "2026-08-20T15:59:57.087Z",
+    "heartbeatAt": "2026-08-20T16:59:06.527Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/evidence/ATM-GOV-0369.*",
-      ".atm/history/evidence/ATM-GOV-0369.runner-publication-takeover.json",
-      ".atm/history/evidence/ATM-GOV-0369.runner-sync-receipt.json",
-      ".atm/history/task-events/ATM-GOV-0369/**",
-      ".atm/history/tasks/ATM-GOV-0369.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-001.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-002.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-003.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-004.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-005.json",
-      "docs/governance/atm-bug-and-optimization-backlog.md",
-      "packages/cli/dist",
-      "packages/cli/dist/atm.js",
-      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
-      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
-      "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
-      "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
-      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
-      "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
-      "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
-      "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
-      "packages/core/src/broker/cross-task-mutation-guard.ts",
-      "packages/core/src/broker/terminal-history-entitlement.ts",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-onefile/release-manifest.json",
-      "release/atm-root-drop",
-      "release/atm-root-drop/release-manifest.json",
-      "scripts/run-sealed-runner-build.test.ts",
-      "scripts/run-sealed-runner-build.ts",
-      "tests/cli/git-commit-failure-index-restoration.test.ts"
+      ".atm/history/tasks/ATM-GOV-0369.json"
     ],
     "state": "active",
+    "reason": "Owner-directed internal takeover after external delegation ended; source is delivered and this takeover prepares governed post-publication closeout.",
     "laneSession": {
-      "laneSessionId": "lane-20260816032340-claude-008-9341749b23",
+      "laneSessionId": "lane-20260820155957-codex-captain-0528407a38",
       "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816032340-claude-008-9341749b23\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820155957-codex-captain-0528407a38\""
     }
   },
-  "owner": "claude-008",
+  "owner": "codex-captain",
   "startedAt": "2026-08-13T23:49:12.556Z",
-  "startedBySessionId": "session-20260816032340-claude-008-ATM-GOV-0369-b5def5623b",
+  "startedBySessionId": "session-20260820155957-codex-captain-ATM-GOV-0369-c180af2ef9",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -351,115 +290,54 @@
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0369.*",
-      ".atm/history/evidence/ATM-GOV-0369.runner-publication-takeover.json",
-      ".atm/history/evidence/ATM-GOV-0369.runner-sync-receipt.json",
       ".atm/history/task-events/ATM-GOV-0369/**",
-      ".atm/history/tasks/ATM-GOV-0369.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-001.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-002.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-003.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-004.json",
-      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-005.json",
-      "docs/governance/atm-bug-and-optimization-backlog.md",
-      "packages/cli/dist",
-      "packages/cli/dist/atm.js",
-      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
-      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
-      "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
-      "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
-      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
-      "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
-      "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
-      "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
-      "packages/core/src/broker/cross-task-mutation-guard.ts",
-      "packages/core/src/broker/terminal-history-entitlement.ts",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-onefile/release-manifest.json",
-      "release/atm-root-drop",
-      "release/atm-root-drop/release-manifest.json",
-      "scripts/run-sealed-runner-build.test.ts",
-      "scripts/run-sealed-runner-build.ts",
-      "tests/cli/git-commit-failure-index-restoration.test.ts"
+      ".atm/history/tasks/ATM-GOV-0369.json"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0369-make-cross-task-mutation-ownership-require-current-authority-snapshots.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0369-make-cross-task-mutation-ownership-require-current-authority-snapshots.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "5b207594ffe60bde970f87173c47244c3a7a4b373e9a019888d6279c412567cc",
-    "actorId": "claude-008",
-    "sessionId": null,
+    "actorId": "codex-captain",
+    "sessionId": "session-20260820155957-codex-captain-ATM-GOV-0369-c180af2ef9",
     "laneSession": {
-      "laneSessionId": "lane-20260816032340-claude-008-9341749b23",
+      "laneSessionId": "lane-20260820155957-codex-captain-0528407a38",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816032340-claude-008-9341749b23\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820155957-codex-captain-0528407a38\""
     },
-    "createdAt": "2026-08-16T03:23:43.394Z",
+    "createdAt": "2026-08-20T15:59:57.992Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-16T11-30-41-979Z-scope-amendment-8f1b84a42009",
-  "lastTransitionAt": "2026-08-16T11:30:41.979Z",
+  "lastTransitionId": "2026-08-20T16-59-07-319Z-renew-df0c9835207a",
+  "lastTransitionAt": "2026-08-20T16:59:07.319Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-f489cc9216c12259",
-    "ticketDigest": "sha256:f489cc9216c122590d829804b3d9ee16c06d40e10068122d1a8f689c288aae48",
+    "ticketId": "wat-f828ddbf1c2c2a9d",
+    "ticketDigest": "sha256:f828ddbf1c2c2a9da0f17740816640b2b0a970a1481bf71e0b16d2d3ff296e11",
     "taskId": "ATM-GOV-0369",
     "origin": "claim",
-    "actorId": "claude-008",
-    "laneSessionId": "lane-20260816032340-claude-008-9341749b23",
-    "claimGeneration": "lease-ddd621457884",
-    "issuedAt": "2026-08-16T11:30:41.780Z",
-    "expiresAt": "2026-08-16T12:00:41.780Z",
-    "scopeDigest": "sha256:a11a886655464abbf8abb4b76cc7db925810d7d7dcc7ccd87e0a5c89233ea238",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260820155957-codex-captain-0528407a38",
+    "claimGeneration": "lease-7e5f84ea5d8e",
+    "issuedAt": "2026-08-20T16:59:06.527Z",
+    "expiresAt": "2026-08-20T17:29:06.527Z",
+    "scopeDigest": "sha256:3ebd1f355c34e06a1f0256fa2331a7d64bb01d259f2d040a13cc27d5fe1db5df",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-16T11:30:41.780Z"
+      "selectedAt": "2026-08-20T16:59:06.527Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0369.*",
-          ".atm/history/evidence/ATM-GOV-0369.runner-publication-takeover.json",
-          ".atm/history/evidence/ATM-GOV-0369.runner-sync-receipt.json",
           ".atm/history/task-events/ATM-GOV-0369/**",
-          ".atm/history/tasks/ATM-GOV-0369.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-001.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-002.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-003.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-004.json",
-          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-005.json",
-          "docs/governance/atm-bug-and-optimization-backlog.md",
-          "packages/cli/dist",
-          "packages/cli/dist/atm.js",
-          "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
-          "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
-          "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
-          "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
-          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
-          "packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
-          "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
-          "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
-          "packages/core/src/broker/cross-task-mutation-guard.ts",
-          "packages/core/src/broker/terminal-history-entitlement.ts",
-          "release/atm-onefile/atm.mjs",
-          "release/atm-onefile/release-manifest.json",
-          "release/atm-root-drop",
-          "release/atm-root-drop/release-manifest.json",
-          "scripts/run-sealed-runner-build.test.ts",
-          "scripts/run-sealed-runner-build.ts",
-          "tests/cli/git-commit-failure-index-restoration.test.ts"
+          ".atm/history/tasks/ATM-GOV-0369.json"
         ],
-        "digest": "sha256:e07ea3700cf345e8400825e78f4f980921567edadd471eb3bafe637577c45f62"
+        "digest": "sha256:2d1d6953b17638b726b78d56ce972e1c13313017c1ea9317eee5cf7e2ccee357"
       },
       {
         "kind": "lifecycle-operation",
@@ -481,20 +359,16 @@
     "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
-      "resolvedMode": "enabled",
+      "resolvedMode": "disabled",
       "reasons": [
-        "complex-task",
-        "shared-surface"
+        "low-risk-task"
       ],
-      "maxSavePoints": 2,
-      "perTaskByteBudget": 16777216,
-      "repositoryByteBudget": 268435456,
-      "handoffTtlSeconds": 604800,
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  },
-  "startedByActor": "cursor-captain",
-  "reservedAt": "2026-08-16T03:23:40.038Z",
-  "promotedAt": "2026-08-16T03:23:40.047Z"
+  }
 }

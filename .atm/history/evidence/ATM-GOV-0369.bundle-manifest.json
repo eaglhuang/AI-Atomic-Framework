@@ -1,8 +1,8 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0369",
-  "updatedAt": "2026-08-16T04:38:51.016Z",
-  "updatedBy": "claude-008",
+  "updatedAt": "2026-08-20T16:58:26.178Z",
+  "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
@@ -10,7 +10,8 @@
     "node --strip-types scripts/run-sealed-runner-build.test.ts",
     "node --strip-types tests/cli/git-commit-failure-index-restoration.test.ts",
     "typecheck",
-    "validate:onefile-release"
+    "validate:onefile-release",
+    "validate:runner-reproducibility"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -236,6 +237,22 @@
       "durationMs": 798,
       "runnerKind": "dev-source",
       "sourceCommit": "fff40ff96b65b41260ce0ca551882f46a82e088b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:runner-reproducibility",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b122270d061d0eed1a752c11e0bda29f66f123032c0fc9202c5f91fdb9c17c02",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:runner-reproducibility"
+      ],
+      "generatedAt": "2026-08-20T16:58:26.177Z",
+      "startedAt": "2026-08-20T16:57:36.274Z",
+      "finishedAt": "2026-08-20T16:58:26.177Z",
+      "durationMs": 49903,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "39a4bad9d9f39c63d647a7cc48f93aafeeeebf26",
       "cached": false
     }
   ],

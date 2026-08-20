@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-4b5176d9476c",
+  "recordedAt": "2026-08-20T16:56:57.435Z",
+  "actorId": null,
+  "taskId": "ATM-GOV-0369",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\governance-optimization\\tasks\\ATM-GOV-0369-make-cross-task-mutation-ownership-require-current-authority-snapshots.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-ATM-GOV-0369-54d43c40b6",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-20T16-56-57-433Z-EMG-ATM-GOV-0369-54d43c40b6.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
