@@ -108,10 +108,19 @@ export function prioritizeSharedHistoricalDeliveryBlockers(
     readonly actorId: string;
     readonly historicalDeliveryRef: string | null;
     readonly outOfScopeFiles?: readonly string[];
+    readonly hasScopedHistoricalDelivery?: boolean;
+    readonly preserveDeliverableGate?: boolean;
   }
 ): TaskflowCloseKnownBlocker[] {
   const historicalRef = input.historicalDeliveryRef;
   if (!historicalRef) return [...blockers];
+  if (input.preserveDeliverableGate) {
+    const deliveryBlockers = blockers.filter((entry) => entry.code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+    if (deliveryBlockers.length > 0) {
+      return [...deliveryBlockers, ...blockers.filter((entry) => entry.code !== 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED')];
+    }
+  }
+  if (input.hasScopedHistoricalDelivery === false) return [...blockers];
   const waiverBlockers = blockers.filter((entry) => SHARED_DELIVERY_WAIVER_BLOCKER_CODES.has(entry.code));
   if (waiverBlockers.length === 0) return [...blockers];
   const filtered = blockers.filter((entry) => !DEMOTED_WHEN_SHARED_HISTORICAL_DELIVERY_PRESENT.has(entry.code));
@@ -337,6 +346,17 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
       waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
       waiverReason: input.waiverReason ?? null
     });
+    if (
+      historicalReport.reason === 'no-scoped-deliverable-files'
+      || historicalReport.reason === 'out-of-scope-source-files-present'
+      || historicalReport.reason === 'out-of-scope-waiver-reason-required'
+    ) {
+      blockers.push({
+        code: 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED',
+        summary: `Historical delivery ${historicalRef} contains no declared non-.atm deliverable for ${input.taskId}; record a scoped delivery before requesting task closure.`,
+        requiredCommand: null
+      });
+    }
     if (
       historicalReport.reason === 'out-of-scope-source-files-present'
       || historicalReport.reason === 'out-of-scope-waiver-reason-required'
