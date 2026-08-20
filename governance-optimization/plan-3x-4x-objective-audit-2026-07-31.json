@@ -91,7 +91,7 @@
     "nonClaim": "Deferred items are explicitly waived into follow-up ownership; this does not claim that those bugs are fixed or retired."
   },
   "releasePushProvenance": {
-    "status": "not-complete",
+    "status": "proven",
     "source": "docs/reports/plan-3x-4x-release-closeback.json",
     "nonClaim": "The bound release commit must remain an ancestor of origin/main; later unrelated commits do not invalidate its proven release surfaces."
   },
@@ -112,16 +112,12 @@
     "appliedRule": "legacyAuthority.retirementRule",
     "reason": "The independent certificate this audit binds to was recompiled against observed evidence and the live remote and returned not-complete. Under this audit's own retirement rule a stale or contradictory input restores legacy authority and downgrades the certification, so the previous proven status and retired legacy authority no longer hold.",
     "blockers": [
-      "evidence-newer-than-certificate:.atm/history/tasks/ATM-GOV-0341.json",
-      "evidence-newer-than-certificate:docs/reports/plan-3x-4x-release-closeback.json",
-      "evidence-uncommitted:docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+      "evidence-uncommitted:.atm/history/tasks/ATM-GOV-0341.json",
       "evidence-uncommitted:docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
-      "evidence-uncommitted:release/atm-onefile/release-manifest.json",
-      "release-digest-mismatch:target-head",
-      "release-surface-unreachable:target-head"
+      "evidence-uncommitted:release/atm-onefile/release-manifest.json"
     ],
     "nonClaim": "This downgrade does not retract the objective denominators. Plan 3.0 17/17, Plan 3.1 23/23, Plan 3.2 29/29 and Plan 4.0 17/17 remain independently replayed; what is withdrawn is the final certification and the retirement of legacy authority.",
     "restoreCondition": "Two genuinely independent reviewer outputs, reproducible dimension digests, and a certificate recompiled against the remote at that moment, all recorded by scripts/compile-four-plan-independent-certificate.ts --mode write."
   },
-  "resultDigest": "sha256:ae00c4b6a3f74fb79c54ee74bfd87eadbc25cf172b504c1ae95aa89ab2c0b98d"
+  "resultDigest": "sha256:4d737efd5b138856b5086c696bbb5fd5347faa764a5508e074e8929d29b57b75"
 }

@@ -1,34 +1,34 @@
 {
   "schemaId": "atm.fourPlanReleaseCloseback.v1",
   "specVersion": "0.1.0",
-  "generatedAt": "2026-08-13T21:18:33+08:00",
+  "generatedAt": "2026-08-21T02:10:32+08:00",
   "taskId": "ATM-GOV-0341",
   "targetRepo": "C:/Users/User/AI-Atomic-Framework",
   "planningRepo": "C:/Users/User/3KLife",
-  "targetHead": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
-  "originMain": "fb9837586590d0598f9122ad882ce93277d51705",
+  "targetHead": "5284125b08fdd790985ffa461ce605afaa3872aa",
+  "originMain": "5284125b08fdd790985ffa461ce605afaa3872aa",
   "remoteReachability": {
     "checked": true,
-    "targetHeadReachableFromOriginMain": false,
-    "status": "not-pushed"
+    "targetHeadReachableFromOriginMain": true,
+    "status": "pushed"
   },
   "releaseSurfaces": [
     {
       "surfaceId": "target-head",
-      "expectedDigest": "ba299de58ca8fbf478ceb48876cf78bfeea5a758",
-      "observedDigest": "fb9837586590d0598f9122ad882ce93277d51705",
-      "reachable": false
+      "expectedDigest": "5284125b08fdd790985ffa461ce605afaa3872aa",
+      "observedDigest": "5284125b08fdd790985ffa461ce605afaa3872aa",
+      "reachable": true
     },
     {
       "surfaceId": "origin-main",
-      "expectedDigest": "fb9837586590d0598f9122ad882ce93277d51705",
-      "observedDigest": "fb9837586590d0598f9122ad882ce93277d51705",
+      "expectedDigest": "5284125b08fdd790985ffa461ce605afaa3872aa",
+      "observedDigest": "5284125b08fdd790985ffa461ce605afaa3872aa",
       "reachable": true
     },
     {
       "surfaceId": "frozen-runner",
-      "expectedDigest": "sha256:7ad4ea2d06616ba627af53e13f37ee9641e56a3fdc9b76ad19fb92f88dd39e0e",
-      "observedDigest": "sha256:7ad4ea2d06616ba627af53e13f37ee9641e56a3fdc9b76ad19fb92f88dd39e0e",
+      "expectedDigest": "sha256:445243c5f855f2d883cbadee5fc9309d371c96fe990031febb89dd3140d05cf5",
+      "observedDigest": "sha256:445243c5f855f2d883cbadee5fc9309d371c96fe990031febb89dd3140d05cf5",
       "reachable": true
     },
     {
@@ -38,9 +38,10 @@
       "reachable": true
     }
   ],
-  "status": "not-pushed",
+  "status": "pushed",
   "diagnostics": [
-    "target HEAD is not remote-reachable from origin/main; release remains blocked"
+    "target HEAD is remote-reachable from origin/main",
+    "release surface parity is current; independent certificate still governs final completion"
   ],
   "legacyAuthority": {
     "retired": false,
