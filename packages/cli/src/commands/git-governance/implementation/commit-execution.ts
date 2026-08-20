@@ -50,6 +50,7 @@ import {
 import { isHeadRaceCommitFailure, readHeadBranchRef, readHeadCommitSha } from './push-command.ts';
 import { prepareCommitCandidate, assertGovernedCommitPhysicalLineBudget } from './commit-candidate-preparation.ts';
 import { executeCommitAttempt } from './commit-attempt-boundary.ts';
+import { createHookFailureDiagnosticReport, summarizeHookFailure } from './hook-failure-diagnostics.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
@@ -204,6 +205,30 @@ try {
       : rollbackFailedGitHeadEvidencePreparation(
           gitHeadEvidenceSnapshotBeforeCommitAttempt,
         );
+    const stderr =
+      error instanceof Error && "stderr" in error
+        ? String(error.stderr ?? "")
+        : "";
+    const stdout =
+      error instanceof Error && "stdout" in error
+        ? String(error.stdout ?? "")
+        : "";
+    let hookFailureDiagnostic: ReturnType<typeof createHookFailureDiagnosticReport> = null;
+    let hookFailureDiagnosticWriteError: string | null = null;
+    try {
+      hookFailureDiagnostic = createHookFailureDiagnosticReport({
+        cwd: options.cwd,
+        commitAttemptStatusPath,
+        stdout,
+        stderr,
+      });
+    } catch (diagnosticError) {
+      hookFailureDiagnosticWriteError = diagnosticError instanceof Error
+        ? diagnosticError.message
+        : String(diagnosticError);
+    }
+    const hookFailureSummary = hookFailureDiagnostic?.summary
+      ?? summarizeHookFailure({ stdout, stderr });
     writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
       schemaId: "atm.gitCommitAttemptStatus.v1",
       actorId,
@@ -231,8 +256,8 @@ try {
           : isCommitTimeoutFailure
             ? "ATM_GIT_COMMIT_TIMEOUT"
             : "UNKNOWN",
-      errorSummary:
-        error instanceof Error ? error.message.slice(0, 500) : String(error),
+      errorSummary: hookFailureSummary
+        ?? (error instanceof Error ? error.message.slice(0, 500) : String(error)),
       statusCommand,
       retryCommand,
       copyableCommitCommand: rawCopyableCommitCommand,
@@ -273,14 +298,6 @@ try {
         }),
       });
     }
-    const stderr =
-      error instanceof Error && "stderr" in error
-        ? String(error.stderr ?? "")
-        : "";
-    const stdout =
-      error instanceof Error && "stdout" in error
-        ? String(error.stdout ?? "")
-        : "";
     if (isHeadRaceCommitFailure(stderr)) {
       throw new CliError(
         "ATM_GIT_COMMIT_BRANCH_QUEUE_RACE",
@@ -340,7 +357,7 @@ try {
         : null;
     throw new CliError(
       "ATM_GIT_COMMIT_FAILED",
-      "ATM git commit wrapper failed.",
+      hookFailureSummary ?? "ATM git commit wrapper failed.",
       {
         exitCode: 1,
         details: {
@@ -349,6 +366,8 @@ try {
           sessionId: session?.sessionId ?? null,
           stdout,
           stderr,
+          hookFailureDiagnostic: hookFailureDiagnostic?.reference ?? null,
+          hookFailureDiagnosticWriteError,
           headShaBeforeCommit,
           headShaAfterFailure,
           headAdvancedDuringAttempt,

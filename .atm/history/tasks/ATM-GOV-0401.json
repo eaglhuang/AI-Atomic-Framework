@@ -1,0 +1,283 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0401",
+  "title": "Make governed hook failures summary-first and full-diagnostic-addressable",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: **Summary first.** Every blocked pre-commit result presents a bounded first-line summary containing the selected blocking ATM code, a safe concise detail, and the exact recovery command when one exists. It must be deterministic and must not emit destructive raw-Git remediation.",
+    "ACC-2: **Complete detail remains addressable.** The native hook and governed `git commit` wrapper expose the same complete structured failure envelope through a stable report reference (path plus SHA-256/digest or equivalent immutable reference). No surface may silently discard structured fields merely to fit a console preview.",
+    "ACC-3: **No false success or data leak.** A formatter/report write failure remains fail-closed as a commit failure, preserves the original blocking code, and never changes staging, HEAD, claim, task, receipt, close, runner, or release state. Sensitive command values must be redacted by the existing operator-hint sanitizer.",
+    "ACC-4: **TDD and parity.** A focused fixture first proves the old large-envelope/truncated-wrapper failure, then proves native-hook and governed-wrapper parity for: a required-command finding, no required-command finding, an oversized envelope, and report-write failure. Existing pre-commit regression remains green."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation/hook-failure-diagnostics.ts",
+    "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+    "tests/cli/governed-hook-failure-diagnostics.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+    "packages/cli/src/commands/git-governance/implementation/hook-failure-diagnostics.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "tests/cli/governed-hook-failure-diagnostics.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "node --strip-types tests/cli/governed-hook-failure-diagnostics.test.ts",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the shared formatter and its writer/consumer wiring together; failure envelopes remain source data and no hook failure may be suppressed.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-commit-execution",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "hook-failure-diagnostics",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0401-make-governed-hook-failures-summary-first-and-full-diagnostic-addressable.task.md",
+    "sectionTitle": "ATM-GOV-0401",
+    "headingLine": 89,
+    "hash": "168aa052fb58cdb8",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0401-make-governed-hook-failures-summary-first-and-full-diagnostic-addressable.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:168aa052fb58cdb8fe21be201e522353b8bbfb3e018050640e92b14710a5eb2e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-16T16:03:19.421Z"
+    }
+  },
+  "importedAt": "2026-08-16T16:03:19.421Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The existing failure-envelope and governed commit wrapper have been inspected; no active claim owns their proposed paths."
+    ],
+    "softRelations": [
+      "ATM-BUG-2026-07-11-115"
+    ],
+    "changedPublicSeams": [
+      "hook-failure-operator-diagnostic-contract"
+    ],
+    "causalImpactEdges": [
+      "governed-commit-hook-failure-to-actionable-summary"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "tests/cli/governed-hook-failure-diagnostics.test.ts"
+    ],
+    "phaseOwner": "gemini-captain"
+  },
+  "testContributions": [
+    {
+      "caseId": "governed_hook_failure_summary_and_report_0401",
+      "targetGroupId": "null",
+      "semanticKey": "governed_hook_failure_summary_and_report",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "governed-commit-hook-failure-to-actionable-summary"
+      ],
+      "expectedRedPredicate": "a large structured pre-commit failure is emitted without an actionable first-line summary or an addressable complete diagnostic.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "hook-failure-operator-diagnostic-contract",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "governed_hook_failure_summary_and_report_0401"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-20T16-03-16-389Z-claim-1ecba5350d5f",
+  "lastTransitionAt": "2026-08-20T16:03:16.389Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-08-20T16:03:09.602Z",
+  "promotedAt": "2026-08-20T16:03:09.658Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-06672816985e",
+    "claimedAt": "2026-08-20T16:03:09.663Z",
+    "heartbeatAt": "2026-08-20T16:03:09.663Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0401.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/hook-failure-diagnostics.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "tests/cli/governed-hook-failure-diagnostics.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260820160309-codex-captain-469d8f20ee",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820160309-codex-captain-469d8f20ee\""
+    }
+  },
+  "startedAt": "2026-08-20T16:03:09.663Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-531454985620c693",
+    "ticketDigest": "sha256:531454985620c6932dbacab6ca602100351feaa09dc92435c73e26ea89a26531",
+    "taskId": "ATM-GOV-0401",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260820160309-codex-captain-469d8f20ee",
+    "claimGeneration": "lease-06672816985e",
+    "issuedAt": "2026-08-20T16:03:09.663Z",
+    "expiresAt": "2026-08-20T16:33:09.663Z",
+    "scopeDigest": "sha256:3930e857cebf817a6f8a198d08c64fc84704513c3bf1b5a5684519945620db38",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-20T16:03:09.663Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0401.*",
+          ".atm/history/task-events/ATM-GOV-0401/**",
+          ".atm/history/tasks/ATM-GOV-0401.json",
+          "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+          "packages/cli/src/commands/git-governance/implementation/hook-failure-diagnostics.ts",
+          "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+          "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "tests/cli/governed-hook-failure-diagnostics.test.ts"
+        ],
+        "digest": "sha256:2422064cba431f179c5f51edcb4f0be3d2f650988eb9e03903e5086d0bd6f654"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260820160309-codex-captain-ATM-GOV-0401-2d2c29122c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0401",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0401.*",
+      ".atm/history/task-events/ATM-GOV-0401/**",
+      ".atm/history/tasks/ATM-GOV-0401.json",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/hook-failure-diagnostics.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "tests/cli/governed-hook-failure-diagnostics.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "cf5ca5d7a52366a60ad1923a1eae3ede8a92075cdffa429ca01a1725566b5769",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260820160309-codex-captain-ATM-GOV-0401-2d2c29122c",
+    "laneSession": {
+      "laneSessionId": "lane-20260820160309-codex-captain-469d8f20ee",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820160309-codex-captain-469d8f20ee\""
+    },
+    "createdAt": "2026-08-20T16:03:16.388Z",
+    "status": "active"
+  }
+}

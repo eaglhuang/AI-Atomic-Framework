@@ -1,0 +1,112 @@
+{
+  "taskId": "ATM-GOV-0401",
+  "updatedAt": "2026-08-20T16:06:42.483Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/governed-hook-failure-diagnostics.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260820160309-codex-captain-ATM-GOV-0401-2d2c29122c",
+      "createdAt": "2026-08-20T16:06:42.483Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260820160309-codex-captain-ATM-GOV-0401-2d2c29122c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check",
+          "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+          "node --strip-types tests/cli/governed-hook-failure-diagnostics.test.ts",
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-commit-execution",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/governed-hook-failure-diagnostics.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:ab5e95ed84a85f7c0bc4b84606aec761498293d26dccc442997993036aeff947",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-20T16:06:42.133Z",
+            "finishedAt": "2026-08-20T16:06:42.481Z",
+            "durationMs": 348,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/governed-hook-failure-diagnostics.test.ts",
+              "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+              "typecheck",
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ecb5a714a6e8609c5f01768ab83c29d2cc989952",
+            "cacheKey": "sha256:dd9dad4641fbc9ddc28ef9247fb9f7e6ba87ea9532c98131cd431898452845eb",
+            "generatedAt": "2026-08-20T16:06:42.481Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:dd9dad4641fbc9ddc28ef9247fb9f7e6ba87ea9532c98131cd431898452845eb",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-20T16:06:42.481Z",
+              "observedAt": "2026-08-20T16:06:42.481Z",
+              "startedAt": "2026-08-20T16:06:42.133Z",
+              "finishedAt": "2026-08-20T16:06:42.481Z",
+              "durationMs": 348,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:47fa322b3f49170de51f40b6abeacbc446fdff2338afc612d878246717974141",
+              "outputDigest": "sha256:25fff8bea665228f72bded8ddab93c39edde2f36ba24cccd6250645e6a291787",
+              "cache": {
+                "key": "sha256:dd9dad4641fbc9ddc28ef9247fb9f7e6ba87ea9532c98131cd431898452845eb",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/governed-hook-failure-diagnostics.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/governed-hook-failure-diagnostics.test.ts",
+                  "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+                  "typecheck",
+                  "git diff --check"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "ecb5a714a6e8609c5f01768ab83c29d2cc989952",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:9b0f527b5aa41ee7616c1c45ab2a1720b9204dd2b537ba8c9ef937844a53c11f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
