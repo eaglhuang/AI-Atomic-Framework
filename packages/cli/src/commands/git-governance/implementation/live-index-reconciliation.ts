@@ -365,7 +365,11 @@ function resolveParentSha(cwd: string, commitSha: string): string {
   }
 }
 
-function assertNamedCommitIsCurrentOrAncestor(cwd: string, commitSha: string, headSha: string | null): void {
+function assertNamedCommitIsCurrentOrAncestor(
+  cwd: string,
+  commitSha: string,
+  headSha: string | null
+): asserts headSha is string {
   if (headSha === commitSha) return;
   try {
     if (headSha) {

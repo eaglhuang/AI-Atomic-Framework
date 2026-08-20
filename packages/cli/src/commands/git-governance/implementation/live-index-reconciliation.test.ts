@@ -23,6 +23,7 @@ import { runWithSealedTaskScopedCommitIndex } from './sealed-commit-attribution.
 import { withTaskScopedCommitIndex } from './git-index-transaction.ts';
 import { applyLiveIndexRollbackAfterCommitError } from './commit-execution.ts';
 import { captureIndexRestorationSnapshot, restoreIndexToSnapshot } from './index-restoration.ts';
+import { CliError } from '../../shared.ts';
 import {
   LIVE_INDEX_HISTORICAL_RECOVERY_SCHEMA_ID,
   LIVE_INDEX_RECONCILIATION_SCHEMA_ID,
@@ -422,6 +423,7 @@ function commitF81Shape(root: string) {
     const commitSha = git(root, ['rev-parse', 'HEAD']);
     const indexBefore = git(root, ['ls-files', '-s']);
     const dry = recoverLiveIndexAfterSuccessfulCommit({ cwd: root, commitSha, dryRun: true });
+    assert.equal(dry.headSha, git(root, ['rev-parse', 'HEAD']));
     assert.equal(dry.schemaId, LIVE_INDEX_HISTORICAL_RECOVERY_SCHEMA_ID);
     assert.equal(dry.dryRun, true);
     assert.equal(dry.mutated, false);
@@ -431,6 +433,7 @@ function commitF81Shape(root: string) {
     assert.ok(dry.reconciledPaths.includes('gone.txt'));
 
     const written = recoverLiveIndexAfterSuccessfulCommit({ cwd: root, commitSha, dryRun: false });
+    assert.equal(written.headSha, git(root, ['rev-parse', 'HEAD']));
     assert.equal(written.mutated, true);
     assert.equal(git(root, ['rev-parse', ':owned.txt']), git(root, ['rev-parse', 'HEAD:owned.txt']));
     assert.equal(git(root, ['ls-files', '--', 'gone.txt']), '');
@@ -472,6 +475,32 @@ function commitF81Shape(root: string) {
     assert.equal(readFileSync(path.join(root, 'gone.txt'), 'utf8'), goneWorktreeBefore);
     assert.ok(report.retainedPaths.some((entry) => entry.path === 'owned.txt' && entry.reason === 'concurrent-index-change'));
     assert.ok(report.retainedPaths.some((entry) => entry.path === 'gone.txt' && entry.reason === 'worktree-diverged'));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+{
+  const root = f81ShapedRepository();
+  try {
+    const ownedBlob = git(root, ['hash-object', '-w', '--', 'owned.txt']);
+    const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-f81-missing-head-'));
+    const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
+    git(root, ['read-tree', 'HEAD'], env);
+    git(root, ['update-index', '--add', '--cacheinfo', `100644,${ownedBlob},owned.txt`], env);
+    git(root, ['update-index', '--force-remove', '--', 'gone.txt'], env);
+    git(root, ['commit', '--quiet', '-m', 'candidate commit'], env);
+    rmSync(tempDir, { recursive: true, force: true });
+
+    const commitSha = git(root, ['rev-parse', 'HEAD']);
+    const indexBefore = git(root, ['ls-files', '-s']);
+    writeFileSync(path.join(root, '.git/HEAD'), 'ref: refs/heads/does-not-exist\n');
+
+    assert.throws(
+      () => recoverLiveIndexAfterSuccessfulCommit({ cwd: root, commitSha, dryRun: false }),
+      (error: unknown) => error instanceof CliError && error.code === 'ATM_LIVE_INDEX_RECOVERY_HEAD_MISMATCH'
+    );
+    assert.equal(git(root, ['ls-files', '-s']), indexBefore, 'missing HEAD must fail closed without mutating the live index');
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
