@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { semanticTaskCardDigest } from './task-card-contract-digest.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const completionPath = 'docs/reports/plan-3x-4x-runbook-completion-evidence.json';
@@ -70,6 +71,18 @@ function commandSucceeded(evidence: RecordLike, targetHead: string): string | nu
   return null;
 }
 
+export function isValidValidatorContract(contract: RecordLike): boolean {
+  const contractId = String(contract?.contractId ?? '');
+  const cardPath = typeof contract?.taskCardPath === 'string' ? contract.taskCardPath : '';
+  return /^atm\.taskCardValidator\/ATM-GOV-\d+\/[0-9a-f]{64}$/.test(contractId)
+    && /^ATM-GOV-\d+$/.test(String(contract?.taskId ?? ''))
+    && typeof contract?.command === 'string'
+    && /^sha256:[0-9a-f]{64}$/.test(String(contract?.taskCardDigest ?? ''))
+    && cardPath.length > 0
+    && existsSync(cardPath)
+    && semanticTaskCardDigest(readFileSync(cardPath, 'utf8')) === contract.taskCardDigest;
+}
+
 export function inspectCompletion(raw: string, runbookRaw = '', targetHead = ''): RecordLike {
   const findings: string[] = [];
   const rowTokens = occurrences(raw, /"itemId"\s*:\s*"(RB-\d{3})"/g);
@@ -89,14 +102,7 @@ export function inspectCompletion(raw: string, runbookRaw = '', targetHead = '')
     if (!Array.isArray(parsed.validatorContracts)) findings.push('validator-contract-registry-missing');
     else for (const contract of parsed.validatorContracts) {
       const contractId = String(contract?.contractId ?? '');
-      const cardPath = typeof contract?.taskCardPath === 'string' ? contract.taskCardPath : '';
-      const valid = /^atm\.taskCardValidator\/ATM-GOV-\d+\/[0-9a-f]{64}$/.test(contractId)
-        && /^ATM-GOV-\d+$/.test(String(contract?.taskId ?? ''))
-        && typeof contract?.command === 'string'
-        && /^sha256:[0-9a-f]{64}$/.test(String(contract?.taskCardDigest ?? ''))
-        && cardPath.length > 0
-        && existsSync(cardPath)
-        && sha256(readFileSync(cardPath, 'utf8')) === contract.taskCardDigest;
+      const valid = isValidValidatorContract(contract);
       if (!valid || validatorContracts.has(contractId)) findings.push(`invalid-validator-contract:${contractId || 'missing'}`);
       else validatorContracts.set(contractId, contract);
     }

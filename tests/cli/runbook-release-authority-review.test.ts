@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { inspectCompletion, sealedRemotePublishVerdict } from '../../scripts/review-runbook-release-authority.ts';
+import { inspectCompletion, isValidValidatorContract, sealedRemotePublishVerdict } from '../../scripts/review-runbook-release-authority.ts';
+import { semanticTaskCardDigest } from '../../scripts/task-card-contract-digest.ts';
 
 const broken = '{"rows":[{"itemId":"RB-001","status":"proven"}],"waveExits":[{"itemId":"EXIT-01"}],';
 const inspection = inspectCompletion(broken);
@@ -21,6 +23,18 @@ assert.ok(duplicateInspection.findings.includes('wave-exits-array-invalid'));
 assert.ok(duplicateInspection.findings.includes('proven-without-evidence:RB-001'));
 
 const temporaryOutput = join(mkdtempSync(join(tmpdir(), 'atm-release-review-')), 'review.json');
+const temporaryCard = join(mkdtempSync(join(tmpdir(), 'atm-validator-contract-')), 'ATM-GOV-9000.task.md');
+const planningCard = 'task_id: ATM-GOV-9000\nstatus: planned\nvalidators:\n  - npm run typecheck\n';
+const lifecycleOnlyCloseback = planningCard.replace('status: planned', 'status: done\nclosedAt: 2026-08-20T00:00:00Z');
+writeFileSync(temporaryCard, lifecycleOnlyCloseback, 'utf8');
+const semanticContract = {
+  contractId: `atm.taskCardValidator/ATM-GOV-9000/${'a'.repeat(64)}`,
+  taskId: 'ATM-GOV-9000', taskCardPath: temporaryCard,
+  taskCardDigest: semanticTaskCardDigest(planningCard), command: 'npm run typecheck'
+};
+assert.notEqual(semanticContract.taskCardDigest, `sha256:${createHash('sha256').update(lifecycleOnlyCloseback).digest('hex')}`);
+assert.equal(isValidValidatorContract(semanticContract), true, 'reviewer must consume the producer semantic digest across lifecycle-only changes');
+assert.equal(isValidValidatorContract({ ...semanticContract, taskCardDigest: `sha256:${'0'.repeat(64)}` }), false, 'semantic content drift remains fail-closed');
 const reviewArgs = ['--strip-types', 'scripts/review-runbook-release-authority.ts', '--offline', '--output', temporaryOutput];
 execFileSync(process.execPath, [...reviewArgs, '--mode', 'write'], { stdio: 'pipe' });
 execFileSync(process.execPath, [...reviewArgs, '--mode', 'validate'], { stdio: 'pipe' });

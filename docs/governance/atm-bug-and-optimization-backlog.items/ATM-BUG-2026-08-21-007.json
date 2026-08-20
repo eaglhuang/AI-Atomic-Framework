@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-21-007",
+  "date": "2026-08-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Open",
+  "area": "Runbook validator-contract consumer used raw task-card bytes instead of the sealed semantic digest",
+  "finding": "The completion compiler and its validator both seal task-card contracts with semanticTaskCardDigest, which intentionally excludes lifecycle-only fields. The independent release reviewer independently hashed the entire card file. A normal lifecycle update therefore made every valid contract appear invalid, producing 247 invalid-validator-contract findings and their dependent unregistered findings.",
+  "expectedBehavior": "All producer and consumer paths must resolve a validator contract through one shared semantic task-card digest implementation. Missing cards, semantic content changes, duplicate contracts, malformed IDs, and command mismatches must remain fail-closed.",
+  "evidenceOrRepro": "On 2026-08-21 the 0341 completion report contained 247 validator contracts. All 247 matched the compiler semantic digest; none matched the release reviewer's raw SHA-256. Replacing the duplicated consumer algorithm with the shared semantic digest reduced invalid-validator-contract findings to zero while leaving actual not-proven requirements and Wave exits unresolved.",
+  "followUp": "Keep the shared digest seam covered by lifecycle-only compatibility and semantic-content-drift rejection tests. Do not repair this class by weakening contract validation or by regenerating reports without fixing the consumer."
+}

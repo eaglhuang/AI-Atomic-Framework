@@ -1,12 +1,12 @@
 {
   "schemaId": "atm.runbookCompletionEvidence.v1",
   "specVersion": "0.1.0",
-  "generatedAt": "2026-08-21T05:49:01+08:00",
+  "generatedAt": "2026-08-21T06:10:03+08:00",
   "authority": {
     "planningPath": "docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md",
     "planningHead": "fc161604944cb802adc1426fc7bbefc39af52d7a",
-    "targetHead": "798492ffe904f0509e0874d8891dc87b950ae36e",
-    "originMain": "d7c8f40a702e4f316e63e1f57588928fee539f6a",
+    "targetHead": "14cf3bb56976f94a8607d6a4399196cca8f5d4e5",
+    "originMain": "4ff23f617be51a68baa71c71bf4f6c90e3d6d91e",
     "sourceDigest": "sha256:dbc3e897c2a1361a954b6e86f997e56e8adce449fa6e1aa90d0e6fc1090ba86b",
     "diagnostics": [],
     "planningSemanticSnapshot": {
@@ -10369,28 +10369,14 @@
       "wave": "Wave 5",
       "requirement": "dashboard 可由 sealed raw data 重建；所有數字有來源、時間窗、分母與 digest；`artifactPaths` 非空且指向 durable artifacts。",
       "requirementDigest": "sha256:01fc7a0f968d1d66af204ac2a504c018340eff27c7dd631b9f787aec56e5d4a3",
-      "status": "proven",
-      "evidence": [
-        {
-          "command": "node --strip-types scripts/review-four-plan-objective-authority.ts --mode validate",
-          "exitCode": 0,
-          "outputDigest": "sha256:c0110f6deaadeb5cf38bc8c0913fdd851e5502d897d65ab03bd064547f7f8e66",
-          "artifactPaths": [
-            "docs/reports/wave-exit-observer-receipts/EXIT-06.json"
-          ],
-          "observedAt": "2026-08-16T14:22:47.647Z",
-          "sourceCommit": "d3ada7383071e504cdc057ea3dc6b852c54b3a0e",
-          "evidenceOwner": "wave-exit-observer:EXIT-06",
-          "validatorContractId": "atm.waveExitObserverReceipt/EXIT-06"
-        }
+      "status": "unproven",
+      "evidence": [],
+      "diagnostics": [
+        "missing-independent-wave-exit-contract",
+        "input-digest-drift"
       ],
-      "diagnostics": [],
-      "coverageOwners": [
-        "wave-exit-observer:EXIT-06"
-      ],
-      "validatorContractIds": [
-        "atm.waveExitObserverReceipt/EXIT-06"
-      ]
+      "coverageOwners": [],
+      "validatorContractIds": []
     },
     {
       "itemId": "EXIT-07",
@@ -10399,28 +10385,16 @@
       "wave": "Wave 6",
       "requirement": "17/17、23/23、29/29 verified；不是只完成 mapping，也不是只看舊卡 done。",
       "requirementDigest": "sha256:dfe5be300138688915c8a2257a2e63fd61c1de34956d96009dbe39b1b313ef6f",
-      "status": "proven",
-      "evidence": [
-        {
-          "command": "node --strip-types scripts/validate-four-plan-objectives.ts --mode validate",
-          "exitCode": 0,
-          "outputDigest": "sha256:c1b7eb8995ece5bff75e59c81630a9da5b39eca4d28ddf65c5669e1b90aa379b",
-          "artifactPaths": [
-            "docs/reports/wave-exit-observer-receipts/EXIT-07/798492ffe904f0509e0874d8891dc87b950ae36e.json"
-          ],
-          "observedAt": "2026-08-20T21:49:43.714Z",
-          "sourceCommit": "798492ffe904f0509e0874d8891dc87b950ae36e",
-          "evidenceOwner": "wave-exit-observer:EXIT-07",
-          "validatorContractId": "atm.waveExitObserverReceipt/EXIT-07"
-        }
+      "status": "unproven",
+      "evidence": [],
+      "diagnostics": [
+        "missing-independent-wave-exit-contract",
+        "observer-role-mismatch",
+        "receipt-stale",
+        "input-digest-drift"
       ],
-      "diagnostics": [],
-      "coverageOwners": [
-        "wave-exit-observer:EXIT-07"
-      ],
-      "validatorContractIds": [
-        "atm.waveExitObserverReceipt/EXIT-07"
-      ]
+      "coverageOwners": [],
+      "validatorContractIds": []
     },
     {
       "itemId": "EXIT-08",
@@ -10545,6 +10519,8 @@
     "RB-110",
     "RB-111",
     "RB-112",
+    "EXIT-06",
+    "EXIT-07",
     "EXIT-11"
   ],
   "deferredIds": [],

@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { DEFAULT_OUTPUT, DEFAULT_PLANNING_ROOT, RUNBOOK_RELATIVE_PATH, digestText, evidenceTupleKey, parseRunbook, semanticTaskCardDigest } from './compile-runbook-completion-evidence.ts';
+import { DEFAULT_OUTPUT, DEFAULT_PLANNING_ROOT, RUNBOOK_RELATIVE_PATH, digestText, evidenceTupleKey, parseRunbook } from './compile-runbook-completion-evidence.ts';
+import { semanticTaskCardDigest } from './task-card-contract-digest.ts';
 
 export function validateReport(report: any, source: string): void {
   const ancestry = new Map<string, boolean>();

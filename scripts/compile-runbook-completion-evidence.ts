@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, relative, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -9,6 +8,8 @@ import {
   readWaveExitReceiptCandidates,
   type WaveExitObserverPolicy
 } from '../packages/core/src/evidence/wave-exit-observer-receipt.ts';
+export { digestText, semanticTaskCardDigest } from './task-card-contract-digest.ts';
+import { digestText, semanticTaskCardDigest } from './task-card-contract-digest.ts';
 
 export const RUNBOOK_RELATIVE_PATH = 'docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md';
 export const DEFAULT_PLANNING_ROOT = process.env.ATM_PLANNING_REPO_ROOT
@@ -28,21 +29,6 @@ export function sealValidatorContractIds(candidates: ReadonlyArray<string | unde
   const holes = candidates.some((id) => typeof id !== 'string' || id.length === 0);
   const validatorContractIds = [...new Set(candidates.filter((id): id is string => typeof id === 'string' && id.length > 0))];
   return { validatorContractIds, diagnostics: coverageOwners.length > 0 && (requireComplete ? holes : validatorContractIds.length === 0) ? ['missing-validator-contract-id'] : [] };
-}
-
-export const digestText = (value: string) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
-
-const TASK_CARD_LIFECYCLE_FIELDS = new Set([
-  'status', 'completed_at', 'completed_by_agent', 'closedAt', 'closedByActor',
-  'closedByCommand', 'lastTransitionId', 'lastTransitionAt', 'delivery_commit'
-]);
-
-export function semanticTaskCardDigest(source: string): string {
-  const semanticLines = source.split(/\r?\n/).filter((line) => {
-    const key = /^([A-Za-z][A-Za-z0-9_]*):/.exec(line)?.[1];
-    return key === undefined || !TASK_CARD_LIFECYCLE_FIELDS.has(key);
-  });
-  return digestText(semanticLines.join('\n'));
 }
 
 function normalizePublicationArtifacts(paths: string[]): string[] | null {
