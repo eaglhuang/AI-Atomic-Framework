@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-20T17-19-22-965Z-close-c237e6222bc8",
+  "taskId": "ATM-GOV-0395",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260820160826-codex-captain-ATM-GOV-0395-15cda57e4b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0395.json",
+  "taskSha256": "sha256:9e5a488d847d24480f147cb0a7c1b9ee6c759fed18df9c8abb6dfbe883da4669",
+  "createdAt": "2026-08-20T17:19:22.965Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0395 --actor codex-captain --status done --historical-delivery fff40ff96b65b41260ce0ca551882f46a82e088b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260820160826-codex-captain-ATM-GOV-0395-15cda57e4b",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0395.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-20T17:19:22.954Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json",
+        ".atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json",
+        ".atm/history/evidence/ATM-GOV-0395.*",
+        ".atm/history/task-events/ATM-GOV-0395/**",
+        ".atm/history/tasks/ATM-GOV-0395.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
+        "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+        "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
+        "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+        "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+        "packages/core/src/broker/terminal-history-entitlement.ts",
+        "packages/plugin-governance-local/src/stores.ts",
+        "packages/plugin-sdk/src/governance/stores.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/__tests__/lane-ownership-provenance.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
+        "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
+        "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
+        "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+        "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+        "packages/core/src/broker/terminal-history-entitlement.ts",
+        "packages/plugin-governance-local/src/stores.ts",
+        "packages/plugin-sdk/src/governance/stores.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
