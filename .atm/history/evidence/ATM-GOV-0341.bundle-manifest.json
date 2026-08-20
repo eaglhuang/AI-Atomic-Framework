@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-20T22:34:56.529Z",
+  "updatedAt": "2026-08-20T22:37:02.110Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
@@ -20,6 +20,7 @@
     "typecheck",
     "validate-backlog-census",
     "validate-four-plan-objectives",
+    "validate-runbook-completion-evidence",
     "validate-runner-reproducibility",
     "validate:backlog-census",
     "validate:cli",
@@ -696,6 +697,22 @@
       "durationMs": 602,
       "runnerKind": "dev-source",
       "sourceCommit": "59eb2efd00dd54d7e808f2177f9c095a0b5f196e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-runbook-completion-evidence.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cdfed886cdef314fc2cd6318fab1a34e5025e0b3c7d40918de0f9eca1e809077",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate-runbook-completion-evidence"
+      ],
+      "generatedAt": "2026-08-20T22:37:02.109Z",
+      "startedAt": "2026-08-20T22:37:00.832Z",
+      "finishedAt": "2026-08-20T22:37:02.109Z",
+      "durationMs": 1277,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7260ddcea7738c3366ddccab4b2e940c3b44dfc6",
       "cached": false
     }
   ],
