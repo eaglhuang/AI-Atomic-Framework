@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-21-005",
+  "date": "2026-08-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P2",
+  "status": "Open",
+  "area": "Runtime cache files can enter the repository-wide ESLint source universe",
+  "finding": "ATM commands write transient TypeScript extracts under .atm-runtime-cache, but the repository ESLint configuration did not exclude that runtime-only directory. A partially generated extract was then parsed as product source and blocked the required lint gate. The same lint run also exposed duplicate imports in tracked source files, but those are ordinary source defects; the governance defect is that a non-source cache can make lint nondeterministic with respect to the tracked tree.",
+  "expectedBehavior": "Repository lint must evaluate tracked source and declared generated source only. ATM runtime cache directories are transient operational state and must be ignored explicitly, so an interrupted cache write cannot create a parser error in the product lint gate. Real tracked-source lint errors remain visible and fail the command normally.",
+  "evidenceOrRepro": "On 2026-08-20, npm run lint failed first at .atm-runtime-cache/scope-add-extract.ts:16 with a TypeScript parser error. Adding .atm-runtime-cache/** to eslint.config.mjs ignores that transient surface. The same replay still identified four tracked duplicate-import violations, which were merged separately; the final npm run lint exited 0 with only pre-existing any-debt warnings.",
+  "followUp": "Keep runtime caches out of all repository-wide source enumerators unless a command explicitly validates a cache artifact. Add a focused config regression if the ESLint configuration gains a generated-path policy test harness."
+}

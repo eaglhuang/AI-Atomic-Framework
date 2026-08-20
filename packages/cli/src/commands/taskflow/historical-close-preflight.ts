@@ -1,9 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { inspectGitIndexOwnership } from '../git-index-ownership.ts';
+import { ATM_INDEX_FOREIGN_ACTIVE_STAGED, inspectGitIndexOwnership } from '../git-index-ownership.ts';
 import { computeMissingValidatorReport } from '../evidence.ts';
-import { ATM_INDEX_FOREIGN_ACTIVE_STAGED } from '../git-index-ownership.ts';
 import { readActiveTaskDirectionLocks } from '../task-direction.ts';
 import { normalizeTaskId } from '../tasks/task-import-validators.ts';
 import { normalizeRelativePath } from '../tasks/task-file-io-helpers.ts';
