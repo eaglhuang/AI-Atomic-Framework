@@ -115,4 +115,19 @@ assert.equal(prioritized[0]?.code, 'ATM_TASKFLOW_CLOSE_OUT_OF_SCOPE_WAIVER_REQUI
 assert.match(prioritized[0]?.summary ?? '', /shared-delivery/i);
 assert.equal(prioritized[0]?.requiredCommand, buildSharedDeliveryWaiverCommand({ taskId, actorId: 'validator', historicalRef }));
 assert.ok(!prioritized.some((entry) => entry.code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED'), 'deliverable diff must be demoted when historical shared delivery waiver is required');
+const writePrioritized = prioritizeSharedHistoricalDeliveryBlockers([
+    {
+        code: 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED',
+        summary: 'missing delivery',
+        requiredCommand: null
+    },
+    ...writeHint.blockers
+], {
+    taskId,
+    actorId: 'validator',
+    historicalDeliveryRef: historicalRef,
+    outOfScopeFiles: mixedBlocker.files ?? [],
+    preserveDeliverableGate: true
+});
+assert.equal(writePrioritized[0]?.code, 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', 'write admission must preserve the backend delivery gate ahead of a shared-delivery waiver');
 console.log('[mixed-delivery-close-ux.spec] ok');

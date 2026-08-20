@@ -121,7 +121,10 @@ export function dedupeDirectionLocks(locks) {
     const seen = new Set();
     const output = [];
     for (const lock of locks) {
-        const key = `${lock.taskId}:${lock.actorId}:${lock.queueId ?? ''}`;
+        // A task has one live claim authority.  Its runtime projections may carry
+        // different queue metadata, but they must never manufacture a second
+        // direction authority for the same task and actor.
+        const key = `${lock.taskId}:${lock.actorId}`;
         if (seen.has(key))
             continue;
         seen.add(key);

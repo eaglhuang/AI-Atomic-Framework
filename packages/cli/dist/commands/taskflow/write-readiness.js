@@ -59,6 +59,14 @@ export function prioritizeSharedHistoricalDeliveryBlockers(blockers, input) {
     const historicalRef = input.historicalDeliveryRef;
     if (!historicalRef)
         return [...blockers];
+    if (input.preserveDeliverableGate) {
+        const deliveryBlockers = blockers.filter((entry) => entry.code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+        if (deliveryBlockers.length > 0) {
+            return [...deliveryBlockers, ...blockers.filter((entry) => entry.code !== 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED')];
+        }
+    }
+    if (input.hasScopedHistoricalDelivery === false)
+        return [...blockers];
     const waiverBlockers = blockers.filter((entry) => SHARED_DELIVERY_WAIVER_BLOCKER_CODES.has(entry.code));
     if (waiverBlockers.length === 0)
         return [...blockers];
@@ -241,6 +249,15 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
             waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
             waiverReason: input.waiverReason ?? null
         });
+        if (historicalReport.reason === 'no-scoped-deliverable-files'
+            || historicalReport.reason === 'out-of-scope-source-files-present'
+            || historicalReport.reason === 'out-of-scope-waiver-reason-required') {
+            blockers.push({
+                code: 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED',
+                summary: `Historical delivery ${historicalRef} contains no declared non-.atm deliverable for ${input.taskId}; record a scoped delivery before requesting task closure.`,
+                requiredCommand: null
+            });
+        }
         if (historicalReport.reason === 'out-of-scope-source-files-present'
             || historicalReport.reason === 'out-of-scope-waiver-reason-required') {
             blockers.push(enhanceSharedDeliveryWaiverBlocker({

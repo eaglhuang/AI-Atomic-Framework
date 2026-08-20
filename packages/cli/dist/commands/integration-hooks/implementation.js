@@ -116,7 +116,7 @@ function runPreToolHook(options) {
     const protectedStateFiles = mutatingIntent && !gitCommitIntent ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isProtectedAtmManagedStatePath) : [];
     const runtimeLockFiles = mutatingIntent && !gitCommitIntent ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isRuntimeLockStatePath) : [];
     const planningClosureFiles = status.mode === 'cross-repo-target-required' && isMutatingToolIntent(options.toolName, toolCommand) ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isPlanningClosureSurface) : [];
-    const hasFrameworkClaim = status.activeLocks.some((entry) => !entry.includes('/BOOTSTRAP-'));
+    const hasFrameworkTempClaim = status.activeLocks.some((entry) => /\/ATM-FRAMEWORK-TEMP-[^/]+\.lock\.json$/i.test(entry));
     const gitHooks = inspectGitHooks(frameworkRoot ?? options.cwd, { frameworkRequired: frameworkRoot !== null });
     const promptScopedContext = resolvePromptScopedTaskContext(options.cwd, { prompt: options.prompt });
     const promptScope = promptScopedContext.promptScope;
@@ -202,6 +202,12 @@ function runPreToolHook(options) {
                 })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, blockedFiles: staticEvidenceArtifactFiles, toolCommand, frameworkStatus: status }
         });
     }
+    if (criticalFiles.length > 0 && !hasFrameworkTempClaim && activeDirectionLocks.length === 0) {
+        const claimCommand = buildFrameworkTempClaimCommand(criticalFiles, 'temporary framework maintenance before tool edit');
+        return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_FRAMEWORK_CLAIM_REQUIRED', 'Framework critical source edit is blocked until ATM framework work is claimed.', { editor: options.editor, criticalFiles, nextStep: claimCommand
+                })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, criticalFiles, frameworkClaimCommand: claimCommand, frameworkStatus: status }
+        });
+    }
     if (quickfixDriftFiles.length > 0) {
         return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_QUICKFIX_SCOPE_EXCEEDED', 'Tool edit scope drifted away from the active ATM quickfix lock.', { editor: options.editor, blockedFiles: quickfixDriftFiles, scopePaths: quickfixAllowedPaths.slice(0, 40),
                     nextStep: 'Finish or release the active quickfix lock before editing unrelated files.' })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, quickfixDriftFiles, quickfixLock: activeQuickfixLock, frameworkStatus: status }
@@ -252,12 +258,6 @@ function runPreToolHook(options) {
         return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', activeWorkAdmission.decision.code, 'Active task write is missing current work-admission coverage.', { taskId: activeDirectionLocks[0]?.taskId ?? null, reason: activeWorkAdmission.decision.reason })], evidence: {
                 action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, workAdmission: activeWorkAdmission, frameworkStatus: status
             }
-        });
-    }
-    if (criticalFiles.length > 0 && !hasFrameworkClaim) {
-        const claimCommand = buildFrameworkTempClaimCommand(criticalFiles, 'temporary framework maintenance before tool edit');
-        return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_FRAMEWORK_CLAIM_REQUIRED', 'Framework critical source edit is blocked until ATM framework work is claimed.', { editor: options.editor, criticalFiles, nextStep: claimCommand
-                })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, criticalFiles, frameworkClaimCommand: claimCommand, frameworkStatus: status }
         });
     }
     const teamGateFindings = evaluateTeamPreToolGate({ cwd: options.cwd, actorId: process.env.ATM_ACTOR_ID ?? process.env.ATM_COMMIT_ACTOR_ID ?? options.editor, files: toolFiles, command: options.command, toolName: options.toolName });
