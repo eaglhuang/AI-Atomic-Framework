@@ -30,7 +30,9 @@ const policy = loadWaveExitObserverPolicy();
 const headAtTestStart = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 assert.equal(loadWaveExitObserverPolicyAtCommit('.', headAtTestStart)?.schemaId, 'atm.waveExitObserverPolicy.v1');
 assert.deepEqual(digestWaveExitObserverInputsAtCommit('.', ['schemas/evidence/wave-exit-observer-policy.json'], headAtTestStart), {
-  'schemas/evidence/wave-exit-observer-policy.json': digestText(readFileSync(WAVE_EXIT_OBSERVER_POLICY_PATH, 'utf8'))
+  'schemas/evidence/wave-exit-observer-policy.json': digestText(execFileSync(
+    'git', ['show', `${headAtTestStart}:${WAVE_EXIT_OBSERVER_POLICY_PATH}`], { encoding: 'utf8' }
+  ))
 });
 assert.equal(loadWaveExitObserverPolicyAtCommit('.', '0'.repeat(40)), null, 'missing historical policy must stay fail-closed');
 const policySource = readFileSync(WAVE_EXIT_OBSERVER_POLICY_PATH, 'utf8');

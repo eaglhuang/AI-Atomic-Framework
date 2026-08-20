@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-20T22:28:26.614Z",
+  "updatedAt": "2026-08-20T22:34:56.529Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
@@ -27,7 +27,8 @@
     "validate:git-head-evidence",
     "validate:module-boundaries",
     "validate:runbook-completion-evidence",
-    "validate:test-facade"
+    "validate:test-facade",
+    "wave-exit-observer-receipt"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -679,6 +680,22 @@
       "durationMs": 8134,
       "runnerKind": "dev-source",
       "sourceCommit": "78821790e27e23d25665dac9484ecaa3882b0f1a",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fd3e92dcca5e8aa3e33ff49784d93126eb433d6a288517d724c48b8f2613d3e5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "wave-exit-observer-receipt"
+      ],
+      "generatedAt": "2026-08-20T22:34:56.528Z",
+      "startedAt": "2026-08-20T22:34:55.926Z",
+      "finishedAt": "2026-08-20T22:34:56.528Z",
+      "durationMs": 602,
+      "runnerKind": "dev-source",
+      "sourceCommit": "59eb2efd00dd54d7e808f2177f9c095a0b5f196e",
       "cached": false
     }
   ],
