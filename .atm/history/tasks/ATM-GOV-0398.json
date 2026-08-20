@@ -243,17 +243,17 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-15T15-06-09-869Z-renew-a64d4253f130",
-  "lastTransitionAt": "2026-08-15T15:06:09.869Z",
+  "lastTransitionId": "2026-08-20T15-52-32-673Z-scope-amendment-76b63c52a653",
+  "lastTransitionAt": "2026-08-20T15:52:32.673Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "cursor-captain",
+  "owner": "codex-captain",
   "reservedAt": "2026-08-15T14:04:16.216Z",
   "promotedAt": "2026-08-15T14:04:16.221Z",
   "claim": {
-    "actorId": "cursor-captain",
-    "leaseId": "lease-d0f4e6a9ca73",
-    "claimedAt": "2026-08-15T14:04:16.227Z",
-    "heartbeatAt": "2026-08-15T15:06:09.073Z",
+    "actorId": "codex-captain",
+    "leaseId": "lease-d4b3923ce31e",
+    "claimedAt": "2026-08-20T15:52:23.557Z",
+    "heartbeatAt": "2026-08-20T15:52:23.557Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0398.*",
@@ -267,39 +267,40 @@
       "scripts/validate-governance-commands/implementation.ts"
     ],
     "state": "active",
+    "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260815140416-cursor-captain-893604fe79",
-      "status": "adopted",
+      "laneSessionId": "lane-20260820155223-codex-captain-a592f74239",
+      "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815140416-cursor-captain-893604fe79\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820155223-codex-captain-a592f74239\""
+    },
+    "reason": "Owner-directed internal takeover after external delegation ended; prior claim is stale and no retained in-scope WIP is being adopted."
   },
   "startedAt": "2026-08-15T14:04:16.227Z",
   "startedByActor": "cursor-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d60e22dbbf95b953",
-    "ticketDigest": "sha256:d60e22dbbf95b953a4e747d5a7987a5724ece10dd77e0344b15b2d42d603209f",
+    "ticketId": "wat-afcac18b516ca8ea",
+    "ticketDigest": "sha256:afcac18b516ca8ea737ca61f02800abf2a73cd176c05770df5f794f2ef2d462f",
     "taskId": "ATM-GOV-0398",
     "origin": "claim",
-    "actorId": "cursor-captain",
-    "laneSessionId": "lane-20260815140416-cursor-captain-893604fe79",
-    "claimGeneration": "lease-d0f4e6a9ca73",
-    "issuedAt": "2026-08-15T15:06:09.073Z",
-    "expiresAt": "2026-08-15T15:36:09.073Z",
-    "scopeDigest": "sha256:ac9d916798c5f10bbe07337b562759ddd34bc8af56a7b21fade4144e25d61cb1",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260820155223-codex-captain-a592f74239",
+    "claimGeneration": "lease-d4b3923ce31e",
+    "issuedAt": "2026-08-20T15:52:32.581Z",
+    "expiresAt": "2026-08-20T16:22:32.581Z",
+    "scopeDigest": "sha256:f3050ef52199534b276463f7414042899e6cf883a18090fe2a0ee3063d411689",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-15T15:06:09.073Z"
+      "selectedAt": "2026-08-20T15:52:32.581Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0398.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0398/**",
           ".atm/history/tasks/ATM-GOV-0398.json",
           "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
@@ -309,7 +310,7 @@
           "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
           "scripts/validate-governance-commands/implementation.ts"
         ],
-        "digest": "sha256:b0de7b3b74d8b5eef276123ef27763c55972d9588b1fa4f69f688385c38f0ed9"
+        "digest": "sha256:6e501c13615d38fabc1ac6f012a652f4b1aa217a91d9ff5ad4ed1cff8ce4736b"
       },
       {
         "kind": "lifecycle-operation",
@@ -343,7 +344,7 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260815140416-cursor-captain-ATM-GOV-0398-5d7054f60a",
+  "startedBySessionId": "session-20260820155223-codex-captain-ATM-GOV-0398-6588677f90",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -363,26 +364,19 @@
       "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
       "scripts/validate-governance-commands/implementation.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0398-repair-the-remaining-declared-validator-regressions-behind-atm-gov-0331-evidence.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0398-repair-the-remaining-declared-validator-regressions-behind-atm-gov-0331-evidence.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "1df3ec1500f109a3d45c7b62384bbff31bf7a15e132b8fbb0f55d35c4a7570f7",
-    "actorId": "cursor-captain",
-    "sessionId": null,
+    "actorId": "codex-captain",
+    "sessionId": "session-20260820155223-codex-captain-ATM-GOV-0398-6588677f90",
     "laneSession": {
-      "laneSessionId": "lane-20260815140416-cursor-captain-893604fe79",
+      "laneSessionId": "lane-20260820155223-codex-captain-a592f74239",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815140416-cursor-captain-893604fe79\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820155223-codex-captain-a592f74239\""
     },
-    "createdAt": "2026-08-15T14:04:21.760Z",
+    "createdAt": "2026-08-20T15:52:24.353Z",
     "status": "active"
   }
 }

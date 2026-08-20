@@ -1,11 +1,12 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0398",
-  "updatedAt": "2026-08-15T15:04:35.350Z",
-  "updatedBy": "cursor-captain",
+  "updatedAt": "2026-08-20T15:56:50.459Z",
+  "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
     "node --strip-types packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+    "typecheck",
     "validate:governance-commands",
     "validate:taskflow-close-atomicity"
   ],
@@ -137,6 +138,25 @@
       "durationMs": 20006,
       "runnerKind": "dev-source",
       "sourceCommit": "42e158daed56daa73ad12915ddbd982cacf0b9dd",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0ae751a29fd231cc54f06907a2b68b91a004e858aec36fad7cae3fd61801ed94",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+        "validate:governance-commands",
+        "validate:taskflow-close-atomicity",
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-20T15:56:50.458Z",
+      "startedAt": "2026-08-20T15:56:49.666Z",
+      "finishedAt": "2026-08-20T15:56:50.458Z",
+      "durationMs": 792,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3432fa95d568432a3f96eda181ffa8b07b5955e2",
       "cached": false
     }
   ],

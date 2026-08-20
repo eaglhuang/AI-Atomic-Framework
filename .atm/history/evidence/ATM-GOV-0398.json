@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0398",
-  "updatedAt": "2026-08-15T15:04:35.350Z",
+  "updatedAt": "2026-08-20T15:56:50.459Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -772,6 +772,168 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:114e3d0d9a1318187af8fac9fb4d5192026605656abb2918cbaa2d3db95d99ed",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0398: cursor-captain -> codex-captain.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0398.json"
+      ],
+      "producedBy": "codex-captain",
+      "createdAt": "2026-08-20T15:52:24.365Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "cursor-captain",
+          "leaseId": "lease-d0f4e6a9ca73",
+          "claimedAt": "2026-08-15T14:04:16.227Z",
+          "heartbeatAt": "2026-08-16T05:07:54.396Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/evidence/ATM-GOV-0398.*",
+            ".atm/history/task-events/ATM-GOV-0398/**",
+            ".atm/history/tasks/ATM-GOV-0398.json",
+            "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+            "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+            "packages/cli/src/commands/taskflow/close-preflight.ts",
+            "packages/cli/src/commands/taskflow/implementation.ts",
+            "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+            "scripts/validate-governance-commands/implementation.ts"
+          ],
+          "state": "active",
+          "laneSession": {
+            "laneSessionId": "lane-20260815140416-cursor-captain-893604fe79",
+            "status": "adopted",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815140416-cursor-captain-893604fe79\""
+          }
+        },
+        "newClaim": {
+          "actorId": "codex-captain",
+          "leaseId": "lease-d4b3923ce31e",
+          "claimedAt": "2026-08-20T15:52:23.557Z",
+          "heartbeatAt": "2026-08-20T15:52:23.557Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0398.json"
+          ],
+          "state": "active",
+          "intent": "write",
+          "laneSession": {
+            "laneSessionId": "lane-20260820155223-codex-captain-a592f74239",
+            "status": "active",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820155223-codex-captain-a592f74239\""
+          },
+          "reason": "Owner-directed internal takeover after external delegation ended; prior claim is stale and no retained in-scope WIP is being adopted."
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260820155223-codex-captain-ATM-GOV-0398-6588677f90",
+      "createdAt": "2026-08-20T15:56:50.459Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260820155223-codex-captain-ATM-GOV-0398-6588677f90",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+          "typecheck",
+          "validate:governance-commands",
+          "validate:taskflow-close-atomicity"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.taskflow-close-preflight",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0ae751a29fd231cc54f06907a2b68b91a004e858aec36fad7cae3fd61801ed94",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-20T15:56:49.666Z",
+            "finishedAt": "2026-08-20T15:56:50.458Z",
+            "durationMs": 792,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+              "validate:governance-commands",
+              "validate:taskflow-close-atomicity",
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "3432fa95d568432a3f96eda181ffa8b07b5955e2",
+            "cacheKey": "sha256:2a4ef8ce2d7a08acb72c6b7844bf6d8d47ed8c5d99744620b4c2266ca028fa4e",
+            "generatedAt": "2026-08-20T15:56:50.458Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:2a4ef8ce2d7a08acb72c6b7844bf6d8d47ed8c5d99744620b4c2266ca028fa4e",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-20T15:56:50.458Z",
+              "observedAt": "2026-08-20T15:56:50.458Z",
+              "startedAt": "2026-08-20T15:56:49.666Z",
+              "finishedAt": "2026-08-20T15:56:50.458Z",
+              "durationMs": 792,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:bc6e5baa98da51bf53fa9d9e0ac6209081f6f680a44fcbcac5aa4b6651b07f41",
+              "outputDigest": "sha256:24a5c989c05c9be6a1e0be6571a065c38a45cb144734d474365e898ec849bbe3",
+              "cache": {
+                "key": "sha256:2a4ef8ce2d7a08acb72c6b7844bf6d8d47ed8c5d99744620b4c2266ca028fa4e",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+                  "validate:governance-commands",
+                  "validate:taskflow-close-atomicity",
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "3432fa95d568432a3f96eda181ffa8b07b5955e2",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7c7729212c3757ec7108acacc3299dae0130def70a4587e8e55fc5e327ffe3e8",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

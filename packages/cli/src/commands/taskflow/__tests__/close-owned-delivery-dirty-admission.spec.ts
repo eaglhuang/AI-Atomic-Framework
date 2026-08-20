@@ -3,6 +3,7 @@ import {
   applyCloseOwnedNonRunnerDeliveryDirtyAdmission,
   extractCloseOwnedDeliveryFiles
 } from '../close-owned-delivery-dirty-admission.ts';
+import { buildCloseOwnedDirtyPendingBlocker } from '../implementation.ts';
 import type { HistoricalClosePreflightSummary } from '../historical-close-preflight.ts';
 import type { FrameworkCloseDirtyGuardReport } from '../../tasks/scope-lock-diagnostics.ts';
 
@@ -83,6 +84,41 @@ assert.equal(admitted.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_PREC
 assert.deepEqual(admitted.scopeTrackedDirtyFiles, []);
 assert.equal(admitted.dirtyGuard.ok, true);
 assert.ok(admitted.dirtyGuard.advisoryTrackedDirtyFiles.includes('src/deliver.txt'));
+
+assert.equal(
+  buildCloseOwnedDirtyPendingBlocker({
+    taskId: 'TASK-DIRTY-0001',
+    actorId: 'captain',
+    previewCommitBundle: {
+      targetRepo: { stageFiles: ['src/deliver.txt'] },
+      targetGovernanceFiles: [],
+      planningRepo: { stageFiles: [] },
+      planningFiles: []
+    } as never,
+    dirtyGuard: admitted.dirtyGuard
+  }),
+  null,
+  'close-owned advisory dirty must stay advisory when another readiness blocker exists'
+);
+
+const blockingPending = buildCloseOwnedDirtyPendingBlocker({
+  taskId: 'TASK-DIRTY-0001',
+  actorId: 'captain',
+  previewCommitBundle: {
+    targetRepo: { stageFiles: ['src/deliver.txt'] },
+    targetGovernanceFiles: [],
+    planningRepo: { stageFiles: [] },
+    planningFiles: []
+  } as never,
+  dirtyGuard: { blockingTrackedDirtyFiles: ['src/deliver.txt'] },
+  fallbackCommand: 'node atm.mjs tasks renew --task unrelated --json'
+});
+assert.equal(blockingPending?.code, 'ATM_TASKFLOW_CLOSE_OWNED_DIRTY_PENDING');
+assert.equal(
+  blockingPending?.requiredCommand,
+  'node atm.mjs taskflow pre-close --task TASK-DIRTY-0001 --actor "captain" --json',
+  'owned-dirty recovery must be derived from the owned-dirty contract, never copied from another blocker'
+);
 
 const runnerAffecting = applyCloseOwnedNonRunnerDeliveryDirtyAdmission({
   preflight: preflight({
