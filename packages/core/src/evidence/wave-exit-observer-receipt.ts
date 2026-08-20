@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID = 'atm.waveExitObserverReceipt.v1' as const;
@@ -115,6 +116,22 @@ export interface WaveExitObserverVerdict {
   readonly canonicalArtifactPath: string | null;
 }
 
+export interface ConsumeWaveExitObserverReceiptCandidatesInput {
+  readonly repoRoot: string;
+  readonly receipts: readonly unknown[];
+  readonly policy: WaveExitObserverPolicy;
+  readonly compilationHead: string;
+  readonly currentInputDigests: Readonly<Record<string, string>>;
+  readonly policyDigestAtCompilationHead: string;
+  readonly isAncestor: (ancestor: string, descendant: string) => boolean;
+  readonly basisActors?: readonly string[];
+}
+
+export interface WaveExitObserverCandidatesVerdict {
+  readonly receipt: WaveExitObserverReceipt | null;
+  readonly diagnostics: readonly (WaveExitObserverDiagnostic | 'receipt-ambiguity')[];
+}
+
 const REQUIRED_RECEIPT_FIELDS = [
   'schemaId',
   'schemaVersion',
@@ -208,17 +225,47 @@ export function readEvidenceProducerActors(repoRoot: string, taskId: string): st
   }
 }
 
+/**
+ * A receipt is an observation of a particular repository state.  Resolving a
+ * basis actor against the current ledger would let a later handoff invalidate
+ * an otherwise immutable observation, so receipt consumers read the task
+ * authority snapshot from the observed commit instead.
+ */
+export function readClaimHolderActorAtCommit(repoRoot: string, taskId: string, commit: string): string | null {
+  if (!COMMIT_SHAPE.test(commit)) return null;
+  try {
+    const body = execFileSync('git', ['show', `${commit}:.atm/history/tasks/${taskId}.json`], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    });
+    const record = JSON.parse(body) as { claim?: { actorId?: unknown; state?: unknown } };
+    return record.claim?.state === 'active' && isNonEmptyString(record.claim.actorId)
+      ? record.claim.actorId.trim()
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 export function resolveWaveExitBasisProducer(input: {
   readonly repoRoot: string;
   readonly policy: WaveExitObserverPolicy;
+  /** The immutable observation commit when consuming a historical receipt. */
+  readonly basisCommit?: string;
   readonly readClaimHolder?: (taskId: string) => string | null;
+  readonly readClaimHolderAtCommit?: (taskId: string, commit: string) => string | null;
   readonly readEvidenceActors?: (taskId: string) => readonly string[];
 }): DerivedBasisIdentity {
   const owners = input.policy.basisEvidenceOwners;
   const readClaim = input.readClaimHolder ?? ((taskId: string) => readClaimHolderActor(input.repoRoot, taskId));
+  const readClaimAtCommit = input.readClaimHolderAtCommit
+    ?? ((taskId: string, commit: string) => readClaimHolderActorAtCommit(input.repoRoot, taskId, commit));
   const readEvidence = input.readEvidenceActors ?? ((taskId: string) => readEvidenceProducerActors(input.repoRoot, taskId));
   if (input.policy.basisActorResolution === 'active-claim-holder') {
-    const actors = owners.map((owner) => readClaim(owner)).filter((actor): actor is string => isNonEmptyString(actor));
+    const actors = owners.map((owner) => input.basisCommit
+      ? readClaimAtCommit(owner, input.basisCommit)
+      : readClaim(owner)).filter((actor): actor is string => isNonEmptyString(actor));
     return { actorIds: [...new Set(actors)], producerRole: input.policy.basisProducerRole };
   }
   const actors = owners.flatMap((owner) => [...readEvidence(owner)]);
@@ -228,8 +275,11 @@ export function resolveWaveExitBasisProducer(input: {
   });
 }
 
-export function canonicalWaveExitReceiptPath(policy: WaveExitObserverPolicy, exitItemId: string): string {
-  return `${policy.canonicalReceiptDir.replace(/\\/g, '/')}/${exitItemId}.json`;
+export function canonicalWaveExitReceiptPath(policy: WaveExitObserverPolicy, exitItemId: string, observedHead?: string): string {
+  const basePath = `${policy.canonicalReceiptDir.replace(/\\/g, '/')}/${exitItemId}.json`;
+  return observedHead && COMMIT_SHAPE.test(observedHead)
+    ? `${basePath.slice(0, -'.json'.length)}/${observedHead}.json`
+    : basePath;
 }
 
 export function deriveBasisIdentityFromEvidence(input: {
@@ -273,6 +323,9 @@ export function consumeWaveExitObserverReceipt(input: ConsumeWaveExitObserverRec
   if (!exitPolicy) diagnostics.add('exit-unmapped');
   const canonicalPath = exitPolicy && isNonEmptyString(receipt.exitItemId)
     ? canonicalWaveExitReceiptPath(policy, receipt.exitItemId)
+    : null;
+  const successorCanonicalPath = exitPolicy && isNonEmptyString(receipt.exitItemId) && isNonEmptyString(receipt.observedHead)
+    ? canonicalWaveExitReceiptPath(policy, receipt.exitItemId, receipt.observedHead)
     : null;
   if (!isNonEmptyString(receipt.wave) || (exitPolicy && receipt.wave !== exitPolicy.wave)) diagnostics.add('wave-mismatch');
   if (!isNonEmptyString(receipt.observerActor) || !isNonEmptyString(receipt.observerRole) || !isNonEmptyString(receipt.declaredBasisActor)) {
@@ -322,7 +375,9 @@ export function consumeWaveExitObserverReceipt(input: ConsumeWaveExitObserverRec
   if (isNonEmptyString(receipt.policyDigest) && receipt.policyDigest !== policyDigestAtCompilationHead) {
     diagnostics.add('receipt-stale');
   }
-  if (canonicalPath && isNonEmptyString(receipt.artifactPath) && receipt.artifactPath.replace(/\\/g, '/') !== canonicalPath) {
+  if (canonicalPath && isNonEmptyString(receipt.artifactPath)
+    && receipt.artifactPath.replace(/\\/g, '/') !== canonicalPath
+    && receipt.artifactPath.replace(/\\/g, '/') !== successorCanonicalPath) {
     diagnostics.add('artifact-path-mismatch');
   }
 
@@ -353,9 +408,68 @@ export function consumeWaveExitObserverReceipt(input: ConsumeWaveExitObserverRec
   };
 }
 
+/** Resolve every immutable receipt for one EXIT and accept exactly one valid candidate. */
+export function consumeWaveExitObserverReceiptCandidates(
+  input: ConsumeWaveExitObserverReceiptCandidatesInput
+): WaveExitObserverCandidatesVerdict {
+  const verdicts = input.receipts.map((receipt) => {
+    const observedHead = receipt && typeof receipt === 'object' && !Array.isArray(receipt)
+      ? (receipt as { observedHead?: unknown }).observedHead
+      : undefined;
+    const derivedBasis = input.basisActors
+      ? { actorIds: input.basisActors, producerRole: input.policy.basisProducerRole }
+      : resolveWaveExitBasisProducer({
+          repoRoot: input.repoRoot,
+          policy: input.policy,
+          basisCommit: typeof observedHead === 'string' && COMMIT_SHAPE.test(observedHead) ? observedHead : undefined
+        });
+    return consumeWaveExitObserverReceipt({
+      receipt,
+      policy: input.policy,
+      compilationHead: input.compilationHead,
+      derivedBasis,
+      currentInputDigests: input.currentInputDigests,
+      isAncestor: input.isAncestor,
+      policyDigestAtCompilationHead: input.policyDigestAtCompilationHead
+    });
+  });
+  const valid = verdicts.filter((verdict) => verdict.ok && verdict.receipt);
+  return {
+    receipt: valid.length === 1 ? valid[0]!.receipt : null,
+    diagnostics: valid.length > 1
+      ? ['receipt-ambiguity']
+      : verdicts.flatMap((verdict) => verdict.diagnostics)
+  };
+}
+
 export function readCanonicalWaveExitReceipt(repoRoot: string, policy: WaveExitObserverPolicy, exitItemId: string): unknown | null {
   const relativePath = canonicalWaveExitReceiptPath(policy, exitItemId);
   const absolutePath = join(repoRoot, relativePath);
   if (!existsSync(absolutePath)) return null;
   return JSON.parse(readFileSync(absolutePath, 'utf8'));
+}
+
+/**
+ * A receipt never overwrites an earlier observation.  When an input changes,
+ * a successor is stored under the EXIT id and observed commit; consumers
+ * evaluate every immutable candidate and accept only a unique valid one.
+ */
+export function readWaveExitReceiptCandidates(repoRoot: string, policy: WaveExitObserverPolicy, exitItemId: string): unknown[] {
+  const basePath = canonicalWaveExitReceiptPath(policy, exitItemId);
+  const candidates = [basePath];
+  const successorDir = join(repoRoot, basePath.slice(0, -'.json'.length));
+  if (existsSync(successorDir)) {
+    for (const entry of readdirSync(successorDir).filter((name) => /^[0-9a-f]{40}\.json$/.test(name)).sort()) {
+      candidates.push(`${basePath.slice(0, -'.json'.length)}/${entry}`);
+    }
+  }
+  return candidates.flatMap((relativePath) => {
+    const absolutePath = join(repoRoot, relativePath);
+    if (!existsSync(absolutePath)) return [];
+    try {
+      return [JSON.parse(readFileSync(absolutePath, 'utf8'))];
+    } catch {
+      return [{}];
+    }
+  });
 }

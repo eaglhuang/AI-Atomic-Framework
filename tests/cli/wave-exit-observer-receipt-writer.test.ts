@@ -58,6 +58,10 @@ function baseInput(overrides: Record<string, unknown> = {}) {
     ),
     executeApprovedCommand: () => ({ exitCode: 0, stdout: 'ok\n', stderr: '' }),
     receiptExists: (absolutePath: string) => files.has(absolutePath.replace(/\\/g, '/')),
+    readExistingReceipt: (absolutePath: string) => {
+      const contents = files.get(absolutePath.replace(/\\/g, '/'));
+      return contents ? JSON.parse(contents) : null;
+    },
     createExclusiveFile: (absolutePath: string, contents: string) => {
       const key = absolutePath.replace(/\\/g, '/');
       if (files.has(key)) {
@@ -130,6 +134,19 @@ writeOnce(baseInput());
 assert.throws(
   () => writeOnce(baseInput()),
   (error: unknown) => error instanceof WaveExitObserverWriteError && error.code === 'ATM_WAVE_EXIT_OBSERVER_RECEIPT_EXISTS'
+);
+
+files.clear();
+writeOnce(baseInput());
+const successorHead = hex('2');
+const successor = writeOnce(baseInput({
+  observedHead: successorHead,
+  isAncestor: (ancestor: string, descendant: string) => ancestor === descendant
+}));
+assert.equal(
+  successor.artifactPath,
+  `docs/reports/wave-exit-observer-receipts/EXIT-02/${successorHead}.json`,
+  'input drift must create a new immutable successor instead of overwriting the canonical receipt'
 );
 
 const tmp = mkdtempSync(join(tmpdir(), 'atm-wave-exit-writer-'));

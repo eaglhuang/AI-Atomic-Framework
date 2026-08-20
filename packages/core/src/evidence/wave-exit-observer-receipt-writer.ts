@@ -83,6 +83,7 @@ export interface WriteWaveExitObserverReceiptInput {
   readonly readObservedInput: (relativePath: string) => string | null;
   readonly executeApprovedCommand: (command: string) => ObservedCommandResult;
   readonly receiptExists?: (absolutePath: string) => boolean;
+  readonly readExistingReceipt?: (absolutePath: string) => unknown | null;
   readonly createExclusiveFile?: (absolutePath: string, contents: string) => void;
 }
 
@@ -186,7 +187,28 @@ export function writeWaveExitObserverReceipt(
     );
   }
 
-  const relativeArtifact = canonicalWaveExitReceiptPath(input.policy, input.exitItemId);
+  const exists = input.receiptExists ?? ((path) => existsSync(path));
+  const readExisting = input.readExistingReceipt ?? ((path: string) => {
+    try {
+      return JSON.parse(readFileSync(path, 'utf8'));
+    } catch {
+      return null;
+    }
+  });
+  const baseArtifact = canonicalWaveExitReceiptPath(input.policy, input.exitItemId);
+  const baseAbsolutePath = resolve(input.repoRoot, baseArtifact);
+  const baseExists = exists(baseAbsolutePath);
+  const baseReceipt = baseExists ? readExisting(baseAbsolutePath) as { observedHead?: unknown } | null : null;
+  if (baseExists && (!baseReceipt || baseReceipt.observedHead === input.observedHead)) {
+    throw new WaveExitObserverWriteError(
+      'ATM_WAVE_EXIT_OBSERVER_RECEIPT_EXISTS',
+      `Canonical wave-exit observer receipt already exists: ${baseArtifact}`,
+      { details: { artifactPath: baseArtifact } }
+    );
+  }
+  const relativeArtifact = baseExists
+    ? canonicalWaveExitReceiptPath(input.policy, input.exitItemId, input.observedHead)
+    : baseArtifact;
   assertSafeCanonicalPath(input.repoRoot, input.policy, relativeArtifact, input.exitItemId);
   if (input.claimedArtifactPath && normalizeRel(input.claimedArtifactPath) !== relativeArtifact) {
     throw new WaveExitObserverWriteError(
@@ -197,7 +219,6 @@ export function writeWaveExitObserverReceipt(
   }
 
   const absolutePath = resolve(input.repoRoot, relativeArtifact);
-  const exists = input.receiptExists ?? ((path) => existsSync(path));
   if (exists(absolutePath)) {
     throw new WaveExitObserverWriteError(
       'ATM_WAVE_EXIT_OBSERVER_RECEIPT_EXISTS',
@@ -380,12 +401,14 @@ function assertSafeCanonicalPath(
       { diagnostics: ['artifact-path-mismatch'], details: { canonicalReceiptDir: policy.canonicalReceiptDir } }
     );
   }
-  const expectedName = `${exitItemId}.json`;
-  if (!relativeArtifact.endsWith(`/${expectedName}`)) {
+  const normalizedArtifact = normalizeRel(relativeArtifact);
+  const baseArtifact = `${dir}/${exitItemId}.json`;
+  const successorPattern = new RegExp(`^${escapeRegExp(`${dir}/${exitItemId}/`)}[0-9a-f]{40}\\.json$`);
+  if (normalizedArtifact !== baseArtifact && !successorPattern.test(normalizedArtifact)) {
     throw new WaveExitObserverWriteError(
       'ATM_WAVE_EXIT_OBSERVER_PATH_TRAVERSAL',
       'Canonical receipt path does not match the sealed EXIT id.',
-      { diagnostics: ['artifact-path-mismatch'], details: { relativeArtifact, expectedName } }
+      { diagnostics: ['artifact-path-mismatch'], details: { relativeArtifact, baseArtifact } }
     );
   }
   const root = resolve(repoRoot);
@@ -406,6 +429,10 @@ function assertSafeCanonicalPath(
       { details: { destRel } }
     );
   }
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function isPathInside(root: string, candidate: string): boolean {

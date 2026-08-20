@@ -7,6 +7,7 @@ import {
 import {
   canonicalWaveExitReceiptPath,
   consumeWaveExitObserverReceipt,
+  consumeWaveExitObserverReceiptCandidates,
   deriveBasisIdentityFromEvidence,
   digestText,
   digestWaveExitObserverPolicy,
@@ -41,6 +42,19 @@ const claimHolder = resolveWaveExitBasisProducer({
   readEvidenceActors: () => ['codex-gpt-5.4-mini', 'codex-captain-recovery', 'cursor-captain']
 });
 assert.deepEqual(claimHolder.actorIds, ['cursor-captain']);
+
+const historicalClaimHolder = resolveWaveExitBasisProducer({
+  repoRoot: '.',
+  policy,
+  basisCommit: observedHead,
+  readClaimHolder: () => 'codex-captain',
+  readClaimHolderAtCommit: (_taskId, commitAtObservation) => commitAtObservation === observedHead ? 'cursor-captain' : null
+});
+assert.deepEqual(
+  historicalClaimHolder.actorIds,
+  ['cursor-captain'],
+  'receipt consumption must resolve authority at observedHead, not from a later handoff'
+);
 
 const unionActors = resolveWaveExitBasisProducer({
   repoRoot: '.',
@@ -99,6 +113,31 @@ const proven = consume(legalReceipt);
 assert.equal(proven.status, 'proven');
 assert.deepEqual(proven.diagnostics, []);
 assert.equal(proven.canonicalArtifactPath, 'docs/reports/wave-exit-observer-receipts/EXIT-02.json');
+
+const uniqueCandidate = consumeWaveExitObserverReceiptCandidates({
+  repoRoot: '.',
+  receipts: [legalReceipt],
+  policy,
+  compilationHead,
+  currentInputDigests: { [inputPath]: inputDigest },
+  policyDigestAtCompilationHead: policyDigest,
+  isAncestor: (ancestor, descendant) => ancestor === observedHead && descendant === compilationHead,
+  basisActors: ['wave-1-basis-producer']
+});
+assert.equal(uniqueCandidate.receipt?.exitItemId, 'EXIT-02');
+assert.deepEqual(uniqueCandidate.diagnostics, []);
+const ambiguousCandidates = consumeWaveExitObserverReceiptCandidates({
+  repoRoot: '.',
+  receipts: [legalReceipt, legalReceipt],
+  policy,
+  compilationHead,
+  currentInputDigests: { [inputPath]: inputDigest },
+  policyDigestAtCompilationHead: policyDigest,
+  isAncestor: (ancestor, descendant) => ancestor === observedHead && descendant === compilationHead,
+  basisActors: ['wave-1-basis-producer']
+});
+assert.equal(ambiguousCandidates.receipt, null);
+assert.deepEqual(ambiguousCandidates.diagnostics, ['receipt-ambiguity']);
 
 const equalHeadStillValid = consume(legalReceipt, {
   compilationHead: observedHead,
