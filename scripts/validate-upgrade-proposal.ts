@@ -97,6 +97,8 @@ function assertInvariants(proposal: any, expectedStatus: any) {
     check(proposal.target.mapId, 'map target must include mapId');
     check(proposal.decompositionDecision === 'map-bump', 'map target must use map-bump decision');
     check(proposal.mapImpactScope, 'map target must include mapImpactScope');
+  } else {
+    check(!Object.hasOwn(proposal.target, 'mapId'), 'atom target must omit mapId rather than serialize an empty value');
   }
 }
 
@@ -104,7 +106,7 @@ function runCliUpgrade(qualityPath: any, options: any = {}) {
   const cwd = options.cwd ?? root;
   const dryRun = options.dryRun ?? true;
   const args = [
-    path.join(root, 'atm.mjs'),
+    path.join(root, 'atm.dev.mjs'),
     'upgrade',
     '--propose',
     '--atom', 'ATM-CORE-0001',
