@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-20T17-21-19-219Z-close-a3646b8fd4cc",
+  "taskId": "ATM-GOV-0398",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260820155223-codex-captain-ATM-GOV-0398-6588677f90",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0398.json",
+  "taskSha256": "sha256:3340c5d8f9d37123ae5649d08caee25cbc495c9b404cb80290eef98911bb71f1",
+  "createdAt": "2026-08-20T17:21:19.219Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0398 --actor codex-captain --status done --historical-delivery 4c802207ff4ca5d1446581be1962855329a46875",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260820155223-codex-captain-ATM-GOV-0398-6588677f90",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0398.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+      "typecheck",
+      "validate:governance-commands",
+      "validate:taskflow-close-atomicity"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+      "validate:governance-commands",
+      "validate:taskflow-close-atomicity"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-20T17:21:19.207Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0398.*",
+        ".atm/history/task-events/ATM-GOV-0398/**",
+        ".atm/history/tasks/ATM-GOV-0398.json",
+        "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+        "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+        "scripts/validate-governance-commands/implementation.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+        "packages/cli/src/commands/taskflow/close-owned-delivery-dirty-admission.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+        "scripts/validate-governance-commands/implementation.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-owned-delivery-dirty-admission.spec.ts",
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/takeover-successor-live-claim-state.spec.ts",
+        "validate:governance-commands",
+        "validate:taskflow-close-atomicity"
+      ]
+    }
+  }
+}
