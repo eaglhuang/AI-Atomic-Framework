@@ -97,8 +97,8 @@
   "importedAt": "2026-08-15T08:57:30.531Z",
   "workAdmission": {
     "recoveryMode": "auto",
-    "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -186,41 +186,33 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-16T04-24-34-831Z-renew-77b048e69585",
-  "lastTransitionAt": "2026-08-16T04:24:34.831Z",
+  "lastTransitionId": "2026-08-20T17-04-01-198Z-renew-4ed94e0388a9",
+  "lastTransitionAt": "2026-08-20T17:04:01.198Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "cursor-captain",
+  "owner": "codex-captain",
   "reservedAt": "2026-08-15T10:20:37.881Z",
   "promotedAt": "2026-08-15T10:20:37.886Z",
   "claim": {
-    "actorId": "cursor-captain",
-    "leaseId": "lease-97675254cf2c",
-    "claimedAt": "2026-08-16T01:12:49.103Z",
-    "heartbeatAt": "2026-08-16T04:24:34.047Z",
+    "actorId": "codex-captain",
+    "leaseId": "lease-e5b567454d95",
+    "claimedAt": "2026-08-20T16:08:26.726Z",
+    "heartbeatAt": "2026-08-20T17:04:00.376Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json",
-      ".atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json",
-      ".atm/history/evidence/ATM-GOV-0395.*",
-      ".atm/history/task-events/ATM-GOV-0395/**",
-      ".atm/history/tasks/ATM-GOV-0395.json",
-      "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
-      "packages/cli/src/commands/git-governance/protected-governance-state.ts",
-      "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
-      "packages/core/src/broker/terminal-history-entitlement.ts"
+      ".atm/history/tasks/ATM-GOV-0395.json"
     ],
     "state": "active",
-    "reason": "Predecessor lease expired; owner authorized 0395 residue reconciliation after joint publication.",
+    "reason": "Owner-directed internal consolidation after external delegation ended; prior lease has expired and this source-done task requires later publication-backed closeout.",
     "laneSession": {
-      "laneSessionId": "lane-20260816011249-cursor-captain-3a3db9e611",
+      "laneSessionId": "lane-20260820160826-codex-captain-af1461745a",
       "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816011249-cursor-captain-3a3db9e611\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820160826-codex-captain-af1461745a\""
     }
   },
   "startedAt": "2026-08-15T10:20:37.891Z",
   "startedByActor": "claude-008",
-  "startedBySessionId": "session-20260816011249-cursor-captain-ATM-GOV-0395-c0406217fb",
+  "startedBySessionId": "session-20260820160826-codex-captain-ATM-GOV-0395-15cda57e4b",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -230,64 +222,52 @@
     "queueId": null,
     "queueIndex": null,
     "allowedFiles": [
-      ".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json",
-      ".atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json",
       ".atm/history/evidence/ATM-GOV-0395.*",
       ".atm/history/task-events/ATM-GOV-0395/**",
-      ".atm/history/tasks/ATM-GOV-0395.json",
-      "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
-      "packages/cli/src/commands/git-governance/protected-governance-state.ts",
-      "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
-      "packages/core/src/broker/terminal-history-entitlement.ts"
+      ".atm/history/tasks/ATM-GOV-0395.json"
     ],
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "32d1ed61e8a6518227fa383bee9c08b84a139c89d293aa26fab1ec3223751873",
-    "actorId": "cursor-captain",
-    "sessionId": "session-20260816011249-cursor-captain-ATM-GOV-0395-c0406217fb",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260820160826-codex-captain-ATM-GOV-0395-15cda57e4b",
     "laneSession": {
-      "laneSessionId": "lane-20260816011249-cursor-captain-3a3db9e611",
+      "laneSessionId": "lane-20260820160826-codex-captain-af1461745a",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816011249-cursor-captain-3a3db9e611\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820160826-codex-captain-af1461745a\""
     },
-    "createdAt": "2026-08-16T01:12:49.879Z",
+    "createdAt": "2026-08-20T16:08:27.541Z",
     "status": "active"
   },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-5e1df28626077ddd",
-    "ticketDigest": "sha256:5e1df28626077ddd069fbefd5fc1f3791884cd49cad7d68ca548deaf5092ce43",
+    "ticketId": "wat-67dfc679ae881936",
+    "ticketDigest": "sha256:67dfc679ae88193611c10247eb4bb745c285e8cd112e9f385a4dec8ad5173397",
     "taskId": "ATM-GOV-0395",
     "origin": "claim",
-    "actorId": "cursor-captain",
-    "laneSessionId": "lane-20260816011249-cursor-captain-3a3db9e611",
-    "claimGeneration": "lease-97675254cf2c",
-    "issuedAt": "2026-08-16T04:24:34.047Z",
-    "expiresAt": "2026-08-16T04:54:34.047Z",
-    "scopeDigest": "sha256:9cb5bf10f53f172787eb7cbbde005576a89ae03ec42f1324087fe81996643ed2",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260820160826-codex-captain-af1461745a",
+    "claimGeneration": "lease-e5b567454d95",
+    "issuedAt": "2026-08-20T17:04:00.376Z",
+    "expiresAt": "2026-08-20T17:34:00.376Z",
+    "scopeDigest": "sha256:135402590efc6f4f1621e9f4a8bd19a62a1fef4a361fb0c48a6484b3ba2732af",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-16T04:24:34.047Z"
+      "selectedAt": "2026-08-20T17:04:00.376Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
-          ".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json",
-          ".atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json",
           ".atm/history/evidence/ATM-GOV-0395.*",
           ".atm/history/task-events/ATM-GOV-0395/**",
-          ".atm/history/tasks/ATM-GOV-0395.json",
-          "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
-          "packages/cli/src/commands/git-governance/protected-governance-state.ts",
-          "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
-          "packages/core/src/broker/terminal-history-entitlement.ts"
+          ".atm/history/tasks/ATM-GOV-0395.json"
         ],
-        "digest": "sha256:76d6e05623b7567fce3321bcd4d6c95c5d5ba0ee292f1cd06b799384ab3822f8"
+        "digest": "sha256:09492ee8c369a004e0718e0aa6d433dad2e114ab861061876b696d8745a89828"
       },
       {
         "kind": "lifecycle-operation",
@@ -309,16 +289,16 @@
     "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
-      "resolvedMode": "enabled",
+      "resolvedMode": "disabled",
       "reasons": [
-        "shared-surface"
+        "low-risk-task"
       ],
-      "maxSavePoints": 2,
-      "perTaskByteBudget": 16777216,
-      "repositoryByteBudget": 268435456,
-      "handoffTtlSeconds": 604800,
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   }
 }

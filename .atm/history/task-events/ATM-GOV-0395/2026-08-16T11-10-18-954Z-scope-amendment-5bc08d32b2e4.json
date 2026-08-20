@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-16T11-10-18-954Z-scope-amendment-5bc08d32b2e4",
+  "taskId": "ATM-GOV-0395",
+  "action": "scope-amendment",
+  "actorId": "cursor-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0395.json",
+  "taskSha256": "sha256:b7d16bafe289f4457dfcd7f107aac805955e01cc964e48b070c2353f5722e136",
+  "createdAt": "2026-08-16T11:10:18.954Z",
+  "command": "node atm.mjs tasks scope remove --task ATM-GOV-0395 --actor cursor-captain --remove packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts --json",
+  "amendmentMetadata": {
+    "amendmentClass": "scope-shrink",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Remove incorrect Claude test ownership from 0395; not a validation bypass."
+  }
+}

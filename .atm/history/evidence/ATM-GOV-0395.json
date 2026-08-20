@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0395",
-  "updatedAt": "2026-08-16T04:22:41.317Z",
+  "updatedAt": "2026-08-20T16:08:27.549Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -892,6 +892,62 @@
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0395: cursor-captain -> codex-captain.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0395.json"
+      ],
+      "producedBy": "codex-captain",
+      "createdAt": "2026-08-20T16:08:27.549Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "cursor-captain",
+          "leaseId": "lease-97675254cf2c",
+          "claimedAt": "2026-08-16T01:12:49.103Z",
+          "heartbeatAt": "2026-08-16T11:13:12.777Z",
+          "ttlSeconds": 3600,
+          "files": [
+            ".atm/history/evidence/ATM-GOV-0392.bundle-manifest.json",
+            ".atm/history/evidence/ATM-GOV-0392.live-index-reconciliation.json",
+            ".atm/history/evidence/ATM-GOV-0395.*",
+            ".atm/history/task-events/ATM-GOV-0395/**",
+            ".atm/history/tasks/ATM-GOV-0395.json",
+            "packages/cli/src/commands/git-governance/__tests__/protected-governance-state.test.ts",
+            "packages/cli/src/commands/git-governance/protected-governance-state.ts",
+            "packages/core/src/broker/terminal-history-entitlement.ts"
+          ],
+          "state": "active",
+          "reason": "Predecessor lease expired; owner authorized 0395 residue reconciliation after joint publication.",
+          "laneSession": {
+            "laneSessionId": "lane-20260816011249-cursor-captain-3a3db9e611",
+            "status": "adopted",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816011249-cursor-captain-3a3db9e611\""
+          }
+        },
+        "newClaim": {
+          "actorId": "codex-captain",
+          "leaseId": "lease-e5b567454d95",
+          "claimedAt": "2026-08-20T16:08:26.726Z",
+          "heartbeatAt": "2026-08-20T16:08:26.726Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0395.json"
+          ],
+          "state": "active",
+          "intent": "write",
+          "laneSession": {
+            "laneSessionId": "lane-20260820160826-codex-captain-af1461745a",
+            "status": "active",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820160826-codex-captain-af1461745a\""
+          },
+          "reason": "Owner-directed internal consolidation after external delegation ended; prior lease has expired and this source-done task requires later publication-backed closeout."
         }
       }
     }
