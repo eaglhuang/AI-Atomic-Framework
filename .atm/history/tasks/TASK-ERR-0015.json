@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-ERR-0015",
   "title": "Bind taskflow close blockers to canonical authority snapshots and registered recovery contracts",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -154,7 +154,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-4b877bdc27e7",
     "claimedAt": "2026-08-20T15:45:51.366Z",
-    "heartbeatAt": "2026-08-20T15:45:51.366Z",
+    "heartbeatAt": "2026-08-20T17:26:23.234Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-ERR-0015.*",
@@ -165,14 +165,14 @@
       "packages/core/src/error-code-registry.generated.ts",
       "tests/cli/taskflow-close-error-code-registry.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260820154551-codex-captain-419a623187",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820154551-codex-captain-419a623187\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-captain",
   "startedAt": "2026-08-20T15:45:51.366Z",
@@ -216,26 +216,26 @@
     "createdAt": "2026-08-20T15:45:57.370Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-20T15-48-59-870Z-scope-amendment-bf26276d7b1b",
-  "lastTransitionAt": "2026-08-20T15:48:59.870Z",
+  "lastTransitionId": "2026-08-20T17-26-23-237Z-close-44b1a7d09d0f",
+  "lastTransitionAt": "2026-08-20T17:26:23.237Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-687a67c2b3fd94ba",
-    "ticketDigest": "sha256:687a67c2b3fd94ba81fed3482ddc5df3e0404955fc8f66cdd7c644c85272ac07",
+    "ticketId": "wat-e460332d61dea9b4",
+    "ticketDigest": "sha256:e460332d61dea9b4b305f99c3cf8814f64807685d8e025d61b66371fbac164a1",
     "taskId": "TASK-ERR-0015",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260820154551-codex-captain-419a623187",
     "claimGeneration": "lease-4b877bdc27e7",
-    "issuedAt": "2026-08-20T15:48:59.664Z",
-    "expiresAt": "2026-08-20T16:18:59.664Z",
+    "issuedAt": "2026-08-20T17:25:54.359Z",
+    "expiresAt": "2026-08-20T17:55:54.359Z",
     "scopeDigest": "sha256:bc4070ddc33bf321954019ec7bf406da587e5c93d73bdbc9391c71d8c7b10b2e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-20T15:48:59.664Z"
+      "selectedAt": "2026-08-20T17:25:54.359Z"
     },
     "grants": [
       {
@@ -282,5 +282,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
-  }
+  },
+  "closedAt": "2026-08-20T17:26:23.234Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260820154551-codex-captain-TASK-ERR-0015-e0d5e3af51",
+  "closurePacket": ".atm/history/evidence/TASK-ERR-0015.closure-packet.json"
 }
