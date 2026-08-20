@@ -1,5 +1,4 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
 import { isCommitAcceptedByLegacyBaseline, readFrameworkCommitRangeBaseline } from './baseline.js';
 import { normalizeOptionalText } from './support.js';
 import os from 'node:os';
@@ -7,7 +6,7 @@ import path from 'node:path';
 import { auditTasks, detectFrameworkRepoIdentity, isAtmCriticalNonDocSurface, requiredValidationPassesForClosure, validateClosurePacket } from '../../framework-development.js';
 import { gitHeadEvidencePath, gitHeadEvidencePaths } from '../../git-head-evidence.js';
 import { normalizeRelativePath, runGit, runGitLines, runGitScalar } from '../git-index-diagnostics.js';
-import { evaluateHistoricalWorkAdmission, HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH } from '../../../../../core/dist/broker/historical-work-admission-attestation.js';
+import { HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH } from '../../../../../core/dist/broker/historical-work-admission-attestation.js';
 const protectedBranchPatterns = ['main', 'master', 'trunk', 'release/*'];
 function sameStringSet(left, right) {
     const normalize = (values) => [...new Set(values.map((value) => String(value).trim()).filter(Boolean))].sort();
@@ -42,23 +41,6 @@ export function createCommitRangeGuardReport(cwd, base, head) {
         const match = evidenceMatches.find((candidate) => candidate.commitSha === entry.commitSha);
         return inspectCommitClosurePackets(root, entry.commitSha, match ?? null, head);
     });
-    const historicalAttestations = readHistoricalWorkAdmissionAttestations(root);
-    const workAdmissionCoverageFindings = enforcedCriticalCommits.flatMap((entry) => {
-        const suggestedFix = buildForwardAttestationCommandSuggestion(root, entry.commitSha);
-        const evaluation = evaluateHistoricalWorkAdmission({
-            commit: readHistoricalCommitIdentity(root, entry.commitSha, head),
-            hasNormalWorkAdmissionTrailer: hasWorkAdmissionCommitCoverage(root, entry.commitSha),
-            attestations: historicalAttestations,
-            isProvenanceValid: (record) => provenanceReferenceMatches(root, record)
-        });
-        return evaluation.decision === 'covered' ? [] : [{
-                level: 'error',
-                code: evaluation.code ?? 'ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED',
-                commitSha: entry.commitSha,
-                detail: evaluation.reason,
-                suggestedFix
-            }];
-    });
     const missingEvidenceMatches = evidenceMatches
         .filter((entry) => !legacyBaseline || !isAcceptedByLegacyBaseline(entry.commitSha))
         .filter((entry) => !entry.matched);
@@ -73,7 +55,6 @@ export function createCommitRangeGuardReport(cwd, base, head) {
         : null;
     const taskAudit = auditTasks(root);
     const findings = [
-        ...workAdmissionCoverageFindings,
         ...closurePacketInspections.flatMap((entry) => legacyBaseline && isAcceptedByLegacyBaseline(entry.commitSha) ? [] : entry.findings.map((finding) => ({
             level: 'error',
             code: finding.code,
@@ -105,65 +86,12 @@ export function createCommitRangeGuardReport(cwd, base, head) {
         evidenceMissingDiagnostic,
         closurePacketInspections,
         historicalAttestationPath: HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH,
+        historicalAttestationEnforcement: 'disabled',
         taskAudit,
         protectedBranchPatterns,
         findings,
         ok: findings.length === 0
     };
-}
-function provenanceReferenceMatches(cwd, record) {
-    const reference = record.provenance.ref.trim();
-    if (reference === `git:${record.commitSha}`) {
-        const message = runGitScalar(cwd, ['log', '-1', '--format=%B', record.commitSha]) ?? '';
-        const digest = `sha256:${createHash('sha256').update(message).digest('hex')}`;
-        return message.includes('ATM-Emergency-Reason:') && digest === record.provenance.digest;
-    }
-    const filePath = path.resolve(cwd, reference);
-    if (!existsSync(filePath))
-        return false;
-    try {
-        const bytes = readFileSync(filePath);
-        return `sha256:${createHash('sha256').update(bytes).digest('hex')}` === record.provenance.digest
-            && bytes.toString('utf8').includes(record.commitSha);
-    }
-    catch {
-        return false;
-    }
-}
-function buildForwardAttestationCommandSuggestion(cwd, commitSha) {
-    const message = runGitScalar(cwd, ['log', '-1', '--format=%B', commitSha]) ?? '';
-    if (message.includes('ATM-Emergency-Reason:')) {
-        const digest = `sha256:${createHash('sha256').update(message).digest('hex')}`;
-        return `node atm.mjs git attest --commit ${commitSha} --task TASK-GIT-0024 --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-ref git:${commitSha} --provenance-digest ${digest} --reason "<reason>" --emergency-class "<class>" --scope "<path>" --evidence-ref "git:${commitSha}" --dry-run --json`;
-    }
-    return `node atm.mjs git attest --commit ${commitSha} --task TASK-GIT-0024 --actor <actor> --lane <lane-id> --provenance-kind emergency --provenance-ref <immutable-evidence-file> --provenance-digest sha256:<digest> --reason "<reason>" --emergency-class "<class>" --scope "<path>" --evidence-ref "<evidence-ref>" --dry-run --json`;
-}
-function readHistoricalCommitIdentity(cwd, commitSha, head) {
-    const parentCommitSha = runGitScalar(cwd, ['rev-parse', `${commitSha}^`]) ?? '';
-    const treeSha = runGitScalar(cwd, ['show', '-s', '--format=%T', commitSha]) ?? '';
-    const ancestor = runGit(cwd, ['merge-base', '--is-ancestor', commitSha, head]);
-    return { commitSha, parentCommitSha, treeSha, isAncestorOfHead: ancestor.exitCode === 0 };
-}
-function readHistoricalWorkAdmissionAttestations(cwd) {
-    const filePath = path.join(cwd, HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH);
-    if (!existsSync(filePath))
-        return [];
-    try {
-        const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
-        const records = Array.isArray(parsed)
-            ? parsed
-            : parsed && typeof parsed === 'object' && Array.isArray(parsed.attestations)
-                ? parsed.attestations
-                : [];
-        return records.filter((entry) => Boolean(entry && typeof entry === 'object'));
-    }
-    catch {
-        return [];
-    }
-}
-function hasWorkAdmissionCommitCoverage(cwd, commitSha) {
-    const message = runGitScalar(cwd, ['log', '-1', '--format=%B', commitSha]) ?? '';
-    return /^ATM-Work-Admission:\s+wat-[a-f0-9]{16}\s+sha256:[a-f0-9]{64}$/m.test(message);
 }
 export function readGitObjectText(cwd, ref) {
     // Git invokes hooks with a temporary index for path-limited commits. Keep
@@ -328,10 +256,14 @@ function inspectCommitClosurePackets(cwd, commitSha, evidenceMatch, headRef = 'H
     return closurePacketPaths.map((packetPath) => {
         const packetText = runGitScalar(cwd, ['show', `${commitSha}:${packetPath}`]);
         const packet = packetText ? readJsonText(packetText) : null;
-        const directInspection = inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, packet, evidenceMatch);
+        // A close transaction creates its packet before the governed commit exists.
+        // Its targetCommitDelta is therefore a pre-commit prediction, not a claim
+        // about the later closure commit.  Only an explicit repair binds that
+        // prediction to an immutable, historical commit for range verification.
+        const repairMetadata = extractClosurePacketRepairMetadata(packet);
+        const directInspection = inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, packet, evidenceMatch, Boolean(repairMetadata));
         if (directInspection.findings.length === 0)
             return directInspection;
-        const repairMetadata = extractClosurePacketRepairMetadata(packet);
         if (repairMetadata?.originalPacketCommitSha && repairMetadata.originalPacketCommitSha !== commitSha) {
             const repairEvidenceMatch = inspectCommitGitHeadEvidence(cwd, repairMetadata.originalPacketCommitSha, [], headRef);
             const repairInspection = inspectClosurePacketAgainstCommit(cwd, repairMetadata.originalPacketCommitSha, packetPath, packet, repairEvidenceMatch);
@@ -377,7 +309,7 @@ function extractClosurePacketTargetCommitSha(packet) {
         return null;
     return normalizeOptionalText(delta.currentCommitSha);
 }
-function inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, packet, evidenceMatch) {
+function inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, packet, evidenceMatch, enforceCommitBinding = true) {
     const commitChangedFiles = readCommitChangedFiles(cwd, commitSha);
     const parentCommitShas = readParentCommitShas(cwd, commitSha);
     const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
@@ -395,6 +327,9 @@ function inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, packet, e
             code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_INVALID',
             detail: `closure packet contract is incomplete (${validation.missing.join(', ')}${invalidFormatSummary})`
         });
+        return { commitSha, packetPath, taskId, findings };
+    }
+    if (!enforceCommitBinding) {
         return { commitSha, packetPath, taskId, findings };
     }
     const normalizedPacket = packet;

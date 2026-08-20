@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
 import { isTaskCloseGovernanceCriticalPath } from '../framework-development.js';
 import { relativePathFrom } from '../shared.js';
 import { sanitizeTaskDirectionAllowedFiles } from '../task-direction.js';
@@ -9,6 +10,21 @@ import { gitHeadEvidencePath, readLatestGitHeadReceiptTaskId } from '../git-head
 function isHistoricalDeliveredFile(filePath, deliverableFiles, historicalDeliveredFiles) {
     return deliverableFiles.some((declared) => pathMatchesTaskScope(filePath, declared)
         && historicalDeliveredFiles.some((historical) => pathMatchesTaskScope(historical, declared)));
+}
+function latestGitHeadReceiptBelongsToTerminalForeignTask(cwd, closingTaskId) {
+    const receiptTaskId = readLatestGitHeadReceiptTaskId(cwd);
+    if (!receiptTaskId || receiptTaskId === closingTaskId)
+        return false;
+    const ledgerPath = path.join(cwd, '.atm', 'history', 'tasks', `${receiptTaskId}.json`);
+    if (!existsSync(ledgerPath))
+        return false;
+    try {
+        const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8'));
+        return ledger.status === 'done' && ledger.claim?.state === 'released';
+    }
+    catch {
+        return false;
+    }
 }
 const dirtyBucketStrategies = [
     {
@@ -61,11 +77,12 @@ export function evaluateFrameworkCloseDirtyGuard(input) {
     const historicalDeliveredFiles = uniqueStrings((input.historicalDeliveredFiles ?? []).map(normalizeRelativePath).filter(Boolean));
     const allowedAdvisoryGovernanceFiles = new Set(uniqueStrings((input.allowedAdvisoryGovernanceFiles ?? []).map(normalizeRelativePath).filter(Boolean)));
     // Git-head provenance is a shared append-only observation surface, not a
-    // closeback artifact owned by whichever task happens to be closing.  A
-    // A parseable newest receipt is advisory only to the task that owns it.
-    // Foreign, malformed, and unowned receipts remain blocking: otherwise a
-    // close could silently accept provenance it neither produced nor verified.
-    if (readLatestGitHeadReceiptTaskId(input.cwd) === input.taskId) {
+    // closeback artifact owned by whichever task happens to be closing. A
+    // parseable newest receipt is advisory to its own task and to other tasks
+    // only after its ledger proves that it is terminal. Active, malformed, and
+    // unowned receipts remain blocking so a close cannot bypass live provenance.
+    if (readLatestGitHeadReceiptTaskId(input.cwd) === input.taskId
+        || latestGitHeadReceiptBelongsToTerminalForeignTask(input.cwd, input.taskId)) {
         allowedAdvisoryGovernanceFiles.add(gitHeadEvidencePath);
     }
     const allowedAdvisoryDirtyFiles = new Set(uniqueStrings((input.allowedAdvisoryDirtyFiles ?? []).map(normalizeRelativePath).filter(Boolean)));

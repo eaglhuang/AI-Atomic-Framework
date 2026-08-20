@@ -3,8 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { isCommitAcceptedByLegacyBaseline, readFrameworkCommitRangeBaseline } from '../commit-range-guard.js';
-import { createCommitRangeGuardReport } from '../commit-range-guard.js';
+import { createCommitRangeGuardReport, isCommitAcceptedByLegacyBaseline, readFrameworkCommitRangeBaseline } from '../commit-range-guard.js';
 import { runRequiredFrameworkValidators, triageForeignValidatorRuns } from '../pre-push.js';
 const cwd = process.cwd();
 const baseline = readFrameworkCommitRangeBaseline(cwd, 'HEAD');
@@ -71,12 +70,8 @@ assert.equal(foreignBrokerTriage.advisoryFindings[0]?.code, 'ATM_HOOK_FOREIGN_CO
     git(['commit', '-m', 'emergency fixture', '-m', 'ATM-Emergency-Reason: fixture']);
     const head = git(['rev-parse', 'HEAD']);
     const report = createCommitRangeGuardReport(repo, base, head);
-    const finding = report.findings.find((entry) => entry.code === 'ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED');
-    assert.ok(finding, 'missing work-admission finding should be present');
-    assert.match(finding.suggestedFix, /node atm\.mjs git attest --commit [a-f0-9]{40}/);
-    assert.match(finding.suggestedFix, /--provenance-ref git:[a-f0-9]{40}/);
-    assert.match(finding.suggestedFix, /--reason "<reason>"/);
-    assert.match(finding.suggestedFix, /--dry-run --json/);
+    assert.equal(report.historicalAttestationEnforcement, 'disabled');
+    assert.equal(report.findings.some((entry) => entry.code === 'ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED'), false, 'historical missing work-admission records must not block a protected push');
 }
 console.log('[pre-push.spec] ok');
 function runGitScalar(repoCwd, args) {

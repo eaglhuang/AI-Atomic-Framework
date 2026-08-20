@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { calculateBrokerDecision } from '../broker/decision.ts';
 import { loadRegistry, cleanupStale } from '../broker/registry.ts';
+import { brokerAdapterMigration } from '../broker/types.ts';
 import type {
   ActiveWriteIntent,
   BrokerDecision,
@@ -22,6 +23,7 @@ import {
 import {
   bridgeGitDiffEntriesToAdapterConflictKeys,
   type GitDiffBridgeDiagnostic,
+  type GitDiffAdapterBridgeResult,
   type GitDiffBridgeResultEntry
 } from './format-adapter-bridge.ts';
 
@@ -61,15 +63,17 @@ export interface GitAdmissionResult {
 export function evaluateGitAdmission(input: GitAdmissionOptions): GitAdmissionResult {
   try {
     const envelope = collectGitDiffMutationRequests(input);
-    const localBridge = bridgeGitDiffEntriesToAdapterConflictKeys({
-      cwd: input.cwd,
-      baseRef: envelope.topology.mergeBaseSha,
-      targetRef: envelope.topology.headSha,
-      entries: envelope.localDiff,
-      actorId: input.actorId,
-      taskId: input.taskId ?? null,
-      gitExecutable: input.gitExecutable
-    });
+    const localBridge = envelope.remoteDiff.length === 0
+      ? bridgeWithoutRemoteCompetition(envelope.localDiff, envelope.localRequests)
+      : bridgeGitDiffEntriesToAdapterConflictKeys({
+          cwd: input.cwd,
+          baseRef: envelope.topology.mergeBaseSha,
+          targetRef: envelope.topology.headSha,
+          entries: envelope.localDiff,
+          actorId: input.actorId,
+          taskId: input.taskId ?? null,
+          gitExecutable: input.gitExecutable
+        });
     const remoteBridge = bridgeGitDiffEntriesToAdapterConflictKeys({
       cwd: input.cwd,
       baseRef: envelope.topology.mergeBaseSha,
@@ -196,6 +200,40 @@ function toAdmissionBridgeEntry(entry: GitDiffBridgeResultEntry): GitAdmissionBr
     diagnostics: entry.diagnostics,
     failClosed: entry.failClosed
   };
+}
+
+/**
+ * When the remote has no divergence from the merge base, there is no opposing
+ * mutation surface to compare.  Parsing every local blob and spawning a diff
+ * process per file cannot improve that decision; it only turns a large,
+ * otherwise-safe push into an unbounded local scan.  Keep whole-file conflict
+ * keys so the broker model and evidence shape remain conservative.
+ */
+function bridgeWithoutRemoteCompetition(
+  entries: readonly GitDiffEntry[],
+  requests: readonly MutationRequest[]
+): GitDiffAdapterBridgeResult {
+  const requestsByFile = new Map<string, MutationRequest[]>();
+  for (const request of requests) {
+    const current = requestsByFile.get(request.filePath) ?? [];
+    current.push(request);
+    requestsByFile.set(request.filePath, current);
+  }
+  const bridgeEntries: GitDiffBridgeResultEntry[] = entries.map((entry) => ({
+    filePath: entry.filePath,
+    adapterId: 'fallback-file-lock',
+    conflictKeys: [{
+      schemaId: 'atm.conflictKey.v1',
+      specVersion: '0.1.0',
+      migration: brokerAdapterMigration(),
+      scope: 'file',
+      key: entry.filePath
+    }],
+    requests: requestsByFile.get(entry.filePath) ?? [],
+    diagnostics: [],
+    failClosed: false
+  }));
+  return { entries: bridgeEntries, diagnostics: [] };
 }
 
 function buildAdmissionIntent(input: {

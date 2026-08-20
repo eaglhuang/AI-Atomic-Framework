@@ -118,6 +118,18 @@ try {
   assert(!foreignReceiptGuard.ok, 'foreign latest receipt must remain blocking');
   assert(foreignReceiptGuard.governanceTrackedDirtyFiles.includes('.atm/history/evidence/git-head.jsonl'), 'foreign receipt must stay governance-blocking');
 
+  const terminalLedgerPath = path.join(receiptFixture, '.atm/history/tasks/TASK-FOREIGN-0001.json');
+  mkdirSync(path.dirname(terminalLedgerPath), { recursive: true });
+  writeFileSync(terminalLedgerPath, JSON.stringify({ status: 'done', claim: { state: 'released' } }), 'utf8');
+  const terminalForeignReceiptGuard = evaluateFrameworkCloseDirtyGuard({
+    cwd: receiptFixture,
+    taskId: 'TASK-CID-0056',
+    taskDeclaredFiles: declaredFiles,
+    trackedDirtyFiles: ['.atm/history/evidence/git-head.jsonl']
+  });
+  assert(terminalForeignReceiptGuard.ok, 'terminal foreign receipt must be advisory because it cannot be live provenance');
+  assert(terminalForeignReceiptGuard.advisoryTrackedDirtyFiles.includes('.atm/history/evidence/git-head.jsonl'), 'terminal foreign receipt must remain observable as advisory');
+
   writeFileSync(receiptPath, '{not-json}\n', 'utf8');
   const malformedReceiptGuard = evaluateFrameworkCloseDirtyGuard({
     cwd: receiptFixture,
