@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0401",
   "title": "Make governed hook failures summary-first and full-diagnostic-addressable",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -147,8 +147,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-20T17-04-13-640Z-renew-af5e05f41d57",
-  "lastTransitionAt": "2026-08-20T17:04:13.640Z",
+  "lastTransitionId": "2026-08-20T17-08-00-967Z-close-c9fb039b2272",
+  "lastTransitionAt": "2026-08-20T17:08:00.967Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-08-20T16:03:09.602Z",
@@ -157,7 +157,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-06672816985e",
     "claimedAt": "2026-08-20T16:03:09.663Z",
-    "heartbeatAt": "2026-08-20T17:04:12.806Z",
+    "heartbeatAt": "2026-08-20T17:08:00.965Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0401.json",
@@ -168,13 +168,14 @@
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "tests/cli/governed-hook-failure-diagnostics.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260820160309-codex-captain-469d8f20ee",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820160309-codex-captain-469d8f20ee\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-20T16:03:09.663Z",
   "startedByActor": "codex-captain",
@@ -278,5 +279,9 @@
     },
     "createdAt": "2026-08-20T16:03:16.388Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-20T17:08:00.965Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260820160309-codex-captain-ATM-GOV-0401-2d2c29122c",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0401.closure-packet.json"
 }
