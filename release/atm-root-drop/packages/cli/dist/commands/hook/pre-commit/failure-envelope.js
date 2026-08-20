@@ -303,7 +303,7 @@ export function summarizePreCommitFailureEnvelope(envelope) {
         : ' Next: inspect failureEnvelope.blockingFindings and rerun the ATM governed command.';
     return `${summary}${next}`;
 }
-function sanitizeOperatorCommandHint(command) {
+export function sanitizeOperatorCommandHint(command) {
     const normalized = command.trim();
     if (/\bgit\s+(reset|clean|checkout|restore|read-tree|rm|switch)\b/i.test(normalized)) {
         return 'use the ATM repair/reconcile command shown by the blocking finding; do not run raw destructive Git remediation';

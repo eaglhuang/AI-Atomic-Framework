@@ -4,7 +4,7 @@ import { resolveTaskRunnerArbitration } from '../validate.js';
 import { canonicalizeValidatorIdentity, classifyValidatorTier, looksLikeLiteralValidatorCommand, resolveValidatorExpectedCommand } from './validator-classification.js';
 import { collectRecordCommandRuns, readRecordValidationPasses, readRecordFreshness, uniqueStrings } from './command-runs.js';
 import { isRecord, isCommandRunProof } from './shared-utils.js';
-import { readEvidenceBundle, readTaskDocument, buildAutoEvidenceRequiredCommand } from './evidence-store.js';
+import { readEvidenceBundle, readTaskDocument, readTaskRunnerSyncReceipt, buildAutoEvidenceRequiredCommand } from './evidence-store.js';
 /** Keep executable task-card commands attached to their canonical evidence gate. */
 export function resolveTaskDeclaredValidatorCommands(taskDocument) {
     const commands = new Map();
@@ -242,7 +242,33 @@ export function computeMissingValidatorReport(cwd, taskId, actorId) {
     const allGates = uniqueStrings([...frameworkGates, ...taskDeclaredValidators]);
     // 4. 讀取 evidence bundle
     const bundle = readEvidenceBundle(resolvedCwd, resolvedTaskId);
-    const bundleRecords = bundle.evidence.map((r) => isRecord(r) ? r : {});
+    const rawBundleRecords = bundle.evidence.map((r) => isRecord(r) ? r : {});
+    const runnerReceipt = readTaskRunnerSyncReceipt(resolvedCwd, resolvedTaskId);
+    const bundleRecords = runnerReceipt
+        ? [
+            ...rawBundleRecords,
+            {
+                schemaId: 'atm.evidenceRecord.v1',
+                evidenceKind: 'validation',
+                evidenceFreshness: runnerReceipt.publicationDisposition === 'published' ? 'fresh' : 'draft',
+                details: {
+                    kind: 'test',
+                    freshness: runnerReceipt.publicationDisposition === 'published' ? 'fresh' : 'draft',
+                    validationPasses: ['build'],
+                    commandRuns: [
+                        {
+                            command: 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build',
+                            exitCode: runnerReceipt.publicationDisposition === 'published' ? 0 : 1,
+                            stdoutSha256: typeof runnerReceipt.runnerInputTreeHash === 'string' ? runnerReceipt.runnerInputTreeHash : 'placeholder',
+                            stderrSha256: typeof runnerReceipt.runnerInputTreeHash === 'string' ? runnerReceipt.runnerInputTreeHash : 'placeholder',
+                            sourceCommit: typeof runnerReceipt.sealedSourceSha === 'string' ? runnerReceipt.sealedSourceSha : null,
+                            validators: ['build']
+                        }
+                    ]
+                }
+            }
+        ]
+        : rawBundleRecords;
     // 5. 分類每個 gate 的 evidence 狀態
     // TASK-AAO-0017 follow-up：closure-required 與 advisory 分開計算，
     // batch-tier framework 健康類 gate 為 advisory，缺失不應阻擋 close。

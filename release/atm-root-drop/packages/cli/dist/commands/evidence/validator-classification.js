@@ -3,6 +3,9 @@ export const VALIDATOR_GATE_ALIAS_MAP = new Map([
     ['test', 'test'],
     ['npm test', 'test'],
     ['npm run test', 'test'],
+    ['build', 'build'],
+    ['npm run build', 'build'],
+    ['npm run build:packages', 'build'],
     ['git diff --check', 'git diff --check'],
     ['git-diff-check', 'git diff --check'],
     ['doctor', 'doctor'],
@@ -13,6 +16,9 @@ export const VALIDATOR_GATE_ALIAS_MAP = new Map([
 ]);
 export function normalizeValidatorToken(raw) {
     return normalizeShellQuotedCommandTokens(raw.trim().replace(/\s+/g, ' '));
+}
+export function stripLeadingEnvVars(raw) {
+    return raw.replace(/^(?:[A-Za-z_][A-Za-z0-9_]*=\S+\s+)+/, '').trim();
 }
 function normalizeShellQuotedCommandTokens(value) {
     return value
@@ -26,18 +32,19 @@ function normalizeShellQuotedCommandTokens(value) {
  *       "npm run validate:cli" → "validate:cli"
  */
 export function normalizeValidatorGateName(raw) {
-    if (/^npm(?:\s+run)?\s+test$/i.test(raw.trim()))
+    const stripped = stripLeadingEnvVars(raw);
+    if (/^npm(?:\s+run)?\s+test$/i.test(stripped.trim()))
         return 'test';
     // "npm run <gate>" → "<gate>"
-    const npmMatch = raw.match(/^npm run (.+)$/);
+    const npmMatch = stripped.match(/^npm run (.+)$/);
     if (npmMatch)
         return npmMatch[1].trim();
     // "node --strip-types scripts/validate-<name>.ts --mode validate" → "validate:<name>"
-    const nodeScriptMatch = raw.match(/validate-([a-z0-9-]+)\.ts/);
+    const nodeScriptMatch = stripped.match(/validate-([a-z0-9-]+)\.ts/);
     if (nodeScriptMatch)
         return `validate:${nodeScriptMatch[1]}`;
     // 已是 gate 名稱
-    return raw;
+    return stripped;
 }
 /** 依 gate 名稱歸類 tier */
 export function canonicalizeValidatorIdentity(raw) {
@@ -156,9 +163,10 @@ export function resolveValidatorExpectedCommand(gate) {
 }
 export function looksLikeLiteralValidatorCommand(value) {
     const normalized = normalizeValidatorToken(value);
-    return /^(?:node|npm|git|npx|pnpm|yarn|powershell(?:\.exe)?|pwsh(?:\.exe)?)\s+/i.test(normalized)
-        || normalized.startsWith('./')
-        || normalized.startsWith('.\\');
+    const stripped = stripLeadingEnvVars(normalized);
+    return /^(?:node|npm|git|npx|pnpm|yarn|powershell(?:\.exe)?|pwsh(?:\.exe)?)\s+/i.test(stripped)
+        || stripped.startsWith('./')
+        || stripped.startsWith('.\\');
 }
 export function detectAutoLinkedValidator(command) {
     const gate = canonicalizeValidatorIdentity(command);

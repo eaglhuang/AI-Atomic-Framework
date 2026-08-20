@@ -41,14 +41,54 @@ import {
 } from "../../shared.ts";
 import { withBranchCommitQueueLock } from './branch-commit-window.ts';
 import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, inspectCloseCommitWindowStagedArtifacts, rollbackNewlyStagedLiveIndexResidue } from './git-index-transaction.ts';
-import { captureIndexRestorationSnapshot, restoreIndexToSnapshot } from './index-restoration.ts';
+import {
+  captureIndexRestorationSnapshot,
+  restoreIndexToSnapshot,
+  type IndexRestorationOutcome,
+  type IndexRestorationSnapshot,
+} from './index-restoration.ts';
 import { isHeadRaceCommitFailure, readHeadBranchRef, readHeadCommitSha } from './push-command.ts';
 import { prepareCommitCandidate, assertGovernedCommitPhysicalLineBudget } from './commit-candidate-preparation.ts';
 import { executeCommitAttempt } from './commit-attempt-boundary.ts';
+import { createHookFailureDiagnosticReport, summarizeHookFailure } from './hook-failure-diagnostics.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
 export { assertGovernedCommitPhysicalLineBudget };
+
+/**
+ * After a commit attempt throws, roll the live index back only when HEAD did
+ * not move. A landed commit has already advanced the ref; restoring the
+ * pre-attempt snapshot would put parent blobs back into the shared index.
+ */
+export function applyLiveIndexRollbackAfterCommitError(input: {
+  readonly cwd: string;
+  readonly headAdvancedDuringAttempt: boolean;
+  readonly indexRestorationSnapshot: IndexRestorationSnapshot | null;
+  readonly liveIndexSnapshotBeforeAttempt: LegacyValue;
+}): {
+  readonly indexRestoration: IndexRestorationOutcome | null;
+  readonly liveIndexResidueRollback: readonly string[];
+} {
+  if (input.headAdvancedDuringAttempt) {
+    return { indexRestoration: null, liveIndexResidueRollback: [] };
+  }
+  const indexRestoration = input.indexRestorationSnapshot
+    ? restoreIndexToSnapshot(input.cwd, input.indexRestorationSnapshot)
+    : null;
+  return {
+    indexRestoration,
+    liveIndexResidueRollback: Array.from(
+      new Set([
+        ...(indexRestoration?.restoredPaths ?? []),
+        ...rollbackNewlyStagedLiveIndexResidue(
+          input.cwd,
+          input.liveIndexSnapshotBeforeAttempt,
+        ),
+      ]),
+    ).sort(),
+  };
+}
 
 export function executeGitCommit(options: LegacyValue, context: LegacyValue) {
 let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers } = context;
@@ -142,21 +182,6 @@ try {
       options.cwd,
       deferredForeignStagedSnapshotPath,
     );
-    // ATM-GOV-0369 amendment 1: name-based rollback cannot see a staged
-    // deletion, so restore against the full pre-attempt index snapshot first
-    // and keep the legacy pass only for what it still covers.
-    const indexRestoration = indexRestorationSnapshotBeforeCommitAttempt
-      ? restoreIndexToSnapshot(options.cwd, indexRestorationSnapshotBeforeCommitAttempt)
-      : null;
-    const liveIndexResidueRollback = Array.from(
-      new Set([
-        ...(indexRestoration?.restoredPaths ?? []),
-        ...rollbackNewlyStagedLiveIndexResidue(
-          options.cwd,
-          liveIndexSnapshotBeforeCommitAttempt,
-        ),
-      ]),
-    ).sort();
     const nodeChildError: LegacyValue = error;
     const isCommitTimeoutFailure = Boolean(
       nodeChildError &&
@@ -169,11 +194,41 @@ try {
       headShaBeforeCommit &&
       headShaAfterFailure !== headShaBeforeCommit,
     );
+    const { liveIndexResidueRollback } = applyLiveIndexRollbackAfterCommitError({
+      cwd: options.cwd,
+      headAdvancedDuringAttempt,
+      indexRestorationSnapshot: indexRestorationSnapshotBeforeCommitAttempt,
+      liveIndexSnapshotBeforeAttempt: liveIndexSnapshotBeforeCommitAttempt,
+    });
     const gitHeadEvidenceRollback = headAdvancedDuringAttempt
       ? false
       : rollbackFailedGitHeadEvidencePreparation(
           gitHeadEvidenceSnapshotBeforeCommitAttempt,
         );
+    const stderr =
+      error instanceof Error && "stderr" in error
+        ? String(error.stderr ?? "")
+        : "";
+    const stdout =
+      error instanceof Error && "stdout" in error
+        ? String(error.stdout ?? "")
+        : "";
+    let hookFailureDiagnostic: ReturnType<typeof createHookFailureDiagnosticReport> = null;
+    let hookFailureDiagnosticWriteError: string | null = null;
+    try {
+      hookFailureDiagnostic = createHookFailureDiagnosticReport({
+        cwd: options.cwd,
+        commitAttemptStatusPath,
+        stdout,
+        stderr,
+      });
+    } catch (diagnosticError) {
+      hookFailureDiagnosticWriteError = diagnosticError instanceof Error
+        ? diagnosticError.message
+        : String(diagnosticError);
+    }
+    const hookFailureSummary = hookFailureDiagnostic?.summary
+      ?? summarizeHookFailure({ stdout, stderr });
     writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
       schemaId: "atm.gitCommitAttemptStatus.v1",
       actorId,
@@ -201,8 +256,8 @@ try {
           : isCommitTimeoutFailure
             ? "ATM_GIT_COMMIT_TIMEOUT"
             : "UNKNOWN",
-      errorSummary:
-        error instanceof Error ? error.message.slice(0, 500) : String(error),
+      errorSummary: hookFailureSummary
+        ?? (error instanceof Error ? error.message.slice(0, 500) : String(error)),
       statusCommand,
       retryCommand,
       copyableCommitCommand: rawCopyableCommitCommand,
@@ -243,14 +298,6 @@ try {
         }),
       });
     }
-    const stderr =
-      error instanceof Error && "stderr" in error
-        ? String(error.stderr ?? "")
-        : "";
-    const stdout =
-      error instanceof Error && "stdout" in error
-        ? String(error.stdout ?? "")
-        : "";
     if (isHeadRaceCommitFailure(stderr)) {
       throw new CliError(
         "ATM_GIT_COMMIT_BRANCH_QUEUE_RACE",
@@ -310,7 +357,7 @@ try {
         : null;
     throw new CliError(
       "ATM_GIT_COMMIT_FAILED",
-      "ATM git commit wrapper failed.",
+      hookFailureSummary ?? "ATM git commit wrapper failed.",
       {
         exitCode: 1,
         details: {
@@ -319,6 +366,8 @@ try {
           sessionId: session?.sessionId ?? null,
           stdout,
           stderr,
+          hookFailureDiagnostic: hookFailureDiagnostic?.reference ?? null,
+          hookFailureDiagnosticWriteError,
           headShaBeforeCommit,
           headShaAfterFailure,
           headAdvancedDuringAttempt,

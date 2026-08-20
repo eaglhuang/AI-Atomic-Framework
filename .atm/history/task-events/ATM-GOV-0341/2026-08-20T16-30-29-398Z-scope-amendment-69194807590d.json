@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-20T16-30-29-398Z-scope-amendment-69194807590d",
+  "taskId": "ATM-GOV-0341",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0341.json",
+  "taskSha256": "sha256:a753d75e59ce16caf78008c89202090be4f594d7f9babe40f9eef94fe304996b",
+  "createdAt": "2026-08-20T16:30:29.398Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0341 --actor codex-captain --add \"packages/core/src/git/publication-delivery-slice.ts,packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts,packages/cli/src/commands/git-governance/implementation/git-command-options.ts,packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts,packages/cli/src/commands/git-governance/implementation/commit-candidate-preparation.ts,packages/cli/src/commands/command-specs/git.spec.ts,packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

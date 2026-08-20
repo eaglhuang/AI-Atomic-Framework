@@ -341,7 +341,7 @@ export function summarizePreCommitFailureEnvelope(envelope: PreCommitFailureEnve
   return `${summary}${next}`;
 }
 
-function sanitizeOperatorCommandHint(command: string): string {
+export function sanitizeOperatorCommandHint(command: string): string {
   const normalized = command.trim();
   if (/\bgit\s+(reset|clean|checkout|restore|read-tree|rm|switch)\b/i.test(normalized)) {
     return 'use the ATM repair/reconcile command shown by the blocking finding; do not run raw destructive Git remediation';

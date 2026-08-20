@@ -25,6 +25,7 @@ import { runGitPostPushFailRecovery, runGitPush } from './push-command.ts';
 import { runGitRecordCommit } from './record-commit-command.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome, requireConsumedEmergencyApproval } from '../../emergency/gate.ts';
 import { GIT_INDEX_LOCK_RECOVERY_FLAG, recoverGitIndexLock } from './git-index-lock-recovery.ts';
+import { recoverLiveIndexAfterSuccessfulCommit } from './live-index-reconciliation.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
@@ -78,6 +79,37 @@ export async function runAtmGit(argv: LegacyValue) {
   }
   if (options.action === "commit-status") {
     return runGitCommitStatus(options);
+  }
+  if (options.action === 'reconcile-live-index') {
+    if (!options.commitSha) {
+      throw new CliError(
+        'ATM_CLI_USAGE',
+        'git reconcile-live-index requires --commit <sha>.',
+        { exitCode: 2 }
+      );
+    }
+    const dryRun = options.write !== true || options.dryRun === true;
+    const recovery = recoverLiveIndexAfterSuccessfulCommit({
+      cwd: options.cwd,
+      commitSha: options.commitSha,
+      dryRun
+    });
+    return makeResult({
+      ok: recovery.clean || dryRun,
+      command: 'git',
+      cwd: options.cwd,
+      messages: [
+        message(
+          recovery.clean ? 'info' : 'warning',
+          dryRun ? 'ATM_LIVE_INDEX_RECOVERY_DRY_RUN' : 'ATM_LIVE_INDEX_RECOVERY_APPLIED',
+          dryRun
+            ? 'Historical live-index recovery dry-run completed without mutating the index.'
+            : 'Historical live-index recovery applied only proven parent-blob residue.',
+          { recovery }
+        )
+      ],
+      evidence: { action: 'reconcile-live-index', recovery }
+    });
   }
   if (options.action === 'recover-index-lock') {
     const command = `node atm.mjs git recover-index-lock --task ${quoteCliValue(options.taskId ?? '<task-id>')} --actor ${quoteCliValue(options.actorId ?? '<actor-id>')} ${GIT_INDEX_LOCK_RECOVERY_FLAG} --emergency-approval <lease-id> --reason "<human-approved reason>" --json`;

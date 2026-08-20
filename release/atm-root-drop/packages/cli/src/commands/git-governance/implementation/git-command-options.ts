@@ -37,6 +37,8 @@ export function parseGitOptions(argv: LegacyValue) {
     overrideReason: null,
     checkTrailers: true,
     autoStage: false,
+    deliverySliceManifestPath: null,
+    deliverySliceReceiptPath: null,
     deferForeignStaged: false,
     stageOverrideLease: null,
     dryRun: false,
@@ -47,6 +49,8 @@ export function parseGitOptions(argv: LegacyValue) {
     paths: [],
     ttlSeconds: null,
     forceIndexLockRecovery: false,
+    commitSha: null,
+    write: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -75,8 +79,17 @@ export function parseGitOptions(argv: LegacyValue) {
       index += 1;
       continue;
     }
+    if (arg === "--write") {
+      options.write = true;
+      continue;
+    }
     if (arg === "--no-fetch") {
       options.noFetch = true;
+      continue;
+    }
+    if (arg === "--commit") {
+      options.commitSha = requireValue(argv, index, "--commit");
+      index += 1;
       continue;
     }
     if (arg === "--name") {
@@ -170,6 +183,24 @@ export function parseGitOptions(argv: LegacyValue) {
       options.autoStage = true;
       continue;
     }
+    if (arg === "--delivery-slice-manifest") {
+      options.deliverySliceManifestPath = requireValue(
+        argv,
+        index,
+        "--delivery-slice-manifest",
+      );
+      index += 1;
+      continue;
+    }
+    if (arg === "--delivery-slice-receipt") {
+      options.deliverySliceReceiptPath = requireValue(
+        argv,
+        index,
+        "--delivery-slice-receipt",
+      );
+      index += 1;
+      continue;
+    }
     if (arg === "--defer-foreign-staged") {
       options.deferForeignStaged = true;
       continue;
@@ -251,11 +282,12 @@ export function parseGitOptions(argv: LegacyValue) {
       arg !== "record-commit" &&
         arg !== "commit-status" &&
         arg !== "recover-index-lock" &&
+      arg !== "reconcile-live-index" &&
       arg !== "lease"
     ) {
       throw new CliError(
         "ATM_CLI_USAGE",
-        "git supports: prepare, admit, push, recover-push-fail, recover-index-lock, check, commit, record-commit, commit-status, lease",
+        "git supports: prepare, admit, push, recover-push-fail, recover-index-lock, reconcile-live-index, check, commit, record-commit, commit-status, lease",
         { exitCode: 2 },
       );
     }
@@ -264,7 +296,7 @@ export function parseGitOptions(argv: LegacyValue) {
   if (!options.action) {
     throw new CliError(
       "ATM_CLI_USAGE",
-      "git requires an action (prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status | lease).",
+      "git requires an action (prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status | recover-index-lock | reconcile-live-index | lease).",
       { exitCode: 2 },
     );
   }

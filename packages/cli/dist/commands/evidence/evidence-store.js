@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { canonicalizeValidatorIdentity, detectAutoLinkedValidator } from './validator-classification.js';
 import { quoteForShell, isRecord } from './shared-utils.js';
@@ -7,6 +7,52 @@ export function evidencePathForTask(cwd, taskId) {
 }
 export function taskPathForEvidence(cwd, taskId) {
     return path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+}
+export function runnerSyncReceiptPathForTask(cwd, taskId) {
+    return path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.runner-sync-receipt.json`);
+}
+export function readTaskRunnerSyncReceipt(cwd, taskId) {
+    const directPath = runnerSyncReceiptPathForTask(cwd, taskId);
+    if (existsSync(directPath)) {
+        try {
+            const parsed = JSON.parse(readFileSync(directPath, 'utf8'));
+            if (isRecord(parsed) && parsed.schemaId === 'atm.runnerSyncReceipt.v1')
+                return parsed;
+        }
+        catch {
+            // ignore
+        }
+    }
+    const evidenceDir = path.join(cwd, '.atm', 'history', 'evidence');
+    if (!existsSync(evidenceDir))
+        return null;
+    try {
+        const files = readdirSync(evidenceDir).filter((f) => f.endsWith('.runner-sync-receipt.json'));
+        for (const f of files) {
+            const filePath = path.join(evidenceDir, f);
+            try {
+                const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+                if (isRecord(parsed) && parsed.schemaId === 'atm.runnerSyncReceipt.v1') {
+                    const linkedTaskIds = Array.isArray(parsed.linkedTaskIds)
+                        ? parsed.linkedTaskIds.filter((id) => typeof id === 'string')
+                        : [];
+                    const memberTaskIds = Array.isArray(parsed.memberTaskIds)
+                        ? parsed.memberTaskIds.filter((id) => typeof id === 'string')
+                        : [];
+                    if (linkedTaskIds.includes(taskId) || memberTaskIds.includes(taskId) || parsed.taskId === taskId) {
+                        return parsed;
+                    }
+                }
+            }
+            catch {
+                // ignore
+            }
+        }
+    }
+    catch {
+        // ignore
+    }
+    return null;
 }
 export function readTaskDocument(cwd, taskId) {
     const taskPath = taskPathForEvidence(cwd, taskId);

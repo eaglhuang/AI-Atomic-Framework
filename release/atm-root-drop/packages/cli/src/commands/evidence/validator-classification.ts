@@ -7,6 +7,9 @@ export const VALIDATOR_GATE_ALIAS_MAP = new Map<string, string>([
   ['test', 'test'],
   ['npm test', 'test'],
   ['npm run test', 'test'],
+  ['build', 'build'],
+  ['npm run build', 'build'],
+  ['npm run build:packages', 'build'],
   ['git diff --check', 'git diff --check'],
   ['git-diff-check', 'git diff --check'],
   ['doctor', 'doctor'],
@@ -18,6 +21,10 @@ export const VALIDATOR_GATE_ALIAS_MAP = new Map<string, string>([
 
 export function normalizeValidatorToken(raw: string): string {
   return normalizeShellQuotedCommandTokens(raw.trim().replace(/\s+/g, ' '));
+}
+
+export function stripLeadingEnvVars(raw: string): string {
+  return raw.replace(/^(?:[A-Za-z_][A-Za-z0-9_]*=\S+\s+)+/, '').trim();
 }
 
 function normalizeShellQuotedCommandTokens(value: string): string {
@@ -33,15 +40,16 @@ function normalizeShellQuotedCommandTokens(value: string): string {
  *       "npm run validate:cli" → "validate:cli"
  */
 export function normalizeValidatorGateName(raw: string): string {
-  if (/^npm(?:\s+run)?\s+test$/i.test(raw.trim())) return 'test';
+  const stripped = stripLeadingEnvVars(raw);
+  if (/^npm(?:\s+run)?\s+test$/i.test(stripped.trim())) return 'test';
   // "npm run <gate>" → "<gate>"
-  const npmMatch = raw.match(/^npm run (.+)$/);
+  const npmMatch = stripped.match(/^npm run (.+)$/);
   if (npmMatch) return npmMatch[1].trim();
   // "node --strip-types scripts/validate-<name>.ts --mode validate" → "validate:<name>"
-  const nodeScriptMatch = raw.match(/validate-([a-z0-9-]+)\.ts/);
+  const nodeScriptMatch = stripped.match(/validate-([a-z0-9-]+)\.ts/);
   if (nodeScriptMatch) return `validate:${nodeScriptMatch[1]}`;
   // 已是 gate 名稱
-  return raw;
+  return stripped;
 }
 
 /** 依 gate 名稱歸類 tier */
@@ -164,9 +172,10 @@ export function resolveValidatorExpectedCommand(gate: string): string {
 
 export function looksLikeLiteralValidatorCommand(value: string): boolean {
   const normalized = normalizeValidatorToken(value);
-  return /^(?:node|npm|git|npx|pnpm|yarn|powershell(?:\.exe)?|pwsh(?:\.exe)?)\s+/i.test(normalized)
-    || normalized.startsWith('./')
-    || normalized.startsWith('.\\');
+  const stripped = stripLeadingEnvVars(normalized);
+  return /^(?:node|npm|git|npx|pnpm|yarn|powershell(?:\.exe)?|pwsh(?:\.exe)?)\s+/i.test(stripped)
+    || stripped.startsWith('./')
+    || stripped.startsWith('.\\');
 }
 
 
