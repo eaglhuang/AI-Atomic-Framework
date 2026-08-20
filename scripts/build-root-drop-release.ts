@@ -75,9 +75,12 @@ export function buildRootDropRelease(options: any = {}) {
   }
   for (const relativePath of sourceFiles) {
     expectedTargets.add(relativePath);
-    if (overlayTargets && !overlayTargets.has(relativePath)) continue;
     const sourcePath = path.join(repositoryRoot, relativePath);
     const targetPath = path.join(releaseRoot, relativePath);
+    // An overlay may begin from a valid older release that predates a current
+    // source file.  Such a file is not in the changed-path projection, but it
+    // must still be copied before the resulting inventory can attest to it.
+    if (overlayTargets && !overlayTargets.has(relativePath) && existsSync(targetPath)) continue;
     mkdirSync(path.dirname(targetPath), { recursive: true });
     if (copyFileIfChanged(sourcePath, targetPath)) {
       copyReport.copied += 1;
