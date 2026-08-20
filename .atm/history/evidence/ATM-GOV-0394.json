@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0394",
-  "updatedAt": "2026-08-15T11:00:15.330Z",
+  "updatedAt": "2026-08-20T16:08:33.777Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -193,6 +193,64 @@
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for ATM-GOV-0394: claude-008 -> codex-captain.",
+      "artifactPaths": [
+        ".atm/history/tasks/ATM-GOV-0394.json"
+      ],
+      "producedBy": "codex-captain",
+      "createdAt": "2026-08-20T16:08:33.777Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "claude-008",
+          "leaseId": "lease-f2e13e18eaf0",
+          "claimedAt": "2026-08-15T08:06:40.523Z",
+          "heartbeatAt": "2026-08-15T11:01:48.371Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/evidence/ATM-GOV-0394.*",
+            ".atm/history/task-events/ATM-GOV-0394/**",
+            ".atm/history/tasks/ATM-GOV-0394.json",
+            "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+            "packages/cli/src/commands/git-governance/implementation/commit-framework-branch.ts",
+            "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+            "packages/cli/src/commands/git-governance/implementation/dry-run-purity.ts",
+            "tests/cli/git-commit-task-scoped-staging.test.ts",
+            "tests/cli/git-commit-task-scoped-staging/dry-run-purity-scenarios.ts"
+          ],
+          "state": "active",
+          "laneSession": {
+            "laneSessionId": "lane-20260815080640-claude-008-a026250359",
+            "status": "adopted",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260815080640-claude-008-a026250359\""
+          }
+        },
+        "newClaim": {
+          "actorId": "codex-captain",
+          "leaseId": "lease-74b7f446d35d",
+          "claimedAt": "2026-08-20T16:08:32.947Z",
+          "heartbeatAt": "2026-08-20T16:08:32.947Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/ATM-GOV-0394.json"
+          ],
+          "state": "active",
+          "intent": "write",
+          "laneSession": {
+            "laneSessionId": "lane-20260820160832-codex-captain-f96c15add0",
+            "status": "active",
+            "source": "minted",
+            "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820160832-codex-captain-f96c15add0\""
+          },
+          "reason": "Owner-directed internal consolidation after external delegation ended; prior lease has expired and this source-done task requires later publication-backed closeout."
         }
       }
     }
