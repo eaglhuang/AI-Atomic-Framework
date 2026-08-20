@@ -297,10 +297,14 @@ function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMat
   return closurePacketPaths.map((packetPath) => {
     const packetText = runGitScalar(cwd, ['show', `${commitSha}:${packetPath}`]);
     const packet = packetText ? readJsonText(packetText) : null;
-    const directInspection = inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, packet, evidenceMatch);
+    // A close transaction creates its packet before the governed commit exists.
+    // Its targetCommitDelta is therefore a pre-commit prediction, not a claim
+    // about the later closure commit.  Only an explicit repair binds that
+    // prediction to an immutable, historical commit for range verification.
+    const repairMetadata = extractClosurePacketRepairMetadata(packet);
+    const directInspection = inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, packet, evidenceMatch, Boolean(repairMetadata));
     if (directInspection.findings.length === 0) return directInspection;
 
-    const repairMetadata = extractClosurePacketRepairMetadata(packet);
     if (repairMetadata?.originalPacketCommitSha && repairMetadata.originalPacketCommitSha !== commitSha) {
       const repairEvidenceMatch = inspectCommitGitHeadEvidence(cwd, repairMetadata.originalPacketCommitSha, [], headRef);
       const repairInspection = inspectClosurePacketAgainstCommit(cwd, repairMetadata.originalPacketCommitSha, packetPath, packet, repairEvidenceMatch);
@@ -350,7 +354,7 @@ function extractClosurePacketTargetCommitSha(packet: unknown): string | null {
   return normalizeOptionalText((delta as Record<string, unknown>).currentCommitSha);
 }
 
-function inspectClosurePacketAgainstCommit(cwd: string, commitSha: string, packetPath: string, packet: unknown, evidenceMatch: CommitEvidenceMatch | null): CommitClosurePacketInspection {
+function inspectClosurePacketAgainstCommit(cwd: string, commitSha: string, packetPath: string, packet: unknown, evidenceMatch: CommitEvidenceMatch | null, enforceCommitBinding = true): CommitClosurePacketInspection {
   const commitChangedFiles = readCommitChangedFiles(cwd, commitSha);
   const parentCommitShas = readParentCommitShas(cwd, commitSha);
   const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
@@ -368,6 +372,10 @@ function inspectClosurePacketAgainstCommit(cwd: string, commitSha: string, packe
       code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_INVALID',
       detail: `closure packet contract is incomplete (${validation.missing.join(', ')}${invalidFormatSummary})`
     });
+    return { commitSha, packetPath, taskId, findings };
+  }
+
+  if (!enforceCommitBinding) {
     return { commitSha, packetPath, taskId, findings };
   }
 
