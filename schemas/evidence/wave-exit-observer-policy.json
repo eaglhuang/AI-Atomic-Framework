@@ -28,6 +28,10 @@
     "wave-exit-observer.claude": {
       "kind": "observer",
       "executor": "claude"
+    },
+    "wave-exit-observer.codex-sidecar": {
+      "kind": "observer",
+      "executor": "codex-sidecar"
     }
   },
   "exits": {
@@ -97,7 +101,7 @@
     },
     "EXIT-07": {
       "wave": "Wave 6",
-      "observerRole": "wave-exit-observer.gemini",
+      "observerRole": "wave-exit-observer.codex-sidecar",
       "command": "node --strip-types scripts/validate-four-plan-objectives.ts --mode validate",
       "commandPath": "scripts/validate-four-plan-objectives.ts",
       "inputs": [

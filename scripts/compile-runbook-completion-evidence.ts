@@ -121,6 +121,7 @@ export type WaveExitObserverCompileOptions = {
   readonly basisActorsByWave?: Readonly<Record<string, readonly string[]>>;
   readonly repoRoot?: string;
   readonly isAncestor?: (ancestor: string, descendant: string) => boolean;
+  readonly readPolicySourceAtCommit?: (commit: string) => string | null;
 };
 
 export type CardContract = {
@@ -464,7 +465,8 @@ export function compileRunbookCompletion(
         currentInputDigests,
         policyDigestAtCompilationHead: observerPolicyDigest,
         isAncestor: observerOptions.isAncestor ?? isAncestor,
-        basisActors: observerOptions.basisActorsByWave?.[row.wave ?? '']
+        basisActors: observerOptions.basisActorsByWave?.[row.wave ?? ''],
+        readPolicySourceAtCommit: observerOptions.readPolicySourceAtCommit
       });
       const selectedReceipt = receiptVerdict.receipt;
       if (selectedReceipt && basisProven) {

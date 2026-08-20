@@ -321,7 +321,8 @@ export function writeWaveExitObserverReceipt(
     derivedBasis: derived,
     currentInputDigests,
     isAncestor: input.isAncestor,
-    policyDigestAtCompilationHead: policyDigest
+    policyDigestAtCompilationHead: policyDigest,
+    readPolicySourceAtCommit: () => policySource
   });
   if (!verdict.ok) {
     throw writeErrorFromDiagnostics(verdict.diagnostics, {

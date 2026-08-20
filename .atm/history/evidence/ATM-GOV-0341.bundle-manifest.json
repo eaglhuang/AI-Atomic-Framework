@@ -1,14 +1,18 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-16T15:58:04.982Z",
-  "updatedBy": "cursor-captain",
+  "updatedAt": "2026-08-20T21:48:32.228Z",
+  "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
+    "lint",
     "lint:touched",
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
     "node --strip-types tests/cli/plan4-final-certification.test.ts",
+    "node --strip-types tests/cli/wave-exit-observer-receipt-writer.test.ts",
+    "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
     "tasks-audit",
+    "test",
     "typecheck",
     "validate-backlog-census",
     "validate-four-plan-objectives",
@@ -491,6 +495,72 @@
       "durationMs": 4192,
       "runnerKind": "dev-source",
       "sourceCommit": "1a256431a0f53b19b0d37e3cb3a1ba9adec4f065",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5bfc7474270ba5e48305685d73b8fd22205773c175574f9de9d0a4d355632b3a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-08-20T18:43:32.381Z",
+      "startedAt": "2026-08-20T18:43:21.764Z",
+      "finishedAt": "2026-08-20T18:43:32.381Z",
+      "durationMs": 10617,
+      "runnerKind": "dev-source",
+      "sourceCommit": "021bbb0e214c700a1238e76955722ec3080aae7c",
+      "cached": false
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f5541a0d82d90df618547d359423f8da1dc6708aadcc554d24478ef77c241e2",
+      "stderrSha256": "sha256:9108eb2a20273a4216d9026e2757d2fb1b429a658e847c1c4972b920488fe561",
+      "validators": [
+        "test"
+      ],
+      "generatedAt": "2026-08-20T18:47:46.998Z",
+      "startedAt": "2026-08-20T18:43:42.197Z",
+      "finishedAt": "2026-08-20T18:47:46.998Z",
+      "durationMs": 244801,
+      "runnerKind": "dev-source",
+      "sourceCommit": "021bbb0e214c700a1238e76955722ec3080aae7c",
+      "cached": false
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4bddbc45f3dd276b32118c64457b447d2002583165e1e4d09223d2596de229f9",
+      "stderrSha256": "sha256:7ec2d982986809f003bd7dff598bcba6fca8b19c0adc7bfaab0a3c8e27b150b3",
+      "validators": [
+        "test"
+      ],
+      "generatedAt": "2026-08-20T18:51:47.415Z",
+      "startedAt": "2026-08-20T18:47:52.382Z",
+      "finishedAt": "2026-08-20T18:51:47.415Z",
+      "durationMs": 235033,
+      "runnerKind": "dev-source",
+      "sourceCommit": "021bbb0e214c700a1238e76955722ec3080aae7c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c51e71ccd83ab962efefb685d94d9c129c1a59386455f20f68fb747df9ab9ba7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
+        "node --strip-types tests/cli/wave-exit-observer-receipt-writer.test.ts",
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-20T21:48:32.227Z",
+      "startedAt": "2026-08-20T21:48:31.791Z",
+      "finishedAt": "2026-08-20T21:48:32.227Z",
+      "durationMs": 436,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b1d5709a6860ae712ab484976cc58c3bdea55051",
       "cached": false
     }
   ],

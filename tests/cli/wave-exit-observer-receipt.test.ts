@@ -96,6 +96,7 @@ const consume = (receipt: unknown, overrides: Record<string, unknown> = {}) => c
   currentInputDigests: { [inputPath]: inputDigest },
   isAncestor: (ancestor, descendant) => ancestor === observedHead && descendant === compilationHead,
   policyDigestAtCompilationHead: policyDigest,
+  readPolicySourceAtCommit: () => policySource,
   ...overrides
 });
 
@@ -106,6 +107,7 @@ assert.equal(policy.schemaId, 'atm.waveExitObserverPolicy.v1');
 assert.equal(policy.compilerCommandPath, 'scripts/compile-runbook-completion-evidence.ts');
 assert.equal(policy.exits['EXIT-02'].observerRole, 'wave-exit-observer.gemini');
 assert.equal(policy.exits['EXIT-04'].observerRole, 'wave-exit-observer.claude');
+assert.equal(policy.exits['EXIT-07'].observerRole, 'wave-exit-observer.codex-sidecar');
 assert.equal(policy.exits['EXIT-11'].command.includes('review-runbook-release-authority'), true);
 assert.equal(policy.exits['EXIT-02'].command.includes('compile-runbook-completion-evidence'), false);
 
@@ -114,6 +116,82 @@ assert.equal(proven.status, 'proven');
 assert.deepEqual(proven.diagnostics, []);
 assert.equal(proven.canonicalArtifactPath, 'docs/reports/wave-exit-observer-receipts/EXIT-02.json');
 
+const evolvedPolicy = {
+  ...policy,
+  roles: {
+    ...policy.roles,
+    'wave-exit-observer.unrelated': { kind: 'observer' as const, executor: 'unrelated' }
+  }
+};
+const evolvedPolicySource = `${JSON.stringify(evolvedPolicy, null, 2)}\n`;
+const evolvedPolicyDigest = digestWaveExitObserverPolicySource(evolvedPolicySource);
+const legacyReceiptAfterUnrelatedRoleAddition = consumeWaveExitObserverReceipt({
+  receipt: legalReceipt,
+  policy: evolvedPolicy,
+  compilationHead,
+  derivedBasis: deriveBasisIdentityFromEvidence({
+    producerActors: ['wave-1-basis-producer'],
+    producerRole: evolvedPolicy.basisProducerRole
+  }),
+  currentInputDigests: { [inputPath]: inputDigest },
+  isAncestor: (ancestor, descendant) => ancestor === observedHead && descendant === compilationHead,
+  policyDigestAtCompilationHead: evolvedPolicyDigest,
+  readPolicySourceAtCommit: () => policySource
+});
+assert.equal(legacyReceiptAfterUnrelatedRoleAddition.status, 'proven', 'unrelated role addition preserves legacy receipt');
+
+const changedExitPolicy = {
+  ...evolvedPolicy,
+  exits: {
+    ...evolvedPolicy.exits,
+    'EXIT-02': { ...evolvedPolicy.exits['EXIT-02'], observerRole: 'wave-exit-observer.claude' }
+  }
+};
+const changedExitPolicySource = `${JSON.stringify(changedExitPolicy, null, 2)}\n`;
+const changedExitPolicyVerdict = consumeWaveExitObserverReceipt({
+  receipt: legalReceipt,
+  policy: changedExitPolicy,
+  compilationHead,
+  derivedBasis: deriveBasisIdentityFromEvidence({
+    producerActors: ['wave-1-basis-producer'],
+    producerRole: changedExitPolicy.basisProducerRole
+  }),
+  currentInputDigests: { [inputPath]: inputDigest },
+  isAncestor: (ancestor, descendant) => ancestor === observedHead && descendant === compilationHead,
+  policyDigestAtCompilationHead: digestWaveExitObserverPolicySource(changedExitPolicySource),
+  readPolicySourceAtCommit: () => policySource
+});
+assert.equal(changedExitPolicyVerdict.status, 'unproven', 'changed EXIT role rejects legacy receipt');
+assert.ok(changedExitPolicyVerdict.diagnostics.includes('observer-role-mismatch'));
+
+const changedGlobalPolicy = {
+  ...evolvedPolicy,
+  compilerCommandPath: 'scripts/other-compiler.ts'
+};
+const changedGlobalPolicySource = `${JSON.stringify(changedGlobalPolicy, null, 2)}\n`;
+const changedGlobalPolicyVerdict = consumeWaveExitObserverReceipt({
+  receipt: legalReceipt,
+  policy: changedGlobalPolicy,
+  compilationHead,
+  derivedBasis: deriveBasisIdentityFromEvidence({
+    producerActors: ['wave-1-basis-producer'],
+    producerRole: changedGlobalPolicy.basisProducerRole
+  }),
+  currentInputDigests: { [inputPath]: inputDigest },
+  isAncestor: (ancestor, descendant) => ancestor === observedHead && descendant === compilationHead,
+  policyDigestAtCompilationHead: digestWaveExitObserverPolicySource(changedGlobalPolicySource),
+  readPolicySourceAtCommit: () => policySource
+});
+assert.equal(changedGlobalPolicyVerdict.status, 'unproven', 'changed global compiler contract rejects legacy receipt');
+assert.ok(changedGlobalPolicyVerdict.diagnostics.includes('receipt-stale'));
+
+const malformedHistoricalPolicy = consume(legalReceipt, { readPolicySourceAtCommit: () => '{' });
+assert.equal(malformedHistoricalPolicy.status, 'unproven');
+assert.ok(malformedHistoricalPolicy.diagnostics.includes('historical-policy-invalid'));
+const missingHistoricalPolicy = consume(legalReceipt, { readPolicySourceAtCommit: () => null });
+assert.equal(missingHistoricalPolicy.status, 'unproven');
+assert.ok(missingHistoricalPolicy.diagnostics.includes('historical-policy-invalid'));
+
 const uniqueCandidate = consumeWaveExitObserverReceiptCandidates({
   repoRoot: '.',
   receipts: [legalReceipt],
@@ -121,6 +199,7 @@ const uniqueCandidate = consumeWaveExitObserverReceiptCandidates({
   compilationHead,
   currentInputDigests: { [inputPath]: inputDigest },
   policyDigestAtCompilationHead: policyDigest,
+  readPolicySourceAtCommit: () => policySource,
   isAncestor: (ancestor, descendant) => ancestor === observedHead && descendant === compilationHead,
   basisActors: ['wave-1-basis-producer']
 });
@@ -133,6 +212,7 @@ const ambiguousCandidates = consumeWaveExitObserverReceiptCandidates({
   compilationHead,
   currentInputDigests: { [inputPath]: inputDigest },
   policyDigestAtCompilationHead: policyDigest,
+  readPolicySourceAtCommit: () => policySource,
   isAncestor: (ancestor, descendant) => ancestor === observedHead && descendant === compilationHead,
   basisActors: ['wave-1-basis-producer']
 });
@@ -213,7 +293,8 @@ const compilerWithMappedExit = compileRunbookCompletion(
     policyDigestAtCompilationHead: policyDigest,
     basisActorsByWave: { 'Wave 1': ['wave-1-basis-producer'] },
     repoRoot: process.cwd(),
-    isAncestor: (ancestor: string, descendant: string) => ancestor === observedHead && descendant === compilationHead
+    isAncestor: (ancestor: string, descendant: string) => ancestor === observedHead && descendant === compilationHead,
+    readPolicySourceAtCommit: () => policySource
   }
 );
 const exit02 = compilerWithMappedExit.waveExits.find((row) => row.itemId === 'EXIT-02');
@@ -242,7 +323,8 @@ const illegalCompiler = compileRunbookCompletion(
     policyDigestAtCompilationHead: policyDigest,
     basisActorsByWave: { 'Wave 1': ['wave-1-basis-producer'] },
     repoRoot: process.cwd(),
-    isAncestor: (ancestor: string, descendant: string) => ancestor === observedHead && descendant === compilationHead
+    isAncestor: (ancestor: string, descendant: string) => ancestor === observedHead && descendant === compilationHead,
+    readPolicySourceAtCommit: () => policySource
   }
 );
 const illegalExit = illegalCompiler.waveExits.find((row) => row.itemId === 'EXIT-02');

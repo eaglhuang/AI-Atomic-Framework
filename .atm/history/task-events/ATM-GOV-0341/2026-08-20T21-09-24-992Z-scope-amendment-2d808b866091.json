@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-20T21-09-24-992Z-scope-amendment-2d808b866091",
+  "taskId": "ATM-GOV-0341",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0341.json",
+  "taskSha256": "sha256:07318e10499f9f3e235939d1f79fec77ee580ad441448a78af228b34dc64d1a7",
+  "createdAt": "2026-08-20T21:09:24.992Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0341 --actor codex-captain --add \"packages/core/src/evidence/wave-exit-observer-receipt.ts,packages/core/src/evidence/wave-exit-observer-receipt-writer.ts,tests/cli/wave-exit-observer-receipt.test.ts,tests/cli/wave-exit-observer-receipt-writer.test.ts\" --reason \"Renew the active 0341 ticket with the bounded immutable receipt successor consumer, writer, and focused fixtures.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Renew the active 0341 ticket with the bounded immutable receipt successor consumer, writer, and focused fixtures."
+  }
+}

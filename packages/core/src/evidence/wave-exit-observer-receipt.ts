@@ -23,6 +23,7 @@ export type WaveExitObserverDiagnostic =
   | 'observer-role-mismatch'
   | 'target-head-unreachable'
   | 'receipt-stale'
+  | 'historical-policy-invalid'
   | 'input-digest-drift'
   | 'basis-actor-unresolved'
   | 'wave-mismatch'
@@ -106,6 +107,7 @@ export interface ConsumeWaveExitObserverReceiptInput {
   readonly currentInputDigests: Readonly<Record<string, string>>;
   readonly isAncestor: (ancestor: string, descendant: string) => boolean;
   readonly policyDigestAtCompilationHead: string;
+  readonly readPolicySourceAtCommit: (commit: string) => string | null;
 }
 
 export interface WaveExitObserverVerdict {
@@ -125,6 +127,7 @@ export interface ConsumeWaveExitObserverReceiptCandidatesInput {
   readonly policyDigestAtCompilationHead: string;
   readonly isAncestor: (ancestor: string, descendant: string) => boolean;
   readonly basisActors?: readonly string[];
+  readonly readPolicySourceAtCommit?: (commit: string) => string | null;
 }
 
 export interface WaveExitObserverCandidatesVerdict {
@@ -180,20 +183,54 @@ export function digestWaveExitObserverPolicy(
 }
 
 export function loadWaveExitObserverPolicy(repoRoot = '.'): WaveExitObserverPolicy {
-  const raw = JSON.parse(readWaveExitObserverPolicySource(repoRoot)) as WaveExitObserverPolicy;
-  if (raw.schemaId !== WAVE_EXIT_OBSERVER_POLICY_SCHEMA_ID) {
-    throw new Error('wave-exit observer policy schema mismatch');
+  const raw = parseWaveExitObserverPolicySource(readWaveExitObserverPolicySource(repoRoot));
+  if (!raw) throw new Error('wave-exit observer policy is malformed');
+  return raw;
+}
+
+function parseWaveExitObserverPolicySource(source: string): WaveExitObserverPolicy | null {
+  let raw: WaveExitObserverPolicy;
+  try {
+    raw = JSON.parse(normalizeWaveExitObserverPolicySource(source)) as WaveExitObserverPolicy;
+  } catch {
+    return null;
   }
-  if (!Array.isArray(raw.basisEvidenceOwners) || raw.basisEvidenceOwners.length === 0 || raw.basisEvidenceOwners.some((owner) => !isNonEmptyString(owner))) {
-    throw new Error('wave-exit observer policy is missing basisEvidenceOwners');
+  if (raw.schemaId !== WAVE_EXIT_OBSERVER_POLICY_SCHEMA_ID) {
+    return null;
+  }
+  if (!isNonEmptyString(raw.specVersion) || !isNonEmptyString(raw.canonicalReceiptDir)
+    || !isNonEmptyString(raw.compilerCommandPath) || !isNonEmptyString(raw.basisProducerRole)
+    || !Array.isArray(raw.basisEvidenceOwners) || raw.basisEvidenceOwners.length === 0
+    || raw.basisEvidenceOwners.some((owner) => !isNonEmptyString(owner))) {
+    return null;
   }
   if (raw.basisActorResolution !== 'active-claim-holder' && raw.basisActorResolution !== 'unique-evidence-actor') {
-    throw new Error('wave-exit observer policy is missing basisActorResolution');
+    return null;
   }
   if (raw.policyDigest?.source !== 'git-show' || raw.policyDigest?.newline !== 'lf' || raw.policyDigest?.path !== WAVE_EXIT_OBSERVER_POLICY_PATH) {
-    throw new Error('wave-exit observer policy digest spec is not git-show LF');
+    return null;
   }
+  if (!raw.roles || typeof raw.roles !== 'object' || !raw.exits || typeof raw.exits !== 'object') return null;
+  if (Object.values(raw.roles).some((role) => !role || !['basis', 'observer', 'not-observer'].includes(role.kind))) return null;
+  if (Object.values(raw.exits).some((exit) => !exit || !isNonEmptyString(exit.wave)
+    || !isNonEmptyString(exit.observerRole) || !isNonEmptyString(exit.command)
+    || !isNonEmptyString(exit.commandPath) || !isNonEmptyString(exit.sideEffects)
+    || !Array.isArray(exit.inputs) || exit.inputs.some((value) => !isNonEmptyString(value))
+    || !Array.isArray(exit.forbiddenFlags) || exit.forbiddenFlags.some((value) => !isNonEmptyString(value)))) return null;
   return raw;
+}
+
+export function readWaveExitObserverPolicySourceAtCommit(repoRoot: string, commit: string): string | null {
+  if (!COMMIT_SHAPE.test(commit)) return null;
+  try {
+    return execFileSync('git', ['show', `${commit}:${WAVE_EXIT_OBSERVER_POLICY_PATH}`], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    });
+  } catch {
+    return null;
+  }
 }
 
 export function readClaimHolderActor(repoRoot: string, taskId: string): string | null {
@@ -301,6 +338,29 @@ function readReceipt(value: unknown): { receipt: Partial<WaveExitObserverReceipt
   return { receipt: record as Partial<WaveExitObserverReceipt>, missing };
 }
 
+function sameArray(left: readonly string[], right: readonly string[]): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function sameExitContract(left: WaveExitObserverExitPolicy | undefined, right: WaveExitObserverExitPolicy | undefined): boolean {
+  return !!left && !!right
+    && left.wave === right.wave
+    && left.command === right.command
+    && left.commandPath === right.commandPath
+    && left.sideEffects === right.sideEffects
+    && sameArray(left.inputs, right.inputs)
+    && sameArray(left.forbiddenFlags, right.forbiddenFlags)
+    && left.observerRole === right.observerRole;
+}
+
+function sameBasisSettings(left: WaveExitObserverPolicy, right: WaveExitObserverPolicy): boolean {
+  return left.canonicalReceiptDir === right.canonicalReceiptDir
+    && left.compilerCommandPath === right.compilerCommandPath
+    && left.basisProducerRole === right.basisProducerRole
+    && left.basisActorResolution === right.basisActorResolution
+    && sameArray(left.basisEvidenceOwners, right.basisEvidenceOwners);
+}
+
 export function consumeWaveExitObserverReceipt(input: ConsumeWaveExitObserverReceiptInput): WaveExitObserverVerdict {
   const diagnostics = new Set<WaveExitObserverDiagnostic>();
   const { policy, compilationHead, derivedBasis, currentInputDigests, isAncestor, policyDigestAtCompilationHead } = input;
@@ -315,6 +375,13 @@ export function consumeWaveExitObserverReceipt(input: ConsumeWaveExitObserverRec
     };
   }
   const receipt = parsed.receipt;
+  const observedPolicySource = isNonEmptyString(receipt.observedHead)
+    ? input.readPolicySourceAtCommit(receipt.observedHead)
+    : null;
+  const observedPolicy = observedPolicySource ? parseWaveExitObserverPolicySource(observedPolicySource) : null;
+  if (!observedPolicy) diagnostics.add('historical-policy-invalid');
+  const observedPolicyDigest = observedPolicySource ? digestWaveExitObserverPolicySource(observedPolicySource) : null;
+  if (observedPolicyDigest && receipt.policyDigest !== observedPolicyDigest) diagnostics.add('receipt-stale');
   if (receipt.schemaId !== WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID || !isNonEmptyString(receipt.schemaVersion)) {
     diagnostics.add('schema-mismatch');
   }
@@ -372,7 +439,11 @@ export function consumeWaveExitObserverReceipt(input: ConsumeWaveExitObserverRec
     // Ancestry is required; equality is a valid ancestor and must not be demanded or rejected.
     if (!isAncestor(receipt.observedHead, compilationHead)) diagnostics.add('target-head-unreachable');
   }
-  if (isNonEmptyString(receipt.policyDigest) && receipt.policyDigest !== policyDigestAtCompilationHead) {
+  const policyEvolvedWithoutContractChange = observedPolicy
+    && observedPolicyDigest !== policyDigestAtCompilationHead
+    && sameExitContract(observedPolicy.exits[receipt.exitItemId ?? ''], exitPolicy)
+    && sameBasisSettings(observedPolicy, policy);
+  if (isNonEmptyString(receipt.policyDigest) && receipt.policyDigest !== policyDigestAtCompilationHead && !policyEvolvedWithoutContractChange) {
     diagnostics.add('receipt-stale');
   }
   if (canonicalPath && isNonEmptyString(receipt.artifactPath)
@@ -430,7 +501,9 @@ export function consumeWaveExitObserverReceiptCandidates(
       derivedBasis,
       currentInputDigests: input.currentInputDigests,
       isAncestor: input.isAncestor,
-      policyDigestAtCompilationHead: input.policyDigestAtCompilationHead
+      policyDigestAtCompilationHead: input.policyDigestAtCompilationHead,
+      readPolicySourceAtCommit: input.readPolicySourceAtCommit
+        ?? ((commit) => readWaveExitObserverPolicySourceAtCommit(input.repoRoot, commit))
     });
   });
   const valid = verdicts.filter((verdict) => verdict.ok && verdict.receipt);
