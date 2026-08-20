@@ -289,7 +289,9 @@
     "packages/cli/dist/commands/hook/__tests__/pre-push.spec.js",
     "packages/cli/dist/commands/hook/commit-range-guard/implementation.js",
     "packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js",
-    "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js"
+    "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-003.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-004.json"
   ],
   "validators": [
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
@@ -520,6 +522,9 @@
       ".atm/history/evidence/ATM-GOV-0341.*",
       ".atm/history/task-events/ATM-GOV-0341/**",
       ".atm/history/tasks/ATM-GOV-0341.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-004.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
       "docs/reports/plan-3x-4x-closeout-blocker-map.json",
       "docs/reports/plan-3x-4x-independent-certificate.json",
       "docs/reports/plan-3x-4x-release-closeback.json",
@@ -581,7 +586,9 @@
       "release/atm-root-drop/packages/core/src/git/index.ts",
       "release/atm-root-drop/scripts/build-root-drop-release.ts",
       "scripts/build-root-drop-release.ts",
-      "tests/cli/root-drop-release-incremental-overlay.test.ts"
+      "scripts/compile-runbook-completion-evidence.ts",
+      "tests/cli/root-drop-release-incremental-overlay.test.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
     ],
     "state": "active",
     "reason": "Owner-directed internal takeover after external delegation ended; previous runner steward lease is now expired and a common frozen publication is required before formal closeout.",
@@ -594,35 +601,37 @@
   },
   "startedAt": "2026-08-14T09:50:24.347Z",
   "startedBySessionId": "session-20260820160847-codex-captain-ATM-GOV-0341-e4d5d241c4",
-  "lastTransitionId": "2026-08-20T18-21-27-793Z-scope-amendment-6ef9cb52cd50",
-  "lastTransitionAt": "2026-08-20T18:21:27.793Z",
+  "lastTransitionId": "2026-08-20T18-31-09-839Z-scope-amendment-52d9dfc6e5a7",
+  "lastTransitionAt": "2026-08-20T18:31:09.839Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-73bafe79f0faf0b3",
-    "ticketDigest": "sha256:73bafe79f0faf0b3bd5a86493185a0ddf8104488652a4570594bca88be2d2249",
+    "ticketId": "wat-4b70aceeade1ef3c",
+    "ticketDigest": "sha256:4b70aceeade1ef3c77b7e437d36ba9bbccf53308f42f3a76c9c8fa6b9ae45720",
     "taskId": "ATM-GOV-0341",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260820160847-codex-captain-ee2148f59c",
     "claimGeneration": "lease-86c56d79b18e",
-    "issuedAt": "2026-08-20T18:21:27.684Z",
-    "expiresAt": "2026-08-20T18:51:27.684Z",
-    "scopeDigest": "sha256:1bb6c299ca7203571dfe1c2b8d190f1c72f8519fff9ac7e7f672d9454b767197",
+    "issuedAt": "2026-08-20T18:31:09.721Z",
+    "expiresAt": "2026-08-20T19:01:09.721Z",
+    "scopeDigest": "sha256:aa36576a9d3b85accbac5b60e99aa84e0f8fbee712053c99b88a1ee17ddb5b2f",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-20T18:21:27.684Z"
+      "selectedAt": "2026-08-20T18:31:09.721Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0341.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0341/**",
           ".atm/history/tasks/ATM-GOV-0341.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-003.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-004.json",
+          "docs/governance/atm-bug-and-optimization-backlog.md",
           "docs/reports/plan-3x-4x-closeout-blocker-map.json",
           "docs/reports/plan-3x-4x-independent-certificate.json",
           "docs/reports/plan-3x-4x-release-closeback.json",
@@ -684,9 +693,11 @@
           "release/atm-root-drop/packages/core/src/git/index.ts",
           "release/atm-root-drop/scripts/build-root-drop-release.ts",
           "scripts/build-root-drop-release.ts",
-          "tests/cli/root-drop-release-incremental-overlay.test.ts"
+          "scripts/compile-runbook-completion-evidence.ts",
+          "tests/cli/root-drop-release-incremental-overlay.test.ts",
+          "tests/cli/runbook-completion-evidence.test.ts"
         ],
-        "digest": "sha256:e9f2ec7c49312dc6ac190156a7b38a201235ef8caf3ddbb1b2a58b30762f4f24"
+        "digest": "sha256:7b805a1af542fbf0cafdcf7a2530f489074755b29ed64219004dfc12c103f82c"
       },
       {
         "kind": "lifecycle-operation",
@@ -735,6 +746,9 @@
       ".atm/history/evidence/ATM-GOV-0341.*",
       ".atm/history/task-events/ATM-GOV-0341/**",
       ".atm/history/tasks/ATM-GOV-0341.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-004.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
       "docs/reports/plan-3x-4x-closeout-blocker-map.json",
       "docs/reports/plan-3x-4x-independent-certificate.json",
       "docs/reports/plan-3x-4x-release-closeback.json",
@@ -796,7 +810,9 @@
       "release/atm-root-drop/packages/core/src/git/index.ts",
       "release/atm-root-drop/scripts/build-root-drop-release.ts",
       "scripts/build-root-drop-release.ts",
-      "tests/cli/root-drop-release-incremental-overlay.test.ts"
+      "scripts/compile-runbook-completion-evidence.ts",
+      "tests/cli/root-drop-release-incremental-overlay.test.ts",
+      "tests/cli/runbook-completion-evidence.test.ts"
     ],
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],

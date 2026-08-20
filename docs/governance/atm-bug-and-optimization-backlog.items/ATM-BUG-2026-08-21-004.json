@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-21-004",
+  "date": "2026-08-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Open",
+  "area": "Completion evidence copied mutable certificate diagnostics into its own terminal dependency",
+  "finding": "The completion compiler treated the independent certificate as both a terminal authorization input and a source of detailed mutable diagnostics. Certificate details can legitimately change when reviewer or publication state changes, so copying them into completion evidence creates a reverse certificate-to-completion freshness edge and prevents the closeout chain from reaching a stable fixed point. This is distinct from certificate pending self-digest validation: the defect is the dependency direction, not a digest comparison.",
+  "expectedBehavior": "Completion evidence consumes only the certificate's terminal authorization state: proven requires a readable, non-pending, diagnostic-free, release-authorized certificate; otherwise the affected requirement remains fail-closed with final-certificate-not-proven. Detailed certificate diagnostics remain addressable on the certificate itself and must not be mirrored into an upstream completion projection.",
+  "evidenceOrRepro": "During the 0341 closeout replay, a certificate correctly reported mutable evidence-uncommitted diagnostics for its own generated inputs. scripts/compile-runbook-completion-evidence.ts appended those details to completion diagnostics, making the completion report stale whenever the certificate surface moved. The repaired observeFinalCertificate preserves final-certificate-not-proven on failure but no longer copies mutable diagnostic detail. Direct completion --mode validate then replayed successfully while retaining not-complete for the 14 genuinely unproven requirement rows.",
+  "followUp": "Keep certificate detail fail-closed and independently inspectable. Add or retain a regression that demonstrates certificate-detail churn cannot invalidate completion evidence when the certificate terminal verdict is unchanged, while a non-authorized certificate still leaves the requirement unproven."
+}

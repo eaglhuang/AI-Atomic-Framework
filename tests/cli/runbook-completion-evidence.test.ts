@@ -14,14 +14,16 @@ assert.notEqual(semanticTaskCardDigest(planningContract), semanticTaskCardDigest
 assert.equal(
   isDeclaredPublicationDelta([
     'docs/reports/plan-3x-4x-runbook-completion-evidence.json',
+    'governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json',
     'docs/reports/reviews/plan-3x-4x-runbook-release-review.json',
     '.atm/history/evidence/ATM-GOV-0376.json'
   ], [
     'docs/reports/plan-3x-4x-runbook-completion-evidence.json',
+    'governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json',
     'docs/reports/reviews/plan-3x-4x-runbook-release-review.json'
   ]),
   true,
-  'a sealed publication bundle may replay its declared outputs and durable receipts'
+  'a sealed publication bundle may replay its declared report or governance projections and durable receipts'
 );
 assert.equal(
   isDeclaredPublicationDelta([

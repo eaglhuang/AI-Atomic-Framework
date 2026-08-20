@@ -18,6 +18,7 @@ export const DEFAULT_PLANNING_ROOT = process.env.ATM_PLANNING_REPO_ROOT
 export const DEFAULT_OUTPUT = resolve('docs/reports/plan-3x-4x-runbook-completion-evidence.json');
 export const DEFAULT_CERTIFICATE = resolve('docs/reports/plan-3x-4x-independent-certificate.json');
 const REPORT_ARTIFACT_PREFIX = 'docs/reports/';
+const GOVERNANCE_PROJECTION_PREFIX = 'governance-optimization/';
 const DURABLE_RECEIPT_PREFIX = '.atm/history/';
 
 type ValidatorContract = { contractId: string; taskId: string; taskCardPath: string; taskCardDigest: string; command: string };
@@ -48,7 +49,12 @@ export function semanticTaskCardDigest(source: string): string {
 function normalizePublicationArtifacts(paths: string[]): string[] | null {
   const normalized = [...new Set(paths.map((path) => path.replace(/\\/g, '/').replace(/^\.\//, '')))].sort();
   return normalized.length > 0
-    && normalized.every((path) => path.startsWith(REPORT_ARTIFACT_PREFIX) && !path.includes('..') && !path.startsWith('/'))
+    && normalized.every((path) => (
+      (path.startsWith(REPORT_ARTIFACT_PREFIX) || path.startsWith(GOVERNANCE_PROJECTION_PREFIX))
+      && path.endsWith('.json')
+      && !path.includes('..')
+      && !path.startsWith('/')
+    ))
     ? normalized
     : null;
 }
@@ -357,7 +363,12 @@ function observeFinalCertificate(): { proven: boolean; diagnostics: string[] } {
       && certificate.releaseAuthorized === true
       && diagnostics.length === 0
       && !pending;
-    return { proven, diagnostics: proven ? [] : ['final-certificate-not-proven', ...diagnostics] };
+    // Completion only consumes the certificate's terminal authorization state.
+    // Copying its mutable diagnostic detail into the completion projection would
+    // feed reviewer/certificate changes back into the producer and prevent a
+    // sealed projection chain from reaching a fixed point.  The certificate
+    // remains the addressable source for the detailed fail-closed reasons.
+    return { proven, diagnostics: proven ? [] : ['final-certificate-not-proven'] };
   } catch {
     return { proven: false, diagnostics: ['final-certificate-unreadable'] };
   }
