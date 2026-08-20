@@ -125,7 +125,7 @@ function waveExitObserverEvidenceFailure(contract: RecordLike, evidence: RecordL
     receipts,
     policy,
     compilationHead: targetHead,
-    currentInputDigests: digestWaveExitObserverInputsAtCommit(root, exit.inputs, targetHead),
+    currentInputDigests: digestWaveExitObserverInputsAtCommit(root, exitItemId, exit, targetHead),
     policyDigestAtCompilationHead: digestWaveExitObserverPolicySource(source),
     isAncestor
   });

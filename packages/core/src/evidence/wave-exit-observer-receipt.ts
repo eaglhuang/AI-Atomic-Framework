@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+export { digestWaveExitObserverInput, digestWaveExitObserverInputsAtCommit } from './wave-exit-observer-input-digest.ts';
 
 export const WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID = 'atm.waveExitObserverReceipt.v1' as const;
 export const WAVE_EXIT_OBSERVER_POLICY_SCHEMA_ID = 'atm.waveExitObserverPolicy.v1' as const;
@@ -68,6 +69,12 @@ export interface WaveExitObserverExitPolicy {
   readonly command: string;
   readonly commandPath: string;
   readonly inputs: readonly string[];
+  /**
+   * A sealed, policy-owned projection for an input that is also rewritten by
+   * the compiler which consumes this receipt.  The projection preserves every
+   * other exit and requirement while excluding this exit's derived envelope.
+   */
+  readonly inputDigestProjection?: 'completion-report-excluding-current-exit';
   readonly sideEffects: string;
   readonly forbiddenFlags: readonly string[];
 }
@@ -227,7 +234,8 @@ function parseWaveExitObserverPolicySource(source: string): WaveExitObserverPoli
     || !isNonEmptyString(exit.observerRole) || !isNonEmptyString(exit.command)
     || !isNonEmptyString(exit.commandPath) || !isNonEmptyString(exit.sideEffects)
     || !Array.isArray(exit.inputs) || exit.inputs.some((value) => !isNonEmptyString(value))
-    || !Array.isArray(exit.forbiddenFlags) || exit.forbiddenFlags.some((value) => !isNonEmptyString(value)))) return null;
+    || !Array.isArray(exit.forbiddenFlags) || exit.forbiddenFlags.some((value) => !isNonEmptyString(value))
+    || (exit.inputDigestProjection !== undefined && exit.inputDigestProjection !== 'completion-report-excluding-current-exit'))) return null;
   return raw;
 }
 
@@ -242,30 +250,6 @@ export function readWaveExitObserverPolicySourceAtCommit(repoRoot: string, commi
   } catch {
     return null;
   }
-}
-
-/** Compute the sealed input digests used by both completion and release review. */
-export function digestWaveExitObserverInputsAtCommit(
-  repoRoot: string,
-  paths: readonly string[],
-  commit: string
-): Record<string, string> {
-  const digests: Record<string, string> = {};
-  if (!COMMIT_SHAPE.test(commit)) return digests;
-  for (const inputPath of paths) {
-    try {
-      const body = execFileSync('git', ['show', `${commit}:${inputPath.replace(/\\/g, '/')}`], {
-        cwd: repoRoot,
-        encoding: 'buffer',
-        stdio: ['ignore', 'pipe', 'ignore']
-      });
-      digests[inputPath] = digestText(Buffer.isBuffer(body) ? body.toString('utf8') : String(body));
-    } catch {
-      // An absent sealed input deliberately stays absent so receipt validation
-      // reports input-digest-drift instead of inferring a digest from live files.
-    }
-  }
-  return digests;
 }
 
 export function readClaimHolderActor(repoRoot: string, taskId: string): string | null {
@@ -383,6 +367,7 @@ function sameExitContract(left: WaveExitObserverExitPolicy | undefined, right: W
     && left.command === right.command
     && left.commandPath === right.commandPath
     && left.sideEffects === right.sideEffects
+    && left.inputDigestProjection === right.inputDigestProjection
     && sameArray(left.inputs, right.inputs)
     && sameArray(left.forbiddenFlags, right.forbiddenFlags)
     && left.observerRole === right.observerRole;

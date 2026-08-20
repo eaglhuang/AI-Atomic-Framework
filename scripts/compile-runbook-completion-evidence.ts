@@ -452,7 +452,7 @@ export function compileRunbookCompletion(
     if (receiptSources.length > 0 && observerPolicy && observerPolicyDigest) {
       const exitPolicy = observerPolicy.exits[row.itemId];
       const currentInputDigests = observerOptions.currentInputDigests
-        ?? (exitPolicy ? digestWaveExitObserverInputsAtCommit(repoRoot, exitPolicy.inputs, targetHead) : {});
+        ?? (exitPolicy ? digestWaveExitObserverInputsAtCommit(repoRoot, row.itemId, exitPolicy, targetHead) : {});
       const receiptVerdict = consumeWaveExitObserverReceiptCandidates({
         repoRoot,
         receipts: receiptSources,

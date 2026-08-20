@@ -4,6 +4,7 @@ import {
   canonicalWaveExitReceiptPath,
   consumeWaveExitObserverReceipt,
   digestText,
+  digestWaveExitObserverInput,
   digestWaveExitObserverPolicySource,
   WAVE_EXIT_OBSERVER_POLICY_PATH,
   WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID,
@@ -262,7 +263,15 @@ export function writeWaveExitObserverReceipt(
         { diagnostics: ['input-digest-drift'], details: { path: inputPath } }
       );
     }
-    currentInputDigests[inputPath] = digestText(body);
+    const digest = digestWaveExitObserverInput(input.exitItemId, exitPolicy, inputPath, body);
+    if (!digest) {
+      throw new WaveExitObserverWriteError(
+        'ATM_WAVE_EXIT_OBSERVER_DIGEST_DRIFT',
+        `Observed input ${inputPath} cannot produce its sealed digest projection.`,
+        { diagnostics: ['input-digest-drift'], details: { path: inputPath } }
+      );
+    }
+    currentInputDigests[inputPath] = digest;
   }
   const policySource = input.readObservedInput(WAVE_EXIT_OBSERVER_POLICY_PATH);
   if (policySource == null) {

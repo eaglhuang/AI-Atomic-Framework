@@ -10,6 +10,7 @@ import {
   consumeWaveExitObserverReceipt,
   consumeWaveExitObserverReceiptCandidates,
   deriveBasisIdentityFromEvidence,
+  digestWaveExitObserverInput,
   digestWaveExitObserverInputsAtCommit,
   digestText,
   digestWaveExitObserverPolicy,
@@ -29,9 +30,9 @@ const compilationHead = commit('2');
 const policy = loadWaveExitObserverPolicy();
 const headAtTestStart = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 assert.equal(loadWaveExitObserverPolicyAtCommit('.', headAtTestStart)?.schemaId, 'atm.waveExitObserverPolicy.v1');
-assert.deepEqual(digestWaveExitObserverInputsAtCommit('.', ['schemas/evidence/wave-exit-observer-policy.json'], headAtTestStart), {
-  'schemas/evidence/wave-exit-observer-policy.json': digestText(execFileSync(
-    'git', ['show', `${headAtTestStart}:${WAVE_EXIT_OBSERVER_POLICY_PATH}`], { encoding: 'utf8' }
+assert.deepEqual(digestWaveExitObserverInputsAtCommit('.', 'EXIT-02', policy.exits['EXIT-02'], headAtTestStart), {
+  'scripts/validate-git-head-evidence.ts': digestText(execFileSync(
+    'git', ['show', `${headAtTestStart}:scripts/validate-git-head-evidence.ts`], { encoding: 'utf8' }
   ))
 });
 assert.equal(loadWaveExitObserverPolicyAtCommit('.', '0'.repeat(40)), null, 'missing historical policy must stay fail-closed');
@@ -120,7 +121,43 @@ assert.equal(policy.exits['EXIT-02'].observerRole, 'wave-exit-observer.gemini');
 assert.equal(policy.exits['EXIT-04'].observerRole, 'wave-exit-observer.claude');
 assert.equal(policy.exits['EXIT-07'].observerRole, 'wave-exit-observer.codex-sidecar');
 assert.equal(policy.exits['EXIT-11'].command.includes('review-runbook-release-authority'), true);
+assert.equal(policy.exits['EXIT-11'].inputDigestProjection, 'completion-report-excluding-current-exit');
 assert.equal(policy.exits['EXIT-02'].command.includes('compile-runbook-completion-evidence'), false);
+
+const selfProjectedExit = policy.exits['EXIT-11'];
+const completionInput = 'docs/reports/plan-3x-4x-runbook-completion-evidence.json';
+const selfProjectedBase = JSON.stringify({
+  generatedAt: '2026-08-21T00:00:00.000Z',
+  overallVerdict: 'not-complete',
+  unresolvedIds: ['RB-001', 'EXIT-11'],
+  deferredIds: [],
+  unknownIds: [],
+  waveExits: [
+    { itemId: 'EXIT-10', status: 'proven', diagnostics: [] },
+    { itemId: 'EXIT-11', status: 'unproven', evidence: [], diagnostics: ['missing-independent-wave-exit-contract'], coverageOwners: [], validatorContractIds: [], requirement: 'final' }
+  ]
+});
+const selfProjectedAfterConsumption = JSON.stringify({
+  generatedAt: '2026-08-21T00:01:00.000Z',
+  overallVerdict: 'complete',
+  unresolvedIds: ['RB-001'],
+  deferredIds: [],
+  unknownIds: [],
+  waveExits: [
+    { itemId: 'EXIT-10', status: 'proven', diagnostics: [] },
+    { itemId: 'EXIT-11', status: 'proven', evidence: [{ outputDigest: hex('e') }], diagnostics: [], coverageOwners: ['wave-exit-observer:EXIT-11'], validatorContractIds: ['atm.waveExitObserverReceipt/EXIT-11'], requirement: 'final' }
+  ]
+});
+assert.equal(
+  digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedBase),
+  digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedAfterConsumption),
+  'a self-excluded projection must survive its own receipt-derived compiler rewrite'
+);
+assert.notEqual(
+  digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedBase),
+  digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedBase.replace('RB-001', 'RB-002')),
+  'a self-excluded projection must retain non-self requirement evidence'
+);
 
 const proven = consume(legalReceipt);
 assert.equal(proven.status, 'proven');

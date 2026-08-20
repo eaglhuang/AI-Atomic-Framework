@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-20T22:37:02.110Z",
+  "updatedAt": "2026-08-20T22:46:35.459Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
@@ -10,6 +10,7 @@
     "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode write",
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
     "node --strip-types tests/cli/plan4-final-certification.test.ts",
+    "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
     "node --strip-types tests/cli/runbook-release-authority-review.test.ts",
     "node --strip-types tests/cli/wave-exit-observer-receipt-writer.test.ts",
     "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
@@ -713,6 +714,42 @@
       "durationMs": 1277,
       "runnerKind": "dev-source",
       "sourceCommit": "7260ddcea7738c3366ddccab4b2e940c3b44dfc6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bc6e63db30bc6292b2448f30f96025426ab9ee1790eece01c6efbe5e346d3117",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
+        "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-20T22:44:02.763Z",
+      "startedAt": "2026-08-20T22:44:02.126Z",
+      "finishedAt": "2026-08-20T22:44:02.763Z",
+      "durationMs": 637,
+      "runnerKind": "dev-source",
+      "sourceCommit": "da2b67ce2ef919697d95de03d2f64ab36ad30922",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bc6e63db30bc6292b2448f30f96025426ab9ee1790eece01c6efbe5e346d3117",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/wave-exit-observer-receipt.test.ts",
+        "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-20T22:46:35.458Z",
+      "startedAt": "2026-08-20T22:46:34.818Z",
+      "finishedAt": "2026-08-20T22:46:35.458Z",
+      "durationMs": 640,
+      "runnerKind": "dev-source",
+      "sourceCommit": "da2b67ce2ef919697d95de03d2f64ab36ad30922",
       "cached": false
     }
   ],
