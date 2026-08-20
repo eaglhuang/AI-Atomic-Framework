@@ -1,12 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-20T21:48:32.228Z",
+  "updatedAt": "2026-08-20T21:50:36.255Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
     "lint",
     "lint:touched",
+    "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode write",
     "node --strip-types tests/cli/four-plan-independent-certificate.test.ts",
     "node --strip-types tests/cli/plan4-final-certification.test.ts",
     "node --strip-types tests/cli/wave-exit-observer-receipt-writer.test.ts",
@@ -561,6 +562,24 @@
       "durationMs": 436,
       "runnerKind": "dev-source",
       "sourceCommit": "b1d5709a6860ae712ab484976cc58c3bdea55051",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode write",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4e9a4553177e4136347ba7ab905db45c45c15b90866abb841950a3d595164763",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode write",
+        "validate:runbook-completion-evidence",
+        "validate:four-plan-objectives"
+      ],
+      "generatedAt": "2026-08-20T21:50:36.254Z",
+      "startedAt": "2026-08-20T21:50:33.215Z",
+      "finishedAt": "2026-08-20T21:50:36.254Z",
+      "durationMs": 3039,
+      "runnerKind": "dev-source",
+      "sourceCommit": "798492ffe904f0509e0874d8891dc87b950ae36e",
       "cached": false
     }
   ],

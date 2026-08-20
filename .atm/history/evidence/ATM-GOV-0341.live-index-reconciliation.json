@@ -1,44 +1,13 @@
 {
   "schemaId": "atm.liveIndexReconciliation.v1",
   "headAdvanced": true,
-  "reconciledPaths": [
-    ".atm/history/evidence/ATM-GOV-0341.runner-publication-takeover.json",
-    ".atm/history/evidence/ATM-GOV-0341.runner-sync-receipt.json",
-    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T17-13-51-072Z-renew-9ab80f8c5e1a.json",
-    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T17-40-11-808Z-renew-11db3cd1569e.json",
-    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T17-41-26-350Z-scope-amendment-da0be77faf90.json",
-    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T17-41-34-124Z-renew-e5b156c71f87.json",
-    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T17-59-21-649Z-renew-9f5f045c5ea9.json",
-    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T18-11-14-753Z-renew-da4494f4cdb6.json",
-    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T18-18-55-604Z-scope-amendment-e732321f3204.json",
-    ".atm/history/tasks/ATM-GOV-0341.json",
-    "packages/cli/dist/commands/hook/__tests__/pre-push.spec.js",
-    "packages/cli/dist/commands/hook/commit-range-guard/implementation.js",
-    "packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js",
-    "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
-    "release/atm-onefile/atm.mjs",
-    "release/atm-root-drop/packages/atm-markdown-task-source/dist/index.d.ts",
-    "release/atm-root-drop/packages/cli/dist/atm.d.ts",
-    "release/atm-root-drop/packages/cli/dist/commands/hook/__tests__/pre-push.spec.js",
-    "release/atm-root-drop/packages/cli/dist/commands/hook/commit-range-guard/implementation.js",
-    "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js",
-    "release/atm-root-drop/packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
-    "release/atm-root-drop/packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
-    "release/atm-root-drop/packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
-    "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
-    "release/atm-root-drop/packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
-    "release/atm-root-drop/packages/core/dist/git/admission.js",
-    "release/atm-root-drop/packages/core/src/git/admission.ts",
-    "release/atm-root-drop/release-manifest.json"
-  ],
-  "retainedPaths": [
-    {
-      "path": ".atm/history/evidence/git-head.jsonl",
-      "reason": "worktree-diverged"
-    }
-  ],
+  "reconciledPaths": [],
+  "retainedPaths": [],
   "clean": false,
-  "failure": null,
+  "failure": {
+    "code": "ATM_LIVE_INDEX_RECONCILIATION_FAILED",
+    "message": "Command failed: C:\\Program Files\\Git\\cmd\\git.exe update-index --add --cacheinfo 100644,42bad812a18ba1fbd72ca74b80884b7577e0b913,.atm/history/task-events/ATM-GOV-0341/2026-08-20T21-15-55-009Z-renew-25f859976b45.json\nfatal: Unable to create 'C:/Users/User/AI-Atomic-Framework/.git/index.lock': File exists.\n\nAnother git process seems to be running in this repository, e.g.\nan editor opened by 'git commit'. Please make sure all processes\nare terminated then try again. If it still fails, a git process\nmay have crashed in this repository earlier:\nremove the file manually to continue.\n"
+  },
   "taskId": "ATM-GOV-0341",
-  "createdAt": "2026-08-20T18:20:49.511Z"
+  "createdAt": "2026-08-20T21:49:06.589Z"
 }
