@@ -1,12 +1,12 @@
 {
   "schemaId": "atm.runbookCompletionEvidence.v1",
   "specVersion": "0.1.0",
-  "generatedAt": "2026-08-21T07:17:37+08:00",
+  "generatedAt": "2026-08-21T07:21:54+08:00",
   "authority": {
     "planningPath": "docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md",
     "planningHead": "fc161604944cb802adc1426fc7bbefc39af52d7a",
-    "targetHead": "e30d9f8b7b3d32284336c26a7b60dfb3f98ac6f8",
-    "originMain": "e30d9f8b7b3d32284336c26a7b60dfb3f98ac6f8",
+    "targetHead": "05f45cb259a5728bdbcc38cc8b4a0d05515270b3",
+    "originMain": "05f45cb259a5728bdbcc38cc8b4a0d05515270b3",
     "sourceDigest": "sha256:dbc3e897c2a1361a954b6e86f997e56e8adce449fa6e1aa90d0e6fc1090ba86b",
     "diagnostics": [],
     "planningSemanticSnapshot": {
@@ -18,7 +18,15 @@
     "publicationBundle": {
       "schemaId": "atm.sealedProjectionPublicationBundle.v1",
       "artifactPaths": [
-        "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+        "docs/reports/plan-3x-4x-closeout-blocker-map.json",
+        "docs/reports/plan-3x-4x-independent-certificate.json",
+        "docs/reports/plan-3x-4x-release-closeback.json",
+        "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+        "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
+        "docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+        "docs/reports/wave-exit-observer-receipts/EXIT-07/e30d9f8b7b3d32284336c26a7b60dfb3f98ac6f8.json",
+        "docs/reports/wave-exit-observer-receipts/EXIT-11/e30d9f8b7b3d32284336c26a7b60dfb3f98ac6f8.json",
+        "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json"
       ]
     }
   },
@@ -10479,28 +10487,16 @@
       "wave": "Wave 6",
       "requirement": "17/17、23/23、29/29 verified；不是只完成 mapping，也不是只看舊卡 done。",
       "requirementDigest": "sha256:dfe5be300138688915c8a2257a2e63fd61c1de34956d96009dbe39b1b313ef6f",
-      "status": "proven",
-      "evidence": [
-        {
-          "command": "node --strip-types scripts/validate-four-plan-objectives.ts --mode validate",
-          "exitCode": 0,
-          "outputDigest": "sha256:c1b7eb8995ece5bff75e59c81630a9da5b39eca4d28ddf65c5669e1b90aa379b",
-          "artifactPaths": [
-            "docs/reports/wave-exit-observer-receipts/EXIT-07/e30d9f8b7b3d32284336c26a7b60dfb3f98ac6f8.json"
-          ],
-          "observedAt": "2026-08-20T23:19:54.123Z",
-          "sourceCommit": "e30d9f8b7b3d32284336c26a7b60dfb3f98ac6f8",
-          "evidenceOwner": "wave-exit-observer:EXIT-07",
-          "validatorContractId": "atm.waveExitObserverReceipt/EXIT-07"
-        }
+      "status": "unproven",
+      "evidence": [],
+      "diagnostics": [
+        "missing-independent-wave-exit-contract",
+        "observer-role-mismatch",
+        "receipt-stale",
+        "input-digest-drift"
       ],
-      "diagnostics": [],
-      "coverageOwners": [
-        "wave-exit-observer:EXIT-07"
-      ],
-      "validatorContractIds": [
-        "atm.waveExitObserverReceipt/EXIT-07"
-      ]
+      "coverageOwners": [],
+      "validatorContractIds": []
     },
     {
       "itemId": "EXIT-08",
@@ -10603,7 +10599,10 @@
       "evidence": [],
       "diagnostics": [
         "wave-requirement-basis-not-proven",
-        "missing-independent-wave-exit-contract"
+        "missing-independent-wave-exit-contract",
+        "observer-role-mismatch",
+        "receipt-stale",
+        "input-digest-drift"
       ],
       "coverageOwners": [],
       "validatorContractIds": []
@@ -10624,6 +10623,7 @@
     "RB-110",
     "RB-111",
     "RB-112",
+    "EXIT-07",
     "EXIT-11"
   ],
   "deferredIds": [],
