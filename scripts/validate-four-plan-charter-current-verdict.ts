@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,7 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const reportPath = path.join(root, 'docs/reports/plan-3x-4x-charter-current-verdict.json');
 
 function parseArgs(argv: string[]) {
-  const options = { json: false, input: reportPath };
+  const options = { json: false, input: reportPath, mode: 'validate' as 'validate' | 'write' };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--json') {
@@ -19,8 +19,14 @@ function parseArgs(argv: string[]) {
       options.input = path.resolve(root, String(argv[++index] ?? ''));
       continue;
     }
+    if (arg === '--mode') {
+      const mode = String(argv[++index] ?? '');
+      if (mode !== 'validate' && mode !== 'write') throw new Error(`unsupported mode: ${mode}`);
+      options.mode = mode;
+      continue;
+    }
     if (arg === '--help' || arg === '-h') {
-      console.log('Usage: node --strip-types scripts/validate-four-plan-charter-current-verdict.ts [--input <json>] [--json]');
+      console.log('Usage: node --strip-types scripts/validate-four-plan-charter-current-verdict.ts [--mode validate|write] [--input <json>] [--json]');
       process.exit(0);
     }
   }
@@ -43,10 +49,27 @@ function sha256File(relativePath: string): string {
   return `sha256:${createHash('sha256').update(readFileSync(path.join(root, relativePath))).digest('hex')}`;
 }
 
+function refreshSourceDigests(report: Record<string, any>): Record<string, any> {
+  const sourceReports = Array.isArray(report.sourceReports) ? report.sourceReports : [];
+  return {
+    ...report,
+    sourceReports: sourceReports.map((source: Record<string, any>) => {
+      const sourcePath = String(source.path ?? '');
+      if (!sourcePath) throw new Error('source path missing');
+      return { ...source, digest: sha256File(sourcePath) };
+    })
+  };
+}
+
 function main() {
   const options = parseArgs(process.argv.slice(2));
   if (!existsSync(options.input)) throw new Error(`charter verdict report missing: ${path.relative(root, options.input)}`);
-  const report = JSON.parse(readFileSync(options.input, 'utf8').replace(/^\uFEFF/, ''));
+  let report = JSON.parse(readFileSync(options.input, 'utf8').replace(/^\uFEFF/, '')) as Record<string, any>;
+  if (options.mode === 'write') {
+    report = refreshSourceDigests(report);
+    mkdirSync(path.dirname(options.input), { recursive: true });
+    writeFileSync(options.input, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  }
   const findings: string[] = [];
 
   const invariants = readJson('.atm/charter/charter-invariants.json');

@@ -18,5 +18,9 @@ assert.deepEqual(report.invariantChecks.map((entry: any) => entry.invariantId), 
   'INV-ATM-011'
 ]);
 
+// The current-verdict projection must be refreshable from the same canonical
+// charter inputs it validates; otherwise a legitimate charter amendment makes
+// the final certificate permanently stale.
+execFileSync('node', ['--strip-types', 'scripts/validate-four-plan-charter-current-verdict.ts', '--mode', 'write'], { stdio: 'pipe' });
 execFileSync('node', ['--strip-types', 'scripts/validate-four-plan-charter-current-verdict.ts'], { stdio: 'pipe' });
 console.log('four-plan-charter-current-verdict.test.ts: ok');

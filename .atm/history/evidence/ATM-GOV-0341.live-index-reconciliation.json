@@ -1,13 +1,34 @@
 {
   "schemaId": "atm.liveIndexReconciliation.v1",
   "headAdvanced": true,
-  "reconciledPaths": [],
-  "retainedPaths": [],
+  "reconciledPaths": [
+    ".atm/history/evidence/ATM-GOV-0341.bundle-manifest.json",
+    ".atm/history/evidence/ATM-GOV-0341.json",
+    ".atm/history/evidence/ATM-GOV-0341.live-index-reconciliation.json",
+    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T21-15-55-009Z-renew-25f859976b45.json",
+    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T21-45-55-376Z-claim-490393881f2f.json",
+    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T21-45-55-381Z-takeover-45b3c5b14a77.json",
+    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T21-46-45-190Z-renew-41d98e34c8cd.json",
+    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T21-46-53-431Z-scope-amendment-8da868e030c9.json",
+    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T21-50-30-683Z-scope-amendment-bd7c27e56342.json",
+    ".atm/history/task-events/ATM-GOV-0341/2026-08-20T21-50-48-534Z-scope-amendment-20c8f68b5635.json",
+    ".atm/history/tasks/ATM-GOV-0341.json",
+    "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+    "docs/reports/wave-exit-observer-receipts/EXIT-07/798492ffe904f0509e0874d8891dc87b950ae36e.json",
+    "packages/core/src/evidence/wave-exit-observer-receipt-writer.ts",
+    "packages/core/src/evidence/wave-exit-observer-receipt.ts",
+    "schemas/evidence/wave-exit-observer-policy.json",
+    "scripts/compile-runbook-completion-evidence.ts",
+    "tests/cli/wave-exit-observer-receipt.test.ts"
+  ],
+  "retainedPaths": [
+    {
+      "path": ".atm/history/evidence/git-head.jsonl",
+      "reason": "worktree-diverged"
+    }
+  ],
   "clean": false,
-  "failure": {
-    "code": "ATM_LIVE_INDEX_RECONCILIATION_FAILED",
-    "message": "Command failed: C:\\Program Files\\Git\\cmd\\git.exe update-index --add --cacheinfo 100644,42bad812a18ba1fbd72ca74b80884b7577e0b913,.atm/history/task-events/ATM-GOV-0341/2026-08-20T21-15-55-009Z-renew-25f859976b45.json\nfatal: Unable to create 'C:/Users/User/AI-Atomic-Framework/.git/index.lock': File exists.\n\nAnother git process seems to be running in this repository, e.g.\nan editor opened by 'git commit'. Please make sure all processes\nare terminated then try again. If it still fails, a git process\nmay have crashed in this repository earlier:\nremove the file manually to continue.\n"
-  },
+  "failure": null,
   "taskId": "ATM-GOV-0341",
-  "createdAt": "2026-08-20T21:49:06.589Z"
+  "createdAt": "2026-08-20T21:51:30.550Z"
 }
