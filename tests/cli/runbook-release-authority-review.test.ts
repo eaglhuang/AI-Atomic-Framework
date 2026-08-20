@@ -46,6 +46,15 @@ assert.equal(report.remote.remoteHeadAfterReview, undefined);
 assert.equal(report.completion.parseable, inspectCompletion(readFileSync('docs/reports/plan-3x-4x-runbook-completion-evidence.json', 'utf8')).parseable);
 assert.ok(report.nonClaims.includes('does-not-read-independent-certificate'));
 
+const canonicalCompletion = readFileSync('docs/reports/plan-3x-4x-runbook-completion-evidence.json', 'utf8');
+const canonicalTargetHead = JSON.parse(canonicalCompletion).authority.targetHead;
+const waveRegistryInspection = inspectCompletion(canonicalCompletion, '', canonicalTargetHead);
+assert.equal(
+  waveRegistryInspection.findings.some((finding: string) => /^unregistered-validator-contract:EXIT-0[2-9]$/.test(finding)),
+  false,
+  'Reviewer B must independently recognize registered Wave receipt contracts rather than misclassifying them as task-card contracts'
+);
+
 const parent = execFileSync('git', ['rev-parse', 'HEAD~1'], { encoding: 'utf8' }).trim();
 const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 assert.equal(sealedRemotePublishVerdict(parent, head), 'already-published');

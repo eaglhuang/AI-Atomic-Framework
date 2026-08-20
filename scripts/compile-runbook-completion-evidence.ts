@@ -3,9 +3,12 @@ import { basename, dirname, relative, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
   consumeWaveExitObserverReceiptCandidates,
+  digestWaveExitObserverInputsAtCommit,
   digestWaveExitObserverPolicy,
   loadWaveExitObserverPolicy,
+  loadWaveExitObserverPolicyAtCommit,
   readWaveExitReceiptCandidates,
+  readWaveExitObserverPolicySourceAtCommit,
   type WaveExitObserverPolicy
 } from '../packages/core/src/evidence/wave-exit-observer-receipt.ts';
 export { digestText, semanticTaskCardDigest } from './task-card-contract-digest.ts';
@@ -22,6 +25,14 @@ const GOVERNANCE_PROJECTION_PREFIX = 'governance-optimization/';
 const DURABLE_RECEIPT_PREFIX = '.atm/history/';
 
 type ValidatorContract = { contractId: string; taskId: string; taskCardPath: string; taskCardDigest: string; command: string };
+type WaveExitObserverValidatorContract = {
+  kind: 'wave-exit-observer-receipt';
+  contractId: string;
+  exitItemId: string;
+  evidenceOwner: string;
+  command: string;
+  policyDigest: string;
+};
 type EvidenceTuple = { command: string; exitCode: number; outputDigest: string; artifactPaths: string[]; observedAt: string; sourceCommit: string; evidenceOwner: string; validatorContractId?: string };
 type CompletionRow = { itemId: string; sourceLine: number; section: string; wave: string | null; requirement: string; requirementDigest: string; status: 'proven' | 'unproven'; evidence: EvidenceTuple[]; diagnostics: string[]; coverageOwners?: string[]; validatorContractIds?: string[] };
 
@@ -365,21 +376,17 @@ function requiresFinalCertificate(row: CompletionRow): boolean {
     || (row.section === 'Tests, backlog and release' && /runner sync queue|remote-reachable|closeback receipt|final certificate/.test(row.requirement));
 }
 
-function digestInputsAtHead(paths: readonly string[], compilationHead: string, repoRoot: string): Record<string, string> {
-  const digests: Record<string, string> = {};
-  for (const inputPath of paths) {
-    try {
-      const body = execFileSync('git', ['show', `${compilationHead}:${inputPath.replace(/\\/g, '/')}`], {
-        cwd: repoRoot,
-        encoding: 'buffer',
-        stdio: ['ignore', 'pipe', 'ignore']
-      });
-      digests[inputPath] = digestText(Buffer.isBuffer(body) ? body.toString('utf8') : String(body));
-    } catch {
-      // Missing path at compilation HEAD stays absent so the consumer fail-closes on drift.
-    }
-  }
-  return digests;
+function observerContracts(policy: WaveExitObserverPolicy, policyDigest: string): WaveExitObserverValidatorContract[] {
+  return Object.entries(policy.exits)
+    .map(([exitItemId, exit]) => ({
+      kind: 'wave-exit-observer-receipt' as const,
+      contractId: `atm.waveExitObserverReceipt/${exitItemId}`,
+      exitItemId,
+      evidenceOwner: `wave-exit-observer:${exitItemId}`,
+      command: exit.command,
+      policyDigest
+    }))
+    .sort((left, right) => left.contractId.localeCompare(right.contractId));
 }
 
 export function compileRunbookCompletion(
@@ -407,11 +414,14 @@ export function compileRunbookCompletion(
   const rowsByWave = new Map<string, CompletionRow[]>();
   for (const row of parsed.rows) if (row.wave) rowsByWave.set(row.wave, [...(rowsByWave.get(row.wave) ?? []), row]);
   const repoRoot = observerOptions.repoRoot ?? resolve('.');
-  const observerPolicy = observerOptions.policy ?? (existsSync(resolve(repoRoot, 'schemas/evidence/wave-exit-observer-policy.json'))
-    ? loadWaveExitObserverPolicy(repoRoot)
-    : null);
+  const observerPolicy = observerOptions.policy
+    ?? loadWaveExitObserverPolicyAtCommit(repoRoot, targetHead)
+    ?? (existsSync(resolve(repoRoot, 'schemas/evidence/wave-exit-observer-policy.json'))
+      ? loadWaveExitObserverPolicy(repoRoot)
+      : null);
+  const observerPolicySourceAtTarget = readWaveExitObserverPolicySourceAtCommit(repoRoot, targetHead);
   const observerPolicyDigest = observerPolicy
-    ? (observerOptions.policyDigestAtCompilationHead ?? digestWaveExitObserverPolicy(observerPolicy))
+    ? (observerOptions.policyDigestAtCompilationHead ?? digestWaveExitObserverPolicy(observerPolicy, observerPolicySourceAtTarget ?? undefined))
     : null;
   parsed.waveExits = parsed.waveExits.map((row) => {
     const basis = rowsByWave.get(row.wave ?? '') ?? [];
@@ -442,7 +452,7 @@ export function compileRunbookCompletion(
     if (receiptSources.length > 0 && observerPolicy && observerPolicyDigest) {
       const exitPolicy = observerPolicy.exits[row.itemId];
       const currentInputDigests = observerOptions.currentInputDigests
-        ?? (exitPolicy ? digestInputsAtHead(exitPolicy.inputs, targetHead, repoRoot) : {});
+        ?? (exitPolicy ? digestWaveExitObserverInputsAtCommit(repoRoot, exitPolicy.inputs, targetHead) : {});
       const receiptVerdict = consumeWaveExitObserverReceiptCandidates({
         repoRoot,
         receipts: receiptSources,
@@ -507,7 +517,10 @@ export function compileRunbookCompletion(
       publicationBundle: { schemaId: 'atm.sealedProjectionPublicationBundle.v1', artifactPaths: normalizedPublicationArtifacts }
     },
     expectedItemCount: parsed.rows.length,
-    validatorContracts: contracts.flatMap((contract) => contract.validators),
+    validatorContracts: [
+      ...contracts.flatMap((contract) => contract.validators),
+      ...(observerPolicy && observerPolicyDigest ? observerContracts(observerPolicy, observerPolicyDigest) : [])
+    ],
     rows: parsed.rows, waveExits: parsed.waveExits,
     unresolvedIds: unresolved, deferredIds: [], unknownIds: unknown, overallVerdict: unresolved.length ? 'not-complete' : 'complete'
   };

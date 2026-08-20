@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import Ajv2020 from 'ajv/dist/2020.js';
 import {
@@ -9,10 +10,12 @@ import {
   consumeWaveExitObserverReceipt,
   consumeWaveExitObserverReceiptCandidates,
   deriveBasisIdentityFromEvidence,
+  digestWaveExitObserverInputsAtCommit,
   digestText,
   digestWaveExitObserverPolicy,
   digestWaveExitObserverPolicySource,
   loadWaveExitObserverPolicy,
+  loadWaveExitObserverPolicyAtCommit,
   resolveWaveExitBasisProducer,
   WAVE_EXIT_OBSERVER_POLICY_PATH,
   WAVE_EXIT_OBSERVER_RECEIPT_SCHEMA_ID,
@@ -24,6 +27,12 @@ const commit = (seed: string): string => seed.repeat(40).slice(0, 40);
 const observedHead = commit('1');
 const compilationHead = commit('2');
 const policy = loadWaveExitObserverPolicy();
+const headAtTestStart = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+assert.equal(loadWaveExitObserverPolicyAtCommit('.', headAtTestStart)?.schemaId, 'atm.waveExitObserverPolicy.v1');
+assert.deepEqual(digestWaveExitObserverInputsAtCommit('.', ['schemas/evidence/wave-exit-observer-policy.json'], headAtTestStart), {
+  'schemas/evidence/wave-exit-observer-policy.json': digestText(readFileSync(WAVE_EXIT_OBSERVER_POLICY_PATH, 'utf8'))
+});
+assert.equal(loadWaveExitObserverPolicyAtCommit('.', '0'.repeat(40)), null, 'missing historical policy must stay fail-closed');
 const policySource = readFileSync(WAVE_EXIT_OBSERVER_POLICY_PATH, 'utf8');
 const policyDigest = digestWaveExitObserverPolicy(policy, policySource);
 assert.equal(policy.basisActorResolution, 'active-claim-holder');

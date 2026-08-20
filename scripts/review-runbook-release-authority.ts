@@ -9,6 +9,13 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { semanticTaskCardDigest } from './task-card-contract-digest.ts';
+import {
+  consumeWaveExitObserverReceiptCandidates,
+  digestWaveExitObserverInputsAtCommit,
+  digestWaveExitObserverPolicySource,
+  loadWaveExitObserverPolicyAtCommit,
+  readWaveExitObserverPolicySourceAtCommit
+} from '../packages/core/src/evidence/wave-exit-observer-receipt.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const completionPath = 'docs/reports/plan-3x-4x-runbook-completion-evidence.json';
@@ -83,6 +90,55 @@ export function isValidValidatorContract(contract: RecordLike): boolean {
     && semanticTaskCardDigest(readFileSync(cardPath, 'utf8')) === contract.taskCardDigest;
 }
 
+function isWaveExitObserverContract(contract: RecordLike): boolean {
+  const exitItemId = String(contract?.exitItemId ?? '');
+  return contract?.kind === 'wave-exit-observer-receipt'
+    && contract?.contractId === `atm.waveExitObserverReceipt/${exitItemId}`
+    && /^EXIT-\d{2}$/.test(exitItemId)
+    && contract?.evidenceOwner === `wave-exit-observer:${exitItemId}`
+    && typeof contract?.command === 'string'
+    && /^sha256:[0-9a-f]{64}$/.test(String(contract?.policyDigest ?? ''));
+}
+
+function waveExitObserverEvidenceFailure(contract: RecordLike, evidence: RecordLike, targetHead: string): string | null {
+  const source = readWaveExitObserverPolicySourceAtCommit(root, targetHead);
+  const policy = loadWaveExitObserverPolicyAtCommit(root, targetHead);
+  const exitItemId = String(contract.exitItemId ?? '');
+  const exit = policy?.exits[exitItemId];
+  if (!source || !policy || !exit
+    || contract.policyDigest !== digestWaveExitObserverPolicySource(source)
+    || contract.command !== exit.command
+    || evidence.evidenceOwner !== contract.evidenceOwner
+    || evidence.command !== contract.command) return 'wave-receipt-contract-drift';
+  const artifacts = Array.isArray(evidence.artifactPaths) ? evidence.artifactPaths : [];
+  const receipts: unknown[] = [];
+  for (const artifactPath of artifacts) {
+    if (typeof artifactPath !== 'string' || !existsSync(path.resolve(root, artifactPath))) return 'wave-receipt-artifact-missing';
+    try {
+      receipts.push(JSON.parse(readFileSync(path.resolve(root, artifactPath), 'utf8')));
+    } catch {
+      return 'wave-receipt-artifact-invalid';
+    }
+  }
+  const verdict = consumeWaveExitObserverReceiptCandidates({
+    repoRoot: root,
+    receipts,
+    policy,
+    compilationHead: targetHead,
+    currentInputDigests: digestWaveExitObserverInputsAtCommit(root, exit.inputs, targetHead),
+    policyDigestAtCompilationHead: digestWaveExitObserverPolicySource(source),
+    isAncestor
+  });
+  const receipt = verdict.receipt;
+  if (!receipt) return `wave-receipt-unproven:${verdict.diagnostics.join(',') || 'missing'}`;
+  return receipt.command === evidence.command
+    && receipt.stdoutDigest === evidence.outputDigest
+    && receipt.observedHead === evidence.sourceCommit
+    && receipt.artifactPath === artifacts[0]
+    ? null
+    : 'wave-receipt-evidence-mismatch';
+}
+
 export function inspectCompletion(raw: string, runbookRaw = '', targetHead = ''): RecordLike {
   const findings: string[] = [];
   const rowTokens = occurrences(raw, /"itemId"\s*:\s*"(RB-\d{3})"/g);
@@ -102,7 +158,7 @@ export function inspectCompletion(raw: string, runbookRaw = '', targetHead = '')
     if (!Array.isArray(parsed.validatorContracts)) findings.push('validator-contract-registry-missing');
     else for (const contract of parsed.validatorContracts) {
       const contractId = String(contract?.contractId ?? '');
-      const valid = isValidValidatorContract(contract);
+      const valid = isValidValidatorContract(contract) || isWaveExitObserverContract(contract);
       if (!valid || validatorContracts.has(contractId)) findings.push(`invalid-validator-contract:${contractId || 'missing'}`);
       else validatorContracts.set(contractId, contract);
     }
@@ -119,12 +175,24 @@ export function inspectCompletion(raw: string, runbookRaw = '', targetHead = '')
       if (row.status === 'proven' && (!Array.isArray(row.evidence) || row.evidence.length === 0)) findings.push(`proven-without-evidence:${String(row.itemId)}`);
       for (const evidence of Array.isArray(row.evidence) ? row.evidence : []) {
         const contract = validatorContracts.get(String(evidence?.validatorContractId ?? ''));
-        if (!contract || contract.taskId !== evidence?.evidenceOwner || contract.command !== evidence?.command) {
+        const isWaveReceipt = !!contract && isWaveExitObserverContract(contract);
+        if (!contract
+          || (isWaveReceipt
+            ? contract.evidenceOwner !== evidence?.evidenceOwner || contract.command !== evidence?.command
+            : contract.taskId !== evidence?.evidenceOwner || contract.command !== evidence?.command)) {
           findings.push(`unregistered-validator-contract:${String(row.itemId)}`);
           continue;
         }
         const failure = !targetHead || !evidence || typeof evidence !== 'object' ? 'invalid-evidence' : commandSucceeded(evidence, targetHead);
         if (failure) findings.push(`evidence-${failure}:${String(row.itemId)}`);
+        else if (isWaveReceipt) {
+          const receiptFailure = waveExitObserverEvidenceFailure(contract, evidence, targetHead);
+          if (receiptFailure) findings.push(`evidence-${receiptFailure}:${String(row.itemId)}`);
+          else {
+            const key = `${evidence.command}\u0000${evidence.sourceCommit}\u0000${evidence.outputDigest}`;
+            sharedEvidence.set(key, [...(sharedEvidence.get(key) ?? []), row]);
+          }
+        }
         else {
           const key = `${evidence.command}\u0000${evidence.sourceCommit}\u0000${evidence.outputDigest}`;
           sharedEvidence.set(key, [...(sharedEvidence.get(key) ?? []), row]);

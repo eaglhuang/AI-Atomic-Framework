@@ -3,6 +3,31 @@ import { resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { DEFAULT_OUTPUT, DEFAULT_PLANNING_ROOT, RUNBOOK_RELATIVE_PATH, digestText, evidenceTupleKey, parseRunbook } from './compile-runbook-completion-evidence.ts';
 import { semanticTaskCardDigest } from './task-card-contract-digest.ts';
+import {
+  digestWaveExitObserverPolicySource,
+  loadWaveExitObserverPolicyAtCommit,
+  readWaveExitObserverPolicySourceAtCommit
+} from '../packages/core/src/evidence/wave-exit-observer-receipt.ts';
+
+function isWaveExitObserverContract(contract: any): boolean {
+  const exitItemId = String(contract?.exitItemId ?? '');
+  return contract?.kind === 'wave-exit-observer-receipt'
+    && contract?.contractId === `atm.waveExitObserverReceipt/${exitItemId}`
+    && /^EXIT-\d{2}$/.test(exitItemId)
+    && contract?.evidenceOwner === `wave-exit-observer:${exitItemId}`
+    && typeof contract?.command === 'string'
+    && /^sha256:[0-9a-f]{64}$/.test(String(contract?.policyDigest ?? ''));
+}
+
+function waveExitObserverContractMatchesTarget(contract: any, targetHead: string): boolean {
+  const policy = loadWaveExitObserverPolicyAtCommit('.', targetHead);
+  const source = readWaveExitObserverPolicySourceAtCommit('.', targetHead);
+  const exit = policy?.exits[String(contract.exitItemId ?? '')];
+  return !!exit
+    && contract.command === exit.command
+    && !!source
+    && contract.policyDigest === digestWaveExitObserverPolicySource(source);
+}
 
 export function validateReport(report: any, source: string): void {
   const ancestry = new Map<string, boolean>();
@@ -13,15 +38,19 @@ export function validateReport(report: any, source: string): void {
   if (!Array.isArray(report.validatorContracts)) throw new Error('missing validator contract registry');
   const validatorContracts = new Map<string, any>();
   for (const contract of report.validatorContracts) {
-    if (!/^atm\.taskCardValidator\/ATM-GOV-\d+\/([0-9a-f]{64})$/.test(String(contract?.contractId ?? ''))
-      || !/^ATM-GOV-\d+$/.test(String(contract?.taskId ?? ''))
-      || typeof contract?.command !== 'string'
-      || !/^sha256:[0-9a-f]{64}$/.test(String(contract?.taskCardDigest ?? ''))
-      || typeof contract?.taskCardPath !== 'string') throw new Error('invalid validator contract');
-    if (validatorContracts.has(contract.contractId)) throw new Error(`duplicate validator contract ${contract.contractId}`);
-    if (!existsSync(contract.taskCardPath) || semanticTaskCardDigest(readFileSync(contract.taskCardPath, 'utf8')) !== contract.taskCardDigest) {
-      throw new Error(`validator contract task card drift ${contract.contractId}`);
+    const isTaskCardContract = /^atm\.taskCardValidator\/ATM-GOV-\d+\/([0-9a-f]{64})$/.test(String(contract?.contractId ?? ''))
+      && /^ATM-GOV-\d+$/.test(String(contract?.taskId ?? ''))
+      && typeof contract?.command === 'string'
+      && /^sha256:[0-9a-f]{64}$/.test(String(contract?.taskCardDigest ?? ''))
+      && typeof contract?.taskCardPath === 'string';
+    if (isTaskCardContract) {
+      if (!existsSync(contract.taskCardPath) || semanticTaskCardDigest(readFileSync(contract.taskCardPath, 'utf8')) !== contract.taskCardDigest) {
+        throw new Error(`validator contract task card drift ${contract.contractId}`);
+      }
+    } else if (!isWaveExitObserverContract(contract)) {
+      throw new Error('invalid validator contract');
     }
+    if (validatorContracts.has(contract.contractId)) throw new Error(`duplicate validator contract ${contract.contractId}`);
     validatorContracts.set(contract.contractId, contract);
   }
   if (report.rows.length !== parsed.rows.length || report.expectedItemCount !== parsed.rows.length) throw new Error('runbook item count drift');
@@ -37,7 +66,12 @@ export function validateReport(report: any, source: string): void {
       if (!/^[0-9a-f]{40}$/.test(tuple.sourceCommit)) throw new Error(`invalid source commit ${row.itemId}`);
       if (!row.coverageOwners?.includes(tuple.evidenceOwner)) throw new Error(`foreign evidence owner ${row.itemId}:${String(tuple.evidenceOwner)}`);
       const contract = validatorContracts.get(tuple.validatorContractId);
-      if (!contract || contract.taskId !== tuple.evidenceOwner || contract.command !== tuple.command) {
+      const registered = contract && (isWaveExitObserverContract(contract)
+        ? contract.evidenceOwner === tuple.evidenceOwner
+          && contract.command === tuple.command
+          && waveExitObserverContractMatchesTarget(contract, report.authority.targetHead)
+        : contract.taskId === tuple.evidenceOwner && contract.command === tuple.command);
+      if (!registered) {
         throw new Error(`unregistered validator contract ${row.itemId}:${String(tuple.validatorContractId)}`);
       }
       try {

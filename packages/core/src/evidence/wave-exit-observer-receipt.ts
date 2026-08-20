@@ -188,6 +188,17 @@ export function loadWaveExitObserverPolicy(repoRoot = '.'): WaveExitObserverPoli
   return raw;
 }
 
+/**
+ * Consumers that replay a sealed completion report must resolve the policy
+ * from the report's target commit, rather than from whatever happens to be in
+ * the live working tree.  A missing or malformed historical policy remains an
+ * explicit failure for the caller to handle.
+ */
+export function loadWaveExitObserverPolicyAtCommit(repoRoot: string, commit: string): WaveExitObserverPolicy | null {
+  const source = readWaveExitObserverPolicySourceAtCommit(repoRoot, commit);
+  return source ? parseWaveExitObserverPolicySource(source) : null;
+}
+
 function parseWaveExitObserverPolicySource(source: string): WaveExitObserverPolicy | null {
   let raw: WaveExitObserverPolicy;
   try {
@@ -231,6 +242,30 @@ export function readWaveExitObserverPolicySourceAtCommit(repoRoot: string, commi
   } catch {
     return null;
   }
+}
+
+/** Compute the sealed input digests used by both completion and release review. */
+export function digestWaveExitObserverInputsAtCommit(
+  repoRoot: string,
+  paths: readonly string[],
+  commit: string
+): Record<string, string> {
+  const digests: Record<string, string> = {};
+  if (!COMMIT_SHAPE.test(commit)) return digests;
+  for (const inputPath of paths) {
+    try {
+      const body = execFileSync('git', ['show', `${commit}:${inputPath.replace(/\\/g, '/')}`], {
+        cwd: repoRoot,
+        encoding: 'buffer',
+        stdio: ['ignore', 'pipe', 'ignore']
+      });
+      digests[inputPath] = digestText(Buffer.isBuffer(body) ? body.toString('utf8') : String(body));
+    } catch {
+      // An absent sealed input deliberately stays absent so receipt validation
+      // reports input-digest-drift instead of inferring a digest from live files.
+    }
+  }
+  return digests;
 }
 
 export function readClaimHolderActor(repoRoot: string, taskId: string): string | null {

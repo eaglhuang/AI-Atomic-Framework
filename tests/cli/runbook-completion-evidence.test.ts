@@ -100,6 +100,18 @@ assert.deepEqual(sealValidatorContractIds(['atm.waveExitObserverReceipt/EXIT-02'
 for (const row of [...report.rows, ...report.waveExits]) {
   for (const id of row.validatorContractIds ?? []) assert.equal(typeof id, 'string');
 }
+assert.ok(
+  report.validatorContracts.some((contract: any) => contract.kind === 'wave-exit-observer-receipt'
+    && contract.contractId === 'atm.waveExitObserverReceipt/EXIT-02'
+    && contract.evidenceOwner === 'wave-exit-observer:EXIT-02'),
+  'the completion registry must include the sealed Wave receipt contract family'
+);
+const malformedWaveContract = structuredClone(report);
+malformedWaveContract.validatorContracts.push({
+  kind: 'wave-exit-observer-receipt', contractId: 'atm.waveExitObserverReceipt/EXIT-99',
+  exitItemId: 'EXIT-99', evidenceOwner: 'wave-exit-observer:EXIT-99', command: 'node forged.ts', policyDigest: 'sha256:bad'
+});
+assert.throws(() => validateReport(malformedWaveContract, source), /invalid validator contract/);
 
 const forged = structuredClone(report);
 forged.rows[0].status = 'proven';
