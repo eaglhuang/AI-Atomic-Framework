@@ -3,11 +3,10 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, relative, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
-  consumeWaveExitObserverReceipt,
+  consumeWaveExitObserverReceiptCandidates,
   digestWaveExitObserverPolicy,
   loadWaveExitObserverPolicy,
-  readCanonicalWaveExitReceipt,
-  resolveWaveExitBasisProducer,
+  readWaveExitReceiptCandidates,
   type WaveExitObserverPolicy
 } from '../packages/core/src/evidence/wave-exit-observer-receipt.ts';
 
@@ -448,32 +447,34 @@ export function compileRunbookCompletion(
           ...(basis.some((item) => item.status !== 'proven') ? ['wave-requirement-basis-not-proven'] : []),
           ...(uncoveredOwners.length ? [`missing-independent-wave-exit-evidence:${uncoveredOwners.join(',')}`] : ['missing-independent-wave-exit-contract'])
         ];
-    const receiptSource = observerPolicy
-      ? (observerOptions.receipts?.[row.itemId] ?? readCanonicalWaveExitReceipt(repoRoot, observerPolicy, row.itemId))
-      : null;
-    if (receiptSource != null && observerPolicy && observerPolicyDigest) {
+    const receiptSources = observerPolicy
+      ? (observerOptions.receipts?.[row.itemId] != null
+        ? [observerOptions.receipts[row.itemId]]
+        : readWaveExitReceiptCandidates(repoRoot, observerPolicy, row.itemId))
+      : [];
+    if (receiptSources.length > 0 && observerPolicy && observerPolicyDigest) {
       const exitPolicy = observerPolicy.exits[row.itemId];
       const currentInputDigests = observerOptions.currentInputDigests
         ?? (exitPolicy ? digestInputsAtHead(exitPolicy.inputs, targetHead, repoRoot) : {});
-      const derivedActors = observerOptions.basisActorsByWave?.[row.wave ?? '']
-        ?? resolveWaveExitBasisProducer({ repoRoot, policy: observerPolicy }).actorIds;
-      const verdict = consumeWaveExitObserverReceipt({
-        receipt: receiptSource,
+      const receiptVerdict = consumeWaveExitObserverReceiptCandidates({
+        repoRoot,
+        receipts: receiptSources,
         policy: observerPolicy,
         compilationHead: targetHead,
-        derivedBasis: { actorIds: derivedActors, producerRole: observerPolicy.basisProducerRole },
         currentInputDigests,
+        policyDigestAtCompilationHead: observerPolicyDigest,
         isAncestor: observerOptions.isAncestor ?? isAncestor,
-        policyDigestAtCompilationHead: observerPolicyDigest
+        basisActors: observerOptions.basisActorsByWave?.[row.wave ?? '']
       });
-      if (verdict.ok && basisProven && verdict.receipt) {
+      const selectedReceipt = receiptVerdict.receipt;
+      if (selectedReceipt && basisProven) {
         const receiptTuple: EvidenceTuple = {
-          command: verdict.receipt.command,
-          exitCode: verdict.receipt.exitCode,
-          outputDigest: verdict.receipt.stdoutDigest,
-          artifactPaths: [verdict.receipt.artifactPath],
-          observedAt: verdict.receipt.observedAt,
-          sourceCommit: verdict.receipt.observedHead,
+          command: selectedReceipt.command,
+          exitCode: selectedReceipt.exitCode,
+          outputDigest: selectedReceipt.stdoutDigest,
+          artifactPaths: [selectedReceipt.artifactPath],
+          observedAt: selectedReceipt.observedAt,
+          sourceCommit: selectedReceipt.observedHead,
           evidenceOwner: `wave-exit-observer:${row.itemId}`,
           validatorContractId: `atm.waveExitObserverReceipt/${row.itemId}`
         };
@@ -493,7 +494,10 @@ export function compileRunbookCompletion(
         ...hydrated,
         evidence: independentEvidence,
         status: 'unproven' as const,
-        diagnostics: [...new Set([...contractDiagnostics, ...verdict.diagnostics])]
+        diagnostics: [...new Set([
+          ...contractDiagnostics,
+          ...receiptVerdict.diagnostics
+        ])]
       };
     }
     return independentlySatisfied
