@@ -1,11 +1,21 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, effectiveEvidenceContracts, independentExitContracts, isDeclaredPublicationDelta, isPublicationOnlyDelta, sealValidatorContractIds, semanticTaskCardDigest } from '../../scripts/compile-runbook-completion-evidence.ts';
+import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, effectiveEvidenceContracts, independentExitContracts, isDeclaredPublicationDelta, isPublicationOnlyDelta, sealValidatorContractIds, semanticTaskCardDigest, summarizeFinalCertificate } from '../../scripts/compile-runbook-completion-evidence.ts';
 import { validateReport } from '../../scripts/validate-runbook-completion-evidence.ts';
 
 const sha = 'a'.repeat(40);
 assert.equal(DEFAULT_PLANNING_ROOT.endsWith('3KLife'), true);
+assert.deepEqual(
+  summarizeFinalCertificate({ status: 'proven', overallVerdict: 'complete', releaseAuthorized: true, diagnostics: [] }),
+  { proven: true, diagnostics: [] },
+  'completion consumes only the certificate terminal authorization state'
+);
+assert.deepEqual(
+  summarizeFinalCertificate({ status: 'stale', overallVerdict: 'not-complete', releaseAuthorized: false, diagnostics: ['volatile-detail'] }),
+  { proven: false, diagnostics: ['final-certificate-not-proven'] },
+  'mutable certificate diagnostics must not leak into the sealed completion projection'
+);
 assert.equal(isPublicationOnlyDelta('invalid', 'also-invalid'), false, 'invalid publication snapshots must fail closed');
 const planningContract = 'task_id: ATM-GOV-9999\nstatus: planned\nvalidators:\n  - npm run typecheck\nscopePaths:\n  - scripts/example.ts\n';
 const lifecycleOnlyCloseback = 'task_id: ATM-GOV-9999\nstatus: done\nvalidators:\n  - npm run typecheck\nscopePaths:\n  - scripts/example.ts\ncompleted_at: "2026-08-14T00:00:00Z"\ndelivery_commit: deadbeef\n';

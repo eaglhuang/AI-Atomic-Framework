@@ -11,7 +11,9 @@ import {
   readWaveExitObserverPolicySourceAtCommit,
   type WaveExitObserverPolicy
 } from '../packages/core/src/evidence/wave-exit-observer-receipt.ts';
+import { observeSealedFinalCertificate } from './lib/final-certificate-observation.ts';
 export { digestText, semanticTaskCardDigest } from './task-card-contract-digest.ts';
+export { summarizeFinalCertificate } from './lib/final-certificate-observation.ts';
 import { digestText, semanticTaskCardDigest } from './task-card-contract-digest.ts';
 
 export const RUNBOOK_RELATIVE_PATH = 'docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md';
@@ -349,26 +351,10 @@ function hydrate(row: CompletionRow, contracts: CardContract[], targetHead: stri
   };
 }
 
-function observeFinalCertificate(): { proven: boolean; diagnostics: string[] } {
-  if (!existsSync(DEFAULT_CERTIFICATE)) return { proven: false, diagnostics: ['final-certificate-missing'] };
-  try {
-    const certificate = JSON.parse(readFileSync(DEFAULT_CERTIFICATE, 'utf8'));
-    const pending = JSON.stringify(certificate).includes('pending-self-digest');
-    const diagnostics = Array.isArray(certificate.diagnostics) ? certificate.diagnostics : ['final-certificate-diagnostics-invalid'];
-    const proven = certificate.status === 'proven'
-      && certificate.overallVerdict === 'complete'
-      && certificate.releaseAuthorized === true
-      && diagnostics.length === 0
-      && !pending;
-    // Completion only consumes the certificate's terminal authorization state.
-    // Copying its mutable diagnostic detail into the completion projection would
-    // feed reviewer/certificate changes back into the producer and prevent a
-    // sealed projection chain from reaching a fixed point.  The certificate
-    // remains the addressable source for the detailed fail-closed reasons.
-    return { proven, diagnostics: proven ? [] : ['final-certificate-not-proven'] };
-  } catch {
-    return { proven: false, diagnostics: ['final-certificate-unreadable'] };
-  }
+function observeFinalCertificate(targetHead: string): { proven: boolean; diagnostics: string[] } {
+  // Completion only consumes terminal authorization from the certificate
+  // sealed at its target tree, never mutable worktree diagnostics.
+  return observeSealedFinalCertificate(targetHead, DEFAULT_CERTIFICATE);
 }
 
 function requiresFinalCertificate(row: CompletionRow): boolean {
@@ -394,7 +380,7 @@ export function compileRunbookCompletion(
   planningHead: string,
   targetHead: string,
   originMain: string,
-  finalCertificate = observeFinalCertificate(),
+  finalCertificate = observeFinalCertificate(targetHead),
   generatedAt = new Date().toISOString(),
   authorityDiagnostics: string[] = [],
   publicationArtifacts = [relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/')],
@@ -582,7 +568,7 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
       ? ['planning-runbook-head-digest-mismatch']
       : [])
   ];
-  const report = compileRunbookCompletion(source, planningHead, targetHead, originMain, observeFinalCertificate(), generatedAt, authorityDiagnostics, publicationArtifacts);
+  const report = compileRunbookCompletion(source, planningHead, targetHead, originMain, observeFinalCertificate(targetHead), generatedAt, authorityDiagnostics, publicationArtifacts);
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (mode === 'write') {
     writeFileSync(DEFAULT_OUTPUT, serialized, 'utf8');
