@@ -267,6 +267,19 @@ export function resolveActiveRunnerPublicationTask(input: {
     .filter((lock) => !explicitlyRequested || lock.workItemId === explicitlyRequested)
     .filter((lock) => ownsReleaseSurface(lock.files))
     .map((lock) => lock.workItemId);
+  // A runner-sync reservation is granted to a live task claim, not to the
+  // incidental presence of a direction-lock file.  Direction locks are one
+  // projection of authority, but renewal and recovery paths can legitimately
+  // leave an active ledger claim without recreating that projection.  Read the
+  // same active-task snapshot used by the cross-task mutation guard, then keep
+  // the claim TTL check here because publication is a time-sensitive write.
+  const ledgerCandidates = getActiveTasks(input.cwd)
+    .filter((task) => task.owner === input.actorId)
+    .filter((task) => !task.taskId.startsWith('ATM-FRAMEWORK-TEMP-'))
+    .filter((task) => !explicitlyRequested || task.taskId === explicitlyRequested.toUpperCase())
+    .filter((task) => ownsReleaseSurface(task.allowedFiles))
+    .filter((task) => hasActiveLedgerClaim(input.cwd, task.taskId, input.actorId, nowMs))
+    .map((task) => task.taskId);
   const candidates = existsSync(lockRoot)
     ? readdirSync(lockRoot, { withFileTypes: true }).flatMap((entry) => {
       if (!entry.isFile() || !entry.name.endsWith('.lock.json')) return [];
@@ -294,7 +307,7 @@ export function resolveActiveRunnerPublicationTask(input: {
       }
     })
     : [];
-  const unique = [...new Set([...candidates, ...frameworkTempCandidates])].sort();
+  const unique = [...new Set([...candidates, ...ledgerCandidates, ...frameworkTempCandidates])].sort();
   if (unique.length !== 1) {
     throw new Error(`Runner publication requires exactly one active release-surface claim for ${input.actorId}; found ${unique.length}.`);
   }
