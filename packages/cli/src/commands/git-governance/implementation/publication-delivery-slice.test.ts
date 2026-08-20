@@ -130,6 +130,7 @@ for (const relative of [
   'docs/reports',
   '.atm/history/evidence',
   '.atm/history/tasks',
+  '.atm/catalog/registry',
 ]) {
   mkdirSync(path.join(cwd, relative), { recursive: true });
 }
@@ -137,6 +138,7 @@ writeFileSync(path.join(cwd, 'packages/cli/dist/atm.d.ts'), 'export {}\n');
 writeFileSync(path.join(cwd, 'packages/cli/dist/gone.d.ts'), 'export {}\n');
 writeFileSync(path.join(cwd, 'release/atm-onefile/atm.mjs'), 'export {}\n');
 writeFileSync(path.join(cwd, 'docs/reports/plan-closeback.json'), '{"closeback":true}\n');
+writeFileSync(path.join(cwd, '.atm/catalog/registry/actors.json'), '{"actors":[]}\n');
 writeFileSync(path.join(cwd, `.atm/history/evidence/${TASK_ID}.runner-sync-receipt.json`), `${JSON.stringify(published)}\n`);
 writeFileSync(
   path.join(cwd, `.atm/history/tasks/${TASK_ID}.json`),
@@ -171,6 +173,7 @@ writeFileSync(path.join(cwd, 'packages/cli/dist/atm.d.ts'), 'export { atm: true 
 rmSync(path.join(cwd, 'packages/cli/dist/gone.d.ts'));
 writeFileSync(path.join(cwd, 'release/atm-onefile/atm.mjs'), 'export { built: true }\n');
 writeFileSync(path.join(cwd, 'docs/reports/plan-closeback.json'), '{"closeback":"dirty"}\n');
+writeFileSync(path.join(cwd, '.atm/catalog/registry/actors.json'), '{"actors":["other-task"]}\n');
 writeFileSync(path.join(cwd, `.atm/history/evidence/${TASK_ID}.runner-sync-receipt.json`), `${JSON.stringify(published)}\n`);
 const manifestPath = path.join(cwd, '.atm', 'history', 'evidence', `${TASK_ID}.delivery-slice.json`);
 writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`);
@@ -194,6 +197,7 @@ assert.ok(bundle.stageFiles.includes('packages/cli/dist/atm.d.ts'));
 assert.ok(bundle.stageFiles.includes('packages/cli/dist/gone.d.ts'));
 assert.ok(bundle.stageFiles.includes('release/atm-onefile/atm.mjs'));
 assert.ok(!bundle.stageFiles.includes('docs/reports/plan-closeback.json'));
+assert.ok(!bundle.stageFiles.includes('.atm/catalog/registry/actors.json'));
 
 const receiptDerivedBundle = resolveTaskScopedCommitBundle({
   cwd,
@@ -211,6 +215,7 @@ const receiptDerivedBundle = resolveTaskScopedCommitBundle({
 });
 assert.equal(receiptDerivedBundle.ok, true, `${receiptDerivedBundle.blockedCode} ${receiptDerivedBundle.blockedSummary}`);
 assert.deepEqual(receiptDerivedBundle.stageFiles, bundle.stageFiles);
+assert.ok(!receiptDerivedBundle.stageFiles.includes('.atm/catalog/registry/actors.json'));
 
 const foreignReceiptBundle = resolveTaskScopedCommitBundle({
   cwd,

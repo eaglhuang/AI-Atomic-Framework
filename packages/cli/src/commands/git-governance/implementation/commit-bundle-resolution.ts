@@ -459,9 +459,17 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
       ? normalizeRelativePath(source.planPath)
       : "";
   const governanceBundleWarnings = [];
-  const commitAttributionStageCandidates = unstagedDirtyFiles.filter(
-    (filePath: LegacyValue) => isCommitAttributionSideEffectPath(filePath),
-  );
+  // A publication delivery slice is closed over the published receipt's
+  // inventory plus the task records derived from that receipt.  Repository
+  // attribution metadata is useful for ordinary commits, but is not evidence
+  // that it belongs to this particular publication.  Letting it bypass the
+  // slice would reintroduce unrelated global state into an otherwise exact
+  // generated-output delivery bundle.
+  const commitAttributionStageCandidates = deliverySliceStageFiles
+    ? []
+    : unstagedDirtyFiles.filter(
+      (filePath: LegacyValue) => isCommitAttributionSideEffectPath(filePath),
+    );
   const stageCandidates = uniqueSorted([
     ...commitAttributionStageCandidates,
     ...(input.autoStage
