@@ -257,6 +257,19 @@ const uniqueCandidate = consumeWaveExitObserverReceiptCandidates({
 });
 assert.equal(uniqueCandidate.receipt?.exitItemId, 'EXIT-02');
 assert.deepEqual(uniqueCandidate.diagnostics, []);
+const uniqueCandidateWithStaleSibling = consumeWaveExitObserverReceiptCandidates({
+  repoRoot: '.',
+  receipts: [legalReceipt, { ...legalReceipt, policyDigest: hex('f') }],
+  policy,
+  compilationHead,
+  currentInputDigests: { [inputPath]: inputDigest },
+  policyDigestAtCompilationHead: policyDigest,
+  readPolicySourceAtCommit: () => policySource,
+  isAncestor: (ancestor, descendant) => ancestor === observedHead && descendant === compilationHead,
+  basisActors: ['wave-1-basis-producer']
+});
+assert.equal(uniqueCandidateWithStaleSibling.receipt?.exitItemId, 'EXIT-02');
+assert.deepEqual(uniqueCandidateWithStaleSibling.diagnostics, [], 'obsolete immutable candidates must not taint the unique valid successor');
 const ambiguousCandidates = consumeWaveExitObserverReceiptCandidates({
   repoRoot: '.',
   receipts: [legalReceipt, legalReceipt],

@@ -529,9 +529,11 @@ export function consumeWaveExitObserverReceiptCandidates(
   const valid = verdicts.filter((verdict) => verdict.ok && verdict.receipt);
   return {
     receipt: valid.length === 1 ? valid[0]!.receipt : null,
-    diagnostics: valid.length > 1
-      ? ['receipt-ambiguity']
-      : verdicts.flatMap((verdict) => verdict.diagnostics)
+    diagnostics: valid.length === 1
+      ? []
+      : valid.length > 1
+        ? ['receipt-ambiguity']
+        : verdicts.flatMap((verdict) => verdict.diagnostics)
   };
 }
 
