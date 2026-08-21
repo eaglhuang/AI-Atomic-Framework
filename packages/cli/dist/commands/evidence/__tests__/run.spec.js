@@ -33,6 +33,26 @@ try {
     assert.equal(typeof passRun?.finishedAt, 'string');
     assert.equal(typeof passRun?.durationMs, 'number');
     assert.ok(passRun?.durationMs >= 0);
+    const previousLaneSessionId = process.env.ATM_LANE_SESSION_ID;
+    process.env.ATM_LANE_SESSION_ID = 'lane-parent-must-not-reach-evidence-command';
+    try {
+        const isolated = runEvidenceRun([
+            '--task', taskId,
+            '--cwd', cwd,
+            '--actor', actor,
+            '--command', 'node -e "process.exit(process.env.ATM_LANE_SESSION_ID ? 19 : 0)"',
+            '--validators', 'rft0007-lane-isolation-probe',
+            '--runner-kind', 'dev-source',
+            '--json'
+        ]);
+        assert.equal(isolated.ok, true, 'evidence command must not inherit its caller lane');
+    }
+    finally {
+        if (previousLaneSessionId === undefined)
+            delete process.env.ATM_LANE_SESSION_ID;
+        else
+            process.env.ATM_LANE_SESSION_ID = previousLaneSessionId;
+    }
     let failed = false;
     try {
         runEvidenceRun([

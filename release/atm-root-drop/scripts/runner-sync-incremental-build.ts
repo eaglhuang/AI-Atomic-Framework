@@ -107,12 +107,21 @@ export type RunnerSyncBuildObservation = {
 
 type RunnerSyncPhaseTimings = ReturnType<typeof phaseTimingsRecord>;
 
+function uniqueNormalizedPaths(paths: readonly string[]): string[] {
+  return [...new Set(paths
+    .filter((value) => typeof value === 'string')
+    .map((value) => value.replace(/\\/g, '/').replace(/^\.\//, '').trim())
+    .filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+
 export type RunnerSyncReceipt = {
   readonly schemaId: 'atm.runnerSyncReceipt.v1';
   readonly specVersion: '0.1.0';
   readonly taskId: string;
   /** Published sealed output or a receipt-backed retention of foreign output. */
   readonly publicationDisposition: 'published' | 'recovery-retained';
+  /** Exact inventory members retained instead of overwritten by a sealed build. */
+  readonly recoveryRetainedPaths: readonly string[];
   readonly actorId: string;
   readonly actorIdentity: {
     readonly actorId: string;
@@ -262,6 +271,7 @@ export function buildRunnerSyncReceipt(input: {
   readonly buildDecision: BuildDecision;
   readonly decisionReason?: string;
   readonly publicationDisposition?: RunnerSyncReceipt['publicationDisposition'];
+  readonly recoveryRetainedPaths?: readonly string[];
   readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
   readonly runtimeTelemetryRef?: string | null;
   readonly tsBuildCache?: TsBuildCacheSummary | null;
@@ -298,6 +308,7 @@ export function buildRunnerSyncReceipt(input: {
     specVersion: '0.1.0',
     taskId,
     publicationDisposition: input.publicationDisposition ?? 'published',
+    recoveryRetainedPaths: uniqueNormalizedPaths(input.recoveryRetainedPaths ?? []),
     actorId: input.actorId,
     actorIdentity: {
       actorId: input.actorId,
@@ -463,6 +474,7 @@ export function writeRunnerSyncReceipt(input: {
   readonly buildDecision: BuildDecision;
   readonly decisionReason?: string;
   readonly publicationDisposition?: RunnerSyncReceipt['publicationDisposition'];
+  readonly recoveryRetainedPaths?: readonly string[];
   readonly incrementalPlan?: RunnerIncrementalBuildPlan | null;
   readonly runtimeTelemetryRef?: string | null;
   readonly tsBuildCache?: TsBuildCacheSummary | null;

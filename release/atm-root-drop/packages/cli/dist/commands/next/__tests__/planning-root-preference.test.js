@@ -168,4 +168,80 @@ finally {
         rmSync(contractSandbox, { recursive: true, force: true });
     }
 }
+// ATM-GOV-0399 Prefer reachable registered sealed planning authority and fail closed on ambiguity
+// caseId: test_prefer_registered_sealed_planning_authority_0399
+// semanticKey: prefer-registered-sealed-planning-authority
+// coversAcceptance: ACC-1, ACC-2, ACC-3
+// caseId: test_fail_closed_on_ambiguous_planning_roots_0399
+// semanticKey: fail-closed-on-ambiguous-planning-roots
+// coversAcceptance: ACC-4, ACC-5
+{
+    const testSandbox = mkdtempSync(path.join(tmpdir(), 'planning-root-0400-'));
+    try {
+        const makePlanningRepo = (name, opts) => {
+            const repoPath = path.join(testSandbox, name);
+            const planningRoot = path.join(repoPath, 'docs', 'ai_atomic_framework');
+            mkdirSync(planningRoot, { recursive: true });
+            if (opts.hasSeriesRegistry) {
+                const series = [];
+                for (let i = 0; i < opts.activeSeriesCount; i++) {
+                    series.push({
+                        series: `SERIES_${i}`,
+                        prefix: `TASK-S${i}`,
+                        familyDir: `family-${i}`,
+                        planDocs: [`family-${i}/plan.md`],
+                        status: 'active',
+                        approvedBy: 'owner',
+                        approvedAt: new Date().toISOString()
+                    });
+                }
+                writeFileSync(path.join(planningRoot, 'series-registry.json'), JSON.stringify({
+                    schemaId: 'atm.seriesRegistry.v1',
+                    generatedAt: new Date().toISOString(),
+                    baseDir: '.',
+                    series
+                }), 'utf8');
+            }
+            return repoPath;
+        };
+        const targetRepo = path.join(testSandbox, 'TargetRepo');
+        mkdirSync(targetRepo, { recursive: true });
+        // Fixture 1: Unregistered/empty candidate vs registered sealed authority candidate
+        const unregRepo = makePlanningRepo('UnregisteredPlan', { hasSeriesRegistry: false, activeSeriesCount: 0 });
+        const regRepo = makePlanningRepo('RegisteredPlan', { hasSeriesRegistry: true, activeSeriesCount: 2 });
+        const selection = selectPlanningRoot(targetRepo, {
+            readDir: fakeReadDir(testSandbox, ['TargetRepo', 'UnregisteredPlan', 'RegisteredPlan']),
+            exists: existsSync
+        });
+        // ACC-3: If exactly one reachable candidate has valid series-registry with active series, it is preferred
+        assert.equal(selection.status, 'canonical', 'should resolve canonical when a single valid registered authority exists');
+        assert.equal(selection.failClosed, false);
+        assert.equal(selection.resolvedRoots.length, 1);
+        assert.equal(selection.resolvedRoots[0], path.resolve(regRepo, 'docs', 'ai_atomic_framework'), 'must select the registered planning authority over unregistered candidate');
+        // Fixture 2: Multiple registered authorities with active series -> must fail closed with ambiguity
+        const regRepo2 = makePlanningRepo('RegisteredPlan2', { hasSeriesRegistry: true, activeSeriesCount: 1 });
+        const ambiguousSelection = selectPlanningRoot(targetRepo, {
+            readDir: fakeReadDir(testSandbox, ['TargetRepo', 'RegisteredPlan', 'RegisteredPlan2']),
+            exists: existsSync
+        });
+        // ACC-4: Multiple valid registered authorities must fail closed
+        assert.equal(ambiguousSelection.status, 'ambiguous', 'multiple registered authorities must be ambiguous');
+        assert.equal(ambiguousSelection.failClosed, true, 'must fail closed on multiple registered authorities');
+        assert.equal(ambiguousSelection.resolvedRoots.length, 0);
+        assert.ok(ambiguousSelection.ambiguities.length >= 1);
+        // Fixture 3: Explicit root takes absolute precedence even if unregistered
+        const explicitSelection = selectPlanningRoot(targetRepo, {
+            explicitRoot: path.join(unregRepo, 'docs', 'ai_atomic_framework'),
+            readDir: fakeReadDir(testSandbox, ['TargetRepo', 'UnregisteredPlan', 'RegisteredPlan']),
+            exists: existsSync
+        });
+        // ACC-1: Explicit option always takes absolute precedence
+        assert.equal(explicitSelection.status, 'explicit');
+        assert.equal(explicitSelection.failClosed, false);
+        assert.equal(explicitSelection.resolvedRoots[0], path.resolve(unregRepo, 'docs', 'ai_atomic_framework'));
+    }
+    finally {
+        rmSync(testSandbox, { recursive: true, force: true });
+    }
+}
 console.log('[planning-root-preference.test] ok');

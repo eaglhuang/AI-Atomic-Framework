@@ -4,6 +4,8 @@ import { parseJsonText, relativePathFrom } from './shared.ts';
 import {
   PLANNING_ROOT_RELATIVE_SUFFIX,
   resolveCandidatePlanningRoots,
+  selectPlanningRoot,
+  hasValidSeriesRegistry,
   type PlanningRootResolution
 } from './next/planning-root-preference.ts';
 import { resolvePlanningRootScopedOnce } from './planning-root-resolution-cache.ts';
@@ -18,6 +20,8 @@ export interface PlanningRepoRootConfig {
   readonly resolvedConfigRoots: readonly string[];
   readonly candidateResolution: PlanningRootResolution;
   readonly effectiveRoots: readonly string[];
+  readonly registeredRoots: readonly string[];
+  readonly canonicalRoot: string | null;
 }
 
 export interface StoredPlanningPathResolution {
@@ -127,12 +131,19 @@ function computePlanningRepoRootConfig(cwd: string): PlanningRepoRootConfig {
     ...resolvedConfigRoots,
     ...candidateResolution.roots
   ]);
+  const selection = selectPlanningRoot(cwd, {
+    configuredRoots: configRoots
+  });
+  const canonicalRoot = selection.resolvedRoots.length === 1 ? selection.resolvedRoots[0] : null;
+  const registeredRoots = effectiveRoots.filter((root) => hasValidSeriesRegistry(root));
   return {
     envRoot,
     configRoots,
     resolvedConfigRoots,
     candidateResolution,
-    effectiveRoots
+    effectiveRoots,
+    registeredRoots,
+    canonicalRoot
   };
 }
 
@@ -182,7 +193,12 @@ export function resolveStoredPlanningPath(cwd: string, storedPath: string): Stor
         isExternalPlanning: false
       };
     }
-    for (const planningRoot of config.effectiveRoots) {
+    const candidateRoots = Array.from(new Set([
+      ...(config.canonicalRoot ? [config.canonicalRoot] : []),
+      ...config.registeredRoots,
+      ...config.effectiveRoots
+    ]));
+    for (const planningRoot of candidateRoots) {
       const candidate = docRelative
         ? path.resolve(planningRoot, docRelative)
         : path.resolve(planningRoot);

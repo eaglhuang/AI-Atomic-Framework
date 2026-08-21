@@ -2,7 +2,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { allowsPlanningMirror, statusQueueWeight } from '../match-and-sort.js';
-import { readConfiguredPlanningRoots } from '../../planning-repo-root.js';
+import { readConfiguredPlanningRoots, shouldReportPlanningRootMissing } from '../../planning-repo-root.js';
 import { resolveCandidatePlanningRoots } from '../planning-root-preference.js';
 import { bootstrapTaskId } from '../../governance-runtime.js';
 import { parseJsonText } from '../../shared.js';
@@ -10,7 +10,6 @@ import { isPathAllowedByScope } from '../../work-channels.js';
 import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, readStringArray, splitListValue } from '../intent-normalizers.js';
 import { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, isExplicitSingleTaskRoute, isTaskAlreadyActivelyClaimed, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards } from '../route-predicates.js';
 import { uniqueSorted } from '../view-projections.js';
-import { shouldReportPlanningRootMissing } from '../../planning-repo-root.js';
 import { createNextProfiler, normalizeOptionalString } from './intent.js';
 import { findActiveTaskQueueForIntent } from './runtime.js';
 import { dedupeTasks, isActiveClaimedTask, isHandoffPrompt, isTaskIdMentioned, resolvePromptScopedTaskRoute } from './matching.js';

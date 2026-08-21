@@ -2,8 +2,8 @@ import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'n
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { detectFrameworkRepoIdentity, type FrameworkRepoIdentity } from '../framework-development.ts';
-import { relativePathFrom } from '../shared.ts';
-import { CliError } from '../shared.ts';
+import { CliError, relativePathFrom } from '../shared.ts';
+
 import { runGit, runGitScalar, normalizeRelativePath } from './git-index-diagnostics.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;

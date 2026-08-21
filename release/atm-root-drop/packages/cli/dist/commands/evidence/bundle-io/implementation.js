@@ -228,7 +228,9 @@ else {
     const shellArgs = process.platform === "win32" ? ["-NoProfile", "-Command", options.command] : ["-c", options.command];
     const startedAtMs = Date.now();
     const startedAt = new Date(startedAtMs).toISOString();
-    const result = spawnSync(shell, shellArgs, { cwd: resolvedCwd, encoding: "utf8", env: { ...process.env, ATM_ACTOR_ID: actorId, ATM_TASK_ID: resolvedTaskId, }, });
+    const childEnvironment = { ...process.env, ATM_ACTOR_ID: actorId, ATM_TASK_ID: resolvedTaskId, };
+    delete childEnvironment.ATM_LANE_SESSION_ID;
+    const result = spawnSync(shell, shellArgs, { cwd: resolvedCwd, encoding: "utf8", env: childEnvironment, });
     const finishedAtMs = Date.now();
     const finishedAt = new Date(finishedAtMs).toISOString();
     finalRun = { command: options.command, exitCode: result.status ?? (result.error ? 1 : 0), stdoutSha256: hashString(result.stdout ?? ""), stderrSha256: hashString(result.stderr ?? ""), generatedAt: finishedAt, startedAt, finishedAt, durationMs: Math.max(0, finishedAtMs - startedAtMs), validators: options.validators, runnerKind: effectiveRunnerKind, };

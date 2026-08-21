@@ -1,0 +1,360 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0385",
+  "title": "Bind all local evidence command runs to their executed source commit",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1 Every locally executed evidence command run records the verified current HEAD when the caller did not supply an explicit source commit, regardless of whether it uses the frozen or development runner.",
+    "ACC-2 A supplied source commit remains authoritative and the cache key uses the exact resolved provenance value.",
+    "ACC-3 External or unverifiable execution remains without local provenance and is rejected by consumers that require it."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/evidence/command-runs.ts",
+    "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/evidence/command-runs.ts",
+    "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop",
+    ".atm/history/evidence/ATM-GOV-0385.*",
+    ".atm/history/task-events/ATM-GOV-0385/**",
+    ".atm/history/tasks/ATM-GOV-0385.json",
+    "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+    "packages/core/src/git/publication-delivery-slice.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/runner-sync-incremental-build.ts",
+    "packages/cli/dist/atm.d.ts",
+    "packages/cli/dist/commands/broker/batch-execute-actions.js",
+    "packages/cli/dist/commands/broker/plan-batch-action.js",
+    "packages/cli/dist/commands/evidence/__tests__/run.spec.js",
+    "packages/cli/dist/commands/evidence/bundle-io/implementation.js",
+    "packages/cli/dist/commands/hook/git-hooks-installer.js",
+    "packages/cli/dist/commands/integration/run.js",
+    "packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js",
+    "packages/cli/dist/commands/next/planning-root-preference.js",
+    "packages/cli/dist/commands/next/route-resolution/queue-inspection.js",
+    "packages/cli/dist/commands/planning-root-preference.js",
+    "packages/cli/dist/index.d.ts",
+    "packages/cli/dist/commands/planning-repo-root.js"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+    "npm run typecheck",
+    "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Backfilling existing receipts",
+    "treating an external execution as local",
+    "changing runbook completion policy"
+  ],
+  "nonGoals": [
+    "Making an absent or unverifiable source commit pass"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert producer and focused test together; never infer a missing sourceCommit in a consumer.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-integrity",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0385-bind-frozen-evidence-runs-to-executed-source.task.md",
+    "sectionTitle": "ATM-GOV-0385",
+    "headingLine": 63,
+    "hash": "106d1923ffaf43b7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0385-bind-frozen-evidence-runs-to-executed-source.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:106d1923ffaf43b740567b55c0fb97a92feb88a80ebd17fbe140623a871e030a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T10:41:43.468Z"
+    }
+  },
+  "importedAt": "2026-08-14T10:41:43.468Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Frozen-runner command receipts can pass while omitting sourceCommit",
+      "so independent completion evidence fails closed."
+    ],
+    "softRelations": [
+      "ATM-GOV-0380",
+      "ATM-GOV-0381"
+    ],
+    "changedPublicSeams": [
+      "atm.commandRunProvenance.v1"
+    ],
+    "causalImpactEdges": [
+      "frozen-runner-source-attribution",
+      "evidence-cache-identity",
+      "runbook-receipt-freshness"
+    ],
+    "parallelFrontierInputs": [
+      "command-run-normalizer",
+      "evidence-receipts",
+      "runbook-completion-report"
+    ],
+    "validatorReferences": [
+      "command-runs.spec",
+      "runbook-completion-evidence"
+    ],
+    "phaseOwner": "correction-wave-0"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0385_frozen_runner_source_provenance",
+      "targetGroupId": "test_group_plan3x4x_wave_0",
+      "semanticKey": "frozen_runner_command_run_source_provenance",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "frozen-runner-source-attribution",
+        "evidence-cache-identity",
+        "runbook-receipt-freshness"
+      ],
+      "expectedRedPredicate": "a local frozen-runner receipt without an explicit sourceCommit omits executed HEAD or collides in cache identity",
+      "contributionResourceKey": "evidence-command-runs",
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "atm.commandRunProvenance.v1",
+      "resourceKey": "evidence-command-runs"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0385_frozen_runner_source_provenance"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-41f5f9372dfc",
+    "claimedAt": "2026-08-14T10:39:48.178Z",
+    "heartbeatAt": "2026-08-21T03:06:46.590Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0385.*",
+      ".atm/history/task-events/ATM-GOV-0385/**",
+      ".atm/history/tasks/ATM-GOV-0385.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/cli/dist/commands/broker/batch-execute-actions.js",
+      "packages/cli/dist/commands/broker/plan-batch-action.js",
+      "packages/cli/dist/commands/evidence/__tests__/run.spec.js",
+      "packages/cli/dist/commands/evidence/bundle-io/implementation.js",
+      "packages/cli/dist/commands/hook/git-hooks-installer.js",
+      "packages/cli/dist/commands/integration/run.js",
+      "packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js",
+      "packages/cli/dist/commands/next/planning-root-preference.js",
+      "packages/cli/dist/commands/next/route-resolution/queue-inspection.js",
+      "packages/cli/dist/commands/planning-repo-root.js",
+      "packages/cli/dist/index.d.ts",
+      "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+      "packages/cli/src/commands/evidence/command-runs.ts",
+      "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+      "packages/core/src/git/publication-delivery-slice.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814103948-codex-captain-recovery-7ca3aaf680",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814103948-codex-captain-recovery-7ca3aaf680\""
+    }
+  },
+  "owner": "codex-captain-recovery",
+  "startedAt": "2026-08-14T10:39:48.178Z",
+  "startedBySessionId": "session-20260814103948-codex-captain-recovery-ATM-GOV-0385-11827686ca",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0385",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0385.*",
+      ".atm/history/task-events/ATM-GOV-0385/**",
+      ".atm/history/tasks/ATM-GOV-0385.json",
+      "packages/cli/dist/atm.d.ts",
+      "packages/cli/dist/commands/broker/batch-execute-actions.js",
+      "packages/cli/dist/commands/broker/plan-batch-action.js",
+      "packages/cli/dist/commands/evidence/__tests__/run.spec.js",
+      "packages/cli/dist/commands/evidence/bundle-io/implementation.js",
+      "packages/cli/dist/commands/hook/git-hooks-installer.js",
+      "packages/cli/dist/commands/integration/run.js",
+      "packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js",
+      "packages/cli/dist/commands/next/planning-root-preference.js",
+      "packages/cli/dist/commands/next/route-resolution/queue-inspection.js",
+      "packages/cli/dist/commands/planning-repo-root.js",
+      "packages/cli/dist/index.d.ts",
+      "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+      "packages/cli/src/commands/evidence/command-runs.ts",
+      "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+      "packages/core/src/git/publication-delivery-slice.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/runner-sync-incremental-build.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0385-bind-frozen-evidence-runs-to-executed-source.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0385-bind-frozen-evidence-runs-to-executed-source.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "3fb1d0259175cedf5287657bcbfe8f33b8a8839485e99ca4763ddae86451da2c",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260814103948-codex-captain-recovery-7ca3aaf680",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814103948-codex-captain-recovery-7ca3aaf680\""
+    },
+    "createdAt": "2026-08-21T02:49:45.412Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-08-21T03-15-55-096Z-scope-amendment-57b4b43da251",
+  "lastTransitionAt": "2026-08-21T03:15:55.096Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-3e0d09ea337a5ef0",
+    "ticketDigest": "sha256:3e0d09ea337a5ef097f238b96aa77bf22fad608c640f78be5464fa03470884f1",
+    "taskId": "ATM-GOV-0385",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260814103948-codex-captain-recovery-7ca3aaf680",
+    "claimGeneration": "lease-41f5f9372dfc",
+    "issuedAt": "2026-08-21T03:15:54.901Z",
+    "expiresAt": "2026-08-21T03:45:54.901Z",
+    "scopeDigest": "sha256:ffe9bba17372ad73fcf7534164ac7031b26b5c9182197c5e0c2f3cb5d3dae961",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-21T03:15:54.901Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0385.*",
+          ".atm/history/task-events/ATM-GOV-0385/**",
+          ".atm/history/tasks/ATM-GOV-0385.json",
+          "packages/cli/dist/atm.d.ts",
+          "packages/cli/dist/commands/broker/batch-execute-actions.js",
+          "packages/cli/dist/commands/broker/plan-batch-action.js",
+          "packages/cli/dist/commands/evidence/__tests__/run.spec.js",
+          "packages/cli/dist/commands/evidence/bundle-io/implementation.js",
+          "packages/cli/dist/commands/hook/git-hooks-installer.js",
+          "packages/cli/dist/commands/integration/run.js",
+          "packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js",
+          "packages/cli/dist/commands/next/planning-root-preference.js",
+          "packages/cli/dist/commands/next/route-resolution/queue-inspection.js",
+          "packages/cli/dist/commands/planning-repo-root.js",
+          "packages/cli/dist/index.d.ts",
+          "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+          "packages/cli/src/commands/evidence/command-runs.ts",
+          "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+          "packages/core/src/git/publication-delivery-slice.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop",
+          "scripts/run-sealed-runner-build.ts",
+          "scripts/runner-sync-incremental-build.ts"
+        ],
+        "digest": "sha256:aa56bb77e3ada7b7a7a39bf12e193ef087464d7ba44f190605bf1dda1cd35b45"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  }
+}

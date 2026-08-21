@@ -7,7 +7,7 @@ import { buildTeamBrokerRunRecord, buildTeamBrokerRunRecordEnvelope } from '../.
 import { defaultAdapterRegistry, resolveAdapter } from '../../../../core/dist/broker/adapters/registry.js';
 import { planMutationBatch } from '../../../../core/dist/broker/adapters/batch-planner.js';
 import { computeCasResult, hashContent } from '../../../../core/dist/broker/adapters/cas.js';
-import { resolveBrokerRunEvidenceDir, normalizeEvidencePath } from './parser.js';
+import { normalizeEvidencePath, resolveBrokerRunEvidenceDir } from './parser.js';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.js';
 export function handleBrokerPlanBatch(options) {
     if (options.action === 'plan-batch') {

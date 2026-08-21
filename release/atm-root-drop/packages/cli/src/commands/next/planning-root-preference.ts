@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, type Dirent } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, type Dirent } from 'node:fs';
 import path from 'node:path';
 
 export const PLANNING_ROOT_RELATIVE_SUFFIX = path.join('docs', 'ai_atomic_framework');
@@ -191,16 +191,43 @@ export function applyCanonicalSiblingPreference(
   };
 }
 
+export interface PlanningRootOptions {
+  readonly explicitRoot?: string;
+  readonly configuredRoots?: readonly string[];
+  readonly readDir?: (directoryPath: string) => readonly Dirent[];
+  readonly exists?: (filePath: string) => boolean;
+  readonly stat?: (filePath: string) => { isDirectory: () => boolean };
+  readonly readFile?: (filePath: string, encoding: string) => string;
+}
+
+export function hasValidSeriesRegistry(
+  planningRoot: string,
+  options?: {
+    readonly exists?: (filePath: string) => boolean;
+    readonly readFile?: (filePath: string, encoding: string) => string;
+  }
+): boolean {
+  const exists = options?.exists ?? existsSync;
+  const readFile = options?.readFile ?? ((p: string, enc: string) => readFileSync(p, enc as BufferEncoding));
+  const registryPath = path.join(planningRoot, 'series-registry.json');
+  if (!exists(registryPath)) return false;
+  try {
+    const raw = readFile(registryPath, 'utf8');
+    const parsed = JSON.parse(raw) as { schemaId?: string; series?: readonly { status?: string }[] };
+    if (parsed.schemaId !== 'atm.seriesRegistry.v1' || !Array.isArray(parsed.series)) return false;
+    return parsed.series.some((s) => s.status === 'active');
+  } catch {
+    return false;
+  }
+}
+
 export function resolveCandidatePlanningRoots(
   cwd: string,
-  options?: {
-    readonly configuredRoots?: readonly string[];
-    readonly readDir?: (directoryPath: string) => readonly Dirent[];
-    readonly exists?: (filePath: string) => boolean;
-  }
+  options?: PlanningRootOptions
 ): PlanningRootResolution {
   const readDir = options?.readDir ?? safeReadDir;
   const exists = options?.exists ?? existsSync;
+  const stat = options?.stat ?? ((p: string) => statSync(p));
   const roots = new Set<string>();
 
   for (const configuredRoot of options?.configuredRoots ?? []) {
@@ -216,7 +243,14 @@ export function resolveCandidatePlanningRoots(
 
   const resolved = Array.from(roots)
     .map((entry) => path.resolve(entry))
-    .filter((entry) => exists(entry))
+    .filter((entry) => {
+      if (!exists(entry)) return false;
+      try {
+        return stat(entry).isDirectory();
+      } catch {
+        return false;
+      }
+    })
     .sort((left, right) => left.localeCompare(right));
 
   return applyCanonicalSiblingPreference(resolved, parent, { exists });
@@ -226,19 +260,15 @@ export function resolveCandidatePlanningRoots(
  * Single entry point for planning-root selection.
  *
  * An explicit operator-supplied root always wins. Otherwise a canonical base
- * directory resolves its derivatives. When a prefix family has no canonical base
- * the selection fails closed: `resolvedRoots` is empty so no caller can fall back
- * to guessing, and `ambiguities[]` carries the candidates, their source
- * availability, and the one safe non-destructive recovery route.
+ * directory resolves its derivatives. When candidate planning roots exist:
+ * 1. Filter candidates to those with valid, reachable series-registry with active series.
+ * 2. If exactly one candidate has a valid registered series-registry, select it as canonical.
+ * 3. If multiple distinct registered authorities exist, fail closed with ATM_PLANNING_ROOT_AMBIGUOUS.
+ * 4. Otherwise fall back to canonical derivative-sibling resolution.
  */
 export function selectPlanningRoot(
   cwd: string,
-  options?: {
-    readonly explicitRoot?: string;
-    readonly configuredRoots?: readonly string[];
-    readonly readDir?: (directoryPath: string) => readonly Dirent[];
-    readonly exists?: (filePath: string) => boolean;
-  }
+  options?: PlanningRootOptions
 ): PlanningRootSelection {
   const explicitRoot = options?.explicitRoot;
   if (explicitRoot) {
@@ -251,8 +281,47 @@ export function selectPlanningRoot(
     return { status: 'ambiguous', failClosed: true, resolvedRoots: [], ambiguities: resolution.warnings };
   }
 
+  const registeredRoots = resolution.roots.filter((root) => hasValidSeriesRegistry(root, options));
+
+  if (registeredRoots.length === 1) {
+    return { status: 'canonical', failClosed: false, resolvedRoots: registeredRoots, ambiguities: [] };
+  }
+
+  if (registeredRoots.length > 1) {
+    const parent = path.dirname(path.resolve(cwd));
+    const siblingRepoDirs = uniqueSorted(
+      registeredRoots
+        .map((root) => repoDirNameFromPlanningRoot(root) ?? path.basename(path.dirname(path.dirname(root))))
+        .filter((entry): entry is string => Boolean(entry))
+    );
+    const ambiguity: PlanningRootAmbiguity = {
+      code: PLANNING_ROOT_AMBIGUOUS_CODE,
+      detail: `Multiple reachable registered planning authorities found: ${siblingRepoDirs.join(', ')}.`,
+      prefix: '',
+      siblingRepoDirs,
+      candidates: registeredRoots.map((planningRoot) => {
+        const repoDir = repoDirFromPlanningRoot(planningRoot) ?? path.dirname(path.dirname(planningRoot));
+        const repoDirName = path.basename(repoDir);
+        return {
+          repoDirName,
+          repoDir,
+          planningRoot,
+          sourceAvailable: (options?.exists ?? existsSync)(planningRoot)
+        };
+      }),
+      recovery: planningRootAmbiguityRecovery()
+    };
+    return {
+      status: 'ambiguous',
+      failClosed: true,
+      resolvedRoots: [],
+      ambiguities: [ambiguity]
+    };
+  }
+
   return { status: 'canonical', failClosed: false, resolvedRoots: resolution.roots, ambiguities: [] };
 }
+
 
 export function listCandidatePlanningRoots(cwd: string): readonly string[] {
   return resolveCandidatePlanningRoots(cwd).roots;

@@ -41,14 +41,15 @@ const taskRoot = path.join(fixtureRoot, '.atm', 'history', 'tasks');
 mkdirSync(lockRoot, { recursive: true });
 mkdirSync(taskRoot, { recursive: true });
 const now = '2026-08-11T12:00:00.000Z';
-const writeLock = (name: string, taskId: string, heartbeatAt: string) => writeFileSync(
+const writeLock = (name: string, taskId: string, heartbeatAt: string, linkedTaskId?: string) => writeFileSync(
   path.join(lockRoot, name),
   JSON.stringify({
     workItemId: taskId,
     actorId: 'runner-steward',
     heartbeatAt,
     ttlSeconds: 300,
-    files: ['release/atm-onefile/atm.mjs', 'release/atm-root-drop']
+    files: ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'],
+    linkedTaskId
   }),
   'utf8'
 );
@@ -76,6 +77,16 @@ try {
     'an active task claim with an admitted release scope must not require a direction-lock file'
   );
   writeLock('active.lock.json', 'ATM-GOV-0345', '2026-08-11T11:59:00.000Z');
+
+  // A framework-temp reservation linked to the live delivery card is a
+  // delegated publication capability, not a second competing owner.
+  writeLock('linked-temp.lock.json', 'ATM-FRAMEWORK-TEMP-runner-steward-current', '2026-08-11T11:59:30.000Z', 'ATM-GOV-0345');
+  assert.equal(
+    resolveActiveRunnerPublicationTask({ cwd: fixtureRoot, actorId: 'runner-steward', now }),
+    'ATM-GOV-0345',
+    'a linked framework-temp reservation must canonicalize to its live delivery card'
+  );
+  unlinkSync(path.join(lockRoot, 'linked-temp.lock.json'));
 
   writeLock('ambiguous.lock.json', 'ATM-GOV-0346', '2026-08-11T11:59:30.000Z');
   assert.throws(

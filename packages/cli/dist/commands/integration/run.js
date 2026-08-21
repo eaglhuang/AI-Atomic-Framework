@@ -3,11 +3,10 @@ import { existsSync } from 'node:fs';
 import { CliError, makeResult, message, parseArgsForCommand, resolveValue } from '../shared.js';
 import { getCommandSpec } from '../command-specs.js';
 import { installAtmPrePushHook, uninstallAtmPrePushHook, verifyAtmPrePushHook } from '../git.js';
-import { inspectTeamRuntimeBackendCapabilities } from './health.js';
+import { inspectTeamRuntimeBackendCapabilities, readIntegrationManifest, verifyInstalledManifest } from './health.js';
 import { createIntegrationListResult } from './list.js';
 import { installIntegrationAdapter } from './install.js';
 import { asOptionalString, createIntegrationAdapter, createIntegrationContext, describeAdapter, manifestPathForIntegration, requireAdapterId } from './adapters.js';
-import { readIntegrationManifest, verifyInstalledManifest } from './health.js';
 import { collectAdapterParity } from './adapter-parity.js';
 async function loadIntegrationHooks() {
     return import('../integration-hooks.js');

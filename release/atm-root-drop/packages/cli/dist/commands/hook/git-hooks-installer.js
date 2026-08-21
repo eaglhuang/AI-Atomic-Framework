@@ -2,8 +2,7 @@ import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'n
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { detectFrameworkRepoIdentity } from '../framework-development.js';
-import { relativePathFrom } from '../shared.js';
-import { CliError } from '../shared.js';
+import { CliError, relativePathFrom } from '../shared.js';
 import { runGit, runGitScalar } from './git-index-diagnostics.js';
 export const hookContractVersion = 'atm.integration-hooks/v1';
 export const hookProvider = 'atm-framework-development-hooks/v1';
