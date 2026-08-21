@@ -63,4 +63,26 @@ assert.deepEqual(fuzzyProjectionReport.scopeExpansionRequiredFiles, []);
 assert.deepEqual(fuzzyProjectionReport.advisoryTrackedFiles, [
   '.github/instructions/adapter-projection.instructions.md'
 ]);
+
+mkdirSync(path.join(cwd, 'atomic_workbench', 'atomization-coverage'), { recursive: true });
+writeFileSync(path.join(cwd, 'atomic_workbench', 'atomization-coverage', 'fixture-exclusion.json'), '{}\n');
+git('add', 'atomic_workbench/atomization-coverage/fixture-exclusion.json');
+const deliverableReport = checkPendingTaskArtifactScopeExpansion({
+  cwd,
+  task: {
+    workItemId: 'TASK-AAO-0011', title: 'Generated fixture exclusion boundaries', status: 'planned', closedAt: null,
+    closedByActor: null, closurePacket: null, lastTransitionId: null, lastTransitionAt: null,
+    milestone: null, dependencies: [], taskPath: '.atm/history/tasks/TASK-AAO-0011.json',
+    format: 'json', sourcePlanPath: null, nearbyPlanPaths: [],
+    scopePaths: ['packages/core/src/broker/runner-build-output-inventory.ts'],
+    targetRepo: null, planningRepo: null, allowPlanningMirror: false,
+    planningReadOnlyPaths: [], planningMirrorPaths: [], targetAllowedFiles: [],
+    closureAuthority: null, activeClaimActorId: null, activeClaimLaneSessionId: null,
+    activeClaimIntent: null
+  } as never
+});
+assert.deepEqual(deliverableReport.scopeExpansionRequiredFiles, [
+  'atomic_workbench/atomization-coverage/fixture-exclusion.json'
+]);
+assert.deepEqual(deliverableReport.advisoryTrackedFiles, []);
 console.log('[pending-task-artifact-scope.test] ok');
