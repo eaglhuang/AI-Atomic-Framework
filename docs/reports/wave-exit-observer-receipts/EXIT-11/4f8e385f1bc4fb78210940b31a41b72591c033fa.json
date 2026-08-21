@@ -1,0 +1,24 @@
+{
+  "schemaId": "atm.waveExitObserverReceipt.v1",
+  "schemaVersion": "0.1.0",
+  "exitItemId": "EXIT-11",
+  "wave": "Wave 10",
+  "observerActor": "codex-wave-exit-observer",
+  "observerRole": "wave-exit-observer.codex-sidecar",
+  "declaredBasisActor": "codex-gpt-5.4-mini",
+  "independenceVerdict": "independent",
+  "command": "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
+  "exitCode": 0,
+  "stdoutDigest": "sha256:343ccfb3451f8829f9f867dc32fdea213c9dfd584f4830e40a89e9ddded181f7",
+  "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observedAt": "2026-08-21T00:10:57.675Z",
+  "observedHead": "4f8e385f1bc4fb78210940b31a41b72591c033fa",
+  "policyDigest": "sha256:529e858c5d88a015a81746b4d434ac4f8182c9b3368368b4b634ceb8cb5e8ab7",
+  "inputDigests": [
+    {
+      "path": "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "digest": "sha256:40c96f99aa3612ac7bcb4ad25d5730dcf46d7a8d501fd65d11d07280c58db651"
+    }
+  ],
+  "artifactPath": "docs/reports/wave-exit-observer-receipts/EXIT-11/4f8e385f1bc4fb78210940b31a41b72591c033fa.json"
+}
