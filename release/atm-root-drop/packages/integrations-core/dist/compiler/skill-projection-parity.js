@@ -46,6 +46,22 @@ export function collectProjectionMetadataFindings(projection, sourceSnapshot) {
     }
     return findings;
 }
+export function resolveTargetedSkillProjectionRefresh(input) {
+    const templateId = input.templateId.trim();
+    if (!templateId)
+        throw new Error('targeted skill projection refresh requires a template id');
+    const projectionRelativePath = `${templateId}/SKILL.md`;
+    const matches = input.compiledProjectionFiles.filter((file) => file.relativePath.replace(/\\/g, '/') === projectionRelativePath);
+    if (matches.length !== 1) {
+        throw new Error(`targeted skill projection refresh requires exactly one compiled member for ${projectionRelativePath}`);
+    }
+    return {
+        templateId,
+        projectionRelativePath,
+        content: matches[0].content,
+        installedPaths: [...new Set(input.installedPaths.map((value) => value.trim()).filter(Boolean))]
+    };
+}
 export function evaluateInstalledProjectionParity(input) {
     const readText = input.readFile ?? ((filePath) => readFileSync(filePath, 'utf8'));
     const hasFile = input.fileExists ?? existsSync;

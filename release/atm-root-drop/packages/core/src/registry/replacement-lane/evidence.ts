@@ -5,13 +5,8 @@ import { validateRetirementProof } from '../retirement-proof.ts';
 import { validateRollbackProof } from '../rollback-proof.ts';
 import type { RollbackProof } from '../rollback-types.ts';
 import { readJson } from './support.ts';
-import type {
-  EvidenceCheckResult,
-  EvidenceDocumentRecord,
-  LoadedEvidenceDocument,
-  ReplacementLaneValidationResult
-} from './types.ts';
-import { asRecord } from './types.ts';
+import { asRecord, type EvidenceCheckResult, type EvidenceDocumentRecord, type LoadedEvidenceDocument, type ReplacementLaneValidationResult } from './types.ts';
+
 
 export function loadEvidenceDocuments(repositoryRoot: string, evidenceRefs: readonly string[]): LoadedEvidenceDocument[] {
   return evidenceRefs.map((evidenceRef) => {

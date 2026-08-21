@@ -10,6 +10,7 @@ import {
   compileSkillCorpus,
   evaluateInstalledProjectionParity,
   loadSkillCorpusSourceSnapshot,
+  resolveTargetedSkillProjectionRefresh,
   sealSkillSourceUniverse
 } from '../../packages/integrations-core/src/compiler/skill-templates.ts';
 import { compileSkillTemplatesForAdapter } from '../../packages/integrations-core/src/compiler/compile.ts';
@@ -462,6 +463,38 @@ withFixtureCorpus(universeFixtureFiles, (directory) => {
       `disposition must stay inside the finite set: ${disposition}`
     );
   }
+}
+
+// caseId: targeted_dispatch_projection_refresh_0039
+// A targeted repair selects only the declared dispatch projection; unrelated
+// compiled skills are not silently folded into the write set.
+{
+  const refresh = resolveTargetedSkillProjectionRefresh({
+    templateId: 'atm-dispatch',
+    compiledProjectionFiles: [
+      { relativePath: 'atm-dispatch/SKILL.md', content: 'dispatch projection\n' },
+      { relativePath: 'atm-next/SKILL.md', content: 'next projection\n' }
+    ],
+    installedPaths: [
+      '.agents/skills/atm-dispatch/SKILL.md',
+      'integrations/codex-skills/atm-dispatch/SKILL.md'
+    ]
+  });
+  assert.equal(refresh.projectionRelativePath, 'atm-dispatch/SKILL.md');
+  assert.equal(refresh.content, 'dispatch projection\n');
+  assert.deepEqual(refresh.installedPaths, [
+    '.agents/skills/atm-dispatch/SKILL.md',
+    'integrations/codex-skills/atm-dispatch/SKILL.md'
+  ]);
+  assert.throws(
+    () => resolveTargetedSkillProjectionRefresh({
+      templateId: 'atm-dispatch',
+      compiledProjectionFiles: [{ relativePath: 'atm-next/SKILL.md', content: 'next projection\n' }],
+      installedPaths: []
+    }),
+    /exactly one compiled member/i,
+    'a missing declared projection must fail closed'
+  );
 }
 
 const generatedPath = path.join(root, 'artifacts', 'generated', 'skill-corpus-audit.json');

@@ -14,7 +14,7 @@ import {
   countTokenOverlap
 } from '../match-and-sort.ts';
 import { buildPromptScopedQueueClaimCommand } from '../prompt-scope-resolution.ts';
-import { readConfiguredPlanningRoots } from '../../planning-repo-root.ts';
+import { readConfiguredPlanningRoots, shouldReportPlanningRootMissing } from '../../planning-repo-root.ts';
 import { resolveCandidatePlanningRoots } from '../planning-root-preference.ts';
 import { bootstrapTaskId } from '../../governance-runtime.ts';
 import { CliError, parseJsonText, quoteCliValue } from '../../shared.ts';
@@ -71,7 +71,7 @@ import {
   uniqueInOrder,
   uniqueSorted
 } from '../view-projections.ts';
-import { shouldReportPlanningRootMissing } from '../../planning-repo-root.ts';
+
 import { extractTaskFamilyRootHintsFromPrompt, extractTaskIdReferencesFromPrompt, expandTaskIdReferenceAliases, extractTaskRootHintsFromPrompt } from './matching.ts';
 import { inspectImportedTaskQueue } from './queue-inspection.ts';
 

@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { compileSkillTemplatesForAdapter } from '../packages/integrations-core/src/compiler/compile.ts';
+import { loadSkillCorpusSourceSnapshot, resolveTargetedSkillProjectionRefresh } from '../packages/integrations-core/src/compiler/skill-templates.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -116,6 +118,20 @@ for (const relativePath of entryGateFiles) {
 
 if (skillContents.length === skillFiles.length) {
   check(skillContents[0] === skillContents[1], 'atm-dispatch local skill and Codex integration copy must stay byte-identical');
+  const snapshot = loadSkillCorpusSourceSnapshot(path.join(root, 'templates', 'skills'));
+  const refresh = resolveTargetedSkillProjectionRefresh({
+    templateId: 'atm-dispatch',
+    compiledProjectionFiles: compileSkillTemplatesForAdapter('codex', snapshot.templates, { repositoryRoot: root })
+      .filter((file): file is typeof file & { readonly content: string } => typeof file.content === 'string'),
+    installedPaths: skillFiles
+  });
+  check(
+    refresh.installedPaths.length === skillFiles.length,
+    'targeted dispatch refresh must retain exactly the declared installed projections'
+  );
+  for (const [index, content] of skillContents.entries()) {
+    check(content === refresh.content, `${skillFiles[index]} must match the compiled atm-dispatch projection`);
+  }
 }
 
 const packageJson = readJson('package.json') as {

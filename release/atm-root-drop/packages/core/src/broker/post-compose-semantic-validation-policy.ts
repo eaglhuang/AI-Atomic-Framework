@@ -1,5 +1,5 @@
-import type { PatchCandidateMaterialization, SealedValidatorSelection } from './patch-candidate-materializer.ts';
-import { sealValidatorSelection } from './patch-candidate-materializer.ts';
+import { type PatchCandidateMaterialization, type SealedValidatorSelection, sealValidatorSelection } from './patch-candidate-materializer.ts';
+
 
 /**
  * Exact ErrorCode constants owned by TASK-ERR-0006.

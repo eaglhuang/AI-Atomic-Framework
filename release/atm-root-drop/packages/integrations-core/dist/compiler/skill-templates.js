@@ -14,7 +14,7 @@ import { defaultSkillInstallProfiles, getSkillInstallProfile, skillBelongsToProf
 // skill-source-universe.ts. They are re-exported here so the compiler's public
 // surface keeps its original shape.
 export { defaultSkillTemplateDirectory, sealSkillSourceUniverse, collectSkillSourceUniverseFindings } from './skill-source-universe.js';
-export { evaluateInstalledProjectionParity, collectProjectionMetadataFindings } from './skill-projection-parity.js';
+export { evaluateInstalledProjectionParity, collectProjectionMetadataFindings, resolveTargetedSkillProjectionRefresh } from './skill-projection-parity.js';
 export function createSkillDefinitionVNext(input) {
     const capabilities = [...new Set(input.capabilities.map((value) => value.trim()).filter(Boolean))].sort();
     const atmContractVersions = [...new Set(input.atmContractVersions.map((value) => value.trim()).filter(Boolean))].sort();

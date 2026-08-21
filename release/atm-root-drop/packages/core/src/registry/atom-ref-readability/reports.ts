@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { writeJson, writeText } from './files.ts';
 import { renderAdopterAtomRefs, renderAdopterMapRefs, renderFrameworkGeneratedRefs } from './render.ts';
-import type { AtomCallsite, AtomCallsiteRewrite, AtomCallsiteViolation, AtomCatalogEntry } from './types.ts';
-import { generatedPathsForRepo, isFrameworkRepo } from './types.ts';
+import { type AtomCallsite, type AtomCallsiteRewrite, type AtomCallsiteViolation, type AtomCatalogEntry, generatedPathsForRepo, isFrameworkRepo } from './types.ts';
+
 
 export function writeGeneratedRefs(repoPath: string, catalog: readonly AtomCatalogEntry[]) {
   const generatedPaths = generatedPathsForRepo(repoPath);

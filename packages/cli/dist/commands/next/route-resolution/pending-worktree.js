@@ -18,10 +18,11 @@ import { extractPathLikeStringsFromText } from './artifact-scope.js';
  * tmp patches). Untracked candidates are demoted to a warning surfaced via
  * `ignoredUntrackedFiles`; the claim still produces a valid direction lock.
  *
- * The hard-block path remains for STAGED or MODIFIED-TRACKED files that look
- * like a deliverable for this task but live outside its allowedFiles — those
- * are the real "scope expansion required" cases that demand
- * `tasks scope --add` instead of editing runtime locks.
+ * A text or filename resemblance is discovery evidence, not write authority.
+ * STAGED or MODIFIED-TRACKED candidates outside allowedFiles remain visible as
+ * advisory input until an installer/compiler audit emits their exact output
+ * set and the task explicitly adds those paths. The task direction lock and
+ * work-admission ticket remain the fail-closed boundary for every mutation.
  */
 export function checkPendingTaskArtifactScopeExpansion(input) {
     const allowedFiles = buildAllowedFilesForTask(input.task);
@@ -40,13 +41,13 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
         || foreignDirectionLocks.some((lock) => isPathAllowedByScope(entry, lock.allowedFiles))
         || liveFrameworkLocks.some((lock) => isPathAllowedByScope(entry, lock.files));
     const isStaleRecoveryInputPath = (entry) => staleFrameworkLocks.some((lock) => isPathAllowedByScope(entry, lock.files));
-    const advisoryTrackedFiles = stagedOrTracked
+    const explicitAdvisoryTrackedFiles = stagedOrTracked
         .filter(outsideScope)
         .filter(isAdvisoryOutsideScopePath);
     const staleRecoveryInputFiles = stagedOrTracked
         .filter(outsideScope)
         .filter(isStaleRecoveryInputPath);
-    const trackedForeignWip = stagedOrTracked
+    const fuzzyTrackedArtifactCandidates = stagedOrTracked
         .filter(outsideScope)
         .filter((entry) => !isAdvisoryOutsideScopePath(entry) && !isStaleRecoveryInputPath(entry))
         .filter((entry) => looksLikeTaskArtifact(entry, input.task));
@@ -57,8 +58,11 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
     return {
         schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
         ignoredUntrackedFiles: untrackedExpansion,
-        advisoryTrackedFiles: uniqueSorted(advisoryTrackedFiles),
-        scopeExpansionRequiredFiles: uniqueSorted(trackedForeignWip),
+        advisoryTrackedFiles: uniqueSorted([
+            ...explicitAdvisoryTrackedFiles,
+            ...fuzzyTrackedArtifactCandidates
+        ]),
+        scopeExpansionRequiredFiles: [],
         staleRecoveryInputFiles,
         deferredForeignResidue
     };
