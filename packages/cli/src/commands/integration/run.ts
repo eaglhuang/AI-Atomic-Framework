@@ -3,11 +3,11 @@ import { existsSync } from 'node:fs';
 import { CliError, makeResult, message, parseArgsForCommand, resolveValue } from '../shared.ts';
 import { getCommandSpec } from '../command-specs.ts';
 import { installAtmPrePushHook, uninstallAtmPrePushHook, verifyAtmPrePushHook } from '../git.ts';
-import { inspectTeamRuntimeBackendCapabilities } from './health.ts';
+import { inspectTeamRuntimeBackendCapabilities, readIntegrationManifest, verifyInstalledManifest } from './health.ts';
 import { createIntegrationListResult } from './list.ts';
 import { installIntegrationAdapter } from './install.ts';
 import { asOptionalString, createIntegrationAdapter, createIntegrationContext, describeAdapter, manifestPathForIntegration, requireAdapterId } from './adapters.ts';
-import { readIntegrationManifest, verifyInstalledManifest } from './health.ts';
+
 import { collectAdapterParity } from './adapter-parity.ts';
 
 async function loadIntegrationHooks() {
