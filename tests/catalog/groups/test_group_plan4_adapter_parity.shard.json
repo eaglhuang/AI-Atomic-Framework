@@ -7,6 +7,7 @@
   "maintainers": ["atm-core"],
   "cases": [
     {"caseId":"test_task_atm_gov_0315_adapter_parity_4d8a1c73","semanticKey":"plan4_six_editor_adapter_parity","command":"node --strip-types tests/cli/plan4-adapter-parity.test.ts","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-2"],"coversImpactEdges":["source/compiler/manifest digest mismatch -> adapter parity block"]},
-    {"caseId":"test_task_atm_gov_0315_adapter_reinstall_smoke_9e2b6f14","semanticKey":"plan4_adapter_reinstall_frozen_smoke","command":"node --strip-types tests/cli/plan4-adapter-parity.test.ts","responsibility":"task-required","coversAcceptance":["ACC-3","ACC-4"],"coversImpactEdges":["source/compiler/manifest digest mismatch -> adapter parity block"]}
+    {"caseId":"test_task_atm_gov_0315_adapter_reinstall_smoke_9e2b6f14","semanticKey":"plan4_adapter_reinstall_frozen_smoke","command":"node --strip-types tests/cli/plan4-adapter-parity.test.ts","responsibility":"task-required","coversAcceptance":["ACC-3","ACC-4"],"coversImpactEdges":["source/compiler/manifest digest mismatch -> adapter parity block"]},
+    {"caseId":"test_six_editor_sealed_source_parity_0338","semanticKey":"six_editor_sealed_source_parity","command":"node --strip-types tests/cli/six-editor-adapter-parity.test.ts","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-2","ACC-3","ACC-4"],"coversImpactEdges":["codex-adapter","claude-adapter","cursor-adapter","copilot-adapter","gemini-adapter","antigravity-adapter"]}
   ]
 }

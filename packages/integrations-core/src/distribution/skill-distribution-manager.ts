@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto';
 import type { InstallManifest } from '../manifest/types.ts';
 import { createManifestFileRecord } from '../manifest/construct.ts';
 import { normalizeManifestPath } from '../manifest/schema.ts';
-import type { SkillInstallProfile, SkillTargetScope } from './install-profile.ts';
-import { skillBelongsToProfile } from './install-profile.ts';
+import { skillBelongsToProfile, type SkillInstallProfile, type SkillTargetScope } from './install-profile.ts';
+
 import type { ProjectedSkillCatalog, SkillProjectionFile } from './skill-catalog.ts';
 
 export interface AdapterCapabilities {

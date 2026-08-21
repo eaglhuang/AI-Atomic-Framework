@@ -2,10 +2,10 @@
   "schemaId": "atm.generatorProvenanceAudit",
   "specVersion": "0.1.0",
   "registryId": "registry.seed",
-  "registryGeneratedAt": "2026-05-20T15:08:15.683Z",
+  "registryGeneratedAt": "2026-07-30T16:39:36.611Z",
   "summary": {
-    "total": 7,
-    "generated": 2,
+    "total": 8,
+    "generated": 3,
     "backfilled": 3,
     "atomized": 1,
     "bootstrapSelf": 1,
@@ -42,8 +42,10 @@
       "testPaths": [
         "scripts/validate-neutrality-scanner.ts"
       ],
-      "driftOk": true,
-      "issues": []
+      "driftOk": false,
+      "issues": [
+        "registry-drift:codeHash"
+      ]
     },
     {
       "atomId": "ATM-CORE-0004",
@@ -61,8 +63,10 @@
         "tests/core/atom-generator.test.ts",
         "tests/core/id-allocator.test.ts"
       ],
-      "driftOk": true,
-      "issues": []
+      "driftOk": false,
+      "issues": [
+        "registry-drift:codeHash+testHash"
+      ]
     },
     {
       "atomId": "ATM-FIXTURE-0001",
@@ -125,8 +129,28 @@
         "atomic_workbench/atoms/ATM-CORE-0005/atom.test.ts",
         "scripts/validate-core-spec-parser.ts"
       ],
-      "driftOk": true,
-      "issues": []
+      "driftOk": false,
+      "issues": [
+        "registry-drift:codeHash+testHash"
+      ]
+    },
+    {
+      "atomId": "ATM-GOV-0001",
+      "logicalName": "atom.work-coordination-authority-planning-source-seal",
+      "provenance": "generated",
+      "marker": "generator-provenance:generated",
+      "workbenchPath": "atomic_workbench/atoms/ATM-GOV-0001",
+      "specPath": "atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
+      "codePaths": [
+        "atomic_workbench/atoms/ATM-GOV-0001/atom.source.mjs"
+      ],
+      "testPaths": [
+        "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts"
+      ],
+      "driftOk": false,
+      "issues": [
+        "registry-drift:specHash+codeHash+testHash"
+      ]
     }
   ]
 }
