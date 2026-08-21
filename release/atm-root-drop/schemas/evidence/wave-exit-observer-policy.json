@@ -1,0 +1,164 @@
+{
+  "schemaId": "atm.waveExitObserverPolicy.v1",
+  "specVersion": "0.1.0",
+  "canonicalReceiptDir": "docs/reports/wave-exit-observer-receipts",
+  "compilerCommandPath": "scripts/compile-runbook-completion-evidence.ts",
+  "basisProducerRole": "basis-producer",
+  "basisEvidenceOwners": [
+    "ATM-GOV-0341"
+  ],
+  "basisActorResolution": "active-claim-holder",
+  "policyDigest": {
+    "encoding": "utf8",
+    "newline": "lf",
+    "source": "git-show",
+    "path": "schemas/evidence/wave-exit-observer-policy.json"
+  },
+  "roles": {
+    "basis-producer": {
+      "kind": "basis"
+    },
+    "compiler": {
+      "kind": "not-observer"
+    },
+    "wave-exit-observer.gemini": {
+      "kind": "observer",
+      "executor": "gemini"
+    },
+    "wave-exit-observer.claude": {
+      "kind": "observer",
+      "executor": "claude"
+    },
+    "wave-exit-observer.codex-sidecar": {
+      "kind": "observer",
+      "executor": "codex-sidecar"
+    }
+  },
+  "exits": {
+    "EXIT-02": {
+      "wave": "Wave 1",
+      "observerRole": "wave-exit-observer.gemini",
+      "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+      "commandPath": "scripts/validate-git-head-evidence.ts",
+      "inputs": [
+        "scripts/validate-git-head-evidence.ts"
+      ],
+      "sideEffects": "temp-workspace-only",
+      "forbiddenFlags": []
+    },
+    "EXIT-03": {
+      "wave": "Wave 2",
+      "observerRole": "wave-exit-observer.gemini",
+      "command": "node --strip-types tests/cli/rescue-worktree-normal-write-classification.test.ts",
+      "commandPath": "tests/cli/rescue-worktree-normal-write-classification.test.ts",
+      "inputs": [
+        "tests/cli/rescue-worktree-normal-write-classification.test.ts"
+      ],
+      "sideEffects": "temp-workspace-only",
+      "forbiddenFlags": []
+    },
+    "EXIT-04": {
+      "wave": "Wave 3",
+      "observerRole": "wave-exit-observer.claude",
+      "command": "node --strip-types scripts/validate-cli.ts --mode surface",
+      "commandPath": "scripts/validate-cli/surface-suite.ts",
+      "inputs": [
+        "scripts/validate-cli/surface-suite.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "sideEffects": "cli-smoke-no-reports",
+      "forbiddenFlags": []
+    },
+    "EXIT-05": {
+      "wave": "Wave 4",
+      "observerRole": "wave-exit-observer.gemini",
+      "command": "node --strip-types tests/cli/observed-evidence-production-callers.test.ts",
+      "commandPath": "tests/cli/observed-evidence-production-callers.test.ts",
+      "inputs": [
+        "tests/cli/observed-evidence-production-callers.test.ts"
+      ],
+      "sideEffects": "none",
+      "forbiddenFlags": []
+    },
+    "EXIT-06": {
+      "wave": "Wave 5",
+      "observerRole": "wave-exit-observer.codex-sidecar",
+      "command": "node --strip-types scripts/review-four-plan-objective-authority.ts --mode validate",
+      "commandPath": "scripts/review-four-plan-objective-authority.ts",
+      "inputs": [
+        "docs/reports/plan-3-0-objective-replay.json",
+        "docs/reports/plan-3-1-objective-replay.json",
+        "docs/reports/plan-3-2-objective-replay.json",
+        "docs/reports/plan4-successor-wave-objective-map.json",
+        "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+        "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json",
+        "docs/reports/plan-3x-4x-charter-current-verdict.json"
+      ],
+      "sideEffects": "validate-existing-review",
+      "forbiddenFlags": [
+        "--mode write"
+      ]
+    },
+    "EXIT-07": {
+      "wave": "Wave 6",
+      "observerRole": "wave-exit-observer.codex-sidecar",
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --mode validate",
+      "commandPath": "scripts/validate-four-plan-objectives.ts",
+      "inputs": [
+        "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json"
+      ],
+      "inputDigestProjection": "objective-audit-excluding-derived-conclusion",
+      "sideEffects": "read-only",
+      "forbiddenFlags": []
+    },
+    "EXIT-08": {
+      "wave": "Wave 7",
+      "observerRole": "wave-exit-observer.gemini",
+      "command": "node --strip-types scripts/validate-plan4-successor-wave-consumption.ts",
+      "commandPath": "scripts/validate-plan4-successor-wave-consumption.ts",
+      "inputs": [
+        "docs/reports/plan4-successor-wave-objective-map.json"
+      ],
+      "sideEffects": "read-only",
+      "forbiddenFlags": []
+    },
+    "EXIT-09": {
+      "wave": "Wave 8",
+      "observerRole": "wave-exit-observer.claude",
+      "command": "node --strip-types tests/cli/six-editor-adapter-parity.test.ts",
+      "commandPath": "tests/cli/six-editor-adapter-parity.test.ts",
+      "inputs": [
+        "docs/reports/plan4-six-editor-adapter-parity.json"
+      ],
+      "sideEffects": "read-only",
+      "forbiddenFlags": []
+    },
+    "EXIT-10": {
+      "wave": "Wave 9",
+      "observerRole": "wave-exit-observer.gemini",
+      "command": "node --strip-types scripts/validate-backlog-census.ts",
+      "commandPath": "scripts/validate-backlog-census.ts",
+      "inputs": [
+        "docs/reports/plan-3x-4x-backlog-disposition-census.json"
+      ],
+      "sideEffects": "read-only",
+      "forbiddenFlags": [
+        "--write"
+      ]
+    },
+    "EXIT-11": {
+      "wave": "Wave 10",
+      "observerRole": "wave-exit-observer.codex-sidecar",
+      "command": "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
+      "commandPath": "scripts/review-runbook-release-authority.ts",
+      "inputs": [
+        "docs/reports/plan-3x-4x-runbook-completion-evidence.json"
+      ],
+      "inputDigestProjection": "completion-report-excluding-current-exit",
+      "sideEffects": "validate-existing-review",
+      "forbiddenFlags": [
+        "--mode write"
+      ]
+    }
+  }
+}
