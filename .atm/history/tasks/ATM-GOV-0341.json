@@ -554,10 +554,10 @@
     "findings": []
   },
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
+    "actorId": "codex-captain",
     "leaseId": "lease-0f19521c845b",
     "claimedAt": "2026-08-21T08:19:03.862Z",
-    "heartbeatAt": "2026-08-21T08:19:03.862Z",
+    "heartbeatAt": "2026-08-21T09:26:40.157Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0341.json",
@@ -767,36 +767,35 @@
       "tests/cli/wave-exit-observer-receipt.test.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260821081904-codex-gpt-5.4-mini-cf5ff1de9d",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260821081904-codex-gpt-5.4-mini-cf5ff1de9d\""
     }
   },
   "startedAt": "2026-08-14T09:50:24.347Z",
   "startedBySessionId": "session-20260821081903-codex-gpt-5.4-mini-ATM-GOV-0341-13bfcb5d7d",
-  "lastTransitionId": "2026-08-21T08-19-08-701Z-claim-6788276a86b9",
-  "lastTransitionAt": "2026-08-21T08:19:08.701Z",
+  "lastTransitionId": "2026-08-21T09-26-40-889Z-renew-d80914cda33b",
+  "lastTransitionAt": "2026-08-21T09:26:40.889Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-2f2850c7cb39a0e8",
-    "ticketDigest": "sha256:2f2850c7cb39a0e82f79d26dc2293df400f1db135e96475a649d3d949a7ce8ad",
+    "ticketId": "wat-b17a5506b79a6e8d",
+    "ticketDigest": "sha256:b17a5506b79a6e8d78351f03e92a5fcef8cb69480700c4e8b6310571a8e22670",
     "taskId": "ATM-GOV-0341",
     "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
+    "actorId": "codex-captain",
     "laneSessionId": "lane-20260821081904-codex-gpt-5.4-mini-cf5ff1de9d",
     "claimGeneration": "lease-0f19521c845b",
-    "issuedAt": "2026-08-21T08:19:03.862Z",
-    "expiresAt": "2026-08-21T08:49:03.862Z",
-    "scopeDigest": "sha256:a40aaa2b880e91af97667fa1fee23f652619de1b326a119bef10c790d3280cb8",
+    "issuedAt": "2026-08-21T09:26:40.157Z",
+    "expiresAt": "2026-08-21T09:56:40.157Z",
+    "scopeDigest": "sha256:6c42ceafd2f60d509061cd02f6d78bbdcc70ccf76ecc9451c63e20bd207cf6e3",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-21T08:19:03.862Z"
+      "selectedAt": "2026-08-21T09:26:40.157Z"
     },
     "grants": [
       {
@@ -804,7 +803,6 @@
         "values": [
           ".atm/history/evidence/ATM-GOV-0341.*",
           ".atm/history/evidence/ATM-GOV-0341.runner-sync-receipt.json",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0341/**",
           ".atm/history/tasks/ATM-GOV-0341.json",
           ".gemini/commands/atm-task-card-authoring.toml",
@@ -1009,7 +1007,7 @@
           "tests/cli/wave-exit-observer-receipt-writer.test.ts",
           "tests/cli/wave-exit-observer-receipt.test.ts"
         ],
-        "digest": "sha256:9dc564a90f7b2436ce52f26d91282787c06686efb6403789f9280661f6b3be6d"
+        "digest": "sha256:482063fd52aca1b698b06e54001c6feef925ba7e7b1417d78726e7c37c646082"
       },
       {
         "kind": "lifecycle-operation",
