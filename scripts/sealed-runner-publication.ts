@@ -264,9 +264,12 @@ export function resolveActiveRunnerPublicationTask(input: {
   const frameworkTempCandidates = readFrameworkTempLockProjection(input.cwd, nowMs)
     .filter((lock) => lock.workItemId.startsWith('ATM-FRAMEWORK-TEMP-'))
     .filter((lock) => lock.actorId === input.actorId && lock.disposition === 'foreign-live')
-    .filter((lock) => !explicitlyRequested || lock.workItemId === explicitlyRequested)
+    .filter((lock) => !explicitlyRequested || lock.workItemId === explicitlyRequested || lock.linkedTaskId === explicitlyRequested)
     .filter((lock) => ownsReleaseSurface(lock.files))
-    .map((lock) => lock.workItemId);
+    // A temporary claim linked to a live delivery card delegates the runner
+    // publication surface to that card.  Count that authority once unless the
+    // caller explicitly selected the temporary work item itself.
+    .map((lock) => explicitlyRequested === lock.workItemId ? lock.workItemId : lock.linkedTaskId ?? lock.workItemId);
   // A runner-sync reservation is granted to a live task claim, not to the
   // incidental presence of a direction-lock file.  Direction locks are one
   // projection of authority, but renewal and recovery paths can legitimately
