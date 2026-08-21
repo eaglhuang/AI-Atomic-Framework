@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.fourPlanCertificate.v1",
   "specVersion": "0.3.0",
-  "status": "proven",
+  "status": "not-certified",
   "decision": {
     "rule": "certify only when every exact objective denominator and every shared closure control is independently recomputed as proven",
     "failClosed": true
@@ -96,12 +96,12 @@
     "nonClaim": "The bound release commit must remain an ancestor of origin/main; later unrelated commits do not invalidate its proven release surfaces."
   },
   "independentReview": {
-    "status": "proven",
+    "status": "not-complete",
     "source": "docs/reports/plan-3x-4x-independent-certificate.json",
     "nonClaim": "The canonical certificate consumes the independent verdict but recomputes its required dimensions and reviewer count."
   },
   "legacyAuthority": {
-    "retired": true,
+    "retired": false,
     "reversible": true,
     "retirementRule": "Any missing, stale, contradictory, unreachable, unresolved, or unknown input restores legacy authority and changes this certificate to not-certified."
   },
@@ -112,10 +112,10 @@
     "appliedRule": "legacyAuthority.retirementRule",
     "reason": "The independent certificate this audit binds to was recompiled against observed evidence and the live remote and returned not-complete. Under this audit's own retirement rule a stale or contradictory input restores legacy authority and downgrades the certification, so the previous proven status and retired legacy authority no longer hold.",
     "blockers": [
-      "evidence-uncommitted:.atm/history/tasks/ATM-GOV-0341.json"
+      "evidence-uncommitted:docs/reports/reviews/plan-3x-4x-runbook-release-review.json"
     ],
     "nonClaim": "This downgrade does not retract the objective denominators. Plan 3.0 17/17, Plan 3.1 23/23, Plan 3.2 29/29 and Plan 4.0 17/17 remain independently replayed; what is withdrawn is the final certification and the retirement of legacy authority.",
     "restoreCondition": "Two genuinely independent reviewer outputs, reproducible dimension digests, and a certificate recompiled against the remote at that moment, all recorded by scripts/compile-four-plan-independent-certificate.ts --mode write."
   },
-  "resultDigest": "sha256:11624b1e50cb8c74eb7b946a17a60c0aea4c00f6acec024e9d6db2d42309ad1a"
+  "resultDigest": "sha256:a184dd8285a005cc2ea0b949f14db60d5f8afbf302b603890521def21c04ed50"
 }
