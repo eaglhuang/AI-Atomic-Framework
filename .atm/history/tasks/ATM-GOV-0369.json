@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0369",
   "title": "Make cross-task mutation ownership require current authority snapshots",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -274,7 +274,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-a29cc9832407",
     "claimedAt": "2026-08-21T08:39:39.571Z",
-    "heartbeatAt": "2026-08-21T09:11:35.149Z",
+    "heartbeatAt": "2026-08-21T09:16:39.667Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/catalog/registry/actors.json",
@@ -299,13 +299,14 @@
       "scripts/run-sealed-runner-build.ts",
       "tests/cli/git-commit-failure-index-restoration.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260821083939-codex-captain-66779ae1ba",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260821083939-codex-captain-66779ae1ba\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-captain",
   "startedAt": "2026-08-13T23:49:12.556Z",
@@ -357,8 +358,8 @@
     "createdAt": "2026-08-21T08:52:50.992Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-21T09-11-35-996Z-renew-36d006445d42",
-  "lastTransitionAt": "2026-08-21T09:11:35.996Z",
+  "lastTransitionId": "2026-08-21T09-16-39-669Z-close-0e9db94ad2b8",
+  "lastTransitionAt": "2026-08-21T09:16:39.669Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -441,5 +442,9 @@
   },
   "reservedAt": "2026-08-21T08:39:39.561Z",
   "promotedAt": "2026-08-21T08:39:39.565Z",
-  "startedByActor": "codex-captain"
+  "startedByActor": "codex-captain",
+  "closedAt": "2026-08-21T09:16:39.667Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260821083939-codex-captain-ATM-GOV-0369-2a0dc550d2",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0369.closure-packet.json"
 }

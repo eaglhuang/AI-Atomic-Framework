@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-21-013",
+  "date": "2026-08-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Fixed in source pending governed publication",
+  "area": "Taskflow close / temporary-index delivery transaction",
+  "finding": "Taskflow close correctly assembled a governed bundle containing an explicitly authorized dirty actor registry, but its preliminary delivery commit rebuilt a temporary Git index from targetDeliveryFiles alone. The registry was omitted from that intermediate index, so the pre-commit hook rejected the bare commit as ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED before the final governance bundle could run.",
+  "expectedBehavior": "Every temporary-index commit in one taskflow close transaction must present the hook with every current-task governance prerequisite that the final bundle has already admitted and that the hook requires. The actor registry is included only when the bundle has independently selected the tracked, authorized registry path; unrelated governance history remains in the final close bundle.",
+  "evidenceOrRepro": "ATM-GOV-0369 passed close dry-run with the actor registry in targetGovernanceFiles, then taskflow close --write failed during its first delivery commit. The focused commit-bundle assembly fixture reproduces the prior omission by asserting that the committed intermediate tree lacked the registry, then proves the corrected delivery transaction includes it.",
+  "followUp": "Publish the source repair, repeat ATM-GOV-0369 taskflow close through its normal dry-run and write sequence, and keep the registry admission predicate bounded to the pre-commit-required tracked actor registry rather than broadening arbitrary .atm governance files into delivery commits."
+}
