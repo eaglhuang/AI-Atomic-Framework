@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-21-011",
+  "date": "2026-08-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Fixed in quickfix pending governed commit",
+  "area": "Taskflow close governance-dirty deferral propagation",
+  "finding": "taskflow close accepted --defer-governance-dirty and --defer-foreign-state at the close transaction boundary, but did not pass that explicit operator choice into historical close preflight. Consequently the preflight classified the reproducible global .atm/history/evidence/git-head.jsonl audit as blocking governance dirty state before the close transaction could snapshot and restore it.",
+  "expectedBehavior": "Without an explicit deferral flag, governance dirty files remain fail-closed. With --defer-governance-dirty or its --defer-foreign-state alias, only the existing proven deferrable shapes (git-head evidence and the current task bundle manifest) are reclassified advisory for the close transaction; foreign task history and unknown governance files remain blocking.",
+  "evidenceOrRepro": "The focused current-task-close-evidence fixture first proves dirty git-head evidence blocks default preflight, then proves the same fixture is advisory only when deferGovernanceDirty is true. Source-first taskflow close for ATM-GOV-0369 with --defer-foreign-state no longer emits ATM_TASK_CLOSE_DIRTY_WORKTREE; its remaining blocker is the unrelated physical-line-budget report from pre-existing broad task scope.",
+  "followUp": "Publish this quickfix in the next controlled runner build, then retry the 0369 close dry-run using explicit deferral. Do not use the flag to suppress foreign task evidence or unclassified governance state."
+}

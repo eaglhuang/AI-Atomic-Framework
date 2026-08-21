@@ -150,6 +150,7 @@ export function buildTaskflowClosePreflight(input: {
   previewCommitBundle: unknown;
   historicalDeliveryRefs: string[];
   deferForeignStaged?: boolean;
+  deferGovernanceDirty?: boolean;
   waiverOutOfScopeDelivery: boolean;
   waiverReason: string | null;
 }): HistoricalClosePreflightSummary {
@@ -161,6 +162,7 @@ export function buildTaskflowClosePreflight(input: {
     previewCommitBundle: input.previewCommitBundle as never,
     historicalDeliveryRefs: input.historicalDeliveryRefs,
     deferForeignStaged: input.deferForeignStaged,
+    deferGovernanceDirty: input.deferGovernanceDirty,
     waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery,
     waiverReason: input.waiverReason
   });

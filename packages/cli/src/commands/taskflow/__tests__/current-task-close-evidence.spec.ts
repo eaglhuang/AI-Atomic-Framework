@@ -37,6 +37,12 @@ const targetRepo = path.join(root, 'target');
 const planningRepo = path.join(root, 'planning');
 initGitRepo(targetRepo);
 initGitRepo(planningRepo);
+const gitHeadEvidencePath = '.atm/history/evidence/git-head.jsonl';
+mkdirSync(path.join(targetRepo, '.atm', 'history', 'evidence'), { recursive: true });
+writeFileSync(path.join(targetRepo, gitHeadEvidencePath), '{"baseline":true}\n', { encoding: 'utf8' });
+execFileSync('git', ['add', '--', gitHeadEvidencePath], { cwd: targetRepo, stdio: 'ignore' });
+execFileSync('git', ['commit', '-m', 'track git-head evidence'], { cwd: targetRepo, stdio: 'ignore' });
+writeFileSync(path.join(targetRepo, gitHeadEvidencePath), '{"baseline":true}\n{"later":true}\n', { encoding: 'utf8' });
 const planningPath = path.join(planningRepo, 'docs', 'tasks', `${taskId}.task.md`);
 writeJson(path.join(targetRepo, '.atm', 'history', 'tasks', `${taskId}.json`), {
   workItemId: taskId,
@@ -78,4 +84,18 @@ const preflight = buildHistoricalClosePreflight({
   waiverReason: null
 });
 assert.equal(preflight.unexpectedNonBundleStaged.flatMap((entry) => entry.stagedFiles).includes(reconciliationPath), false, 'pre-close must not classify bundled current-task evidence as unexpected staged residue');
+assert.ok(preflight.blockers.some((entry) => entry.id === 'governanceTrackedDirtyFiles'), 'default pre-close must keep dirty git-head evidence fail-closed');
+const deferredPreflight = buildHistoricalClosePreflight({
+  cwd: targetRepo,
+  taskId,
+  actorId: 'validator',
+  taskDocument: { deliverables: ['src/value.ts'], scopePaths: ['src/value.ts'] },
+  previewCommitBundle: { targetRepo: { repoRoot: targetRepo, stageFiles: bundle.targetRepo.stageFiles }, planningRepo: { repoRoot: null, stageFiles: [] } },
+  historicalDeliveryRefs: [],
+  deferGovernanceDirty: true,
+  waiverOutOfScopeDelivery: false,
+  waiverReason: null
+});
+assert.equal(deferredPreflight.blockers.some((entry) => entry.id === 'governanceTrackedDirtyFiles'), false, 'explicit governance deferral must park only deferrable git-head evidence');
+assert.ok(deferredPreflight.dirtyGuard.advisoryTrackedDirtyFiles.includes(gitHeadEvidencePath), 'deferred git-head evidence must remain visible as advisory');
 console.log('[current-task-close-evidence] ok');
