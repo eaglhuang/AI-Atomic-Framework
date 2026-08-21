@@ -112,11 +112,14 @@
     "appliedRule": "legacyAuthority.retirementRule",
     "reason": "The independent certificate this audit binds to was recompiled against observed evidence and the live remote and returned not-complete. Under this audit's own retirement rule a stale or contradictory input restores legacy authority and downgrades the certification, so the previous proven status and retired legacy authority no longer hold.",
     "blockers": [
+      "evidence-uncommitted:.atm/history/tasks/ATM-GOV-0341.json",
       "evidence-uncommitted:docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
-      "evidence-uncommitted:docs/reports/reviews/plan-3x-4x-runbook-release-review.json"
+      "evidence-uncommitted:docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
+      "independent-reviewer-count-insufficient",
+      "reviewer-input-digests-unreproducible:reviewer-b-runbook-release-authority"
     ],
     "nonClaim": "This downgrade does not retract the objective denominators. Plan 3.0 17/17, Plan 3.1 23/23, Plan 3.2 29/29 and Plan 4.0 17/17 remain independently replayed; what is withdrawn is the final certification and the retirement of legacy authority.",
     "restoreCondition": "Two genuinely independent reviewer outputs, reproducible dimension digests, and a certificate recompiled against the remote at that moment, all recorded by scripts/compile-four-plan-independent-certificate.ts --mode write."
   },
-  "resultDigest": "sha256:f1c0d75a627eb59b58a45e865b85df9cf998795205e65a2693704d32fdb5abd6"
+  "resultDigest": "sha256:11dcec018066128338ddfe8ee6aac544e6e6a629c5f37c420245ae6d7ccfdb25"
 }
