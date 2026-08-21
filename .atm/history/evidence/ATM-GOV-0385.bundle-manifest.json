@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0385",
+  "updatedAt": "2026-08-21T03:19:35.729Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a0434169fd67e79f0f0fc28566236dbc5fd86fce6a3e3e6707ac725bafb72fdd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts"
+      ],
+      "generatedAt": "2026-08-14T10:43:25.232Z",
+      "startedAt": "2026-08-14T10:43:24.835Z",
+      "finishedAt": "2026-08-14T10:43:25.232Z",
+      "durationMs": 397,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "da5eb5c10b0754e92112576ac1adfc9713f1a2fd",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T10:43:54.493Z",
+      "startedAt": "2026-08-14T10:43:45.921Z",
+      "finishedAt": "2026-08-14T10:43:54.493Z",
+      "durationMs": 8572,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "da5eb5c10b0754e92112576ac1adfc9713f1a2fd",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:5ce46e9fb66c00218fc3b157d813a27e938b4e1d43edbcf2d204772190351039",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-21T03:14:33.342Z",
+      "startedAt": "2026-08-21T03:14:31.082Z",
+      "finishedAt": "2026-08-21T03:14:33.342Z",
+      "durationMs": 2260,
+      "runnerKind": "dev-source",
+      "sourceCommit": "73cb174e3c28a9622fc023c58231779763106898",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:5ce46e9fb66c00218fc3b157d813a27e938b4e1d43edbcf2d204772190351039",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-21T03:19:35.728Z",
+      "startedAt": "2026-08-21T03:19:33.051Z",
+      "finishedAt": "2026-08-21T03:19:35.728Z",
+      "durationMs": 2677,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "071cdc1db90806a12d2dab5c3019dabb1c84786c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
