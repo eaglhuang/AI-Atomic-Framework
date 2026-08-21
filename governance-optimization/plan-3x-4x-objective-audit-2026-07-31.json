@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.fourPlanCertificate.v1",
   "specVersion": "0.3.0",
-  "status": "not-certified",
+  "status": "proven",
   "decision": {
     "rule": "certify only when every exact objective denominator and every shared closure control is independently recomputed as proven",
     "failClosed": true
@@ -96,12 +96,12 @@
     "nonClaim": "The bound release commit must remain an ancestor of origin/main; later unrelated commits do not invalidate its proven release surfaces."
   },
   "independentReview": {
-    "status": "not-complete",
+    "status": "proven",
     "source": "docs/reports/plan-3x-4x-independent-certificate.json",
     "nonClaim": "The canonical certificate consumes the independent verdict but recomputes its required dimensions and reviewer count."
   },
   "legacyAuthority": {
-    "retired": false,
+    "retired": true,
     "reversible": true,
     "retirementRule": "Any missing, stale, contradictory, unreachable, unresolved, or unknown input restores legacy authority and changes this certificate to not-certified."
   },
@@ -117,5 +117,5 @@
     "nonClaim": "This downgrade does not retract the objective denominators. Plan 3.0 17/17, Plan 3.1 23/23, Plan 3.2 29/29 and Plan 4.0 17/17 remain independently replayed; what is withdrawn is the final certification and the retirement of legacy authority.",
     "restoreCondition": "Two genuinely independent reviewer outputs, reproducible dimension digests, and a certificate recompiled against the remote at that moment, all recorded by scripts/compile-four-plan-independent-certificate.ts --mode write."
   },
-  "resultDigest": "sha256:e08c5bec35cf9fa4d9255a2fb40eb942dfa9b41875bc826ec40aba24816443ca"
+  "resultDigest": "sha256:b1988679678f07c4c61964f068ab4bfec09e96177e049fceaab75e122dba1118"
 }

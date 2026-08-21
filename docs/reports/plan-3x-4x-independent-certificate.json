@@ -3,7 +3,7 @@
   "specVersion": "0.1.0",
   "certificateId": "ATM-GOV-0341-independent-four-plan-certificate",
   "certificatePath": "docs/reports/plan-3x-4x-independent-certificate.json",
-  "generatedAt": "2026-08-21T07:55:43+08:00",
+  "generatedAt": "2026-08-21T08:06:13+08:00",
   "writerRole": "certificate-writer",
   "reviewers": [
     {
@@ -63,7 +63,7 @@
     {
       "dimensionId": "card-state-verdict",
       "status": "proven",
-      "digest": "sha256:43bfe079a579585f33a57d1c99b7f5d9b13fe5141a3adbc260e4ddd46b7b2bc5",
+      "digest": "sha256:bc06b980e0d9f09ca840f1cafc38d37d0555c9e128455fcd19996895872b5439",
       "evidenceRefs": [
         ".atm/history/tasks/ATM-GOV-0340.json",
         ".atm/history/tasks/ATM-GOV-0341.json"
@@ -82,7 +82,7 @@
     {
       "dimensionId": "freshness-verdict",
       "status": "proven",
-      "digest": "sha256:50a49e018a540404bd7f448c9d6fd4850f902d1062896bca18051657b491e188",
+      "digest": "sha256:722e6f63dafd19735db488ccf3a4ddbc9728a3badcfa9594841e8a4ae24d3b35",
       "evidenceRefs": [
         "release/atm-onefile/release-manifest.json",
         "scripts/validate-runner-reproducibility.ts"
@@ -114,7 +114,7 @@
     {
       "dimensionId": "release-verdict",
       "status": "proven",
-      "digest": "sha256:76425ac722c66cfde01ae688dac6803133cb2b9b04dd742b9b7a0595287e1785",
+      "digest": "sha256:3422ab6374d59626cb0d1affd3ba3a4b7d1e8c5f30947be4feadfad5509f9724",
       "evidenceRefs": [
         "docs/reports/plan-3x-4x-release-closeback.json"
       ],
@@ -143,10 +143,10 @@
     {
       "path": ".atm/history/tasks/ATM-GOV-0341.json",
       "present": true,
-      "digest": "sha256:a616afc480c91a0fad78289a5868bc0acf8773b7e05d1c519e38c60364252868",
+      "digest": "sha256:1743acf63d0d67c3392d4cb8766dbc97a0d4975fb702c554b72ae4aa8515f15a",
       "tracked": true,
       "dirty": false,
-      "lastCommit": "37890e85d7731d7c60db364f13556d5015e6f406",
+      "lastCommit": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
       "reachableFromTargetHead": true
     },
     {
@@ -206,10 +206,10 @@
     {
       "path": "docs/reports/plan-3x-4x-release-closeback.json",
       "present": true,
-      "digest": "sha256:49a17241fdf1d3840127d9f02f89a576e0375f24770cd4b2b14c279f6cc4c9aa",
+      "digest": "sha256:3f9b7b61376cb54a462f5d98c94b6a3d2c8c2bb07eba1c7688c5b07c7bd650b8",
       "tracked": true,
       "dirty": false,
-      "lastCommit": "4acbb8cb2f7fb319f4950c9474236dc55a68931c",
+      "lastCommit": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
       "reachableFromTargetHead": true
     },
     {
@@ -251,10 +251,10 @@
     {
       "path": "release/atm-onefile/release-manifest.json",
       "present": true,
-      "digest": "sha256:31cfb336bb50a556d439934c043b33ed634fb05a7459e95a290fe4109573d356",
+      "digest": "sha256:14046b2ff144ba5cc419b6a6cbfd871853fda50945c6769d4ef6a94d67d50ca2",
       "tracked": true,
-      "dirty": true,
-      "lastCommit": "f81d9a586819b04ea3c454c4ac330ee63e39e294",
+      "dirty": false,
+      "lastCommit": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
       "reachableFromTargetHead": true
     },
     {
@@ -276,8 +276,8 @@
     },
     {
       "surfaceId": "origin-main",
-      "expectedDigest": "4acbb8cb2f7fb319f4950c9474236dc55a68931c",
-      "observedDigest": "4acbb8cb2f7fb319f4950c9474236dc55a68931c",
+      "expectedDigest": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
+      "observedDigest": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
       "reachable": true
     },
     {
@@ -288,8 +288,8 @@
     },
     {
       "surfaceId": "target-head",
-      "expectedDigest": "4acbb8cb2f7fb319f4950c9474236dc55a68931c",
-      "observedDigest": "4acbb8cb2f7fb319f4950c9474236dc55a68931c",
+      "expectedDigest": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
+      "observedDigest": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
       "reachable": true
     }
   ],
@@ -299,25 +299,23 @@
     "independent-reviewer-role-separation",
     "no-legacy-retirement-with-stale-or-unpushed-surface"
   ],
-  "status": "stale",
-  "overallVerdict": "not-complete",
-  "diagnostics": [
-    "evidence-uncommitted:release/atm-onefile/release-manifest.json"
-  ],
+  "status": "proven",
+  "overallVerdict": "complete",
+  "diagnostics": [],
   "nonClaims": [],
-  "releaseAuthorized": false,
+  "releaseAuthorized": true,
   "provenance": {
     "compiledBy": "scripts/compile-four-plan-independent-certificate.ts",
-    "observedRemoteHead": "4acbb8cb2f7fb319f4950c9474236dc55a68931c",
-    "originMain": "4acbb8cb2f7fb319f4950c9474236dc55a68931c",
+    "observedRemoteHead": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
+    "originMain": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
     "remoteRef": "origin/main",
-    "closebackDigest": "sha256:49a17241fdf1d3840127d9f02f89a576e0375f24770cd4b2b14c279f6cc4c9aa",
-    "closebackTargetHead": "4acbb8cb2f7fb319f4950c9474236dc55a68931c",
+    "closebackDigest": "sha256:3f9b7b61376cb54a462f5d98c94b6a3d2c8c2bb07eba1c7688c5b07c7bd650b8",
+    "closebackTargetHead": "a718a00f4d79748f9eab1c16e67a02235f7ce138",
     "taskId": "ATM-GOV-0341",
     "reviewerReceipts": [
       "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
       "docs/reports/reviews/plan-3x-4x-runbook-release-review.json"
     ]
   },
-  "certificateDigest": "sha256:e08c5bec35cf9fa4d9255a2fb40eb942dfa9b41875bc826ec40aba24816443ca"
+  "certificateDigest": "sha256:b1988679678f07c4c61964f068ab4bfec09e96177e049fceaab75e122dba1118"
 }
