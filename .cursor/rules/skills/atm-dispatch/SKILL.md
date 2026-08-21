@@ -253,6 +253,34 @@ removing a line would make the worker infer actor identity, sequencing,
 permission, stop conditions, or validation from chat history, keep the line.
 Optimize for the smallest packet that is still independently executable.
 
+## Model-Bound Capability Evidence
+
+Treat worker capability evidence as a versioned model snapshot, never as a
+permanent property of a provider, editor, or captain alias. The evidence key is
+`provider + exact model identifier + reasoning profile + benchmark id/version +
+observed date + tool/adapter context`.
+
+- Put the exact model identifier and reasoning profile in every external
+  dispatch. Require the worker's first report line to repeat them.
+- A new or unknown model must not inherit a predecessor's score. Mark it
+  `unbenchmarked` and use a bounded evaluation or conservative assignment.
+- Medium, High, and Low reasoning results are distinct evidence unless the
+  benchmark explicitly normalizes them.
+- Use benchmark evidence only after matching the task's required capabilities;
+  it is a routing aid and tie-breaker, never authority to write, close, publish,
+  or bypass ATM governance.
+- Refresh the evidence after a model/revision, reasoning profile, system prompt,
+  context budget, tool permission, adapter, benchmark, or material production
+  result changes. Never silently rewrite a historical score.
+- Consult `docs/governance/model-bound-agent-capability-benchmark.md` for the
+  newest non-expired snapshot and its limitations.
+
+External reports must begin with:
+
+```text
+AI Captain: <captain/runtime> | Provider/Model: <exact identifier> | Reasoning: <profile> | Benchmark: <id or unbenchmarked>
+```
+
 ## Dispatch Rules
 
 - Before drafting a plan or task cards, state `Planning authority`, `Target

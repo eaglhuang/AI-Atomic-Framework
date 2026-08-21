@@ -78,6 +78,15 @@ bound. The closed exceptions are emergency/anomaly recovery, historical
 read-only discrimination, and non-development sealed packaging, each with a
 named receipt. A safe same-file compose may have zero queue residency.
 
+## Fail-fast control-plane rule (INV-ATM-013)
+
+Dispatch mandatory, cheap admission checks before asking a worker to acquire a
+queue slot, lease, lock, or write ticket. A known failed prerequisite must stop
+the route immediately with a precise recovery command; do not spend shared
+capacity or run work that cannot change admission. Normal routing and status
+commands have a five-second response budget; declared tests, builds, and
+external I/O must instead report a progress or completion receipt.
+
 ## Cohesion-First Split Rule
 
 TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
@@ -248,6 +257,34 @@ removing a line would make the worker infer actor identity, sequencing,
 permission, stop conditions, or validation from chat history, keep the line.
 Optimize for the smallest packet that is still independently executable.
 
+## Model-Bound Capability Evidence
+
+Treat worker capability evidence as a versioned model snapshot, never as a
+permanent property of a provider, editor, or captain alias. The evidence key is
+`provider + exact model identifier + reasoning profile + benchmark id/version +
+observed date + tool/adapter context`.
+
+- Put the exact model identifier and reasoning profile in every external
+  dispatch. Require the worker's first report line to repeat them.
+- A new or unknown model must not inherit a predecessor's score. Mark it
+  `unbenchmarked` and use a bounded evaluation or conservative assignment.
+- Medium, High, and Low reasoning results are distinct evidence unless the
+  benchmark explicitly normalizes them.
+- Use benchmark evidence only after matching the task's required capabilities;
+  it is a routing aid and tie-breaker, never authority to write, close, publish,
+  or bypass ATM governance.
+- Refresh the evidence after a model/revision, reasoning profile, system prompt,
+  context budget, tool permission, adapter, benchmark, or material production
+  result changes. Never silently rewrite a historical score.
+- Consult `docs/governance/model-bound-agent-capability-benchmark.md` for the
+  newest non-expired snapshot and its limitations.
+
+External reports must begin with:
+
+```text
+AI Captain: <captain/runtime> | Provider/Model: <exact identifier> | Reasoning: <profile> | Benchmark: <id or unbenchmarked>
+```
+
 ## Dispatch Rules
 
 - Before drafting a plan or task cards, state `Planning authority`, `Target
@@ -395,6 +432,12 @@ governance defects go to the bug backlog first.
   Rule: Normal governed parallel development uses one canonical worktree, base, and HEAD. A shared physical file is compose-eligible rather than a file lock: workers declare bounded atom/CID/content-anchor/source-range intents and submit proposals, while the broker, format adapter, and transactional composer decide compose, revalidation, escalation, or queue. A neutral steward is the only shared-file writer and shared delivery records member attribution. Queueing or revalidation is a fallback for a true logical conflict, stale base/CAS failure, unsupported adapter, or fairness bound. AI workers must not use Git branches, detached worktrees, alternate indexes, merges, or rebases as normal concurrency/isolation mechanisms. The closed exceptions are emergency/anomaly recovery, historical read-only discrimination, and non-development sealed packaging; each requires a named receipt and cannot perform normal governed contribution writes.
 - `INV-ATM-011` ??**Minimum queue residency** (enforcement: `doctor`, breaking change: no)
   Rule: Queueing is a scarce-resource boundary, never a work-ownership model. Every queue design must minimize residency to the irreducible interval during which a specific shared resource cannot be safely parallelized, composed, deferred, or made private. All separable preparation, computation, validation, and staging must occur outside that interval before a worker joins the queue. The design must make the boundary observable and prove it is minimal: admission binds a ready candidate to current state, the shared transition has explicit success and failure outcomes, and completion or invalidation releases capacity immediately. A queue may not substitute for polling, long-lived reservation, or avoidable serialization. A particular broker, lock, lease, publish flow, or commit mechanism is only one implementation of this invariant, not its meaning.
+- `INV-ATM-012` ??**Canonical authority snapshots** (enforcement: `doctor`, breaking change: no)
+  Rule: Whenever a governed decision depends on authority — including claim, lock, lease, lane, broker receipt, candidate scope, expiry, or release entitlement — ATM must resolve that fact once through a canonical authority-snapshot module. Every consumer must consume the same immutable, attributable, scoped, TTL-aware where applicable, digestable decision or verify its digest. A consumer must not independently recreate an approximate authority rule; recovery commands must be generated from the same snapshot that the next consumer accepts. Missing, expired, partial, ambiguous, changed, or unverifiable authority remains fail-closed. New authority consumers require parity coverage for absent, live exact, live partial, expired, released, actor/lane-mismatched, delegated, and concurrent-change cases.
+- `INV-ATM-013` ??**Fail fast before irreversible or expensive work** (enforcement: `doctor`, breaking change: no)
+  Rule: Every non-optional precondition for an ATM CLI operation must be evaluated before expensive validation, build, lock acquisition, queue admission, lease consumption, staging, or any local/cross-repository write. A failed precondition must immediately return one precise error code, the observed blocking fact, and an executable recovery command. Control-plane commands (routing, status, preflight, admission, recovery diagnosis) have a five-second response budget. Large declared test suites, builds, and external I/O are execution-plane exceptions, but must be explicitly classified before they start and expose a ticket, progress receipt, or bounded completion result. A lease, override, lock, or queue slot is consumed only after every prerequisite that can be checked without that capability has passed.
+- `INV-ATM-014` ??**Operation-owned transient artifact lifecycle** (enforcement: `doctor`, breaking change: no)
+  Rule: Every governed operation owns every transient artifact it creates. Success, failure, timeout, and cancellation must either restore the exact pre-operation state or retain one durable owner-bound, digest-verifiable, resumable recovery receipt. Claim, lock, queue, lease, or capability release is forbidden while operation-created residue is unowned. Cleanup may modify only receipt-listed transient paths whose ownership and current bytes still match; user-authored source, staged foreign work, and active-owner artifacts remain fail-closed. Cleanup success never converts a failed primary operation into success.
 
 ## Captain Dogfood Lessons (2026-07-14)
 

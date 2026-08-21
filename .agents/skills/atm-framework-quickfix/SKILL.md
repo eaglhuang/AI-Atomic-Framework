@@ -1,7 +1,10 @@
 ---
 name: atm-framework-quickfix
 description: Execute a bounded, evidence-backed ATM framework quickfix for a severe recurring blocker. Use when a captain needs to restore a broken fast path, control-plane latency, commitability, or fail-closed boundary without waiting for a broad governance closeout.
+argument-hint: "<ATM context>"
+charter-invariants-injected: true
 ---
+
 
 # ATM Framework Quickfix
 
@@ -66,4 +69,3 @@ Do not use it for broad refactors, release publication, bulk cleanup, task-card 
 ## Completion report
 
 Report: causal rule, exact files, focused command and result, commit SHA, whether an emergency lease was used, backlog item, temporary-lock release, and the three separate states: source repair, frozen publication, formal closeout.
-
