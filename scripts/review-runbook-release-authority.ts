@@ -21,6 +21,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const completionPath = 'docs/reports/plan-3x-4x-runbook-completion-evidence.json';
 const runbookPath = '../3KLife/docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md';
 const outputPath = 'docs/reports/reviews/plan-3x-4x-runbook-release-review.json';
+export const completionReviewProjection = 'completion-report-excluding-certificate-derived-conclusion';
 
 type RecordLike = Record<string, any>;
 const ancestryCache = new Map<string, boolean>();
@@ -32,6 +33,38 @@ function sha256(value: string | Buffer): string {
 function stableDigest(value: unknown): string {
   return sha256(JSON.stringify(value, (_, item) => item && typeof item === 'object' && !Array.isArray(item)
     ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b))) : item));
+}
+
+function isCertificateDerivedRow(row: RecordLike): boolean {
+  return row.wave === 'Wave 10'
+    || (row.section === 'Tests, backlog and release'
+      && /runner sync queue|remote-reachable|closeback receipt|final certificate/i.test(String(row.requirement ?? '')));
+}
+
+/**
+ * Reviewer B verifies the runbook's evidence contracts independently of the
+ * final certificate's conclusion.  The final certificate separately consumes
+ * this review, so digesting that conclusion here would form a self-reference.
+ */
+export function projectCompletionForRunbookReview(raw: string): string {
+  const projected = JSON.parse(raw.replace(/^\uFEFF/, '')) as RecordLike;
+  delete projected.generatedAt;
+  delete projected.overallVerdict;
+  delete projected.unresolvedIds;
+  delete projected.unknownIds;
+  delete projected.deferredIds;
+  delete projected.authority?.targetHead;
+  delete projected.authority?.originMain;
+  for (const row of [...(Array.isArray(projected.rows) ? projected.rows : []), ...(Array.isArray(projected.waveExits) ? projected.waveExits : [])]) {
+    if (!isCertificateDerivedRow(row)) continue;
+    // `deferred` is a stable, schema-valid review state.  The reviewer below
+    // still validates any underlying evidence but explicitly does not decide
+    // whether the certificate-derived conclusion is proven.
+    row.status = 'deferred';
+    row.reviewStatus = 'certificate-derived';
+    delete row.diagnostics;
+  }
+  return `${JSON.stringify(projected, null, 2)}\n`;
 }
 
 function git(args: string[], timeout?: number): string {
@@ -166,8 +199,9 @@ export function inspectCompletion(raw: string, runbookRaw = '', targetHead = '')
     const allRows = [...(parsed.rows ?? []), ...(parsed.waveExits ?? [])] as RecordLike[];
     const sharedEvidence = new Map<string, RecordLike[]>();
     for (const row of allRows) {
+      const certificateDerived = row.reviewStatus === 'certificate-derived';
       if (!['proven', 'unproven', 'unknown', 'deferred'].includes(String(row.status))) findings.push(`invalid-status:${String(row.itemId)}`);
-      if (row.status !== 'proven') findings.push(`not-proven:${String(row.itemId)}`);
+      if (!certificateDerived && row.status !== 'proven') findings.push(`not-proven:${String(row.itemId)}`);
       const sourceLine = sourceLines[row.sourceLine - 1];
       if (runbookRaw !== '' && (typeof sourceLine !== 'string' || !sourceLine.includes(String(row.requirement ?? '')) || sha256(String(row.requirement ?? '')) !== row.requirementDigest)) {
         findings.push(`source-authority-mismatch:${String(row.itemId)}`);
@@ -258,18 +292,19 @@ function observeRemote(targetHead: string, offline = false, sealedRemote?: Recor
   }
 }
 
-export function compileReview(offline = false, sealedTargetHead?: string, sealedRemote?: RecordLike): RecordLike {
+export function compileReview(offline = false, sealedTargetHead?: string, sealedRemote?: RecordLike, projectionArtifactPath = projectionPathForOutput(outputPath)): RecordLike {
   const completionAbsolute = path.join(root, completionPath);
   const runbookAbsolute = path.resolve(root, runbookPath);
   if (!existsSync(completionAbsolute)) throw new Error(`missing completion evidence: ${completionPath}`);
   if (!existsSync(runbookAbsolute)) throw new Error(`missing runbook: ${runbookPath}`);
   const raw = readFileSync(completionAbsolute, 'utf8').replace(/^\uFEFF/, '');
+  const projectedCompletion = projectCompletionForRunbookReview(raw);
   // Offline mode exists only for deterministic local regression tests. It
   // intentionally has no Git ancestry or remote-release authority.
   const targetHead = offline ? 'offline-unverified' : sealedTargetHead ?? git(['rev-parse', 'HEAD']);
   if (!offline && !/^[0-9a-f]{7,64}$/i.test(targetHead)) throw new Error('sealed review target must be a Git commit SHA');
   if (!offline && !isAncestor(targetHead, git(['rev-parse', 'HEAD']))) throw new Error('sealed review target is not an ancestor of the current HEAD');
-  const inspected = inspectCompletion(raw, readFileSync(runbookAbsolute, 'utf8'), targetHead);
+  const inspected = inspectCompletion(projectedCompletion, readFileSync(runbookAbsolute, 'utf8'), targetHead);
   const remote = observeRemote(targetHead, offline, sealedRemote);
   const headAfterRemote = targetHead;
   const findings = [...inspected.findings];
@@ -294,11 +329,11 @@ export function compileReview(offline = false, sealedTargetHead?: string, sealed
   const unsigned = {
     schemaId: 'atm.fourPlanIndependentReleaseReview.v1', specVersion: '0.1.0', reviewerId: 'reviewer-b-runbook-release-authority',
     reviewerRole: 'independent-runbook-wave-and-live-remote-reviewer', generatedAt, targetHead, headAfterRemote,
-    inputDigests: [{ path: completionPath, digest: sha256(raw) }, { path: runbookPath, digest: sha256(readFileSync(runbookAbsolute)) }],
+    inputDigests: [{ path: projectionArtifactPath, digest: sha256(projectedCompletion), projection: completionReviewProjection, sourcePath: completionPath }, { path: runbookPath, digest: sha256(readFileSync(runbookAbsolute)) }],
     completion: { parseable: inspected.parseable, rowTokenCount: inspected.rowTokens.length, uniqueRowCount: inspected.rowIds.length,
       waveExitTokenCount: inspected.exitTokens.length, uniqueWaveExitCount: inspected.exitIds.length, findings: inspected.findings },
     remote, findings: [...new Set(findings)].sort(), verdict: findings.length === 0 ? 'proven' : 'not-proven',
-    nonClaims: ['does-not-read-independent-certificate', 'does-not-read-reviewer-a-output', 'does-not-authorize-release']
+    nonClaims: ['does-not-read-independent-certificate', 'does-not-read-reviewer-a-output', 'does-not-assess-final-certificate-derived-state', 'does-not-authorize-release']
   };
   return { ...unsigned, reviewDigest: stableDigest(unsigned) };
 }
@@ -309,6 +344,12 @@ function outputPathFromArgs(): string {
   const value = process.argv[outputIndex + 1];
   if (!value || value.startsWith('--')) throw new Error('--output requires a path');
   return value;
+}
+
+function projectionPathForOutput(reportPath: string): string {
+  return reportPath.endsWith('.json')
+    ? reportPath.slice(0, -'.json'.length) + '.input.json'
+    : `${reportPath}.input.json`;
 }
 
 function sealedRemoteFromProjection(absoluteOutput: string): RecordLike | undefined {
@@ -340,6 +381,8 @@ function main(): void {
   const mode = process.argv.includes('--mode') ? process.argv[process.argv.indexOf('--mode') + 1] : 'validate';
   if (mode !== 'validate' && mode !== 'write') throw new Error(`unknown --mode ${String(mode)}; expected validate or write`);
   const absoluteOutput = path.resolve(root, outputPathFromArgs());
+  const absoluteProjection = path.resolve(root, projectionPathForOutput(outputPathFromArgs()));
+  const projectionArtifactPath = path.relative(root, absoluteProjection).replaceAll('\\', '/');
   const offline = process.argv.includes('--offline');
   // The evidence commit that stores this report is necessarily newer than its
   // target. Validation therefore replays the sealed target, while still
@@ -347,11 +390,19 @@ function main(): void {
   const report = compileReview(
     offline,
     mode === 'validate' ? sealedTargetHeadFromProjection(absoluteOutput) : undefined,
-    mode === 'validate' ? sealedRemoteFromProjection(absoluteOutput) : undefined
+    mode === 'validate' ? sealedRemoteFromProjection(absoluteOutput) : undefined,
+    projectionArtifactPath
   );
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
-  if (mode === 'write') { mkdirSync(path.dirname(absoluteOutput), { recursive: true }); writeFileSync(absoluteOutput, serialized, 'utf8'); }
-  else if (!existsSync(absoluteOutput) || readFileSync(absoluteOutput, 'utf8') !== serialized) throw new Error('runbook release authority review is stale; rerun with --mode write');
+  const projection = projectCompletionForRunbookReview(readFileSync(path.join(root, completionPath), 'utf8'));
+  if (mode === 'write') {
+    mkdirSync(path.dirname(absoluteOutput), { recursive: true });
+    writeFileSync(absoluteProjection, projection, 'utf8');
+    writeFileSync(absoluteOutput, serialized, 'utf8');
+  }
+  else if (!existsSync(absoluteOutput) || !existsSync(absoluteProjection)
+    || readFileSync(absoluteOutput, 'utf8') !== serialized
+    || readFileSync(absoluteProjection, 'utf8') !== projection) throw new Error('runbook release authority review is stale; rerun with --mode write');
   if (!offline && mode === 'validate') assertSealedRemoteStillOnPublishedHistory(report);
   console.log(`[review-runbook-release-authority] ${report.verdict} findings=${report.findings.length} digest=${report.reviewDigest}`);
 }

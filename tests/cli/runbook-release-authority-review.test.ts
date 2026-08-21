@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { compileReview, inspectCompletion, isValidValidatorContract, sealedRemotePublishVerdict } from '../../scripts/review-runbook-release-authority.ts';
+import { compileReview, completionReviewProjection, inspectCompletion, isValidValidatorContract, projectCompletionForRunbookReview, sealedRemotePublishVerdict } from '../../scripts/review-runbook-release-authority.ts';
 import { semanticTaskCardDigest } from '../../scripts/task-card-contract-digest.ts';
 
 const broken = '{"rows":[{"itemId":"RB-001","status":"proven"}],"waveExits":[{"itemId":"EXIT-01"}],';
@@ -39,6 +39,10 @@ const reviewArgs = ['--strip-types', 'scripts/review-runbook-release-authority.t
 execFileSync(process.execPath, [...reviewArgs, '--mode', 'write'], { stdio: 'pipe' });
 execFileSync(process.execPath, [...reviewArgs, '--mode', 'validate'], { stdio: 'pipe' });
 const report = JSON.parse(readFileSync(temporaryOutput, 'utf8'));
+const temporaryProjection = temporaryOutput.replace(/\.json$/, '.input.json');
+assert.equal(existsSync(temporaryProjection), true);
+assert.equal(report.inputDigests[0].path.endsWith('.input.json'), true);
+assert.equal(report.inputDigests[0].projection, completionReviewProjection);
 assert.equal(report.schemaId, 'atm.fourPlanIndependentReleaseReview.v1');
 assert.equal(report.verdict, 'not-proven');
 assert.equal(report.remote.error, 'remote-observation-disabled');
@@ -47,6 +51,23 @@ assert.equal(report.completion.parseable, inspectCompletion(readFileSync('docs/r
 assert.ok(report.nonClaims.includes('does-not-read-independent-certificate'));
 
 const canonicalCompletion = readFileSync('docs/reports/plan-3x-4x-runbook-completion-evidence.json', 'utf8');
+const certificateChanged = JSON.parse(canonicalCompletion);
+certificateChanged.overallVerdict = 'not-complete';
+certificateChanged.authority.targetHead = 'f'.repeat(40);
+certificateChanged.rows.find((row: { wave?: string }) => row.wave === 'Wave 10').status = 'unproven';
+assert.equal(
+  projectCompletionForRunbookReview(canonicalCompletion),
+  projectCompletionForRunbookReview(`${JSON.stringify(certificateChanged, null, 2)}\n`),
+  'certificate-derived conclusions must not make Reviewer B observe its own downstream result'
+);
+const projectedFinalRows = JSON.parse(projectCompletionForRunbookReview(canonicalCompletion)).rows.filter((row: { wave?: string; section?: string }) => row.wave === 'Wave 10' || row.section === 'Tests, backlog and release');
+assert.ok(projectedFinalRows.some((row: { reviewStatus?: string }) => row.reviewStatus === 'certificate-derived'));
+certificateChanged.rows.find((row: { wave?: string }) => row.wave !== 'Wave 10').status = 'unproven';
+assert.notEqual(
+  projectCompletionForRunbookReview(canonicalCompletion),
+  projectCompletionForRunbookReview(`${JSON.stringify(certificateChanged, null, 2)}\n`),
+  'non-final evidence status drift remains visible to Reviewer B'
+);
 const canonicalTargetHead = JSON.parse(canonicalCompletion).authority.targetHead;
 const waveRegistryInspection = inspectCompletion(canonicalCompletion, '', canonicalTargetHead);
 assert.equal(
