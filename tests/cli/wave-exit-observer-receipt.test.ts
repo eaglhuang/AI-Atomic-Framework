@@ -304,6 +304,28 @@ const uniqueCandidateWithStaleSibling = consumeWaveExitObserverReceiptCandidates
 });
 assert.equal(uniqueCandidateWithStaleSibling.receipt?.exitItemId, 'EXIT-02');
 assert.deepEqual(uniqueCandidateWithStaleSibling.diagnostics, [], 'obsolete immutable candidates must not taint the unique valid successor');
+const successorHead = commit('3');
+const uniqueCandidateWithOlderValidReceipt = consumeWaveExitObserverReceiptCandidates({
+  repoRoot: '.',
+  receipts: [legalReceipt, { ...legalReceipt, observedHead: successorHead }],
+  policy,
+  compilationHead,
+  currentInputDigests: { [inputPath]: inputDigest },
+  policyDigestAtCompilationHead: policyDigest,
+  readPolicySourceAtCommit: () => policySource,
+  isAncestor: (ancestor, descendant) => (
+    (ancestor === observedHead && descendant === compilationHead)
+    || (ancestor === successorHead && descendant === compilationHead)
+    || (ancestor === observedHead && descendant === successorHead)
+  ),
+  basisActors: ['wave-1-basis-producer']
+});
+assert.equal(
+  uniqueCandidateWithOlderValidReceipt.receipt?.observedHead,
+  successorHead,
+  'a unique strict descendant observation supersedes an older valid immutable receipt'
+);
+assert.deepEqual(uniqueCandidateWithOlderValidReceipt.diagnostics, []);
 const ambiguousCandidates = consumeWaveExitObserverReceiptCandidates({
   repoRoot: '.',
   receipts: [legalReceipt, legalReceipt],

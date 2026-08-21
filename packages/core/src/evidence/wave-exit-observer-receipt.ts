@@ -501,7 +501,11 @@ export function consumeWaveExitObserverReceipt(input: ConsumeWaveExitObserverRec
   };
 }
 
-/** Resolve every immutable receipt for one EXIT and accept exactly one valid candidate. */
+/**
+ * Resolve immutable receipts for one EXIT.  A later valid observation supersedes
+ * an earlier valid observation only when its observed HEAD is a strict descendant.
+ * Divergent observations (or duplicate observations at one HEAD) remain ambiguous.
+ */
 export function consumeWaveExitObserverReceiptCandidates(
   input: ConsumeWaveExitObserverReceiptCandidatesInput
 ): WaveExitObserverCandidatesVerdict {
@@ -529,11 +533,17 @@ export function consumeWaveExitObserverReceiptCandidates(
     });
   });
   const valid = verdicts.filter((verdict) => verdict.ok && verdict.receipt);
+  const newestValid = valid.filter((candidate) => !valid.some((other) => {
+    if (candidate === other) return false;
+    const candidateHead = candidate.receipt!.observedHead;
+    const otherHead = other.receipt!.observedHead;
+    return candidateHead !== otherHead && input.isAncestor(candidateHead, otherHead);
+  }));
   return {
-    receipt: valid.length === 1 ? valid[0]!.receipt : null,
-    diagnostics: valid.length === 1
+    receipt: newestValid.length === 1 ? newestValid[0]!.receipt : null,
+    diagnostics: newestValid.length === 1
       ? []
-      : valid.length > 1
+      : newestValid.length > 1
         ? ['receipt-ambiguity']
         : verdicts.flatMap((verdict) => verdict.diagnostics)
   };
