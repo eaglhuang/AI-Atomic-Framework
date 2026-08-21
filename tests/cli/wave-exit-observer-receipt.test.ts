@@ -120,7 +120,7 @@ assert.equal(policy.compilerCommandPath, 'scripts/compile-runbook-completion-evi
 assert.equal(policy.exits['EXIT-02'].observerRole, 'wave-exit-observer.gemini');
 assert.equal(policy.exits['EXIT-04'].observerRole, 'wave-exit-observer.claude');
 assert.equal(policy.exits['EXIT-07'].observerRole, 'wave-exit-observer.codex-sidecar');
-assert.equal(policy.exits['EXIT-07'].inputDigestProjection, 'objective-audit-excluding-certificate-result');
+assert.equal(policy.exits['EXIT-07'].inputDigestProjection, 'objective-audit-excluding-derived-conclusion');
 assert.equal(policy.exits['EXIT-11'].command.includes('review-runbook-release-authority'), true);
 assert.equal(policy.exits['EXIT-11'].inputDigestProjection, 'completion-report-excluding-current-exit');
 assert.equal(policy.exits['EXIT-02'].command.includes('compile-runbook-completion-evidence'), false);
@@ -184,8 +184,30 @@ assert.notEqual(
 
 const objectiveAuditInput = 'governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json';
 const certificateProjectedExit = policy.exits['EXIT-07'];
-const objectiveAuditBeforeCertificate = JSON.stringify({ objectiveCount: 86, resultDigest: hex('a') });
-const objectiveAuditAfterCertificate = JSON.stringify({ objectiveCount: 86, resultDigest: hex('b') });
+const objectiveAuditBeforeCertificate = JSON.stringify({
+  objectiveCount: 86,
+  rows: [{ plan: '3.0', status: 'proven' }],
+  status: 'not-certified',
+  independentReview: { status: 'not-complete' },
+  releasePushProvenance: { status: 'not-proven' },
+  legacyAuthority: { retired: false },
+  unknownRows: [],
+  unresolvedRows: ['RB-071'],
+  supersession: { blockers: ['evidence-uncommitted:review-a'] },
+  resultDigest: hex('a')
+});
+const objectiveAuditAfterCertificate = JSON.stringify({
+  objectiveCount: 86,
+  rows: [{ plan: '3.0', status: 'proven' }],
+  status: 'certified',
+  independentReview: { status: 'proven' },
+  releasePushProvenance: { status: 'proven' },
+  legacyAuthority: { retired: true },
+  unknownRows: [],
+  unresolvedRows: [],
+  supersession: { blockers: [] },
+  resultDigest: hex('b')
+});
 assert.equal(
   digestWaveExitObserverInput('EXIT-07', certificateProjectedExit, objectiveAuditInput, objectiveAuditBeforeCertificate),
   digestWaveExitObserverInput('EXIT-07', certificateProjectedExit, objectiveAuditInput, objectiveAuditAfterCertificate),
@@ -193,9 +215,10 @@ assert.equal(
 );
 assert.notEqual(
   digestWaveExitObserverInput('EXIT-07', certificateProjectedExit, objectiveAuditInput, objectiveAuditBeforeCertificate),
-  digestWaveExitObserverInput('EXIT-07', certificateProjectedExit, objectiveAuditInput, JSON.stringify({ objectiveCount: 87, resultDigest: hex('a') })),
+  digestWaveExitObserverInput('EXIT-07', certificateProjectedExit, objectiveAuditInput, JSON.stringify({ objectiveCount: 87, rows: [{ plan: '3.0', status: 'proven' }], resultDigest: hex('a') })),
   'semantic objective-audit changes must remain observable'
 );
+
 
 const proven = consume(legalReceipt);
 assert.equal(proven.status, 'proven');

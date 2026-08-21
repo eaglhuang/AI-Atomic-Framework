@@ -27,6 +27,34 @@ export function digestWaveExitObserverInput(
       return null;
     }
   }
+  if (exitPolicy.inputDigestProjection === 'objective-audit-excluding-derived-conclusion') {
+    try {
+      const audit = JSON.parse(source) as Record<string, unknown>;
+      // EXIT-07 observes the independently replayed objective rows.  The
+      // surrounding certificate conclusion is compiler-owned output: it is
+      // expected to change when reviewers, the release surface, or the final
+      // certificate are refreshed.  Including that conclusion would make a
+      // valid observation invalidate itself after an otherwise unrelated
+      // closeout projection.
+      const {
+        status: _derivedCertificateStatus,
+        releasePushProvenance: _derivedReleaseProvenance,
+        independentReview: _derivedIndependentReview,
+        legacyAuthority: _derivedLegacyAuthority,
+        unknownRows: _derivedUnknownRows,
+        unresolvedRows: _derivedUnresolvedRows,
+        supersession: _derivedSupersession,
+        resultDigest: _derivedCertificateDigest,
+        ...semanticAudit
+      } = audit;
+      return digestText(`${inputPath.replace(/\\/g, '/')}\n${JSON.stringify({
+        ...semanticAudit,
+        certificateConclusion: '<derived-final-certificate-conclusion>'
+      })}`);
+    } catch {
+      return null;
+    }
+  }
   if (exitPolicy.inputDigestProjection !== 'completion-report-excluding-current-exit') return digestText(source);
   try {
     const report = JSON.parse(source) as Record<string, unknown>;
