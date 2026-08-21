@@ -10569,9 +10569,26 @@
       "requirement": "總完成門檻全部通過，才可 reversible retirement legacy authority；否則保留 legacy authority 並列出精確 blockers。",
       "requirementDigest": "sha256:ad9db0d0920af112557c9e4fc3a3fc91d08a425c0e321b5919d14351c50251e0",
       "status": "deferred",
-      "evidence": [],
-      "coverageOwners": [],
-      "validatorContractIds": [],
+      "evidence": [
+        {
+          "command": "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
+          "exitCode": 0,
+          "outputDigest": "sha256:1affaed2d741472d1eabf9b07ca8bf8fcc5c48a822c5b26358d768e55124a3c5",
+          "artifactPaths": [
+            "docs/reports/wave-exit-observer-receipts/EXIT-11/e0a5ac2c938110abdc07c0844d642aebd844aad4.json"
+          ],
+          "observedAt": "2026-08-21T01:12:36.247Z",
+          "sourceCommit": "e0a5ac2c938110abdc07c0844d642aebd844aad4",
+          "evidenceOwner": "wave-exit-observer:EXIT-11",
+          "validatorContractId": "atm.waveExitObserverReceipt/EXIT-11"
+        }
+      ],
+      "coverageOwners": [
+        "wave-exit-observer:EXIT-11"
+      ],
+      "validatorContractIds": [
+        "atm.waveExitObserverReceipt/EXIT-11"
+      ],
       "reviewStatus": "certificate-derived"
     }
   ]
