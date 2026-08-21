@@ -74,7 +74,7 @@ export interface WaveExitObserverExitPolicy {
    * the compiler which consumes this receipt.  The projection preserves every
    * other exit and requirement while excluding this exit's derived envelope.
    */
-  readonly inputDigestProjection?: 'completion-report-excluding-current-exit';
+  readonly inputDigestProjection?: 'completion-report-excluding-current-exit' | 'objective-audit-excluding-certificate-result';
   readonly sideEffects: string;
   readonly forbiddenFlags: readonly string[];
 }
@@ -235,7 +235,9 @@ function parseWaveExitObserverPolicySource(source: string): WaveExitObserverPoli
     || !isNonEmptyString(exit.commandPath) || !isNonEmptyString(exit.sideEffects)
     || !Array.isArray(exit.inputs) || exit.inputs.some((value) => !isNonEmptyString(value))
     || !Array.isArray(exit.forbiddenFlags) || exit.forbiddenFlags.some((value) => !isNonEmptyString(value))
-    || (exit.inputDigestProjection !== undefined && exit.inputDigestProjection !== 'completion-report-excluding-current-exit'))) return null;
+    || (exit.inputDigestProjection !== undefined
+      && exit.inputDigestProjection !== 'completion-report-excluding-current-exit'
+      && exit.inputDigestProjection !== 'objective-audit-excluding-certificate-result'))) return null;
   return raw;
 }
 

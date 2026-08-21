@@ -15,6 +15,18 @@ export function digestWaveExitObserverInput(
   inputPath: string,
   source: string
 ): string | null {
+  if (exitPolicy.inputDigestProjection === 'objective-audit-excluding-certificate-result') {
+    try {
+      const audit = JSON.parse(source) as Record<string, unknown>;
+      const { resultDigest: _derivedCertificateDigest, ...semanticAudit } = audit;
+      return digestText(`${inputPath.replace(/\\/g, '/')}\n${JSON.stringify({
+        ...semanticAudit,
+        resultDigest: '<derived-final-certificate-digest>'
+      })}`);
+    } catch {
+      return null;
+    }
+  }
   if (exitPolicy.inputDigestProjection !== 'completion-report-excluding-current-exit') return digestText(source);
   try {
     const report = JSON.parse(source) as Record<string, unknown>;

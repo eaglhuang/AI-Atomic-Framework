@@ -120,6 +120,7 @@ assert.equal(policy.compilerCommandPath, 'scripts/compile-runbook-completion-evi
 assert.equal(policy.exits['EXIT-02'].observerRole, 'wave-exit-observer.gemini');
 assert.equal(policy.exits['EXIT-04'].observerRole, 'wave-exit-observer.claude');
 assert.equal(policy.exits['EXIT-07'].observerRole, 'wave-exit-observer.codex-sidecar');
+assert.equal(policy.exits['EXIT-07'].inputDigestProjection, 'objective-audit-excluding-certificate-result');
 assert.equal(policy.exits['EXIT-11'].command.includes('review-runbook-release-authority'), true);
 assert.equal(policy.exits['EXIT-11'].inputDigestProjection, 'completion-report-excluding-current-exit');
 assert.equal(policy.exits['EXIT-02'].command.includes('compile-runbook-completion-evidence'), false);
@@ -161,6 +162,21 @@ assert.notEqual(
   digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedBase),
   digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedBase.replace('RB-001', 'RB-002')),
   'a self-excluded projection must retain non-self requirement evidence'
+);
+
+const objectiveAuditInput = 'governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json';
+const certificateProjectedExit = policy.exits['EXIT-07'];
+const objectiveAuditBeforeCertificate = JSON.stringify({ objectiveCount: 86, resultDigest: hex('a') });
+const objectiveAuditAfterCertificate = JSON.stringify({ objectiveCount: 86, resultDigest: hex('b') });
+assert.equal(
+  digestWaveExitObserverInput('EXIT-07', certificateProjectedExit, objectiveAuditInput, objectiveAuditBeforeCertificate),
+  digestWaveExitObserverInput('EXIT-07', certificateProjectedExit, objectiveAuditInput, objectiveAuditAfterCertificate),
+  'the certificate-derived audit field must not self-invalidate its observer receipt'
+);
+assert.notEqual(
+  digestWaveExitObserverInput('EXIT-07', certificateProjectedExit, objectiveAuditInput, objectiveAuditBeforeCertificate),
+  digestWaveExitObserverInput('EXIT-07', certificateProjectedExit, objectiveAuditInput, JSON.stringify({ objectiveCount: 87, resultDigest: hex('a') })),
+  'semantic objective-audit changes must remain observable'
 );
 
 const proven = consume(legalReceipt);
