@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-21T02:20:37.638Z",
+  "updatedAt": "2026-08-21T08:16:25.630Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
@@ -27,6 +27,7 @@
     "validate:cli",
     "validate:four-plan-objectives",
     "validate:git-head-evidence",
+    "validate:governance-projections",
     "validate:module-boundaries",
     "validate:runbook-completion-evidence",
     "validate:task-direction-governance",
@@ -804,6 +805,22 @@
       "durationMs": 22122,
       "runnerKind": "dev-source",
       "sourceCommit": "7c352a457ae5ee43abc5efdfcddbdc385a9fe80e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7aa476bca25a23108f1758ebd6d337e12d53f88e41cc9fd306c7f425fc0c68d3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:governance-projections"
+      ],
+      "generatedAt": "2026-08-21T08:16:25.629Z",
+      "startedAt": "2026-08-21T08:16:25.310Z",
+      "finishedAt": "2026-08-21T08:16:25.629Z",
+      "durationMs": 319,
+      "runnerKind": "dev-source",
+      "sourceCommit": "639db50783b449ca14f00819d1edd7eb81dfe538",
       "cached": false
     }
   ],
