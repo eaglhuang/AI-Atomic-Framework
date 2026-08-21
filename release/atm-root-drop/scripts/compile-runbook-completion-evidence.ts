@@ -1,15 +1,20 @@
-import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, relative, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
-  consumeWaveExitObserverReceipt,
+  consumeWaveExitObserverReceiptCandidates,
+  digestWaveExitObserverInputsAtCommit,
   digestWaveExitObserverPolicy,
   loadWaveExitObserverPolicy,
-  readCanonicalWaveExitReceipt,
-  resolveWaveExitBasisProducer,
+  loadWaveExitObserverPolicyAtCommit,
+  readWaveExitReceiptCandidates,
+  readWaveExitObserverPolicySourceAtCommit,
   type WaveExitObserverPolicy
 } from '../packages/core/src/evidence/wave-exit-observer-receipt.ts';
+import { observeSealedFinalCertificate } from './lib/final-certificate-observation.ts';
+export { digestText, semanticTaskCardDigest } from './task-card-contract-digest.ts';
+export { summarizeFinalCertificate } from './lib/final-certificate-observation.ts';
+import { digestText, semanticTaskCardDigest } from './task-card-contract-digest.ts';
 
 export const RUNBOOK_RELATIVE_PATH = 'docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md';
 export const DEFAULT_PLANNING_ROOT = process.env.ATM_PLANNING_REPO_ROOT
@@ -18,9 +23,18 @@ export const DEFAULT_PLANNING_ROOT = process.env.ATM_PLANNING_REPO_ROOT
 export const DEFAULT_OUTPUT = resolve('docs/reports/plan-3x-4x-runbook-completion-evidence.json');
 export const DEFAULT_CERTIFICATE = resolve('docs/reports/plan-3x-4x-independent-certificate.json');
 const REPORT_ARTIFACT_PREFIX = 'docs/reports/';
+const GOVERNANCE_PROJECTION_PREFIX = 'governance-optimization/';
 const DURABLE_RECEIPT_PREFIX = '.atm/history/';
 
 type ValidatorContract = { contractId: string; taskId: string; taskCardPath: string; taskCardDigest: string; command: string };
+type WaveExitObserverValidatorContract = {
+  kind: 'wave-exit-observer-receipt';
+  contractId: string;
+  exitItemId: string;
+  evidenceOwner: string;
+  command: string;
+  policyDigest: string;
+};
 type EvidenceTuple = { command: string; exitCode: number; outputDigest: string; artifactPaths: string[]; observedAt: string; sourceCommit: string; evidenceOwner: string; validatorContractId?: string };
 type CompletionRow = { itemId: string; sourceLine: number; section: string; wave: string | null; requirement: string; requirementDigest: string; status: 'proven' | 'unproven'; evidence: EvidenceTuple[]; diagnostics: string[]; coverageOwners?: string[]; validatorContractIds?: string[] };
 
@@ -30,25 +44,15 @@ export function sealValidatorContractIds(candidates: ReadonlyArray<string | unde
   return { validatorContractIds, diagnostics: coverageOwners.length > 0 && (requireComplete ? holes : validatorContractIds.length === 0) ? ['missing-validator-contract-id'] : [] };
 }
 
-export const digestText = (value: string) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
-
-const TASK_CARD_LIFECYCLE_FIELDS = new Set([
-  'status', 'completed_at', 'completed_by_agent', 'closedAt', 'closedByActor',
-  'closedByCommand', 'lastTransitionId', 'lastTransitionAt', 'delivery_commit'
-]);
-
-export function semanticTaskCardDigest(source: string): string {
-  const semanticLines = source.split(/\r?\n/).filter((line) => {
-    const key = /^([A-Za-z][A-Za-z0-9_]*):/.exec(line)?.[1];
-    return key === undefined || !TASK_CARD_LIFECYCLE_FIELDS.has(key);
-  });
-  return digestText(semanticLines.join('\n'));
-}
-
 function normalizePublicationArtifacts(paths: string[]): string[] | null {
   const normalized = [...new Set(paths.map((path) => path.replace(/\\/g, '/').replace(/^\.\//, '')))].sort();
   return normalized.length > 0
-    && normalized.every((path) => path.startsWith(REPORT_ARTIFACT_PREFIX) && !path.includes('..') && !path.startsWith('/'))
+    && normalized.every((path) => (
+      (path.startsWith(REPORT_ARTIFACT_PREFIX) || path.startsWith(GOVERNANCE_PROJECTION_PREFIX))
+      && path.endsWith('.json')
+      && !path.includes('..')
+      && !path.startsWith('/')
+    ))
     ? normalized
     : null;
 }
@@ -76,6 +80,12 @@ export function isPublicationOnlyDelta(observedHead: string, currentHead: string
   } catch {
     return false;
   }
+}
+
+export function selectCompletionObservationOrigin(committedOrigin: string, liveOrigin: string, sealedTarget: string, committedSnapshot: string): string {
+  return sealedTarget === committedSnapshot && /^[0-9a-f]{40}$/i.test(committedOrigin)
+    ? committedOrigin
+    : liveOrigin;
 }
 
 export function parseRunbook(source: string): { rows: CompletionRow[]; waveExits: CompletionRow[] } {
@@ -116,6 +126,7 @@ export type WaveExitObserverCompileOptions = {
   readonly basisActorsByWave?: Readonly<Record<string, readonly string[]>>;
   readonly repoRoot?: string;
   readonly isAncestor?: (ancestor: string, descendant: string) => boolean;
+  readonly readPolicySourceAtCommit?: (commit: string) => string | null;
 };
 
 export type CardContract = {
@@ -346,21 +357,10 @@ function hydrate(row: CompletionRow, contracts: CardContract[], targetHead: stri
   };
 }
 
-function observeFinalCertificate(): { proven: boolean; diagnostics: string[] } {
-  if (!existsSync(DEFAULT_CERTIFICATE)) return { proven: false, diagnostics: ['final-certificate-missing'] };
-  try {
-    const certificate = JSON.parse(readFileSync(DEFAULT_CERTIFICATE, 'utf8'));
-    const pending = JSON.stringify(certificate).includes('pending-self-digest');
-    const diagnostics = Array.isArray(certificate.diagnostics) ? certificate.diagnostics : ['final-certificate-diagnostics-invalid'];
-    const proven = certificate.status === 'proven'
-      && certificate.overallVerdict === 'complete'
-      && certificate.releaseAuthorized === true
-      && diagnostics.length === 0
-      && !pending;
-    return { proven, diagnostics: proven ? [] : ['final-certificate-not-proven', ...diagnostics] };
-  } catch {
-    return { proven: false, diagnostics: ['final-certificate-unreadable'] };
-  }
+function observeFinalCertificate(targetHead: string): { proven: boolean; diagnostics: string[] } {
+  // Completion only consumes terminal authorization from the certificate
+  // sealed at its target tree, never mutable worktree diagnostics.
+  return observeSealedFinalCertificate(targetHead, DEFAULT_CERTIFICATE);
 }
 
 function requiresFinalCertificate(row: CompletionRow): boolean {
@@ -368,21 +368,17 @@ function requiresFinalCertificate(row: CompletionRow): boolean {
     || (row.section === 'Tests, backlog and release' && /runner sync queue|remote-reachable|closeback receipt|final certificate/.test(row.requirement));
 }
 
-function digestInputsAtHead(paths: readonly string[], compilationHead: string, repoRoot: string): Record<string, string> {
-  const digests: Record<string, string> = {};
-  for (const inputPath of paths) {
-    try {
-      const body = execFileSync('git', ['show', `${compilationHead}:${inputPath.replace(/\\/g, '/')}`], {
-        cwd: repoRoot,
-        encoding: 'buffer',
-        stdio: ['ignore', 'pipe', 'ignore']
-      });
-      digests[inputPath] = digestText(Buffer.isBuffer(body) ? body.toString('utf8') : String(body));
-    } catch {
-      // Missing path at compilation HEAD stays absent so the consumer fail-closes on drift.
-    }
-  }
-  return digests;
+function observerContracts(policy: WaveExitObserverPolicy, policyDigest: string): WaveExitObserverValidatorContract[] {
+  return Object.entries(policy.exits)
+    .map(([exitItemId, exit]) => ({
+      kind: 'wave-exit-observer-receipt' as const,
+      contractId: `atm.waveExitObserverReceipt/${exitItemId}`,
+      exitItemId,
+      evidenceOwner: `wave-exit-observer:${exitItemId}`,
+      command: exit.command,
+      policyDigest
+    }))
+    .sort((left, right) => left.contractId.localeCompare(right.contractId));
 }
 
 export function compileRunbookCompletion(
@@ -390,7 +386,7 @@ export function compileRunbookCompletion(
   planningHead: string,
   targetHead: string,
   originMain: string,
-  finalCertificate = observeFinalCertificate(),
+  finalCertificate = observeFinalCertificate(targetHead),
   generatedAt = new Date().toISOString(),
   authorityDiagnostics: string[] = [],
   publicationArtifacts = [relative(resolve('.'), DEFAULT_OUTPUT).replace(/\\/g, '/')],
@@ -410,11 +406,14 @@ export function compileRunbookCompletion(
   const rowsByWave = new Map<string, CompletionRow[]>();
   for (const row of parsed.rows) if (row.wave) rowsByWave.set(row.wave, [...(rowsByWave.get(row.wave) ?? []), row]);
   const repoRoot = observerOptions.repoRoot ?? resolve('.');
-  const observerPolicy = observerOptions.policy ?? (existsSync(resolve(repoRoot, 'schemas/evidence/wave-exit-observer-policy.json'))
-    ? loadWaveExitObserverPolicy(repoRoot)
-    : null);
+  const observerPolicy = observerOptions.policy
+    ?? loadWaveExitObserverPolicyAtCommit(repoRoot, targetHead)
+    ?? (existsSync(resolve(repoRoot, 'schemas/evidence/wave-exit-observer-policy.json'))
+      ? loadWaveExitObserverPolicy(repoRoot)
+      : null);
+  const observerPolicySourceAtTarget = readWaveExitObserverPolicySourceAtCommit(repoRoot, targetHead);
   const observerPolicyDigest = observerPolicy
-    ? (observerOptions.policyDigestAtCompilationHead ?? digestWaveExitObserverPolicy(observerPolicy))
+    ? (observerOptions.policyDigestAtCompilationHead ?? digestWaveExitObserverPolicy(observerPolicy, observerPolicySourceAtTarget ?? undefined))
     : null;
   parsed.waveExits = parsed.waveExits.map((row) => {
     const basis = rowsByWave.get(row.wave ?? '') ?? [];
@@ -437,32 +436,35 @@ export function compileRunbookCompletion(
           ...(basis.some((item) => item.status !== 'proven') ? ['wave-requirement-basis-not-proven'] : []),
           ...(uncoveredOwners.length ? [`missing-independent-wave-exit-evidence:${uncoveredOwners.join(',')}`] : ['missing-independent-wave-exit-contract'])
         ];
-    const receiptSource = observerPolicy
-      ? (observerOptions.receipts?.[row.itemId] ?? readCanonicalWaveExitReceipt(repoRoot, observerPolicy, row.itemId))
-      : null;
-    if (receiptSource != null && observerPolicy && observerPolicyDigest) {
+    const receiptSources = observerPolicy
+      ? (observerOptions.receipts?.[row.itemId] != null
+        ? [observerOptions.receipts[row.itemId]]
+        : readWaveExitReceiptCandidates(repoRoot, observerPolicy, row.itemId))
+      : [];
+    if (receiptSources.length > 0 && observerPolicy && observerPolicyDigest) {
       const exitPolicy = observerPolicy.exits[row.itemId];
       const currentInputDigests = observerOptions.currentInputDigests
-        ?? (exitPolicy ? digestInputsAtHead(exitPolicy.inputs, targetHead, repoRoot) : {});
-      const derivedActors = observerOptions.basisActorsByWave?.[row.wave ?? '']
-        ?? resolveWaveExitBasisProducer({ repoRoot, policy: observerPolicy }).actorIds;
-      const verdict = consumeWaveExitObserverReceipt({
-        receipt: receiptSource,
+        ?? (exitPolicy ? digestWaveExitObserverInputsAtCommit(repoRoot, row.itemId, exitPolicy, targetHead) : {});
+      const receiptVerdict = consumeWaveExitObserverReceiptCandidates({
+        repoRoot,
+        receipts: receiptSources,
         policy: observerPolicy,
         compilationHead: targetHead,
-        derivedBasis: { actorIds: derivedActors, producerRole: observerPolicy.basisProducerRole },
         currentInputDigests,
+        policyDigestAtCompilationHead: observerPolicyDigest,
         isAncestor: observerOptions.isAncestor ?? isAncestor,
-        policyDigestAtCompilationHead: observerPolicyDigest
+        basisActors: observerOptions.basisActorsByWave?.[row.wave ?? ''],
+        readPolicySourceAtCommit: observerOptions.readPolicySourceAtCommit
       });
-      if (verdict.ok && basisProven && verdict.receipt) {
+      const selectedReceipt = receiptVerdict.receipt;
+      if (selectedReceipt && basisProven) {
         const receiptTuple: EvidenceTuple = {
-          command: verdict.receipt.command,
-          exitCode: verdict.receipt.exitCode,
-          outputDigest: verdict.receipt.stdoutDigest,
-          artifactPaths: [verdict.receipt.artifactPath],
-          observedAt: verdict.receipt.observedAt,
-          sourceCommit: verdict.receipt.observedHead,
+          command: selectedReceipt.command,
+          exitCode: selectedReceipt.exitCode,
+          outputDigest: selectedReceipt.stdoutDigest,
+          artifactPaths: [selectedReceipt.artifactPath],
+          observedAt: selectedReceipt.observedAt,
+          sourceCommit: selectedReceipt.observedHead,
           evidenceOwner: `wave-exit-observer:${row.itemId}`,
           validatorContractId: `atm.waveExitObserverReceipt/${row.itemId}`
         };
@@ -482,7 +484,10 @@ export function compileRunbookCompletion(
         ...hydrated,
         evidence: independentEvidence,
         status: 'unproven' as const,
-        diagnostics: [...new Set([...contractDiagnostics, ...verdict.diagnostics])]
+        diagnostics: [...new Set([
+          ...contractDiagnostics,
+          ...receiptVerdict.diagnostics
+        ])]
       };
     }
     return independentlySatisfied
@@ -504,7 +509,10 @@ export function compileRunbookCompletion(
       publicationBundle: { schemaId: 'atm.sealedProjectionPublicationBundle.v1', artifactPaths: normalizedPublicationArtifacts }
     },
     expectedItemCount: parsed.rows.length,
-    validatorContracts: contracts.flatMap((contract) => contract.validators),
+    validatorContracts: [
+      ...contracts.flatMap((contract) => contract.validators),
+      ...(observerPolicy && observerPolicyDigest ? observerContracts(observerPolicy, observerPolicyDigest) : [])
+    ],
     rows: parsed.rows, waveExits: parsed.waveExits,
     unresolvedIds: unresolved, deferredIds: [], unknownIds: unknown, overallVerdict: unresolved.length ? 'not-complete' : 'complete'
   };
@@ -534,7 +542,7 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
   };
   const observedPlanningHead = process.env.ATM_PLANNING_HEAD ?? git(DEFAULT_PLANNING_ROOT, ['rev-parse', 'HEAD']);
   const currentTargetHead = process.env.ATM_TARGET_HEAD ?? git(resolve('.'), ['rev-parse', 'HEAD']);
-  const originMain = process.env.ATM_ORIGIN_MAIN ?? git(resolve('.'), ['ls-remote', 'origin', 'refs/heads/main']).split(/\s+/)[0] ?? 'unknown';
+   const liveOriginMain = process.env.ATM_ORIGIN_MAIN ?? git(resolve('.'), ['ls-remote', 'origin', 'refs/heads/main']).split(/\s+/)[0] ?? 'unknown';
   const committed = mode === 'validate' && existsSync(DEFAULT_OUTPUT)
     ? JSON.parse(readFileSync(DEFAULT_OUTPUT, 'utf8'))
     : null;
@@ -548,9 +556,15 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
   const publicationArtifacts = mode === 'validate'
     ? (committed?.authority?.publicationBundle?.artifactPaths ?? [defaultPublicationArtifact])
     : [defaultPublicationArtifact, ...requestedPublicationArtifacts];
-  const targetHead = mode === 'validate' && isPublicationOnlyDelta(committedSnapshot, currentTargetHead, publicationArtifacts)
-    ? committedSnapshot
-    : currentTargetHead;
+   const targetHead = mode === 'validate' && isPublicationOnlyDelta(committedSnapshot, currentTargetHead, publicationArtifacts)
+     ? committedSnapshot
+     : currentTargetHead;
+   const originMain = selectCompletionObservationOrigin(
+     String(committed?.authority?.originMain ?? ''),
+     liveOriginMain,
+     targetHead,
+     committedSnapshot
+   );
   // A sealed evidence projection must be reproducible for an unchanged target
   // tree.  Wall-clock generation time would alter Reviewer B's input digest on
   // every write and create a matrix -> review -> certificate -> matrix loop.
@@ -566,7 +580,7 @@ if (process.argv[1]?.endsWith('compile-runbook-completion-evidence.ts')) {
       ? ['planning-runbook-head-digest-mismatch']
       : [])
   ];
-  const report = compileRunbookCompletion(source, planningHead, targetHead, originMain, observeFinalCertificate(), generatedAt, authorityDiagnostics, publicationArtifacts);
+  const report = compileRunbookCompletion(source, planningHead, targetHead, originMain, observeFinalCertificate(targetHead), generatedAt, authorityDiagnostics, publicationArtifacts);
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (mode === 'write') {
     writeFileSync(DEFAULT_OUTPUT, serialized, 'utf8');

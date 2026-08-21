@@ -431,7 +431,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     const baseWriteBlockers = [...writeReadinessHint.blockers, ...staleRunnerBlockers, ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)];
     const closeOwnedDirtyPendingBlocker = baseWriteBlockers.length > 0 ? buildCloseOwnedDirtyPendingBlocker({ taskId, actorId: actorId || '<actor>', previewCommitBundle, dirtyGuard: historicalClosePreflight.dirtyGuard, fallbackCommand: baseWriteBlockers[0]?.requiredCommand ?? writeReadinessHint.nextCommand }) : null;
     if (baseWriteBlockers.length > 0 || closeOwnedDirtyPendingBlocker) {
-        const mergedBlockers = prioritizeSharedHistoricalDeliveryBlockers([...baseWriteBlockers, ...(closeOwnedDirtyPendingBlocker ? [closeOwnedDirtyPendingBlocker] : [])], { taskId, actorId: actorId || '<actor>', historicalDeliveryRef: historicalDeliveryRefs[0] ?? null, outOfScopeFiles: historicalClosePreflight.mixedDeliveryCommit?.fileBuckets.outOfScopeSourceFiles ?? [] });
+        const mergedBlockers = prioritizeSharedHistoricalDeliveryBlockers([...baseWriteBlockers, ...(closeOwnedDirtyPendingBlocker ? [closeOwnedDirtyPendingBlocker] : [])], { taskId, actorId: actorId || '<actor>', historicalDeliveryRef: historicalDeliveryRefs[0] ?? null, outOfScopeFiles: historicalClosePreflight.mixedDeliveryCommit?.fileBuckets.outOfScopeSourceFiles ?? [], hasScopedHistoricalDelivery: (historicalClosePreflight.mixedDeliveryCommit?.deliverableFiles.length ?? 0) > 0, preserveDeliverableGate: writeRequested });
         writeReadinessHint = { ...writeReadinessHint, status: 'blocked', summary: mergedBlockers[0]?.summary ?? `taskflow close --write has ${mergedBlockers.length} known blocker(s) that dry-run can already disclose.`, blockers: mergedBlockers, nextCommand: mergedBlockers[0]?.requiredCommand ?? writeReadinessHint.nextCommand };
     }
     const packageJsonForAutoEvidencePlan = actorId ? readPackageJsonForAutoEvidence(cwd) : null;
@@ -453,7 +453,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     }
     if (writeRequested && preCloseWriteBlocked) {
         const blocker = writeReadinessHint.blockers[0] ?? null;
-        throw new CliError(blocker?.code ?? 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED', blocker?.summary ?? 'taskflow close --write has a known preflight blocker.', { exitCode: 1, details: { taskId, closeMode: closebackPlan.closeMode, writeReadinessHint, historicalClosePreflight, recommendedCommand: blocker?.requiredCommand ?? writeReadinessHint.nextCommand } });
+        throw new CliError(blocker?.code ?? 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED', blocker?.summary ?? 'taskflow close --write has a known preflight blocker.', { exitCode: 1, details: { taskId, closeMode: closebackPlan.closeMode, writeReadinessHint, historicalClosePreflight, historicalDeliveries: historicalClosePreflight.mixedDeliveryCommit ? [historicalClosePreflight.mixedDeliveryCommit] : [], recommendedCommand: blocker?.requiredCommand ?? writeReadinessHint.nextCommand } });
     }
     if (writeRequested && writeSupport.allowed) {
         authorizeLaneCapability({ cwd, taskId, actorId, commandClass: 'taskflow-close-write' });

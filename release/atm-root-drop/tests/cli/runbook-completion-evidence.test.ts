@@ -1,11 +1,31 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, effectiveEvidenceContracts, independentExitContracts, isDeclaredPublicationDelta, isPublicationOnlyDelta, sealValidatorContractIds, semanticTaskCardDigest } from '../../scripts/compile-runbook-completion-evidence.ts';
+import { compileRunbookCompletion, DEFAULT_PLANNING_ROOT, effectiveEvidenceContracts, independentExitContracts, isDeclaredPublicationDelta, isPublicationOnlyDelta, sealValidatorContractIds, selectCompletionObservationOrigin, semanticTaskCardDigest, summarizeFinalCertificate } from '../../scripts/compile-runbook-completion-evidence.ts';
 import { validateReport } from '../../scripts/validate-runbook-completion-evidence.ts';
 
 const sha = 'a'.repeat(40);
 assert.equal(DEFAULT_PLANNING_ROOT.endsWith('3KLife'), true);
+assert.equal(
+  selectCompletionObservationOrigin('b'.repeat(40), 'c'.repeat(40), 'a'.repeat(40), 'a'.repeat(40)),
+  'b'.repeat(40),
+  'a declared projection delta replays its sealed origin snapshot'
+);
+assert.equal(
+  selectCompletionObservationOrigin('invalid', 'c'.repeat(40), 'a'.repeat(40), 'a'.repeat(40)),
+  'c'.repeat(40),
+  'an invalid sealed origin must fail back to the live observation'
+);
+assert.deepEqual(
+  summarizeFinalCertificate({ status: 'proven', overallVerdict: 'complete', releaseAuthorized: true, diagnostics: [] }),
+  { proven: true, diagnostics: [] },
+  'completion consumes only the certificate terminal authorization state'
+);
+assert.deepEqual(
+  summarizeFinalCertificate({ status: 'stale', overallVerdict: 'not-complete', releaseAuthorized: false, diagnostics: ['volatile-detail'] }),
+  { proven: false, diagnostics: ['final-certificate-not-proven'] },
+  'mutable certificate diagnostics must not leak into the sealed completion projection'
+);
 assert.equal(isPublicationOnlyDelta('invalid', 'also-invalid'), false, 'invalid publication snapshots must fail closed');
 const planningContract = 'task_id: ATM-GOV-9999\nstatus: planned\nvalidators:\n  - npm run typecheck\nscopePaths:\n  - scripts/example.ts\n';
 const lifecycleOnlyCloseback = 'task_id: ATM-GOV-9999\nstatus: done\nvalidators:\n  - npm run typecheck\nscopePaths:\n  - scripts/example.ts\ncompleted_at: "2026-08-14T00:00:00Z"\ndelivery_commit: deadbeef\n';
@@ -14,14 +34,16 @@ assert.notEqual(semanticTaskCardDigest(planningContract), semanticTaskCardDigest
 assert.equal(
   isDeclaredPublicationDelta([
     'docs/reports/plan-3x-4x-runbook-completion-evidence.json',
+    'governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json',
     'docs/reports/reviews/plan-3x-4x-runbook-release-review.json',
     '.atm/history/evidence/ATM-GOV-0376.json'
   ], [
     'docs/reports/plan-3x-4x-runbook-completion-evidence.json',
+    'governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json',
     'docs/reports/reviews/plan-3x-4x-runbook-release-review.json'
   ]),
   true,
-  'a sealed publication bundle may replay its declared outputs and durable receipts'
+  'a sealed publication bundle may replay its declared report or governance projections and durable receipts'
 );
 assert.equal(
   isDeclaredPublicationDelta([
@@ -98,6 +120,18 @@ assert.deepEqual(sealValidatorContractIds(['atm.waveExitObserverReceipt/EXIT-02'
 for (const row of [...report.rows, ...report.waveExits]) {
   for (const id of row.validatorContractIds ?? []) assert.equal(typeof id, 'string');
 }
+assert.ok(
+  report.validatorContracts.some((contract: any) => contract.kind === 'wave-exit-observer-receipt'
+    && contract.contractId === 'atm.waveExitObserverReceipt/EXIT-02'
+    && contract.evidenceOwner === 'wave-exit-observer:EXIT-02'),
+  'the completion registry must include the sealed Wave receipt contract family'
+);
+const malformedWaveContract = structuredClone(report);
+malformedWaveContract.validatorContracts.push({
+  kind: 'wave-exit-observer-receipt', contractId: 'atm.waveExitObserverReceipt/EXIT-99',
+  exitItemId: 'EXIT-99', evidenceOwner: 'wave-exit-observer:EXIT-99', command: 'node forged.ts', policyDigest: 'sha256:bad'
+});
+assert.throws(() => validateReport(malformedWaveContract, source), /invalid validator contract/);
 
 const forged = structuredClone(report);
 forged.rows[0].status = 'proven';
