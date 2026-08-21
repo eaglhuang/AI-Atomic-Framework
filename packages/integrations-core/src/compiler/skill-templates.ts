@@ -40,13 +40,14 @@ export type {
   SkillSourceUniverseEntry,
   SkillSourceUniverseFinding
 } from './skill-source-universe.ts';
-export { evaluateInstalledProjectionParity, collectProjectionMetadataFindings } from './skill-projection-parity.ts';
+export { evaluateInstalledProjectionParity, collectProjectionMetadataFindings, resolveTargetedSkillProjectionRefresh } from './skill-projection-parity.ts';
 export type {
   ProjectionMetadataFinding,
   InstalledProjectionDisposition,
   InstalledProjectionDispositionRule,
   InstalledProjectionParityFinding,
-  InstalledProjectionParityReport
+  InstalledProjectionParityReport,
+  TargetedSkillProjectionRefresh
 } from './skill-projection-parity.ts';
 
 export type SkillTemplateAdapterTarget = 'claude-code' | 'copilot' | 'cursor' | 'gemini' | 'codex';

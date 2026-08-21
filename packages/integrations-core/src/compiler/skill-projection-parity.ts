@@ -91,6 +91,39 @@ export interface InstalledProjectionParityReport {
   readonly failClosed: readonly InstalledProjectionParityFinding[];
 }
 
+/**
+ * A targeted refresh is intentionally smaller than a corpus refresh.  It
+ * selects exactly one compiled SKILL.md member, so a repair can update its
+ * declared projections without treating unrelated installed copies as
+ * incidental output.
+ */
+export interface TargetedSkillProjectionRefresh {
+  readonly templateId: string;
+  readonly projectionRelativePath: string;
+  readonly content: string;
+  readonly installedPaths: readonly string[];
+}
+
+export function resolveTargetedSkillProjectionRefresh(input: {
+  readonly templateId: string;
+  readonly compiledProjectionFiles: readonly { readonly relativePath: string; readonly content: string }[];
+  readonly installedPaths: readonly string[];
+}): TargetedSkillProjectionRefresh {
+  const templateId = input.templateId.trim();
+  if (!templateId) throw new Error('targeted skill projection refresh requires a template id');
+  const projectionRelativePath = `${templateId}/SKILL.md`;
+  const matches = input.compiledProjectionFiles.filter((file) => file.relativePath.replace(/\\/g, '/') === projectionRelativePath);
+  if (matches.length !== 1) {
+    throw new Error(`targeted skill projection refresh requires exactly one compiled member for ${projectionRelativePath}`);
+  }
+  return {
+    templateId,
+    projectionRelativePath,
+    content: matches[0].content,
+    installedPaths: [...new Set(input.installedPaths.map((value) => value.trim()).filter(Boolean))]
+  };
+}
+
 export function evaluateInstalledProjectionParity(input: {
   readonly compiledProjectionFiles: readonly { readonly relativePath: string; readonly content: string }[];
   readonly installedSkillRoot: string;

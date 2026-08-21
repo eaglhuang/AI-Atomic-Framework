@@ -1,0 +1,322 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0039",
+  "title": "Repair canonical dispatch skill projection parity without corpus-wide overwrite",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-SKL-0038"
+  ],
+  "acceptance": [
+    "ACC-1: `atm-dispatch` source policy, local installed copy, and Codex installed copy have one compiler-verifiable canonical relation; `validate-captain-dispatch-protocol` passes without copy-only edits.",
+    "ACC-2: a focused red/green test proves the targeted dispatch refresh updates only the declared dispatch projection and manifest entries; unrelated installed-copy bytes remain unchanged.",
+    "ACC-3: source tracking/audit emits the source digest, compiler version, manifest digest, and explicit parity disposition for the repaired projection.",
+    "ACC-4: `npm run validate:skill-templates` passes with no newly introduced advisory drift for `atm-dispatch`."
+  ],
+  "deliverables": [
+    "templates/skills/atm-dispatch.skill.md",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+    "scripts/validate-captain-dispatch-protocol.ts",
+    "tests/cli/skill-corpus-canary-rewrite.test.ts"
+  ],
+  "scopePaths": [
+    "templates/skills/atm-dispatch.skill.md",
+    ".agents/skills/atm-dispatch/SKILL.md",
+    "integrations/codex-skills/atm-dispatch/SKILL.md",
+    ".atm/integrations/codex.manifest.json",
+    "packages/integrations-core/src/compiler/skill-templates.ts",
+    "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+    "scripts/validate-captain-dispatch-protocol.ts",
+    "tests/cli/skill-corpus-canary-rewrite.test.ts"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-captain-dispatch-protocol.ts --mode validate",
+    "npm run validate:skill-templates",
+    "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-and-regenerate-targeted-projection",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.skill-template-compiler",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.skill-projection-parity",
+        "pattern": "Policy Object",
+        "source": "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+        "disposition": "inline",
+        "inlineReason": "The existing parity policy module is the lifecycle authority; this card narrows its targeted refresh boundary rather than creating a second resolver."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0039-repair-canonical-dispatch-skill-projection-parity-without-corpus-wide-overwrite.task.md",
+    "sectionTitle": "TASK-SKL-0039",
+    "headingLine": 101,
+    "hash": "65f34784b72793be",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0039-repair-canonical-dispatch-skill-projection-parity-without-corpus-wide-overwrite.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:65f34784b72793be4a490dac8c02d7491115b3e643b05cf72cb6b7d665756353",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-21T02:46:39.609Z"
+    }
+  },
+  "importedAt": "2026-08-21T02:46:39.609Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-SKL-0038 established the sealed source-universe and installed-projection audit seam."
+    ],
+    "startConditions": [
+      "Source template and both current dispatch projections are inventoried without overwriting unrelated dirty corpus files.",
+      "Broker admission grants an exact task scope before any source or projection write."
+    ],
+    "softRelations": [
+      "ATM-BUG-2026-08-14-013 records source-template tracking risk; this card consumes only the confirmed dispatch parity failure."
+    ],
+    "changedPublicSeams": [
+      "atm-dispatch canonical source-to-projection parity",
+      "targeted adapter refresh isolation"
+    ],
+    "causalImpactEdges": [
+      "dispatch-template-change -> projected-local-and-codex-copies",
+      "targeted-refresh -> no-unrelated-installed-copy-mutation"
+    ],
+    "parallelFrontierInputs": [
+      "Current installed-copy drift is foreign WIP until the task admits exact paths."
+    ],
+    "validatorReferences": [
+      "validate-captain-dispatch-protocol",
+      "validate-skill-templates",
+      "skill-corpus-canary-rewrite"
+    ],
+    "phaseOwner": "TASK-SKL-0039"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_skl_0039_dispatch_projection_parity",
+      "targetGroupId": "skill-corpus-canary-rewrite",
+      "semanticKey": "targeted_dispatch_projection_refresh",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "dispatch-template-change -> projected-local-and-codex-copies",
+        "targeted-refresh -> no-unrelated-installed-copy-mutation"
+      ],
+      "expectedRedPredicate": "a dispatch source/projection mismatch or unrelated-copy mutation is detected",
+      "contributionResourceKey": "skill-corpus-dispatch-projection",
+      "responsibility": "task-required",
+      "dependencyEdge": "TASK-SKL-0038",
+      "contractEdge": "sealed-source-to-projection",
+      "resourceKey": "skill-corpus-dispatch-projection"
+    },
+    {
+      "caseId": "test_skl_0039_dispatch_projection_audit_receipt",
+      "targetGroupId": "skill-corpus-canary-rewrite",
+      "semanticKey": "dispatch_projection_audit_metadata",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "dispatch-template-change -> projected-local-and-codex-copies"
+      ],
+      "expectedRedPredicate": "missing source, compiler, manifest, or parity metadata is rejected",
+      "contributionResourceKey": "skill-corpus-dispatch-projection",
+      "responsibility": "task-required",
+      "dependencyEdge": "TASK-SKL-0038",
+      "contractEdge": "audit-receipt-contract",
+      "resourceKey": "skill-corpus-dispatch-projection"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_skl_0039_dispatch_projection_parity",
+    "test_skl_0039_dispatch_projection_audit_receipt"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-21T05-13-43-138Z-claim-f4555b034617",
+  "lastTransitionAt": "2026-08-21T05:13:43.138Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-21T05:13:36.560Z",
+  "promotedAt": "2026-08-21T05:13:36.565Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-2e0cabb0ff2d",
+    "claimedAt": "2026-08-21T05:13:36.569Z",
+    "heartbeatAt": "2026-08-21T05:13:36.569Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0039.json",
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".atm/integrations/codex.manifest.json",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "scripts/validate-captain-dispatch-protocol.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "tests/cli/skill-corpus-canary-rewrite.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260821051336-codex-gpt-5.4-mini-1d2f1b28ec",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260821051336-codex-gpt-5.4-mini-1d2f1b28ec\""
+    }
+  },
+  "startedAt": "2026-08-21T05:13:36.569Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-de8d119ff14bb3b0",
+    "ticketDigest": "sha256:de8d119ff14bb3b01b32e6914a5122939072cd5dc7f91659091f4186af6f600d",
+    "taskId": "TASK-SKL-0039",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260821051336-codex-gpt-5.4-mini-1d2f1b28ec",
+    "claimGeneration": "lease-2e0cabb0ff2d",
+    "issuedAt": "2026-08-21T05:13:36.569Z",
+    "expiresAt": "2026-08-21T05:43:36.569Z",
+    "scopeDigest": "sha256:6f28eb5b6d3c44851a3673994f8a729233ffa26a1a75d7ac9451df5fcbafafc5",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-21T05:13:36.569Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".agents/skills/atm-dispatch/SKILL.md",
+          ".atm/history/evidence/TASK-SKL-0039.*",
+          ".atm/history/task-events/TASK-SKL-0039/**",
+          ".atm/history/tasks/TASK-SKL-0039.json",
+          ".atm/integrations/codex.manifest.json",
+          "integrations/codex-skills/atm-dispatch/SKILL.md",
+          "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+          "packages/integrations-core/src/compiler/skill-templates.ts",
+          "scripts/validate-captain-dispatch-protocol.ts",
+          "templates/skills/atm-dispatch.skill.md",
+          "tests/cli/skill-corpus-canary-rewrite.test.ts"
+        ],
+        "digest": "sha256:fe48204a1718863640db08515464046c1197d5754ab2e881ad763deb16dd525a"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260821051336-codex-gpt-5.4-mini-TASK-SKL-0039-4253fde74b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0039",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".atm/history/evidence/TASK-SKL-0039.*",
+      ".atm/history/task-events/TASK-SKL-0039/**",
+      ".atm/history/tasks/TASK-SKL-0039.json",
+      ".atm/integrations/codex.manifest.json",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+      "packages/integrations-core/src/compiler/skill-templates.ts",
+      "scripts/validate-captain-dispatch-protocol.ts",
+      "templates/skills/atm-dispatch.skill.md",
+      "tests/cli/skill-corpus-canary-rewrite.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4de4b7ff44f05ecb557d18e73f1fccf5babe2f108d157d2aad9808815de3086b",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260821051336-codex-gpt-5.4-mini-TASK-SKL-0039-4253fde74b",
+    "laneSession": {
+      "laneSessionId": "lane-20260821051336-codex-gpt-5.4-mini-1d2f1b28ec",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260821051336-codex-gpt-5.4-mini-1d2f1b28ec\""
+    },
+    "createdAt": "2026-08-21T05:13:43.137Z",
+    "status": "active"
+  }
+}

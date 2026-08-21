@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-SKL-0039",
+  "updatedAt": "2026-08-21T05:18:03.488Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+    "validate:captain-dispatch-protocol",
+    "validate:skill-templates"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:562bd0cab614d34cd7d31e6e3947ac56ce03391f54d85a6c5bcfd27d8749897f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+      ],
+      "generatedAt": "2026-08-21T05:17:49.605Z",
+      "startedAt": "2026-08-21T05:17:46.052Z",
+      "finishedAt": "2026-08-21T05:17:49.605Z",
+      "durationMs": 3553,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9080e1b092994adfe237404177d01b358e0066aa",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-captain-dispatch-protocol.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:11c253f431cac00523a83c9d643e6b8d148eba162e7670d9f528effc7134e883",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:captain-dispatch-protocol"
+      ],
+      "generatedAt": "2026-08-21T05:17:53.527Z",
+      "startedAt": "2026-08-21T05:17:52.327Z",
+      "finishedAt": "2026-08-21T05:17:53.527Z",
+      "durationMs": 1200,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9080e1b092994adfe237404177d01b358e0066aa",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a7c0e6cd2632abafb2cd16a13c6a598f2c1760ebaad2c9de4aa7c89d6c8a6c1a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:skill-templates"
+      ],
+      "generatedAt": "2026-08-21T05:18:03.487Z",
+      "startedAt": "2026-08-21T05:17:56.286Z",
+      "finishedAt": "2026-08-21T05:18:03.487Z",
+      "durationMs": 7201,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9080e1b092994adfe237404177d01b358e0066aa",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
