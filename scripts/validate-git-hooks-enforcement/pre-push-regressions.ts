@@ -112,6 +112,18 @@ assert(driftDoctor.ok === false, 'doctor must fail when tracked actor registry h
 const governanceReadinessCheck = (driftDoctor.evidence?.checks ?? []).find((entry: any) => entry.name === 'governance-entry-readiness');
 assert(governanceReadinessCheck?.ok === false, 'doctor governance-entry-readiness must fail for tracked actor registry drift');
 assert(governanceReadinessCheck?.details?.actorRegistryState?.blocking === true, 'doctor must report actor registry drift details');
+const driftRecoveryClaim = parsePayload(runCli(governedWrapperRepo, [
+  'framework-mode',
+  'claim',
+  '--actor',
+  'hook-validator',
+  '--files',
+  '.atm/catalog/registry/actors.json,docs/tracked-actor-registry-drift.md',
+  '--reason',
+  'fixture recovery for a taskless governed registry-drift commit',
+  '--json'
+]));
+assert(driftRecoveryClaim.ok === true, 'registry-drift recovery must acquire fixture-local framework authority');
 const driftRecoveryCommit = parsePayload(runCli(governedWrapperRepo, [
   'git',
   'commit',
@@ -121,6 +133,7 @@ const driftRecoveryCommit = parsePayload(runCli(governedWrapperRepo, [
   'hook-validator',
   '--message',
   'chore: auto-stage tracked actor registry drift',
+  '--auto-stage',
   '--json'
 ]));
 assert(driftRecoveryCommit.ok === true, 'governed git commit must auto-stage tracked actor registry drift for non-task commits');
@@ -128,8 +141,22 @@ const driftRecoverySha = String(driftRecoveryCommit.evidence?.commitSha ?? '');
 const driftRecoveryTouchedPaths = String(runGit(governedWrapperRepo, ['show', '--pretty=', '--name-only', driftRecoverySha]).stdout || '').trim().split(/\r?\n/).filter(Boolean);
 assert(driftRecoveryTouchedPaths.includes('.atm/catalog/registry/actors.json'), 'governed drift-recovery commit must include the tracked actor registry');
 assert(driftRecoveryTouchedPaths.includes('docs/tracked-actor-registry-drift.md'), 'governed drift-recovery commit must preserve the caller-staged payload');
+const driftRecoveryRelease = parsePayload(runCli(governedWrapperRepo, ['framework-mode', 'release', '--actor', 'hook-validator', '--json']));
+assert(driftRecoveryRelease.ok === true, 'registry-drift recovery must release fixture-local framework authority');
 writeFileSync(path.join(governedWrapperRepo, 'packages', 'core', 'src', 'index.ts'), 'export const governedWrapperEvidence = true;\n', 'utf8');
 runGit(governedWrapperRepo, ['add', 'packages/core/src/index.ts']);
+const wrapperCommitClaim = parsePayload(runCli(governedWrapperRepo, [
+  'framework-mode',
+  'claim',
+  '--actor',
+  'hook-validator',
+  '--files',
+  'packages/core/src/index.ts',
+  '--reason',
+  'fixture authority for a taskless critical governed commit',
+  '--json'
+]));
+assert(wrapperCommitClaim.ok === true, 'critical governed wrapper commit must acquire fixture-local framework authority');
 const wrapperCommit = parsePayload(runCli(governedWrapperRepo, [
   'git',
   'commit',
@@ -147,6 +174,8 @@ assert(Boolean(wrapperCommitSha), 'governed git wrapper critical commit must ret
 const wrapperTouchedPaths = String(runGit(governedWrapperRepo, ['show', '--pretty=', '--name-only', wrapperCommitSha]).stdout || '').trim().split(/\r?\n/).filter(Boolean);
 assert(wrapperTouchedPaths.includes('packages/core/src/index.ts'), 'governed git wrapper critical commit must include the critical file');
 assert(wrapperTouchedPaths.includes('.atm/history/evidence/git-head.jsonl'), 'governed git wrapper critical commit must include git-head evidence in the same commit');
+const wrapperCommitRelease = parsePayload(runCli(governedWrapperRepo, ['framework-mode', 'release', '--actor', 'hook-validator', '--json']));
+assert(wrapperCommitRelease.ok === true, 'critical governed wrapper commit must release fixture-local framework authority');
 const governedPrePush = parsePayload(runCli(governedWrapperRepo, ['hook', 'pre-push', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true }));
 assert(governedPrePush.ok === true, 'same-commit governed git-head evidence must satisfy pre-push without a backfill-only follow-up commit');
 assert(parsePayload(runCli(governedWrapperRepo, ['git-hooks', 'install', '--framework-required', '--json'])).ok === true, 'governed wrapper fixture must install framework-required git hooks before doctor verification');
