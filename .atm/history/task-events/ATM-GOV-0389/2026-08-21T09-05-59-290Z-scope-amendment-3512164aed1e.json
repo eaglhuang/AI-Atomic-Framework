@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T09-05-59-290Z-scope-amendment-3512164aed1e",
+  "taskId": "ATM-GOV-0389",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0389.json",
+  "taskSha256": "sha256:8938a7f6c631d0f35a159349d0e4f700201e21803bbdcfc12680a013cc7b5578",
+  "createdAt": "2026-08-21T09:05:59.290Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0389 --actor codex-captain --add packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts --reason \"Regression must exercise the owned temporary-index commit assembly seam and prove authorized actor-registry staging survives the intermediate delivery commit.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Regression must exercise the owned temporary-index commit assembly seam and prove authorized actor-registry staging survives the intermediate delivery commit."
+  }
+}

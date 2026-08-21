@@ -1,0 +1,320 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0389",
+  "title": "Fail fast and avoid unnecessary runner publication on governed closeout",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "First close-transaction candidate invokes normal pre-commit validation and produces a receipt.",
+    "Matching governance-only follow-up consumes exactly that receipt without a second expensive hook invocation.",
+    "Any changed task, HEAD, index lease, candidate digest, expired receipt, or direct Git invocation fails closed to normal hook validation.",
+    "Focused hook and transaction-receipt tests pass.",
+    "`npm run typecheck` passes.",
+    "No runner build, validator, or external commit can use the receipt as a bypass."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/hook/pre-commit/close-transaction-receipt.ts",
+    "packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/hook/pre-commit/close-transaction-receipt.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
+    "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+    ".atm/history/evidence/ATM-GOV-0389.*",
+    ".atm/history/task-events/ATM-GOV-0389/**",
+    ".atm/history/tasks/ATM-GOV-0389.json",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-013.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the receipt protocol and its two integrations together; the normal pre-commit path remains the fallback whenever receipt binding is missing or invalid.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "pattern": "Result Contract Object",
+        "inlineReason": null
+      },
+      {
+        "pattern": "Policy Object",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/close-transaction-receipt.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
+        "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0389-fail-fast-and-avoid-unnecessary-runner-publication-on-governed-closeout.task.md",
+    "sectionTitle": "ATM-GOV-0389",
+    "headingLine": 47,
+    "hash": "685b86d81552bb95",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0389-fail-fast-and-avoid-unnecessary-runner-publication-on-governed-closeout.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:685b86d81552bb951a5b88012dc04e0c469874a8f81388eb8fb451e98870e97e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T13:39:13.139Z"
+    }
+  },
+  "importedAt": "2026-08-14T13:39:13.139Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.hook.tests.pre.commit.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.close.transaction.hook.receipt.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-21T09-08-13-794Z-renew-ed50f4715e22",
+  "lastTransitionAt": "2026-08-21T09:08:13.794Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-recovery",
+  "reservedAt": "2026-08-14T14:17:57.972Z",
+  "promotedAt": "2026-08-14T14:17:57.976Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-6a04a0536ab6",
+    "claimedAt": "2026-08-14T14:18:25.402Z",
+    "heartbeatAt": "2026-08-21T09:08:12.909Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0389.*",
+      ".atm/history/task-events/ATM-GOV-0389/**",
+      ".atm/history/tasks/ATM-GOV-0389.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-013.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/close-transaction-receipt.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260814141825-codex-captain-recovery-7f8d252173",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814141825-codex-captain-recovery-7f8d252173\""
+    }
+  },
+  "startedAt": "2026-08-14T14:18:25.402Z",
+  "startedByActor": "codex-captain-recovery",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-5f7265a6b0f6b3dd",
+    "ticketDigest": "sha256:5f7265a6b0f6b3dd7ab45064fb433cdd47dcdd66226f9f67787828a97c19fb34",
+    "taskId": "ATM-GOV-0389",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260814141825-codex-captain-recovery-7f8d252173",
+    "claimGeneration": "lease-6a04a0536ab6",
+    "issuedAt": "2026-08-21T09:08:12.909Z",
+    "expiresAt": "2026-08-21T09:38:12.909Z",
+    "scopeDigest": "sha256:6167e4cf8836527b78ce931beebb47a175eeec06c003ad5768a5f194059a410f",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-21T09:08:12.909Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0389.*",
+          ".atm/history/task-events/ATM-GOV-0389/**",
+          ".atm/history/tasks/ATM-GOV-0389.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-013.json",
+          "docs/governance/atm-bug-and-optimization-backlog.md",
+          "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+          "packages/cli/src/commands/hook/pre-commit/close-transaction-receipt.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+          "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+          "packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+        ],
+        "digest": "sha256:37e002f9f535d37118b921ca187718331df8286f76885554ed13007ee0ef9221"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260814141825-codex-captain-recovery-ATM-GOV-0389-3f5136606e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0389",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0389.*",
+      ".atm/history/task-events/ATM-GOV-0389/**",
+      ".atm/history/tasks/ATM-GOV-0389.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-013.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/close-transaction-receipt.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0389-fail-fast-and-avoid-unnecessary-runner-publication-on-governed-closeout.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0389-fail-fast-and-avoid-unnecessary-runner-publication-on-governed-closeout.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "07316706add88458111cc41f355d25631fe6fbf3f7675446a92933f1e0f3385d",
+    "actorId": "codex-captain-recovery",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260814141825-codex-captain-recovery-7f8d252173",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260814141825-codex-captain-recovery-7f8d252173\""
+    },
+    "createdAt": "2026-08-14T14:18:29.947Z",
+    "status": "active"
+  }
+}

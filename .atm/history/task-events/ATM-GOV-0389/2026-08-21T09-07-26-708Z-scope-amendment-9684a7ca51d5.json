@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T09-07-26-708Z-scope-amendment-9684a7ca51d5",
+  "taskId": "ATM-GOV-0389",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0389.json",
+  "taskSha256": "sha256:bc6757fd9c8dcb9c4fa1337f8326682a1650dede54de9daa9abee9765ae5a913",
+  "createdAt": "2026-08-21T09:07:26.708Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0389 --actor codex-captain --add \"docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-013.json,docs/governance/atm-bug-and-optimization-backlog.md\" --reason \"Record the newly reproduced close-transaction consistency defect and regenerate its governed backlog projection.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Record the newly reproduced close-transaction consistency defect and regenerate its governed backlog projection."
+  }
+}
