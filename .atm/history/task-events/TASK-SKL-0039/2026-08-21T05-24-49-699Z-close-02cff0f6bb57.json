@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T05-24-49-699Z-close-02cff0f6bb57",
+  "taskId": "TASK-SKL-0039",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260821051336-codex-gpt-5.4-mini-TASK-SKL-0039-4253fde74b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0039.json",
+  "taskSha256": "sha256:7c122ff81699afa9cdaf4af5df60d6e25ebe917aa35bd3eb6dd8be3251648cdc",
+  "createdAt": "2026-08-21T05:24:49.699Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0039 --actor codex-gpt-5.4-mini --status done --historical-delivery fee9daae19ec53e313c53994e8f32ee94917446a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260821051336-codex-gpt-5.4-mini-TASK-SKL-0039-4253fde74b",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0039.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "validate:captain-dispatch-protocol",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "validate:captain-dispatch-protocol",
+      "validate:skill-templates"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-21T05:24:49.686Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-dispatch/SKILL.md",
+        ".atm/history/evidence/TASK-SKL-0039.*",
+        ".atm/history/task-events/TASK-SKL-0039/**",
+        ".atm/history/tasks/TASK-SKL-0039.json",
+        ".atm/integrations/codex.manifest.json",
+        "integrations/codex-skills/atm-dispatch/SKILL.md",
+        "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "scripts/validate-captain-dispatch-protocol.ts",
+        "templates/skills/atm-dispatch.skill.md",
+        "tests/cli/skill-corpus-canary-rewrite.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/integrations-core/src/compiler/skill-projection-parity.ts",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "scripts/validate-captain-dispatch-protocol.ts",
+        "tests/cli/skill-corpus-canary-rewrite.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+        "validate:captain-dispatch-protocol",
+        "validate:skill-templates"
+      ]
+    }
+  }
+}
