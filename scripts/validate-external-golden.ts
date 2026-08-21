@@ -75,6 +75,14 @@ try {
   assert(bootstrap.exitCode === 0, 'external golden bootstrap must exit 0');
   assert(bootstrap.parsed.ok === true, 'external golden bootstrap must report ok=true');
 
+  const chart = runAtm(hostRepo, ['atm-chart', 'render', '--cwd', '.', '--json']);
+  assert(chart.exitCode === 0, 'external golden ATMChart render must exit 0');
+  assert(chart.parsed.ok === true, 'external golden ATMChart render must report ok=true');
+
+  const welcome = runAtm(hostRepo, ['welcome', '--cwd', '.', '--json']);
+  assert(welcome.exitCode === 0, 'external golden welcome must exit 0');
+  assert(welcome.parsed.ok === true, 'external golden welcome must report ok=true');
+
   const doctor = runAtm(hostRepo, ['doctor', '--json']);
   const doctorSummary = JSON.stringify({
     exitCode: doctor.exitCode,
