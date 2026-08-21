@@ -266,6 +266,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
         buildDecision,
         decisionReason: `foreign generated outputs retained: ${artifactSync.preservedPaths.join(', ')}`,
         publicationDisposition: 'recovery-retained',
+        recoveryRetainedPaths: artifactSync.preservedPaths,
         incrementalPlan,
         runtimeTelemetryRef: null,
         tsBuildCache,

@@ -11,6 +11,7 @@ export interface PublicationDeliverySliceManifest {
   readonly receiptPath: string;
   readonly expectedSealedSourceSha: string;
   readonly expectedInventoryDigest: string;
+  readonly expectedPublicationDisposition: 'published' | 'recovery-retained';
 }
 
 export type PublicationDeliverySliceRejectionCode =
@@ -59,12 +60,18 @@ export function parsePublicationDeliverySliceManifest(
     typeof raw.expectedSealedSourceSha === 'string' ? raw.expectedSealedSourceSha.trim() : '';
   const expectedInventoryDigest =
     typeof raw.expectedInventoryDigest === 'string' ? raw.expectedInventoryDigest.trim() : '';
-  if (!receiptPath || !expectedSealedSourceSha || !expectedInventoryDigest) return null;
+  const expectedPublicationDisposition = raw.expectedPublicationDisposition === 'recovery-retained'
+    ? 'recovery-retained'
+    : raw.expectedPublicationDisposition === 'published'
+      ? 'published'
+      : null;
+  if (!receiptPath || !expectedSealedSourceSha || !expectedInventoryDigest || !expectedPublicationDisposition) return null;
   return {
     schemaId: PUBLICATION_DELIVERY_SLICE_MANIFEST_SCHEMA_ID,
     receiptPath,
     expectedSealedSourceSha,
     expectedInventoryDigest,
+    expectedPublicationDisposition,
   };
 }
 
@@ -91,12 +98,18 @@ export function derivePublicationDeliverySliceManifest(input: {
       ? String((rawInventory as Record<string, unknown>).digest).trim()
       : '';
   const receiptPath = normalizePath(input.receiptPath);
-  if (!receiptPath || !sealedSourceSha || !expectedInventoryDigest) return null;
+  const expectedPublicationDisposition = receipt.publicationDisposition === 'recovery-retained'
+    ? 'recovery-retained'
+    : receipt.publicationDisposition === 'published'
+      ? 'published'
+      : null;
+  if (!receiptPath || !sealedSourceSha || !expectedInventoryDigest || !expectedPublicationDisposition) return null;
   return {
     schemaId: PUBLICATION_DELIVERY_SLICE_MANIFEST_SCHEMA_ID,
     receiptPath,
     expectedSealedSourceSha: sealedSourceSha,
     expectedInventoryDigest,
+    expectedPublicationDisposition,
   };
 }
 
@@ -146,7 +159,7 @@ export function resolvePublicationDeliverySlice(input: {
   if (!manifest) {
     return fail(
       'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID',
-      'delivery-slice manifest must declare schemaId atm.publicationDeliverySliceManifest.v1 with receiptPath, expectedSealedSourceSha, and expectedInventoryDigest',
+      'delivery-slice manifest must declare schemaId atm.publicationDeliverySliceManifest.v1 with receiptPath, expectedSealedSourceSha, expectedInventoryDigest, and expectedPublicationDisposition',
     );
   }
   if (!input.receipt || typeof input.receipt !== 'object' || Array.isArray(input.receipt)) {
@@ -156,10 +169,11 @@ export function resolvePublicationDeliverySlice(input: {
   if (receipt.schemaId !== 'atm.runnerSyncReceipt.v1') {
     return fail('ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID', 'runner-sync receipt schemaId is invalid');
   }
-  if (String(receipt.publicationDisposition ?? '').trim() !== 'published') {
+  const receiptDisposition = String(receipt.publicationDisposition ?? '').trim();
+  if (receiptDisposition !== manifest.expectedPublicationDisposition) {
     return fail(
       'ATM_GIT_COMMIT_DELIVERY_SLICE_NOT_PUBLISHED',
-      'runner-sync receipt publicationDisposition must be published',
+      `runner-sync receipt publicationDisposition must match the delivery-slice manifest: ${manifest.expectedPublicationDisposition}`,
     );
   }
   const sealedSourceSha = typeof receipt.sealedSourceSha === 'string' ? receipt.sealedSourceSha.trim() : '';
@@ -202,14 +216,37 @@ export function resolvePublicationDeliverySlice(input: {
     );
   }
 
+  const recoveryRetainedPaths = receiptDisposition === 'recovery-retained'
+    ? uniqueSorted(Array.isArray(receipt.recoveryRetainedPaths)
+      ? receipt.recoveryRetainedPaths.filter((value): value is string => typeof value === 'string')
+      : [])
+    : [];
+  if (receiptDisposition === 'recovery-retained' && recoveryRetainedPaths.length === 0) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID',
+      'recovery-retained runner-sync receipts must declare non-empty recoveryRetainedPaths',
+    );
+  }
+  const inventoryPathSet = new Set(validated.inventory.entries.map((entry) => normalizePath(entry.path)));
+  const nonInventoryRetainedPaths = recoveryRetainedPaths.filter((filePath) => !inventoryPathSet.has(filePath));
+  if (nonInventoryRetainedPaths.length > 0) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID',
+      `recoveryRetainedPaths must be output inventory members: ${nonInventoryRetainedPaths.join(', ')}`,
+    );
+  }
+
   const inScope = (filePath: string) =>
     input.allowedScope.some((scope) => input.pathMatchesScope(filePath, scope));
-  const outOfScopeMembers = disposition.dirtyInventoryPaths.filter((filePath) => !inScope(filePath));
+  const selectedInventoryMembers = receiptDisposition === 'recovery-retained'
+    ? disposition.dirtyInventoryPaths.filter((filePath) => recoveryRetainedPaths.includes(filePath))
+    : disposition.dirtyInventoryPaths;
+  const outOfScopeMembers = selectedInventoryMembers.filter((filePath) => !inScope(filePath));
   if (outOfScopeMembers.length > 0) {
     return fail(
       'ATM_GIT_COMMIT_DELIVERY_SLICE_OUT_OF_SCOPE',
       `inventory dirty members are outside the active allowed scope: ${outOfScopeMembers.join(', ')}`,
-      { inventoryMembers: [...disposition.dirtyInventoryPaths] },
+      { inventoryMembers: [...selectedInventoryMembers] },
     );
   }
 
@@ -217,7 +254,7 @@ export function resolvePublicationDeliverySlice(input: {
   const requiredRecords = uniqueSorted(
     dirtyPaths.filter((filePath) => isRequiredRecord(filePath, manifest.receiptPath, receiptTaskId) && inScope(filePath)),
   );
-  const inventoryMembers = uniqueSorted(disposition.dirtyInventoryPaths);
+  const inventoryMembers = uniqueSorted(selectedInventoryMembers);
   return {
     ok: true,
     code: null,

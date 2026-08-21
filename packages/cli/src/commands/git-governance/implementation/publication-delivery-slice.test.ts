@@ -53,6 +53,7 @@ const manifest = {
   receiptPath: `.atm/history/evidence/${TASK_ID}.runner-sync-receipt.json`,
   expectedSealedSourceSha: SHA,
   expectedInventoryDigest: inventory.digest,
+  expectedPublicationDisposition: 'published',
 };
 
 const happy = resolvePublicationDeliverySlice({
@@ -89,6 +90,36 @@ const unpublished = resolvePublicationDeliverySlice({
 });
 assert.equal(unpublished.ok, false);
 assert.equal(unpublished.code, 'ATM_GIT_COMMIT_DELIVERY_SLICE_NOT_PUBLISHED');
+
+const recoveryRetained = {
+  ...buildPublishedReceipt({ outputPaths: inventoryPaths, publicationDisposition: 'recovery-retained' }),
+  recoveryRetainedPaths: ['packages/cli/dist/gone.d.ts'],
+};
+const recoveryManifest = {
+  ...manifest,
+  expectedPublicationDisposition: 'recovery-retained',
+};
+const recoverySlice = resolvePublicationDeliverySlice({
+  manifest: recoveryManifest,
+  receipt: recoveryRetained,
+  dirtyPaths: [...inventoryPaths, 'docs/reports/plan-closeback.json'],
+  allowedScope: [...inventoryPaths, 'docs/reports/plan-closeback.json'],
+  pathMatchesScope: pathInScope,
+});
+assert.equal(recoverySlice.ok, true);
+assert.deepEqual(recoverySlice.inventoryMembers, ['packages/cli/dist/gone.d.ts']);
+assert.ok(!recoverySlice.stageFiles.includes('packages/cli/dist/atm.d.ts'));
+assert.ok(!recoverySlice.stageFiles.includes('docs/reports/plan-closeback.json'));
+
+const recoveryWithoutPaths = resolvePublicationDeliverySlice({
+  manifest: recoveryManifest,
+  receipt: buildPublishedReceipt({ outputPaths: inventoryPaths, publicationDisposition: 'recovery-retained' }),
+  dirtyPaths: inventoryPaths,
+  allowedScope: inventoryPaths,
+  pathMatchesScope: pathInScope,
+});
+assert.equal(recoveryWithoutPaths.ok, false);
+assert.equal(recoveryWithoutPaths.code, 'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID');
 
 const shaMismatch = resolvePublicationDeliverySlice({
   manifest: { ...manifest, expectedSealedSourceSha: 'deadbeef' },
