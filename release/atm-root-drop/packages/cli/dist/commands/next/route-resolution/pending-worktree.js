@@ -51,6 +51,8 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
         .filter(outsideScope)
         .filter((entry) => !isAdvisoryOutsideScopePath(entry) && !isStaleRecoveryInputPath(entry))
         .filter((entry) => looksLikeTaskArtifact(entry, input.task));
+    const deliverableLikeTrackedArtifacts = fuzzyTrackedArtifactCandidates
+        .filter(isDeliverableLikePendingArtifactPath);
     const untrackedExpansion = untracked
         .filter(outsideScope)
         .filter((entry) => !isAdvisoryOutsideScopePath(entry))
@@ -60,12 +62,22 @@ export function checkPendingTaskArtifactScopeExpansion(input) {
         ignoredUntrackedFiles: untrackedExpansion,
         advisoryTrackedFiles: uniqueSorted([
             ...explicitAdvisoryTrackedFiles,
-            ...fuzzyTrackedArtifactCandidates
+            ...fuzzyTrackedArtifactCandidates.filter((entry) => !isDeliverableLikePendingArtifactPath(entry))
         ]),
-        scopeExpansionRequiredFiles: [],
+        scopeExpansionRequiredFiles: uniqueSorted(deliverableLikeTrackedArtifacts),
         staleRecoveryInputFiles,
         deferredForeignResidue
     };
+}
+/**
+ * Name resemblance is only advisory, but generated workbench artifacts are
+ * themselves prospective delivery surfaces.  A task must explicitly admit
+ * those paths before claiming them; otherwise a fuzzy match could silently
+ * widen the mutation boundary.
+ */
+function isDeliverableLikePendingArtifactPath(filePath) {
+    const normalized = normalizeOptionalTaskPath(filePath)?.replace(/\\/g, '/') ?? '';
+    return normalized.startsWith('atomic_workbench/');
 }
 function deferredGeneratedResidue(cwd, candidateTaskId, entry) {
     const normalized = normalizeOptionalTaskPath(entry)?.replace(/\\/g, '/') ?? '';

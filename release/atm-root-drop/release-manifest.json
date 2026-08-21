@@ -5980,11 +5980,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1265,
-    "unchanged": 4680,
+    "copied": 4,
+    "unchanged": 1932,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -20181,7 +20181,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/cross-task-admission.js",
-        "digest": "2f52b65da7ff4844ec9d1f71833a5306c44b3cb6e42f2bc32f9308a4d546000b",
+        "digest": "be618a2283b922370b3050543114d7825d70a60cfc27c45c91ac8ac240f5ae95",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/cross-task-admission.js"
@@ -21882,7 +21882,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/route-resolution/pending-worktree.js",
-        "digest": "2623847585d7a6071f5eeb36c17add02e0148d9191aaf530801c186c32c6b523",
+        "digest": "4a4578611270d108fd446d028a8e0196b758517c1c7c936a066d766204440e20",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/route-resolution/pending-worktree.js"
@@ -29514,7 +29514,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
-        "digest": "e16369c95ecbddc8de03dbab55741fac2635f3a32dfb7d704dd0106fd9b5baca",
+        "digest": "d890a6f4abfd946427f8cb3781331d581e2c305d7c1a402b6a67938dc05034af",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts"
@@ -30522,7 +30522,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
-        "digest": "a1dda8fda867e2e57a738f05eff1c688204eab09ab6af904c57e6bf8929c0926",
+        "digest": "cbd612bce85ab5d5c432eedf342bfd8b03efc864a87d8d350cc41641eb611a87",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/route-resolution/pending-worktree.ts"
@@ -59492,7 +59492,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:767e2c50fb6f02c07285ca94c8fd164aa188ebfb1281bb16069143f6cf462f79"
+    "treeDigest": "sha256:82ca77f7ad8fbc1c616187d72da55440e2a1b6a03eba3acdc4ebcf3cc426f519"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60921,7 +60921,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:162ca96e8b9acd394f37b9a413b98fedbd5ab475cf264e87562002b67249dbe7"
+    "digest": "sha256:156b0d35f8e2e05a90f646d201643d20c0998355d2e92cac89a9ba429f890881"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66878,22 +66878,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:e721d01019edd2b36a0f6bec2247f8026b5bb103e142c34fd56cfc6bd99e1589",
-  "sealedSourceCommit": "7710e8554c53e13037d4cc27e4b9941628570ff8",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:f02d8b3b8ba0f4541b8738f68ec39dd396d6562758ac8c7900d8b63e9f17523d",
-  "tsBuildCacheDigest": "sha256:e9380db0783c0f91f00ec4e68910ca9e945ad481bd2d526d8e14ef2c32cae276",
+  "buildInputsTreeHash": "sha256:892204322f877a24c0686cb1738cbc62d2bcea11db76d6ffe015b284a4b45579",
+  "sealedSourceCommit": "3f20a032c387b325896c6564decb9313b1fe5d98",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:a41b196a3343bc80a9ce09511d5a3a0ac20c73ec3b65f4178e88591ecc64ae40",
+  "tsBuildCacheDigest": "sha256:ed363d00e0bf5d2e475321c1f3ef67dd576fb4185ebacf68b9a9a6702af8344e",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 48,
-    "skipDecision": 55,
-    "worktreeSetup": 12638,
-    "typescriptBuild": 14007,
-    "rootDropReleaseAssembly": 23474,
-    "onefileReleaseAssembly": 1301,
-    "artifactSync": 7293,
+    "inputHashCalculation": 45,
+    "skipDecision": 97,
+    "worktreeSetup": 12659,
+    "typescriptBuild": 13844,
+    "rootDropReleaseAssembly": 18280,
+    "onefileReleaseAssembly": 1272,
+    "artifactSync": 9468,
     "cleanup": 0,
-    "totalElapsed": 65496
+    "totalElapsed": 73248
   }
 }

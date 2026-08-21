@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T08-18-50-467Z-repair-claim-25c82cf9b136",
+  "taskId": "ATM-GOV-0341",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260820214554-codex-gpt-5.4-mini-ATM-GOV-0341-a3d1aacedb",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0341.json",
+  "taskSha256": "sha256:98274bce533adda214886861e9b3c25f42ddeb0b8dbd2c5c7361f0e6e368588f",
+  "createdAt": "2026-08-21T08:18:50.467Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --write --reason \"Repair expired self-owned lane claim before the queued final runner publication.\" --json"
+}
