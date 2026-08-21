@@ -1,8 +1,8 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0369",
-  "updatedAt": "2026-08-20T16:58:26.178Z",
-  "updatedBy": "codex-captain",
+  "updatedAt": "2026-08-21T08:05:48.106Z",
+  "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-candidate-index.test.ts",
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
@@ -253,6 +253,22 @@
       "durationMs": 49903,
       "runnerKind": "frozen-runner",
       "sourceCommit": "39a4bad9d9f39c63d647a7cc48f93aafeeeebf26",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-21T08:05:48.105Z",
+      "startedAt": "2026-08-21T08:05:39.057Z",
+      "finishedAt": "2026-08-21T08:05:48.105Z",
+      "durationMs": 9048,
+      "runnerKind": "dev-source",
+      "sourceCommit": "82d1efcee2292d45c4c328cc39fb030fe70032f6",
       "cached": false
     }
   ],

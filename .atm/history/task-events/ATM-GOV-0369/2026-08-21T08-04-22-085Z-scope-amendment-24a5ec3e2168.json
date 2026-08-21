@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T08-04-22-085Z-scope-amendment-24a5ec3e2168",
+  "taskId": "ATM-GOV-0369",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0369.json",
+  "taskSha256": "sha256:58a533b5efe23b07cc6bab4c99a1d5e9d630e357e0ed64a01bd548af72773ed1",
+  "createdAt": "2026-08-21T08:04:22.085Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0369 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts --reason \"Doctor reports this extracted 0369 admission module as the only unexpected TypeScript escape hatch; add the exact owner module for a typed repair.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Doctor reports this extracted 0369 admission module as the only unexpected TypeScript escape hatch; add the exact owner module for a typed repair."
+  }
+}
