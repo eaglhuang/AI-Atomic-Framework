@@ -153,10 +153,28 @@ const selfProjectedAfterConsumption = JSON.stringify({
     { itemId: 'EXIT-11', status: 'proven', evidence: [{ outputDigest: hex('e') }], diagnostics: [], coverageOwners: ['wave-exit-observer:EXIT-11'], validatorContractIds: ['atm.waveExitObserverReceipt/EXIT-11'], requirement: 'final' }
   ]
 });
+const selfProjectedAfterSiblingReceipt = JSON.stringify({
+  generatedAt: '2026-08-21T00:01:00.000Z',
+  overallVerdict: 'complete',
+  authority: { targetHead: commit('5'), originMain: commit('5'), planningHead: commit('4') },
+  validatorContracts: [{ contractId: 'atm.waveExitObserverReceipt/EXIT-11', policyDigest: hex('2') }],
+  unresolvedIds: ['RB-001'],
+  deferredIds: [],
+  unknownIds: [],
+  waveExits: [
+    { itemId: 'EXIT-10', status: 'proven', diagnostics: [], evidence: [{ artifactPaths: ['receipts/EXIT-10/new.json'] }] },
+    { itemId: 'EXIT-11', status: 'proven', evidence: [{ outputDigest: hex('e') }], diagnostics: [], coverageOwners: ['wave-exit-observer:EXIT-11'], validatorContractIds: ['atm.waveExitObserverReceipt/EXIT-11'], requirement: 'final' }
+  ]
+});
 assert.equal(
   digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedBase),
   digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedAfterConsumption),
   'a self-excluded projection must survive its own receipt-derived compiler rewrite'
+);
+assert.equal(
+  digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedAfterConsumption),
+  digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedAfterSiblingReceipt),
+  'a sibling receipt envelope must not self-invalidate this observer while sibling status remains proven'
 );
 assert.notEqual(
   digestWaveExitObserverInput('EXIT-11', selfProjectedExit, completionInput, selfProjectedBase),

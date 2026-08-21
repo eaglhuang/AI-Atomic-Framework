@@ -8,7 +8,7 @@ function digestText(value: string): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
-/** Project only compiler-derived metadata and the current exit result out of a compiler-owned input. */
+/** Project compiler-derived metadata and receipt envelopes out of compiler-owned inputs. */
 export function digestWaveExitObserverInput(
   exitItemId: string,
   exitPolicy: WaveExitObserverExitPolicy,
@@ -32,8 +32,12 @@ export function digestWaveExitObserverInput(
     const report = JSON.parse(source) as Record<string, unknown>;
     if (!Array.isArray(report.waveExits)) return null;
     const waveExits = report.waveExits.map((entry) => {
-      if (!entry || typeof entry !== 'object' || (entry as Record<string, unknown>).itemId !== exitItemId) return entry;
+      if (!entry || typeof entry !== 'object') return entry;
       const row = entry as Record<string, unknown>;
+      if (row.itemId !== exitItemId) {
+        const { evidence: _receiptEnvelope, ...semanticExit } = row;
+        return semanticExit;
+      }
       const { status, evidence, diagnostics, coverageOwners, validatorContractIds, ...identity } = row;
       return identity;
     });
