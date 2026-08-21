@@ -207,7 +207,12 @@ export function validateRunnerPublicationTakeoverPlan(input: {
     const value = entry && typeof entry === 'object' && !Array.isArray(entry) ? entry as Record<string, unknown> : {};
     return { path: typeof value.path === 'string' ? normalizePath(value.path) : '', observedDigest: typeof value.observedDigest === 'string' ? value.observedDigest : '' };
   });
-  if (!sealedSourceSha || !snapshotDigest || entries.some((entry) => !entry.path || !entry.observedDigest) || JSON.stringify(entries) !== JSON.stringify([...entries].sort((a, b) => a.path.localeCompare(b.path)))) {
+  // Keep validation on the same deterministic byte-order comparator used by
+  // `uniquePaths()` when the broker authored the plan. `localeCompare()` is
+  // locale-sensitive and can reorder mixed-case generated members differently
+  // (for example an `ATM-*` directory beside lowercase siblings), turning a
+  // freshly authorized plan into an invalid one at publication time.
+  if (!sealedSourceSha || !snapshotDigest || entries.some((entry) => !entry.path || !entry.observedDigest) || JSON.stringify(entries) !== JSON.stringify([...entries].sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0))) {
     return { ok: false, plan: null, reason: 'plan entries must be complete, unique, and sorted' };
   }
   const plan: RunnerPublicationTakeoverPlan = { schemaId: 'atm.runnerPublicationTakeoverPlan.v1', sealedSourceSha, snapshotDigest, entries, digest: typeof raw.digest === 'string' ? raw.digest.trim() : '' };

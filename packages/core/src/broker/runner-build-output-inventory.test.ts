@@ -5,7 +5,9 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   captureRunnerBuildOutputSnapshot,
-  scanSealedRunnerBuildOutputInventory
+  planRunnerPublicationTakeover,
+  scanSealedRunnerBuildOutputInventory,
+  validateRunnerPublicationTakeoverPlan
 } from './runner-build-output-inventory.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-inventory-'));
@@ -62,6 +64,31 @@ try {
     ownerTaskId: 'TASK-CURRENT',
     ownerActorId: null
   });
+  const mixedCaseSnapshot = {
+    schemaId: 'atm.runnerBuildOutputSnapshot.v1' as const,
+    buildTarget: 'root-drop' as const,
+    members: {
+      'release/atm-root-drop/atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json': 'sha256:upper',
+      'release/atm-root-drop/atomic_workbench/generator-provenance-audit.json': 'sha256:lower'
+    },
+    preexistingDirtyPaths: [
+      'release/atm-root-drop/atomic_workbench/generator-provenance-audit.json',
+      'release/atm-root-drop/atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json'
+    ]
+  };
+  const mixedCasePlan = planRunnerPublicationTakeover({
+    sealedSourceSha: 'b'.repeat(40),
+    snapshot: mixedCaseSnapshot
+  });
+  assert.equal(
+    validateRunnerPublicationTakeoverPlan({
+      plan: mixedCasePlan,
+      sealedSourceSha: 'b'.repeat(40),
+      snapshot: mixedCaseSnapshot
+    }).ok,
+    true,
+    'a broker-authored takeover plan with mixed-case generated paths must validate under the same canonical order'
+  );
   console.log('[runner-build-output-inventory] preserves foreign ownership until an exact takeover is supplied');
 } finally {
   rmSync(repo, { recursive: true, force: true });
