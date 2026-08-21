@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T09-25-30-529Z-close-8ad332f483b0",
+  "taskId": "ATM-GOV-0389",
+  "action": "close",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260821092348-codex-captain-recovery-ATM-GOV-0389-b292993641",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0389.json",
+  "taskSha256": "sha256:0662cc0d6d36064169c9e2c6a72f732f8a8b472490b0e1b43caa56316f78822b",
+  "createdAt": "2026-08-21T09:25:30.529Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0389 --actor codex-captain-recovery --status done --historical-delivery 79896c2e2fc1e4c2cf76c7f63007fe51ee9b445b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260821092348-codex-captain-recovery-ATM-GOV-0389-b292993641",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0389.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-21T09:25:30.517Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0389.*",
+        ".atm/history/task-events/ATM-GOV-0389/**",
+        ".atm/history/tasks/ATM-GOV-0389.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-013.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/pre-commit/close-transaction-receipt.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/pre-commit/close-transaction-receipt.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
