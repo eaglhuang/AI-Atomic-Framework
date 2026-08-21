@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T08-52-57-863Z-scope-amendment-c1da8ce737e5",
+  "taskId": "ATM-GOV-0369",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0369.json",
+  "taskSha256": "sha256:301fd8356f012f4c01da355f32d934f1d14da02d77303c4c1b9faad3873c4374",
+  "createdAt": "2026-08-21T08:52:57.863Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0369 --actor codex-captain --add \"release/atm-onefile/atm.mjs,release/atm-root-drop\" --reason \"Runner publication requires explicit release-surface authority for the active closeout owner\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Runner publication requires explicit release-surface authority for the active closeout owner"
+  }
+}

@@ -179,6 +179,8 @@ function getDirtyFiles(cwd) {
     }
     return [...new Set(files.filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
+function isTrackedGitFile(cwd, file) { return tryGitScalar(cwd, ['ls-files', '--error-unmatch', '--', file]) === file; }
+function listAuthorizedDirtyActorRegistryFiles(input) { const actorRegistry = '.atm/catalog/registry/actors.json'; const runtimeAllowed = resolveTaskflowDeclaredFiles(input.repoRoot, input.taskId, input.taskDocument); return input.dirtyFiles.includes(actorRegistry) && isTrackedGitFile(input.repoRoot, actorRegistry) && runtimeAllowed.some((allowed) => taskflowPathMatches(actorRegistry, allowed)) ? [actorRegistry] : []; }
 function getHistoricalCommittedFiles(cwd, refs) {
     const files = [];
     for (const ref of refs) {
@@ -355,7 +357,7 @@ export function buildTaskflowCommitBundle(input) {
     const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
     const backendGovernanceFiles = [...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId), ...listCurrentTaskCloseEvidenceFiles(targetRepoRoot, input.taskId), ...(input.backendResult ? extractBackendStageFiles(input.backendResult) : []),
         ...listTaskOwnedProtectedOverrideAuditFiles(targetRepoRoot, input.taskId)];
-    const targetGovernanceFiles = uniqueSorted([...(historicalBatchStageFile ? [historicalBatchStageFile] : []), ...backendGovernanceFiles, taskflowSealManifestPath(input.taskId)]);
+    const targetGovernanceFiles = uniqueSorted([...(historicalBatchStageFile ? [historicalBatchStageFile] : []), ...backendGovernanceFiles, ...listAuthorizedDirtyActorRegistryFiles({ repoRoot: targetRepoRoot, taskId: input.taskId, taskDocument, dirtyFiles }), taskflowSealManifestPath(input.taskId)]);
     const excludedDirtyFiles = [];
     const excludedReasons = {};
     const scopeAmendmentCandidateFiles = [];
@@ -545,7 +547,8 @@ function commitRepoWithTemporaryIndex(input) {
 }
 export async function commitTaskflowDeliveryFiles(input) {
     const repoRoot = input.bundle.targetRepo.repoRoot;
-    const stageFiles = uniqueSorted(input.bundle.targetDeliveryFiles);
+    const deliveryPrerequisiteGovernanceFiles = input.bundle.targetGovernanceFiles.filter((file) => file === '.atm/catalog/registry/actors.json');
+    const stageFiles = uniqueSorted([...input.bundle.targetDeliveryFiles, ...deliveryPrerequisiteGovernanceFiles]);
     if (!repoRoot || stageFiles.length === 0) {
         return null;
     }

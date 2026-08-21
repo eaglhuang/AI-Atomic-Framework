@@ -119,6 +119,7 @@ export function buildTaskflowClosePreflight(input) {
         previewCommitBundle: input.previewCommitBundle,
         historicalDeliveryRefs: input.historicalDeliveryRefs,
         deferForeignStaged: input.deferForeignStaged,
+        deferGovernanceDirty: input.deferGovernanceDirty,
         waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery,
         waiverReason: input.waiverReason
     });

@@ -40,7 +40,13 @@
     ".atm/history/task-events/ATM-GOV-0369/**",
     ".atm/history/tasks/ATM-GOV-0369.json",
     "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
-    ".atm/catalog/registry/actors.json"
+    ".atm/catalog/registry/actors.json",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop",
+    "packages/cli/dist",
+    "packages/cli/dist/**",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/**"
   ],
   "validators": [
     "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
@@ -265,16 +271,18 @@
     "findings": []
   },
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-7e5f84ea5d8e",
-    "claimedAt": "2026-08-20T15:59:57.087Z",
-    "heartbeatAt": "2026-08-21T08:04:03.385Z",
+    "actorId": "codex-captain",
+    "leaseId": "lease-a29cc9832407",
+    "claimedAt": "2026-08-21T08:39:39.571Z",
+    "heartbeatAt": "2026-08-21T09:11:35.149Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/catalog/registry/actors.json",
       ".atm/history/evidence/ATM-GOV-0369.*",
       ".atm/history/task-events/ATM-GOV-0369/**",
       ".atm/history/tasks/ATM-GOV-0369.json",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
       "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
       "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
       "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
@@ -283,22 +291,25 @@
       "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
       "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
       "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/**",
       "scripts/run-sealed-runner-build.test.ts",
       "scripts/run-sealed-runner-build.ts",
       "tests/cli/git-commit-failure-index-restoration.test.ts"
     ],
     "state": "active",
-    "reason": "Owner-directed internal takeover after external delegation ended; source is delivered and this takeover prepares governed post-publication closeout.",
     "laneSession": {
-      "laneSessionId": "lane-20260820155957-codex-captain-0528407a38",
+      "laneSessionId": "lane-20260821083939-codex-captain-66779ae1ba",
       "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820155957-codex-captain-0528407a38\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260821083939-codex-captain-66779ae1ba\""
     }
   },
   "owner": "codex-captain",
   "startedAt": "2026-08-13T23:49:12.556Z",
-  "startedBySessionId": "session-20260820155957-codex-captain-ATM-GOV-0369-c180af2ef9",
+  "startedBySessionId": "session-20260821083939-codex-captain-ATM-GOV-0369-2a0dc550d2",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -312,6 +323,8 @@
       ".atm/history/evidence/ATM-GOV-0369.*",
       ".atm/history/task-events/ATM-GOV-0369/**",
       ".atm/history/tasks/ATM-GOV-0369.json",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
       "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
       "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
       "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
@@ -320,6 +333,10 @@
       "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
       "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
       "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/**",
       "scripts/run-sealed-runner-build.test.ts",
       "scripts/run-sealed-runner-build.ts",
       "tests/cli/git-commit-failure-index-restoration.test.ts"
@@ -335,37 +352,31 @@
     ],
     "allowPlanningMirror": false,
     "promptHash": "5b207594ffe60bde970f87173c47244c3a7a4b373e9a019888d6279c412567cc",
-    "actorId": "codex-gpt-5.4-mini",
-    "sessionId": null,
-    "laneSession": {
-      "laneSessionId": "lane-20260820155957-codex-captain-0528407a38",
-      "status": "adopted",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260820155957-codex-captain-0528407a38\""
-    },
-    "createdAt": "2026-08-21T08:04:04.428Z",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260821083939-codex-captain-ATM-GOV-0369-2a0dc550d2",
+    "createdAt": "2026-08-21T08:52:50.992Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-21T08-05-36-736Z-scope-amendment-e99a7482c46e",
-  "lastTransitionAt": "2026-08-21T08:05:36.736Z",
+  "lastTransitionId": "2026-08-21T09-11-35-996Z-renew-36d006445d42",
+  "lastTransitionAt": "2026-08-21T09:11:35.996Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-ab3d2d8a0192be10",
-    "ticketDigest": "sha256:ab3d2d8a0192be104c993901b9ac5611587f9d70e752d0024e94bae0ebb3a108",
+    "ticketId": "wat-102bbcd0395e2ffc",
+    "ticketDigest": "sha256:102bbcd0395e2ffc0da176284389c777ab3dc3cfff07d52506e3418d25dc756c",
     "taskId": "ATM-GOV-0369",
     "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260820155957-codex-captain-0528407a38",
-    "claimGeneration": "lease-7e5f84ea5d8e",
-    "issuedAt": "2026-08-21T08:05:36.650Z",
-    "expiresAt": "2026-08-21T08:35:36.650Z",
-    "scopeDigest": "sha256:a684ed688a948f0afe04ab8b1c9ed16c0e1fbbc43df4adc9f722a0ad18261512",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260821083939-codex-captain-66779ae1ba",
+    "claimGeneration": "lease-a29cc9832407",
+    "issuedAt": "2026-08-21T09:11:35.149Z",
+    "expiresAt": "2026-08-21T09:41:35.149Z",
+    "scopeDigest": "sha256:2eae30011510d65f49e1e8d4cfb9065b0da68cd7381a1ce8b49f61fcc2a2bfe2",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-21T08:05:36.650Z"
+      "selectedAt": "2026-08-21T09:11:35.149Z"
     },
     "grants": [
       {
@@ -375,6 +386,8 @@
           ".atm/history/evidence/ATM-GOV-0369.*",
           ".atm/history/task-events/ATM-GOV-0369/**",
           ".atm/history/tasks/ATM-GOV-0369.json",
+          "packages/cli/dist",
+          "packages/cli/dist/**",
           "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
           "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
           "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
@@ -383,11 +396,15 @@
           "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
           "packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
           "packages/core/src/broker/cross-task-mutation-guard.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop",
+          "release/atm-root-drop/**",
           "scripts/run-sealed-runner-build.test.ts",
           "scripts/run-sealed-runner-build.ts",
           "tests/cli/git-commit-failure-index-restoration.test.ts"
         ],
-        "digest": "sha256:53c87813a75cf9d60cc6e5fef635957d522301c6dc7897b222bce1e6cfceb76c"
+        "digest": "sha256:fff2f6d7999e59efecb9a71ac6d3606f40f62c432ad69e9747295881470067f9"
       },
       {
         "kind": "lifecycle-operation",
@@ -421,5 +438,8 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
-  }
+  },
+  "reservedAt": "2026-08-21T08:39:39.561Z",
+  "promotedAt": "2026-08-21T08:39:39.565Z",
+  "startedByActor": "codex-captain"
 }

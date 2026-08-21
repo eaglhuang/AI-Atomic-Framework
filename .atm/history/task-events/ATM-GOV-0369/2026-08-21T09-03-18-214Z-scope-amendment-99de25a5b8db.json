@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T09-03-18-214Z-scope-amendment-99de25a5b8db",
+  "taskId": "ATM-GOV-0369",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0369.json",
+  "taskSha256": "sha256:60a5377f9b0039274f0fa09898e4145384ea0571a48a89d405a013cbe2db06d2",
+  "createdAt": "2026-08-21T09:03:18.214Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0369 --actor codex-captain --add \"packages/cli/dist/**,release/atm-root-drop/**,release/atm-onefile/release-manifest.json\" --reason \"Taskflow close's published 0369 delivery bundle mutates descendants under the declared distribution and root-drop surfaces plus the onefile manifest; recursive grants are required because bare directory entries match no child files.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Taskflow close's published 0369 delivery bundle mutates descendants under the declared distribution and root-drop surfaces plus the onefile manifest; recursive grants are required because bare directory entries match no child files."
+  }
+}

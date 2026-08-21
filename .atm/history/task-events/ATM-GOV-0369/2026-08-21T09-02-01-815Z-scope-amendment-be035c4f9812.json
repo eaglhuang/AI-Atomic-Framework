@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T09-02-01-815Z-scope-amendment-be035c4f9812",
+  "taskId": "ATM-GOV-0369",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0369.json",
+  "taskSha256": "sha256:fd02c52f03325769e5f969ef8b16ec0c9debfc67b078ebbf29d2c38bdf69c260",
+  "createdAt": "2026-08-21T09:02:01.815Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0369 --actor codex-captain --add packages/cli/dist --reason \"Published 0369 runner receipt explicitly owns the taskflow dist outputs; close bundle requires the exact generated CLI distribution surface.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Published 0369 runner receipt explicitly owns the taskflow dist outputs; close bundle requires the exact generated CLI distribution surface."
+  }
+}

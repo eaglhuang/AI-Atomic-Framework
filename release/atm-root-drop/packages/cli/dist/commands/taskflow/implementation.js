@@ -421,7 +421,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
     const declaredFiles = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];
     const observedTaskEvidence = inspectObservedTaskEvidence(cwd, taskId);
-    const rawHistoricalClosePreflight = buildTaskflowClosePreflight({ cwd, taskId, actorId: actorId || '<actor>', taskDocument, previewCommitBundle, historicalDeliveryRefs, deferForeignStaged, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason });
+    const rawHistoricalClosePreflight = buildTaskflowClosePreflight({ cwd, taskId, actorId: actorId || '<actor>', taskDocument, previewCommitBundle, historicalDeliveryRefs, deferForeignStaged, deferGovernanceDirty, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason });
     let writeReadinessHint = buildTaskflowCloseWriteReadinessHint({ cwd, taskId, actorId, taskDocument, declaredFiles, closebackPlan, previewCommitBundle,
         historicalDeliveryRefs, deferForeignStaged, waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason, planningAuthorityDeliveryGate });
     const runnerGateEvidence = buildTaskflowRunnerGateDecision(uniqueSorted([...declaredFiles, ...previewCommitBundle.targetDeliveryFiles, ...previewCommitBundle.targetGovernanceFiles]));

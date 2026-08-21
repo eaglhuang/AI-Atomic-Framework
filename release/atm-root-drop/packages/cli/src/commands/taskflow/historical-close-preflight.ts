@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { ATM_INDEX_FOREIGN_ACTIVE_STAGED, inspectGitIndexOwnership } from '../git-index-ownership.ts';
+import { inspectGitIndexOwnership } from '../git-index-ownership.ts';
 import { computeMissingValidatorReport } from '../evidence.ts';
 import { readActiveTaskDirectionLocks } from '../task-direction.ts';
 import { normalizeTaskId } from '../tasks/task-import-validators.ts';
@@ -16,6 +16,8 @@ import { buildSharedDeliveryWaiverCommand } from './write-readiness.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.ts';
 import { isCurrentTaskCloseEvidenceFile } from './current-task-close-evidence.ts';
+import { applyExplicitGovernanceDirtyDeferral } from './governance-dirty-deferral.ts';
+import { buildGovernanceDirtyBlocker, buildScopeDirtyBlocker, buildUnexpectedStagedBlocker } from './dirty-blockers.ts';
 
 interface PreflightCommitRepoBundle {
   readonly repoRoot: string | null;
@@ -312,73 +314,6 @@ function buildIncorrectPlanningMirrorBlocker(input: {
   };
 }
 
-function buildScopeDirtyBlocker(input: {
-  taskId: string;
-  actorId: string;
-  dirtyGuard: FrameworkCloseDirtyGuardReport;
-}): HistoricalClosePreflightBlocker | null {
-  if (input.dirtyGuard.scopeTrackedDirtyFiles.length === 0) return null;
-  return {
-    id: 'scopeTrackedDirtyFiles',
-    code: 'ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY',
-    summary: 'In-scope delivery files are modified but not committed; close --write needs a governed delivery commit first.',
-    files: input.dirtyGuard.scopeTrackedDirtyFiles,
-    remediationChoices: [
-      {
-        id: 'commit-scoped-delivery',
-        summary: 'Commit only task-scoped delivery files through the governed git commit lane.',
-        requiredCommand: input.dirtyGuard.remediation.requiredCommand
-      },
-      {
-        id: 'restore-accidental-drift',
-        summary: 'If the drift is accidental, do not run raw git restore; request an explicit ATM destructive-override lease before any worktree mutation.',
-        requiredCommand: `node atm.mjs git lease destructive-override --task ${input.taskId} --actor ${input.actorId} --paths ${input.dirtyGuard.scopeTrackedDirtyFiles.map((entry) => JSON.stringify(entry)).join(',')} --reason "<human-approved reason>" --json`
-      }
-    ],
-    requiredCommand: input.dirtyGuard.remediation.requiredCommand
-  };
-}
-
-function buildGovernanceDirtyBlocker(input: {
-  taskId: string;
-  dirtyGuard: FrameworkCloseDirtyGuardReport;
-}): HistoricalClosePreflightBlocker | null {
-  if (input.dirtyGuard.governanceTrackedDirtyFiles.length === 0) return null;
-  return {
-    id: 'governanceTrackedDirtyFiles',
-    // Preserve the backend code: preflight and tasks close must classify the
-    // same dirty surface into the same fail-fast result.
-    code: 'ATM_TASK_CLOSE_DIRTY_WORKTREE',
-    summary: `Task ${input.taskId} has uncommitted task-owned closure governance residue; close --write must not start a transaction until it is reconciled.`,
-    files: input.dirtyGuard.governanceTrackedDirtyFiles,
-    remediationChoices: [{
-      id: 'restore-accidental-drift',
-      summary: 'Do not alter governance history manually. Use the guarded remediation supplied by the dirty-worktree diagnostic.',
-      requiredCommand: input.dirtyGuard.remediation.requiredCommand
-    }],
-    requiredCommand: input.dirtyGuard.remediation.requiredCommand
-  };
-}
-
-function buildUnexpectedStagedBlocker(unexpectedStagedTasks: readonly UnexpectedStagedTaskReport[]): HistoricalClosePreflightBlocker | null {
-  if (unexpectedStagedTasks.length === 0) return null;
-  const taskIds = unexpectedStagedTasks.map((entry) => entry.taskId);
-  const files = uniqueStrings(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
-  return {
-    id: 'unexpectedStagedTasks',
-    code: ATM_INDEX_FOREIGN_ACTIVE_STAGED,
-    summary: `Git index contains staged governance files for other active tasks (${taskIds.join(', ')}). taskflow close --write will fail index isolation unless the owner commits, Broker grants an index lane, or an explicit stage-override lease is supplied.`,
-    files,
-    taskIds,
-    remediationChoices: unexpectedStagedTasks.map((entry) => ({
-      id: 'defer-foreign-staged' as const,
-      summary: entry.restoreChoice,
-      requiredCommand: entry.deferCommand
-    })),
-    requiredCommand: unexpectedStagedTasks[0]?.deferCommand ?? null
-  };
-}
-
 function buildSharedDeliverySiblingHint(outOfScopeFiles: readonly string[]): string {
   if (outOfScopeFiles.length === 0) {
     return 'Close each intentionally co-delivered sibling with the same --historical-delivery and waiver reason.';
@@ -484,6 +419,7 @@ export function buildHistoricalClosePreflight(input: {
   previewCommitBundle: PreflightCommitBundle;
   historicalDeliveryRefs: readonly string[];
   deferForeignStaged?: boolean;
+  deferGovernanceDirty?: boolean;
   waiverOutOfScopeDelivery: boolean;
   waiverReason: string | null;
 }): HistoricalClosePreflightSummary {
@@ -516,7 +452,7 @@ export function buildHistoricalClosePreflight(input: {
       waiverReason: null
     }).deliverableFiles)
   );
-  const dirtyGuard = evaluateFrameworkCloseDirtyGuard({
+  const evaluatedDirtyGuard = evaluateFrameworkCloseDirtyGuard({
     cwd: input.cwd,
     taskId: input.taskId,
     taskDeclaredFiles: declaredFiles,
@@ -532,6 +468,11 @@ export function buildHistoricalClosePreflight(input: {
     allowedAdvisoryDirtyFiles: foreignActiveDirtyFiles,
     correctPlanningMirrorPreEditFiles: planningMirrorDirty.correctPlanningMirrorPreEditFiles,
     incorrectPlanningMirrorPreEditFiles: planningMirrorDirty.incorrectPlanningMirrorPreEditFiles
+  });
+  const dirtyGuard = applyExplicitGovernanceDirtyDeferral({
+    taskId: input.taskId,
+    requested: input.deferGovernanceDirty === true,
+    dirtyGuard: evaluatedDirtyGuard
   });
   const unexpectedStagedTasks = buildUnexpectedStagedTasks({
     taskId: input.taskId,

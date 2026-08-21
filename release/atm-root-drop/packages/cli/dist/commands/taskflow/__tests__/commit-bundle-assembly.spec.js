@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildTaskflowCommitBundle, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, isDeferrableGovernanceDirtyFile, restoreDeferredGovernanceDirtyFiles } from '../commit-bundle-assembly.js';
+import { buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, isDeferrableGovernanceDirtyFile, restoreDeferredGovernanceDirtyFiles } from '../commit-bundle-assembly.js';
 import { closeTransactionMutexPath } from '../close-transaction-mutex.js';
 function writeJson(filePath, value) { mkdirSync(path.dirname(filePath), { recursive: true }); writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8'); }
 function writeText(filePath, text) {
@@ -43,6 +43,26 @@ assert.ok(backendBundle.targetRepo.stageFiles.includes('.atm/history/tasks/TASK-
 assert.ok(backendBundle.targetRepo.stageFiles.includes('.atm/history/evidence/TASK-BUNDLE-0001.json'), 'post-close bundle must stage same-task evidence bundle');
 assert.ok(backendBundle.targetRepo.stageFiles.includes('.atm/history/task-events/TASK-BUNDLE-0001/import.json'), 'post-close bundle must stage pre-close import history for the same task');
 assert.ok(backendBundle.targetRepo.stageFiles.includes('.atm/history/task-events/TASK-BUNDLE-0001/claim.json'), 'post-close bundle must stage pre-close claim history for the same task');
+const registryTaskId = 'TASK-BUNDLE-REGISTRY';
+const registryTargetRepo = path.join(tempRoot, 'target-registry');
+const registryPlanningRepo = path.join(tempRoot, 'planning-registry');
+initGitRepo(registryTargetRepo);
+initGitRepo(registryPlanningRepo);
+const registryPlanPath = path.join(registryPlanningRepo, 'docs/tasks/TASK-BUNDLE-REGISTRY.task.md');
+writeText(registryPlanPath, `# ${registryTaskId}\n`);
+writeJson(path.join(registryTargetRepo, `.atm/history/tasks/${registryTaskId}.json`), { workItemId: registryTaskId, status: 'running', claim: { actorId: 'validator', leaseId: 'lease-registry', state: 'active', files: ['src/app.ts', '.atm/catalog/registry/actors.json'] }, taskDirectionLock: { allowedFiles: ['src/app.ts', '.atm/catalog/registry/actors.json'] }, deliverables: ['src/app.ts'], scopePaths: ['src/app.ts'], source: { planPath: registryPlanPath } });
+writeText(path.join(registryTargetRepo, 'src/app.ts'), 'export const registry = 1;\n');
+writeJson(path.join(registryTargetRepo, '.atm/catalog/registry/actors.json'), { actors: ['before'] });
+execFileSync('git', ['add', '.'], { cwd: registryTargetRepo, stdio: 'ignore' });
+execFileSync('git', ['commit', '-m', 'seed registry fixture'], { cwd: registryTargetRepo, stdio: 'ignore' });
+writeText(path.join(registryTargetRepo, 'src/app.ts'), 'export const registry = 2;\n');
+writeJson(path.join(registryTargetRepo, '.atm/catalog/registry/actors.json'), { actors: ['after'] });
+const registryBundle = buildTaskflowCommitBundle({ cwd: registryTargetRepo, taskId: registryTaskId, actorId: 'validator', commitMode: 'dry-run', planningMirrorPath: registryPlanPath, rosterIndexPath: null, planningAuthorityDeliveryOk: false });
+assert.ok(registryBundle.targetRepo.stageFiles.includes('.atm/catalog/registry/actors.json'), 'tracked actor registry changes explicitly authorized by the active task must join the isolated taskflow commit bundle');
+const registryDelivery = await commitTaskflowDeliveryFiles({ bundle: registryBundle, actorId: 'validator', taskId: registryTaskId });
+assert.ok(registryDelivery, 'a taskflow delivery commit must be created for the authorized registry fixture');
+const registryDeliveryFiles = execFileSync('git', ['show', '--pretty=format:', '--name-only', 'HEAD'], { cwd: registryTargetRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean);
+assert.ok(registryDeliveryFiles.includes('.atm/catalog/registry/actors.json'), 'the intermediate delivery commit must stage an authorized dirty actor registry so its hook sees the same governed candidate as the preview bundle');
 const autoCommitTaskId = 'TASK-BUNDLE-0002';
 const autoTargetRepo = path.join(tempRoot, 'target-auto');
 const autoPlanningRepo = path.join(tempRoot, 'planning-auto');
