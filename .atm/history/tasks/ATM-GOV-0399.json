@@ -24,7 +24,10 @@
     "packages/cli/src/commands/planning-root-resolution-cache.ts",
     "packages/cli/src/commands/next/planning-root-preference.ts",
     "tests/cli/planning-root-resolution-cache.test.ts",
-    "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+    "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+    ".atm/history/evidence/ATM-GOV-0399.*",
+    ".atm/history/task-events/ATM-GOV-0399/**",
+    ".atm/history/tasks/ATM-GOV-0399.json"
   ],
   "validators": [
     "node --strip-types tests/cli/planning-root-resolution-cache.test.ts",
@@ -174,23 +177,29 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-16T01-14-10-721Z-claim-081eea325986",
-  "lastTransitionAt": "2026-08-16T01:14:10.721Z",
+  "lastTransitionId": "2026-08-21T03-01-42-006Z-scope-amendment-8d4890c91a8b",
+  "lastTransitionAt": "2026-08-21T03:01:42.006Z",
   "ledgerContractVersion": "task-ledger/v1",
   "claim": {
-    "actorId": "gemini-captain",
+    "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-57f9e1747513",
     "claimedAt": "2026-08-16T01:14:04.729Z",
-    "heartbeatAt": "2026-08-16T01:14:04.729Z",
+    "heartbeatAt": "2026-08-21T03:01:33.034Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/ATM-GOV-0399.json"
+      ".atm/history/evidence/ATM-GOV-0399.*",
+      ".atm/history/task-events/ATM-GOV-0399/**",
+      ".atm/history/tasks/ATM-GOV-0399.json",
+      "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "packages/cli/src/commands/next/planning-root-preference.ts",
+      "packages/cli/src/commands/planning-repo-root.ts",
+      "packages/cli/src/commands/planning-root-resolution-cache.ts",
+      "tests/cli/planning-root-resolution-cache.test.ts"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260816011405-gemini-captain-e457ff63a4",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816011405-gemini-captain-e457ff63a4\""
     }
@@ -201,20 +210,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-efe64955ca608563",
-    "ticketDigest": "sha256:efe64955ca6085639a7677bc499385521311e3bc13bb1bbf94ecdb871c7362af",
+    "ticketId": "wat-65ba2187c1e19db2",
+    "ticketDigest": "sha256:65ba2187c1e19db2cc4d0e2711814e3b64c6625806ef43baa5d5af30a033190e",
     "taskId": "ATM-GOV-0399",
     "origin": "claim",
-    "actorId": "gemini-captain",
+    "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260816011405-gemini-captain-e457ff63a4",
     "claimGeneration": "lease-57f9e1747513",
-    "issuedAt": "2026-08-16T01:14:04.729Z",
-    "expiresAt": "2026-08-16T01:44:04.729Z",
+    "issuedAt": "2026-08-21T03:01:41.849Z",
+    "expiresAt": "2026-08-21T03:31:41.849Z",
     "scopeDigest": "sha256:2a6b5942edd1cfb8b136c3f3c3f8c3793d4d31b9040ffa7fd953cec865421f5a",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-16T01:14:04.729Z"
+      "selectedAt": "2026-08-21T03:01:41.849Z"
     },
     "grants": [
       {
@@ -275,7 +284,12 @@
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0399.*",
       ".atm/history/task-events/ATM-GOV-0399/**",
-      ".atm/history/tasks/ATM-GOV-0399.json"
+      ".atm/history/tasks/ATM-GOV-0399.json",
+      "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "packages/cli/src/commands/next/planning-root-preference.ts",
+      "packages/cli/src/commands/planning-repo-root.ts",
+      "packages/cli/src/commands/planning-root-resolution-cache.ts",
+      "tests/cli/planning-root-resolution-cache.test.ts"
     ],
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],

@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-21T03-01-42-006Z-scope-amendment-8d4890c91a8b",
+  "taskId": "ATM-GOV-0399",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0399.json",
+  "taskSha256": "sha256:fc47e10cfbbac30159efde2e74f59d4f0225da931dea4cb75e2fc1bef93aeac4",
+  "createdAt": "2026-08-21T03:01:42.006Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0399 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/planning-repo-root.ts,packages/cli/src/commands/planning-root-resolution-cache.ts,packages/cli/src/commands/next/planning-root-preference.ts,packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts,tests/cli/planning-root-resolution-cache.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

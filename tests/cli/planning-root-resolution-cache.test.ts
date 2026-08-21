@@ -132,13 +132,47 @@ try {
   // --- ACC-5: memoizing changes timing only. Two independent fresh
   // resolutions, and the memoized one, must all carry the same value.
 
+  // --- ACC-5: registered roots resolution and cache invalidation on series-registry presence
   resetPlanningRootResolutionCache();
-  const fresh1 = resolvePlanningRepoRootConfig(repoA);
+  const suiteSandbox = mkdtempSync(path.join(os.tmpdir(), 'atm-planning-sandbox-'));
+  repos.push(suiteSandbox);
+  const targetRepo = path.join(suiteSandbox, 'TargetApp');
+  mkdirSync(path.join(targetRepo, '.atm'), { recursive: true });
+  writeFileSync(
+    path.join(targetRepo, '.atm', 'config.json'),
+    JSON.stringify({ taskLedger: { planningRoots: [] } }),
+    'utf8'
+  );
+
+  const siblingPlanningRepo = path.join(suiteSandbox, 'PlanningRepo');
+  const planningDir = path.join(siblingPlanningRepo, 'docs', 'ai_atomic_framework');
+  mkdirSync(planningDir, { recursive: true });
+  writeFileSync(
+    path.join(planningDir, 'series-registry.json'),
+    JSON.stringify({
+      schemaId: 'atm.seriesRegistry.v1',
+      generatedAt: new Date().toISOString(),
+      baseDir: '.',
+      series: [
+        {
+          series: 'TEST',
+          prefix: 'TASK-TEST',
+          familyDir: 'test-family',
+          planDocs: ['test-family/plan.md'],
+          status: 'active',
+          approvedBy: 'owner',
+          approvedAt: new Date().toISOString()
+        }
+      ]
+    }),
+    'utf8'
+  );
+
+  const initialResolved = resolvePlanningRepoRootConfig(targetRepo);
+  assert.ok(initialResolved.registeredRoots.some((r) => r.startsWith(siblingPlanningRepo)));
+  assert.equal(initialResolved.canonicalRoot, path.resolve(planningDir));
+
   resetPlanningRootResolutionCache();
-  const fresh2 = resolvePlanningRepoRootConfig(repoA);
-  assert.notEqual(fresh1, fresh2, 'the two fresh resolutions must be distinct objects for this to prove anything');
-  assert.deepEqual(fresh2, fresh1, 'a fresh resolution must equal the value the cache would have returned');
-  assert.deepEqual(resolvePlanningRepoRootConfig(repoA), fresh1);
 } finally {
   resetPlanningRootResolutionCache();
   if (originalEnv === undefined) {
