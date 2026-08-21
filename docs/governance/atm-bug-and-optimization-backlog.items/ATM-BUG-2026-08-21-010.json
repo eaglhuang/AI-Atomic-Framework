@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-21-010",
+  "date": "2026-08-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Open",
+  "area": "Fuzzy pending-worktree matching can deadlock a task claim before an adapter projection is audited",
+  "finding": "The next-route pending-worktree check treated two-token title, plan, or filename resemblance as proof that a tracked file belonged to the candidate task. A source-first adapter-projection task could therefore be blocked before claim by generated editor files that were not yet declared in its exact scope. The matcher had discovered a plausible candidate, but the claim gate treated discovery evidence as mutation authority. This is distinct from task-direction scope enforcement: the observed failure happens before a task can run the compiler or installer that would enumerate the exact projection set.",
+  "expectedBehavior": "Fuzzy task-artifact resemblance remains visible as advisory preflight evidence. It must not require scope expansion or grant write authority. A task may mutate a projection only after the compiler or installer emits its exact paths and the task explicitly adds those paths to its direction lock and work-admission ticket. Untracked and tracked foreign WIP remain non-mutating; scope and ticket checks remain fail-closed at every write boundary.",
+  "evidenceOrRepro": "Focused regression tests/cli/pending-task-artifact-scope.test.ts creates a tracked .github/instructions/adapter-projection.instructions.md whose filename and task title overlap on adapter/projection. Before the repair it appears in scopeExpansionRequiredFiles and blocks claim. After the repair it appears in advisoryTrackedFiles while scopeExpansionRequiredFiles remains empty. The existing exact-stem case for docs/governance/error-code-registry.json is covered by the same test. npm run typecheck passes.",
+  "followUp": "Use TASK-SKL-0040 to refresh projections only after normal claim admission succeeds; do not force-add unknown templates, hand-edit installed copies, or use advisory data as an allowlist. Keep source repair, frozen publication, and formal closeout separate."
+}

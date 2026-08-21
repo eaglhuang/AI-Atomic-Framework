@@ -36,5 +36,31 @@ const report = checkPendingTaskArtifactScopeExpansion({
     activeClaimIntent: null
   } as never
 });
+assert.deepEqual(report.scopeExpansionRequiredFiles, []);
 assert.deepEqual(report.advisoryTrackedFiles, ['docs/governance/error-code-registry.json']);
+
+mkdirSync(path.join(cwd, '.github', 'instructions'), { recursive: true });
+writeFileSync(path.join(cwd, '.github', 'instructions', 'adapter-projection.instructions.md'), 'baseline\n');
+git('add', '.github');
+git('commit', '-m', 'add projection fixture');
+writeFileSync(path.join(cwd, '.github', 'instructions', 'adapter-projection.instructions.md'), 'foreign projection drift\n');
+
+const fuzzyProjectionReport = checkPendingTaskArtifactScopeExpansion({
+  cwd,
+  task: {
+    workItemId: 'TASK-SKL-0040', title: 'Refresh sealed adapter projection parity', status: 'planned', closedAt: null,
+    closedByActor: null, closurePacket: null, lastTransitionId: null, lastTransitionAt: null,
+    milestone: null, dependencies: [], taskPath: '.atm/history/tasks/TASK-SKL-0040.json',
+    format: 'json', sourcePlanPath: 'docs/ai_atomic_framework/skl-tool-first-upgrade/SKL-validator-governance-test-case-catalog-plan.md', nearbyPlanPaths: [],
+    scopePaths: ['packages/integrations-core/src/compiler/skill-projection-parity.ts'],
+    targetRepo: null, planningRepo: null, allowPlanningMirror: false,
+    planningReadOnlyPaths: [], planningMirrorPaths: [], targetAllowedFiles: [],
+    closureAuthority: null, activeClaimActorId: null, activeClaimLaneSessionId: null,
+    activeClaimIntent: null
+  } as never
+});
+assert.deepEqual(fuzzyProjectionReport.scopeExpansionRequiredFiles, []);
+assert.deepEqual(fuzzyProjectionReport.advisoryTrackedFiles, [
+  '.github/instructions/adapter-projection.instructions.md'
+]);
 console.log('[pending-task-artifact-scope.test] ok');
