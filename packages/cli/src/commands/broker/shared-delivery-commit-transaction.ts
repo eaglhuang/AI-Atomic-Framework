@@ -29,16 +29,9 @@ import {
   type SharedDeliveryCommitInput,
   type SharedDeliveryCommitPlan
 } from '../../../../core/src/broker/shared-delivery-commit.ts';
-import {
-  assertCommitAttribution,
-  readCommittedTreeEntries,
-  sealCommitBundleFromLiveIndex
-} from '../git-governance/implementation/sealed-commit-attribution.ts';
+import { assembleSealedCommitIndex, assertCommitAttribution, readCandidateTreeEntries, readCommittedTreeEntries, sealCommitBundleFromLiveIndex } from '../git-governance/implementation/sealed-commit-attribution.ts';
 import { assertRecordCommitPayloadPresent } from '../git-governance/record-commit-payload-assertion.ts';
-import {
-  assembleSealedCommitIndex,
-  readCandidateTreeEntries
-} from '../git-governance/implementation/sealed-commit-attribution.ts';
+
 
 export const ATM_BROKER_BATCH_COMMIT_BLOCKED = 'ATM_BROKER_BATCH_COMMIT_BLOCKED' as const;
 export const ATM_BROKER_BATCH_COMMIT_HEAD_MOVED = 'ATM_BROKER_BATCH_COMMIT_HEAD_MOVED' as const;

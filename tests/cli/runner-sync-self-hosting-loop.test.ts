@@ -7,8 +7,8 @@ import {
   buildRunnerSyncReceipt,
   type SealedBuildTimings
 } from '../../scripts/run-sealed-runner-build.ts';
-import { inspectRunnerSyncAdmission } from '../../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
-import type { RunnerSyncAdmissionReport } from '../../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
+import { inspectRunnerSyncAdmission, type RunnerSyncAdmissionReport } from '../../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
+
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-sync-loop-'));
 const root = process.cwd();

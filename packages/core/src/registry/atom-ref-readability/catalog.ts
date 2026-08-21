@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync, readJson } from './files.ts';
-import type { AtomCatalogEntry, MapSpecMemberRecord, MapSpecRecord, RegistryDocumentRecord, RegistryEntryRecord } from './types.ts';
-import { asRecord, atomIdLikePattern, atomIdPattern } from './types.ts';
+import { asRecord, type AtomCatalogEntry, atomIdLikePattern, atomIdPattern, type MapSpecMemberRecord, type MapSpecRecord, type RegistryDocumentRecord, type RegistryEntryRecord } from './types.ts';
+
 
 export function buildCatalog(repoPath: string, registry: unknown): AtomCatalogEntry[] {
   const entries: AtomCatalogEntry[] = [];

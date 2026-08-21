@@ -1,13 +1,6 @@
 import { createHash } from 'node:crypto';
-import {
-  applyParallelAdmissionSafetyDecision,
-  defaultParallelAdmissionPolicy,
-  evaluateParallelAdmissionSafety
-} from '../../../../../core/src/broker/parallel-admission-policy.ts';
-import type {
-  ParallelAdmissionPolicy,
-  ParallelAdmissionSafetyMetrics
-} from '../../../../../core/src/broker/parallel-admission-policy.ts';
+import { applyParallelAdmissionSafetyDecision, defaultParallelAdmissionPolicy, evaluateParallelAdmissionSafety, type ParallelAdmissionPolicy, type ParallelAdmissionSafetyMetrics } from '../../../../../core/src/broker/parallel-admission-policy.ts';
+
 import type { ParallelReplayEvidence } from '../../../../../core/src/broker/replay/index.ts';
 import type { ClosureObservation } from './closure-observation.ts';
 

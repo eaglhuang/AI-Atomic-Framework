@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-20T22:53:29.071Z",
+  "updatedAt": "2026-08-21T02:20:37.638Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
@@ -29,6 +29,7 @@
     "validate:git-head-evidence",
     "validate:module-boundaries",
     "validate:runbook-completion-evidence",
+    "validate:task-direction-governance",
     "validate:test-facade",
     "wave-exit-observer-receipt"
   ],
@@ -787,6 +788,22 @@
       "durationMs": 681,
       "runnerKind": "dev-source",
       "sourceCommit": "d0fcd88bfb48b91225210ad889ce601767d1bed1",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:task-direction-governance",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7b7faae6d1ca5b529178588fbcacf260ddc34b9f93f2e0890c06fee871487d11",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:task-direction-governance"
+      ],
+      "generatedAt": "2026-08-21T02:20:37.637Z",
+      "startedAt": "2026-08-21T02:20:15.515Z",
+      "finishedAt": "2026-08-21T02:20:37.637Z",
+      "durationMs": 22122,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7c352a457ae5ee43abc5efdfcddbdc385a9fe80e",
       "cached": false
     }
   ],
