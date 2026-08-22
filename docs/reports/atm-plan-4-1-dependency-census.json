@@ -1,0 +1,325 @@
+{
+  "schemaId": "atm.plan41DependencyCensus.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-22T16:02:57.808Z",
+  "planSeal": {
+    "path": "docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v4-1.md",
+    "digest": "sha256:11697f57e516de8824723b8c5e8d59088ad7d5df65065bcf3bdde985b2c954f4"
+  },
+  "timeWindow": {
+    "startedAt": "2026-08-22T16:02:57.808Z",
+    "endedAt": "2026-08-22T16:02:57.808Z",
+    "watermark": "32ebefdf78e6a25675a96a11ec86c004ecef2f43"
+  },
+  "sources": [
+    {
+      "path": "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0002-restore-packaged-runner-and-plan-import-compatibility.task.md",
+      "digest": "sha256:6018a78bd69a9286b815b363cbce6fe0cf3132f99491e0922990cf526ae38bdb"
+    },
+    {
+      "path": "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0003-separate-required-product-ci-and-enforce-protected-main.task.md",
+      "digest": "sha256:4cbb9a521c3783bf8d7b97c5f1119d6af98e2c1885b4635a3234682ed5a5b688"
+    },
+    {
+      "path": "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v4-1.md",
+      "digest": "sha256:11697f57e516de8824723b8c5e8d59088ad7d5df65065bcf3bdde985b2c954f4"
+    }
+  ],
+  "commits": {
+    "planning": "913299a225ba271a6f599d82e4dc52539bd19041",
+    "target": "32ebefdf78e6a25675a96a11ec86c004ecef2f43"
+  },
+  "sampleTaskIds": [
+    "TASK-PRF-0002",
+    "TASK-PRF-0003"
+  ],
+  "edges": [
+    {
+      "producer": "TASK-PRF-0002",
+      "consumer": "TASK-PRF-0003",
+      "sourceFields": [
+        "causalGraph.softRelations"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "soft-order",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Soft relation is advisory ordering and remains nonblocking at claim.",
+      "edgeId": "2f7e13f130af6a3d",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "start-condition:TASK-PRF-0002:1",
+      "consumer": "TASK-PRF-0002",
+      "sourceFields": [
+        "causalGraph.startConditions"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "observation",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Start condition is an observation or capture requirement, not a hard-causal producer output. Text: Frozen and source runner versions and digests are captured before mutation.",
+      "edgeId": "af9e3237e8172137",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "start-condition:TASK-PRF-0002:2",
+      "consumer": "TASK-PRF-0002",
+      "sourceFields": [
+        "causalGraph.startConditions"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "observation",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Unspecified start condition is treated as observation until six hard-causal facts exist. Text: The 3KLife planning-only exception remains planning-only; implementation occurs in the target repository.",
+      "edgeId": "5d7b8815f6dbf147",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "frontier:frozen-runner-source-drift-report",
+      "consumer": "TASK-PRF-0002",
+      "sourceFields": [
+        "causalGraph.parallelFrontierInputs"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "observation",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Parallel frontier input frozen-runner-source-drift-report is observational and cannot freeze claim.",
+      "edgeId": "c35a7e3e561b6dbd",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "frontier:causal-graph-import-failure-reproduction",
+      "consumer": "TASK-PRF-0002",
+      "sourceFields": [
+        "causalGraph.parallelFrontierInputs"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "observation",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Parallel frontier input causal-graph-import-failure-reproduction is observational and cannot freeze claim.",
+      "edgeId": "0febfd3e4f082b9d",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "TASK-PRF-0002",
+      "consumer": "TASK-PRF-0003",
+      "sourceFields": [
+        "depends_on",
+        "causalGraph.causalDependencies"
+      ],
+      "declaredAsHard": true,
+      "lifecycleType": "validation",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Declared dependency on TASK-PRF-0002 waits at validate/close for a product-check basis; it does not prove the six hard-causal facts, so claim stays nonblocking.",
+      "edgeId": "b55e2a01a4cdb8a0",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "TASK-PRF-0003",
+      "consumer": "TASK-PRF-0004",
+      "sourceFields": [
+        "causalGraph.softRelations"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "soft-order",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Soft relation is advisory ordering and remains nonblocking at claim.",
+      "edgeId": "8136b41da7f48510",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "start-condition:TASK-PRF-0003:1",
+      "consumer": "TASK-PRF-0003",
+      "sourceFields": [
+        "causalGraph.startConditions"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "validation",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Start condition names a validator or compatibility basis; it is nonblocking at claim. Text: TASK-PRF-0002 packaged-runner compatibility matrix is green.",
+      "edgeId": "707f8ee9e29585d4",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "start-condition:TASK-PRF-0003:2",
+      "consumer": "TASK-PRF-0003",
+      "sourceFields": [
+        "causalGraph.startConditions"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "observation",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Start condition is an observation or capture requirement, not a hard-causal producer output. Text: Current red CI failures and skipped downstream jobs are captured as baseline evidence.",
+      "edgeId": "50c2b813e6ff177b",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "frontier:latest-ci-failure-envelope",
+      "consumer": "TASK-PRF-0003",
+      "sourceFields": [
+        "causalGraph.parallelFrontierInputs"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "observation",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Parallel frontier input latest-ci-failure-envelope is observational and cannot freeze claim.",
+      "edgeId": "4aeb17dd6bd053a0",
+      "planningAuthorityUnchanged": true
+    },
+    {
+      "producer": "frontier:standard-validator-inventory",
+      "consumer": "TASK-PRF-0003",
+      "sourceFields": [
+        "causalGraph.parallelFrontierInputs"
+      ],
+      "declaredAsHard": false,
+      "lifecycleType": "observation",
+      "hardCausalProven": false,
+      "hardCausalFacts": null,
+      "missingHardFacts": [
+        "producerTaskId",
+        "producerOutputId",
+        "consumerOperation",
+        "producerChangeAffectsConsumerResult",
+        "noSubstituteExists",
+        "consumerUndefinedWithoutOutput",
+        "negativeControl.blocksBeforeOutput",
+        "negativeControl.admitsAfterSealedOutput"
+      ],
+      "rationale": "Parallel frontier input standard-validator-inventory is observational and cannot freeze claim.",
+      "edgeId": "4b8fd381f5b2c9c6",
+      "planningAuthorityUnchanged": true
+    }
+  ],
+  "counts": {
+    "denominator": 11,
+    "hardCausal": 0,
+    "validation": 2,
+    "publication": 0,
+    "observation": 7,
+    "softOrder": 2,
+    "unclassified": 0,
+    "unprovenHardDeclarations": 1
+  },
+  "hardDependencyRate": {
+    "numerator": 0,
+    "denominator": 11,
+    "observed": 0,
+    "quotaTargetRejected": true
+  },
+  "unclassifiedEdgeIds": [],
+  "antiGaming": {
+    "quotaRelabelingDetected": false,
+    "rule": "Hard-dependency rate is observed proven six-fact edges over all classified edges. Declared causalDependencies without six facts stay nonblocking and are not relabelled to chase any percentage target."
+  },
+  "digest": "sha256:2eb7c7a5f24d5b4e66677e868559a70680505559402ad7d54843b21e02c1a2c2"
+}

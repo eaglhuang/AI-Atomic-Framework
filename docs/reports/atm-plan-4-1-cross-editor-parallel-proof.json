@@ -1,0 +1,192 @@
+{
+  "schemaId": "atm.crossEditorParallelProof.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-22T16:02:57.903Z",
+  "planSeal": {
+    "path": "docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v4-1.md",
+    "digest": "sha256:11697f57e516de8824723b8c5e8d59088ad7d5df65065bcf3bdde985b2c954f4"
+  },
+  "timeWindow": {
+    "startedAt": "2026-08-22T15:45:06.036Z",
+    "endedAt": "2026-08-22T16:02:57.903Z",
+    "watermark": "32ebefdf78e6a25675a96a11ec86c004ecef2f43"
+  },
+  "sources": [
+    {
+      "path": "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0002-restore-packaged-runner-and-plan-import-compatibility.task.md",
+      "digest": "sha256:6018a78bd69a9286b815b363cbce6fe0cf3132f99491e0922990cf526ae38bdb"
+    },
+    {
+      "path": "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0003-separate-required-product-ci-and-enforce-protected-main.task.md",
+      "digest": "sha256:4cbb9a521c3783bf8d7b97c5f1119d6af98e2c1885b4635a3234682ed5a5b688"
+    },
+    {
+      "path": "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v4-1.md",
+      "digest": "sha256:11697f57e516de8824723b8c5e8d59088ad7d5df65065bcf3bdde985b2c954f4"
+    }
+  ],
+  "commits": {
+    "planning": "913299a225ba271a6f599d82e4dc52539bd19041",
+    "target": "32ebefdf78e6a25675a96a11ec86c004ecef2f43"
+  },
+  "censusDigest": "sha256:2eb7c7a5f24d5b4e66677e868559a70680505559402ad7d54843b21e02c1a2c2",
+  "actors": [
+    {
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "taskIds": [
+        "ATM-GOV-0407"
+      ]
+    },
+    {
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "taskIds": [
+        "ATM-GOV-0406"
+      ]
+    },
+    {
+      "actorId": "claude-captain",
+      "editor": "claude-code",
+      "taskIds": [
+        "ATM-GOV-0406"
+      ]
+    }
+  ],
+  "intervals": [
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-22T15:55:06.036Z",
+      "endedAt": null,
+      "source": ".atm/history/task-events/ATM-GOV-0407"
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-22T15:56:42.966Z",
+      "endedAt": null,
+      "source": ".atm/history/task-events/ATM-GOV-0406"
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-captain",
+      "editor": "claude-code",
+      "startedAt": "2026-08-22T15:45:06.036Z",
+      "endedAt": "2026-08-22T16:15:06.036Z",
+      "source": "sealed-plan-4-1-harness"
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-22T15:55:06.036Z",
+      "endedAt": "2026-08-22T16:20:06.036Z",
+      "source": "sealed-plan-4-1-harness"
+    }
+  ],
+  "concurrency": {
+    "maxActiveClaims": 2,
+    "distinctEditors": [
+      "cursor",
+      "claude-code"
+    ]
+  },
+  "overlap": {
+    "pair": "ATM-GOV-0406/ATM-GOV-0407",
+    "overlapMs": 374937,
+    "shorterIntervalMs": 374937,
+    "overlapRatio": 1,
+    "requiredMs": 93734,
+    "status": "met"
+  },
+  "proposals": [
+    {
+      "proposalId": "prop-0407-shared-dashboard-surface",
+      "surface": "docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
+      "state": "proposal-submitted"
+    }
+  ],
+  "broker": {
+    "arbitration": "proposal-first",
+    "ticket": "execute-now-on-0407-private-report-surface; 0406 bytes not admitted"
+  },
+  "compose": {
+    "outcome": "deferred-final-compose",
+    "reason": "Final compose/acceptance waits for ATM-GOV-0406 contract SHA; census and telemetry compose from the sealed Plan 4.1 contract now."
+  },
+  "safetyEvents": {
+    "foreignOverwrite": 0,
+    "unauthorizedTakeover": 0,
+    "bypass": 0
+  },
+  "hardCausalControls": {
+    "beforeProducerOutput": {
+      "claim": "blocked",
+      "code": "ATM_PARALLEL_PROOF_INPUT_INVALID",
+      "reason": "Producer output is unsealed; hard-causal consumer claim is blocked."
+    },
+    "afterProducerOutput": {
+      "claim": "allowed",
+      "code": null,
+      "reason": "Sealed producer output admits the hard-causal consumer."
+    },
+    "nonHardClaimBeforeCompose": "allowed"
+  },
+  "acceptance": {
+    "acc1": {
+      "status": "met",
+      "detail": "denominator=11 hard=0 observedRate=0"
+    },
+    "acc2": {
+      "status": "met",
+      "detail": "PRF sample has zero proven hard-causal edges; unproven declarations remain nonblocking."
+    },
+    "acc3": {
+      "status": "met",
+      "detail": "live overlapMs=374937 liveRequiredMs=93734 maxLive=2 editors=cursor,claude-code"
+    },
+    "acc4": {
+      "status": "met",
+      "detail": "Overlapping dashboard surface uses proposal-first Broker arbitration; 0406 bytes untouched."
+    },
+    "acc5": {
+      "status": "met",
+      "detail": "before=blocked after=allowed"
+    },
+    "acc6": {
+      "status": "met",
+      "detail": "Dashboard seals window, watermark, sources, commits, counts, overlap, proposals, compose and safety events."
+    },
+    "acc7": {
+      "status": "met",
+      "detail": "Digest is computed from canonical JSON excluding digest; lifecycle states are independent."
+    }
+  },
+  "lifecycle": {
+    "sourceDelivery": {
+      "status": "delivered",
+      "sha": "sha256:ca6d696d4e58005c62f3f16e1fc9558c7a5164e531716f61bb4f588be0917797",
+      "reason": "Source deliverables exist on the canonical worktree. Frozen publication and formal close remain independent and are not started."
+    },
+    "frozenPublication": {
+      "status": "not-started",
+      "sha": null,
+      "reason": "ATM-GOV-0407 must not self-publish the frozen runner after source-done."
+    },
+    "formalCloseout": {
+      "status": "not-started",
+      "sha": null,
+      "reason": "Formal closeout is deferred; no taskflow close --write in this delivery."
+    }
+  },
+  "validators": [
+    "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+    "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+    "node --strip-types scripts/validate-cross-editor-parallel-proof.ts",
+    "npm run typecheck"
+  ],
+  "digest": "sha256:aac2047fcd51eebf972689d2222372efe9b1659e1ef31e1bf971a3a0e1818f73"
+}

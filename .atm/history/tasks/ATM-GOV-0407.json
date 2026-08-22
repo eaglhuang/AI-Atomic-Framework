@@ -1,0 +1,346 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0407",
+  "title": "Prove cross-editor parallel work with typed dependency telemetry",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: PRF census has zero unclassified edges and publishes numerator, denominator and observed hard-dependency rate without quota gaming.",
+    "ACC-2: Every blocking edge contains six hard-causal facts; validation/publication/observation/soft relations remain nonblocking at claim.",
+    "ACC-3: Distinct Claude and Cursor actors/editors hold concurrent active work for at least 15 minutes or 25% of the shorter active interval; maximum concurrency is at least two.",
+    "ACC-4: At least one overlapping/dependent surface uses proposal-first or Broker arbitration, with no foreign-byte overwrite, unauthorized takeover or bypass.",
+    "ACC-5: A hard-causal negative control blocks before its producer result and admits afterward; non-hard controls start before compose/validation.",
+    "ACC-6: Dashboard seals time window, watermark, sources, commits, SHA-256 digests, counts, overlap, proposals, compose outcomes and safety events.",
+    "ACC-7: Regeneration reproduces the digest and reports source delivery, frozen publication and formal closeout separately."
+  ],
+  "deliverables": [
+    "schemas/evidence/cross-editor-parallel-proof.schema.json",
+    "scripts/audit-task-dependency-semantics.ts",
+    "scripts/compile-cross-editor-parallel-proof.ts",
+    "scripts/validate-cross-editor-parallel-proof.ts",
+    "tests/cli/task-dependency-semantics-census.test.ts",
+    "tests/cli/cross-editor-parallel-proof.test.ts",
+    "docs/reports/atm-plan-4-1-dependency-census.json",
+    "docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json"
+  ],
+  "scopePaths": [
+    "schemas/evidence/cross-editor-parallel-proof.schema.json",
+    "scripts/audit-task-dependency-semantics.ts",
+    "scripts/compile-cross-editor-parallel-proof.ts",
+    "scripts/validate-cross-editor-parallel-proof.ts",
+    "tests/cli/task-dependency-semantics-census.test.ts",
+    "tests/cli/cross-editor-parallel-proof.test.ts",
+    "docs/reports/atm-plan-4-1-dependency-census.json",
+    "docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+    "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+    "node --strip-types scripts/validate-cross-editor-parallel-proof.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "preserve-raw-events-and-invalidate-derived-proof",
+  "rollbackNotes": "Never rewrite raw events; invalidate and regenerate census/dashboard after source or policy drift.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.parallel-governance-proof",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.cross-editor-parallel-proof-compiler",
+        "pattern": "Functional Core Imperative Shell",
+        "source": "scripts/compile-cross-editor-parallel-proof.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0407-prove-cross-editor-parallel-work-with-typed-dependency-telemetry.task.md",
+    "sectionTitle": "ATM-GOV-0407",
+    "headingLine": 108,
+    "hash": "b1995eadc502da88",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0407-prove-cross-editor-parallel-work-with-typed-dependency-telemetry.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:b1995eadc502da889753493f938c05e179db336f273bd54e43f606e9468f9744",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-22T15:38:23.950Z"
+    }
+  },
+  "importedAt": "2026-08-22T15:38:23.950Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Plan 4.1 taxonomy and proof thresholds are sealed.",
+      "TASK-PRF-0002 and TASK-PRF-0003 remain available as real workload samples."
+    ],
+    "softRelations": [
+      "ATM-GOV-0406"
+    ],
+    "changedPublicSeams": [
+      "dependency-semantics-census",
+      "cross-editor-parallel-proof",
+      "parallel-progress-dashboard"
+    ],
+    "causalImpactEdges": [
+      "prf-edges-receive-explicit-lifecycle-types",
+      "concurrent-work-produces-replayable-telemetry",
+      "dashboard-proves-or-refutes-parallel-governance"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-plan-4-1-definition",
+      "prf-planning-corpus",
+      "broker-and-task-event-streams"
+    ],
+    "validatorReferences": [
+      "test_gov_dependency_census_0407",
+      "test_gov_parallel_telemetry_0407",
+      "test_gov_parallel_dashboard_0407"
+    ],
+    "phaseOwner": "plan-4-1-proof-lane"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_gov_dependency_census_0407",
+      "targetGroupId": "null",
+      "semanticKey": "prf_dependency_semantics_census",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "prf-edges-receive-explicit-lifecycle-types"
+      ],
+      "expectedRedPredicate": "A PRF edge is unclassified, or a blocking edge lacks the six hard-causal facts.",
+      "contributionResourceKey": "prf-dependency-census",
+      "responsibility": "task-required",
+      "dependencyEdge": "planning-edge-to-lifecycle-classification",
+      "contractEdge": "dependency-semantics-census",
+      "resourceKey": "planning-corpus"
+    },
+    {
+      "caseId": "test_gov_parallel_telemetry_0407",
+      "targetGroupId": "null",
+      "semanticKey": "real_cross_editor_parallel_window",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "concurrent-work-produces-replayable-telemetry"
+      ],
+      "expectedRedPredicate": "Distinct editors cannot maintain two active work intervals, or overlap/proposal/compose/safety events cannot be replayed.",
+      "contributionResourceKey": "parallel-proof-events",
+      "responsibility": "task-required",
+      "dependencyEdge": "task-events-to-parallel-proof",
+      "contractEdge": "cross-editor-parallel-proof",
+      "resourceKey": "event-stream"
+    },
+    {
+      "caseId": "test_gov_parallel_dashboard_0407",
+      "targetGroupId": "null",
+      "semanticKey": "reproducible_parallel_progress_dashboard",
+      "coversAcceptance": [
+        "ACC-6",
+        "ACC-7"
+      ],
+      "coversImpactEdges": [
+        "dashboard-proves-or-refutes-parallel-governance"
+      ],
+      "expectedRedPredicate": "Dashboard lacks window, watermark, denominator, source digest, independent lifecycle states or reproducible totals.",
+      "contributionResourceKey": "plan-4-1-dashboard",
+      "responsibility": "task-required",
+      "dependencyEdge": "sealed-inputs-to-dashboard",
+      "contractEdge": "parallel-progress-dashboard",
+      "resourceKey": "proof-report"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_gov_dependency_census_0407",
+    "test_gov_parallel_telemetry_0407",
+    "test_gov_parallel_dashboard_0407"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-22T16-09-07-286Z-renew-08cb1416cd7d",
+  "lastTransitionAt": "2026-08-22T16:09:07.286Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-captain",
+  "reservedAt": "2026-08-22T15:55:01.245Z",
+  "promotedAt": "2026-08-22T15:55:01.251Z",
+  "claim": {
+    "actorId": "cursor-captain",
+    "leaseId": "lease-0cbb89a9698c",
+    "claimedAt": "2026-08-22T15:55:01.258Z",
+    "heartbeatAt": "2026-08-22T16:09:06.350Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0407.json",
+      "docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
+      "docs/reports/atm-plan-4-1-dependency-census.json",
+      "schemas/evidence/cross-editor-parallel-proof.schema.json",
+      "scripts/audit-task-dependency-semantics.ts",
+      "scripts/compile-cross-editor-parallel-proof.ts",
+      "scripts/validate-cross-editor-parallel-proof.ts",
+      "tests/cli/cross-editor-parallel-proof.test.ts",
+      "tests/cli/task-dependency-semantics-census.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260822155501-cursor-captain-9730459103",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155501-cursor-captain-9730459103\""
+    }
+  },
+  "startedAt": "2026-08-22T15:55:01.258Z",
+  "startedByActor": "cursor-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-bcfaee82d0c12b06",
+    "ticketDigest": "sha256:bcfaee82d0c12b0628556808d70d2d12eecb40b8a331bd351c855bb9a2ce4397",
+    "taskId": "ATM-GOV-0407",
+    "origin": "claim",
+    "actorId": "cursor-captain",
+    "laneSessionId": "lane-20260822155501-cursor-captain-9730459103",
+    "claimGeneration": "lease-0cbb89a9698c",
+    "issuedAt": "2026-08-22T16:09:06.350Z",
+    "expiresAt": "2026-08-22T16:39:06.350Z",
+    "scopeDigest": "sha256:c88e76902d1ec3a7362aa73e655494668971a3b068c1f5fe78701ac875e0ac0b",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-22T16:09:06.350Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0407.*",
+          ".atm/history/task-events/ATM-GOV-0407/**",
+          ".atm/history/tasks/ATM-GOV-0407.json",
+          "docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
+          "docs/reports/atm-plan-4-1-dependency-census.json",
+          "schemas/evidence/cross-editor-parallel-proof.schema.json",
+          "scripts/audit-task-dependency-semantics.ts",
+          "scripts/compile-cross-editor-parallel-proof.ts",
+          "scripts/validate-cross-editor-parallel-proof.ts",
+          "tests/cli/cross-editor-parallel-proof.test.ts",
+          "tests/cli/task-dependency-semantics-census.test.ts"
+        ],
+        "digest": "sha256:06314a201c6ff72ca836133f476fcd22331fb1fd59c9124dd64f69f999bfb3bd"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260822155501-cursor-captain-ATM-GOV-0407-f794c45634",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0407",
+    "batchId": null,
+    "scopeKey": "tasks-dc4a5d32eff0",
+    "queueId": "queue-300b5bdbff96156d",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0407.*",
+      ".atm/history/task-events/ATM-GOV-0407/**",
+      ".atm/history/tasks/ATM-GOV-0407.json",
+      "docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
+      "docs/reports/atm-plan-4-1-dependency-census.json",
+      "schemas/evidence/cross-editor-parallel-proof.schema.json",
+      "scripts/audit-task-dependency-semantics.ts",
+      "scripts/compile-cross-editor-parallel-proof.ts",
+      "scripts/validate-cross-editor-parallel-proof.ts",
+      "tests/cli/cross-editor-parallel-proof.test.ts",
+      "tests/cli/task-dependency-semantics-census.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0876309ff776914f5259c90ee506649978b0dab46c1a1d7d83232b70b0f0f94e",
+    "actorId": "cursor-captain",
+    "sessionId": "session-20260822155501-cursor-captain-ATM-GOV-0407-f794c45634",
+    "laneSession": {
+      "laneSessionId": "lane-20260822155501-cursor-captain-9730459103",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155501-cursor-captain-9730459103\""
+    },
+    "createdAt": "2026-08-22T15:55:06.035Z",
+    "status": "active"
+  }
+}

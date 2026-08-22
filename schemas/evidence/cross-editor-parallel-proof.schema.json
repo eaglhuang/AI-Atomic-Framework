@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atm.local/schemas/evidence/cross-editor-parallel-proof.schema.json",
+  "title": "ATM Plan 4.1 dependency census and cross-editor parallel proof",
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "lifecycleType": {
+      "enum": ["hard-causal", "validation", "publication", "observation", "soft-order"]
+    },
+    "thresholdStatus": {
+      "enum": ["met", "unmet", "not-applicable"]
+    },
+    "lifecycleState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "sha", "reason"],
+      "properties": {
+        "status": { "enum": ["not-started", "in-progress", "delivered", "blocked"] },
+        "sha": { "type": ["string", "null"] },
+        "reason": { "type": "string" }
+      }
+    },
+    "timeWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startedAt", "endedAt", "watermark"],
+      "properties": {
+        "startedAt": { "type": "string" },
+        "endedAt": { "type": "string" },
+        "watermark": { "type": "string" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "schemaId": { "const": "atm.plan41DependencyCensus.v1" } },
+        "required": ["schemaId"]
+      },
+      "then": {
+        "type": "object",
+        "required": [
+          "schemaId",
+          "specVersion",
+          "generatedAt",
+          "planSeal",
+          "timeWindow",
+          "sources",
+          "commits",
+          "sampleTaskIds",
+          "edges",
+          "counts",
+          "hardDependencyRate",
+          "unclassifiedEdgeIds",
+          "antiGaming",
+          "digest"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "schemaId": { "const": "atm.plan41DependencyCensus.v1" },
+          "specVersion": { "const": "0.1.0" },
+          "generatedAt": { "type": "string" },
+          "planSeal": { "type": "object" },
+          "timeWindow": { "$ref": "#/$defs/timeWindow" },
+          "sources": { "type": "array", "items": { "type": "object" } },
+          "commits": { "type": "object" },
+          "sampleTaskIds": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "edges": { "type": "array", "minItems": 1 },
+          "counts": { "type": "object" },
+          "hardDependencyRate": { "type": "object" },
+          "unclassifiedEdgeIds": { "type": "array", "items": { "type": "string" } },
+          "antiGaming": { "type": "object" },
+          "digest": { "$ref": "#/$defs/sha256" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "schemaId": { "const": "atm.crossEditorParallelProof.v1" } },
+        "required": ["schemaId"]
+      },
+      "then": {
+        "type": "object",
+        "required": [
+          "schemaId",
+          "specVersion",
+          "generatedAt",
+          "planSeal",
+          "timeWindow",
+          "sources",
+          "commits",
+          "censusDigest",
+          "actors",
+          "intervals",
+          "concurrency",
+          "overlap",
+          "proposals",
+          "broker",
+          "compose",
+          "safetyEvents",
+          "hardCausalControls",
+          "acceptance",
+          "lifecycle",
+          "validators",
+          "digest"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "schemaId": { "const": "atm.crossEditorParallelProof.v1" },
+          "specVersion": { "const": "0.1.0" },
+          "generatedAt": { "type": "string" },
+          "planSeal": { "type": "object" },
+          "timeWindow": { "$ref": "#/$defs/timeWindow" },
+          "sources": { "type": "array" },
+          "commits": { "type": "object" },
+          "censusDigest": { "$ref": "#/$defs/sha256" },
+          "actors": { "type": "array" },
+          "intervals": { "type": "array" },
+          "concurrency": { "type": "object" },
+          "overlap": { "type": "object" },
+          "proposals": { "type": "array" },
+          "broker": { "type": "object" },
+          "compose": { "type": "object" },
+          "safetyEvents": { "type": "object" },
+          "hardCausalControls": { "type": "object" },
+          "acceptance": { "type": "object" },
+          "lifecycle": { "type": "object" },
+          "validators": { "type": "array" },
+          "digest": { "$ref": "#/$defs/sha256" }
+        }
+      }
+    }
+  ]
+}
