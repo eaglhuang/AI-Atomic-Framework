@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.fourPlanCloseoutBlockerMap.v1",
   "specVersion": "0.1.0",
-  "generatedAt": "2026-08-22T18:25:45+08:00",
+  "generatedAt": "2026-08-22T18:29:08+08:00",
   "status": "actionable-not-complete",
   "nonClaim": "This map is an execution dashboard, not a completion certificate.",
   "sourceReports": [
@@ -39,7 +39,7 @@
     },
     {
       "path": "docs/reports/plan-3x-4x-independent-certificate.json",
-      "digest": "sha256:a17813449bfbee68d2bf94bcafa1f3e3f91a1ebb986a4be9f049d3eb49b26b9e"
+      "digest": "sha256:4b6c46a183a52eaf98ac611d4d8ca18d3109716698b96c25b9b27f24c655a13f"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json",
@@ -170,7 +170,7 @@
         "final certificate",
         "release closeback"
       ],
-      "status": "open",
+      "status": "resolved",
       "reason": "ATM-GOV-0360 recompiled the independent certificate against observed evidence and the remote at execution time, and it returned not-complete. The previous recompute accepted a placeholder reviewer digest, a reviewer whose only output was the certificate itself, and dimension digests that do not follow from the evidence they cite; its release surfaces were also bound to a commit the remote has since passed.",
       "requiredOutcome": "two genuinely independent reviewer outputs, dimension digests reproducible from the artifacts they cite, and a certificate recompiled against the remote at that moment via scripts/compile-four-plan-independent-certificate.ts --mode write."
     }

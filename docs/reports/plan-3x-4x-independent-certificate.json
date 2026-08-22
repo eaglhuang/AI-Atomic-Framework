@@ -3,7 +3,7 @@
   "specVersion": "0.1.0",
   "certificateId": "ATM-GOV-0341-independent-four-plan-certificate",
   "certificatePath": "docs/reports/plan-3x-4x-independent-certificate.json",
-  "generatedAt": "2026-08-22T18:25:45+08:00",
+  "generatedAt": "2026-08-22T18:29:08+08:00",
   "writerRole": "certificate-writer",
   "reviewers": [
     {
@@ -114,7 +114,7 @@
     {
       "dimensionId": "release-verdict",
       "status": "proven",
-      "digest": "sha256:ae6610916be825681f9723649a1f2e66d98799e660028be2c976c8efbc6cb100",
+      "digest": "sha256:2171e2c4a5a63fe1e25c943acd8cfbeebc5cd38e9b03ab4cace9829d8849d308",
       "evidenceRefs": [
         "docs/reports/plan-3x-4x-release-closeback.json"
       ],
@@ -206,10 +206,10 @@
     {
       "path": "docs/reports/plan-3x-4x-release-closeback.json",
       "present": true,
-      "digest": "sha256:d20ed54a43fdb1606f1afc254276f4bf6dceadc574a0a6a23c97ccf1b5e29a40",
+      "digest": "sha256:5ddd868b6ec06a70b74659ad60c41acb9ad1180e14e6360a6cd3f7f06fef75e9",
       "tracked": true,
       "dirty": false,
-      "lastCommit": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
+      "lastCommit": "cfa72f89b5b494b31b8259e7a3e3095979919257",
       "reachableFromTargetHead": true
     },
     {
@@ -235,8 +235,8 @@
       "present": true,
       "digest": "sha256:a4ef9e9f7d517c56ddef5ca8be5937d33da6967201e0594a5c32bb7e3db3296c",
       "tracked": true,
-      "dirty": true,
-      "lastCommit": "ce2c8cb970e6580df0f62654276dc7807bca56a5",
+      "dirty": false,
+      "lastCommit": "cfa72f89b5b494b31b8259e7a3e3095979919257",
       "reachableFromTargetHead": true
     },
     {
@@ -244,8 +244,8 @@
       "present": true,
       "digest": "sha256:0e3e554691fe33319df322ca2d0f4d9303a4d1e8a98b757bb9973f907da5289c",
       "tracked": true,
-      "dirty": true,
-      "lastCommit": "ce2c8cb970e6580df0f62654276dc7807bca56a5",
+      "dirty": false,
+      "lastCommit": "cfa72f89b5b494b31b8259e7a3e3095979919257",
       "reachableFromTargetHead": true
     },
     {
@@ -276,8 +276,8 @@
     },
     {
       "surfaceId": "origin-main",
-      "expectedDigest": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
-      "observedDigest": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
+      "expectedDigest": "cfa72f89b5b494b31b8259e7a3e3095979919257",
+      "observedDigest": "cfa72f89b5b494b31b8259e7a3e3095979919257",
       "reachable": true
     },
     {
@@ -288,8 +288,8 @@
     },
     {
       "surfaceId": "target-head",
-      "expectedDigest": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
-      "observedDigest": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
+      "expectedDigest": "cfa72f89b5b494b31b8259e7a3e3095979919257",
+      "observedDigest": "cfa72f89b5b494b31b8259e7a3e3095979919257",
       "reachable": true
     }
   ],
@@ -299,25 +299,23 @@
     "independent-reviewer-role-separation",
     "no-legacy-retirement-with-stale-or-unpushed-surface"
   ],
-  "status": "stale",
-  "overallVerdict": "not-complete",
-  "diagnostics": [
-    "evidence-uncommitted:docs/reports/reviews/plan-3x-4x-runbook-release-review.json"
-  ],
+  "status": "proven",
+  "overallVerdict": "complete",
+  "diagnostics": [],
   "nonClaims": [],
-  "releaseAuthorized": false,
+  "releaseAuthorized": true,
   "provenance": {
     "compiledBy": "scripts/compile-four-plan-independent-certificate.ts",
-    "observedRemoteHead": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
-    "originMain": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
+    "observedRemoteHead": "cfa72f89b5b494b31b8259e7a3e3095979919257",
+    "originMain": "cfa72f89b5b494b31b8259e7a3e3095979919257",
     "remoteRef": "origin/main",
-    "closebackDigest": "sha256:d20ed54a43fdb1606f1afc254276f4bf6dceadc574a0a6a23c97ccf1b5e29a40",
-    "closebackTargetHead": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
+    "closebackDigest": "sha256:5ddd868b6ec06a70b74659ad60c41acb9ad1180e14e6360a6cd3f7f06fef75e9",
+    "closebackTargetHead": "cfa72f89b5b494b31b8259e7a3e3095979919257",
     "taskId": "ATM-GOV-0341",
     "reviewerReceipts": [
       "docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
       "docs/reports/reviews/plan-3x-4x-runbook-release-review.json"
     ]
   },
-  "certificateDigest": "sha256:a17813449bfbee68d2bf94bcafa1f3e3f91a1ebb986a4be9f049d3eb49b26b9e"
+  "certificateDigest": "sha256:4b6c46a183a52eaf98ac611d4d8ca18d3109716698b96c25b9b27f24c655a13f"
 }
