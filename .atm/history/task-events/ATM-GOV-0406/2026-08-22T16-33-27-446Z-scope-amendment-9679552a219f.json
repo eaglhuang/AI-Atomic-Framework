@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-22T16-33-27-446Z-scope-amendment-9679552a219f",
+  "taskId": "ATM-GOV-0406",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0406.json",
+  "taskSha256": "sha256:ea5ba11fe48996f1c048140aaa8c29c9359a189a120710ac5b1352d568083d95",
+  "createdAt": "2026-08-22T16:33:27.446Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0406 --actor claude-008 --add \"packages/cli/src/commands/tasks/task-import-validators.ts,packages/cli/src/commands/tasks/import-orchestrator.ts,packages/cli/src/commands/tasks/task-card-contract-import.ts,packages/cli/src/commands/tasks/task-atomization-policy-import.ts,packages/cli/src/commands/tasks/import-card-contract-validation.ts,docs/governance/error-code-registry.json,docs/ERROR_CODES.md,packages/core/src/error-code-registry.generated.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

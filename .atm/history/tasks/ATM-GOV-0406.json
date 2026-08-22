@@ -33,7 +33,17 @@
     "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
     "packages/cli/src/commands/next/claim-readiness.ts",
     "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
-    "tests/cli/hard-causal-dependency-import.test.ts"
+    "tests/cli/hard-causal-dependency-import.test.ts",
+    ".atm/history/evidence/ATM-GOV-0406.*",
+    ".atm/history/task-events/ATM-GOV-0406/**",
+    ".atm/history/tasks/ATM-GOV-0406.json",
+    "docs/ERROR_CODES.md",
+    "docs/governance/error-code-registry.json",
+    "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
+    "packages/cli/src/commands/tasks/task-card-contract-import.ts",
+    "packages/core/src/error-code-registry.generated.ts"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
@@ -90,7 +100,7 @@
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -205,8 +215,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-22T16-14-52-952Z-renew-88433d38b744",
-  "lastTransitionAt": "2026-08-22T16:14:52.952Z",
+  "lastTransitionId": "2026-08-22T16-53-54-736Z-renew-f77968999b19",
+  "lastTransitionAt": "2026-08-22T16:53:54.736Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-008",
   "reservedAt": "2026-08-22T15:56:38.703Z",
@@ -215,23 +225,33 @@
     "actorId": "claude-008",
     "leaseId": "lease-3763d7bed6f2",
     "claimedAt": "2026-08-22T15:56:38.716Z",
-    "heartbeatAt": "2026-08-22T16:14:52.170Z",
+    "heartbeatAt": "2026-08-22T16:53:53.983Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/ATM-GOV-0406.*",
+      ".atm/history/task-events/ATM-GOV-0406/**",
       ".atm/history/tasks/ATM-GOV-0406.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
       "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
       "packages/cli/src/commands/next/claim-readiness.ts",
       "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
       "packages/cli/src/commands/tasks/dependency-gate.ts",
       "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
+      "packages/cli/src/commands/tasks/task-card-contract-import.ts",
       "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/core/src/error-code-registry.generated.ts",
       "schemas/governance/work-item.schema.json",
       "tests/cli/hard-causal-dependency-import.test.ts"
     ],
     "state": "active",
     "laneSession": {
       "laneSessionId": "lane-20260822155638-claude-008-987687d797",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155638-claude-008-987687d797\""
     }
@@ -241,38 +261,47 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d9adaccd7b2be155",
-    "ticketDigest": "sha256:d9adaccd7b2be155f761e46ddd64a78ce6d6f556598591ef28a64be9f7d781a5",
+    "ticketId": "wat-8e664f6c4f6650d0",
+    "ticketDigest": "sha256:8e664f6c4f6650d07d2c3df198367950a22f81967b8e37cf7ee9eff9b77bab13",
     "taskId": "ATM-GOV-0406",
     "origin": "claim",
     "actorId": "claude-008",
     "laneSessionId": "lane-20260822155638-claude-008-987687d797",
     "claimGeneration": "lease-3763d7bed6f2",
-    "issuedAt": "2026-08-22T16:14:52.170Z",
-    "expiresAt": "2026-08-22T16:44:52.170Z",
-    "scopeDigest": "sha256:418617658743ba1ec3c6da9dfa0c7090d8909531647f904d50105a2827708180",
+    "issuedAt": "2026-08-22T16:53:53.983Z",
+    "expiresAt": "2026-08-22T17:23:53.983Z",
+    "scopeDigest": "sha256:a624f77985364c61de56d876c9e9d058f26073143565ae95b8b239aedba97e76",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-22T16:14:52.170Z"
+      "selectedAt": "2026-08-22T16:53:53.983Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0406.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0406/**",
           ".atm/history/tasks/ATM-GOV-0406.json",
+          "docs/ERROR_CODES.md",
+          "docs/governance/error-code-registry.json",
           "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
           "packages/cli/src/commands/next/claim-readiness.ts",
           "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
           "packages/cli/src/commands/tasks/dependency-gate.ts",
           "packages/cli/src/commands/tasks/dependency-gates.ts",
+          "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
+          "packages/cli/src/commands/tasks/import-orchestrator.ts",
+          "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
+          "packages/cli/src/commands/tasks/task-card-contract-import.ts",
           "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+          "packages/cli/src/commands/tasks/task-import-validators.ts",
+          "packages/core/src/error-code-registry.generated.ts",
           "schemas/governance/work-item.schema.json",
           "tests/cli/hard-causal-dependency-import.test.ts"
         ],
-        "digest": "sha256:7769981b7b2c277378d92785ab5d06f4a41134f313e6ad4a320a7838cb1266a4"
+        "digest": "sha256:a65f6351f9a89234279b94beb73288e7a03c55c06d126bcdbb925e815ad52ff9"
       },
       {
         "kind": "lifecycle-operation",
@@ -296,6 +325,7 @@
       "requestedMode": "auto",
       "resolvedMode": "enabled",
       "reasons": [
+        "complex-task",
         "shared-surface"
       ],
       "maxSavePoints": 2,
@@ -303,7 +333,7 @@
       "repositoryByteBudget": 268435456,
       "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
   },
   "startedBySessionId": "session-20260822155638-claude-008-ATM-GOV-0406-2236dc5a8f",
@@ -312,35 +342,50 @@
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0406",
     "batchId": null,
-    "scopeKey": "tasks-dc4a5d32eff0",
-    "queueId": "queue-300b5bdbff96156d",
+    "scopeKey": null,
+    "queueId": null,
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0406.*",
       ".atm/history/task-events/ATM-GOV-0406/**",
       ".atm/history/tasks/ATM-GOV-0406.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
       "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
       "packages/cli/src/commands/next/claim-readiness.ts",
       "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
       "packages/cli/src/commands/tasks/dependency-gate.ts",
       "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
+      "packages/cli/src/commands/tasks/task-card-contract-import.ts",
       "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/core/src/error-code-registry.generated.ts",
       "schemas/governance/work-item.schema.json",
       "tests/cli/hard-causal-dependency-import.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "4dd2c7d3df7b45be54259e0834b0f49c829bddde07ff9b3745162d42f0aaf356",
     "actorId": "claude-008",
-    "sessionId": "session-20260822155638-claude-008-ATM-GOV-0406-2236dc5a8f",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260822155638-claude-008-987687d797",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155638-claude-008-987687d797\""
     },
-    "createdAt": "2026-08-22T15:56:42.964Z",
+    "createdAt": "2026-08-22T15:56:43.053Z",
     "status": "active"
   }
 }

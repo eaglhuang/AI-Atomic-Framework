@@ -1,11 +1,16 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
   HARD_CAUSAL_DEPENDENCY_SEMANTICS,
+  TASK_DEPENDENCY_HARD_PROOF_CONTRADICTORY_CODE,
+  TASK_DEPENDENCY_HARD_PROOF_INCOMPLETE_CODE,
+  TASK_DEPENDENCY_RELATION_UNKNOWN_CODE,
+  TASK_DEPENDENCY_UNTYPED_IN_TYPED_CARD_CODE,
   classifyTaskDependencyEdges,
   validateHardCausalDependencyImport
 } from '../../packages/cli/src/commands/tasks/dependency-gate.ts';
+import { applySingleCardContractValidation } from '../../packages/cli/src/commands/tasks/import-card-contract-validation.ts';
 
 /**
  * ATM-GOV-0406 — Plan 4.1 hard-causal dependency contract, import boundary.
@@ -230,6 +235,105 @@ function typedCard(dependencies: readonly unknown[]) {
   const after = classifyTaskDependencyEdges(document, { cwd: repo });
   assert(after.edges[0]?.producerOutputSatisfied === true, 'the producer output must be satisfied once the sealed output exists');
   assert(after.edges[0]?.blockingCandidate === false, 'the same declaration must admit once the sealed producer output exists');
+}
+
+// caseId: test_gov_hard_causal_contract_0406
+// ACC-2 — the contract is wired into the product import path, not only callable
+// from a test. A card whose hard-causal edge is missing a fact must reach the
+// import diagnostics as an error, which is what makes tasks import fail closed
+// before any ledger file is written.
+{
+  const proof = completeProof();
+  delete (proof as Record<string, unknown>).negativeControl;
+  const parsed = {
+    tasks: [{
+      workItemId: 'ATM-GOV-9406',
+      dependencySemantics: HARD_CAUSAL_DEPENDENCY_SEMANTICS,
+      dependencies: [{ taskId: 'ATM-GOV-9400', relation: 'hard-causal', hardCausalProof: proof }]
+    }],
+    diagnostics: [] as Record<string, unknown>[]
+  };
+  const result = applySingleCardContractValidation({
+    cwd: repo,
+    parsed: parsed as never,
+    causalFrontmatter: null,
+    planText: '',
+    planPath: 'docs/plans/atm-gov-9406.md'
+  });
+  const dependencyErrors = result.parsed.diagnostics.filter(
+    (entry) => String(entry.code ?? '').startsWith('ATM_TASK_DEPENDENCY_')
+  );
+  assert(
+    dependencyErrors.length === 1,
+    `the import path must surface the incomplete proof as one dependency diagnostic, got ${JSON.stringify(result.parsed.diagnostics)}`
+  );
+  assert(
+    dependencyErrors[0]?.code === 'ATM_TASK_DEPENDENCY_HARD_PROOF_INCOMPLETE',
+    'the import diagnostic must carry the canonical incomplete-proof code'
+  );
+  assert(
+    dependencyErrors[0]?.level === 'error',
+    'an unproven hard-causal edge must fail import closed, not warn'
+  );
+  assert(
+    String(dependencyErrors[0]?.text ?? '').includes('Recovery:'),
+    'the import diagnostic must carry an executable recovery command'
+  );
+}
+
+// caseId: test_gov_nonhard_claim_admission_0406
+// The same wiring must stay silent for a card that declares nothing typed and
+// for a non-hard relation, so adding the contract to the import path does not
+// change what already-valid cards mean.
+{
+  for (const document of [
+    { workItemId: 'ATM-GOV-9406', dependencies: ['ATM-GOV-9400'] },
+    {
+      workItemId: 'ATM-GOV-9406',
+      dependencySemantics: HARD_CAUSAL_DEPENDENCY_SEMANTICS,
+      dependencies: [{ taskId: 'ATM-GOV-9400', relation: 'soft-order' }]
+    }
+  ]) {
+    const result = applySingleCardContractValidation({
+      cwd: repo,
+      parsed: { tasks: [document], diagnostics: [] } as never,
+      causalFrontmatter: null,
+      planText: '',
+      planPath: 'docs/plans/atm-gov-9406.md'
+    });
+    const dependencyErrors = result.parsed.diagnostics.filter(
+      (entry) => String(entry.code ?? '').startsWith('ATM_TASK_DEPENDENCY_')
+    );
+    assert(
+      dependencyErrors.length === 0,
+      `${JSON.stringify(document.dependencies)} must import without a dependency diagnostic, got ${JSON.stringify(dependencyErrors)}`
+    );
+  }
+}
+
+// caseId: test_gov_hard_causal_contract_0406
+// Every code this contract can emit is registered in the canonical error-code
+// registry. A code a user can hit without a registry entry has no shared
+// operator meaning and no recovery an agent can resolve.
+{
+  const registry = JSON.parse(readFileSync('docs/governance/error-code-registry.json', 'utf8')) as {
+    entries: readonly { code: string; remediation: readonly string[]; sourceOwner: string }[];
+  };
+  const registered = new Map(registry.entries.map((entry) => [entry.code, entry]));
+  for (const code of [
+    TASK_DEPENDENCY_HARD_PROOF_INCOMPLETE_CODE,
+    TASK_DEPENDENCY_HARD_PROOF_CONTRADICTORY_CODE,
+    TASK_DEPENDENCY_UNTYPED_IN_TYPED_CARD_CODE,
+    TASK_DEPENDENCY_RELATION_UNKNOWN_CODE
+  ]) {
+    const entry = registered.get(code);
+    assert(entry, `${code} must have a canonical error-code registry entry`);
+    assert((entry?.remediation.length ?? 0) > 0, `${code} must carry an operator remediation path`);
+    assert(
+      entry?.sourceOwner === 'packages/cli/src/commands/tasks/dependency-gate.ts',
+      `${code} must name the module that owns it`
+    );
+  }
 }
 
 console.log('[hard-causal-dependency-import.test] ok');
