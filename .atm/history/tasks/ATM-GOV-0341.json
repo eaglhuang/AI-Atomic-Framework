@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0341",
   "title": "Produce independent four-plan certification and governed release",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0340"
@@ -574,15 +574,15 @@
   },
   "claim": {
     "actorId": "codex-captain",
-    "leaseId": "lease-0f19521c845b",
-    "claimedAt": "2026-08-21T08:19:03.862Z",
-    "heartbeatAt": "2026-08-22T10:17:00.811Z",
+    "leaseId": "lease-e333dda0d373",
+    "claimedAt": "2026-08-22T10:24:51.613Z",
+    "heartbeatAt": "2026-08-22T10:25:41.860Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/tasks/ATM-GOV-0341.json",
       ".atm/history/evidence/ATM-GOV-0341.*",
       ".atm/history/evidence/ATM-GOV-0341.runner-sync-receipt.json",
       ".atm/history/task-events/ATM-GOV-0341/**",
-      ".atm/history/tasks/ATM-GOV-0341.json",
       ".gemini/commands/atm-task-card-authoring.toml",
       ".github/instructions/atm-task-card-authoring.instructions.md",
       ".github/prompts/atm-task-card-authoring.prompt.md",
@@ -804,36 +804,37 @@
       "tests/cli/wave-exit-observer-receipt-writer.test.ts",
       "tests/cli/wave-exit-observer-receipt.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260821081904-codex-gpt-5.4-mini-cf5ff1de9d",
       "status": "adopted",
-      "source": "minted",
+      "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260821081904-codex-gpt-5.4-mini-cf5ff1de9d\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-14T09:50:24.347Z",
-  "startedBySessionId": "session-20260821081903-codex-gpt-5.4-mini-ATM-GOV-0341-13bfcb5d7d",
-  "lastTransitionId": "2026-08-22T10-21-17-854Z-scope-amendment-cc4f3f614bd3",
-  "lastTransitionAt": "2026-08-22T10:21:17.854Z",
+  "startedBySessionId": "session-20260822102451-codex-captain-ATM-GOV-0341-9b1e4a56c5",
+  "lastTransitionId": "2026-08-22T10-25-41-863Z-close-e79eca5771cc",
+  "lastTransitionAt": "2026-08-22T10:25:41.863Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-a6faa1f9f11ed83f",
-    "ticketDigest": "sha256:a6faa1f9f11ed83f0e58f9c74bd897b3fc48fc2a7da6767ed0503de833183c80",
+    "ticketId": "wat-b34805550dbeaf51",
+    "ticketDigest": "sha256:b34805550dbeaf519247fe9aeab97c7520681498ce6d2c069c53591596baf4a9",
     "taskId": "ATM-GOV-0341",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260821081904-codex-gpt-5.4-mini-cf5ff1de9d",
-    "claimGeneration": "lease-0f19521c845b",
-    "issuedAt": "2026-08-22T10:21:17.683Z",
-    "expiresAt": "2026-08-22T10:51:17.683Z",
-    "scopeDigest": "sha256:40860cd3a5043d8cb43124a87fed4e9499f7c8f259e66337fbfb8d9e9418b723",
+    "claimGeneration": "lease-e333dda0d373",
+    "issuedAt": "2026-08-22T10:24:51.613Z",
+    "expiresAt": "2026-08-22T10:54:51.613Z",
+    "scopeDigest": "sha256:b3426b5e4d47be3174a3aef6cd9760bf956406d9141b0eb7d74ffde070d0e447",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-22T10:21:17.683Z"
+      "selectedAt": "2026-08-22T10:24:51.613Z"
     },
     "grants": [
       {
@@ -841,6 +842,7 @@
         "values": [
           ".atm/history/evidence/ATM-GOV-0341.*",
           ".atm/history/evidence/ATM-GOV-0341.runner-sync-receipt.json",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0341/**",
           ".atm/history/tasks/ATM-GOV-0341.json",
           ".gemini/commands/atm-task-card-authoring.toml",
@@ -1064,7 +1066,7 @@
           "tests/cli/wave-exit-observer-receipt-writer.test.ts",
           "tests/cli/wave-exit-observer-receipt.test.ts"
         ],
-        "digest": "sha256:01d0b2fc3412cc306692833d2a8640636a425f0a1ed9fcfe757eba16562bcb0c"
+        "digest": "sha256:196289461eb8cd9c040c4eb6d17cf3ffee14f8eff665b61a53b085d812c6acab"
       },
       {
         "kind": "lifecycle-operation",
@@ -1110,15 +1112,15 @@
     "retainedAt": "2026-08-21T08:18:49.648Z",
     "transitionClass": "release-wip-retained"
   },
-  "owner": "codex-gpt-5.4-mini",
+  "owner": "codex-captain",
   "startedByActor": "codex-gpt-5.4-mini",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0341",
     "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
+    "scopeKey": "tasks-dc4a5d32eff0",
+    "queueId": "queue-300b5bdbff96156d",
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0341.*",
@@ -1346,28 +1348,25 @@
       "tests/cli/wave-exit-observer-receipt-writer.test.ts",
       "tests/cli/wave-exit-observer-receipt.test.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0341-produce-independent-four-plan-certification-and-governed-release.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0341-produce-independent-four-plan-certification-and-governed-release.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
-    "promptHash": "eb170a946f91f27b52ee3a4f5fab388b30f464259c3f7b1a4856c4441e6fc01c",
+    "promptHash": "2f4249b1d9ff1963bbbf0fbf2674275589094f85da728a7b785875b4e66b2a27",
     "actorId": "codex-captain",
-    "sessionId": null,
+    "sessionId": "session-20260822102451-codex-captain-ATM-GOV-0341-9b1e4a56c5",
     "laneSession": {
       "laneSessionId": "lane-20260821081904-codex-gpt-5.4-mini-cf5ff1de9d",
       "status": "adopted",
-      "source": "minted",
+      "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260821081904-codex-gpt-5.4-mini-cf5ff1de9d\""
     },
-    "createdAt": "2026-08-22T10:17:01.049Z",
+    "createdAt": "2026-08-22T10:24:53.798Z",
     "status": "active"
-  }
+  },
+  "reservedAt": "2026-08-22T10:24:51.605Z",
+  "promotedAt": "2026-08-22T10:24:51.609Z",
+  "closedAt": "2026-08-22T10:25:41.860Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260822102451-codex-captain-ATM-GOV-0341-9b1e4a56c5",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0341.closure-packet.json"
 }

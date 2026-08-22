@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0341",
-  "updatedAt": "2026-08-21T09:29:51.025Z",
+  "updatedAt": "2026-08-22T05:32:59.196Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "four-plan-independent-certificate",
@@ -26,10 +26,13 @@
     "validate:backlog-census",
     "validate:cli",
     "validate:four-plan-objectives",
+    "validate:full",
+    "validate:full -- --resume run-2026-08-21T15-27-39-398Z-42308 --validator-timeout-ms 900000",
     "validate:git-head-evidence",
     "validate:governance-projections",
     "validate:module-boundaries",
     "validate:runbook-completion-evidence",
+    "validate:standard",
     "validate:task-direction-governance",
     "validate:test-facade",
     "wave-exit-observer-receipt"
@@ -821,6 +824,84 @@
       "durationMs": 319,
       "runnerKind": "dev-source",
       "sourceCommit": "639db50783b449ca14f00819d1edd7eb81dfe538",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:ed4e25598c506fae6481512bd1b16eb9d76c8eb7c9fa9084c7ff65d8a7a6b7a5",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-21T11:41:25.011Z",
+      "startedAt": "2026-08-21T11:41:05.602Z",
+      "finishedAt": "2026-08-21T11:41:25.011Z",
+      "durationMs": 19409,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ecec3ee5ea9fcb0b6825f047cc22b553b4e1bb57",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/run-validators.ts standard --resume run-2026-08-21T14-34-07-211Z-35708",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dcc4bcfc10931b21a5d98111a404eaeb80a80813dfdbd215809628ff6fdfcfd1",
+      "stderrSha256": "sha256:1b26455faffeac3cf33b86c494aa19f03f5fb48677f867f18aa4a0a7e84b0e41",
+      "validators": [],
+      "generatedAt": "2026-08-21T15:08:32.609Z",
+      "startedAt": "2026-08-21T15:08:28.249Z",
+      "finishedAt": "2026-08-21T15:08:32.609Z",
+      "durationMs": 4360,
+      "runnerKind": "dev-source",
+      "sourceCommit": "81057db8b2696dcc9a7db2af6c61aa80e8fc5018",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:standard",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94492f1d8a90964824eacc6f092ad752632d09c68b4878e85d174619a13fdd93",
+      "stderrSha256": "sha256:641d39842256129f5b62dacab060e15990781679635b86a0b59b6b81c3a27ee5",
+      "validators": [
+        "validate:standard"
+      ],
+      "generatedAt": "2026-08-21T15:25:56.139Z",
+      "startedAt": "2026-08-21T15:09:09.286Z",
+      "finishedAt": "2026-08-21T15:25:56.139Z",
+      "durationMs": 1006853,
+      "runnerKind": "dev-source",
+      "sourceCommit": "81057db8b2696dcc9a7db2af6c61aa80e8fc5018",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:full -- --resume run-2026-08-21T15-27-39-398Z-42308 --validator-timeout-ms 900000",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:27b8af181cd6f3810f9f3215fb8eb8c355a6558762882d2fae870ecbf90e0796",
+      "stderrSha256": "sha256:8c4e14622274f2d5f6ded03b3a0a6c5f93d493e4d13a4375b1d4ac7b6192b23a",
+      "validators": [
+        "validate:full -- --resume run-2026-08-21T15-27-39-398Z-42308 --validator-timeout-ms 900000"
+      ],
+      "generatedAt": "2026-08-21T16:17:26.878Z",
+      "startedAt": "2026-08-21T16:17:21.251Z",
+      "finishedAt": "2026-08-21T16:17:26.878Z",
+      "durationMs": 5627,
+      "runnerKind": "dev-source",
+      "sourceCommit": "81057db8b2696dcc9a7db2af6c61aa80e8fc5018",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:full -- --resume run-2026-08-21T16-18-05-252Z-52172",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dc86313bcd942768434f174e1950b25dbea794a9e3b547bbec7fc3c124eadc48",
+      "stderrSha256": "sha256:3b888a3e6bc46f0f84db1bb057fa14514f71b37364ebcc65dd94b85f1a48cb2a",
+      "validators": [
+        "validate:full"
+      ],
+      "generatedAt": "2026-08-22T05:32:59.195Z",
+      "startedAt": "2026-08-22T05:32:08.004Z",
+      "finishedAt": "2026-08-22T05:32:59.195Z",
+      "durationMs": 51191,
+      "runnerKind": "dev-source",
+      "sourceCommit": "81057db8b2696dcc9a7db2af6c61aa80e8fc5018",
       "cached": false
     }
   ],
