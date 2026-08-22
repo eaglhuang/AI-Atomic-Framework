@@ -59,6 +59,10 @@ try {
   cpSync(fixtureRoot, hostRepo, { recursive: true });
   copyReleaseBundleIntoHost(release.releaseRoot, hostRepo);
   initializeGitRepository(hostRepo);
+  const baselineAdd = spawnSync('git', ['add', '.'], { cwd: hostRepo, encoding: 'utf8' });
+  assert((baselineAdd.status ?? 1) === 0, 'external golden release baseline must stage successfully');
+  const baselineCommit = spawnSync('git', ['commit', '--no-verify', '-m', 'install ATM release baseline'], { cwd: hostRepo, encoding: 'utf8' });
+  assert((baselineCommit.status ?? 1) === 0, 'external golden release baseline must commit successfully');
 
   const hostPackage = JSON.parse(readFileSync(path.join(hostRepo, 'package.json'), 'utf8'));
   assert(hostPackage.name === 'downstream-js-repo-fixture', 'release overlay must preserve downstream package.json');
@@ -71,9 +75,25 @@ try {
   assert(bootstrap.exitCode === 0, 'external golden bootstrap must exit 0');
   assert(bootstrap.parsed.ok === true, 'external golden bootstrap must report ok=true');
 
+  const chart = runAtm(hostRepo, ['atm-chart', 'render', '--cwd', '.', '--json']);
+  assert(chart.exitCode === 0, 'external golden ATMChart render must exit 0');
+  assert(chart.parsed.ok === true, 'external golden ATMChart render must report ok=true');
+
+  const welcome = runAtm(hostRepo, ['welcome', '--cwd', '.', '--json']);
+  assert(welcome.exitCode === 0, 'external golden welcome must exit 0');
+  assert(welcome.parsed.ok === true, 'external golden welcome must report ok=true');
+
   const doctor = runAtm(hostRepo, ['doctor', '--json']);
-  assert(doctor.exitCode === 0, 'external golden doctor must exit 0');
-  assert(doctor.parsed.ok === true, 'external golden doctor must report ok=true');
+  const doctorSummary = JSON.stringify({
+    exitCode: doctor.exitCode,
+    ok: doctor.parsed?.ok ?? null,
+    messages: doctor.parsed?.messages ?? [],
+    failedChecks: (doctor.parsed?.evidence?.checks ?? [])
+      .filter((check: any) => check?.ok === false)
+      .map((check: any) => ({ name: check?.name ?? null, details: check?.details ?? null }))
+  });
+  assert(doctor.exitCode === 0, `external golden doctor must exit 0: ${doctorSummary}`);
+  assert(doctor.parsed.ok === true, `external golden doctor must report ok=true: ${doctorSummary}`);
   assert(doctor.parsed.evidence.layoutVersion === 2, 'external golden doctor must report layoutVersion=2');
 
   const handoff = runAtm(hostRepo, ['handoff', 'summarize', '--task', 'BOOTSTRAP-0001', '--json']);

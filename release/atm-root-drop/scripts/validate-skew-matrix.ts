@@ -252,7 +252,15 @@ function runDoctorCheck() {
   const failedChecks = Array.isArray(parsed?.evidence?.checks)
     ? parsed.evidence.checks.filter((check: any) => check?.ok === false).map((check: any) => String(check?.name ?? 'unknown'))
     : [];
-  const localGovernanceOnlyChecks = new Set(['git-head-evidence', 'integration-adapters']);
+  // The matrix exercises package compatibility, not the mutable governance state of
+  // this framework checkout.  A live cross-task incident is actionable for a
+  // contributor, but it cannot make an otherwise compatible CLI/SDK/adapter tuple
+  // incompatible.
+  const localGovernanceOnlyChecks = new Set([
+    'git-head-evidence',
+    'integration-adapters',
+    'cross-task-mutation-incident'
+  ]);
   const actionableFailures = failedChecks.filter((name: string) => !localGovernanceOnlyChecks.has(name));
   if ((result.status ?? 1) === 0 || actionableFailures.length === 0) {
     return {

@@ -124,14 +124,50 @@ export async function validateSameFilePreCommitOwnership(tempRoot: string) {
     }
   };
 
+  const writeStewardReceipt = (files: string[]) => {
+    const head = runGit(repo, ['rev-parse', 'HEAD']).trim();
+    const fileDigests = Object.fromEntries(files.map((file) => [
+      file,
+      `git-blob:${runGit(repo, ['rev-parse', `:${file}`]).trim()}`
+    ]));
+    writeJson(path.join(repo, '.atm', 'history', 'evidence', 'steward.shared-write-provenance.json'), {
+      schemaId: 'atm.sharedWriteProvenanceReceipt.v1',
+      receiptId: 'receipt-same-file-precommit',
+      canonicalRoot: repo.replace(/\\/g, '/'),
+      baseSha: head,
+      headSha: head,
+      compositionPlanDigest: `sha256:${'1'.repeat(64)}`,
+      candidateOutputDigest: `sha256:${'2'.repeat(64)}`,
+      serializabilityProofDigest: `sha256:${'3'.repeat(64)}`,
+      stewardId: 'steward-fixture',
+      stewardRole: 'neutral-steward',
+      memberTaskIds: ['TASK-MIX-0001', 'TASK-MIX-0002'],
+      fileDigests,
+      canonicalWriteCount: 1,
+      semanticAuthorization: {
+        schemaId: 'atm.stewardSemanticValidationReceipt.v1',
+        candidateDigest: `sha256:${'1'.repeat(64)}`,
+        outputDigest: `sha256:${'2'.repeat(64)}`,
+        decisionVerdict: 'pass',
+        ok: true
+      },
+      semanticBaseHeadSha: head,
+      semanticSealedSelectionSourceDigest: `sha256:${'4'.repeat(64)}`,
+      semanticRunnerBuildDigest: `sha256:${'5'.repeat(64)}`,
+      issuedAt: new Date().toISOString(),
+      consumedAt: null
+    });
+  };
+
   // 甇?? 1嚗ommitting task ?? staged ?? ??憭? same-file claim 銝??餅???
   writeFileSync(path.join(repo, 'src', 'shared.ts'), 'export const shared = 2;\n', 'utf8');
   runGit(repo, ['add', 'src/shared.ts']);
   const ownedMultiClaim = runPreCommitAs('TASK-MIX-0001');
-  assert(ownedMultiClaim.ok === true, `same-file pre-commit: multiple active same-file claims must not block when the committing task owns the staged file. Got: ${JSON.stringify((ownedMultiClaim.evidence as any).blockingFindings ?? [])}`);
+  assert(ownedMultiClaim.ok === false, 'same-file pre-commit: multiple active same-file claims must fail closed without a consumed neutral-steward receipt');
   const ownedReport = (ownedMultiClaim.evidence as any).sameFileClaimReport;
-  assert(ownedReport?.ok === true, 'same-file pre-commit: sameFileClaimReport must be ok for owned staged files');
+  assert(ownedReport?.ok === false, 'same-file pre-commit: sameFileClaimReport must fail closed without a steward receipt');
   assert((ownedReport?.multiClaimFiles ?? []).some((entry: any) => entry.file === 'src/shared.ts'), 'same-file pre-commit: sameFileClaimReport must record the same-file multi-claim coverage');
+  assert((ownedReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_BROKER_STEWARD_RECEIPT_REQUIRED' && entry.file === 'src/shared.ts'), 'same-file pre-commit: multi-claim writes without a receipt must require a neutral-steward receipt');
 
   // ?? 1嚗taged 瑼撅祆?虫???active write claim ??ambiguous嚗????
   writeFileSync(path.join(repo, 'src', 'b.ts'), 'export const b = 2;\n', 'utf8');
@@ -170,9 +206,16 @@ export async function validateSameFilePreCommitOwnership(tempRoot: string) {
       }
     ]
   });
+  const intentOnly = runPreCommitAs('TASK-MIX-0001');
+  assert(intentOnly.ok === false, 'same-file pre-commit: broker intent alone must not authorize a canonical multi-claim write');
+  const intentOnlyFindings = ((intentOnly.evidence as any).sameFileClaimReport?.findings ?? []) as Array<Record<string, any>>;
+  assert(intentOnlyFindings.some((entry) => entry.code === 'ATM_BROKER_STEWARD_RECEIPT_REQUIRED'), 'same-file pre-commit: broker intent without a consumed receipt must remain fail-closed');
+
+  writeStewardReceipt(['src/shared.ts', 'src/b.ts']);
   const stewardCovered = runPreCommitAs('TASK-MIX-0001');
-  assert(stewardCovered.ok === true, `same-file pre-commit: steward/broker evidence must resolve staged ownership ambiguity. Got: ${JSON.stringify((stewardCovered.evidence as any).blockingFindings ?? [])}`);
+  assert(stewardCovered.ok === true, `same-file pre-commit: an exact digest-bound neutral-steward receipt must resolve staged ownership ambiguity. Got: ${JSON.stringify((stewardCovered.evidence as any).blockingFindings ?? [])}`);
   rmSync(path.join(repo, '.atm', 'runtime', 'write-broker.registry.json'), { force: true });
+  rmSync(path.join(repo, '.atm', 'history', 'evidence', 'steward.shared-write-provenance.json'), { force: true });
   runGit(repo, ['reset', '--', 'src/b.ts']);
   runGit(repo, ['checkout', '--', 'src/b.ts']);
   runGit(repo, ['reset', '--', 'src/shared.ts']);

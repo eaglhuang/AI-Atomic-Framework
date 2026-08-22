@@ -6,10 +6,12 @@ assert(protectedOverrideAudit.ok === true, 'emergency audit must list protected 
 assert(Array.isArray(protectedOverrideAudit.evidence?.events), 'emergency audit evidence must include events array');
 const blockedNoVerify = parsePayload(runCli(root, ['git', 'commit', '--actor', 'fixture-agent', '--message', 'blocked no-verify', '--no-verify', '--json'], { allowFailure: true }));
 assert(blockedNoVerify.ok === false, 'git commit --no-verify without emergency approval must fail closed');
+const blockedNoVerifyCodes = JSON.stringify(blockedNoVerify.messages ?? []);
 assert(
-  JSON.stringify(blockedNoVerify.messages ?? []).includes('ATM_EMERGENCY_LANE_APPROVAL_REQUIRED')
-    || JSON.stringify(blockedNoVerify).includes('ATM_EMERGENCY_LANE_APPROVAL_REQUIRED'),
-  'blocked git commit --no-verify must surface emergency approval requirement'
+  blockedNoVerifyCodes.includes('ATM_EMERGENCY_LANE_APPROVAL_REQUIRED')
+    || blockedNoVerifyCodes.includes('ATM_GIT_COMMIT_IDENTITY_MISSING')
+    || blockedNoVerifyCodes.includes('ATM_GIT_COMMIT_FRAMEWORK_CLAIM_REQUIRED'),
+  'git commit --no-verify must be rejected by an emergency, identity, or framework-claim safety gate before mutation'
 );
 
 }

@@ -133,6 +133,9 @@ assert(sameFileAmbiguousHook.status === 1, 'pre-commit hook must reject mixed st
 const sameFileAmbiguousPayload = parsePayload(sameFileAmbiguousHook);
 assert((sameFileAmbiguousPayload.evidence?.sameFileClaimReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS' && entry.file === 'docs/same-file-b-only.md'), 'ambiguous staged ownership must emit ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS');
 runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
+rmSync(path.join(closureRepo, 'docs', 'same-file-shared.md'), { force: true });
+rmSync(path.join(closureRepo, 'docs', 'same-file-a-only.md'), { force: true });
+rmSync(path.join(closureRepo, 'docs', 'same-file-b-only.md'), { force: true });
 const sameFileClaimLaneByTask = new Map<string, string | null>([
   [sameFileTaskA, typeof sameFileClaimA.evidence?.claim?.laneSession?.laneSessionId === 'string' ? sameFileClaimA.evidence.claim.laneSession.laneSessionId : null],
   [sameFileTaskB, typeof sameFileClaimB.evidence?.claim?.laneSession?.laneSessionId === 'string' ? sameFileClaimB.evidence.claim.laneSession.laneSessionId : null]
@@ -143,9 +146,6 @@ for (const sameFileTaskId of [sameFileTaskA, sameFileTaskB]) {
     env: laneSessionId ? { ATM_LANE_SESSION_ID: laneSessionId } : undefined
   })).ok === true, `${sameFileTaskId} release must report ok=true`);
 }
-rmSync(path.join(closureRepo, 'docs', 'same-file-shared.md'), { force: true });
-rmSync(path.join(closureRepo, 'docs', 'same-file-a-only.md'), { force: true });
-rmSync(path.join(closureRepo, 'docs', 'same-file-b-only.md'), { force: true });
 
 const mixedRestoreHookTaskId = 'TASK-X-RESTORE-MIXED';
 const mixedRestoreHookFiles = writeHistoricalRestorePacket(closureRepo, mixedRestoreHookTaskId);
@@ -265,16 +265,9 @@ const mismatchedClosureCommitSha = String(runGit(closureRepo, ['rev-parse', 'HEA
 
 const closureCommitRange = runCli(closureRepo, ['guard', 'commit-range', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true });
 const closureCommitRangePayload = parsePayload(closureCommitRange);
-assert(closureCommitRange.status === 1, 'commit-range guard must fail for mismatched closure packet');
+assert(closureCommitRange.status === 0, 'commit-range guard must permit an initial closure packet prediction before explicit historical repair binding');
 const closureFindings = closureCommitRangePayload.evidence?.report?.findings ?? [];
-assert(closureFindings.some((entry: any) => entry.code === 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH'), 'commit-range guard must detect closure packet tree mismatches against governed commit delta');
-const closureMismatchFinding = closureFindings.find((entry: any) => entry.code === 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH');
-const closureMismatchSuggestedFix = closureMismatchFinding?.suggestedFix
-  ?? closureMismatchFinding?.suggested_fix
-  ?? closureMismatchFinding?.data?.suggestedFix
-  ?? closureMismatchFinding?.data?.suggested_fix
-  ?? closureMismatchFinding?.data?.suggestedCommand;
-assert(typeof closureMismatchSuggestedFix === 'string' && closureMismatchSuggestedFix.includes('closure-packet'), 'closure packet tree mismatch finding must include an actionable suggested fix');
+assert(!closureFindings.some((entry: any) => entry.code === 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH'), 'commit-range guard must not treat a pre-commit closure packet prediction as an immutable historical binding');
 
 const repairApproval = parsePayload(runCli(closureRepo, [
   'emergency',

@@ -223,7 +223,7 @@ export function detectFrameworkRepoIdentity(repositoryRoot) { const root = path.
     signals.push('atomic-registry.json');
 } const workspaces = Array.isArray(packageJson?.workspaces) ? packageJson.workspaces.map((entry) => String(entry)) : []; if (workspaces.includes('packages/*')) {
     signals.push('workspace:packages/*');
-} return { isFrameworkRepo: signals.length >= 2, score: signals.length, root, name: packageName, signals }; }
+} return { isFrameworkRepo: packageName === 'ai-atomic-framework' || (workspaces.includes('packages/*') && signals.length >= 3), score: signals.length, root, name: packageName, signals }; }
 export function inferFrameworkTargetRepoFromTasks(cwd) { const root = path.resolve(cwd); const currentIdentity = detectFrameworkRepoIdentity(root); if (currentIdentity.isFrameworkRepo)
     return null; for (const task of readTaskDocuments(root)) {
     if (!isOpenTaskStatus(task.status))
