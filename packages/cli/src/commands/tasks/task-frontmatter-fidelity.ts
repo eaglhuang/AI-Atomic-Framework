@@ -73,6 +73,11 @@ const GOVERNANCE_FIELD_CONTRACTS: readonly GovernanceFieldContract[] = [
       { declarationKeys: ['phaseOwner', 'phase_owner'], recordKey: 'phaseOwner' }
     ]
   },
+  // ATM-GOV-0406: a typed dependency edge carries the proof that decides
+  // whether another lane freezes. Dropping it on import would silently restore
+  // legacy semantics to a card that opted out of them.
+  { declarationKeys: ['dependencySemantics', 'dependency_semantics'], recordKey: 'dependencySemantics' },
+  { declarationKeys: ['dependencies', 'depends_on', 'blocked_by'], recordKey: 'dependencies' },
   { declarationKeys: ['atomizationImpact', 'atomization_impact'], recordKey: 'atomizationImpact' },
   { declarationKeys: ['testContributions', 'test_contributions'], recordKey: 'testContributions' },
   { declarationKeys: ['requiredTestCaseIds', 'required_test_case_ids'], recordKey: 'requiredTestCaseIds' },

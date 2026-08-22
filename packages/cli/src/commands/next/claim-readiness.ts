@@ -74,6 +74,20 @@ export function extractClaimIntentFlag(argv: readonly string[]): { argv: string[
   return { argv: remaining, claimIntent, autoIntent };
 }
 
+function describeDependencyBlocker(taskId: string, blocker: TaskClaimDependencyBlocker): string {
+  if (blocker.status === 'hard-causal-producer-output-pending') {
+    const output = blocker.hardCausalEdge?.producerOutput ?? 'its declared producer output';
+    return `Task ${taskId} is blocked until ${output} exists; the hard-causal dependency on ${blocker.taskId} is answered by that output, not by the card closing.`;
+  }
+  if (blocker.status === 'hard-causal-proof-unprovable') {
+    return `Task ${taskId} declares a blocking dependency on ${blocker.taskId} that does not state the six hard-causal facts, so the edge fails closed until the declaration is repaired.`;
+  }
+  if (blocker.status === 'source-done-governance-incomplete') {
+    return `Task ${taskId} is blocked because prerequisite ${blocker.taskId} is source-done but not governably closed.`;
+  }
+  return `Task ${taskId} is blocked until prerequisite task(s) close.`;
+}
+
 export function diagnoseClaimReadinessForTasks(
   cwd: string,
   tasks: readonly ClaimReadinessTaskSummary[],
@@ -134,9 +148,10 @@ export function diagnoseClaimReadinessForTasks(
         format: task.format,
         claimable: false,
         blockerCode: 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED',
-        blockerSummary: firstBlocker.status === 'source-done-governance-incomplete'
-          ? `Task ${task.workItemId} is blocked because prerequisite ${firstBlocker.taskId} is source-done but not governably closed.`
-          : `Task ${task.workItemId} is blocked until prerequisite task(s) close.`,
+        // ATM-GOV-0406: a typed hard-causal edge is answered by a producer
+        // output, not by a card closing, so the refusal has to say which of the
+        // two it is or the operator waits on the wrong thing.
+        blockerSummary: describeDependencyBlocker(task.workItemId, firstBlocker),
         requiredCommand: firstBlocker.requiredCommand
           ?? (firstBlocker.status === 'incomplete-closeout' || firstBlocker.status === 'source-done-governance-incomplete'
             ? `node atm.mjs tasks status --task ${firstBlocker.taskId} --residue --json`

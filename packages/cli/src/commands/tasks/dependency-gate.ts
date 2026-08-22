@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { deriveAtmScopeClass, type AtmFileScopeReport } from '../../../../core/src/broker/atm-core-scope.ts';
 import { taskPathFor } from './task-file-io-helpers.ts';
 import { parseYamlList } from './task-import-validators.ts';
@@ -15,7 +16,384 @@ export type TaskClaimDependencyBlocker = TaskDependencyCloseoutBlocker & {
   readonly scopeClass?: AtmFileScopeReport;
   readonly codeFilesBlocked?: readonly string[];
   readonly allowedDependencyBlockedRoute?: 'docs-ledger-planning';
+  readonly relation?: TaskDependencyRelation | 'legacy-untyped';
+  readonly hardCausalEdge?: TaskDependencyEdge;
 };
+
+/**
+ * ATM-GOV-0406 — Plan 4.1 proven hard-causal dependency contract.
+ *
+ * A declared dependency is expensive: it freezes a lane that could otherwise
+ * run in parallel. The contract below exists so that cost is only paid where it
+ * is earned. An edge blocks a claim when, and only when, six facts are all
+ * stated about it — a named producer output, a named consumer operation, that
+ * the output's *value* changes the consumer's correct result, that no
+ * substitute (stable interface, fixture, proposal-first, late binding,
+ * deferred compose) removes the need, that the consumer's result is undefined
+ * without the output, and an executable negative control.
+ *
+ * Every other relation a card might want to record — validation, publication,
+ * observation, ordering preference, file or atom overlap — stays declarable and
+ * stays non-blocking. Overlap is the Broker's problem, handled proposal-first
+ * at the write boundary; it is not a reason to freeze a whole task.
+ *
+ * Classification reads the declaration and nothing else: no task id, family,
+ * actor, date, or path participates in the decision.
+ */
+export const HARD_CAUSAL_DEPENDENCY_SEMANTICS = 'hard-causal/v1';
+
+export const HARD_CAUSAL_FACT_IDS = [
+  'producer-output',
+  'consumer-operation',
+  'output-value-changes-consumer-result',
+  'no-substitute-available',
+  'result-undefined-without-output',
+  'executable-negative-control'
+] as const;
+
+export type HardCausalFactId = (typeof HARD_CAUSAL_FACT_IDS)[number];
+
+export const TASK_DEPENDENCY_RELATIONS = [
+  'hard-causal',
+  'validation',
+  'publication',
+  'observation',
+  'soft-order',
+  'file-overlap',
+  'atom-overlap'
+] as const;
+
+export type TaskDependencyRelation = (typeof TASK_DEPENDENCY_RELATIONS)[number];
+
+/** The five substitutes that, if any is available, defeat fact four. */
+export const HARD_CAUSAL_SUBSTITUTE_KINDS = [
+  'stableInterface',
+  'fixture',
+  'proposalFirst',
+  'lateBinding',
+  'deferredCompose'
+] as const;
+
+export interface TaskDependencyEdge {
+  readonly taskId: string;
+  readonly relation: TaskDependencyRelation | 'legacy-untyped' | 'unknown';
+  /** How this edge is admitted: by the legacy status gate, or by typed proof. */
+  readonly admissionMode: 'legacy-status-gate' | 'typed-hard-causal' | 'typed-non-blocking';
+  readonly provenFacts: readonly HardCausalFactId[];
+  readonly missingFacts: readonly HardCausalFactId[];
+  readonly contradictions: readonly string[];
+  readonly producerOutput: string | null;
+  readonly producerOutputSatisfied: boolean;
+  readonly negativeControlCommand: string | null;
+  /** True only when all six facts hold and the producer output is not yet sealed. */
+  readonly blockingCandidate: boolean;
+}
+
+export interface TaskDependencyClassification {
+  readonly schemaId: 'atm.taskDependencyClassification.v1';
+  readonly semantics: typeof HARD_CAUSAL_DEPENDENCY_SEMANTICS | 'legacy';
+  readonly edges: readonly TaskDependencyEdge[];
+}
+
+export interface HardCausalDependencyDiagnostic {
+  readonly code: string;
+  readonly severity: 'error';
+  readonly taskId: string;
+  readonly dependencyTaskId: string;
+  readonly field: string;
+  readonly message: string;
+  readonly requiredCommand: string;
+}
+
+export interface HardCausalDependencyImportValidation {
+  readonly schemaId: 'atm.hardCausalDependencyImportValidation.v1';
+  readonly ok: boolean;
+  readonly semantics: typeof HARD_CAUSAL_DEPENDENCY_SEMANTICS | 'legacy';
+  readonly edges: readonly TaskDependencyEdge[];
+  readonly diagnostics: readonly HardCausalDependencyDiagnostic[];
+}
+
+export const TASK_DEPENDENCY_HARD_PROOF_INCOMPLETE_CODE = 'ATM_TASK_DEPENDENCY_HARD_PROOF_INCOMPLETE';
+export const TASK_DEPENDENCY_HARD_PROOF_CONTRADICTORY_CODE = 'ATM_TASK_DEPENDENCY_HARD_PROOF_CONTRADICTORY';
+export const TASK_DEPENDENCY_UNTYPED_IN_TYPED_CARD_CODE = 'ATM_TASK_DEPENDENCY_UNTYPED_IN_TYPED_CARD';
+export const TASK_DEPENDENCY_RELATION_UNKNOWN_CODE = 'ATM_TASK_DEPENDENCY_RELATION_UNKNOWN';
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function nonEmptyString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+interface FactVerdict {
+  readonly proven: boolean;
+  readonly missing: boolean;
+  readonly contradiction: string | null;
+}
+
+const PROVEN: FactVerdict = { proven: true, missing: false, contradiction: null };
+const MISSING: FactVerdict = { proven: false, missing: true, contradiction: null };
+
+function denied(contradiction: string): FactVerdict {
+  return { proven: false, missing: false, contradiction };
+}
+
+/** A stated string fact: absent is missing, present but blank is a denial. */
+function judgeStringFact(raw: unknown, field: string): FactVerdict {
+  if (raw === undefined || raw === null) return MISSING;
+  return nonEmptyString(raw) ? PROVEN : denied(`${field} is declared but empty`);
+}
+
+/** A stated boolean fact: absent is missing, present and false is a denial. */
+function judgeAssertedFact(raw: unknown, field: string): FactVerdict {
+  if (raw === undefined || raw === null) return MISSING;
+  if (raw === true) return PROVEN;
+  if (raw === false) return denied(`${field} is declared false, so this edge is not hard-causal`);
+  return denied(`${field} must be a boolean`);
+}
+
+function judgeSubstitutesFact(raw: unknown): FactVerdict {
+  const record = asRecord(raw);
+  if (!record) return MISSING;
+  const available: string[] = [];
+  for (const kind of HARD_CAUSAL_SUBSTITUTE_KINDS) {
+    const value = record[kind];
+    if (value === undefined || value === null) return MISSING;
+    if (value === true) available.push(kind);
+    else if (value !== false) return denied(`substitutesAvailable.${kind} must be a boolean`);
+  }
+  return available.length === 0
+    ? PROVEN
+    : denied(`a substitute is available (${available.join(', ')}), so the dependency is not hard-causal`);
+}
+
+function judgeNegativeControlFact(raw: unknown): FactVerdict {
+  const record = asRecord(raw);
+  if (!record) return MISSING;
+  if (!nonEmptyString(record.command)) return denied('negativeControl.command is declared but empty');
+  if (record.blocksBeforeProducerOutput !== true) {
+    return denied('negativeControl must block before the producer output exists');
+  }
+  if (record.admitsAfterProducerOutput !== true) {
+    return denied('negativeControl must admit once the producer output exists');
+  }
+  return PROVEN;
+}
+
+function judgeHardCausalProof(proof: Record<string, unknown> | null): {
+  provenFacts: HardCausalFactId[];
+  missingFacts: HardCausalFactId[];
+  contradictions: string[];
+} {
+  const provenFacts: HardCausalFactId[] = [];
+  const missingFacts: HardCausalFactId[] = [];
+  const contradictions: string[] = [];
+  const verdicts: readonly (readonly [HardCausalFactId, FactVerdict])[] = [
+    ['producer-output', judgeStringFact(proof?.producerOutput, 'producerOutput')],
+    ['consumer-operation', judgeStringFact(proof?.consumerOperation, 'consumerOperation')],
+    [
+      'output-value-changes-consumer-result',
+      judgeAssertedFact(proof?.outputValueChangesConsumerResult, 'outputValueChangesConsumerResult')
+    ],
+    ['no-substitute-available', judgeSubstitutesFact(proof?.substitutesAvailable)],
+    ['result-undefined-without-output', judgeAssertedFact(proof?.resultUndefinedWithoutOutput, 'resultUndefinedWithoutOutput')],
+    ['executable-negative-control', judgeNegativeControlFact(proof?.negativeControl)]
+  ];
+  for (const [factId, verdict] of verdicts) {
+    if (verdict.proven) provenFacts.push(factId);
+    else if (verdict.missing) missingFacts.push(factId);
+    else contradictions.push(`${factId}: ${verdict.contradiction}`);
+  }
+  return { provenFacts, missingFacts, contradictions };
+}
+
+/**
+ * A hard-causal edge is answered by the producer's *output*, not by the
+ * producer's card. Once the named output exists the consumer has what it needs,
+ * which is what makes the negative control executable in both directions.
+ */
+function isProducerOutputSealed(cwd: string, producerOutput: string | null): boolean {
+  if (!producerOutput) return false;
+  return existsSync(path.resolve(cwd, producerOutput));
+}
+
+function classifyDeclaredEdge(
+  declaration: unknown,
+  context: { readonly typed: boolean; readonly cwd: string }
+): TaskDependencyEdge {
+  const legacyId = nonEmptyString(declaration);
+  if (legacyId) {
+    const untypedInTypedCard = context.typed;
+    return {
+      taskId: legacyId,
+      relation: 'legacy-untyped',
+      admissionMode: 'legacy-status-gate',
+      provenFacts: [],
+      missingFacts: [],
+      contradictions: untypedInTypedCard
+        ? ['relation: a card on typed dependency semantics may not declare an untyped dependency']
+        : [],
+      producerOutput: null,
+      producerOutputSatisfied: false,
+      negativeControlCommand: null,
+      blockingCandidate: false
+    };
+  }
+  const record = asRecord(declaration);
+  const taskId = nonEmptyString(record?.taskId ?? record?.workItemId ?? record?.id) ?? '';
+  const declaredRelation = nonEmptyString(record?.relation);
+  const known = TASK_DEPENDENCY_RELATIONS.find((entry) => entry === declaredRelation) ?? null;
+  const proof = asRecord(record?.hardCausalProof);
+  if (!known) {
+    return {
+      taskId,
+      relation: 'unknown',
+      admissionMode: 'typed-non-blocking',
+      provenFacts: [],
+      missingFacts: [],
+      contradictions: [`relation: ${declaredRelation ?? '(absent)'} is not a declared dependency relation`],
+      producerOutput: null,
+      producerOutputSatisfied: false,
+      negativeControlCommand: null,
+      blockingCandidate: false
+    };
+  }
+  if (known !== 'hard-causal') {
+    return {
+      taskId,
+      relation: known,
+      admissionMode: 'typed-non-blocking',
+      provenFacts: [],
+      missingFacts: [],
+      contradictions: proof
+        ? [`relation: ${known} carries a hard-causal proof, so the declaration states two different things about this edge`]
+        : [],
+      producerOutput: null,
+      producerOutputSatisfied: false,
+      negativeControlCommand: null,
+      blockingCandidate: false
+    };
+  }
+  const { provenFacts, missingFacts, contradictions } = judgeHardCausalProof(proof);
+  const producerOutput = nonEmptyString(proof?.producerOutput);
+  const producerOutputSatisfied = isProducerOutputSealed(context.cwd, producerOutput);
+  const complete = provenFacts.length === HARD_CAUSAL_FACT_IDS.length && contradictions.length === 0;
+  return {
+    taskId,
+    relation: 'hard-causal',
+    admissionMode: 'typed-hard-causal',
+    provenFacts,
+    missingFacts,
+    contradictions,
+    producerOutput,
+    producerOutputSatisfied,
+    negativeControlCommand: nonEmptyString(asRecord(proof?.negativeControl)?.command),
+    blockingCandidate: complete && !producerOutputSatisfied
+  };
+}
+
+function readDeclaredDependencyEntries(taskDocument: Record<string, unknown>): readonly unknown[] {
+  const raw = taskDocument.dependencies ?? taskDocument.depends_on ?? taskDocument.blocked_by;
+  if (Array.isArray(raw)) return raw;
+  return parseYamlList(raw);
+}
+
+/**
+ * Classify every declared dependency edge of one task document.
+ *
+ * Cards that have not opted into typed semantics classify as `legacy`, and the
+ * legacy status gate keeps deciding them exactly as before — an audit has to
+ * happen before behavior changes, not as a side effect of shipping this.
+ */
+export function classifyTaskDependencyEdges(
+  taskDocument: Record<string, unknown>,
+  options: { readonly cwd?: string } = {}
+): TaskDependencyClassification {
+  const typed = nonEmptyString(taskDocument.dependencySemantics) === HARD_CAUSAL_DEPENDENCY_SEMANTICS;
+  const cwd = options.cwd ?? process.cwd();
+  return {
+    schemaId: 'atm.taskDependencyClassification.v1',
+    semantics: typed ? HARD_CAUSAL_DEPENDENCY_SEMANTICS : 'legacy',
+    edges: readDeclaredDependencyEntries(taskDocument).map(
+      (declaration) => classifyDeclaredEdge(declaration, { typed, cwd })
+    )
+  };
+}
+
+function recoveryCommandFor(taskId: string): string {
+  return `node atm.mjs tasks show --task ${taskId} --json`;
+}
+
+/**
+ * The import boundary for the contract.
+ *
+ * Import is where a declaration becomes authority, so an edge that cannot prove
+ * itself must be refused here rather than admitted with a reduced meaning that
+ * some later consumer reinterprets. Missing and contradicted facts are reported
+ * apart because they need different repairs.
+ */
+export function validateHardCausalDependencyImport(input: {
+  readonly taskId: string;
+  readonly taskDocument: Record<string, unknown>;
+  readonly cwd?: string;
+}): HardCausalDependencyImportValidation {
+  const classification = classifyTaskDependencyEdges(input.taskDocument, { cwd: input.cwd });
+  const diagnostics: HardCausalDependencyDiagnostic[] = [];
+  for (const edge of classification.edges) {
+    const dependencyTaskId = edge.taskId || '(unnamed)';
+    const base = {
+      severity: 'error' as const,
+      taskId: input.taskId,
+      dependencyTaskId,
+      requiredCommand: recoveryCommandFor(input.taskId)
+    };
+    if (edge.relation === 'legacy-untyped' && edge.contradictions.length > 0) {
+      diagnostics.push({
+        ...base,
+        code: TASK_DEPENDENCY_UNTYPED_IN_TYPED_CARD_CODE,
+        field: 'dependencies[]',
+        message: `Dependency ${dependencyTaskId} is untyped on a card declaring ${HARD_CAUSAL_DEPENDENCY_SEMANTICS}; type the edge instead of relying on legacy fallback.`
+      });
+      continue;
+    }
+    if (edge.relation === 'unknown') {
+      diagnostics.push({
+        ...base,
+        code: TASK_DEPENDENCY_RELATION_UNKNOWN_CODE,
+        field: 'dependencies[].relation',
+        message: `Dependency ${dependencyTaskId} declares no known relation; use one of ${TASK_DEPENDENCY_RELATIONS.join(', ')}.`
+      });
+      continue;
+    }
+    if (edge.contradictions.length > 0) {
+      diagnostics.push({
+        ...base,
+        code: TASK_DEPENDENCY_HARD_PROOF_CONTRADICTORY_CODE,
+        field: 'dependencies[].hardCausalProof',
+        message: `Dependency ${dependencyTaskId} contradicts its own declaration: ${edge.contradictions.join('; ')}.`
+      });
+      continue;
+    }
+    if (edge.missingFacts.length > 0) {
+      diagnostics.push({
+        ...base,
+        code: TASK_DEPENDENCY_HARD_PROOF_INCOMPLETE_CODE,
+        field: 'dependencies[].hardCausalProof',
+        message: `Dependency ${dependencyTaskId} is declared hard-causal but does not state: ${edge.missingFacts.join(', ')}.`
+      });
+    }
+  }
+  return {
+    schemaId: 'atm.hardCausalDependencyImportValidation.v1',
+    ok: diagnostics.length === 0,
+    semantics: classification.semantics,
+    edges: classification.edges,
+    diagnostics
+  };
+}
 
 export interface TaskDependencyRouteSummary {
   readonly workItemId: string;
@@ -48,12 +426,52 @@ function isDependencyStatusClosed(status: unknown): boolean {
   return normalized === 'done' || normalized === 'verified';
 }
 
+/**
+ * The claim gate for a card on typed semantics.
+ *
+ * Only a hard-causal edge can reach here as a blocker, and only while its
+ * producer output is still unsealed. An edge that claims to be hard-causal but
+ * cannot state all six facts fails closed rather than opening: import refuses
+ * such a declaration, so one reaching a live ledger means the record was
+ * written outside the contract and its meaning is unknown.
+ */
+function findTypedClaimDependencyBlockers(
+  cwd: string,
+  taskId: string,
+  classification: TaskDependencyClassification
+): TaskClaimDependencyBlocker[] {
+  const blockers: TaskClaimDependencyBlocker[] = [];
+  for (const edge of classification.edges) {
+    if (!edge.taskId || edge.taskId === taskId) continue;
+    const unprovable = edge.relation === 'legacy-untyped'
+      || (edge.relation === 'hard-causal' && (edge.missingFacts.length > 0 || edge.contradictions.length > 0));
+    if (!edge.blockingCandidate && !unprovable) continue;
+    blockers.push({
+      taskId: edge.taskId,
+      status: unprovable ? 'hard-causal-proof-unprovable' : 'hard-causal-producer-output-pending',
+      taskPath: taskPathFor(cwd, edge.taskId),
+      blockedByDependency: true,
+      dependencyTaskIds: [edge.taskId],
+      relation: edge.relation === 'unknown' ? 'legacy-untyped' : edge.relation,
+      hardCausalEdge: edge,
+      requiredCommand: unprovable
+        ? `node atm.mjs tasks show --task ${taskId} --json`
+        : edge.negativeControlCommand ?? `node atm.mjs tasks status --task ${edge.taskId} --json`
+    } as TaskClaimDependencyBlocker);
+  }
+  return blockers;
+}
+
 export function findTaskClaimDependencyBlockers(
   cwd: string,
   taskId: string,
   taskDocument: Record<string, unknown>,
   options: TaskClaimDependencyGateOptions = {}
 ): TaskClaimDependencyBlocker[] {
+  const classification = classifyTaskDependencyEdges(taskDocument, { cwd });
+  if (classification.semantics === HARD_CAUSAL_DEPENDENCY_SEMANTICS) {
+    return findTypedClaimDependencyBlockers(cwd, taskId, classification);
+  }
   const declaredDependencies = declaredDependenciesFor(taskDocument);
   if (declaredDependencies.length === 0) {
     return [];

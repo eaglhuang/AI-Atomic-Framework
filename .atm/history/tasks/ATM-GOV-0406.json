@@ -1,0 +1,346 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0406",
+  "title": "Define and enforce proven hard causal dependencies",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: Contract represents all six mandatory hard-causal facts.",
+    "ACC-2: Import rejects missing or contradictory hard proof with precise recovery and no task/actor/date/path special case.",
+    "ACC-3: Validation, publication, observation and soft-order relations do not block claim.",
+    "ACC-4: File/atom overlap alone reaches Broker proposal-first/arbitration without becoming whole-task dependency; unauthorized mutation and compose stay fail-closed.",
+    "ACC-5: Legacy families retain legacy behavior until audited; opted-in cards cannot silently fall back.",
+    "ACC-6: Negative control blocks before producer output and admits after sealed output exists."
+  ],
+  "deliverables": [
+    "schemas/governance/work-item.schema.json",
+    "packages/cli/src/commands/tasks/dependency-gate.ts",
+    "packages/cli/src/commands/tasks/dependency-gates.ts",
+    "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+    "packages/cli/src/commands/next/claim-readiness.ts",
+    "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+    "tests/cli/hard-causal-dependency-import.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/governance/work-item.schema.json",
+    "packages/cli/src/commands/tasks/dependency-gate.ts",
+    "packages/cli/src/commands/tasks/dependency-gates.ts",
+    "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+    "packages/cli/src/commands/next/claim-readiness.ts",
+    "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+    "tests/cli/hard-causal-dependency-import.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+    "node --strip-types tests/cli/hard-causal-dependency-import.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-opt-in-semantics-and-restore-legacy-gate",
+  "rollbackNotes": "Preserve ledgers and evidence; revert only opted-in parsing and admission if controls fail.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-dependency-gate",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.hard-causal-dependency-contract",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/tasks/dependency-gate.ts",
+        "disposition": "inline",
+        "inlineReason": "Existing dependency gate owns classification and admission authority."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md",
+    "sectionTitle": "ATM-GOV-0406",
+    "headingLine": 110,
+    "hash": "d38a699326811b09",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:d38a699326811b09195bdecfd3424e09e8f41258b45b9dd9f04ef38737089e98",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-22T15:38:21.876Z"
+    }
+  },
+  "importedAt": "2026-08-22T15:38:21.876Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Plan 4.1 six-part hard-causal definition is sealed.",
+      "Existing dependency-gate and claim-readiness fixtures are available."
+    ],
+    "softRelations": [
+      "ATM-GOV-0407"
+    ],
+    "changedPublicSeams": [
+      "hard-causal-dependency-contract",
+      "task-import-dependency-diagnostics",
+      "claim-readiness-dependency-gate"
+    ],
+    "causalImpactEdges": [
+      "typed-proof-controls-claim-blocking",
+      "incomplete-hard-proof-fails-import",
+      "non-hard-relations-remain-claimable"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-plan-4-1-definition",
+      "legacy-dependency-fixtures"
+    ],
+    "validatorReferences": [
+      "test_gov_hard_causal_contract_0406",
+      "test_gov_nonhard_claim_admission_0406",
+      "test_gov_legacy_boundary_0406"
+    ],
+    "phaseOwner": "plan-4-1-contract-lane"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_gov_hard_causal_contract_0406",
+      "targetGroupId": "null",
+      "semanticKey": "six_part_hard_causal_contract",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "typed-proof-controls-claim-blocking",
+        "incomplete-hard-proof-fails-import"
+      ],
+      "expectedRedPredicate": "An incomplete or false hard-causal declaration blocks a claim or passes import.",
+      "contributionResourceKey": "hard-causal-fixtures",
+      "responsibility": "task-required",
+      "dependencyEdge": "dependency-proof-to-claim-gate",
+      "contractEdge": "hard-causal-dependency-contract",
+      "resourceKey": "dependency-proof"
+    },
+    {
+      "caseId": "test_gov_nonhard_claim_admission_0406",
+      "targetGroupId": "null",
+      "semanticKey": "nonhard_relations_remain_claimable",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "non-hard-relations-remain-claimable"
+      ],
+      "expectedRedPredicate": "A validation, publication, observation, soft-order, file or atom relation freezes the whole task.",
+      "contributionResourceKey": "typed-relation-fixtures",
+      "responsibility": "task-required",
+      "dependencyEdge": "relation-type-to-lifecycle-gate",
+      "contractEdge": "claim-readiness-dependency-gate",
+      "resourceKey": "task-ledger"
+    },
+    {
+      "caseId": "test_gov_legacy_boundary_0406",
+      "targetGroupId": "null",
+      "semanticKey": "explicit_semantics_migration_boundary",
+      "coversAcceptance": [
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "typed-proof-controls-claim-blocking"
+      ],
+      "expectedRedPredicate": "An unaudited legacy family silently changes behavior or an opted-in card falls back to untyped semantics.",
+      "contributionResourceKey": "migration-fixtures",
+      "responsibility": "task-required",
+      "dependencyEdge": "semantics-version-to-gate-mode",
+      "contractEdge": "task-import-dependency-diagnostics",
+      "resourceKey": "work-item-schema"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_gov_hard_causal_contract_0406",
+    "test_gov_nonhard_claim_admission_0406",
+    "test_gov_legacy_boundary_0406"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-22T16-14-52-952Z-renew-88433d38b744",
+  "lastTransitionAt": "2026-08-22T16:14:52.952Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-008",
+  "reservedAt": "2026-08-22T15:56:38.703Z",
+  "promotedAt": "2026-08-22T15:56:38.709Z",
+  "claim": {
+    "actorId": "claude-008",
+    "leaseId": "lease-3763d7bed6f2",
+    "claimedAt": "2026-08-22T15:56:38.716Z",
+    "heartbeatAt": "2026-08-22T16:14:52.170Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0406.json",
+      "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "packages/cli/src/commands/tasks/dependency-gate.ts",
+      "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "schemas/governance/work-item.schema.json",
+      "tests/cli/hard-causal-dependency-import.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260822155638-claude-008-987687d797",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155638-claude-008-987687d797\""
+    }
+  },
+  "startedAt": "2026-08-22T15:56:38.716Z",
+  "startedByActor": "claude-008",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d9adaccd7b2be155",
+    "ticketDigest": "sha256:d9adaccd7b2be155f761e46ddd64a78ce6d6f556598591ef28a64be9f7d781a5",
+    "taskId": "ATM-GOV-0406",
+    "origin": "claim",
+    "actorId": "claude-008",
+    "laneSessionId": "lane-20260822155638-claude-008-987687d797",
+    "claimGeneration": "lease-3763d7bed6f2",
+    "issuedAt": "2026-08-22T16:14:52.170Z",
+    "expiresAt": "2026-08-22T16:44:52.170Z",
+    "scopeDigest": "sha256:418617658743ba1ec3c6da9dfa0c7090d8909531647f904d50105a2827708180",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-22T16:14:52.170Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0406.*",
+          ".atm/history/task-events/ATM-GOV-0406/**",
+          ".atm/history/tasks/ATM-GOV-0406.json",
+          "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+          "packages/cli/src/commands/next/claim-readiness.ts",
+          "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+          "packages/cli/src/commands/tasks/dependency-gate.ts",
+          "packages/cli/src/commands/tasks/dependency-gates.ts",
+          "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+          "schemas/governance/work-item.schema.json",
+          "tests/cli/hard-causal-dependency-import.test.ts"
+        ],
+        "digest": "sha256:7769981b7b2c277378d92785ab5d06f4a41134f313e6ad4a320a7838cb1266a4"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260822155638-claude-008-ATM-GOV-0406-2236dc5a8f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0406",
+    "batchId": null,
+    "scopeKey": "tasks-dc4a5d32eff0",
+    "queueId": "queue-300b5bdbff96156d",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0406.*",
+      ".atm/history/task-events/ATM-GOV-0406/**",
+      ".atm/history/tasks/ATM-GOV-0406.json",
+      "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "packages/cli/src/commands/tasks/dependency-gate.ts",
+      "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "schemas/governance/work-item.schema.json",
+      "tests/cli/hard-causal-dependency-import.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4dd2c7d3df7b45be54259e0834b0f49c829bddde07ff9b3745162d42f0aaf356",
+    "actorId": "claude-008",
+    "sessionId": "session-20260822155638-claude-008-ATM-GOV-0406-2236dc5a8f",
+    "laneSession": {
+      "laneSessionId": "lane-20260822155638-claude-008-987687d797",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155638-claude-008-987687d797\""
+    },
+    "createdAt": "2026-08-22T15:56:42.964Z",
+    "status": "active"
+  }
+}
