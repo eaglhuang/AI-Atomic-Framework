@@ -495,6 +495,26 @@ export function writeRunnerSyncReceipt(input: {
   const absolute = path.join(input.cwd, relative);
   mkdirSync(path.dirname(absolute), { recursive: true });
   writeJsonWithRetry({ filePath: absolute, value: receipt });
+
+  // A coalesced publication is shared work, but closure remains task-specific.
+  // Persist one immutable receipt per durable queue member so every task can
+  // independently prove attribution and close without rebuilding the runner.
+  const requests = input.admission.runnerSyncSteward?.requests ?? [];
+  for (const taskId of input.admission.queueHeadOwnership.waitingTasks) {
+    if (taskId === receipt.taskId || taskId.startsWith('ATM-FRAMEWORK-TEMP-')) continue;
+    const taskLedgerPath = path.join(input.cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (!existsSync(taskLedgerPath)) continue;
+    const memberActorId = requests.find((request) => request.taskId === taskId)?.actorId ?? input.actorId;
+    const memberReceipt = buildRunnerSyncReceipt({
+      ...input,
+      actorId: memberActorId,
+      linkedTaskIds,
+      receiptTaskId: taskId
+    });
+    const memberPath = path.join(input.cwd, '.atm', 'history', 'evidence', `${taskId}.runner-sync-receipt.json`);
+    mkdirSync(path.dirname(memberPath), { recursive: true });
+    writeJsonWithRetry({ filePath: memberPath, value: memberReceipt });
+  }
   return relative.replace(/\\/g, '/');
 }
 
