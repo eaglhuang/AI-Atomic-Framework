@@ -1,11 +1,12 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0407",
-  "updatedAt": "2026-08-23T02:54:41.024Z",
+  "updatedAt": "2026-08-23T07:15:25.548Z",
   "updatedBy": "cursor-captain",
   "freshValidationPasses": [
     "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
     "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+    "typecheck",
     "validate:cross-editor-parallel-proof"
   ],
   "staleValidationPasses": [],
@@ -104,6 +105,70 @@
       "durationMs": 1023,
       "runnerKind": "dev-source",
       "sourceCommit": "9f066f5d8572a1f2a663c7f6c1ae7c1aaffd5fb8",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4628e8236c6fc32cba1d6d84118ec6e478ecb6ebc2a1621bb5ea002aa1a0f4e4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/task-dependency-semantics-census.test.ts"
+      ],
+      "generatedAt": "2026-08-23T07:10:35.434Z",
+      "startedAt": "2026-08-23T07:10:35.024Z",
+      "finishedAt": "2026-08-23T07:10:35.434Z",
+      "durationMs": 410,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "f5e00d3c9f0a6aab315479bbd88771db9597a32a",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19e3daca89a608f0317ec63c7e440d5de9788b491ce3c7a15eab91893dc515e3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts"
+      ],
+      "generatedAt": "2026-08-23T07:10:40.722Z",
+      "startedAt": "2026-08-23T07:10:38.922Z",
+      "finishedAt": "2026-08-23T07:10:40.722Z",
+      "durationMs": 1800,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "f5e00d3c9f0a6aab315479bbd88771db9597a32a",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-cross-editor-parallel-proof.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c1b4fcde99254b46dc3ea3565b930d9eccd3ac883f066d6bd72d6d039bae43d3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cross-editor-parallel-proof"
+      ],
+      "generatedAt": "2026-08-23T07:10:44.192Z",
+      "startedAt": "2026-08-23T07:10:43.882Z",
+      "finishedAt": "2026-08-23T07:10:44.192Z",
+      "durationMs": 310,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "f5e00d3c9f0a6aab315479bbd88771db9597a32a",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-23T07:10:59.706Z",
+      "startedAt": "2026-08-23T07:10:47.575Z",
+      "finishedAt": "2026-08-23T07:10:59.706Z",
+      "durationMs": 12131,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "f5e00d3c9f0a6aab315479bbd88771db9597a32a",
       "cached": false
     }
   ],

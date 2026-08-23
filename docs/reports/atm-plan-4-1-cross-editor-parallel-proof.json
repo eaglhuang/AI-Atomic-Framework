@@ -1,15 +1,15 @@
 {
   "schemaId": "atm.crossEditorParallelProof.v1",
   "specVersion": "0.1.0",
-  "generatedAt": "2026-08-23T05:55:17.949Z",
+  "generatedAt": "2026-08-23T07:17:41.743Z",
   "planSeal": {
     "path": "docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v4-1.md",
     "digest": "sha256:03ea18fb961c4e6da5591dd5e1bc05f5c97426288a6f24d84db0a6888764efc9"
   },
   "timeWindow": {
     "startedAt": "2026-08-22T15:55:06.036Z",
-    "endedAt": "2026-08-23T05:55:17.949Z",
-    "watermark": "4e693964c5edf85b3857da033ab2064dada6e5c9"
+    "endedAt": "2026-08-23T07:17:41.743Z",
+    "watermark": "f5e00d3c9f0a6aab315479bbd88771db9597a32a"
   },
   "sources": [
     {
@@ -27,7 +27,7 @@
   ],
   "commits": {
     "planning": "913299a225ba271a6f599d82e4dc52539bd19041",
-    "target": "4e693964c5edf85b3857da033ab2064dada6e5c9",
+    "target": "f5e00d3c9f0a6aab315479bbd88771db9597a32a",
     "atmGov0407Source": "bec5bb75f7b33d593eebe45b9716cf8f08110515",
     "atmGov0406": [
       "0cdbc9e95d5abbcbf1ba688d57e450c542aec5db",
@@ -36,7 +36,7 @@
     ],
     "producerPlanningSeal": "sha256:a3a910e3c96751ae8c8ec184596f361355ea73af7f43f537b7daab983c9008e4"
   },
-  "censusDigest": "sha256:1ff1dce1e189d81b1d5c493222ed79b8a4b78f8a99f4d1b9b1fd22418a91fc49",
+  "censusDigest": "sha256:086a5409f0350ba17a0e84e4f80dcd84cb3b491e64c95fdf1e7cfe0955c296b8",
   "actors": [
     {
       "actorId": "cursor-captain",
@@ -71,6 +71,14 @@
       "source": ".atm/history/task-events/ATM-GOV-0406"
     },
     {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-23T07:11:19.264Z",
+      "endedAt": "2026-08-23T07:16:40.204Z",
+      "source": ".atm/history/evidence/ATM-GOV-0406.json"
+    },
+    {
       "taskId": "ATM-GOV-0407",
       "actorId": "cursor-captain",
       "editor": "cursor",
@@ -84,6 +92,14 @@
       "editor": "cursor",
       "startedAt": "2026-08-23T02:54:39.512Z",
       "endedAt": "2026-08-23T02:59:21.000Z",
+      "source": ".atm/history/evidence/ATM-GOV-0407.json"
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-23T07:10:35.024Z",
+      "endedAt": "2026-08-23T07:15:25.547Z",
       "source": ".atm/history/evidence/ATM-GOV-0407.json"
     }
   ],
@@ -107,7 +123,7 @@
   ],
   "concurrency": {
     "maxActiveClaims": 2,
-    "maxScopedWork": 1,
+    "maxScopedWork": 2,
     "distinctEditors": [
       "cursor",
       "claude-code"
@@ -116,14 +132,12 @@
   "overlap": {
     "pair": "ATM-GOV-0406/ATM-GOV-0407",
     "basis": "scoped-work",
-    "overlapMs": 0,
-    "shorterIntervalMs": 755305,
-    "overlapRatio": 0,
-    "requiredMs": 188826,
+    "overlapMs": 246283,
+    "shorterIntervalMs": 1045828,
+    "overlapRatio": 0.2354909220254191,
+    "requiredMs": 261457,
     "status": "unproven",
-    "missing": [
-      "no overlapping scoped-work intervals between distinct editors"
-    ]
+    "missing": []
   },
   "proposals": [],
   "broker": {
@@ -168,14 +182,14 @@
     {
       "id": "second-window",
       "startedAt": "2026-08-22T16:11:04.000Z",
-      "endedAt": "2026-08-23T05:55:17.949Z",
+      "endedAt": "2026-08-23T07:17:41.743Z",
       "policyViolationCount": 0,
       "foreignByteLoss": 0,
       "unauthorizedTakeover": 0,
       "bypass": 0,
       "cleanProofWindow": true,
       "source": "task-events-0406-0407-scan",
-      "scannedEventCount": 9
+      "scannedEventCount": 13
     }
   ],
   "compose": {
@@ -212,7 +226,7 @@
     },
     "acc3": {
       "status": "unproven",
-      "detail": "basis=scoped-work overlapMs=0 requiredMs=188826 shorterScopedMs=755305 maxScopedWork=1 maxActiveClaims=2 missing=no overlapping scoped-work intervals between distinct editors"
+      "detail": "basis=scoped-work overlapMs=246283 requiredMs=261457 shorterScopedMs=1045828 maxScopedWork=2 maxActiveClaims=2 missing=none"
     },
     "acc4": {
       "status": "met",
@@ -254,5 +268,5 @@
     "node --strip-types scripts/validate-cross-editor-parallel-proof.ts",
     "npm run typecheck"
   ],
-  "digest": "sha256:5a93ba5c4827409c59f4778d528c9d1932b377c3128f3569319aa09f349f308f"
+  "digest": "sha256:7e18761e7f9eb1130505b72cc07f2040cbdf42c4d6e20580bfc0200b87905aa7"
 }
