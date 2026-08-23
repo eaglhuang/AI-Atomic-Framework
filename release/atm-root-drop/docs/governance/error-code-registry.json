@@ -2351,6 +2351,96 @@
       "statusCommand": "node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json",
       "registryOwner": "TASK-ERR-0015",
       "sourceOwner": "packages/cli/src/commands/taskflow/implementation.ts"
+    },
+    {
+      "code": "ATM_TASK_DEPENDENCY_HARD_PROOF_CONTRADICTORY",
+      "shortDescription": "A dependency edge stated a hard-causal fact and then denied it, so the declaration says two different things about the same edge.",
+      "commonCauses": [
+        "The edge sets outputValueChangesConsumerResult or resultUndefinedWithoutOutput to false while still declaring relation hard-causal.",
+        "The edge declares an available substitute, which by definition means the dependency is not hard-causal.",
+        "A non-hard relation carries a hardCausalProof block, or the negative control does not block before the producer output exists."
+      ],
+      "remediation": [
+        "Re-declare the edge with the relation its own proof supports; a satisfied substitute or a false fact means the edge is not hard-causal.",
+        "Keep file and atom overlap as overlap relations and resolve them through the Broker or proposal-first at the write boundary, not as a whole-card dependency.",
+        "Re-run node atm.mjs tasks import --from <plan-path> --dry-run --json to confirm the card imports."
+      ],
+      "category": "task-ledger",
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks import --from <plan-path> --dry-run --json",
+        "node atm.mjs tasks status --task <task-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/dependency-gate.ts",
+      "registryOwner": "ATM-GOV-0406"
+    },
+    {
+      "code": "ATM_TASK_DEPENDENCY_HARD_PROOF_INCOMPLETE",
+      "shortDescription": "A card declaring hard-causal dependency semantics named a hard-causal edge without proving all six required facts.",
+      "commonCauses": [
+        "The edge omits producerOutput, consumerOperation, or the negative control command.",
+        "The edge omits outputValueChangesConsumerResult or resultUndefinedWithoutOutput.",
+        "The edge omits substitutesAvailable, so no substitute (stable interface, fixture, proposal-first, late binding, deferred compose) was ruled out."
+      ],
+      "remediation": [
+        "Add the missing hardCausalProof fact named by the diagnostic to the dependency edge on the task card.",
+        "If the edge cannot prove all six facts, declare it as validation, publication, observation, soft-order, file-overlap, or atom-overlap instead; those relations never block a claim.",
+        "Re-run node atm.mjs tasks import --from <plan-path> --dry-run --json to confirm the card imports."
+      ],
+      "category": "task-ledger",
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks import --from <plan-path> --dry-run --json",
+        "node atm.mjs tasks status --task <task-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/dependency-gate.ts",
+      "registryOwner": "ATM-GOV-0406"
+    },
+    {
+      "code": "ATM_TASK_DEPENDENCY_RELATION_UNKNOWN",
+      "shortDescription": "A typed dependency edge declared a relation that is not in the canonical dependency relation set.",
+      "commonCauses": [
+        "The relation value is misspelled or uses an ad-hoc name.",
+        "The card was authored against an older or invented relation vocabulary."
+      ],
+      "remediation": [
+        "Use one of hard-causal, validation, publication, observation, soft-order, file-overlap, atom-overlap.",
+        "Only hard-causal can block a claim, and only when all six hard-causal facts are proven.",
+        "Re-run node atm.mjs tasks import --from <plan-path> --dry-run --json to confirm the card imports."
+      ],
+      "category": "task-ledger",
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks import --from <plan-path> --dry-run --json",
+        "node atm.mjs tasks status --task <task-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/dependency-gate.ts",
+      "registryOwner": "ATM-GOV-0406"
+    },
+    {
+      "code": "ATM_TASK_DEPENDENCY_UNTYPED_IN_TYPED_CARD",
+      "shortDescription": "A card that opted into hard-causal dependency semantics still carries a bare task-id dependency with no declared relation.",
+      "commonCauses": [
+        "A dependency was added as a plain string after the card declared dependencySemantics.",
+        "A card was partially migrated to typed dependencies and one edge was missed."
+      ],
+      "remediation": [
+        "Type the remaining edge with an explicit relation instead of relying on the legacy status gate.",
+        "Alternatively remove dependencySemantics from the card so every edge keeps legacy semantics consistently.",
+        "Re-run node atm.mjs tasks import --from <plan-path> --dry-run --json to confirm the card imports."
+      ],
+      "category": "task-ledger",
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks import --from <plan-path> --dry-run --json",
+        "node atm.mjs tasks status --task <task-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks/dependency-gate.ts",
+      "registryOwner": "ATM-GOV-0406"
     }
   ],
   "prefixRules": [

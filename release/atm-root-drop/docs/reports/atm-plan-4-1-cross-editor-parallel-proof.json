@@ -1,0 +1,435 @@
+{
+  "schemaId": "atm.crossEditorParallelProof.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-23T07:45:54.672Z",
+  "planSeal": {
+    "path": "docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v4-1.md",
+    "digest": "sha256:03ea18fb961c4e6da5591dd5e1bc05f5c97426288a6f24d84db0a6888764efc9"
+  },
+  "timeWindow": {
+    "startedAt": "2026-08-22T15:55:06.036Z",
+    "endedAt": "2026-08-23T07:45:54.672Z",
+    "watermark": "343576a455f7cd19a01133ef83729001664b38c3"
+  },
+  "sources": [
+    {
+      "path": "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0002-restore-packaged-runner-and-plan-import-compatibility.task.md",
+      "digest": "sha256:6018a78bd69a9286b815b363cbce6fe0cf3132f99491e0922990cf526ae38bdb"
+    },
+    {
+      "path": "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0003-separate-required-product-ci-and-enforce-protected-main.task.md",
+      "digest": "sha256:4cbb9a521c3783bf8d7b97c5f1119d6af98e2c1885b4635a3234682ed5a5b688"
+    },
+    {
+      "path": "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v4-1.md",
+      "digest": "sha256:03ea18fb961c4e6da5591dd5e1bc05f5c97426288a6f24d84db0a6888764efc9"
+    }
+  ],
+  "commits": {
+    "planning": "913299a225ba271a6f599d82e4dc52539bd19041",
+    "target": "343576a455f7cd19a01133ef83729001664b38c3",
+    "atmGov0407Source": "bec5bb75f7b33d593eebe45b9716cf8f08110515",
+    "atmGov0406": [
+      "0cdbc9e95d5abbcbf1ba688d57e450c542aec5db",
+      "da019ca4827eee0af3d32621f0439e00caa75d55",
+      "9f066f5d8572a1f2a663c7f6c1ae7c1aaffd5fb8"
+    ],
+    "producerPlanningSeal": "sha256:a3a910e3c96751ae8c8ec184596f361355ea73af7f43f537b7daab983c9008e4"
+  },
+  "censusDigest": "sha256:9ac82f906d10616502aa755c30075fdfbb35364008420e5c4cdc5849d4377336",
+  "actors": [
+    {
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "taskIds": [
+        "ATM-GOV-0407"
+      ]
+    },
+    {
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "taskIds": [
+        "ATM-GOV-0406"
+      ]
+    }
+  ],
+  "productProofWindow": {
+    "startedAt": "2026-08-23T07:10:35.024Z",
+    "endedAt": "2026-08-23T07:16:40.204Z",
+    "source": "sealed-plan-4-1-product-proof-window"
+  },
+  "intervals": [
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-23T07:11:19.264Z",
+      "endedAt": "2026-08-23T07:11:19.745Z",
+      "source": ".atm/history/evidence/ATM-GOV-0406.json",
+      "command": "node --experimental-strip-types tests/cli/hard-causal-dependency-import.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-23T07:11:23.330Z",
+      "endedAt": "2026-08-23T07:11:23.790Z",
+      "source": ".atm/history/evidence/ATM-GOV-0406.json",
+      "command": "node --experimental-strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-23T07:11:27.253Z",
+      "endedAt": "2026-08-23T07:11:28.404Z",
+      "source": ".atm/history/evidence/ATM-GOV-0406.json",
+      "command": "node --experimental-strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-23T07:11:32.236Z",
+      "endedAt": "2026-08-23T07:11:33.322Z",
+      "source": ".atm/history/evidence/ATM-GOV-0406.json",
+      "command": "node --experimental-strip-types scripts/generate-error-code-index.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-23T07:11:38.287Z",
+      "endedAt": "2026-08-23T07:11:54.932Z",
+      "source": ".atm/history/evidence/ATM-GOV-0406.json",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-23T07:13:01.816Z",
+      "endedAt": "2026-08-23T07:16:40.204Z",
+      "source": ".atm/history/evidence/ATM-GOV-0406.json",
+      "command": "npm test",
+      "exitCode": 1
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-23T07:10:35.024Z",
+      "endedAt": "2026-08-23T07:10:35.434Z",
+      "source": ".atm/history/evidence/ATM-GOV-0407.json",
+      "command": "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-23T07:10:38.922Z",
+      "endedAt": "2026-08-23T07:10:40.722Z",
+      "source": ".atm/history/evidence/ATM-GOV-0407.json",
+      "command": "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-23T07:10:43.882Z",
+      "endedAt": "2026-08-23T07:10:44.192Z",
+      "source": ".atm/history/evidence/ATM-GOV-0407.json",
+      "command": "node --strip-types scripts/validate-cross-editor-parallel-proof.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-23T07:10:47.575Z",
+      "endedAt": "2026-08-23T07:10:59.706Z",
+      "source": ".atm/history/evidence/ATM-GOV-0407.json",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-23T07:11:26.797Z",
+      "endedAt": "2026-08-23T07:15:25.547Z",
+      "source": ".atm/history/evidence/ATM-GOV-0407.json",
+      "command": "npm test",
+      "exitCode": 1
+    }
+  ],
+  "claimIntervals": [
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-22T15:55:06.036Z",
+      "endedAt": null,
+      "source": ".atm/history/task-events/ATM-GOV-0407"
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-22T15:56:42.966Z",
+      "endedAt": null,
+      "source": ".atm/history/task-events/ATM-GOV-0406"
+    }
+  ],
+  "actorUnions": [
+    {
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "durationMs": 238211,
+      "intervalCount": 6
+    },
+    {
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "durationMs": 253401,
+      "intervalCount": 5
+    }
+  ],
+  "validatorOutcomes": [
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "command": "node --experimental-strip-types tests/cli/hard-causal-dependency-import.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "command": "node --experimental-strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "command": "node --experimental-strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "command": "node --experimental-strip-types scripts/generate-error-code-index.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "command": "npm test",
+      "exitCode": 1
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "command": "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "command": "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "command": "node --strip-types scripts/validate-cross-editor-parallel-proof.ts",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "command": "npm test",
+      "exitCode": 1
+    }
+  ],
+  "publicationBlockers": [
+    {
+      "taskId": "ATM-GOV-0406",
+      "reason": "P1 source repair remains a publication blocker; ATM-GOV-0407 must not self-publish before 0406."
+    },
+    {
+      "taskId": "ATM-GOV-0406",
+      "reason": "npm test exit 1 is retained as a failed validator, not a green pass."
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "reason": "npm test exit 1 is retained as a failed validator, not a green pass."
+    }
+  ],
+  "concurrency": {
+    "maxActiveClaims": 2,
+    "maxScopedWork": 2,
+    "distinctEditors": [
+      "cursor",
+      "claude-code"
+    ]
+  },
+  "overlap": {
+    "pair": "ATM-GOV-0406/ATM-GOV-0407",
+    "basis": "scoped-work",
+    "overlapMs": 162613,
+    "shorterIntervalMs": 238211,
+    "overlapRatio": 0.682642699119688,
+    "requiredMs": 59552,
+    "status": "met",
+    "missing": []
+  },
+  "proposals": [],
+  "broker": {
+    "arbitration": "broker-arbitration",
+    "source": {
+      "path": ".atm/runtime/team-runs/team-0e35f115a714.json",
+      "schemaId": "atm.teamRun.v1",
+      "digest": "sha256:db5f21d0c46a3bce436bc5174a8d2ef31ce59ba58134069a71ba8f3a809b1ace",
+      "taskId": "ATM-GOV-0407",
+      "verdict": "parallel-safe",
+      "lane": "direct-brokered",
+      "available": true,
+      "issues": []
+    }
+  },
+  "linkedSoftRelation": {
+    "producer": "ATM-GOV-0406",
+    "consumer": "ATM-GOV-0407",
+    "classification": "soft-order",
+    "available": true
+  },
+  "producerContract": {
+    "planningSealExpected": "sha256:a3a910e3c96751ae8c8ec184596f361355ea73af7f43f537b7daab983c9008e4",
+    "planningSealObserved": "sha256:a3a910e3c96751ae8c8ec184596f361355ea73af7f43f537b7daab983c9008e4",
+    "planningSealMatched": true,
+    "reachable0406": true,
+    "reachable0407": true
+  },
+  "proofWindows": [
+    {
+      "id": "first-window",
+      "startedAt": "2026-08-22T15:45:06.036Z",
+      "endedAt": "2026-08-22T16:11:04.000Z",
+      "policyViolationCount": 1,
+      "foreignByteLoss": 0,
+      "unauthorizedTakeover": 0,
+      "bypass": 0,
+      "cleanProofWindow": false,
+      "source": "sealed-first-window-observation",
+      "scannedEventCount": 0
+    },
+    {
+      "id": "second-window",
+      "startedAt": "2026-08-22T16:11:04.000Z",
+      "endedAt": "2026-08-23T07:45:54.672Z",
+      "policyViolationCount": 0,
+      "foreignByteLoss": 0,
+      "unauthorizedTakeover": 0,
+      "bypass": 0,
+      "cleanProofWindow": true,
+      "source": "task-events-0406-0407-scan",
+      "scannedEventCount": 14
+    }
+  ],
+  "compose": {
+    "outcome": "final-compose",
+    "reason": "Final compose consumes reachable 0406/0407 Git SHAs, the 0406 planning seal, and ATM team-run Broker arbitration evidence."
+  },
+  "safetyEvents": {
+    "policyViolationCount": 1,
+    "foreignOverwrite": 0,
+    "unauthorizedTakeover": 0,
+    "bypass": 0
+  },
+  "hardCausalControls": {
+    "beforeProducerOutput": {
+      "claim": "blocked",
+      "code": "ATM_PARALLEL_PROOF_INPUT_INVALID",
+      "reason": "Producer output is unsealed; hard-causal consumer claim is blocked."
+    },
+    "afterProducerOutput": {
+      "claim": "allowed",
+      "code": null,
+      "reason": "Sealed producer output admits the hard-causal consumer."
+    },
+    "nonHardClaimBeforeCompose": "allowed"
+  },
+  "acceptance": {
+    "acc1": {
+      "status": "met",
+      "detail": "denominator=11 hard=0 observedRate=0"
+    },
+    "acc2": {
+      "status": "met",
+      "detail": "PRF sample has zero proven hard-causal edges; unproven declarations remain nonblocking."
+    },
+    "acc3": {
+      "status": "met",
+      "detail": "basis=scoped-work window=2026-08-23T07:10:35.024Z/2026-08-23T07:16:40.204Z overlapMs=162613 requiredMs=59552 shorterScopedMs=238211 maxScopedWork=2 maxActiveClaims=2 npmTestFailures=2 missing=none"
+    },
+    "acc4": {
+      "status": "met",
+      "detail": "Broker arbitration branch: .atm/runtime/team-runs/team-0e35f115a714.json schema=atm.teamRun.v1 verdict=parallel-safe lane=direct-brokered digest=sha256:db5f21d0c46a3bce436bc5174a8d2ef31ce59ba58134069a71ba8f3a809b1ace"
+    },
+    "acc5": {
+      "status": "met",
+      "detail": "before=blocked after=allowed"
+    },
+    "acc6": {
+      "status": "met",
+      "detail": "Dashboard seals the product-proof window and retains 2 npm test failure(s); focused validators passed, npm test did not."
+    },
+    "acc7": {
+      "status": "met",
+      "detail": "Digest is computed from canonical JSON excluding digest; lifecycle states are independent."
+    }
+  },
+  "lifecycle": {
+    "sourceDelivery": {
+      "status": "delivered",
+      "sha": "sha256:c3e4cd38e994d94fd878fb485ca0394e587fa9f69e1b3708fa690f15df7e83e6",
+      "reason": "Source deliverables exist on the canonical worktree. Frozen publication and formal close remain independent and are not started."
+    },
+    "frozenPublication": {
+      "status": "not-started",
+      "sha": null,
+      "reason": "Frozen publication waits for ATM-GOV-0406 P1 source repair; this card must not self-publish."
+    },
+    "formalCloseout": {
+      "status": "not-started",
+      "sha": null,
+      "reason": "Formal closeout is deferred; no taskflow close --write in this delivery."
+    }
+  },
+  "validators": [
+    "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+    "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+    "node --strip-types scripts/validate-cross-editor-parallel-proof.ts",
+    "npm run typecheck"
+  ],
+  "digest": "sha256:53d132ea41c7f4d4fa0617a341cd01b953535b488a908586bbe9ec0f0de04dcd"
+}

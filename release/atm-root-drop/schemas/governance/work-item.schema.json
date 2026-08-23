@@ -4,7 +4,14 @@
   "title": "ATM Governance Work Item v0.1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaId", "specVersion", "migration", "workItemId", "title", "status"],
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "workItemId",
+    "title",
+    "status"
+  ],
   "properties": {
     "schemaId": {
       "const": "atm.governanceWorkItem"
@@ -24,14 +31,26 @@
       "minLength": 1
     },
     "status": {
-      "enum": ["planned", "locked", "running", "verified", "done", "blocked"]
+      "enum": [
+        "planned",
+        "locked",
+        "running",
+        "verified",
+        "done",
+        "blocked"
+      ]
     },
     "owner": {
       "type": "string",
       "minLength": 1
     },
     "priority": {
-      "enum": ["P0", "P1", "P2", "P3"]
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3"
+      ]
     },
     "summary": {
       "type": "string"
@@ -39,10 +58,20 @@
     "externalRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["provider", "id"],
+      "required": [
+        "provider",
+        "id"
+      ],
       "properties": {
         "provider": {
-          "enum": ["atm-local", "jira", "github-issues", "linear", "notion", "custom"]
+          "enum": [
+            "atm-local",
+            "jira",
+            "github-issues",
+            "linear",
+            "notion",
+            "custom"
+          ]
         },
         "id": {
           "type": "string",
@@ -95,19 +124,51 @@
     },
     "acceptanceEvidence": {
       "$ref": "#/$defs/acceptanceEvidenceMap"
+    },
+    "dependencySemantics": {
+      "description": "Opt-in marker for ATM-GOV-0406 typed dependency semantics. Cards omitting it keep legacy status-gate behavior until their family is audited.",
+      "const": "hard-causal/v1"
+    },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "default": [],
+      "description": "Declared dependency edges. Untyped strings are legacy-only; a card declaring dependencySemantics must type every edge.",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "$ref": "#/$defs/taskDependencyEdge"
+          }
+        ]
+      }
     }
   },
   "$defs": {
     "migration": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["strategy", "fromVersion", "notes"],
+      "required": [
+        "strategy",
+        "fromVersion",
+        "notes"
+      ],
       "properties": {
         "strategy": {
-          "enum": ["none", "additive", "breaking"]
+          "enum": [
+            "none",
+            "additive",
+            "breaking"
+          ]
         },
         "fromVersion": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^\\d+\\.\\d+\\.\\d+$"
         },
         "notes": {
@@ -118,7 +179,10 @@
     "contextFile": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "reason"],
+      "required": [
+        "path",
+        "reason"
+      ],
       "properties": {
         "path": {
           "type": "string",
@@ -133,7 +197,11 @@
     "contextPattern": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["referencePath", "referenceTaskId", "description"],
+      "required": [
+        "referencePath",
+        "referenceTaskId",
+        "description"
+      ],
       "properties": {
         "referencePath": {
           "type": "string",
@@ -162,38 +230,83 @@
     "acceptanceEvidencePredicate": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "claim", "authoritativeSources", "derivationRule", "requiredRealness", "verifier", "negativeControls", "missingDataVerdict", "closureCritical"],
+      "required": [
+        "id",
+        "claim",
+        "authoritativeSources",
+        "derivationRule",
+        "requiredRealness",
+        "verifier",
+        "negativeControls",
+        "missingDataVerdict",
+        "closureCritical"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
-        "claim": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "claim": {
+          "type": "string",
+          "minLength": 1
+        },
         "authoritativeSources": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
-        "derivationRule": { "type": "string", "minLength": 1 },
+        "derivationRule": {
+          "type": "string",
+          "minLength": 1
+        },
         "requiredRealness": {
-          "enum": ["fixture", "unit", "command-smoke", "integration", "sealed-replay", "real-dogfood", "production-ledger"]
+          "enum": [
+            "fixture",
+            "unit",
+            "command-smoke",
+            "integration",
+            "sealed-replay",
+            "real-dogfood",
+            "production-ledger"
+          ]
         },
         "verifier": {
           "oneOf": [
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["mode"],
+              "required": [
+                "mode"
+              ],
               "properties": {
-                "mode": { "const": "separate-actor" },
-                "actorId": { "type": "string", "minLength": 1 }
+                "mode": {
+                  "const": "separate-actor"
+                },
+                "actorId": {
+                  "type": "string",
+                  "minLength": 1
+                }
               }
             },
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["mode", "policyDigest"],
+              "required": [
+                "mode",
+                "policyDigest"
+              ],
               "properties": {
-                "mode": { "const": "locked-policy" },
-                "policyDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+                "mode": {
+                  "const": "locked-policy"
+                },
+                "policyDigest": {
+                  "type": "string",
+                  "pattern": "^sha256:[a-f0-9]{64}$"
+                }
               }
             }
           ]
@@ -204,16 +317,169 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "expectedFailureReason"],
+            "required": [
+              "id",
+              "expectedFailureReason"
+            ],
             "properties": {
-              "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
-              "expectedFailureReason": { "type": "string", "minLength": 1 }
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "expectedFailureReason": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           }
         },
-        "missingDataVerdict": { "const": "inconclusive" },
-        "closureCritical": { "type": "boolean" }
+        "missingDataVerdict": {
+          "const": "inconclusive"
+        },
+        "closureCritical": {
+          "type": "boolean"
+        }
       }
+    },
+    "hardCausalProof": {
+      "title": "Hard-causal dependency proof",
+      "description": "The six facts that must all hold before a declared dependency may block a claim. Missing keys are reported as missing facts; keys present but denying their fact are reported as contradictions.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producerOutput",
+        "consumerOperation",
+        "outputValueChangesConsumerResult",
+        "substitutesAvailable",
+        "resultUndefinedWithoutOutput",
+        "negativeControl"
+      ],
+      "properties": {
+        "producerOutput": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Repository-relative path of the named producer output this edge waits on."
+        },
+        "consumerOperation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Named consumer operation whose correct result depends on the output value."
+        },
+        "outputValueChangesConsumerResult": {
+          "const": true
+        },
+        "substitutesAvailable": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stableInterface",
+            "fixture",
+            "proposalFirst",
+            "lateBinding",
+            "deferredCompose"
+          ],
+          "description": "Each substitute must be evaluated explicitly. Any true value defeats the hard-causal claim.",
+          "properties": {
+            "stableInterface": {
+              "const": false
+            },
+            "fixture": {
+              "const": false
+            },
+            "proposalFirst": {
+              "const": false
+            },
+            "lateBinding": {
+              "const": false
+            },
+            "deferredCompose": {
+              "const": false
+            }
+          }
+        },
+        "resultUndefinedWithoutOutput": {
+          "const": true
+        },
+        "negativeControl": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "command",
+            "blocksBeforeProducerOutput",
+            "admitsAfterProducerOutput"
+          ],
+          "properties": {
+            "command": {
+              "type": "string",
+              "minLength": 1
+            },
+            "blocksBeforeProducerOutput": {
+              "const": true
+            },
+            "admitsAfterProducerOutput": {
+              "const": true
+            }
+          }
+        }
+      }
+    },
+    "taskDependencyEdge": {
+      "title": "Typed task dependency edge",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId",
+        "relation"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relation": {
+          "enum": [
+            "hard-causal",
+            "validation",
+            "publication",
+            "observation",
+            "soft-order",
+            "file-overlap",
+            "atom-overlap"
+          ]
+        },
+        "note": {
+          "type": "string"
+        },
+        "hardCausalProof": {
+          "$ref": "#/$defs/hardCausalProof"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "relation": {
+                "const": "hard-causal"
+              }
+            },
+            "required": [
+              "relation"
+            ]
+          },
+          "then": {
+            "required": [
+              "hardCausalProof"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "hardCausalProof"
+              ]
+            }
+          }
+        }
+      ]
     }
   }
 }

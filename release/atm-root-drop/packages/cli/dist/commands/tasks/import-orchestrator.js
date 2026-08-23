@@ -7,9 +7,8 @@ import { readPluginRegistry } from '../../plugin-registry.js';
 import { toStoredPlanningPath, resolvePlanAbsoluteFromStored } from '../planning-repo-root.js';
 import { assertRunnerFreshForWriteAction } from '../framework-development.js';
 import { assertEmergencyApproval } from '../emergency/gate.js';
-import { buildExtractionFirstPatrolDiagnostics, extractFrontMatter, normalizeTaskCausalGraphContract, parseAcceptanceEvidenceMap, validateCausalValidatorContractImport, validateDeliverablesList } from './task-import-validators.js';
-import { buildContractImportRecoveryManifest } from './contract-import-recovery.js';
-import { buildTaskFrontmatterFidelityDiagnostics } from './task-frontmatter-fidelity.js';
+import { buildExtractionFirstPatrolDiagnostics, extractFrontMatter, parseAcceptanceEvidenceMap, validateDeliverablesList } from './task-import-validators.js';
+import { applySingleCardContractValidation } from './import-card-contract-validation.js';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
 import { classifyForceImportAdmission } from './import-validation.js';
@@ -178,67 +177,18 @@ export async function runTasksImport(argv) {
             tasks: parsed.tasks.map((task) => ({ ...task, workAdmission: workAdmissionValidation.policy }))
         };
     }
-    // TASK-SKL-0029 — when a single card fails its validation contract, carry the
-    // executable recovery manifest (missing contract/case/group fields + one
-    // dry-run recovery command) into the structured import failure below.
-    let contractRecovery = null;
-    if (parsed.tasks.length === 1) {
-        const task = parsed.tasks[0];
-        const causalGraph = normalizeTaskCausalGraphContract(causalFrontmatter?.causalGraph ?? causalFrontmatter?.causal_graph);
-        const causalValidation = validateCausalValidatorContractImport({
-            frontmatter: causalFrontmatter,
-            validators: task.validators ?? [],
-            acceptance: task.acceptance ?? [],
-            causalImpactEdges: causalGraph.causalImpactEdges
-        });
-        contractRecovery = buildContractImportRecoveryManifest({
-            validation: causalValidation,
-            taskId: task.workItemId,
-            planPath: toStoredPlanningPath(options.cwd, planAbsolute)
-        });
-        for (const diagnostic of causalValidation.diagnostics) {
-            if (diagnostic.severity === 'error') {
-                parsed.diagnostics.push({
-                    level: 'error',
-                    code: diagnostic.code,
-                    text: diagnostic.message,
-                    workItemId: task.workItemId
-                });
-            }
-        }
-        parsed = {
-            ...parsed,
-            tasks: parsed.tasks.map((entry) => ({
-                ...entry,
-                causalGraph,
-                testContributions: causalValidation.fields.testContributions,
-                requiredTestCaseIds: causalValidation.fields.requiredTestCaseIds,
-                phaseTestCaseIds: causalValidation.fields.phaseTestCaseIds,
-                advisoryTestCaseIds: causalValidation.fields.advisoryTestCaseIds,
-                ...(causalValidation.fields.legacyProjection.length > 0
-                    ? { legacyValidatorProjection: causalValidation.fields.legacyProjection }
-                    : {}),
-                importDiagnostics: [
-                    ...(entry.importDiagnostics ?? []),
-                    ...causalValidation.diagnostics
-                ]
-            }))
-        };
-        // ATM-GOV-0276: a card's machine-readable declarations must round-trip into
-        // the record both surfaces share, or import fails closed here — before the
-        // dry-run manifest is reported and before any ledger file is written.
-        const fidelity = buildTaskFrontmatterFidelityDiagnostics({
-            frontmatter: causalFrontmatter,
-            record: parsed.tasks[0],
-            planText,
-            workItemId: task.workItemId
-        });
-        parsed.diagnostics.push(...fidelity.diagnostics);
-        parsed = {
-            ...parsed,
-            tasks: parsed.tasks.map((entry) => ({ ...entry, frontmatterFidelity: fidelity.report }))
-        };
-    }
+    // ATM-GOV-0406: the single-card contract checks (causal validator, typed
+    // dependency proof, frontmatter fidelity) live in one module so the
+    // orchestrator body stays inside the physical line budget.
+    const cardContracts = applySingleCardContractValidation({
+        cwd: options.cwd,
+        parsed,
+        causalFrontmatter,
+        planText,
+        planPath: toStoredPlanningPath(options.cwd, planAbsolute)
+    });
+    parsed = cardContracts.parsed;
+    const contractRecovery = cardContracts.contractRecovery;
     const enrichedParsed = enrichParsedTasksFromSiblingTaskCards({
         cwd: options.cwd,
         planAbsolute,

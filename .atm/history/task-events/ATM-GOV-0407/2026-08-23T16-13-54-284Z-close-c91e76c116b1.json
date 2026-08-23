@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-23T16-13-54-284Z-close-c91e76c116b1",
+  "taskId": "ATM-GOV-0407",
+  "action": "close",
+  "actorId": "cursor-captain",
+  "sessionId": "session-20260822155501-cursor-captain-ATM-GOV-0407-f794c45634",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0407.json",
+  "taskSha256": "sha256:9e5303ac8e158cb70cb9b6cc185da67f4ef86739945fd140e41fcccf34fb8295",
+  "createdAt": "2026-08-23T16:13:54.284Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0407 --actor cursor-captain --status done --historical-delivery a910f1dc599375845e703bfeb68bd7b22481da80",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260822155501-cursor-captain-ATM-GOV-0407-f794c45634",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0407.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+      "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+      "typecheck",
+      "validate:cross-editor-parallel-proof"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+      "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+      "typecheck",
+      "validate:cross-editor-parallel-proof"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-23T16:13:54.271Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0407.*",
+        ".atm/history/task-events/ATM-GOV-0407/**",
+        ".atm/history/tasks/ATM-GOV-0407.json",
+        "docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
+        "docs/reports/atm-plan-4-1-dependency-census.json",
+        "schemas/evidence/cross-editor-parallel-proof.schema.json",
+        "scripts/audit-task-dependency-semantics.ts",
+        "scripts/compile-cross-editor-parallel-proof.ts",
+        "scripts/validate-cross-editor-parallel-proof.ts",
+        "tests/cli/cross-editor-parallel-proof.test.ts",
+        "tests/cli/task-dependency-semantics-census.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "schemas/evidence/cross-editor-parallel-proof.schema.json",
+        "scripts/audit-task-dependency-semantics.ts",
+        "scripts/compile-cross-editor-parallel-proof.ts",
+        "scripts/validate-cross-editor-parallel-proof.ts",
+        "tests/cli/cross-editor-parallel-proof.test.ts",
+        "tests/cli/task-dependency-semantics-census.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+        "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+        "typecheck",
+        "validate:cross-editor-parallel-proof"
+      ]
+    }
+  }
+}

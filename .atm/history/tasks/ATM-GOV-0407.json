@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0407",
   "title": "Prove cross-editor parallel work with typed dependency telemetry",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -205,8 +205,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-23T07-48-13-261Z-renew-5f088d396ef5",
-  "lastTransitionAt": "2026-08-23T07:48:13.261Z",
+  "lastTransitionId": "2026-08-23T16-13-54-284Z-close-c91e76c116b1",
+  "lastTransitionAt": "2026-08-23T16:13:54.284Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-captain",
   "reservedAt": "2026-08-22T15:55:01.245Z",
@@ -215,7 +215,7 @@
     "actorId": "cursor-captain",
     "leaseId": "lease-0cbb89a9698c",
     "claimedAt": "2026-08-22T15:55:01.258Z",
-    "heartbeatAt": "2026-08-23T07:48:12.705Z",
+    "heartbeatAt": "2026-08-23T16:13:54.281Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0407.json",
@@ -228,40 +228,40 @@
       "tests/cli/cross-editor-parallel-proof.test.ts",
       "tests/cli/task-dependency-semantics-census.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260822155501-cursor-captain-9730459103",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155501-cursor-captain-9730459103\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-22T15:55:01.258Z",
   "startedByActor": "cursor-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-e24e3a77dbe01450",
-    "ticketDigest": "sha256:e24e3a77dbe014505a739ced777580d45ab92fd796dcdedd040439e82024b684",
+    "ticketId": "wat-396c0bd944dadffa",
+    "ticketDigest": "sha256:396c0bd944dadffacad52864d337cdc40ee3dc2734ac03047ff43dcf0f979a19",
     "taskId": "ATM-GOV-0407",
     "origin": "claim",
     "actorId": "cursor-captain",
     "laneSessionId": "lane-20260822155501-cursor-captain-9730459103",
     "claimGeneration": "lease-0cbb89a9698c",
-    "issuedAt": "2026-08-23T07:48:12.705Z",
-    "expiresAt": "2026-08-23T08:18:12.705Z",
-    "scopeDigest": "sha256:cd409bee35c784f16af08fbf8912283a0487e95d8a7e9cd827987c746c48acc1",
+    "issuedAt": "2026-08-23T16:11:50.867Z",
+    "expiresAt": "2026-08-23T16:41:50.867Z",
+    "scopeDigest": "sha256:c88e76902d1ec3a7362aa73e655494668971a3b068c1f5fe78701ac875e0ac0b",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-23T07:48:12.705Z"
+      "selectedAt": "2026-08-23T16:11:50.867Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0407.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0407/**",
           ".atm/history/tasks/ATM-GOV-0407.json",
           "docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
@@ -273,7 +273,7 @@
           "tests/cli/cross-editor-parallel-proof.test.ts",
           "tests/cli/task-dependency-semantics-census.test.ts"
         ],
-        "digest": "sha256:569e2f98ae47d0c4e8b0d698ac101b69d52ab2873afe195a521e0a806d451781"
+        "digest": "sha256:06314a201c6ff72ca836133f476fcd22331fb1fd59c9124dd64f69f999bfb3bd"
       },
       {
         "kind": "lifecycle-operation",
@@ -343,5 +343,9 @@
     },
     "createdAt": "2026-08-22T15:55:06.035Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-23T16:13:54.281Z",
+  "closedByActor": "cursor-captain",
+  "closedBySessionId": "session-20260822155501-cursor-captain-ATM-GOV-0407-f794c45634",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0407.closure-packet.json"
 }

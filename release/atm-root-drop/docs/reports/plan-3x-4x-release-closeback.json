@@ -1,0 +1,51 @@
+{
+  "schemaId": "atm.fourPlanReleaseCloseback.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-22T18:29:08+08:00",
+  "taskId": "ATM-GOV-0341",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetHead": "cfa72f89b5b494b31b8259e7a3e3095979919257",
+  "originMain": "cfa72f89b5b494b31b8259e7a3e3095979919257",
+  "remoteReachability": {
+    "checked": true,
+    "targetHeadReachableFromOriginMain": true,
+    "status": "pushed"
+  },
+  "releaseSurfaces": [
+    {
+      "surfaceId": "target-head",
+      "expectedDigest": "cfa72f89b5b494b31b8259e7a3e3095979919257",
+      "observedDigest": "cfa72f89b5b494b31b8259e7a3e3095979919257",
+      "reachable": true
+    },
+    {
+      "surfaceId": "origin-main",
+      "expectedDigest": "cfa72f89b5b494b31b8259e7a3e3095979919257",
+      "observedDigest": "cfa72f89b5b494b31b8259e7a3e3095979919257",
+      "reachable": true
+    },
+    {
+      "surfaceId": "frozen-runner",
+      "expectedDigest": "sha256:19807935564b42072240cd953685447193ad3e0b3da3791cd1c455abb7aaee44",
+      "observedDigest": "sha256:19807935564b42072240cd953685447193ad3e0b3da3791cd1c455abb7aaee44",
+      "reachable": true
+    },
+    {
+      "surfaceId": "root-drop",
+      "expectedDigest": "sha256:7dfda82fba40fd02cff5b79b8c008f548e9465828484d5e3163620638aa8df64",
+      "observedDigest": "sha256:7dfda82fba40fd02cff5b79b8c008f548e9465828484d5e3163620638aa8df64",
+      "reachable": true
+    }
+  ],
+  "status": "pushed",
+  "diagnostics": [
+    "target HEAD is remote-reachable from origin/main",
+    "release surface parity is current; independent certificate still governs final completion"
+  ],
+  "legacyAuthority": {
+    "retired": false,
+    "reversible": true,
+    "reason": "Independent certificate is the final authority for release authorization; unpushed targets never retire legacy authority."
+  }
+}

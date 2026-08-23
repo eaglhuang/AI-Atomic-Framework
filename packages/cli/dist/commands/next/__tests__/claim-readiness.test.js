@@ -83,6 +83,67 @@ try {
     const readyLane = diagnoseClaimReadinessForTasks(repo, [taskSummaries[4]], 'write');
     assert(readyLane.primaryBlocker === null, 'ready task must not report a blocking readiness issue');
     assert(readyLane.diagnostics[0]?.claimable === true, 'ready task must be marked claimable');
+    /**
+     * ATM-GOV-0406 — typed dependency semantics at the claim-readiness surface.
+     *
+     * Two cards differ only in the relation they declare about the same upstream
+     * task. One starts, one waits. That difference is the whole point of the
+     * contract, so it is asserted here rather than only at the gate below.
+     */
+    const upstreamOutput = 'docs/reports/atm-gov-0406-claim-readiness-output.json';
+    const hardCausalProof = {
+        producerOutput: upstreamOutput,
+        consumerOperation: 'atm.next.claim',
+        outputValueChangesConsumerResult: true,
+        substitutesAvailable: {
+            stableInterface: false,
+            fixture: false,
+            proposalFirst: false,
+            lateBinding: false,
+            deferredCompose: false
+        },
+        resultUndefinedWithoutOutput: true,
+        negativeControl: {
+            command: 'node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts',
+            blocksBeforeProducerOutput: true,
+            admitsAfterProducerOutput: true
+        }
+    };
+    // caseId: test_gov_nonhard_claim_admission_0406
+    writeJson(path.join(repo, '.atm', 'history', 'tasks', 'TASK-TYPED-SOFT.json'), {
+        workItemId: 'TASK-TYPED-SOFT',
+        status: 'ready',
+        dependencySemantics: 'hard-causal/v1',
+        dependencies: [{ taskId: 'TASK-UPSTREAM', relation: 'soft-order' }]
+    });
+    const softLane = diagnoseClaimReadinessForTasks(repo, [{
+            workItemId: 'TASK-TYPED-SOFT',
+            status: 'ready',
+            format: 'json',
+            sourcePlanPath: null,
+            scopePaths: ['packages/cli/src/commands/tasks/dependency-gate.ts']
+        }], 'write');
+    assert(softLane.primaryBlocker === null, 'a soft-order relation must not block a code claim');
+    // caseId: test_gov_hard_causal_contract_0406
+    writeJson(path.join(repo, '.atm', 'history', 'tasks', 'TASK-TYPED-HARD.json'), {
+        workItemId: 'TASK-TYPED-HARD',
+        status: 'ready',
+        dependencySemantics: 'hard-causal/v1',
+        dependencies: [{ taskId: 'TASK-UPSTREAM', relation: 'hard-causal', hardCausalProof }]
+    });
+    const hardSummary = {
+        workItemId: 'TASK-TYPED-HARD',
+        status: 'ready',
+        format: 'json',
+        sourcePlanPath: null,
+        scopePaths: ['packages/cli/src/commands/tasks/dependency-gate.ts']
+    };
+    const hardLane = diagnoseClaimReadinessForTasks(repo, [hardSummary], 'write');
+    assert(hardLane.primaryBlocker?.blockerCode === 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED', 'a proven hard-causal edge must block the claim');
+    assert(String(hardLane.primaryBlocker?.blockerSummary).includes(upstreamOutput), 'the refusal must name the producer output the claim is actually waiting on');
+    writeJson(path.join(repo, upstreamOutput), { sealed: true });
+    const hardLaneAfter = diagnoseClaimReadinessForTasks(repo, [hardSummary], 'write');
+    assert(hardLaneAfter.primaryBlocker === null, 'the same card must become claimable once the producer output is sealed');
 }
 finally {
     rmSync(repo, { recursive: true, force: true });
