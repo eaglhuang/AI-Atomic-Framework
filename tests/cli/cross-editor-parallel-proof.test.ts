@@ -7,11 +7,63 @@ import {
   NEGATIVE_CONTROL_FACTS,
   compileParallelProof,
   createHarnessTwoEditorIntervals,
+  evaluateScopedAcc3,
   maxConcurrency,
+  maxDistinctConcurrency,
   overlapMs,
-  requiredOverlapMs
+  requiredOverlapMs,
+  scopedIntervalsFromEvents,
+  unionDurationMs
 } from '../../scripts/compile-cross-editor-parallel-proof.ts';
 import { resolvePlanningRoot, sealWithoutDigest } from '../../scripts/audit-task-dependency-semantics.ts';
+import type { TaskEvent } from '../../scripts/validate-cross-editor-parallel-proof.ts';
+
+const editors = new Map<string, string>([
+  ['cursor-captain', 'cursor'],
+  ['claude-captain', 'claude-code']
+]);
+
+const claimOnly: TaskEvent[] = [
+  { action: 'claim', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T00:00:00.000Z' },
+  { action: 'claim', actorId: 'claude-captain', taskId: 'ATM-GOV-0406', createdAt: '2026-08-22T00:00:00.000Z' }
+];
+assert.equal(scopedIntervalsFromEvents(claimOnly, editors).length, 0);
+assert.equal(evaluateScopedAcc3([]).status, 'unproven');
+
+const shortIdle: TaskEvent[] = [
+  ...claimOnly,
+  { action: 'scope-amendment', actorId: 'claude-captain', taskId: 'ATM-GOV-0406', createdAt: '2026-08-22T01:00:00.000Z', endedAt: '2026-08-22T01:00:05.000Z' },
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T10:00:00.000Z', endedAt: '2026-08-22T10:00:02.000Z' }
+];
+const shortScoped = scopedIntervalsFromEvents(shortIdle, editors);
+assert.ok(unionDurationMs(shortScoped) < 60_000);
+assert.equal(evaluateScopedAcc3(shortScoped).status, 'unproven');
+assert.equal(evaluateScopedAcc3(shortScoped).overlapMs, 0);
+
+const overlapping: TaskEvent[] = [
+  { action: 'claim', actorId: 'claude-captain', taskId: 'ATM-GOV-0406', createdAt: '2026-08-22T15:00:00.000Z' },
+  { action: 'claim', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T15:00:00.000Z' },
+  { action: 'scope-amendment', actorId: 'claude-captain', taskId: 'ATM-GOV-0406', createdAt: '2026-08-22T15:10:00.000Z' },
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T15:12:00.000Z', endedAt: '2026-08-22T15:12:01.000Z' },
+  { action: 'commit', actorId: 'claude-captain', taskId: 'ATM-GOV-0406', createdAt: '2026-08-22T15:40:00.000Z' },
+  { action: 'commit', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T15:45:00.000Z' }
+];
+const overlapped = scopedIntervalsFromEvents(overlapping, editors);
+const overlappedAcc3 = evaluateScopedAcc3(overlapped);
+assert.equal(overlappedAcc3.status, 'met');
+assert.ok(overlappedAcc3.overlapMs > 0);
+assert.ok(overlappedAcc3.overlapMs < 40 * 60 * 1000);
+assert.equal(overlapped.find((interval) => interval.actorId === 'cursor-captain')?.endedAt, '2026-08-22T15:45:00.000Z');
+
+const duplicateSessions: TaskEvent[] = [
+  { action: 'claim', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T15:00:00.000Z' },
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T15:10:00.000Z', endedAt: '2026-08-22T15:20:00.000Z', source: 'session-a' },
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T15:12:00.000Z', endedAt: '2026-08-22T15:18:00.000Z', source: 'session-b' },
+  { action: 'commit', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T15:25:00.000Z' }
+];
+const duplicateScoped = scopedIntervalsFromEvents(duplicateSessions, editors);
+assert.equal(maxDistinctConcurrency(duplicateScoped, 'editor'), 1);
+assert.equal(maxDistinctConcurrency(duplicateScoped, 'actorId'), 1);
 
 const harness = createHarnessTwoEditorIntervals('2026-08-22T15:55:01.258Z');
 const now = harness[1].endedAt ?? '2026-08-22T16:20:01.258Z';
@@ -75,6 +127,14 @@ assert.equal(proof.lifecycle.frozenPublication.status, 'not-started');
 assert.equal(proof.lifecycle.formalCloseout.status, 'not-started');
 assert.equal(proof.hardCausalControls.nonHardClaimBeforeCompose, 'allowed');
 assert.equal(proof.acceptance.acc5.status, 'met');
+assert.equal(proof.overlap.basis, 'scoped-work');
+assert.ok(!proof.intervals.some((interval) => String(interval.source).includes('harness')));
+assert.ok(!proof.acceptance.acc3.detail.includes('harness'));
+assert.notEqual(proof.acceptance.acc3.status, 'met');
+assert.equal(evaluateScopedAcc3(harness).status, 'met');
+assert.ok(Array.isArray(proof.claimIntervals));
+assert.ok(typeof proof.concurrency.maxScopedWork === 'number');
+assert.ok(proof.concurrency.maxActiveClaims >= proof.concurrency.maxScopedWork || proof.concurrency.maxActiveClaims >= 1);
 
 const regenerated = compileParallelProof({
   targetRoot: resolve('.'),
@@ -87,7 +147,10 @@ console.log('[cross-editor-parallel-proof.test] ok');
 console.log(JSON.stringify({
   overlapMs: proof.overlap.overlapMs,
   overlapRatio: proof.overlap.overlapRatio,
-  maxConcurrency: proof.concurrency.maxActiveClaims,
+  maxActiveClaims: proof.concurrency.maxActiveClaims,
+  maxScopedWork: proof.concurrency.maxScopedWork,
+  acc3: proof.acceptance.acc3.status,
+  acc4: proof.acceptance.acc4.status,
   digest: proof.digest,
   sourceSha: proof.lifecycle.sourceDelivery.sha
 }));

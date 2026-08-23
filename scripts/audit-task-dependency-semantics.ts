@@ -111,6 +111,16 @@ export function gitCommitExists(cwd: string, sha: string): boolean {
   }
 }
 
+export function gitCommitMeta(cwd: string, sha: string): { sha: string; committedAt: string; body: string } | null {
+  try {
+    const raw = execFileSync('git', ['show', '-s', '--format=%cI%n%B', sha], { cwd, encoding: 'utf8' });
+    const split = raw.indexOf('\n');
+    return { sha, committedAt: raw.slice(0, split).trim(), body: raw.slice(split + 1) };
+  } catch {
+    return null;
+  }
+}
+
 export function resolvePlanningRoot(): string {
   if (process.env.ATM_PLANNING_REPO_ROOT) {
     return resolve(process.env.ATM_PLANNING_REPO_ROOT);
@@ -467,6 +477,7 @@ export function writeCensus(census: Plan41Census, targetRoot: string): string {
 
 export const ARBITRATION_TEAM_RUN_RELATIVE = '.atm/runtime/team-runs/team-0e35f115a714.json';
 export const ATM_GOV_0407_SOURCE_SHA = 'bec5bb75f7b33d593eebe45b9716cf8f08110515';
+export const ATM_GOV_0407_COMPOSE_SHA = '4e693964c5edf85b3857da033ab2064dada6e5c9';
 export const ATM_GOV_0406_SOURCE_SHAS = [
   '0cdbc9e95d5abbcbf1ba688d57e450c542aec5db',
   'da019ca4827eee0af3d32621f0439e00caa75d55',

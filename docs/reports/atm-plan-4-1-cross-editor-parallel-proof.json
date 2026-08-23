@@ -1,15 +1,15 @@
 {
   "schemaId": "atm.crossEditorParallelProof.v1",
   "specVersion": "0.1.0",
-  "generatedAt": "2026-08-23T02:58:46.252Z",
+  "generatedAt": "2026-08-23T05:55:17.949Z",
   "planSeal": {
     "path": "docs/ai_atomic_framework/governance-optimization/end-to-end-auto-batch-performance-plan-v4-1.md",
     "digest": "sha256:03ea18fb961c4e6da5591dd5e1bc05f5c97426288a6f24d84db0a6888764efc9"
   },
   "timeWindow": {
-    "startedAt": "2026-08-22T15:28:24.182Z",
-    "endedAt": "2026-08-23T02:58:46.252Z",
-    "watermark": "9f066f5d8572a1f2a663c7f6c1ae7c1aaffd5fb8"
+    "startedAt": "2026-08-22T15:55:06.036Z",
+    "endedAt": "2026-08-23T05:55:17.949Z",
+    "watermark": "4e693964c5edf85b3857da033ab2064dada6e5c9"
   },
   "sources": [
     {
@@ -27,7 +27,7 @@
   ],
   "commits": {
     "planning": "913299a225ba271a6f599d82e4dc52539bd19041",
-    "target": "9f066f5d8572a1f2a663c7f6c1ae7c1aaffd5fb8",
+    "target": "4e693964c5edf85b3857da033ab2064dada6e5c9",
     "atmGov0407Source": "bec5bb75f7b33d593eebe45b9716cf8f08110515",
     "atmGov0406": [
       "0cdbc9e95d5abbcbf1ba688d57e450c542aec5db",
@@ -36,15 +36,8 @@
     ],
     "producerPlanningSeal": "sha256:a3a910e3c96751ae8c8ec184596f361355ea73af7f43f537b7daab983c9008e4"
   },
-  "censusDigest": "sha256:af6e6ac8be42015bb797cb3080cd155daf77baca709949934b29d5bd8f5a43e8",
+  "censusDigest": "sha256:1ff1dce1e189d81b1d5c493222ed79b8a4b78f8a99f4d1b9b1fd22418a91fc49",
   "actors": [
-    {
-      "actorId": "unknown",
-      "editor": "unknown",
-      "taskIds": [
-        "ATM-GOV-0407"
-      ]
-    },
     {
       "actorId": "cursor-captain",
       "editor": "cursor",
@@ -54,13 +47,6 @@
     },
     {
       "actorId": "claude-008",
-      "editor": "claude-code",
-      "taskIds": [
-        "ATM-GOV-0406"
-      ]
-    },
-    {
-      "actorId": "claude-captain",
       "editor": "claude-code",
       "taskIds": [
         "ATM-GOV-0406"
@@ -70,25 +56,43 @@
   "intervals": [
     {
       "taskId": "ATM-GOV-0406",
-      "actorId": "unknown",
-      "editor": "unknown",
-      "startedAt": "2026-08-22T15:38:22.104Z",
-      "endedAt": null,
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-22T16:33:27.446Z",
+      "endedAt": "2026-08-22T16:58:18.000Z",
       "source": ".atm/history/task-events/ATM-GOV-0406"
     },
     {
-      "taskId": "ATM-GOV-0407",
-      "actorId": "unknown",
-      "editor": "unknown",
-      "startedAt": "2026-08-22T15:38:24.182Z",
-      "endedAt": null,
-      "source": ".atm/history/task-events/ATM-GOV-0407"
+      "taskId": "ATM-GOV-0406",
+      "actorId": "claude-008",
+      "editor": "claude-code",
+      "startedAt": "2026-08-23T02:53:02.224Z",
+      "endedAt": "2026-08-23T02:53:56.000Z",
+      "source": ".atm/history/task-events/ATM-GOV-0406"
     },
     {
       "taskId": "ATM-GOV-0407",
       "actorId": "cursor-captain",
       "editor": "cursor",
-      "startedAt": "2026-08-22T15:55:01.245Z",
+      "startedAt": "2026-08-22T16:03:10.183Z",
+      "endedAt": "2026-08-22T16:11:04.000Z",
+      "source": ".atm/history/evidence/ATM-GOV-0407.json"
+    },
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-23T02:54:39.512Z",
+      "endedAt": "2026-08-23T02:59:21.000Z",
+      "source": ".atm/history/evidence/ATM-GOV-0407.json"
+    }
+  ],
+  "claimIntervals": [
+    {
+      "taskId": "ATM-GOV-0407",
+      "actorId": "cursor-captain",
+      "editor": "cursor",
+      "startedAt": "2026-08-22T15:55:06.036Z",
       "endedAt": null,
       "source": ".atm/history/task-events/ATM-GOV-0407"
     },
@@ -96,29 +100,14 @@
       "taskId": "ATM-GOV-0406",
       "actorId": "claude-008",
       "editor": "claude-code",
-      "startedAt": "2026-08-22T15:56:38.704Z",
+      "startedAt": "2026-08-22T15:56:42.966Z",
       "endedAt": null,
       "source": ".atm/history/task-events/ATM-GOV-0406"
-    },
-    {
-      "taskId": "ATM-GOV-0406",
-      "actorId": "claude-captain",
-      "editor": "claude-code",
-      "startedAt": "2026-08-22T15:28:24.182Z",
-      "endedAt": "2026-08-22T15:58:24.182Z",
-      "source": "sealed-plan-4-1-harness"
-    },
-    {
-      "taskId": "ATM-GOV-0407",
-      "actorId": "cursor-captain",
-      "editor": "cursor",
-      "startedAt": "2026-08-22T15:38:24.182Z",
-      "endedAt": "2026-08-22T16:03:24.182Z",
-      "source": "sealed-plan-4-1-harness"
     }
   ],
   "concurrency": {
-    "maxActiveClaims": 4,
+    "maxActiveClaims": 2,
+    "maxScopedWork": 1,
     "distinctEditors": [
       "cursor",
       "claude-code"
@@ -126,11 +115,15 @@
   },
   "overlap": {
     "pair": "ATM-GOV-0406/ATM-GOV-0407",
-    "overlapMs": 39727548,
-    "shorterIntervalMs": 39727548,
-    "overlapRatio": 1,
-    "requiredMs": 900000,
-    "status": "met"
+    "basis": "scoped-work",
+    "overlapMs": 0,
+    "shorterIntervalMs": 755305,
+    "overlapRatio": 0,
+    "requiredMs": 188826,
+    "status": "unproven",
+    "missing": [
+      "no overlapping scoped-work intervals between distinct editors"
+    ]
   },
   "proposals": [],
   "broker": {
@@ -175,14 +168,14 @@
     {
       "id": "second-window",
       "startedAt": "2026-08-22T16:11:04.000Z",
-      "endedAt": "2026-08-23T02:58:46.252Z",
+      "endedAt": "2026-08-23T05:55:17.949Z",
       "policyViolationCount": 0,
       "foreignByteLoss": 0,
       "unauthorizedTakeover": 0,
       "bypass": 0,
       "cleanProofWindow": true,
       "source": "task-events-0406-0407-scan",
-      "scannedEventCount": 8
+      "scannedEventCount": 9
     }
   ],
   "compose": {
@@ -218,8 +211,8 @@
       "detail": "PRF sample has zero proven hard-causal edges; unproven declarations remain nonblocking."
     },
     "acc3": {
-      "status": "met",
-      "detail": "live overlapMs=39727548 liveRequiredMs=900000 maxLive=4 editors=unknown,cursor,claude-code"
+      "status": "unproven",
+      "detail": "basis=scoped-work overlapMs=0 requiredMs=188826 shorterScopedMs=755305 maxScopedWork=1 maxActiveClaims=2 missing=no overlapping scoped-work intervals between distinct editors"
     },
     "acc4": {
       "status": "met",
@@ -241,7 +234,7 @@
   "lifecycle": {
     "sourceDelivery": {
       "status": "delivered",
-      "sha": "sha256:d60c71aff5b759eea28a9452c3f415bfebf1f3ce6c4c82c6c25b09dd9ed3ab81",
+      "sha": "sha256:fd3f224688d8c706ef6fc3b012b1dcdd8b366d334f23fb967382d7d3e98e21b6",
       "reason": "Source deliverables exist on the canonical worktree. Frozen publication and formal close remain independent and are not started."
     },
     "frozenPublication": {
@@ -261,5 +254,5 @@
     "node --strip-types scripts/validate-cross-editor-parallel-proof.ts",
     "npm run typecheck"
   ],
-  "digest": "sha256:5aa01fcaaf06458c630e0f2d41574016ea5de8f11df5d1d6d99488a2d9db436f"
+  "digest": "sha256:5a93ba5c4827409c59f4778d528c9d1932b377c3128f3569319aa09f349f308f"
 }
