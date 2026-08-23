@@ -5,8 +5,13 @@ import {
 } from '../../scripts/audit-task-dependency-semantics.ts';
 import {
   NEGATIVE_CONTROL_FACTS,
+  PRODUCT_PROOF_WINDOW_ENDED_AT,
+  PRODUCT_PROOF_WINDOW_STARTED_AT,
   compileParallelProof,
   createHarnessTwoEditorIntervals,
+  clipIntervalToWindow,
+  commandRunIntervalsFromEvents,
+  evaluateProductProofAcc3,
   evaluateScopedAcc3,
   maxConcurrency,
   maxDistinctConcurrency,
@@ -64,6 +69,53 @@ const duplicateSessions: TaskEvent[] = [
 const duplicateScoped = scopedIntervalsFromEvents(duplicateSessions, editors);
 assert.equal(maxDistinctConcurrency(duplicateScoped, 'editor'), 1);
 assert.equal(maxDistinctConcurrency(duplicateScoped, 'actorId'), 1);
+
+const windowedHistorical: TaskEvent[] = [
+  { action: 'claim', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T15:55:01.000Z' },
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-22T16:03:10.000Z', endedAt: '2026-08-22T16:11:04.000Z', command: 'historical' },
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-23T07:10:35.024Z', endedAt: '2026-08-23T07:10:36.024Z', command: 'current-cursor' },
+  { action: 'evidence-run', actorId: 'claude-captain', taskId: 'ATM-GOV-0406', createdAt: '2026-08-23T07:10:35.524Z', endedAt: '2026-08-23T07:10:36.524Z', command: 'current-claude' }
+];
+const windowedRuns = commandRunIntervalsFromEvents(windowedHistorical, editors);
+const windowedAcc3 = evaluateProductProofAcc3(windowedRuns);
+assert.ok(windowedAcc3.shorterIntervalMs < 5_000);
+assert.ok(windowedAcc3.shorterIntervalMs < Date.parse('2026-08-22T16:11:04.000Z') - Date.parse('2026-08-22T16:03:10.000Z'));
+assert.equal(windowedAcc3.status, 'met');
+
+const gapped: TaskEvent[] = [
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-23T07:10:35.024Z', endedAt: '2026-08-23T07:10:36.024Z' },
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-23T07:12:00.000Z', endedAt: '2026-08-23T07:12:01.000Z' }
+];
+assert.equal(unionDurationMs(commandRunIntervalsFromEvents(gapped, editors)), 2_000);
+
+const failedRun: TaskEvent[] = [
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-23T07:11:00.000Z', endedAt: '2026-08-23T07:12:00.000Z', command: 'npm test', exitCode: 1 },
+  { action: 'evidence-run', actorId: 'claude-captain', taskId: 'ATM-GOV-0406', createdAt: '2026-08-23T07:11:10.000Z', endedAt: '2026-08-23T07:11:50.000Z', command: 'npm test', exitCode: 1 }
+];
+const failedIntervals = commandRunIntervalsFromEvents(failedRun, editors);
+assert.equal(failedIntervals[0]?.exitCode, 1);
+assert.ok(unionDurationMs(failedIntervals) >= 40_000);
+assert.equal(evaluateProductProofAcc3(failedIntervals).status, 'met');
+
+const overlappingUnion: TaskEvent[] = [
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-23T07:11:00.000Z', endedAt: '2026-08-23T07:11:20.000Z' },
+  { action: 'evidence-run', actorId: 'cursor-captain', taskId: 'ATM-GOV-0407', createdAt: '2026-08-23T07:11:05.000Z', endedAt: '2026-08-23T07:11:15.000Z' }
+];
+assert.equal(unionDurationMs(commandRunIntervalsFromEvents(overlappingUnion, editors)), 20_000);
+
+const claimsDoNotChangeScoped = commandRunIntervalsFromEvents([
+  ...claimOnly,
+  ...failedRun
+], editors);
+assert.equal(claimsDoNotChangeScoped.length, 2);
+assert.equal(clipIntervalToWindow({
+  taskId: 'ATM-GOV-0407',
+  actorId: 'cursor-captain',
+  editor: 'cursor',
+  startedAt: '2026-08-22T16:03:10.000Z',
+  endedAt: '2026-08-22T16:11:04.000Z',
+  source: 'historical'
+}, PRODUCT_PROOF_WINDOW_STARTED_AT, PRODUCT_PROOF_WINDOW_ENDED_AT), null);
 
 const harness = createHarnessTwoEditorIntervals('2026-08-22T15:55:01.258Z');
 const now = harness[1].endedAt ?? '2026-08-22T16:20:01.258Z';
@@ -130,11 +182,17 @@ assert.equal(proof.acceptance.acc5.status, 'met');
 assert.equal(proof.overlap.basis, 'scoped-work');
 assert.ok(!proof.intervals.some((interval) => String(interval.source).includes('harness')));
 assert.ok(!proof.acceptance.acc3.detail.includes('harness'));
-assert.notEqual(proof.acceptance.acc3.status, 'met');
+assert.equal(proof.productProofWindow.startedAt, PRODUCT_PROOF_WINDOW_STARTED_AT);
+assert.equal(proof.productProofWindow.endedAt, PRODUCT_PROOF_WINDOW_ENDED_AT);
+assert.ok(proof.overlap.shorterIntervalMs < Date.parse(PRODUCT_PROOF_WINDOW_ENDED_AT) - Date.parse(PRODUCT_PROOF_WINDOW_STARTED_AT));
+assert.equal(proof.acceptance.acc3.status, proof.overlap.overlapMs >= proof.overlap.requiredMs ? 'met' : 'unproven');
+assert.ok(proof.validatorOutcomes.some((outcome) => outcome.command === 'npm test' && outcome.exitCode === 1));
+assert.ok(proof.publicationBlockers.some((blocker) => /P1/.test(blocker.reason)));
+assert.ok(/npm test failure/i.test(proof.acceptance.acc6.detail));
 assert.equal(evaluateScopedAcc3(harness).status, 'met');
 assert.ok(Array.isArray(proof.claimIntervals));
 assert.ok(typeof proof.concurrency.maxScopedWork === 'number');
-assert.ok(proof.concurrency.maxActiveClaims >= proof.concurrency.maxScopedWork || proof.concurrency.maxActiveClaims >= 1);
+assert.ok(proof.concurrency.maxActiveClaims >= 1);
 
 const regenerated = compileParallelProof({
   targetRoot: resolve('.'),

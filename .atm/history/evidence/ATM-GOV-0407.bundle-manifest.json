@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0407",
-  "updatedAt": "2026-08-23T07:15:25.548Z",
+  "updatedAt": "2026-08-23T07:49:30.185Z",
   "updatedBy": "cursor-captain",
   "freshValidationPasses": [
     "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
@@ -169,6 +169,70 @@
       "durationMs": 12131,
       "runnerKind": "frozen-runner",
       "sourceCommit": "f5e00d3c9f0a6aab315479bbd88771db9597a32a",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/task-dependency-semantics-census.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c12d9bee248fff527de09452339d025b0179878a51838927abc8422344c809b7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/task-dependency-semantics-census.test.ts"
+      ],
+      "generatedAt": "2026-08-23T07:48:25.624Z",
+      "startedAt": "2026-08-23T07:48:25.214Z",
+      "finishedAt": "2026-08-23T07:48:25.624Z",
+      "durationMs": 410,
+      "runnerKind": "dev-source",
+      "sourceCommit": "343576a455f7cd19a01133ef83729001664b38c3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9192d78888ad880684da2f00d5b96a7d864c41d81baa7e2c7afe15dcfefb22f2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts"
+      ],
+      "generatedAt": "2026-08-23T07:48:42.641Z",
+      "startedAt": "2026-08-23T07:48:41.629Z",
+      "finishedAt": "2026-08-23T07:48:42.641Z",
+      "durationMs": 1012,
+      "runnerKind": "dev-source",
+      "sourceCommit": "343576a455f7cd19a01133ef83729001664b38c3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-cross-editor-parallel-proof.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3e2d073dd056c9936b4e8f4c6fcaeef1ba3a60e3e681443280d6a7705830319a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cross-editor-parallel-proof"
+      ],
+      "generatedAt": "2026-08-23T07:48:55.342Z",
+      "startedAt": "2026-08-23T07:48:55.036Z",
+      "finishedAt": "2026-08-23T07:48:55.342Z",
+      "durationMs": 306,
+      "runnerKind": "dev-source",
+      "sourceCommit": "343576a455f7cd19a01133ef83729001664b38c3",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-23T07:49:30.184Z",
+      "startedAt": "2026-08-23T07:49:18.282Z",
+      "finishedAt": "2026-08-23T07:49:30.184Z",
+      "durationMs": 11902,
+      "runnerKind": "dev-source",
+      "sourceCommit": "343576a455f7cd19a01133ef83729001664b38c3",
       "cached": false
     }
   ],

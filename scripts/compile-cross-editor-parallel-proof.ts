@@ -18,24 +18,32 @@ import {
   type Plan41Census
 } from './audit-task-dependency-semantics.ts';
 import {
+  PRODUCT_PROOF_WINDOW_ENDED_AT,
+  PRODUCT_PROOF_WINDOW_STARTED_AT,
   claimIntervalsFromEvents,
-  evaluateScopedAcc3,
+  clipIntervalToWindow,
+  commandRunIntervalsFromEvents,
+  evaluateProductProofAcc3,
   loadActorEditors,
   loadEvidenceScopedEvents,
-  loadSealedCommitEvents,
   loadTaskEvents,
   maxDistinctConcurrency,
-  scopedIntervalsFromEvents,
+  unionDurationMs,
   type TaskEvent
 } from './validate-cross-editor-parallel-proof.ts';
 
 export {
   claimIntervalsFromEvents,
+  clipIntervalToWindow,
+  commandRunIntervalsFromEvents,
+  evaluateProductProofAcc3,
   evaluateScopedAcc3,
   intervalsFromEvents,
   maxConcurrency,
   maxDistinctConcurrency,
   overlapMs,
+  PRODUCT_PROOF_WINDOW_ENDED_AT,
+  PRODUCT_PROOF_WINDOW_STARTED_AT,
   requiredOverlapMs,
   scopedIntervalsFromEvents,
   unionDurationMs
@@ -53,6 +61,8 @@ export interface ActiveInterval {
   startedAt: string;
   endedAt: string | null;
   source: string;
+  command?: string;
+  exitCode?: number;
 }
 
 export interface ProofWindow {
@@ -84,8 +94,12 @@ export interface ParallelProof {
   };
   censusDigest: string;
   actors: Array<{ actorId: string; editor: string; taskIds: string[] }>;
+  productProofWindow: { startedAt: string; endedAt: string; source: string };
   intervals: ActiveInterval[];
   claimIntervals: ActiveInterval[];
+  actorUnions: Array<{ actorId: string; editor: string; durationMs: number; intervalCount: number }>;
+  validatorOutcomes: Array<{ taskId: string; actorId: string; command: string; exitCode: number }>;
+  publicationBlockers: Array<{ taskId: string; reason: string }>;
   concurrency: { maxActiveClaims: number; maxScopedWork: number; distinctEditors: string[] };
   overlap: {
     pair: string;
@@ -231,10 +245,26 @@ export function compileParallelProof(options: {
   const editors = loadActorEditors(targetRoot);
   const pairIds = ['ATM-GOV-0406', 'ATM-GOV-0407'];
   const liveEvents = loadTaskEvents(targetRoot, [...pairIds, 'TASK-PRF-0002', 'TASK-PRF-0003']);
-  const workEvents = [...liveEvents, ...loadEvidenceScopedEvents(targetRoot, pairIds), ...loadSealedCommitEvents(targetRoot, pairIds)];
+  const evidenceEvents = loadEvidenceScopedEvents(targetRoot, pairIds);
   const claimIntervals = claimIntervalsFromEvents(liveEvents, editors).filter((interval) => pairIds.includes(interval.taskId));
-  const scopedIntervals = scopedIntervalsFromEvents(workEvents, editors).filter((interval) => pairIds.includes(interval.taskId));
-  const acc3 = evaluateScopedAcc3(scopedIntervals);
+  const productWindow = { startedAt: PRODUCT_PROOF_WINDOW_STARTED_AT, endedAt: PRODUCT_PROOF_WINDOW_ENDED_AT };
+  const scopedIntervals = commandRunIntervalsFromEvents(evidenceEvents, editors)
+    .filter((interval) => pairIds.includes(interval.taskId))
+    .map((interval) => clipIntervalToWindow(interval, productWindow.startedAt, productWindow.endedAt))
+    .filter((interval): interval is NonNullable<typeof interval> => interval !== null);
+  const acc3 = evaluateProductProofAcc3(scopedIntervals, productWindow);
+  const actorUnions = [...new Map(scopedIntervals.map((interval) => [interval.actorId, interval.editor])).entries()].map(([actorId, editor]) => {
+    const owned = scopedIntervals.filter((interval) => interval.actorId === actorId);
+    return { actorId, editor, durationMs: unionDurationMs(owned), intervalCount: owned.length };
+  });
+  const validatorOutcomes = scopedIntervals
+    .filter((interval) => interval.command)
+    .map((interval) => ({ taskId: interval.taskId, actorId: interval.actorId, command: String(interval.command), exitCode: interval.exitCode ?? 0 }));
+  const failedNpmTests = validatorOutcomes.filter((outcome) => outcome.command === 'npm test' && outcome.exitCode !== 0);
+  const publicationBlockers = [
+    { taskId: 'ATM-GOV-0406', reason: 'P1 source repair remains a publication blocker; ATM-GOV-0407 must not self-publish before 0406.' },
+    ...failedNpmTests.map((outcome) => ({ taskId: outcome.taskId, reason: `${outcome.command} exit ${outcome.exitCode} is retained as a failed validator, not a green pass.` }))
+  ];
   const reachable0406 = ATM_GOV_0406_SOURCE_SHAS.every((sha) => gitCommitExists(targetRoot, sha));
   const reachable0407 = gitCommitExists(targetRoot, ATM_GOV_0407_SOURCE_SHA);
   const before = evaluateHardCausalAdmission(NEGATIVE_CONTROL_FACTS, false);
@@ -325,8 +355,16 @@ export function compileParallelProof(options: {
         ])
       ).values()
     ],
+    productProofWindow: {
+      startedAt: productWindow.startedAt,
+      endedAt: productWindow.endedAt,
+      source: 'sealed-plan-4-1-product-proof-window'
+    },
     intervals: scopedIntervals,
     claimIntervals,
+    actorUnions,
+    validatorOutcomes,
+    publicationBlockers,
     concurrency: {
       maxActiveClaims,
       maxScopedWork,
@@ -380,7 +418,7 @@ export function compileParallelProof(options: {
       },
       acc3: {
         status: acc3.status,
-        detail: `basis=scoped-work overlapMs=${acc3.overlapMs} requiredMs=${acc3.requiredMs} shorterScopedMs=${acc3.shorterIntervalMs} maxScopedWork=${maxScopedWork} maxActiveClaims=${maxActiveClaims} missing=${acc3.missing.join(',') || 'none'}`
+        detail: `basis=scoped-work window=${productWindow.startedAt}/${productWindow.endedAt} overlapMs=${acc3.overlapMs} requiredMs=${acc3.requiredMs} shorterScopedMs=${acc3.shorterIntervalMs} maxScopedWork=${maxScopedWork} maxActiveClaims=${maxActiveClaims} npmTestFailures=${failedNpmTests.length} missing=${acc3.missing.join(',') || 'none'}`
       },
       acc4: {
         status: acc4Met ? 'met' : 'unproven',
@@ -394,7 +432,9 @@ export function compileParallelProof(options: {
       },
       acc6: {
         status: 'met',
-        detail: 'Dashboard seals window, watermark, sources, commits, overlap, Broker arbitration, proof windows and safety events.'
+        detail: failedNpmTests.length > 0
+          ? `Dashboard seals the product-proof window and retains ${failedNpmTests.length} npm test failure(s); focused validators passed, npm test did not.`
+          : 'Dashboard seals window, watermark, sources, commits, overlap, Broker arbitration, proof windows and safety events.'
       },
       acc7: {
         status: 'met',
@@ -410,7 +450,7 @@ export function compileParallelProof(options: {
       frozenPublication: {
         status: 'not-started',
         sha: null,
-        reason: 'ATM-GOV-0407 must not self-publish the frozen runner after source-done.'
+        reason: 'Frozen publication waits for ATM-GOV-0406 P1 source repair; this card must not self-publish.'
       },
       formalCloseout: {
         status: 'not-started',

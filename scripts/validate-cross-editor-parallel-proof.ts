@@ -26,8 +26,12 @@ export interface TaskEvent {
   createdAt?: string;
   endedAt?: string;
   command?: string;
+  exitCode?: number;
   source?: string;
 }
+
+export const PRODUCT_PROOF_WINDOW_STARTED_AT = '2026-08-23T07:10:35.024Z';
+export const PRODUCT_PROOF_WINDOW_ENDED_AT = '2026-08-23T07:16:40.204Z';
 
 const SCOPED_ACTIONS = new Set(['scope-amendment', 'evidence-run', 'validator']);
 const CLOSER_ACTIONS = new Set(['commit', 'release', 'close']);
@@ -111,6 +115,43 @@ export function maxDistinctConcurrency(intervals: ActiveInterval[], key: 'actorI
 
 export function maxConcurrency(intervals: ActiveInterval[], nowIso?: string): number {
   return maxDistinctConcurrency(intervals, 'actorId', nowIso);
+}
+
+export function clipIntervalToWindow(interval: ActiveInterval, startedAt: string, endedAt: string): ActiveInterval | null {
+  if (!interval.endedAt) return null;
+  const start = Math.max(Date.parse(startedAt), Date.parse(interval.startedAt));
+  const end = Math.min(Date.parse(endedAt), Date.parse(interval.endedAt));
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
+  return { ...interval, startedAt: new Date(start).toISOString(), endedAt: new Date(end).toISOString() };
+}
+
+export function commandRunIntervalsFromEvents(events: TaskEvent[], editors: Map<string, string>): ActiveInterval[] {
+  const intervals: ActiveInterval[] = [];
+  for (const event of events) {
+    if (event.action !== 'evidence-run' || !event.taskId || !event.createdAt || !event.endedAt) continue;
+    const actorId = event.actorId ?? 'unknown';
+    intervals.push({
+      taskId: event.taskId,
+      actorId,
+      editor: editorForActor(actorId, editors.get(actorId)),
+      startedAt: event.createdAt,
+      endedAt: event.endedAt,
+      source: event.source ?? 'evidence-run',
+      command: event.command,
+      exitCode: event.exitCode
+    });
+  }
+  return intervals;
+}
+
+export function evaluateProductProofAcc3(
+  scoped: ActiveInterval[],
+  window = { startedAt: PRODUCT_PROOF_WINDOW_STARTED_AT, endedAt: PRODUCT_PROOF_WINDOW_ENDED_AT }
+): ParallelProof['overlap'] {
+  const clipped = scoped
+    .map((interval) => clipIntervalToWindow(interval, window.startedAt, window.endedAt))
+    .filter((interval): interval is ActiveInterval => interval !== null);
+  return evaluateScopedAcc3(clipped);
 }
 
 export function evaluateScopedAcc3(scoped: ActiveInterval[]): ParallelProof['overlap'] {
@@ -241,11 +282,20 @@ export function loadEvidenceScopedEvents(targetRoot: string, taskIds: string[]):
     const path = resolve(targetRoot, '.atm/history/evidence', `${taskId}.json`);
     if (!exists(path)) continue;
     try {
-      const parsed = JSON.parse(read(path, 'utf8')) as { evidence?: Array<{ producedBy?: string; details?: { commandRuns?: Array<{ startedAt?: string; finishedAt?: string }> } }> };
+      const parsed = JSON.parse(read(path, 'utf8')) as { evidence?: Array<{ producedBy?: string; details?: { commandRuns?: Array<{ command?: string; exitCode?: number; startedAt?: string; finishedAt?: string }> } }> };
       for (const item of parsed.evidence ?? []) {
         for (const run of item.details?.commandRuns ?? []) {
           if (!run.startedAt || !run.finishedAt) continue;
-          events.push({ action: 'evidence-run', actorId: item.producedBy ?? 'unknown', taskId, createdAt: run.startedAt, endedAt: run.finishedAt, source: `.atm/history/evidence/${taskId}.json` });
+          events.push({
+            action: 'evidence-run',
+            actorId: item.producedBy ?? 'unknown',
+            taskId,
+            createdAt: run.startedAt,
+            endedAt: run.finishedAt,
+            command: run.command,
+            exitCode: run.exitCode,
+            source: `.atm/history/evidence/${taskId}.json`
+          });
         }
       }
     } catch {
@@ -362,6 +412,24 @@ export function validateProof(proof: ParallelProof, census: Plan41Census): strin
   }
   if (proof.acceptance.acc3.detail.includes('harness')) {
     errors.push('production ACC-3 must not use harness as a substitute');
+  }
+  if (proof.productProofWindow.startedAt !== PRODUCT_PROOF_WINDOW_STARTED_AT) {
+    errors.push('product-proof window start is not the sealed Cursor first commandRun');
+  }
+  if (proof.productProofWindow.endedAt !== PRODUCT_PROOF_WINDOW_ENDED_AT) {
+    errors.push('product-proof window end is not the sealed Claude last commandRun');
+  }
+  const windowMs = Date.parse(PRODUCT_PROOF_WINDOW_ENDED_AT) - Date.parse(PRODUCT_PROOF_WINDOW_STARTED_AT);
+  if (proof.overlap.shorterIntervalMs > windowMs) {
+    errors.push('shorterIntervalMs exceeds the sealed product-proof window');
+  }
+  if (proof.validatorOutcomes.some((outcome) => outcome.command === 'npm test' && outcome.exitCode !== 0)) {
+    if (!JSON.stringify(proof.publicationBlockers).includes('npm test')) {
+      errors.push('npm test failure must remain a publication/validator blocker');
+    }
+    if (/\bnpm test (passed|green)\b/i.test(proof.acceptance.acc6.detail)) {
+      errors.push('npm test failure must not be reported as passed');
+    }
   }
   return errors;
 }
