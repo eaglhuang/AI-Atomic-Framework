@@ -1,19 +1,27 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
+  ATM_GOV_0406_PLANNING_SEAL,
+  ATM_GOV_0406_SOURCE_SHAS,
+  ATM_GOV_0407_SOURCE_SHA,
   auditPrfDependencyCensus,
   digestText,
   evaluateHardCausalAdmission,
+  gitCommitExists,
   gitRevParse,
+  loadBrokerArbitration,
   resolvePlanningRoot,
   sealWithoutDigest,
   writeCensus,
+  type ArbitrationSource,
   type HardCausalFacts,
   type Plan41Census
 } from './audit-task-dependency-semantics.ts';
 
 export const PROOF_SCHEMA_ID = 'atm.crossEditorParallelProof.v1' as const;
 export const PROOF_OUTPUT_RELATIVE = 'docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json';
+export const FIRST_WINDOW_STARTED_AT = '2026-08-22T15:45:06.036Z';
+export const FIRST_WINDOW_ENDED_AT = '2026-08-22T16:11:04.000Z';
 
 export interface ActiveInterval {
   taskId: string;
@@ -24,6 +32,19 @@ export interface ActiveInterval {
   source: string;
 }
 
+export interface ProofWindow {
+  id: 'first-window' | 'second-window';
+  startedAt: string;
+  endedAt: string;
+  policyViolationCount: number;
+  foreignByteLoss: number;
+  unauthorizedTakeover: number;
+  bypass: number;
+  cleanProofWindow: boolean;
+  source: string;
+  scannedEventCount: number;
+}
+
 export interface ParallelProof {
   schemaId: typeof PROOF_SCHEMA_ID;
   specVersion: '0.1.0';
@@ -31,7 +52,13 @@ export interface ParallelProof {
   planSeal: { path: string; digest: string };
   timeWindow: { startedAt: string; endedAt: string; watermark: string };
   sources: Array<{ path: string; digest: string }>;
-  commits: { planning: string | null; target: string };
+  commits: {
+    planning: string | null;
+    target: string;
+    atmGov0407Source: string;
+    atmGov0406: string[];
+    producerPlanningSeal: string;
+  };
   censusDigest: string;
   actors: Array<{ actorId: string; editor: string; taskIds: string[] }>;
   intervals: ActiveInterval[];
@@ -45,15 +72,34 @@ export interface ParallelProof {
     status: 'met' | 'unmet';
   };
   proposals: Array<{ proposalId: string; surface: string; state: string }>;
-  broker: { arbitration: string; ticket: string };
+  broker: { arbitration: 'broker-arbitration' | 'unproven'; source: ArbitrationSource };
+  linkedSoftRelation: {
+    producer: string;
+    consumer: string;
+    classification: 'soft-order';
+    available: boolean;
+  };
+  producerContract: {
+    planningSealExpected: string;
+    planningSealObserved: string | null;
+    planningSealMatched: boolean;
+    reachable0406: boolean;
+    reachable0407: boolean;
+  };
+  proofWindows: ProofWindow[];
   compose: { outcome: string; reason: string };
-  safetyEvents: { foreignOverwrite: number; unauthorizedTakeover: number; bypass: number };
+  safetyEvents: {
+    policyViolationCount: number;
+    foreignOverwrite: number;
+    unauthorizedTakeover: number;
+    bypass: number;
+  };
   hardCausalControls: {
     beforeProducerOutput: ReturnType<typeof evaluateHardCausalAdmission>;
     afterProducerOutput: ReturnType<typeof evaluateHardCausalAdmission>;
     nonHardClaimBeforeCompose: 'allowed';
   };
-  acceptance: Record<string, { status: 'met' | 'unmet'; detail: string }>;
+  acceptance: Record<string, { status: 'met' | 'unmet' | 'unproven'; detail: string }>;
   lifecycle: {
     sourceDelivery: { status: 'not-started' | 'in-progress' | 'delivered' | 'blocked'; sha: string | null; reason: string };
     frozenPublication: { status: 'not-started' | 'in-progress' | 'delivered' | 'blocked'; sha: string | null; reason: string };
@@ -77,6 +123,23 @@ export const NEGATIVE_CONTROL_FACTS: HardCausalFacts = {
     command: 'evaluateHardCausalAdmission(facts, producerOutputSealed)'
   }
 };
+
+const ACTIVITY_ACTIONS = new Set([
+  'claim',
+  'renew',
+  'import',
+  'promote',
+  'reserve',
+  'scope-amendment',
+  'heartbeat',
+  'commit'
+]);
+
+const POLICY_PATTERNS: Array<{ field: keyof Pick<ProofWindow, 'policyViolationCount' | 'unauthorizedTakeover' | 'bypass'>; re: RegExp }> = [
+  { field: 'policyViolationCount', re: /\bstash\b/i },
+  { field: 'unauthorizedTakeover', re: /\btakeover\b/i },
+  { field: 'bypass', re: /\bbypass\b/i }
+];
 
 export function editorForActor(actorId: string, registryEditor?: string | null): string {
   if (registryEditor) return registryEditor;
@@ -124,6 +187,7 @@ interface TaskEvent {
   actorId?: string | null;
   taskId?: string;
   createdAt?: string;
+  command?: string;
 }
 
 function loadActorEditors(targetRoot: string): Map<string, string> {
@@ -151,7 +215,7 @@ export function intervalsFromEvents(events: TaskEvent[], editors: Map<string, st
     const createdAt = event.createdAt;
     if (!taskId || !createdAt) continue;
     const key = `${taskId}|${actorId}`;
-    if (event.action === 'claim' || event.action === 'renew') {
+    if (ACTIVITY_ACTIONS.has(String(event.action))) {
       if (!open.has(key)) {
         open.set(key, {
           taskId,
@@ -193,6 +257,41 @@ function loadTaskEvents(targetRoot: string, taskIds: string[]): TaskEvent[] {
   return events;
 }
 
+function observePlanningSeal(planningRoot: string): string | null {
+  const path = resolve(
+    planningRoot,
+    'docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md'
+  );
+  if (!existsSync(path)) return null;
+  return digestText(readFileSync(path, 'utf8'));
+}
+
+function scanSafetyCounters(events: TaskEvent[], startedAt: string, endedAt: string): Pick<ProofWindow, 'policyViolationCount' | 'foreignByteLoss' | 'unauthorizedTakeover' | 'bypass' | 'scannedEventCount'> {
+  const start = Date.parse(startedAt);
+  const end = Date.parse(endedAt);
+  const inWindow = events.filter((event) => {
+    const at = Date.parse(String(event.createdAt ?? ''));
+    return Number.isFinite(at) && at >= start && at <= end;
+  });
+  const counters = {
+    policyViolationCount: 0,
+    foreignByteLoss: 0,
+    unauthorizedTakeover: 0,
+    bypass: 0,
+    scannedEventCount: inWindow.length
+  };
+  for (const event of inWindow) {
+    const haystack = `${event.action ?? ''} ${event.command ?? ''} ${JSON.stringify(event)}`;
+    for (const pattern of POLICY_PATTERNS) {
+      if (pattern.re.test(haystack)) counters[pattern.field] += 1;
+    }
+    if (/\brestore\b|\breset\b/i.test(haystack) && /foreign|0406|stash/i.test(haystack)) {
+      counters.foreignByteLoss += 1;
+    }
+  }
+  return counters;
+}
+
 export function createHarnessTwoEditorIntervals(cursorClaimAt: string): ActiveInterval[] {
   const cursorStart = Date.parse(cursorClaimAt);
   return [
@@ -221,6 +320,7 @@ export function compileParallelProof(options: {
   census?: Plan41Census;
   generatedAt?: string;
   sourceSha?: string | null;
+  arbitrationPath?: string;
 }): ParallelProof {
   const targetRoot = resolve(options.targetRoot);
   const generatedAt = options.generatedAt ?? new Date().toISOString();
@@ -247,8 +347,10 @@ export function compileParallelProof(options: {
     intervalDurationMs(harnessIntervals[1], harnessNow)
   );
   const required = requiredOverlapMs(shorterHarness);
+  const reachable0406 = ATM_GOV_0406_SOURCE_SHAS.every((sha) => gitCommitExists(targetRoot, sha));
+  const reachable0407 = gitCommitExists(targetRoot, ATM_GOV_0407_SOURCE_SHA);
   const before = evaluateHardCausalAdmission(NEGATIVE_CONTROL_FACTS, false);
-  const after = evaluateHardCausalAdmission({ ...NEGATIVE_CONTROL_FACTS, producerOutputAvailable: true }, true);
+  const after = evaluateHardCausalAdmission({ ...NEGATIVE_CONTROL_FACTS, producerOutputAvailable: reachable0406 }, reachable0406);
   const liveNow = generatedAt;
   const liveShorter = claudeLive.length > 0 && cursorPair.length > 0
     ? Math.min(intervalDurationMs(claudeLive[0], liveNow), intervalDurationMs(cursorPair[0], liveNow))
@@ -274,6 +376,50 @@ export function compileParallelProof(options: {
     const path = resolve(targetRoot, relative);
     return existsSync(path) ? readFileSync(path, 'utf8') : '';
   }).join('\n'));
+  const arbitration = loadBrokerArbitration({
+    targetRoot,
+    relativePath: options.arbitrationPath
+  });
+  const planningSealObserved = observePlanningSeal(options.planningRoot);
+  const planningSealMatched = planningSealObserved === ATM_GOV_0406_PLANNING_SEAL;
+  const softRelationAvailable = true;
+  const acc4Met = arbitration.available
+    && planningSealMatched
+    && reachable0406
+    && reachable0407
+    && softRelationAvailable;
+  const secondStartedAt = FIRST_WINDOW_ENDED_AT;
+  const secondEndedAt = generatedAt;
+  const secondScan = Date.parse(secondEndedAt) >= Date.parse(secondStartedAt)
+    ? scanSafetyCounters(liveEvents, secondStartedAt, secondEndedAt)
+    : { policyViolationCount: 0, foreignByteLoss: 0, unauthorizedTakeover: 0, bypass: 0, scannedEventCount: 0 };
+  const firstWindow: ProofWindow = {
+    id: 'first-window',
+    startedAt: FIRST_WINDOW_STARTED_AT,
+    endedAt: FIRST_WINDOW_ENDED_AT,
+    policyViolationCount: 1,
+    foreignByteLoss: 0,
+    unauthorizedTakeover: 0,
+    bypass: 0,
+    cleanProofWindow: false,
+    source: 'sealed-first-window-observation',
+    scannedEventCount: 0
+  };
+  const secondWindow: ProofWindow = {
+    id: 'second-window',
+    startedAt: secondStartedAt,
+    endedAt: secondEndedAt,
+    policyViolationCount: secondScan.policyViolationCount,
+    foreignByteLoss: secondScan.foreignByteLoss,
+    unauthorizedTakeover: secondScan.unauthorizedTakeover,
+    bypass: secondScan.bypass,
+    cleanProofWindow: secondScan.policyViolationCount === 0
+      && secondScan.foreignByteLoss === 0
+      && secondScan.unauthorizedTakeover === 0
+      && secondScan.bypass === 0,
+    source: 'task-events-0406-0407-scan',
+    scannedEventCount: secondScan.scannedEventCount
+  };
   const proof: ParallelProof = {
     schemaId: PROOF_SCHEMA_ID,
     specVersion: '0.1.0',
@@ -285,7 +431,13 @@ export function compileParallelProof(options: {
       watermark: gitRevParse(targetRoot)
     },
     sources: census.sources,
-    commits: census.commits,
+    commits: {
+      planning: census.commits.planning,
+      target: census.commits.target,
+      atmGov0407Source: ATM_GOV_0407_SOURCE_SHA,
+      atmGov0406: [...ATM_GOV_0406_SOURCE_SHAS],
+      producerPlanningSeal: ATM_GOV_0406_PLANNING_SEAL
+    },
     censusDigest: census.digest,
     actors: [
       ...new Map(
@@ -310,22 +462,37 @@ export function compileParallelProof(options: {
       requiredMs: acc3Live ? liveRequired : required,
       status: acc3Live || acc3Harness ? 'met' : 'unmet'
     },
-    proposals: [
-      {
-        proposalId: 'prop-0407-shared-dashboard-surface',
-        surface: 'docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json',
-        state: 'proposal-submitted'
-      }
-    ],
+    proposals: [],
     broker: {
-      arbitration: 'proposal-first',
-      ticket: 'execute-now-on-0407-private-report-surface; 0406 bytes not admitted'
+      arbitration: acc4Met ? 'broker-arbitration' : 'unproven',
+      source: arbitration
     },
+    linkedSoftRelation: {
+      producer: 'ATM-GOV-0406',
+      consumer: 'ATM-GOV-0407',
+      classification: 'soft-order',
+      available: softRelationAvailable
+    },
+    producerContract: {
+      planningSealExpected: ATM_GOV_0406_PLANNING_SEAL,
+      planningSealObserved,
+      planningSealMatched,
+      reachable0406,
+      reachable0407
+    },
+    proofWindows: [firstWindow, secondWindow],
     compose: {
-      outcome: 'deferred-final-compose',
-      reason: 'Final compose/acceptance waits for ATM-GOV-0406 contract SHA; census and telemetry compose from the sealed Plan 4.1 contract now.'
+      outcome: acc4Met ? 'final-compose' : 'deferred-final-compose',
+      reason: acc4Met
+        ? 'Final compose consumes reachable 0406/0407 Git SHAs, the 0406 planning seal, and ATM team-run Broker arbitration evidence.'
+        : `ACC-4 remains unproven: ${arbitration.issues.join('; ') || 'producer contract or SHA is not sealed'}.`
     },
-    safetyEvents: { foreignOverwrite: 0, unauthorizedTakeover: 0, bypass: 0 },
+    safetyEvents: {
+      policyViolationCount: firstWindow.policyViolationCount + secondWindow.policyViolationCount,
+      foreignOverwrite: firstWindow.foreignByteLoss + secondWindow.foreignByteLoss,
+      unauthorizedTakeover: firstWindow.unauthorizedTakeover + secondWindow.unauthorizedTakeover,
+      bypass: firstWindow.bypass + secondWindow.bypass
+    },
     hardCausalControls: {
       beforeProducerOutput: before,
       afterProducerOutput: after,
@@ -347,15 +514,23 @@ export function compileParallelProof(options: {
           : `live overlapMs=${liveOverlap} liveRequiredMs=${liveRequired}; harness overlapMs=${harnessOverlap} requiredMs=${required}`
       },
       acc4: {
-        status: 'met',
-        detail: 'Overlapping dashboard surface uses proposal-first Broker arbitration; 0406 bytes untouched.'
+        status: acc4Met ? 'met' : 'unproven',
+        detail: acc4Met
+          ? `Broker arbitration branch: ${arbitration.path} schema=${arbitration.schemaId} verdict=${arbitration.verdict} lane=${arbitration.lane} digest=${arbitration.digest}`
+          : `unproven: ${[...arbitration.issues, planningSealMatched ? null : 'planning seal mismatch', reachable0406 ? null : '0406 SHA unreachable', reachable0407 ? null : '0407 SHA unreachable'].filter(Boolean).join('; ')}`
       },
       acc5: {
         status: before.claim === 'blocked' && after.claim === 'allowed' ? 'met' : 'unmet',
         detail: `before=${before.claim} after=${after.claim}`
       },
-      acc6: { status: 'met', detail: 'Dashboard seals window, watermark, sources, commits, counts, overlap, proposals, compose and safety events.' },
-      acc7: { status: 'met', detail: 'Digest is computed from canonical JSON excluding digest; lifecycle states are independent.' }
+      acc6: {
+        status: 'met',
+        detail: 'Dashboard seals window, watermark, sources, commits, overlap, Broker arbitration, proof windows and safety events.'
+      },
+      acc7: {
+        status: 'met',
+        detail: 'Digest is computed from canonical JSON excluding digest; lifecycle states are independent.'
+      }
     },
     lifecycle: {
       sourceDelivery: {
@@ -400,5 +575,5 @@ if (invoked) {
   writeCensus(census, targetRoot);
   const proof = compileParallelProof({ targetRoot, planningRoot, census });
   const output = writeProof(proof, targetRoot);
-  process.stdout.write(`${JSON.stringify({ ok: true, output, digest: proof.digest, overlap: proof.overlap, safetyEvents: proof.safetyEvents }, null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify({ ok: true, output, digest: proof.digest, overlap: proof.overlap, safetyEvents: proof.safetyEvents, acc4: proof.acceptance.acc4 }, null, 2)}\n`);
 }

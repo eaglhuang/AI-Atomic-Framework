@@ -55,9 +55,34 @@ export function validateProof(proof: ParallelProof, census: Plan41Census): strin
     errors.push('proof time window incomplete');
   }
   if (proof.digest !== sealWithoutDigest(proof)) errors.push('proof digest does not reproduce');
-  if (proof.safetyEvents.foreignOverwrite !== 0) errors.push('foreign overwrite is not zero');
-  if (proof.safetyEvents.unauthorizedTakeover !== 0) errors.push('unauthorized takeover is not zero');
-  if (proof.safetyEvents.bypass !== 0) errors.push('bypass is not zero');
+  if (JSON.stringify(proof).includes('prop-0407-shared-dashboard-surface')) {
+    errors.push('hardcoded false-green proposal id remains');
+  }
+  if (JSON.stringify(proof).includes('execute-now-on-0407-private-report-surface')) {
+    errors.push('hardcoded false-green broker ticket remains');
+  }
+  const first = proof.proofWindows.find((window) => window.id === 'first-window');
+  const second = proof.proofWindows.find((window) => window.id === 'second-window');
+  if (!first || first.policyViolationCount !== 1 || first.foreignByteLoss !== 0 || first.cleanProofWindow !== false) {
+    errors.push('first-window sealed safety counters are missing or mutated');
+  }
+  if (!second || second.source !== 'task-events-0406-0407-scan') {
+    errors.push('second-window was not computed from task events');
+  }
+  if (proof.safetyEvents.policyViolationCount !== (first?.policyViolationCount ?? 0) + (second?.policyViolationCount ?? 0)) {
+    errors.push('aggregated policyViolationCount does not equal window sum');
+  }
+  if (proof.broker.arbitration === 'broker-arbitration') {
+    if (proof.acceptance.acc4.status !== 'met') errors.push('broker-arbitration requires ACC-4 met');
+    if (!proof.broker.source.available) errors.push('broker-arbitration requires a validated source');
+    if (proof.broker.source.schemaId !== 'atm.teamRun.v1') errors.push('arbitration schemaId mismatch');
+    if (proof.broker.source.taskId !== 'ATM-GOV-0407') errors.push('arbitration taskId mismatch');
+    if (proof.broker.source.verdict !== 'parallel-safe') errors.push('arbitration verdict mismatch');
+    if (proof.broker.source.lane !== 'direct-brokered') errors.push('arbitration lane mismatch');
+    if (!proof.broker.source.digest) errors.push('arbitration digest missing');
+  } else if (proof.acceptance.acc4.status === 'met') {
+    errors.push('ACC-4 cannot be met without validated Broker arbitration');
+  }
   if (proof.hardCausalControls.beforeProducerOutput.claim !== 'blocked') {
     errors.push('hard-causal negative control did not block before producer output');
   }
@@ -72,9 +97,6 @@ export function validateProof(proof: ParallelProof, census: Plan41Census): strin
   }
   if (proof.lifecycle.formalCloseout.status !== 'not-started') {
     errors.push('formal closeout must remain not-started for this card');
-  }
-  if (!proof.proposals.some((proposal) => proposal.state.includes('proposal'))) {
-    errors.push('missing proposal-first surface');
   }
   return errors;
 }

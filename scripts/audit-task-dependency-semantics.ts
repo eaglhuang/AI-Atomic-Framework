@@ -102,6 +102,15 @@ export function gitRevParse(cwd: string): string {
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
 }
 
+export function gitCommitExists(cwd: string, sha: string): boolean {
+  try {
+    execFileSync('git', ['cat-file', '-e', `${sha}^{commit}`], { cwd, stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function resolvePlanningRoot(): string {
   if (process.env.ATM_PLANNING_REPO_ROOT) {
     return resolve(process.env.ATM_PLANNING_REPO_ROOT);
@@ -454,6 +463,58 @@ export function writeCensus(census: Plan41Census, targetRoot: string): string {
   const output = resolve(targetRoot, CENSUS_OUTPUT_RELATIVE);
   writeFileSync(output, `${JSON.stringify(census, null, 2)}\n`, 'utf8');
   return output;
+}
+
+export const ARBITRATION_TEAM_RUN_RELATIVE = '.atm/runtime/team-runs/team-0e35f115a714.json';
+export const ATM_GOV_0407_SOURCE_SHA = 'bec5bb75f7b33d593eebe45b9716cf8f08110515';
+export const ATM_GOV_0406_SOURCE_SHAS = [
+  '0cdbc9e95d5abbcbf1ba688d57e450c542aec5db',
+  'da019ca4827eee0af3d32621f0439e00caa75d55',
+  '9f066f5d8572a1f2a663c7f6c1ae7c1aaffd5fb8'
+] as const;
+export const ATM_GOV_0406_PLANNING_SEAL = 'sha256:a3a910e3c96751ae8c8ec184596f361355ea73af7f43f537b7daab983c9008e4';
+
+export interface ArbitrationSource {
+  path: string;
+  schemaId: string | null;
+  digest: string | null;
+  taskId: string | null;
+  verdict: string | null;
+  lane: string | null;
+  available: boolean;
+  issues: string[];
+}
+
+export function loadBrokerArbitration(options: { targetRoot: string; relativePath?: string }): ArbitrationSource {
+  const relativePath = options.relativePath ?? ARBITRATION_TEAM_RUN_RELATIVE;
+  const absolute = resolve(options.targetRoot, relativePath);
+  if (!existsSync(absolute)) {
+    return { path: relativePath.replace(/\\/g, '/'), schemaId: null, digest: null, taskId: null, verdict: null, lane: null, available: false, issues: ['arbitration artifact missing'] };
+  }
+  const raw = readFileSync(absolute, 'utf8');
+  const issues: string[] = [];
+  let parsed: Record<string, unknown> | null = null;
+  try {
+    const value = JSON.parse(raw) as unknown;
+    parsed = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
+  } catch {
+    issues.push('arbitration artifact is not JSON');
+  }
+  const schemaId = typeof parsed?.schemaId === 'string' ? parsed.schemaId : null;
+  const taskId = typeof parsed?.taskId === 'string' ? parsed.taskId : null;
+  const brokerLane = parsed?.brokerLane && typeof parsed.brokerLane === 'object' && !Array.isArray(parsed.brokerLane)
+    ? parsed.brokerLane as Record<string, unknown>
+    : null;
+  const decision = brokerLane?.decision && typeof brokerLane.decision === 'object' && !Array.isArray(brokerLane.decision)
+    ? brokerLane.decision as Record<string, unknown>
+    : null;
+  const verdict = typeof decision?.verdict === 'string' ? decision.verdict : null;
+  const lane = typeof brokerLane?.chosenLane === 'string' ? brokerLane.chosenLane : typeof decision?.lane === 'string' ? decision.lane : null;
+  if (schemaId !== 'atm.teamRun.v1') issues.push('schemaId is not atm.teamRun.v1');
+  if (taskId !== 'ATM-GOV-0407') issues.push('taskId is not ATM-GOV-0407');
+  if (verdict !== 'parallel-safe') issues.push('Broker verdict is not parallel-safe');
+  if (lane !== 'direct-brokered') issues.push('chosen lane is not direct-brokered');
+  return { path: relativePath.replace(/\\/g, '/'), schemaId, digest: digestText(raw), taskId, verdict, lane, available: issues.length === 0, issues };
 }
 
 const invoked = process.argv[1] && /audit-task-dependency-semantics\.ts$/.test(process.argv[1].replace(/\\/g, '/'));
