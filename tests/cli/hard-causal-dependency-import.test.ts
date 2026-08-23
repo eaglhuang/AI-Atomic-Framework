@@ -10,6 +10,9 @@ import {
   classifyTaskDependencyEdges,
   validateHardCausalDependencyImport
 } from '../../packages/cli/src/commands/tasks/dependency-gate.ts';
+import { extractFrontMatter } from '../../packages/cli/src/commands/tasks/task-import-validators.ts';
+import { runTasksImport } from '../../packages/cli/src/commands/tasks/import-orchestrator.ts';
+import { inspectTaskFrontmatterFidelity } from '../../packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts';
 import { applySingleCardContractValidation } from '../../packages/cli/src/commands/tasks/import-card-contract-validation.ts';
 
 /**
@@ -347,6 +350,140 @@ function typedCard(dependencies: readonly unknown[]) {
       `${code} must name the module that owns it`
     );
   }
+}
+
+
+/**
+ * ATM-GOV-0406 regression — quoted YAML list entries are not fidelity loss.
+ *
+ * The `dependencies` fidelity contract this card added exposed a latent
+ * asymmetry in the fidelity comparison: the frontmatter reader keeps the YAML
+ * double quotes on a scalar list entry ("TASK-AAO-0015"), while the importer
+ * projects the unquoted value (TASK-AAO-0015). The raw string comparison then
+ * reported every quoted entry as dropped, so any long-standing card that quotes
+ * its dependency ids failed to import. The rule is general: a declaration and
+ * its projection must be compared in one normalized form, and only a genuinely
+ * absent entry may fail closed.
+ */
+{
+  const projected = ['TASK-AAO-0015', 'TASK-AAO-0017'];
+  for (const quoting of ['"', "'", ''] as const) {
+    const declared = projected.map((entry) => `${quoting}${entry}${quoting}`);
+    const report = inspectTaskFrontmatterFidelity({
+      frontmatter: { dependencies: declared },
+      record: { dependencies: projected }
+    });
+    assert(
+      report.ok,
+      `a ${quoting || 'bare'}-quoted declaration whose entries all round-trip must not report fidelity loss, got ${JSON.stringify(report.findings)}`
+    );
+  }
+
+  for (const declarationKey of ['dependencies', 'depends_on', 'blocked_by'] as const) {
+    const dropped = inspectTaskFrontmatterFidelity({
+      frontmatter: { [declarationKey]: ['"TASK-AAO-0015"', '"TASK-AAO-0017"'] },
+      record: {}
+    });
+    assert(
+      !dropped.ok &&
+        dropped.findings.some((finding) => finding.kind === 'dropped-governance-field'),
+      `${declarationKey} that reaches no record field must still fail closed, got ${JSON.stringify(dropped.findings)}`
+    );
+
+    const partial = inspectTaskFrontmatterFidelity({
+      frontmatter: { [declarationKey]: ['"TASK-AAO-0015"', '"TASK-AAO-0017"'] },
+      record: { dependencies: ['TASK-AAO-0015'] }
+    });
+    assert(
+      !partial.ok &&
+        partial.findings.some((finding) => finding.kind === 'partial-governance-list'),
+      `${declarationKey} with a genuinely unprojected entry must still fail closed, got ${JSON.stringify(partial.findings)}`
+    );
+  }
+
+  // Markdown prose, headings, and fenced code never carry frontmatter
+  // authority: only the parsed frontmatter record is a declaration.
+  const proseOnly = inspectTaskFrontmatterFidelity({
+    frontmatter: { task_id: 'TASK-TEST-8811' },
+    record: { workItemId: 'TASK-TEST-8811' },
+    planText: [
+      '---',
+      'task_id: TASK-TEST-8811',
+      '---',
+      '',
+      '## Dependencies',
+      '',
+      'This card depends_on TASK-AAO-0015 in prose only.',
+      '',
+      '```yaml',
+      'dependencies:',
+      '  - "TASK-AAO-0017"',
+      '```',
+      ''
+    ].join('\n')
+  });
+  assert(
+    proseOnly.ok,
+    `prose, headings, and fenced code must not be promoted to frontmatter declarations, got ${JSON.stringify(proseOnly.findings)}`
+  );
+}
+
+/**
+ * ATM-GOV-0406 regression — the shipped TASK-AAO-0063 fixture, whose card has
+ * quoted `depends_on` ids, must import. This is the case validate-cli asserts.
+ */
+{
+  const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-gov-0406-fixture-'));
+  mkdirSync(path.join(repo, '.atm', 'history', 'tasks'), { recursive: true });
+  const fixturePath = path.resolve(
+    'scripts/fixtures/tasks/TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.fixture.md'
+  );
+  const declared = (
+    extractFrontMatter(readFileSync(fixturePath, 'utf8')) as unknown as { data: Record<string, unknown> }
+  ).data.depends_on;
+  assert(
+    Array.isArray(declared) && declared.length === 2,
+    `the fixture must still declare two dependency ids, got ${JSON.stringify(declared)}`
+  );
+  const imported = (await runTasksImport([
+    '--cwd', repo, '--from', fixturePath, '--dry-run', '--json'
+  ])) as { ok: boolean; messages?: unknown };
+  assert(
+    imported.ok === true,
+    `the shipped TASK-AAO-0063 fixture must import, got ${JSON.stringify(imported.messages)}`
+  );
+}
+
+/**
+ * ATM-GOV-0406 — quoting normalization must not weaken the six-fact hard-causal
+ * contract: a quoted typed edge missing a fact still fails closed.
+ */
+{
+  const quotedIncomplete = validateHardCausalDependencyImport({
+    taskId: 'TASK-TEST-8812',
+    taskDocument: {
+      dependencySemantics: HARD_CAUSAL_DEPENDENCY_SEMANTICS,
+      dependencies: [
+        {
+          taskId: '"TASK-TEST-8813"',
+          relation: 'hard-causal',
+          hardCausalProof: {
+            sharedAtomOrMap: 'atm.example',
+            producedArtifact: 'packages/example.ts',
+            consumedArtifact: 'packages/example.ts',
+            failureMode: 'consumer cannot compile without the produced seam',
+            provenBy: 'tests/cli/example.test.ts'
+          }
+        }
+      ]
+    },
+    cwd: process.cwd()
+  });
+  assert(
+    quotedIncomplete.diagnostics.length === 1 &&
+      quotedIncomplete.diagnostics[0]?.code === TASK_DEPENDENCY_HARD_PROOF_INCOMPLETE_CODE,
+    `a quoted typed edge missing negativeControl must still fail closed, got ${JSON.stringify(quotedIncomplete.diagnostics)}`
+  );
 }
 
 console.log('[hard-causal-dependency-import.test] ok');

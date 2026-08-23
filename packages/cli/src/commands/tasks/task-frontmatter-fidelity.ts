@@ -132,6 +132,21 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 }
 
 /**
+ * ATM-GOV-0406: a declaration and its projection have to be compared in one
+ * normalized form. The frontmatter reader preserves the YAML quotes a card
+ * wrote around a scalar list entry, while the importer projects the unquoted
+ * value, so a raw string comparison reports every quoted entry as dropped.
+ * Normalizing one balanced pair of surrounding quotes on both sides keeps a
+ * genuinely absent entry failing closed without inventing a per-field or
+ * per-task exception.
+ */
+function normalizeListEntry(entry: string): string {
+  const trimmed = entry.trim();
+  const quoted = /^(["'])([\s\S]*)\1$/.exec(trimmed);
+  return (quoted ? quoted[2] : trimmed).trim();
+}
+
+/**
  * Declared plain-string list entries that never reached the projected list.
  * Object-shaped entries are skipped because projection deliberately rewrites them
  * into deterministic edge strings.
@@ -141,11 +156,11 @@ function findMissingListEntries(declared: unknown, represented: unknown): readon
   const projected = new Set(
     (Array.isArray(represented) ? represented : [])
       .filter((entry): entry is string => typeof entry === 'string')
-      .map((entry) => entry.trim())
+      .map(normalizeListEntry)
   );
   return declared
     .filter((entry): entry is string => typeof entry === 'string')
-    .map((entry) => entry.trim())
+    .map(normalizeListEntry)
     .filter((entry) => entry.length > 0 && !projected.has(entry));
 }
 
