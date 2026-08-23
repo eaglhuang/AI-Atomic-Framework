@@ -16,7 +16,8 @@ import {
 } from '../../../../core/src/broker/runner-build-output-inventory.ts';
 
 export function authorizeRunnerPublicationTakeover(input: { readonly cwd: string; readonly taskId: string; readonly sealedSourceSha: string; readonly buildTarget: RunnerBuildOutputTarget; readonly currentTaskAllowedFiles: readonly string[] }): RunnerPublicationTakeoverPlan {
-  const snapshot = captureRunnerBuildOutputSnapshot({ cwd: input.cwd, buildTarget: input.buildTarget, currentTaskId: input.taskId, currentTaskAllowedFiles: input.currentTaskAllowedFiles });
+  // Authority is checked above; the takeover plan must describe the physical dirty surface seen by the publisher.
+  const snapshot = captureRunnerBuildOutputSnapshot({ cwd: input.cwd, buildTarget: input.buildTarget, currentTaskId: null, currentTaskAllowedFiles: [] });
   const plan = planRunnerPublicationTakeover({ sealedSourceSha: input.sealedSourceSha, snapshot });
   if (plan.entries.length === 0) throw new Error('ATM_RUNNER_PUBLICATION_PENDING: takeover requires at least one pre-existing generated publication member.');
   const receiptPath = path.join(input.cwd, '.atm', 'history', 'evidence', `${input.taskId}.runner-publication-takeover.json`);
@@ -26,7 +27,6 @@ export function authorizeRunnerPublicationTakeover(input: { readonly cwd: string
   writeFileSync(receiptPath, `${JSON.stringify({ ...plan, taskId: input.taskId }, null, 2)}\n`, 'utf8');
   return plan;
 }
-
 /**
  * Pure lifecycle for a sealed runner: private prepare/build/seal, then a
  * queue-head-gated shared publication, receipt archival, and idempotent retry.
