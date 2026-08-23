@@ -1,0 +1,88 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-23T16-01-44-857Z-close-59019ead722f",
+  "taskId": "ATM-GOV-0406",
+  "action": "close",
+  "actorId": "claude-008",
+  "sessionId": "session-20260822155638-claude-008-ATM-GOV-0406-2236dc5a8f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0406.json",
+  "taskSha256": "sha256:ccb1c3cfcccab6909636a7acf4b5772928ac26c40ec91f67f5ac7ce98cff64ec",
+  "createdAt": "2026-08-23T16:01:44.857Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0406 --actor claude-008 --status done --historical-delivery ff37dccd44f6870636ce0609fbb0420e8dbf581d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260822155638-claude-008-ATM-GOV-0406-2236dc5a8f",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0406.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "generate:error-codes",
+      "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "node --strip-types tests/cli/hard-causal-dependency-import.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "generate:error-codes",
+      "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "node --strip-types tests/cli/hard-causal-dependency-import.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-23T16:01:44.844Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0406.*",
+        ".atm/history/task-events/ATM-GOV-0406/**",
+        ".atm/history/tasks/ATM-GOV-0406.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "packages/cli/src/commands/next/claim-readiness.ts",
+        "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+        "packages/cli/src/commands/tasks/dependency-gate.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
+        "packages/cli/src/commands/tasks/task-card-contract-import.ts",
+        "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/core/src/error-code-registry.generated.ts",
+        "schemas/governance/work-item.schema.json",
+        "tests/cli/hard-causal-dependency-import.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "packages/cli/src/commands/next/claim-readiness.ts",
+        "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+        "packages/cli/src/commands/tasks/dependency-gate.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
+        "packages/cli/src/commands/tasks/task-card-contract-import.ts",
+        "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/core/src/error-code-registry.generated.ts",
+        "schemas/governance/work-item.schema.json",
+        "tests/cli/hard-causal-dependency-import.test.ts"
+      ],
+      "requiredGates": [
+        "generate:error-codes",
+        "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+        "node --strip-types tests/cli/hard-causal-dependency-import.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

@@ -1,9 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0406",
-  "updatedAt": "2026-08-23T07:56:33.365Z",
+  "updatedAt": "2026-08-23T11:09:33.827Z",
   "updatedBy": "claude-008",
   "freshValidationPasses": [
+    "generate:error-codes",
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+    "node --strip-types tests/cli/hard-causal-dependency-import.test.ts",
     "typecheck"
   ],
   "staleValidationPasses": [],
@@ -164,6 +168,70 @@
       "durationMs": 176829,
       "runnerKind": "dev-source",
       "sourceCommit": "a910f1dc599375845e703bfeb68bd7b22481da80",
+      "cached": false
+    },
+    {
+      "command": "npm run generate:error-codes",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3e490c28de9db603166e5f3f12d17ad0350291991758850535146be719edf5c2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "generate:error-codes"
+      ],
+      "generatedAt": "2026-08-23T11:08:23.877Z",
+      "startedAt": "2026-08-23T11:08:22.777Z",
+      "finishedAt": "2026-08-23T11:08:23.877Z",
+      "durationMs": 1100,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ff37dccd44f6870636ce0609fbb0420e8dbf581d",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f0539c9948213b92bf13b7ddc44333bd7629dd5ab72413ba77989228e28ddb25",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts"
+      ],
+      "generatedAt": "2026-08-23T11:08:33.524Z",
+      "startedAt": "2026-08-23T11:08:33.031Z",
+      "finishedAt": "2026-08-23T11:08:33.524Z",
+      "durationMs": 493,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ff37dccd44f6870636ce0609fbb0420e8dbf581d",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/hard-causal-dependency-import.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6213575469e88accd55e42b25358684f9859ebe4bf2045df8f54431046691708",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/hard-causal-dependency-import.test.ts"
+      ],
+      "generatedAt": "2026-08-23T11:08:39.739Z",
+      "startedAt": "2026-08-23T11:08:37.347Z",
+      "finishedAt": "2026-08-23T11:08:39.739Z",
+      "durationMs": 2392,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ff37dccd44f6870636ce0609fbb0420e8dbf581d",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:79261341175af208281f001de5cd0d66358d3b5ccba599f1558a46322674b33a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts"
+      ],
+      "generatedAt": "2026-08-23T11:09:33.826Z",
+      "startedAt": "2026-08-23T11:09:32.718Z",
+      "finishedAt": "2026-08-23T11:09:33.826Z",
+      "durationMs": 1108,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ff37dccd44f6870636ce0609fbb0420e8dbf581d",
       "cached": false
     }
   ],

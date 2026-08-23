@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0406",
   "title": "Define and enforce proven hard causal dependencies",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -250,7 +250,7 @@
     "actorId": "claude-008",
     "leaseId": "lease-3763d7bed6f2",
     "claimedAt": "2026-08-22T15:56:38.716Z",
-    "heartbeatAt": "2026-08-23T07:59:12.051Z",
+    "heartbeatAt": "2026-08-23T16:01:44.854Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0406.*",
@@ -273,13 +273,14 @@
       "schemas/governance/work-item.schema.json",
       "tests/cli/hard-causal-dependency-import.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260822155638-claude-008-987687d797",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155638-claude-008-987687d797\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "claude-008",
   "startedAt": "2026-08-22T15:56:38.716Z",
@@ -335,26 +336,26 @@
     "createdAt": "2026-08-22T15:56:43.053Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-23T07-59-12-578Z-renew-f1c6d1468249",
-  "lastTransitionAt": "2026-08-23T07:59:12.578Z",
+  "lastTransitionId": "2026-08-23T16-01-44-857Z-close-59019ead722f",
+  "lastTransitionAt": "2026-08-23T16:01:44.857Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-b2b0533af4e3fb8e",
-    "ticketDigest": "sha256:b2b0533af4e3fb8e566ff54593788cee258a764c1d6b9e01bd142aa25f373373",
+    "ticketId": "wat-d1ac13fc1d42a14a",
+    "ticketDigest": "sha256:d1ac13fc1d42a14a030b8e5eb35ff53a72fb34609a9fb0e7ec9aaeedfecef845",
     "taskId": "ATM-GOV-0406",
     "origin": "claim",
     "actorId": "claude-008",
     "laneSessionId": "lane-20260822155638-claude-008-987687d797",
     "claimGeneration": "lease-3763d7bed6f2",
-    "issuedAt": "2026-08-23T07:59:12.051Z",
-    "expiresAt": "2026-08-23T08:29:12.051Z",
+    "issuedAt": "2026-08-23T15:58:26.574Z",
+    "expiresAt": "2026-08-23T16:28:26.574Z",
     "scopeDigest": "sha256:c7031a15e04e7530bdc93af860efbb181b5217276a17454b44000914512c5740",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-23T07:59:12.051Z"
+      "selectedAt": "2026-08-23T15:58:26.574Z"
     },
     "grants": [
       {
@@ -414,5 +415,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
-  }
+  },
+  "closedAt": "2026-08-23T16:01:44.854Z",
+  "closedByActor": "claude-008",
+  "closedBySessionId": "session-20260822155638-claude-008-ATM-GOV-0406-2236dc5a8f",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0406.closure-packet.json"
 }
