@@ -13,6 +13,19 @@ import {
 import { applySingleCardContractValidation } from '../../packages/cli/src/commands/tasks/import-card-contract-validation.ts';
 
 /**
+ * ATM-GOV-0406 — the dependency diagnostics are identified by the canonical
+ * codes dependency-gate exports, not by a name prefix. A bare prefix literal
+ * would be picked up by the canonical ErrorCode source scan as a code that no
+ * registry entry can ever own.
+ */
+const DEPENDENCY_DIAGNOSTIC_CODES: ReadonlySet<string> = new Set([
+  TASK_DEPENDENCY_HARD_PROOF_INCOMPLETE_CODE,
+  TASK_DEPENDENCY_HARD_PROOF_CONTRADICTORY_CODE,
+  TASK_DEPENDENCY_UNTYPED_IN_TYPED_CARD_CODE,
+  TASK_DEPENDENCY_RELATION_UNKNOWN_CODE
+]);
+
+/**
  * ATM-GOV-0406 — Plan 4.1 hard-causal dependency contract, import boundary.
  *
  * A declared dependency freezes another lane, so the declaration itself has to
@@ -261,7 +274,7 @@ function typedCard(dependencies: readonly unknown[]) {
     planPath: 'docs/plans/atm-gov-9406.md'
   });
   const dependencyErrors = result.parsed.diagnostics.filter(
-    (entry) => String(entry.code ?? '').startsWith('ATM_TASK_DEPENDENCY_')
+    (entry) => DEPENDENCY_DIAGNOSTIC_CODES.has(String(entry.code ?? ''))
   );
   assert(
     dependencyErrors.length === 1,
@@ -302,7 +315,7 @@ function typedCard(dependencies: readonly unknown[]) {
       planPath: 'docs/plans/atm-gov-9406.md'
     });
     const dependencyErrors = result.parsed.diagnostics.filter(
-      (entry) => String(entry.code ?? '').startsWith('ATM_TASK_DEPENDENCY_')
+      (entry) => DEPENDENCY_DIAGNOSTIC_CODES.has(String(entry.code ?? ''))
     );
     assert(
       dependencyErrors.length === 0,

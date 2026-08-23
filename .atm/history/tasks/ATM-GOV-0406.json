@@ -11,7 +11,8 @@
     "ACC-3: Validation, publication, observation and soft-order relations do not block claim.",
     "ACC-4: File/atom overlap alone reaches Broker proposal-first/arbitration without becoming whole-task dependency; unauthorized mutation and compose stay fail-closed.",
     "ACC-5: Legacy families retain legacy behavior until audited; opted-in cards cannot silently fall back.",
-    "ACC-6: Negative control blocks before producer output and admits after sealed output exists."
+    "ACC-6: Negative control blocks before producer output and admits after sealed output exists.",
+    "ACC-7: The four dependency diagnostics are registered canonically and generated ErrorCode projections reproduce from the registry without absorbing foreign worktree declarations."
   ],
   "deliverables": [
     "schemas/governance/work-item.schema.json",
@@ -19,10 +20,17 @@
     "packages/cli/src/commands/tasks/dependency-gates.ts",
     "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
     "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/task-card-contract-import.ts",
+    "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
+    "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
     "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
     "packages/cli/src/commands/next/claim-readiness.ts",
     "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
-    "tests/cli/hard-causal-dependency-import.test.ts"
+    "tests/cli/hard-causal-dependency-import.test.ts",
+    "docs/governance/error-code-registry.json",
+    "packages/core/src/error-code-registry.generated.ts",
+    "docs/ERROR_CODES.md"
   ],
   "scopePaths": [
     "schemas/governance/work-item.schema.json",
@@ -30,25 +38,26 @@
     "packages/cli/src/commands/tasks/dependency-gates.ts",
     "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
     "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/task-card-contract-import.ts",
+    "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
+    "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
     "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
     "packages/cli/src/commands/next/claim-readiness.ts",
     "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
     "tests/cli/hard-causal-dependency-import.test.ts",
+    "docs/governance/error-code-registry.json",
+    "packages/core/src/error-code-registry.generated.ts",
+    "docs/ERROR_CODES.md",
     ".atm/history/evidence/ATM-GOV-0406.*",
     ".atm/history/task-events/ATM-GOV-0406/**",
-    ".atm/history/tasks/ATM-GOV-0406.json",
-    "docs/ERROR_CODES.md",
-    "docs/governance/error-code-registry.json",
-    "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
-    "packages/cli/src/commands/tasks/import-orchestrator.ts",
-    "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
-    "packages/cli/src/commands/tasks/task-card-contract-import.ts",
-    "packages/core/src/error-code-registry.generated.ts"
+    ".atm/history/tasks/ATM-GOV-0406.json"
   ],
   "validators": [
     "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
     "node --strip-types packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
     "node --strip-types tests/cli/hard-causal-dependency-import.test.ts",
+    "npm run generate:error-codes",
     "npm run typecheck"
   ],
   "planningRepo": "C:/Users/User/3KLife",
@@ -73,6 +82,27 @@
         "source": "packages/cli/src/commands/tasks/dependency-gate.ts",
         "disposition": "inline",
         "inlineReason": "Existing dependency gate owns classification and admission authority."
+      },
+      {
+        "atom": "atm.task-import-card-contract-validation",
+        "pattern": "Extract Method Object",
+        "source": "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.task-card-contract-import",
+        "pattern": "Deep Module",
+        "source": "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.task-atomization-policy-import",
+        "pattern": "Deep Module",
+        "source": "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
       }
     ]
   },
@@ -83,20 +113,20 @@
   "source": {
     "planPath": "governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md",
     "sectionTitle": "ATM-GOV-0406",
-    "headingLine": 110,
-    "hash": "d38a699326811b09",
+    "headingLine": 140,
+    "hash": "a3a910e3c96751ae",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md",
       "planningCommitSha": null,
-      "contentDigest": "sha256:d38a699326811b09195bdecfd3424e09e8f41258b45b9dd9f04ef38737089e98",
+      "contentDigest": "sha256:a3a910e3c96751ae8c8ec184596f361355ea73af7f43f537b7daab983c9008e4",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-22T15:38:21.876Z"
+      "sealedAt": "2026-08-23T01:47:01.585Z"
     }
   },
-  "importedAt": "2026-08-22T15:38:21.876Z",
+  "importedAt": "2026-08-23T01:47:01.585Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
@@ -140,7 +170,8 @@
       "coversAcceptance": [
         "ACC-1",
         "ACC-2",
-        "ACC-6"
+        "ACC-6",
+        "ACC-7"
       ],
       "coversImpactEdges": [
         "typed-proof-controls-claim-blocking",
@@ -215,12 +246,6 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-22T16-53-54-736Z-renew-f77968999b19",
-  "lastTransitionAt": "2026-08-22T16:53:54.736Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "claude-008",
-  "reservedAt": "2026-08-22T15:56:38.703Z",
-  "promotedAt": "2026-08-22T15:56:38.709Z",
   "claim": {
     "actorId": "claude-008",
     "leaseId": "lease-3763d7bed6f2",
@@ -256,25 +281,80 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155638-claude-008-987687d797\""
     }
   },
+  "owner": "claude-008",
   "startedAt": "2026-08-22T15:56:38.716Z",
-  "startedByActor": "claude-008",
+  "startedBySessionId": "session-20260822155638-claude-008-ATM-GOV-0406-2236dc5a8f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0406",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0406.*",
+      ".atm/history/task-events/ATM-GOV-0406/**",
+      ".atm/history/tasks/ATM-GOV-0406.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "packages/cli/src/commands/tasks/dependency-gate.ts",
+      "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
+      "packages/cli/src/commands/tasks/task-card-contract-import.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/core/src/error-code-registry.generated.ts",
+      "schemas/governance/work-item.schema.json",
+      "tests/cli/hard-causal-dependency-import.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4dd2c7d3df7b45be54259e0834b0f49c829bddde07ff9b3745162d42f0aaf356",
+    "actorId": "claude-008",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260822155638-claude-008-987687d797",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155638-claude-008-987687d797\""
+    },
+    "createdAt": "2026-08-22T15:56:43.053Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-08-23T02-53-02-224Z-scope-amendment-64593298468f",
+  "lastTransitionAt": "2026-08-23T02:53:02.224Z",
+  "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-8e664f6c4f6650d0",
-    "ticketDigest": "sha256:8e664f6c4f6650d07d2c3df198367950a22f81967b8e37cf7ee9eff9b77bab13",
+    "ticketId": "wat-065ff87a29f77bdf",
+    "ticketDigest": "sha256:065ff87a29f77bdfa094f47af71291e1b4ee50f7fea391f90712f370f95acce3",
     "taskId": "ATM-GOV-0406",
     "origin": "claim",
     "actorId": "claude-008",
     "laneSessionId": "lane-20260822155638-claude-008-987687d797",
     "claimGeneration": "lease-3763d7bed6f2",
-    "issuedAt": "2026-08-22T16:53:53.983Z",
-    "expiresAt": "2026-08-22T17:23:53.983Z",
+    "issuedAt": "2026-08-23T02:53:02.085Z",
+    "expiresAt": "2026-08-23T03:23:02.085Z",
     "scopeDigest": "sha256:a624f77985364c61de56d876c9e9d058f26073143565ae95b8b239aedba97e76",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-22T16:53:53.983Z"
+      "selectedAt": "2026-08-23T02:53:02.085Z"
     },
     "grants": [
       {
@@ -335,57 +415,5 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
-  },
-  "startedBySessionId": "session-20260822155638-claude-008-ATM-GOV-0406-2236dc5a8f",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
-    "taskId": "ATM-GOV-0406",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
-    "allowedFiles": [
-      ".atm/history/evidence/ATM-GOV-0406.*",
-      ".atm/history/task-events/ATM-GOV-0406/**",
-      ".atm/history/tasks/ATM-GOV-0406.json",
-      "docs/ERROR_CODES.md",
-      "docs/governance/error-code-registry.json",
-      "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
-      "packages/cli/src/commands/next/claim-readiness.ts",
-      "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
-      "packages/cli/src/commands/tasks/dependency-gate.ts",
-      "packages/cli/src/commands/tasks/dependency-gates.ts",
-      "packages/cli/src/commands/tasks/import-card-contract-validation.ts",
-      "packages/cli/src/commands/tasks/import-orchestrator.ts",
-      "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
-      "packages/cli/src/commands/tasks/task-card-contract-import.ts",
-      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
-      "packages/cli/src/commands/tasks/task-import-validators.ts",
-      "packages/core/src/error-code-registry.generated.ts",
-      "schemas/governance/work-item.schema.json",
-      "tests/cli/hard-causal-dependency-import.test.ts"
-    ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/governance-optimization/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/",
-      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0406-define-and-enforce-proven-hard-causal-dependencies.task.md"
-    ],
-    "allowPlanningMirror": false,
-    "promptHash": "4dd2c7d3df7b45be54259e0834b0f49c829bddde07ff9b3745162d42f0aaf356",
-    "actorId": "claude-008",
-    "sessionId": null,
-    "laneSession": {
-      "laneSessionId": "lane-20260822155638-claude-008-987687d797",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260822155638-claude-008-987687d797\""
-    },
-    "createdAt": "2026-08-22T15:56:43.053Z",
-    "status": "active"
   }
 }

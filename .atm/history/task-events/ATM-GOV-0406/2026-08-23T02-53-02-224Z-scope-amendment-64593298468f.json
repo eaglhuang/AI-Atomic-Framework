@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-23T02-53-02-224Z-scope-amendment-64593298468f",
+  "taskId": "ATM-GOV-0406",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0406.json",
+  "taskSha256": "sha256:12f5818090184e7e7430921e53fc7d4df543a7c0f9ddaaa7ec4cf0930c5e7295",
+  "createdAt": "2026-08-23T02:53:02.224Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0406 --actor claude-008 --add \"docs/ERROR_CODES.md,tests/cli/hard-causal-dependency-import.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
