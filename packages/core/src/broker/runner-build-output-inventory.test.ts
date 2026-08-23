@@ -89,6 +89,38 @@ try {
     true,
     'a broker-authored takeover plan with mixed-case generated paths must validate under the same canonical order'
   );
+  const cleanUniverseDrift = {
+    ...mixedCaseSnapshot,
+    members: {
+      ...mixedCaseSnapshot.members,
+      'release/atm-root-drop/unrelated-clean-member.js': 'sha256:new-clean-member'
+    }
+  };
+  assert.equal(
+    validateRunnerPublicationTakeoverPlan({
+      plan: mixedCasePlan,
+      sealedSourceSha: 'b'.repeat(40),
+      snapshot: cleanUniverseDrift
+    }).ok,
+    true,
+    'unrelated clean-member enumeration drift must not invalidate an exact dirty-byte takeover'
+  );
+  const dirtyByteDrift = {
+    ...mixedCaseSnapshot,
+    members: {
+      ...mixedCaseSnapshot.members,
+      'release/atm-root-drop/atomic_workbench/generator-provenance-audit.json': 'sha256:changed'
+    }
+  };
+  assert.equal(
+    validateRunnerPublicationTakeoverPlan({
+      plan: mixedCasePlan,
+      sealedSourceSha: 'b'.repeat(40),
+      snapshot: dirtyByteDrift
+    }).ok,
+    false,
+    'dirty-member byte drift must remain fail-closed'
+  );
   console.log('[runner-build-output-inventory] preserves foreign ownership until an exact takeover is supplied');
 } finally {
   rmSync(repo, { recursive: true, force: true });
