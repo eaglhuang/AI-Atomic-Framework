@@ -106,21 +106,23 @@ function isGovernanceNamespaceKey(key: string): boolean {
 }
 
 function isDeclared(value: unknown): boolean {
-  if (value === null || value === undefined) return false;
-  if (Array.isArray(value)) return value.length > 0;
-  if (typeof value === 'string') return value.trim().length > 0;
-  if (typeof value === 'object') return Object.keys(value as Record<string, unknown>).length > 0;
-  return true;
+  // Presence, rather than truthiness or collection cardinality, is the
+  // fidelity contract.  `[]` is an explicit declaration that must round-trip
+  // as `[]`; only an absent/null field means no declaration was made.
+  return value !== null && value !== undefined;
 }
 
 function isRepresented(value: unknown): boolean {
-  return isDeclared(value);
+  // Keep the same distinction on the projection side: an empty collection is
+  // faithfully represented, whereas undefined/null means the importer dropped
+  // the declared field.
+  return value !== null && value !== undefined;
 }
 
 function readAlias(record: Record<string, unknown> | null, keys: readonly string[]): unknown {
   if (!record) return undefined;
   for (const key of keys) {
-    if (isDeclared(record[key])) return record[key];
+    if (Object.prototype.hasOwnProperty.call(record, key) && isDeclared(record[key])) return record[key];
   }
   return undefined;
 }

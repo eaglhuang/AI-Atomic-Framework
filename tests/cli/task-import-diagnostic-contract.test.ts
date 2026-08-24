@@ -275,4 +275,30 @@ const faithfulReport = inspectTaskFrontmatterFidelity({
 assert.equal(faithfulReport.ok, true, 'a faithful projection must not raise findings');
 assert.deepEqual(faithfulReport.findings, []);
 
+// Explicit empty collections carry governance meaning: they say the card
+// intentionally declares no edges/cases, not that the parser may omit the
+// corresponding record fields.  A matching empty projection is therefore
+// faithful; a missing property remains covered by the dropped-field cases.
+const explicitEmptyCollectionsReport = inspectTaskFrontmatterFidelity({
+  frontmatter: {
+    dependencies: [],
+    phaseTestCaseIds: [],
+    advisoryTestCaseIds: [],
+    causalGraph: { causalDependencies: [], softRelations: [] }
+  },
+  record: {
+    workItemId: 'TASK-FID-EMPTY-0001',
+    dependencies: [],
+    phaseTestCaseIds: [],
+    advisoryTestCaseIds: [],
+    causalGraph: { causalDependencies: [], softRelations: [] }
+  }
+});
+assert.equal(explicitEmptyCollectionsReport.ok, true, 'explicit empty collections must round-trip without a fidelity-loss finding');
+assert.deepEqual(explicitEmptyCollectionsReport.findings, []);
+assert.ok(
+  explicitEmptyCollectionsReport.checkedFields.includes('causalGraph.causalDependencies'),
+  'an explicit empty causal dependency collection must be checked rather than silently skipped'
+);
+
 console.log('task-import-diagnostic-contract.test passed');

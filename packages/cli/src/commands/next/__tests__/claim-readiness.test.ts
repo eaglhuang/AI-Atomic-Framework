@@ -29,7 +29,8 @@ try {
       workItemId: 'TASK-MARKDOWN',
       status: 'open',
       format: 'markdown',
-      sourcePlanPath: 'docs/tasks/TASK-MARKDOWN.task.md'
+      sourcePlanPath: 'docs/plans/product-proof.md',
+      taskPath: '../planning/docs/plans/tasks/TASK-MARKDOWN.task.md'
     },
     {
       workItemId: 'TASK-REVIEW',
@@ -80,6 +81,10 @@ try {
   const writeLane = diagnoseClaimReadinessForTasks(repo, taskSummaries, 'write');
   assert(writeLane.primaryBlocker?.taskId === 'TASK-MARKDOWN', 'markdown import requirement must be the first blocker');
   assert(writeLane.primaryBlocker?.blockerCode === 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED', 'markdown tasks must explain import requirement');
+  assert(
+    writeLane.primaryBlocker?.requiredCommand?.includes('../planning/docs/plans/tasks/TASK-MARKDOWN.task.md'),
+    'a discovered Markdown task must recover through its card path, not a narrative plan path'
+  );
 
   const reviewLane = diagnoseClaimReadinessForTasks(repo, [taskSummaries[1]], 'write');
   assert(reviewLane.primaryBlocker?.blockerCode === 'ATM_NEXT_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED', 'review tasks must require closeout-only on write intent');
