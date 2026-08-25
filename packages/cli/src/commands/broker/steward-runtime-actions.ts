@@ -32,6 +32,17 @@ import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleas
 
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.ts';
 
+function persistComposedMergePlan(cwd: string, mergePlan: MergePlan): { readonly path: string; readonly digest: string } {
+  const relativePath = path.join('.atm', 'runtime', 'broker-merge-plans', `${mergePlan.mergePlanId}.json`);
+  const absolutePath = path.join(cwd, relativePath);
+  const content = `${JSON.stringify(mergePlan, null, 2)}\n`;
+  mkdirSync(path.dirname(absolutePath), { recursive: true });
+  writeFileSync(absolutePath, content, 'utf8');
+  return {
+    path: relativePath.replace(/\\/g, '/'),
+    digest: hashContent(content)
+  };
+}
 
 export function handleBrokerStewardRuntimeActions(options: ParsedBrokerOptions, context: BrokerCommandContext) {
   const registryPath = context.registryPath;
@@ -307,6 +318,9 @@ export function handleBrokerStewardRuntimeActions(options: ParsedBrokerOptions, 
     const composeResult = composeBrokerProposals(proposals);
     const blocked = composeResult.mergePlan.verdict === 'blocked-cid-conflict'
       || composeResult.mergePlan.verdict === 'blocked-shared-surface';
+    const persistedMergePlan = options.persistMergePlan && !blocked
+      ? persistComposedMergePlan(options.cwd, composeResult.mergePlan)
+      : null;
 
     return makeResult({
       ok: composeResult.ok && !blocked,
@@ -322,13 +336,15 @@ export function handleBrokerStewardRuntimeActions(options: ParsedBrokerOptions, 
           {
             mergePlanId: composeResult.mergePlan.mergePlanId,
             verdict: composeResult.mergePlan.verdict,
-            proposalCount: proposals.length
+            proposalCount: proposals.length,
+            mergePlanPath: persistedMergePlan?.path ?? null
           }
         )
       ],
       evidence: {
         action: 'compose',
         mergePlan: composeResult.mergePlan,
+        persistedMergePlan,
         proposalCount: proposals.length,
         proposalIds: composeResult.mergePlan.inputProposals
       }
