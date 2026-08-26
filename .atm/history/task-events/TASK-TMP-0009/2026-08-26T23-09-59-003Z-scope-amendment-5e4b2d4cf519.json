@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-26T23-09-59-003Z-scope-amendment-5e4b2d4cf519",
+  "taskId": "TASK-TMP-0009",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0009.json",
+  "taskSha256": "sha256:934fb2afbcaadc18ef0da09f31320c7e088c5c100537e25dc93a0b79fd8a428c",
+  "createdAt": "2026-08-26T23:09:59.003Z",
+  "command": "node atm.mjs tasks scope add --task TASK-TMP-0009 --actor codex-captain --add tests/cli/cross-editor-parallel-proof.test.ts --reason \"The task's required lint validator is blocked by one committed duplicate import; add the exact failing file for a minimal baseline repair.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The task's required lint validator is blocked by one committed duplicate import; add the exact failing file for a minimal baseline repair."
+  }
+}

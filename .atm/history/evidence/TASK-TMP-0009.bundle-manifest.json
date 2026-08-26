@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TMP-0009",
+  "updatedAt": "2026-08-26T23:11:15.595Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "cross-editor-parallel-proof",
+    "lint",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7826501cb43ed4c1bdf58db8684acc66926822ca574880f5882bf20248bd6a69",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-08-26T23:10:59.745Z",
+      "startedAt": "2026-08-26T23:10:49.924Z",
+      "finishedAt": "2026-08-26T23:10:59.745Z",
+      "durationMs": 9821,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "d53c5998b5b380f3fa5830b6ec5a2d33afb77d38",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-26T23:11:11.482Z",
+      "startedAt": "2026-08-26T23:11:02.893Z",
+      "finishedAt": "2026-08-26T23:11:11.482Z",
+      "durationMs": 8589,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "d53c5998b5b380f3fa5830b6ec5a2d33afb77d38",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/cross-editor-parallel-proof.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:04b60f2813060f5d0a400378085be5ca23c5105ec293419dd329425af7d06253",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "cross-editor-parallel-proof"
+      ],
+      "generatedAt": "2026-08-26T23:11:15.594Z",
+      "startedAt": "2026-08-26T23:11:14.640Z",
+      "finishedAt": "2026-08-26T23:11:15.594Z",
+      "durationMs": 954,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "d53c5998b5b380f3fa5830b6ec5a2d33afb77d38",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

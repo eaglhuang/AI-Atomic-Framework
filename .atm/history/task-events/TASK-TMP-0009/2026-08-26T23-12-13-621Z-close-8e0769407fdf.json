@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-26T23-12-13-621Z-close-8e0769407fdf",
+  "taskId": "TASK-TMP-0009",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260826230823-codex-captain-TASK-TMP-0009-c6cf0e260a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0009.json",
+  "taskSha256": "sha256:9644d15f3041a2f039d7c6437d09b3317c27634f1bd8ab34c404d8e8e27553ec",
+  "createdAt": "2026-08-26T23:12:13.621Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0009 --actor codex-captain --status done --from-batch-checkpoint --batch batch-04c0416ff644 --historical-delivery 021bbb0e214c700a1238e76955722ec3080aae7c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-04c0416ff644",
+    "sessionId": "session-20260826230823-codex-captain-TASK-TMP-0009-c6cf0e260a",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0009.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "cross-editor-parallel-proof",
+      "lint",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "lint",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-26T23:12:13.611Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0009.*",
+        ".atm/history/task-events/TASK-TMP-0009/**",
+        ".atm/history/tasks/TASK-TMP-0009.json",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "tests/cli/cross-editor-parallel-proof.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "tests/cli/cross-editor-parallel-proof.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "typecheck"
+      ]
+    }
+  }
+}

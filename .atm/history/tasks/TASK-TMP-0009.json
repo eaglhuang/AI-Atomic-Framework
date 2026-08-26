@@ -1,0 +1,290 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0009",
+  "title": "Restore lint baseline by consolidating duplicate imports",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Each affected module has at most one import declaration per referenced source module.",
+    "Imported symbols retain the same type/value semantics and source module.",
+    "`npm run lint` exits 0.",
+    "`npm run typecheck` exits 0.",
+    "Diff contains only the three declared import consolidations and governed task evidence."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    ".atm/history/evidence/TASK-TMP-0009.*",
+    ".atm/history/task-events/TASK-TMP-0009/**",
+    ".atm/history/tasks/TASK-TMP-0009.json",
+    "tests/cli/cross-editor-parallel-proof.test.ts"
+  ],
+  "validators": [
+    "npm run lint",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the import declaration consolidation; no runtime behavior, generated output, or task ledger is part of the delivery.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    },
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 2 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "packages/cli/src/commands/broker/steward-queues.ts (606 lines)",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts (623 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "temporary-governance/tasks/TASK-TMP-0009-restore-lint-baseline-by-consolidating-duplicate-imports.task.md",
+    "sectionTitle": "TASK-TMP-0009",
+    "headingLine": 35,
+    "hash": "4e39dc9111f610bf",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "temporary-governance/tasks/TASK-TMP-0009-restore-lint-baseline-by-consolidating-duplicate-imports.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4e39dc9111f610bf36383d5747edea07a1dc43e060f361073533c26368a79cf0",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-14T13:34:22.407Z"
+    }
+  },
+  "importedAt": "2026-08-14T13:34:22.407Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.lint",
+      "command": "npm run lint",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-26T23-12-13-769Z-lock-cleanup-9b2a5ee98e31",
+  "lastTransitionAt": "2026-08-26T23:12:13.769Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-08-26T23:08:23.510Z",
+  "promotedAt": "2026-08-26T23:08:23.515Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-859e9263bc66",
+    "claimedAt": "2026-08-26T23:08:23.519Z",
+    "heartbeatAt": "2026-08-26T23:12:13.619Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-TMP-0009.*",
+      ".atm/history/task-events/TASK-TMP-0009/**",
+      ".atm/history/tasks/TASK-TMP-0009.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "tests/cli/cross-editor-parallel-proof.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260826230823-codex-captain-e8285bf185",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826230823-codex-captain-e8285bf185\""
+    },
+    "reason": "Commit 021bbb0e contains all three TASK-TMP-0009 deliverables plus unrelated framework changes; recognize only the three task-matched files. The current scoped import consolidation restores the required lint baseline."
+  },
+  "startedAt": "2026-08-26T23:08:23.519Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-00e15e8f5d417ef1",
+    "ticketDigest": "sha256:00e15e8f5d417ef10849c57257a9fb9b49d6b5cdccc34432bdd99012233add96",
+    "taskId": "TASK-TMP-0009",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260826230823-codex-captain-e8285bf185",
+    "claimGeneration": "lease-859e9263bc66",
+    "issuedAt": "2026-08-26T23:09:58.882Z",
+    "expiresAt": "2026-08-26T23:39:58.882Z",
+    "scopeDigest": "sha256:0429006a1ac8f06517361acfdd2d7d988b61a0706d6c7100e0ec6c95d63deb2e",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-26T23:09:58.882Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-TMP-0009.*",
+          ".atm/history/task-events/TASK-TMP-0009/**",
+          ".atm/history/tasks/TASK-TMP-0009.json",
+          "packages/cli/src/commands/broker/steward-queues.ts",
+          "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+          "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+          "tests/cli/cross-editor-parallel-proof.test.ts"
+        ],
+        "digest": "sha256:9c987f94e864b07b09c3f99e601c6dbe8e679b2f094b5244ec07e1e204cd2a76"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260826230823-codex-captain-TASK-TMP-0009-c6cf0e260a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0009",
+    "batchId": "batch-04c0416ff644",
+    "scopeKey": "tasks-dc4a5d32eff0",
+    "queueId": "queue-94da07f324aa6f51",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TMP-0009.*",
+      ".atm/history/task-events/TASK-TMP-0009/**",
+      ".atm/history/tasks/TASK-TMP-0009.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "tests/cli/cross-editor-parallel-proof.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0009-restore-lint-baseline-by-consolidating-duplicate-imports.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/temporary-governance/",
+      "docs/ai_atomic_framework/temporary-governance/tasks/",
+      "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0009-restore-lint-baseline-by-consolidating-duplicate-imports.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "c6210201753bd53a9e88c655540fa60685df0d9ed5722f0a4e23a44058d49871",
+    "actorId": "codex-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260826230823-codex-captain-e8285bf185",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826230823-codex-captain-e8285bf185\""
+    },
+    "createdAt": "2026-08-26T23:08:28.447Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-26T23:12:13.766Z",
+    "releasedBy": "codex-captain"
+  },
+  "closedAt": "2026-08-26T23:12:13.619Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260826230823-codex-captain-TASK-TMP-0009-c6cf0e260a",
+  "closeReason": "Commit 021bbb0e contains all three TASK-TMP-0009 deliverables plus unrelated framework changes; recognize only the three task-matched files. The current scoped import consolidation restores the required lint baseline.",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0009.closure-packet.json"
+}
