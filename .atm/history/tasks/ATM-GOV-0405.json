@@ -1,0 +1,289 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0405",
+  "title": "Keep state-only Team start independent of execution backends",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0402"
+  ],
+  "acceptance": [
+    "ACC-1: A valid state-only Team start succeeds without `teamRuntimeCapabilities`, mints no worker execution, and records `executeRequested: false`.",
+    "ACC-2: `team start --execute` with a missing backend remains fail-closed as `ATM_TEAM_RUNTIME_BACKEND_MISSING` and reports a structured recovery derived from installed capabilities.",
+    "ACC-3: Existing installed manifests are not falsely widened; actual execution capability remains a separately verified adapter fact.",
+    "ACC-4: Fixture-first red/green tests prove state-only success, execute failure, and no agents spawned in either unavailable-backend fixture."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team/team-execution-lane.ts",
+    "packages/cli/src/commands/team/legacy/command-runner.ts",
+    "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+    "tests/cli/team-state-only-runtime-admission.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team/team-execution-lane.ts",
+    "packages/cli/src/commands/team/legacy/command-runner.ts",
+    "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+    "tests/cli/team-state-only-runtime-admission.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+    "node --strip-types tests/cli/team-state-only-runtime-admission.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "C:/Users/User/AI-Atomic-Framework",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-runtime-admission",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-state-only-admission",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/team/team-execution-lane.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0405-keep-state-only-team-start-independent-of-execution-backends.task.md",
+    "sectionTitle": "ATM-GOV-0405",
+    "headingLine": 88,
+    "hash": "8e534c194c7845ec",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0405-keep-state-only-team-start-independent-of-execution-backends.task.md",
+      "planningCommitSha": "9c83ff0667baaa3dcc92d8d1f47bb1bb1ee02982",
+      "contentDigest": "sha256:8e534c194c7845ec560c9f9c1b61edad314cc91e2516e4d5d04ec0ae9efc5617",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-16T22:55:52.901Z"
+    }
+  },
+  "importedAt": "2026-08-16T22:55:52.901Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "A validated state-only L5 plan is rejected for a missing editor-subagent execution backend before it can create its coordination record."
+    ],
+    "startConditions": [
+      "A Team plan is safeToStart and execution was not requested."
+    ],
+    "softRelations": [
+      "ATM-GOV-0341"
+    ],
+    "changedPublicSeams": [
+      "team-state-only-runtime-admission"
+    ],
+    "causalImpactEdges": [
+      "state-only-start-to-runtime-capability-validation"
+    ],
+    "parallelFrontierInputs": [
+      "validated team plan and executionRequested flag"
+    ],
+    "validatorReferences": [
+      "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts"
+    ],
+    "phaseOwner": "gemini-captain"
+  },
+  "testContributions": [
+    {
+      "caseId": "state_only_team_start_defers_execution_backend_0405",
+      "targetGroupId": "null",
+      "semanticKey": "state_only_backend_deferred",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "state-only-start-to-runtime-capability-validation"
+      ],
+      "expectedRedPredicate": "state-only start rejects a valid plan because the chosen execution backend is unavailable",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "team-state-only-runtime-admission",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "state_only_team_start_defers_execution_backend_0405"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-26T23-05-30-296Z-lock-cleanup-696f4fb4dd55",
+  "lastTransitionAt": "2026-08-26T23:05:30.296Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-08-26T23:03:32.022Z",
+  "promotedAt": "2026-08-26T23:03:32.026Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-5d92a2603554",
+    "claimedAt": "2026-08-26T23:03:32.031Z",
+    "heartbeatAt": "2026-08-26T23:05:30.156Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0405.json",
+      "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "packages/cli/src/commands/team/team-execution-lane.ts",
+      "tests/cli/team-state-only-runtime-admission.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260826230332-codex-captain-ea66dc8ba2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826230332-codex-captain-ea66dc8ba2\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-26T23:03:32.031Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-4c271c2af06c0155",
+    "ticketDigest": "sha256:4c271c2af06c0155d80034720b095e2a9bf8c9db3d2053883e3eda95b69c909c",
+    "taskId": "ATM-GOV-0405",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260826230332-codex-captain-ea66dc8ba2",
+    "claimGeneration": "lease-5d92a2603554",
+    "issuedAt": "2026-08-26T23:03:32.031Z",
+    "expiresAt": "2026-08-26T23:33:32.031Z",
+    "scopeDigest": "sha256:706ae576b41797c8e8d2e2aa90bf95e7695f4d190440cf46fe45fea46cf20ea3",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-26T23:03:32.031Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0405.*",
+          ".atm/history/task-events/ATM-GOV-0405/**",
+          ".atm/history/tasks/ATM-GOV-0405.json",
+          "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+          "packages/cli/src/commands/team/legacy/command-runner.ts",
+          "packages/cli/src/commands/team/team-execution-lane.ts",
+          "tests/cli/team-state-only-runtime-admission.test.ts"
+        ],
+        "digest": "sha256:3729fe6f3b804e2bacf71c91f4e0bebd0878ff7a832c162d3e8157962abf0c93"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260826230332-codex-captain-ATM-GOV-0405-6afa0e458b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0405",
+    "batchId": "batch-04c0416ff644",
+    "scopeKey": "tasks-dc4a5d32eff0",
+    "queueId": "queue-7ab19b4d76ba3440",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0405.*",
+      ".atm/history/task-events/ATM-GOV-0405/**",
+      ".atm/history/tasks/ATM-GOV-0405.json",
+      "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "packages/cli/src/commands/team/team-execution-lane.ts",
+      "tests/cli/team-state-only-runtime-admission.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "924bf49f71ecd2ae08a6d637975f1f90c9d92c9b4dd5ded35412dfff510454d8",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260826230332-codex-captain-ATM-GOV-0405-6afa0e458b",
+    "laneSession": {
+      "laneSessionId": "lane-20260826230332-codex-captain-ea66dc8ba2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826230332-codex-captain-ea66dc8ba2\""
+    },
+    "createdAt": "2026-08-26T23:03:36.878Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-26T23:05:30.294Z",
+    "releasedBy": "codex-captain"
+  },
+  "closedAt": "2026-08-26T23:05:30.156Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260826230332-codex-captain-ATM-GOV-0405-6afa0e458b",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0405.closure-packet.json"
+}
