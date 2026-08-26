@@ -1,9 +1,11 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-SKL-0040",
-  "updatedAt": "2026-08-21T08:12:12.825Z",
-  "updatedBy": "codex-gpt-5.4-mini",
+  "updatedAt": "2026-08-26T23:07:31.331Z",
+  "updatedBy": "codex-captain",
   "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
     "skill-corpus-canary-rewrite",
     "validate:integration-adapter",
     "validate:skill-templates"
@@ -56,6 +58,70 @@
       "durationMs": 3974,
       "runnerKind": "dev-source",
       "sourceCommit": "77d84f3ddf028d09652c03c5288a1c28ff7ffb42",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:skill-templates",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ea2abeda2856f1b7cc42934053fd55ced7b2f47a798538fd450521f85370e6a3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:skill-templates"
+      ],
+      "generatedAt": "2026-08-26T23:07:07.668Z",
+      "startedAt": "2026-08-26T23:07:00.846Z",
+      "finishedAt": "2026-08-26T23:07:07.668Z",
+      "durationMs": 6822,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ef3d9fcf378f26ec171b125f58cffa402f348bda",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:integration-adapter",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19063ae4e9017f3439a6036376ae04f39f88e27233b4bfbda0a594b4f7348d3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:integration-adapter"
+      ],
+      "generatedAt": "2026-08-26T23:07:20.796Z",
+      "startedAt": "2026-08-26T23:07:10.872Z",
+      "finishedAt": "2026-08-26T23:07:20.796Z",
+      "durationMs": 9924,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ef3d9fcf378f26ec171b125f58cffa402f348bda",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c4b0a7fa3ed11d01238bc92e5cbe0b252c3c2ccd7107dc85aca71cf41cc7fb6c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts"
+      ],
+      "generatedAt": "2026-08-26T23:07:27.615Z",
+      "startedAt": "2026-08-26T23:07:24.052Z",
+      "finishedAt": "2026-08-26T23:07:27.615Z",
+      "durationMs": 3563,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ef3d9fcf378f26ec171b125f58cffa402f348bda",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-08-26T23:07:31.330Z",
+      "startedAt": "2026-08-26T23:07:30.879Z",
+      "finishedAt": "2026-08-26T23:07:31.330Z",
+      "durationMs": 451,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ef3d9fcf378f26ec171b125f58cffa402f348bda",
       "cached": false
     }
   ],
