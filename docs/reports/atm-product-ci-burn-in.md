@@ -5,7 +5,7 @@ This report is a compact, reproducible record for `TASK-PRF-0003`. It distinguis
 ## Product contract
 
 - Required check: `Product CI`.
-- The `product-ci` job runs clean install, typecheck, lint, the focused product contract, package-skeleton validation, workspace package smoke, and a second clean-install smoke.
+- The `product-ci` job runs clean install, typecheck, scoped lint for the product-CI contract, the focused product contract, package-skeleton validation, workspace package smoke, and a second clean-install smoke. Full-repository lint remains a visible ATM Dogfood diagnostic.
 - `atm-dogfood` is a separate job with no dependency edge into `product-ci`; diagnostics remain visible without suppressing Product CI.
 
 ## Protected-main verification

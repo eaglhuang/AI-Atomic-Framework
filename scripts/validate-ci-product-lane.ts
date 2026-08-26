@@ -28,7 +28,7 @@ function validateWorkflow(): void {
   assert(/atm-dogfood:\s*\r?\n\s*name: ATM Dogfood/.test(workflow), 'ATM Dogfood must remain visible as a separate job');
   const productSlice = workflow.slice(workflow.indexOf('  product-ci:'), workflow.indexOf('  atm-dogfood:'));
   assert(!/\bneeds:/.test(productSlice), 'Product CI must not depend on ATM Dogfood');
-  for (const requiredStep of ['npm ci', 'npm run typecheck', 'npm run lint', 'ci-product-lane-contract.test.ts', 'validate-package-skeleton.ts', 'npm pack --workspaces --dry-run', 'npm ci --ignore-scripts']) {
+  for (const requiredStep of ['npm ci', 'npm run typecheck', 'npx eslint scripts/validate-ci-product-lane.ts tests/cli/ci-product-lane-contract.test.ts', 'ci-product-lane-contract.test.ts', 'validate-package-skeleton.ts', 'npm pack --workspaces --dry-run', 'npm ci --ignore-scripts']) {
     assert(productSlice.includes(requiredStep), `Product CI is missing required step: ${requiredStep}`);
   }
 }

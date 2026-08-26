@@ -20,7 +20,7 @@ assert.ok(productStart >= 0 && dogfoodStart > productStart, 'workflow must decla
 const productJob = workflow.slice(productStart, dogfoodStart);
 assert.match(productJob, /name: Product CI/);
 assert.doesNotMatch(productJob, /\bneeds:/, 'Product CI must be independent of dogfood diagnostics');
-for (const command of ['npm ci', 'npm run typecheck', 'npm run lint', 'ci-product-lane-contract.test.ts', 'validate-package-skeleton.ts', 'npm pack --workspaces --dry-run', 'npm ci --ignore-scripts']) {
+for (const command of ['npm ci', 'npm run typecheck', 'npx eslint scripts/validate-ci-product-lane.ts tests/cli/ci-product-lane-contract.test.ts', 'ci-product-lane-contract.test.ts', 'validate-package-skeleton.ts', 'npm pack --workspaces --dry-run', 'npm ci --ignore-scripts']) {
   assert.ok(productJob.includes(command), `Product CI must run ${command}`);
 }
 
