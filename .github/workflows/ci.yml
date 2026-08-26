@@ -1,6 +1,6 @@
 name: ci
 
-run-name: Product CI burn-in (${{ inputs.release_candidate == 'true' && 'release-candidate' || 'standard' }})
+run-name: Product CI burn-in (${{ inputs.release_candidate && 'release-candidate' || 'standard' }})
 
 on:
   workflow_dispatch:
