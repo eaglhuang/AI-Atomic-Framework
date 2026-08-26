@@ -50,6 +50,8 @@ function validateRemote(): void {
     ? runs.workflow_runs.filter((entry: any) => entry?.name === 'ci' && entry?.status === 'completed').slice(0, 10)
     : [];
   assert(ciRuns.length === 10, 'protected-main burn-in requires ten completed ci runs');
+  const releaseCandidateRuns = ciRuns.filter((run: any) => String(run?.display_title ?? '').includes('release-candidate'));
+  assert(releaseCandidateRuns.length >= 2, 'protected-main burn-in requires at least two release-candidate ci runs');
   for (const run of ciRuns as Array<{ id?: unknown }>) {
     const jobs = readJson(['api', `repos/eaglhuang/AI-Atomic-Framework/actions/runs/${String(run.id)}/jobs`]) as { jobs?: unknown };
     const product = Array.isArray(jobs.jobs) ? jobs.jobs.find((entry: any) => entry?.name === 'Product CI') : null;

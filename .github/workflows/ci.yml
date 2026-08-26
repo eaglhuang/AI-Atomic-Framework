@@ -1,7 +1,15 @@
 name: ci
 
+run-name: Product CI burn-in (${{ inputs.release_candidate == 'true' && 'release-candidate' || 'standard' }})
+
 on:
   workflow_dispatch:
+    inputs:
+      release_candidate:
+        description: Mark this manually-dispatched burn-in run as a release-candidate observation.
+        required: false
+        default: false
+        type: boolean
   pull_request:
   push:
     branches:

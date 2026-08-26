@@ -17,6 +17,8 @@ const workflow = readFileSync(workflowPath, 'utf8');
 const productStart = workflow.indexOf('  product-ci:');
 const dogfoodStart = workflow.indexOf('  atm-dogfood:');
 assert.ok(productStart >= 0 && dogfoodStart > productStart, 'workflow must declare Product CI before ATM Dogfood');
+assert.match(workflow, /release_candidate:/, 'workflow_dispatch must support release-candidate burn-in runs');
+assert.match(workflow, /run-name: Product CI burn-in/, 'workflow runs must expose their burn-in classification');
 const productJob = workflow.slice(productStart, dogfoodStart);
 assert.match(productJob, /name: Product CI/);
 assert.doesNotMatch(productJob, /\bneeds:/, 'Product CI must be independent of dogfood diagnostics');
