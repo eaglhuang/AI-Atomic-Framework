@@ -12,7 +12,7 @@ This report is a compact, reproducible record for `TASK-PRF-0003`. It distinguis
 
 - Command: `gh api repos/eaglhuang/AI-Atomic-Framework/branches/main/protection`.
 - Required status: `Product CI` (or GitHub's workflow-qualified equivalent).
-- Burn-in rule: the ten newest completed `ci` workflow runs on `main` must all have conclusion `success`; two of those runs must be release-candidate runs when release-candidate labeling is available.
+- Burn-in rule: the `Product CI` job in each of the ten newest completed `ci` workflow runs on `main` must have conclusion `success`; advisory ATM Dogfood may report independently. Two of those runs must be release-candidate runs when release-candidate labeling is available.
 - This checked-in document is not a substitute for the live API check and must never claim green status without it.
 
 ## Run ledger
