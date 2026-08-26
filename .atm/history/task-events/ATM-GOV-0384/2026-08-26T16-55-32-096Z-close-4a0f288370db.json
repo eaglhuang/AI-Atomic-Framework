@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-26T16-55-32-096Z-close-4a0f288370db",
+  "taskId": "ATM-GOV-0384",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260826165115-codex-captain-ATM-GOV-0384-3b0c179756",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0384.json",
+  "taskSha256": "sha256:ed7ec48cf41f0acd259d1dc39c9d768473c7f9017ad89314ab850c14389e5c06",
+  "createdAt": "2026-08-26T16:55:32.096Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0384 --actor codex-captain --status done --from-batch-checkpoint --batch batch-04c0416ff644 --historical-delivery bc8d78f00",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-04c0416ff644",
+    "sessionId": "session-20260826165115-codex-captain-ATM-GOV-0384-3b0c179756",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0384.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate",
+      "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+      "typecheck",
+      "validate:git-head-evidence",
+      "validate:runbook-completion-evidence"
+    ],
+    "requiredGates": [
+      "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate",
+      "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+      "typecheck",
+      "validate:runbook-completion-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-26T16:55:32.085Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0384.*",
+        ".atm/history/task-events/ATM-GOV-0384/**",
+        ".atm/history/tasks/ATM-GOV-0384.json",
+        "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+        "packages/cli/src/commands/next/claim-delivery-admission.ts",
+        "packages/cli/src/commands/next/claim-scope-expansion-admission.ts",
+        "scripts/compile-runbook-completion-evidence.ts",
+        "tests/cli/runbook-completion-evidence.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/claim-delivery-admission.ts",
+        "packages/cli/src/commands/next/claim-scope-expansion-admission.ts",
+        "scripts/compile-runbook-completion-evidence.ts",
+        "tests/cli/runbook-completion-evidence.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types scripts/compile-runbook-completion-evidence.ts --mode validate",
+        "node --strip-types tests/cli/runbook-completion-evidence.test.ts",
+        "typecheck",
+        "validate:runbook-completion-evidence"
+      ]
+    }
+  }
+}
