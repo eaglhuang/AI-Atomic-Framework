@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-26T23-00-00-354Z-close-f77eab4e2396",
+  "taskId": "ATM-GOV-0400",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260826225644-codex-captain-ATM-GOV-0400-235f434072",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0400.json",
+  "taskSha256": "sha256:515980714fbc82039ee0d7271a0991daa19edd78c3cc72192ce6842fa3780403",
+  "createdAt": "2026-08-26T23:00:00.354Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0400 --actor codex-captain --status done --from-batch-checkpoint --batch batch-04c0416ff644 --historical-delivery f43c3c9e9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-04c0416ff644",
+    "sessionId": "session-20260826225644-codex-captain-ATM-GOV-0400-235f434072",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0400.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "node --strip-types tests/cli/planning-root-resolution-cache.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "node --strip-types tests/cli/planning-root-resolution-cache.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-26T23:00:00.345Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0400.*",
+        ".atm/history/task-events/ATM-GOV-0400/**",
+        ".atm/history/tasks/ATM-GOV-0400.json",
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "packages/cli/src/commands/planning-root-resolution-cache.ts",
+        "tests/cli/planning-root-resolution-cache.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "packages/cli/src/commands/planning-root-resolution-cache.ts",
+        "tests/cli/planning-root-resolution-cache.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "node --strip-types tests/cli/planning-root-resolution-cache.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
