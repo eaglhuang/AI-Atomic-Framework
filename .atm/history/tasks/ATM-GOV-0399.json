@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0399",
   "title": "Prefer reachable registered sealed planning authority and fail closed on ambiguity",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -177,53 +177,53 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-21T03-01-42-006Z-scope-amendment-8d4890c91a8b",
-  "lastTransitionAt": "2026-08-21T03:01:42.006Z",
+  "lastTransitionId": "2026-08-26T23-23-14-554Z-close-2369943b11a9",
+  "lastTransitionAt": "2026-08-26T23:23:14.554Z",
   "ledgerContractVersion": "task-ledger/v1",
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-57f9e1747513",
-    "claimedAt": "2026-08-16T01:14:04.729Z",
-    "heartbeatAt": "2026-08-21T03:01:33.034Z",
+    "actorId": "codex-captain",
+    "leaseId": "lease-aa5ed0413f9b",
+    "claimedAt": "2026-08-26T23:19:36.489Z",
+    "heartbeatAt": "2026-08-26T23:23:14.552Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/tasks/ATM-GOV-0399.json",
       ".atm/history/evidence/ATM-GOV-0399.*",
       ".atm/history/task-events/ATM-GOV-0399/**",
-      ".atm/history/tasks/ATM-GOV-0399.json",
       "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
       "packages/cli/src/commands/next/planning-root-preference.ts",
       "packages/cli/src/commands/planning-repo-root.ts",
       "packages/cli/src/commands/planning-root-resolution-cache.ts",
       "tests/cli/planning-root-resolution-cache.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260816011405-gemini-captain-e457ff63a4",
-      "status": "adopted",
+      "laneSessionId": "lane-20260826231936-codex-captain-451c21eaa3",
+      "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816011405-gemini-captain-e457ff63a4\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826231936-codex-captain-451c21eaa3\""
+    },
+    "reason": "closed"
   },
-  "owner": "gemini-captain",
   "startedAt": "2026-08-16T01:14:04.729Z",
   "startedByActor": "gemini-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-65ba2187c1e19db2",
-    "ticketDigest": "sha256:65ba2187c1e19db2cc4d0e2711814e3b64c6625806ef43baa5d5af30a033190e",
+    "ticketId": "wat-90f97bea58119983",
+    "ticketDigest": "sha256:90f97bea58119983dcc45ae53de88c81114ba32cf955e4d33db613c8c7866ed7",
     "taskId": "ATM-GOV-0399",
     "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260816011405-gemini-captain-e457ff63a4",
-    "claimGeneration": "lease-57f9e1747513",
-    "issuedAt": "2026-08-21T03:01:41.849Z",
-    "expiresAt": "2026-08-21T03:31:41.849Z",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260826231936-codex-captain-451c21eaa3",
+    "claimGeneration": "lease-aa5ed0413f9b",
+    "issuedAt": "2026-08-26T23:22:09.250Z",
+    "expiresAt": "2026-08-26T23:52:09.250Z",
     "scopeDigest": "sha256:2a6b5942edd1cfb8b136c3f3c3f8c3793d4d31b9040ffa7fd953cec865421f5a",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-21T03:01:41.849Z"
+      "selectedAt": "2026-08-26T23:22:09.250Z"
     },
     "grants": [
       {
@@ -272,7 +272,8 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260816011404-gemini-captain-ATM-GOV-0399-88e6b2ae79",
+  "startedBySessionId": "session-20260826231936-codex-captain-ATM-GOV-0399-063dc9ec47",
+  "owner": "codex-captain",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -295,15 +296,19 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "4ded3e74c267aa72eb10a9f9082c6444daee9b706a30674fccc0ac28d174001b",
-    "actorId": "gemini-captain",
-    "sessionId": "session-20260816011404-gemini-captain-ATM-GOV-0399-88e6b2ae79",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260826231936-codex-captain-ATM-GOV-0399-063dc9ec47",
     "laneSession": {
-      "laneSessionId": "lane-20260816011405-gemini-captain-e457ff63a4",
+      "laneSessionId": "lane-20260826231936-codex-captain-451c21eaa3",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260816011405-gemini-captain-e457ff63a4\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826231936-codex-captain-451c21eaa3\""
     },
-    "createdAt": "2026-08-16T01:14:10.719Z",
+    "createdAt": "2026-08-26T23:19:38.190Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-26T23:23:14.552Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260826231936-codex-captain-ATM-GOV-0399-063dc9ec47",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0399.closure-packet.json"
 }

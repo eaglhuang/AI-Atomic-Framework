@@ -1,8 +1,8 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0399",
-  "updatedAt": "2026-08-21T03:02:48.691Z",
-  "updatedBy": "codex-gpt-5.4-mini",
+  "updatedAt": "2026-08-26T23:20:26.312Z",
+  "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
     "node --strip-types tests/cli/planning-root-resolution-cache.test.ts",
@@ -56,6 +56,54 @@
       "durationMs": 9623,
       "runnerKind": "dev-source",
       "sourceCommit": "191e6ad0c4a1a7a1b176d04accabbc42b623f2b8",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/planning-root-resolution-cache.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3311aa91e818a6e4d10ffcb1803369cc20ab25079962f7089558d03fc22de79a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/planning-root-resolution-cache.test.ts"
+      ],
+      "generatedAt": "2026-08-26T23:20:11.009Z",
+      "startedAt": "2026-08-26T23:20:07.745Z",
+      "finishedAt": "2026-08-26T23:20:11.009Z",
+      "durationMs": 3264,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "614ed3170b653e76b99aaf31da05f336344fbf54",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a97d3066dc86f0af3e99708cde06f0fd5cd4dc66fd3ddcbefe7f620083ddac1c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts"
+      ],
+      "generatedAt": "2026-08-26T23:20:14.528Z",
+      "startedAt": "2026-08-26T23:20:14.222Z",
+      "finishedAt": "2026-08-26T23:20:14.528Z",
+      "durationMs": 306,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "614ed3170b653e76b99aaf31da05f336344fbf54",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-26T23:20:26.311Z",
+      "startedAt": "2026-08-26T23:20:17.697Z",
+      "finishedAt": "2026-08-26T23:20:26.311Z",
+      "durationMs": 8614,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "614ed3170b653e76b99aaf31da05f336344fbf54",
       "cached": false
     }
   ],
