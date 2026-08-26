@@ -167,6 +167,11 @@ function readActiveClaimOwner(cwd: string, taskId: string, claim: Record<string,
 }
 
 function readRetainedWipOwner(task: Record<string, unknown>, taskId: string, file: string): DirtyPathOwner | null {
+  // Retained WIP protects a released, resumable operation.  Once its task is
+  // terminal, it cannot remain a live owner: future admission must still see
+  // the dirty byte as unowned and fail closed unless an explicit recovery path
+  // authorizes it.
+  if (task.status === 'done' || task.status === 'abandoned') return null;
   const retention = task.wipOwnership && typeof task.wipOwnership === 'object' && !Array.isArray(task.wipOwnership)
     ? task.wipOwnership as Record<string, unknown>
     : null;

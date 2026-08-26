@@ -69,6 +69,27 @@ try {
 
   writeJson(`.atm/history/tasks/${taskId}.json`, {
     workItemId: taskId,
+    status: 'done',
+    wipOwnership: {
+      schemaId: 'atm.retainedWipOwnership.v1',
+      taskId,
+      actorId,
+      laneSessionId: 'lane-released-owner',
+      dirtyPaths: [file]
+    }
+  });
+  const terminalOwner = inspectClaimDirtyWipAdmission({
+    cwd: repo,
+    task: { workItemId: 'TASK-OTHER' } as never,
+    actorId: 'other-agent',
+    laneSessionId: 'lane-fresh-resume',
+    claimFiles: [file]
+  });
+  assert.equal(terminalOwner.ok, false, 'terminal retained WIP remains blocked until explicit recovery');
+  assert.equal(terminalOwner.blockers[0]?.ownership, 'unowned', 'a terminal task must not remain the foreign WIP owner');
+
+  writeJson(`.atm/history/tasks/${taskId}.json`, {
+    workItemId: taskId,
     status: 'running',
     claim: {
       state: 'active',
