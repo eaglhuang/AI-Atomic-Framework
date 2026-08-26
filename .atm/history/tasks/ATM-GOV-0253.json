@@ -141,24 +141,34 @@
   "source": {
     "planPath": "governance-optimization/tasks/ATM-GOV-0253-cross-authority-two-phase-closeback-saga.task.md",
     "sectionTitle": "ATM-GOV-0253",
-    "headingLine": 92,
-    "hash": "ee47938a81d5f8c2",
+    "headingLine": 101,
+    "hash": "d3d034348d493ea4",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0253-cross-authority-two-phase-closeback-saga.task.md",
-      "planningCommitSha": "10ef055c46c4d2b888417e7e3cd2b13b6f55fb51",
-      "contentDigest": "sha256:ee47938a81d5f8c29e197c0b823e3b6cd023a6f84557e8fa8f4ff5733d2cd7c0",
+      "planningCommitSha": "1b57c507accc4f0c07f373c97933c5156a27abe7",
+      "contentDigest": "sha256:d3d034348d493ea4262153777475e380a92ada72060f5743945d5d3dd238eb2d",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-29T22:19:08.986Z"
+      "sealedAt": "2026-08-14T05:32:37.716Z"
     }
   },
-  "importedAt": "2026-07-29T22:19:08.986Z",
+  "importedAt": "2026-08-14T05:32:37.716Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
     "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
   },
   "testContributions": [],
   "requiredTestCaseIds": [],
@@ -256,27 +266,25 @@
       "impactEdges": []
     }
   ],
-  "causalGraph": {
-    "causalDependencies": [],
-    "startConditions": [],
-    "softRelations": [],
-    "changedPublicSeams": [],
-    "causalImpactEdges": [],
-    "parallelFrontierInputs": [],
-    "validatorReferences": [],
-    "phaseOwner": null
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "atomizationImpact"
+    ],
+    "findings": []
   },
-  "lastTransitionId": "2026-07-29T22-38-31-318Z-close-23585671dd11",
-  "lastTransitionAt": "2026-07-29T22:38:31.318Z",
+  "lastTransitionId": "2026-08-26T16-49-41-897Z-lock-cleanup-5b27ae8c86c3",
+  "lastTransitionAt": "2026-08-26T16:49:41.897Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-git-series-captain",
-  "reservedAt": "2026-07-29T22:19:23.353Z",
-  "promotedAt": "2026-07-29T22:19:23.357Z",
+  "reservedAt": "2026-08-14T05:32:41.612Z",
+  "promotedAt": "2026-08-14T05:32:41.616Z",
   "claim": {
-    "actorId": "codex-git-series-captain",
-    "leaseId": "lease-85ec534c4175",
-    "claimedAt": "2026-07-29T22:19:23.361Z",
-    "heartbeatAt": "2026-07-29T22:38:31.315Z",
+    "actorId": "codex-captain",
+    "leaseId": "lease-4fda0b30cced",
+    "claimedAt": "2026-08-26T16:43:07.412Z",
+    "heartbeatAt": "2026-08-26T16:49:41.763Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0253.json",
@@ -301,39 +309,38 @@
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260729221923-codex-git-series-captain-485b761d8e",
-      "status": "active",
+      "laneSessionId": "lane-20260826164307-codex-captain-1370a230ec",
+      "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729221923-codex-git-series-captain-485b761d8e\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826164307-codex-captain-1370a230ec\""
     },
     "reason": "closed"
   },
-  "startedAt": "2026-07-29T22:19:23.361Z",
-  "startedByActor": "codex-git-series-captain",
+  "startedAt": "2026-08-14T05:32:41.621Z",
+  "startedByActor": "codex-captain-recovery",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-8aff7d154d18a9a4",
-    "ticketDigest": "sha256:8aff7d154d18a9a4ac20b0e9c3c1dfa95e4018a2037f6ab634b75998577dad83",
+    "ticketId": "wat-5abe3ace5d8e5e2e",
+    "ticketDigest": "sha256:5abe3ace5d8e5e2e114a3198ceed611c4a3b280621f66eb8a96088c46a1acb4b",
     "taskId": "ATM-GOV-0253",
     "origin": "claim",
-    "actorId": "codex-git-series-captain",
-    "laneSessionId": "lane-20260729221923-codex-git-series-captain-485b761d8e",
-    "claimGeneration": "lease-85ec534c4175",
-    "issuedAt": "2026-07-29T22:19:23.361Z",
-    "expiresAt": "2026-07-29T22:49:23.361Z",
-    "scopeDigest": "sha256:09c66c801d5ba083722cb19ec2b9df49c42ff95c186bb6803cf46fa9cfc8ae13",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260826164307-codex-captain-1370a230ec",
+    "claimGeneration": "lease-4fda0b30cced",
+    "issuedAt": "2026-08-26T16:45:04.168Z",
+    "expiresAt": "2026-08-26T17:15:04.168Z",
+    "scopeDigest": "sha256:ff682899033a50b9be0e10c417808cdd53f596530e60a7290472a7e00f66908a",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-07-29T22:19:23.361Z"
+      "selectedAt": "2026-08-26T16:45:04.168Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0253.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/ATM-GOV-0253/**",
           ".atm/history/tasks/ATM-GOV-0253.json",
           "packages/cli/src/commands/taskflow/close-orchestration.ts",
@@ -355,7 +362,7 @@
           "tests/cli/taskflow-cross-authority-remote-durability.test.ts",
           "tests/cli/taskflow-cross-task-residue-recovery.test.ts"
         ],
-        "digest": "sha256:d829bd2c0e434e269db7b3c81c517ea395fece32f6973c9f8817c9032ae07bd1"
+        "digest": "sha256:3720b88c094a2df34f3aa926a71081905cca1fb0731e779c4a98aeaa3db8337f"
       },
       {
         "kind": "lifecycle-operation",
@@ -390,15 +397,28 @@
       "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
   },
-  "startedBySessionId": "session-20260729221923-codex-git-series-captain-ATM-GOV-0253-af3174b157",
+  "startedBySessionId": "session-20260826164307-codex-captain-ATM-GOV-0253-6bf7db4553",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0253",
+    "actorId": "codex-captain-recovery",
+    "laneSessionId": "lane-20260814053241-codex-captain-recovery-49094fd7cd",
+    "dirtyPaths": [
+      ".atm/history/tasks/ATM-GOV-0253.json",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts"
+    ],
+    "retainedAt": "2026-08-14T11:07:32.869Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-captain",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0253",
     "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
+    "scopeKey": "tasks-dc4a5d32eff0",
+    "queueId": "queue-300b5bdbff96156d",
+    "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0253.*",
       ".atm/history/task-events/ATM-GOV-0253/**",
@@ -426,19 +446,22 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "09dafe546abadee2191defef41b6db781a0fb51818b2e3de3a526205fc2ab807",
-    "actorId": "codex-git-series-captain",
-    "sessionId": "session-20260729221923-codex-git-series-captain-ATM-GOV-0253-af3174b157",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260826164307-codex-captain-ATM-GOV-0253-6bf7db4553",
     "laneSession": {
-      "laneSessionId": "lane-20260729221923-codex-git-series-captain-485b761d8e",
+      "laneSessionId": "lane-20260826164307-codex-captain-1370a230ec",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260729221923-codex-git-series-captain-485b761d8e\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826164307-codex-captain-1370a230ec\""
     },
-    "createdAt": "2026-07-29T22:19:35.522Z",
-    "status": "active"
+    "createdAt": "2026-08-26T16:43:09.966Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-26T16:49:41.895Z",
+    "releasedBy": "codex-captain"
   },
-  "closedAt": "2026-07-29T22:38:31.315Z",
-  "closedByActor": "codex-git-series-captain",
-  "closedBySessionId": "session-20260729221923-codex-git-series-captain-ATM-GOV-0253-af3174b157",
+  "closedAt": "2026-08-26T16:49:41.763Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260826164307-codex-captain-ATM-GOV-0253-6bf7db4553",
   "closurePacket": ".atm/history/evidence/ATM-GOV-0253.closure-packet.json"
 }
