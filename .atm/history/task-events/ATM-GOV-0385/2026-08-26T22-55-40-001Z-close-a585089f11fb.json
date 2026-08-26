@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-26T22-55-40-001Z-close-a585089f11fb",
+  "taskId": "ATM-GOV-0385",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260826170204-codex-captain-ATM-GOV-0385-53ae5dee80",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0385.json",
+  "taskSha256": "sha256:ed3d1c7d887bf62901361daaac39d14859e776bfcfb146beb781ccc5d2d6ae1d",
+  "createdAt": "2026-08-26T22:55:40.001Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0385 --actor codex-captain --status done --from-batch-checkpoint --batch batch-04c0416ff644 --historical-delivery da5eb5c10b0754e92112576ac1adfc9713f1a2fd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-04c0416ff644",
+    "sessionId": "session-20260826170204-codex-captain-ATM-GOV-0385-53ae5dee80",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0385.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+      "node --strip-types packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "build",
+      "node --strip-types packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-26T22:55:39.987Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0385.*",
+        ".atm/history/task-events/ATM-GOV-0385/**",
+        ".atm/history/tasks/ATM-GOV-0385.json",
+        "packages/cli/dist/atm.d.ts",
+        "packages/cli/dist/commands/broker/batch-execute-actions.js",
+        "packages/cli/dist/commands/broker/plan-batch-action.js",
+        "packages/cli/dist/commands/evidence/__tests__/run.spec.js",
+        "packages/cli/dist/commands/evidence/bundle-io/implementation.js",
+        "packages/cli/dist/commands/hook/git-hooks-installer.js",
+        "packages/cli/dist/commands/integration/run.js",
+        "packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js",
+        "packages/cli/dist/commands/next/planning-root-preference.js",
+        "packages/cli/dist/commands/next/route-resolution/queue-inspection.js",
+        "packages/cli/dist/commands/planning-repo-root.js",
+        "packages/cli/dist/commands/planning-root-preference.js",
+        "packages/cli/dist/index.d.ts",
+        "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+        "packages/cli/src/commands/evidence/command-runs.ts",
+        "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+        "packages/core/src/git/publication-delivery-slice.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/atm.d.ts",
+        "packages/cli/dist/commands/broker/batch-execute-actions.js",
+        "packages/cli/dist/commands/broker/plan-batch-action.js",
+        "packages/cli/dist/commands/evidence/__tests__/run.spec.js",
+        "packages/cli/dist/commands/evidence/bundle-io/implementation.js",
+        "packages/cli/dist/commands/hook/git-hooks-installer.js",
+        "packages/cli/dist/commands/integration/run.js",
+        "packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js",
+        "packages/cli/dist/commands/next/planning-root-preference.js",
+        "packages/cli/dist/commands/next/route-resolution/queue-inspection.js",
+        "packages/cli/dist/commands/planning-repo-root.js",
+        "packages/cli/dist/commands/planning-root-preference.js",
+        "packages/cli/dist/index.d.ts",
+        "packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+        "packages/cli/src/commands/evidence/command-runs.ts",
+        "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+        "packages/core/src/git/publication-delivery-slice.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/runner-sync-incremental-build.ts"
+      ],
+      "requiredGates": [
+        "build",
+        "node --strip-types packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
