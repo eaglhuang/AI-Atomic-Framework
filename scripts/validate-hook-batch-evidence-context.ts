@@ -50,6 +50,12 @@ const staged = [
   '.atm/history/evidence/nested-runs/artifact.json'
 ];
 
+// The pre-commit guard reads the Git index, rather than the worktree. Stage
+// this fixture exactly as the hook will receive it before asserting context
+// inheritance for nested evidence.
+runGit(tempRoot, ['init']);
+runGit(tempRoot, ['add', ...staged]);
+
 const withoutExemption = inspectProtectedAtmStateChanges(tempRoot, staged);
 assert(
   !withoutExemption.findings.some((finding) => finding.file.endsWith('nested-runs/artifact.json') && finding.reason === 'evidence-file-missing-task-context'),
@@ -93,6 +99,7 @@ runGit(committedContextRoot, ['add', '.atm/history/tasks']);
 runGit(committedContextRoot, ['commit', '-m', 'seed committed task contexts']);
 
 const committedEvidence = writeTaskEvidence(committedContextRoot, 'TASK-COMMITTED');
+runGit(committedContextRoot, ['add', committedEvidence]);
 const committedContextResult = inspectProtectedAtmStateChanges(committedContextRoot, [committedEvidence]);
 assert(
   !committedContextResult.findings.some((finding) => finding.reason === 'evidence-file-missing-task-context'),
@@ -100,6 +107,7 @@ assert(
 );
 
 const mismatchEvidence = writeTaskEvidence(committedContextRoot, 'TASK-MISMATCH');
+runGit(committedContextRoot, ['add', mismatchEvidence]);
 const mismatchResult = inspectProtectedAtmStateChanges(committedContextRoot, [mismatchEvidence]);
 assert(
   mismatchResult.findings.some((finding) => finding.reason === 'evidence-file-missing-task-context'),
@@ -107,6 +115,7 @@ assert(
 );
 
 const absentEvidence = writeTaskEvidence(committedContextRoot, 'TASK-ABSENT');
+runGit(committedContextRoot, ['add', absentEvidence]);
 const absentResult = inspectProtectedAtmStateChanges(committedContextRoot, [absentEvidence]);
 assert(
   absentResult.findings.some((finding) => finding.reason === 'evidence-file-missing-task-context'),
@@ -114,6 +123,7 @@ assert(
 );
 
 const secondEvidence = writeTaskEvidence(committedContextRoot, 'TASK-SECOND');
+runGit(committedContextRoot, ['add', secondEvidence]);
 const multiTaskResult = inspectProtectedAtmStateChanges(committedContextRoot, [committedEvidence, secondEvidence]);
 assert(
   multiTaskResult.findings.some((finding) => finding.reason === 'evidence-file-missing-task-context'),
