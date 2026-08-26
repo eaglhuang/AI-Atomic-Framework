@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-26T16-40-22-523Z-repair-claim-2a3a84561f4b",
+  "taskId": "TASK-PRF-0003",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260825104600-cursor-captain-TASK-PRF-0003-3c6c1feb5e",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0003.json",
+  "taskSha256": "sha256:c13b2275732425c164d064760af4135b6986df3d7d78b225f543dab99ad9c87c",
+  "createdAt": "2026-08-26T16:40:22.523Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0003 --actor codex-captain --write --reason \"Clear verified expired claim and dangling lock during dual-repository cleanup\" --json"
+}

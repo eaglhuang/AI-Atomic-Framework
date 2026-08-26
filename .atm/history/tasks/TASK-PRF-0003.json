@@ -1,0 +1,339 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0003",
+  "title": "Separate required product CI and enforce protected main",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: Required product CI runs install, typecheck, lint, focused tests, package smoke and clean-install smoke.",
+    "ACC-2: Dogfood diagnostics remain visible but cannot prevent product checks from producing their own verdict.",
+    "ACC-3: A skipped required product check is failed or incomplete, never green.",
+    "ACC-4: Main requires the named product status through a verified ruleset or equivalent protected-branch control.",
+    "ACC-5: Ten consecutive protected-main runs are green, including two clean release-candidate runs, with command-backed compact evidence."
+  ],
+  "deliverables": [
+    ".github/workflows/ci.yml",
+    "scripts/validate-ci-product-lane.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "docs/reports/atm-product-ci-burn-in.md"
+  ],
+  "scopePaths": [
+    ".github/workflows/ci.yml",
+    "scripts/run-validators.ts",
+    "scripts/validate-ci-product-lane.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "docs/reports/atm-product-ci-burn-in.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "node --strip-types scripts/validate-ci-product-lane.ts",
+    "npm run validate:standard"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert workflow and ruleset changes together; retain the last known working required-status name.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.ci-release-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-ci-release-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0003-separate-required-product-ci-and-enforce-protected-main.task.md",
+    "sectionTitle": "TASK-PRF-0003",
+    "headingLine": 104,
+    "hash": "c46f8fb1d5a62f31",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0003-separate-required-product-ci-and-enforce-protected-main.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:c46f8fb1d5a62f31e68ac76acc5e2def5677ad378d5420a70de9e388756a024c",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-25T10:43:55.566Z"
+    }
+  },
+  "importedAt": "2026-08-25T10:43:55.566Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Current red CI failures and skipped downstream jobs are captured as baseline evidence.",
+      "The current frozen runner can execute the declared product-CI validation commands."
+    ],
+    "softRelations": [
+      "TASK-PRF-0002",
+      "TASK-PRF-0004"
+    ],
+    "changedPublicSeams": [
+      "required-product-ci",
+      "advisory-dogfood-ci",
+      "protected-main-status"
+    ],
+    "causalImpactEdges": [
+      "product-checks-run-even-when-dogfood-is-red",
+      "skipped-required-check-is-not-green",
+      "main-requires-current-product-status"
+    ],
+    "parallelFrontierInputs": [
+      "latest-ci-failure-envelope",
+      "standard-validator-inventory"
+    ],
+    "validatorReferences": [
+      "test_prf_ci_lane_separation_6f1a82cd",
+      "test_prf_required_check_completion_d98b220e",
+      "test_prf_protected_main_contract_25a6714b"
+    ],
+    "phaseOwner": "phase-1-product-ci"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_ci_lane_separation_6f1a82cd",
+      "targetGroupId": "null",
+      "semanticKey": "required_product_ci_lane",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "product-checks-run-even-when-dogfood-is-red"
+      ],
+      "expectedRedPredicate": "Dogfood or doctor failure prevents required product checks from executing.",
+      "contributionResourceKey": ".github/workflows/ci.yml",
+      "responsibility": "task-required",
+      "dependencyEdge": "ci-job-dependency-graph",
+      "contractEdge": "required-product-ci",
+      "resourceKey": "github-actions"
+    },
+    {
+      "caseId": "test_prf_required_check_completion_d98b220e",
+      "targetGroupId": "null",
+      "semanticKey": "required_check_completion",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "skipped-required-check-is-not-green"
+      ],
+      "expectedRedPredicate": "A required product step can be skipped while aggregate status remains successful.",
+      "contributionResourceKey": "ci-product-summary",
+      "responsibility": "task-required",
+      "dependencyEdge": "product-step-to-required-status",
+      "contractEdge": "required-product-ci",
+      "resourceKey": "github-actions"
+    },
+    {
+      "caseId": "test_prf_protected_main_contract_25a6714b",
+      "targetGroupId": "null",
+      "semanticKey": "protected_main_required_status",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "main-requires-current-product-status"
+      ],
+      "expectedRedPredicate": "Main accepts delivery without current required product status or compact evidence fields.",
+      "contributionResourceKey": "protected-main-contract",
+      "responsibility": "task-required",
+      "dependencyEdge": "branch-rule-to-product-status",
+      "contractEdge": "protected-main-status",
+      "resourceKey": "github-ruleset"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_ci_lane_separation_6f1a82cd",
+    "test_prf_required_check_completion_d98b220e",
+    "test_prf_protected_main_contract_25a6714b"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-26T23-29-32-075Z-claim-bb7dd2dbafe2",
+  "lastTransitionAt": "2026-08-26T23:29:32.075Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-08-25T10:46:00.095Z",
+  "promotedAt": "2026-08-25T10:46:00.100Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-7532f4e9705d",
+    "claimedAt": "2026-08-26T23:29:27.150Z",
+    "heartbeatAt": "2026-08-26T23:29:27.150Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0003.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "scripts/run-validators.ts",
+      "scripts/validate-ci-product-lane.ts",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260826232927-codex-captain-f7b7002d31",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826232927-codex-captain-f7b7002d31\""
+    }
+  },
+  "startedAt": "2026-08-25T10:46:00.107Z",
+  "startedByActor": "cursor-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-8d0ba7275261c01e",
+    "ticketDigest": "sha256:8d0ba7275261c01e978f2d2b19b3d626acb8af9a78b600e617b7cd0ee8bb1973",
+    "taskId": "TASK-PRF-0003",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260826232927-codex-captain-f7b7002d31",
+    "claimGeneration": "lease-7532f4e9705d",
+    "issuedAt": "2026-08-26T23:29:27.150Z",
+    "expiresAt": "2026-08-26T23:59:27.150Z",
+    "scopeDigest": "sha256:7e2d661452a61b8f0ceada1b1b57e0c93e5a32203db9e87e209e0fa3cdbcc5c9",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-26T23:29:27.150Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0003.*",
+          ".atm/history/task-events/TASK-PRF-0003/**",
+          ".atm/history/tasks/TASK-PRF-0003.json",
+          ".github/workflows/ci.yml",
+          "docs/reports/atm-product-ci-burn-in.md",
+          "scripts/run-validators.ts",
+          "scripts/validate-ci-product-lane.ts",
+          "tests/cli/ci-product-lane-contract.test.ts"
+        ],
+        "digest": "sha256:6a67fc2f5549c78e4cd51c899ee2305c351fecb85bcc10f7746716067153708f"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260826232927-codex-captain-TASK-PRF-0003-4aa0ebe233",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "TASK-PRF-0003",
+    "actorId": "cursor-captain",
+    "laneSessionId": "lane-20260825104600-cursor-captain-afaf52c0e9",
+    "dirtyPaths": [
+      ".atm/history/tasks/TASK-PRF-0003.json"
+    ],
+    "retainedAt": "2026-08-26T16:40:21.892Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-captain",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0003",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0003.*",
+      ".atm/history/task-events/TASK-PRF-0003/**",
+      ".atm/history/tasks/TASK-PRF-0003.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "scripts/run-validators.ts",
+      "scripts/validate-ci-product-lane.ts",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "c410c1b00921ef98c59d08c51250768c21996b11ad7c9d8584c12092a2ba27a7",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260826232927-codex-captain-TASK-PRF-0003-4aa0ebe233",
+    "laneSession": {
+      "laneSessionId": "lane-20260826232927-codex-captain-f7b7002d31",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826232927-codex-captain-f7b7002d31\""
+    },
+    "createdAt": "2026-08-26T23:29:32.075Z",
+    "status": "active"
+  }
+}
