@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0002",
+  "updatedAt": "2026-08-26T23:25:26.591Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/runner-publication-inventory-parity.test.ts",
+    "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
+    "validate:task-import"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts"
+      ],
+      "generatedAt": "2026-08-26T23:24:59.121Z",
+      "startedAt": "2026-08-26T23:24:58.757Z",
+      "finishedAt": "2026-08-26T23:24:59.121Z",
+      "durationMs": 364,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8a5b9ed4c4e7681ccc74bbb5b50674c39b92449e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-publication-inventory-parity.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3fcd7ba05fcd66b7a28f77e88707d95cb751f3bf809e3ce1df0fb1bc4e61ba40",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/runner-publication-inventory-parity.test.ts"
+      ],
+      "generatedAt": "2026-08-26T23:25:02.974Z",
+      "startedAt": "2026-08-26T23:25:02.278Z",
+      "finishedAt": "2026-08-26T23:25:02.974Z",
+      "durationMs": 696,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8a5b9ed4c4e7681ccc74bbb5b50674c39b92449e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-import.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5978a12bcfbed4dcaf96038554055174138e5b209731fc37dd0b772d23f28d6f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:task-import"
+      ],
+      "generatedAt": "2026-08-26T23:25:26.590Z",
+      "startedAt": "2026-08-26T23:25:06.133Z",
+      "finishedAt": "2026-08-26T23:25:26.590Z",
+      "durationMs": 20457,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8a5b9ed4c4e7681ccc74bbb5b50674c39b92449e",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

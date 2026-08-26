@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-26T23-28-00-701Z-close-6b21cab307ca",
+  "taskId": "TASK-PRF-0002",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260826232348-codex-captain-TASK-PRF-0002-993a0d8bee",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0002.json",
+  "taskSha256": "sha256:6038b8f38d99063d47fabdea8dbddd898d02cdf2e427f04349f38b7242c424ed",
+  "createdAt": "2026-08-26T23:28:00.701Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0002 --actor codex-captain --status done --historical-delivery d3312405e6c31caf11eb0d21f6c56854ed038024",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260826232348-codex-captain-TASK-PRF-0002-993a0d8bee",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0002.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/runner-publication-inventory-parity.test.ts",
+      "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
+      "validate:task-import"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/runner-publication-inventory-parity.test.ts",
+      "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
+      "validate:task-import"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-26T23:28:00.690Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0002.*",
+        ".atm/history/task-events/TASK-PRF-0002/**",
+        ".atm/history/tasks/TASK-PRF-0002.json",
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/command-specs/plan.spec.ts",
+        "packages/cli/src/commands/next/plan-scoped-preflight.ts",
+        "packages/cli/src/commands/next/runner-mode.ts",
+        "packages/cli/src/commands/plan.ts",
+        "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "scripts/sealed-runner-publication.ts",
+        "scripts/validate-task-import.ts",
+        "tests/cli/runner-publication-inventory-parity.test.ts",
+        "tests/cli/task-card-causal-graph-authoring.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/command-specs/plan.spec.ts",
+        "packages/cli/src/commands/next/plan-scoped-preflight.ts",
+        "packages/cli/src/commands/next/runner-mode.ts",
+        "packages/cli/src/commands/plan.ts",
+        "packages/cli/src/commands/tasks/plan-import-boundary.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "scripts/sealed-runner-publication.ts",
+        "scripts/validate-task-import.ts",
+        "tests/cli/runner-publication-inventory-parity.test.ts",
+        "tests/cli/task-card-causal-graph-authoring.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/runner-publication-inventory-parity.test.ts",
+        "node --strip-types tests/cli/task-card-causal-graph-authoring.test.ts",
+        "validate:task-import"
+      ]
+    }
+  }
+}
