@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0373",
   "title": "Allow committed task context for evidence-only closeback",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -160,8 +160,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-26T23-17-30-569Z-renew-7a3f582e2ab0",
-  "lastTransitionAt": "2026-08-26T23:17:30.569Z",
+  "lastTransitionId": "2026-08-26T23-19-01-713Z-close-543b0ded8b27",
+  "lastTransitionAt": "2026-08-26T23:19:01.713Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-14T02:36:33.451Z",
   "promotedAt": "2026-08-14T02:36:33.456Z",
@@ -169,7 +169,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-55233180bee2",
     "claimedAt": "2026-08-26T23:14:28.182Z",
-    "heartbeatAt": "2026-08-26T23:17:29.717Z",
+    "heartbeatAt": "2026-08-26T23:19:01.712Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0373.json",
@@ -177,13 +177,14 @@
       "packages/cli/src/commands/hook/pre-commit/support.ts",
       "scripts/validate-hook-batch-evidence-context.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260826231428-codex-captain-f2329b3f3a",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826231428-codex-captain-f2329b3f3a\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-14T02:36:33.460Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -282,5 +283,9 @@
     },
     "createdAt": "2026-08-26T23:14:29.757Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-26T23:19:01.712Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260826231428-codex-captain-ATM-GOV-0373-90f65290be",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0373.closure-packet.json"
 }

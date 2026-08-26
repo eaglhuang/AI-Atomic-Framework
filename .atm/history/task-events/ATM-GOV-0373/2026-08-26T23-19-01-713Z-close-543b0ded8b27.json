@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-26T23-19-01-713Z-close-543b0ded8b27",
+  "taskId": "ATM-GOV-0373",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260826231428-codex-captain-ATM-GOV-0373-90f65290be",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0373.json",
+  "taskSha256": "sha256:375b58be962660aa5b97a7daf8921dec006f8cb15380e7143fa71a4d9fdf0939",
+  "createdAt": "2026-08-26T23:19:01.713Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0373 --actor codex-captain --status done --historical-delivery 9b68f75ea",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260826231428-codex-captain-ATM-GOV-0373-90f65290be",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0373.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:hook-batch-evidence-context"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:hook-batch-evidence-context"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-26T23:19:01.703Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0373.*",
+        ".atm/history/task-events/ATM-GOV-0373/**",
+        ".atm/history/tasks/ATM-GOV-0373.json",
+        "packages/cli/src/commands/hook/pre-commit/committed-task-context.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "scripts/validate-hook-batch-evidence-context.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook/pre-commit/committed-task-context.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "scripts/validate-hook-batch-evidence-context.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:hook-batch-evidence-context"
+      ]
+    }
+  }
+}
