@@ -1,0 +1,290 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0402",
+  "title": "Make Team proposal-first blocks return a machine-actionable recovery",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: Proposal-first block reports schema, broker-bound subject, official proposal-file command, and no-runtime-mutation facts.",
+    "ACC-2: Read-only preview exposes the same recovery while stale, absent, mismatched, and out-of-scope proposals remain fail-closed.",
+    "ACC-3: Focused red/green and existing Team contract validations are command-backed; no emergency lease is used."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team/legacy/types.ts",
+    "packages/cli/src/commands/team/legacy/permission-lease-policy.ts",
+    "packages/cli/src/commands/team/legacy/command-runner.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "tests/cli/team-proposal-first-recovery.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team/legacy/types.ts",
+    "packages/cli/src/commands/team/legacy/permission-lease-policy.ts",
+    "packages/cli/src/commands/team/legacy/command-runner.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "tests/cli/team-proposal-first-recovery.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-proposal-first-recovery.test.ts",
+    "node --strip-types tests/cli/team-plan-contract.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "C:/Users/User/AI-Atomic-Framework",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-command-routing",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-proposal-recovery",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/team/legacy/permission-lease-policy.ts",
+        "disposition": "inline",
+        "inlineReason": "The repair extends the existing policy result, so a second resolver would duplicate broker authority."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0402-make-team-proposal-first-blocks-return-a-machine-actionable-recovery.task.md",
+    "sectionTitle": "ATM-GOV-0402",
+    "headingLine": 89,
+    "hash": "b2ded9d833100b15",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0402-make-team-proposal-first-blocks-return-a-machine-actionable-recovery.task.md",
+      "planningCommitSha": "3707b9192644125872a03fdd07e528c57e708a97",
+      "contentDigest": "sha256:b2ded9d833100b157afa70a31ca78476391e7e2dbdee74d765c8a58a69c5933e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-16T22:56:11.539Z"
+    }
+  },
+  "importedAt": "2026-08-16T22:56:11.539Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "L5 Team plan/start fails proposal-first before runtime mutation but previously exposes only prose recovery."
+    ],
+    "startConditions": [
+      "A hot shared surface requires atm.patchProposal.v1."
+    ],
+    "softRelations": [
+      "ATM-GOV-0341"
+    ],
+    "changedPublicSeams": [
+      "team-proposal-first-recovery"
+    ],
+    "causalImpactEdges": [
+      "proposal-first-block-to-actionable-recovery"
+    ],
+    "parallelFrontierInputs": [
+      "canonical broker lane decision"
+    ],
+    "validatorReferences": [
+      "tests/cli/team-proposal-first-recovery.test.ts"
+    ],
+    "phaseOwner": "gemini-captain"
+  },
+  "testContributions": [
+    {
+      "caseId": "proposal_first_block_returns_structured_recovery_0402",
+      "targetGroupId": "null",
+      "semanticKey": "team_proposal_recovery",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "proposal-first-block-to-actionable-recovery"
+      ],
+      "expectedRedPredicate": "proposal-first rejection lacks a structured schema and official proposal-file recovery",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "team-proposal-first-recovery",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "proposal_first_block_returns_structured_recovery_0402"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-26T23-01-32-027Z-lock-cleanup-5bb615f06bb5",
+  "lastTransitionAt": "2026-08-26T23:01:32.027Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-08-26T23:00:24.040Z",
+  "promotedAt": "2026-08-26T23:00:24.044Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-cdadb0342623",
+    "claimedAt": "2026-08-26T23:00:24.049Z",
+    "heartbeatAt": "2026-08-26T23:01:31.884Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0402.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "packages/cli/src/commands/team/legacy/permission-lease-policy.ts",
+      "packages/cli/src/commands/team/legacy/types.ts",
+      "tests/cli/team-proposal-first-recovery.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260826230024-codex-captain-430931e558",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826230024-codex-captain-430931e558\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-08-26T23:00:24.049Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-377d32e4f98ea5af",
+    "ticketDigest": "sha256:377d32e4f98ea5af7cec6989e3bb66a0e9ba112b3c138f4866c49ff0aeb761e4",
+    "taskId": "ATM-GOV-0402",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260826230024-codex-captain-430931e558",
+    "claimGeneration": "lease-cdadb0342623",
+    "issuedAt": "2026-08-26T23:00:24.049Z",
+    "expiresAt": "2026-08-26T23:30:24.049Z",
+    "scopeDigest": "sha256:5c51487e22c918275c01ec1b5504c004f949e3540b094bedd72471f969388a71",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-26T23:00:24.049Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0402.*",
+          ".atm/history/task-events/ATM-GOV-0402/**",
+          ".atm/history/tasks/ATM-GOV-0402.json",
+          "packages/cli/src/commands/command-specs/team.spec.ts",
+          "packages/cli/src/commands/team/legacy/command-runner.ts",
+          "packages/cli/src/commands/team/legacy/permission-lease-policy.ts",
+          "packages/cli/src/commands/team/legacy/types.ts",
+          "tests/cli/team-proposal-first-recovery.test.ts"
+        ],
+        "digest": "sha256:7d53849e04c417f09d096a44e6078e5bc5de25716aa41080c3612b0fc2b45d04"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260826230024-codex-captain-ATM-GOV-0402-75fab5668c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0402",
+    "batchId": "batch-04c0416ff644",
+    "scopeKey": "tasks-dc4a5d32eff0",
+    "queueId": "queue-abb040e2d9d35616",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0402.*",
+      ".atm/history/task-events/ATM-GOV-0402/**",
+      ".atm/history/tasks/ATM-GOV-0402.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "packages/cli/src/commands/team/legacy/permission-lease-policy.ts",
+      "packages/cli/src/commands/team/legacy/types.ts",
+      "tests/cli/team-proposal-first-recovery.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "02e6875fb2f594a0d9092e4d480647e624d7cab16ed5949c5fc7da2659af21ca",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260826230024-codex-captain-ATM-GOV-0402-75fab5668c",
+    "laneSession": {
+      "laneSessionId": "lane-20260826230024-codex-captain-430931e558",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826230024-codex-captain-430931e558\""
+    },
+    "createdAt": "2026-08-26T23:00:29.140Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-08-26T23:01:32.025Z",
+    "releasedBy": "codex-captain"
+  },
+  "closedAt": "2026-08-26T23:01:31.884Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260826230024-codex-captain-ATM-GOV-0402-75fab5668c",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0402.closure-packet.json"
+}
