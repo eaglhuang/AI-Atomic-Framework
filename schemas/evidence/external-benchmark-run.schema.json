@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atm.local/schemas/evidence/external-benchmark-run.schema.json",
+  "title": "ATM external benchmark preregistration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "protocolVersion", "status", "sealedAt", "externalRepositories", "arms", "oracle", "counterbalancing", "metrics", "controls", "runEligibility"],
+  "properties": {
+    "schemaId": { "const": "atm.externalBenchmarkRun.v1" },
+    "protocolVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "status": { "const": "preregistered" },
+    "sealedAt": { "type": "string", "format": "date-time" },
+    "externalRepositories": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "repositoryUrl", "commitSha", "nonAtmAuthored"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "repositoryUrl": { "type": "string", "format": "uri" },
+          "commitSha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+          "nonAtmAuthored": { "const": true }
+        }
+      }
+    },
+    "arms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline", "atm"],
+      "properties": {
+        "baseline": { "$ref": "#/$defs/baselineArm" },
+        "atm": { "$ref": "#/$defs/atmArm" }
+      }
+    },
+    "oracle": { "$ref": "#/$defs/oracle" },
+    "counterbalancing": { "$ref": "#/$defs/counterbalancing" },
+    "metrics": { "$ref": "#/$defs/metrics" },
+    "controls": {
+      "type": "array",
+      "minItems": 6,
+      "uniqueItems": true,
+      "items": { "enum": ["positive-conflict", "benign-concurrency", "semantic-conflict", "stale-base", "recovery", "negative-control"] }
+    },
+    "runEligibility": { "$ref": "#/$defs/runEligibility" }
+  },
+  "$defs": {
+    "baselineArm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executionMode", "modeled", "requiresPullRequest"],
+      "properties": {
+        "executionMode": { "const": "real-git-worktree" },
+        "modeled": { "const": false },
+        "requiresPullRequest": { "const": true }
+      }
+    },
+    "atmArm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executionMode", "packageName", "packageAvailability", "workspaceLink", "packageVersion", "packageTarballSha256"],
+      "properties": {
+        "executionMode": { "const": "published-npm" },
+        "packageName": { "type": "string", "minLength": 1 },
+        "packageAvailability": { "enum": ["sealed", "unavailable"] },
+        "workspaceLink": { "const": false },
+        "packageVersion": { "type": ["string", "null"] },
+        "packageTarballSha256": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hiddenCorpusOwner", "adjudicator", "baselineImplementer", "atmImplementer", "visibilityBeforeSeal"],
+      "properties": {
+        "hiddenCorpusOwner": { "type": "string", "minLength": 1 },
+        "adjudicator": { "type": "string", "minLength": 1 },
+        "baselineImplementer": { "type": "string", "minLength": 1 },
+        "atmImplementer": { "type": "string", "minLength": 1 },
+        "visibilityBeforeSeal": { "const": "oracle-only" }
+      }
+    },
+    "counterbalancing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequences", "environmentControls", "p95Source"],
+      "properties": {
+        "sequences": { "type": "array", "uniqueItems": true, "items": { "enum": ["AB", "BA"] } },
+        "environmentControls": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "p95Source": { "const": "raw-timestamps-only" }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["falseBlock", "missedConflict", "humanMinutes", "tokens", "billedCost", "completion", "retries", "repairTime"],
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "runEligibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eligible", "blockingReasons"],
+      "properties": {
+        "eligible": { "type": "boolean" },
+        "blockingReasons": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  }
+}

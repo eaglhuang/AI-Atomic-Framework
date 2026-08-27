@@ -1,0 +1,373 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0007",
+  "title": "Preregister an independent external ATM benchmark",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0004",
+    "TASK-PRF-0005",
+    "TASK-PRF-0006"
+  ],
+  "acceptance": [
+    "ACC-1: Protocol, hypotheses, metrics, thresholds, retry rules, exclusions and precision analysis are sealed before execution.",
+    "ACC-2: At least two external repository SHAs are sealed; baseline uses real worktree plus Git/PR and ATM installs only from public npm.",
+    "ACC-3: Hidden oracle and adjudicator are separated from both implementers and cover conflicts, benign concurrency, stale-base, recovery and negative controls.",
+    "ACC-4: AB/BA counterbalancing and environment controls are defined, and p95 uses raw timestamps only.",
+    "ACC-5: False block, missed conflict, human minutes, tokens, billed cost, completion, retries and repair time have executable definitions."
+  ],
+  "deliverables": [
+    "docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
+    "scripts/fixtures/atm-external-benchmark/manifest.json",
+    "scripts/validate-external-benchmark-protocol.ts",
+    "tests/cli/external-benchmark-protocol.test.ts",
+    "schemas/evidence/external-benchmark-run.schema.json"
+  ],
+  "scopePaths": [
+    "docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
+    "scripts/fixtures/atm-external-benchmark/manifest.json",
+    "scripts/validate-external-benchmark-protocol.ts",
+    "tests/cli/external-benchmark-protocol.test.ts",
+    "schemas/evidence/external-benchmark-run.schema.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "node --strip-types scripts/validate-external-benchmark-protocol.ts"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "invalidate-and-reseal",
+  "rollbackNotes": "If protocol, corpus or oracle confidentiality changes after sealing, invalidate and preregister a new version.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.comparative-evaluation-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-comparative-evaluation-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0007-preregister-an-independent-external-atm-benchmark.task.md",
+    "sectionTitle": "TASK-PRF-0007",
+    "headingLine": 107,
+    "hash": "2744a818f7250a80",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0007-preregister-an-independent-external-atm-benchmark.task.md",
+      "planningCommitSha": "a2d8387c5cfb6ab047d509e261ba79dac1a56b5d",
+      "contentDigest": "sha256:2744a818f7250a80dd8e9d846be9304323746d6f7792c0669efc083fc2493259",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-27T16:40:51.968Z"
+    }
+  },
+  "importedAt": "2026-08-27T16:40:51.968Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0004",
+      "TASK-PRF-0005",
+      "TASK-PRF-0006"
+    ],
+    "startConditions": [
+      "Public npm and reduced adopter artifacts pass their external exit gates.",
+      "At least two non-ATM-authored external repositories are eligible for sealing."
+    ],
+    "softRelations": [
+      "TASK-PRF-0008"
+    ],
+    "changedPublicSeams": [
+      "comparative-evaluation-protocol",
+      "sealed-corpus-contract",
+      "independent-oracle-contract"
+    ],
+    "causalImpactEdges": [
+      "baseline-executes-real-worktree-git-workflow",
+      "atm-arm-installs-public-npm-artifact",
+      "oracle-is-independent-from-both-arm-implementers"
+    ],
+    "parallelFrontierInputs": [
+      "external-repository-eligibility-report",
+      "published-package-version-and-digest",
+      "phase-4-artifact-manifests"
+    ],
+    "validatorReferences": [
+      "test_prf_benchmark_protocol_seal_d01cf8e4",
+      "test_prf_arm_realness_7a5283b9",
+      "test_prf_oracle_independence_3e9cfc12"
+    ],
+    "phaseOwner": "phase-5-benchmark-preregistration"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_benchmark_protocol_seal_d01cf8e4",
+      "targetGroupId": "null",
+      "semanticKey": "external_benchmark_protocol_seal",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "baseline-executes-real-worktree-git-workflow"
+      ],
+      "expectedRedPredicate": "Protocol can change after evidence is visible, or baseline uses a modeled substitute.",
+      "contributionResourceKey": "external-benchmark-protocol",
+      "responsibility": "task-required",
+      "dependencyEdge": "preregistration-to-run-admission",
+      "contractEdge": "comparative-evaluation-protocol",
+      "resourceKey": "protocol-seal"
+    },
+    {
+      "caseId": "test_prf_arm_realness_7a5283b9",
+      "targetGroupId": "null",
+      "semanticKey": "benchmark_arm_realness",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "baseline-executes-real-worktree-git-workflow",
+        "atm-arm-installs-public-npm-artifact"
+      ],
+      "expectedRedPredicate": "Either arm uses modeled timing, workspace link, fixture, or derived p95 instead of raw execution.",
+      "contributionResourceKey": "arm-environment-manifest",
+      "responsibility": "task-required",
+      "dependencyEdge": "workload-to-arm-runner",
+      "contractEdge": "sealed-corpus-contract",
+      "resourceKey": "external-repositories"
+    },
+    {
+      "caseId": "test_prf_oracle_independence_3e9cfc12",
+      "targetGroupId": "null",
+      "semanticKey": "benchmark_oracle_independence",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "oracle-is-independent-from-both-arm-implementers"
+      ],
+      "expectedRedPredicate": "Oracle labels or hidden conflicts are available to implementers before sealing.",
+      "contributionResourceKey": "oracle-separation-manifest",
+      "responsibility": "task-required",
+      "dependencyEdge": "hidden-corpus-to-adjudication",
+      "contractEdge": "independent-oracle-contract",
+      "resourceKey": "oracle"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_benchmark_protocol_seal_d01cf8e4",
+    "test_prf_arm_realness_7a5283b9",
+    "test_prf_oracle_independence_3e9cfc12"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0004",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-PRF-0005",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-PRF-0006",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-27T16-45-31-841Z-renew-a51898962b44",
+  "lastTransitionAt": "2026-08-27T16:45:31.841Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-08-27T16:40:58.608Z",
+  "promotedAt": "2026-08-27T16:40:58.614Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-a2cb1d93ff27",
+    "claimedAt": "2026-08-27T16:40:58.620Z",
+    "heartbeatAt": "2026-08-27T16:45:31.073Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0007.json",
+      "docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
+      "schemas/evidence/external-benchmark-run.schema.json",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
+      "scripts/validate-external-benchmark-protocol.ts",
+      "tests/cli/external-benchmark-protocol.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260827164058-codex-captain-0e03a722cf",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827164058-codex-captain-0e03a722cf\""
+    }
+  },
+  "startedAt": "2026-08-27T16:40:58.620Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-a55d281d52180303",
+    "ticketDigest": "sha256:a55d281d52180303c2cfb9c0f16fb2255b8bd18ed12b3ebd78a201ee44b85edc",
+    "taskId": "TASK-PRF-0007",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260827164058-codex-captain-0e03a722cf",
+    "claimGeneration": "lease-a2cb1d93ff27",
+    "issuedAt": "2026-08-27T16:45:31.073Z",
+    "expiresAt": "2026-08-27T17:15:31.073Z",
+    "scopeDigest": "sha256:f9964a36c8a3b4edfbb27be40b3855c54714dc9f75f823b3ddea1617f757b0bb",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-27T16:45:31.073Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0007.*",
+          ".atm/history/task-events/TASK-PRF-0007/**",
+          ".atm/history/tasks/TASK-PRF-0007.json",
+          "docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
+          "schemas/evidence/external-benchmark-run.schema.json",
+          "scripts/fixtures/atm-external-benchmark/manifest.json",
+          "scripts/validate-external-benchmark-protocol.ts",
+          "tests/cli/external-benchmark-protocol.test.ts"
+        ],
+        "digest": "sha256:c332215bb986f0febc5165137f6f1715af6bdd3d19553e9c4da601ccbbed13ab"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260827164058-codex-captain-TASK-PRF-0007-467973ddc8",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0007",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0007.*",
+      ".atm/history/task-events/TASK-PRF-0007/**",
+      ".atm/history/tasks/TASK-PRF-0007.json",
+      "docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
+      "schemas/evidence/external-benchmark-run.schema.json",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
+      "scripts/validate-external-benchmark-protocol.ts",
+      "tests/cli/external-benchmark-protocol.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "edcc0cfb9f5c6bf1b950134c1f73b28a8278bb7dbf16e7ed432736724da6a5fa",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260827164058-codex-captain-TASK-PRF-0007-467973ddc8",
+    "laneSession": {
+      "laneSessionId": "lane-20260827164058-codex-captain-0e03a722cf",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827164058-codex-captain-0e03a722cf\""
+    },
+    "createdAt": "2026-08-27T16:41:03.829Z",
+    "status": "active"
+  }
+}

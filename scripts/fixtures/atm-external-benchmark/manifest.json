@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.externalBenchmarkRun.v1",
+  "protocolVersion": "1.0.0",
+  "status": "preregistered",
+  "sealedAt": "2026-08-28T00:00:00.000Z",
+  "externalRepositories": [
+    {
+      "name": "sindresorhus/p-map",
+      "repositoryUrl": "https://github.com/sindresorhus/p-map.git",
+      "commitSha": "bc26cf03f81292325236a1188063dac8e7a4de0f",
+      "nonAtmAuthored": true
+    },
+    {
+      "name": "fastify/fastify",
+      "repositoryUrl": "https://github.com/fastify/fastify.git",
+      "commitSha": "1beaf7e72d24b2fc63a02a7f5806772a00e45454",
+      "nonAtmAuthored": true
+    }
+  ],
+  "arms": {
+    "baseline": {
+      "executionMode": "real-git-worktree",
+      "modeled": false,
+      "requiresPullRequest": true
+    },
+    "atm": {
+      "executionMode": "published-npm",
+      "packageName": "@ai-atomic-framework/cli",
+      "packageAvailability": "unavailable",
+      "workspaceLink": false,
+      "packageVersion": null,
+      "packageTarballSha256": null
+    }
+  },
+  "oracle": {
+    "hiddenCorpusOwner": "external-oracle-custodian",
+    "adjudicator": "independent-adjudicator",
+    "baselineImplementer": "baseline-operator",
+    "atmImplementer": "atm-operator",
+    "visibilityBeforeSeal": "oracle-only"
+  },
+  "counterbalancing": {
+    "sequences": ["AB", "BA"],
+    "environmentControls": ["pinned OS image", "pinned Node version", "fresh worktree per run", "same repository SHA per paired run"],
+    "p95Source": "raw-timestamps-only"
+  },
+  "metrics": {
+    "falseBlock": "admitted benign operation rejected by the governance layer / all benign operations",
+    "missedConflict": "oracle-labelled conflicting operations admitted concurrently / all oracle-labelled conflicts",
+    "humanMinutes": "wall-clock human intervention intervals recorded in raw event log",
+    "tokens": "provider-reported token count retained as raw telemetry; unavailable values remain unavailable",
+    "billedCost": "provider invoice or API cost telemetry retained as raw telemetry; unavailable values remain unavailable",
+    "completion": "oracle-adjudicated successful task completion / assigned tasks",
+    "retries": "count of explicit rerun attempts after a nonzero or rejected attempt",
+    "repairTime": "raw timestamp from first failed attempt to oracle-accepted repair"
+  },
+  "controls": ["positive-conflict", "benign-concurrency", "semantic-conflict", "stale-base", "recovery", "negative-control"],
+  "runEligibility": {
+    "eligible": false,
+    "blockingReasons": ["public npm package version and tarball digest are not sealed", "independent hidden-corpus custodian has not accepted the execution packet", "raw provider cost telemetry endpoint is not sealed"]
+  }
+}
