@@ -8,6 +8,12 @@
   "cases": [
     {"caseId":"test_task_atm_gov_0314_shadow_comparison_2a6f9d41","semanticKey":"plan4_selected_full_shadow_comparison","command":"node --strip-types tests/cli/plan4-shadow-comparison.test.ts","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-2"],"coversImpactEdges":["selected-versus-full divergence -> selector policy epoch invalidation"]},
     {"caseId":"test_task_atm_gov_0314_shadow_adjudication_7c1b4e92","semanticKey":"plan4_escaped_defect_adjudication","command":"node --strip-types tests/cli/plan4-shadow-comparison.test.ts","responsibility":"task-required","coversAcceptance":["ACC-3","ACC-4","ACC-5"],"coversImpactEdges":["selected-versus-full divergence -> selector policy epoch invalidation"]},
-    {"caseId":"test_real_same_candidate_shadow_0337","semanticKey":"real_same_candidate_shadow","command":"node --strip-types tests/core/real-shadow-comparison.test.ts","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-2","ACC-3","ACC-4"],"coversImpactEdges":["same-candidate-shadow","escaped-defect-adjudication","policy-epoch"]}
+    {"caseId":"test_task_atm_gov_0337_real_same_candidate_shadow_759c0b45","semanticKey":"real_same_candidate_shadow","command":"node --strip-types tests/core/real-shadow-comparison.test.ts","responsibility":"task-required","coversAcceptance":["ACC-1","ACC-2","ACC-3","ACC-4"],"coversImpactEdges":["same-candidate-shadow","escaped-defect-adjudication","policy-epoch"]}
+  ],
+  "legacyAliases": [
+    {
+      "legacyCaseId": "test_real_same_candidate_shadow_0337",
+      "canonicalCaseId": "test_task_atm_gov_0337_real_same_candidate_shadow_759c0b45"
+    }
   ]
 }
