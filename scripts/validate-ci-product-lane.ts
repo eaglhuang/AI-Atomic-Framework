@@ -45,7 +45,7 @@ function validateRemote(): void {
   const contexts = Array.isArray(protection.required_status_checks?.contexts) ? protection.required_status_checks.contexts.map(String) : [];
   assert(contexts.some((context) => context === 'Product CI' || context.endsWith('/ Product CI')), 'main must require the Product CI status');
 
-  const runs = readJson(['api', 'repos/eaglhuang/AI-Atomic-Framework/actions/runs?branch=main&per_page=10']) as { workflow_runs?: unknown };
+  const runs = readJson(['api', 'repos/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/runs?branch=main&per_page=10']) as { workflow_runs?: unknown };
   const ciRuns = Array.isArray(runs.workflow_runs)
     ? runs.workflow_runs.filter((entry: any) => entry?.path === '.github/workflows/ci.yml').slice(0, 10)
     : [];
