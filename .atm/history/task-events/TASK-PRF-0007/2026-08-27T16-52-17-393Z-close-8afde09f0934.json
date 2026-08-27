@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-27T16-52-17-393Z-close-8afde09f0934",
+  "taskId": "TASK-PRF-0007",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260827164058-codex-captain-TASK-PRF-0007-467973ddc8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0007.json",
+  "taskSha256": "sha256:d7106f752b5d1568c69224071d594e3c7c1db3d9925f27e9db0cf5737b759c9e",
+  "createdAt": "2026-08-27T16:52:17.393Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0007 --actor codex-captain --status done --historical-delivery 23f69f7bc805bff5a15a0467635e13c435cd3daa",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260827164058-codex-captain-TASK-PRF-0007-467973ddc8",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0007.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "validate:external-benchmark-protocol"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "validate:external-benchmark-protocol"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-27T16:52:17.374Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0007.*",
+        ".atm/history/task-events/TASK-PRF-0007/**",
+        ".atm/history/tasks/TASK-PRF-0007.json",
+        "docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
+        "schemas/evidence/external-benchmark-run.schema.json",
+        "scripts/fixtures/atm-external-benchmark/manifest.json",
+        "scripts/validate-external-benchmark-protocol.ts",
+        "tests/cli/external-benchmark-protocol.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "schemas/evidence/external-benchmark-run.schema.json",
+        "scripts/fixtures/atm-external-benchmark/manifest.json",
+        "scripts/validate-external-benchmark-protocol.ts",
+        "tests/cli/external-benchmark-protocol.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+        "validate:external-benchmark-protocol"
+      ]
+    }
+  }
+}
