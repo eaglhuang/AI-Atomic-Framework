@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
@@ -12,8 +13,13 @@ function writeJson(root: string, relativePath: string, value: unknown): void {
   writeFileSync(target, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function stageAll(root: string): void {
+  execFileSync('git', ['add', '-A'], { cwd: root, stdio: 'ignore' });
+}
+
 function taskBundle(taskId: string, includeLedger: boolean, includeEvent: boolean): { root: string; staged: string[] } {
   const root = mkdtempSync(path.join(os.tmpdir(), 'atm-precommit-evidence-'));
+  execFileSync('git', ['init', '--quiet'], { cwd: root, stdio: 'ignore' });
   const evidencePath = `.atm/history/evidence/${taskId}.historical-work-admission-attestations.json`;
   writeJson(root, evidencePath, { schemaId: 'atm.historicalWorkAdmissionAttestationLedger.v1', attestations: [{ taskId }] });
   const staged = [evidencePath];
@@ -32,7 +38,7 @@ function taskBundle(taskId: string, includeLedger: boolean, includeEvent: boolea
     writeJson(root, eventPath, { schemaId: 'atm.taskTransition.v1', transitionId, taskId, taskPath: ledgerPath, taskSha256: 'sha256:fixture', command: 'node atm.mjs tasks renew' });
     staged.push(eventPath);
   }
-  return { root, staged };
+  stageAll(root); return { root, staged };
 }
 
 function appendTaskBundle(root: string, taskId: string): string[] {
@@ -42,7 +48,7 @@ function appendTaskBundle(root: string, taskId: string): string[] {
   writeJson(root, ledgerPath, ledger);
   const eventPath = `.atm/history/task-events/${taskId}/${transitionId}.json`;
   writeJson(root, eventPath, { schemaId: 'atm.taskTransition.v1', transitionId, taskId, taskPath: ledgerPath, taskSha256: sha256(JSON.stringify(ledger, null, 2) + '\n'), command: 'node atm.mjs tasks renew' });
-  return [`.atm/history/evidence/${taskId}.historical-work-admission-attestations.json`, ledgerPath, eventPath];
+  stageAll(root); return [`.atm/history/evidence/${taskId}.historical-work-admission-attestations.json`, ledgerPath, eventPath];
 }
 
 {
@@ -74,8 +80,21 @@ function appendTaskBundle(root: string, taskId: string): string[] {
   const receiptPath = `.atm/history/evidence/${taskId}.runner-sync-receipt.json`;
   writeJson(fixture.root, receiptPath, { schemaId: 'atm.runnerSyncReceipt.v1', taskId, actorId: 'captain', outputInventory: { entries: [] } });
   writeJson(fixture.root, `.atm/runtime/locks/${taskId}.lock.json`, { workItemId: taskId, actorId: 'captain', files: [receiptPath] });
+  stageAll(fixture.root);
   const decision = classifyProtectedEvidenceBundle(fixture.root, [...fixture.staged, receiptPath]).decisions.get(receiptPath.toLowerCase());
   assert.deepEqual(decision, { ok: true, taskId, reason: null });
+}
+
+{
+  const fixture = taskBundle('TASK-RUNNER-0005', true, true);
+  const producerTaskId = 'ATM-FRAMEWORK-TEMP-producer';
+  const closingReceiptPath = '.atm/history/evidence/TASK-RUNNER-0005.runner-sync-receipt.json';
+  const producerReceiptPath = `.atm/history/evidence/${producerTaskId}.runner-sync-receipt.json`;
+  const members = [producerTaskId];
+  writeJson(fixture.root, closingReceiptPath, { schemaId: 'atm.runnerSyncReceipt.v1', taskId: 'TASK-RUNNER-0005', linkedTaskIds: ['TASK-RUNNER-0005'], memberTaskIds: members, groupManifest: { memberTaskIds: members }, childAttribution: { complete: true, members: [{ taskId: producerTaskId }] } });
+  writeJson(fixture.root, producerReceiptPath, { schemaId: 'atm.runnerSyncReceipt.v1', taskId: producerTaskId, memberTaskIds: members });
+  stageAll(fixture.root);
+  assert.equal(inspectProtectedAtmStateChanges(fixture.root, [...fixture.staged, closingReceiptPath, producerReceiptPath]).ok, true, 'a sealed runner receipt may carry its explicitly attested temporary producer receipt in the same close bundle');
 }
 
 console.log('pre-commit-evidence-context-parity: ok');
