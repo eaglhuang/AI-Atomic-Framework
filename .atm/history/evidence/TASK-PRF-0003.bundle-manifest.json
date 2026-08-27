@@ -1,11 +1,12 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0003",
-  "updatedAt": "2026-08-26T23:51:57.041Z",
+  "updatedAt": "2026-08-27T01:23:14.402Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
-    "validate:ci-product-lane"
+    "validate:ci-product-lane",
+    "validate:standard"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -24,6 +25,39 @@
       "durationMs": 7542,
       "runnerKind": "frozen-runner",
       "sourceCommit": "b8cdf3c727e6380ce66d11f75e7f915f603ad7cb",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-ci-product-lane.ts --remote",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d1b7b48e620c65885e6d20f871d73a59622ef2ef8a01c9e37aded6e090b4ee1b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-08-27T00:23:03.606Z",
+      "startedAt": "2026-08-27T00:22:55.825Z",
+      "finishedAt": "2026-08-27T00:23:03.606Z",
+      "durationMs": 7781,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "f7d86c44bde8158137b5cd6d7b67f4ca5cac88c3",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:standard",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9d0ad8812cda6b9f3b92e1db16b8e6d5042fd539d6ec5183724f405daecf745e",
+      "stderrSha256": "sha256:7d052490dbe3eccdf542abb11fe26ccf4a08b48983b1b4d95d985424ef61dadb",
+      "validators": [
+        "validate:standard"
+      ],
+      "generatedAt": "2026-08-27T01:23:14.401Z",
+      "startedAt": "2026-08-27T01:09:09.779Z",
+      "finishedAt": "2026-08-27T01:23:14.401Z",
+      "durationMs": 844622,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "d658aa90f84d512c9aa1d817fc9c5a62db51ed8b",
       "cached": false
     }
   ],

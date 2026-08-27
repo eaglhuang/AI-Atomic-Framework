@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-27T01-26-15-914Z-close-d32a0304b50d",
+  "taskId": "TASK-PRF-0003",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260826232927-codex-captain-TASK-PRF-0003-4aa0ebe233",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0003.json",
+  "taskSha256": "sha256:dfcba0846e9a090bfdbf26e559910119e811f0dc812c9f748285de1c62748cac",
+  "createdAt": "2026-08-27T01:26:15.914Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0003 --actor codex-captain --status done --historical-delivery f7d86c44bde8158137b5cd6d7b67f4ca5cac88c3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260826232927-codex-captain-TASK-PRF-0003-4aa0ebe233",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0003.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "validate:ci-product-lane",
+      "validate:standard"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "validate:ci-product-lane",
+      "validate:standard"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-27T01:26:15.903Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0003.*",
+        ".atm/history/task-events/TASK-PRF-0003/**",
+        ".atm/history/tasks/TASK-PRF-0003.json",
+        ".github/workflows/ci.yml",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "scripts/run-validators.ts",
+        "scripts/validate-ci-product-lane.ts",
+        "tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/run-validators.ts",
+        "scripts/validate-ci-product-lane.ts",
+        "tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+        "validate:ci-product-lane",
+        "validate:standard"
+      ]
+    }
+  }
+}

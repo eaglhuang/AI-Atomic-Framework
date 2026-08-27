@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0003",
   "title": "Separate required product CI and enforce protected main",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -195,8 +195,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-27T00-17-38-791Z-renew-a45942ccc598",
-  "lastTransitionAt": "2026-08-27T00:17:38.791Z",
+  "lastTransitionId": "2026-08-27T01-26-15-914Z-close-d32a0304b50d",
+  "lastTransitionAt": "2026-08-27T01:26:15.914Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-25T10:46:00.095Z",
   "promotedAt": "2026-08-25T10:46:00.100Z",
@@ -204,7 +204,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-7532f4e9705d",
     "claimedAt": "2026-08-26T23:29:27.150Z",
-    "heartbeatAt": "2026-08-27T00:17:37.928Z",
+    "heartbeatAt": "2026-08-27T01:26:15.912Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0003.json",
@@ -214,33 +214,34 @@
       "scripts/validate-ci-product-lane.ts",
       "tests/cli/ci-product-lane-contract.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260826232927-codex-captain-f7b7002d31",
       "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826232927-codex-captain-f7b7002d31\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-25T10:46:00.107Z",
   "startedByActor": "cursor-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-ce019c4f95b203e0",
-    "ticketDigest": "sha256:ce019c4f95b203e09058d3308d4102faeeb9a8012d61f94266b6142ed6619a52",
+    "ticketId": "wat-80edacf2ece015c0",
+    "ticketDigest": "sha256:80edacf2ece015c0a0736074c2faefe95890fea30ec069e3d0c72f2f378ed526",
     "taskId": "TASK-PRF-0003",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260826232927-codex-captain-f7b7002d31",
     "claimGeneration": "lease-7532f4e9705d",
-    "issuedAt": "2026-08-27T00:17:37.928Z",
-    "expiresAt": "2026-08-27T00:47:37.928Z",
+    "issuedAt": "2026-08-27T01:07:01.077Z",
+    "expiresAt": "2026-08-27T01:37:01.077Z",
     "scopeDigest": "sha256:7e2d661452a61b8f0ceada1b1b57e0c93e5a32203db9e87e209e0fa3cdbcc5c9",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-27T00:17:37.928Z"
+      "selectedAt": "2026-08-27T01:07:01.077Z"
     },
     "grants": [
       {
@@ -334,5 +335,9 @@
     },
     "createdAt": "2026-08-26T23:29:32.075Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-27T01:26:15.912Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260826232927-codex-captain-TASK-PRF-0003-4aa0ebe233",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0003.closure-packet.json"
 }
