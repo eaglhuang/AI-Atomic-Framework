@@ -180,7 +180,9 @@ function getDirtyFiles(cwd) {
     return [...new Set(files.filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
 function isTrackedGitFile(cwd, file) { return tryGitScalar(cwd, ['ls-files', '--error-unmatch', '--', file]) === file; }
-function listAuthorizedDirtyActorRegistryFiles(input) { const actorRegistry = '.atm/catalog/registry/actors.json'; const runtimeAllowed = resolveTaskflowDeclaredFiles(input.repoRoot, input.taskId, input.taskDocument); return input.dirtyFiles.includes(actorRegistry) && isTrackedGitFile(input.repoRoot, actorRegistry) && runtimeAllowed.some((allowed) => taskflowPathMatches(actorRegistry, allowed)) ? [actorRegistry] : []; }
+function listExplicitTaskFiles(taskDocument, key) { const container = taskDocument[key]; if (!container || typeof container !== 'object' || Array.isArray(container))
+    return []; const files = container.files ?? container.allowedFiles; return Array.isArray(files) ? files.filter((file) => typeof file === 'string').map(normalizeTaskflowRelativePath) : []; }
+function listAuthorizedDirtyActorRegistryFiles(input) { const actorRegistry = '.atm/catalog/registry/actors.json'; const runtimeAllowed = resolveTaskflowDeclaredFiles(input.repoRoot, input.taskId, input.taskDocument); const explicitAllowed = [...listExplicitTaskFiles(input.taskDocument, 'claim'), ...listExplicitTaskFiles(input.taskDocument, 'taskDirectionLock')]; const authorized = [...runtimeAllowed, ...explicitAllowed].some((allowed) => taskflowPathMatches(actorRegistry, allowed)); return input.dirtyFiles.includes(actorRegistry) && isTrackedGitFile(input.repoRoot, actorRegistry) && authorized ? [actorRegistry] : []; }
 function getHistoricalCommittedFiles(cwd, refs) {
     const files = [];
     for (const ref of refs) {

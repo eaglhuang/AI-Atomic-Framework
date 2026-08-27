@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-27T16-20-18-906Z-close-ec9479de4377",
+  "taskId": "TASK-PRF-0005",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260827152540-codex-captain-TASK-PRF-0005-52b1e64c2a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0005.json",
+  "taskSha256": "sha256:0fcbc1e73ee8445d8d7404544e73822e169cce7133487e500197419bc85260d9",
+  "createdAt": "2026-08-27T16:20:18.906Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0005 --actor codex-captain --status done --historical-delivery 76f77a9395fe4e5f5c35cca79fea668bebcfd6b5",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260827152540-codex-captain-TASK-PRF-0005-52b1e64c2a",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0005.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "typecheck",
+      "validate:evidence-ledger-boundary"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "validate:evidence-ledger-boundary"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-27T16:20:18.895Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0005.*",
+        ".atm/history/task-events/TASK-PRF-0005/**",
+        ".atm/history/tasks/TASK-PRF-0005.json",
+        "docs/reports/evidence-ledger-migration-manifest.json",
+        "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+        "packages/cli/src/commands/evidence/evidence-store.ts",
+        "packages/core/src/evidence/evidence-ledger.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/index.ts",
+        "packages/plugin-governance-local/src/stores.ts",
+        "packages/plugin-sdk/src/governance/stores.ts",
+        "scripts/migrate-evidence-ledger.ts",
+        "scripts/validate-evidence-ledger-boundary.ts",
+        "tests/cli/evidence-ledger-migration.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+        "packages/cli/src/commands/evidence/evidence-store.ts",
+        "packages/core/src/evidence/evidence-ledger.ts",
+        "packages/core/src/evidence/index.ts",
+        "packages/core/src/index.ts",
+        "packages/plugin-governance-local/src/stores.ts",
+        "packages/plugin-sdk/src/governance/stores.ts",
+        "scripts/migrate-evidence-ledger.ts",
+        "scripts/validate-evidence-ledger-boundary.ts",
+        "tests/cli/evidence-ledger-migration.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+        "validate:evidence-ledger-boundary"
+      ]
+    }
+  }
+}

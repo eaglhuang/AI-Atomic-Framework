@@ -4,6 +4,7 @@ export * from './coverage-semantics.js';
 export * from './coverage-universe-compiler.js';
 export * from './structural-coverage.js';
 export * from './diff-evidence.js';
+export * from './evidence-ledger.js';
 export * from './diagnostic-loop.js';
 export * from './git-boundary-evidence.js';
 export * from './mutation-lineage.js';

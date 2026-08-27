@@ -5,6 +5,19 @@ import { quoteForShell, isRecord } from './shared-utils.js';
 export function evidencePathForTask(cwd, taskId) {
     return path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
 }
+/**
+ * The only adapter-owned legacy evidence root. Runtime callers must use the
+ * ledger for new evidence and keep this path solely for historical reads.
+ */
+export function legacyEvidenceDirectory(cwd) {
+    return path.join(cwd, '.atm', 'history', 'evidence');
+}
+export function evidenceBundleManifestRelativePath(taskId) {
+    return `.atm/history/evidence/${taskId}.bundle-manifest.json`;
+}
+export function evidenceBundleManifestPathForTask(cwd, taskId) {
+    return path.join(cwd, evidenceBundleManifestRelativePath(taskId));
+}
 export function taskPathForEvidence(cwd, taskId) {
     return path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
 }
@@ -23,7 +36,7 @@ export function readTaskRunnerSyncReceipt(cwd, taskId) {
             // ignore
         }
     }
-    const evidenceDir = path.join(cwd, '.atm', 'history', 'evidence');
+    const evidenceDir = legacyEvidenceDirectory(cwd);
     if (!existsSync(evidenceDir))
         return null;
     try {

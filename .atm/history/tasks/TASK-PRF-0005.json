@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0005",
   "title": "Migrate runtime evidence to the Evidence Ledger",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0004"
@@ -232,8 +232,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-27T15-33-14-955Z-scope-amendment-efc8f30cbe22",
-  "lastTransitionAt": "2026-08-27T15:33:14.955Z",
+  "lastTransitionId": "2026-08-27T16-20-18-906Z-close-ec9479de4377",
+  "lastTransitionAt": "2026-08-27T16:20:18.906Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-08-27T15:25:40.548Z",
@@ -242,7 +242,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-371a4ae4d199",
     "claimedAt": "2026-08-27T15:25:40.557Z",
-    "heartbeatAt": "2026-08-27T15:25:40.557Z",
+    "heartbeatAt": "2026-08-27T16:20:18.903Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0005.*",
@@ -260,40 +260,41 @@
       "scripts/validate-evidence-ledger-boundary.ts",
       "tests/cli/evidence-ledger-migration.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260827152540-codex-captain-dd3b3caf26",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827152540-codex-captain-dd3b3caf26\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-27T15:25:40.557Z",
   "startedByActor": "codex-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-7df7d5fd436fda85",
-    "ticketDigest": "sha256:7df7d5fd436fda8560300bf41ab9c3ce482c14b6c26218363ed246f046685e6f",
+    "ticketId": "wat-806b2958fd10324f",
+    "ticketDigest": "sha256:806b2958fd10324ff00087d04862aae324cd6a481c1ea4d172243fde9d3b9300",
     "taskId": "TASK-PRF-0005",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260827152540-codex-captain-dd3b3caf26",
     "claimGeneration": "lease-371a4ae4d199",
-    "issuedAt": "2026-08-27T15:33:14.817Z",
-    "expiresAt": "2026-08-27T16:03:14.817Z",
-    "scopeDigest": "sha256:d54824911badd1ae283a56403c6d49ad590e2068144c1a66d3dc034e088cecb4",
+    "issuedAt": "2026-08-27T16:18:34.271Z",
+    "expiresAt": "2026-08-27T16:48:34.271Z",
+    "scopeDigest": "sha256:c345632d13a6457875b10b0399f8f0b404c9eba8358536221a8d4bb4f87c48ab",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-27T15:33:14.817Z"
+      "selectedAt": "2026-08-27T16:18:34.271Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0005.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-PRF-0005/**",
           ".atm/history/tasks/TASK-PRF-0005.json",
           "docs/reports/evidence-ledger-migration-manifest.json",
@@ -308,7 +309,7 @@
           "scripts/validate-evidence-ledger-boundary.ts",
           "tests/cli/evidence-ledger-migration.test.ts"
         ],
-        "digest": "sha256:9d55d6d2163cb45b94c766fd0df70601e625fb6933eea0187720fdce6b815111"
+        "digest": "sha256:7fea7fdef5514359c8fd730fa5c1178c06c422033e4ef3c1fca3fef1326e9848"
       },
       {
         "kind": "lifecycle-operation",
@@ -378,16 +379,14 @@
       "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0005-migrate-runtime-evidence-to-the-evidence-ledger.task.md"
     ],
     "allowPlanningMirror": false,
-    "promptHash": "d390b900dd1629bac38309014c0470023059bccc88c9d0dfd33b9d77a61367ab",
+    "promptHash": "963317a4c94a621cfaa3b29b8bb302f719f958bcd256d05edc6d3d6b770b394b",
     "actorId": "codex-captain",
-    "sessionId": null,
-    "laneSession": {
-      "laneSessionId": "lane-20260827152540-codex-captain-dd3b3caf26",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827152540-codex-captain-dd3b3caf26\""
-    },
-    "createdAt": "2026-08-27T15:25:45.941Z",
+    "sessionId": "session-20260827152540-codex-captain-TASK-PRF-0005-52b1e64c2a",
+    "createdAt": "2026-08-27T16:14:04.307Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-27T16:20:18.903Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260827152540-codex-captain-TASK-PRF-0005-52b1e64c2a",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0005.closure-packet.json"
 }

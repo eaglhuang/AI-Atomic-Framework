@@ -27,6 +27,13 @@ export function applySingleCardContractValidation(input) {
     }
     const causalFrontmatter = input.causalFrontmatter ?? null;
     const task = parsed.tasks[0];
+    const typedDependencySemantics = causalFrontmatter?.dependencySemantics === 'hard-causal/v1'
+        || causalFrontmatter?.dependency_semantics === 'hard-causal/v1'
+        ? 'hard-causal/v1'
+        : null;
+    const typedDependencies = Array.isArray(causalFrontmatter?.dependencies)
+        ? causalFrontmatter.dependencies
+        : null;
     const causalGraph = normalizeTaskCausalGraphContract(causalFrontmatter?.causalGraph ?? causalFrontmatter?.causal_graph);
     const causalValidation = validateCausalValidatorContractImport({
         frontmatter: causalFrontmatter,
@@ -53,6 +60,8 @@ export function applySingleCardContractValidation(input) {
         ...parsed,
         tasks: parsed.tasks.map((entry) => ({
             ...entry,
+            ...(typedDependencySemantics ? { dependencySemantics: typedDependencySemantics } : {}),
+            ...(typedDependencies ? { dependencies: typedDependencies } : {}),
             causalGraph,
             testContributions: causalValidation.fields.testContributions,
             requiredTestCaseIds: causalValidation.fields.requiredTestCaseIds,

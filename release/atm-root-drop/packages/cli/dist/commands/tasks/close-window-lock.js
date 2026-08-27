@@ -95,6 +95,8 @@ function readCloseWindowStagedIndexLock(cwd) {
     }
 }
 const INDEX_LOCK_RETRY_DELAYS_MS = [25, 50, 100, 200, 400, 800, 1600];
+const CLOSE_WINDOW_HANDOFF_POLL_MS = 100;
+const CLOSE_WINDOW_HANDOFF_MAX_WAIT_MS = 120_000;
 function isGitIndexLockContention(error) {
     const message = error instanceof Error ? error.message : String(error);
     return /(?:index\.lock|unable to create .*\.git[\\/]index\.lock)/i.test(message);
@@ -240,7 +242,34 @@ export function inspectCloseWindowStagedIndexAdmission(input) {
 }
 export function acquireCloseWindowStagedIndexLock(input) {
     const lockPath = closeWindowStagedIndexLockPath(input.cwd);
-    const existing = readCloseWindowStagedIndexLock(input.cwd);
+    const firstExisting = readCloseWindowStagedIndexLock(input.cwd);
+    let existing = firstExisting;
+    let handoffAttempts = 0;
+    const handoffStartedAt = Date.now();
+    const maxHandoffWaitMs = input.maxHandoffWaitMs ?? CLOSE_WINDOW_HANDOFF_MAX_WAIT_MS;
+    while (input.waitForHandoff === true
+        && existing?.status === 'active'
+        && existing.taskId !== normalizeTaskId(input.taskId)
+        && Date.now() - handoffStartedAt < maxHandoffWaitMs) {
+        handoffAttempts += 1;
+        (input.waitForHandoffPoll ?? waitForIndexLockRetry)(CLOSE_WINDOW_HANDOFF_POLL_MS);
+        existing = readCloseWindowStagedIndexLock(input.cwd);
+    }
+    const handoffWait = firstExisting?.status === 'active' && firstExisting.taskId !== normalizeTaskId(input.taskId)
+        ? {
+            waitedForTaskId: firstExisting.taskId,
+            waitedMs: Date.now() - handoffStartedAt,
+            attempts: handoffAttempts,
+            disposition: existing?.status === 'active' && existing.taskId !== normalizeTaskId(input.taskId)
+                ? 'timed-out'
+                : 'acquired-after-release'
+        }
+        : {
+            waitedForTaskId: normalizeTaskId(input.taskId),
+            waitedMs: 0,
+            attempts: 0,
+            disposition: 'not-required'
+        };
     const unexpectedStagedTasks = inspectForeignStagedTasksForCloseWindow({
         cwd: input.cwd,
         taskId: input.taskId,
@@ -259,7 +288,8 @@ export function acquireCloseWindowStagedIndexLock(input) {
             unexpectedStagedTasks,
             foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null,
             blockedCode: admission.blockedCode,
-            blockedSummary: admission.blockedSummary
+            blockedSummary: admission.blockedSummary,
+            handoffWait
         };
     }
     // Publish the coordination lease before touching Git's shared index.  The
@@ -303,7 +333,8 @@ export function acquireCloseWindowStagedIndexLock(input) {
         unexpectedStagedTasks,
         foreignStagedSnapshotPath: record.foreignStagedSnapshotPath,
         blockedCode: null,
-        blockedSummary: null
+        blockedSummary: null,
+        handoffWait
     };
 }
 export function assertCloseWindowStagingAllowed(input) {

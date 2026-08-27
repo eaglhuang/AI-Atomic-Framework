@@ -2,11 +2,11 @@
   "schemaVersion": "atm.onefileRelease.v0.2",
   "generatedAt": "1970-01-01T00:00:00.000Z",
   "entrypoint": "atm.mjs",
-  "payloadSha256": "122499c964443c4ce231e7bda874168d34bbb617a8533afb722dbc3eb82cc87a",
-  "payloadInputManifestHash": "sha256:d5c5907007b84331e7e76fbf588b1e24dddf39cfbcd7eb43dc3ed653af1ef87c",
+  "payloadSha256": "7801566a65d8655035ae3c73069bcdbea31c1aac9fa9f4fa9edcd3c7d9944f23",
+  "payloadInputManifestHash": "sha256:c8d615a3defc39eafb7fc5111ca1149766cd1f79e8f50c3eae2fd3cd95cc0d15",
   "payloadReuse": false,
   "sourceRoot": "release/atm-root-drop",
-  "fileCount": 1915,
+  "fileCount": 1904,
   "generatedFiles": [
     "release/atm-onefile/README.onefile.md",
     "release/atm-onefile/atm.mjs",
@@ -24,5 +24,23 @@
     "contractSurface": "release-manifest.json",
     "dependsOnRootDropManifest": "release/atm-root-drop/release-manifest.json",
     "rationale": "release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list."
+  },
+  "buildInputsTreeHash": "sha256:6b633e2070a53bb9ea245df0b4a401101ba3952cfcd75223a9ba2120c7e164fc",
+  "sealedSourceCommit": "b211efa47bd454dfa3b56b8e46dbe011eacca0ba",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:2ece5624e58fab8bbe6703c7e8aebb82dba50117e0001bbb748fa501fe69677f",
+  "tsBuildCacheDigest": "sha256:e89437bdc38b3d982029611ce6ea3e584513c54f243676462a57035f8d0c73be",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
+  "phaseTimingsMs": {
+    "inputHashCalculation": 49,
+    "skipDecision": 54,
+    "worktreeSetup": 13540,
+    "typescriptBuild": 13770,
+    "rootDropReleaseAssembly": 18572,
+    "onefileReleaseAssembly": 1122,
+    "artifactSync": 8831,
+    "cleanup": 0,
+    "totalElapsed": 74991
   }
 }

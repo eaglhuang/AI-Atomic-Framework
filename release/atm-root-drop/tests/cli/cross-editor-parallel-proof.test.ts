@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import {
-  evaluateHardCausalAdmission
+  evaluateHardCausalAdmission,
+  resolvePlanningRoot,
+  sealWithoutDigest
 } from '../../scripts/audit-task-dependency-semantics.ts';
 import {
   NEGATIVE_CONTROL_FACTS,
@@ -20,7 +22,6 @@ import {
   scopedIntervalsFromEvents,
   unionDurationMs
 } from '../../scripts/compile-cross-editor-parallel-proof.ts';
-import { resolvePlanningRoot, sealWithoutDigest } from '../../scripts/audit-task-dependency-semantics.ts';
 import type { TaskEvent } from '../../scripts/validate-cross-editor-parallel-proof.ts';
 
 const editors = new Map<string, string>([

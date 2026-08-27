@@ -11,6 +11,10 @@ export const createAtmPackage = {
 };
 export function runCreateAtm(argv = process.argv.slice(2)) {
     const startedAt = Date.now();
+    if (argv.includes('--help') || argv.includes('-h')) {
+        process.stdout.write('Usage: create-atm <project-name> [--agent <pack-id>] [--cwd <dir>] [--json]\n');
+        return 0;
+    }
     const options = parseArgs(argv);
     const targetRoot = path.resolve(options.cwd, options.projectName);
     ensureCreatableTarget(targetRoot);

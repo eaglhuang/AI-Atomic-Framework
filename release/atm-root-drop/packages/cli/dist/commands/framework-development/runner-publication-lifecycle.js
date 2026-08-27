@@ -5,7 +5,8 @@ import { spawnSync } from 'node:child_process';
 import { buildRunnerPublicationReceipt } from './runner-publication-receipt.js';
 import { captureRunnerBuildOutputSnapshot, deriveRunnerBuildOutputInventory, evaluateRunnerPublicationDisposition, planRunnerPublicationTakeover, validateRunnerBuildOutputInventory } from '../../../../core/dist/broker/runner-build-output-inventory.js';
 export function authorizeRunnerPublicationTakeover(input) {
-    const snapshot = captureRunnerBuildOutputSnapshot({ cwd: input.cwd, buildTarget: input.buildTarget, currentTaskId: input.taskId, currentTaskAllowedFiles: input.currentTaskAllowedFiles });
+    // Authority is checked above; the takeover plan must describe the physical dirty surface seen by the publisher.
+    const snapshot = captureRunnerBuildOutputSnapshot({ cwd: input.cwd, buildTarget: input.buildTarget, currentTaskId: null, currentTaskAllowedFiles: [] });
     const plan = planRunnerPublicationTakeover({ sealedSourceSha: input.sealedSourceSha, snapshot });
     if (plan.entries.length === 0)
         throw new Error('ATM_RUNNER_PUBLICATION_PENDING: takeover requires at least one pre-existing generated publication member.');

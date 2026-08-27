@@ -275,4 +275,85 @@ const faithfulReport = inspectTaskFrontmatterFidelity({
 assert.equal(faithfulReport.ok, true, 'a faithful projection must not raise findings');
 assert.deepEqual(faithfulReport.findings, []);
 
+// Explicit empty collections carry governance meaning: they say the card
+// intentionally declares no edges/cases, not that the parser may omit the
+// corresponding record fields.  A matching empty projection is therefore
+// faithful; a missing property remains covered by the dropped-field cases.
+const explicitEmptyCollectionsReport = inspectTaskFrontmatterFidelity({
+  frontmatter: {
+    dependencies: [],
+    phaseTestCaseIds: [],
+    advisoryTestCaseIds: [],
+    causalGraph: { causalDependencies: [], softRelations: [] }
+  },
+  record: {
+    workItemId: 'TASK-FID-EMPTY-0001',
+    dependencies: [],
+    phaseTestCaseIds: [],
+    advisoryTestCaseIds: [],
+    causalGraph: { causalDependencies: [], softRelations: [] }
+  }
+});
+assert.equal(explicitEmptyCollectionsReport.ok, true, 'explicit empty collections must round-trip without a fidelity-loss finding');
+assert.deepEqual(explicitEmptyCollectionsReport.findings, []);
+assert.ok(
+  explicitEmptyCollectionsReport.checkedFields.includes('causalGraph.causalDependencies'),
+  'an explicit empty causal dependency collection must be checked rather than silently skipped'
+);
+
+// Typed non-hard edges are the Plan 4.1 route for speculative proposal-first
+// work. Import must preserve both the opt-in marker and its object edge instead
+// of silently restoring the legacy status gate.
+const typedDependencyCard = path.join(tempRepo, 'TASK-TYPED-0001.task.md');
+writeFileSync(typedDependencyCard, [
+  '---',
+  'task_id: TASK-TYPED-0001',
+  'title: Typed validation dependency fidelity',
+  'status: planned',
+  'dependencySemantics: hard-causal/v1',
+  'dependencies:',
+  '  - taskId: TASK-UPSTREAM-0001',
+  '    relation: validation',
+  '    note: Proposal-first work may start; upstream output is checked at compose.',
+  'scopePaths:',
+  '  - packages/cli/package.json',
+  'deliverables:',
+  '  - packages/cli/package.json',
+  'validators:',
+  '  - node --strip-types tests/cli/task-import-diagnostic-contract.test.ts',
+  '---',
+  '',
+  '# TASK-TYPED-0001',
+  '',
+  '## Acceptance',
+  '',
+  '- ACC-1 Typed validation dependencies survive import.'
+].join('\n'), 'utf8');
+
+const typedDependencyPreview = await runTasksImport([
+  '--cwd', tempRepo,
+  '--from', typedDependencyCard,
+  '--dry-run',
+  '--json'
+]) as any;
+assert.equal(typedDependencyPreview.ok, true, JSON.stringify(typedDependencyPreview.messages ?? typedDependencyPreview, null, 2));
+const typedDependencyTask = typedDependencyPreview.evidence.manifest.tasks[0];
+assert.equal(typedDependencyTask.dependencySemantics, 'hard-causal/v1');
+assert.deepEqual(typedDependencyTask.dependencies, [{
+  taskId: 'TASK-UPSTREAM-0001',
+  relation: 'validation',
+  note: 'Proposal-first work may start; upstream output is checked at compose.'
+}]);
+
+const typedDependencyWrite = await runTasksImport([
+  '--cwd', tempRepo,
+  '--from', typedDependencyCard,
+  '--write',
+  '--json'
+]) as any;
+assert.equal(typedDependencyWrite.ok, true, JSON.stringify(typedDependencyWrite.messages ?? typedDependencyWrite, null, 2));
+const typedDependencyLedger = JSON.parse(readFileSync(path.join(tempRepo, '.atm/history/tasks/TASK-TYPED-0001.json'), 'utf8'));
+assert.equal(typedDependencyLedger.dependencySemantics, 'hard-causal/v1');
+assert.deepEqual(typedDependencyLedger.dependencies, typedDependencyTask.dependencies);
+
 console.log('task-import-diagnostic-contract.test passed');

@@ -1,12 +1,24 @@
 // @ts-nocheck
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
 import { composeBrokerProposals } from '../../../../core/dist/broker/compose.js';
 import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../../../core/dist/broker/steward.js';
 import { buildTeamBrokerRuntimeActivationHandshake } from '../../../../core/dist/broker/team-lane.js';
 import { readBrokerProposalFile, validateBrokerProposal } from '../../../../core/dist/broker/proposal.js';
+import { hashContent } from '../../../../core/dist/broker/adapters/cas.js';
 import { loadComposeProposals } from './parser.js';
+function persistComposedMergePlan(cwd, mergePlan) {
+    const relativePath = path.join('.atm', 'runtime', 'broker-merge-plans', `${mergePlan.mergePlanId}.json`);
+    const absolutePath = path.join(cwd, relativePath);
+    const content = `${JSON.stringify(mergePlan, null, 2)}\n`;
+    mkdirSync(path.dirname(absolutePath), { recursive: true });
+    writeFileSync(absolutePath, content, 'utf8');
+    return {
+        path: relativePath.replace(/\\/g, '/'),
+        digest: hashContent(content)
+    };
+}
 export function handleBrokerStewardRuntimeActions(options, context) {
     const registryPath = context.registryPath;
     if (options.action === 'steward') {
@@ -253,6 +265,9 @@ export function handleBrokerStewardRuntimeActions(options, context) {
         const composeResult = composeBrokerProposals(proposals);
         const blocked = composeResult.mergePlan.verdict === 'blocked-cid-conflict'
             || composeResult.mergePlan.verdict === 'blocked-shared-surface';
+        const persistedMergePlan = options.persistMergePlan && !blocked
+            ? persistComposedMergePlan(options.cwd, composeResult.mergePlan)
+            : null;
         return makeResult({
             ok: composeResult.ok && !blocked,
             command: 'broker',
@@ -263,12 +278,14 @@ export function handleBrokerStewardRuntimeActions(options, context) {
                     : `Broker compose produced merge plan '${composeResult.mergePlan.mergePlanId}' with verdict '${composeResult.mergePlan.verdict}'.`, {
                     mergePlanId: composeResult.mergePlan.mergePlanId,
                     verdict: composeResult.mergePlan.verdict,
-                    proposalCount: proposals.length
+                    proposalCount: proposals.length,
+                    mergePlanPath: persistedMergePlan?.path ?? null
                 })
             ],
             evidence: {
                 action: 'compose',
                 mergePlan: composeResult.mergePlan,
+                persistedMergePlan,
                 proposalCount: proposals.length,
                 proposalIds: composeResult.mergePlan.inputProposals
             }

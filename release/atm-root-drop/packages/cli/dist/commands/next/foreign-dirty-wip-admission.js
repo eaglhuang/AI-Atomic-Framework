@@ -129,6 +129,12 @@ function readActiveClaimOwner(cwd, taskId, claim, file) {
     return { taskId, actorId, sessionId: session?.sessionId ?? null, laneSessionId: typeof laneSession?.laneSessionId === 'string' ? laneSession.laneSessionId : session?.guidanceSessionId ?? null, authority: 'active-claim' };
 }
 function readRetainedWipOwner(task, taskId, file) {
+    // Retained WIP protects a released, resumable operation.  Once its task is
+    // terminal, it cannot remain a live owner: future admission must still see
+    // the dirty byte as unowned and fail closed unless an explicit recovery path
+    // authorizes it.
+    if (task.status === 'done' || task.status === 'abandoned')
+        return null;
     const retention = task.wipOwnership && typeof task.wipOwnership === 'object' && !Array.isArray(task.wipOwnership)
         ? task.wipOwnership
         : null;

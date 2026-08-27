@@ -7,7 +7,7 @@
     "notes": "Phase B1 seed governance registry."
   },
   "registryId": "registry.seed",
-  "generatedAt": "2026-07-30T16:39:36.611Z",
+  "generatedAt": "2026-08-25T13:11:55.153Z",
   "entries": [
     {
       "atomId": "ATM-CORE-0001",
@@ -561,6 +561,150 @@
           ],
           "tests": [
             "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ATM-CORE-0006",
+      "atomId": "ATM-CORE-0006",
+      "logicalName": "atom.npm-package.runtime-allowlist",
+      "atomVersion": "0.1.0",
+      "currentVersion": "0.1.0",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "specHash": "sha256:2d7c6b36f552d04e506c48f298520e55314c559ac91612c25413de794b95bc89",
+          "codeHash": "sha256:c6a2f49d53076cb833771e65e8d02e0a392938ed1bd65098d833ac6beba00490",
+          "testHash": "sha256:10006284deeccab81dc798be07c4b14f60f2dfc037cca6a15ba1ba59c119a64d",
+          "timestamp": "2026-08-25T13:11:49.758Z",
+          "semanticFingerprint": "sf:sha256:96a975fd592841eabb90b8a1f9628054c1b6a5763c9fc565cea2a97a20e28a18"
+        }
+      ],
+      "schemaId": "atm.atomicSpec",
+      "specVersion": "0.1.0",
+      "schemaPath": "schemas/atomic-spec.schema.json",
+      "specPath": "atomic_workbench/atoms/ATM-CORE-0006/atom.spec.json",
+      "hashLock": {
+        "algorithm": "sha256",
+        "digest": "sha256:7cc6402f893cdb5ac5f1a1923abfd5491ed059ad6589a69666490b9d504d12b8",
+        "canonicalization": "json-stable-v1"
+      },
+      "owner": {
+        "name": "ATM maintainers",
+        "contact": "maintainers@example.invalid"
+      },
+      "status": "active",
+      "governance": {
+        "tier": "standard"
+      },
+      "semanticFingerprint": "sf:sha256:96a975fd592841eabb90b8a1f9628054c1b6a5763c9fc565cea2a97a20e28a18",
+      "location": {
+        "specPath": "atomic_workbench/atoms/ATM-CORE-0006/atom.spec.json",
+        "codePaths": [
+          "atomic_workbench/atoms/ATM-CORE-0006/atom.source.mjs"
+        ],
+        "testPaths": [
+          "atomic_workbench/atoms/ATM-CORE-0006/atom.test.ts"
+        ],
+        "reportPath": "atomic_workbench/atoms/ATM-CORE-0006/atom.test.report.json",
+        "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0006"
+      },
+      "compatibility": {
+        "coreVersion": "0.1.0",
+        "registryVersion": "0.1.0",
+        "languageAdapter": "language-js"
+      },
+      "evidence": [
+        "generator-provenance:generated",
+        "atomic_workbench/atoms/ATM-CORE-0006/atom.source.mjs",
+        "atomic_workbench/atoms/ATM-CORE-0006/atom.test.report.json",
+        "atomic_workbench/atoms/ATM-CORE-0006/atom.spec.json"
+      ],
+      "selfVerification": {
+        "legacyPlanningId": null,
+        "specHash": "sha256:2d7c6b36f552d04e506c48f298520e55314c559ac91612c25413de794b95bc89",
+        "codeHash": "sha256:c6a2f49d53076cb833771e65e8d02e0a392938ed1bd65098d833ac6beba00490",
+        "testHash": "sha256:10006284deeccab81dc798be07c4b14f60f2dfc037cca6a15ba1ba59c119a64d",
+        "sourcePaths": {
+          "spec": "atomic_workbench/atoms/ATM-CORE-0006/atom.spec.json",
+          "code": [
+            "atomic_workbench/atoms/ATM-CORE-0006/atom.source.mjs"
+          ],
+          "tests": [
+            "atomic_workbench/atoms/ATM-CORE-0006/atom.test.ts"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ATM-CORE-0007",
+      "atomId": "ATM-CORE-0007",
+      "logicalName": "atom.npm-package.artifact-budget",
+      "atomVersion": "0.1.0",
+      "currentVersion": "0.1.0",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "specHash": "sha256:0346115bf471b1e206bb22d436abd02ac333f97c22dbf00bdd55888452fbba2c",
+          "codeHash": "sha256:e939c43a2e560035399a66dca6db8867f96d4e77aa5a53a428977fd6a4104865",
+          "testHash": "sha256:cb6bb3d2fdc5e7086550bf1a4959b2bf607120de8f20744d75cce88b07e29aee",
+          "timestamp": "2026-08-25T13:11:55.152Z",
+          "semanticFingerprint": "sf:sha256:96a975fd592841eabb90b8a1f9628054c1b6a5763c9fc565cea2a97a20e28a18"
+        }
+      ],
+      "schemaId": "atm.atomicSpec",
+      "specVersion": "0.1.0",
+      "schemaPath": "schemas/atomic-spec.schema.json",
+      "specPath": "atomic_workbench/atoms/ATM-CORE-0007/atom.spec.json",
+      "hashLock": {
+        "algorithm": "sha256",
+        "digest": "sha256:1051fbc46de4a45327f823bf9c0acf5e45f4eab132922c412a43288864b35190",
+        "canonicalization": "json-stable-v1"
+      },
+      "owner": {
+        "name": "ATM maintainers",
+        "contact": "maintainers@example.invalid"
+      },
+      "status": "active",
+      "governance": {
+        "tier": "standard"
+      },
+      "semanticFingerprint": "sf:sha256:96a975fd592841eabb90b8a1f9628054c1b6a5763c9fc565cea2a97a20e28a18",
+      "location": {
+        "specPath": "atomic_workbench/atoms/ATM-CORE-0007/atom.spec.json",
+        "codePaths": [
+          "atomic_workbench/atoms/ATM-CORE-0007/atom.source.mjs"
+        ],
+        "testPaths": [
+          "atomic_workbench/atoms/ATM-CORE-0007/atom.test.ts"
+        ],
+        "reportPath": "atomic_workbench/atoms/ATM-CORE-0007/atom.test.report.json",
+        "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0007"
+      },
+      "compatibility": {
+        "coreVersion": "0.1.0",
+        "registryVersion": "0.1.0",
+        "languageAdapter": "language-js"
+      },
+      "evidence": [
+        "generator-provenance:generated",
+        "atomic_workbench/atoms/ATM-CORE-0007/atom.source.mjs",
+        "atomic_workbench/atoms/ATM-CORE-0007/atom.test.report.json",
+        "atomic_workbench/atoms/ATM-CORE-0007/atom.spec.json"
+      ],
+      "selfVerification": {
+        "legacyPlanningId": null,
+        "specHash": "sha256:0346115bf471b1e206bb22d436abd02ac333f97c22dbf00bdd55888452fbba2c",
+        "codeHash": "sha256:e939c43a2e560035399a66dca6db8867f96d4e77aa5a53a428977fd6a4104865",
+        "testHash": "sha256:cb6bb3d2fdc5e7086550bf1a4959b2bf607120de8f20744d75cce88b07e29aee",
+        "sourcePaths": {
+          "spec": "atomic_workbench/atoms/ATM-CORE-0007/atom.spec.json",
+          "code": [
+            "atomic_workbench/atoms/ATM-CORE-0007/atom.source.mjs"
+          ],
+          "tests": [
+            "atomic_workbench/atoms/ATM-CORE-0007/atom.test.ts"
           ]
         }
       }

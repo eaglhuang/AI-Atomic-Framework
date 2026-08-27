@@ -14,11 +14,18 @@
  * machines holding the same bytes.
  */
 import { createHash } from 'node:crypto';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-// Private: repo root is 4 levels above packages/integrations-core/src/compiler/
-export const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
+const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
+const installedPackageRoot = path.resolve(moduleDirectory, '../..');
+const sourceRepositoryRoot = path.resolve(moduleDirectory, '../../../../');
+// Source builds resolve the framework-level corpus; published packages carry
+// the same corpus beside dist so a clean npm installation never reads paths
+// outside node_modules.
+export const integrationsCoreRepoRoot = existsSync(path.join(installedPackageRoot, 'templates', 'skills'))
+    ? installedPackageRoot
+    : sourceRepositoryRoot;
 export const defaultSkillTemplateDirectory = path.join(integrationsCoreRepoRoot, 'templates', 'skills');
 export function sha256Text(content) {
     return `sha256:${createHash('sha256').update(content).digest('hex')}`;

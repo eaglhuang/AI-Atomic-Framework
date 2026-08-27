@@ -149,6 +149,27 @@ try {
   assert.equal(competing.ok, false);
   assert.equal(competing.blockedCode, 'ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED');
 
+  const handedOff = acquireCloseWindowStagedIndexLock({
+    cwd: repoRoot,
+    taskId: 'TASK-CLOSE-0002',
+    actorId: 'second-agent',
+    expectedStageFiles: [],
+    waitForHandoff: true,
+    maxHandoffWaitMs: 1_000,
+    waitForHandoffPoll: () => {
+      releaseCloseWindowStagedIndexLock({ cwd: repoRoot, taskId, actorId: 'fixture-agent', outcome: 'committed' });
+      execFileSync('git', ['restore', '--staged', '--', expectedStageFile], { cwd: repoRoot, stdio: 'ignore' });
+    }
+  });
+  assert.equal(handedOff.ok, true);
+  assert.equal(handedOff.lock?.taskId, 'TASK-CLOSE-0002');
+  assert.equal(handedOff.handoffWait?.waitedForTaskId, taskId);
+  assert.equal(handedOff.handoffWait?.disposition, 'acquired-after-release');
+  releaseCloseWindowStagedIndexLock({ cwd: repoRoot, taskId: 'TASK-CLOSE-0002', actorId: 'second-agent', outcome: 'committed' });
+  execFileSync('git', ['add', '--', expectedStageFile], { cwd: repoRoot, stdio: 'ignore' });
+
+  acquireCloseWindowStagedIndexLock({ cwd: repoRoot, taskId, actorId: 'fixture-agent', expectedStageFiles: [expectedStageFile] });
+
   assert.throws(
     () => assertCloseWindowStagingAllowed({
       cwd: repoRoot,

@@ -157,6 +157,7 @@ function isPlainObject(value) {
 export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
     const contexts = new Map();
     const evidenceByPath = new Map();
+    const evidenceRecords = new Map();
     const lockBackedRunnerReceipts = new Set();
     const linkedRunnerReceiptTaskId = (file, evidence, taskId) => {
         if (evidence?.schemaId !== 'atm.runnerSyncReceipt.v1' || !taskId)
@@ -217,6 +218,7 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
                 if (typeof task?.taskId === 'string')
                     taskIds.add(task.taskId);
         evidenceByPath.set(lower, [...taskIds].sort((left, right) => left.localeCompare(right)));
+        evidenceRecords.set(lower, evidence);
     }
     function readStagedJsonFile(cwd, relativePath) {
         const stagedText = readGitObjectText(cwd, `:${normalizeRelativePath(relativePath)}`);
@@ -230,10 +232,26 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
         }
     }
     const decisions = new Map();
-    const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat()]);
+    const normalizedStringSet = (value) => Array.isArray(value) ? [...new Set(value.filter((entry) => typeof entry === 'string').map((entry) => entry.trim()).filter(Boolean))].sort((left, right) => left.localeCompare(right)) : [];
+    const sameStringSet = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+    const attestedTemporaryProducerIds = new Set();
+    for (const evidence of evidenceRecords.values()) {
+        if (evidence?.schemaId !== 'atm.runnerSyncReceipt.v1' || typeof evidence?.taskId !== 'string')
+            continue;
+        const closingTaskId = evidence.taskId.trim();
+        const linkedTaskIds = normalizedStringSet(evidence.linkedTaskIds);
+        const memberTaskIds = normalizedStringSet(evidence.memberTaskIds);
+        const groupTaskIds = normalizedStringSet(evidence?.groupManifest?.memberTaskIds);
+        const childTaskIds = normalizedStringSet(Array.isArray(evidence?.childAttribution?.members) ? evidence.childAttribution.members.map((entry) => entry?.taskId) : []);
+        if (!closingTaskId.startsWith('ATM-FRAMEWORK-TEMP-') && linkedTaskIds.includes(closingTaskId) && memberTaskIds.length > 0 && memberTaskIds.every((taskId) => taskId.startsWith('ATM-FRAMEWORK-TEMP-')) && sameStringSet(memberTaskIds, groupTaskIds) && evidence?.childAttribution?.complete === true && sameStringSet(memberTaskIds, childTaskIds))
+            for (const taskId of memberTaskIds)
+                attestedTemporaryProducerIds.add(taskId);
+    }
+    const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat().filter((taskId) => !attestedTemporaryProducerIds.has(taskId))]);
     for (const [file, taskIds] of evidenceByPath) {
         const isIndependentRunnerWitness = lockBackedRunnerReceipts.has(file) && taskIds.length === 1 && Boolean(contexts.get(taskIds[0])?.event);
-        if (bundleTaskIds.size > 1 && !isIndependentRunnerWitness) {
+        const isAttestedTemporaryProducerReceipt = taskIds.length === 1 && attestedTemporaryProducerIds.has(taskIds[0]) && evidenceRecords.get(file)?.schemaId === 'atm.runnerSyncReceipt.v1';
+        if (bundleTaskIds.size > 1 && !isIndependentRunnerWitness && !isAttestedTemporaryProducerReceipt) {
             decisions.set(file, { ok: false, taskId: null, reason: 'bundle-with-ambiguous-task-ids' });
             continue;
         }
@@ -244,7 +262,7 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
         const taskId = taskIds[0];
         const context = contexts.get(taskId);
         const committedContext = context?.ledger || context?.event ? null : resolveCommittedTaskContext(cwd, taskId);
-        decisions.set(file, context?.ledger || context?.event || committedContext?.ok
+        decisions.set(file, isAttestedTemporaryProducerReceipt || context?.ledger || context?.event || committedContext?.ok
             ? { ok: true, taskId, reason: null }
             : { ok: false, taskId, reason: committedContext?.reason ?? 'evidence-without-staged-task-context' });
     }

@@ -1,12 +1,12 @@
 {
   "schemaId": "atm.runbookCompletionEvidence.v1",
   "specVersion": "0.1.0",
-  "generatedAt": "2026-08-22T18:25:45+08:00",
+  "generatedAt": "2026-08-27T00:50:52+08:00",
   "authority": {
     "planningPath": "docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md",
-    "planningHead": "913299a225ba271a6f599d82e4dc52539bd19041",
-    "targetHead": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
-    "originMain": "a8eae8d7a43f9c182cab1a882eb21fcfa37d1133",
+    "planningHead": "15f302994ee287e75bbbd3cb9fbbee7208e4569a",
+    "targetHead": "849914acbdc7b144b7c0826b0e8fd2d374d0227b",
+    "originMain": "8a9984509aa85514f8ca0f15be0188f41cc2c7fb",
     "sourceDigest": "sha256:dbc3e897c2a1361a954b6e86f997e56e8adce449fa6e1aa90d0e6fc1090ba86b",
     "diagnostics": [],
     "planningSemanticSnapshot": {
@@ -10571,32 +10571,22 @@
       "wave": "Wave 10",
       "requirement": "總完成門檻全部通過，才可 reversible retirement legacy authority；否則保留 legacy authority 並列出精確 blockers。",
       "requirementDigest": "sha256:ad9db0d0920af112557c9e4fc3a3fc91d08a425c0e321b5919d14351c50251e0",
-      "status": "proven",
-      "evidence": [
-        {
-          "command": "node --strip-types scripts/review-runbook-release-authority.ts --mode validate",
-          "exitCode": 0,
-          "outputDigest": "sha256:b97fc770f12d6f8baeb89c50e278b0af1987be0971badddc4e8579e8e344b80e",
-          "artifactPaths": [
-            "docs/reports/wave-exit-observer-receipts/EXIT-11/203cc69b18edae2629ff440eab8b9a7b72248fef.json"
-          ],
-          "observedAt": "2026-08-21T09:34:11.285Z",
-          "sourceCommit": "203cc69b18edae2629ff440eab8b9a7b72248fef",
-          "evidenceOwner": "wave-exit-observer:EXIT-11",
-          "validatorContractId": "atm.waveExitObserverReceipt/EXIT-11"
-        }
+      "status": "unproven",
+      "evidence": [],
+      "diagnostics": [
+        "missing-independent-wave-exit-contract",
+        "observer-role-mismatch",
+        "receipt-stale",
+        "input-digest-drift"
       ],
-      "diagnostics": [],
-      "coverageOwners": [
-        "wave-exit-observer:EXIT-11"
-      ],
-      "validatorContractIds": [
-        "atm.waveExitObserverReceipt/EXIT-11"
-      ]
+      "coverageOwners": [],
+      "validatorContractIds": []
     }
   ],
-  "unresolvedIds": [],
+  "unresolvedIds": [
+    "EXIT-11"
+  ],
   "deferredIds": [],
   "unknownIds": [],
-  "overallVerdict": "complete"
+  "overallVerdict": "not-complete"
 }

@@ -109,11 +109,16 @@ export function validateRunnerPublicationTakeoverPlan(input) {
         return { ok: false, plan: null, reason: 'plan digest is invalid' };
     if (plan.sealedSourceSha !== input.sealedSourceSha.trim())
         return { ok: false, plan: null, reason: 'plan sealed source does not match this build' };
-    if (plan.snapshotDigest !== digestSnapshot(input.snapshot))
-        return { ok: false, plan: null, reason: 'plan snapshot does not match current pre-build bytes' };
-    const expected = planRunnerPublicationTakeover({ sealedSourceSha: input.sealedSourceSha, snapshot: input.snapshot });
-    if (plan.digest !== expected.digest)
-        return { ok: false, plan: null, reason: 'plan does not cover exactly the current pre-existing publication members' };
+    // The takeover authority is the exact dirty-member set and each member's
+    // observed byte digest. Do not couple it to unrelated clean generated
+    // members: a frozen broker and a source-first publisher can enumerate a
+    // different clean universe during runner bootstrap while still agreeing on
+    // every byte that will actually be replaced.
+    const currentEntries = uniquePaths(input.snapshot.preexistingDirtyPaths)
+        .map((entry) => ({ path: entry, observedDigest: input.snapshot.members[entry] ?? 'missing' }));
+    if (JSON.stringify(plan.entries) !== JSON.stringify(currentEntries)) {
+        return { ok: false, plan: null, reason: 'plan does not cover exactly the current pre-existing publication members and byte digests' };
+    }
     return { ok: true, plan, reason: null };
 }
 export function buildRunnerBuildOutputInventory(input) {

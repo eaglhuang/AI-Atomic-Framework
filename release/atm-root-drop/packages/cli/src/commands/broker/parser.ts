@@ -78,6 +78,7 @@ export interface ParsedBrokerOptions {
   readonly proposalFiles: readonly string[];
   readonly proposalIds: readonly string[];
   readonly proposalStorePath: string | null;
+  readonly persistMergePlan: boolean;
   readonly mergePlanFile: string | null;
   readonly scopeFiles: readonly string[];
   readonly claimedTasks: readonly string[];
@@ -137,6 +138,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     proposalIds: [] as string[],
     proposalIdPositional: null as string | null,
     proposalStorePath: null as string | null,
+    persistMergePlan: false,
     mergePlanFile: null as string | null,
     scopeFiles: [] as string[],
     claimedTasks: [] as string[],
@@ -324,6 +326,10 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--persist-merge-plan') {
+      state.persistMergePlan = true;
+      continue;
+    }
     if (arg === '--scope-file') {
       state.scopeFiles.push(requireValue(argv, index, '--scope-file'));
       index += 1;
@@ -472,6 +478,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     proposalFiles: state.proposalFiles,
     proposalIds,
     proposalStorePath: state.proposalStorePath,
+    persistMergePlan: state.persistMergePlan,
     mergePlanFile: state.mergePlanFile,
     scopeFiles: state.scopeFiles,
     claimedTasks: state.claimedTasks,

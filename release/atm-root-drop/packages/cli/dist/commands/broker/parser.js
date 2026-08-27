@@ -47,6 +47,7 @@ export function parseBrokerArgs(argv) {
         proposalIds: [],
         proposalIdPositional: null,
         proposalStorePath: null,
+        persistMergePlan: false,
         mergePlanFile: null,
         scopeFiles: [],
         claimedTasks: [],
@@ -233,6 +234,10 @@ export function parseBrokerArgs(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--persist-merge-plan') {
+            state.persistMergePlan = true;
+            continue;
+        }
         if (arg === '--scope-file') {
             state.scopeFiles.push(requireValue(argv, index, '--scope-file'));
             index += 1;
@@ -391,6 +396,7 @@ export function parseBrokerArgs(argv) {
         proposalFiles: state.proposalFiles,
         proposalIds,
         proposalStorePath: state.proposalStorePath,
+        persistMergePlan: state.persistMergePlan,
         mergePlanFile: state.mergePlanFile,
         scopeFiles: state.scopeFiles,
         claimedTasks: state.claimedTasks,

@@ -19,10 +19,8 @@ export function buildPatchProposalComposition(input) {
     for (const [filePath, proposals] of [...byFile].sort((left, right) => left[0].localeCompare(right[0]))) {
         const targetPath = path.resolve(input.cwd, filePath);
         const before = readFileSync(targetPath, 'utf8');
-        let after = before;
+        const after = composeProposalPatchesAgainstImmutableBase(before, proposals);
         for (const proposal of proposals) {
-            // Patches compose against the immutable base; canonical writes happen later.
-            after = applyUnifiedPatch(after, proposal.patch);
             selectedIds.push(proposal.proposalId);
             attribution.push({
                 requestId: proposal.proposalId,
@@ -76,6 +74,103 @@ export function buildPatchProposalComposition(input) {
         plan,
         outputFiles: outputFiles.sort((left, right) => left.filePath.localeCompare(right.filePath))
     };
+}
+/**
+ * Compose each proposal against the same immutable source bytes.  Text patches
+ * normally retain strict ordered unified-patch semantics.  JSON-pointer
+ * proposals are different: their declared pointers describe disjoint semantic
+ * slices, so applying their textual hunks one after another can make the
+ * second hunk's surrounding context stale despite a conflict-free intent.
+ */
+function composeProposalPatchesAgainstImmutableBase(before, proposals) {
+    const pointers = proposals.map((proposal) => declaredSingleJsonPointer(proposal));
+    const useJsonPointerComposition = pointers.every((pointer) => pointer !== null)
+        && new Set(pointers).size === pointers.length;
+    if (!useJsonPointerComposition) {
+        return proposals.reduce((content, proposal) => applyUnifiedPatch(content, proposal.patch), before);
+    }
+    let baseDocument;
+    try {
+        baseDocument = JSON.parse(before);
+    }
+    catch {
+        return proposals.reduce((content, proposal) => applyUnifiedPatch(content, proposal.patch), before);
+    }
+    if (!isJsonObject(baseDocument)) {
+        return proposals.reduce((content, proposal) => applyUnifiedPatch(content, proposal.patch), before);
+    }
+    const composed = structuredClone(baseDocument);
+    for (const [index, proposal] of proposals.entries()) {
+        const pointer = pointers[index];
+        const patched = JSON.parse(applyUnifiedPatch(before, proposal.patch));
+        if (!isJsonObject(patched) || !isOnlyDeclaredPointerMutation(baseDocument, patched, pointer)) {
+            // A JSON anchor is an authority boundary, never a hint: any hidden
+            // mutation falls back to the strict text route and fails closed if stale.
+            return proposals.reduce((content, entry) => applyUnifiedPatch(content, entry.patch), before);
+        }
+        setJsonPointer(composed, pointer, readJsonPointer(patched, pointer));
+    }
+    return `${JSON.stringify(composed, null, 2)}\n`;
+}
+function declaredSingleJsonPointer(proposal) {
+    if (proposal.anchors.length !== 1 || proposal.anchors[0]?.kind !== 'json-pointer')
+        return null;
+    const pointer = proposal.anchors[0]?.hint;
+    return typeof pointer === 'string' && pointer.startsWith('/') ? pointer : null;
+}
+function isOnlyDeclaredPointerMutation(before, after, pointer) {
+    const beforeWithoutPointer = structuredClone(before);
+    const afterWithoutPointer = structuredClone(after);
+    deleteJsonPointer(beforeWithoutPointer, pointer);
+    deleteJsonPointer(afterWithoutPointer, pointer);
+    return JSON.stringify(beforeWithoutPointer) === JSON.stringify(afterWithoutPointer);
+}
+function isJsonObject(value) {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+function pointerTokens(pointer) {
+    return pointer.slice(1).split('/').map((token) => token.replace(/~1/g, '/').replace(/~0/g, '~'));
+}
+function readJsonPointer(document, pointer) {
+    let current = document;
+    for (const token of pointerTokens(pointer)) {
+        if (!isJsonObject(current) || !(token in current))
+            return undefined;
+        current = current[token];
+    }
+    return structuredClone(current);
+}
+function setJsonPointer(document, pointer, value) {
+    const tokens = pointerTokens(pointer);
+    let current = document;
+    for (const token of tokens.slice(0, -1)) {
+        const next = current[token];
+        if (!isJsonObject(next))
+            current[token] = {};
+        current = current[token];
+    }
+    const leaf = tokens.at(-1);
+    if (!leaf)
+        throw new Error('JSON pointer must target a property.');
+    if (value === undefined)
+        delete current[leaf];
+    else
+        current[leaf] = value;
+}
+function deleteJsonPointer(document, pointer) {
+    if (!isJsonObject(document))
+        return;
+    const tokens = pointerTokens(pointer);
+    let current = document;
+    for (const token of tokens.slice(0, -1)) {
+        const next = current[token];
+        if (!isJsonObject(next))
+            return;
+        current = next;
+    }
+    const leaf = tokens.at(-1);
+    if (leaf)
+        delete current[leaf];
 }
 export function buildStewardSemanticValidationReceipt(input) {
     const digest = digestCandidate(input.plan, input.outputFiles);

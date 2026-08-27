@@ -22,6 +22,7 @@ import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliv
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.js';
 import { resolveRunnerPublicationCloseHandoff } from '../framework-development/runner-publication-close-handoff.js';
 import { buildTaskflowRunnerRecoveryArgs } from './runner-recovery-forwarding.js';
+import { enqueueTaskflowClosePublication } from './runner-publication-close-queue.js';
 import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../../core/dist/team-runtime/handoff-ledger.js';
 import { clearBrokerRuntimeStateForTask } from '../../../../core/dist/broker/lifecycle.js';
 import { classifyRunnerAffectingPaths, filterRunnerInputTreeListing, RUNNER_INPUT_TREE_PATHS } from '../../../../core/dist/broker/runner-version-contract.js';
@@ -427,8 +428,19 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     const runnerGateEvidence = buildTaskflowRunnerGateDecision(uniqueSorted([...declaredFiles, ...previewCommitBundle.targetDeliveryFiles, ...previewCommitBundle.targetGovernanceFiles]));
     const runnerReceiptPublicationClosure = inspectRunnerReceiptPublicationClosure({ cwd, taskId });
     const historicalClosePreflight = applyRunnerReceiptPublicationClosureDirtyException({ taskId, preflight: rawHistoricalClosePreflight, closure: runnerReceiptPublicationClosure });
-    const staleRunnerBlockers = isRunnerSyncRequired(cwd) && runnerGateEvidence.runnerGateDecision === 'required' && runnerReceiptPublicationClosure.status !== 'accepted' ? [buildTaskflowStaleRunnerBlocker({ cwd, taskId, actorId, runnerGateDecision: runnerGateEvidence })] : [];
-    const baseWriteBlockers = [...writeReadinessHint.blockers, ...staleRunnerBlockers, ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)];
+    const runnerPublicationRequired = isRunnerSyncRequired(cwd) && runnerGateEvidence.runnerGateDecision === 'required' && runnerReceiptPublicationClosure.status !== 'accepted';
+    const nonRunnerBlockers = [...writeReadinessHint.blockers, ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)];
+    let closePublicationQueue = null;
+    if (writeRequested && runnerPublicationRequired && nonRunnerBlockers.length === 0) {
+        authorizeLaneCapability({ cwd, taskId, actorId, commandClass: 'taskflow-close-write' });
+        const sealedSourceSha = readCurrentGitHead(cwd);
+        if (!sealedSourceSha) {
+            throw new CliError('ATM_TASKFLOW_CLOSE_PUBLICATION_SEAL_REQUIRED', 'taskflow close could not resolve the current HEAD for automatic runner publication registration.', { exitCode: 1 });
+        }
+        closePublicationQueue = enqueueTaskflowClosePublication({ cwd, taskId, actorId, sealedSourceSha });
+    }
+    const staleRunnerBlockers = runnerPublicationRequired ? [buildTaskflowStaleRunnerBlocker({ cwd, taskId, actorId, runnerGateDecision: runnerGateEvidence })] : [];
+    const baseWriteBlockers = [...nonRunnerBlockers, ...staleRunnerBlockers];
     const closeOwnedDirtyPendingBlocker = baseWriteBlockers.length > 0 ? buildCloseOwnedDirtyPendingBlocker({ taskId, actorId: actorId || '<actor>', previewCommitBundle, dirtyGuard: historicalClosePreflight.dirtyGuard, fallbackCommand: baseWriteBlockers[0]?.requiredCommand ?? writeReadinessHint.nextCommand }) : null;
     if (baseWriteBlockers.length > 0 || closeOwnedDirtyPendingBlocker) {
         const mergedBlockers = prioritizeSharedHistoricalDeliveryBlockers([...baseWriteBlockers, ...(closeOwnedDirtyPendingBlocker ? [closeOwnedDirtyPendingBlocker] : [])], { taskId, actorId: actorId || '<actor>', historicalDeliveryRef: historicalDeliveryRefs[0] ?? null, outOfScopeFiles: historicalClosePreflight.mixedDeliveryCommit?.fileBuckets.outOfScopeSourceFiles ?? [], hasScopedHistoricalDelivery: (historicalClosePreflight.mixedDeliveryCommit?.deliverableFiles.length ?? 0) > 0, preserveDeliverableGate: writeRequested });
@@ -444,7 +456,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         return { ...makeResult({ ok: historicalClosePreflight.ok && !preCloseWriteBlocked, command: 'taskflow pre-close', cwd, mode: 'pre-close', messages: [
                     message(preCloseMessageLevel, preCloseMessageCode, preCloseMessageText, { taskId, blockerCount: historicalClosePreflight.blockers.length, writeReadinessBlockerCount: writeReadinessHint.blockers.length, runnerGateDecision: runnerGateEvidence.runnerGateDecision })
                 ], evidence: { historicalClosePreflight, writeReadinessHint, observedTaskEvidence, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, runnerReceiptPublicationClosure, closebackPlan, governedCommitBundle: previewCommitBundle, residueDiagnosis: enrichedDiagnosis, closebackPathResolution,
-                    ...(autoEvidencePlan ? { autoEvidencePlan } : {}), ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowPreCloseResult.v1', writeEnabled: false, historicalClosePreflight };
+                    ...(closePublicationQueue ? { closePublicationQueue } : {}), ...(autoEvidencePlan ? { autoEvidencePlan } : {}), ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowPreCloseResult.v1', writeEnabled: false, historicalClosePreflight };
     }
     const writeSupport = resolveCloseWriteSupport({ writeRequested, closeMode: closebackPlan.closeMode, actorSupplied: actorId.length > 0, taskIdSupplied: taskId.length > 0,
         historicalDeliveryGateRequired: closebackPlan.historicalDeliveryGate.required && !hasUncommittedDeliverables, historicalDeliverySupplied: historicalDeliveryRefs.length > 0 || historicalBatchRef !== null });
@@ -453,7 +465,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     }
     if (writeRequested && preCloseWriteBlocked) {
         const blocker = writeReadinessHint.blockers[0] ?? null;
-        throw new CliError(blocker?.code ?? 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED', blocker?.summary ?? 'taskflow close --write has a known preflight blocker.', { exitCode: 1, details: { taskId, closeMode: closebackPlan.closeMode, writeReadinessHint, historicalClosePreflight, historicalDeliveries: historicalClosePreflight.mixedDeliveryCommit ? [historicalClosePreflight.mixedDeliveryCommit] : [], recommendedCommand: blocker?.requiredCommand ?? writeReadinessHint.nextCommand } });
+        throw new CliError(blocker?.code ?? 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED', blocker?.summary ?? 'taskflow close --write has a known preflight blocker.', { exitCode: 1, details: { taskId, closeMode: closebackPlan.closeMode, writeReadinessHint, historicalClosePreflight, historicalDeliveries: historicalClosePreflight.mixedDeliveryCommit ? [historicalClosePreflight.mixedDeliveryCommit] : [], closePublicationQueue, recommendedCommand: blocker?.requiredCommand ?? writeReadinessHint.nextCommand } });
     }
     if (writeRequested && writeSupport.allowed) {
         authorizeLaneCapability({ cwd, taskId, actorId, commandClass: 'taskflow-close-write' });
@@ -487,7 +499,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         let deferredGovernanceDirty = deferGovernanceDirtyFiles(cwd, deferGovernanceDirty, taskId);
         let deferredGovernanceDirtyRestored = false;
         try {
-            closeWindowLock = acquireCloseWindowStagedIndexLock({ cwd, taskId, actorId, expectedStageFiles: expectedCloseWindowStageFiles, deferForeignStaged });
+            closeWindowLock = acquireCloseWindowStagedIndexLock({ cwd, taskId, actorId, expectedStageFiles: expectedCloseWindowStageFiles, deferForeignStaged, waitForHandoff: true });
             if (!closeWindowLock.ok) {
                 throw new CliError(closeWindowLock.blockedCode ?? 'ATM_CLOSE_WINDOW_STAGED_INDEX_BLOCKED', closeWindowLock.blockedSummary ?? 'Close window staged-index lock could not be acquired.', { exitCode: 1, details: { taskId, actorId, closeWindowLock, deferForeignStagedCommand: `node atm.mjs taskflow close --task ${taskId} --actor ${quoteCliValue(actorId)} --defer-foreign-staged --write --json` } });
             }

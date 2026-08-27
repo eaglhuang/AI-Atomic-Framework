@@ -65,9 +65,15 @@ export function diagnoseClaimReadinessForTasks(cwd, tasks, claimIntent, options 
                 claimable: false,
                 blockerCode: 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED',
                 blockerSummary: `Task ${task.workItemId} is still a Markdown task card and must be imported before claim.`,
-                requiredCommand: task.sourcePlanPath
-                    ? `node atm.mjs tasks import --from ${quoteCliValue(task.sourcePlanPath)} --dry-run --cwd . --json`
-                    : 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json',
+                // A plan narrative may link to a sibling tasks/ directory without
+                // containing any inline task declarations.  Import the discovered card
+                // itself; falling back to the narrative would deterministically return
+                // ATM_TASKS_PLAN_EMPTY and leave the task unable to claim.
+                requiredCommand: task.taskPath
+                    ? `node atm.mjs tasks import --from ${quoteCliValue(task.taskPath)} --dry-run --cwd . --json`
+                    : task.sourcePlanPath
+                        ? `node atm.mjs tasks import --from ${quoteCliValue(task.sourcePlanPath)} --dry-run --cwd . --json`
+                        : 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json',
                 dependencyBlockers: []
             });
             continue;
