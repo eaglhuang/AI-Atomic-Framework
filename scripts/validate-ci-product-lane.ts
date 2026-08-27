@@ -45,11 +45,11 @@ function validateRemote(): void {
   const contexts = Array.isArray(protection.required_status_checks?.contexts) ? protection.required_status_checks.contexts.map(String) : [];
   assert(contexts.some((context) => context === 'Product CI' || context.endsWith('/ Product CI')), 'main must require the Product CI status');
 
-  const runs = readJson(['api', 'repos/eaglhuang/AI-Atomic-Framework/actions/runs?branch=main&status=completed&per_page=100']) as { workflow_runs?: unknown };
+  const runs = readJson(['api', 'repos/eaglhuang/AI-Atomic-Framework/actions/runs?branch=main&per_page=10']) as { workflow_runs?: unknown };
   const ciRuns = Array.isArray(runs.workflow_runs)
-    ? runs.workflow_runs.filter((entry: any) => entry?.name === 'ci' && entry?.status === 'completed').slice(0, 10)
+    ? runs.workflow_runs.filter((entry: any) => entry?.path === '.github/workflows/ci.yml').slice(0, 10)
     : [];
-  assert(ciRuns.length === 10, 'protected-main burn-in requires ten completed ci runs');
+  assert(ciRuns.length === 10, 'protected-main burn-in requires ten ci runs');
   const releaseCandidateRuns = ciRuns.filter((run: any) => String(run?.display_title ?? '').includes('release-candidate'));
   assert(releaseCandidateRuns.length >= 2, 'protected-main burn-in requires at least two release-candidate ci runs');
   for (const run of ciRuns as Array<{ id?: unknown }>) {

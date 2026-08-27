@@ -195,8 +195,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-26T23-43-09-729Z-renew-ab800f1df098",
-  "lastTransitionAt": "2026-08-26T23:43:09.729Z",
+  "lastTransitionId": "2026-08-27T00-17-38-791Z-renew-a45942ccc598",
+  "lastTransitionAt": "2026-08-27T00:17:38.791Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-25T10:46:00.095Z",
   "promotedAt": "2026-08-25T10:46:00.100Z",
@@ -204,7 +204,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-7532f4e9705d",
     "claimedAt": "2026-08-26T23:29:27.150Z",
-    "heartbeatAt": "2026-08-26T23:43:08.676Z",
+    "heartbeatAt": "2026-08-27T00:17:37.928Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0003.json",
@@ -217,7 +217,7 @@
     "state": "active",
     "laneSession": {
       "laneSessionId": "lane-20260826232927-codex-captain-f7b7002d31",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260826232927-codex-captain-f7b7002d31\""
     }
@@ -227,27 +227,26 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-76fb5b63afbcc49e",
-    "ticketDigest": "sha256:76fb5b63afbcc49e4355cbeeaca9d96db6d550bb8774fa66b7a028a8bdd1b699",
+    "ticketId": "wat-ce019c4f95b203e0",
+    "ticketDigest": "sha256:ce019c4f95b203e09058d3308d4102faeeb9a8012d61f94266b6142ed6619a52",
     "taskId": "TASK-PRF-0003",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260826232927-codex-captain-f7b7002d31",
     "claimGeneration": "lease-7532f4e9705d",
-    "issuedAt": "2026-08-26T23:43:08.676Z",
-    "expiresAt": "2026-08-27T00:13:08.676Z",
-    "scopeDigest": "sha256:19fb6c8b9521e6c4635f83faf57d8408763e47751fa8b4b217c55c4f89e2ee66",
+    "issuedAt": "2026-08-27T00:17:37.928Z",
+    "expiresAt": "2026-08-27T00:47:37.928Z",
+    "scopeDigest": "sha256:7e2d661452a61b8f0ceada1b1b57e0c93e5a32203db9e87e209e0fa3cdbcc5c9",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-26T23:43:08.676Z"
+      "selectedAt": "2026-08-27T00:17:37.928Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0003.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-PRF-0003/**",
           ".atm/history/tasks/TASK-PRF-0003.json",
           ".github/workflows/ci.yml",
@@ -256,7 +255,7 @@
           "scripts/validate-ci-product-lane.ts",
           "tests/cli/ci-product-lane-contract.test.ts"
         ],
-        "digest": "sha256:c1d7a1755eccf7071c0b974b9579a422e75a6a3922b6ede240f760ba3e254499"
+        "digest": "sha256:6a67fc2f5549c78e4cd51c899ee2305c351fecb85bcc10f7746716067153708f"
       },
       {
         "kind": "lifecycle-operation",

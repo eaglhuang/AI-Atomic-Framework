@@ -1,0 +1,31 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0003",
+  "updatedAt": "2026-08-26T23:51:57.041Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "validate:ci-product-lane"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-ci-product-lane.ts --remote",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d1b7b48e620c65885e6d20f871d73a59622ef2ef8a01c9e37aded6e090b4ee1b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-08-26T23:51:57.040Z",
+      "startedAt": "2026-08-26T23:51:49.498Z",
+      "finishedAt": "2026-08-26T23:51:57.040Z",
+      "durationMs": 7542,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "b8cdf3c727e6380ce66d11f75e7f915f603ad7cb",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -1,0 +1,112 @@
+{
+  "taskId": "TASK-PRF-0003",
+  "updatedAt": "2026-08-26T23:51:57.041Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-ci-product-lane.ts --remote",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260826232927-codex-captain-TASK-PRF-0003-4aa0ebe233",
+      "createdAt": "2026-08-26T23:51:57.041Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260826232927-codex-captain-TASK-PRF-0003-4aa0ebe233",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+          "validate:ci-product-lane"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.ci-release-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/atm-ci-release-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-ci-product-lane.ts --remote",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d1b7b48e620c65885e6d20f871d73a59622ef2ef8a01c9e37aded6e090b4ee1b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-26T23:51:49.498Z",
+            "finishedAt": "2026-08-26T23:51:57.040Z",
+            "durationMs": 7542,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+              "validate:ci-product-lane"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "b8cdf3c727e6380ce66d11f75e7f915f603ad7cb",
+            "cacheKey": "sha256:651f0a9589d478299510d416da23ac9c224ab679312b976d5843de60d7c2a25e",
+            "generatedAt": "2026-08-26T23:51:57.040Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:651f0a9589d478299510d416da23ac9c224ab679312b976d5843de60d7c2a25e",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-26T23:51:57.040Z",
+              "observedAt": "2026-08-26T23:51:57.040Z",
+              "startedAt": "2026-08-26T23:51:49.498Z",
+              "finishedAt": "2026-08-26T23:51:57.040Z",
+              "durationMs": 7542,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:023bf1d6dfa43c69204bffe8d07afe1a8f5698648acd1257606c416b69063789",
+              "outputDigest": "sha256:7c274d754cbe0242d90b0c2cb917270f6fb8f4ec7d2c55a2e7039bac73ce75a8",
+              "cache": {
+                "key": "sha256:651f0a9589d478299510d416da23ac9c224ab679312b976d5843de60d7c2a25e",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types scripts/validate-ci-product-lane.ts --remote",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+                  "validate:ci-product-lane"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "b8cdf3c727e6380ce66d11f75e7f915f603ad7cb",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:2b3560033b282909ce8e9477b0f3144a19987b0bdb8daf1717daf064ac127cb8",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
