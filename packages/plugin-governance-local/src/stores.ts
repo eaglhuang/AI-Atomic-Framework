@@ -34,7 +34,7 @@ import {
   verifyEvidenceLedgerEntry,
   type EvidenceLedgerCheckpoint,
   type EvidenceLedgerEntry
-} from '@ai-atomic-framework/core';
+} from '../../core/src/evidence/evidence-ledger.ts';
 import type { LocalGovernanceConfig } from './index';
 import { resolveLocalGovernanceLayout } from './layout.ts';
 import {
