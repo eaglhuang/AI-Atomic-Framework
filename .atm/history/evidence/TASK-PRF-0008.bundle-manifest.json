@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0008",
+  "updatedAt": "2026-08-27T16:59:15.110Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/external-benchmark-decision.test.ts",
+    "node --strip-types tests/cli/external-benchmark-metrics.test.ts",
+    "validate:external-benchmark-protocol"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-metrics.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f27ab6c327030e234a09ace1f2d492045ebbdcc51c574dfe66f78b1e4956be9e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-metrics.test.ts"
+      ],
+      "generatedAt": "2026-08-27T16:59:06.999Z",
+      "startedAt": "2026-08-27T16:59:06.713Z",
+      "finishedAt": "2026-08-27T16:59:06.999Z",
+      "durationMs": 286,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1f74a6fdaa1747d21c6fe500fe2a661cf89e2934",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-decision.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19cf1f8c3401c3d82d6a915ed31c73884ecceb25555f9f8f35bfb3e28309868b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-decision.test.ts"
+      ],
+      "generatedAt": "2026-08-27T16:59:11.016Z",
+      "startedAt": "2026-08-27T16:59:10.735Z",
+      "finishedAt": "2026-08-27T16:59:11.016Z",
+      "durationMs": 281,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1f74a6fdaa1747d21c6fe500fe2a661cf89e2934",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-external-benchmark-protocol.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bc587e8665c9b7137373507efa5e65a96876b9fb246afbfcc7b70e462d297c65",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:external-benchmark-protocol"
+      ],
+      "generatedAt": "2026-08-27T16:59:15.109Z",
+      "startedAt": "2026-08-27T16:59:14.728Z",
+      "finishedAt": "2026-08-27T16:59:15.109Z",
+      "durationMs": 381,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1f74a6fdaa1747d21c6fe500fe2a661cf89e2934",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
