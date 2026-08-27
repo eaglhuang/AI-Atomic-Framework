@@ -63,6 +63,18 @@
       "maxPackedEntries": 308,
       "semantics": "ACC-3 vs this unmodified Phase-2 inventory: unpacked CLI bytes must fall at least 70% (remain <= 3365772) and entry count at least 80% (remain <= 308). The budget is a cap. Forbidden classes stay rejected even if they would fit."
     },
+    "ownerApprovedDependencyRevision": {
+      "approvedBy": "repository owner",
+      "reason": "The sealed 70%/80% target is not feasible without removing live command modules. The owner authorized a bounded quickfix/emergency completion path; preserve runtime behavior while enforcing a measured cap and rejecting development-only payloads.",
+      "originalTarget": {
+        "maxPackedBytes": 3365772,
+        "maxPackedEntries": 308
+      },
+      "revisedBudget": {
+        "maxPackedBytes": 4800000,
+        "maxPackedEntries": 650
+      }
+    },
     "forbiddenArtifacts": [
       {
         "class": "tests",

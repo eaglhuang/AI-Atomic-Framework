@@ -1,0 +1,425 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0006",
+  "title": "Minimize adopter artifacts and enforce bundle budgets",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    {
+      "taskId": "TASK-PRF-0004",
+      "relation": "validation",
+      "note": "The public package baseline is required to accept a minimized artifact, but a bounded package-manifest proposal can be developed and broker-composed against its sealed base without waiting for publication."
+    },
+    {
+      "taskId": "TASK-PRF-0005",
+      "relation": "validation",
+      "note": "Evidence-ledger migration is required for final acceptance evidence, not for proposal-first work or a bounded shared-surface compose."
+    }
+  ],
+  "acceptance": [
+    "ACC-1: npm runtime, onefile adopter runner and developer kit have distinct manifests and entrypoint ownership.",
+    "ACC-2: Every packed file maps to a runtime entrypoint; tests, CI fixtures, evidence and duplicate development assets are rejected.",
+    "ACC-3: Against Phase 2, unpacked CLI bytes fall at least 70%, entry count at least 80%, and root-drop bytes below 25%, unless the owner approves a dependency-level revision.",
+    "ACC-4: Every reduced artifact passes the same clean-install and smoke contract as the published baseline."
+  ],
+  "deliverables": [
+    "packages/cli/package.json",
+    "scripts/build-package-dist.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/build-root-drop-release.ts",
+    "scripts/validate-adopter-artifact-manifest.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/release-manifest.json"
+  ],
+  "scopePaths": [
+    "packages/cli/package.json",
+    "scripts/build-package-dist.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/build-root-drop-release.ts",
+    "scripts/validate-onefile-budget.ts",
+    "scripts/validate-root-drop-release.ts",
+    "scripts/validate-adopter-artifact-manifest.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/release-manifest.json",
+    ".atm/history/evidence/TASK-PRF-0006.*",
+    ".atm/history/task-events/TASK-PRF-0006/**",
+    ".atm/history/tasks/TASK-PRF-0006.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+    "node --strip-types scripts/validate-onefile-budget.ts",
+    "node --strip-types scripts/validate-root-drop-release.ts",
+    "node --strip-types scripts/validate-adopter-artifact-manifest.ts"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Restore last clean-install-passing manifests and allowlist; do not relax budgets silently.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom.npm-package.artifact-budget",
+    "atomCid": "cid:atom.npm-package.artifact-budget",
+    "mapUpdates": [
+      "atomic_workbench/atoms/ATM-CORE-0007/atom.spec.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "release/atm-root-drop/release-manifest.json (61682 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0006-minimize-adopter-artifacts-and-enforce-bundle-budgets.task.md",
+    "sectionTitle": "TASK-PRF-0006",
+    "headingLine": 122,
+    "hash": "f2cd6c29bf635ee0",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0006-minimize-adopter-artifacts-and-enforce-bundle-budgets.task.md",
+      "planningCommitSha": "15f302994ee287e75bbbd3cb9fbbee7208e4569a",
+      "contentDigest": "sha256:f2cd6c29bf635ee011f7d207d196237753c44d1af068182392b315fbf2054205",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-25T14:05:43.154Z"
+    }
+  },
+  "importedAt": "2026-08-25T14:05:43.154Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "dependencySemantics": "hard-causal/v1",
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Phase-2 public package baseline is sealed.",
+      "New runtime evidence is no longer packed or stored as adopter source content."
+    ],
+    "softRelations": [
+      "TASK-PRF-0004",
+      "TASK-PRF-0005",
+      "TASK-PRF-0007"
+    ],
+    "changedPublicSeams": [
+      "npm-runtime-artifact",
+      "onefile-adopter-artifact",
+      "developer-kit-artifact"
+    ],
+    "causalImpactEdges": [
+      "every-packed-file-has-runtime-reason",
+      "developer-kit-is-not-runtime-dependency",
+      "reduced-artifacts-preserve-clean-install-behavior"
+    ],
+    "parallelFrontierInputs": [
+      "phase-2-pack-baseline",
+      "runtime-entrypoint-import-graph"
+    ],
+    "validatorReferences": [
+      "test_prf_artifact_manifest_84d57b20",
+      "test_prf_bundle_budget_f6ab90e3",
+      "test_prf_reduced_artifact_equivalence_5e2c1f7a"
+    ],
+    "phaseOwner": "phase-4-adopter-bundle-minimisation"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_artifact_manifest_84d57b20",
+      "targetGroupId": "null",
+      "semanticKey": "adopter_artifact_manifest",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "every-packed-file-has-runtime-reason",
+        "developer-kit-is-not-runtime-dependency"
+      ],
+      "expectedRedPredicate": "Artifact contains an orphan file or runtime transitively requires the developer kit.",
+      "contributionResourceKey": "adopter-artifact-manifests",
+      "responsibility": "task-required",
+      "dependencyEdge": "packed-file-to-runtime-entrypoint",
+      "contractEdge": "npm-runtime-artifact",
+      "resourceKey": "release-manifest"
+    },
+    {
+      "caseId": "test_prf_bundle_budget_f6ab90e3",
+      "targetGroupId": "null",
+      "semanticKey": "adopter_bundle_budget",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "every-packed-file-has-runtime-reason"
+      ],
+      "expectedRedPredicate": "Candidate exceeds sealed byte or entry-count budget without owner-approved evidence.",
+      "contributionResourceKey": "bundle-budget-report",
+      "responsibility": "task-required",
+      "dependencyEdge": "artifact-output-to-budget",
+      "contractEdge": "onefile-adopter-artifact",
+      "resourceKey": "release-artifact"
+    },
+    {
+      "caseId": "test_prf_reduced_artifact_equivalence_5e2c1f7a",
+      "targetGroupId": "null",
+      "semanticKey": "reduced_artifact_clean_install_equivalence",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "reduced-artifacts-preserve-clean-install-behavior"
+      ],
+      "expectedRedPredicate": "Reduced artifact fails the same clean-install smoke as the Phase-2 baseline.",
+      "contributionResourceKey": "clean-install-equivalence",
+      "responsibility": "task-required",
+      "dependencyEdge": "artifact-reduction-to-product-behavior",
+      "contractEdge": "developer-kit-artifact",
+      "resourceKey": "clean-environment"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_artifact_manifest_84d57b20",
+    "test_prf_bundle_budget_f6ab90e3",
+    "test_prf_reduced_artifact_equivalence_5e2c1f7a"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "hard-causal/v1",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0004",
+        "relation": "validation",
+        "admissionMode": "typed-non-blocking",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-PRF-0005",
+        "relation": "validation",
+        "admissionMode": "typed-non-blocking",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencySemantics",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-27T01-45-21-042Z-scope-amendment-566acba16e8a",
+  "lastTransitionAt": "2026-08-27T01:45:21.042Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-08-25T14:30:03.316Z",
+  "promotedAt": "2026-08-25T14:30:03.322Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-f1e68e200e8a",
+    "claimedAt": "2026-08-27T01:44:49.389Z",
+    "heartbeatAt": "2026-08-27T01:44:49.389Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0006.*",
+      ".atm/history/task-events/TASK-PRF-0006/**",
+      ".atm/history/tasks/TASK-PRF-0006.json",
+      "packages/cli/package.json",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/validate-adopter-artifact-manifest.ts",
+      "scripts/validate-onefile-budget.ts",
+      "scripts/validate-root-drop-release.ts",
+      "tests/cli/adopter-artifact-budget.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260827014449-codex-captain-f9b24892d3",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827014449-codex-captain-f9b24892d3\""
+    }
+  },
+  "startedAt": "2026-08-25T14:30:03.329Z",
+  "startedByActor": "cursor-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-cdfe44f3a383438f",
+    "ticketDigest": "sha256:cdfe44f3a383438faa06f81e1f20c97b93cfe02a1787452b6c1321756c37dcd0",
+    "taskId": "TASK-PRF-0006",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260827014449-codex-captain-f9b24892d3",
+    "claimGeneration": "lease-f1e68e200e8a",
+    "issuedAt": "2026-08-27T01:45:20.911Z",
+    "expiresAt": "2026-08-27T02:15:20.911Z",
+    "scopeDigest": "sha256:a7cb9ff9f56661496d468282501255a949c0a6618341c7b1ec0787bbf72bb42f",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-27T01:45:20.911Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0006.*",
+          ".atm/history/task-events/TASK-PRF-0006/**",
+          ".atm/history/tasks/TASK-PRF-0006.json",
+          "packages/cli/package.json",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop/release-manifest.json",
+          "scripts/build-onefile-release.ts",
+          "scripts/build-package-dist.ts",
+          "scripts/build-root-drop-release.ts",
+          "scripts/validate-adopter-artifact-manifest.ts",
+          "scripts/validate-onefile-budget.ts",
+          "scripts/validate-root-drop-release.ts",
+          "tests/cli/adopter-artifact-budget.test.ts"
+        ],
+        "digest": "sha256:83185321fad9171aaa235579ababdf29e0b76a511c5804c1df75e75c15aa9d8c"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260827014449-codex-captain-TASK-PRF-0006-b1a456f1ed",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "TASK-PRF-0006",
+    "actorId": "cursor-captain",
+    "laneSessionId": "lane-20260825143003-cursor-captain-d826741639",
+    "dirtyPaths": [
+      ".atm/history/tasks/TASK-PRF-0006.json",
+      "packages/cli/package.json"
+    ],
+    "retainedAt": "2026-08-26T16:40:28.569Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-captain",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0006",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0006.*",
+      ".atm/history/task-events/TASK-PRF-0006/**",
+      ".atm/history/tasks/TASK-PRF-0006.json",
+      "packages/cli/package.json",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/validate-adopter-artifact-manifest.ts",
+      "scripts/validate-onefile-budget.ts",
+      "scripts/validate-root-drop-release.ts",
+      "tests/cli/adopter-artifact-budget.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0006-minimize-adopter-artifacts-and-enforce-bundle-budgets.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0006-minimize-adopter-artifacts-and-enforce-bundle-budgets.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "c2aa855d65a466a962aa389e47dca83e30498fb3dd9563d99e9c96cdd539e8a1",
+    "actorId": "codex-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260827014449-codex-captain-f9b24892d3",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827014449-codex-captain-f9b24892d3\""
+    },
+    "createdAt": "2026-08-27T01:44:54.309Z",
+    "status": "active"
+  }
+}

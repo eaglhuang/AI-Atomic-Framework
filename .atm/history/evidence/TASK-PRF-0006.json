@@ -1,0 +1,118 @@
+{
+  "taskId": "TASK-PRF-0006",
+  "updatedAt": "2026-08-27T01:51:28.789Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-adopter-artifact-manifest.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260827014449-codex-captain-TASK-PRF-0006-b1a456f1ed",
+      "createdAt": "2026-08-27T01:51:28.789Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260827014449-codex-captain-TASK-PRF-0006-b1a456f1ed",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+          "validate:adopter-artifact-manifest",
+          "validate:onefile-budget",
+          "validate:root-drop-release"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom.npm-package.artifact-budget",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atoms/ATM-CORE-0007/atom.spec.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-adopter-artifact-manifest.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:38b4a7758c3f370c4966b382e369a9bc665db4d558c787d08efe90d19f2ed19f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-27T01:51:28.454Z",
+            "finishedAt": "2026-08-27T01:51:28.788Z",
+            "durationMs": 334,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+              "validate:adopter-artifact-manifest",
+              "validate:onefile-budget",
+              "validate:root-drop-release"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "db6f3de7ede096cf7f783a1606d6bef460505f0b",
+            "cacheKey": "sha256:5ce86a1fd486d23641a931f0e1a3e24d33287613470b6f0a6cc83472cabce37c",
+            "generatedAt": "2026-08-27T01:51:28.788Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:5ce86a1fd486d23641a931f0e1a3e24d33287613470b6f0a6cc83472cabce37c",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-27T01:51:28.788Z",
+              "observedAt": "2026-08-27T01:51:28.788Z",
+              "startedAt": "2026-08-27T01:51:28.454Z",
+              "finishedAt": "2026-08-27T01:51:28.788Z",
+              "durationMs": 334,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:3befbeb84f29e0737b5b2f455d690777b61754c9c8bd60cb6b6f15f3c446d12b",
+              "outputDigest": "sha256:9dee434cc1172934108356f5195adf72ce3b74c391c12d405a41b3fa9c25ac7b",
+              "cache": {
+                "key": "sha256:5ce86a1fd486d23641a931f0e1a3e24d33287613470b6f0a6cc83472cabce37c",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types scripts/validate-adopter-artifact-manifest.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+                  "validate:adopter-artifact-manifest",
+                  "validate:onefile-budget",
+                  "validate:root-drop-release"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "db6f3de7ede096cf7f783a1606d6bef460505f0b",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:9ba6ea297d606db14a5c8a3d3c69aac3e530955c862611337e18adfbeb9b4e4e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

@@ -72,16 +72,14 @@ function ensureDir(filePath: string): void {
 function copyDeclarations(packageDir: string): void {
   const typeRoot = path.join(root, '.types', packageDir, 'src');
   const distRoot = path.join(root, packageDir, 'dist');
-  if (existsSync(typeRoot)) {
-    for (const filePath of listFiles(typeRoot)) {
-      if (!filePath.endsWith('.d.ts')) continue;
-      const target = path.join(distRoot, path.relative(typeRoot, filePath));
-      ensureDir(target);
-      copyFileSync(filePath, target);
-    }
-  }
   for (const declarationEntrypoint of declaredDeclarationEntrypoints(packageDir)) {
     const absoluteEntrypoint = path.join(root, packageDir, declarationEntrypoint);
+    const declarationSource = path.join(typeRoot, declarationEntrypoint.replace(/^dist\//, ''));
+    if (existsSync(declarationSource)) {
+      ensureDir(absoluteEntrypoint);
+      copyFileSync(declarationSource, absoluteEntrypoint);
+      continue;
+    }
     if (existsSync(absoluteEntrypoint)) continue;
     const sourceName = path.basename(declarationEntrypoint, '.d.ts');
     // Incremental caches may survive while a fresh sealed worktree has no hydrated .types output.
@@ -161,9 +159,17 @@ function buildPackage(packageDir: string, mode: 'full' | 'incremental'): void {
     writeCliEntrypointWrapper(distRoot);
   }
   copyDeclarations(packageDir);
+  const declaredDeclarations = new Set(declaredDeclarationEntrypoints(packageDir));
   for (const filePath of listFiles(distRoot)) {
     const relative = path.relative(distRoot, filePath).replace(/\\/g, '/');
-    if (relative.endsWith('.d.ts')) continue;
+    if (relative.split('/').includes('__tests__') || /\.test\.d\.ts$/.test(relative)) {
+      unlinkSync(filePath);
+      continue;
+    }
+    if (relative.endsWith('.d.ts')) {
+      if (!declaredDeclarations.has(relative)) unlinkSync(filePath);
+      continue;
+    }
     if (!expectedOutputs.has(relative)) unlinkSync(filePath);
   }
   if (packageDir === 'packages/integrations-core') {
