@@ -1,0 +1,2636 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0006",
+  "publicationDisposition": "recovery-retained",
+  "recoveryRetainedPaths": [
+    "packages/cli/dist/atm.d.ts",
+    "packages/cli/dist/commands/__tests__/actor-adopt.spec.js",
+    "packages/cli/dist/commands/__tests__/batch-skip-resume.spec.js",
+    "packages/cli/dist/commands/__tests__/broker-intent-validation.spec.js",
+    "packages/cli/dist/commands/__tests__/broker-shared-surface-workflow.test.js",
+    "packages/cli/dist/commands/__tests__/candidates-file-include.spec.js",
+    "packages/cli/dist/commands/__tests__/framework-mode-staged-residue.spec.js",
+    "packages/cli/dist/commands/__tests__/git-hook-bypass-broker-conflict.spec.js",
+    "packages/cli/dist/commands/__tests__/lock.spec.js",
+    "packages/cli/dist/commands/__tests__/planning-repo-root.test.js",
+    "packages/cli/dist/commands/__tests__/residue.spec.js",
+    "packages/cli/dist/commands/__tests__/task-direction-queue.test.js",
+    "packages/cli/dist/commands/broker/parser.js",
+    "packages/cli/dist/commands/broker/steward-runtime-actions.js",
+    "packages/cli/dist/commands/command-specs/broker.spec.js",
+    "packages/cli/dist/commands/emergency/__tests__/gate.test.js",
+    "packages/cli/dist/commands/evidence/__tests__/add.spec.js",
+    "packages/cli/dist/commands/evidence/__tests__/command-runs.spec.js",
+    "packages/cli/dist/commands/evidence/__tests__/diff.spec.js",
+    "packages/cli/dist/commands/evidence/__tests__/git-head-backfill.spec.js",
+    "packages/cli/dist/commands/evidence/__tests__/missing.spec.js",
+    "packages/cli/dist/commands/evidence/__tests__/run.spec.js",
+    "packages/cli/dist/commands/evidence/__tests__/validator-classification.spec.js",
+    "packages/cli/dist/commands/evidence/__tests__/validators.spec.js",
+    "packages/cli/dist/commands/evidence/__tests__/verify.spec.js",
+    "packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.js",
+    "packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema.spec.js",
+    "packages/cli/dist/commands/framework-development/__tests__/critical-path-gate.spec.js",
+    "packages/cli/dist/commands/framework-development/__tests__/historical-delivery-provenance.spec.js",
+    "packages/cli/dist/commands/framework-development/__tests__/sha256-normalization.spec.js",
+    "packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.js",
+    "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+    "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+    "packages/cli/dist/commands/git-governance/__tests__/commit-scope-policy.spec.js",
+    "packages/cli/dist/commands/git-governance/__tests__/protected-governance-state.test.js",
+    "packages/cli/dist/commands/hook/__tests__/commit-range-guard.spec.js",
+    "packages/cli/dist/commands/hook/__tests__/git-hooks-installer.spec.js",
+    "packages/cli/dist/commands/hook/__tests__/git-index-diagnostics.spec.js",
+    "packages/cli/dist/commands/hook/__tests__/pre-commit.spec.js",
+    "packages/cli/dist/commands/hook/__tests__/pre-push.spec.js",
+    "packages/cli/dist/commands/hook/context-map-advisor.test.js",
+    "packages/cli/dist/commands/integration-hooks-stdin.test.js",
+    "packages/cli/dist/commands/lane-session/__tests__/events.spec.js",
+    "packages/cli/dist/commands/lane-session/__tests__/store.spec.js",
+    "packages/cli/dist/commands/next/__tests__/active-work-summary.spec.js",
+    "packages/cli/dist/commands/next/__tests__/channel-strategy.spec.js",
+    "packages/cli/dist/commands/next/__tests__/claim-admission-broker-parity.spec.js",
+    "packages/cli/dist/commands/next/__tests__/claim-admission.spec.js",
+    "packages/cli/dist/commands/next/__tests__/claim-broker-resolution.spec.js",
+    "packages/cli/dist/commands/next/__tests__/claim-files-option.spec.js",
+    "packages/cli/dist/commands/next/__tests__/claim-readiness.test.js",
+    "packages/cli/dist/commands/next/__tests__/fresh-task-reservation.spec.js",
+    "packages/cli/dist/commands/next/__tests__/journaling-route.spec.js",
+    "packages/cli/dist/commands/next/__tests__/next-action-assembly.spec.js",
+    "packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js",
+    "packages/cli/dist/commands/next/__tests__/runner-mode.spec.js",
+    "packages/cli/dist/commands/next/__tests__/same-atom-proposal-admission.test.js",
+    "packages/cli/dist/commands/next/__tests__/task-scoped-claim-command.spec.js",
+    "packages/cli/dist/commands/next/claim-readiness.js",
+    "packages/cli/dist/commands/next/foreign-dirty-wip-admission.js",
+    "packages/cli/dist/commands/taskflow/__tests__/auto-evidence-mapper.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/close-gates-focused.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/close-preflight.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/close-residue-advisory.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/close-transaction-mutex.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/closeback-orchestration.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/commit-bundle-assembly.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/commit-messages.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/dryrun/broker-close-readiness.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/dryrun/fixtures.js",
+    "packages/cli/dist/commands/taskflow/__tests__/dryrun/open.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/dryrun/planning-authority.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/dryrun/profile-fallback.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/framework-opener.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/profile-loader.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/taskflow-close-atomicity.test.js",
+    "packages/cli/dist/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.js",
+    "packages/cli/dist/commands/taskflow/__tests__/taskflow-close-window-lock.test.js",
+    "packages/cli/dist/commands/taskflow/__tests__/taskflow-dryrun.spec.js",
+    "packages/cli/dist/commands/taskflow/__tests__/taskflow-seal-and-commit.test.js",
+    "packages/cli/dist/commands/taskflow/__tests__/write-readiness.spec.js",
+    "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+    "packages/cli/dist/commands/taskflow/implementation.js",
+    "packages/cli/dist/commands/tasks/__tests__/claim-orchestrator.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/claim-release-transition.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/claim-repair-diagnostics.test.js",
+    "packages/cli/dist/commands/tasks/__tests__/close-governance.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/close-orchestrator.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/closeout-provenance.test.js",
+    "packages/cli/dist/commands/tasks/__tests__/command-dispatch.test.js",
+    "packages/cli/dist/commands/tasks/__tests__/deliver-close-orchestrator.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js",
+    "packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.js",
+    "packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/import-reset-open-ux.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/import-verify.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/legacy-compat-command-map.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/lifecycle-state.test.js",
+    "packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/planning-mirror-close-diagnostics.test.js",
+    "packages/cli/dist/commands/tasks/__tests__/planning-root-authorship.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/reconcile-orchestrator.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/repair-claim-orchestrator.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/repairclose-orchestrator.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/residue-diagnostics.test.js",
+    "packages/cli/dist/commands/tasks/__tests__/result-contracts.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js",
+    "packages/cli/dist/commands/tasks/__tests__/scope-queue.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/status-triangulation.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/task-card-parser.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/task-card-writer.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/task-import-tier1-admission.spec.js",
+    "packages/cli/dist/commands/tasks/__tests__/verify-orchestrator.spec.js",
+    "packages/cli/dist/commands/tasks/close-window-lock.js",
+    "packages/cli/dist/commands/tasks/import-card-contract-validation.js",
+    "packages/cli/dist/commands/tasks/task-frontmatter-fidelity.js",
+    "packages/cli/dist/commands/team/__tests__/team-execute-defaults.spec.js",
+    "packages/cli/dist/commands/team/__tests__/team-execute-fail-closed.spec.js",
+    "packages/cli/dist/commands/team/__tests__/team-plan-readonly.spec.js",
+    "packages/cli/dist/commands/team/__tests__/team-route-map.spec.js",
+    "packages/cli/dist/commands/team/__tests__/team-runtime-precedence.spec.js",
+    "packages/cli/dist/index.d.ts"
+  ],
+  "actorId": "codex-captain",
+  "actorIdentity": {
+    "actorId": "codex-captain",
+    "source": "ATM_ACTOR_ID"
+  },
+  "stewardWorkId": "runner-sync-c7dc5070",
+  "sealedSourceSha": "0e05913298a797e08edd74d5d288e8a55c0c73bd",
+  "outputInventory": {
+    "schemaId": "atm.runnerBuildOutputInventory.v1",
+    "sealedSourceSha": "0e05913298a797e08edd74d5d288e8a55c0c73bd",
+    "entries": [
+      {
+        "path": ".atm/history/evidence/TASK-PRF-0006.runner-sync-receipt.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/atm.d.ts",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/actor-adopt.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/batch-skip-resume.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/broker-intent-validation.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/broker-shared-surface-workflow.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/candidates-file-include.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/framework-mode-staged-residue.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/git-hook-bypass-broker-conflict.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/lock.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/planning-repo-root.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/residue.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/__tests__/task-direction-queue.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/broker/parser.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/broker/steward-runtime-actions.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/command-specs/broker.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/emergency/__tests__/gate.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/evidence/__tests__/add.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/evidence/__tests__/command-runs.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/evidence/__tests__/diff.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/evidence/__tests__/git-head-backfill.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/evidence/__tests__/missing.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/evidence/__tests__/run.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/evidence/__tests__/validator-classification.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/evidence/__tests__/validators.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/evidence/__tests__/verify.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/__tests__/critical-path-gate.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/__tests__/historical-delivery-provenance.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/__tests__/sha256-normalization.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/__tests__/commit-scope-policy.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/__tests__/protected-governance-state.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/__tests__/commit-range-guard.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/__tests__/git-hooks-installer.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/__tests__/git-index-diagnostics.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/__tests__/pre-commit.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/__tests__/pre-push.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/context-map-advisor.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/integration-hooks-stdin.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/__tests__/events.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/lane-session/__tests__/store.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/active-work-summary.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/channel-strategy.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/claim-admission-broker-parity.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/claim-admission.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/claim-broker-resolution.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/claim-files-option.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/claim-readiness.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/fresh-task-reservation.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/journaling-route.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/next-action-assembly.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/runner-mode.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/same-atom-proposal-admission.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/__tests__/task-scoped-claim-command.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/claim-readiness.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/foreign-dirty-wip-admission.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/auto-evidence-mapper.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/close-gates-focused.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/close-preflight.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/close-residue-advisory.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/close-transaction-mutex.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/closeback-orchestration.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/commit-bundle-assembly.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/commit-messages.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/dryrun/broker-close-readiness.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/dryrun/fixtures.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/dryrun/open.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/dryrun/planning-authority.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/dryrun/profile-fallback.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/framework-opener.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/profile-loader.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/taskflow-close-atomicity.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/taskflow-close-window-lock.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/taskflow-dryrun.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/taskflow-seal-and-commit.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/write-readiness.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/implementation.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/claim-orchestrator.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/claim-release-transition.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/claim-repair-diagnostics.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/close-governance.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/close-orchestrator.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/closeout-provenance.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/command-dispatch.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/deliver-close-orchestrator.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/import-reset-open-ux.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/import-verify.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/legacy-compat-command-map.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/lifecycle-state.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/planning-mirror-close-diagnostics.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/planning-root-authorship.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/reconcile-orchestrator.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/repair-claim-orchestrator.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/repairclose-orchestrator.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/residue-diagnostics.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/result-contracts.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/scope-queue.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/status-triangulation.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/task-card-parser.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/task-card-writer.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/task-import-tier1-admission.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/__tests__/verify-orchestrator.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/close-window-lock.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/import-card-contract-validation.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/task-frontmatter-fidelity.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/__tests__/team-execute-defaults.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/__tests__/team-execute-fail-closed.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/__tests__/team-plan-readonly.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/__tests__/team-route-map.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/team/__tests__/team-runtime-precedence.spec.js",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/index.d.ts",
+        "disposition": "unowned",
+        "ownerTaskId": null,
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-onefile/atm.mjs",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-onefile/release-manifest.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/atomic-registry.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/atomic_workbench/registry-catalog.md",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/docs/release-trust-ops.md",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/adapter-local-git/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/agent-pack-claude-code/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/agent-pack-copilot/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/agent-pack-cursor/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/agent-pack-gemini/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/agent-pack-sdk/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/agent-pack-windsurf/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/atm-markdown-task-source/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/atm.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/actor-adopt.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/batch-skip-resume.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/broker-intent-validation.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/broker-shared-surface-workflow.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/candidates-file-include.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/framework-mode-staged-residue.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/git-hook-bypass-broker-conflict.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/lock.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/planning-repo-root.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/residue.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/__tests__/task-direction-queue.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/broker/parser.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/broker/steward-runtime-actions.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/command-specs/broker.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/emergency/__tests__/gate.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/add.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/command-runs.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/diff.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/git-head-backfill.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/missing.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/run.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/validator-classification.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/validators.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/evidence/__tests__/verify.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/critical-path-gate.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/historical-delivery-provenance.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/sha256-normalization.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/__tests__/commit-scope-policy.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/git-governance/__tests__/protected-governance-state.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/__tests__/commit-range-guard.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/__tests__/git-hooks-installer.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/__tests__/git-index-diagnostics.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/__tests__/pre-commit.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/__tests__/pre-push.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/hook/context-map-advisor.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/integration-hooks-stdin.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/__tests__/events.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/lane-session/__tests__/store.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/active-work-summary.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/channel-strategy.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/claim-admission-broker-parity.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/claim-admission.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/claim-broker-resolution.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/claim-files-option.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/claim-readiness.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/fresh-task-reservation.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/journaling-route.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/next-action-assembly.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/runner-mode.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/same-atom-proposal-admission.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/task-scoped-claim-command.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/claim-readiness.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/foreign-dirty-wip-admission.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/auto-evidence-mapper.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/close-gates-focused.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/close-preflight.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/close-residue-advisory.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/close-transaction-mutex.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/closeback-orchestration.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/commit-bundle-assembly.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/commit-messages.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/dryrun/broker-close-readiness.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/dryrun/fixtures.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/dryrun/open.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/dryrun/planning-authority.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/dryrun/profile-fallback.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/framework-opener.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/profile-loader.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/taskflow-close-atomicity.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/taskflow-close-window-lock.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/taskflow-dryrun.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/taskflow-seal-and-commit.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/write-readiness.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/claim-orchestrator.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/claim-release-transition.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/claim-repair-diagnostics.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/close-governance.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/close-orchestrator.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/closeout-provenance.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/command-dispatch.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/deliver-close-orchestrator.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-reset-open-ux.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-verify.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/legacy-compat-command-map.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/lifecycle-state.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/planning-mirror-close-diagnostics.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/planning-root-authorship.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/reconcile-orchestrator.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/repair-claim-orchestrator.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/repairclose-orchestrator.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/residue-diagnostics.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/result-contracts.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/scope-queue.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/status-triangulation.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/task-card-parser.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/task-card-writer.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/task-import-tier1-admission.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/verify-orchestrator.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-lock.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/import-card-contract-validation.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/task-frontmatter-fidelity.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/__tests__/team-execute-defaults.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/__tests__/team-execute-fail-closed.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/__tests__/team-plan-readonly.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/__tests__/team-route-map.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/team/__tests__/team-runtime-precedence.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/package.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/broker/parser.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/command-specs/broker.spec.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/next/claim-readiness.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/tasks/close-window-lock.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/tasks/import-card-contract-validation.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/adapter-registry.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/agr-layer2.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/atm-core-scope.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/atom-map-adapter.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/batch-planner.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/candidate-bridge.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/compose.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/conflict-key-overlap.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/conflict-matrix.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/cross-task-mutation-guard.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/cross-task-mutation-terminal-entitlement.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/decision.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/dogfood-adapter-benchmark.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/freeze-protocol.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/generated-projection-steward.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/global-resource-projection.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/intent-registry.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/json-record-adapter.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/numeric-scalar-adapter.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/patch-envelope-atm-core.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/patch-envelope.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/recovery.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/registry-stale-cleanup.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/runner-bootstrap.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/runner-failure-modes.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/runner-ref-store.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/runner-sync-steward-queue.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/runner-version-state.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/steward-arbitration.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/team-lane.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/team-wave-admission.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/team-wave-checkpoint.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/team-wave-closeout-guard.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/team-wave-envelope.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/team-wave-evidence.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/team-wave-planner.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/team-worker-report.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/text-range-adapter.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/__tests__/wave-manifest.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/runner-build-output-inventory.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/steward-transactional-apply.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/police/__tests__/dedup.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/police/__tests__/polymorph.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/police/__tests__/quality.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/police/__tests__/role-registry.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/police/__tests__/suppression-keys.spec.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/registry/__tests__/atom-capsule.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/team-runtime/__tests__/openai-usage-normalization.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/team-runtime/__tests__/permission-broker.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/src/broker/runner-build-output-inventory.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/src/broker/steward-transactional-apply.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/create-atm/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/create-atm/dist/index.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/create-atm/package.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/create-atm/src/index.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integration-claude-code/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integration-codex/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integration-copilot/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integration-cursor/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integration-gemini/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integrations-core/dist/compiler/skill-source-universe.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integrations-core/dist/compiler/skill-source-universe.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integrations-core/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integrations-core/package.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/integrations-core/src/compiler/skill-source-universe.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/language-csharp/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/language-js/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-behavior-pack/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-experience-loop/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-governance-local/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-human-review/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-review-advisory/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-rule-guard/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/release-manifest.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/scripts/build-package-dist.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/scripts/runner-sync-incremental-build.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/scripts/validate-adopter-artifact-manifest.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/scripts/validate-hook-batch-evidence-context.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/tests/cli-fixtures/help-snapshots/broker.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/tests/cli/adopter-artifact-budget.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/tests/cli/cross-editor-parallel-proof.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/tests/cli/task-import-diagnostic-contract.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0006",
+        "ownerActorId": null
+      }
+    ],
+    "digest": "sha256:7956dae9b666e96e3ac7f33d35f456b51eb129062947f38e827a0459d4e5945c"
+  },
+  "memberTaskIds": [
+    "TASK-PRF-0006"
+  ],
+  "linkedTaskIds": [],
+  "groupManifest": {
+    "schemaId": "atm.runnerSyncCoalescedGroupManifest.v1",
+    "stewardWorkId": "runner-sync-c7dc5070",
+    "sealedSourceSha": "0e05913298a797e08edd74d5d288e8a55c0c73bd",
+    "members": [
+      {
+        "taskId": "TASK-PRF-0006",
+        "actorId": "codex-captain",
+        "laneFingerprint": null,
+        "requestedSurfaces": [
+          "packages/cli/dist",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop"
+        ],
+        "requestDigest": "sha256:35de29db18a3500300562c8f4fbfa5109ea74e3ce81c3d11b0e7f4f1e912c798"
+      }
+    ],
+    "memberTaskIds": [
+      "TASK-PRF-0006"
+    ],
+    "sharedSealedInputDigest": "sha256:6bdd61ac706cd4582d22ee87d8fca223e39bbc6ed41ba3cdec3ee56717eac347",
+    "sharedOutputDigest": "sha256:5be45a9dd0ee5a91d1f4cdaea480f46d0816d2245141109cdd51ee530bf0b331",
+    "manifestDigest": "sha256:109b08b15e9ae538a37618a54138b8a6e290e184bfe4697d3e3647f81b4f9e4b",
+    "createdAt": "2026-08-27T01:54:10.289Z"
+  },
+  "childReceipts": [
+    {
+      "schemaId": "atm.runnerSyncChildReceipt.v1",
+      "taskId": "TASK-PRF-0006",
+      "parentStewardWorkId": "runner-sync-c7dc5070",
+      "groupManifestDigest": "sha256:109b08b15e9ae538a37618a54138b8a6e290e184bfe4697d3e3647f81b4f9e4b",
+      "memberRequestDigest": "sha256:35de29db18a3500300562c8f4fbfa5109ea74e3ce81c3d11b0e7f4f1e912c798",
+      "sealedSourceSha": "0e05913298a797e08edd74d5d288e8a55c0c73bd",
+      "sharedSealedInputDigest": "sha256:6bdd61ac706cd4582d22ee87d8fca223e39bbc6ed41ba3cdec3ee56717eac347",
+      "sharedOutputDigest": "sha256:5be45a9dd0ee5a91d1f4cdaea480f46d0816d2245141109cdd51ee530bf0b331",
+      "receiptDigest": "sha256:71bdfb928d65b68fec75c8522eb74205c9cdc1e00395140af67685ae521d43e3",
+      "issuedAt": "2026-08-27T01:54:10.289Z"
+    }
+  ],
+  "childAttribution": {
+    "schemaId": "atm.runnerSyncChildAttribution.v1",
+    "complete": true,
+    "members": [
+      {
+        "taskId": "TASK-PRF-0006",
+        "actorId": "codex-captain",
+        "laneFingerprint": null,
+        "childReceiptDigest": "sha256:71bdfb928d65b68fec75c8522eb74205c9cdc1e00395140af67685ae521d43e3"
+      }
+    ],
+    "missingTaskIds": []
+  },
+  "lifecycle": {
+    "schemaId": "atm.runnerSyncReceiptLifecycle.v1",
+    "durableStates": [
+      "building",
+      "built-provisional",
+      "publication-ready",
+      "published",
+      "reconciled"
+    ],
+    "provisionalState": "built-provisional",
+    "publicationReadyState": "publication-ready",
+    "terminalState": "reconciled",
+    "releasePhase": "published",
+    "reconcilePhase": "reconciled",
+    "finalizable": true,
+    "recoveryCommand": null
+  },
+  "runnerInputTreeHash": "sha256:6bdd61ac706cd4582d22ee87d8fca223e39bbc6ed41ba3cdec3ee56717eac347",
+  "runnerInputGraph": {
+    "schemaId": "atm.runnerInputGraph.v1",
+    "sealedSourceSha": "0e05913298a797e08edd74d5d288e8a55c0c73bd",
+    "aggregateInputTreeHash": "sha256:6bdd61ac706cd4582d22ee87d8fca223e39bbc6ed41ba3cdec3ee56717eac347",
+    "nodes": [
+      {
+        "segment": "packages",
+        "inputPaths": [
+          "atomic_workbench",
+          "package-lock.json",
+          "package.json",
+          "packages",
+          "schemas",
+          "scripts",
+          "templates",
+          "tsconfig.build.json",
+          "tsconfig.json"
+        ],
+        "inputDigest": "sha256:6bdd61ac706cd4582d22ee87d8fca223e39bbc6ed41ba3cdec3ee56717eac347",
+        "outputEntries": [
+          "packages/cli/dist",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop"
+        ],
+        "outputDigest": "sha256:3c41da997ba51483faa05b5b4c18877ee8e5356160e43e909264f099d02466a4"
+      }
+    ]
+  },
+  "requestedSurfaces": [
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildInputsTreeHash": "sha256:6bdd61ac706cd4582d22ee87d8fca223e39bbc6ed41ba3cdec3ee56717eac347",
+  "buildDecision": "fullRebuild",
+  "decisionReason": "foreign generated outputs retained: packages/cli/dist/atm.d.ts, packages/cli/dist/commands/__tests__/actor-adopt.spec.js, packages/cli/dist/commands/__tests__/batch-skip-resume.spec.js, packages/cli/dist/commands/__tests__/broker-intent-validation.spec.js, packages/cli/dist/commands/__tests__/broker-shared-surface-workflow.test.js, packages/cli/dist/commands/__tests__/candidates-file-include.spec.js, packages/cli/dist/commands/__tests__/framework-mode-staged-residue.spec.js, packages/cli/dist/commands/__tests__/git-hook-bypass-broker-conflict.spec.js, packages/cli/dist/commands/__tests__/lock.spec.js, packages/cli/dist/commands/__tests__/planning-repo-root.test.js, packages/cli/dist/commands/__tests__/residue.spec.js, packages/cli/dist/commands/__tests__/task-direction-queue.test.js, packages/cli/dist/commands/broker/parser.js, packages/cli/dist/commands/broker/steward-runtime-actions.js, packages/cli/dist/commands/command-specs/broker.spec.js, packages/cli/dist/commands/emergency/__tests__/gate.test.js, packages/cli/dist/commands/evidence/__tests__/add.spec.js, packages/cli/dist/commands/evidence/__tests__/command-runs.spec.js, packages/cli/dist/commands/evidence/__tests__/diff.spec.js, packages/cli/dist/commands/evidence/__tests__/git-head-backfill.spec.js, packages/cli/dist/commands/evidence/__tests__/missing.spec.js, packages/cli/dist/commands/evidence/__tests__/run.spec.js, packages/cli/dist/commands/evidence/__tests__/validator-classification.spec.js, packages/cli/dist/commands/evidence/__tests__/validators.spec.js, packages/cli/dist/commands/evidence/__tests__/verify.spec.js, packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.js, packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema.spec.js, packages/cli/dist/commands/framework-development/__tests__/critical-path-gate.spec.js, packages/cli/dist/commands/framework-development/__tests__/historical-delivery-provenance.spec.js, packages/cli/dist/commands/framework-development/__tests__/sha256-normalization.spec.js, packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.js, packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js, packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js, packages/cli/dist/commands/git-governance/__tests__/commit-scope-policy.spec.js, packages/cli/dist/commands/git-governance/__tests__/protected-governance-state.test.js, packages/cli/dist/commands/hook/__tests__/commit-range-guard.spec.js, packages/cli/dist/commands/hook/__tests__/git-hooks-installer.spec.js, packages/cli/dist/commands/hook/__tests__/git-index-diagnostics.spec.js, packages/cli/dist/commands/hook/__tests__/pre-commit.spec.js, packages/cli/dist/commands/hook/__tests__/pre-push.spec.js, packages/cli/dist/commands/hook/context-map-advisor.test.js, packages/cli/dist/commands/integration-hooks-stdin.test.js, packages/cli/dist/commands/lane-session/__tests__/events.spec.js, packages/cli/dist/commands/lane-session/__tests__/store.spec.js, packages/cli/dist/commands/next/__tests__/active-work-summary.spec.js, packages/cli/dist/commands/next/__tests__/channel-strategy.spec.js, packages/cli/dist/commands/next/__tests__/claim-admission-broker-parity.spec.js, packages/cli/dist/commands/next/__tests__/claim-admission.spec.js, packages/cli/dist/commands/next/__tests__/claim-broker-resolution.spec.js, packages/cli/dist/commands/next/__tests__/claim-files-option.spec.js, packages/cli/dist/commands/next/__tests__/claim-readiness.test.js, packages/cli/dist/commands/next/__tests__/fresh-task-reservation.spec.js, packages/cli/dist/commands/next/__tests__/journaling-route.spec.js, packages/cli/dist/commands/next/__tests__/next-action-assembly.spec.js, packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js, packages/cli/dist/commands/next/__tests__/runner-mode.spec.js, packages/cli/dist/commands/next/__tests__/same-atom-proposal-admission.test.js, packages/cli/dist/commands/next/__tests__/task-scoped-claim-command.spec.js, packages/cli/dist/commands/next/claim-readiness.js, packages/cli/dist/commands/next/foreign-dirty-wip-admission.js, packages/cli/dist/commands/taskflow/__tests__/auto-evidence-mapper.spec.js, packages/cli/dist/commands/taskflow/__tests__/close-gates-focused.spec.js, packages/cli/dist/commands/taskflow/__tests__/close-preflight.spec.js, packages/cli/dist/commands/taskflow/__tests__/close-residue-advisory.spec.js, packages/cli/dist/commands/taskflow/__tests__/close-transaction-mutex.spec.js, packages/cli/dist/commands/taskflow/__tests__/closeback-orchestration.spec.js, packages/cli/dist/commands/taskflow/__tests__/commit-bundle-assembly.spec.js, packages/cli/dist/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.js, packages/cli/dist/commands/taskflow/__tests__/commit-messages.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/broker-close-readiness.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/fixtures.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/open.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/planning-authority.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/profile-fallback.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.js, packages/cli/dist/commands/taskflow/__tests__/framework-opener.spec.js, packages/cli/dist/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.js, packages/cli/dist/commands/taskflow/__tests__/profile-loader.spec.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-close-atomicity.test.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-close-window-lock.test.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-dryrun.spec.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-seal-and-commit.test.js, packages/cli/dist/commands/taskflow/__tests__/write-readiness.spec.js, packages/cli/dist/commands/taskflow/commit-bundle-assembly.js, packages/cli/dist/commands/taskflow/implementation.js, packages/cli/dist/commands/tasks/__tests__/claim-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/claim-release-transition.spec.js, packages/cli/dist/commands/tasks/__tests__/claim-repair-diagnostics.test.js, packages/cli/dist/commands/tasks/__tests__/close-governance.spec.js, packages/cli/dist/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.js, packages/cli/dist/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.js, packages/cli/dist/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.js, packages/cli/dist/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.js, packages/cli/dist/commands/tasks/__tests__/close-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/closeout-provenance.test.js, packages/cli/dist/commands/tasks/__tests__/command-dispatch.test.js, packages/cli/dist/commands/tasks/__tests__/deliver-close-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js, packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.js, packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/import-reset-open-ux.spec.js, packages/cli/dist/commands/tasks/__tests__/import-verify.spec.js, packages/cli/dist/commands/tasks/__tests__/legacy-compat-command-map.spec.js, packages/cli/dist/commands/tasks/__tests__/lifecycle-state.test.js, packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js, packages/cli/dist/commands/tasks/__tests__/planning-mirror-close-diagnostics.test.js, packages/cli/dist/commands/tasks/__tests__/planning-root-authorship.spec.js, packages/cli/dist/commands/tasks/__tests__/reconcile-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/repair-claim-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/repairclose-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/residue-diagnostics.test.js, packages/cli/dist/commands/tasks/__tests__/result-contracts.spec.js, packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js, packages/cli/dist/commands/tasks/__tests__/scope-queue.spec.js, packages/cli/dist/commands/tasks/__tests__/status-triangulation.spec.js, packages/cli/dist/commands/tasks/__tests__/task-card-parser.spec.js, packages/cli/dist/commands/tasks/__tests__/task-card-writer.spec.js, packages/cli/dist/commands/tasks/__tests__/task-import-tier1-admission.spec.js, packages/cli/dist/commands/tasks/__tests__/verify-orchestrator.spec.js, packages/cli/dist/commands/tasks/close-window-lock.js, packages/cli/dist/commands/tasks/import-card-contract-validation.js, packages/cli/dist/commands/tasks/task-frontmatter-fidelity.js, packages/cli/dist/commands/team/__tests__/team-execute-defaults.spec.js, packages/cli/dist/commands/team/__tests__/team-execute-fail-closed.spec.js, packages/cli/dist/commands/team/__tests__/team-plan-readonly.spec.js, packages/cli/dist/commands/team/__tests__/team-route-map.spec.js, packages/cli/dist/commands/team/__tests__/team-runtime-precedence.spec.js, packages/cli/dist/index.d.ts",
+  "incrementalPlan": {
+    "schemaId": "atm.runnerIncrementalBuildPlan.v1",
+    "specVersion": "0.1.0",
+    "previousSealedSourceSha": null,
+    "currentSealedSourceSha": "0e05913298a797e08edd74d5d288e8a55c0c73bd",
+    "changedPaths": [],
+    "affectedPackages": [],
+    "affectedGroups": {
+      "packages": [],
+      "scripts": [],
+      "templates": [],
+      "schemas": [],
+      "atomicWorkbench": [],
+      "rootConfig": [],
+      "unknown": []
+    },
+    "incrementalEligible": false,
+    "unsafeReasons": [
+      "missing-previous-sealed-source"
+    ]
+  },
+  "runtimeTelemetryRef": null,
+  "tsBuildCache": {
+    "schemaId": "atm.runnerTsBuildCacheSummary.v1",
+    "cacheRoot": ".atm/runtime/runner-sync-build-cache/typescript",
+    "tsBuildInfoPath": ".atm/runtime/runner-sync-build-cache/typescript/tsconfig.build.tsbuildinfo",
+    "existedBefore": true,
+    "existsAfter": true,
+    "digestBefore": "sha256:90c404745ea8e220d9053fd73bf45e6ac25baa2563e43a8f81b57d8bc1e05d38",
+    "digestAfter": "sha256:90c404745ea8e220d9053fd73bf45e6ac25baa2563e43a8f81b57d8bc1e05d38",
+    "restoredBeforeBuild": true,
+    "persistedAfterBuild": true,
+    "gitPolicy": {
+      "rawCacheCommitted": false,
+      "storage": ".atm/runtime/runner-sync-build-cache/typescript/**"
+    }
+  },
+  "brokerTicket": {
+    "ticketId": "runner-sync-c7dc5070:0e05913298a797e08edd74d5d288e8a55c0c73bd",
+    "waitedMs": 0,
+    "position": 1,
+    "headOwner": "TASK-PRF-0006"
+  },
+  "dominantPhaseSummary": {
+    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+    "dominantPhase": "rootDropReleaseAssembly",
+    "dominantPhaseMs": 19749,
+    "totalElapsedMs": 50545,
+    "dominanceRatio": 0.3907,
+    "phaseMedianMs": 1043,
+    "phaseP95Ms": 19749,
+    "measuredPhaseCount": 8,
+    "optimizationVerdict": "inconclusive",
+    "basis": "single-run"
+  },
+  "buildObservation": {
+    "schemaId": "atm.runnerSyncBuildObservation.v1",
+    "buildDecision": "fullRebuild",
+    "decisionReason": "foreign generated outputs retained: packages/cli/dist/atm.d.ts, packages/cli/dist/commands/__tests__/actor-adopt.spec.js, packages/cli/dist/commands/__tests__/batch-skip-resume.spec.js, packages/cli/dist/commands/__tests__/broker-intent-validation.spec.js, packages/cli/dist/commands/__tests__/broker-shared-surface-workflow.test.js, packages/cli/dist/commands/__tests__/candidates-file-include.spec.js, packages/cli/dist/commands/__tests__/framework-mode-staged-residue.spec.js, packages/cli/dist/commands/__tests__/git-hook-bypass-broker-conflict.spec.js, packages/cli/dist/commands/__tests__/lock.spec.js, packages/cli/dist/commands/__tests__/planning-repo-root.test.js, packages/cli/dist/commands/__tests__/residue.spec.js, packages/cli/dist/commands/__tests__/task-direction-queue.test.js, packages/cli/dist/commands/broker/parser.js, packages/cli/dist/commands/broker/steward-runtime-actions.js, packages/cli/dist/commands/command-specs/broker.spec.js, packages/cli/dist/commands/emergency/__tests__/gate.test.js, packages/cli/dist/commands/evidence/__tests__/add.spec.js, packages/cli/dist/commands/evidence/__tests__/command-runs.spec.js, packages/cli/dist/commands/evidence/__tests__/diff.spec.js, packages/cli/dist/commands/evidence/__tests__/git-head-backfill.spec.js, packages/cli/dist/commands/evidence/__tests__/missing.spec.js, packages/cli/dist/commands/evidence/__tests__/run.spec.js, packages/cli/dist/commands/evidence/__tests__/validator-classification.spec.js, packages/cli/dist/commands/evidence/__tests__/validators.spec.js, packages/cli/dist/commands/evidence/__tests__/verify.spec.js, packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.js, packages/cli/dist/commands/framework-development/__tests__/closure-packet-schema.spec.js, packages/cli/dist/commands/framework-development/__tests__/critical-path-gate.spec.js, packages/cli/dist/commands/framework-development/__tests__/historical-delivery-provenance.spec.js, packages/cli/dist/commands/framework-development/__tests__/sha256-normalization.spec.js, packages/cli/dist/commands/framework-development/__tests__/temp-claim.spec.js, packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js, packages/cli/dist/commands/framework-development/runner-publication-lifecycle.test.js, packages/cli/dist/commands/git-governance/__tests__/commit-scope-policy.spec.js, packages/cli/dist/commands/git-governance/__tests__/protected-governance-state.test.js, packages/cli/dist/commands/hook/__tests__/commit-range-guard.spec.js, packages/cli/dist/commands/hook/__tests__/git-hooks-installer.spec.js, packages/cli/dist/commands/hook/__tests__/git-index-diagnostics.spec.js, packages/cli/dist/commands/hook/__tests__/pre-commit.spec.js, packages/cli/dist/commands/hook/__tests__/pre-push.spec.js, packages/cli/dist/commands/hook/context-map-advisor.test.js, packages/cli/dist/commands/integration-hooks-stdin.test.js, packages/cli/dist/commands/lane-session/__tests__/events.spec.js, packages/cli/dist/commands/lane-session/__tests__/store.spec.js, packages/cli/dist/commands/next/__tests__/active-work-summary.spec.js, packages/cli/dist/commands/next/__tests__/channel-strategy.spec.js, packages/cli/dist/commands/next/__tests__/claim-admission-broker-parity.spec.js, packages/cli/dist/commands/next/__tests__/claim-admission.spec.js, packages/cli/dist/commands/next/__tests__/claim-broker-resolution.spec.js, packages/cli/dist/commands/next/__tests__/claim-files-option.spec.js, packages/cli/dist/commands/next/__tests__/claim-readiness.test.js, packages/cli/dist/commands/next/__tests__/fresh-task-reservation.spec.js, packages/cli/dist/commands/next/__tests__/journaling-route.spec.js, packages/cli/dist/commands/next/__tests__/next-action-assembly.spec.js, packages/cli/dist/commands/next/__tests__/planning-root-preference.test.js, packages/cli/dist/commands/next/__tests__/runner-mode.spec.js, packages/cli/dist/commands/next/__tests__/same-atom-proposal-admission.test.js, packages/cli/dist/commands/next/__tests__/task-scoped-claim-command.spec.js, packages/cli/dist/commands/next/claim-readiness.js, packages/cli/dist/commands/next/foreign-dirty-wip-admission.js, packages/cli/dist/commands/taskflow/__tests__/auto-evidence-mapper.spec.js, packages/cli/dist/commands/taskflow/__tests__/close-gates-focused.spec.js, packages/cli/dist/commands/taskflow/__tests__/close-preflight.spec.js, packages/cli/dist/commands/taskflow/__tests__/close-residue-advisory.spec.js, packages/cli/dist/commands/taskflow/__tests__/close-transaction-mutex.spec.js, packages/cli/dist/commands/taskflow/__tests__/closeback-orchestration.spec.js, packages/cli/dist/commands/taskflow/__tests__/commit-bundle-assembly.spec.js, packages/cli/dist/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.js, packages/cli/dist/commands/taskflow/__tests__/commit-messages.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/broker-close-readiness.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/dual-repo-close.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/fixtures.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/open.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/planning-authority.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/profile-fallback.spec.js, packages/cli/dist/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.js, packages/cli/dist/commands/taskflow/__tests__/framework-opener.spec.js, packages/cli/dist/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.js, packages/cli/dist/commands/taskflow/__tests__/profile-loader.spec.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-close-atomicity.test.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-close-window-lock.test.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-dryrun.spec.js, packages/cli/dist/commands/taskflow/__tests__/taskflow-seal-and-commit.test.js, packages/cli/dist/commands/taskflow/__tests__/write-readiness.spec.js, packages/cli/dist/commands/taskflow/commit-bundle-assembly.js, packages/cli/dist/commands/taskflow/implementation.js, packages/cli/dist/commands/tasks/__tests__/claim-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/claim-release-transition.spec.js, packages/cli/dist/commands/tasks/__tests__/claim-repair-diagnostics.test.js, packages/cli/dist/commands/tasks/__tests__/close-governance.spec.js, packages/cli/dist/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.js, packages/cli/dist/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.js, packages/cli/dist/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.js, packages/cli/dist/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.js, packages/cli/dist/commands/tasks/__tests__/close-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/closeout-provenance.test.js, packages/cli/dist/commands/tasks/__tests__/command-dispatch.test.js, packages/cli/dist/commands/tasks/__tests__/deliver-close-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js, packages/cli/dist/commands/tasks/__tests__/historical-delivery.test.js, packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/import-reset-open-ux.spec.js, packages/cli/dist/commands/tasks/__tests__/import-verify.spec.js, packages/cli/dist/commands/tasks/__tests__/legacy-compat-command-map.spec.js, packages/cli/dist/commands/tasks/__tests__/lifecycle-state.test.js, packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js, packages/cli/dist/commands/tasks/__tests__/planning-mirror-close-diagnostics.test.js, packages/cli/dist/commands/tasks/__tests__/planning-root-authorship.spec.js, packages/cli/dist/commands/tasks/__tests__/reconcile-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/repair-claim-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/repairclose-orchestrator.spec.js, packages/cli/dist/commands/tasks/__tests__/residue-diagnostics.test.js, packages/cli/dist/commands/tasks/__tests__/result-contracts.spec.js, packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js, packages/cli/dist/commands/tasks/__tests__/scope-queue.spec.js, packages/cli/dist/commands/tasks/__tests__/status-triangulation.spec.js, packages/cli/dist/commands/tasks/__tests__/task-card-parser.spec.js, packages/cli/dist/commands/tasks/__tests__/task-card-writer.spec.js, packages/cli/dist/commands/tasks/__tests__/task-import-tier1-admission.spec.js, packages/cli/dist/commands/tasks/__tests__/verify-orchestrator.spec.js, packages/cli/dist/commands/tasks/close-window-lock.js, packages/cli/dist/commands/tasks/import-card-contract-validation.js, packages/cli/dist/commands/tasks/task-frontmatter-fidelity.js, packages/cli/dist/commands/team/__tests__/team-execute-defaults.spec.js, packages/cli/dist/commands/team/__tests__/team-execute-fail-closed.spec.js, packages/cli/dist/commands/team/__tests__/team-plan-readonly.spec.js, packages/cli/dist/commands/team/__tests__/team-route-map.spec.js, packages/cli/dist/commands/team/__tests__/team-runtime-precedence.spec.js, packages/cli/dist/index.d.ts",
+    "brokerTicket": {
+      "ticketId": "runner-sync-c7dc5070:0e05913298a797e08edd74d5d288e8a55c0c73bd",
+      "waitedMs": 0,
+      "position": 1,
+      "headOwner": "TASK-PRF-0006"
+    },
+    "changedPathCount": 0,
+    "affectedPackageCount": 0,
+    "unsafeReasons": [
+      "missing-previous-sealed-source"
+    ],
+    "dominantPhaseSummary": {
+      "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+      "dominantPhase": "rootDropReleaseAssembly",
+      "dominantPhaseMs": 19749,
+      "totalElapsedMs": 50545,
+      "dominanceRatio": 0.3907,
+      "phaseMedianMs": 1043,
+      "phaseP95Ms": 19749,
+      "measuredPhaseCount": 8,
+      "optimizationVerdict": "inconclusive",
+      "basis": "single-run"
+    }
+  },
+  "phaseTimingsMs": {
+    "inputHashCalculation": 54,
+    "skipDecision": 16,
+    "worktreeSetup": 10903,
+    "typescriptBuild": 8314,
+    "rootDropReleaseAssembly": 19749,
+    "onefileReleaseAssembly": 1043,
+    "artifactSync": 4730,
+    "cleanup": 0,
+    "totalElapsed": 50545
+  },
+  "atomicWrite": {
+    "schemaId": "atm.runnerSyncAtomicWrite.v1",
+    "strategy": "temp-file-rename-with-retry",
+    "platform": "win32",
+    "maxAttempts": 4
+  },
+  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"TASK-PRF-0006\" --steward-work-id \"runner-sync-c7dc5070\" --receipt-ref \".atm/history/evidence/TASK-PRF-0006.runner-sync-receipt.json\" --json",
+  "treatmentTelemetry": {
+    "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
+    "executionMode": "command-executed",
+    "commandExecuted": true,
+    "outputObserved": true,
+    "receiptValidity": "valid",
+    "buildDecision": "fullRebuild",
+    "phaseTimingsMs": {
+      "inputHashCalculation": 54,
+      "skipDecision": 16,
+      "worktreeSetup": 10903,
+      "typescriptBuild": 8314,
+      "rootDropReleaseAssembly": 19749,
+      "onefileReleaseAssembly": 1043,
+      "artifactSync": 4730,
+      "cleanup": 0,
+      "totalElapsed": 50545
+    },
+    "rawTelemetryPolicy": "gitignored-runtime-only",
+    "tsBuildCacheDigest": "sha256:342db4aaed13e7cacd135674d8c92eaf023e6b4d9dc052dff351e7a248a46801"
+  },
+  "publishedAt": "2026-08-27T01:54:10.290Z"
+}

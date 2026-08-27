@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0006",
   "title": "Minimize adopter artifacts and enforce bundle budgets",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     {
@@ -256,8 +256,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-27T01-45-21-042Z-scope-amendment-566acba16e8a",
-  "lastTransitionAt": "2026-08-27T01:45:21.042Z",
+  "lastTransitionId": "2026-08-27T01-56-20-072Z-close-49c9a2f285cf",
+  "lastTransitionAt": "2026-08-27T01:56:20.072Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-25T14:30:03.316Z",
   "promotedAt": "2026-08-25T14:30:03.322Z",
@@ -265,7 +265,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-f1e68e200e8a",
     "claimedAt": "2026-08-27T01:44:49.389Z",
-    "heartbeatAt": "2026-08-27T01:44:49.389Z",
+    "heartbeatAt": "2026-08-27T01:56:20.070Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0006.*",
@@ -282,14 +282,14 @@
       "scripts/validate-root-drop-release.ts",
       "tests/cli/adopter-artifact-budget.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260827014449-codex-captain-f9b24892d3",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827014449-codex-captain-f9b24892d3\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-25T14:30:03.329Z",
   "startedByActor": "cursor-captain",
@@ -421,5 +421,9 @@
     },
     "createdAt": "2026-08-27T01:44:54.309Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-08-27T01:56:20.070Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260827014449-codex-captain-TASK-PRF-0006-b1a456f1ed",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0006.closure-packet.json"
 }

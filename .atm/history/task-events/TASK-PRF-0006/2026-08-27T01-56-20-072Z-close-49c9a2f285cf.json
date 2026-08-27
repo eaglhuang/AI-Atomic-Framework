@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-27T01-56-20-072Z-close-49c9a2f285cf",
+  "taskId": "TASK-PRF-0006",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260827014449-codex-captain-TASK-PRF-0006-b1a456f1ed",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0006.json",
+  "taskSha256": "sha256:92e457e86f964485452e5958f1ea537c7cb4c615c46ae8cf4d5385cfcf7d81d6",
+  "createdAt": "2026-08-27T01:56:20.072Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0006 --actor codex-captain --status done --historical-delivery 0e05913298a797e08edd74d5d288e8a55c0c73bd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260827014449-codex-captain-TASK-PRF-0006-b1a456f1ed",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0006.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+      "validate:adopter-artifact-manifest",
+      "validate:onefile-budget",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+      "validate:adopter-artifact-manifest",
+      "validate:onefile-budget",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-27T01:56:20.061Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0006.*",
+        ".atm/history/task-events/TASK-PRF-0006/**",
+        ".atm/history/tasks/TASK-PRF-0006.json",
+        "packages/cli/package.json",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/release-manifest.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-adopter-artifact-manifest.ts",
+        "scripts/validate-onefile-budget.ts",
+        "scripts/validate-root-drop-release.ts",
+        "tests/cli/adopter-artifact-budget.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/package.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-adopter-artifact-manifest.ts",
+        "scripts/validate-onefile-budget.ts",
+        "scripts/validate-root-drop-release.ts",
+        "tests/cli/adopter-artifact-budget.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+        "validate:adopter-artifact-manifest",
+        "validate:onefile-budget",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
