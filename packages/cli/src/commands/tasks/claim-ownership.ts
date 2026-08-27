@@ -86,6 +86,28 @@ export function throwIfForeignSameTaskClaim(input: {
   );
 }
 
+// The owner comparison decides ownership on lane ids whenever both lifecycle
+// records carry one, and falls back to actor ids only when a lane id is missing.
+// The message must name whichever identity actually discriminated, otherwise one
+// actor holding a task on an older lane reads "claimed by X, not X" and is sent
+// looking for an identity problem that does not exist.
+export function describeClaimOwnerMismatch(input: {
+  readonly taskId: string;
+  readonly currentActorId: string;
+  readonly requestedActorId: string;
+  readonly comparison: ClaimOwnerComparison;
+}): string {
+  const { comparison } = input;
+  if (comparison.mode === 'lane-id' && comparison.currentLaneSessionId && comparison.conflictingLaneSessionId) {
+    const sameActor = input.currentActorId === input.requestedActorId;
+    return `Task ${input.taskId} is claimed on lane ${comparison.currentLaneSessionId}, not on the requested lane ${comparison.conflictingLaneSessionId}.`
+      + (sameActor
+        ? ` Actor ${input.currentActorId} holds both sides, so this is a lane mismatch rather than a foreign owner: adopt the holding lane to continue.`
+        : ` The holding lane belongs to ${input.currentActorId} and the request came from ${input.requestedActorId}.`);
+  }
+  return `Task ${input.taskId} is claimed by ${input.currentActorId}, not ${input.requestedActorId}.`;
+}
+
 export function throwIfClaimOwnerMismatch(input: {
   readonly taskId: string;
   readonly currentActorId: string;
@@ -97,7 +119,12 @@ export function throwIfClaimOwnerMismatch(input: {
   if (comparison.sameOwner) return comparison;
   throw new CliError(
     'ATM_TASK_CLAIM_OWNER_MISMATCH',
-    `Task ${input.taskId} is claimed by ${input.currentActorId}, not ${input.requestedActorId}.`,
+    describeClaimOwnerMismatch({
+      taskId: input.taskId,
+      currentActorId: input.currentActorId,
+      requestedActorId: input.requestedActorId,
+      comparison
+    }),
     {
       exitCode: 1,
       details: {
@@ -107,6 +134,7 @@ export function throwIfClaimOwnerMismatch(input: {
         holdingLaneSessionId: comparison.currentLaneSessionId,
         requestedLaneSessionId: comparison.conflictingLaneSessionId,
         ownershipMode: comparison.mode,
+        ownerComparisonReason: comparison.reason,
         laneAdoptCommand: comparison.currentLaneSessionId
           ? `node atm.mjs lane adopt ${comparison.currentLaneSessionId} --actor ${input.requestedActorId} --json`
           : null
