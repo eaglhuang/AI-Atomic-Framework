@@ -1,0 +1,393 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0005",
+  "title": "Migrate runtime evidence to the Evidence Ledger",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0004"
+  ],
+  "acceptance": [
+    "ACC-1: `append`, `resolve`, `verify` and `checkpoint` are exposed through a provider-neutral Evidence Ledger port.",
+    "ACC-2: A content-addressed local adapter writes new runtime evidence outside Git while preserving digest and provenance.",
+    "ACC-3: No runtime caller references `.atm/history/evidence` outside the bounded legacy read adapter, and a static guard prevents regression.",
+    "ACC-4: The migration manifest maps sealed legacy records to identical resolved digests in the new store.",
+    "ACC-5: Retention, access, offline behavior, checkpointing and a restore drill are documented and command-backed."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/evidence-ledger.ts",
+    "packages/cli/src/commands/evidence/evidence-store.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "packages/plugin-sdk/src/governance/stores.ts",
+    "scripts/validate-evidence-ledger-boundary.ts",
+    "scripts/migrate-evidence-ledger.ts",
+    "tests/cli/evidence-ledger-migration.test.ts",
+    "docs/reports/evidence-ledger-migration-manifest.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/evidence-ledger.ts",
+    "packages/core/src/evidence/index.ts",
+    "packages/cli/src/commands/evidence/evidence-store.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "packages/plugin-sdk/src/governance/stores.ts",
+    "scripts/validate-evidence-ledger-boundary.ts",
+    "scripts/migrate-evidence-ledger.ts",
+    "tests/cli/evidence-ledger-migration.test.ts",
+    "docs/reports/evidence-ledger-migration-manifest.json",
+    ".atm/history/evidence/TASK-PRF-0005.*",
+    ".atm/history/task-events/TASK-PRF-0005/**",
+    ".atm/history/tasks/TASK-PRF-0005.json",
+    "packages/core/src/index.ts",
+    "packages/cli/src/commands/evidence/bundle-io/implementation.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+    "node --strip-types scripts/validate-evidence-ledger-boundary.ts"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "dual-read-revert",
+  "rollbackNotes": "Retain the export and temporary legacy read adapter until restore proof passes; never delete either store during rollback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-ledger-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-evidence-ledger-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.evidence-ledger-port",
+        "pattern": "Ports and Adapters",
+        "source": "packages/cli/src/commands/evidence/evidence-store.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0005-migrate-runtime-evidence-to-the-evidence-ledger.task.md",
+    "sectionTitle": "TASK-PRF-0005",
+    "headingLine": 116,
+    "hash": "c3800bdc08094505",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0005-migrate-runtime-evidence-to-the-evidence-ledger.task.md",
+      "planningCommitSha": "a2d8387c5cfb6ab047d509e261ba79dac1a56b5d",
+      "contentDigest": "sha256:c3800bdc08094505c81b7487833ee4ddd8f4cf9b65bfd099ab8d6422bdad8ad3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-27T15:25:15.736Z"
+    }
+  },
+  "importedAt": "2026-08-27T15:25:15.736Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0004"
+    ],
+    "startConditions": [
+      "Public npm clean-install proof is green.",
+      "Legacy evidence inventory, caller inventory and content digests are sealed."
+    ],
+    "softRelations": [
+      "TASK-PRF-0006"
+    ],
+    "changedPublicSeams": [
+      "evidence-ledger-port",
+      "evidence-resolution",
+      "evidence-retention-boundary"
+    ],
+    "causalImpactEdges": [
+      "callers-do-not-know-legacy-evidence-path",
+      "evidence-resolves-by-immutable-digest",
+      "recovery-restores-verifiable-evidence"
+    ],
+    "parallelFrontierInputs": [
+      "legacy-evidence-caller-inventory",
+      "legacy-evidence-size-and-history-baseline"
+    ],
+    "validatorReferences": [
+      "test_prf_evidence_ledger_contract_2f0b97d1",
+      "test_prf_legacy_path_guard_a6cd3014",
+      "test_prf_evidence_restore_drill_03c7f66e"
+    ],
+    "phaseOwner": "phase-3-evidence-ledger-migration"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_evidence_ledger_contract_2f0b97d1",
+      "targetGroupId": "null",
+      "semanticKey": "evidence_ledger_contract",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "evidence-resolves-by-immutable-digest"
+      ],
+      "expectedRedPredicate": "Append, resolve, verify or checkpoint depends on the legacy Git path or changes digest.",
+      "contributionResourceKey": "evidence-ledger-port",
+      "responsibility": "task-required",
+      "dependencyEdge": "evidence-command-to-ledger-adapter",
+      "contractEdge": "evidence-ledger-port",
+      "resourceKey": "evidence-store"
+    },
+    {
+      "caseId": "test_prf_legacy_path_guard_a6cd3014",
+      "targetGroupId": "null",
+      "semanticKey": "legacy_evidence_path_guard",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "callers-do-not-know-legacy-evidence-path"
+      ],
+      "expectedRedPredicate": "Runtime source outside the legacy adapter directly references .atm/history/evidence.",
+      "contributionResourceKey": "evidence-path-inventory",
+      "responsibility": "task-required",
+      "dependencyEdge": "runtime-caller-to-evidence-adapter",
+      "contractEdge": "evidence-retention-boundary",
+      "resourceKey": "source-tree"
+    },
+    {
+      "caseId": "test_prf_evidence_restore_drill_03c7f66e",
+      "targetGroupId": "null",
+      "semanticKey": "evidence_restore_drill",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "recovery-restores-verifiable-evidence"
+      ],
+      "expectedRedPredicate": "Exported evidence cannot be restored and verified with matching digest and provenance.",
+      "contributionResourceKey": "evidence-migration-manifest",
+      "responsibility": "task-required",
+      "dependencyEdge": "migration-export-to-recovery",
+      "contractEdge": "evidence-resolution",
+      "resourceKey": "immutable-evidence-store"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_evidence_ledger_contract_2f0b97d1",
+    "test_prf_legacy_path_guard_a6cd3014",
+    "test_prf_evidence_restore_drill_03c7f66e"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0004",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-27T15-33-14-955Z-scope-amendment-efc8f30cbe22",
+  "lastTransitionAt": "2026-08-27T15:33:14.955Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-08-27T15:25:40.548Z",
+  "promotedAt": "2026-08-27T15:25:40.551Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-371a4ae4d199",
+    "claimedAt": "2026-08-27T15:25:40.557Z",
+    "heartbeatAt": "2026-08-27T15:25:40.557Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0005.*",
+      ".atm/history/task-events/TASK-PRF-0005/**",
+      ".atm/history/tasks/TASK-PRF-0005.json",
+      "docs/reports/evidence-ledger-migration-manifest.json",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/evidence-store.ts",
+      "packages/core/src/evidence/evidence-ledger.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/index.ts",
+      "packages/plugin-governance-local/src/stores.ts",
+      "packages/plugin-sdk/src/governance/stores.ts",
+      "scripts/migrate-evidence-ledger.ts",
+      "scripts/validate-evidence-ledger-boundary.ts",
+      "tests/cli/evidence-ledger-migration.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260827152540-codex-captain-dd3b3caf26",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827152540-codex-captain-dd3b3caf26\""
+    }
+  },
+  "startedAt": "2026-08-27T15:25:40.557Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-7df7d5fd436fda85",
+    "ticketDigest": "sha256:7df7d5fd436fda8560300bf41ab9c3ce482c14b6c26218363ed246f046685e6f",
+    "taskId": "TASK-PRF-0005",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260827152540-codex-captain-dd3b3caf26",
+    "claimGeneration": "lease-371a4ae4d199",
+    "issuedAt": "2026-08-27T15:33:14.817Z",
+    "expiresAt": "2026-08-27T16:03:14.817Z",
+    "scopeDigest": "sha256:d54824911badd1ae283a56403c6d49ad590e2068144c1a66d3dc034e088cecb4",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-27T15:33:14.817Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0005.*",
+          ".atm/history/task-events/TASK-PRF-0005/**",
+          ".atm/history/tasks/TASK-PRF-0005.json",
+          "docs/reports/evidence-ledger-migration-manifest.json",
+          "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+          "packages/cli/src/commands/evidence/evidence-store.ts",
+          "packages/core/src/evidence/evidence-ledger.ts",
+          "packages/core/src/evidence/index.ts",
+          "packages/core/src/index.ts",
+          "packages/plugin-governance-local/src/stores.ts",
+          "packages/plugin-sdk/src/governance/stores.ts",
+          "scripts/migrate-evidence-ledger.ts",
+          "scripts/validate-evidence-ledger-boundary.ts",
+          "tests/cli/evidence-ledger-migration.test.ts"
+        ],
+        "digest": "sha256:9d55d6d2163cb45b94c766fd0df70601e625fb6933eea0187720fdce6b815111"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260827152540-codex-captain-TASK-PRF-0005-52b1e64c2a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0005",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0005.*",
+      ".atm/history/task-events/TASK-PRF-0005/**",
+      ".atm/history/tasks/TASK-PRF-0005.json",
+      "docs/reports/evidence-ledger-migration-manifest.json",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/evidence-store.ts",
+      "packages/core/src/evidence/evidence-ledger.ts",
+      "packages/core/src/evidence/index.ts",
+      "packages/core/src/index.ts",
+      "packages/plugin-governance-local/src/stores.ts",
+      "packages/plugin-sdk/src/governance/stores.ts",
+      "scripts/migrate-evidence-ledger.ts",
+      "scripts/validate-evidence-ledger-boundary.ts",
+      "tests/cli/evidence-ledger-migration.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0005-migrate-runtime-evidence-to-the-evidence-ledger.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0005-migrate-runtime-evidence-to-the-evidence-ledger.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "d390b900dd1629bac38309014c0470023059bccc88c9d0dfd33b9d77a61367ab",
+    "actorId": "codex-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260827152540-codex-captain-dd3b3caf26",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827152540-codex-captain-dd3b3caf26\""
+    },
+    "createdAt": "2026-08-27T15:25:45.941Z",
+    "status": "active"
+  }
+}

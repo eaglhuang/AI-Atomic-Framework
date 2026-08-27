@@ -7,6 +7,7 @@ import type {
   ScopeLockRecord,
   WorkItemRef
 } from '@ai-atomic-framework/core';
+import type { EvidenceLedgerCheckpoint, EvidenceLedgerEntry } from '@ai-atomic-framework/core';
 import type { CapabilityResult } from '../capability';
 
 export interface StoreLifecycle {
@@ -74,6 +75,10 @@ export interface RuleGuard extends StoreLifecycle {
 }
 
 export interface EvidenceStore extends StoreLifecycle {
+  appendEvidence(workItemId: string, evidence: EvidenceRecord): Promise<EvidenceLedgerEntry> | EvidenceLedgerEntry;
+  resolveEvidence(digest: string): Promise<EvidenceLedgerEntry | null> | EvidenceLedgerEntry | null;
+  verifyEvidence(digest: string): Promise<boolean> | boolean;
+  checkpointEvidence(): Promise<EvidenceLedgerCheckpoint> | EvidenceLedgerCheckpoint;
   writeEvidence(workItemId: string, evidence: EvidenceRecord): Promise<EvidenceRecord> | EvidenceRecord;
   listEvidence(workItemId: string): Promise<readonly EvidenceRecord[]> | readonly EvidenceRecord[];
 }

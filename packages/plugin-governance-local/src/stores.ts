@@ -28,6 +28,13 @@ import type {
   ShardStore,
   TaskStore
 } from '@ai-atomic-framework/plugin-sdk';
+import {
+  createEvidenceLedgerEntry,
+  sha256,
+  verifyEvidenceLedgerEntry,
+  type EvidenceLedgerCheckpoint,
+  type EvidenceLedgerEntry
+} from '@ai-atomic-framework/core';
 import type { LocalGovernanceConfig } from './index';
 import { resolveLocalGovernanceLayout } from './layout.ts';
 import {
@@ -382,19 +389,65 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     }
   };
 
+  const appendLedgerEvidence = (workItemId: string, evidence: EvidenceRecord): EvidenceLedgerEntry => {
+    const entry = createEvidenceLedgerEntry(workItemId, evidence);
+    const ledgerRoot = path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger');
+    const recordsRoot = path.join(ledgerRoot, 'records');
+    const workItemsRoot = path.join(ledgerRoot, 'work-items');
+    mkdirSync(recordsRoot, { recursive: true });
+    mkdirSync(workItemsRoot, { recursive: true });
+    const recordPath = path.join(recordsRoot, `${entry.digest.slice('sha256:'.length)}.json`);
+    if (!existsSync(recordPath)) writeJsonFile(recordPath, entry);
+    const indexPath = path.join(workItemsRoot, `${workItemId}.json`);
+    const existing = existsSync(indexPath) ? readJsonFile(indexPath) as { readonly digests?: unknown } : {};
+    const digests = Array.isArray(existing.digests) ? existing.digests.filter((digest): digest is string => typeof digest === 'string') : [];
+    if (!digests.includes(entry.digest)) writeJsonFile(indexPath, { schemaId: 'atm.evidenceLedgerWorkItemIndex.v1', workItemId, digests: [...digests, entry.digest] });
+    return entry;
+  };
+  const resolveLedgerEvidence = (digest: string): EvidenceLedgerEntry | null => {
+    const recordPath = path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'records', `${digest.replace(/^sha256:/, '')}.json`);
+    if (!existsSync(recordPath)) return null;
+    const entry = readJsonFile(recordPath) as EvidenceLedgerEntry;
+    return verifyEvidenceLedgerEntry(entry) ? entry : null;
+  };
+  const checkpointLedgerEvidence = (): EvidenceLedgerCheckpoint => {
+    const recordsRoot = path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'records');
+    const entryDigests = existsSync(recordsRoot)
+      ? readdirSync(recordsRoot).filter((entry) => entry.endsWith('.json')).map((entry) => `sha256:${entry.slice(0, -'.json'.length)}`).sort()
+      : [];
+    return { schemaId: 'atm.evidenceLedgerCheckpoint.v1', entryDigests, digest: sha256({ entryDigests }) };
+  };
+
   const evidenceStore: EvidenceStore = {
-    initialize: () => initializeStore('evidence store'),
-    healthCheck: () => capabilityResult(`Evidence store is ready at ${layout.evidenceStorePath}.`),
+    initialize: () => {
+      mkdirSync(path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'records'), { recursive: true });
+      mkdirSync(path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'work-items'), { recursive: true });
+      return capabilityResult('Evidence Ledger is ready outside Git history.');
+    },
+    healthCheck: () => capabilityResult('Evidence Ledger is ready outside Git history.'),
+    appendEvidence(workItemId, evidence) {
+      return appendLedgerEvidence(workItemId, evidence);
+    },
+    resolveEvidence(digest) {
+      return resolveLedgerEvidence(digest);
+    },
+    verifyEvidence(digest) {
+      const entry = resolveLedgerEvidence(digest);
+      return entry !== null && verifyEvidenceLedgerEntry(entry);
+    },
+    checkpointEvidence() {
+      return checkpointLedgerEvidence();
+    },
     writeEvidence(workItemId, evidence) {
-      ensureAllDirectories();
-      const filePath = path.join(absoluteLayout.evidenceStorePath, `${workItemId}.json`);
-      const existing = readEvidenceDocument(filePath);
-      const versionedEvidence = materializeEvidenceVersionMetadata(evidence, existing.wrapper);
-      const nextEvidence = [...existing.evidence, versionedEvidence];
-      writeJsonFile(filePath, createEvidenceDocument(existing.wrapper, nextEvidence));
-      return versionedEvidence;
+      return appendLedgerEvidence(workItemId, evidence).record;
     },
     listEvidence(workItemId) {
+      const indexPath = path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'work-items', `${workItemId}.json`);
+      if (existsSync(indexPath)) {
+        const index = readJsonFile(indexPath) as { readonly digests?: unknown };
+        const entries = Array.isArray(index.digests) ? index.digests.map((digest) => typeof digest === 'string' ? resolveLedgerEvidence(digest) : null).filter((entry): entry is EvidenceLedgerEntry => entry !== null) : [];
+        return entries.map((entry) => entry.record);
+      }
       return readEvidenceDocument(path.join(absoluteLayout.evidenceStorePath, `${workItemId}.json`)).evidence;
     }
   };

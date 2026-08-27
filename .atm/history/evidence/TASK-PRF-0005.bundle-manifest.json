@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0005",
+  "updatedAt": "2026-08-27T15:38:09.514Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+    "typecheck",
+    "validate:evidence-ledger-boundary"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0f09efc248cd2df6a713e748c402d0d07fb72a7f93c26a7ab4ce56dedd7f06a0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/evidence-ledger-migration.test.ts"
+      ],
+      "generatedAt": "2026-08-27T15:37:50.671Z",
+      "startedAt": "2026-08-27T15:37:50.268Z",
+      "finishedAt": "2026-08-27T15:37:50.671Z",
+      "durationMs": 403,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f6d61ca7ebf44714041f71b363682ae71f71e485",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-evidence-ledger-boundary.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2f6b46d3e4766ce2979beb284bcffc2ed07e44dd8c8a2164f581ad5ad18adf09",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:evidence-ledger-boundary"
+      ],
+      "generatedAt": "2026-08-27T15:37:57.104Z",
+      "startedAt": "2026-08-27T15:37:54.039Z",
+      "finishedAt": "2026-08-27T15:37:57.104Z",
+      "durationMs": 3065,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f6d61ca7ebf44714041f71b363682ae71f71e485",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-27T15:38:09.513Z",
+      "startedAt": "2026-08-27T15:38:00.465Z",
+      "finishedAt": "2026-08-27T15:38:09.513Z",
+      "durationMs": 9048,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f6d61ca7ebf44714041f71b363682ae71f71e485",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
