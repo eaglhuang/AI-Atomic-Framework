@@ -102,9 +102,12 @@ export function partitionTaskScope(task: TaskDirectionTask, options?: { readonly
   const normalizeScopePath = (value: string) => !value ? value : cwd ? normalizeStoredPlanningPathForIdentity(cwd, value) : normalizeRelativePath(value);
   const isPlanningPath = (value: string) => value ? (cwd ? isExternalPlanningStoredPath(cwd, value) : isExternalPlanningPath(value)) : false;
   const resolveAbsolute = (value: string) => !value ? '' : cwd ? resolveStoredPlanningPath(cwd, value).absolutePath : path.resolve(value);
-  const planningReadOnlyPaths = sanitizeTaskDirectionAllowedFiles([
+  // Planning context may live outside the target repository.  These paths are
+  // read-only guard inputs, not target-work write grants, so preserving their
+  // resolved absolute form is required to derive a local mirror guard.
+  const planningReadOnlyPaths = uniqueSorted([
     task.sourcePlanPath ?? '', ...task.nearbyPlanPaths, ...task.scopePaths.filter(isPlanningPath)
-  ].map(resolveAbsolute));
+  ].map(resolveAbsolute).filter(Boolean));
   const planningMirrorPaths = uniqueSorted(planningReadOnlyPaths.flatMap(derivePlanningMirrorGuardPaths));
   const targetCandidates = sanitizeTaskDirectionAllowedFiles(task.scopePaths.map(normalizeScopePath));
   const allowedFiles = targetCandidates.filter((entry) => !planningReadOnlyPaths.includes(entry)
