@@ -30,6 +30,7 @@ import path from 'node:path';
 import { CliError } from '../../shared.ts';
 import { runGitCommand, runGitCommandWithEnv } from './git-process-port.ts';
 import { forEachPathspecBatch, planPathspecBatches } from './pathspec-argv-batching.ts';
+import { isIndexLockContention, withIndexLockRetry, type LiveIndexLockRetryPolicy } from './live-index-lock-retry.ts';
 
 export const LIVE_INDEX_RECONCILIATION_SCHEMA_ID = 'atm.liveIndexReconciliation.v1';
 export const LIVE_INDEX_HISTORICAL_RECOVERY_SCHEMA_ID = 'atm.liveIndexHistoricalRecovery.v1';
@@ -41,7 +42,7 @@ const ADD_ARGS = ['add', '-A', '-f', '--'] as const;
 
 type Entry = { readonly mode: string; readonly blobId: string } | null;
 
-export type LiveIndexRetentionReason = 'concurrent-index-change' | 'worktree-diverged';
+export type LiveIndexRetentionReason = 'concurrent-index-change' | 'worktree-diverged' | 'index-locked';
 
 export interface LiveIndexSnapshot {
   readonly paths: readonly string[];
@@ -138,12 +139,16 @@ function readHeadEntries(
   return readTreeEntries(cwd, 'HEAD', paths, budgetBytes);
 }
 
-function applyLiveIndexHeadEntry(cwd: string, filePath: string, target: Entry): void {
-  if (target === null) {
-    runGitCommand(cwd, ['update-index', '--force-remove', '--', filePath], QUIET_STDIO);
-    return;
-  }
-  runGitCommand(cwd, ['update-index', '--add', '--cacheinfo', `${target.mode},${target.blobId},${filePath}`], QUIET_STDIO);
+function applyLiveIndexHeadEntry(
+  cwd: string,
+  filePath: string,
+  target: Entry,
+  retry: LiveIndexLockRetryPolicy = {}
+): void {
+  const args = target === null
+    ? ['update-index', '--force-remove', '--', filePath]
+    : ['update-index', '--add', '--cacheinfo', `${target.mode},${target.blobId},${filePath}`];
+  withIndexLockRetry(() => runGitCommand(cwd, args, QUIET_STDIO), retry);
 }
 
 function readWorktreeEntries(
@@ -194,8 +199,9 @@ export function reconcileCommittedPathsInLiveIndex(input: {
   readonly cwd: string;
   readonly snapshot: LiveIndexSnapshot;
   readonly budgetBytes?: number;
+  readonly lockRetry?: LiveIndexLockRetryPolicy;
 }): { readonly reconciledPaths: readonly string[]; readonly retainedPaths: readonly LiveIndexRetainedPath[] } {
-  const { cwd, snapshot, budgetBytes } = input;
+  const { cwd, snapshot, budgetBytes, lockRetry } = input;
   const current = readIndexEntries(cwd, snapshot.paths, undefined, budgetBytes);
   const head = readHeadEntries(cwd, snapshot.paths, budgetBytes);
   const worktree = readWorktreeEntries(cwd, snapshot.paths, head, budgetBytes);
@@ -211,7 +217,17 @@ export function reconcileCommittedPathsInLiveIndex(input: {
       retainedPaths.push({ path: filePath, reason: 'worktree-diverged' });
       continue;
     }
-    applyLiveIndexHeadEntry(cwd, filePath, head[filePath]);
+    try {
+      applyLiveIndexHeadEntry(cwd, filePath, head[filePath], lockRetry);
+    } catch (error) {
+      // An exhausted lock retry leaves this one path behind while the rest of
+      // the transaction still advances, so the receipt enumerates exactly the
+      // remaining debt instead of collapsing every committed path into a single
+      // opaque failure that no later run can drain path by path.
+      if (!isIndexLockContention(error)) throw error;
+      retainedPaths.push({ path: filePath, reason: 'index-locked' });
+      continue;
+    }
     reconciledPaths.push(filePath);
   }
 
@@ -253,6 +269,7 @@ export function reconcileLiveIndexAfterCommitAttempt(input: {
   readonly snapshot: LiveIndexSnapshot;
   readonly headBefore: string | null;
   readonly budgetBytes?: number;
+  readonly lockRetry?: LiveIndexLockRetryPolicy;
 }): LiveIndexReconciliation {
   let headAdvanced = false;
   try {
@@ -261,9 +278,23 @@ export function reconcileLiveIndexAfterCommitAttempt(input: {
     const outcome = reconcileCommittedPathsInLiveIndex({
       cwd: input.cwd,
       snapshot: input.snapshot,
-      budgetBytes: input.budgetBytes
+      budgetBytes: input.budgetBytes,
+      lockRetry: input.lockRetry
     });
-    return report({ headAdvanced: true, ...outcome });
+    // A path left behind by an exhausted lock retry keeps the established
+    // failure code, so nothing downstream reads an unreconciled index as a
+    // merely-retained one, while the retained list still names what to drain.
+    const lockedPaths = outcome.retainedPaths.filter((entry) => entry.reason === 'index-locked');
+    return report({
+      headAdvanced: true,
+      ...outcome,
+      failure: lockedPaths.length === 0
+        ? null
+        : {
+          code: 'ATM_LIVE_INDEX_RECONCILIATION_FAILED',
+          message: `Live-index reconciliation could not acquire the index lock for ${lockedPaths.length} committed path(s). HEAD is advanced and every listed path remains idempotently retryable.`
+        }
+    });
   } catch (error) {
     const failure = error as { code?: unknown; message?: unknown };
     return report({
