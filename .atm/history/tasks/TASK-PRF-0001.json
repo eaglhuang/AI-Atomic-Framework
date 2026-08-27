@@ -1,0 +1,240 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0001",
+  "title": "Author ATM Product Proof Plan",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "The plan defines the product thesis, observed baseline, five phase gates, independent-benchmark decision rule, stop rule, rollback boundary, and explicit distinction between measured and unknown evidence.",
+    "TASK-PRF-0002 through TASK-PRF-0008 exist as the plan's executable delivery contracts; their ordering does not serialize claim admission unless a typed hard-causal dependency proves it necessary.",
+    "The plan imports deterministically through the target ATM task importer without losing the causal graph or planning authority.",
+    "Deliverables and validators are declared before final import and close."
+  ],
+  "deliverables": [
+    "docs/ai_atomic_framework/atm-product-proof/atm-product-proof-plan.md",
+    "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0002-restore-packaged-runner-and-plan-import-compatibility.task.md",
+    "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0003-separate-required-product-ci-and-enforce-protected-main.task.md",
+    "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0004-publish-installable-npm-packages-with-clean-install-proof.task.md",
+    "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0005-migrate-runtime-evidence-to-the-evidence-ledger.task.md",
+    "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0006-minimize-adopter-artifacts-and-enforce-bundle-budgets.task.md",
+    "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0007-preregister-an-independent-external-atm-benchmark.task.md",
+    "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0008-execute-the-external-benchmark-and-issue-the-product-decision.task.md"
+  ],
+  "scopePaths": [
+    "docs/ai_atomic_framework/atm-product-proof/atm-product-proof-plan.md",
+    "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0001-author-atm-product-proof-plan.task.md"
+  ],
+  "validators": [
+    "node atm.mjs tasks import --from ../3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0001-author-atm-product-proof-plan.task.md --dry-run --json"
+  ],
+  "planningRepo": "C:\\\\Users\\\\User\\\\3KLife\\\\docs\\\\ai_atomic_framework",
+  "targetRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "closureAuthority": "planning-repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-planning-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0001-author-atm-product-proof-plan.task.md",
+    "sectionTitle": "TASK-PRF-0001",
+    "headingLine": 45,
+    "hash": "9679b54ce42db7c2",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0001-author-atm-product-proof-plan.task.md",
+      "planningCommitSha": "a2d8387c5cfb6ab047d509e261ba79dac1a56b5d",
+      "contentDigest": "sha256:9679b54ce42db7c267a10e5340787454836fe8610061ff2a6a74595bf0f4310a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-27T16:26:10.971Z"
+    }
+  },
+  "importedAt": "2026-08-27T16:26:10.971Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.tasks.import.from.3klife.docs.ai.atomic.framework.atm.product.proof.tasks.task.prf.0001.author.atm.product.proof.plan.task.md.dry.run.json",
+      "command": "node atm.mjs tasks import --from ../3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0001-author-atm-product-proof-plan.task.md --dry-run --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-5d1037f55a3b",
+    "claimedAt": "2026-08-27T16:21:45.606Z",
+    "heartbeatAt": "2026-08-27T16:31:09.010Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0001.json"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260827162145-codex-captain-8ee9b0f11f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827162145-codex-captain-8ee9b0f11f\""
+    }
+  },
+  "owner": "codex-captain",
+  "startedAt": "2026-08-27T16:21:45.606Z",
+  "startedBySessionId": "session-20260827162145-codex-captain-TASK-PRF-0001-bac1564fae",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0001",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0001.*",
+      ".atm/history/task-events/TASK-PRF-0001/**",
+      ".atm/history/tasks/TASK-PRF-0001.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7870998d4cb8c92fb49717978b9137bf89089b180aad67cd37703fa3f8a3c46b",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260827162145-codex-captain-TASK-PRF-0001-bac1564fae",
+    "laneSession": {
+      "laneSessionId": "lane-20260827162145-codex-captain-8ee9b0f11f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260827162145-codex-captain-8ee9b0f11f\""
+    },
+    "createdAt": "2026-08-27T16:21:46.580Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-08-27T16-31-09-511Z-renew-da53a1f186c6",
+  "lastTransitionAt": "2026-08-27T16:31:09.511Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-7f5ace3875a25178",
+    "ticketDigest": "sha256:7f5ace3875a25178a3032d232aedc8cb7d816405a0ddf3bc0ca7bbf1147c55fa",
+    "taskId": "TASK-PRF-0001",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260827162145-codex-captain-8ee9b0f11f",
+    "claimGeneration": "lease-5d1037f55a3b",
+    "issuedAt": "2026-08-27T16:31:09.010Z",
+    "expiresAt": "2026-08-27T17:01:09.010Z",
+    "scopeDigest": "sha256:ec8e8ad952e59c4d8d11d87c7576bcd5c0baf4e5f195cbf92e30e3f411129a9b",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-27T16:31:09.010Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0001.*",
+          ".atm/history/task-events/TASK-PRF-0001/**",
+          ".atm/history/tasks/TASK-PRF-0001.json"
+        ],
+        "digest": "sha256:8af671f4e0210a4507cb797fd2a2ae3073fc38c9d09055c74d4fe104693dcf30"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}
