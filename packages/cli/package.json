@@ -18,8 +18,7 @@
     "access": "public"
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "dependencies": {
     "@ai-atomic-framework/agent-pack-claude-code": "0.1.0",
@@ -39,5 +38,49 @@
     "typecheck": "tsc -p ../../tsconfig.json --noEmit",
     "lint": "eslint ."
   },
-  "types": "./dist/index.d.ts"
+  "types": "./dist/index.d.ts",
+  "atmArtifactBudget": {
+    "schemaId": "atm.cliArtifactBudget.v1",
+    "inventoryCommit": "5cf291dd23811ed400d6056b20d3913ba727367b",
+    "phase2Packed": {
+      "bytes": 11219241,
+      "entries": 1543,
+      "filesField": [
+        "dist",
+        "src"
+      ]
+    },
+    "runtimeDist": {
+      "bytes": 5415555,
+      "entries": 772
+    },
+    "developerKitSrc": {
+      "bytes": 5803686,
+      "entries": 771
+    },
+    "budget": {
+      "maxPackedBytes": 3365772,
+      "maxPackedEntries": 308,
+      "semantics": "ACC-3 vs this unmodified Phase-2 inventory: unpacked CLI bytes must fall at least 70% (remain <= 3365772) and entry count at least 80% (remain <= 308). The budget is a cap. Forbidden classes stay rejected even if they would fit."
+    },
+    "forbiddenArtifacts": [
+      {
+        "class": "tests",
+        "countInSrcInventory": 213,
+        "reason": "Not mapped to a runtime entrypoint."
+      },
+      {
+        "class": "ci-fixtures",
+        "reason": "Dogfood/CI only; must not pack as adopter runtime."
+      },
+      {
+        "class": "evidence-ledger",
+        "reason": "Runtime evidence must not ship as adopter source content."
+      },
+      {
+        "class": "duplicate-development-src",
+        "reason": "Developer kit (src) must not be a runtime dependency once dist exists. This proposal does not mutate /files."
+      }
+    ]
+  }
 }

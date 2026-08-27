@@ -1,0 +1,51 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0004",
+  "updatedAt": "2026-08-27T01:36:16.039Z",
+  "updatedBy": "claude-008",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/npm-clean-install.test.ts",
+    "validate:npm-clean-install",
+    "validate:package-skeleton"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7172183763c321065b9a26c4df2ae461d307855a1612de89f9b2a72034a3e653",
+      "stderrSha256": "sha256:5737a378b7897f449f2c0ec7ef7964327b009ef3e51df4c370a7dac4ca4b75b6",
+      "validators": [
+        "validate:package-skeleton",
+        "node --strip-types tests/cli/npm-clean-install.test.ts",
+        "validate:npm-clean-install"
+      ],
+      "generatedAt": "2026-08-27T01:36:05.448Z",
+      "startedAt": "2026-08-27T01:35:41.571Z",
+      "finishedAt": "2026-08-27T01:36:05.448Z",
+      "durationMs": 23877,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "11b4cdd1e90064b61ca9379dcb4f592a5915d9bc",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7172183763c321065b9a26c4df2ae461d307855a1612de89f9b2a72034a3e653",
+      "stderrSha256": "sha256:c4894d56f6bdd92af36c60b5bf89cc5d471567e240f1dc91190853a4a5f00381",
+      "validators": [
+        "validate:package-skeleton",
+        "node --strip-types tests/cli/npm-clean-install.test.ts",
+        "validate:npm-clean-install"
+      ],
+      "generatedAt": "2026-08-27T01:36:16.037Z",
+      "startedAt": "2026-08-27T01:35:52.507Z",
+      "finishedAt": "2026-08-27T01:36:16.037Z",
+      "durationMs": 23530,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "11b4cdd1e90064b61ca9379dcb4f592a5915d9bc",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

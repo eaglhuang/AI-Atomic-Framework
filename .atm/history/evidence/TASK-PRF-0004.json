@@ -1,0 +1,224 @@
+{
+  "taskId": "TASK-PRF-0004",
+  "updatedAt": "2026-08-27T01:36:16.039Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-npm-clean-install.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008",
+      "sessionId": "session-20260825124249-claude-008-TASK-PRF-0004-1a06f603f5",
+      "createdAt": "2026-08-27T01:36:05.449Z",
+      "details": {
+        "actorId": "claude-008",
+        "sessionId": "session-20260825124249-claude-008-TASK-PRF-0004-1a06f603f5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/npm-clean-install.test.ts",
+          "validate:npm-clean-install",
+          "validate:package-skeleton"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom.npm-package.runtime-allowlist",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atoms/ATM-CORE-0006/atom.spec.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:7172183763c321065b9a26c4df2ae461d307855a1612de89f9b2a72034a3e653",
+            "stderrSha256": "sha256:5737a378b7897f449f2c0ec7ef7964327b009ef3e51df4c370a7dac4ca4b75b6",
+            "startedAt": "2026-08-27T01:35:41.571Z",
+            "finishedAt": "2026-08-27T01:36:05.448Z",
+            "durationMs": 23877,
+            "cached": false,
+            "validators": [
+              "validate:package-skeleton",
+              "node --strip-types tests/cli/npm-clean-install.test.ts",
+              "validate:npm-clean-install"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "11b4cdd1e90064b61ca9379dcb4f592a5915d9bc",
+            "cacheKey": "sha256:7aa8e6f5d924f813a1745d47c032e1393a4ffc4d6778a753e98373e1b05c0010",
+            "generatedAt": "2026-08-27T01:36:05.448Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:7aa8e6f5d924f813a1745d47c032e1393a4ffc4d6778a753e98373e1b05c0010",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-27T01:36:05.448Z",
+              "observedAt": "2026-08-27T01:36:05.448Z",
+              "startedAt": "2026-08-27T01:35:41.571Z",
+              "finishedAt": "2026-08-27T01:36:05.448Z",
+              "durationMs": 23877,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:5a9d50acfe08f89aa786e1b5ae904f3c6b2ed943fc64f72bf93a0b0f6549c16c",
+              "outputDigest": "sha256:0d0036a13b8e8a240f1f910c4a44382a7f79c11342dbdcc883101bb2cc789674",
+              "cache": {
+                "key": "sha256:7aa8e6f5d924f813a1745d47c032e1393a4ffc4d6778a753e98373e1b05c0010",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:package-skeleton",
+                  "node --strip-types tests/cli/npm-clean-install.test.ts",
+                  "validate:npm-clean-install"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "11b4cdd1e90064b61ca9379dcb4f592a5915d9bc",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a116d4673055d2ad26ffd064223bc2326e5065aae00e4b0932766ad926613bec",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-npm-clean-install.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-008",
+      "sessionId": "session-20260825124249-claude-008-TASK-PRF-0004-1a06f603f5",
+      "createdAt": "2026-08-27T01:36:16.039Z",
+      "details": {
+        "actorId": "claude-008",
+        "sessionId": "session-20260825124249-claude-008-TASK-PRF-0004-1a06f603f5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/npm-clean-install.test.ts",
+          "validate:npm-clean-install",
+          "validate:package-skeleton"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom.npm-package.runtime-allowlist",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atoms/ATM-CORE-0006/atom.spec.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:7172183763c321065b9a26c4df2ae461d307855a1612de89f9b2a72034a3e653",
+            "stderrSha256": "sha256:c4894d56f6bdd92af36c60b5bf89cc5d471567e240f1dc91190853a4a5f00381",
+            "startedAt": "2026-08-27T01:35:52.507Z",
+            "finishedAt": "2026-08-27T01:36:16.037Z",
+            "durationMs": 23530,
+            "cached": false,
+            "validators": [
+              "validate:package-skeleton",
+              "node --strip-types tests/cli/npm-clean-install.test.ts",
+              "validate:npm-clean-install"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "11b4cdd1e90064b61ca9379dcb4f592a5915d9bc",
+            "cacheKey": "sha256:1b2e8b99889baed09a33f3a416725b9ec84840b4e6632bfda3c93e2f1249291c",
+            "generatedAt": "2026-08-27T01:36:16.037Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:1b2e8b99889baed09a33f3a416725b9ec84840b4e6632bfda3c93e2f1249291c",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-27T01:36:16.037Z",
+              "observedAt": "2026-08-27T01:36:16.037Z",
+              "startedAt": "2026-08-27T01:35:52.507Z",
+              "finishedAt": "2026-08-27T01:36:16.037Z",
+              "durationMs": 23530,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:5a9d50acfe08f89aa786e1b5ae904f3c6b2ed943fc64f72bf93a0b0f6549c16c",
+              "outputDigest": "sha256:580c73b2c3872071b1d1db75b50cb32bd53be547548f126301b0a6adf0d9f3ce",
+              "cache": {
+                "key": "sha256:1b2e8b99889baed09a33f3a416725b9ec84840b4e6632bfda3c93e2f1249291c",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:package-skeleton",
+                  "node --strip-types tests/cli/npm-clean-install.test.ts",
+                  "validate:npm-clean-install"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "11b4cdd1e90064b61ca9379dcb4f592a5915d9bc",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:2b0d3bfedfabb24f9dc135c4d3423f19010b1472107d641c78617dae829886ac",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

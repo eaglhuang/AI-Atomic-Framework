@@ -1,0 +1,456 @@
+---
+schemaId: atm.skillTemplate
+specVersion: 0.1.0
+id: atm-dispatch
+title: ATM Dispatch
+summary: ATM Captain dispatch routing for task cards, sidecars, subagents, condition review, mailbox work, and closeout coordination.
+command: node atm.mjs next --prompt "$ARGUMENTS" --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
+charter-invariants-injected: true
+handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
+owner: atm-framework
+tier: entry
+installProfiles: [adopter-bootstrap, framework-full, role-oriented]
+invocationPolicy: model-or-user
+companionFiles: []
+adapterCapabilityRequirements:
+  - "*:charter-injection"
+---
+
+# {{title}}
+
+Use this skill when the user asks for Captain, Coordinator, dispatch, task
+cards, sidecars, subagents, delegation, condition review, mailbox work, or
+closeout review.
+
+State `Skill used: atm-dispatch` and the chosen `Delegation mode`.
+
+Terminology boundary: ATM is the product, framework, CLI, and governance workflow. AI-Atomic-Framework is only this repository name; do not call ATM AAF.
+
+Captain must apply atm-dispatch before any dispatch, sidecar delegation,
+review, condition review, or closeout.
+
+Delegation modes:
+
+- `local`: the current agent does the work directly.
+- `internal sidecar`: Internal sidecar is the default for review, preflight,
+  grep, 審稿 / planning-only / checklist, and post-report verification.
+- `external handoff`: External dispatch is opt-in. A separate agent/thread may
+  receive a bounded task only when the user explicitly chooses that route.
+
+External write is forbidden unless the user explicitly grants write authority
+and scope.
+
+## Highest Parallel Governance Principle
+
+Treat ATM parallel governance as a tiered authority model:
+
+- Reads never queue behind write lanes.
+- Private writes to the actor's own ledger, evidence, notes, or planning
+  artifacts never queue behind unrelated lanes.
+- Shared writes to the git index, release mirrors, build artifacts, protected
+  runtime state, or other shared mutation surfaces go through the broker, which
+  answers with a ticket: execute now, enqueue with a position, or batch into a
+  shared write window. A bare refusal at a shared-write gate is charter debt
+  (INV-ATM-008), not a design choice.
+
+## Minimum Queue Residency
+
+Apply `INV-ATM-011` to every queue decision. Treat a queue as a scarce-resource
+boundary, not work ownership: identify the irreducible shared interval, move all
+separable work outside it, and queue only a ready candidate. Completion or
+invalidation must release capacity immediately.
+
+Do not solve avoidable queue time with agent polling, long-lived reservation, or
+path-only serialization. Require observable readiness and current-state evidence
+at the boundary; broker tickets, locks, leases, publication flows, and commits
+are implementations of this principle, not exceptions to it.
+
+The only standing serialization exceptions are the four owner-ruled cases in
+`docs/governance/parallel-governance-charter.md` (one lane session per task
+card; dependency gates block code only, never documents; the single-branch
+commit core with related-task batching only; document writes are ungoverned,
+code writes are always governed). Any new serialization point must be surfaced
+to the project owner for an explicit ruling before it ships.
+
+Do not serialize Tier 0 or Tier 1 work merely because another lane has active
+work. Before blocking parallel progress, identify the concrete Tier 2 shared
+surface and the intersecting task, actor, or file set that requires
+broker/steward coordination.
+
+`INV-ATM-010` requires one canonical worktree, base, and HEAD for normal
+governed parallel development. The same physical file is compose-eligible, not a
+file lock: workers declare bounded atom/CID/content-anchor/source-range intents
+and submit proposals. The broker, format adapter, and transactional composer
+select compatible proposals; the neutral steward is the only shared-file writer
+and shared delivery records every member's attribution.
+
+Do not create or use a Git branch, detached worktree, alternate index, merge, or
+rebase as a normal concurrency/isolation mechanism. Queue or revalidate only for
+a true logical conflict, stale base/CAS failure, unsupported adapter, or fairness
+bound. The closed exceptions are emergency/anomaly recovery, historical
+read-only discrimination, and non-development sealed packaging, each with a
+named receipt. A safe same-file compose may have zero queue residency.
+
+## Fail-fast control-plane rule (INV-ATM-013)
+
+Dispatch mandatory, cheap admission checks before asking a worker to acquire a
+queue slot, lease, lock, or write ticket. A known failed prerequisite must stop
+the route immediately with a precise recovery command; do not spend shared
+capacity or run work that cannot change admission. Normal routing and status
+commands have a five-second response budget; declared tests, builds, and
+external I/O must instead report a progress or completion receipt.
+
+## Cohesion-First Split Rule
+
+TASK-SKL-0020 promoted this rule and TASK-SKL-0028 keeps it in the skill corpus
+canary set: dispatch by cohesive ownership before dispatching by ticket count.
+Each card or sidecar should own one behavior, interface, evidence contract, or
+rollback boundary. If the proposed split would scatter one behavior across
+several actors merely to shrink claims, keep one owner and use reviewers,
+sidecars, or provider-neutral receipts for confidence.
+
+For skill-template or integration projection dispatch, source templates are the
+authority. Installed copies and adapter projections must come from a sealed
+corpus source snapshot and must report source digest, compiler version,
+degradation diagnostics, and manifest digest.
+
+{{ACTOR_IDENTITY_HANDOFF_GATE}}
+
+## Dispatch Identity Rule
+
+Captain identity and worker identity are separate authority lanes. A dispatch
+card may transfer scope, acceptance criteria, and evidence requirements, but it
+must not transfer the captain's runtime identity to the worker.
+
+When assigning work, include the expected actor id or tell the worker to set one
+before claiming. When receiving work, the worker must clear stale default
+identity if the editor or repo was previously used by another agent, then set its
+own actor-scoped identity before claim, edit, close, report, or commit.
+
+## First Command
+
+```bash
+{{firstCommand}}
+```
+
+After every `next --prompt` or `next --claim` response, read
+`evidence.nextAction.playbook` before drafting dispatch instructions, editing,
+closing, or committing. The playbook is the short channel-specific work order.
+
+## Captain Governance Flow Checklist
+
+For Captain, dispatch, condition review, and closeout work, require the worker
+or report to identify:
+
+- consumed sealed summaries;
+- missing data;
+- assumption changes;
+- stop rule;
+- whether the task touches a shared-write gate;
+- the closeout evidence window, watermark, counters, duration/timing, source
+  availability, compact digest, and unavailable receipts.
+
+When a task touches a shared-write gate, do not treat a bare refusal or terminal
+block as normal until it has been checked against `INV-ATM-008`. Prefer broker
+ticket, compose/steward, or queue-ticket coordination. If the blocker is not an
+owner-ruled exception and cannot be resolved in scope, dispatch must record the
+backlog or stop-rule path.
+
+Skill and framework repairs must be generalized and data-driven. Do not encode
+one card id, actor id, queue id, local path, date, or incident string as the
+rule. Promote the reusable rule into source templates or shared learning
+references; leave incident details in task evidence, backlog, or handoff.
+
+If a route, validator, hook, worker report, plan, or task card includes an
+`ATM_*` error code, route interpretation and authoring through
+`atm-error-code-resolver` and its shared registry instead of keeping private
+recovery prose in the dispatch brief. New, renamed, or retired codes must be
+declared in both the source plan and owning task card before implementation.
+
+## Task Series Governance
+
+Never invent a new task-series prefix (a new TASK-XXX family) on your own.
+Before opening a card, survey the existing families in the target repository
+task ledger and in the planning repository, and reuse the semantically closest
+existing family at its next free id. Opening a brand-new series is only legal
+after a complete written plan for that series has been approved by the project
+owner. Every dispatch or card header must state which family was chosen and
+why it is the closest match; a new prefix without an approved plan must be
+rejected at review.
+
+Series legitimacy check: a series is legitimate only if its parent
+directory exists under the resolved planning repository / governance workbench
+repo, for example `docs/ai_atomic_framework/<family-dir>/tasks/` within that
+repo. A prefix that appears only in the target-repo ledger with no
+planning-repo parent directory is itself an illegally invented series - do not
+reuse it; report it to the owner and remap the work onto the correct family.
+Task ids are assigned from the planning repository state, never inferred from
+the local target-repo ledger.
+
+Reserved family routing: ErrorCode and error-governance work must use the registered ERR family (series ERR, prefix TASK-ERR). Temporary cleanup, quarantine, and one-off residue-disposition work must use the registered TMP family (series TMP, prefix TASK-TMP). Do not spend GOV numbers on these categories. If a draft or ledger record already used a GOV id for ERR/TMP work, stop and reclassify it through the registered planning family and, when needed, a ledger rekey/realign repair before implementation continues.
+
+## Windows Text Document IO Rule
+
+On Windows, read, write, and compare Markdown, JSON, and text planning documents with Node.js UTF-8 helpers. Do not use PowerShell content commands such as `Get-Content`, `Set-Content`, or `Out-File` as the basis for document authoring or content comparison, because console encoding can make valid Traditional Chinese UTF-8 look corrupted.
+
+PowerShell may still launch `node`, `git`, and ATM CLI commands; the restriction is on document content IO and document content comparison.
+
+## Copy-paste Dispatch Packet Rule
+
+When preparing an external handoff for a human to paste into Claude, Cursor,
+Copilot, Gemini, Antigravity, another Codex thread, or any other worker, every
+instruction needed by that worker must live inside the copy-paste block itself.
+Treat the block as the worker's whole briefing packet.
+
+Do not leave required context, sequencing, scope, authority, stop conditions,
+validation commands, actor identity, source card paths, or report requirements
+only in surrounding prose. Surrounding prose may summarize why the packet was
+chosen, but it must not contain anything the worker must read in order to
+execute correctly.
+
+For multiple workers, emit one complete self-contained block per worker. The
+human should be able to copy any one block without selecting extra text,
+merging bullets from above or below, or inferring missing constraints from the
+captain's commentary. This is a high-priority dispatch quality rule.
+
+Before sending any dispatch response, run this self-check: if the human copies
+only the fenced block for one worker, the worker must know the recipient,
+priority/order, whether to wait for another worker, exact commands, authority,
+scope, stop conditions, and report contract. If any of those facts appears only
+outside the fenced block, the dispatch is invalid and must be rewritten before
+sending. Outside-block prose may only say that the blocks below are ready to
+paste; it must not contain sequencing such as "paste this first" unless the
+same sequencing is repeated inside the affected block.
+
+## Dispatch Token Economy Rule
+
+Prefer task-card-referenced dispatch over reprinting the task card. Treat the
+task card as the full specification for scope, deliverables, acceptance, and
+validators; treat the dispatch packet as a concise navigation note for the
+current lane state.
+
+When a card contains `causalGraph`, dispatch references the sealed card and
+reports only the current phase owner, start-condition verdict, and frontier
+inputs. Do not restate causal edges or soft relations in the packet.
+
+When a card contains `causalGraph`, dispatch references the sealed card and
+reports only the current phase owner, start-condition verdict, and frontier
+inputs. Do not restate causal edges or soft relations in the packet.
+
+A good dispatch packet should normally contain only:
+
+- recipient and actor identity;
+- source task card path and instruction to read it first;
+- this turn's objective and next safe stop point;
+- current worktree/broker/claim constraints that the task card cannot know;
+- allowed commands and forbidden actions;
+- hard stop conditions;
+- compact report contract.
+
+Do not paste long acceptance criteria, design rationale, historical narrative,
+or validator lists into every dispatch packet when the worker can read them from
+the task card. If the task card is missing essential instructions, amend the task
+card or explicitly mark a short temporary override; do not hide durable
+requirements in a long one-off handoff. Aim for "directly pasteable and
+self-contained" without becoming a duplicate spec. A useful default shape is:
+`Goal / Card / Constraints / Commands / Stop / Report`.
+
+Do not over-compress the packet either. Include enough concrete commands,
+current-state constraints, authority boundaries, and report fields for the
+worker to reach the next safe stop without asking follow-up questions. If
+removing a line would make the worker infer actor identity, sequencing,
+permission, stop conditions, or validation from chat history, keep the line.
+Optimize for the smallest packet that is still independently executable.
+
+## Model-Bound Capability Evidence
+
+Treat worker capability evidence as a versioned model snapshot, never as a
+permanent property of a provider, editor, or captain alias. The evidence key is
+`provider + exact model identifier + reasoning profile + benchmark id/version +
+observed date + tool/adapter context`.
+
+- Put the exact model identifier and reasoning profile in every external
+  dispatch. Require the worker's first report line to repeat them.
+- A new or unknown model must not inherit a predecessor's score. Mark it
+  `unbenchmarked` and use a bounded evaluation or conservative assignment.
+- Medium, High, and Low reasoning results are distinct evidence unless the
+  benchmark explicitly normalizes them.
+- Use benchmark evidence only after matching the task's required capabilities;
+  it is a routing aid and tie-breaker, never authority to write, close, publish,
+  or bypass ATM governance.
+- Refresh the evidence after a model/revision, reasoning profile, system prompt,
+  context budget, tool permission, adapter, benchmark, or material production
+  result changes. Never silently rewrite a historical score.
+- Consult `docs/governance/model-bound-agent-capability-benchmark.md` for the
+  newest non-expired snapshot and its limitations.
+
+External reports must begin with:
+
+```text
+AI Captain: <captain/runtime> | Provider/Model: <exact identifier> | Reasoning: <profile> | Benchmark: <id or unbenchmarked>
+```
+
+## Dispatch Rules
+
+- Before drafting a plan or task cards, state `Planning authority`, `Target
+  authority`, and `Closure authority`. If planning and target repositories
+  differ, keep the full plan and source cards in the planning repository and
+  let the target receive only CLI-imported ATM ledger records.
+- Do not create a parallel task model; route task-card work through ATM.
+- Do not delegate write authority unless the user explicitly granted it.
+- Prefer internal sidecars for review, grep, preflight, checklist, and
+  post-report verification.
+- Keep sidecars bounded: specify objective, read/write boundary, required
+  evidence, stop condition, and report contract.
+- For batch work, dispatch only the current queue head unless ATM returns a
+  batch route and checkpoint plan.
+- For closeout review, verify deliverables and evidence before saying a task is
+  complete.
+
+## Planning Authority Resolution Gate
+
+Before drafting any ATM plan, task-card directory, or source task card, classify
+the request as one of:
+
+- ATM framework implementation
+- ATM governance optimization planning
+- adopter or project work
+- dogfood or backlog recording
+
+For ATM framework work that must be planned outside the target ATM ledger,
+resolve an external governance workbench repository first. Do not assume the
+current working directory is the planning repository.
+
+Before writing any plan or task card, state these fields:
+
+- `planning_repo_root`
+- `planning_repo_is_external_to_target`
+- `target_repo_root`
+- `source_plan_path`
+- `source_task_card_path`
+- `target_import_method`
+
+If no external governance workbench can be resolved, stop and ask the user for
+the planning repository, or record a backlog item for missing planning-authority
+discovery. Do not create source planning cards inside the ATM target repository
+by default; the target may receive only CLI-imported `.atm/history/**` ledger
+records unless the source plan itself is an explicit target deliverable.
+
+When changing ATM skills, update the source-of-truth template files first.
+Installed skill copies under agent or integration directories are derived
+artifacts; direct-only edits to those copies are not sufficient and must fail
+review because reinstalling or refreshing adapters can overwrite them.
+
+## Team Agents Dispatch Surface
+
+When dispatching or reviewing Team Agents work, preserve the current runtime
+surface instead of falling back to the older "manual advisory only" model:
+
+- Use L1 through L5 as the canonical crew scale. L1 is Coordinator,
+  Atomization Planner, Implementer, and Validator; L5 adds Lieutenant, Review
+  Agent, and Knowledge Scout.
+- Mention `--team-size L1..L5` when crew completeness matters, and
+  `--role-provider role=provider:model[:sdk][:mode]` when a role needs a
+  specific provider/model.
+- Treat `team start --execute` as an explicit governed execution lane. The
+  default `team start` remains state-only and does not spawn workers.
+- Preserve runtime governance fields in reports: `decisionClass`,
+  `decisionReason`, `requiresHumanSignoff`, `requiresAdr`,
+  `violationStatus`, and `escalationTarget`.
+- Treat `broker-conflict-blocked` as a hard stop. Do not tell workers to
+  self-close, self-commit, or bypass Team Broker.
+- If a task card declares `team.required: true`, closeout needs a completed Team
+  run and summary before task close can proceed.
+
+## ATM-Only Execution Route
+
+Never dispatch a worker instruction that tells an agent to run raw Git mutation,
+`node -e` / `node --eval`, PowerShell write commands such as `Set-Content`,
+`cmd /c`, or `bash -c`. Those are not approved worker routes. The only normal
+mutation path is the ATM command returned by the current playbook, diagnostic,
+or recovery hint for that worker's exact situation.
+
+Do not write that command into the dispatch packet from memory. Tell the worker
+to read it from the ATM output it receives (`evidence.nextAction.command`,
+`evidence.nextAction.playbook`, or the blocking message's `requiredCommand`).
+
+This warning is not an authorization, and neither is a dispatch packet. Write
+permission comes only from a `RestrictedExecutionGateway` allow decision.
+Adapters that cannot enforce a blocking pre-tool surface advertise
+`externalWriteCapability: unsupported`; do not assign them external write work,
+and do not treat a strongly worded instruction as a substitute for the gate.
+
+This restriction covers ATM-managed worker and integration execution. It does
+not try to sandbox an ordinary human local shell outside that runtime.
+
+For external write dispatch, require a write-intent claim first. That claim
+mints the task-bound admission ticket; the dispatch packet neither creates nor
+widens it. Claude, Codex, Cursor, Gemini, Copilot, and Antigravity may differ
+in early hook support, but all must receive the same downstream ticket verdict
+at review, commit, close, push, and protected-branch acceptance.
+
+## Route Command
+
+Use this ATM command only after the first command confirms dispatch is the
+current governed route:
+
+```bash
+{{command}}
+```
+
+## Handoff
+
+```bash
+{{handoffs}}
+```
+
+## Memory Write Check (TASK-MEM-0004)
+
+During condition review of an agent report, run the same memory-write
+checklist as `atm-handoff` (pitfall/gotcha, closure snapshot, human feedback,
+invalidated note) against the reported work. The agent report format gains one
+required line: `keep-memory write: <file name | none + reason>`. The no-write
+rules apply unchanged: nothing that backlog/cards/shards already record;
+governance defects go to the bug backlog first.
+
+## Charter Invariants
+
+{{CHARTER_INVARIANTS}}
+
+## Captain Dogfood Lessons (2026-07-14)
+
+Planning authority:
+
+- Do not let the current working directory decide where a plan lives. Resolve
+  planning, target, and closure authority before writing any plan or card.
+- Memory and handoff summaries are not a gate. Persist cross-repository planning
+  rules in `atm-task-card-authoring` and verify the card source path before
+  import.
+
+Token / speed:
+
+- Prefer **internal sidecars** for backlog ranking and disjoint bug re-implements; they beat full Team `start --execute` when scopes collide or Frozen is stale.
+- Cap batch size (e.g. 5 bugs) before writing the optimization report; unbounded queues burn tokens on governance thrash.
+- Validate with `node --strip-types <focused-spec>` instead of live `team plan` against a dirty shared worktree.
+- Parallel Composer sidecars accelerate **implementation + focused tests**; Captain should keep claim/evidence/close on the Frozen lane (one authority). Do not ask write sidecars to `npm run build` or commit.
+
+ATM flow:
+
+- When another captain owns `git-governance` / RFT work, pick **core/scripts-only** bugs first; `packages/cli/src/**` often collapses to `atom-cli-router` and false-freezes claims.
+- `team broker resolve` emits BCR artifacts but **does not unblock** `next --claim` CID freeze by itself — fixed in TASK-AAO-0200 / ATM-BUG-160 (claim now consumes BCR). Keep the lesson: BCR authoring ≠ automatic claim admit until the claim lane is proven.
+- Frozen prefer + source delivery: `ATM_RUNNER_STALE_WRITE_REFUSED` vs `ATM_SOURCE_FIRST_WRITE_REFUSED` is a deadlock; rebuild with `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` before import/close writes when Frozen lags source.
+- After any foreign `build(release): sync`, **re-diff your deliverables immediately**; uncommitted source can vanish (ATM-BUG-184).
+- Cross-file consistency will block a scoped commit when `team.ts` imports symbols changed in unstaged siblings — `tasks scope add` the coupled files **before** `git commit --auto-stage`, or expect `ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY`.
+- One shared delivery SHA for related bugs is fine: close siblings with `--historical-delivery <sha> --waiver-out-of-scope-delivery --reason "..."`; without the waiver, `MIXED_DELIVERY_COMMIT` / `OUT_OF_SCOPE_WAIVER_REQUIRED` blocks. TASK-AAO-0201 / ATM-BUG-186 now promotes the waiver recipe as the primary shared-delivery blocker (not "missing delivery").
+- After closing a batch under a temporary `framework-mode claim`, **release** that temp lock before the next sibling `taskflow close --write`, or framework-development gates fail with stale-lock / `ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED`.
+- Branch discipline: unless the human gives explicit special approval for a branch/worktree experiment, no AI/agent may create or switch to a development branch or worktree branch. Backlog fixes default to the current `main` lane with formal task-card claim/evidence so concurrency and overlap remain measurable.
+- Card generator scripts under `.atm/runtime/*.js` race with `package.json` `"type":"module"` — use `.cjs` (or write cards with the Write tool) so planning-card generation does not silently fail.
+- Do **not** run `integration add --force` to clear skill drift after editing dogfood lessons in installed copies; update `templates/skills/atm-dispatch.skill.md` first, then reinstall adapters so manifests stay in parity.
+
+Team Agents efficiency:
+
+- Parallel subagents helped **re-apply wiped fixes** (159/097/102) in one turn; they did **not** accelerate 0195 while CID-frozen against RFT-0020.
+- Live `team plan` as validator preflight is slow and flaky under foreign broker intents; keep body-shape asserts independent of plan admission.
+- 2026-07-14 five-bug batch (095/105/094/149/160): two parallel implement sidecars finished source+tests while Captain rebuilt Frozen; wall-clock win was real for coding, but **closeout stayed serial** (evidence + taskflow). Parallel Agents do not shorten governed close.
+- 2026-07-14 second batch (186/185/150/117/182): same pattern — two implement sidecars + one fix-up sidecar for an unrelated `blockedResidue` OR-bug exposed by the staging suite; Captain still owns serial close.

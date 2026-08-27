@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/skill-template.schema.json",
+  "title": "ATM Skill Template",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "id",
+    "title",
+    "summary",
+    "command",
+    "firstCommand",
+    "charter-invariants-injected",
+    "handoffs",
+    "owner",
+    "tier",
+    "installProfiles",
+    "invocationPolicy",
+    "companionFiles",
+    "adapterCapabilityRequirements"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.skillTemplate" },
+    "specVersion": { "const": "0.1.0" },
+    "id": { "type": "string", "pattern": "^(atm|mailbox)-[a-z0-9-]+$" },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "command": { "type": "string", "pattern": "^node atm\\.mjs " },
+    "firstCommand": {
+      "enum": [
+        "node atm.mjs next --json",
+        "node atm.mjs next --prompt \"$ARGUMENTS\" --json",
+        "node atm.mjs next --intent .atm/runtime/task-intent.json --json"
+      ]
+    },
+    "charter-invariants-injected": { "const": true },
+    "handoffs": { "type": "string", "pattern": "^node atm\\.mjs " },
+    "owner": { "type": "string", "minLength": 1 },
+    "tier": { "enum": ["entry", "specialist", "emergency"] },
+    "installProfiles": {
+      "type": "array",
+      "items": { "enum": ["adopter-bootstrap", "framework-full", "role-oriented", "emergency-explicit"] },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "invocationPolicy": { "enum": ["model-or-user", "explicit-user", "router-only", "emergency-only"] },
+    "companionFiles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "adapterCapabilityRequirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["adapterId", "requires"],
+        "properties": {
+          "adapterId": { "type": "string", "minLength": 1 },
+          "requires": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "skillDefinition": {
+      "$ref": "#/$defs/skillDefinitionVNext"
+    }
+  },
+  "$defs": {
+    "skillDefinitionVNext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "specVersion",
+        "provider",
+        "capabilities",
+        "compatibility",
+        "fallbackPolicy",
+        "rollbackPolicy"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.skillDefinition.vNext" },
+        "specVersion": { "const": "0.1.0" },
+        "provider": { "$ref": "#/$defs/providerProvenance" },
+        "capabilities": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "compatibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["atmContractVersions"],
+          "properties": {
+            "atmContractVersions": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true }
+          }
+        },
+        "fallbackPolicy": { "enum": ["deny", "degrade-with-evidence", "legacy-compatible"] },
+        "rollbackPolicy": { "enum": ["provider-only", "manifest-only", "full-revert"] },
+        "invocationModes": { "type": "array", "items": { "enum": ["model", "user", "router"] }, "uniqueItems": true, "minItems": 1 },
+        "progressiveDisclosure": { "type": "array", "items": { "$ref": "#/$defs/progressiveDisclosureReference" }, "uniqueItems": true },
+        "completionCriteria": { "type": "array", "items": { "$ref": "#/$defs/completionCriterion" }, "uniqueItems": true },
+        "canaryMeasurements": { "$ref": "#/$defs/canaryMeasurements" },
+        "shadowRun": { "type": "boolean" },
+        "promotion": { "enum": ["manual-review", "measured-promotion", "disabled"] }
+      }
+    },
+    "progressiveDisclosureReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "purpose"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "purpose": { "type": "string", "minLength": 1 },
+        "maxTokens": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "completionCriterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "validator", "required"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "validator": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" }
+      }
+    },
+    "canaryMeasurements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contextTokens", "falseInvocationRate"],
+      "properties": {
+        "contextTokens": { "$ref": "#/$defs/measurementRange" },
+        "falseInvocationRate": { "$ref": "#/$defs/measurementRange" }
+      }
+    },
+    "measurementRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "max"],
+      "properties": {
+        "target": { "type": "number", "minimum": 0 },
+        "max": { "type": "number", "minimum": 0 }
+      }
+    },
+    "providerProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerId", "version", "provenance", "license"],
+      "properties": {
+        "providerId": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["upstreamUrl", "upstreamCommit", "sourceDigest"],
+          "properties": {
+            "upstreamUrl": { "type": "string", "format": "uri" },
+            "upstreamCommit": { "type": "string", "minLength": 1 },
+            "sourceDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+          }
+        },
+        "license": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

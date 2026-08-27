@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-27T01-32-37-607Z-scope-amendment-4721f57a2d73",
+  "taskId": "TASK-PRF-0004",
+  "action": "scope-amendment",
+  "actorId": "claude-008",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0004.json",
+  "taskSha256": "sha256:5bdae5a5d64ffcf638a8f06be1385af8583cfbecd04668acbff92654299daad1",
+  "createdAt": "2026-08-27T01:32:37.607Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0004 --actor claude-008 --add \"packages/integrations-core/package.json,packages/integrations-core/src/compiler/skill-source-universe.ts,packages/integrations-core/templates/**\" --reason \"Clean-install proof established that CLI requires shipped skill templates from integrations-core; amend the package boundary minimally so the runtime dependency resolves its required template corpus.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Clean-install proof established that CLI requires shipped skill templates from integrations-core; amend the package boundary minimally so the runtime dependency resolves its required template corpus."
+  }
+}

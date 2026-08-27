@@ -129,6 +129,9 @@ function buildPackage(packageDir: string, mode: 'full' | 'incremental'): void {
   const expectedOutputs = new Set<string>();
   for (const filePath of listFiles(srcRoot)) {
     const relativePath = path.relative(srcRoot, filePath);
+    if (relativePath.split(path.sep).includes('__tests__') || /\.test\.ts$/.test(relativePath)) {
+      continue;
+    }
     const targetBase = path.join(distRoot, relativePath);
     if (filePath.endsWith('.ts')) {
       const source = rewriteRelativeImports(readFileSync(filePath, 'utf8'), filePath);
@@ -162,6 +165,16 @@ function buildPackage(packageDir: string, mode: 'full' | 'incremental'): void {
     const relative = path.relative(distRoot, filePath).replace(/\\/g, '/');
     if (relative.endsWith('.d.ts')) continue;
     if (!expectedOutputs.has(relative)) unlinkSync(filePath);
+  }
+  if (packageDir === 'packages/integrations-core') {
+    const templateSource = path.join(root, 'templates', 'skills');
+    const templateTarget = path.join(root, packageDir, 'templates', 'skills');
+    rmSync(path.dirname(templateTarget), { recursive: true, force: true });
+    for (const filePath of listFiles(templateSource)) {
+      const target = path.join(templateTarget, path.relative(templateSource, filePath));
+      ensureDir(target);
+      copyFileIfChanged(filePath, target);
+    }
   }
 }
 
