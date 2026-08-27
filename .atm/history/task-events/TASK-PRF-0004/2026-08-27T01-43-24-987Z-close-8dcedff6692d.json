@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-27T01-43-24-987Z-close-8dcedff6692d",
+  "taskId": "TASK-PRF-0004",
+  "action": "close",
+  "actorId": "claude-008",
+  "sessionId": "session-20260825124249-claude-008-TASK-PRF-0004-1a06f603f5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0004.json",
+  "taskSha256": "sha256:da102c54a99cd04436159e7e4a739f1f73515219ff1078bd9ee992768e2d226c",
+  "createdAt": "2026-08-27T01:43:24.987Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0004 --actor claude-008 --status done --historical-delivery 656b6d4f53447b730ed627afbbac0943a0d5146b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260825124249-claude-008-TASK-PRF-0004-1a06f603f5",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0004.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "validate:npm-clean-install",
+      "validate:package-skeleton"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "validate:npm-clean-install",
+      "validate:package-skeleton"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-27T01:43:24.976Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0004.*",
+        ".atm/history/task-events/TASK-PRF-0004/**",
+        ".atm/history/tasks/TASK-PRF-0004.json",
+        ".github/workflows/release-npm.yml",
+        "docs/release-trust-ops.md",
+        "package.json",
+        "packages/cli/package.json",
+        "packages/create-atm/package.json",
+        "packages/create-atm/src/index.ts",
+        "packages/integrations-core/package.json",
+        "packages/integrations-core/src/compiler/skill-source-universe.ts",
+        "packages/integrations-core/templates/**",
+        "scripts/build-package-dist.ts",
+        "scripts/validate-npm-clean-install.ts",
+        "scripts/validate-package-skeleton.ts",
+        "tests/cli/npm-clean-install.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "packages/cli/package.json",
+        "packages/create-atm/package.json",
+        "packages/create-atm/src/index.ts",
+        "packages/integrations-core/package.json",
+        "packages/integrations-core/src/compiler/skill-source-universe.ts",
+        "packages/integrations-core/templates/**",
+        "scripts/build-package-dist.ts",
+        "scripts/validate-npm-clean-install.ts",
+        "scripts/validate-package-skeleton.ts",
+        "tests/cli/npm-clean-install.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/npm-clean-install.test.ts",
+        "validate:npm-clean-install",
+        "validate:package-skeleton"
+      ]
+    }
+  }
+}
