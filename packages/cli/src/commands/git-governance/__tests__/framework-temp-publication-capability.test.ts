@@ -100,7 +100,12 @@ assert.equal(unboundCommit.frameworkClaimRequired, true);
 assert.equal(unboundCommit.usesFrameworkClaimCommit, false, 'taskless commits must not fall back to every actor-owned staged file');
 assert.throws(
   () => assertFrameworkCommitClaimAuthority({ actorId: 'publication-steward', laneSessionId: null, authority: unboundCommit }),
-  (error: unknown) => (error as { code?: string }).code === 'ATM_GIT_COMMIT_FRAMEWORK_CLAIM_REQUIRED',
+  (error: unknown) => {
+    const candidate = error as { code?: string; details?: { frameworkClaimResolution?: { liveOwnedClaimCount?: number; eligibleClaimCount?: number } } };
+    return candidate.code === 'ATM_GIT_COMMIT_FRAMEWORK_CLAIM_REQUIRED'
+      && candidate.details?.frameworkClaimResolution?.liveOwnedClaimCount === 2
+      && candidate.details?.frameworkClaimResolution?.eligibleClaimCount === 0;
+  },
 );
 
 const priorLaneSessionId = process.env.ATM_LANE_SESSION_ID;

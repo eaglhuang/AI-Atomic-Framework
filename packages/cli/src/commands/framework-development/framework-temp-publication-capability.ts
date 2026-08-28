@@ -28,6 +28,16 @@ export interface FrameworkCommitAuthorityContext {
   readonly frameworkClaimFiles: readonly string[] | null;
   /** The exact live lock identity used by hook attribution; never reconstruct it from an actor id. */
   readonly frameworkClaimTaskId: string | null;
+  /** Fail-closed diagnostic facts for a rejected taskless commit; never authority. */
+  readonly frameworkClaimResolution?: FrameworkTempClaimResolution;
+}
+
+export interface FrameworkTempClaimResolution {
+  readonly laneSessionId: string | null;
+  readonly liveOwnedClaimCount: number;
+  readonly eligibleClaimCount: number;
+  readonly liveOwnedTaskIds: readonly string[];
+  readonly eligibleTaskIds: readonly string[];
 }
 
 /** Resolves the framework-only commit surface without exposing lock details to callers. */
@@ -37,15 +47,17 @@ export function resolveFrameworkCommitAuthorityContext(input: {
   readonly actorId: string;
   readonly taskExists: boolean;
 }): FrameworkCommitAuthorityContext {
-  const capability = input.taskExists ? null : resolveFrameworkTempPublicationCapability({
-    ...input,
-    laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null,
-  });
+  const laneSessionId = process.env.ATM_LANE_SESSION_ID ?? null;
+  const resolution = input.taskExists
+    ? { capability: null, summary: emptyFrameworkTempClaimResolution(laneSessionId) }
+    : inspectFrameworkTempClaimResolution({ ...input, laneSessionId });
+  const capability = resolution.capability;
   return {
     usesFrameworkClaimCommit: capability !== null,
     frameworkClaimRequired: !input.taskExists,
     frameworkClaimFiles: capability?.allowedFiles ?? null,
     frameworkClaimTaskId: capability?.taskId ?? null,
+    frameworkClaimResolution: resolution.summary,
   };
 }
 
@@ -58,6 +70,16 @@ export function resolveFrameworkTempPublicationCapability(input: {
   readonly laneSessionId?: string | null;
   readonly now?: number;
 }): FrameworkTempPublicationCapability | null {
+  return inspectFrameworkTempClaimResolution(input).capability;
+}
+
+function inspectFrameworkTempClaimResolution(input: {
+  readonly cwd: string;
+  readonly taskId: string | null | undefined;
+  readonly actorId?: string | null;
+  readonly laneSessionId?: string | null;
+  readonly now?: number;
+}): { readonly capability: FrameworkTempPublicationCapability | null; readonly summary: FrameworkTempClaimResolution } {
   const taskId = input.taskId?.trim();
   const actorId = input.actorId?.trim() ?? '';
   const laneSessionId = input.laneSessionId?.trim() ?? '';
@@ -82,7 +104,26 @@ export function resolveFrameworkTempPublicationCapability(input: {
   // publication must instead be unique after lane binding; guessing among an
   // actor's other live claims would permit receipt/lock identity drift.
   const lock = candidates.length === 1 ? candidates[0] : null;
-  return lock ? toCapability(input.cwd, lock) : null;
+  return {
+    capability: lock ? toCapability(input.cwd, lock) : null,
+    summary: {
+      laneSessionId: laneSessionId || null,
+      liveOwnedClaimCount: owned.length,
+      eligibleClaimCount: candidates.length,
+      liveOwnedTaskIds: owned.map((candidate) => candidate.workItemId).sort(),
+      eligibleTaskIds: candidates.map((candidate) => candidate.workItemId).sort(),
+    },
+  };
+}
+
+function emptyFrameworkTempClaimResolution(laneSessionId: string | null | undefined): FrameworkTempClaimResolution {
+  return {
+    laneSessionId: laneSessionId?.trim() || null,
+    liveOwnedClaimCount: 0,
+    eligibleClaimCount: 0,
+    liveOwnedTaskIds: [],
+    eligibleTaskIds: [],
+  };
 }
 
 /**

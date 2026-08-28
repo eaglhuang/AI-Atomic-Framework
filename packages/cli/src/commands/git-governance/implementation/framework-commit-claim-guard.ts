@@ -23,6 +23,7 @@ export function assertFrameworkCommitClaimAuthority(input: {
       details: {
         actorId: input.actorId,
         laneSessionId: input.laneSessionId,
+        frameworkClaimResolution: input.authority.frameworkClaimResolution ?? null,
         requiredCommand: `node atm.mjs framework-mode claim --actor ${quoteCliValue(input.actorId)} --files "<claimed-files>" --json`,
       },
     },
