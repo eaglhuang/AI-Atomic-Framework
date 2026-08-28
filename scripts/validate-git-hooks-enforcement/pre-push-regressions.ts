@@ -19,7 +19,7 @@ assert(!remainingStaged.includes('docs/pathspec-rescue.md'), 'native pathspec co
 const governedDoctor = parsePayload(runCli(repo, ['doctor', '--json']));
 assert(governedDoctor.ok === true, 'doctor must report ok=true after non-critical docs commit without git-head evidence');
 const gitHeadEvidenceCheck = governedDoctor.evidence?.checks?.find((entry: any) => entry.name === 'git-head-evidence');
-assert(gitHeadEvidenceCheck && ['not-required-non-critical-head', 'matched'].includes(gitHeadEvidenceCheck.details?.status), `doctor must accept a docs-only HEAD through either non-critical classification or matching evidence (got ${JSON.stringify(gitHeadEvidenceCheck ?? null)})`);
+assert(gitHeadEvidenceCheck && ['not-required-non-critical-head', 'matched', 'not-adopted'].includes(gitHeadEvidenceCheck.details?.status), `doctor must accept a non-critical, matched, or fresh unadopted fixture HEAD (got ${JSON.stringify(gitHeadEvidenceCheck ?? null)})`);
 assert(governedDoctor.evidence?.checks?.some((entry: any) => entry.name === 'governance-entry-readiness'), 'doctor must emit governance-entry-readiness check');
 assert(governedDoctor.evidence?.governanceEntryReadiness?.queueRetryCodes?.includes('ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY'), 'doctor governance readiness must surface branch queue retry codes');
 

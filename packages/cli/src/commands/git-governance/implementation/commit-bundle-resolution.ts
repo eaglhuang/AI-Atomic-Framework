@@ -59,7 +59,7 @@ import {
   inspectProtectedGovernanceStateDestructiveChanges,
 } from "../protected-governance-state.ts";
 
-import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, deferStagedFilePaths, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles, readUnstagedFiles } from './git-index-transaction.ts';
+import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, deferStagedFilePaths, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, listTaskOwnedProtectedOverrideAuditFiles, readStagedDiffNames, readStagedFiles, readUnstagedFiles } from './git-index-transaction.ts';
 
 import { parseTaskClaim } from './identity-check-command.ts';
 import { createCommitAuthorityPolicy } from './commit-authority-scopes.ts';
@@ -292,10 +292,18 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     ...effectiveDirtyFiles.filter((filePath: LegacyValue) => !stagedSet.has(filePath)),
     ...effectiveDirtyFiles.filter((filePath: LegacyValue) => trackedUnstagedSet.has(filePath)),
   ]);
+  // A protected-override audit is neither generic evidence nor disposable
+  // residue: its embedded taskId is the ownership proof.  Preserve a
+  // current-task audit through the generic evidence admissibility filter so a
+  // foreign staged audit can be deferred without suppressing its companion.
+  const taskOwnedProtectedOverrideAudits = new Set(
+    listTaskOwnedProtectedOverrideAuditFiles(input.cwd, input.taskId),
+  );
   const inScopeUnstagedDirty = unstagedDirtyFiles.filter(
     (filePath: LegacyValue) =>
       !isRuntimeCommitSideEffect(filePath) &&
-      !isUncommittableTaskEvidenceArtifact(input.cwd, filePath, input.taskId, input.taskDocument) &&
+      (taskOwnedProtectedOverrideAudits.has(normalizeRelativePath(filePath)) ||
+        !isUncommittableTaskEvidenceArtifact(input.cwd, filePath, input.taskId, input.taskDocument)) &&
       (isCommitAttributionSideEffectPath(filePath) ||
         isAllowedGovernanceArtifactPath(input.cwd, filePath, input.taskId) ||
         (declaredScope.some((scope: LegacyValue) => pathMatchesTaskScope(filePath, scope)) &&
