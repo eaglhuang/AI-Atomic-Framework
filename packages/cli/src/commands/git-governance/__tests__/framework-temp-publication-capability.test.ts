@@ -138,6 +138,36 @@ assert.equal(frameworkTempPublicationCapabilityCovers(laneBound, [
   '.atm/history/evidence/ATM-GOV-0342.runner-sync-receipt.json',
 ]), true);
 
+const noLaneTaskId = 'ATM-FRAMEWORK-TEMP-publication-steward';
+writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${noLaneTaskId}.lock.json`), `${JSON.stringify({
+  workItemId: noLaneTaskId,
+  actorId: 'publication-steward',
+  heartbeatAt: new Date(nowMs - 1_000).toISOString(),
+  ttlSeconds: 3600,
+  files: ['release/atm-onefile/atm.mjs'],
+}, null, 2)}\n`, 'utf8');
+const noLaneBound = resolveFrameworkTempPublicationCapability({
+  cwd,
+  taskId: null,
+  actorId: 'publication-steward',
+  now: Date.parse(now),
+});
+assert.equal(
+  noLaneBound?.taskId,
+  noLaneTaskId,
+  'a taskless command without a lane must bind only to the actor canonical no-lane lock, even when other lane-bound claims are live',
+);
+assert.doesNotThrow(() => assertFrameworkCommitClaimAuthority({
+  actorId: 'publication-steward',
+  laneSessionId: null,
+  authority: resolveFrameworkCommitAuthorityContext({
+    cwd,
+    taskId: null,
+    actorId: 'publication-steward',
+    taskExists: false,
+  }),
+}));
+
 const admitted = evaluateTaskWorkAdmissionGate({
   cwd,
   taskId,

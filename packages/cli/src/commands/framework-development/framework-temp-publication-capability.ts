@@ -75,7 +75,9 @@ export function resolveFrameworkTempPublicationCapability(input: {
   // unambiguous, and anything ambiguous stays out and fails closed upstream.
   const candidates = laneSessionId
     ? admitLaneBoundCandidates(owned, laneSessionId)
-    : owned;
+    : taskId
+      ? owned
+      : admitCanonicalNoLaneCandidate(owned, actorId);
   // A task id already provides a canonical authority key.  A taskless
   // publication must instead be unique after lane binding; guessing among an
   // actor's other live claims would permit receipt/lock identity drift.
@@ -105,6 +107,30 @@ function admitLaneBoundCandidates(
   const recordedForAnotherLane = owned.some((candidate) => candidate.laneProvenance === 'recorded');
   if (recordedForAnotherLane) return [];
   return owned.filter((candidate) => candidate.laneProvenance === 'unrecorded-legacy');
+}
+
+/**
+ * A taskless command without ATM_LANE_SESSION_ID is not lane-agnostic: it is
+ * bound to the canonical no-lane temporary lock that framework-mode claim
+ * creates for that actor.  Other lane-bound claims must not make that exact
+ * lock ambiguous, nor may they be selected as a substitute for it.
+ */
+function admitCanonicalNoLaneCandidate(
+  owned: readonly FrameworkTempLockProjection[],
+  actorId: string,
+): readonly FrameworkTempLockProjection[] {
+  const workItemId = `ATM-FRAMEWORK-TEMP-${sanitizeFrameworkTempActorKey(actorId)}`;
+  return owned.filter(
+    (candidate) =>
+      candidate.workItemId === workItemId
+      && candidate.laneSessionId === null,
+  );
+}
+
+function sanitizeFrameworkTempActorKey(value: string): string {
+  return value.trim()
+    .replace(/[^A-Za-z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'actor';
 }
 
 export function frameworkTempPublicationCapabilityCovers(
