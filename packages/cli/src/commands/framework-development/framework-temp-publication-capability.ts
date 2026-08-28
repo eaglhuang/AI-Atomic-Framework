@@ -120,11 +120,20 @@ function admitCanonicalNoLaneCandidate(
   actorId: string,
 ): readonly FrameworkTempLockProjection[] {
   const workItemId = `ATM-FRAMEWORK-TEMP-${sanitizeFrameworkTempActorKey(actorId)}`;
-  return owned.filter(
+  const canonical = owned.filter(
     (candidate) =>
       candidate.workItemId === workItemId
       && candidate.laneSessionId === null,
   );
+  if (canonical.length > 0) return canonical;
+
+  // A historical producer could derive a lane-qualified work-item id before
+  // persisting the resolved lane in the lock record.  It is not safe to infer
+  // that missing lane as the caller's lane, but a single live unrecorded lock
+  // for this actor is still an unambiguous no-lane authority.  More than one
+  // remains ambiguous and therefore fails closed.
+  const unrecorded = owned.filter((candidate) => candidate.laneSessionId === null);
+  return unrecorded.length === 1 ? unrecorded : [];
 }
 
 function sanitizeFrameworkTempActorKey(value: string): string {
