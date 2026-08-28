@@ -59,6 +59,9 @@ try {
   cpSync(fixtureRoot, hostRepo, { recursive: true });
   copyReleaseBundleIntoHost(release.releaseRoot, hostRepo);
   initializeGitRepository(hostRepo);
+  const identityName = spawnSync('git', ['config', 'user.name', 'ATM external-golden fixture'], { cwd: hostRepo, encoding: 'utf8' });
+  const identityEmail = spawnSync('git', ['config', 'user.email', 'atm-external-golden@local'], { cwd: hostRepo, encoding: 'utf8' });
+  assert((identityName.status ?? 1) === 0 && (identityEmail.status ?? 1) === 0, 'external golden fixture must configure its local Git identity');
   const baselineAdd = spawnSync('git', ['add', '.'], { cwd: hostRepo, encoding: 'utf8' });
   assert((baselineAdd.status ?? 1) === 0, 'external golden release baseline must stage successfully');
   const baselineCommit = spawnSync('git', ['commit', '--no-verify', '-m', 'install ATM release baseline'], { cwd: hostRepo, encoding: 'utf8' });
