@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { observeEvidenceRunProcess } from '../../packages/cli/src/commands/evidence/verbs/run.ts';
-import { runEvidenceRun } from '../../packages/cli/src/commands/evidence/verbs/run.ts';
+import { observeEvidenceRunProcess, runEvidenceRun } from '../../packages/cli/src/commands/evidence/verbs/run.ts';
+
 import { createObservedValidationReceipt } from '../../packages/cli/src/commands/evidence/observed-source-loader.ts';
 import { resolveAutoEvidenceValidationContract } from '../../packages/cli/src/commands/taskflow/auto-evidence-mapper.ts';
 import { resolveClosePreflightValidationContract } from '../../packages/cli/src/commands/taskflow/close-preflight.ts';

@@ -6,10 +6,10 @@ import { makeResult, message } from '../shared.ts';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, selectQuickfixChannel } from './channel-strategy.ts';
 import { buildNonPlaybookRouteHints, resolveQuickfixScope } from './route-resolution.ts';
 import { isQuickfixPrompt } from '../work-channels.ts';
-import { isFrameworkMaintenancePrompt } from './route-predicates.ts';
+import { type ImportedTaskQueue, isFrameworkMaintenancePrompt } from './route-predicates.ts';
 import type { TaskIntent } from './intent-normalizers.ts';
 import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages } from './playbook-projection.ts';
-import type { ImportedTaskQueue } from './route-predicates.ts';
+
 import { quoteCliValue, toTaskCandidateView } from './view-projections.ts';
 import type { NextActionLike } from './next-action-assembly.ts';
 
