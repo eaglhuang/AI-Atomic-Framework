@@ -40,7 +40,7 @@ const INDEX_ENTRY = /^(\d+) ([0-9a-f]+) \d+\t(.+)$/i;
 const LS_FILES_ARGS = ['ls-files', '-s', '--'] as const;
 const ADD_ARGS = ['add', '-A', '-f', '--'] as const;
 
-type Entry = { readonly mode: string; readonly blobId: string } | null;
+export type Entry = { readonly mode: string; readonly blobId: string } | null;
 
 export type LiveIndexRetentionReason = 'concurrent-index-change' | 'worktree-diverged' | 'index-locked';
 
@@ -52,6 +52,16 @@ export interface LiveIndexSnapshot {
 export interface LiveIndexRetainedPath {
   readonly path: string;
   readonly reason: LiveIndexRetentionReason;
+  /**
+   * The commit that first left this path unreconciled.
+   *
+   * Debt compounds: once a later commit rewrites a path that is still behind,
+   * no single commit's parent-and-tree pair describes the state any more. The
+   * only pre-state the live index still holds is the parent of the FIRST
+   * unreconciled commit, so that is what a drain has to be told, and it must
+   * stay pinned to the first one for as long as the path remains retained.
+   */
+  readonly firstUnreconciledCommit?: string;
 }
 
 /**
@@ -81,7 +91,7 @@ function normalizePath(value: string): string {
   return String(value ?? '').replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
 
-function sameEntry(left: Entry, right: Entry): boolean {
+export function sameEntry(left: Entry, right: Entry): boolean {
   return left === null || right === null
     ? left === right
     : left.mode === right.mode && left.blobId === right.blobId;
@@ -98,7 +108,7 @@ function collectIndexEntries(entries: Record<string, Entry>, output: string): vo
   }
 }
 
-function readIndexEntries(
+export function readIndexEntries(
   cwd: string,
   paths: readonly string[],
   env: NodeJS.ProcessEnv | undefined,
@@ -115,7 +125,7 @@ function readIndexEntries(
   return entries;
 }
 
-function readTreeEntries(
+export function readTreeEntries(
   cwd: string,
   treeish: string,
   paths: readonly string[],
@@ -139,7 +149,7 @@ function readHeadEntries(
   return readTreeEntries(cwd, 'HEAD', paths, budgetBytes);
 }
 
-function applyLiveIndexHeadEntry(
+export function applyLiveIndexHeadEntry(
   cwd: string,
   filePath: string,
   target: Entry,
@@ -151,7 +161,7 @@ function applyLiveIndexHeadEntry(
   withIndexLockRetry(() => runGitCommand(cwd, args, QUIET_STDIO), retry);
 }
 
-function readWorktreeEntries(
+export function readWorktreeEntries(
   cwd: string,
   paths: readonly string[],
   headEntries: Readonly<Record<string, Entry>>,
@@ -331,30 +341,60 @@ export function recordLiveIndexReconciliation(
   // new task-scoped dirty file after every commit and makes close impossible.
   // The task-event ledger already preserves attempt history; keep this receipt
   // byte-stable until the unresolved reconciliation state actually changes.
+  let existing: Record<string, unknown> | null = null;
   if (existsSync(absolutePath)) {
     try {
-      const existing = JSON.parse(readFileSync(absolutePath, 'utf8')) as Record<string, unknown>;
-      // The receipt path already binds task identity.  Retention is the sole
-      // unresolved state that requires a durable recovery receipt; successful
-      // reconciled paths are attempt telemetry and live in task-events.
-      if (
-        existing.schemaId === LIVE_INDEX_RECONCILIATION_SCHEMA_ID
-        && existing.clean === false
-        && JSON.stringify(existing.retainedPaths) === JSON.stringify(reconciliation.retainedPaths)
-        && JSON.stringify(existing.failure ?? null) === JSON.stringify(reconciliation.failure ?? null)
-      ) return relativePath;
+      existing = JSON.parse(readFileSync(absolutePath, 'utf8')) as Record<string, unknown>;
     } catch {
       // A malformed prior receipt is replaced with the current attributable
       // state; leaving it in place would make recovery unverifiable.
     }
   }
+  const retainedPaths = stampFirstUnreconciledCommit(cwd, reconciliation.retainedPaths, existing);
+  // The receipt path already binds task identity.  Retention is the sole
+  // unresolved state that requires a durable recovery receipt; successful
+  // reconciled paths are attempt telemetry and live in task-events. Lineage is
+  // carried forward before this comparison, so re-stamping a path that is still
+  // retained never rewrites the file on its own.
+  if (
+    existing?.schemaId === LIVE_INDEX_RECONCILIATION_SCHEMA_ID
+    && existing.clean === false
+    && JSON.stringify(existing.retainedPaths) === JSON.stringify(retainedPaths)
+    && JSON.stringify(existing.failure ?? null) === JSON.stringify(reconciliation.failure ?? null)
+  ) return relativePath;
   mkdirSync(path.dirname(absolutePath), { recursive: true });
   writeFileSync(
     absolutePath,
-    `${JSON.stringify({ ...reconciliation, taskId, createdAt: new Date().toISOString() }, null, 2)}\n`,
+    `${JSON.stringify({ ...reconciliation, retainedPaths, taskId, createdAt: new Date().toISOString() }, null, 2)}\n`,
     'utf8'
   );
   return relativePath;
+}
+
+/**
+ * Pin each retained path to the commit that first left it behind, preserving a
+ * lineage the previous receipt already established.
+ */
+function stampFirstUnreconciledCommit(
+  cwd: string,
+  retainedPaths: readonly LiveIndexRetainedPath[],
+  existing: Record<string, unknown> | null
+): readonly LiveIndexRetainedPath[] {
+  if (retainedPaths.length === 0) return retainedPaths;
+  const known = new Map<string, string>();
+  const prior = Array.isArray(existing?.retainedPaths)
+    ? (existing.retainedPaths as readonly LiveIndexRetainedPath[])
+    : [];
+  for (const entry of prior) {
+    if (typeof entry?.path === 'string' && typeof entry?.firstUnreconciledCommit === 'string') {
+      known.set(entry.path, entry.firstUnreconciledCommit);
+    }
+  }
+  const headSha = readHeadCommit(cwd);
+  return retainedPaths.map((entry) => {
+    const lineage = known.get(entry.path) ?? headSha;
+    return lineage ? { ...entry, firstUnreconciledCommit: lineage } : entry;
+  });
 }
 
 export interface LiveIndexHistoricalRecovery {
@@ -509,7 +549,10 @@ export function recoverLiveIndexAfterSuccessfulCommit(input: {
     reconciledPaths,
     retainedPaths,
     unprovenPaths,
-    clean: retainedPaths.length === 0
+    // A path this recovery could not prove is not a path it repaired. Reporting
+    // clean while the live index is still behind HEAD is the fail-open that let
+    // accumulated debt look resolved.
+    clean: retainedPaths.length === 0 && unprovenPaths.length === 0
   };
   return {
     ...report,
