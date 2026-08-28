@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import {
   type ContinuationContractInput,
   createContinuationRunReport,
@@ -131,9 +131,9 @@ async function materializeUpgradeHardStop(
 
   await resolveValue(runReportStore.writeRunReport(continuationReportId, createContinuationRunReport(continuationReportId, continuationInput)));
   const summary = await resolveValue(contextSummaryStore.writeSummary(createContinuationSummaryRecord(continuationInput)));
-  await resolveValue(adapter.stores.evidenceStore.writeEvidence(atomId, {
+  const handoffEvidence = {
     workItemId: atomId,
-    evidenceKind: 'handoff',
+    evidenceKind: 'handoff' as const,
     summary: 'Upgrade hard-stop continuation contract recorded.',
     artifactPaths: [qualityReportPath, evaluation.reportPath, continuationReportPath],
     createdAt: generatedAt,
@@ -143,7 +143,9 @@ async function materializeUpgradeHardStop(
       contextSummaryPath,
       contextSummaryMarkdownPath: summary.summaryMarkdownPath ?? contextSummaryMarkdownPath
     }
-  }));
+  };
+  await resolveValue(adapter.stores.evidenceStore.writeEvidence(atomId, handoffEvidence));
+  persistUpgradeHandoffEvidence(cwd, atomId, handoffEvidence);
 
   return {
     continuationReportPath,
@@ -151,6 +153,26 @@ async function materializeUpgradeHardStop(
     contextSummaryMarkdownPath: summary.summaryMarkdownPath ?? contextSummaryMarkdownPath,
     evidencePath
   };
+}
+
+function persistUpgradeHandoffEvidence(cwd: string, atomId: string, handoffEvidence: Record<string, unknown>): void {
+  const absolutePath = path.join(cwd, '.atm', 'history', 'evidence', `${atomId}.json`);
+  const existing = existsSync(absolutePath) ? JSON.parse(readFileSync(absolutePath, 'utf8')) as unknown : null;
+  const existingEvidence = Array.isArray(existing)
+    ? existing
+    : existing && typeof existing === 'object' && Array.isArray((existing as { evidence?: unknown }).evidence)
+      ? (existing as { evidence: unknown[] }).evidence
+      : [];
+  const alreadyRecorded = existingEvidence.some((entry) => entry && typeof entry === 'object'
+    && (entry as { evidenceKind?: unknown }).evidenceKind === handoffEvidence.evidenceKind
+    && (entry as { createdAt?: unknown }).createdAt === handoffEvidence.createdAt
+    && (entry as { summary?: unknown }).summary === handoffEvidence.summary);
+  const evidence = alreadyRecorded ? existingEvidence : [...existingEvidence, handoffEvidence];
+  const document = Array.isArray(existing)
+    ? evidence
+    : { ...(existing && typeof existing === 'object' ? existing : {}), taskId: atomId, evidence };
+  mkdirSync(path.dirname(absolutePath), { recursive: true });
+  writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
 }
 
 function readUpgradeContextBudgetPolicy(cwd: string) {
