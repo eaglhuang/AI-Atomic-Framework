@@ -191,4 +191,32 @@ const expired = resolveFrameworkTempPublicationCapability({
   now: nowMs + 3_700_000,
 });
 assert.equal(expired, null);
+
+const missingOwnerDiagnostics = resolveFrameworkCommitAuthorityContext({
+  cwd,
+  taskId: null,
+  actorId: 'missing-owner',
+  taskExists: false,
+});
+assert.equal(missingOwnerDiagnostics.frameworkClaimResolution?.lockScan.lockRootExists, true);
+assert.equal(missingOwnerDiagnostics.frameworkClaimResolution?.lockScan.discoveredLockFileCount >= 1, true);
+assert.equal(missingOwnerDiagnostics.frameworkClaimResolution?.observedOwnedLockCount, 0);
+
+const staleTaskId = 'ATM-FRAMEWORK-TEMP-stale-owner';
+writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${staleTaskId}.lock.json`), `${JSON.stringify({
+  workItemId: staleTaskId,
+  actorId: 'stale-owner',
+  heartbeatAt: new Date(nowMs - 7_200_000).toISOString(),
+  ttlSeconds: 60,
+  files: ['docs/stale.md'],
+}, null, 2)}\n`, 'utf8');
+const staleOwnerDiagnostics = resolveFrameworkCommitAuthorityContext({
+  cwd,
+  taskId: null,
+  actorId: 'stale-owner',
+  taskExists: false,
+});
+assert.equal(staleOwnerDiagnostics.frameworkClaimResolution?.observedOwnedLockCount, 1);
+assert.equal(staleOwnerDiagnostics.frameworkClaimResolution?.staleOwnedClaimCount, 1);
+assert.deepEqual(staleOwnerDiagnostics.frameworkClaimResolution?.staleOwnedTaskIds, [staleTaskId]);
 console.log('framework-temp-publication-capability: ok');

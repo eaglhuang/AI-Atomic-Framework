@@ -2,7 +2,7 @@ import { pathMatchesWriteScope } from '../../../../core/src/broker/write-scope-p
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import {
-  readFrameworkTempLockProjection,
+  inspectFrameworkTempLockProjection,
   type FrameworkTempLockProjection,
 } from './framework-temp-lock-projection.ts';
 
@@ -34,6 +34,15 @@ export interface FrameworkCommitAuthorityContext {
 
 export interface FrameworkTempClaimResolution {
   readonly laneSessionId: string | null;
+  readonly lockScan: {
+    readonly lockRootExists: boolean;
+    readonly discoveredLockFileCount: number;
+    readonly readableLockFileCount: number;
+    readonly unreadableLockFiles: readonly string[];
+  };
+  readonly observedOwnedLockCount: number;
+  readonly staleOwnedClaimCount: number;
+  readonly staleOwnedTaskIds: readonly string[];
   readonly liveOwnedClaimCount: number;
   readonly eligibleClaimCount: number;
   readonly liveOwnedTaskIds: readonly string[];
@@ -83,10 +92,14 @@ function inspectFrameworkTempClaimResolution(input: {
   const taskId = input.taskId?.trim();
   const actorId = input.actorId?.trim() ?? '';
   const laneSessionId = input.laneSessionId?.trim() ?? '';
-  const owned = readFrameworkTempLockProjection(input.cwd, input.now).filter(
+  const scan = inspectFrameworkTempLockProjection(input.cwd, input.now);
+  const observedOwned = scan.locks.filter(
     (candidate) =>
       (!taskId || candidate.workItemId === taskId) &&
-      (!actorId || candidate.actorId === actorId) &&
+      (!actorId || candidate.actorId === actorId),
+  );
+  const owned = observedOwned.filter(
+    (candidate) =>
       candidate.disposition === 'foreign-live',
   );
   // ATM-GOV-0395: a lane matches only on an explicitly recorded lane. A lock
@@ -108,6 +121,18 @@ function inspectFrameworkTempClaimResolution(input: {
     capability: lock ? toCapability(input.cwd, lock) : null,
     summary: {
       laneSessionId: laneSessionId || null,
+      lockScan: {
+        lockRootExists: scan.lockRootExists,
+        discoveredLockFileCount: scan.discoveredLockFileCount,
+        readableLockFileCount: scan.readableLockFileCount,
+        unreadableLockFiles: scan.unreadableLockFiles,
+      },
+      observedOwnedLockCount: observedOwned.length,
+      staleOwnedClaimCount: observedOwned.filter((candidate) => candidate.disposition === 'stale-recovery-input').length,
+      staleOwnedTaskIds: observedOwned
+        .filter((candidate) => candidate.disposition === 'stale-recovery-input')
+        .map((candidate) => candidate.workItemId)
+        .sort(),
       liveOwnedClaimCount: owned.length,
       eligibleClaimCount: candidates.length,
       liveOwnedTaskIds: owned.map((candidate) => candidate.workItemId).sort(),
@@ -119,6 +144,15 @@ function inspectFrameworkTempClaimResolution(input: {
 function emptyFrameworkTempClaimResolution(laneSessionId: string | null | undefined): FrameworkTempClaimResolution {
   return {
     laneSessionId: laneSessionId?.trim() || null,
+    lockScan: {
+      lockRootExists: false,
+      discoveredLockFileCount: 0,
+      readableLockFileCount: 0,
+      unreadableLockFiles: [],
+    },
+    observedOwnedLockCount: 0,
+    staleOwnedClaimCount: 0,
+    staleOwnedTaskIds: [],
     liveOwnedClaimCount: 0,
     eligibleClaimCount: 0,
     liveOwnedTaskIds: [],
