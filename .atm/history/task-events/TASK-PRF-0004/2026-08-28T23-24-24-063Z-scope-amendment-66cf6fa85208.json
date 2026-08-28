@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-28T23-24-24-063Z-scope-amendment-66cf6fa85208",
+  "taskId": "TASK-PRF-0004",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0004.json",
+  "taskSha256": "sha256:2512f2a39c3fcdb726bfbcf07d5b9bfdd65f120b432dc048d9249102e0f23ae6",
+  "createdAt": "2026-08-28T23:24:24.063Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0004 --actor codex-captain --add scripts/validate-git-hooks-enforcement/context.ts --reason \"Release CI fixture repair: make the validator temp root absolute so framework claim and governed commit use one repository.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Release CI fixture repair: make the validator temp root absolute so framework claim and governed commit use one repository."
+  }
+}

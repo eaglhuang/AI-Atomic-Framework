@@ -221,7 +221,11 @@ assert(examplePreCommit.includes('runner="atm.mjs"'), 'example pre-commit hook m
 assert(examplePreCommit.includes('runner="atm.dev.mjs"'), 'example pre-commit hook must allow source-first framework routing');
 assert(examplePreCommit.includes('node "$runner" hook pre-commit --json'), 'example pre-commit hook must use hook pre-commit through the selected runner');
 
-export const tempRoot = mkdtempSync(path.join(process.env.TMPDIR ?? process.env.TEMP ?? '.', 'atm-git-hooks-'));
+// Fixtures invoke the CLI from inside their own repository and also pass the
+// fixture root through --cwd.  Keep that root absolute: a relative fallback
+// would be resolved a second time by the nested CLI process, separating a
+// framework claim from the governed commit that is meant to consume it.
+export const tempRoot = mkdtempSync(path.join(path.resolve(process.env.TMPDIR ?? process.env.TEMP ?? '.'), 'atm-git-hooks-'));
 export function completeLaneBoundary(boundary: ValidatorLane) {
   if (selectedLane !== boundary) return;
   rmSync(tempRoot, { recursive: true, force: true });
