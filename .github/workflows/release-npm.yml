@@ -145,7 +145,7 @@ jobs:
           if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
             version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
           fi
-          node -e "const fs=require('fs'); const p='docs/DEPRECATIONS.md'; let text=fs.readFileSync(p,'utf8'); text=text.replace(/^Last release audit: .*$/m, 'Last release audit: '+version+' ('+process.env.NPM_DIST_TAG+') at '+new Date().toISOString()); fs.writeFileSync(p, text);"
+          RELEASE_AUDIT_VERSION="$version" node -e "const fs=require('fs'); const p='docs/DEPRECATIONS.md'; let text=fs.readFileSync(p,'utf8'); text=text.replace(/^Last release audit: .*$/m, 'Last release audit: '+process.env.RELEASE_AUDIT_VERSION+' ('+process.env.NPM_DIST_TAG+') at '+new Date().toISOString()); fs.writeFileSync(p, text);"
 
       - name: Prepare deprecation reminder
         id: deprecation-reminder
