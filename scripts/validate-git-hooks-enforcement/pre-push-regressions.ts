@@ -148,7 +148,12 @@ const driftRecoveryCommit = parsePayload(runCli(governedWrapperRepo, [
   'chore: auto-stage tracked actor registry drift',
   '--auto-stage',
   '--json'
-]));
+], {
+  env: {
+    ATM_GIT_NAME: 'Hook Validator',
+    ATM_GIT_EMAIL: 'hook-validator@example.com'
+  }
+}));
 assert(driftRecoveryCommit.ok === true, 'governed git commit must auto-stage tracked actor registry drift for non-task commits');
 const driftRecoverySha = String(driftRecoveryCommit.evidence?.commitSha ?? '');
 const driftRecoveryTouchedPaths = String(runGit(governedWrapperRepo, ['show', '--pretty=', '--name-only', driftRecoverySha]).stdout || '').trim().split(/\r?\n/).filter(Boolean);
