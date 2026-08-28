@@ -88,7 +88,7 @@ import {
 import { buildBrokerConflictUxProjection, buildTeamRecommendation, type TeamRecommendation } from './team.ts';
 import { buildTeamKnowledgeSummary } from './team-knowledge.ts';
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
-import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.ts';
+import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath, type CommandResult } from './shared.ts';
 import {
   runTasks,
   findTaskClaimDependencyBlockers,
@@ -207,14 +207,7 @@ export { buildActiveWorkSummary } from './next/playbook-projection.ts';
 
 import { compactNextRouteResult } from './next/result-compaction.ts';
 
-export type NextCommandResult = {
-  readonly ok?: boolean;
-  readonly command?: string;
-  readonly cwd?: string;
-  readonly messages: Array<Record<string, any>>;
-  readonly evidence: Record<string, any>;
-  readonly [key: string]: any;
-};
+export type NextCommandResult = CommandResult;
 
 export async function runNext(argv: string[]): Promise<NextCommandResult> {
   const verbose = Array.isArray(argv) && argv.includes('--verbose');

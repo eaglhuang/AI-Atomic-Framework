@@ -296,7 +296,7 @@ function readSnapshotTaskId(filePath: string): string | null {
   return taskId || null;
 }
 
-function readJsonObject(filePath: string): Record<string, any> | null {
+function readJsonObject(filePath: string): Record<string, unknown> | null {
   if (!existsSync(filePath)) return null;
   try {
     const parsed = JSON.parse(readFileSync(filePath, 'utf8'));

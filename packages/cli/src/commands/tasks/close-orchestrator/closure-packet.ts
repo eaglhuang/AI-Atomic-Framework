@@ -8,9 +8,30 @@ import {
   type ClosurePacket,
   validateClosurePacket
 } from '../../framework-development.ts';
-import { buildHistoricalDeliveryProvenance } from '../historical-delivery.ts';
+import { buildHistoricalDeliveryProvenance, type TaskHistoricalDeliveryReport } from '../historical-delivery.ts';
 import { uniqueStrings } from '../../tasks.ts';
 import { assertAcceptanceEvidenceClosureGate } from './acceptance-evidence-gate.ts';
+
+type ClosurePacketOptions = {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly status: string;
+  readonly reason?: string | null;
+};
+
+type ClosurePacketInput = Parameters<typeof createClosurePacket>[0];
+
+type DeliverableGate = {
+  readonly deliverableFiles?: readonly string[];
+  readonly historicalDeliveries?: readonly TaskHistoricalDeliveryReport[];
+};
+
+type HistoricalBatchSlice = {
+  readonly okToCloseTask?: boolean;
+  readonly taskSpecificValidationPasses?: readonly string[];
+  readonly batchWideValidationPasses?: readonly string[];
+  readonly advisoryValidationPasses?: readonly string[];
+};
 
 export interface PreparedClosurePacket {
   readonly existingClosurePacketPath: string | null;
@@ -21,14 +42,14 @@ export interface PreparedClosurePacket {
 }
 
 export function prepareClosurePacket(input: {
-  readonly options: any;
+  readonly options: ClosurePacketOptions;
   readonly taskDocument: Record<string, unknown>;
   readonly actorId: string;
   readonly activeSession: { readonly sessionId?: string | null } | null;
-  readonly frameworkStatus: any;
-  readonly deliverableGate: any;
+  readonly frameworkStatus: ClosurePacketInput['frameworkStatus'];
+  readonly deliverableGate: DeliverableGate | null;
   readonly taskDeclaredFiles: readonly string[];
-  readonly historicalBatchSlice: any;
+  readonly historicalBatchSlice: HistoricalBatchSlice | null;
 }): PreparedClosurePacket {
   const { options, taskDocument, actorId, activeSession, frameworkStatus, deliverableGate, taskDeclaredFiles, historicalBatchSlice } = input;
   const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
@@ -76,7 +97,7 @@ export function prepareClosurePacket(input: {
       createdClosurePacketAbsolute: null
     };
   }
-  const closePacketChangedFiles = deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles;
+  const closePacketChangedFiles = deliverableGate?.deliverableFiles?.length ? deliverableGate.deliverableFiles : taskDeclaredFiles;
   const taskRequiredGates = Array.isArray(taskDocument.validators)
     ? uniqueStrings(taskDocument.validators
       .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
@@ -91,22 +112,22 @@ export function prepareClosurePacket(input: {
     evidencePath: `.atm/history/evidence/${options.taskId}.json`,
     requiredGates: historicalBatchSlice?.okToCloseTask === true
       ? uniqueStrings([
-        ...historicalBatchSlice.taskSpecificValidationPasses,
-        ...historicalBatchSlice.batchWideValidationPasses
+        ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),
+        ...(historicalBatchSlice.batchWideValidationPasses ?? [])
       ])
       : taskRequiredGates,
     changedFiles: closePacketChangedFiles,
     frameworkStatus,
     validationPasses: historicalBatchSlice?.okToCloseTask === true
       ? uniqueStrings([
-        ...historicalBatchSlice.taskSpecificValidationPasses,
-        ...historicalBatchSlice.batchWideValidationPasses,
-        ...historicalBatchSlice.advisoryValidationPasses
+        ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),
+        ...(historicalBatchSlice.batchWideValidationPasses ?? []),
+        ...(historicalBatchSlice.advisoryValidationPasses ?? [])
       ])
       : undefined,
     evidenceFreshness: historicalBatchSlice?.okToCloseTask === true ? 'fresh' : undefined,
     historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(
-      deliverableGate?.historicalDeliveries[0] ?? null,
+      deliverableGate?.historicalDeliveries?.[0] ?? null,
       options.reason
     )
   });

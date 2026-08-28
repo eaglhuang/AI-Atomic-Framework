@@ -19,6 +19,15 @@ import { relativePathFrom } from '../../shared.ts';
 
 type AbandonResidueDispositionClass = 'keep-diagnostic' | 'abandon' | 'remove-evidence';
 
+type CloseWriteOptions = {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly status: string;
+  readonly fromBatchCheckpoint?: boolean;
+  readonly batchId?: string | null;
+  readonly reason?: string | null;
+};
+
 function normalizeRel(filePath: string): string {
   return filePath.replace(/\\/g, '/');
 }
@@ -147,7 +156,7 @@ export function applyAbandonedResidueDisposition(input: {
 }
 
 export async function executeCloseWrites(input: {
-  readonly options: any;
+  readonly options: CloseWriteOptions;
   readonly actorId: string;
   readonly taskPath: string;
   readonly previousTaskContent: string;

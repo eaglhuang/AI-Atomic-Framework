@@ -49,7 +49,7 @@ export function applyHybridRerank(input: {
   query: string;
   lexicalShortlist: KnowledgeHit[];
   top: number;
-}): { hits: KnowledgeHit[]; evidence: Record<string, any> } {
+}): { hits: KnowledgeHit[]; evidence: Record<string, unknown> } {
   const cache = readEmbeddingCache(input.outputs.embeddingCachePath);
   if (!cache) {
     return {

@@ -6,18 +6,20 @@ import { CliError } from '../shared.ts';
 import { readClaimLaneSessionId } from './claim-ownership.ts';
 import { runAtmGit } from '../git-governance.ts';
 
-export function isConfirmedWipCommitResult(result: any): boolean {
-  const evidence = result?.evidence && typeof result.evidence === 'object' ? result.evidence as Record<string, any> : null;
-  const decision = evidence?.workAdmission?.decision && typeof evidence.workAdmission.decision === 'object' ? evidence.workAdmission.decision as Record<string, any> : null;
-  return result?.ok === true && decision?.ok !== false && typeof evidence?.commitSha === 'string' && evidence.commitSha.trim().length > 0;
+export function isConfirmedWipCommitResult(result: unknown): boolean {
+  const resultRecord = result && typeof result === 'object' ? result as Record<string, unknown> : null;
+  const evidence = resultRecord?.evidence && typeof resultRecord.evidence === 'object' ? resultRecord.evidence as Record<string, unknown> : null;
+  const workAdmission = evidence?.workAdmission && typeof evidence.workAdmission === 'object' ? evidence.workAdmission as Record<string, unknown> : null;
+  const decision = workAdmission?.decision && typeof workAdmission.decision === 'object' ? workAdmission.decision as Record<string, unknown> : null;
+  return resultRecord?.ok === true && decision?.ok !== false && typeof evidence?.commitSha === 'string' && evidence.commitSha.trim().length > 0;
 }
 
 export async function prepareReleaseWip(input: {
   readonly cwd: string;
   readonly taskId: string;
   readonly actorId: string;
-  readonly currentClaim: Record<string, any> | null;
-  readonly taskDocument: Record<string, any>;
+  readonly currentClaim: Record<string, unknown> | null;
+  readonly taskDocument: Record<string, unknown>;
   readonly dirtyInScopeFiles: readonly string[];
   readonly discardWip: boolean;
   readonly wipCommit: boolean;
@@ -39,7 +41,7 @@ export async function prepareReleaseWip(input: {
       }
     } else if (input.wipCommit) {
       const gitResult = await runAtmGit(['commit', '--cwd', input.cwd, '--actor', input.actorId, '--task', input.taskId, '--message', `wip: ${input.taskId} non-delivery WIP commit`, '--wip', '--auto-stage', '--json']);
-      const evidence = gitResult?.evidence && typeof gitResult.evidence === 'object' ? gitResult.evidence as Record<string, any> : null;
+      const evidence = gitResult?.evidence && typeof gitResult.evidence === 'object' ? gitResult.evidence as Record<string, unknown> : null;
       const commitSha = typeof evidence?.commitSha === 'string' ? evidence.commitSha.trim() : '';
       if (!isConfirmedWipCommitResult(gitResult)) throw new CliError('ATM_RELEASE_DIRTY_WIP_BLOCKED', `WIP preservation for ${input.taskId} did not produce a governed commit SHA; claim release was not applied.`, { exitCode: 1, details: { taskId: input.taskId, actorId: input.actorId, failureKind: 'preservation-commit-not-confirmed', committedFiles: input.dirtyInScopeFiles, gitResult: gitResult?.evidence ?? null } });
       wipCommitReceipt = { schemaId: 'atm.wipCommitReceipt.v1', taskId: input.taskId, actorId: input.actorId, timestamp: input.nowIso, committedFiles: input.dirtyInScopeFiles, commitSha, gitResult: gitResult.evidence };

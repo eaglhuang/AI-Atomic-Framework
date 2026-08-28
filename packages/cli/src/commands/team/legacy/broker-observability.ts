@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import type { TeamBrokerLaneEvidence } from '../../../../../core/src/broker/team-lane.ts';
+import { TEAM_PROVIDER_IDS, type TeamProviderId } from '../../../../../core/src/team-runtime/provider-contract.ts';
 import {
   createBrokerConflictResolutionArtifact,
   type BrokerConflictDecisionClass,
@@ -11,7 +12,8 @@ import {
   buildTeamObservabilityContract,
   createBrokerConflictObservabilityEvents,
   createTeamObservabilityEvent,
-  queryTeamObservabilityEvents
+  queryTeamObservabilityEvents,
+  type TeamObservabilityEventType
 } from '../../../../../core/src/team-runtime/observability.ts';
 import { inspectTeamRuntimeBackendCapabilities } from '../../integration.ts';
 import { CliError, makeResult, message } from '../../shared.ts';
@@ -35,6 +37,15 @@ export function buildBrokerConflictSharedVocabulary(brokerLane: TeamBrokerLaneEv
     violationStatus: 'broker-conflict-blocked',
     statusCode: 'broker-conflict-blocked'
   };
+}
+
+function normalizeObservabilityEventType(value: string | undefined): TeamObservabilityEventType | undefined {
+  const known: readonly TeamObservabilityEventType[] = ['session.start', 'step.execution', 'tool.invocation', 'artifact.output', 'session.complete', 'session.failure', 'broker.conflict.blocked', 'broker.conflict.resolution', 'handoff.materialized', 'handoff.consumed', 'handoff.integrity-blocked', 'handoff.archived'];
+  return value && known.includes(value as TeamObservabilityEventType) ? value as TeamObservabilityEventType : undefined;
+}
+
+function normalizeTeamProviderId(value: string): TeamProviderId | 'unknown' {
+  return (TEAM_PROVIDER_IDS as readonly string[]).includes(value) ? value as TeamProviderId : 'unknown';
 }
 
 export function evaluateTeamRuntimeBackendAdmission(
@@ -119,7 +130,7 @@ export function runTeamObservability(argv: string[], defaultCwd: string) {
     providerId: readOptionValue(argv, '--provider-filter') ?? readOptionValue(argv, '--provider'),
     role: readOptionValue(argv, '--role-filter') ?? readOptionValue(argv, '--role'),
     artifactType: readOptionValue(argv, '--artifact') ?? readOptionValue(argv, '--artifact-type'),
-    eventType: readOptionValue(argv, '--event-type') as any
+    eventType: normalizeObservabilityEventType(readOptionValue(argv, '--event-type'))
   };
 
   if (!fixture) {
@@ -166,7 +177,7 @@ export function runTeamObservability(argv: string[], defaultCwd: string) {
     releaseOrder: readOptionValues(argv, '--release-order'),
     createdAt: emittedAt
   });
-  const providerId = String(readOptionValue(argv, '--provider') ?? 'openai').trim() as any;
+  const providerId = normalizeTeamProviderId(String(readOptionValue(argv, '--provider') ?? 'openai').trim());
   const role = String(readOptionValue(argv, '--role') ?? 'coordinator').trim();
   const teamRunId = readOptionValue(argv, '--team-run') ?? `team-observability-${artifact.resolutionId.toLowerCase()}`;
   const events = createBrokerConflictObservabilityEvents({

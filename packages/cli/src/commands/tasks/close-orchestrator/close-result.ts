@@ -1,7 +1,13 @@
 import { makeResult, message, relativePathFrom } from '../../shared.ts';
 
+type CloseResultOptions = {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly status: string;
+};
+
 export function makeTasksClosedResult(input: {
-  readonly options: any;
+  readonly options: CloseResultOptions;
   readonly actorId: string;
   readonly taskPath: string;
   readonly evidenceGate: unknown;
