@@ -496,9 +496,14 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   const stageCandidates = uniqueSorted([
     ...commitAttributionStageCandidates,
     ...(input.autoStage
-      ? (deliverySliceRejection ? [] : autoStagePool).filter(
-          (filePath: LegacyValue) => !isCommitAttributionSideEffectPath(filePath),
-        )
+      ? [
+          ...(deliverySliceRejection ? [] : autoStagePool),
+          // Protected audit records are ignored worktree files.  Their embedded
+          // task id is the ownership proof, so include the verified set at the
+          // final candidate boundary even if an earlier generic classifier
+          // discarded the ignored path.
+          ...taskOwnedProtectedOverrideAudits,
+        ].filter((filePath: LegacyValue) => !isCommitAttributionSideEffectPath(filePath))
       : []),
   ]);
   const commitFiles = buildTaskScopedCommitFileSet({
