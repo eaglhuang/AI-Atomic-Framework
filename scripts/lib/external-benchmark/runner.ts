@@ -1,7 +1,5 @@
-import type { OracleAdjudication } from './adjudication.ts';
-import { calculateAdjudicationRates } from './adjudication.ts';
-import type { RawBenchmarkRun } from './metrics.ts';
-import { aggregateRawRuns } from './metrics.ts';
+import { calculateAdjudicationRates, type OracleAdjudication } from './adjudication.ts';
+import { aggregateRawRuns, type RawBenchmarkRun } from './metrics.ts';
 import { decideBenchmark, type BenchmarkDecision } from './report.ts';
 
 export interface ProtocolManifest {
