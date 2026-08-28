@@ -133,6 +133,10 @@ const driftRecoveryClaim = parsePayload(runCli(governedWrapperRepo, [
   '--json'
 ]));
 assert(driftRecoveryClaim.ok === true, 'registry-drift recovery must acquire fixture-local framework authority');
+const refreshGovernedWrapperIdentity = parsePayload(runCli(governedWrapperRepo, [
+  'identity', 'set', '--actor', 'hook-validator', '--git-name', 'Hook Validator', '--git-email', 'hook-validator@example.com', '--json'
+]));
+assert(refreshGovernedWrapperIdentity.ok === true, 'governed wrapper fixture must refresh identity after actor-registry drift and before its governed commit');
 const driftRecoveryCommit = parsePayload(runCli(governedWrapperRepo, [
   'git',
   'commit',

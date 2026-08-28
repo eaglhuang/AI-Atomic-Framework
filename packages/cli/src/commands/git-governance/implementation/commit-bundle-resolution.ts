@@ -315,7 +315,8 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     ...taskOwnedProtectedOverrideAudits,
   ]).filter(
     (filePath: LegacyValue) =>
-      !isRuntimeCommitSideEffect(filePath) &&
+      (taskOwnedProtectedOverrideAudits.has(normalizeRelativePath(filePath)) ||
+        !isRuntimeCommitSideEffect(filePath)) &&
       (taskOwnedProtectedOverrideAudits.has(normalizeRelativePath(filePath)) ||
         !isUncommittableTaskEvidenceArtifact(input.cwd, filePath, input.taskId, input.taskDocument)) &&
       (isCommitAttributionSideEffectPath(filePath) ||
