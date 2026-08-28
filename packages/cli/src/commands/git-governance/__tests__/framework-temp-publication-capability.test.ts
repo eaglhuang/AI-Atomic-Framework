@@ -143,7 +143,7 @@ writeFileSync(path.join(cwd, '.atm', 'runtime', 'locks', `${noLaneTaskId}.lock.j
   workItemId: noLaneTaskId,
   actorId: 'publication-steward',
   heartbeatAt: new Date(nowMs - 1_000).toISOString(),
-  ttlSeconds: 3600,
+  ttlSeconds: '3600',
   files: ['release/atm-onefile/atm.mjs'],
 }, null, 2)}\n`, 'utf8');
 const noLaneBound = resolveFrameworkTempPublicationCapability({
