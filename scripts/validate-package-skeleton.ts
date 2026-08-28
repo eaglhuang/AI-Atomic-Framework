@@ -65,6 +65,9 @@ for (const packageSpec of fixture.packages) {
   }
 
   const manifest = readJson(manifestPath);
+  const expectedPublishFiles = Array.isArray(packageSpec.publishFiles)
+    ? packageSpec.publishFiles
+    : ['dist'];
   const allowedExternalDependencies = typeof packageSpec.externalDependencies === 'object' && packageSpec.externalDependencies !== null
     ? packageSpec.externalDependencies as Record<string, unknown>
     : {};
@@ -84,8 +87,8 @@ for (const packageSpec of fixture.packages) {
   if (exportTarget?.import !== './dist/index.js' || exportTarget?.types !== './dist/index.d.ts') {
     fail(`${manifestPath} must export ./dist/index.js with ./dist/index.d.ts types`);
   }
-  if (!Array.isArray(manifest.files) || !manifest.files.includes('dist')) {
-    fail(`${manifestPath} must publish dist artifacts`);
+  if (JSON.stringify(manifest.files) !== JSON.stringify(expectedPublishFiles)) {
+    fail(`${manifestPath} files must exactly match the runtime allowlist ${JSON.stringify(expectedPublishFiles)}`);
   }
   if (manifest.types !== './dist/index.d.ts') {
     fail(`${manifestPath} must set types=./dist/index.d.ts`);

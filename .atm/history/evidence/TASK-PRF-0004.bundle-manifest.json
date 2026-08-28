@@ -1,8 +1,8 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0004",
-  "updatedAt": "2026-08-27T01:36:16.039Z",
-  "updatedBy": "claude-008",
+  "updatedAt": "2026-08-28T13:48:47.959Z",
+  "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "node --strip-types tests/cli/npm-clean-install.test.ts",
     "validate:npm-clean-install",
@@ -44,6 +44,22 @@
       "durationMs": 23530,
       "runnerKind": "frozen-runner",
       "sourceCommit": "11b4cdd1e90064b61ca9379dcb4f592a5915d9bc",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:974f1aee3a3035a76faae39e0198e2c4b1aab2561618fcfeae4bf00d4ed6aa32",
+      "stderrSha256": "sha256:dac38ea6f211a81aca85133c558c7828480f14363a947bd760a8e431729e0dbf",
+      "validators": [
+        "validate:package-skeleton"
+      ],
+      "generatedAt": "2026-08-28T13:48:47.958Z",
+      "startedAt": "2026-08-28T13:48:28.176Z",
+      "finishedAt": "2026-08-28T13:48:47.958Z",
+      "durationMs": 19782,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f9bae1bd9e4ba595b982ee69b82e786b01edd7ad",
       "cached": false
     }
   ],

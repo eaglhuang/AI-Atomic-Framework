@@ -160,24 +160,46 @@ jobs:
               labels: ['release', 'deprecation']
             });
 
-      - name: Publish ATM CLI
+      - name: Publish public workspace closure
         shell: bash
         run: |
+          PUBLIC_WORKSPACES=(
+            "@ai-atomic-framework/core"
+            "@ai-atomic-framework/cli"
+            "@ai-atomic-framework/plugin-sdk"
+            "@ai-atomic-framework/plugin-rule-guard"
+            "@ai-atomic-framework/plugin-governance-local"
+            "@ai-atomic-framework/plugin-human-review"
+            "@ai-atomic-framework/plugin-review-advisory"
+            "@ai-atomic-framework/plugin-experience-loop"
+            "@ai-atomic-framework/plugin-behavior-pack"
+            "@ai-atomic-framework/adapter-local-git"
+            "@ai-atomic-framework/language-js"
+            "@ai-atomic-framework/language-python"
+            "@ai-atomic-framework/language-csharp"
+            "@ai-atomic-framework/integrations-core"
+            "@ai-atomic-framework/integration-claude-code"
+            "@ai-atomic-framework/integration-copilot"
+            "@ai-atomic-framework/integration-codex"
+            "@ai-atomic-framework/integration-cursor"
+            "@ai-atomic-framework/integration-gemini"
+            "@ai-atomic-framework/agent-pack-sdk"
+            "@ai-atomic-framework/agent-pack-claude-code"
+            "@ai-atomic-framework/agent-pack-cursor"
+            "@ai-atomic-framework/agent-pack-copilot"
+            "@ai-atomic-framework/agent-pack-gemini"
+            "@ai-atomic-framework/agent-pack-windsurf"
+            "create-atm"
+            "@ai-atomic-framework/atm-markdown-task-source"
+          )
+          WORKSPACE_ARGS=()
+          for workspace in "${PUBLIC_WORKSPACES[@]}"; do
+            WORKSPACE_ARGS+=(--workspace "$workspace")
+          done
           if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
-            npm publish --workspace @ai-atomic-framework/cli --access public --provenance --tag "$NPM_DIST_TAG" --dry-run
+            npm publish "${WORKSPACE_ARGS[@]}" --include-workspace-root=false --access public --provenance --tag "$NPM_DIST_TAG" --dry-run
           else
-            npm publish --workspace @ai-atomic-framework/cli --access public --provenance --tag "$NPM_DIST_TAG"
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish create-atm
-        shell: bash
-        run: |
-          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
-            npm publish --workspace create-atm --access public --provenance --tag "$NPM_DIST_TAG" --dry-run
-          else
-            npm publish --workspace create-atm --access public --provenance --tag "$NPM_DIST_TAG"
+            npm publish "${WORKSPACE_ARGS[@]}" --include-workspace-root=false --access public --provenance --tag "$NPM_DIST_TAG"
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
