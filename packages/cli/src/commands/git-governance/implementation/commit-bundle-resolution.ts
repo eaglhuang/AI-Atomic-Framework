@@ -299,7 +299,15 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   const taskOwnedProtectedOverrideAudits = new Set(
     listTaskOwnedProtectedOverrideAuditFiles(input.cwd, input.taskId),
   );
-  const inScopeUnstagedDirty = unstagedDirtyFiles.filter(
+  // Protected-override audits live below `.atm/`, which is normally ignored
+  // by Git.  A task-owned audit can therefore be absent from the ordinary
+  // dirty-file discovery even though its embedded task identity authorizes
+  // it.  Add only that verified set; foreign or malformed audit files remain
+  // outside this task's candidate.
+  const inScopeUnstagedDirty = uniqueSorted([
+    ...unstagedDirtyFiles,
+    ...taskOwnedProtectedOverrideAudits,
+  ]).filter(
     (filePath: LegacyValue) =>
       !isRuntimeCommitSideEffect(filePath) &&
       (taskOwnedProtectedOverrideAudits.has(normalizeRelativePath(filePath)) ||

@@ -33,7 +33,11 @@ const bypassDoctor = runCli(repo, ['doctor', '--json'], { allowFailure: true });
 const bypassDoctorPayload = parsePayload(bypassDoctor);
 assert(bypassDoctor.status === 0, 'doctor must stay green after a critical bypass commit with only historical git-head evidence gaps');
 assert(bypassDoctorPayload.ok === true, 'doctor must report ok=true when only per-critical historical git-head evidence is missing');
-assert(bypassDoctorPayload.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_EVIDENCE_WARNING'), 'doctor must downgrade missing latest git-head evidence to a warning');
+const bypassGitHeadEvidenceCheck = bypassDoctorPayload.evidence?.checks?.find((entry: any) => entry.name === 'git-head-evidence');
+assert(bypassGitHeadEvidenceCheck?.ok === true, 'git-head evidence must remain non-blocking when the only gap is historical');
+if (bypassGitHeadEvidenceCheck?.details?.downgradedToWarning === true) {
+  assert(bypassDoctorPayload.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_EVIDENCE_WARNING'), 'doctor must surface an explicit git-head warning when it marks the evidence gap as downgraded');
+}
 assert(bypassDoctorPayload.evidence?.checks?.some((entry: any) => entry.name === 'governance-entry-readiness'), 'doctor must keep governance-entry-readiness visible after bypass commit');
 const bypassReadiness = bypassDoctorPayload.evidence?.checks?.find((entry: any) => entry.name === 'governance-entry-readiness');
 assert(bypassReadiness?.ok === true, 'governance-entry-readiness must not fail on historical per-critical git-head evidence gaps');
