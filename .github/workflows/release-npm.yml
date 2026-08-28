@@ -119,7 +119,10 @@ jobs:
             version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
             echo "Dry-run mode: simulating package version $version"
           fi
-          npm version "$version" --workspaces --include-workspace-root --no-git-tag-version
+          # These packages are versioned as one unpublished workspace closure.
+          # Do not ask npm to refresh workspace links from the public registry
+          # before the first package has been published.
+          npm version "$version" --workspaces --include-workspace-root --no-git-tag-version --no-workspaces-update
 
       - name: Validate release version compatibility
         if: ${{ github.event_name != 'workflow_dispatch' }}
