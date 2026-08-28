@@ -13,9 +13,9 @@ export type SharedSurfaceFreezeRecord = {
   readonly surfacePath: string;
   readonly waitingTaskId: string;
   readonly waitingActorId: string;
-  readonly signal: any;
-  readonly ack?: any;
-  readonly resolution?: any;
+  readonly signal: unknown;
+  readonly ack?: unknown;
+  readonly resolution?: unknown;
   readonly status: 'pending' | 'acknowledged' | 'released';
   readonly requiredNextAction: 'publish-patch-proposal-or-release';
   readonly createdAt: string;

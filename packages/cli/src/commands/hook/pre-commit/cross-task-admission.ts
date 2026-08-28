@@ -44,8 +44,10 @@ export function authorizeBlockLifecycleRecordBridge(
       const ledgerPath = path.join(root, '.atm', 'history', 'tasks', `${bridgeTaskId}.json`);
       if (!existsSync(ledgerPath)) return null;
       try {
-        const ledgerDoc = JSON.parse(readFileSync(ledgerPath, 'utf8')) as Record<string, any>;
-        const claim = ledgerDoc.claim && typeof ledgerDoc.claim === 'object' ? ledgerDoc.claim : null;
+        const ledgerDoc = JSON.parse(readFileSync(ledgerPath, 'utf8')) as Record<string, unknown>;
+        const claim = ledgerDoc.claim && typeof ledgerDoc.claim === 'object'
+          ? ledgerDoc.claim as Record<string, unknown>
+          : null;
         return {
           workItemId: typeof ledgerDoc.workItemId === 'string' ? ledgerDoc.workItemId : (typeof ledgerDoc.id === 'string' ? ledgerDoc.id : null),
           status: typeof ledgerDoc.status === 'string' ? ledgerDoc.status : '',
@@ -61,7 +63,7 @@ export function authorizeBlockLifecycleRecordBridge(
       const eventAbs = path.join(root, eventPath);
       if (!existsSync(eventAbs)) return null;
       try {
-        const eventDoc = JSON.parse(readFileSync(eventAbs, 'utf8')) as Record<string, any>;
+        const eventDoc = JSON.parse(readFileSync(eventAbs, 'utf8')) as Record<string, unknown>;
         return {
           taskId: typeof eventDoc.taskId === 'string' ? eventDoc.taskId : null,
           action: typeof eventDoc.action === 'string' ? eventDoc.action : null,
