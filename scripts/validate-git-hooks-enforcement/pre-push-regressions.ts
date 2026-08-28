@@ -85,6 +85,10 @@ const registerGovernedActor = parsePayload(runCli(governedWrapperRepo, [
   '--json'
 ]));
 assert(registerGovernedActor.ok === true, 'governed wrapper fixture actor register must report ok=true');
+const setGovernedWrapperIdentity = parsePayload(runCli(governedWrapperRepo, [
+  'identity', 'set', '--actor', 'hook-validator', '--git-name', 'Hook Validator', '--git-email', 'hook-validator@example.com', '--json'
+]));
+assert(setGovernedWrapperIdentity.ok === true, 'governed wrapper fixture must explicitly set the registered actor identity before governed commits');
 runGit(governedWrapperRepo, ['config', 'user.name', 'Hook Validator']);
 runGit(governedWrapperRepo, ['config', 'user.email', 'hook-validator@example.com']);
 runGit(governedWrapperRepo, ['add', '.atm/catalog/registry/actors.json']);

@@ -207,7 +207,16 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
       stagedFiles,
     });
   }
-  const dirtyFiles = listTaskScopedWorktreeDirtyFiles(input.cwd);
+  // `.atm/` is ignored by the ordinary untracked-file scan.  Bring verified
+  // task-owned protected audits into the source set before either pass of the
+  // bundle resolver, including the second resolve used by commit execution.
+  const taskOwnedProtectedOverrideAudits = new Set(
+    listTaskOwnedProtectedOverrideAuditFiles(input.cwd, input.taskId),
+  );
+  const dirtyFiles = uniqueSorted([
+    ...listTaskScopedWorktreeDirtyFiles(input.cwd),
+    ...taskOwnedProtectedOverrideAudits,
+  ]);
   const activeDeferredSnapshot = normalizeRelativePath(
     deferredForeignStagedSnapshot ?? "",
   );
@@ -296,9 +305,6 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   // residue: its embedded taskId is the ownership proof.  Preserve a
   // current-task audit through the generic evidence admissibility filter so a
   // foreign staged audit can be deferred without suppressing its companion.
-  const taskOwnedProtectedOverrideAudits = new Set(
-    listTaskOwnedProtectedOverrideAuditFiles(input.cwd, input.taskId),
-  );
   // Protected-override audits live below `.atm/`, which is normally ignored
   // by Git.  A task-owned audit can therefore be absent from the ordinary
   // dirty-file discovery even though its embedded task identity authorizes
