@@ -39,6 +39,8 @@ assert.deepEqual(
 const snapshot = loadSkillCorpusSourceSnapshot(templateDirectory, { sourceUniverse });
 assert.equal(snapshot.sourceUniverseSealed, true);
 assert.equal(snapshot.schemaId, 'atm.skillCorpusSourceSnapshot.v1');
+assert.equal(snapshot.sourceRoot, 'templates/skills', 'framework source paths must stay rooted at the repository, not packages/integrations-core');
+assert(snapshot.sourceFiles.every((file) => file.sourcePath.startsWith('templates/skills/')), 'framework source files must be repository-relative');
 assert(snapshot.templateCount >= 21, 'corpus snapshot must include the complete source template corpus');
 assert.equal(snapshot.templates.length, snapshot.sourceFiles.length);
 assert(snapshot.sourceDigest.startsWith('sha256:'));
