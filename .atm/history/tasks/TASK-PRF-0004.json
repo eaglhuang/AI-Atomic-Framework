@@ -66,7 +66,11 @@
     "packages/plugin-review-advisory/package.json",
     "packages/plugin-rule-guard/package.json",
     "packages/plugin-sdk/package.json",
-    "tests/package-skeleton.fixture.json"
+    "tests/package-skeleton.fixture.json",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+    "tests/cli/root-drop-release-doctor.test.ts",
+    "packages/cli/src/commands/doctor/policy.ts",
+    "packages/cli/src/commands/doctor/run-doctor.ts"
   ],
   "validators": [
     "node --strip-types scripts/validate-package-skeleton.ts",
@@ -254,8 +258,8 @@
     "findings": []
   },
   "reopenedAt": "2026-08-28T13:31:50.235Z",
-  "lastTransitionId": "2026-08-28T13-43-03-261Z-scope-amendment-dd76c68f275b",
-  "lastTransitionAt": "2026-08-28T13:43:03.261Z",
+  "lastTransitionId": "2026-08-28T15-04-36-974Z-renew-ccea98a2cb4c",
+  "lastTransitionAt": "2026-08-28T15:04:36.974Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-08-28T13:32:12.466Z",
@@ -264,7 +268,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-922944971efb",
     "claimedAt": "2026-08-28T13:32:12.475Z",
-    "heartbeatAt": "2026-08-28T13:32:12.475Z",
+    "heartbeatAt": "2026-08-28T15:04:35.868Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0004.*",
@@ -282,6 +286,9 @@
       "packages/agent-pack-windsurf/package.json",
       "packages/atm-markdown-task-source/package.json",
       "packages/cli/package.json",
+      "packages/cli/src/commands/doctor/policy.ts",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
       "packages/core/package.json",
       "packages/create-atm/package.json",
       "packages/create-atm/src/index.ts",
@@ -306,10 +313,10 @@
       "scripts/validate-package-skeleton.ts",
       "scripts/validate-release-trust.ts",
       "tests/cli/npm-clean-install.test.ts",
+      "tests/cli/root-drop-release-doctor.test.ts",
       "tests/package-skeleton.fixture.json"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
       "laneSessionId": "lane-20260827165500-codex-captain-7ef7cf210b",
       "status": "adopted",
@@ -322,20 +329,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-3e9f58e606cc4693",
-    "ticketDigest": "sha256:3e9f58e606cc4693afd3ec205bb1cff504a975fd386b1f2eeded37078a69a4ab",
+    "ticketId": "wat-1b05cda4cc9a4f86",
+    "ticketDigest": "sha256:1b05cda4cc9a4f866fbca1e796f855cfac13173530307eae2a37363db043c533",
     "taskId": "TASK-PRF-0004",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260827165500-codex-captain-7ef7cf210b",
     "claimGeneration": "lease-922944971efb",
-    "issuedAt": "2026-08-28T13:43:03.176Z",
-    "expiresAt": "2026-08-28T14:13:03.176Z",
-    "scopeDigest": "sha256:b8f910186549daa9f605dbd298d3591d1018a0e180dc192a3ce09a7b75578a80",
+    "issuedAt": "2026-08-28T15:04:35.868Z",
+    "expiresAt": "2026-08-28T15:34:35.868Z",
+    "scopeDigest": "sha256:a8bc8544675e654c0ae2bcc269ffb970910d4985ec3e3bfe90776f18aaa909a1",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-28T13:43:03.176Z"
+      "selectedAt": "2026-08-28T15:04:35.868Z"
     },
     "grants": [
       {
@@ -356,6 +363,9 @@
           "packages/agent-pack-windsurf/package.json",
           "packages/atm-markdown-task-source/package.json",
           "packages/cli/package.json",
+          "packages/cli/src/commands/doctor/policy.ts",
+          "packages/cli/src/commands/doctor/run-doctor.ts",
+          "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
           "packages/core/package.json",
           "packages/create-atm/package.json",
           "packages/create-atm/src/index.ts",
@@ -380,9 +390,10 @@
           "scripts/validate-package-skeleton.ts",
           "scripts/validate-release-trust.ts",
           "tests/cli/npm-clean-install.test.ts",
+          "tests/cli/root-drop-release-doctor.test.ts",
           "tests/package-skeleton.fixture.json"
         ],
-        "digest": "sha256:7ffb181e2ddc9041ea9c4c0309bf41c4eda59d257e214be3e8c3d899b7491eab"
+        "digest": "sha256:881679ed183f8e44bac7f89fd0fd444085737a64c1ed215d6296e8d42af82f14"
       },
       {
         "kind": "lifecycle-operation",
@@ -442,6 +453,9 @@
       "packages/agent-pack-windsurf/package.json",
       "packages/atm-markdown-task-source/package.json",
       "packages/cli/package.json",
+      "packages/cli/src/commands/doctor/policy.ts",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
       "packages/core/package.json",
       "packages/create-atm/package.json",
       "packages/create-atm/src/index.ts",
@@ -466,6 +480,7 @@
       "scripts/validate-package-skeleton.ts",
       "scripts/validate-release-trust.ts",
       "tests/cli/npm-clean-install.test.ts",
+      "tests/cli/root-drop-release-doctor.test.ts",
       "tests/package-skeleton.fixture.json"
     ],
     "planningReadOnlyPaths": [
