@@ -78,6 +78,11 @@ jobs:
         run: npm test
 
       - name: Build release artifacts
+        env:
+          # build-onefile-release normally restores tracked release mirrors after
+          # packing. The following root-drop smoke test must exercise the fresh
+          # mirror, so retain the generated release artifacts for this CI job.
+          ATM_RETAIN_RELEASE_ARTIFACTS: '1'
         run: |
           node --experimental-strip-types scripts/build-package-dist.ts
           node --experimental-strip-types scripts/build-root-drop-release.ts
