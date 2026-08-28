@@ -137,6 +137,18 @@ const refreshGovernedWrapperIdentity = parsePayload(runCli(governedWrapperRepo, 
   'identity', 'set', '--actor', 'hook-validator', '--git-name', 'Hook Validator', '--git-email', 'hook-validator@example.com', '--json'
 ]));
 assert(refreshGovernedWrapperIdentity.ok === true, 'governed wrapper fixture must refresh identity after actor-registry drift and before its governed commit');
+const refreshedDriftRecoveryClaim = parsePayload(runCli(governedWrapperRepo, [
+  'framework-mode',
+  'claim',
+  '--actor',
+  'hook-validator',
+  '--files',
+  '.atm/catalog/registry/actors.json,docs/tracked-actor-registry-drift.md',
+  '--reason',
+  'refresh fixture-local framework authority after identity setup',
+  '--json'
+]));
+assert(refreshedDriftRecoveryClaim.ok === true, 'governed wrapper fixture must retain live framework authority after identity setup');
 const driftRecoveryCommit = parsePayload(runCli(governedWrapperRepo, [
   'git',
   'commit',
