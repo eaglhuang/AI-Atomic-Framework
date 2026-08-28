@@ -104,11 +104,11 @@ const taskDocument = options.taskId
     ? readTaskDocument(options.cwd, options.taskId)
     : null;
 
-const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId } = resolveFrameworkCommitAuthorityContext({
+const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution } = resolveFrameworkCommitAuthorityContext({
   cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
 });
 
-assertFrameworkCommitClaimAuthority({ actorId, laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null, authority: { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId } });
+assertFrameworkCommitClaimAuthority({ actorId, laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null, authority: { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution } });
 
 const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
 
