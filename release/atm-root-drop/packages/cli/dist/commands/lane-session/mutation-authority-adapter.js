@@ -1,4 +1,4 @@
-import { authorizeMutationCapability, audienceForOperation } from '../../../../core/dist/lane/lane-capability-provider.js';
+import { authorizeMutationCapability, audienceForOperation } from '../../_vendor/core/dist/lane/lane-capability-provider.js';
 import { evaluateLaneCapability } from './capability-authority.js';
 /**
  * Thin adapter: the single mutation-authorization surface every protected lane

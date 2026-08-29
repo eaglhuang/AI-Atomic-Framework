@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { frameworkTempPublicationCapabilityCovers, resolveFrameworkTempPublicationCapability, } from '../framework-development/framework-temp-publication-capability.js';
-import { checkWorkAdmissionTicket, createWorkAdmissionCoverageReceipt, issueWorkAdmissionTicket } from '../../../../core/dist/broker/work-admission-ticket.js';
+import { checkWorkAdmissionTicket, createWorkAdmissionCoverageReceipt, issueWorkAdmissionTicket } from '../../_vendor/core/dist/broker/work-admission-ticket.js';
 /**
  * Boundary adapter for the single claim-issued authority.  It deliberately
  * owns no policy: callers supply the observed operation/files and receive the

@@ -1,7 +1,7 @@
 import { execFileSync, execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { validateAtomRefReadability } from '../../../core/dist/registry/atom-ref-readability.js';
+import { validateAtomRefReadability } from '../_vendor/core/dist/registry/atom-ref-readability.js';
 import { runFrameworkDevelopmentValidation } from './framework-development.js';
 import { readActiveTaskDirectionLocks } from './task-direction.js';
 import { configPathFor, makeResult, message, parseOptions, readJsonFile, relativePathFrom } from './shared.js';

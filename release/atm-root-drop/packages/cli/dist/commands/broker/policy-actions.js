@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { CliError, makeResult, message } from '../shared.js';
-import { buildParallelAdmissionReceipt, readParallelAdmissionPolicy, resetParallelAdmissionPolicy, tripParallelAdmissionPolicy, updateParallelAdmissionPolicy } from '../../../../core/dist/broker/parallel-admission-policy.js';
+import { buildParallelAdmissionReceipt, readParallelAdmissionPolicy, resetParallelAdmissionPolicy, tripParallelAdmissionPolicy, updateParallelAdmissionPolicy } from '../../_vendor/core/dist/broker/parallel-admission-policy.js';
 export function handleBrokerParallelAdmissionPolicy(options, _context) {
     if (options.action !== 'parallel-admission')
         return null;

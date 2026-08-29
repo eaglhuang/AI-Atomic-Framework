@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { evaluateDiagnosticLoopReceipt } from '../../../../../core/dist/evidence/diagnostic-loop.js';
+import { evaluateDiagnosticLoopReceipt } from '../../../_vendor/core/dist/evidence/diagnostic-loop.js';
 import { CliError, makeResult, message } from '../../shared.js';
 export function runEvidenceDiagnose(argv) {
     const options = parseDiagnoseOptions(argv);

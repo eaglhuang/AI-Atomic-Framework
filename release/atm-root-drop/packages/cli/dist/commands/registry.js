@@ -1,9 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { computeHashDiffReport, resolveRegistryDiffTarget } from '../../../core/dist/registry/diff.js';
-import { validateRegistryDocument } from '../../../core/dist/registry/registry.js';
-import { validatePropagationReport } from '../../../core/dist/test-runner/propagation.js';
-import { validateHumanReviewDecisionLog } from '../../../plugin-human-review/dist/index.js';
+import { computeHashDiffReport, resolveRegistryDiffTarget } from '../_vendor/core/dist/registry/diff.js';
+import { validateRegistryDocument } from '../_vendor/core/dist/registry/registry.js';
+import { validatePropagationReport } from '../_vendor/core/dist/test-runner/propagation.js';
+import { validateHumanReviewDecisionLog } from '../_vendor/plugin-human-review/dist/index.js';
 import { getCommandSpec } from './command-specs.js';
 import { lineageLogMatchesMap, normalizeVersionLineage, resolveBackfillTimestamp } from './registry/lineage-normalization.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';

@@ -1,9 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/dist/index.js';
-import { checkProgression, pauseProgression, readProgressionPolicy } from '../../../core/dist/registry/progression-policy.js';
-import { readShadowComparisonReport } from '../../../core/dist/maps/shadow-comparator.js';
-import { computeDecisionSnapshotHash, createHumanReviewDecisionLog, createHumanReviewQueueDocument, createHumanReviewQueueRecord, findHumanReviewQueueRecord, loadHumanReviewQueueDocument, renderHumanReviewQueueMarkdown, replaceHumanReviewQueueRecord, validateHumanReviewDecisionLog, validateHumanReviewQueueDocument, validateHumanReviewQueueRecord, writeHumanReviewQueueDocument } from '../../../plugin-human-review/dist/index.js';
+import { createLocalGovernanceAdapter } from '../_vendor/plugin-governance-local/dist/index.js';
+import { checkProgression, pauseProgression, readProgressionPolicy } from '../_vendor/core/dist/registry/progression-policy.js';
+import { readShadowComparisonReport } from '../_vendor/core/dist/maps/shadow-comparator.js';
+import { computeDecisionSnapshotHash, createHumanReviewDecisionLog, createHumanReviewQueueDocument, createHumanReviewQueueRecord, findHumanReviewQueueRecord, loadHumanReviewQueueDocument, renderHumanReviewQueueMarkdown, replaceHumanReviewQueueRecord, validateHumanReviewDecisionLog, validateHumanReviewQueueDocument, validateHumanReviewQueueRecord, writeHumanReviewQueueDocument } from '../_vendor/plugin-human-review/dist/index.js';
 import { CliError, makeResult, message, parseJsonText, relativePathFrom } from './shared.js';
 export function runReview(argv) {
     const { options, positional } = parseReviewOptions(argv);

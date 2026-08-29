@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { attachStandardsSpecReviewReceipt, appendMachineFindings, createStubReviewAdvisoryReport, createUnavailableAdvisoryReport, normalizeProviderPayload } from '../../../plugin-review-advisory/dist/index.js';
-import { evaluateValidationContract } from '../../../core/dist/evidence/validation-contract.js';
+import { attachStandardsSpecReviewReceipt, appendMachineFindings, createStubReviewAdvisoryReport, createUnavailableAdvisoryReport, normalizeProviderPayload } from '../_vendor/plugin-review-advisory/dist/index.js';
+import { evaluateValidationContract } from '../_vendor/core/dist/evidence/validation-contract.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';
 import { evaluateTaskWorkAdmissionGate } from './git-governance/work-admission-check.js';
 // TASK-SKL-0029 — review-advisory lifecycle adapter.

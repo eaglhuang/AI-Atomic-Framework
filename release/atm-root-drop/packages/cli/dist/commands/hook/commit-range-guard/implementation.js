@@ -6,7 +6,7 @@ import path from 'node:path';
 import { auditTasks, detectFrameworkRepoIdentity, isAtmCriticalNonDocSurface, requiredValidationPassesForClosure, validateClosurePacket } from '../../framework-development.js';
 import { gitHeadEvidencePath, gitHeadEvidencePaths } from '../../git-head-evidence.js';
 import { normalizeRelativePath, runGit, runGitLines, runGitScalar } from '../git-index-diagnostics.js';
-import { HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH } from '../../../../../core/dist/broker/historical-work-admission-attestation.js';
+import { HISTORICAL_WORK_ADMISSION_ATTESTATION_PATH } from '../../../_vendor/core/dist/broker/historical-work-admission-attestation.js';
 const protectedBranchPatterns = ['main', 'master', 'trunk', 'release/*'];
 function sameStringSet(left, right) {
     const normalize = (values) => [...new Set(values.map((value) => String(value).trim()).filter(Boolean))].sort();

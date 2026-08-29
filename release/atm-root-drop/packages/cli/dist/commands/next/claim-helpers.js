@@ -4,7 +4,7 @@ import path from 'node:path';
 import { runBroker } from '../broker.js';
 import { CliError } from '../shared.js';
 import { prepareTaskForClaim } from '../tasks/public-surface.js';
-import { projectGovernanceSharedSurfacesFromPaths } from '../../../../core/dist/broker/global-resource-projection.js';
+import { projectGovernanceSharedSurfacesFromPaths } from '../../_vendor/core/dist/broker/global-resource-projection.js';
 import { normalizeTaskRouteStatus } from './intent-normalizers.js';
 export async function prepareImportedTaskForClaim(input) {
     const normalizedStatus = normalizeTaskRouteStatus(input.task.status);

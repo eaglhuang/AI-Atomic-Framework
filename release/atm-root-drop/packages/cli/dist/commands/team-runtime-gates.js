@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { ATM_ONLY_EXECUTION_ROUTE_NOTICE, describeRestrictedExecutionAdapterCapability, evaluateRestrictedExecution } from '../../../core/dist/team-agents/restricted-execution-gateway.js';
+import { ATM_ONLY_EXECUTION_ROUTE_NOTICE, describeRestrictedExecutionAdapterCapability, evaluateRestrictedExecution } from '../_vendor/core/dist/team-agents/restricted-execution-gateway.js';
 export function evaluateTeamPreToolGate(input) {
     const actorId = normalizeOptional(input.actorId);
     const files = normalizePaths(input.files);

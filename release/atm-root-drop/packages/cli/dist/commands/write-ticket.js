@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { acquireWriteTicket, checkWriteTicket } from '../../../core/dist/broker/write-ticket.js';
-import { normalizeWritePathList } from '../../../core/dist/broker/write-scope-policy.js';
+import { acquireWriteTicket, checkWriteTicket } from '../_vendor/core/dist/broker/write-ticket.js';
+import { normalizeWritePathList } from '../_vendor/core/dist/broker/write-scope-policy.js';
 import { resolveActorId } from './actor-registry.js';
 import { CliError, makeResult, message, parseJsonText } from './shared.js';
 export async function runWriteTicket(argv) {

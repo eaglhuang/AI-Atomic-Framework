@@ -11,7 +11,7 @@
  * The public surface is unchanged: task-import-validators.ts re-exports every
  * symbol below, so existing importers keep their import path.
  */
-import { isTddMode, parseTddMode } from '../../../../core/dist/evidence/tdd-cycle.js';
+import { isTddMode, parseTddMode } from '../../_vendor/core/dist/evidence/tdd-cycle.js';
 import { isBroadSuiteCommandOrKey, projectLegacyCommandValidators } from '../test-catalog.js';
 import { normalizeOptionalString, normalizeTaskCausalGraphContract, parseYamlList } from './task-import-validators.js';
 export function parseCausalValidatorCardFields(input) {

@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { emitGateTelemetryEvent } from '../../../../core/dist/telemetry/index.js';
+import { emitGateTelemetryEvent } from '../../_vendor/core/dist/telemetry/index.js';
 import { pathMatchesTaskScope, uniqueSorted } from '../git-governance/commit-scope-policy.js';
 import { readConfiguredPlanningRoots } from '../planning-repo-root.js';
 import { normalizeWorkPath } from './playbook-projection.js';

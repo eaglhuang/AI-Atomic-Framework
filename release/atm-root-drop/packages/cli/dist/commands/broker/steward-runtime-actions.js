@@ -2,11 +2,11 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
-import { composeBrokerProposals } from '../../../../core/dist/broker/compose.js';
-import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../../../core/dist/broker/steward.js';
-import { buildTeamBrokerRuntimeActivationHandshake } from '../../../../core/dist/broker/team-lane.js';
-import { readBrokerProposalFile, validateBrokerProposal } from '../../../../core/dist/broker/proposal.js';
-import { hashContent } from '../../../../core/dist/broker/adapters/cas.js';
+import { composeBrokerProposals } from '../../_vendor/core/dist/broker/compose.js';
+import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../_vendor/core/dist/broker/steward.js';
+import { buildTeamBrokerRuntimeActivationHandshake } from '../../_vendor/core/dist/broker/team-lane.js';
+import { readBrokerProposalFile, validateBrokerProposal } from '../../_vendor/core/dist/broker/proposal.js';
+import { hashContent } from '../../_vendor/core/dist/broker/adapters/cas.js';
 import { loadComposeProposals } from './parser.js';
 function persistComposedMergePlan(cwd, mergePlan) {
     const relativePath = path.join('.atm', 'runtime', 'broker-merge-plans', `${mergePlan.mergePlanId}.json`);

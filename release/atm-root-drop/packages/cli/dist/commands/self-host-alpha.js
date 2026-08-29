@@ -1,6 +1,6 @@
 import { cpSync, existsSync, mkdirSync, rmSync, statSync, utimesSync } from 'node:fs';
 import path from 'node:path';
-import { createContinuationSummaryRecord, createLocalGovernanceAdapter, estimateContextBudgetTokens } from '../../../plugin-governance-local/dist/index.js';
+import { createContinuationSummaryRecord, createLocalGovernanceAdapter, estimateContextBudgetTokens } from '../_vendor/plugin-governance-local/dist/index.js';
 import { createTempWorkspace } from '../temp-workspace.js';
 import { runBootstrap } from './bootstrap-entry.js';
 import { createAgentConfidenceEvidence, resolveAgentProfile, verifyAgentsMarkdown } from './agent-confidence.js';

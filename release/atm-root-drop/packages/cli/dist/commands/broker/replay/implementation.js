@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { buildParallelReplayDogfoodEvidence, buildParallelReplayEvidence, buildParallelReplayScenario } from '../../../../../core/dist/broker/replay/index.js';
+import { buildParallelReplayDogfoodEvidence, buildParallelReplayEvidence, buildParallelReplayScenario } from '../../../_vendor/core/dist/broker/replay/index.js';
 export async function runFrozenParallelReplay(input) {
     const runnerPath = input.runnerPath ?? 'atm.mjs';
     const runner = sealRunner(path.resolve(input.cwd, runnerPath));

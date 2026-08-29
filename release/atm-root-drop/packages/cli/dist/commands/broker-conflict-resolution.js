@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { evaluateBrokerConflictResolutionAuthority } from '../../../core/dist/team-runtime/permission-broker.js';
+import { evaluateBrokerConflictResolutionAuthority } from '../_vendor/core/dist/team-runtime/permission-broker.js';
 /**
  * Read foreign task ids authorized by a single broker conflict resolution
  * artifact for the given claiming task. Mirrors the governed commit lane.

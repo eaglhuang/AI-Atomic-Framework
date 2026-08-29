@@ -4,11 +4,11 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync, } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { actorIdEnvVar, } from "../../actor-registry.js";
-import { evaluateGitAdmission } from "../../../../../core/dist/git/admission.js";
-import { composeBrokerProposals } from "../../../../../core/dist/broker/compose.js";
-import { applyStewardPlan, planStewardApply, } from "../../../../../core/dist/broker/steward.js";
-import { jsonRecordAdapter } from "../../../../../core/dist/broker/adapters/index.js";
-import { buildGitBoundaryEvidenceEnvelope } from "../../../../../core/dist/evidence/index.js";
+import { evaluateGitAdmission } from "../../../_vendor/core/dist/git/admission.js";
+import { composeBrokerProposals } from "../../../_vendor/core/dist/broker/compose.js";
+import { applyStewardPlan, planStewardApply, } from "../../../_vendor/core/dist/broker/steward.js";
+import { jsonRecordAdapter } from "../../../_vendor/core/dist/broker/adapters/index.js";
+import { buildGitBoundaryEvidenceEnvelope } from "../../../_vendor/core/dist/evidence/index.js";
 import { CliError, makeResult, message, quoteCliValue, } from "../../shared.js";
 import { readHeadCommitSha } from './push-command.js';
 export function runGitAdmission(options) {
