@@ -19,6 +19,7 @@ import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { quoteCliValue } from '../shared.ts';
 import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.ts';
 import { inspectCloseWindowStagedIndexAdmission } from '../tasks/close-window-lock.ts';
+import { evaluateAcceptanceEvidenceClosureGate } from '../tasks/close-orchestrator/acceptance-evidence-gate.ts';
 
 export interface TaskflowCloseKnownBlocker {
   readonly code: string;
@@ -195,6 +196,19 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
   };
 }): TaskflowCloseWriteReadinessHint {
   const blockers: TaskflowCloseKnownBlocker[] = [];
+  // `tasks close` builds a closure packet through this same gate.  Evaluate it
+  // before advertising taskflow close as ready, so dry-run cannot be greener
+  // than the eventual write path.
+  const acceptanceEvidenceGate = evaluateAcceptanceEvidenceClosureGate({
+    taskDocument: input.taskDocument
+  });
+  for (const blocker of acceptanceEvidenceGate.blockers) {
+    blockers.push({
+      code: blocker.code,
+      summary: `Taskflow close requires closure-critical acceptance evidence for ${blocker.predicateId}: ${blocker.reasons.join(', ')}.`,
+      requiredCommand: null
+    });
+  }
   const brokerConflictGate = evaluateTaskflowBrokerConflictGate({
     cwd: input.cwd,
     taskId: input.taskId,

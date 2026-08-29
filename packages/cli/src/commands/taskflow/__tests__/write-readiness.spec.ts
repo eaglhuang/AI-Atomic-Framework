@@ -208,4 +208,50 @@ assert.ok(
   'dry-run blockers must include the same code assertClosebackPlanningPathReady() would throw at --write time'
 );
 
+// A closure-critical acceptance predicate is consumed by `tasks close` when it
+// builds the packet.  taskflow preview must surface the exact same missing
+// evidence rather than reporting ready until the first write attempt.
+const acceptanceEvidenceHint = buildTaskflowCloseWriteReadinessHint({
+  cwd: repo,
+  taskId: 'TASK-WRITE-0004',
+  actorId: 'validator',
+  taskDocument: {
+    status: 'done',
+    claim: { state: 'released', actorId: 'validator', leaseId: 'lease-4' },
+    acceptanceEvidence: {
+      'external-proof': {
+        id: 'external-proof',
+        claim: 'An independently verified external proof exists.',
+        authoritativeSources: ['atm.externalProof.v1'],
+        derivationRule: 'verify-external-proof',
+        requiredRealness: 'production-ledger',
+        verifier: { mode: 'separate-actor', actorId: 'independent-verifier' },
+        negativeControls: [{ id: 'missing-proof', expectedFailureReason: 'proof-missing' }],
+        missingDataVerdict: 'inconclusive',
+        closureCritical: true
+      }
+    }
+  },
+  declaredFiles: ['src/app.ts'],
+  closebackPlan: {
+    writerBoundary: { planningMirrorPath: null },
+    closebackPathResolution: null,
+    historicalDeliveryGate: { required: false }
+  } as any,
+  previewCommitBundle: { targetDeliveryFiles: [] },
+  historicalDeliveryRefs: [],
+  planningAuthorityDeliveryGate: {
+    required: false,
+    ok: false,
+    repoRoot: null,
+    matchedFiles: [],
+    reason: null
+  }
+});
+assert.equal(acceptanceEvidenceHint.status, 'blocked');
+assert.ok(
+  acceptanceEvidenceHint.blockers.some((entry) => entry.code === 'ATM_TASK_CLOSE_ACCEPTANCE_EVIDENCE_INSUFFICIENT'),
+  'taskflow preview must surface the same missing acceptance observation that blocks tasks close'
+);
+
 console.log('ok: write readiness spec passed');
