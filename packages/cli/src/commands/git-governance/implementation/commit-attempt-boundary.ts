@@ -7,6 +7,15 @@ import { resolveGovernedCommitSeal } from './sealed-commit-attribution.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
+/**
+ * Preserve the wrapper's explicit attribution when an isolated candidate index
+ * contributes its temporary Git environment. Candidate construction inherits
+ * the process environment, so its ATM_COMMIT_* values are not authoritative.
+ */
+export function mergeCandidateCommitEnv(commitEnv: LegacyValue, scopedEnv: LegacyValue): LegacyValue {
+  return { ...scopedEnv, ...commitEnv };
+}
+
 export function executeCommitAttempt(input: LegacyValue): LegacyValue {
   let protectedOverrideAudit = input.protectedOverrideAudit;
   const runCommit = (env: LegacyValue) => {
@@ -50,7 +59,7 @@ export function executeCommitAttempt(input: LegacyValue): LegacyValue {
         : input.stagedCommitSurface,
       input.actorId,
       input.options.taskId,
-      (scopedEnv: LegacyValue) => runCommit({ ...input.commitEnv, ...scopedEnv }),
+      (scopedEnv: LegacyValue) => runCommit(mergeCandidateCommitEnv(input.commitEnv, scopedEnv)),
       resolveGovernedCommitSeal({
         cwd: input.options.cwd,
         admittedBundle:
