@@ -22,6 +22,7 @@ import { type TaskImportResetOpenClassification } from './import-verify.ts';
 import { classifyForceImportAdmission } from './import-validation.ts';
 import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.ts';
 import { issueTaskImportAdmissionTicket, validateWorkAdmissionImport } from './task-work-admission-import.ts';
+import { preparePlanningMirrorReconcile } from './planning-mirror-reconcile.ts';
 import {
   type TaskImportManifest,
   classifyResetOpenImportForOptions,
@@ -404,6 +405,9 @@ export async function runTasksImport(argv: string[]) {
 
   if (options.write) {
     assertLocalTaskLedgerEnabled(options.cwd, 'import --write');
+    const planningMirrorReconcile = options.reconcileMirror
+      ? preparePlanningMirrorReconcile({ cwd: options.cwd, planAbsolute, tasks: parsed.tasks })
+      : null;
     const result = writeTaskFiles({
       cwd: options.cwd,
       tasks: parsed.tasks,
@@ -423,6 +427,10 @@ export async function runTasksImport(argv: string[]) {
           writtenPaths: result.writtenPaths
         }
       });
+    }
+    if (planningMirrorReconcile) {
+      const planningMirrorPath = planningMirrorReconcile.apply();
+      if (planningMirrorPath) writtenPaths.push(planningMirrorPath);
     }
     attachTaskImportAdmissionTickets({
       cwd: options.cwd,
