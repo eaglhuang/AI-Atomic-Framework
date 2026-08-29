@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TMP-0010",
+  "updatedAt": "2026-08-29T12:39:05.740Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --experimental-strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+    "node atm.mjs --version",
+    "npx tsc --noEmit"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --experimental-strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fd667859c524bc9a45561595c4294cb7a1249506347265e711fe5af96392c8f6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --experimental-strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts"
+      ],
+      "generatedAt": "2026-08-29T12:38:42.786Z",
+      "startedAt": "2026-08-29T12:38:36.888Z",
+      "finishedAt": "2026-08-29T12:38:42.786Z",
+      "durationMs": 5898,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "2d3af263f7b5c55eeaf83d72802fb05c6714946c",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs --version",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0101a7ffad5011e9fae4bd6c1bcff64ac7e9bf967638068cd3782157ec4403e1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs --version"
+      ],
+      "generatedAt": "2026-08-29T12:38:53.783Z",
+      "startedAt": "2026-08-29T12:38:51.923Z",
+      "finishedAt": "2026-08-29T12:38:53.783Z",
+      "durationMs": 1860,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "2d3af263f7b5c55eeaf83d72802fb05c6714946c",
+      "cached": false
+    },
+    {
+      "command": "npx tsc --noEmit",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "npx tsc --noEmit"
+      ],
+      "generatedAt": "2026-08-29T12:39:05.739Z",
+      "startedAt": "2026-08-29T12:38:56.203Z",
+      "finishedAt": "2026-08-29T12:39:05.739Z",
+      "durationMs": 9536,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "2d3af263f7b5c55eeaf83d72802fb05c6714946c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

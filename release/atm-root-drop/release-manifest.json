@@ -1581,6 +1581,13 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-framework-quickfix.skill.md",
     "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-framework-temp-claim.skill.md",
     "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-git-pathspec-emergency-commit.skill.md",
+    "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+    "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
+    "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
+    "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
+    "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
+    "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
+    "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
     "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.skill.md",
     "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-handoff.skill.md",
     "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-internal-build-sync.skill.md",
@@ -2156,6 +2163,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/normalize-task-document-id-helper.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/plan-import-boundary.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/planning-mirror-close-diagnostics.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/planning-mirror-reconcile.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/planning-root-authorship.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/planning-source-seal-policy.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/public-surface.js",
@@ -2927,6 +2935,7 @@
     "release/atm-root-drop/packages/cli/src/commands/tasks/normalize-task-document-id-helper.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/plan-import-boundary.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+    "release/atm-root-drop/packages/cli/src/commands/tasks/planning-mirror-reconcile.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/planning-root-authorship.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/public-surface.ts",
@@ -3918,6 +3927,13 @@
     "release/atm-root-drop/packages/integrations-core/templates/skills/atm-framework-quickfix.skill.md",
     "release/atm-root-drop/packages/integrations-core/templates/skills/atm-framework-temp-claim.skill.md",
     "release/atm-root-drop/packages/integrations-core/templates/skills/atm-git-pathspec-emergency-commit.skill.md",
+    "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+    "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
+    "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
+    "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
+    "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
+    "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
+    "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
     "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.skill.md",
     "release/atm-root-drop/packages/integrations-core/templates/skills/atm-handoff.skill.md",
     "release/atm-root-drop/packages/integrations-core/templates/skills/atm-internal-build-sync.skill.md",
@@ -5866,11 +5882,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1407,
-    "unchanged": 4424,
-    "removed": 193
+    "copied": 19,
+    "unchanged": 1897,
+    "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -19823,6 +19839,69 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+        "digest": "e0d0aa2de42dc8832cde4613dec5eb12fb13b100186494337ed87a84099fe13c",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
+        "digest": "c4a8dbbfc3b35a36dce9ddad0e940cdd63a0c835e476618ee513b9cec874c5ec",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
+        "digest": "8ba314d98eb87015aeee7db301c37d57425187b12567bea1611587d1c97342eb",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
+        "digest": "10b2ccdde51d59d88610ddd6121bfd929e9f4d7ee82acc3c5ade05b32e92c115",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/index.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
+        "digest": "70442b98ed5fea1a2ecc5e95dd485aa5c7db057ec0c697479df01ed7f11f8104",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
+        "digest": "ed47ab80bbf904848621db184a35a09404312a857069bdad151f1930dab6754d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
+        "digest": "c602c541280dab21b685ba114232e76b99ccc1a9669d9281d4d9926731c32315",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.skill.md",
         "digest": "16fb361c23952b59949713723111fa131f18ba0062f399989309eeb696f80807",
         "origin": "source",
@@ -24855,7 +24934,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/import-orchestrator.js",
-        "digest": "005966578fde89e2320ded4cecfd29ce60bdf1e240c5087ec812898cfd9b9203",
+        "digest": "e7bd765df3eabfbfa67b6b9bdfb7df187b91c652f1eaca642c1d1fe7f1b59575",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/import-orchestrator.js"
@@ -24994,6 +25073,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/planning-mirror-close-diagnostics.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/planning-mirror-reconcile.js",
+        "digest": "c52d8ce9402fae3818e69d27eaf52e951a577503d40f6afa66ac16f2f9ba0d79",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/tasks/planning-mirror-reconcile.js"
         ],
         "replaceable": true
       },
@@ -31290,7 +31378,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
-        "digest": "7580c88f3c7580be244f332e4d1a217a0e68f920ce70c48b4662093ee40c75be",
+        "digest": "42cb1c21bb2307f1274d199b7e02cf67ee418650569ffe3fc9ea01c45470d548",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts"
@@ -31794,7 +31882,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/import-orchestrator.ts",
-        "digest": "6cf05edf1164baebb5d1d99d139062a4d7aa5bacb4f8af5366081d3cdafa8a48",
+        "digest": "6a4f9bded6e9808d0c704cd03a6f3d278bc596d0429c7f1eb46202895c26b8dc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/import-orchestrator.ts"
@@ -31933,6 +32021,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/tasks/planning-mirror-reconcile.ts",
+        "digest": "40a658c4bc84d9e03eaab6c24915ac5c692ae56da8f4721c1f5fc14c4e85678d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/tasks/planning-mirror-reconcile.ts"
         ],
         "replaceable": true
       },
@@ -40852,6 +40949,69 @@
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/templates/skills/atm-git-pathspec-emergency-commit.skill.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+        "digest": "e0d0aa2de42dc8832cde4613dec5eb12fb13b100186494337ed87a84099fe13c",
+        "origin": "source",
+        "inputPaths": [
+          "packages/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
+        "digest": "c4a8dbbfc3b35a36dce9ddad0e940cdd63a0c835e476618ee513b9cec874c5ec",
+        "origin": "source",
+        "inputPaths": [
+          "packages/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
+        "digest": "8ba314d98eb87015aeee7db301c37d57425187b12567bea1611587d1c97342eb",
+        "origin": "source",
+        "inputPaths": [
+          "packages/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
+        "digest": "10b2ccdde51d59d88610ddd6121bfd929e9f4d7ee82acc3c5ade05b32e92c115",
+        "origin": "source",
+        "inputPaths": [
+          "packages/integrations-core/templates/skills/atm-governance-router.files/references/index.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
+        "digest": "70442b98ed5fea1a2ecc5e95dd485aa5c7db057ec0c697479df01ed7f11f8104",
+        "origin": "source",
+        "inputPaths": [
+          "packages/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
+        "digest": "ed47ab80bbf904848621db184a35a09404312a857069bdad151f1930dab6754d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
+        "digest": "c602c541280dab21b685ba114232e76b99ccc1a9669d9281d4d9926731c32315",
+        "origin": "source",
+        "inputPaths": [
+          "packages/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md"
         ],
         "replaceable": true
       },
@@ -58352,7 +58512,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:ac0f5229d0681fc29ee1c9044ac9ca2e18e2a39f2925fabf4a2285daba8721ec"
+    "treeDigest": "sha256:6856b202d19c61e3eca0dd4f10c5d93d424cf00a66460bf137bab8bd28f2f398"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -59023,6 +59183,7 @@
       "packages/cli/src/commands/tasks/normalize-task-document-id-helper.ts",
       "packages/cli/src/commands/tasks/plan-import-boundary.ts",
       "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+      "packages/cli/src/commands/tasks/planning-mirror-reconcile.ts",
       "packages/cli/src/commands/tasks/planning-root-authorship.ts",
       "packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
       "packages/cli/src/commands/tasks/public-surface.ts",
@@ -59796,7 +59957,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:78ba8ba333d2efad9863c643632bbdd523c3e36da94c83daa0b8fd237b1b56b8"
+    "digest": "sha256:339704899f5fdb67cc39187c061704fc4a1e37024667ab6080768c1eb49590f4"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -61351,6 +61512,13 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-framework-quickfix.skill.md",
       "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-framework-temp-claim.skill.md",
       "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-git-pathspec-emergency-commit.skill.md",
+      "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+      "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
+      "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
+      "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
+      "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
+      "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
+      "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
       "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-governance-router.skill.md",
       "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-handoff.skill.md",
       "release/atm-root-drop/packages/cli/dist/_vendor/integrations-core/templates/skills/atm-internal-build-sync.skill.md",
@@ -61926,6 +62094,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/normalize-task-document-id-helper.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/plan-import-boundary.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/planning-mirror-close-diagnostics.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/planning-mirror-reconcile.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/planning-root-authorship.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/planning-source-seal-policy.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/public-surface.js",
@@ -62697,6 +62866,7 @@
       "release/atm-root-drop/packages/cli/src/commands/tasks/normalize-task-document-id-helper.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/plan-import-boundary.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/planning-mirror-reconcile.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/planning-root-authorship.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/planning-source-seal-policy.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/public-surface.ts",
@@ -63688,6 +63858,13 @@
       "release/atm-root-drop/packages/integrations-core/templates/skills/atm-framework-quickfix.skill.md",
       "release/atm-root-drop/packages/integrations-core/templates/skills/atm-framework-temp-claim.skill.md",
       "release/atm-root-drop/packages/integrations-core/templates/skills/atm-git-pathspec-emergency-commit.skill.md",
+      "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+      "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
+      "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
+      "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
+      "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
+      "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
+      "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
       "release/atm-root-drop/packages/integrations-core/templates/skills/atm-governance-router.skill.md",
       "release/atm-root-drop/packages/integrations-core/templates/skills/atm-handoff.skill.md",
       "release/atm-root-drop/packages/integrations-core/templates/skills/atm-internal-build-sync.skill.md",
@@ -65639,22 +65816,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:e6d12def4ad7e93322f1b04b71d63ffc3e5d6ae791cf79596d9e8df69f4d225d",
-  "sealedSourceCommit": "1a5e29346c94cbbd2107c08fe573629301e1c0f6",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:d3a00ee4052c18ad8884f08d14600bace715ed389ba14e9f03cb9f717f72913c",
-  "tsBuildCacheDigest": "sha256:d0d38a9f224fb921fa834a38f917889168b8357670a3733750c43a6d07f68715",
+  "buildInputsTreeHash": "sha256:22b28364615b55eded7766634be51ee74c21d202b507d5f4c388bf33d441460b",
+  "sealedSourceCommit": "0b7f9d1b3935a381953a5fa196b06299be739fad",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:06dd4feee26f28ef3cbff54ab29b97f8182b7de9ce6c7727ed148aba35cb69d5",
+  "tsBuildCacheDigest": "sha256:1973b2987179debec1cd995dd05e6e24a333d781fc090c31909bcd44162b88b4",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 49,
-    "skipDecision": 55,
-    "worktreeSetup": 12482,
-    "typescriptBuild": 9199,
-    "rootDropReleaseAssembly": 25856,
-    "onefileReleaseAssembly": 1150,
-    "artifactSync": 8653,
+    "inputHashCalculation": 48,
+    "skipDecision": 62,
+    "worktreeSetup": 17556,
+    "typescriptBuild": 22586,
+    "rootDropReleaseAssembly": 26660,
+    "onefileReleaseAssembly": 1234,
+    "artifactSync": 5016,
     "cleanup": 0,
-    "totalElapsed": 59955
+    "totalElapsed": 87219
   }
 }

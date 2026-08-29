@@ -14,6 +14,7 @@ import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task
 import { classifyForceImportAdmission } from './import-validation.js';
 import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.js';
 import { issueTaskImportAdmissionTicket, validateWorkAdmissionImport } from './task-work-admission-import.js';
+import { preparePlanningMirrorReconcile } from './planning-mirror-reconcile.js';
 import { classifyResetOpenImportForOptions, collectActiveClaimImportSkips, detectPlanHeadings, enrichParsedTasksFromSiblingTaskCards, parseImportOptions, parseSingleCardFromPlugin, parsePlanMarkdown, writeImportEvidence, writeTaskFiles, assertLocalTaskLedgerEnabled, recordStaleRunnerOverride } from '../tasks.js';
 export async function runTasksImport(argv) {
     const options = parseImportOptions(argv);
@@ -365,6 +366,9 @@ export async function runTasksImport(argv) {
     }
     if (options.write) {
         assertLocalTaskLedgerEnabled(options.cwd, 'import --write');
+        const planningMirrorReconcile = options.reconcileMirror
+            ? preparePlanningMirrorReconcile({ cwd: options.cwd, planAbsolute, tasks: parsed.tasks })
+            : null;
         const result = writeTaskFiles({
             cwd: options.cwd,
             tasks: parsed.tasks,
@@ -384,6 +388,11 @@ export async function runTasksImport(argv) {
                     writtenPaths: result.writtenPaths
                 }
             });
+        }
+        if (planningMirrorReconcile) {
+            const planningMirrorPath = planningMirrorReconcile.apply();
+            if (planningMirrorPath)
+                writtenPaths.push(planningMirrorPath);
         }
         attachTaskImportAdmissionTickets({
             cwd: options.cwd,

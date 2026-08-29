@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-29T12-39-48-306Z-close-bd6a766e877d",
+  "taskId": "TASK-TMP-0010",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260829123801-codex-captain-TASK-TMP-0010-14fc30b42c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0010.json",
+  "taskSha256": "sha256:fe70a5161c2200ff48a0b97298a77aa0a19d280ddc75f55edcc26687cea9a1f8",
+  "createdAt": "2026-08-29T12:39:48.306Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0010 --actor codex-captain --status done --historical-delivery 2d3af263f7b5c55eeaf83d72802fb05c6714946c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260829123801-codex-captain-TASK-TMP-0010-14fc30b42c",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0010.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --experimental-strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "node atm.mjs --version",
+      "npx tsc --noEmit"
+    ],
+    "requiredGates": [
+      "node --experimental-strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "node atm.mjs --version",
+      "npx tsc --noEmit"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-29T12:39:48.300Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0010.*",
+        ".atm/history/task-events/TASK-TMP-0010/**",
+        ".atm/history/tasks/TASK-TMP-0010.json",
+        "packages/cli/dist/atm.js",
+        "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/planning-mirror-reconcile.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop/atm.mjs"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/atm.js",
+        "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/planning-mirror-reconcile.ts"
+      ],
+      "requiredGates": [
+        "node --experimental-strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "node atm.mjs --version",
+        "npx tsc --noEmit"
+      ]
+    }
+  }
+}

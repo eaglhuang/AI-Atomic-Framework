@@ -77,8 +77,8 @@ try {
     schemaVersion: 'atm.config.v0.1',
     taskLedger: { enabled: true, mode: 'auto', mirrorExternalTasks: true, requireCliTransitions: true, provider: 'atm-local' }
   });
-  const taskId = 'TASK-IMPORT-077';
-  const planPath = path.join(tempRoot, 'docs/tasks/TASK-IMPORT-077.task.md');
+  const taskId = 'TASK-IMPORT-0077';
+  const planPath = path.join(tempRoot, 'docs/tasks/TASK-IMPORT-0077.task.md');
   mkdirSync(path.dirname(planPath), { recursive: true });
   writeFileSync(planPath, [
     '---',
@@ -114,13 +114,39 @@ try {
   assert(updated.closedAt === '2026-07-10T00:00:00.000Z', 'reconcile-mirror must preserve closedAt');
   assert(updated.closedByActor === 'validator', 'reconcile-mirror must preserve closedByActor');
   assert(updated.closurePacket === '.atm/history/evidence/TASK-IMPORT-077.closure-packet.json', 'reconcile-mirror must preserve closurePacket');
-  assert(updated.source.planPath === 'docs/tasks/TASK-IMPORT-077.task.md', 'reconcile-mirror must refresh source planPath');
+  assert(updated.source.planPath === 'docs/tasks/TASK-IMPORT-0077.task.md', 'reconcile-mirror must refresh source planPath');
   assert(updated.planningRepo === 'PlanningRepo', 'reconcile-mirror must refresh planningRepo');
   assert(updated.targetRepo === 'TargetRepo', 'reconcile-mirror must refresh targetRepo');
   const eventDir = path.join(tempRoot, '.atm/history/task-events', taskId);
   assert(existsSync(eventDir), 'reconcile-mirror must write a transition event');
   const eventText = readFileSync(path.join(eventDir, readdirFirstJson(eventDir)), 'utf8');
   assert(eventText.includes('planning-mirror-reconcile'), 'transition event must identify mirror-only reconcile action');
+
+  const staleTaskId = 'TASK-IMPORT-0078';
+  const stalePlanPath = path.join(tempRoot, 'docs/tasks/TASK-IMPORT-0078.task.md');
+  writeFileSync(stalePlanPath, [
+    '---',
+    `task_id: ${staleTaskId}`,
+    'title: Stale planning mirror fixture',
+    'status: planned',
+    '---',
+    `# ${staleTaskId}`,
+    ''
+  ].join('\n'), 'utf8');
+  writeJson(path.join(tempRoot, '.atm/history/tasks', `${staleTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: staleTaskId,
+    status: 'done',
+    closedAt: '2026-07-10T00:00:00.000Z',
+    source: { planPath: 'docs/tasks/TASK-IMPORT-0078.task.md', hash: 'old-hash' }
+  });
+  const staleResult = await runTasksImport(['--cwd', tempRoot, '--from', stalePlanPath, '--write', '--reconcile-mirror', '--json']);
+  assert(staleResult.ok === true, 'reconcile-mirror must converge a stale planned single card');
+  const stalePlan = readFileSync(stalePlanPath, 'utf8');
+  assert(stalePlan.includes('status: done'), 'reconcile-mirror must write done to the stale planning frontmatter');
+  assert(!stalePlan.includes('status: planned'), 'reconcile-mirror must remove the stale planning status');
+  const staleLedger = JSON.parse(readFileSync(path.join(tempRoot, '.atm/history/tasks', `${staleTaskId}.json`), 'utf8')) as Record<string, any>;
+  assert(staleLedger.status === 'done', 'reconcile-mirror must not reopen a completed ledger while converging planning status');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
@@ -193,8 +219,8 @@ function readdirFirstJson(directory: string): string {
       schemaVersion: 'atm.config.v0.1',
       taskLedger: { enabled: true, mode: 'auto', mirrorExternalTasks: true, requireCliTransitions: true, provider: 'atm-local' }
     });
-    const abandonedId = 'TASK-IMPORT-178';
-    const abandonedPlan = path.join(reopenRoot, 'docs/tasks/TASK-IMPORT-178.task.md');
+    const abandonedId = 'TASK-IMPORT-0178';
+    const abandonedPlan = path.join(reopenRoot, 'docs/tasks/TASK-IMPORT-0178.task.md');
     mkdirSync(path.dirname(abandonedPlan), { recursive: true });
     writeFileSync(abandonedPlan, [
       '---',
@@ -216,7 +242,7 @@ function readdirFirstJson(directory: string): string {
       workItemId: abandonedId,
       title: 'Abandoned fixture',
       status: 'abandoned',
-      source: { planPath: 'docs/tasks/TASK-IMPORT-178.task.md', hash: 'old-abandoned-hash' },
+      source: { planPath: 'docs/tasks/TASK-IMPORT-0178.task.md', hash: 'old-abandoned-hash' },
       importedAt: '2026-07-13T00:00:00.000Z'
     });
     const reopenResult = await runTasksImport([
@@ -244,8 +270,8 @@ function readdirFirstJson(directory: string): string {
       schemaVersion: 'atm.config.v0.1',
       taskLedger: { enabled: true, mode: 'auto', mirrorExternalTasks: true, requireCliTransitions: true, provider: 'atm-local' }
     });
-    const placeholderId = 'TASK-IMPORT-159';
-    const placeholderPlan = path.join(placeholderRoot, 'docs/tasks/TASK-IMPORT-159.task.md');
+    const placeholderId = 'TASK-IMPORT-0159';
+    const placeholderPlan = path.join(placeholderRoot, 'docs/tasks/TASK-IMPORT-0159.task.md');
     mkdirSync(path.dirname(placeholderPlan), { recursive: true });
     writeFileSync(placeholderPlan, [
       '---',
@@ -285,7 +311,7 @@ function readdirFirstJson(directory: string): string {
     const imported = JSON.parse(readFileSync(placeholderTaskPath, 'utf8')) as Record<string, any>;
     assert(imported.status === 'ready', `placeholder import must adopt planning status, got ${imported.status}`);
     assert(typeof imported.source?.hash === 'string' && imported.source.hash.length > 0, 'placeholder import must stamp source hash');
-    assert(imported.source?.planPath === 'docs/tasks/TASK-IMPORT-159.task.md', 'placeholder import must refresh source planPath');
+    assert(imported.source?.planPath === 'docs/tasks/TASK-IMPORT-0159.task.md', 'placeholder import must refresh source planPath');
   } finally {
     rmSync(placeholderRoot, { recursive: true, force: true });
   }
