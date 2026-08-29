@@ -13,6 +13,7 @@ function writeManifest(directory: string, manifest: object): void {
 
 try {
   writeManifest(path.join(root, 'packages', 'core'), { name: '@scope/core', version: '0.1.0' });
+  mkdirSync(path.join(root, 'packages', 'generated'), { recursive: true });
   writeManifest(path.join(root, 'packages', 'cli'), {
     name: '@scope/cli',
     version: '0.1.0',

@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -24,7 +24,8 @@ function packageManifestPaths(root: string): string[] {
   const packagesRoot = path.join(root, 'packages');
   return readdirSync(packagesRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
-    .map((entry) => path.join(packagesRoot, entry.name, 'package.json'));
+    .map((entry) => path.join(packagesRoot, entry.name, 'package.json'))
+    .filter((manifestPath) => existsSync(manifestPath));
 }
 
 /**
