@@ -123,6 +123,7 @@ jobs:
           # Do not ask npm to refresh workspace links from the public registry
           # before the first package has been published.
           npm version "$version" --workspaces --include-workspace-root --no-git-tag-version --no-workspaces-update
+          node --experimental-strip-types scripts/set-release-workspace-versions.ts --version "$version"
 
       - name: Validate release version compatibility
         if: ${{ github.event_name != 'workflow_dispatch' }}
