@@ -114,6 +114,17 @@ jobs:
       - name: Verify npm package contents
         run: npm pack --workspaces --dry-run
 
+      - name: Verify adopter artifact budget
+        run: node --experimental-strip-types scripts/validate-adopter-artifact-manifest.ts
+
+      # Hard publish gate. The published CLI is packed and installed on its own
+      # in a clean directory, with no sibling workspace present, and then run.
+      # beta.1 shipped a tarball whose modules resolved only because the whole
+      # workspace closure happened to be installed alongside it; an isolated
+      # install is the only check that can observe that class of defect.
+      - name: Clean-install npx smoke (publish gate)
+        run: node --experimental-strip-types scripts/validate-npm-clean-install.ts
+
       - name: Set npm package versions from tag
         shell: bash
         run: |
@@ -175,34 +186,14 @@ jobs:
       - name: Publish public workspace closure
         shell: bash
         run: |
+          # The npm product is one self-contained CLI tarball. Every other
+          # workspace is a build-time input whose runtime output ships vendored
+          # inside packages/cli/dist/_vendor, so it is never published. This list
+          # must stay identical to publishClosure.publishedPackages in
+          # tests/package-skeleton.fixture.json; validate-release-trust fails the
+          # release if the two drift or if a non-closure workspace reappears here.
           PUBLIC_WORKSPACES=(
-            "@ai-atomic-framework/core"
             "@ai-atomic-framework/cli"
-            "@ai-atomic-framework/plugin-sdk"
-            "@ai-atomic-framework/plugin-rule-guard"
-            "@ai-atomic-framework/plugin-governance-local"
-            "@ai-atomic-framework/plugin-human-review"
-            "@ai-atomic-framework/plugin-review-advisory"
-            "@ai-atomic-framework/plugin-experience-loop"
-            "@ai-atomic-framework/plugin-behavior-pack"
-            "@ai-atomic-framework/adapter-local-git"
-            "@ai-atomic-framework/language-js"
-            "@ai-atomic-framework/language-python"
-            "@ai-atomic-framework/language-csharp"
-            "@ai-atomic-framework/integrations-core"
-            "@ai-atomic-framework/integration-claude-code"
-            "@ai-atomic-framework/integration-copilot"
-            "@ai-atomic-framework/integration-codex"
-            "@ai-atomic-framework/integration-cursor"
-            "@ai-atomic-framework/integration-gemini"
-            "@ai-atomic-framework/agent-pack-sdk"
-            "@ai-atomic-framework/agent-pack-claude-code"
-            "@ai-atomic-framework/agent-pack-cursor"
-            "@ai-atomic-framework/agent-pack-copilot"
-            "@ai-atomic-framework/agent-pack-gemini"
-            "@ai-atomic-framework/agent-pack-windsurf"
-            "create-atm"
-            "@ai-atomic-framework/atm-markdown-task-source"
           )
           release_version="${GITHUB_REF_NAME#v}"
           if [[ "$RELEASE_DRY_RUN" == "true" ]]; then

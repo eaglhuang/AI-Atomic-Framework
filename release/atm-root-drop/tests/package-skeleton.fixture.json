@@ -1,4 +1,11 @@
 {
+  "publishClosure": {
+    "schemaId": "atm.npmPublishClosure.v1",
+    "rationale": "The npm product is a single self-contained CLI tarball. Every other workspace stays a build-time input whose runtime output ships vendored inside packages/cli/dist/_vendor, so it is skeleton-validated here but never published.",
+    "publishedPackages": [
+      "@ai-atomic-framework/cli"
+    ]
+  },
   "packages": [
     {
       "name": "@ai-atomic-framework/core",
@@ -13,7 +20,11 @@
       "name": "@ai-atomic-framework/cli",
       "directory": "packages/cli",
       "role": "Command entrypoints and run envelopes",
-      "exportSymbol": "cliPackage"
+      "exportSymbol": "cliPackage",
+      "externalDependencies": {
+        "ajv": "^8.17.1",
+        "ajv-formats": "^3.0.1"
+      }
     },
     {
       "name": "@ai-atomic-framework/plugin-sdk",
@@ -49,7 +60,8 @@
       "name": "@ai-atomic-framework/plugin-experience-loop",
       "directory": "packages/plugin-experience-loop",
       "role": "Experience-loop learning artifact extraction plugin",
-      "exportSymbol": "pluginExperienceLoopPackage"
+      "exportSymbol": "pluginExperienceLoopPackage",
+      "publishFiles": ["dist", "schemas"]
     },
     {
       "name": "@ai-atomic-framework/plugin-behavior-pack",
@@ -85,7 +97,8 @@
       "name": "@ai-atomic-framework/integrations-core",
       "directory": "packages/integrations-core",
       "role": "Integration adapter contracts and install manifest utilities",
-      "exportSymbol": "integrationsCorePackage"
+      "exportSymbol": "integrationsCorePackage",
+      "publishFiles": ["dist", "templates"]
     },
     {
       "name": "@ai-atomic-framework/integration-claude-code",
@@ -131,6 +144,7 @@
       "directory": "packages/agent-pack-claude-code",
       "role": "Claude Code agent pack",
       "exportSymbol": "claudeCodePack",
+      "publishFiles": ["dist", "templates"],
       "externalDependencies": {
         "typescript": "^5.9.3"
       }
@@ -175,13 +189,15 @@
       "name": "create-atm",
       "directory": "packages/create-atm",
       "role": "npm create command for ATM governance onboarding",
-      "exportSymbol": "createAtmPackage"
+      "exportSymbol": "createAtmPackage",
+      "publishFiles": ["dist", "README.md"]
     },
     {
       "name": "@ai-atomic-framework/atm-markdown-task-source",
       "directory": "packages/atm-markdown-task-source",
       "role": "Reference ExternalTaskSourcePlugin for parsing markdown task cards.",
-      "exportSymbol": "AtmMarkdownTaskSourcePlugin"
+      "exportSymbol": "AtmMarkdownTaskSourcePlugin",
+      "publishFiles": ["dist", "templates"]
     }
   ]
 }

@@ -25,16 +25,8 @@
     "dist"
   ],
   "dependencies": {
-    "@ai-atomic-framework/agent-pack-claude-code": "0.1.0",
-    "@ai-atomic-framework/agent-pack-copilot": "0.1.0",
-    "@ai-atomic-framework/agent-pack-cursor": "0.1.0",
-    "@ai-atomic-framework/agent-pack-gemini": "0.1.0",
-    "@ai-atomic-framework/agent-pack-sdk": "0.1.0",
-    "@ai-atomic-framework/agent-pack-windsurf": "0.1.0",
-    "@ai-atomic-framework/core": "0.1.0",
-    "@ai-atomic-framework/plugin-human-review": "0.1.0",
-    "@ai-atomic-framework/plugin-governance-local": "0.1.0",
-    "@ai-atomic-framework/plugin-rule-guard": "0.1.0"
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
   },
   "scripts": {
     "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/cli",
@@ -67,16 +59,36 @@
       "maxPackedEntries": 308,
       "semantics": "ACC-3 vs this unmodified Phase-2 inventory: unpacked CLI bytes must fall at least 70% (remain <= 3365772) and entry count at least 80% (remain <= 308). The budget is a cap. Forbidden classes stay rejected even if they would fit."
     },
+    "runtimeClosure": {
+      "schemaId": "atm.cliRuntimeClosure.v1",
+      "vendorRoot": "dist/_vendor",
+      "rationale": "The CLI is the single published npm product. Transpiled CLI modules reach sibling workspaces through relative specifiers that escape packages/cli, so a tarball carrying only packages/cli/dist resolved nothing. Sibling runtime output is vendored under dist/_vendor in the packages/<name>/ layout, which keeps intra-vendor specifiers valid and leaves only the CLI's own escaping specifiers to rewrite.",
+      "measuredOn": "2026-08-29",
+      "measured": {
+        "entries": 1127,
+        "bytes": 7539953
+      }
+    },
+    "supersededBudgets": [
+      {
+        "reason": "The sealed 70%/80% target is not feasible without removing live command modules. The owner authorized a bounded quickfix/emergency completion path; preserve runtime behavior while enforcing a measured cap and rejecting development-only payloads.",
+        "revisedBudget": {
+          "maxPackedBytes": 4800000,
+          "maxPackedEntries": 650
+        },
+        "supersededBy": "single-public-cli-tarball-product-closure"
+      }
+    ],
     "ownerApprovedDependencyRevision": {
       "approvedBy": "repository owner",
-      "reason": "The sealed 70%/80% target is not feasible without removing live command modules. The owner authorized a bounded quickfix/emergency completion path; preserve runtime behavior while enforcing a measured cap and rejecting development-only payloads.",
+      "reason": "Owner directed the single public CLI tarball product closure: converge the npm release from 27 public workspaces to one self-contained CLI. Vendoring sibling runtime output into dist/_vendor is the direct and intended cost of that closure, so the cap is re-based on the measured self-contained artifact rather than on the multi-package layout it replaces. The forbidden classes below stay rejected at the new cap.",
       "originalTarget": {
         "maxPackedBytes": 3365772,
         "maxPackedEntries": 308
       },
       "revisedBudget": {
-        "maxPackedBytes": 4800000,
-        "maxPackedEntries": 650
+        "maxPackedBytes": 8144000,
+        "maxPackedEntries": 1220
       }
     },
     "forbiddenArtifacts": [

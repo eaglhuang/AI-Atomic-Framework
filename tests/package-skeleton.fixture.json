@@ -1,4 +1,11 @@
 {
+  "publishClosure": {
+    "schemaId": "atm.npmPublishClosure.v1",
+    "rationale": "The npm product is a single self-contained CLI tarball. Every other workspace stays a build-time input whose runtime output ships vendored inside packages/cli/dist/_vendor, so it is skeleton-validated here but never published.",
+    "publishedPackages": [
+      "@ai-atomic-framework/cli"
+    ]
+  },
   "packages": [
     {
       "name": "@ai-atomic-framework/core",
@@ -13,7 +20,11 @@
       "name": "@ai-atomic-framework/cli",
       "directory": "packages/cli",
       "role": "Command entrypoints and run envelopes",
-      "exportSymbol": "cliPackage"
+      "exportSymbol": "cliPackage",
+      "externalDependencies": {
+        "ajv": "^8.17.1",
+        "ajv-formats": "^3.0.1"
+      }
     },
     {
       "name": "@ai-atomic-framework/plugin-sdk",

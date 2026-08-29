@@ -48,11 +48,20 @@ assert(existsSync(workflowPath), '.github/workflows/release-npm.yml must exist')
 const workflow = existsSync(workflowPath) ? readFileSync(workflowPath, 'utf8') : '';
 const packageFixturePath = path.join(root, 'tests', 'package-skeleton.fixture.json');
 const packageFixture = existsSync(packageFixturePath)
-  ? JSON.parse(readFileSync(packageFixturePath, 'utf8')) as { packages?: readonly { name?: unknown }[] }
+  ? JSON.parse(readFileSync(packageFixturePath, 'utf8')) as {
+      packages?: readonly { name?: unknown }[];
+      publishClosure?: { publishedPackages?: readonly unknown[] };
+    }
   : {};
-const publicPackageNames = Array.isArray(packageFixture.packages)
+const skeletonPackageNames = Array.isArray(packageFixture.packages)
   ? packageFixture.packages.map((entry) => entry.name).filter((name): name is string => typeof name === 'string')
   : [];
+// Skeleton coverage and publish surface are different obligations. Every
+// workspace is skeleton-validated; only the declared publish closure may reach
+// npm, so release trust is asserted against that closure rather than against
+// the full workspace list.
+const publicPackageNames = (packageFixture.publishClosure?.publishedPackages ?? [])
+  .filter((name): name is string => typeof name === 'string');
 
 const publishLines = workflow.split(/\r?\n/).filter((line) => line.includes('npm publish'));
 assert(publishLines.length >= 2, 'release-npm.yml: must publish the complete workspace closure in both dry-run and release branches');
@@ -66,9 +75,18 @@ assert(workflow.includes('PUBLIC_WORKSPACES=('), 'release-npm.yml: must declare 
 assert(workflow.includes('for workspace in "${PUBLIC_WORKSPACES[@]}"; do'), 'release-npm.yml: must iterate every explicitly declared public workspace');
 assert(workflow.includes('npm view "$workspace@$release_version" version --json'), 'release-npm.yml: release retries must skip already-published workspace versions');
 assert(!workflow.includes('npm publish --workspaces'), 'release-npm.yml: must not publish example workspaces through --workspaces');
-assert(publicPackageNames.length > 0, 'tests/package-skeleton.fixture.json must declare the public package closure');
+assert(publicPackageNames.length > 0, 'tests/package-skeleton.fixture.json must declare publishClosure.publishedPackages');
 for (const packageName of publicPackageNames) {
   assert(workflow.includes(`"${packageName}"`), `release-npm.yml: missing explicit public workspace ${packageName}`);
+}
+// A workspace outside the declared closure must not be reachable from the
+// publish list, or the release silently widens back to the multi-package surface.
+for (const packageName of skeletonPackageNames) {
+  if (publicPackageNames.includes(packageName)) continue;
+  assert(
+    !new RegExp(`^\\s*"${packageName.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}"\\s*$`, 'm').test(workflow),
+    `release-npm.yml: ${packageName} is outside publishClosure.publishedPackages and must not be listed for publish`
+  );
 }
 
 assert(/workflow_dispatch/.test(workflow) && /dry_run/.test(workflow), 'release-npm.yml: must expose workflow_dispatch dry_run mode');

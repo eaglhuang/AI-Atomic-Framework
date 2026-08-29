@@ -6,7 +6,8 @@
  * At PR/CI time `release/integrity.json` may not yet exist (it is
  * produced at publish time).  This validator therefore checks:
  *
- *   1. The release workflow declares `--provenance` on every `npm publish` step.
+ *   1. The release workflow publishes the complete public workspace closure
+ *      with provenance, public access, and a resolved dist-tag.
  *   2. The release workflow includes a SBOM generation step.
  *   3. The release workflow includes the `build-release-integrity` step.
  *   4. `scripts/build-release-integrity.ts` exists.
@@ -45,11 +46,47 @@ const workflowPath = path.join(root, '.github', 'workflows', 'release-npm.yml');
 assert(existsSync(workflowPath), '.github/workflows/release-npm.yml must exist');
 
 const workflow = existsSync(workflowPath) ? readFileSync(workflowPath, 'utf8') : '';
+const packageFixturePath = path.join(root, 'tests', 'package-skeleton.fixture.json');
+const packageFixture = existsSync(packageFixturePath)
+  ? JSON.parse(readFileSync(packageFixturePath, 'utf8')) as {
+      packages?: readonly { name?: unknown }[];
+      publishClosure?: { publishedPackages?: readonly unknown[] };
+    }
+  : {};
+const skeletonPackageNames = Array.isArray(packageFixture.packages)
+  ? packageFixture.packages.map((entry) => entry.name).filter((name): name is string => typeof name === 'string')
+  : [];
+// Skeleton coverage and publish surface are different obligations. Every
+// workspace is skeleton-validated; only the declared publish closure may reach
+// npm, so release trust is asserted against that closure rather than against
+// the full workspace list.
+const publicPackageNames = (packageFixture.publishClosure?.publishedPackages ?? [])
+  .filter((name): name is string => typeof name === 'string');
 
 const publishLines = workflow.split(/\r?\n/).filter((line) => line.includes('npm publish'));
-assert(publishLines.length >= 2, 'release-npm.yml: must publish both ATM CLI and create-atm packages');
+assert(publishLines.length >= 2, 'release-npm.yml: must publish the complete workspace closure in both dry-run and release branches');
 for (const line of publishLines) {
   assert(line.includes('--provenance'), `release-npm.yml: npm publish line must include --provenance: ${line.trim()}`);
+  assert(line.includes('--access public'), `release-npm.yml: npm publish line must make public packages explicitly public: ${line.trim()}`);
+  assert(line.includes('--tag "$NPM_DIST_TAG"'), `release-npm.yml: npm publish line must use the resolved NPM_DIST_TAG: ${line.trim()}`);
+  assert(line.includes('--workspace "$workspace"'), `release-npm.yml: npm publish line must target one explicit workspace: ${line.trim()}`);
+}
+assert(workflow.includes('PUBLIC_WORKSPACES=('), 'release-npm.yml: must declare the explicit public workspace closure');
+assert(workflow.includes('for workspace in "${PUBLIC_WORKSPACES[@]}"; do'), 'release-npm.yml: must iterate every explicitly declared public workspace');
+assert(workflow.includes('npm view "$workspace@$release_version" version --json'), 'release-npm.yml: release retries must skip already-published workspace versions');
+assert(!workflow.includes('npm publish --workspaces'), 'release-npm.yml: must not publish example workspaces through --workspaces');
+assert(publicPackageNames.length > 0, 'tests/package-skeleton.fixture.json must declare publishClosure.publishedPackages');
+for (const packageName of publicPackageNames) {
+  assert(workflow.includes(`"${packageName}"`), `release-npm.yml: missing explicit public workspace ${packageName}`);
+}
+// A workspace outside the declared closure must not be reachable from the
+// publish list, or the release silently widens back to the multi-package surface.
+for (const packageName of skeletonPackageNames) {
+  if (publicPackageNames.includes(packageName)) continue;
+  assert(
+    !new RegExp(`^\\s*"${packageName.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}"\\s*$`, 'm').test(workflow),
+    `release-npm.yml: ${packageName} is outside publishClosure.publishedPackages and must not be listed for publish`
+  );
 }
 
 assert(/workflow_dispatch/.test(workflow) && /dry_run/.test(workflow), 'release-npm.yml: must expose workflow_dispatch dry_run mode');

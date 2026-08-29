@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const CLI_PACKAGE_DIR = 'packages/cli';
+const VENDOR_DIRNAME = '_vendor';
 const onlyPackage = process.argv.includes('--package')
   ? process.argv[process.argv.indexOf('--package') + 1]
   : null;
@@ -193,6 +195,7 @@ const packageDirs = readdirSync(path.join(root, 'packages'), { withFileTypes: tr
 
 const mode = onlyPackage || onlyPackages ? 'incremental' : 'full';
 for (const packageDir of packageDirs) buildPackage(packageDir, mode);
+if (packageDirs.includes(CLI_PACKAGE_DIR)) buildCliRuntimeClosure();
 console.log(`[build-package-dist] built ${packageDirs.length} packages (${mode})`);
 
 function writeTextIfChanged(filePath: string, content: string): void {
@@ -208,4 +211,151 @@ function copyFileIfChanged(source: string, target: string): void {
 function fileDigest(filePath: string): string {
   const stats = statSync(filePath);
   return createHash('sha256').update(readFileSync(filePath)).update(String(stats.mode & 0o777)).digest('hex');
+}
+
+// --- CLI runtime closure -------------------------------------------------
+// The CLI is the single published product. Transpiled CLI modules reference
+// sibling workspaces through relative specifiers that escape packages/cli, so
+// an npm tarball containing only packages/cli/dist resolves nothing. Vendor the
+// referenced workspaces under dist/_vendor using the same packages/<name>/
+// layout: intra-vendor relative specifiers then resolve unchanged, and only the
+// CLI's own escaping specifiers need rewriting.
+
+type EscapingReference = {
+  readonly specifier: string;
+  readonly packageName: string;
+  readonly absoluteTarget: string;
+};
+
+function packageOwnerOf(absolutePath: string): string | null {
+  const normalized = absolutePath.replace(/\\/g, '/');
+  const packagesRoot = `${root.replace(/\\/g, '/')}/packages/`;
+  if (!normalized.startsWith(packagesRoot)) return null;
+  const packageName = normalized.slice(packagesRoot.length).split('/')[0];
+  return packageName || null;
+}
+
+function escapingPackageReferences(sourceFile: string, resolveFrom: string): readonly EscapingReference[] {
+  const source = readFileSync(sourceFile, 'utf8');
+  const owner = packageOwnerOf(resolveFrom);
+  const references: EscapingReference[] = [];
+  const patterns = [
+    /from\s+['"]([^'"]+)['"]/g,
+    /import\s+['"]([^'"]+)['"]/g,
+    /import\(\s*['"]([^'"]+)['"]\s*\)/g
+  ];
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern)) {
+      const specifier = match[1]!;
+      if (!specifier.startsWith('.')) continue;
+      const absoluteTarget = path.resolve(path.dirname(resolveFrom), specifier);
+      const targetOwner = packageOwnerOf(absoluteTarget);
+      if (!targetOwner || targetOwner === owner) continue;
+      references.push({ specifier, packageName: targetOwner, absoluteTarget });
+    }
+  }
+  return references;
+}
+
+function publishRootsOf(packageName: string): readonly string[] {
+  const manifestPath = path.join(root, 'packages', packageName, 'package.json');
+  if (!existsSync(manifestPath)) return ['dist'];
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as { files?: string[] };
+  const roots = (manifest.files ?? ['dist']).filter((entry) => entry !== 'src' && !entry.endsWith('.md'));
+  return roots.length > 0 ? roots : ['dist'];
+}
+
+function copyRuntimeTree(sourceRoot: string, targetRoot: string): readonly string[] {
+  const copied: string[] = [];
+  for (const filePath of listFiles(sourceRoot)) {
+    const relative = path.relative(sourceRoot, filePath);
+    if (relative.split(path.sep).includes('__tests__') || /\.test\.[cm]?[jt]s$/.test(relative)) continue;
+    const target = path.join(targetRoot, relative);
+    ensureDir(target);
+    copyFileIfChanged(filePath, target);
+    copied.push(filePath);
+  }
+  return copied;
+}
+
+function replaceSpecifier(source: string, specifier: string, replacement: string): string {
+  const escaped = specifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return source
+    .replace(new RegExp(`(from\\s+['"])${escaped}(['"])`, 'g'), `$1${replacement}$2`)
+    .replace(new RegExp(`(import\\s+['"])${escaped}(['"])`, 'g'), `$1${replacement}$2`)
+    .replace(new RegExp(`(import\\(\\s*['"])${escaped}(['"]\\s*\\))`, 'g'), `$1${replacement}$2`);
+}
+
+function buildCliRuntimeClosure(): void {
+  const cliDist = path.join(root, CLI_PACKAGE_DIR, 'dist');
+  const vendorRoot = path.join(cliDist, VENDOR_DIRNAME);
+  rmSync(vendorRoot, { recursive: true, force: true });
+  if (!existsSync(cliDist)) return;
+
+  const cliFiles = listFiles(cliDist).filter((filePath) => /\.[cm]?js$/.test(filePath));
+  const vendored = new Set<string>();
+  const pending: string[] = [];
+  const enqueue = (packageName: string): void => {
+    if (packageName === 'cli' || vendored.has(packageName)) return;
+    vendored.add(packageName);
+    pending.push(packageName);
+  };
+  for (const filePath of cliFiles) {
+    for (const reference of escapingPackageReferences(filePath, filePath)) enqueue(reference.packageName);
+  }
+
+  while (pending.length > 0) {
+    const packageName = pending.shift()!;
+    for (const publishRoot of publishRootsOf(packageName)) {
+      const sourceRoot = path.join(root, 'packages', packageName, publishRoot);
+      if (!existsSync(sourceRoot)) continue;
+      for (const originalFile of copyRuntimeTree(sourceRoot, path.join(vendorRoot, packageName, publishRoot))) {
+        if (!/\.[cm]?js$/.test(originalFile)) continue;
+        // Resolve against the authored location so an escaping specifier names
+        // the workspace it was written against, not the vendored copy.
+        for (const reference of escapingPackageReferences(originalFile, originalFile)) enqueue(reference.packageName);
+      }
+    }
+  }
+
+  // A vendored workspace may reference back into the CLI. The mirrored layout
+  // cannot satisfy that, because the CLI is the tarball root rather than a
+  // vendored sibling, so those specifiers are redirected to the real CLI dist.
+  let rewrittenVendorFiles = 0;
+  for (const vendorFile of listFiles(vendorRoot)) {
+    if (!/\.[cm]?js$/.test(vendorFile)) continue;
+    const relativeToVendor = path.relative(vendorRoot, vendorFile);
+    const vendoredPackage = relativeToVendor.split(path.sep)[0]!;
+    const originalFile = path.join(root, 'packages', vendoredPackage, path.relative(path.join(vendorRoot, vendoredPackage), vendorFile));
+    const cliReferences = escapingPackageReferences(originalFile, originalFile).filter((reference) => reference.packageName === 'cli');
+    if (cliReferences.length === 0) continue;
+    let source = readFileSync(vendorFile, 'utf8');
+    for (const reference of cliReferences) {
+      let rewritten = path.relative(path.dirname(vendorFile), reference.absoluteTarget).replace(/\\/g, '/');
+      if (!rewritten.startsWith('.')) rewritten = `./${rewritten}`;
+      source = replaceSpecifier(source, reference.specifier, rewritten);
+    }
+    writeTextIfChanged(vendorFile, source);
+    rewrittenVendorFiles += 1;
+  }
+
+  let rewrittenFiles = 0;
+  for (const filePath of cliFiles) {
+    const references = escapingPackageReferences(filePath, filePath);
+    if (references.length === 0) continue;
+    let source = readFileSync(filePath, 'utf8');
+    for (const reference of references) {
+      const vendorTarget = path.join(
+        vendorRoot,
+        reference.packageName,
+        path.relative(path.join(root, 'packages', reference.packageName), reference.absoluteTarget)
+      );
+      let rewritten = path.relative(path.dirname(filePath), vendorTarget).replace(/\\/g, '/');
+      if (!rewritten.startsWith('.')) rewritten = `./${rewritten}`;
+      source = replaceSpecifier(source, reference.specifier, rewritten);
+    }
+    writeTextIfChanged(filePath, source);
+    rewrittenFiles += 1;
+  }
+  console.log(`[build-package-dist] cli runtime closure: vendored ${vendored.size} workspaces, rewrote ${rewrittenFiles} cli modules and ${rewrittenVendorFiles} vendored modules`);
 }
