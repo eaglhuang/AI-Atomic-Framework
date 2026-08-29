@@ -102,7 +102,7 @@ function describeAdoptionResidue(adoptionRoot: string): string {
   return `left ${residue.length} file(s) behind: ${residue.slice(0, 8).join(', ')}${residue.length > 8 ? ` (+${residue.length - 8} more)` : ''}`;
 }
 
-function assertAdoptionSucceeds(binPath: string, tempRoot: string): void {
+function assertAdoptionSucceeds(binPath: string, tempRoot: string, expectedVersion: string): void {
   const adoptionRoot = path.join(tempRoot, 'adoption-probe');
   mkdirSync(adoptionRoot, { recursive: true });
   run('git', ['init', '--quiet', '.'], adoptionRoot);
@@ -119,7 +119,10 @@ function assertAdoptionSucceeds(binPath: string, tempRoot: string): void {
   const configPath = path.join(adoptionRoot, '.atm', 'config.json');
   if (!existsSync(configPath)) fail(`atm init reported success but wrote no .atm/config.json; it ${describeAdoptionResidue(adoptionRoot)}`);
   try {
-    JSON.parse(readFileSync(configPath, 'utf8'));
+    const config = JSON.parse(readFileSync(configPath, 'utf8')) as { frameworkVersion?: unknown };
+    if (config.frameworkVersion !== expectedVersion) {
+      fail(`atm init wrote frameworkVersion ${JSON.stringify(config.frameworkVersion)} instead of installed tarball version ${JSON.stringify(expectedVersion)}`);
+    }
   } catch (parseError) {
     fail(`atm init wrote an unparseable .atm/config.json: ${String(parseError)}`);
   }
@@ -131,6 +134,10 @@ function assertAdoptionSucceeds(binPath: string, tempRoot: string): void {
   ]).filter((relative) => !existsSync(path.join(adoptionRoot, relative)));
   if (missingScripts.length > 0) {
     fail(`atm init reported success but the adopted repository is incomplete; missing ${missingScripts.length} root-drop script(s): ${missingScripts.slice(0, 6).join(', ')}`);
+  }
+  const doctor = spawnSync(binPath, ['doctor', '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  if (doctor.status !== 0) {
+    fail(`atm doctor failed in a freshly initialized adopter: ${`${doctor.stdout ?? ''}${doctor.stderr ?? ''}`.split('\n').slice(0, 8).join(' ')}`);
   }
 }
 
@@ -204,7 +211,18 @@ try {
         fail(`${packageSpec.bin} ${smokeArgs.join(' ')} failed after clean install: ${smokeText}`);
       }
     }
-    if (packageSpec.name === '@ai-atomic-framework/cli') assertAdoptionSucceeds(binPath, tempRoot);
+    if (packageSpec.name === '@ai-atomic-framework/cli') {
+      const installedManifest = JSON.parse(readFileSync(path.join(installRoot, 'node_modules', ...packageSpec.name.split('/'), 'package.json'), 'utf8')) as { version?: unknown };
+      if (typeof installedManifest.version !== 'string' || installedManifest.version.trim().length === 0) {
+        fail('installed CLI tarball has no package version');
+      }
+      const version = spawnSync(binPath, ['--version', '--json'], { cwd: installRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+      const versionText = `${version.stdout ?? ''}${version.stderr ?? ''}`;
+      if (version.status !== 0 || !versionText.includes(`\"frameworkVersion\": \"${installedManifest.version}\"`)) {
+        fail(`atm --version must report the installed tarball version ${installedManifest.version}: ${versionText.split('\n').slice(0, 8).join(' ')}`);
+      }
+      assertAdoptionSucceeds(binPath, tempRoot, installedManifest.version);
+    }
   }
   console.log(JSON.stringify({
     ok: true,
