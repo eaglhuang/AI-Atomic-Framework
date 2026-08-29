@@ -29,9 +29,12 @@ const workflow = readFileSync(releaseWorkflow, 'utf8');
 const publishLines = workflow.split(/\r?\n/).filter((line) => line.includes('npm publish'));
 assert.ok(publishLines.length >= 2, 'release workflow must publish in both dry-run and release branches');
 for (const line of publishLines) {
-  assert.match(line, /"\$\{WORKSPACE_ARGS\[@\]\}"/, 'release workflow must publish the explicit public workspace closure');
+  assert.match(line, /--workspace "\$workspace"/, 'release workflow must publish one explicit workspace at a time');
   assert.match(line, /--include-workspace-root=false/, 'release workflow must not publish the private repository root');
 }
+assert.match(workflow, /PUBLIC_WORKSPACES=\(/, 'release workflow must declare the explicit public workspace closure');
+assert.match(workflow, /for workspace in "\$\{PUBLIC_WORKSPACES\[@\]\}"; do/, 'release workflow must iterate the explicit public workspace closure');
+assert.match(workflow, /npm view "\$workspace@\$release_version" version --json/, 'release workflow must skip versions already published during a recovery rerun');
 assert.doesNotMatch(workflow, /npm publish --workspaces/, 'release workflow must not publish example workspaces');
 for (const packageSpec of fixture.packages) {
   assert.ok(workflow.includes(`"${packageSpec.name}"`), `release workflow must include ${packageSpec.name}`);

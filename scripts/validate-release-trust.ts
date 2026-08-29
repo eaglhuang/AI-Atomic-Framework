@@ -60,8 +60,11 @@ for (const line of publishLines) {
   assert(line.includes('--provenance'), `release-npm.yml: npm publish line must include --provenance: ${line.trim()}`);
   assert(line.includes('--access public'), `release-npm.yml: npm publish line must make public packages explicitly public: ${line.trim()}`);
   assert(line.includes('--tag "$NPM_DIST_TAG"'), `release-npm.yml: npm publish line must use the resolved NPM_DIST_TAG: ${line.trim()}`);
-  assert(line.includes('"${WORKSPACE_ARGS[@]}"'), `release-npm.yml: npm publish line must use the explicit public workspace closure: ${line.trim()}`);
+  assert(line.includes('--workspace "$workspace"'), `release-npm.yml: npm publish line must target one explicit workspace: ${line.trim()}`);
 }
+assert(workflow.includes('PUBLIC_WORKSPACES=('), 'release-npm.yml: must declare the explicit public workspace closure');
+assert(workflow.includes('for workspace in "${PUBLIC_WORKSPACES[@]}"; do'), 'release-npm.yml: must iterate every explicitly declared public workspace');
+assert(workflow.includes('npm view "$workspace@$release_version" version --json'), 'release-npm.yml: release retries must skip already-published workspace versions');
 assert(!workflow.includes('npm publish --workspaces'), 'release-npm.yml: must not publish example workspaces through --workspaces');
 assert(publicPackageNames.length > 0, 'tests/package-skeleton.fixture.json must declare the public package closure');
 for (const packageName of publicPackageNames) {
