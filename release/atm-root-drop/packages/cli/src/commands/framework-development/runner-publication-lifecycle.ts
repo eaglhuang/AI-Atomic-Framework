@@ -323,7 +323,7 @@ export function inspectRunnerPublicationDisposition(cwd: string, receiptRef?: st
     : null) ?? receipts.find((candidate) => {
     const members = new Set(candidate.inventory.entries.map((entry) => entry.path));
     return dirtyPaths.some((entry) => members.has(entry));
-  }) ?? receipts[0] ?? null;
+  }) ?? null;
   const inventory = selected?.inventory ?? deriveRunnerBuildOutputInventory({
     sealedSourceSha: readHeadSha(cwd),
     observedPaths: []

@@ -638,6 +638,7 @@
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-27-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-28-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-29-001.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-30-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
     "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
     "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -1091,10 +1092,18 @@
     "release/atm-root-drop/fixtures/verify/guard-evidence-missing-justification.json",
     "release/atm-root-drop/fixtures/verify/guard-evidence-pass.json",
     "release/atm-root-drop/integrations/codex-skills/atm-atom-map-refactor/SKILL.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-bug-backlog/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-create/SKILL.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-deep-module-refactor/SKILL.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-deep-module-refactor/references/deepening.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-deep-module-refactor/references/design-it-twice.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-diagnostic-loop/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-dispatch/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-error-code-resolver/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-evidence/SKILL.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-framework-quickfix/SKILL.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-framework-temp-claim/SKILL.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-git-pathspec-emergency-commit/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-governance-router/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-governance-router/references/boundary-confusion.md",
     "release/atm-root-drop/integrations/codex-skills/atm-governance-router/references/entry-friction.md",
@@ -1107,9 +1116,12 @@
     "release/atm-root-drop/integrations/codex-skills/atm-internal-build-sync/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-legacy-atomization-guidance/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-lock/SKILL.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-memory-consolidate/SKILL.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-minimal-patch-rebuilder/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-next/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-orient/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-plan-authoring/SKILL.md",
+    "release/atm-root-drop/integrations/codex-skills/atm-residue-cleanup/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-task-card-authoring/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-task-intent-resolver/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-upgrade-scan/SKILL.md",
@@ -5477,6 +5489,7 @@
     "release/atm-root-drop/tests/cli/skill-distribution-manager.test.ts",
     "release/atm-root-drop/tests/cli/skill-provider-capability-contract.test.ts",
     "release/atm-root-drop/tests/cli/standards-spec-review-receipt.test.ts",
+    "release/atm-root-drop/tests/cli/startup-known-bad.test.ts",
     "release/atm-root-drop/tests/cli/status-active-workers.test.ts",
     "release/atm-root-drop/tests/cli/steward-receipt-error-contract.test.ts",
     "release/atm-root-drop/tests/cli/steward-receipt-pre-commit-gate.test.ts",
@@ -5913,8 +5926,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 3,
-    "unchanged": 2002,
+    "copied": 13,
+    "unchanged": 1931,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -11383,8 +11396,17 @@
         "replaceable": true
       },
       {
+        "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-30-001.json",
+        "digest": "033e72bc150ffcb9b0dadb4b3aa8e9c5b57d9779b6f875d5b143504ef55496aa",
+        "origin": "source",
+        "inputPaths": [
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-30-001.json"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "docs/governance/atm-bug-and-optimization-backlog.md",
-        "digest": "cd17e860b5b3cb37f9a4077ddff993775f80c7ba6e57df0f721b97788e3af364",
+        "digest": "f6dbdc2e251343d216c2503d19e3e7e9d33d681d36a3097bfdcfd1d244fa7432",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.md"
@@ -15460,11 +15482,56 @@
         "replaceable": true
       },
       {
+        "path": "integrations/codex-skills/atm-bug-backlog/SKILL.md",
+        "digest": "1e1950ef0c3ef1a3698599f2890e73cd293c0dc6bf321800a1e1c083fdce88b7",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-bug-backlog/SKILL.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "integrations/codex-skills/atm-create/SKILL.md",
         "digest": "765b845f4af8a88fe51f237da30069d883ed163b1a7e51436fbc80a96bdfdd6d",
         "origin": "source",
         "inputPaths": [
           "integrations/codex-skills/atm-create/SKILL.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "integrations/codex-skills/atm-deep-module-refactor/SKILL.md",
+        "digest": "69c761ffdcdeef377a93c74e4f845a2f75564e4b5e0f753c18c0271285cf8ab6",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-deep-module-refactor/SKILL.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "integrations/codex-skills/atm-deep-module-refactor/references/deepening.md",
+        "digest": "a69d3d664f24dfdf8c72bd0394747cbce85ff8646db007edbc92afa98e866b97",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-deep-module-refactor/references/deepening.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "integrations/codex-skills/atm-deep-module-refactor/references/design-it-twice.md",
+        "digest": "599a948a7386ca79f167f40fd3d23d01bb7e3a7f09d10858c43d312a0031c076",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-deep-module-refactor/references/design-it-twice.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "integrations/codex-skills/atm-diagnostic-loop/SKILL.md",
+        "digest": "7cb40ff558e59a5458bd166dae75f7f9b879940bc623949923507734337f5603",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-diagnostic-loop/SKILL.md"
         ],
         "replaceable": true
       },
@@ -15492,6 +15559,33 @@
         "origin": "source",
         "inputPaths": [
           "integrations/codex-skills/atm-evidence/SKILL.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "integrations/codex-skills/atm-framework-quickfix/SKILL.md",
+        "digest": "66901add3a5369b02493f887788541feb0dd3420b9d7170e8b77480dd9487bed",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-framework-quickfix/SKILL.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "integrations/codex-skills/atm-framework-temp-claim/SKILL.md",
+        "digest": "df2d3bb0128367e971b1dcda9ec6c176bd2f74cd5fa8308f4aaac3adae886312",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-framework-temp-claim/SKILL.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "integrations/codex-skills/atm-git-pathspec-emergency-commit/SKILL.md",
+        "digest": "f1587ed9e51a582c570a7ac1820483c325535a1567ff27d5a91ee83343047952",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-git-pathspec-emergency-commit/SKILL.md"
         ],
         "replaceable": true
       },
@@ -15604,6 +15698,24 @@
         "replaceable": true
       },
       {
+        "path": "integrations/codex-skills/atm-memory-consolidate/SKILL.md",
+        "digest": "9fbfd4aab88959d6f5dd76ae6b51fd3c8a58166e3fb719e4545f18373ac1becb",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-memory-consolidate/SKILL.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "integrations/codex-skills/atm-minimal-patch-rebuilder/SKILL.md",
+        "digest": "9b4d85899ccfcb7a70cd73a500530677420e9f7dc5dac2185e2eac4ee23c579d",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-minimal-patch-rebuilder/SKILL.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "integrations/codex-skills/atm-next/SKILL.md",
         "digest": "656b18ab2e739a75545fc08b88936250236a4710030f5f0530cb3234d6d42872",
         "origin": "source",
@@ -15627,6 +15739,15 @@
         "origin": "source",
         "inputPaths": [
           "integrations/codex-skills/atm-plan-authoring/SKILL.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "integrations/codex-skills/atm-residue-cleanup/SKILL.md",
+        "digest": "e0aea65f8efbbc6e34ab8bda9a86d1fcfcdf56f182abdcc72282b1a106340d0a",
+        "origin": "source",
+        "inputPaths": [
+          "integrations/codex-skills/atm-residue-cleanup/SKILL.md"
         ],
         "replaceable": true
       },
@@ -22364,7 +22485,7 @@
       },
       {
         "path": "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
-        "digest": "f03849a3f8084fa67642598495881eeb4eafd63f9273231b08cc6f84479e725c",
+        "digest": "4d94b111ed9da54f79b6b21020d53855e9a6f08d9aeb5568ff70cc0bf5fac827",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js"
@@ -26261,7 +26382,7 @@
       },
       {
         "path": "packages/cli/dist/startup-known-bad.js",
-        "digest": "18a732ac351e36a3ba50382721bbd02c2d6c0d00c74dfae98f4a3744200fceda",
+        "digest": "4732285fa47aba848880edab873b29e0b9941a327ce6805dd2e082ee249d63aa",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/startup-known-bad.js"
@@ -28484,7 +28605,7 @@
       },
       {
         "path": "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
-        "digest": "fd0917ccff424194c79c6d5f80dfd98dc4e242e450939836339acf0dfd8bf090",
+        "digest": "f84c66ef9e707058fa14aa80d15d3c04cd2af5cb225ed528733a7a63d1ea1a4b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts"
@@ -33479,7 +33600,7 @@
       },
       {
         "path": "packages/cli/src/startup-known-bad.ts",
-        "digest": "6f311db219c628c6c4042ee8c6a6799368235bd0615caf92e7ab71a61f2d12ba",
+        "digest": "12cc4cc07fcd6e42b87d14d99c7735a8df87fe0fc6f99d9e69117a7d3afc7172",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/startup-known-bad.ts"
@@ -46934,7 +47055,7 @@
       },
       {
         "path": "scripts/validate-breaking-changes.ts",
-        "digest": "ad12acce45d49ef6cd2be51c11bbe4fbaf0d2c3196e8c89744256db7bbd95bf0",
+        "digest": "c47d3da86e1d57986ea6e1256d325b52e7413ec21f6c4cff437e2abd7f615a23",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-breaking-changes.ts"
@@ -54925,6 +55046,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/startup-known-bad.test.ts",
+        "digest": "50fc2828daedebc97b13394747caebeea2fec4286c97c2e818f4c37c5ae01e87",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/startup-known-bad.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/status-active-workers.test.ts",
         "digest": "322fa8aa2015d979eea9854fb6f632bf98ccaef6a3174922afe733a080b42b56",
         "origin": "source",
@@ -58822,17 +58952,25 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:46f159891da76f78596e3305db488e8b85bdeffa61c6cf9c7eefd416c5a7184d"
+    "treeDigest": "sha256:0b543192110560fc1fcdd8c61128cf5dd23193b3095dfbe9b3438e6ca2e9d482"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
     "algorithm": "sha256",
     "files": [
       "integrations/codex-skills/atm-atom-map-refactor/SKILL.md",
+      "integrations/codex-skills/atm-bug-backlog/SKILL.md",
       "integrations/codex-skills/atm-create/SKILL.md",
+      "integrations/codex-skills/atm-deep-module-refactor/SKILL.md",
+      "integrations/codex-skills/atm-deep-module-refactor/references/deepening.md",
+      "integrations/codex-skills/atm-deep-module-refactor/references/design-it-twice.md",
+      "integrations/codex-skills/atm-diagnostic-loop/SKILL.md",
       "integrations/codex-skills/atm-dispatch/SKILL.md",
       "integrations/codex-skills/atm-error-code-resolver/SKILL.md",
       "integrations/codex-skills/atm-evidence/SKILL.md",
+      "integrations/codex-skills/atm-framework-quickfix/SKILL.md",
+      "integrations/codex-skills/atm-framework-temp-claim/SKILL.md",
+      "integrations/codex-skills/atm-git-pathspec-emergency-commit/SKILL.md",
       "integrations/codex-skills/atm-governance-router/SKILL.md",
       "integrations/codex-skills/atm-governance-router/references/boundary-confusion.md",
       "integrations/codex-skills/atm-governance-router/references/entry-friction.md",
@@ -58845,9 +58983,12 @@
       "integrations/codex-skills/atm-internal-build-sync/SKILL.md",
       "integrations/codex-skills/atm-legacy-atomization-guidance/SKILL.md",
       "integrations/codex-skills/atm-lock/SKILL.md",
+      "integrations/codex-skills/atm-memory-consolidate/SKILL.md",
+      "integrations/codex-skills/atm-minimal-patch-rebuilder/SKILL.md",
       "integrations/codex-skills/atm-next/SKILL.md",
       "integrations/codex-skills/atm-orient/SKILL.md",
       "integrations/codex-skills/atm-plan-authoring/SKILL.md",
+      "integrations/codex-skills/atm-residue-cleanup/SKILL.md",
       "integrations/codex-skills/atm-task-card-authoring/SKILL.md",
       "integrations/codex-skills/atm-task-intent-resolver/SKILL.md",
       "integrations/codex-skills/atm-upgrade-scan/SKILL.md",
@@ -60269,7 +60410,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:37c7252c7d4a567fd53892bc8ee5166009da67edb04d25cd30eb3839efae25eb"
+    "digest": "sha256:4b902f0b5b74fa62e165f9ebdec7b8dd3a30a0b2c6095d6eda9971a8d4b7836f"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -60881,6 +61022,7 @@
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-27-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-28-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-29-001.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-30-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
       "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
       "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -61334,10 +61476,18 @@
       "release/atm-root-drop/fixtures/verify/guard-evidence-missing-justification.json",
       "release/atm-root-drop/fixtures/verify/guard-evidence-pass.json",
       "release/atm-root-drop/integrations/codex-skills/atm-atom-map-refactor/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-bug-backlog/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-create/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-deep-module-refactor/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-deep-module-refactor/references/deepening.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-deep-module-refactor/references/design-it-twice.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-diagnostic-loop/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-dispatch/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-error-code-resolver/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-evidence/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-framework-quickfix/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-framework-temp-claim/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-git-pathspec-emergency-commit/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-governance-router/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-governance-router/references/boundary-confusion.md",
       "release/atm-root-drop/integrations/codex-skills/atm-governance-router/references/entry-friction.md",
@@ -61350,9 +61500,12 @@
       "release/atm-root-drop/integrations/codex-skills/atm-internal-build-sync/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-legacy-atomization-guidance/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-lock/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-memory-consolidate/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-minimal-patch-rebuilder/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-next/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-orient/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-plan-authoring/SKILL.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-residue-cleanup/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-task-card-authoring/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-task-intent-resolver/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-upgrade-scan/SKILL.md",
@@ -65720,6 +65873,7 @@
       "release/atm-root-drop/tests/cli/skill-distribution-manager.test.ts",
       "release/atm-root-drop/tests/cli/skill-provider-capability-contract.test.ts",
       "release/atm-root-drop/tests/cli/standards-spec-review-receipt.test.ts",
+      "release/atm-root-drop/tests/cli/startup-known-bad.test.ts",
       "release/atm-root-drop/tests/cli/status-active-workers.test.ts",
       "release/atm-root-drop/tests/cli/steward-receipt-error-contract.test.ts",
       "release/atm-root-drop/tests/cli/steward-receipt-pre-commit-gate.test.ts",
@@ -66159,22 +66313,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:ce66934189e25284a836a21bb52b356a9ac6ce0daebb3337cd37af7da5a7c9e0",
-  "sealedSourceCommit": "fcc5462eb88fb68115895c3518f0bf50d79bb6b5",
+  "buildInputsTreeHash": "sha256:fda797213ee416af7e251f9419dea01c1c228df1752d007cf834004ab767526e",
+  "sealedSourceCommit": "64d5882abdaf527b7e45ee499f26accf9a1688e2",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:ffe055b906a619ce61d18ad1780dc61721bd0800d4ff5b995e94010691394105",
-  "tsBuildCacheDigest": "sha256:ce02a0de68097155b7ef95ffdb3e212f1c17e9a5f774c2d020b026c8359678d1",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:dbdbb5c4b3bc28de9f67ee318f1d5f7b705b2b2b789ec06977ff41d4c1bc9435",
+  "tsBuildCacheDigest": "sha256:d1130758ebfb603294859e7135515c396de3ad44dfa205b2647692f8786681ed",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 52,
-    "skipDecision": 57,
-    "worktreeSetup": 12650,
-    "typescriptBuild": 17763,
-    "rootDropReleaseAssembly": 24691,
-    "onefileReleaseAssembly": 1270,
-    "artifactSync": 5560,
+    "inputHashCalculation": 46,
+    "skipDecision": 52,
+    "worktreeSetup": 11442,
+    "typescriptBuild": 16326,
+    "rootDropReleaseAssembly": 24005,
+    "onefileReleaseAssembly": 1135,
+    "artifactSync": 5364,
     "cleanup": 0,
-    "totalElapsed": 83952
+    "totalElapsed": 77049
   }
 }
