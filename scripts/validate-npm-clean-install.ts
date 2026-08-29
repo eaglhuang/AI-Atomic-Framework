@@ -87,6 +87,53 @@ function assertNoEscapingSpecifiers(packageSpec: PackageSpec): void {
   }
 }
 
+// Installing and printing --version only proves the module graph resolves.
+// Adoption is what an adopter actually came for, and it is the path that
+// depends on bundled data assets rather than on code, so it is exercised for
+// real against a throwaway repository.
+const REQUIRED_ROOT_DROP_SCRIPTS = ['atm-next', 'atm-orient', 'atm-create', 'atm-lock', 'atm-evidence', 'atm-upgrade-scan', 'atm-handoff'] as const;
+
+function describeAdoptionResidue(adoptionRoot: string): string {
+  const residue = listFiles(adoptionRoot)
+    .map((filePath) => path.relative(adoptionRoot, filePath).replace(/\\/g, '/'))
+    .filter((relative) => !relative.startsWith('.git/'))
+    .sort();
+  if (residue.length === 0) return 'no files were written';
+  return `left ${residue.length} file(s) behind: ${residue.slice(0, 8).join(', ')}${residue.length > 8 ? ` (+${residue.length - 8} more)` : ''}`;
+}
+
+function assertAdoptionSucceeds(binPath: string, tempRoot: string): void {
+  const adoptionRoot = path.join(tempRoot, 'adoption-probe');
+  mkdirSync(adoptionRoot, { recursive: true });
+  run('git', ['init', '--quiet', '.'], adoptionRoot);
+
+  const init = spawnSync(binPath, ['init', '--cwd', adoptionRoot, '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  const initText = `${init.stdout ?? ''}${init.stderr ?? ''}`;
+  if (init.status !== 0 || /"ok":\s*false/.test(initText)) {
+    // A failed adoption that still wrote files leaves the adopter with a
+    // repository that is neither clean nor usable, so the residue is reported
+    // rather than silently discarded with the scratch directory.
+    fail(`atm init failed after a clean install and ${describeAdoptionResidue(adoptionRoot)}: ${initText.split('\n').slice(0, 8).join(' ')}`);
+  }
+
+  const configPath = path.join(adoptionRoot, '.atm', 'config.json');
+  if (!existsSync(configPath)) fail(`atm init reported success but wrote no .atm/config.json; it ${describeAdoptionResidue(adoptionRoot)}`);
+  try {
+    JSON.parse(readFileSync(configPath, 'utf8'));
+  } catch (parseError) {
+    fail(`atm init wrote an unparseable .atm/config.json: ${String(parseError)}`);
+  }
+  // The root-drop scripts are the bundled data asset the tarball previously
+  // failed to carry, so their presence is asserted by name, not by directory.
+  const missingScripts = REQUIRED_ROOT_DROP_SCRIPTS.flatMap((scriptName) => [
+    path.join('.atm', 'scripts', 'sh', `${scriptName}.sh`),
+    path.join('.atm', 'scripts', 'ps', `${scriptName}.ps1`)
+  ]).filter((relative) => !existsSync(path.join(adoptionRoot, relative)));
+  if (missingScripts.length > 0) {
+    fail(`atm init reported success but the adopted repository is incomplete; missing ${missingScripts.length} root-drop script(s): ${missingScripts.slice(0, 6).join(', ')}`);
+  }
+}
+
 if (publishedPackages.length === 0) {
   fail('tests/package-skeleton.fixture.json must declare publishClosure.publishedPackages');
 }
@@ -157,13 +204,15 @@ try {
         fail(`${packageSpec.bin} ${smokeArgs.join(' ')} failed after clean install: ${smokeText}`);
       }
     }
+    if (packageSpec.name === '@ai-atomic-framework/cli') assertAdoptionSucceeds(binPath, tempRoot);
   }
   console.log(JSON.stringify({
     ok: true,
     schemaId: 'atm.npmCleanInstallValidation.v1',
     skeletonPackages: fixture.packages.length,
     publishedPackages: publishedPackages.map((packageSpec) => packageSpec.name),
-    isolatedInstall: true
+    isolatedInstall: true,
+    adoptionVerified: true
   }, null, 2));
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });

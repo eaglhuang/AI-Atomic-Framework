@@ -357,5 +357,18 @@ function buildCliRuntimeClosure(): void {
     writeTextIfChanged(filePath, source);
     rewrittenFiles += 1;
   }
-  console.log(`[build-package-dist] cli runtime closure: vendored ${vendored.size} workspaces, rewrote ${rewrittenFiles} cli modules and ${rewrittenVendorFiles} vendored modules`);
+  // Adoption templates are a data asset of the same closure. `atm init` finds
+  // its bundled repo root by walking up from the loaded module until it sees
+  // templates/root-drop: in the monorepo that walk reaches the repository root,
+  // so inside a tarball it must terminate at dist/. Without this the command
+  // resolves a path that the published package never carried.
+  const adoptionTemplateSource = path.join(root, 'templates', 'root-drop');
+  const adoptionTemplateTarget = path.join(cliDist, 'templates', 'root-drop');
+  rmSync(adoptionTemplateTarget, { recursive: true, force: true });
+  let adoptionTemplateFiles = 0;
+  if (existsSync(adoptionTemplateSource)) {
+    adoptionTemplateFiles = copyRuntimeTree(adoptionTemplateSource, adoptionTemplateTarget).length;
+  }
+
+  console.log(`[build-package-dist] cli runtime closure: vendored ${vendored.size} workspaces, rewrote ${rewrittenFiles} cli modules and ${rewrittenVendorFiles} vendored modules, bundled ${adoptionTemplateFiles} adoption template files`);
 }
