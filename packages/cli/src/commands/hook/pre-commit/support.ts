@@ -42,13 +42,16 @@ const textFileExtensions = new Set([ '.cjs', '.css', '.html', '.js', '.json', '.
 export function hasValidTerminalRepairClosureAdmission(input) {
   const ticket = input?.task?.workAdmissionTicket;
   if (!ticket || ticket.origin !== 'repair-closure') return false;
+  const taskOwnedAuditFiles = new Set(input.cwd
+    ? listTaskOwnedProtectedOverrideAuditFiles(input.cwd, input.taskId)
+    : []);
   return checkWorkAdmissionTicket({
     ticket,
     taskId: input.taskId,
     actorId: input.actorId,
     laneSessionId: ticket.laneSessionId ?? null,
     claimGeneration: ticket.claimGeneration ?? null,
-    files: input.stagedFiles,
+    files: (input.stagedFiles ?? []).filter((filePath) => !taskOwnedAuditFiles.has(filePath)),
     operation: 'commit',
     now: input.now
   }).ok;
@@ -337,7 +340,7 @@ const mirrorSyncOnly = inspectMirrorSyncOnlyStagedArtifacts(cwd, effectiveTaskId
 const historicalLedgerRestore = inspectHistoricalLedgerRestoreStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
 const closeCommitWindow = inspectCloseCommitWindowStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
 const pendingBatchCheckpoint = inspectPendingBatchCheckpointStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
-const terminalRepairClosure = hasValidTerminalRepairClosureAdmission({ task, taskId: effectiveTaskId, actorId, stagedFiles });
+const terminalRepairClosure = hasValidTerminalRepairClosureAdmission({ cwd, task, taskId: effectiveTaskId, actorId, stagedFiles });
 const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok || pendingBatchCheckpoint.ok || terminalRepairClosure;
 const claimForSession = bypassesActiveSession ? null : claim;
 const session = bypassesActiveSession && !sessionId ? null : resolveActorWorkSession(cwd, { sessionId, actorId, taskId: effectiveTaskId, claimLeaseId: claimLeaseId ?? claimForSession?.leaseId ?? null, includeNonActive: true });

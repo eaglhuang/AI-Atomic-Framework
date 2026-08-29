@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { issueWorkAdmissionTicket } from '../../../../../core/src/broker/work-admission-ticket.ts';
 import { hasValidTerminalRepairClosureAdmission } from './support.ts';
 
@@ -24,5 +27,22 @@ assert.equal(hasValidTerminalRepairClosureAdmission({
 assert.equal(hasValidTerminalRepairClosureAdmission({
   task: { workAdmissionTicket: { ...ticket, origin: 'claim' } }, taskId, actorId: 'closure-steward', stagedFiles: [taskPath], now: '2026-08-09T14:53:01.000Z'
 }), false);
+
+const auditFixture = mkdtempSync(path.join(os.tmpdir(), 'atm-terminal-audit-'));
+try {
+  const auditPath = '.atm/history/protected-override-audit/own.json';
+  const foreignAuditPath = '.atm/history/protected-override-audit/foreign.json';
+  mkdirSync(path.join(auditFixture, '.atm', 'history', 'protected-override-audit'), { recursive: true });
+  writeFileSync(path.join(auditFixture, auditPath), JSON.stringify({ taskId }));
+  writeFileSync(path.join(auditFixture, foreignAuditPath), JSON.stringify({ taskId: 'ATM-GOV-foreign' }));
+  assert.equal(hasValidTerminalRepairClosureAdmission({
+    cwd: auditFixture, task: { workAdmissionTicket: ticket }, taskId, actorId: 'closure-steward', stagedFiles: [taskPath, auditPath], now: '2026-08-09T14:53:01.000Z'
+  }), true, 'a terminal ticket may carry its task-owned protected override receipt');
+  assert.equal(hasValidTerminalRepairClosureAdmission({
+    cwd: auditFixture, task: { workAdmissionTicket: ticket }, taskId, actorId: 'closure-steward', stagedFiles: [taskPath, foreignAuditPath], now: '2026-08-09T14:53:01.000Z'
+  }), false, 'a terminal ticket must still reject another task\'s protected override receipt');
+} finally {
+  rmSync(auditFixture, { recursive: true, force: true });
+}
 
 console.log('pre-commit support: terminal repair-closure admission ok');
