@@ -4,9 +4,21 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { atomicSpecSemanticFingerprintAtom, runAtm } from '../registry/atom-runtime.js';
 import { normalizeSemanticFingerprint } from '../registry/semantic-fingerprint.js';
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const require = createRequire(import.meta.url);
-export const defaultAtomicSpecSchemaPath = path.join(repoRoot, 'schemas', 'atomic-spec.schema.json');
+export function resolveAtomicSpecSchemaPath(startDirectory = path.dirname(fileURLToPath(import.meta.url))) {
+    const fallbackPath = path.resolve(startDirectory, '../../../../schemas/atomic-spec.schema.json');
+    let current = path.resolve(startDirectory);
+    while (true) {
+        const candidate = path.join(current, 'schemas', 'atomic-spec.schema.json');
+        if (existsSync(candidate))
+            return candidate;
+        const parent = path.dirname(current);
+        if (parent === current)
+            return fallbackPath;
+        current = parent;
+    }
+}
+export const defaultAtomicSpecSchemaPath = resolveAtomicSpecSchemaPath();
 function asRecord(value) {
     return value && typeof value === 'object' && !Array.isArray(value)
         ? value

@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import { copyFileSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseAtomicSpecFile } from '../packages/core/src/spec/parse-spec.ts';
+import { parseAtomicSpecFile, resolveAtomicSpecSchemaPath } from '../packages/core/src/spec/parse-spec.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -84,6 +84,15 @@ try {
   const hostAgnosticResult = parseAtomicSpecFile('minimal-valid.atom.json', { cwd: tempRoot });
   check(hostAgnosticResult.ok === true, 'parser must work in a temp repo without host-specific config');
   check((hostAgnosticResult.normalizedModel?.source.specPath ?? '').endsWith('/minimal-valid.atom.json') === true, 'parser must resolve spec path from explicit cwd without reading host config');
+
+  const onefileModuleDirectory = path.join(tempRoot, 'packages', 'cli', 'dist', '_vendor', 'core', 'dist', 'spec');
+  const onefileSchemaPath = path.join(tempRoot, 'schemas', 'atomic-spec.schema.json');
+  mkdirSync(path.dirname(onefileSchemaPath), { recursive: true });
+  copyFileSync(path.join(root, 'schemas', 'atomic-spec.schema.json'), onefileSchemaPath);
+  check(
+    resolveAtomicSpecSchemaPath(onefileModuleDirectory) === onefileSchemaPath,
+    'schema resolver must discover the extracted onefile payload root from a vendored core module path'
+  );
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

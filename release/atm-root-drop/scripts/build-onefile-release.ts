@@ -119,10 +119,10 @@ export function buildOnefileRelease(options: any = {}) {
 }
 
 function ensureBuiltCliDist(repositoryRoot: string) {
-  const cliDistEntrypoint = path.join(repositoryRoot, 'packages', 'cli', 'dist', 'atm.js');
-  if (existsSync(cliDistEntrypoint)) {
-    return;
-  }
+  // `dist/atm.js` alone is not a closure proof. A fresh checkout can retain
+  // that tracked entrypoint while omitting ignored generated leaf modules
+  // imported by it (for example command-spec files). Rebuild before every
+  // onefile assembly so the root-drop snapshot is self-contained.
   const buildScript = path.join(repositoryRoot, 'scripts', 'build-package-dist.ts');
   const result = spawnSync(process.execPath, ['--strip-types', buildScript], {
     cwd: repositoryRoot,
