@@ -5926,11 +5926,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1304,
-    "unchanged": 4587,
+    "copied": 3,
+    "unchanged": 1930,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -24771,7 +24771,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/write-readiness.js",
-        "digest": "3dfd4e250b755d54fe08cb47721ebfdbed925790be27ccdb49d2966057676303",
+        "digest": "30f4ad556bdc37d95e2343f02f940b35032e3542322b7bd835fa5c18e28f029a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/write-readiness.js"
@@ -31341,7 +31341,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
-        "digest": "12587a0874242f9542fb86cb0709bf924373912c851f02ab84eaa92e190690e1",
+        "digest": "3107867e5d6e4d92b083210b1adf2fbdd2882410495c9fa543b04323884b6a15",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts"
@@ -31584,7 +31584,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/write-readiness.ts",
-        "digest": "da68e08f6de7cac793dc026f783ccbd6f4329dd79f710b60cbf8acee68df3b1a",
+        "digest": "ded30c947d550556f67cb1d29f98e988c49ac9cf9d1152e951911a9a30eee2cd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/write-readiness.ts"
@@ -58952,7 +58952,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:484e4c61213abd98628f50bdd2bd7e830194366ef8dc1d2710f3e90b895a9ede"
+    "treeDigest": "sha256:1b5e55da2b05a861602fb94ab781039b80c5c79f1c4d9385806eeb990b4b1110"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60410,7 +60410,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:6fe2632a9bbfa6a5c7b4e897235bd736dd7b900f90c6e8387795fcc4a81b5375"
+    "digest": "sha256:d70003f7784b368d34823d542f0d3fd4228514359195d38bf4dd7d40fbc33dce"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66313,22 +66313,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:4e690a29827cc3378de904187977db9ab9667c92e1a45978fdf39e078ea6a01b",
-  "sealedSourceCommit": "4bd74d11a027f76daa9371d1c346916c913b5575",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:b9883c2f6a2c5284eecdec7dec3c8e8ebe4f341f906378d299cf99a53594a237",
-  "tsBuildCacheDigest": "sha256:d7559bcb3811dbafbedae07970d5b9b76458a2aa60ef527319df6689a9ee67d4",
+  "buildInputsTreeHash": "sha256:0ffe06832f5c9357362070294b34e9c131efd265e2af4d8f5ff7ac306a0b7506",
+  "sealedSourceCommit": "c8e1907bc6dff620396efe28596d1ffa97cb7e79",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:77e3ea7e2d739060a3894e67a1b0192aded186bb7fadcd12b589dd84a7aee827",
+  "tsBuildCacheDigest": "sha256:9e1258d226aef2edda32724d107b2e0328c82d6a67d803a52d715aa3cb28820c",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 44,
-    "skipDecision": 53,
-    "worktreeSetup": 12697,
-    "typescriptBuild": 8955,
-    "rootDropReleaseAssembly": 25375,
-    "onefileReleaseAssembly": 1236,
-    "artifactSync": 8351,
+    "skipDecision": 54,
+    "worktreeSetup": 11307,
+    "typescriptBuild": 15867,
+    "rootDropReleaseAssembly": 23602,
+    "onefileReleaseAssembly": 1203,
+    "artifactSync": 5486,
     "cleanup": 0,
-    "totalElapsed": 67027
+    "totalElapsed": 114346
   }
 }

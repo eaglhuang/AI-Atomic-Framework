@@ -8,6 +8,7 @@ import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { quoteCliValue } from '../shared.js';
 import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.js';
 import { inspectCloseWindowStagedIndexAdmission } from '../tasks/close-window-lock.js';
+import { evaluateAcceptanceEvidenceClosureGate } from '../tasks/close-orchestrator/acceptance-evidence-gate.js';
 // TASK-SKL-0029 — write-readiness lifecycle adapter.
 //
 // Write-readiness must not recompute a task's required-case set or freshness; it
@@ -104,6 +105,19 @@ function resolvePlanningPath(cwd, planningMirrorPath) {
 }
 export function buildTaskflowCloseWriteReadinessHint(input) {
     const blockers = [];
+    // `tasks close` builds a closure packet through this same gate.  Evaluate it
+    // before advertising taskflow close as ready, so dry-run cannot be greener
+    // than the eventual write path.
+    const acceptanceEvidenceGate = evaluateAcceptanceEvidenceClosureGate({
+        taskDocument: input.taskDocument
+    });
+    for (const blocker of acceptanceEvidenceGate.blockers) {
+        blockers.push({
+            code: blocker.code,
+            summary: `Taskflow close requires closure-critical acceptance evidence for ${blocker.predicateId}: ${blocker.reasons.join(', ')}.`,
+            requiredCommand: null
+        });
+    }
     const brokerConflictGate = evaluateTaskflowBrokerConflictGate({
         cwd: input.cwd,
         taskId: input.taskId,

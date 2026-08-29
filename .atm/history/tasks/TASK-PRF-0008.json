@@ -33,11 +33,16 @@
     "tests/cli/external-benchmark-metrics.test.ts",
     "tests/cli/external-benchmark-decision.test.ts",
     "docs/reports/atm-external-benchmark-decision.md",
+    ".atm/catalog/registry/actors.json",
     ".atm/history/evidence/TASK-PRF-0008.*",
+    ".atm/history/evidence/TASK-PRF-0008.runner-sync-receipt.json",
     ".atm/history/task-events/TASK-PRF-0008/**",
     ".atm/history/tasks/TASK-PRF-0008.json",
     "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+    "packages/cli/dist/commands/taskflow/write-readiness.js",
     "packages/cli/dist/startup-known-bad.js",
+    "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
     "release/atm-onefile/atm.mjs",
     "release/atm-onefile/release-manifest.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
@@ -45,13 +50,15 @@
     "release/atm-root-drop/integrations/codex-skills/atm-plan-authoring/SKILL.md",
     "release/atm-root-drop/integrations/codex-skills/atm-task-card-authoring/SKILL.md",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+    "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
     "release/atm-root-drop/packages/cli/dist/startup-known-bad.js",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+    "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
     "release/atm-root-drop/packages/cli/src/startup-known-bad.ts",
     "release/atm-root-drop/release-manifest.json",
     "release/atm-root-drop/scripts/validate-breaking-changes.ts",
     "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
-    ".atm/catalog/registry/actors.json",
     "schemas/evidence/external-benchmark-run.schema.json",
     "scripts/fixtures/atm-external-benchmark/manifest.json",
     "scripts/validate-external-benchmark-protocol.ts"
@@ -95,20 +102,88 @@
   "source": {
     "planPath": "atm-product-proof/tasks/TASK-PRF-0008-execute-the-external-benchmark-and-issue-the-product-decision.task.md",
     "sectionTitle": "TASK-PRF-0008",
-    "headingLine": 119,
-    "hash": "85217cafe0e8de5a",
+    "headingLine": 120,
+    "hash": "7a16221349121cc5",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0008-execute-the-external-benchmark-and-issue-the-product-decision.task.md",
-      "planningCommitSha": "a2d8387c5cfb6ab047d509e261ba79dac1a56b5d",
-      "contentDigest": "sha256:85217cafe0e8de5ab77cfe8f7fc6f2eac531c712830a0dedf689f0a125c63649",
+      "planningCommitSha": "dc8fabadcf6fe7e280bf646ba612b2c7a1a5cf58",
+      "contentDigest": "sha256:7a16221349121cc5f208f97c9705b413753dc260e8cf7bffe4f2898ba6b5090a",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-08-27T16:54:25.795Z"
+      "sealedAt": "2026-08-29T18:09:00.137Z"
     }
   },
-  "importedAt": "2026-08-27T16:54:25.795Z",
+  "importedAt": "2026-08-29T18:09:00.137Z",
+  "acceptanceEvidence": {
+    "hidden-corpus-acceptance": {
+      "id": "hidden-corpus-acceptance",
+      "claim": "The hidden benchmark corpus was accepted and sealed by its external custodian before either arm received its labels or conflict graph.",
+      "authoritativeSources": [
+        "atm.hiddenCorpusAcceptance.v1",
+        "atm.externalBenchmarkProtocol.v1"
+      ],
+      "derivationRule": "verify-hidden-corpus-acceptance-signature-and-protocol-digest",
+      "requiredRealness": "production-ledger",
+      "verifier": {
+        "mode": "separate-actor",
+        "actorId": "independent-adjudicator"
+      },
+      "negativeControls": [
+        {
+          "id": "unsealed-or-visible-corpus",
+          "expectedFailureReason": "hidden-corpus-not-accepted-or-visibility-policy-violated"
+        }
+      ],
+      "missingDataVerdict": "inconclusive",
+      "closureCritical": true
+    },
+    "independent-adjudication": {
+      "id": "independent-adjudication",
+      "claim": "An independent adjudicator labeled the anonymized external runs without sharing the oracle labels with either implementer.",
+      "authoritativeSources": [
+        "atm.adjudicationManifest.v1",
+        "atm.externalBenchmarkRun.v1"
+      ],
+      "derivationRule": "verify-independent-adjudication-signature-anonymized-input-digest-and-output-digest",
+      "requiredRealness": "production-ledger",
+      "verifier": {
+        "mode": "separate-actor",
+        "actorId": "independent-adjudicator"
+      },
+      "negativeControls": [
+        {
+          "id": "implementer-self-adjudication",
+          "expectedFailureReason": "adjudicator-not-independent"
+        }
+      ],
+      "missingDataVerdict": "inconclusive",
+      "closureCritical": true
+    },
+    "provider-telemetry": {
+      "id": "provider-telemetry",
+      "claim": "Each product-decision run has original provider telemetry that permits its billed-cost claim to be reproduced.",
+      "authoritativeSources": [
+        "atm.providerCostTelemetry.v1",
+        "atm.externalBenchmarkRun.v1"
+      ],
+      "derivationRule": "verify-provider-usage-records-bind-to-run-ids-and-raw-export-digests",
+      "requiredRealness": "production-ledger",
+      "verifier": {
+        "mode": "separate-actor",
+        "actorId": "independent-adjudicator"
+      },
+      "negativeControls": [
+        {
+          "id": "modeled-or-missing-provider-cost",
+          "expectedFailureReason": "provider-telemetry-unavailable-or-not-original"
+        }
+      ],
+      "missingDataVerdict": "inconclusive",
+      "closureCritical": true
+    }
+  },
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
@@ -248,11 +323,6 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-29T17-56-19-094Z-renew-e7ee0f6bdd1f",
-  "lastTransitionAt": "2026-08-29T17:56:19.094Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "reservedAt": "2026-08-27T16:54:33.813Z",
-  "promotedAt": "2026-08-27T16:54:33.823Z",
   "claim": {
     "actorId": "codex-captain",
     "leaseId": "lease-bc21db2cfe9d",
@@ -262,11 +332,15 @@
     "files": [
       ".atm/catalog/registry/actors.json",
       ".atm/history/evidence/TASK-PRF-0008.*",
+      ".atm/history/evidence/TASK-PRF-0008.runner-sync-receipt.json",
       ".atm/history/task-events/TASK-PRF-0008/**",
       ".atm/history/tasks/TASK-PRF-0008.json",
       "docs/reports/atm-external-benchmark-decision.md",
       "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+      "packages/cli/dist/commands/taskflow/write-readiness.js",
       "packages/cli/dist/startup-known-bad.js",
+      "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
@@ -274,8 +348,11 @@
       "release/atm-root-drop/integrations/codex-skills/atm-plan-authoring/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-task-card-authoring/SKILL.md",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
       "release/atm-root-drop/packages/cli/dist/startup-known-bad.js",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
       "release/atm-root-drop/packages/cli/src/startup-known-bad.ts",
       "release/atm-root-drop/release-manifest.json",
       "release/atm-root-drop/scripts/validate-breaking-changes.ts",
@@ -299,99 +376,9 @@
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260829162836-codex-captain-dace4623d3\""
     }
   },
-  "startedAt": "2026-08-27T16:55:00.111Z",
-  "startedByActor": "codex-captain",
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-8e8a731ba9a57965",
-    "ticketDigest": "sha256:8e8a731ba9a57965852620978fa72462923f4c9393270e74642e517ef8d738b1",
-    "taskId": "TASK-PRF-0008",
-    "origin": "claim",
-    "actorId": "codex-captain",
-    "laneSessionId": "lane-20260829162836-codex-captain-dace4623d3",
-    "claimGeneration": "lease-bc21db2cfe9d",
-    "issuedAt": "2026-08-29T17:56:18.180Z",
-    "expiresAt": "2026-08-29T18:26:18.180Z",
-    "scopeDigest": "sha256:507bbfb1a487ae1820b798fd2b9fb1d9611ebbde01a66f5051e42e17e499a407",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-29T17:56:18.180Z"
-    },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/catalog/registry/actors.json",
-          ".atm/history/evidence/TASK-PRF-0008.*",
-          ".atm/history/evidence/git-head.jsonl",
-          ".atm/history/task-events/TASK-PRF-0008/**",
-          ".atm/history/tasks/TASK-PRF-0008.json",
-          "docs/reports/atm-external-benchmark-decision.md",
-          "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
-          "packages/cli/dist/startup-known-bad.js",
-          "release/atm-onefile/atm.mjs",
-          "release/atm-onefile/release-manifest.json",
-          "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
-          "release/atm-root-drop/integrations/codex-skills/atm-evidence/SKILL.md",
-          "release/atm-root-drop/integrations/codex-skills/atm-plan-authoring/SKILL.md",
-          "release/atm-root-drop/integrations/codex-skills/atm-task-card-authoring/SKILL.md",
-          "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
-          "release/atm-root-drop/packages/cli/dist/startup-known-bad.js",
-          "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
-          "release/atm-root-drop/packages/cli/src/startup-known-bad.ts",
-          "release/atm-root-drop/release-manifest.json",
-          "release/atm-root-drop/scripts/validate-breaking-changes.ts",
-          "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
-          "schemas/evidence/external-benchmark-run.schema.json",
-          "scripts/fixtures/atm-external-benchmark/manifest.json",
-          "scripts/lib/external-benchmark/adjudication.ts",
-          "scripts/lib/external-benchmark/metrics.ts",
-          "scripts/lib/external-benchmark/report.ts",
-          "scripts/lib/external-benchmark/runner.ts",
-          "scripts/run-atm-external-benchmark.ts",
-          "scripts/validate-external-benchmark-protocol.ts",
-          "tests/cli/external-benchmark-decision.test.ts",
-          "tests/cli/external-benchmark-metrics.test.ts"
-        ],
-        "digest": "sha256:0167839b78f0b5d900475cd193bf7765b9fbf34ecbec35f986ea9723d7a8c39a"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "enabled",
-      "reasons": [
-        "complex-task",
-        "shared-surface"
-      ],
-      "maxSavePoints": 2,
-      "perTaskByteBudget": 16777216,
-      "repositoryByteBudget": 268435456,
-      "handoffTtlSeconds": 604800,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
-    }
-  },
-  "startedBySessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
   "owner": "codex-captain",
+  "startedAt": "2026-08-27T16:55:00.111Z",
+  "startedBySessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -403,11 +390,15 @@
     "allowedFiles": [
       ".atm/catalog/registry/actors.json",
       ".atm/history/evidence/TASK-PRF-0008.*",
+      ".atm/history/evidence/TASK-PRF-0008.runner-sync-receipt.json",
       ".atm/history/task-events/TASK-PRF-0008/**",
       ".atm/history/tasks/TASK-PRF-0008.json",
       "docs/reports/atm-external-benchmark-decision.md",
       "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+      "packages/cli/dist/commands/taskflow/write-readiness.js",
       "packages/cli/dist/startup-known-bad.js",
+      "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
@@ -415,8 +406,11 @@
       "release/atm-root-drop/integrations/codex-skills/atm-plan-authoring/SKILL.md",
       "release/atm-root-drop/integrations/codex-skills/atm-task-card-authoring/SKILL.md",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
       "release/atm-root-drop/packages/cli/dist/startup-known-bad.js",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
       "release/atm-root-drop/packages/cli/src/startup-known-bad.ts",
       "release/atm-root-drop/release-manifest.json",
       "release/atm-root-drop/scripts/validate-breaking-changes.ts",
@@ -453,5 +447,103 @@
     },
     "createdAt": "2026-08-29T16:28:37.957Z",
     "status": "active"
+  },
+  "lastTransitionId": "2026-08-29T18-17-21-302Z-scope-amendment-f95665edbbc9",
+  "lastTransitionAt": "2026-08-29T18:17:21.302Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-676ba800010d65c0",
+    "ticketDigest": "sha256:676ba800010d65c09c0209503f711670cce9d14a2320123f28c400f3d890eeab",
+    "taskId": "TASK-PRF-0008",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260829162836-codex-captain-dace4623d3",
+    "claimGeneration": "lease-bc21db2cfe9d",
+    "issuedAt": "2026-08-29T18:17:21.183Z",
+    "expiresAt": "2026-08-29T18:47:21.183Z",
+    "scopeDigest": "sha256:f31dbeb71c2fbc21540988babcbd439b322dd71fbbe4dd0d5525f901aa78b0f5",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-29T18:17:21.183Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/catalog/registry/actors.json",
+          ".atm/history/evidence/TASK-PRF-0008.*",
+          ".atm/history/evidence/TASK-PRF-0008.runner-sync-receipt.json",
+          ".atm/history/task-events/TASK-PRF-0008/**",
+          ".atm/history/tasks/TASK-PRF-0008.json",
+          "docs/reports/atm-external-benchmark-decision.md",
+          "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+          "packages/cli/dist/commands/taskflow/write-readiness.js",
+          "packages/cli/dist/startup-known-bad.js",
+          "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+          "packages/cli/src/commands/taskflow/write-readiness.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+          "release/atm-root-drop/integrations/codex-skills/atm-evidence/SKILL.md",
+          "release/atm-root-drop/integrations/codex-skills/atm-plan-authoring/SKILL.md",
+          "release/atm-root-drop/integrations/codex-skills/atm-task-card-authoring/SKILL.md",
+          "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
+          "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
+          "release/atm-root-drop/packages/cli/dist/startup-known-bad.js",
+          "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+          "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
+          "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
+          "release/atm-root-drop/packages/cli/src/startup-known-bad.ts",
+          "release/atm-root-drop/release-manifest.json",
+          "release/atm-root-drop/scripts/validate-breaking-changes.ts",
+          "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
+          "schemas/evidence/external-benchmark-run.schema.json",
+          "scripts/fixtures/atm-external-benchmark/manifest.json",
+          "scripts/lib/external-benchmark/adjudication.ts",
+          "scripts/lib/external-benchmark/metrics.ts",
+          "scripts/lib/external-benchmark/report.ts",
+          "scripts/lib/external-benchmark/runner.ts",
+          "scripts/run-atm-external-benchmark.ts",
+          "scripts/validate-external-benchmark-protocol.ts",
+          "tests/cli/external-benchmark-decision.test.ts",
+          "tests/cli/external-benchmark-metrics.test.ts"
+        ],
+        "digest": "sha256:bdd203ef012ba3d80025a82713c7518b608c6c7c2349692fe1b3b6c326a436ca"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
   }
 }

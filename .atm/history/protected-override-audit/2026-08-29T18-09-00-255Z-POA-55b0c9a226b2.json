@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-55b0c9a226b2",
+  "recordedAt": "2026-08-29T18:09:00.255Z",
+  "actorId": null,
+  "taskId": "TASK-PRF-0008",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\atm-product-proof\\tasks\\TASK-PRF-0008-execute-the-external-benchmark-and-issue-the-product-decision.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-TASK-PRF-0008-9df858e7d8",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-29T18-09-00-254Z-EMG-TASK-PRF-0008-9df858e7d8.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
