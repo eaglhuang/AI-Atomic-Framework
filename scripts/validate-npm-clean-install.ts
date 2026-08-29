@@ -92,6 +92,7 @@ function assertNoEscapingSpecifiers(packageSpec: PackageSpec): void {
 // depends on bundled data assets rather than on code, so it is exercised for
 // real against a throwaway repository.
 const REQUIRED_ROOT_DROP_SCRIPTS = ['atm-next', 'atm-orient', 'atm-create', 'atm-lock', 'atm-evidence', 'atm-upgrade-scan', 'atm-handoff'] as const;
+const REQUIRED_ROUTER_REFERENCE = path.join('references', 'index.md');
 
 function describeAdoptionResidue(adoptionRoot: string): string {
   const residue = listFiles(adoptionRoot)
@@ -138,6 +139,26 @@ function assertAdoptionSucceeds(binPath: string, tempRoot: string, expectedVersi
   const doctor = spawnSync(binPath, ['doctor', '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
   if (doctor.status !== 0) {
     fail(`atm doctor failed in a freshly initialized adopter: ${`${doctor.stdout ?? ''}${doctor.stderr ?? ''}`.split('\n').slice(0, 8).join(' ')}`);
+  }
+
+  // The entry skill explicitly directs an installed agent to read this
+  // companion file. Verify the real installation path rather than merely
+  // checking the tarball's file list, because an adapter can otherwise copy
+  // SKILL.md while silently dropping its companion tree.
+  const integration = spawnSync(binPath, ['integration', 'add', 'codex', '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  const integrationText = `${integration.stdout ?? ''}${integration.stderr ?? ''}`;
+  if (integration.status !== 0 || /"ok":\s*false/.test(integrationText)) {
+    fail(`atm integration add codex failed after a clean install: ${integrationText.split('\n').slice(0, 8).join(' ')}`);
+  }
+  const routerReference = path.join(
+    adoptionRoot,
+    'integrations',
+    'codex-skills',
+    'atm-governance-router',
+    REQUIRED_ROUTER_REFERENCE,
+  );
+  if (!existsSync(routerReference)) {
+    fail(`atm integration add codex omitted required router companion file ${path.relative(adoptionRoot, routerReference).replace(/\\/g, '/')}`);
   }
 }
 

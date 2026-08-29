@@ -3,7 +3,9 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { detectFrameworkRepoIdentity } from '../../packages/cli/src/commands/framework-development.ts';
+import { checkOnboardingLifecycle } from '../../packages/cli/src/commands/doctor/lifecycle.ts';
 import { resolveDoctorRepositoryIdentity } from '../../packages/cli/src/commands/doctor/policy.ts';
+import { detectGovernanceRuntime } from '../../packages/cli/src/commands/governance-runtime.ts';
 
 const workspace = mkdtempSync(path.join(os.tmpdir(), 'atm-root-drop-doctor-identity-'));
 
@@ -38,6 +40,20 @@ try {
     portableBundle.signals.includes('release-manifest:atm.rootDropRelease'),
     'the portable-release classification must be observable in the identity evidence'
   );
+
+  mkdirSync(path.join(workspace, '.atm', 'runtime'), { recursive: true });
+  writeFileSync(path.join(workspace, '.atm', 'config.json'), `${JSON.stringify({
+    schemaVersion: 'atm.config.v0.1',
+    layoutVersion: 2,
+    adapter: { mode: 'standalone', implemented: false }
+  })}\n`, 'utf8');
+  const standaloneLifecycle = checkOnboardingLifecycle(workspace, detectGovernanceRuntime(workspace));
+  assert.equal(
+    standaloneLifecycle.ok,
+    true,
+    'a fresh standalone atm init must be doctor-ready before optional onboarding artifacts exist'
+  );
+  assert.equal(standaloneLifecycle.stage, 'standalone-ready');
 
   console.log('ok: root-drop release manifests select adopter doctor policy');
 } finally {

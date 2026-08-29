@@ -64,4 +64,8 @@ assert.ok(smokeIndex > -1, 'release workflow must run the clean-install smoke va
 assert.ok(publishIndex > -1, 'release workflow must retain the publish step');
 assert.ok(smokeIndex < publishIndex, 'the clean-install smoke must gate publish, not follow it');
 
+const validatorSource = readFileSync(validator, 'utf8');
+assert.match(validatorSource, /integration', 'add', 'codex'/, 'the clean-install validator must exercise a real installed integration');
+assert.match(validatorSource, /REQUIRED_ROUTER_REFERENCE/, 'the clean-install validator must guard router companion files');
+
 console.log('[npm-clean-install:test] ok');
