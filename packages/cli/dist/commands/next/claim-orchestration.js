@@ -7,7 +7,7 @@ import { resolveActorWorkSession, upsertActorWorkSession } from '../actor-sessio
 import { tryBuildQuickfixClaimResult, buildNoClaimableTaskResult } from './claim-early-results.js';
 import { cleanupPreviousBatchQueueLocks } from './claim-cleanup.js';
 import { assertClaimRunnerWriteAuthority, assertRunnerRecoveryClaimPreflight } from './runner-recovery-claim-authorization.js';
-import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../../core/dist/broker/lifecycle.js';
+import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../_vendor/core/dist/broker/lifecycle.js';
 import { buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, writeTaskDirectionLock } from '../task-direction.js';
 import { inspectBatchRunConsistency, readActiveBatchRun, writeBatchRun } from '../work-channels.js';
 import { buildTeamKnowledgeSummary } from '../team-knowledge.js';
@@ -477,7 +477,7 @@ export async function claimNextImportedTask(input) {
         claimIntent: resolvedClaimIntent,
         riskLevel: recommendedChannel === 'batch' ? 'high' : 'medium',
         playbook: buildChannelPlaybook({
-            channel: recommendedChannel,
+            channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
             taskId: claimableTask.workItemId,
             queueHeadTaskId: batchRun?.currentTaskId ?? claimableTask.workItemId,
             originalPrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
@@ -529,7 +529,7 @@ export async function claimNextImportedTask(input) {
     const nextAction = embedTeamRecommendation(nextActionBase, {
         taskId: claimableTask.workItemId,
         actorId: resolvedActor.actorId,
-        channel: recommendedChannel,
+        channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
         reason: recommendedChannel === 'batch'
             ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
             : 'This task can use an optional team run for role/permission coordination.',

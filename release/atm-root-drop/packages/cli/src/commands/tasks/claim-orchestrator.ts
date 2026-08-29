@@ -339,7 +339,7 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       cwd: options.cwd,
       taskId: options.taskId,
       actorId,
-      currentClaim: currentClaim as Record<string, any> | null,
+      currentClaim: currentClaim as unknown as Record<string, unknown> | null,
       taskDocument,
       dirtyInScopeFiles,
       discardWip: options.discardWip,

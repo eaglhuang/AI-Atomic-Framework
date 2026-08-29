@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 
+import { planPathspecBatches } from '../packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts';
+
 type Mode = 'touched' | 'staged';
 
 const cwd = process.cwd();
@@ -14,13 +16,58 @@ if (files.length === 0) {
   process.exit(0);
 }
 
-const result = spawnSync(process.execPath, ['atm.mjs', 'guard', 'encoding', '--files', files.join(','), '--json'], {
-  cwd,
-  encoding: 'utf8',
-  stdio: ['ignore', 'inherit', 'inherit']
-});
+// This guard used to build one `--files` argument for every touched text file.
+// On a busy worktree that argument reaches tens of kilobytes, Windows rejects
+// the process creation with ENAMETOOLONG, and `spawnSync` returns a null status
+// — which this script then reported as a bare exit 1 with no output at all. A
+// gate whose "found a problem" and "never ran" outcomes are indistinguishable is
+// not a gate, so the invocation is batched against the same platform argv budget
+// the Git pathspec callers already share, and a spawn that never ran is named.
+const GUARD_FIXED_ARGS = ['atm.mjs', 'guard', 'encoding', '--files', '--json'];
 
-process.exit(typeof result.status === 'number' ? result.status : 1);
+process.exit(runGuardInBatches(files));
+
+function runGuardInBatches(guardFiles: string[]): number {
+  // The budget charges each path as its own argument; the guard joins them with
+  // commas instead, so every planned batch is strictly smaller than budgeted.
+  const batches = planGuardBatches(guardFiles);
+  if (batches === null) return 1;
+  let exitCode = 0;
+  for (const batch of batches) {
+    const result = spawnSync(
+      process.execPath,
+      ['atm.mjs', 'guard', 'encoding', '--files', batch.join(','), '--json'],
+      { cwd, encoding: 'utf8', stdio: ['ignore', 'inherit', 'inherit'] }
+    );
+    if (typeof result.status !== 'number') {
+      const cause = result.error as NodeJS.ErrnoException | undefined;
+      console.error(
+        `[check-encoding-${mode}] the encoding guard never ran for ${batch.length} file(s): `
+        + (cause ? `${cause.code ?? 'unknown'} ${cause.message}` : 'the process exited without a status')
+      );
+      exitCode = 1;
+      continue;
+    }
+    if (result.status !== 0) exitCode = result.status;
+  }
+  return exitCode;
+}
+
+function planGuardBatches(guardFiles: string[]): readonly (readonly string[])[] | null {
+  try {
+    return planPathspecBatches({ paths: guardFiles, fixedArgs: GUARD_FIXED_ARGS }).batches;
+  } catch (error) {
+    // A single path too long to batch is unrunnable by any split. Report it
+    // rather than checking a silently truncated subset.
+    const failure = error as { code?: unknown; message?: unknown };
+    console.error(
+      `[check-encoding-${mode}] cannot plan a runnable encoding guard invocation: `
+      + `${typeof failure?.code === 'string' ? failure.code : 'unknown'} `
+      + `${typeof failure?.message === 'string' ? failure.message : String(error)}`
+    );
+    return null;
+  }
+}
 
 function resolveFiles(explicitFileArgs: string[], currentMode: Mode): string[] {
   const hasExplicitFiles = explicitFileArgs.length > 0;

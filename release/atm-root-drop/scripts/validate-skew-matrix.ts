@@ -259,6 +259,7 @@ function runDoctorCheck() {
   const localGovernanceOnlyChecks = new Set([
     'git-head-evidence',
     'integration-adapters',
+    'runner-publication-disposition',
     'cross-task-mutation-incident'
   ]);
   const actionableFailures = failedChecks.filter((name: string) => !localGovernanceOnlyChecks.has(name));

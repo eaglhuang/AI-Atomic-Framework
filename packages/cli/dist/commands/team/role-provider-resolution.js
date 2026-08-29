@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { readJsonFile } from '../shared.js';
-import { mergeTeamProviderSelectionConfig, resolveTeamProviderSelection } from '../../../../core/dist/team-runtime/provider-selection.js';
+import { mergeTeamProviderSelectionConfig, resolveTeamProviderSelection } from '../../_vendor/core/dist/team-runtime/provider-selection.js';
 export function loadTeamProviderSelectionConfigFromRepo(cwd, cliRoleOverrides, cliGlobalDefault) {
     const configPath = path.join(cwd, '.atm', 'config', 'team-provider-selection.json');
     const loaded = existsSync(configPath);

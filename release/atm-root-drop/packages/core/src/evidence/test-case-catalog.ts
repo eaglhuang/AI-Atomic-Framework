@@ -27,8 +27,11 @@ export interface TestCaseGroupCase {
   readonly dependsOnCaseIds?: readonly string[];
 }
 
+/** The only shard schema the group loader can address. */
+export const CASE_GROUP_SHARD_SCHEMA_ID = 'atm.testCaseGroup.v1';
+
 export interface TestCaseGroupShard {
-  readonly schemaId: 'atm.testCaseGroup.v1';
+  readonly schemaId: typeof CASE_GROUP_SHARD_SCHEMA_ID;
   readonly specVersion: string;
   readonly groupId: string;
   readonly theme: string;
@@ -144,10 +147,54 @@ export function readRawShardFiles(repositoryRoot: string, groupsRoot?: string): 
     .sort((left, right) => left.sourcePath.localeCompare(right.sourcePath));
 }
 
+/**
+ * Why a shard cannot be loaded, or null when it can.
+ *
+ * Reachability was decided by a normalizer that answered null and said nothing.
+ * A shard that failed any one of several conditions therefore left no trace, so
+ * the catalog reported green over case ids it had never read. The conditions are
+ * named here once and consulted by both the loader, which fails closed on them,
+ * and the reachability report, which only describes them.
+ */
+export function describeShardUnreachability(raw: Record<string, unknown>, sourcePath: string): string | null {
+  if (normalizeGroupShard(raw, sourcePath) !== null) return null;
+  const schemaId = String(raw.schemaId ?? '').trim();
+  if (schemaId !== CASE_GROUP_SHARD_SCHEMA_ID) {
+    return `schemaId ${schemaId || '(absent)'} is not the canonical ${CASE_GROUP_SHARD_SCHEMA_ID}`;
+  }
+  const missing = (['groupId', 'theme', 'resourceKey'] as const).filter((field) => !String(raw[field] ?? '').trim());
+  if (missing.length > 0) return `missing required field(s): ${missing.join(', ')}`;
+  // A shard whose entries all lack caseId or semanticKey declares cases the
+  // catalog cannot address, which reads exactly like declaring none.
+  return 'no case entry carries both a caseId and a semanticKey';
+}
+
+/**
+ * Load every shard, or refuse to load any.
+ *
+ * Dropping the unloadable ones is what made the blind spot invisible: the
+ * validator could pass while a shard's case ids were never checked, which is
+ * precisely the outcome a catalog validator exists to prevent. Every unreachable
+ * shard is named with its file and schemaId in one message, so a repair does not
+ * have to be discovered one failure at a time.
+ */
 export function loadTestCaseGroupShards(repositoryRoot: string, groupsRoot?: string): TestCaseGroupShard[] {
-  return readRawShardFiles(repositoryRoot, groupsRoot)
-    .map(({ raw, sourcePath }) => normalizeGroupShard(raw, sourcePath))
-    .filter((shard): shard is TestCaseGroupShard => Boolean(shard))
+  const files = readRawShardFiles(repositoryRoot, groupsRoot);
+  const unreachable = files.flatMap(({ raw, sourcePath }) => {
+    const reason = describeShardUnreachability(raw, sourcePath);
+    return reason ? [`${sourcePath.slice(sourcePath.lastIndexOf('/') + 1)}: ${reason}`] : [];
+  });
+  if (unreachable.length > 0) {
+    throw new Error(
+      `ATM_TEST_CASE_SHARD_UNREACHABLE: ${unreachable.length} catalog shard(s) cannot be loaded and would be skipped silently. `
+      + `Catalog green must mean every declared case id was checked. Unreachable: ${unreachable.join('; ')}`
+    );
+  }
+  return files
+    .flatMap(({ raw, sourcePath }) => {
+      const shard = normalizeGroupShard(raw, sourcePath);
+      return shard ? [shard] : [];
+    })
     .sort((left, right) => left.groupId.localeCompare(right.groupId));
 }
 
@@ -206,18 +253,20 @@ export function validateLegacyCaseAliases(
 }
 
 // atm.shard-reachability — `normalizeGroupShard` accepts exactly one schemaId and
-// drops everything else, silently. That silence is the defect: shards whose
-// schemaId is not accepted never reach validation, so their case ids look
-// validated when they are not. This report never throws on an unknown shape; it
-// enumerates every shard file and states plainly whether the group loader can see
-// it and which case ids it declares (both the `cases[].caseId` and the legacy
-// `caseIds: string[]` shapes).
+// one shape. The loader now fails closed on anything else, but a refusal is not a
+// diagnosis: this report is the surface that stays readable when the loader will
+// not run at all. It never throws; it enumerates every shard file and states
+// plainly whether the group loader can see it, why not when it cannot, and which
+// case ids it declares (both the `cases[].caseId` and the legacy `caseIds:
+// string[]` shapes).
 export interface ShardReachabilityEntry {
   readonly sourcePath: string;
   readonly fileName: string;
   readonly groupId: string;
   readonly schemaId: string;
   readonly reachable: boolean;
+  /** Null when reachable; otherwise why the loader refuses this file. */
+  readonly unreachableReason: string | null;
   readonly caseIds: readonly string[];
   readonly caseIdShape: 'cases' | 'caseIds' | 'mixed' | 'none';
 }
@@ -228,18 +277,19 @@ export function reportShardReachability(repositoryRoot: string, groupsRoot?: str
       const declared = declaredCaseIds(raw);
       const caseIds = [...new Set([...declared.fromCases, ...declared.fromCaseIds])].sort();
       const fileName = sourcePath.slice(sourcePath.lastIndexOf('/') + 1);
-      let reachable = false;
+      let unreachableReason: string | null = 'shard could not be inspected';
       try {
-        reachable = normalizeGroupShard(raw, sourcePath) !== null;
-      } catch {
-        reachable = false;
+        unreachableReason = describeShardUnreachability(raw, sourcePath);
+      } catch (error) {
+        unreachableReason = `shard could not be inspected: ${String(error)}`;
       }
       return {
         sourcePath,
         fileName,
         groupId: String(raw.groupId ?? '').trim() || fileName.replace(/\.shard\.json$/, ''),
         schemaId: String(raw.schemaId ?? '').trim(),
-        reachable,
+        reachable: unreachableReason === null,
+        unreachableReason,
         caseIds,
         caseIdShape: declared.fromCases.length && declared.fromCaseIds.length
           ? 'mixed'
@@ -415,6 +465,10 @@ export function generateReadOnlyTestCaseCatalog(
 }
 
 function normalizeGroupShard(raw: Record<string, unknown>, sourcePath: string): TestCaseGroupShard | null {
+  // The canonical schemaId was documented as the acceptance condition but never
+  // actually checked, so a shard under any other namespace was normalised and
+  // silently admitted under a schemaId it does not carry.
+  if (String(raw.schemaId ?? '').trim() !== CASE_GROUP_SHARD_SCHEMA_ID) return null;
   const groupId = String(raw.groupId ?? '').trim();
   const theme = String(raw.theme ?? '').trim();
   const resourceKey = String(raw.resourceKey ?? '').trim();
@@ -437,7 +491,7 @@ function normalizeGroupShard(raw: Record<string, unknown>, sourcePath: string): 
   });
   if (!groupId || !theme || !resourceKey || cases.length === 0) return null;
   return {
-    schemaId: 'atm.testCaseGroup.v1',
+    schemaId: CASE_GROUP_SHARD_SCHEMA_ID,
     specVersion: String(raw.specVersion ?? '0.1.0'),
     groupId,
     theme,

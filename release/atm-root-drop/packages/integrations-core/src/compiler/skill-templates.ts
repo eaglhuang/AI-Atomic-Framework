@@ -15,6 +15,7 @@ import {
   collectSkillSourceUniverseFindings,
   defaultSkillTemplateDirectory,
   integrationsCoreRepoRoot,
+  resolveSkillSourceRoot,
   sha256Text
 } from './skill-source-universe.ts';
 import {
@@ -297,12 +298,13 @@ export function parseSkillTemplate(content: string, sourcePath = '<inline>'): At
 }
 
 export function loadSkillTemplates(templateDirectory = defaultSkillTemplateDirectory): readonly AtmSkillTemplate[] {
+  const sourceRoot = resolveSkillSourceRoot(templateDirectory);
   return readdirSync(templateDirectory)
     .filter((entryName) => entryName.endsWith('.skill.md'))
     .sort((left, right) => left.localeCompare(right))
     .map((entryName) => {
       const templatePath = path.join(templateDirectory, entryName);
-      return parseSkillTemplate(readFileSync(templatePath, 'utf8'), path.relative(integrationsCoreRepoRoot, templatePath).replace(/\\/g, '/'));
+      return parseSkillTemplate(readFileSync(templatePath, 'utf8'), path.relative(sourceRoot, templatePath).replace(/\\/g, '/'));
     });
 }
 
@@ -341,9 +343,10 @@ export function loadSkillCorpusSourceSnapshot(
   templateDirectory = defaultSkillTemplateDirectory,
   options: LoadSkillCorpusSourceSnapshotOptions = {}
 ): SkillCorpusSourceSnapshot {
+  const sourceRoot = resolveSkillSourceRoot(templateDirectory);
   const templates = loadSkillTemplates(templateDirectory);
   const sourceFiles = templates.map((template) => {
-    const absolutePath = path.join(integrationsCoreRepoRoot, template.sourcePath);
+    const absolutePath = path.join(sourceRoot, template.sourcePath);
     const content = readFileSync(absolutePath, 'utf8');
     return {
       id: template.frontmatter.id,
@@ -362,7 +365,7 @@ export function loadSkillCorpusSourceSnapshot(
     schemaId: 'atm.skillCorpusSourceSnapshot.v1',
     compilerVersion: '0.1.0',
     generatedAt: new Date(0).toISOString(),
-    sourceRoot: path.relative(integrationsCoreRepoRoot, templateDirectory).replace(/\\/g, '/'),
+    sourceRoot: path.relative(sourceRoot, templateDirectory).replace(/\\/g, '/'),
     templateCount: templates.length,
     templates,
     sourceFiles,
@@ -405,10 +408,11 @@ export interface SkillCorpusDiscoveryFinding {
 export function collectSkillCorpusDiscoveryFindings(
   templateDirectory = defaultSkillTemplateDirectory
 ): readonly SkillCorpusDiscoveryFinding[] {
+  const sourceRoot = resolveSkillSourceRoot(templateDirectory);
   const findings: SkillCorpusDiscoveryFinding[] = [];
   for (const entryName of readdirSync(templateDirectory).filter((entry) => entry.endsWith('.skill.md')).sort()) {
     const templatePath = path.join(templateDirectory, entryName);
-    const sourcePath = path.relative(integrationsCoreRepoRoot, templatePath).replace(/\\/g, '/');
+    const sourcePath = path.relative(sourceRoot, templatePath).replace(/\\/g, '/');
     let template: AtmSkillTemplate;
     try {
       template = parseSkillTemplate(readFileSync(templatePath, 'utf8'), sourcePath);

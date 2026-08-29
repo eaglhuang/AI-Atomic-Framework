@@ -1,13 +1,21 @@
 // @ts-nocheck
-export type ProtectedStateFinding = any;
-export type TaskCardStatusFinding = any;
-export type SameFileClaimOwnershipFinding = any;
-export type SameFileClaimOwnershipReport = any;
-export type EmergencyUseAuditFinding = any;
-export type EmergencyUseAuditReport = any;
-export type PreCommitBlockingFinding = any;
-export type ExpectedGitIdentity = any;
-export type PreCommitFailureEnvelope = any;
+export type ProtectedStateFinding = Record<string, unknown>;
+export type TaskCardStatusFinding = Record<string, unknown>;
+export type SameFileClaimOwnershipFinding = Record<string, unknown>;
+export interface SameFileClaimOwnershipReport {
+  readonly ok: boolean;
+  readonly committingTaskId: string | null;
+  readonly committingClaimIntent: string | null;
+  readonly multiClaimFiles: readonly unknown[];
+  readonly stewardCoveredFiles: readonly string[];
+  readonly sharedWriteAdmission: unknown;
+  readonly findings: readonly SameFileClaimOwnershipFinding[];
+}
+export type EmergencyUseAuditFinding = Record<string, unknown>;
+export type EmergencyUseAuditReport = Record<string, unknown>;
+export type ExpectedGitIdentity = Record<string, unknown>;
+export type PreCommitFailureEnvelope = Record<string, unknown>;
+export type { PreCommitBlockingFinding } from './failure-envelope.ts';
 export { inspectSameFileClaimOwnership } from './scope-ownership.ts';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';

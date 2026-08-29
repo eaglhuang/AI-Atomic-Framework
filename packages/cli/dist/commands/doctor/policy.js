@@ -1,4 +1,32 @@
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { CliError } from '../shared.js';
+/**
+ * A root-drop release intentionally carries the framework package name and
+ * source topology, but it is an adopter-facing portable bundle.  Doctor must
+ * therefore apply host policy to an explicit root-drop manifest rather than
+ * requiring every development-workspace distribution artifact.
+ */
+export function resolveDoctorRepositoryIdentity(root, identity) {
+    const manifestPath = path.join(root, 'release-manifest.json');
+    if (!existsSync(manifestPath)) {
+        return identity;
+    }
+    try {
+        const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+        if (typeof manifest.schemaVersion !== 'string' || !manifest.schemaVersion.startsWith('atm.rootDropRelease.')) {
+            return identity;
+        }
+        return {
+            ...identity,
+            isFrameworkRepo: false,
+            signals: [...identity.signals, 'release-manifest:atm.rootDropRelease']
+        };
+    }
+    catch {
+        return identity;
+    }
+}
 export function resolveDoctorPolicy(options) {
     const supportedProfiles = new Set(['dependency-pr']);
     const supportedSkipChecks = new Set(['git-head-evidence']);

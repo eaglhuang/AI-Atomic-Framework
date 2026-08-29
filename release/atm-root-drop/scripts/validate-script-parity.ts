@@ -141,7 +141,7 @@ try {
 
   const firstEncodingProbe = path.join(tempRoot, 'encoding-first.ts');
   const secondEncodingProbe = path.join(tempRoot, 'encoding-second.ts');
-  cpSync(path.join(root, 'scripts', 'check-encoding-touched.ts'), path.join(tempRoot, 'check-encoding-touched.ts'));
+  cpSync(path.join(root, 'scripts', 'check-encoding-touched.ts'), path.join(tempRoot, 'scripts', 'check-encoding-touched.ts'));
   cpSync(path.join(root, 'atm.mjs'), path.join(tempRoot, 'atm.mjs'));
   cpSync(path.join(root, 'release'), path.join(tempRoot, 'release'), { recursive: true });
   mkdirSync(path.join(tempRoot, 'packages'), { recursive: true });
@@ -160,7 +160,7 @@ try {
   cpSync(path.join(root, 'README.md'), secondEncodingProbe);
   const encodingProbe = run(process.execPath, [
     '--strip-types',
-    'check-encoding-touched.ts',
+    'scripts/check-encoding-touched.ts',
     '--mode',
     'touched',
     '--files',
@@ -180,7 +180,7 @@ try {
   writeFileSync(path.join(tempRoot, 'tmp', 'foreign-transcript.json'), `{"note":"bad replacement char: ${replacementChar}"}\n`, 'utf8');
   const touchedWithTempArtifact = run(process.execPath, [
     '--strip-types',
-    'check-encoding-touched.ts',
+    'scripts/check-encoding-touched.ts',
     '--mode',
     'touched'
   ], tempRoot);
@@ -192,7 +192,7 @@ try {
 
   const explicitTempArtifact = run(process.execPath, [
     '--strip-types',
-    'check-encoding-touched.ts',
+    'scripts/check-encoding-touched.ts',
     '--mode',
     'touched',
     '--files',

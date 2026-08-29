@@ -84,13 +84,14 @@ export function buildValidatorLifecycleSummary(input: {
   readonly dag?: Record<string, unknown> | null;
   readonly config?: unknown;
 }): ValidatorLifecycleSummary {
-  const usageEntries: [string, any][] = (Array.isArray(input.usageTelemetry?.validators) ? input.usageTelemetry?.validators : [])
-    .map((entry: any): [string, any] => [String(entry.validatorId ?? entry.name ?? ''), entry])
+  const usageEntries: [string, Record<string, unknown>][] = (Array.isArray(input.usageTelemetry?.validators) ? input.usageTelemetry?.validators : [])
+    .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
+    .map((entry): [string, Record<string, unknown>] => [String(entry.validatorId ?? entry.name ?? ''), entry])
     .filter(([key]) => Boolean(key));
-  const usageById = new Map<string, any>(usageEntries);
+  const usageById = new Map<string, Record<string, unknown>>(usageEntries);
   const events = input.validators.flatMap((validator) => {
     const validatorId = String(validator.name ?? validator.validatorId ?? '');
-    const usage: any = usageById.get(validatorId) ?? {};
+    const usage = usageById.get(validatorId) ?? {};
     return lifecycleEventsForValidator(validatorId, validator, usage);
   });
   const eligibleCount = countEvents(events, 'eligible');

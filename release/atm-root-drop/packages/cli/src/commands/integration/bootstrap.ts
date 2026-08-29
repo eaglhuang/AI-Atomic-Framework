@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { availableAdapters, detectCurrentEditorIntegrationId, primaryEntryPathByAdapterId } from './adapters.ts';
-import type { KnownCliIntegrationId } from './adapters.ts';
+import { availableAdapters, detectCurrentEditorIntegrationId, type KnownCliIntegrationId, primaryEntryPathByAdapterId } from './adapters.ts';
+
 import { inspectTeamRuntimeBackendCapabilities } from './health.ts';
 import type { GovernedVendorConfigSurface } from './types.ts';
 

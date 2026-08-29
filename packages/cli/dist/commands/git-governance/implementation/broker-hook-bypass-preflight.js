@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, } from "node:fs";
 import path from "node:path";
 import { assertEmergencyApproval, } from "../../emergency/gate.js";
-import { detectCrossTaskMutation, recordIncidentFlag, } from "../../../../../core/dist/broker/cross-task-mutation-guard.js";
+import { detectCrossTaskMutation, recordIncidentFlag, } from "../../../_vendor/core/dist/broker/cross-task-mutation-guard.js";
 import { CliError, relativePathFrom, } from "../../shared.js";
 export function readBrokerConflictResolutionArtifact(input) {
     if (!input.artifactPath?.trim()) {

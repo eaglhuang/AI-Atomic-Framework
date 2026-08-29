@@ -2,11 +2,8 @@ import { createValidator } from './lib/validator-harness.ts';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createTempWorkspace } from './temp-root.ts';
-import { classifyGuidanceIntent } from '../packages/core/src/guidance/index.ts';
-import {
-  buildFirstLayerCommandContract,
-  classifyFirstLayerIntent
-} from '../packages/core/src/guidance/index.ts';
+import { buildFirstLayerCommandContract, classifyFirstLayerIntent, classifyGuidanceIntent } from '../packages/core/src/guidance/index.ts';
+
 
 const validator = createValidator('guide');
 const { assert, requireFile, runAtmJsonPortable, ok, readText, root } = validator;

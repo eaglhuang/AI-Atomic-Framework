@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { computeSha256ForContent, computeSha256ForFile } from '../../../../core/dist/hash-lock/hash-lock.js';
+import { computeSha256ForContent, computeSha256ForFile } from '../../_vendor/core/dist/hash-lock/hash-lock.js';
 import { detectGovernanceRuntime, relativePathFrom } from '../governance-runtime.js';
 import { CliError, makeResult, message } from '../shared.js';
 import { atmChartFrontmatterSchemaVersion, atmChartSourceSchemas, defaultATMChartRelativePath, frameworkRoot } from './constants.js';

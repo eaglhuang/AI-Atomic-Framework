@@ -27,12 +27,28 @@ export const integrationsCoreRepoRoot = existsSync(path.join(installedPackageRoo
     ? installedPackageRoot
     : sourceRepositoryRoot;
 export const defaultSkillTemplateDirectory = path.join(integrationsCoreRepoRoot, 'templates', 'skills');
+/**
+ * Returns the provenance root for a concrete template directory. Source-tree
+ * callers hand us the framework corpus under the repository root; installed
+ * packages hand us their bundled corpus. A fixture has no broader provenance
+ * root, so its directory itself is the only stable relative base.
+ */
+export function resolveSkillSourceRoot(templateDirectory) {
+    const resolvedDirectory = path.resolve(templateDirectory);
+    for (const candidateRoot of [installedPackageRoot, sourceRepositoryRoot]) {
+        const relative = path.relative(candidateRoot, resolvedDirectory);
+        if (relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative))) {
+            return candidateRoot;
+        }
+    }
+    return resolvedDirectory;
+}
 export function sha256Text(content) {
     return `sha256:${createHash('sha256').update(content).digest('hex')}`;
 }
 export function sealSkillSourceUniverse(input) {
     const templateDirectory = input.templateDirectory ?? defaultSkillTemplateDirectory;
-    const sourceRoot = path.relative(integrationsCoreRepoRoot, templateDirectory).replace(/\\/g, '/');
+    const sourceRoot = path.relative(resolveSkillSourceRoot(templateDirectory), templateDirectory).replace(/\\/g, '/');
     const tracked = normalizeProbePaths(input.probe.trackedPaths, sourceRoot);
     const ignored = normalizeProbePaths(input.probe.ignoredPaths, sourceRoot);
     const entries = readdirSync(templateDirectory)

@@ -2,8 +2,8 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../shared.js';
-import { emptyRunnerSyncStewardQueue } from '../../../../core/dist/broker/runner-sync-steward-queue.js';
-import { emptyGeneratedProjectionSteward } from '../../../../core/dist/broker/generated-projection-steward.js';
+import { emptyRunnerSyncStewardQueue } from '../../_vendor/core/dist/broker/runner-sync-steward-queue.js';
+import { emptyGeneratedProjectionSteward } from '../../_vendor/core/dist/broker/generated-projection-steward.js';
 function readSharedSurfaceFreezeRecords(filePath) {
     if (!existsSync(filePath))
         return [];

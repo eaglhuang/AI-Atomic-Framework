@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { CliError, relativePathFrom, resolveValue } from '../shared.js';
-import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
+import { createLocalGovernanceAdapter } from '../../_vendor/plugin-governance-local/dist/index.js';
 import { resolveActorId } from '../actor-registry.js';
 import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-session.js';
 import { computeMissingValidatorReport, verifyTaskEvidence } from '../evidence.js';

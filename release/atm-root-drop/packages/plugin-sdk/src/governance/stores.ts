@@ -1,13 +1,14 @@
 import type {
   ArtifactRecord,
   ContextSummaryRecord,
+  EvidenceLedgerCheckpoint,
+  EvidenceLedgerEntry,
   EvidenceRecord,
   RegistryDocument,
   RegistryEntryRecord,
   ScopeLockRecord,
   WorkItemRef
 } from '@ai-atomic-framework/core';
-import type { EvidenceLedgerCheckpoint, EvidenceLedgerEntry } from '@ai-atomic-framework/core';
 import type { CapabilityResult } from '../capability';
 
 export interface StoreLifecycle {

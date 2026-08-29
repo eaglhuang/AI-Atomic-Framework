@@ -200,6 +200,12 @@ try {
   assert.equal(deferred.ok, true);
   assert.ok(deferred.foreignStagedSnapshotPath);
   assert.ok(existsSync(path.join(repoRoot, deferred.foreignStagedSnapshotPath!)));
+  // Ownership disclosure: genuine foreign work is proved by no receipt, so the
+  // record carries an empty set rather than an absent field. A close window
+  // that cannot say who owns a deferred path cannot later be asked whether it
+  // may act on another card's debt (ATM-BUG-2026-08-12-001, slice B1).
+  assert.deepEqual(deferred.lock?.provenResidueEntries, []);
+  assert.deepEqual(deferred.provenResidueEntries, []);
 
   const stagedAfterDefer = execFileSync('git', ['diff', '--cached', '--name-only'], {
     cwd: repoRoot,
@@ -328,6 +334,27 @@ try {
     failureCode: 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_FAILED'
   });
   assert.equal(existsSync(transitionPath), false, 'rollback must remove the transition inferred from the mutated live ledger');
+
+  // A lock written before ownership disclosure existed must read back as an
+  // empty set, not as an absent field: every consumer sees one shape, so a
+  // legacy record can never be mistaken for unrecorded ownership.
+  const legacyLockPath = path.join(repoRoot, '.atm', 'runtime', 'locks', 'close-window-staged-index.lock.json');
+  writeJson(legacyLockPath, {
+    schemaId: 'atm.closeWindowStagedIndexLock.v1',
+    specVersion: '0.1.0',
+    taskId,
+    actorId: 'fixture-agent',
+    acquiredAt: new Date().toISOString(),
+    status: 'active',
+    expectedStageFiles: [expectedStageFile],
+    foreignStagedSnapshotPath: null,
+    foreignStagedEntries: [],
+    unexpectedStagedTasks: [],
+    releasedAt: null,
+    releaseOutcome: null
+  });
+  assert.deepEqual(readCloseWindowStagedIndexLockReport(repoRoot)?.provenResidueEntries, []);
+  rmSync(legacyLockPath, { force: true });
 
   console.log('taskflow-close-window-lock.test.ts: all assertions passed');
 } finally {

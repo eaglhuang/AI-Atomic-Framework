@@ -4,6 +4,10 @@
   "private": false,
   "description": "Gemini agent pack for ATM command files under .gemini/commands/.",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eaglhuang/AI-Atomic-Framework.git"
+  },
   "type": "module",
   "exports": {
     ".": {
@@ -12,8 +16,7 @@
     }
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/agent-pack-gemini",

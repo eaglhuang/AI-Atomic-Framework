@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { TEAM_PROVIDER_IDS } from '../../../../../core/dist/team-runtime/provider-contract.js';
 import { createBrokerConflictResolutionArtifact } from '../../../../../core/dist/team-runtime/permission-broker.js';
 import { buildTeamObservabilityContract, createBrokerConflictObservabilityEvents, queryTeamObservabilityEvents } from '../../../../../core/dist/team-runtime/observability.js';
 import { CliError, makeResult, message } from '../../shared.js';
@@ -18,6 +19,13 @@ export function buildBrokerConflictSharedVocabulary(brokerLane) {
         violationStatus: 'broker-conflict-blocked',
         statusCode: 'broker-conflict-blocked'
     };
+}
+function normalizeObservabilityEventType(value) {
+    const known = ['session.start', 'step.execution', 'tool.invocation', 'artifact.output', 'session.complete', 'session.failure', 'broker.conflict.blocked', 'broker.conflict.resolution', 'handoff.materialized', 'handoff.consumed', 'handoff.integrity-blocked', 'handoff.archived'];
+    return value && known.includes(value) ? value : undefined;
+}
+function normalizeTeamProviderId(value) {
+    return TEAM_PROVIDER_IDS.includes(value) ? value : 'unknown';
 }
 export function evaluateTeamRuntimeBackendAdmission(runtimeContract, readiness) {
     return runtimeBackendAdmissionForTeam({
@@ -82,7 +90,7 @@ export function runTeamObservability(argv, defaultCwd) {
         providerId: readOptionValue(argv, '--provider-filter') ?? readOptionValue(argv, '--provider'),
         role: readOptionValue(argv, '--role-filter') ?? readOptionValue(argv, '--role'),
         artifactType: readOptionValue(argv, '--artifact') ?? readOptionValue(argv, '--artifact-type'),
-        eventType: readOptionValue(argv, '--event-type')
+        eventType: normalizeObservabilityEventType(readOptionValue(argv, '--event-type'))
     };
     if (!fixture) {
         const events = readTeamRuntimeObservabilityEvents(cwd, readOptionValue(argv, '--team-run'));
@@ -126,7 +134,7 @@ export function runTeamObservability(argv, defaultCwd) {
         releaseOrder: readOptionValues(argv, '--release-order'),
         createdAt: emittedAt
     });
-    const providerId = String(readOptionValue(argv, '--provider') ?? 'openai').trim();
+    const providerId = normalizeTeamProviderId(String(readOptionValue(argv, '--provider') ?? 'openai').trim());
     const role = String(readOptionValue(argv, '--role') ?? 'coordinator').trim();
     const teamRunId = readOptionValue(argv, '--team-run') ?? `team-observability-${artifact.resolutionId.toLowerCase()}`;
     const events = createBrokerConflictObservabilityEvents({

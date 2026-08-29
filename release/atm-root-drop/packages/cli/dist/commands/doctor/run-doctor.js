@@ -15,7 +15,7 @@ import { detectCrossTaskMutation, readIncidentFlag } from '../../../../core/dist
 import { inspectRunnerSourceDrift } from '../framework-development/closure-packet-schema.js';
 import { inspectRunnerPublicationDisposition } from '../framework-development/runner-publication-lifecycle.js';
 import { knownTsNoCheckBaseline, knownTsNoCheckCleanupOwners, legacyBehaviorPackageNames } from './constants.js';
-import { applyDoctorPolicyToCheck, downgradeAdopterGitHeadEvidenceCheck, resolveDoctorPolicy } from './policy.js';
+import { applyDoctorPolicyToCheck, downgradeAdopterGitHeadEvidenceCheck, resolveDoctorPolicy, resolveDoctorRepositoryIdentity } from './policy.js';
 import { checkOnboardingLifecycle, createVersionSummaryMessages } from './lifecycle.js';
 import { createBacklogSyncCheck, createGovernanceEntryReadinessCheck, hasRequiredScripts, isFrameworkContractExpected } from './readiness.js';
 import { checkCharterIntegrityV2, listFiles, listPackageDirs, packageDirLabel, readJsonIfExists, createCheck, createIntegrationDriftRemediation } from './utilities.js';
@@ -66,7 +66,7 @@ export async function runDoctor(argv) {
     const root = options.cwd;
     const doctorPolicy = resolveDoctorPolicy(options);
     const rootPackage = readJsonIfExists(path.join(root, 'package.json')) ?? {};
-    const repoIdentity = detectFrameworkRepoIdentity(root);
+    const repoIdentity = resolveDoctorRepositoryIdentity(root, detectFrameworkRepoIdentity(root));
     const frameworkContractExpected = isFrameworkContractExpected(repoIdentity);
     const packageDirs = listPackageDirs(root);
     const hashAudit = runHashPlaceholderAudit({ root });

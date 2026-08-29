@@ -59,7 +59,7 @@ import {
   inspectProtectedGovernanceStateDestructiveChanges,
 } from "../protected-governance-state.ts";
 
-import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, deferStagedFilePaths, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, readStagedDiffNames, readStagedFiles, readUnstagedFiles } from './git-index-transaction.ts';
+import { buildCopyableGitCommitCommand, buildProtectedForeignStagedOwnershipFiles, buildUnexpectedStagedTasksForGitCommit, deferStagedFilePaths, isActiveForeignGovernanceResidueOwner, isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, listTaskOwnedProtectedOverrideAuditFiles, readStagedDiffNames, readStagedFiles, readUnstagedFiles } from './git-index-transaction.ts';
 
 import { parseTaskClaim } from './identity-check-command.ts';
 import { createCommitAuthorityPolicy } from './commit-authority-scopes.ts';
@@ -207,7 +207,16 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
       stagedFiles,
     });
   }
-  const dirtyFiles = listTaskScopedWorktreeDirtyFiles(input.cwd);
+  // `.atm/` is ignored by the ordinary untracked-file scan.  Bring verified
+  // task-owned protected audits into the source set before either pass of the
+  // bundle resolver, including the second resolve used by commit execution.
+  const taskOwnedProtectedOverrideAudits = new Set(
+    listTaskOwnedProtectedOverrideAuditFiles(input.cwd, input.taskId),
+  );
+  const dirtyFiles = uniqueSorted([
+    ...listTaskScopedWorktreeDirtyFiles(input.cwd),
+    ...taskOwnedProtectedOverrideAudits,
+  ]);
   const activeDeferredSnapshot = normalizeRelativePath(
     deferredForeignStagedSnapshot ?? "",
   );
@@ -292,10 +301,24 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     ...effectiveDirtyFiles.filter((filePath: LegacyValue) => !stagedSet.has(filePath)),
     ...effectiveDirtyFiles.filter((filePath: LegacyValue) => trackedUnstagedSet.has(filePath)),
   ]);
-  const inScopeUnstagedDirty = unstagedDirtyFiles.filter(
+  // A protected-override audit is neither generic evidence nor disposable
+  // residue: its embedded taskId is the ownership proof.  Preserve a
+  // current-task audit through the generic evidence admissibility filter so a
+  // foreign staged audit can be deferred without suppressing its companion.
+  // Protected-override audits live below `.atm/`, which is normally ignored
+  // by Git.  A task-owned audit can therefore be absent from the ordinary
+  // dirty-file discovery even though its embedded task identity authorizes
+  // it.  Add only that verified set; foreign or malformed audit files remain
+  // outside this task's candidate.
+  const inScopeUnstagedDirty = uniqueSorted([
+    ...unstagedDirtyFiles,
+    ...taskOwnedProtectedOverrideAudits,
+  ]).filter(
     (filePath: LegacyValue) =>
-      !isRuntimeCommitSideEffect(filePath) &&
-      !isUncommittableTaskEvidenceArtifact(input.cwd, filePath, input.taskId, input.taskDocument) &&
+      (taskOwnedProtectedOverrideAudits.has(normalizeRelativePath(filePath)) ||
+        !isRuntimeCommitSideEffect(filePath)) &&
+      (taskOwnedProtectedOverrideAudits.has(normalizeRelativePath(filePath)) ||
+        !isUncommittableTaskEvidenceArtifact(input.cwd, filePath, input.taskId, input.taskDocument)) &&
       (isCommitAttributionSideEffectPath(filePath) ||
         isAllowedGovernanceArtifactPath(input.cwd, filePath, input.taskId) ||
         (declaredScope.some((scope: LegacyValue) => pathMatchesTaskScope(filePath, scope)) &&
@@ -473,9 +496,14 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   const stageCandidates = uniqueSorted([
     ...commitAttributionStageCandidates,
     ...(input.autoStage
-      ? (deliverySliceRejection ? [] : autoStagePool).filter(
-          (filePath: LegacyValue) => !isCommitAttributionSideEffectPath(filePath),
-        )
+      ? [
+          ...(deliverySliceRejection ? [] : autoStagePool),
+          // Protected audit records are ignored worktree files.  Their embedded
+          // task id is the ownership proof, so include the verified set at the
+          // final candidate boundary even if an earlier generic classifier
+          // discarded the ignored path.
+          ...taskOwnedProtectedOverrideAudits,
+        ].filter((filePath: LegacyValue) => !isCommitAttributionSideEffectPath(filePath))
       : []),
   ]);
   const commitFiles = buildTaskScopedCommitFileSet({

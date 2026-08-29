@@ -1,5 +1,6 @@
 import { isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, listTaskOwnedProtectedOverrideAuditFiles, readProtectedOverrideAuditTaskId, readStagedFiles, readStagedJsonFile, } from './git-index-transaction.js';
 import { isCommitAttributionSideEffectPath, isIgnorableTaskScopedDirtySideEffect, listCommitAttributionSideEffectPaths, resolveGitExecutable, runGitCommand, } from './git-process-port.js';
+import { forEachPathspecBatch } from './pathspec-argv-batching.js';
 import { existsSync, readFileSync, readdirSync, rmSync, statSync, } from "node:fs";
 import path from "node:path";
 import { gitHeadEvidencePaths, } from "../../git-head-evidence.js";
@@ -280,9 +281,20 @@ export function autoStageFrameworkClaimFiles(cwd, actorId, apply = true, claimed
         !isIgnorableFrameworkCommitStagingSideEffect(filePath) &&
         isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
     if (apply && candidates.length > 0) {
-        runGitCommand(cwd, ["add", "-A", "-f", "--", ...candidates], ["ignore", "pipe", "pipe"]);
+        stageFrameworkClaimPathspecBatches(cwd, candidates);
     }
     return candidates;
+}
+/**
+ * Stage a framework delivery slice without exceeding the platform argv budget.
+ *
+ * Runner publications intentionally contain hundreds of generated files.  The
+ * governed auto-stage route must preserve the same all-or-nothing candidate
+ * set while issuing several bounded Git invocations, rather than constructing
+ * one Windows-unspawnable `git add` command.
+ */
+export function stageFrameworkClaimPathspecBatches(cwd, candidates, invoke = (args) => runGitCommand(cwd, args, ["ignore", "pipe", "pipe"])) {
+    return forEachPathspecBatch({ paths: candidates, fixedArgs: ["add", "-A", "-f", "--"] }, (batch) => invoke(["add", "-A", "-f", "--", ...batch]));
 }
 export function inspectFrameworkScopedUnstagedCommit(cwd, actorId, claimedFilesOverride = null) {
     const claimedFiles = new Set(claimedFilesOverride ?? readActiveFrameworkClaimFiles(cwd, actorId));

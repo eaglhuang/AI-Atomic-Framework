@@ -473,7 +473,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     claimIntent: resolvedClaimIntent,
     riskLevel: recommendedChannel === 'batch' ? 'high' : 'medium',
     playbook: buildChannelPlaybook({
-      channel: recommendedChannel as any,
+      channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
       taskId: claimableTask.workItemId,
       queueHeadTaskId: batchRun?.currentTaskId ?? claimableTask.workItemId,
       originalPrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
@@ -525,7 +525,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   const nextAction = embedTeamRecommendation(nextActionBase, {
     taskId: claimableTask.workItemId,
     actorId: resolvedActor.actorId,
-    channel: recommendedChannel as any,
+    channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
     reason: recommendedChannel === 'batch'
       ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
       : 'This task can use an optional team run for role/permission coordination.',

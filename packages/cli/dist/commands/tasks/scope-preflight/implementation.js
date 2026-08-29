@@ -1,4 +1,4 @@
-import { inferLinkedSurfaceClosure } from '../../../../../core/dist/scope/linked-surface/index.js';
+import { inferLinkedSurfaceClosure } from '../../../_vendor/core/dist/scope/linked-surface/index.js';
 export function buildLinkedSurfaceScopePreflight(input) {
     const closure = inferLinkedSurfaceClosure({
         rootScope: input.existingScope,

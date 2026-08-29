@@ -128,7 +128,7 @@ export function buildTeamStatusResult(input: {
     : listTeamRuns(input.cwd).filter((run: unknown) => typeof run === 'object' && run !== null && (run as Record<string, unknown>).status === 'active');
   const sharedSurfaceQueues = readTeamSharedSurfaceQueues(input.cwd);
   const sharedSurfaceAcquisitionPlans = runs
-    .map((run: any) => String(run?.taskId ?? '').trim())
+    .map((run: unknown) => String(typeof run === 'object' && run !== null ? (run as Record<string, unknown>).taskId ?? '' : '').trim())
     .filter(Boolean)
     .map((taskId) => planSharedSurfaceAcquisition(sharedSurfaceQueues, taskId));
   return makeResult({

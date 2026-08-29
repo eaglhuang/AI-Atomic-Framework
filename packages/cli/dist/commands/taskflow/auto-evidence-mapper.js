@@ -25,7 +25,7 @@
  * touch the filesystem. `taskflow.ts` wires it to the current package.json
  * before calling `executeAutoEvidencePlan`.
  */
-import { evaluateValidationContract } from '../../../../core/dist/evidence/validation-contract.js';
+import { evaluateValidationContract } from '../../_vendor/core/dist/evidence/validation-contract.js';
 // TASK-SKL-0029 — auto-evidence lifecycle adapter.
 //
 // Auto-evidence must map only the cases the validation contract selected; it

@@ -8,7 +8,7 @@
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { collectSkillSourceUniverseFindings, defaultSkillTemplateDirectory, integrationsCoreRepoRoot, sha256Text } from './skill-source-universe.js';
+import { collectSkillSourceUniverseFindings, defaultSkillTemplateDirectory, resolveSkillSourceRoot, sha256Text } from './skill-source-universe.js';
 import { defaultSkillInstallProfiles, getSkillInstallProfile, skillBelongsToProfile } from '../distribution/install-profile.js';
 // The source root, its digest helper, and the sealed tracking universe live in
 // skill-source-universe.ts. They are re-exported here so the compiler's public
@@ -104,12 +104,13 @@ export function parseSkillTemplate(content, sourcePath = '<inline>') {
     };
 }
 export function loadSkillTemplates(templateDirectory = defaultSkillTemplateDirectory) {
+    const sourceRoot = resolveSkillSourceRoot(templateDirectory);
     return readdirSync(templateDirectory)
         .filter((entryName) => entryName.endsWith('.skill.md'))
         .sort((left, right) => left.localeCompare(right))
         .map((entryName) => {
         const templatePath = path.join(templateDirectory, entryName);
-        return parseSkillTemplate(readFileSync(templatePath, 'utf8'), path.relative(integrationsCoreRepoRoot, templatePath).replace(/\\/g, '/'));
+        return parseSkillTemplate(readFileSync(templatePath, 'utf8'), path.relative(sourceRoot, templatePath).replace(/\\/g, '/'));
     });
 }
 export function loadMinimumAtmSkillTemplates(templateDirectory = defaultSkillTemplateDirectory) {
@@ -128,9 +129,10 @@ export function loadSkillTemplatesForProfile(profileId, templateDirectory = defa
     }));
 }
 export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTemplateDirectory, options = {}) {
+    const sourceRoot = resolveSkillSourceRoot(templateDirectory);
     const templates = loadSkillTemplates(templateDirectory);
     const sourceFiles = templates.map((template) => {
-        const absolutePath = path.join(integrationsCoreRepoRoot, template.sourcePath);
+        const absolutePath = path.join(sourceRoot, template.sourcePath);
         const content = readFileSync(absolutePath, 'utf8');
         return {
             id: template.frontmatter.id,
@@ -149,7 +151,7 @@ export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTe
         schemaId: 'atm.skillCorpusSourceSnapshot.v1',
         compilerVersion: '0.1.0',
         generatedAt: new Date(0).toISOString(),
-        sourceRoot: path.relative(integrationsCoreRepoRoot, templateDirectory).replace(/\\/g, '/'),
+        sourceRoot: path.relative(sourceRoot, templateDirectory).replace(/\\/g, '/'),
         templateCount: templates.length,
         templates,
         sourceFiles,
@@ -171,10 +173,11 @@ export function loadSkillCorpusSourceSnapshot(templateDirectory = defaultSkillTe
  * and the bake.
  */
 export function collectSkillCorpusDiscoveryFindings(templateDirectory = defaultSkillTemplateDirectory) {
+    const sourceRoot = resolveSkillSourceRoot(templateDirectory);
     const findings = [];
     for (const entryName of readdirSync(templateDirectory).filter((entry) => entry.endsWith('.skill.md')).sort()) {
         const templatePath = path.join(templateDirectory, entryName);
-        const sourcePath = path.relative(integrationsCoreRepoRoot, templatePath).replace(/\\/g, '/');
+        const sourcePath = path.relative(sourceRoot, templatePath).replace(/\\/g, '/');
         let template;
         try {
             template = parseSkillTemplate(readFileSync(templatePath, 'utf8'), sourcePath);

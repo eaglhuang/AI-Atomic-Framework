@@ -1,4 +1,4 @@
-import { evaluateValidationContract } from '../../../../core/dist/evidence/validation-contract.js';
+import { evaluateValidationContract } from '../../_vendor/core/dist/evidence/validation-contract.js';
 import { resolveActorWorkSession } from '../actor-session.js';
 import { evaluateTaskDoneCloseAdmission } from '../tasks/lifecycle-state.js';
 import { detectHistoricalDeliveryCommit, inspectHistoricalDelivery } from '../tasks/historical-delivery.js';
@@ -142,9 +142,15 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
         blockers.push({
             code: closeWindowAdmission.blockedCode ?? 'ATM_CLOSE_WINDOW_STAGED_INDEX_BLOCKED',
             summary: closeWindowAdmission.blockedSummary ?? 'Close window staged-index admission is blocked.',
-            requiredCommand: closeWindowAdmission.blockedCode === 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS'
-                ? `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --defer-foreign-staged --write --json`
-                : closeWindowAdmission.lock?.taskId ? `node atm.mjs tasks status --task ${closeWindowAdmission.lock.taskId} --json` : null,
+            // Proven reconciliation residue must not be sent down the defer route: that
+            // parks a byte-exact snapshot and restores it on release, so it recreates
+            // the debt. The recovery command is the drain, and the summary already
+            // names it.
+            requiredCommand: closeWindowAdmission.blockedCode === 'ATM_CLOSE_WINDOW_UNRECONCILED_RESIDUE'
+                ? closeWindowAdmission.residueDrainCommand ?? null
+                : closeWindowAdmission.blockedCode === 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS'
+                    ? `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --defer-foreign-staged --write --json`
+                    : closeWindowAdmission.lock?.taskId ? `node atm.mjs tasks status --task ${closeWindowAdmission.lock.taskId} --json` : null,
             files: closeWindowAdmission.unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles)
         });
     if (!workAdmission.decision.ok) {

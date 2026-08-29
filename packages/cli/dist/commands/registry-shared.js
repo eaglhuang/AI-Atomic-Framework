@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createSourceHashSnapshot } from '../../../core/dist/hash-lock/hash-lock.js';
-import { createRegistryDocument, evaluateRegistryEntryDrift, validateRegistryDocumentFile } from '../../../core/dist/registry/registry.js';
+import { createSourceHashSnapshot } from '../_vendor/core/dist/hash-lock/hash-lock.js';
+import { createRegistryDocument, evaluateRegistryEntryDrift, validateRegistryDocumentFile } from '../_vendor/core/dist/registry/registry.js';
 import { makeResult, message, readJsonFile, relativePathFrom } from './shared.js';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 export const frameworkRepoRoot = repoRoot;

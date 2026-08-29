@@ -430,6 +430,9 @@ try {
   check(existsSync(path.join(governedRepo, '.atm', 'history', 'handoff', 'ATM-CORE-0001.json')), 'hard-stop run must persist the continuation summary json');
   check(existsSync(path.join(governedRepo, '.atm', 'history', 'handoff', 'ATM-CORE-0001.md')), 'hard-stop run must persist the continuation summary markdown');
   check(existsSync(path.join(governedRepo, '.atm', 'history', 'evidence', 'ATM-CORE-0001.json')), 'hard-stop run must persist the handoff evidence');
+  const handoffEvidence = JSON.parse(readFileSync(path.join(governedRepo, '.atm', 'history', 'evidence', 'ATM-CORE-0001.json'), 'utf8'));
+  const handoffRecords = Array.isArray(handoffEvidence) ? handoffEvidence : handoffEvidence.evidence;
+  check(Array.isArray(handoffRecords) && handoffRecords.some((entry: any) => entry.evidenceKind === 'handoff' && entry.workItemId === 'ATM-CORE-0001'), 'hard-stop history evidence must contain the durable handoff record');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

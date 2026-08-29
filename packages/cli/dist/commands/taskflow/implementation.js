@@ -17,15 +17,15 @@ import { isRunnerSyncRequired } from '../framework-development.js';
 import { inspectRunnerSyncAdmission } from '../framework-development/runner-sync-admission.js';
 import { buildTaskflowCloseWriteReadinessHint, prioritizeSharedHistoricalDeliveryBlockers } from './write-readiness.js';
 import { resolveTaskflowDeclaredFiles } from './task-scope.js';
-import { deriveAtmScopeClass } from '../../../../core/dist/broker/atm-core-scope.js';
+import { deriveAtmScopeClass } from '../../_vendor/core/dist/broker/atm-core-scope.js';
 import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, readStagedFiles, restoreDeferredGovernanceDirtyFiles } from './commit-bundle-assembly.js';
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.js';
 import { resolveRunnerPublicationCloseHandoff } from '../framework-development/runner-publication-close-handoff.js';
 import { buildTaskflowRunnerRecoveryArgs } from './runner-recovery-forwarding.js';
 import { enqueueTaskflowClosePublication } from './runner-publication-close-queue.js';
-import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../../core/dist/team-runtime/handoff-ledger.js';
-import { clearBrokerRuntimeStateForTask } from '../../../../core/dist/broker/lifecycle.js';
-import { classifyRunnerAffectingPaths, filterRunnerInputTreeListing, RUNNER_INPUT_TREE_PATHS } from '../../../../core/dist/broker/runner-version-contract.js';
+import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../_vendor/core/dist/team-runtime/handoff-ledger.js';
+import { clearBrokerRuntimeStateForTask } from '../../_vendor/core/dist/broker/lifecycle.js';
+import { classifyRunnerAffectingPaths, filterRunnerInputTreeListing, RUNNER_INPUT_TREE_PATHS } from '../../_vendor/core/dist/broker/runner-version-contract.js';
 function buildTasksNewCommand(input) {
     const parts = ['node atm.mjs tasks new'];
     if (input.template) {

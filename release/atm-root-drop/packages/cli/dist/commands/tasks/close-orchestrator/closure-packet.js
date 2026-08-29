@@ -54,7 +54,7 @@ export function prepareClosurePacket(input) {
             createdClosurePacketAbsolute: null
         };
     }
-    const closePacketChangedFiles = deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles;
+    const closePacketChangedFiles = deliverableGate?.deliverableFiles?.length ? deliverableGate.deliverableFiles : taskDeclaredFiles;
     const taskRequiredGates = Array.isArray(taskDocument.validators)
         ? uniqueStrings(taskDocument.validators
             .filter((entry) => typeof entry === 'string' && entry.trim().length > 0)
@@ -69,21 +69,21 @@ export function prepareClosurePacket(input) {
         evidencePath: `.atm/history/evidence/${options.taskId}.json`,
         requiredGates: historicalBatchSlice?.okToCloseTask === true
             ? uniqueStrings([
-                ...historicalBatchSlice.taskSpecificValidationPasses,
-                ...historicalBatchSlice.batchWideValidationPasses
+                ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),
+                ...(historicalBatchSlice.batchWideValidationPasses ?? [])
             ])
             : taskRequiredGates,
         changedFiles: closePacketChangedFiles,
         frameworkStatus,
         validationPasses: historicalBatchSlice?.okToCloseTask === true
             ? uniqueStrings([
-                ...historicalBatchSlice.taskSpecificValidationPasses,
-                ...historicalBatchSlice.batchWideValidationPasses,
-                ...historicalBatchSlice.advisoryValidationPasses
+                ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),
+                ...(historicalBatchSlice.batchWideValidationPasses ?? []),
+                ...(historicalBatchSlice.advisoryValidationPasses ?? [])
             ])
             : undefined,
         evidenceFreshness: historicalBatchSlice?.okToCloseTask === true ? 'fresh' : undefined,
-        historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate?.historicalDeliveries[0] ?? null, options.reason)
+        historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate?.historicalDeliveries?.[0] ?? null, options.reason)
     });
     const validation = validateClosurePacket(pendingClosurePacket);
     if (!validation.ok) {

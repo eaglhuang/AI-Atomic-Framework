@@ -6,7 +6,28 @@ import { normalizeRelativePath } from './task-file-io-helpers.js';
 import { CliError, quoteCliValue, relativePathFrom } from '../shared.js';
 import { inspectGitIndexOwnership } from '../git-index-ownership.js';
 import { evaluateCloseWindowStagedIndexAdmission } from './close-window-staged-index-admission.js';
+import { classifyCloseWindowUnexpectedStaged, residueDisclosure, EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE } from './close-window-residue-classification.js';
 export const CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID = 'atm.closeWindowStagedIndexLock.v1';
+/**
+ * Classify staged entries for diagnosis only.
+ *
+ * This runs where admission already ran, reads only, and cannot change what
+ * blocks: the classifier narrows a block's wording and recovery command, never
+ * its verdict. Deferral, the lease publication order, and the foreign staged
+ * snapshot and restore contract are untouched.
+ */
+function diagnoseUnexpectedStaged(cwd, unexpectedStagedFiles) {
+    if (unexpectedStagedFiles.length === 0)
+        return EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE;
+    try {
+        return residueDisclosure(classifyCloseWindowUnexpectedStaged({ cwd, unexpectedStagedFiles }));
+    }
+    catch {
+        // Diagnosis must never decide a close. An unreadable evidence directory
+        // leaves the original foreign-staged treatment exactly as it was.
+        return EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE;
+    }
+}
 function resolveGitExecutable() {
     const configured = process.env.ATM_GIT_EXECUTABLE?.trim();
     if (configured && existsSync(configured)) {
@@ -88,7 +109,10 @@ function readCloseWindowStagedIndexLock(cwd) {
         const parsed = JSON.parse(readFileSync(lockPath, 'utf8'));
         if (parsed?.schemaId !== CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID)
             return null;
-        return parsed;
+        // A record written before ownership disclosure existed carries no entries;
+        // it reads as an empty set rather than an absent field, so every consumer
+        // sees one shape.
+        return Array.isArray(parsed.provenResidueEntries) ? parsed : { ...parsed, provenResidueEntries: [] };
     }
     catch {
         return null;
@@ -234,11 +258,15 @@ export function inspectCloseWindowStagedIndexAdmission(input) {
     const unexpectedStagedTasks = inspectForeignStagedTasksForCloseWindow(input);
     const expected = new Set(uniqueSorted(input.expectedStageFiles));
     const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expected.has(filePath));
+    const diagnosis = diagnoseUnexpectedStaged(input.cwd, unexpectedStagedFiles);
     const decision = evaluateCloseWindowStagedIndexAdmission({ taskId: normalizeTaskId(input.taskId), activeLockTaskId: existing?.status === 'active' ? existing.taskId : null,
-        unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true });
+        unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true,
+        provenResidueFiles: diagnosis.provenResidueFiles, residueDrainCommand: diagnosis.residueDrainCommand });
     return { schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID, ok: decision.ok,
         lockPath: relativePathFrom(input.cwd, closeWindowStagedIndexLockPath(input.cwd)), lock: existing, unexpectedStagedTasks,
-        foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null, blockedCode: decision.blockedCode, blockedSummary: decision.blockedSummary };
+        foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null, blockedCode: decision.blockedCode, blockedSummary: decision.blockedSummary,
+        residueDrainCommand: diagnosis.residueDrainCommand, residueDrainCommands: diagnosis.residueDrainCommands,
+        provenResidueEntries: diagnosis.provenResidueEntries };
 }
 export function acquireCloseWindowStagedIndexLock(input) {
     const lockPath = closeWindowStagedIndexLockPath(input.cwd);
@@ -277,8 +305,10 @@ export function acquireCloseWindowStagedIndexLock(input) {
     });
     const expectedStageFiles = new Set(uniqueSorted(input.expectedStageFiles));
     const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expectedStageFiles.has(filePath));
+    const acquireDiagnosis = diagnoseUnexpectedStaged(input.cwd, unexpectedStagedFiles);
     const admission = evaluateCloseWindowStagedIndexAdmission({ taskId: normalizeTaskId(input.taskId), activeLockTaskId: existing?.status === 'active' ? existing.taskId : null,
-        unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true });
+        unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true,
+        provenResidueFiles: acquireDiagnosis.provenResidueFiles, residueDrainCommand: acquireDiagnosis.residueDrainCommand });
     if (!admission.ok) {
         return {
             schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
@@ -289,6 +319,9 @@ export function acquireCloseWindowStagedIndexLock(input) {
             foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null,
             blockedCode: admission.blockedCode,
             blockedSummary: admission.blockedSummary,
+            residueDrainCommand: acquireDiagnosis.residueDrainCommand,
+            residueDrainCommands: acquireDiagnosis.residueDrainCommands,
+            provenResidueEntries: acquireDiagnosis.provenResidueEntries,
             handoffWait
         };
     }
@@ -304,6 +337,7 @@ export function acquireCloseWindowStagedIndexLock(input) {
         expectedStageFiles: uniqueSorted(input.expectedStageFiles),
         foreignStagedSnapshotPath: null,
         foreignStagedEntries: [],
+        provenResidueEntries: acquireDiagnosis.provenResidueEntries,
         unexpectedStagedTasks,
         releasedAt: null,
         releaseOutcome: null
@@ -334,6 +368,9 @@ export function acquireCloseWindowStagedIndexLock(input) {
         foreignStagedSnapshotPath: record.foreignStagedSnapshotPath,
         blockedCode: null,
         blockedSummary: null,
+        residueDrainCommand: acquireDiagnosis.residueDrainCommand,
+        residueDrainCommands: acquireDiagnosis.residueDrainCommands,
+        provenResidueEntries: record.provenResidueEntries,
         handoffWait
     };
 }

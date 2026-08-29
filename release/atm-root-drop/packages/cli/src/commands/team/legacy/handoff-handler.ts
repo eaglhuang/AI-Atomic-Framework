@@ -41,7 +41,7 @@ function assertTeamHandoffHardGate(input: { cwd: string; taskId: string; teamRun
   const runActorId = String(run.actorId ?? '').trim();
   const runTaskId = String(run.taskId ?? '').trim();
   const roles = Array.isArray(run.roles) ? run.roles : Array.isArray(run.agents) ? run.agents : [];
-  const coordinator = roles.find((entry: any) => entry?.role === 'coordinator') as { agentId?: unknown; permissions?: unknown } | undefined;
+  const coordinator = roles.find((entry: unknown) => typeof entry === 'object' && entry !== null && (entry as Record<string, unknown>).role === 'coordinator') as { agentId?: unknown; permissions?: unknown } | undefined;
   const coordinatorAgentId = String(coordinator?.agentId ?? '').trim();
   const coordinatorPermissions = Array.isArray(coordinator?.permissions) ? coordinator.permissions.map(String) : [];
   const leases = normalizePermissionLeaseRecords(run.permissionLeases ?? run.leases);

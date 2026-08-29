@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { createHumanReviewQueueDocument, createHumanReviewQueueRecord, findHumanReviewQueueRecord, loadHumanReviewQueueDocument, renderHumanReviewQueueMarkdown, replaceHumanReviewQueueRecord, writeHumanReviewQueueDocument } from '../../../../../plugin-human-review/dist/index.js';
+import { createHumanReviewQueueDocument, createHumanReviewQueueRecord, findHumanReviewQueueRecord, loadHumanReviewQueueDocument, renderHumanReviewQueueMarkdown, replaceHumanReviewQueueRecord, writeHumanReviewQueueDocument } from '../../../_vendor/plugin-human-review/dist/index.js';
 import { makeResult, message } from '../../shared.js';
 export function isGuidedLegacyDryRun(options) {
     return options.propose === true

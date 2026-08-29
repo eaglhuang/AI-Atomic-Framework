@@ -9,6 +9,13 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const tempRoot = createTempWorkspace('atm-skew-matrix-');
 
 try {
+  const source = readFileSync(path.join(root, 'scripts', 'validate-skew-matrix.ts'), 'utf8');
+  assert.match(
+    source,
+    /'runner-publication-disposition'/,
+    'the compatibility matrix must ignore mutable runner-publication state from its host checkout'
+  );
+
   const summaryPath = path.join(tempRoot, 'skew-summary.json');
   const valid = runValidator(['--mode', 'validate', '--summary', summaryPath]);
   assert.equal(valid.exitCode, 0);

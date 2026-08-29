@@ -1,6 +1,6 @@
 import { CliError, makeResult, message } from '../../shared.js';
-import { createTeamObservabilityEvent } from '../../../../../core/dist/team-runtime/observability.js';
-import { readTeamHandoffArtifacts, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../../../../../core/dist/team-runtime/handoff-ledger.js';
+import { createTeamObservabilityEvent } from '../../../_vendor/core/dist/team-runtime/observability.js';
+import { readTeamHandoffArtifacts, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../../../_vendor/core/dist/team-runtime/handoff-ledger.js';
 import { teamPermissionCatalog } from './types.js';
 import { appendTeamRuntimeObservabilityEvents, buildDirectTeamRoleInstructions, TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS } from './provider-execution.js';
 import { normalizePermissionLeaseRecords, readTeamRun } from './team-run-store.js';
@@ -44,7 +44,7 @@ function assertTeamHandoffHardGate(input) {
     const runActorId = String(run.actorId ?? '').trim();
     const runTaskId = String(run.taskId ?? '').trim();
     const roles = Array.isArray(run.roles) ? run.roles : Array.isArray(run.agents) ? run.agents : [];
-    const coordinator = roles.find((entry) => entry?.role === 'coordinator');
+    const coordinator = roles.find((entry) => typeof entry === 'object' && entry !== null && entry.role === 'coordinator');
     const coordinatorAgentId = String(coordinator?.agentId ?? '').trim();
     const coordinatorPermissions = Array.isArray(coordinator?.permissions) ? coordinator.permissions.map(String) : [];
     const leases = normalizePermissionLeaseRecords(run.permissionLeases ?? run.leases);

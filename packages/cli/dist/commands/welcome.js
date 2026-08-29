@@ -8,7 +8,7 @@ import { runNext } from './next.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { getCommandSpec } from './command-specs.js';
 import { readTelemetryState, telemetryAllowedFields } from '../telemetry/index.js';
-import { listExperimentalApis } from '../../../agent-pack-sdk/dist/experimental/index.js';
+import { listExperimentalApis } from '../_vendor/agent-pack-sdk/dist/experimental/index.js';
 const defaultWelcomeLineageRelativePath = path.join('.atm', 'runtime', 'welcome.lineage.json');
 export async function runWelcome(argv) {
     const spec = getCommandSpec('welcome');

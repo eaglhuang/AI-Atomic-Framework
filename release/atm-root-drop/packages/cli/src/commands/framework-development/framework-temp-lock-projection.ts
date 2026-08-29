@@ -27,14 +27,38 @@ export interface FrameworkTempLockProjection {
   readonly files: readonly string[];
 }
 
+/**
+ * Fail-closed scan facts for temporary framework locks. These facts explain
+ * why a lock was not selected; they never themselves grant authority.
+ */
+export interface FrameworkTempLockScan {
+  readonly lockRootExists: boolean;
+  readonly discoveredLockFileCount: number;
+  readonly readableLockFileCount: number;
+  readonly unreadableLockFiles: readonly string[];
+  readonly locks: readonly FrameworkTempLockProjection[];
+}
+
 export type FrameworkTempLockLaneProvenance = 'recorded' | 'unrecorded-legacy';
 
 export function readFrameworkTempLockProjection(cwd: string, now = Date.now()): readonly FrameworkTempLockProjection[] {
+  return inspectFrameworkTempLockProjection(cwd, now).locks;
+}
+
+export function inspectFrameworkTempLockProjection(cwd: string, now = Date.now()): FrameworkTempLockScan {
   const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
-  if (!existsSync(lockRoot)) return [];
-  return readdirSync(lockRoot)
-    .filter((entry) => entry.endsWith('.lock.json'))
-    .flatMap((entry): readonly FrameworkTempLockProjection[] => {
+  if (!existsSync(lockRoot)) {
+    return {
+      lockRootExists: false,
+      discoveredLockFileCount: 0,
+      readableLockFileCount: 0,
+      unreadableLockFiles: [],
+      locks: []
+    };
+  }
+  const entries = readdirSync(lockRoot).filter((entry) => entry.endsWith('.lock.json'));
+  const unreadableLockFiles: string[] = [];
+  const locks = entries.flatMap((entry): readonly FrameworkTempLockProjection[] => {
       try {
         const parsed = JSON.parse(readFileSync(path.join(lockRoot, entry), 'utf8')) as Record<string, unknown>;
         if (String(parsed.status ?? '').trim().toLowerCase() === 'released') return [];
@@ -61,9 +85,17 @@ export function readFrameworkTempLockProjection(cwd: string, now = Date.now()): 
           files: uniqueStrings(Array.isArray(parsed.files) ? parsed.files : [])
         }];
       } catch {
+        unreadableLockFiles.push(entry);
         return [];
       }
     });
+  return {
+    lockRootExists: true,
+    discoveredLockFileCount: entries.length,
+    readableLockFileCount: entries.length - unreadableLockFiles.length,
+    unreadableLockFiles: unreadableLockFiles.sort(),
+    locks
+  };
 }
 
 export function frameworkTempLockOwnsPath(
@@ -78,7 +110,10 @@ function text(value: unknown): string | null {
 }
 
 function number(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value !== 'string' || value.trim().length === 0) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function uniqueStrings(values: readonly unknown[]): readonly string[] {

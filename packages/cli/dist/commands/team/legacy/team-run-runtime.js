@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { makeResult, message, readJsonFile, writeJsonFile } from '../../shared.js';
-import { planSharedSurfaceAcquisition } from '../../../../../core/dist/broker/shared-surface-queue.js';
+import { planSharedSurfaceAcquisition } from '../../../_vendor/core/dist/broker/shared-surface-queue.js';
 import { composeTeamContributionManifests } from '../../team/composer.js';
 import { buildTeamReworkRouteStateMachine } from './runtime-contracts.js';
 import { compactTeamRun, createTeamRunId, listTeamRuns, readTeamRun, teamRunsDirectory } from './team-run-store.js';
@@ -110,7 +110,7 @@ export function buildTeamStatusResult(input) {
         : listTeamRuns(input.cwd).filter((run) => typeof run === 'object' && run !== null && run.status === 'active');
     const sharedSurfaceQueues = readTeamSharedSurfaceQueues(input.cwd);
     const sharedSurfaceAcquisitionPlans = runs
-        .map((run) => String(run?.taskId ?? '').trim())
+        .map((run) => String(typeof run === 'object' && run !== null ? run.taskId ?? '' : '').trim())
         .filter(Boolean)
         .map((taskId) => planSharedSurfaceAcquisition(sharedSurfaceQueues, taskId));
     return makeResult({

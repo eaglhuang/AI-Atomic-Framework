@@ -175,6 +175,7 @@
     "release/atm-root-drop/docs/assets/atm-governance-layers.svg",
     "release/atm-root-drop/docs/atm-broker-evidence-plan.md",
     "release/atm-root-drop/docs/bench/ATM-AdmissionBench-CONTRACT.md",
+    "release/atm-root-drop/docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
     "release/atm-root-drop/docs/bench/ATM-OperationalBench-CONTRACT.md",
     "release/atm-root-drop/docs/cli-error-policy.md",
     "release/atm-root-drop/docs/environment-variables.md",
@@ -634,6 +635,9 @@
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-011.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-012.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-013.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-27-001.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-28-001.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-29-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
     "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
     "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -696,6 +700,7 @@
     "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
     "release/atm-root-drop/docs/reports/atm-2-1-paired-ab-v4.md",
     "release/atm-root-drop/docs/reports/atm-2-1-real-parallel-dogfood.md",
+    "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
     "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
     "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
     "release/atm-root-drop/docs/reports/atm-plan-4-1-dependency-census.json",
@@ -1392,6 +1397,8 @@
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/identity-check-command.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/index-restoration.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/lease-command.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-drain.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-lock-retry.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-reconciliation.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/pathspec-argv-batching.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/push-command.js",
@@ -1627,6 +1634,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/historical-context.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/runner-recovery.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-lock.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-residue-classification.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-staged-index-admission.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/closeout-provenance.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/closeout-signaling.js",
@@ -2057,6 +2065,10 @@
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/identity-check-command.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/lease-command.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-drain.test.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-drain.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-lock-contention.test.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-lock-retry.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
@@ -2393,6 +2405,7 @@
     "release/atm-root-drop/packages/cli/src/commands/tasks/close-orchestrator/historical-context.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/close-window-lock.ts",
+    "release/atm-root-drop/packages/cli/src/commands/tasks/close-window-residue-classification.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/close-window-staged-index-admission.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/closeout-provenance.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/closeout-signaling.ts",
@@ -3650,6 +3663,7 @@
     "release/atm-root-drop/schemas/evidence/concurrency-fuzz-generators.schema.json",
     "release/atm-root-drop/schemas/evidence/concurrency-schedule-obligations.schema.json",
     "release/atm-root-drop/schemas/evidence/constraint-solver.schema.json",
+    "release/atm-root-drop/schemas/evidence/coverage-certificate.schema.json",
     "release/atm-root-drop/schemas/evidence/coverage-ratchet-baseline.schema.json",
     "release/atm-root-drop/schemas/evidence/coverage-universe.schema.json",
     "release/atm-root-drop/schemas/evidence/cross-editor-parallel-proof.schema.json",
@@ -3657,6 +3671,7 @@
     "release/atm-root-drop/schemas/evidence/diagnostic-loop-receipt.schema.json",
     "release/atm-root-drop/schemas/evidence/evidence-freshness-certificate.schema.json",
     "release/atm-root-drop/schemas/evidence/example-branch-generators.schema.json",
+    "release/atm-root-drop/schemas/evidence/external-benchmark-run.schema.json",
     "release/atm-root-drop/schemas/evidence/fault-fingerprint.schema.json",
     "release/atm-root-drop/schemas/evidence/four-plan-independent-certificate.schema.json",
     "release/atm-root-drop/schemas/evidence/gap-planning.schema.json",
@@ -3885,6 +3900,7 @@
     "release/atm-root-drop/scripts/fixtures/agr-conflict-benchmark/manifest.json",
     "release/atm-root-drop/scripts/fixtures/atm-admission-bench/manifest.json",
     "release/atm-root-drop/scripts/fixtures/atm-admission-bench/unresolved.json",
+    "release/atm-root-drop/scripts/fixtures/atm-external-benchmark/manifest.json",
     "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/coverage-ready.json",
     "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-00-00-000Z-control.json",
     "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-01-00-000Z-treatment.json",
@@ -3955,6 +3971,10 @@
     "release/atm-root-drop/scripts/lib/agr-benchmark-runner.ts",
     "release/atm-root-drop/scripts/lib/agr-conflict-benchmark-runner.ts",
     "release/atm-root-drop/scripts/lib/atom-id-to-cid.ts",
+    "release/atm-root-drop/scripts/lib/external-benchmark/adjudication.ts",
+    "release/atm-root-drop/scripts/lib/external-benchmark/metrics.ts",
+    "release/atm-root-drop/scripts/lib/external-benchmark/report.ts",
+    "release/atm-root-drop/scripts/lib/external-benchmark/runner.ts",
     "release/atm-root-drop/scripts/lib/final-certificate-observation.ts",
     "release/atm-root-drop/scripts/lib/git-boundary-fixtures.ts",
     "release/atm-root-drop/scripts/lib/governance-cost-bench/paired-runner.ts",
@@ -3962,6 +3982,8 @@
     "release/atm-root-drop/scripts/lib/mao-parallel-routing-benchmark-runner.ts",
     "release/atm-root-drop/scripts/lib/mao-parallel-routing-benchmark-runner/report.ts",
     "release/atm-root-drop/scripts/lib/next-warm-latency-workload.ts",
+    "release/atm-root-drop/scripts/lib/release-prepublish-gate.ts",
+    "release/atm-root-drop/scripts/lib/release-version-compatibility.ts",
     "release/atm-root-drop/scripts/lib/structured-artifact-admission-runner.ts",
     "release/atm-root-drop/scripts/lib/task-ledger-assertions.ts",
     "release/atm-root-drop/scripts/lib/task-ledger-fixture-builder.ts",
@@ -3986,6 +4008,7 @@
     "release/atm-root-drop/scripts/review-four-plan-objective-authority.ts",
     "release/atm-root-drop/scripts/review-runbook-release-authority.ts",
     "release/atm-root-drop/scripts/run-atm-admission-bench.ts",
+    "release/atm-root-drop/scripts/run-atm-external-benchmark.ts",
     "release/atm-root-drop/scripts/run-atm-operational-bench.ts",
     "release/atm-root-drop/scripts/run-broker-run-log-scan.ps1",
     "release/atm-root-drop/scripts/run-paired-ab-v4.ts",
@@ -4003,9 +4026,11 @@
     "release/atm-root-drop/scripts/runner-sync-receipt-continuation.ts",
     "release/atm-root-drop/scripts/runner-version-selection-replay.ts",
     "release/atm-root-drop/scripts/scan-broker-runs.ts",
+    "release/atm-root-drop/scripts/seal-release-prepublish-evidence.ts",
     "release/atm-root-drop/scripts/sealed-build-output-ownership.ts",
     "release/atm-root-drop/scripts/sealed-runner-artifact-lifecycle.ts",
     "release/atm-root-drop/scripts/sealed-runner-publication.ts",
+    "release/atm-root-drop/scripts/set-release-workspace-versions.ts",
     "release/atm-root-drop/scripts/skew-matrix.config.json",
     "release/atm-root-drop/scripts/split-command-specs.ts",
     "release/atm-root-drop/scripts/src/atomization-coverage-guard.js",
@@ -4075,6 +4100,7 @@
     "release/atm-root-drop/scripts/validate-evidence-ledger-boundary.ts",
     "release/atm-root-drop/scripts/validate-examples.ts",
     "release/atm-root-drop/scripts/validate-experience-loop.ts",
+    "release/atm-root-drop/scripts/validate-external-benchmark-protocol.ts",
     "release/atm-root-drop/scripts/validate-external-core-pipeline.ts",
     "release/atm-root-drop/scripts/validate-external-golden.ts",
     "release/atm-root-drop/scripts/validate-false-green-evidence-freeze.ts",
@@ -4562,11 +4588,13 @@
     "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
     "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
     "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
+    "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
     "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
     "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
     "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
     "release/atm-root-drop/tests/cli/close-orchestrator-final-600.test.ts",
     "release/atm-root-drop/tests/cli/close-preflight-foreign-line-budget.test.ts",
+    "release/atm-root-drop/tests/cli/close-window-residue-diagnosis.test.ts",
     "release/atm-root-drop/tests/cli/closure-acceptance-evidence-gate.test.ts",
     "release/atm-root-drop/tests/cli/closure-packet-schema-extraction.test.ts",
     "release/atm-root-drop/tests/cli/closure-repair-write-ticket-commit.test.ts",
@@ -4595,12 +4623,16 @@
     "release/atm-root-drop/tests/cli/editor-global-overlay-collision.test.ts",
     "release/atm-root-drop/tests/cli/editor-global-skill-federation.test.ts",
     "release/atm-root-drop/tests/cli/emergency-git-author-continuity.test.ts",
+    "release/atm-root-drop/tests/cli/encoding-guard-argv-budget.test.ts",
     "release/atm-root-drop/tests/cli/engineering-change-method-profiles.test.ts",
     "release/atm-root-drop/tests/cli/error-recovery-contract.test.ts",
     "release/atm-root-drop/tests/cli/evidence-bundle-io-extraction.test.ts",
     "release/atm-root-drop/tests/cli/evidence-bundle-manifest.test.ts",
     "release/atm-root-drop/tests/cli/evidence-ledger-migration.test.ts",
     "release/atm-root-drop/tests/cli/evidence-seal-task-summary.test.ts",
+    "release/atm-root-drop/tests/cli/external-benchmark-decision.test.ts",
+    "release/atm-root-drop/tests/cli/external-benchmark-metrics.test.ts",
+    "release/atm-root-drop/tests/cli/external-benchmark-protocol.test.ts",
     "release/atm-root-drop/tests/cli/final-backlog-closeback-provenance.test.ts",
     "release/atm-root-drop/tests/cli/first-layer-command-contracts.test.ts",
     "release/atm-root-drop/tests/cli/first-layer-ux-routing.test.ts",
@@ -4610,6 +4642,7 @@
     "release/atm-root-drop/tests/cli/four-plan-independent-certificate.test.ts",
     "release/atm-root-drop/tests/cli/four-plan-objective-authority-review.test.ts",
     "release/atm-root-drop/tests/cli/four-plan-objective-denominator.test.ts",
+    "release/atm-root-drop/tests/cli/framework-auto-stage-pathspec-batching.test.ts",
     "release/atm-root-drop/tests/cli/framework-temp-claim-lifecycle-parity.test.ts",
     "release/atm-root-drop/tests/cli/framework-temp-lock-admission-parity.test.ts",
     "release/atm-root-drop/tests/cli/framework-temp-task-id-normalization.test.ts",
@@ -4817,6 +4850,7 @@
     "release/atm-root-drop/tests/cli/post-compose-semantic-validation.test.ts",
     "release/atm-root-drop/tests/cli/pre-commit-evidence-context-parity.test.ts",
     "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
+    "release/atm-root-drop/tests/cli/pre-commit-no-explicit-any.test.ts",
     "release/atm-root-drop/tests/cli/pre-push-historical-attestation-advisory.test.ts",
     "release/atm-root-drop/tests/cli/pre-push-provisional-closure-packet.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
@@ -4833,7 +4867,10 @@
     "release/atm-root-drop/tests/cli/real-team-wave-worker-executor.test.ts",
     "release/atm-root-drop/tests/cli/receipt-bound-shared-delivery-commit.test.ts",
     "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
+    "release/atm-root-drop/tests/cli/release-prepublish-gate.test.ts",
     "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
+    "release/atm-root-drop/tests/cli/release-version-compatibility.test.ts",
+    "release/atm-root-drop/tests/cli/release-workspace-versions.test.ts",
     "release/atm-root-drop/tests/cli/released-residue-transaction.test.ts",
     "release/atm-root-drop/tests/cli/released-wip-reclaim-transaction.test.ts",
     "release/atm-root-drop/tests/cli/repair-closure-emergency-atomicity.test.ts",
@@ -4843,6 +4880,7 @@
     "release/atm-root-drop/tests/cli/rft-atomization-metrics.test.ts",
     "release/atm-root-drop/tests/cli/rft-atomization-rollout.test.ts",
     "release/atm-root-drop/tests/cli/rft-continuation-card-generation.test.ts",
+    "release/atm-root-drop/tests/cli/root-drop-release-doctor.test.ts",
     "release/atm-root-drop/tests/cli/root-drop-release-incremental-overlay.test.ts",
     "release/atm-root-drop/tests/cli/root-drop-release-manifest-integrity.test.ts",
     "release/atm-root-drop/tests/cli/root-drop-release-source-list.test.ts",
@@ -4908,6 +4946,7 @@
     "release/atm-root-drop/tests/cli/status-active-workers.test.ts",
     "release/atm-root-drop/tests/cli/steward-receipt-error-contract.test.ts",
     "release/atm-root-drop/tests/cli/steward-receipt-pre-commit-gate.test.ts",
+    "release/atm-root-drop/tests/cli/strict-lint-release-contract.test.ts",
     "release/atm-root-drop/tests/cli/strict-paired-ab-dogfood.test.ts",
     "release/atm-root-drop/tests/cli/task-audit-bulk-close-mirror.test.ts",
     "release/atm-root-drop/tests/cli/task-card-causal-graph-authoring.test.ts",
@@ -5002,7 +5041,10 @@
     "release/atm-root-drop/tests/cli/validator-dag-shared-cache.test.ts",
     "release/atm-root-drop/tests/cli/validator-discoverability.test.ts",
     "release/atm-root-drop/tests/cli/validator-execution-receipt-hard-gate.test.ts",
+    "release/atm-root-drop/tests/cli/validator-fixture-worktree-lock-contract.test.ts",
+    "release/atm-root-drop/tests/cli/validator-git-fixture-resource-lock.test.ts",
     "release/atm-root-drop/tests/cli/validator-governance-verdict.test.ts",
+    "release/atm-root-drop/tests/cli/validator-guidance-performance-budget.test.ts",
     "release/atm-root-drop/tests/cli/validator-observed-lifecycle.test.ts",
     "release/atm-root-drop/tests/cli/validator-run-resume-and-status.test.ts",
     "release/atm-root-drop/tests/cli/validator-scheduler-resource-contract.test.ts",
@@ -5337,8 +5379,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 2,
-    "unchanged": 1396,
+    "copied": 12,
+    "unchanged": 1402,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -5399,7 +5441,7 @@
       },
       {
         "path": "atomic-registry.json",
-        "digest": "3360ebd099ed88ad4b5133cb37afbc211bd0bc958a5ae825310577d6848816dd",
+        "digest": "4592c5abb3049cd3a9d9f61a9169c94028b7d054964b61d8e7c8a58e20866aa3",
         "origin": "source",
         "inputPaths": [
           "atomic-registry.json"
@@ -5912,7 +5954,7 @@
       },
       {
         "path": "atomic_workbench/generator-provenance-audit.json",
-        "digest": "6f259094cb50d37ec265431b71c2d0e7a301ccedd9905ee7dc459cded1efba11",
+        "digest": "3558edf181fc9d7e8111bcfdb075fe7c4cb5d5241a471a0cb26d4f2688354700",
         "origin": "source",
         "inputPaths": [
           "atomic_workbench/generator-provenance-audit.json"
@@ -5939,7 +5981,7 @@
       },
       {
         "path": "atomic_workbench/map-generator-provenance-audit.json",
-        "digest": "a888d96b1d27747d9fdbce4cdb2bc67dcbcbf46031f69416181c0a0bb20d9d47",
+        "digest": "9bd85d74a0772462a4e833958e6f2c1e63de38cf3c331627bf980952a8ba2483",
         "origin": "source",
         "inputPaths": [
           "atomic_workbench/map-generator-provenance-audit.json"
@@ -6636,6 +6678,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/bench/ATM-AdmissionBench-CONTRACT.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
+        "digest": "d60868c0ab1fb0336fa5e8a7454a04cf6a14e4310064b0cd4b58e387c442ab05",
+        "origin": "source",
+        "inputPaths": [
+          "docs/bench/ATM-ExternalBenchmark-PROTOCOL.md"
         ],
         "replaceable": true
       },
@@ -10124,7 +10175,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json",
-        "digest": "24829808f24faeccd0955c51e30dc94684a12128a57f4b9a242bc9d85e782c78",
+        "digest": "f4285039c20f517ea8f2b3b6f34070b61003b27b5758de97a785f949c4484137",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-013.json"
@@ -10205,7 +10256,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json",
-        "digest": "6adbfe8918fbc6349646bf5d6f406ce7f98477ec8d340c853ff46f9cef7f90a2",
+        "digest": "8804a03b35058fa0ee7b40038099485ffb5c7eaa442e37040294328ff0e576ce",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json"
@@ -10771,8 +10822,35 @@
         "replaceable": true
       },
       {
+        "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-27-001.json",
+        "digest": "863baddf8359917431d50f2005bd569edb60634928dd37393737090468128dd1",
+        "origin": "source",
+        "inputPaths": [
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-27-001.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-28-001.json",
+        "digest": "2b163f76c9021d0d8ef4720f2c668fca871f9e4e6e1daae1c8ec401228ce7f44",
+        "origin": "source",
+        "inputPaths": [
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-28-001.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-29-001.json",
+        "digest": "1649bfc8ec488cf5d5059121a5649026777f283a48c286322c3568acc5558c55",
+        "origin": "source",
+        "inputPaths": [
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-29-001.json"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "docs/governance/atm-bug-and-optimization-backlog.md",
-        "digest": "ae5f61afac72b0856f2804fb14262ec96d17777a038832b4a13680c449b508b7",
+        "digest": "cd17e860b5b3cb37f9a4077ddff993775f80c7ba6e57df0f721b97788e3af364",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.md"
@@ -11276,7 +11354,7 @@
       },
       {
         "path": "docs/release-trust-ops.md",
-        "digest": "d00cb672b2e01604c2a8e4a52ac286c9e25c43c0ad2e9256fa9a9419bc622ffa",
+        "digest": "691f2c9644c470990610afb3ada7a829b925770b825d70d38aa82d7c77858df1",
         "origin": "source",
         "inputPaths": [
           "docs/release-trust-ops.md"
@@ -11325,6 +11403,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-2-1-real-parallel-dogfood.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/atm-external-benchmark-decision.md",
+        "digest": "91416392b96b7eec70281a29b16fad091d23fb41d6e78d57c8410919a5ea9efc",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-external-benchmark-decision.md"
         ],
         "replaceable": true
       },
@@ -15056,7 +15143,7 @@
       },
       {
         "path": "package.json",
-        "digest": "a06f6e5d55ffd20e234b7395d3904469c01b1df9910f8f7981f223624a40d4e5",
+        "digest": "234c273879f7752ce1631c010e68f4034c7a6bce444550320aee94f9dda3b28e",
         "origin": "source",
         "inputPaths": [
           "package.json"
@@ -15092,7 +15179,7 @@
       },
       {
         "path": "packages/adapter-local-git/package.json",
-        "digest": "92700ef792034836e4376f6796bfa96d7c1488bf7cf50e9616da4c4db8e7075a",
+        "digest": "89ef83238757643345d5b37b36e27f3bb521c07c291aa8df9bc4d046fc50963b",
         "origin": "source",
         "inputPaths": [
           "packages/adapter-local-git/package.json"
@@ -15137,7 +15224,7 @@
       },
       {
         "path": "packages/agent-pack-claude-code/package.json",
-        "digest": "0c13764cd38e1194bce66c33abcff64ed4107a2c2bb181d202633875a3fc8399",
+        "digest": "fc5d5f2a36b5c764cd7b8985cdd584bca7817c7f5fe97ae96333f8f87161eba1",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-claude-code/package.json"
@@ -15227,7 +15314,7 @@
       },
       {
         "path": "packages/agent-pack-copilot/package.json",
-        "digest": "6f949fd93f7bd1d2fac8d2df433aa36053b8270a37cba26d68e094d6e258d228",
+        "digest": "2e0bf09f27b9e8ceed74c248f29e6956862901cd40049181263ab72070216cbb",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-copilot/package.json"
@@ -15263,7 +15350,7 @@
       },
       {
         "path": "packages/agent-pack-cursor/package.json",
-        "digest": "89c938264ba96bbc126563c19309d7e77373e2df437a39df938de4747b0650ab",
+        "digest": "3d1c2104b16a3b6c89bb91156df46f11fef3f3203e611a8e2620a1edfd3f6215",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-cursor/package.json"
@@ -15299,7 +15386,7 @@
       },
       {
         "path": "packages/agent-pack-gemini/package.json",
-        "digest": "93f4c57143f1695e544b445a7d5e30979eed9025b924dc844944e771406b02eb",
+        "digest": "7a9c8a33ba777f5202f64c184d872a8608825ae1e437851dbe39f6c88bf2e0ac",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-gemini/package.json"
@@ -15353,7 +15440,7 @@
       },
       {
         "path": "packages/agent-pack-sdk/package.json",
-        "digest": "8a156a79a68a5461b910aad3af7c74a438211c7d67a070492ad1eb5eef56189e",
+        "digest": "f5878f03b4bbfa5f3ece11054873ba7359f8a38c9c2345aa391e7d741a86080e",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-sdk/package.json"
@@ -15407,7 +15494,7 @@
       },
       {
         "path": "packages/agent-pack-windsurf/package.json",
-        "digest": "d3c0e304176f8b3da095328781e6df5f58def8035037cc9b0c1116942ebbe648",
+        "digest": "3c682bb381475f32fa68ce1d76aabb7d44e44927f44da19004bdbca1c7555ef6",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-windsurf/package.json"
@@ -15461,7 +15548,7 @@
       },
       {
         "path": "packages/atm-markdown-task-source/package.json",
-        "digest": "619c545db49c2518e3d5da5516c865a8e612dbfb7ce96b46ebbf5e6e17b34f63",
+        "digest": "05cd4a8b5ab7337173ad3ada4418fc3c14bf7c53fbbb25cf4094b7a3542cf2e7",
         "origin": "source",
         "inputPaths": [
           "packages/atm-markdown-task-source/package.json"
@@ -16802,7 +16889,7 @@
       },
       {
         "path": "packages/cli/dist/commands/doctor/policy.js",
-        "digest": "ddb43f8150a59a10b7baf613a2d75150414b137dbed939a9a68c19864890fa15",
+        "digest": "4106e215ebac29c75b7d1b52ee3ddf6a05f7d49b660d07d588df7dd752c52ef7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/doctor/policy.js"
@@ -16820,7 +16907,7 @@
       },
       {
         "path": "packages/cli/dist/commands/doctor/run-doctor.js",
-        "digest": "53656916938575789da2823d8e13c8f3bf9a9692924fb4a256f492281e8ce681",
+        "digest": "779181f89e7eb8853c7e9724ad0a4562d7d65451a252a694c96f2454043b4e86",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/doctor/run-doctor.js"
@@ -17189,7 +17276,7 @@
       },
       {
         "path": "packages/cli/dist/commands/framework-development/framework-temp-lock-projection.js",
-        "digest": "f8a2b903069c068f3c83fe29eb9c33721fe5668f593ab85b82b983702ea5d571",
+        "digest": "e2b70a275e512fde8c511d87674a65b12a626d34c7d779e622a60dd4808f17a0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/framework-development/framework-temp-lock-projection.js"
@@ -17198,7 +17285,7 @@
       },
       {
         "path": "packages/cli/dist/commands/framework-development/framework-temp-publication-capability.js",
-        "digest": "7d41b7a3baa7640b3924901653cb7132676aa48a48f605cc5cd2d0faec995721",
+        "digest": "77fa06029a9252cd8bc3c3b2f7875ab616ad5c21a6af0545a09f0b6535118aac",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/framework-development/framework-temp-publication-capability.js"
@@ -17378,7 +17465,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/command-router.js",
-        "digest": "93d266faeefb29203b9b86943e19482a4cfdd3e33c8230537cf7776d97b16ba1",
+        "digest": "6a34208b1fb0e6855e5450d5f29ef562214693ab73cc534cac9c50cb92c1d062",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/command-router.js"
@@ -17405,7 +17492,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
-        "digest": "772bb17e91af362f7c90bd912532caaae90a596fa867225618bdb991336fe099",
+        "digest": "7ed8aa3c5bae1926890fafbb192f0c08e67c21eecfc39dfd3d0fbd2ad76eda1e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js"
@@ -17432,7 +17519,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-command.js",
-        "digest": "b7e7ea0525ed872e8df5d0d0ca658988409e6344c949adb1ec934dc28f21c08f",
+        "digest": "d7f97888b5851d52dcce8824634528877650bcbb10dcf3f71ee8292a16450334",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-command.js"
@@ -17477,7 +17564,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/framework-commit-claim-guard.js",
-        "digest": "34e769360b585fefd6b59cd945f0adbe140ec4f0faa826a6c8b7852d3f84c3ab",
+        "digest": "f81a18f3ba5f7ca9a87b4536c7244ef78c090fd91b4cf5c3070834c1cabf333f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/framework-commit-claim-guard.js"
@@ -17593,8 +17680,26 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/git-governance/implementation/live-index-drain.js",
+        "digest": "311f18914eef6fbd2b9ba2b461d8660895d2fa56008510e7eca81dac46212b52",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/git-governance/implementation/live-index-drain.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/live-index-lock-retry.js",
+        "digest": "2b646ce62585bcc6adb9de915bc7c3ec183714c55fd607a3590a9e0938b5bdf6",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/git-governance/implementation/live-index-lock-retry.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/git-governance/implementation/live-index-reconciliation.js",
-        "digest": "19bce089b425ea97018a160258c809765d8d0046618a91dc258c42aadfaafb6a",
+        "digest": "2e87c1d482a8b3a36245f7b5ba901f2e72f0cf77ce3b58ca191bf6f668cc97fd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/live-index-reconciliation.js"
@@ -17648,7 +17753,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
-        "digest": "9e9d11d75b1bd12511e95127f4e5b29b57ca7d91bbdd7c8b68e66af8b3132341",
+        "digest": "53654732fc9265ccf2a3cd6d0aa4adc489ff782387577233742c3938d25a99c2",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js"
@@ -17945,7 +18050,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/cross-task-admission.js",
-        "digest": "be618a2283b922370b3050543114d7825d70a60cfc27c45c91ac8ac240f5ae95",
+        "digest": "aa63efb9115771bf8b89677a701d629fcb989cb6413e5fa70950f050a4bbe502",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/cross-task-admission.js"
@@ -18467,7 +18572,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/claim-orchestration.js",
-        "digest": "d9c85d6a98ed5f5b04da31eb197ab7c14cf5779de890a42956ab024151513061",
+        "digest": "bdd757b5c76c22f9913046fda6148aa8c6f0f271c02e4e3b005d762d632ef8f7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/claim-orchestration.js"
@@ -19502,7 +19607,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/write-readiness.js",
-        "digest": "c1e4aca6c119204ab3226b552450a0ec61b2cee6f2f6c84386e4c459a9f48ee5",
+        "digest": "5f7c5bcc19fb8890d23ac2b64ea4f71d6895c38a34b3c1fb74766aaa4be67d6f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/write-readiness.js"
@@ -19556,7 +19661,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/claim-ownership.js",
-        "digest": "d80abe8bad75cae47f2d4a1f5ed021253e4b3e409122dbd4657dfdc03af3e278",
+        "digest": "f2f9d321f40c2ed83814f533ac77a75e99c9200c65ed5698ef88b98fd34ea26f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/claim-ownership.js"
@@ -19673,7 +19778,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js",
-        "digest": "052146bfa34b79d5a35ca60f5fcfe4b4dc84b1eb384221f2dbb7f8778edbb6e2",
+        "digest": "1aa0cd1eb24efda6e2919ecb5b1956d5c65420516d0c2ec02c1d906c81079870",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js"
@@ -19700,7 +19805,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-window-lock.js",
-        "digest": "722e3de08f8d78c48d5996daf7e0f09f66a5b19d53de963f5e007456e24bfe7a",
+        "digest": "9a884f82002bc2ba1f1b338503826d673de4ec806fc6882d1a00fe187e192190",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-window-lock.js"
@@ -19708,8 +19813,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/tasks/close-window-residue-classification.js",
+        "digest": "01ff735de8a0dc67fb02405554df09a0e54db8291dc8bbccd07750f9cc425a9a",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/tasks/close-window-residue-classification.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/tasks/close-window-staged-index-admission.js",
-        "digest": "193c5913019aaf3f5b1f37083d6209ff6b46db26a4b18fbe1a54486cdc6b3ba1",
+        "digest": "aa7c886f8d1e2320ad4c797f4c9336be61b16cfcf509e920625183214cd63a74",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-window-staged-index-admission.js"
@@ -20006,7 +20120,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/release-wip-transaction.js",
-        "digest": "d985c8a44ff3aff79dad2d149a7a3da3bab134667e7eda9ae93e7083c6f7e38b",
+        "digest": "4942911705700bd19a6c919918c954cb9b05954cfe156b2b662be23d12ec9106",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/release-wip-transaction.js"
@@ -20501,7 +20615,7 @@
       },
       {
         "path": "packages/cli/dist/commands/team/cost-command.js",
-        "digest": "84e2f31f3f9eb4569a82cc829a42b290dc1ac8cd4d2fb3be78924677122a2abf",
+        "digest": "d73f46178c2b9623cea6daeedb70e7b74a9c0b39af9ab506539ca200f69f2b6e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/team/cost-command.js"
@@ -20537,7 +20651,7 @@
       },
       {
         "path": "packages/cli/dist/commands/team/legacy/broker-observability.js",
-        "digest": "39d239ad63a1612f903bf1475e234060658ffc961a5622f3cbaabf43ff591898",
+        "digest": "dda20069100703861f5c5eb7745960b90687fd96ea4127a907f0ca8d6e1d3c18",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/team/legacy/broker-observability.js"
@@ -20564,7 +20678,7 @@
       },
       {
         "path": "packages/cli/dist/commands/team/legacy/handoff-handler.js",
-        "digest": "f66f27b8dc419a367082f2ce04365dbbf28d8ca9a22f921bfd0506605be91796",
+        "digest": "c881abd96dc8c5127f284884c9bfbd72c25d1ea58339337f4bc5bb075f123bae",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/team/legacy/handoff-handler.js"
@@ -20663,7 +20777,7 @@
       },
       {
         "path": "packages/cli/dist/commands/team/legacy/team-run-runtime.js",
-        "digest": "e58c4ce89a6d87465e90aa63c902c28096b33b726909615896feb01441b09050",
+        "digest": "aa57682bf3dcaae937d5f6789fd3ee1ea25f14d3ba26ece0532ea28ba0e86da7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/team/legacy/team-run-runtime.js"
@@ -20924,7 +21038,7 @@
       },
       {
         "path": "packages/cli/dist/commands/upgrade/proposal/context-budget.js",
-        "digest": "7768cc5b252d64fa6059d8cce06fd180f5363c0a0978114fa7df529b9cf2fe8f",
+        "digest": "2fd8a75c07de013bff743e403c707597e243d48f0ad272a71165ae6eb5764beb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/upgrade/proposal/context-budget.js"
@@ -21122,7 +21236,7 @@
       },
       {
         "path": "packages/cli/package.json",
-        "digest": "ee9ed30b3e648cc3734f96526d255f88ecc798d4cf5c93b9f31283b0b7d6a65b",
+        "digest": "5a9e457d5fe54893590b0d0b0dddbf54bbfe3c7e3cbb848e47a9af79f2d1c457",
         "origin": "source",
         "inputPaths": [
           "packages/cli/package.json"
@@ -21518,7 +21632,7 @@
       },
       {
         "path": "packages/cli/src/commands/broker/mutation-helpers.ts",
-        "digest": "e1a893a3dbc23b669ca68cc859730e223dd84d7f488397163c68eaec678e505d",
+        "digest": "bb0b6a7e448abc49feb307bdf17a957c48150b7b3519596aab38d050c17933ea",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/broker/mutation-helpers.ts"
@@ -21554,7 +21668,7 @@
       },
       {
         "path": "packages/cli/src/commands/broker/persistence.ts",
-        "digest": "a8816a825c7512d573704c162ca82b1d92d48a08b634238b13e4f850f450a44a",
+        "digest": "ec0f51bec1365827aa9815e44cad20db22b840d7f6d11b62236b83d025005483",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/broker/persistence.ts"
@@ -21617,7 +21731,7 @@
       },
       {
         "path": "packages/cli/src/commands/broker/registry-actions.ts",
-        "digest": "79adfec7422468a15cba306af13534a2ec86854443a722f3e8ad60d43e988850",
+        "digest": "24e2e8b93ee5637a9280d9f6a6966b966282ca712e9b09c1ca35b2fd3f87afcd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/broker/registry-actions.ts"
@@ -21743,7 +21857,7 @@
       },
       {
         "path": "packages/cli/src/commands/broker/shared-surface.ts",
-        "digest": "2d65e4998f5327d2486c40dbfb8f5c019756a5c59bed93d66bccac93a5e9b978",
+        "digest": "e79b1a51c28632774eb42433aca4255dcf7b98a4e24ccf149cf5c7585d42a8a1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/broker/shared-surface.ts"
@@ -21770,7 +21884,7 @@
       },
       {
         "path": "packages/cli/src/commands/broker/types.ts",
-        "digest": "3e4bc9f90b7483f890fb86829199d608c551a735b56f1c32a2a681b7986bdedf",
+        "digest": "4afc83d890099471591d0f72572bee80344db1cb3fbec8f32cb887841be17174",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/broker/types.ts"
@@ -22526,7 +22640,7 @@
       },
       {
         "path": "packages/cli/src/commands/doctor/policy.ts",
-        "digest": "17bcf69517064d79bf7656ebe0a63c0fc6987304c697d3a333790847c3e94c33",
+        "digest": "70dd596ca97fdc82966f941bfd919748fe2e1fb648e79c940a7f969f158af8f8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/doctor/policy.ts"
@@ -22544,7 +22658,7 @@
       },
       {
         "path": "packages/cli/src/commands/doctor/run-doctor.ts",
-        "digest": "d1ed3985d2c8895dce7870be249ea9136ca88c88e51a9341dab06b5d05c6f241",
+        "digest": "9aca70d45e0948c55645c51d20c0251807b64d876cc51dcef92bc4cfb1653efb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/doctor/run-doctor.ts"
@@ -23066,7 +23180,7 @@
       },
       {
         "path": "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts",
-        "digest": "829932503afa8cc06d17ab4590da7554b046937e3f51e6526e8ac9989e55e1af",
+        "digest": "b513bc1178f5a4a5022905e1faf3c69041e12f4703f097aab9d502a6daccbbdb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts"
@@ -23075,7 +23189,7 @@
       },
       {
         "path": "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts",
-        "digest": "7590d9f6f3820bb386e5e189ade7f05b4d7f45e63986d8202609845df287ec82",
+        "digest": "44a715f4b3dbfd4788eb370b3887b416c3788f70b19cf6b9a7cd5677434ae335",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts"
@@ -23210,7 +23324,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts",
-        "digest": "33161b5a298e47e2ab5f332d59cd689ff55760e48565138e2104cce810fa2aee",
+        "digest": "753d8a5f72f1411da1ef45ecdfdf16f046c4c58dc59910c290bfd9de7ec464ed",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/__tests__/framework-temp-publication-capability.test.ts"
@@ -23318,7 +23432,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/command-router.ts",
-        "digest": "3b6dbc66b8c7c6c5839824b281f9843948e9329d550f2cff2c861252f7987206",
+        "digest": "ffd5fc3c81eaed7c392e220a42df36570b5b81d1c82dbd5e7aa853d59a4e41d3",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/command-router.ts"
@@ -23363,7 +23477,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
-        "digest": "6ef1338361f539cd549c5ff6daa0c7c5390ea28077c47a39986600176de2668e",
+        "digest": "1e1867da3b20a11abbacf831cee3c401d19a2fd89101f21bb3c32c42ce1b817b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts"
@@ -23390,7 +23504,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
-        "digest": "aa71d0ae9a31ad61323ac6fc76581ec02017eb2000a5b97e6dc6045a35c6b5d1",
+        "digest": "f0ffee2e05d03fe0637d9eadfa643b70be8af0e36c0f77e64335662dd22b7151",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-command.ts"
@@ -23444,7 +23558,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/framework-commit-claim-guard.ts",
-        "digest": "ce76db0fbda4692d2a8623a10f76df8ac5dd591742032b8723539f45ddf5fbe7",
+        "digest": "77b3f1240406a13b44f4e43564bd44f5a9e5601fe94e76c341cd9a9873270746",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/framework-commit-claim-guard.ts"
@@ -23578,6 +23692,42 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/git-governance/implementation/live-index-drain.test.ts",
+        "digest": "11991374a3a8acefddf5a9ea2eec92dfaa894bfe2ae8c05d73becf47730b1688",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/live-index-drain.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/git-governance/implementation/live-index-drain.ts",
+        "digest": "9c2918c8db21d680202aacaab0113dbf376e47b43cb9f1f8cb6ad4105d66b314",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/live-index-drain.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/git-governance/implementation/live-index-lock-contention.test.ts",
+        "digest": "982917fcf21db7ebd3e8ba1ca7fb01897893228f578080e06e5cf79fcfca57d2",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/live-index-lock-contention.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/git-governance/implementation/live-index-lock-retry.ts",
+        "digest": "1948493bc31a7f84bdcf1a9ea714555645a6436253dd30283389388ece696757",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/live-index-lock-retry.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
         "digest": "40e2ff511e4242aef4d8a6ceaf49e1a1267adcbd65918686fccf98a21a9d4d70",
         "origin": "source",
@@ -23588,7 +23738,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
-        "digest": "58f5f098d669f887f03f478e605ffb4b49dfaa07d7ee595c72142b542cdd4494",
+        "digest": "6f6bd4538548f42387f7ea5e01dcfed46ce4215f529f3b02cbf6fd859e371430",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts"
@@ -23669,7 +23819,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
-        "digest": "b1d93226b6da5dfc562f959311b650e11082c6ce87ad1977192b71ea9c71a9ee",
+        "digest": "09acdf9ccbc850465fac00ab7a7b145d110c7e28b19911e5d60b464c0632b0c7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts"
@@ -24029,7 +24179,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts",
-        "digest": "d890a6f4abfd946427f8cb3781331d581e2c305d7c1a402b6a67938dc05034af",
+        "digest": "72771c4e1da773145f1ea075c8a752ce5fff6a8a31c5a0e76bf964aab346aee7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/cross-task-admission.ts"
@@ -24038,7 +24188,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
-        "digest": "9a97d904b963b6daa2cc5b55a05fb07cf56c7da6ba47270a667ab21ed5fda49f",
+        "digest": "c331039e662aa9dedc30fc27c925cedb535fbf4038d611d2c9b3617205f3324b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts"
@@ -24110,7 +24260,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/support.ts",
-        "digest": "899f37a45ea5c90240652c107fb5473860a10d4e146ca47179b05c05377c3e28",
+        "digest": "06a194ed912afb4c206c959d12a35640fab4457e60de9447cca567e4c641955d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/support.ts"
@@ -24209,7 +24359,7 @@
       },
       {
         "path": "packages/cli/src/commands/integration/bootstrap.ts",
-        "digest": "52d1a731de857ff519766ae77bd7967bd53117666e00b1591cb54cd4310fa911",
+        "digest": "496cfbefdc41977e0ac8f12959c74e591832bdbbbfcdec11eed38684d0926576",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/integration/bootstrap.ts"
@@ -24497,7 +24647,7 @@
       },
       {
         "path": "packages/cli/src/commands/next.ts",
-        "digest": "5b5f2745782f237e501306c6ec88e03cc603f27a4da64e30c42a709ec317a388",
+        "digest": "0c2e7c266d83cd35a846abef53830dd510f7ae7541f501dffd533bb56665adbe",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next.ts"
@@ -24740,7 +24890,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/claim-orchestration.ts",
-        "digest": "d0f1c744fe1a7eb8671e74455c981397caaa5f468460793df87d696f9f72156d",
+        "digest": "568c90fbf491e127867b97effb7fed9f9bc479a997266425dc5e4d1b3101fcb5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/claim-orchestration.ts"
@@ -24938,7 +25088,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/prompt-guidance-result.ts",
-        "digest": "36e130ab3b37ed5f297ea8510228fae564b39a7dfd7e4cca644cae320eacadc5",
+        "digest": "e04f87ae58d22bd0601890df36659db05f0f98e318f74da211aeeddd8a1f5de5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/prompt-guidance-result.ts"
@@ -25586,7 +25736,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts",
-        "digest": "38ead61001027bb7554ad125149c36c25e50665d774b14c147f48408c77097f8",
+        "digest": "566affd8c36c5942064d410876cd15884ca08ba119dadad6fd5bcc75ad2ad498",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/close-transaction-hook-receipt.spec.ts"
@@ -25775,7 +25925,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
-        "digest": "ee04beb0fb6776c0f2b5dc2a3a3e0c9c405c38ee2bdf760d6a0e142757c0e806",
+        "digest": "13b635b531f698ddad96a509c6af9b1a948bea2693b1a3d8b90442f0b542216b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts"
@@ -26045,7 +26195,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/write-readiness.ts",
-        "digest": "a7a64a60714c8e9369a0bb08a8aece981647267a28f74f19a896f4efccc28ce3",
+        "digest": "da68e08f6de7cac793dc026f783ccbd6f4329dd79f710b60cbf8acee68df3b1a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/write-readiness.ts"
@@ -26441,7 +26591,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/claim-orchestrator.ts",
-        "digest": "10f3f5606850ca8764015e199f832ec85be7a9007ec7e882e7a4449145d576e3",
+        "digest": "6ad4ca67911a8961ece0391de1ca97e06172f51b84cf03631852ca484469eaac",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/claim-orchestrator.ts"
@@ -26450,7 +26600,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/claim-ownership.ts",
-        "digest": "db92359bf5239b018972bfcfaf52a3a1c685528de0a2311df715c6fad9229559",
+        "digest": "5283c358e436d7f11d4547bf066bd85076ad5750ff0c1cee4c59721170c8f84c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/claim-ownership.ts"
@@ -26549,7 +26699,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-orchestrator/close-result.ts",
-        "digest": "88da7c71433fa8a85b2a72ecc6472e1478ac6ea21b74fcf43fb3837cbd9b595c",
+        "digest": "dfdb00d81e5f632f96d51e83deb310a73cf446dcf5725f649e7e397206988c86",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-orchestrator/close-result.ts"
@@ -26558,7 +26708,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
-        "digest": "84d661c7ddae1bc33ae4c46d0df674eacf4eaa33c45c1b30b42c287665d664ec",
+        "digest": "66b96dcf70edfc1d9c18a1fe48f73e2fd1e534d0c2f7266d2643ad01a4f28bb5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts"
@@ -26567,7 +26717,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
-        "digest": "17fb1860413f3e990150a280ddc0db27952da10084ba148cafa1f0a12c63a1b0",
+        "digest": "cd799b841425f3c4e43155723a7a7ed2ccfe3407ae889b208046380724e79f90",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts"
@@ -26594,7 +26744,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-window-lock.ts",
-        "digest": "008d755a2d18819418483d3ab160b67cfbd1f9b0d904509ec00afc662504d6db",
+        "digest": "b70ee8d3df4b47661bab6e1b6149f2228e2b61707beb8058fe3e4a2c81671324",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-window-lock.ts"
@@ -26602,8 +26752,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/tasks/close-window-residue-classification.ts",
+        "digest": "afa8c1f1a6cfb921fcb58f62ea3f46235cf9c49533428f6e4838c6425ff93884",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/tasks/close-window-residue-classification.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts",
-        "digest": "dc7800682d12cf5fb1222dccc4842eb27f0df4aa50e40763f9745afb1354511e",
+        "digest": "1ceae22cab5056750489d373792602b3713f45d2276338e00d9e8ce81cd39fde",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts"
@@ -26900,7 +27059,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/release-wip-transaction.ts",
-        "digest": "048e3e81c0f231b25d70e1ef7549e2d3fb61f7459b9c28b2d6cd310ec4268995",
+        "digest": "38f916ba81f2bc41f4d50927368ba72744e8c9a09326a37472eb7e1efdd21518",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/release-wip-transaction.ts"
@@ -27260,7 +27419,7 @@
       },
       {
         "path": "packages/cli/src/commands/team-knowledge/ranking.ts",
-        "digest": "f8334f03f4100558f7089e4404626cd830d24baa98782964d3e08a8d35451968",
+        "digest": "e6269a7e6d93b198250ed1f255861d485b02c7bc1ad004882507717f605f45ed",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/team-knowledge/ranking.ts"
@@ -27440,7 +27599,7 @@
       },
       {
         "path": "packages/cli/src/commands/team/cost-command.ts",
-        "digest": "1cf25f14ce2152be6dec832419ff2ca3178804c1f5184af6ef0855e8a40f212d",
+        "digest": "64836faf4409d001d096860141d43c432ccbf5556c222d8d9dd74bf604192ac0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/team/cost-command.ts"
@@ -27476,7 +27635,7 @@
       },
       {
         "path": "packages/cli/src/commands/team/legacy/broker-observability.ts",
-        "digest": "fc7a2839ce16afd92d67fe89f369fcd613d2ede5493921f40d0f3f4900c3f921",
+        "digest": "1d59108980115e95050beb5a7a4ec6ef756bc197e71239ac75de5ab129e7c474",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/team/legacy/broker-observability.ts"
@@ -27503,7 +27662,7 @@
       },
       {
         "path": "packages/cli/src/commands/team/legacy/handoff-handler.ts",
-        "digest": "d9b523aa5531cf1c149429a7abea773ef6e9245243b21c02a1a765c80592b24b",
+        "digest": "11c1c27be534df477d651b0adba6122578a9902b4d7aa52b5590c82833064b4e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/team/legacy/handoff-handler.ts"
@@ -27602,7 +27761,7 @@
       },
       {
         "path": "packages/cli/src/commands/team/legacy/team-run-runtime.ts",
-        "digest": "2b67983ffc27d5d676cfbf715732ef82b7592b9780551014e3d7420d65935a39",
+        "digest": "3276ca365a69b488b1a6f81151bffcfd386e12bd6a320b8da432d8e769e49784",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/team/legacy/team-run-runtime.ts"
@@ -27782,7 +27941,7 @@
       },
       {
         "path": "packages/cli/src/commands/test-catalog.ts",
-        "digest": "3fecca638b5c9898614be8ae0a1409887676138a91654d2feccb52a395645684",
+        "digest": "c7fdb779b9e392b4bd296bd719c9e112a050fbc0fba403825ff730ae4f93d997",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/test-catalog.ts"
@@ -27872,7 +28031,7 @@
       },
       {
         "path": "packages/cli/src/commands/upgrade/proposal/context-budget.ts",
-        "digest": "5fc13336c4b6cbb73a1ed23ac0e64ad8d41b6f195ee99014283b890fcf6ec372",
+        "digest": "23e4af650016e38aaa7ff4cc4af5ba3f6e1ebb7ba925ad65b15e3c4390a46f5e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/upgrade/proposal/context-budget.ts"
@@ -29654,7 +29813,7 @@
       },
       {
         "path": "packages/core/dist/evidence/test-case-catalog.js",
-        "digest": "89973cc292e2a8331c017eb847d71cf8ea214a35e7117d9f9d58c3e28eb637db",
+        "digest": "2be02315fa02c56372749aadba7e44ac965785fce65a716263d95fe3f7ae3985",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/evidence/test-case-catalog.js"
@@ -29690,7 +29849,7 @@
       },
       {
         "path": "packages/core/dist/evidence/validator-lifecycle.js",
-        "digest": "31fbf7b32fd17696e9d409572760cbc224e724a9ee8dfc5c6494438ccf921435",
+        "digest": "6bfb60d95e2d3f111d3d2df04f4dcfbe81daf905bb993d1cc2fc61e3ef44b548",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/evidence/validator-lifecycle.js"
@@ -31337,7 +31496,7 @@
       },
       {
         "path": "packages/core/package.json",
-        "digest": "fabb4c02147117735903dd2845d55b2f6639085e8ad973fb0fb5566d773fe870",
+        "digest": "f0c3966f13456917fb9911ee31a94b89902782821b4984bd108c0ae91f0468c9",
         "origin": "source",
         "inputPaths": [
           "packages/core/package.json"
@@ -32138,7 +32297,7 @@
       },
       {
         "path": "packages/core/src/broker/lifecycle.ts",
-        "digest": "2993d86b64807b37e4f14e3bf67c58b7d8add9c0afeef030646b569575c4bc4b",
+        "digest": "2e9b36b379a9554a0cb0e97308ce584795f233a1915d7a03ae3214db698fc171",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/broker/lifecycle.ts"
@@ -33308,7 +33467,7 @@
       },
       {
         "path": "packages/core/src/evidence/test-case-catalog.ts",
-        "digest": "5a4612c8c82284d9d5f5ac5e4ea5b0b6c2c1312773d7f6d8241a11620f6abfee",
+        "digest": "57740a7a68d2e33ed51c5fc135b70dad74183af195b956760747916fe22e5b65",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/evidence/test-case-catalog.ts"
@@ -33344,7 +33503,7 @@
       },
       {
         "path": "packages/core/src/evidence/validator-lifecycle.ts",
-        "digest": "4926161e5661394b49ee64d7f6e05050e1bc9ab583a1dd3b814a91925a52e839",
+        "digest": "b885d8504603fe28c5cf86da9366e0d4c91863aae772a472886d9de908723857",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/evidence/validator-lifecycle.ts"
@@ -34100,7 +34259,7 @@
       },
       {
         "path": "packages/core/src/registry/atom-ref-readability.ts",
-        "digest": "aec4d73a93e8ace9adb210fa5d5968aa61b7d756aebef97ff5ba8d937fa720b3",
+        "digest": "5aadc7411dc9de48b92dbf49d4cee71e1388003bec19f50ceff8922d6f96c8d4",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/registry/atom-ref-readability.ts"
@@ -35108,7 +35267,7 @@
       },
       {
         "path": "packages/create-atm/package.json",
-        "digest": "5ef4e1ec62f87f52bdf925d41b80037987d5a775dc7f306ec3747bd68c33c2bc",
+        "digest": "991fb20a64649ec4f9924824e0f9e583a47b33b9a49498289cd53b6dd5ca79b2",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/package.json"
@@ -35153,7 +35312,7 @@
       },
       {
         "path": "packages/integration-claude-code/package.json",
-        "digest": "aa3780c8dbc5d083683468b418d690be1ae8e24cb8a54942f0957d2733451364",
+        "digest": "952ff40f3ef6fa48035f12ec9f2595790a18ea82f52fe41803bdea22edae4ff5",
         "origin": "source",
         "inputPaths": [
           "packages/integration-claude-code/package.json"
@@ -35189,7 +35348,7 @@
       },
       {
         "path": "packages/integration-codex/package.json",
-        "digest": "0f3525240cd3690f3e0d48a17cc5974607eaf6f3f4e678f3974c0d0d55cc0adc",
+        "digest": "2ddb0a0c8e9d8cc5e730aef16179fbb3ec96916ad64d6e7b29db2220f6ca97ee",
         "origin": "source",
         "inputPaths": [
           "packages/integration-codex/package.json"
@@ -35225,7 +35384,7 @@
       },
       {
         "path": "packages/integration-copilot/package.json",
-        "digest": "aa4c0d8992e9a2abecf95952f70559ce6b3b8c6b465e3eb30989f9e9054e5ae0",
+        "digest": "cb56e9292bdb3dc155c107b864e95e115755014b8a7bda6f1d36aff9a287cdb4",
         "origin": "source",
         "inputPaths": [
           "packages/integration-copilot/package.json"
@@ -35261,7 +35420,7 @@
       },
       {
         "path": "packages/integration-cursor/package.json",
-        "digest": "63245cac133d05a4561daef453f30e0c37ddd8b47a64b2064bf875e1dd5e5da5",
+        "digest": "944b2db7099d342dacf55cfd3cf31f4e83af2f5e375a6d150d9333f10f401345",
         "origin": "source",
         "inputPaths": [
           "packages/integration-cursor/package.json"
@@ -35297,7 +35456,7 @@
       },
       {
         "path": "packages/integration-gemini/package.json",
-        "digest": "cd7534278d80b9df44591aa96996008f093697ccdd4b3489aa81771a09c11eba",
+        "digest": "9268a0101262411192bdf4ba95eece0fb14683080312233956e558cfef68919d",
         "origin": "source",
         "inputPaths": [
           "packages/integration-gemini/package.json"
@@ -35360,7 +35519,7 @@
       },
       {
         "path": "packages/integrations-core/dist/compiler/skill-source-universe.js",
-        "digest": "0901c449dab3b550b1c92721cd0a6abce82bbcd35f7a0197befa824ec294d7ba",
+        "digest": "4846a8e2778dfaf3cd8a2f2a53d2c86c55711745d5945418a6d13a3f4f90a6b3",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/dist/compiler/skill-source-universe.js"
@@ -35369,7 +35528,7 @@
       },
       {
         "path": "packages/integrations-core/dist/compiler/skill-templates.js",
-        "digest": "946debcd825b95b50d68fe9576d80be89902c8331a7bce3126ef43960dd924d7",
+        "digest": "c3224d5e0e3e65f988a5cbfffbfe2c09b83717768cd70047989e2402864317f4",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/dist/compiler/skill-templates.js"
@@ -35486,7 +35645,7 @@
       },
       {
         "path": "packages/integrations-core/package.json",
-        "digest": "f22ab33561b13b49d650e5c90c1fc404daea1cf6e4c6a5ac6a0d1dd020207792",
+        "digest": "e9821a8cdfa552add15edea27d44677ec4d6907835d1e50f86d17a9ffc4735b6",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/package.json"
@@ -35522,7 +35681,7 @@
       },
       {
         "path": "packages/integrations-core/src/compiler/skill-source-universe.ts",
-        "digest": "03bc88f305c0e0b200210ecc95ce82430c400941aef3c23b80049361b3db2eec",
+        "digest": "e9b805897ddc4f33f15b6093774599cb722c30cdf8535f844e770f0575a14c00",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/src/compiler/skill-source-universe.ts"
@@ -35531,7 +35690,7 @@
       },
       {
         "path": "packages/integrations-core/src/compiler/skill-templates.ts",
-        "digest": "e9212f7ca0d227c16d01ab46dc6c6950aa7dbfd6d88a46f4e458c422c446ed23",
+        "digest": "ff18875f2eb62c538e3938b24884606fffd4257b24ee305ab2c48f3f75c673b6",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/src/compiler/skill-templates.ts"
@@ -35990,7 +36149,7 @@
       },
       {
         "path": "packages/language-csharp/package.json",
-        "digest": "2a1bca3235db1ba8589d318bcd151eadfeb69812cfd890835d14dbbffc1e913c",
+        "digest": "29a468efda9aa54897a2a3bc58bf8ee618c171c9f0027466facaa25d66a37fcc",
         "origin": "source",
         "inputPaths": [
           "packages/language-csharp/package.json"
@@ -36044,7 +36203,7 @@
       },
       {
         "path": "packages/language-js/package.json",
-        "digest": "a2a9c87a40cd2c5fd4aa27f3b1ae02298273933fe793af9c930c12b6879ee3c6",
+        "digest": "39b3d723b952add068926f25ec33945d326ce419dd3c6342acc45b6d126536f3",
         "origin": "source",
         "inputPaths": [
           "packages/language-js/package.json"
@@ -36206,7 +36365,7 @@
       },
       {
         "path": "packages/language-python/package.json",
-        "digest": "767670ca70a9e4f9486a8dd77ac95418ee07a8093d356e2375fc1a1fc509f92e",
+        "digest": "82d936e9f80ed4f3618288390e0b57ba6583cf07a02ae1be22e2d7d5feb1e56a",
         "origin": "source",
         "inputPaths": [
           "packages/language-python/package.json"
@@ -36440,7 +36599,7 @@
       },
       {
         "path": "packages/plugin-behavior-pack/package.json",
-        "digest": "335cec7be2732bebcb0b98e3b89339f6f54752b2a625c2b3564727548c6191ab",
+        "digest": "56ae10b33649f7881c01c644203a8ad1eca38db7069d68512b076f039571ce73",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-behavior-pack/package.json"
@@ -36566,7 +36725,7 @@
       },
       {
         "path": "packages/plugin-experience-loop/package.json",
-        "digest": "7939bfff47d8adbbc2043b9a7d841a1fb95056c1c2754642386fbefa0d2dfd2a",
+        "digest": "01986e14b15d1e811ac5031d20d0a8a95a6e26312284e9c8759b4b2dfa5bc0aa",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-experience-loop/package.json"
@@ -36746,7 +36905,7 @@
       },
       {
         "path": "packages/plugin-governance-local/package.json",
-        "digest": "ca121beb57565f76537530cf669e083bee2e37fd3d4b1dfa8d54af88f954ae81",
+        "digest": "81fa5e87bedcf0598011f3a60a3156273d50a0fac8beb3e53db95002e51dad14",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/package.json"
@@ -36917,7 +37076,7 @@
       },
       {
         "path": "packages/plugin-human-review/package.json",
-        "digest": "7ab9a044f1cc3e4102c8f13170a1d51f630d9d165ef1363508b5bd02698f8281",
+        "digest": "26ac9636b57dd565f5358728643dee436dd5cb5d68b96dc55980d14e0cb3cf0f",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-human-review/package.json"
@@ -37007,7 +37166,7 @@
       },
       {
         "path": "packages/plugin-review-advisory/package.json",
-        "digest": "f8399b0256a6ffeba0a700c5e7eaf46788a017f89a32030ba26eeff695091abf",
+        "digest": "5c19d2c13fe0a055b55effd6e72bf00df194c75f9e73a47050580255d33a6e25",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-review-advisory/package.json"
@@ -37097,7 +37256,7 @@
       },
       {
         "path": "packages/plugin-rule-guard/package.json",
-        "digest": "7725c9df724ff184e179bd43e42862d2767c1f08e6b71a92c6539132b30552ce",
+        "digest": "24dd5492bc40c9d1c5b2ec523a90d6560ecdc92bbf02fbfe60a48aef01a4fceb",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-rule-guard/package.json"
@@ -37367,7 +37526,7 @@
       },
       {
         "path": "packages/plugin-sdk/package.json",
-        "digest": "f287160ff004c85b03cecb7637908b0a82ca2b913e0b7bbfcac87e04b86bc3a8",
+        "digest": "696168d5ae4f786c0f98f5669c96ce31a5c7666bbc3fa6f48d20c18325d391c2",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-sdk/package.json"
@@ -37520,7 +37679,7 @@
       },
       {
         "path": "packages/plugin-sdk/src/governance/stores.ts",
-        "digest": "bb8d679fee3dceab6494532958aa0b2e8e92325e399847f88dd0c9dd14735420",
+        "digest": "98ea93a3a3c3b389a6b889cb3944fe93cab30322846efe15dff4233fc5523e15",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-sdk/src/governance/stores.ts"
@@ -37906,6 +38065,15 @@
         "replaceable": true
       },
       {
+        "path": "schemas/evidence/coverage-certificate.schema.json",
+        "digest": "9044240aafd1be8ac854ed79c5a0735faeace430d98b06d81bec39fc76285625",
+        "origin": "source",
+        "inputPaths": [
+          "schemas/evidence/coverage-certificate.schema.json"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "schemas/evidence/coverage-ratchet-baseline.schema.json",
         "digest": "3df276696d805cf98f503a2a696614beb4ea3300f73f69aac68fe8df95579392",
         "origin": "source",
@@ -37965,6 +38133,15 @@
         "origin": "source",
         "inputPaths": [
           "schemas/evidence/example-branch-generators.schema.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "schemas/evidence/external-benchmark-run.schema.json",
+        "digest": "0933377cfdcc494c26dd3f2537971c3cbfe96723383055777cd97d6e1cadceb5",
+        "origin": "source",
+        "inputPaths": [
+          "schemas/evidence/external-benchmark-run.schema.json"
         ],
         "replaceable": true
       },
@@ -38105,7 +38282,7 @@
       },
       {
         "path": "schemas/evidence/quality-certificate.schema.json",
-        "digest": "6f3c7a428bfb72f746c8128c3b2eca8f859de3aef33a14f5b25a2d2d9a8f1da0",
+        "digest": "18e019d58702c407769693a17a1431f7ec96e326cc5c41f638c5b3dd953df700",
         "origin": "source",
         "inputPaths": [
           "schemas/evidence/quality-certificate.schema.json"
@@ -39635,7 +39812,7 @@
       },
       {
         "path": "scripts/check-encoding-touched.ts",
-        "digest": "9791b468f34575a88981cce44304c20d4199b26a05b143644738a52aad9dd33c",
+        "digest": "10665a4449f2026eaa89dc4661061243c5446579bb8841645c19ad640acaa693",
         "origin": "source",
         "inputPaths": [
           "scripts/check-encoding-touched.ts"
@@ -40017,6 +40194,15 @@
         "origin": "source",
         "inputPaths": [
           "scripts/fixtures/atm-admission-bench/unresolved.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/fixtures/atm-external-benchmark/manifest.json",
+        "digest": "6e3bfef7a28aa90f8004a0fff59e8831bf6876c6f2f180a6468469706196e3ea",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/fixtures/atm-external-benchmark/manifest.json"
         ],
         "replaceable": true
       },
@@ -40651,6 +40837,42 @@
         "replaceable": true
       },
       {
+        "path": "scripts/lib/external-benchmark/adjudication.ts",
+        "digest": "23dfdbb2b384799c2d19318c63e36006e12bde35e097a1b582707a7d5b8e9e51",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/external-benchmark/adjudication.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/lib/external-benchmark/metrics.ts",
+        "digest": "598991385df25d95a1f3aec7a947e20e42c119bd34ec8fd46c946be9d182c084",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/external-benchmark/metrics.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/lib/external-benchmark/report.ts",
+        "digest": "a6275cb5172b968b01d479335a24eed15b0ce71e1aeb5bfb6ffa7ab8419c5fe9",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/external-benchmark/report.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/lib/external-benchmark/runner.ts",
+        "digest": "c7e6eba1f1c9ecdc556b0f7431fc15581005befb9f07aa4a2ab4a876204e4060",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/external-benchmark/runner.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/lib/final-certificate-observation.ts",
         "digest": "8753267a2c812dba148d5379d4a5b74882ab35dbbe9e02a5c4171d555ab9dfbe",
         "origin": "source",
@@ -40710,6 +40932,24 @@
         "origin": "source",
         "inputPaths": [
           "scripts/lib/next-warm-latency-workload.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/lib/release-prepublish-gate.ts",
+        "digest": "69a53b2ff75535bd8dca89b80c10f0cf1dbe6f2cfc58e0e51aa7a79c3d3bd5c7",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/release-prepublish-gate.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/lib/release-version-compatibility.ts",
+        "digest": "9d9e1b494a8eb0e29600836e062ffaf178895eb779e6a51134afeb7d139b662f",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/release-version-compatibility.ts"
         ],
         "replaceable": true
       },
@@ -40930,6 +41170,15 @@
         "replaceable": true
       },
       {
+        "path": "scripts/run-atm-external-benchmark.ts",
+        "digest": "68114a62883bc06562aae1daad19e101d8859d9acd534259463b139d27eb98df",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/run-atm-external-benchmark.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/run-atm-operational-bench.ts",
         "digest": "158b9673bf485d843e767c505d31e7130d09b59540ec776a37cc1a58c15f638e",
         "origin": "source",
@@ -41012,7 +41261,7 @@
       },
       {
         "path": "scripts/run-validators/implementation.ts",
-        "digest": "1c1aa1f178797feee509ff51a0bb60dcbd2307f5434832c5f68d26caa8e0f247",
+        "digest": "38c5d278578eb6c94394e2982fd753e15cbc1396d79c3f96648138377d332bbc",
         "origin": "source",
         "inputPaths": [
           "scripts/run-validators/implementation.ts"
@@ -41083,6 +41332,15 @@
         "replaceable": true
       },
       {
+        "path": "scripts/seal-release-prepublish-evidence.ts",
+        "digest": "5b385fb3a9db4c225dc46758d7c359f0528751b0d560b0bd11bbc92414854816",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/seal-release-prepublish-evidence.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/sealed-build-output-ownership.ts",
         "digest": "3a97457191f005936f4f92302e30859483892135abe24c836d9c2283fddce749",
         "origin": "source",
@@ -41106,6 +41364,15 @@
         "origin": "source",
         "inputPaths": [
           "scripts/sealed-runner-publication.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/set-release-workspace-versions.ts",
+        "digest": "7a0999cfe37352838917ebc87f9d7f508b4945ffcf2c5e4fb4902ce1c9adc424",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/set-release-workspace-versions.ts"
         ],
         "replaceable": true
       },
@@ -41399,7 +41666,7 @@
       },
       {
         "path": "scripts/validate-bridge-minor.ts",
-        "digest": "b41125e42cd155e659f7c6253ec57c11ffe5db272ac7a40417af363186576003",
+        "digest": "845944f9f8acaf9a32ade06757463305cce9e25f5819f3e4f00367b347d1ee08",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-bridge-minor.ts"
@@ -41561,7 +41828,7 @@
       },
       {
         "path": "scripts/validate-cli/full-suite.ts",
-        "digest": "a473ef6ee763d5835d6b2e8167458c0cd4b2a1fba888a3b0f72a36c76658de20",
+        "digest": "b56ffe6618ccbc2e07158631c7d4debec3ddf0db0bab224e50236fd200d061a0",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-cli/full-suite.ts"
@@ -41579,7 +41846,7 @@
       },
       {
         "path": "scripts/validate-cli/surface-suite.ts",
-        "digest": "290b268d06a38d232cba81e80df8d144749d086a568cb8b7b01e7cbb8713d8b1",
+        "digest": "359fae9a227de7b41c0c7063670c4453f3b362822a2b8ea30697cebd1ee58aca",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-cli/surface-suite.ts"
@@ -41731,6 +41998,15 @@
         "replaceable": true
       },
       {
+        "path": "scripts/validate-external-benchmark-protocol.ts",
+        "digest": "1e7edb6e4f6118d863223fdf12e326ae3f4833d70c8bacb78c068165aa847abe",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/validate-external-benchmark-protocol.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/validate-external-core-pipeline.ts",
         "digest": "9f229b99cdc55520b9df8eca274f71da3f4f4445c57372ed71056ded62661852",
         "origin": "source",
@@ -41741,7 +42017,7 @@
       },
       {
         "path": "scripts/validate-external-golden.ts",
-        "digest": "e7b258418fbccc5c2529f93ead542587ec2555d67ea8b73f75798b23e8914b6c",
+        "digest": "2973b16bea3e1f270573ad738fa9539767255e79ff42a4fc86568dcea1651173",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-external-golden.ts"
@@ -41903,7 +42179,7 @@
       },
       {
         "path": "scripts/validate-git-hooks-enforcement/context.ts",
-        "digest": "3c321a636e89d91447043cb19feccab0a6f7a0d601a62d57d89bdb97c0035b97",
+        "digest": "1b507e0d6ab7f8c5fae17467aff3e5827f04cebaec1745a1d16ac804c4cdab58",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-git-hooks-enforcement/context.ts"
@@ -41930,7 +42206,7 @@
       },
       {
         "path": "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
-        "digest": "42a61fc6e05e33bd6966e5d1511956bc7ec30ef771d0007a5bdc1992fd0a1713",
+        "digest": "310adaadcbffca6856de8f61d3097280c7fd501e183fa880803bb7a2a60b403d",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts"
@@ -41957,7 +42233,7 @@
       },
       {
         "path": "scripts/validate-governance-commands/implementation.ts",
-        "digest": "82f44763519429c89307d0b48d61f7ea32ae41a8a0fd4207b12957c8939beaff",
+        "digest": "059a10d804076e6bcb4a165bf16234d5ca7eec864a8aad478dc57d014025f564",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-governance-commands/implementation.ts"
@@ -42011,7 +42287,7 @@
       },
       {
         "path": "scripts/validate-guide.ts",
-        "digest": "4a9514af5e26674c2a6565718c3528a8d135d4c9f2f4e22d8909bb5c26b17a4b",
+        "digest": "8e4c6ab4d804403611ae693a60191ff2b61d1044a779d13f46f1113529f63c27",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-guide.ts"
@@ -42263,7 +42539,7 @@
       },
       {
         "path": "scripts/validate-npm-clean-install.ts",
-        "digest": "648fa697171fa105a8ed3c03687d4512922baf85029a012fe864cbbb147592e9",
+        "digest": "3746aa93a431aad1b15933c6edc9c27497d484477b0b99f02a25a2252ae67728",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-npm-clean-install.ts"
@@ -42299,7 +42575,7 @@
       },
       {
         "path": "scripts/validate-package-skeleton.ts",
-        "digest": "57c8393d2c22ba95d8412c7549dca0972471f8609ba0c2eb386c07d6eba8703a",
+        "digest": "be20104c18fcf65e03fc9cc37b1fc149214de6f0174eaf8b636749673378d58b",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-package-skeleton.ts"
@@ -42866,7 +43142,7 @@
       },
       {
         "path": "scripts/validate-release-trust.ts",
-        "digest": "d9842684768dbd59c2a9a2d19e33b586e6cf94d491cbf6d91388112ebddc623f",
+        "digest": "a59c6a3373b5ac113283540ce3fd0db4416588b3ddb2c23d597cb3d32fa7a021",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-release-trust.ts"
@@ -43037,7 +43313,7 @@
       },
       {
         "path": "scripts/validate-script-parity.ts",
-        "digest": "f92e5671587ff1d38947582519f00dbc0eac68a29ab56a64fc0db20c50ed7a38",
+        "digest": "d2e39a08e03a7801433095c10764ddb4ebf0ad4ffc5c893c13a99416e3fed519",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-script-parity.ts"
@@ -43091,7 +43367,7 @@
       },
       {
         "path": "scripts/validate-skew-matrix.ts",
-        "digest": "fede03ec8f37fd81ce34b746fa389858b2f72b34b8f6a7cd15a22b24f55c0cf0",
+        "digest": "2230178ab77f043aef4ba7593c664b434eac7e8488bca29d30caf1133eab5f26",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-skew-matrix.ts"
@@ -43523,7 +43799,7 @@
       },
       {
         "path": "scripts/validate-upgrade-proposal.ts",
-        "digest": "e21341667ebdacf9a029771b688237ee3687cdfc799dcb38c6b62e0694137cac",
+        "digest": "5f121778eda1d764e25b776b3011014d8abbbef16b8fea12a63c9c7568193197",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-upgrade-proposal.ts"
@@ -43559,7 +43835,7 @@
       },
       {
         "path": "scripts/validate-version-compatibility.ts",
-        "digest": "49371d4645d37730a1c865fa99f22933cdde2cf237e16b88cff2d6cd8584c815",
+        "digest": "36e94873540506caac6b2440b2ff8d0301521991e17c16abce8fb17b149cef9d",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-version-compatibility.ts"
@@ -43586,7 +43862,7 @@
       },
       {
         "path": "scripts/validators.config.json",
-        "digest": "c51ff8dac49e2d6ba097b6b77bed87bff60a9639485827cf5a2377bd4669ca08",
+        "digest": "5ee9737e42a692c9952d51977c3f5211f1c0b3a7d4737d1751de85e293b448bf",
         "origin": "source",
         "inputPaths": [
           "scripts/validators.config.json"
@@ -45179,7 +45455,7 @@
       },
       {
         "path": "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json",
-        "digest": "3fca92abfa7f800d40056d3b1b3e7cec2979377694e5aa4bdc91dba336af561c",
+        "digest": "f39036ad2479db8e94ea6180df2cc29f9fcd9e5d204c4fa245e050ef84d76d1e",
         "origin": "source",
         "inputPaths": [
           "tests/catalog/groups/test_group_plan4_adapter_parity.shard.json"
@@ -45323,7 +45599,7 @@
       },
       {
         "path": "tests/catalog/groups/test_group_plan4_final_certification.shard.json",
-        "digest": "bd6d298ebdf032f3ca15e88489c9a4eda3d0070832407c0b166bd6f6b0273571",
+        "digest": "3aa40199b18116a5b87d4fd78624e4b0aad89edb357c288c38f6aa5baf3d19c2",
         "origin": "source",
         "inputPaths": [
           "tests/catalog/groups/test_group_plan4_final_certification.shard.json"
@@ -45332,7 +45608,7 @@
       },
       {
         "path": "tests/catalog/groups/test_group_plan4_foundation_topology.shard.json",
-        "digest": "29082104f5b98802ab309f2a6584de8cbad0ee4f749056e2aeb5fbebaf9c5294",
+        "digest": "0715c5117b5bc00358d10b8752cd2518b4d0fcc9e50e7ccf57b1e5139efc870b",
         "origin": "source",
         "inputPaths": [
           "tests/catalog/groups/test_group_plan4_foundation_topology.shard.json"
@@ -45485,7 +45761,7 @@
       },
       {
         "path": "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json",
-        "digest": "a2f21d5b7470c8cc15d8504e2f1c2abdbedc933ee704f6b0d86b02c09c56d45c",
+        "digest": "60351e261b1b0737e8d6092c215b1f32336f712e123d407fd1f4f19c4029bb7c",
         "origin": "source",
         "inputPaths": [
           "tests/catalog/groups/test_group_plan4_shadow_comparison.shard.json"
@@ -46114,6 +46390,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/claim-owner-mismatch-message.test.ts",
+        "digest": "4dd3ea4230ac8a2c69339e4652ea3b01b4ecb415c89b69f3da973940b85e0453",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/claim-owner-mismatch-message.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/claim-repair-wip-ownership-continuity.test.ts",
         "digest": "26912a48948dc320bd849f06d4d4ddf110ffc35ee314124188f00d5618d46217",
         "origin": "source",
@@ -46155,6 +46440,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/close-preflight-foreign-line-budget.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/close-window-residue-diagnosis.test.ts",
+        "digest": "b0477ff45683afe56abce171b3a506cedfa14bca89916846d0b6fb1d2ab25eb1",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/close-window-residue-diagnosis.test.ts"
         ],
         "replaceable": true
       },
@@ -46411,6 +46705,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/encoding-guard-argv-budget.test.ts",
+        "digest": "df4c80c6a0c40f3e257ff2bbb6af05c8ab7d530b2977c897cc94c83919b64e5e",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/encoding-guard-argv-budget.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/engineering-change-method-profiles.test.ts",
         "digest": "2f9d20b9091ae77327e2ba110c579c61289c736329d6230a51664e26492506cc",
         "origin": "source",
@@ -46461,6 +46764,33 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/evidence-seal-task-summary.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/external-benchmark-decision.test.ts",
+        "digest": "543c3a3d08576b61b5711810cfd5d7a0d3fcc2ab9743fc626e8694878779c6ae",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-benchmark-decision.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/external-benchmark-metrics.test.ts",
+        "digest": "4147ca68fdd1f360bae6676121d896721a10fb597c05388bff1e978b1ebdcdac",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-benchmark-metrics.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/external-benchmark-protocol.test.ts",
+        "digest": "e9a5323449c7d0e5398ead320fd19f26d901b4e1d106e46f9ba7a5f3228faa42",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-benchmark-protocol.test.ts"
         ],
         "replaceable": true
       },
@@ -46542,6 +46872,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/four-plan-objective-denominator.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/framework-auto-stage-pathspec-batching.test.ts",
+        "digest": "3af40745f5d9cd04bb9be7d7af3813099a0de2f3840faea3362ec34db44024d2",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/framework-auto-stage-pathspec-batching.test.ts"
         ],
         "replaceable": true
       },
@@ -47240,7 +47579,7 @@
       },
       {
         "path": "tests/cli/npm-clean-install.test.ts",
-        "digest": "2dc8206ec1940c9c7f9e0f80c00c5e2722437220c87c9e200f3ec19aee08b3fc",
+        "digest": "24e5961d087569cface2543f70b9efb51df4052c60986be09017e979ab2efb19",
         "origin": "source",
         "inputPaths": [
           "tests/cli/npm-clean-install.test.ts"
@@ -47249,7 +47588,7 @@
       },
       {
         "path": "tests/cli/observed-evidence-production-callers.test.ts",
-        "digest": "4f345930004caf8c1f1278ca9b273356744c54473354b14a7ccf22a22b025c68",
+        "digest": "a73b43d92ac9cbdbf1d47092828d9bab4aedc2f5bc35681ac4e771a28747a332",
         "origin": "source",
         "inputPaths": [
           "tests/cli/observed-evidence-production-callers.test.ts"
@@ -47366,7 +47705,7 @@
       },
       {
         "path": "tests/cli/plan-3x-4x-validator-profile-coverage.test.ts",
-        "digest": "4dd9fafbaa7c9d9659b9f3f16de58276ee7ef0dd16f436859dbf4a7f230b79f2",
+        "digest": "25d94a390b911d8622567073b348e975712b60103f2e8afbb24ccf247f38b3b4",
         "origin": "source",
         "inputPaths": [
           "tests/cli/plan-3x-4x-validator-profile-coverage.test.ts"
@@ -47384,7 +47723,7 @@
       },
       {
         "path": "tests/cli/plan-level-executor-live-loop.test.ts",
-        "digest": "c70fcc5f4fec7b0df030e9df214615106943fd0a871acc573da8d756b4db2106",
+        "digest": "8e54d3541cfa330ff924590c403b52416c6deadbb30b6504078e37de75c8ae94",
         "origin": "source",
         "inputPaths": [
           "tests/cli/plan-level-executor-live-loop.test.ts"
@@ -47735,7 +48074,7 @@
       },
       {
         "path": "tests/cli/plan4-catalog-contract.test.ts",
-        "digest": "2ce3932a1511866b3b89af262eb54b24f9b4df0ccd8d2bbc390c93b3dd8940fc",
+        "digest": "45426bacb99497d5c6f67b3fb24527e87e682875aafb96123fe8a86930c9a491",
         "origin": "source",
         "inputPaths": [
           "tests/cli/plan4-catalog-contract.test.ts"
@@ -47843,7 +48182,7 @@
       },
       {
         "path": "tests/cli/plan4-coverage-certificate.test.ts",
-        "digest": "b091ff2b0c2c7555ce279596d78ca3ca485522917e401dbbbe407f8e287def74",
+        "digest": "685e9abc5029616cd6c0a71b2c3f6d1fc159f631ce14ee1d39a2e17318774eae",
         "origin": "source",
         "inputPaths": [
           "tests/cli/plan4-coverage-certificate.test.ts"
@@ -47870,7 +48209,7 @@
       },
       {
         "path": "tests/cli/plan4-coverage-semantics.test.ts",
-        "digest": "eb91296785dc45449b748decc47f39561a4a0f48f79f18e2456ee0afc6be52e2",
+        "digest": "bc0542bdb46dbd3e95650f77d479b853891fc7aa3dbaa9c51fec7db1785e1934",
         "origin": "source",
         "inputPaths": [
           "tests/cli/plan4-coverage-semantics.test.ts"
@@ -47969,7 +48308,7 @@
       },
       {
         "path": "tests/cli/plan4-foundation-topology.test.ts",
-        "digest": "b2d6b6176236f9032294b0e0197f994fe8ea70ab97462fe2e925edf4b5caac51",
+        "digest": "30d8fdec89d65df41cdcde8a2e389a714ac68dd816b7532f1ca2915d26c8054f",
         "origin": "source",
         "inputPaths": [
           "tests/cli/plan4-foundation-topology.test.ts"
@@ -48329,7 +48668,7 @@
       },
       {
         "path": "tests/cli/plan4-validator-catalog-selection.test.ts",
-        "digest": "8b33dba3cc5683b8e19f0bd2fb8e8235bb9603f603bf816a9fe172e776593064",
+        "digest": "39fdadd9b11d6d96dad133447eb95daa69f1471db6c0f0e37de8cc4a9b5149c9",
         "origin": "source",
         "inputPaths": [
           "tests/cli/plan4-validator-catalog-selection.test.ts"
@@ -48392,7 +48731,7 @@
       },
       {
         "path": "tests/cli/pre-commit-evidence-context-parity.test.ts",
-        "digest": "e046cccc5f7c9d1d26f39f892436d6fde922d9a29028adb3de5518d90d75327a",
+        "digest": "ea3107b7d15bf6ce5d764f7993cadedc3337de366f79d11ca396a17b536870a6",
         "origin": "source",
         "inputPaths": [
           "tests/cli/pre-commit-evidence-context-parity.test.ts"
@@ -48405,6 +48744,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/pre-commit-hook-extraction.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/pre-commit-no-explicit-any.test.ts",
+        "digest": "7d188aaa1f40884f813fb9c0ba50316856245d555ba14d6817e3acc84c83c018",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/pre-commit-no-explicit-any.test.ts"
         ],
         "replaceable": true
       },
@@ -48553,11 +48901,38 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/release-prepublish-gate.test.ts",
+        "digest": "9a7f9411feb6f2a0d5bfcec9c42e90f473b37ac94eca72dcc72afd2242fffe68",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/release-prepublish-gate.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/release-publication-steward.test.ts",
         "digest": "57c1ba7686c156a2b69b577dfef7e64e0e02b747298f7f050b5fb5be8f11bad8",
         "origin": "source",
         "inputPaths": [
           "tests/cli/release-publication-steward.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/release-version-compatibility.test.ts",
+        "digest": "dc52e0c739547d7029c6a7be7bd4aea4fa13fd524330d6215362aacc0708aeb1",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/release-version-compatibility.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/release-workspace-versions.test.ts",
+        "digest": "02643db0dcaae8780bfb53cd0a699a26222b746b0fbc950aee71fce67694fd94",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/release-workspace-versions.test.ts"
         ],
         "replaceable": true
       },
@@ -48639,6 +49014,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/rft-continuation-card-generation.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/root-drop-release-doctor.test.ts",
+        "digest": "e4ce2b691f746da67e29853644b614eb158911bb6182b03da0033355b0b8e599",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/root-drop-release-doctor.test.ts"
         ],
         "replaceable": true
       },
@@ -49157,7 +49541,7 @@
       },
       {
         "path": "tests/cli/skill-corpus-canary-rewrite.test.ts",
-        "digest": "6af76b530829cde180c007d2b612fcfb7b42590f3686f1c3ea17a4a88f019dc3",
+        "digest": "0a119f365fd13e91a3bcb0f018571fbf5904794fee07184611f274adbf6e6a5c",
         "origin": "source",
         "inputPaths": [
           "tests/cli/skill-corpus-canary-rewrite.test.ts"
@@ -49224,6 +49608,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/steward-receipt-pre-commit-gate.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/strict-lint-release-contract.test.ts",
+        "digest": "c003f0d3af82487f8ad1b73b0c718db02d62d9ce4707a79ded2ab6350c8dfffe",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/strict-lint-release-contract.test.ts"
         ],
         "replaceable": true
       },
@@ -49886,7 +50279,7 @@
       },
       {
         "path": "tests/cli/test-case-catalog-shards.test.ts",
-        "digest": "4da3006384b9fff61ed596125d82d93d8fdebc6be596df0f1a4e713537fcb347",
+        "digest": "2ca81927e847fbc54f4f44bae7e376a1783a8720ab69ce34af856e08ad0bdcad",
         "origin": "source",
         "inputPaths": [
           "tests/cli/test-case-catalog-shards.test.ts"
@@ -50039,7 +50432,7 @@
       },
       {
         "path": "tests/cli/validator-contract-subject.test.ts",
-        "digest": "e505fb6c4572c17a79ea791334ab1109ece117bb5360277fe4a9b3f375b60746",
+        "digest": "b829d09d2da9df73eb4fcced12a27f6bb03bacbe058fd9d014b9964579adf8d1",
         "origin": "source",
         "inputPaths": [
           "tests/cli/validator-contract-subject.test.ts"
@@ -50074,11 +50467,38 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/validator-fixture-worktree-lock-contract.test.ts",
+        "digest": "8314dc36a20de6b0e5ccd142cd6bd63c14af607dac1dabd680f09aa26ddbc329",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/validator-fixture-worktree-lock-contract.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/validator-git-fixture-resource-lock.test.ts",
+        "digest": "f0aa31066b8b638b02efac99af2f74dc899170021b67d551ac6307fdff41d160",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/validator-git-fixture-resource-lock.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/validator-governance-verdict.test.ts",
         "digest": "539f4ee5320c2d5139a961536fdb9240990693dab6a8e3aac5574f4d6f7a0a19",
         "origin": "source",
         "inputPaths": [
           "tests/cli/validator-governance-verdict.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/validator-guidance-performance-budget.test.ts",
+        "digest": "ea096a75cf35c67b83b95af0049bc11ef094192da1887b83f59baa3bd3b83982",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/validator-guidance-performance-budget.test.ts"
         ],
         "replaceable": true
       },
@@ -51335,7 +51755,7 @@
       },
       {
         "path": "tests/package-skeleton.fixture.json",
-        "digest": "13bbc23be92f48139e2ccae186541d2190f519af76a37bf80fb15b9f06041fc1",
+        "digest": "298f9b798bc22fc9816a47d9433eafe7e3e7932e6bc6c14594f51967c89713da",
         "origin": "source",
         "inputPaths": [
           "tests/package-skeleton.fixture.json"
@@ -52568,7 +52988,7 @@
       },
       {
         "path": "tests/skew/skew-matrix.test.ts",
-        "digest": "2bddb3f7460fbb2751bcaeafff6598e2d986666851a19bc1c4851db444c473b6",
+        "digest": "7f0fb96c747152ffb44b6a567769a5105141010aea3a2887724d0c72f4f31bcf",
         "origin": "source",
         "inputPaths": [
           "tests/skew/skew-matrix.test.ts"
@@ -53062,7 +53482,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:3b39ad62753529e6f2de3aa64a8cd10c044e77f33f57fcff9ec7496cea5cac23"
+    "treeDigest": "sha256:6e7bb519a7b095c482296c23c24c31d98075f7dbc67b0d10ee9c776194cfa5f1"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -53365,6 +53785,10 @@
       "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts",
       "packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
       "packages/cli/src/commands/git-governance/implementation/lease-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-drain.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-drain.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-lock-contention.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/live-index-lock-retry.ts",
       "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
       "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
       "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
@@ -53701,6 +54125,7 @@
       "packages/cli/src/commands/tasks/close-orchestrator/historical-context.ts",
       "packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
       "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "packages/cli/src/commands/tasks/close-window-residue-classification.ts",
       "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts",
       "packages/cli/src/commands/tasks/closeout-provenance.ts",
       "packages/cli/src/commands/tasks/closeout-signaling.ts",
@@ -54337,6 +54762,7 @@
       "schemas/evidence/concurrency-fuzz-generators.schema.json",
       "schemas/evidence/concurrency-schedule-obligations.schema.json",
       "schemas/evidence/constraint-solver.schema.json",
+      "schemas/evidence/coverage-certificate.schema.json",
       "schemas/evidence/coverage-ratchet-baseline.schema.json",
       "schemas/evidence/coverage-universe.schema.json",
       "schemas/evidence/cross-editor-parallel-proof.schema.json",
@@ -54344,6 +54770,7 @@
       "schemas/evidence/diagnostic-loop-receipt.schema.json",
       "schemas/evidence/evidence-freshness-certificate.schema.json",
       "schemas/evidence/example-branch-generators.schema.json",
+      "schemas/evidence/external-benchmark-run.schema.json",
       "schemas/evidence/fault-fingerprint.schema.json",
       "schemas/evidence/four-plan-independent-certificate.schema.json",
       "schemas/evidence/gap-planning.schema.json",
@@ -54499,7 +54926,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:76ec469a57d07b29162824466262b5f6570058acdabd08be24ef107da7c39cbb"
+    "digest": "sha256:d7a308fe74b9371eded69355a1991a762563eeefe5d1bb4e06da2a4d5b3b7fe9"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -54648,6 +55075,7 @@
       "release/atm-root-drop/docs/assets/atm-governance-layers.svg",
       "release/atm-root-drop/docs/atm-broker-evidence-plan.md",
       "release/atm-root-drop/docs/bench/ATM-AdmissionBench-CONTRACT.md",
+      "release/atm-root-drop/docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
       "release/atm-root-drop/docs/bench/ATM-OperationalBench-CONTRACT.md",
       "release/atm-root-drop/docs/cli-error-policy.md",
       "release/atm-root-drop/docs/environment-variables.md",
@@ -55107,6 +55535,9 @@
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-011.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-012.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-013.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-27-001.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-28-001.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-29-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
       "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
       "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -55169,6 +55600,7 @@
       "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
       "release/atm-root-drop/docs/reports/atm-2-1-paired-ab-v4.md",
       "release/atm-root-drop/docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
       "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
       "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
       "release/atm-root-drop/docs/reports/atm-plan-4-1-dependency-census.json",
@@ -55865,6 +56297,8 @@
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/identity-check-command.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/index-restoration.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/lease-command.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-drain.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-lock-retry.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-reconciliation.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/pathspec-argv-batching.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/push-command.js",
@@ -56100,6 +56534,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/historical-context.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/runner-recovery.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-lock.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-residue-classification.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-staged-index-admission.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/closeout-provenance.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/closeout-signaling.js",
@@ -56530,6 +56965,10 @@
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/identity-check-command.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/index-restoration.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/lease-command.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-drain.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-drain.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-lock-contention.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-lock-retry.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
@@ -56866,6 +57305,7 @@
       "release/atm-root-drop/packages/cli/src/commands/tasks/close-orchestrator/historical-context.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/close-window-lock.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/close-window-residue-classification.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/close-window-staged-index-admission.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/closeout-provenance.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/closeout-signaling.ts",
@@ -58123,6 +58563,7 @@
       "release/atm-root-drop/schemas/evidence/concurrency-fuzz-generators.schema.json",
       "release/atm-root-drop/schemas/evidence/concurrency-schedule-obligations.schema.json",
       "release/atm-root-drop/schemas/evidence/constraint-solver.schema.json",
+      "release/atm-root-drop/schemas/evidence/coverage-certificate.schema.json",
       "release/atm-root-drop/schemas/evidence/coverage-ratchet-baseline.schema.json",
       "release/atm-root-drop/schemas/evidence/coverage-universe.schema.json",
       "release/atm-root-drop/schemas/evidence/cross-editor-parallel-proof.schema.json",
@@ -58130,6 +58571,7 @@
       "release/atm-root-drop/schemas/evidence/diagnostic-loop-receipt.schema.json",
       "release/atm-root-drop/schemas/evidence/evidence-freshness-certificate.schema.json",
       "release/atm-root-drop/schemas/evidence/example-branch-generators.schema.json",
+      "release/atm-root-drop/schemas/evidence/external-benchmark-run.schema.json",
       "release/atm-root-drop/schemas/evidence/fault-fingerprint.schema.json",
       "release/atm-root-drop/schemas/evidence/four-plan-independent-certificate.schema.json",
       "release/atm-root-drop/schemas/evidence/gap-planning.schema.json",
@@ -58358,6 +58800,7 @@
       "release/atm-root-drop/scripts/fixtures/agr-conflict-benchmark/manifest.json",
       "release/atm-root-drop/scripts/fixtures/atm-admission-bench/manifest.json",
       "release/atm-root-drop/scripts/fixtures/atm-admission-bench/unresolved.json",
+      "release/atm-root-drop/scripts/fixtures/atm-external-benchmark/manifest.json",
       "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/coverage-ready.json",
       "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-00-00-000Z-control.json",
       "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-01-00-000Z-treatment.json",
@@ -58428,6 +58871,10 @@
       "release/atm-root-drop/scripts/lib/agr-benchmark-runner.ts",
       "release/atm-root-drop/scripts/lib/agr-conflict-benchmark-runner.ts",
       "release/atm-root-drop/scripts/lib/atom-id-to-cid.ts",
+      "release/atm-root-drop/scripts/lib/external-benchmark/adjudication.ts",
+      "release/atm-root-drop/scripts/lib/external-benchmark/metrics.ts",
+      "release/atm-root-drop/scripts/lib/external-benchmark/report.ts",
+      "release/atm-root-drop/scripts/lib/external-benchmark/runner.ts",
       "release/atm-root-drop/scripts/lib/final-certificate-observation.ts",
       "release/atm-root-drop/scripts/lib/git-boundary-fixtures.ts",
       "release/atm-root-drop/scripts/lib/governance-cost-bench/paired-runner.ts",
@@ -58435,6 +58882,8 @@
       "release/atm-root-drop/scripts/lib/mao-parallel-routing-benchmark-runner.ts",
       "release/atm-root-drop/scripts/lib/mao-parallel-routing-benchmark-runner/report.ts",
       "release/atm-root-drop/scripts/lib/next-warm-latency-workload.ts",
+      "release/atm-root-drop/scripts/lib/release-prepublish-gate.ts",
+      "release/atm-root-drop/scripts/lib/release-version-compatibility.ts",
       "release/atm-root-drop/scripts/lib/structured-artifact-admission-runner.ts",
       "release/atm-root-drop/scripts/lib/task-ledger-assertions.ts",
       "release/atm-root-drop/scripts/lib/task-ledger-fixture-builder.ts",
@@ -58459,6 +58908,7 @@
       "release/atm-root-drop/scripts/review-four-plan-objective-authority.ts",
       "release/atm-root-drop/scripts/review-runbook-release-authority.ts",
       "release/atm-root-drop/scripts/run-atm-admission-bench.ts",
+      "release/atm-root-drop/scripts/run-atm-external-benchmark.ts",
       "release/atm-root-drop/scripts/run-atm-operational-bench.ts",
       "release/atm-root-drop/scripts/run-broker-run-log-scan.ps1",
       "release/atm-root-drop/scripts/run-paired-ab-v4.ts",
@@ -58476,9 +58926,11 @@
       "release/atm-root-drop/scripts/runner-sync-receipt-continuation.ts",
       "release/atm-root-drop/scripts/runner-version-selection-replay.ts",
       "release/atm-root-drop/scripts/scan-broker-runs.ts",
+      "release/atm-root-drop/scripts/seal-release-prepublish-evidence.ts",
       "release/atm-root-drop/scripts/sealed-build-output-ownership.ts",
       "release/atm-root-drop/scripts/sealed-runner-artifact-lifecycle.ts",
       "release/atm-root-drop/scripts/sealed-runner-publication.ts",
+      "release/atm-root-drop/scripts/set-release-workspace-versions.ts",
       "release/atm-root-drop/scripts/skew-matrix.config.json",
       "release/atm-root-drop/scripts/split-command-specs.ts",
       "release/atm-root-drop/scripts/src/atomization-coverage-guard.js",
@@ -58548,6 +59000,7 @@
       "release/atm-root-drop/scripts/validate-evidence-ledger-boundary.ts",
       "release/atm-root-drop/scripts/validate-examples.ts",
       "release/atm-root-drop/scripts/validate-experience-loop.ts",
+      "release/atm-root-drop/scripts/validate-external-benchmark-protocol.ts",
       "release/atm-root-drop/scripts/validate-external-core-pipeline.ts",
       "release/atm-root-drop/scripts/validate-external-golden.ts",
       "release/atm-root-drop/scripts/validate-false-green-evidence-freeze.ts",
@@ -59035,11 +59488,13 @@
       "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
       "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
       "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
       "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
       "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
       "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
       "release/atm-root-drop/tests/cli/close-orchestrator-final-600.test.ts",
       "release/atm-root-drop/tests/cli/close-preflight-foreign-line-budget.test.ts",
+      "release/atm-root-drop/tests/cli/close-window-residue-diagnosis.test.ts",
       "release/atm-root-drop/tests/cli/closure-acceptance-evidence-gate.test.ts",
       "release/atm-root-drop/tests/cli/closure-packet-schema-extraction.test.ts",
       "release/atm-root-drop/tests/cli/closure-repair-write-ticket-commit.test.ts",
@@ -59068,12 +59523,16 @@
       "release/atm-root-drop/tests/cli/editor-global-overlay-collision.test.ts",
       "release/atm-root-drop/tests/cli/editor-global-skill-federation.test.ts",
       "release/atm-root-drop/tests/cli/emergency-git-author-continuity.test.ts",
+      "release/atm-root-drop/tests/cli/encoding-guard-argv-budget.test.ts",
       "release/atm-root-drop/tests/cli/engineering-change-method-profiles.test.ts",
       "release/atm-root-drop/tests/cli/error-recovery-contract.test.ts",
       "release/atm-root-drop/tests/cli/evidence-bundle-io-extraction.test.ts",
       "release/atm-root-drop/tests/cli/evidence-bundle-manifest.test.ts",
       "release/atm-root-drop/tests/cli/evidence-ledger-migration.test.ts",
       "release/atm-root-drop/tests/cli/evidence-seal-task-summary.test.ts",
+      "release/atm-root-drop/tests/cli/external-benchmark-decision.test.ts",
+      "release/atm-root-drop/tests/cli/external-benchmark-metrics.test.ts",
+      "release/atm-root-drop/tests/cli/external-benchmark-protocol.test.ts",
       "release/atm-root-drop/tests/cli/final-backlog-closeback-provenance.test.ts",
       "release/atm-root-drop/tests/cli/first-layer-command-contracts.test.ts",
       "release/atm-root-drop/tests/cli/first-layer-ux-routing.test.ts",
@@ -59083,6 +59542,7 @@
       "release/atm-root-drop/tests/cli/four-plan-independent-certificate.test.ts",
       "release/atm-root-drop/tests/cli/four-plan-objective-authority-review.test.ts",
       "release/atm-root-drop/tests/cli/four-plan-objective-denominator.test.ts",
+      "release/atm-root-drop/tests/cli/framework-auto-stage-pathspec-batching.test.ts",
       "release/atm-root-drop/tests/cli/framework-temp-claim-lifecycle-parity.test.ts",
       "release/atm-root-drop/tests/cli/framework-temp-lock-admission-parity.test.ts",
       "release/atm-root-drop/tests/cli/framework-temp-task-id-normalization.test.ts",
@@ -59290,6 +59750,7 @@
       "release/atm-root-drop/tests/cli/post-compose-semantic-validation.test.ts",
       "release/atm-root-drop/tests/cli/pre-commit-evidence-context-parity.test.ts",
       "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
+      "release/atm-root-drop/tests/cli/pre-commit-no-explicit-any.test.ts",
       "release/atm-root-drop/tests/cli/pre-push-historical-attestation-advisory.test.ts",
       "release/atm-root-drop/tests/cli/pre-push-provisional-closure-packet.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
@@ -59306,7 +59767,10 @@
       "release/atm-root-drop/tests/cli/real-team-wave-worker-executor.test.ts",
       "release/atm-root-drop/tests/cli/receipt-bound-shared-delivery-commit.test.ts",
       "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
+      "release/atm-root-drop/tests/cli/release-prepublish-gate.test.ts",
       "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
+      "release/atm-root-drop/tests/cli/release-version-compatibility.test.ts",
+      "release/atm-root-drop/tests/cli/release-workspace-versions.test.ts",
       "release/atm-root-drop/tests/cli/released-residue-transaction.test.ts",
       "release/atm-root-drop/tests/cli/released-wip-reclaim-transaction.test.ts",
       "release/atm-root-drop/tests/cli/repair-closure-emergency-atomicity.test.ts",
@@ -59316,6 +59780,7 @@
       "release/atm-root-drop/tests/cli/rft-atomization-metrics.test.ts",
       "release/atm-root-drop/tests/cli/rft-atomization-rollout.test.ts",
       "release/atm-root-drop/tests/cli/rft-continuation-card-generation.test.ts",
+      "release/atm-root-drop/tests/cli/root-drop-release-doctor.test.ts",
       "release/atm-root-drop/tests/cli/root-drop-release-incremental-overlay.test.ts",
       "release/atm-root-drop/tests/cli/root-drop-release-manifest-integrity.test.ts",
       "release/atm-root-drop/tests/cli/root-drop-release-source-list.test.ts",
@@ -59381,6 +59846,7 @@
       "release/atm-root-drop/tests/cli/status-active-workers.test.ts",
       "release/atm-root-drop/tests/cli/steward-receipt-error-contract.test.ts",
       "release/atm-root-drop/tests/cli/steward-receipt-pre-commit-gate.test.ts",
+      "release/atm-root-drop/tests/cli/strict-lint-release-contract.test.ts",
       "release/atm-root-drop/tests/cli/strict-paired-ab-dogfood.test.ts",
       "release/atm-root-drop/tests/cli/task-audit-bulk-close-mirror.test.ts",
       "release/atm-root-drop/tests/cli/task-card-causal-graph-authoring.test.ts",
@@ -59475,7 +59941,10 @@
       "release/atm-root-drop/tests/cli/validator-dag-shared-cache.test.ts",
       "release/atm-root-drop/tests/cli/validator-discoverability.test.ts",
       "release/atm-root-drop/tests/cli/validator-execution-receipt-hard-gate.test.ts",
+      "release/atm-root-drop/tests/cli/validator-fixture-worktree-lock-contract.test.ts",
+      "release/atm-root-drop/tests/cli/validator-git-fixture-resource-lock.test.ts",
       "release/atm-root-drop/tests/cli/validator-governance-verdict.test.ts",
+      "release/atm-root-drop/tests/cli/validator-guidance-performance-budget.test.ts",
       "release/atm-root-drop/tests/cli/validator-observed-lifecycle.test.ts",
       "release/atm-root-drop/tests/cli/validator-run-resume-and-status.test.ts",
       "release/atm-root-drop/tests/cli/validator-scheduler-resource-contract.test.ts",
@@ -59813,22 +60282,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:6b633e2070a53bb9ea245df0b4a401101ba3952cfcd75223a9ba2120c7e164fc",
-  "sealedSourceCommit": "b211efa47bd454dfa3b56b8e46dbe011eacca0ba",
+  "buildInputsTreeHash": "sha256:8e7b43e28d19b5d4a6bf43e2ac23082f751f592edd636dab5206e6f26ff02060",
+  "sealedSourceCommit": "d8911636f64d675bd103bf6ebab2e82175e3b9d3",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:2ece5624e58fab8bbe6703c7e8aebb82dba50117e0001bbb748fa501fe69677f",
-  "tsBuildCacheDigest": "sha256:e89437bdc38b3d982029611ce6ea3e584513c54f243676462a57035f8d0c73be",
+  "incrementalPlanDigest": "sha256:69233f4fcdd7f2ee337ee8671eec8db8bc320dc12bdd84ee5bf1541ca8bdb002",
+  "tsBuildCacheDigest": "sha256:5892672aad9138ffbb817adddbac11dbb6008afedb70927f70240f84647d988b",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 49,
+    "inputHashCalculation": 45,
     "skipDecision": 54,
-    "worktreeSetup": 13540,
-    "typescriptBuild": 13770,
-    "rootDropReleaseAssembly": 18572,
-    "onefileReleaseAssembly": 1122,
-    "artifactSync": 8831,
+    "worktreeSetup": 11737,
+    "typescriptBuild": 13924,
+    "rootDropReleaseAssembly": 17247,
+    "onefileReleaseAssembly": 1010,
+    "artifactSync": 7193,
     "cleanup": 0,
-    "totalElapsed": 74991
+    "totalElapsed": 62981
   }
 }

@@ -6,8 +6,34 @@ import { normalizeRelativePath } from './task-file-io-helpers.ts';
 import { CliError, quoteCliValue, relativePathFrom } from '../shared.ts';
 import { inspectGitIndexOwnership } from '../git-index-ownership.ts';
 import { evaluateCloseWindowStagedIndexAdmission } from './close-window-staged-index-admission.ts';
+import {
+  classifyCloseWindowUnexpectedStaged,
+  residueDisclosure,
+  EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE,
+  type CloseWindowResidueDisclosure,
+  type CloseWindowResidueOwnership
+} from './close-window-residue-classification.ts';
 
 export const CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID = 'atm.closeWindowStagedIndexLock.v1';
+
+/**
+ * Classify staged entries for diagnosis only.
+ *
+ * This runs where admission already ran, reads only, and cannot change what
+ * blocks: the classifier narrows a block's wording and recovery command, never
+ * its verdict. Deferral, the lease publication order, and the foreign staged
+ * snapshot and restore contract are untouched.
+ */
+function diagnoseUnexpectedStaged(cwd: string, unexpectedStagedFiles: readonly string[]): CloseWindowResidueDisclosure {
+  if (unexpectedStagedFiles.length === 0) return EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE;
+  try {
+    return residueDisclosure(classifyCloseWindowUnexpectedStaged({ cwd, unexpectedStagedFiles }));
+  } catch {
+    // Diagnosis must never decide a close. An unreadable evidence directory
+    // leaves the original foreign-staged treatment exactly as it was.
+    return EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE;
+  }
+}
 
 export type CloseWindowStagedIndexLockOutcome = 'committed' | 'rolled_back' | 'aborted';
 
@@ -28,6 +54,15 @@ export interface CloseWindowStagedIndexLockRecord {
   readonly expectedStageFiles: readonly string[];
   readonly foreignStagedSnapshotPath: string | null;
   readonly foreignStagedEntries: readonly ForeignStagedIndexEntry[];
+  /**
+   * Staged paths this close proved are recorded reconciliation debt, each named
+   * with the receipt that proved it. Disclosure only: what deferral parks and
+   * restores is unchanged, and nothing here decides a close. Recording the
+   * owner per path is what makes a later cross-task authority decision
+   * expressible at all — until now the window could not tell its own receipt's
+   * residue from another card's.
+   */
+  readonly provenResidueEntries: readonly CloseWindowResidueOwnership[];
   readonly unexpectedStagedTasks: readonly CloseWindowForeignStagedTaskReport[];
   readonly releasedAt: string | null;
   readonly releaseOutcome: CloseWindowStagedIndexLockOutcome | null;
@@ -42,6 +77,15 @@ export interface CloseWindowStagedIndexLockReport {
   readonly foreignStagedSnapshotPath: string | null;
   readonly blockedCode: string | null;
   readonly blockedSummary: string | null;
+  /**
+   * Set only when staged entries were proved to be this repository's own
+   * unreconciled commits. Diagnosis, not authority: it names the drain that
+   * clears the recorded debt instead of the defer that would recreate it.
+   */
+  readonly residueDrainCommand?: string | null;
+  /** One drain command per distinct receipt owner, so the set is fully recoverable. */
+  readonly residueDrainCommands?: readonly string[];
+  readonly provenResidueEntries?: readonly CloseWindowResidueOwnership[];
   readonly handoffWait?: {
     readonly waitedForTaskId: string;
     readonly waitedMs: number;
@@ -133,7 +177,10 @@ function readCloseWindowStagedIndexLock(cwd: string): CloseWindowStagedIndexLock
   try {
     const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as CloseWindowStagedIndexLockRecord;
     if (parsed?.schemaId !== CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID) return null;
-    return parsed;
+    // A record written before ownership disclosure existed carries no entries;
+    // it reads as an empty set rather than an absent field, so every consumer
+    // sees one shape.
+    return Array.isArray(parsed.provenResidueEntries) ? parsed : { ...parsed, provenResidueEntries: [] };
   } catch {
     return null;
   }
@@ -300,11 +347,15 @@ export function inspectCloseWindowStagedIndexAdmission(input: {
   const unexpectedStagedTasks = inspectForeignStagedTasksForCloseWindow(input);
   const expected = new Set(uniqueSorted(input.expectedStageFiles));
   const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expected.has(filePath));
+  const diagnosis = diagnoseUnexpectedStaged(input.cwd, unexpectedStagedFiles);
   const decision = evaluateCloseWindowStagedIndexAdmission({ taskId: normalizeTaskId(input.taskId), activeLockTaskId: existing?.status === 'active' ? existing.taskId : null,
-    unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true });
+    unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true,
+    provenResidueFiles: diagnosis.provenResidueFiles, residueDrainCommand: diagnosis.residueDrainCommand });
   return { schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID, ok: decision.ok,
     lockPath: relativePathFrom(input.cwd, closeWindowStagedIndexLockPath(input.cwd)), lock: existing, unexpectedStagedTasks,
-    foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null, blockedCode: decision.blockedCode, blockedSummary: decision.blockedSummary };
+    foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null, blockedCode: decision.blockedCode, blockedSummary: decision.blockedSummary,
+    residueDrainCommand: diagnosis.residueDrainCommand, residueDrainCommands: diagnosis.residueDrainCommands,
+    provenResidueEntries: diagnosis.provenResidueEntries };
 }
 
 export function acquireCloseWindowStagedIndexLock(input: {
@@ -353,8 +404,10 @@ export function acquireCloseWindowStagedIndexLock(input: {
   });
   const expectedStageFiles = new Set(uniqueSorted(input.expectedStageFiles));
   const unexpectedStagedFiles = readStagedFiles(input.cwd).filter((filePath) => !expectedStageFiles.has(filePath));
+  const acquireDiagnosis = diagnoseUnexpectedStaged(input.cwd, unexpectedStagedFiles);
   const admission = evaluateCloseWindowStagedIndexAdmission({ taskId: normalizeTaskId(input.taskId), activeLockTaskId: existing?.status === 'active' ? existing.taskId : null,
-    unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true });
+    unexpectedStagedFiles, unexpectedStagedTaskIds: unexpectedStagedTasks.map((entry) => entry.taskId), deferForeignStaged: input.deferForeignStaged === true,
+    provenResidueFiles: acquireDiagnosis.provenResidueFiles, residueDrainCommand: acquireDiagnosis.residueDrainCommand });
   if (!admission.ok) {
     return {
       schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID,
@@ -365,6 +418,9 @@ export function acquireCloseWindowStagedIndexLock(input: {
       foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null,
       blockedCode: admission.blockedCode,
       blockedSummary: admission.blockedSummary,
+      residueDrainCommand: acquireDiagnosis.residueDrainCommand,
+      residueDrainCommands: acquireDiagnosis.residueDrainCommands,
+      provenResidueEntries: acquireDiagnosis.provenResidueEntries,
       handoffWait
     };
   }
@@ -380,6 +436,7 @@ export function acquireCloseWindowStagedIndexLock(input: {
     expectedStageFiles: uniqueSorted(input.expectedStageFiles),
     foreignStagedSnapshotPath: null,
     foreignStagedEntries: [],
+    provenResidueEntries: acquireDiagnosis.provenResidueEntries,
     unexpectedStagedTasks,
     releasedAt: null,
     releaseOutcome: null
@@ -409,6 +466,9 @@ export function acquireCloseWindowStagedIndexLock(input: {
     foreignStagedSnapshotPath: record.foreignStagedSnapshotPath,
     blockedCode: null,
     blockedSummary: null,
+    residueDrainCommand: acquireDiagnosis.residueDrainCommand,
+    residueDrainCommands: acquireDiagnosis.residueDrainCommands,
+    provenResidueEntries: record.provenResidueEntries,
     handoffWait
   };
 }

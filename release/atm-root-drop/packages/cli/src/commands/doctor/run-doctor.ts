@@ -16,7 +16,7 @@ import { inspectRunnerSourceDrift } from '../framework-development/closure-packe
 import { inspectRunnerPublicationDisposition } from '../framework-development/runner-publication-lifecycle.ts';
 import { knownTsNoCheckBaseline, knownTsNoCheckCleanupOwners, legacyBehaviorPackageNames } from './constants.ts';
 import type { DoctorOptions, PackageJson } from './types.ts';
-import { applyDoctorPolicyToCheck, downgradeAdopterGitHeadEvidenceCheck, resolveDoctorPolicy } from './policy.ts';
+import { applyDoctorPolicyToCheck, downgradeAdopterGitHeadEvidenceCheck, resolveDoctorPolicy, resolveDoctorRepositoryIdentity } from './policy.ts';
 import { checkOnboardingLifecycle, createVersionSummaryMessages } from './lifecycle.ts';
 import { createBacklogSyncCheck, createGovernanceEntryReadinessCheck, hasRequiredScripts, isFrameworkContractExpected } from './readiness.ts';
 import { checkCharterIntegrityV2, listFiles, listPackageDirs, packageDirLabel, readJsonIfExists, createCheck, createIntegrationDriftRemediation } from './utilities.ts';
@@ -70,7 +70,7 @@ export async function runDoctor(argv: readonly string[]) {
   const root = options.cwd;
   const doctorPolicy = resolveDoctorPolicy(options);
   const rootPackage = (readJsonIfExists(path.join(root, 'package.json')) as PackageJson) ?? {};
-  const repoIdentity = detectFrameworkRepoIdentity(root);
+  const repoIdentity = resolveDoctorRepositoryIdentity(root, detectFrameworkRepoIdentity(root));
   const frameworkContractExpected = isFrameworkContractExpected(repoIdentity);
   const packageDirs = listPackageDirs(root);
   const hashAudit = runHashPlaceholderAudit({ root });

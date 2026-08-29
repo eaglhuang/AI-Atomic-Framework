@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 export const VALIDATOR_LIFECYCLE_SUMMARY_SCHEMA_ID = 'atm.validatorLifecycleSummary.v1';
 export function buildValidatorLifecycleSummary(input) {
     const usageEntries = (Array.isArray(input.usageTelemetry?.validators) ? input.usageTelemetry?.validators : [])
+        .filter((entry) => typeof entry === 'object' && entry !== null)
         .map((entry) => [String(entry.validatorId ?? entry.name ?? ''), entry])
         .filter(([key]) => Boolean(key));
     const usageById = new Map(usageEntries);

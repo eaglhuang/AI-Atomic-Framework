@@ -1,7 +1,7 @@
 import path from 'node:path';
-import { existsSync } from 'node:fs';
-import { createContinuationRunReport, createContinuationSummaryRecord, createLocalGovernanceAdapter, estimateContextBudgetTokens } from '../../../../../plugin-governance-local/dist/index.js';
-import { renderQualityReportMarkdown } from '../../../../../core/dist/police/regression-compare.js';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createContinuationRunReport, createContinuationSummaryRecord, createLocalGovernanceAdapter, estimateContextBudgetTokens } from '../../../_vendor/plugin-governance-local/dist/index.js';
+import { renderQualityReportMarkdown } from '../../../_vendor/core/dist/police/regression-compare.js';
 import { CliError, readJsonFile, resolveValue } from '../../shared.js';
 import { inferInputKind } from './inputs.js';
 import { sanitizeUpgradeBudgetId } from './guided-legacy.js';
@@ -100,7 +100,7 @@ async function materializeUpgradeHardStop(cwd, atomId, qualityReportPath, evalua
     };
     await resolveValue(runReportStore.writeRunReport(continuationReportId, createContinuationRunReport(continuationReportId, continuationInput)));
     const summary = await resolveValue(contextSummaryStore.writeSummary(createContinuationSummaryRecord(continuationInput)));
-    await resolveValue(adapter.stores.evidenceStore.writeEvidence(atomId, {
+    const handoffEvidence = {
         workItemId: atomId,
         evidenceKind: 'handoff',
         summary: 'Upgrade hard-stop continuation contract recorded.',
@@ -112,13 +112,34 @@ async function materializeUpgradeHardStop(cwd, atomId, qualityReportPath, evalua
             contextSummaryPath,
             contextSummaryMarkdownPath: summary.summaryMarkdownPath ?? contextSummaryMarkdownPath
         }
-    }));
+    };
+    await resolveValue(adapter.stores.evidenceStore.writeEvidence(atomId, handoffEvidence));
+    persistUpgradeHandoffEvidence(cwd, atomId, handoffEvidence);
     return {
         continuationReportPath,
         contextSummaryPath,
         contextSummaryMarkdownPath: summary.summaryMarkdownPath ?? contextSummaryMarkdownPath,
         evidencePath
     };
+}
+function persistUpgradeHandoffEvidence(cwd, atomId, handoffEvidence) {
+    const absolutePath = path.join(cwd, '.atm', 'history', 'evidence', `${atomId}.json`);
+    const existing = existsSync(absolutePath) ? JSON.parse(readFileSync(absolutePath, 'utf8')) : null;
+    const existingEvidence = Array.isArray(existing)
+        ? existing
+        : existing && typeof existing === 'object' && Array.isArray(existing.evidence)
+            ? existing.evidence
+            : [];
+    const alreadyRecorded = existingEvidence.some((entry) => entry && typeof entry === 'object'
+        && entry.evidenceKind === handoffEvidence.evidenceKind
+        && entry.createdAt === handoffEvidence.createdAt
+        && entry.summary === handoffEvidence.summary);
+    const evidence = alreadyRecorded ? existingEvidence : [...existingEvidence, handoffEvidence];
+    const document = Array.isArray(existing)
+        ? evidence
+        : { ...(existing && typeof existing === 'object' ? existing : {}), taskId: atomId, evidence };
+    mkdirSync(path.dirname(absolutePath), { recursive: true });
+    writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
 }
 function readUpgradeContextBudgetPolicy(cwd) {
     const policyPath = path.join(cwd, '.atm', 'runtime', 'budget', 'default-policy.json');

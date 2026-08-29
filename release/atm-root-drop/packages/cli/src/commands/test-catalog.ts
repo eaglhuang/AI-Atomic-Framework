@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { normalizeValidatorResponsibility } from '../../../core/src/evidence/test-case-catalog.ts';
+import { normalizeValidatorResponsibility, type ValidatorResponsibility } from '../../../core/src/evidence/test-case-catalog.ts';
 
 // atm.causal-validator-selector — the Selection Policy now lives in
 // packages/core/src/evidence/validation-contract.ts (the pure
@@ -36,7 +36,7 @@ export type {
   ValidatorResponsibility
 } from '../../../core/src/evidence/test-case-catalog.ts';
 
-import type { ValidatorResponsibility } from '../../../core/src/evidence/test-case-catalog.ts';
+
 
 export type TestCapability = 'validator' | 'integration-test';
 export type TestTier = 'quick' | 'standard' | 'full';

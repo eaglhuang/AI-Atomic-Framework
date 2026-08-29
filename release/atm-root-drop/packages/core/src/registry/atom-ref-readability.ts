@@ -3,14 +3,8 @@ import { buildCatalog } from './atom-ref-readability/catalog.ts';
 import { applyCallsiteRewrites, collectDefinedReadableRefs, evaluateCallsites, planCallsiteRewrites, scanCallsites } from './atom-ref-readability/callsites.ts';
 import { existsSync, readJson } from './atom-ref-readability/files.ts';
 import { writeGeneratedRefs, writeReports } from './atom-ref-readability/reports.ts';
-import type {
-  AtomRefSweepOptions,
-  AtomRefSweepResult,
-  RegistryDocumentRecord,
-  RegistryEntryRecord,
-  RepoReadabilityReport
-} from './atom-ref-readability/types.ts';
-import { asRecord, atomIdPattern, generatedPathsForRepo } from './atom-ref-readability/types.ts';
+import { asRecord, atomIdPattern, type AtomRefSweepOptions, type AtomRefSweepResult, generatedPathsForRepo, type RegistryDocumentRecord, type RegistryEntryRecord, type RepoReadabilityReport } from './atom-ref-readability/types.ts';
+
 
 export type {
   AtomCallsiteRewrite,

@@ -9,6 +9,7 @@ import { runGitRecordCommit } from './record-commit-command.js';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome, requireConsumedEmergencyApproval } from '../../emergency/gate.js';
 import { GIT_INDEX_LOCK_RECOVERY_FLAG, recoverGitIndexLock } from './git-index-lock-recovery.js';
 import { recoverLiveIndexAfterSuccessfulCommit } from './live-index-reconciliation.js';
+import { drainLiveIndexReconciliationReceipt } from './live-index-drain.js';
 export function normalizeCommitLaneSessionId(value) {
     return typeof value === "string" && value.trim() ? value.trim() : null;
 }
@@ -55,8 +56,31 @@ export async function runAtmGit(argv) {
         return runGitCommitStatus(options);
     }
     if (options.action === 'reconcile-live-index') {
+        // Without a commit sha the durable receipt is the addressable input: it is
+        // the record of the debt, so it is also sufficient to drain it. This is the
+        // route for debt that accumulated across commits, where no single commit's
+        // parent tree describes the live index any more.
+        if (!options.commitSha && options.taskId) {
+            const dryRun = options.write !== true || options.dryRun === true;
+            const drain = drainLiveIndexReconciliationReceipt({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                dryRun
+            });
+            return makeResult({
+                ok: drain.clean || dryRun,
+                command: 'git',
+                cwd: options.cwd,
+                messages: [
+                    message(drain.clean ? 'info' : 'warning', dryRun ? 'ATM_LIVE_INDEX_DRAIN_DRY_RUN' : 'ATM_LIVE_INDEX_DRAIN_APPLIED', dryRun
+                        ? 'Receipt-scoped live-index drain dry-run completed without mutating the index.'
+                        : 'Receipt-scoped live-index drain advanced only paths whose recorded pre-state was still provable.', { drain })
+                ],
+                evidence: { action: 'reconcile-live-index', drain }
+            });
+        }
         if (!options.commitSha) {
-            throw new CliError('ATM_CLI_USAGE', 'git reconcile-live-index requires --commit <sha>.', { exitCode: 2 });
+            throw new CliError('ATM_CLI_USAGE', 'git reconcile-live-index requires --commit <sha>, or --task <id> to drain that task\'s reconciliation receipt.', { exitCode: 2 });
         }
         const dryRun = options.write !== true || options.dryRun === true;
         const recovery = recoverLiveIndexAfterSuccessfulCommit({

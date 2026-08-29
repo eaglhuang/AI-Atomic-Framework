@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { applyStewardPlan } from '../../../../core/dist/broker/steward.js';
+import { applyStewardPlan } from '../../_vendor/core/dist/broker/steward.js';
 import { CliError, makeResult, message } from '../shared.js';
 import { restoreBackups } from './files.js';
 export function runTakeover(options) {

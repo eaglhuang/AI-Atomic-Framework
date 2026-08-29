@@ -2,7 +2,7 @@ import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { classifyGuidanceIntent, buildFirstLayerCommandContract, loadHostIntentLexicon, probeProject, recordGuidanceIntentPhrase } from '../../../core/dist/guidance/index.js';
+import { classifyGuidanceIntent, buildFirstLayerCommandContract, loadHostIntentLexicon, probeProject, recordGuidanceIntentPhrase } from '../_vendor/core/dist/guidance/index.js';
 import { getCommandSpec, listCommandSpecs } from './command-specs.js';
 import { glossaryEntries } from './glossary-data.js';
 import { CliError, makeHelpResult, makeResult, message } from './shared.js';
