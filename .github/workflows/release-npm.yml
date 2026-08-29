@@ -65,6 +65,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Derive the release version before any build, pack, or smoke gate. Every
+      # pre-publish receipt must describe the exact tarball npm will receive.
+      - name: Set npm package versions from tag
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
+            version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
+            echo "Dry-run mode: simulating package version $version"
+          fi
+          # These packages are versioned as one unpublished workspace closure.
+          # Do not ask npm to refresh workspace links from the public registry
+          # before the first package has been published.
+          npm version "$version" --workspaces --include-workspace-root --no-git-tag-version --no-workspaces-update
+          node --experimental-strip-types scripts/set-release-workspace-versions.ts --version "$version"
+
       - name: Validate bridge minor policy
         run: node --experimental-strip-types scripts/validate-bridge-minor.ts --mode validate
 
@@ -124,20 +140,6 @@ jobs:
       # install is the only check that can observe that class of defect.
       - name: Clean-install npx smoke (publish gate)
         run: node --experimental-strip-types scripts/validate-npm-clean-install.ts
-
-      - name: Set npm package versions from tag
-        shell: bash
-        run: |
-          version="${GITHUB_REF_NAME#v}"
-          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
-            version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
-            echo "Dry-run mode: simulating package version $version"
-          fi
-          # These packages are versioned as one unpublished workspace closure.
-          # Do not ask npm to refresh workspace links from the public registry
-          # before the first package has been published.
-          npm version "$version" --workspaces --include-workspace-root --no-git-tag-version --no-workspaces-update
-          node --experimental-strip-types scripts/set-release-workspace-versions.ts --version "$version"
 
       - name: Validate release version compatibility
         if: ${{ github.event_name != 'workflow_dispatch' }}
