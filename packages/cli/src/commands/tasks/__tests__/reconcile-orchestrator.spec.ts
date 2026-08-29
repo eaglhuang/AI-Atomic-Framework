@@ -20,13 +20,16 @@ function lineCount(text: string): number {
 }
 
 const facade = read('packages/cli/src/commands/tasks.ts');
+const legacyImplementation = read('packages/cli/src/commands/tasks/legacy/implementation.ts');
 const orchestrator = read('packages/cli/src/commands/tasks/reconcile-orchestrator.ts');
 
 assert(orchestrator.includes('export async function runTasksReconcile'), 'reconcile runner must live in reconcile-orchestrator');
 assert(orchestrator.includes('createClosurePacket'), 'reconcile orchestrator must own closure packet creation');
 assert(orchestrator.includes('buildHistoricalDeliveryProvenance'), 'reconcile orchestrator must own historical delivery provenance');
 assert(orchestrator.includes('executeTaskCloseTransaction'), 'reconcile orchestrator must own close transaction writes');
-assert(facade.includes("import { runTasksReconcile } from './tasks/reconcile-orchestrator.ts';"), 'tasks facade must import reconcile orchestrator');
+assert(orchestrator.includes('issueRepairClosureAdmissionTicket'), 'reconcile must issue the bounded closeback ticket before staging its terminal bundle');
+assert(orchestrator.includes('taskDocument.workAdmissionTicket = issueRepairClosureAdmissionTicket'), 'reconcile must persist the closeback ticket with the staged ledger record');
+assert(legacyImplementation.includes("import { runTasksReconcile } from '../reconcile-orchestrator.ts';"), 'task implementation must import reconcile orchestrator');
 assert(!facade.includes('Historical reconcile sync completed'), 'tasks facade must not retain reconcile evidence body');
 assert(!facade.includes('atm.reconcileAttestation.v1'), 'tasks facade must not retain reconcile attestation body');
 assert(lineCount(orchestrator) <= 600, 'reconcile-orchestrator.ts must stay at or below 600 lines');

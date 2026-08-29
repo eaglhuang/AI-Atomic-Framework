@@ -19,6 +19,7 @@ import { resolveActorId } from '../actor-registry.ts';
 import { computeMissingValidatorReport } from '../evidence.ts';
 import { CliError, makeResult, message, relativePathFrom, resolveValue, type CommandResult } from '../shared.ts';
 import { recordStaleRunnerOverride } from './close-governance.ts';
+import { issueRepairClosureAdmissionTicket } from '../git-governance/work-admission-check.ts';
 import { parseReconcileOptions } from './task-option-parsers.ts';
 import { readGitScalar } from './task-git-helpers.ts';
 import { parseClaimRecord } from './task-ledger-readers.ts';
@@ -299,6 +300,15 @@ export async function runTasksReconcile(argv: string[]): Promise<CommandResult> 
   taskDocument.closedByActor = actorId;
   taskDocument.closedBySessionId = null;
   taskDocument.closeReason = reconcileReason;
+  // Reconcile writes a terminal closeback bundle which must be committed after
+  // the active claim is released. Persist the same bounded bridge used by the
+  // closure-repair lane so the ordinary governed commit facade can admit this
+  // exact task-scoped bundle without resurrecting a claim.
+  taskDocument.workAdmissionTicket = issueRepairClosureAdmissionTicket({
+    cwd: options.cwd,
+    taskId: options.taskId,
+    actorId
+  });
 
   const reconcileCommand = `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --json`;
   const reconcileWriteResult = await executeTaskCloseTransaction({
@@ -378,6 +388,7 @@ export async function runTasksReconcile(argv: string[]): Promise<CommandResult> 
       transitionPath,
       closeCommitWindowPath: closeCommitWindowPathReconcile,
       closeCommitWindowAllowedFiles,
+      workAdmissionTicket: taskDocument.workAdmissionTicket,
       emergencyUse,
       deliverableGate: deliverableGate as unknown as Record<string, unknown> | null
     }
