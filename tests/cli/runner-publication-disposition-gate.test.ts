@@ -43,6 +43,23 @@ try {
   assert.equal(clean.ok, true, 'a clean checkout must not inherit a historical pending receipt');
   assert.equal(clean.receiptPath, null, 'a receipt is relevant only when it names a currently dirty runner artifact');
   assert.equal(clean.report.disposition, 'published');
+
+  const currentSealedSourceSha = 'fedcba9876543210fedcba9876543210fedcba98';
+  const currentReceiptPath = '.atm/history/evidence/TASK-GIT-0023.runner-sync-receipt.json';
+  const currentInventory = deriveRunnerBuildOutputInventory({
+    sealedSourceSha: currentSealedSourceSha,
+    observedPaths: ['packages/cli/dist/atm.js', 'release/atm-onefile/atm.mjs', 'release/atm-onefile/release-manifest.json', currentReceiptPath],
+    currentTaskId: 'TASK-GIT-0023'
+  });
+  write('release/atm-onefile/release-manifest.json', `${JSON.stringify({ sealedSourceCommit: currentSealedSourceSha })}\n`);
+  write(currentReceiptPath, `${JSON.stringify({ schemaId: 'atm.runnerSyncReceipt.v1', outputInventory: currentInventory, publicationDisposition: 'published' })}\n`);
+  write('packages/cli/dist/atm.js', 'current published build output\n');
+
+  const currentPublication = inspectRunnerPublicationDisposition(repo);
+  assert.equal(currentPublication.ok, true, 'a sealed current receipt must win over an older overlapping receipt');
+  assert.equal(currentPublication.receiptPath, currentReceiptPath);
+  assert.equal(currentPublication.sealedSourceSha, currentSealedSourceSha);
+  assert.equal(currentPublication.report.disposition, 'published');
   console.log('[runner-publication-disposition-gate.test] ok');
 } finally {
   rmSync(repo, { recursive: true, force: true });
