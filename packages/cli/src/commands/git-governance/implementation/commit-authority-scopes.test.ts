@@ -33,6 +33,18 @@ assert.equal(active.evaluate('src/other.ts').code, 'outside-active-claim');
 const released = createCommitAuthorityPolicy(task({ ...activeClaim, state: 'released' }));
 assert.equal(released.evaluate('src/owned/allowed.ts').code, 'claim-not-active');
 
+const terminalClosebackTicket = {
+  ...matchingTicket,
+  origin: 'repair-closure',
+  claimGeneration: 'repair-closure:2026-08-29T14:33:19.227Z',
+};
+const terminalCloseback = createCommitAuthorityPolicy(task(
+  { ...activeClaim, state: 'released' },
+  terminalClosebackTicket,
+));
+assert.equal(terminalCloseback.evaluate('src/owned/allowed.ts').code, 'claim-and-ticket-covered');
+assert.equal(terminalCloseback.evaluate('src/owned/not-granted.ts').code, 'outside-ticket-grant');
+
 const legacy = createCommitAuthorityPolicy(task(null));
 assert.equal(legacy.evaluate('src/legacy.ts').code, 'legacy-inspection');
 assert.equal(legacy.evaluate('src/legacy.ts').ok, true);

@@ -38,29 +38,42 @@ function resolveCommitAuthorityScopes(input: LegacyValue): CommitAuthorityScopes
     // still enforced by the later session/ticket boundary.
     return { enforced: false, claimScopes: [], ticketScopes: [] };
   }
-  if (claim.state !== 'active') {
-    return { enforced: true, claimScopes: [], ticketScopes: [] };
-  }
-
   const rawClaim = input.taskDocument.claim;
   const claimScopes = rawClaim && typeof rawClaim === 'object' && !Array.isArray(rawClaim)
     ? stringScopes(rawClaim.files)
     : [];
   const ticket = input.taskDocument.workAdmissionTicket;
-  const matchingTicket = ticket && typeof ticket === 'object' && !Array.isArray(ticket)
+  const ticketForTaskActor = ticket && typeof ticket === 'object' && !Array.isArray(ticket)
     && ticket.schemaId === 'atm.workAdmissionTicket.v1'
     && ticket.taskId === input.taskId
     && ticket.actorId === claim.actorId
-    && ticket.claimGeneration === claim.leaseId
       ? ticket
       : null;
+  const activeClaimTicket = ticketForTaskActor && ticketForTaskActor.claimGeneration === claim.leaseId
+    ? ticketForTaskActor
+    : null;
+  const terminalClosebackTicket = claim.state === 'released'
+    && ticketForTaskActor?.origin === 'repair-closure'
+      ? ticketForTaskActor
+      : null;
+  const matchingTicket = activeClaimTicket ?? terminalClosebackTicket;
   const fileGrant = matchingTicket && Array.isArray(matchingTicket.grants)
     ? matchingTicket.grants.find((grant: LegacyValue) => grant?.kind === 'file-write')
     : null;
+  const ticketScopes = fileGrant ? stringScopes(fileGrant.values) : [];
+  if (terminalClosebackTicket) {
+    // A reconcile/repair closeback intentionally releases the normal claim
+    // before its ledger, event and closure packet are committed. Its persisted
+    // ticket is the sole, actor-bound authority for that final narrow bundle.
+    return { enforced: true, claimScopes, ticketScopes };
+  }
+  if (claim.state !== 'active') {
+    return { enforced: true, claimScopes: [], ticketScopes: [] };
+  }
   return {
     enforced: true,
     claimScopes,
-    ticketScopes: fileGrant ? stringScopes(fileGrant.values) : [],
+    ticketScopes,
   };
 }
 
