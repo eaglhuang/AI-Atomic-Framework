@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import {
   frameworkTempPublicationCapabilityCovers,
@@ -107,7 +107,7 @@ function issueLegacyActiveTaskAdmissionTicket(input: Parameters<typeof evaluateW
   const actorId = typeof record.actorId === 'string' ? record.actorId.trim() : '';
   const claimGeneration = typeof record.leaseId === 'string' ? record.leaseId.trim() : '';
   if (!actorId || actorId !== input.actorId || !claimGeneration) return null;
-  const allowedFiles = resolveLegacyTaskAdmissionFiles(task, input.taskId);
+  const allowedFiles = resolveLegacyTaskAdmissionFiles(input.cwd, task, input.taskId);
   if (allowedFiles.length === 0) return null;
   const lane = record.laneSession && typeof record.laneSession === 'object'
     ? record.laneSession as Record<string, unknown>
@@ -156,9 +156,13 @@ export function evaluateTaskWorkAdmissionGate(input: {
   });
   return evaluateWorkAdmissionGate({
     ...input,
-    actorId: terminalRepairTicket?.actorId ?? task?.actorId ?? frameworkTemp?.actorId ?? '',
-    laneSessionId: terminalRepairTicket?.laneSessionId ?? task?.laneSessionId ?? frameworkTemp?.laneSessionId ?? null,
-    claimGeneration: terminalRepairTicket?.claimGeneration ?? task?.claimGeneration ?? (frameworkTemp?.heartbeatAt ? `framework-lock:${frameworkTemp.heartbeatAt}` : null)
+    // A terminal repair ticket is a complete identity.  In particular, its
+    // deliberate null lane must not fall back to the released claim's lane.
+    actorId: terminalRepairTicket ? terminalRepairTicket.actorId : (task?.actorId ?? frameworkTemp?.actorId ?? ''),
+    laneSessionId: terminalRepairTicket ? terminalRepairTicket.laneSessionId : (task?.laneSessionId ?? frameworkTemp?.laneSessionId ?? null),
+    claimGeneration: terminalRepairTicket
+      ? terminalRepairTicket.claimGeneration
+      : (task?.claimGeneration ?? (frameworkTemp?.heartbeatAt ? `framework-lock:${frameworkTemp.heartbeatAt}` : null))
   });
 }
 
@@ -182,7 +186,7 @@ export function issueRepairClosureAdmissionTicket(input: {
     actorId: input.actorId,
     laneSessionId: input.laneSessionId ?? process.env.ATM_LANE_SESSION_ID ?? null,
     claimGeneration: `repair-closure:${now}`,
-    allowedFiles: resolveLegacyTaskAdmissionFiles(task ?? {}, input.taskId),
+    allowedFiles: resolveLegacyTaskAdmissionFiles(input.cwd, task ?? {}, input.taskId),
     runnerSelection: { runnerKind: 'frozen', runnerRef: 'repair-closure', selectedAt: now },
     now
   });
@@ -230,7 +234,7 @@ function readTaskDocument(cwd: string, taskId: string): {
   }
 }
 
-function resolveLegacyTaskAdmissionFiles(task: {
+function resolveLegacyTaskAdmissionFiles(cwd: string, task: {
   taskDirectionLock?: unknown;
   scopePaths?: unknown;
   deliverables?: unknown;
@@ -253,11 +257,35 @@ function resolveLegacyTaskAdmissionFiles(task: {
           : [];
   return [...new Set([
     ...declaredFiles.map((entry) => entry.trim()).filter(Boolean),
+    ...resolveTaskOwnedProtectedOverrideAuditPaths(cwd, taskId),
     '.atm/history/evidence/git-head.jsonl',
     `.atm/history/evidence/${taskId}.*`,
     `.atm/history/task-events/${taskId}/**`,
     `.atm/history/tasks/${taskId}.json`
   ])];
+}
+
+/**
+ * A terminal closeback can include protected-override receipts created for the
+ * same task before its claim was released.  Admit only concrete receipts whose
+ * payload names that task; never grant the shared audit directory by wildcard.
+ */
+function resolveTaskOwnedProtectedOverrideAuditPaths(cwd: string, taskId: string): readonly string[] {
+  const directory = path.join(cwd, '.atm', 'history', 'protected-override-audit');
+  if (!existsSync(directory)) return [];
+  return readdirSync(directory, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .flatMap((entry) => {
+      const absolutePath = path.join(directory, entry.name);
+      try {
+        const payload = JSON.parse(readFileSync(absolutePath, 'utf8')) as { taskId?: unknown };
+        return payload.taskId === taskId
+          ? [`.atm/history/protected-override-audit/${entry.name}`]
+          : [];
+      } catch {
+        return [];
+      }
+    });
 }
 
 function isTicket(value: unknown): value is WorkAdmissionTicket {

@@ -58,8 +58,27 @@ export const configRelativePath = path.join('.atm', 'config.json');
 
 export const frameworkVersion = '0.0.0';
 
+export function resolveFrameworkRoot(moduleUrl = import.meta.url): string {
+  let cursor = path.dirname(fileURLToPath(moduleUrl));
+  let bundledCliRoot: string | null = null;
+  while (true) {
+    const packagePath = path.join(cursor, 'package.json');
+    if (existsSync(packagePath)) {
+      try {
+        const manifest = JSON.parse(readFileSync(packagePath, 'utf8')) as { name?: unknown };
+        if (manifest.name === 'ai-atomic-framework') return cursor;
+        if (manifest.name === '@ai-atomic-framework/cli') bundledCliRoot ??= cursor;
+      } catch {
+        // Keep walking; a malformed ancestor manifest is not an authority root.
+      }
+    }
+    const parent = path.dirname(cursor);
+    if (parent === cursor) return bundledCliRoot ?? path.resolve(path.dirname(fileURLToPath(moduleUrl)), '../../../../../');
+    cursor = parent;
+  }
+}
 
-const defaultFrameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../../');
+const defaultFrameworkRoot = resolveFrameworkRoot();
 
 
 export function readFrameworkVersion(root: string = defaultFrameworkRoot): string {

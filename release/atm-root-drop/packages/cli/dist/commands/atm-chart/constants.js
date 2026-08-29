@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-export const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../../');
+import { resolveFrameworkRoot } from '../shared.js';
+export const frameworkRoot = resolveFrameworkRoot();
 export const defaultATMChartRelativePath = path.join('.atm', 'memory', 'atm-chart.md');
 export const atmChartFrontmatterSchemaVersion = 'atm.atmChart.v0.1';
 export const atmChartSourceSchemas = Object.freeze({

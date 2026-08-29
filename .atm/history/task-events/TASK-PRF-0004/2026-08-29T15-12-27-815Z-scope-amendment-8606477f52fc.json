@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-29T15-12-27-815Z-scope-amendment-8606477f52fc",
+  "taskId": "TASK-PRF-0004",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0004.json",
+  "taskSha256": "sha256:2a8216ae2ab90a308395ac8b1be9c6d5c5a96d8d839a2f6e948e7dbbcca31885",
+  "createdAt": "2026-08-29T15:12:27.815Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0004 --actor codex-captain --add \"packages/cli/src/commands/shared/result-core.ts,packages/cli/src/commands/atm-chart/constants.ts,packages/core/src/manager/test-runner/report-support.ts,packages/core/src/registry/registry/paths.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

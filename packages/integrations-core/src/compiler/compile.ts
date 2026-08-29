@@ -252,7 +252,10 @@ function loadSkillTemplateCompanionFiles(
 
 function walkCompanionDirectory(directoryPath: string): readonly string[] {
   const trackedFiles = listTrackedFilesUnder(directoryPath);
-  if (trackedFiles) {
+  // A published package can live below an adopter's Git worktree. In that
+  // case `git ls-files` succeeds but returns no node_modules paths; fall back
+  // to the bundled directory instead of treating an empty result as complete.
+  if (trackedFiles && trackedFiles.length > 0) {
     return trackedFiles;
   }
   try {

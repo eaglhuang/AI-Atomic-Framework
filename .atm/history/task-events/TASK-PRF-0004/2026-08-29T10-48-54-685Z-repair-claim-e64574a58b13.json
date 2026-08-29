@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-29T10-48-54-685Z-repair-claim-e64574a58b13",
+  "taskId": "TASK-PRF-0004",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260828133212-codex-captain-TASK-PRF-0004-0f16f228e5",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0004.json",
+  "taskSha256": "sha256:be2383eecd7f5c94a358bf9f90b2ede39b010e1716231663e7cfd606720b1fb6",
+  "createdAt": "2026-08-29T10:48:54.685Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0004 --actor codex-captain --write --reason \"Owner-authorized cleanup: repair expired claim and dangling governance lock before governed residue reconciliation; no delivery state is changed.\" --json"
+}

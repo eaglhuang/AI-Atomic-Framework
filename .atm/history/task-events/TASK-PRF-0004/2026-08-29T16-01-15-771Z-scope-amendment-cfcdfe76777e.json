@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-29T16-01-15-771Z-scope-amendment-cfcdfe76777e",
+  "taskId": "TASK-PRF-0004",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0004.json",
+  "taskSha256": "sha256:28be0d05678b281cfa3a08c28c5dc986ed41f04a639c2b574ab0eda667e46922",
+  "createdAt": "2026-08-29T16:01:15.771Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0004 --actor codex-captain --add packages/integrations-core/src/compiler/compile.ts --reason \"Clean-install evidence proves the integration compiler resolves companion templates from a wrong vendored root; this compiler is the minimal installer closure seam.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Clean-install evidence proves the integration compiler resolves companion templates from a wrong vendored root; this compiler is the minimal installer closure seam."
+  }
+}

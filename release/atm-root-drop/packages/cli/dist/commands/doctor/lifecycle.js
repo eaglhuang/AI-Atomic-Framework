@@ -22,6 +22,23 @@ export function checkOnboardingLifecycle(root, runtime) {
     const defaultGuardsPresent = existsSync(defaultGuardsPath);
     const atmChartPresent = existsSync(atmChartPath);
     const welcomeLineage = readJsonIfExists(welcomeLineagePath);
+    const adapter = runtime.config?.adapter;
+    const standaloneInitialization = adapter
+        && typeof adapter === 'object'
+        && adapter.mode === 'standalone'
+        && adapter.implemented === false;
+    if (standaloneInitialization && !defaultGuardsPresent && !atmChartPresent) {
+        return {
+            ok: true,
+            stage: 'standalone-ready',
+            defaultGuardsPath: runtime.paths.defaultGuardsPath,
+            atmChartPath: relativePathFrom(root, atmChartPath),
+            welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
+            atmChartFreshness: 'optional-before-adoption',
+            welcomeRecorded: Boolean(welcomeLineage),
+            recommendedAction: 'node atm.mjs init --adopt default --cwd .'
+        };
+    }
     if (!defaultGuardsPresent) {
         return {
             ok: false,

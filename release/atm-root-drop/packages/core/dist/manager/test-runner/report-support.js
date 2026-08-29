@@ -1,9 +1,9 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createTestReportMetrics } from '../../test-runner/metrics-collector.js';
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../../');
+const repoRoot = resolveFrameworkRoot();
 const require = createRequire(import.meta.url);
 export const defaultTestReportSchemaPath = path.join(repoRoot, 'schemas', 'test-report.schema.json');
 export const defaultTestReportMetricsSchemaPath = path.join(repoRoot, 'schemas', 'test-report', 'metrics.schema.json');
@@ -12,6 +12,29 @@ export const defaultTestReportMigration = Object.freeze({
     fromVersion: null,
     notes: 'Initial alpha0 test runner report.'
 });
+function resolveFrameworkRoot(moduleUrl = import.meta.url) {
+    let cursor = path.dirname(fileURLToPath(moduleUrl));
+    let bundledCliRoot = null;
+    while (true) {
+        const packagePath = path.join(cursor, 'package.json');
+        if (existsSync(packagePath)) {
+            try {
+                const manifest = JSON.parse(readFileSync(packagePath, 'utf8'));
+                if (manifest.name === 'ai-atomic-framework')
+                    return cursor;
+                if (manifest.name === '@ai-atomic-framework/cli')
+                    bundledCliRoot ??= cursor;
+            }
+            catch {
+                // Keep walking; malformed manifests cannot define the framework root.
+            }
+        }
+        const parent = path.dirname(cursor);
+        if (parent === cursor)
+            return bundledCliRoot ?? path.resolve(path.dirname(fileURLToPath(moduleUrl)), '../../../../../');
+        cursor = parent;
+    }
+}
 export function createAtomicTestRunnerContract(normalizedModel) {
     if (!normalizedModel) {
         throw new Error('Normalized model is required.');

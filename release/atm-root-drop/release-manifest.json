@@ -2294,6 +2294,28 @@
     "release/atm-root-drop/packages/cli/dist/startup-known-bad.js",
     "release/atm-root-drop/packages/cli/dist/telemetry/index.js",
     "release/atm-root-drop/packages/cli/dist/temp-workspace.js",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/atm-first-principles.template.md",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/atomic-charter.template.md",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/charter-invariants.template.json",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/context/INITIAL_SUMMARY.md",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/profile/default.md",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/WRAPPER_DEDUP_PLAN.md",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-create.ps1",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-evidence.ps1",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-handoff.ps1",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-lock.ps1",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-next.ps1",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-orient.ps1",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-upgrade-scan.ps1",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-create.sh",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-evidence.sh",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-handoff.sh",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-lock.sh",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-next.sh",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-orient.sh",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-upgrade-scan.sh",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/wrappers.json",
+    "release/atm-root-drop/packages/cli/dist/templates/root-drop/AGENTS.md",
     "release/atm-root-drop/packages/cli/package.json",
     "release/atm-root-drop/packages/cli/src/atm.ts",
     "release/atm-root-drop/packages/cli/src/commands/__tests__/actor-adopt.spec.ts",
@@ -2546,6 +2568,7 @@
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-selection.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-candidate-preparation.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-command.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-command.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-execution.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
@@ -2630,6 +2653,7 @@
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/input-state.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+    "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/team-gate-findings.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-push.ts",
@@ -4943,6 +4967,13 @@
     "release/atm-root-drop/templates/skills/atm-framework-quickfix.skill.md",
     "release/atm-root-drop/templates/skills/atm-framework-temp-claim.skill.md",
     "release/atm-root-drop/templates/skills/atm-git-pathspec-emergency-commit.skill.md",
+    "release/atm-root-drop/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+    "release/atm-root-drop/templates/skills/atm-governance-router.files/references/entry-friction.md",
+    "release/atm-root-drop/templates/skills/atm-governance-router.files/references/fallback-design.md",
+    "release/atm-root-drop/templates/skills/atm-governance-router.files/references/index.md",
+    "release/atm-root-drop/templates/skills/atm-governance-router.files/references/learning-loop.md",
+    "release/atm-root-drop/templates/skills/atm-governance-router.files/references/route-interpretation.md",
+    "release/atm-root-drop/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
     "release/atm-root-drop/templates/skills/atm-governance-router.skill.md",
     "release/atm-root-drop/templates/skills/atm-handoff.skill.md",
     "release/atm-root-drop/templates/skills/atm-internal-build-sync.skill.md",
@@ -5882,8 +5913,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 19,
-    "unchanged": 1897,
+    "copied": 2,
+    "unchanged": 72,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -17950,7 +17981,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/git/publication-delivery-slice.js",
-        "digest": "653692f9bd4cee7ecfcdf04469d568fbf69b0819b50ad7bdd3526b358632a106",
+        "digest": "f06be8b3cf1f0c6c47d251a7979fe35222ac20184d0e982de13c0e1b162d4349",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/git/publication-delivery-slice.js"
@@ -18220,7 +18251,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/manager/test-runner/report-support.js",
-        "digest": "14571b08d400cb776329df9257ecaf139dfc4dd97502d3474ff5a57b7a0de5cd",
+        "digest": "7195ea35f3ee63c3b2cff96d64b6374d258991bbfe11d8a4a1cdd08d7b09a2d1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/manager/test-runner/report-support.js"
@@ -18787,7 +18818,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/registry/registry/paths.js",
-        "digest": "3f3e27b594cedc9c491a12dab51f94d15914cae2f70166e201d80e0e97907597",
+        "digest": "907b73a74786e9f7b337836f59c049b498f0c09de8a23226b62032cff6946183",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/registry/registry/paths.js"
@@ -20695,7 +20726,7 @@
       },
       {
         "path": "packages/cli/dist/commands/atm-chart/constants.js",
-        "digest": "c6523220590a95c485289837f1bfd46c561a4448ac6bbcefe4cef37c70ced623",
+        "digest": "6d4cc76a57653980a1e3caf7813ca9a1e33708f4cc111ec8db8bf24c0aba5a7b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/atm-chart/constants.js"
@@ -21892,7 +21923,7 @@
       },
       {
         "path": "packages/cli/dist/commands/doctor/lifecycle.js",
-        "digest": "4d342096f3be3848ea894c2c85bd758e4e724d76ca4027d4493b4651c4dfcfd7",
+        "digest": "e5ae8c0fd89360530282b8b4446e78bc422a2584621c3b96d83a71f6d8d5e0d7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/doctor/lifecycle.js"
@@ -22486,7 +22517,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-attempt-boundary.js",
-        "digest": "fe6b189b6e47f08598fc81d61eb8d50a38125921077a993e664eb0c75ccde414",
+        "digest": "c98a63b37aa6611bfac7e5a44bdc2d5e5c385d80d2b7b286110904777e2a1ba4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-attempt-boundary.js"
@@ -22495,7 +22526,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-authority-scopes.js",
-        "digest": "667f42f09a97a94a77b09c3beed95aa8ee56f22d1841ab863b75afe2c7e3044a",
+        "digest": "f27a48bd9cc659393db43d5eb0a9d48c1ac1f67a0c6d6aef0b5fa84f2c63bc21",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-authority-scopes.js"
@@ -22531,7 +22562,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-command.js",
-        "digest": "d7f97888b5851d52dcce8824634528877650bcbb10dcf3f71ee8292a16450334",
+        "digest": "0b597df7ddd75a6f9abb0a3c594d4e4deba8ee37b33393fea975f1e55e1bee3f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-command.js"
@@ -22819,7 +22850,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/work-admission-check.js",
-        "digest": "d734ee8e0f75934e9b193539e61722016f4222e49aa16e2642d78ca69e6cb8e3",
+        "digest": "9840f1e682148acc8ce2629fc723015b327016f63144e2f0ac32a92a4eb61fa4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/work-admission-check.js"
@@ -23134,7 +23165,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/support.js",
-        "digest": "98a99b18679e4c5bb0022d81daeb32d23b22dc0fdc259442514b0809cc065e70",
+        "digest": "38247658712acc44915c8e7eee6242a593e35f6ece0693a578043fa6fe76b2e1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/support.js"
@@ -24268,7 +24299,7 @@
       },
       {
         "path": "packages/cli/dist/commands/shared/result-core.js",
-        "digest": "10a36efe4eebd0ccd65a94fd3ad45e3eaef4b979bf00b0473df952fbdd97cdee",
+        "digest": "5c6244801a6e3c85125896468f9e74895ce900dafc78841e7ccb09d0745fc572",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/shared/result-core.js"
@@ -25132,7 +25163,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/reconcile-orchestrator.js",
-        "digest": "704e0ee536771a57fdb1acb7b4660481ee0ececacfdeb7b79d71b96d2fe55fda",
+        "digest": "5e50e78bc21d8c4ae82cec3b5b71d5f4abf2ad30b11d95101b923ac413c94cf4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/reconcile-orchestrator.js"
@@ -26256,6 +26287,204 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/templates/root-drop/.atm/charter/atm-first-principles.template.md",
+        "digest": "03c82a6f51f80b2cc7cbfd3858c9b6847e5f208c22b565aab06b598be06063ab",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/charter/atm-first-principles.template.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/charter/atomic-charter.template.md",
+        "digest": "c6ce90dd3382732448b761a670548cdb106f6c1ff86cf137bfee4410a50eab66",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/charter/atomic-charter.template.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/charter/charter-invariants.template.json",
+        "digest": "074299348a494f055a611c63d35e98322bca40fa97b1d903031251dd627ae495",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/charter/charter-invariants.template.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/context/INITIAL_SUMMARY.md",
+        "digest": "035fe90907994e5eb4d6a9ff4122cb5e8d57adc465114f6ccfe16fe3e758bd2c",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/context/INITIAL_SUMMARY.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/profile/default.md",
+        "digest": "b8a8fa9b2431e15e0fa6b12acdf89fce3fd6c14c53cd9b9b798a455c2badbef3",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/profile/default.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/WRAPPER_DEDUP_PLAN.md",
+        "digest": "2131ec4299d6cc645139e80bbb962a34e17a29be3c5b7037dc0ed92c959dadfc",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/WRAPPER_DEDUP_PLAN.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-create.ps1",
+        "digest": "1b9888b5fb751d89be3fd1efe2717840b07b06ec7fcc2ba29d2da356bfa297d9",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-create.ps1"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-evidence.ps1",
+        "digest": "5e8c43639a099153f1c12601c1bee9aae66d567d98575a3a68ef057e8659091c",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-evidence.ps1"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-handoff.ps1",
+        "digest": "c8c25c412421c13504a4ab388e44f8443ce99d9125795135dc0f1296ecba4465",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-handoff.ps1"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-lock.ps1",
+        "digest": "02a0cdb4fa06c224be9593e596067e0d26e93b44d11abe523a4eb110f035a945",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-lock.ps1"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-next.ps1",
+        "digest": "6c2d554e2b7ab1c15f9f302731da24413628f4c4aa03ac03408c94da7944fa30",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-next.ps1"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-orient.ps1",
+        "digest": "fb0e565ed3f864e10fad7dc07eb9f23c54f63d47188db74793e73c4162c1f503",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-orient.ps1"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-upgrade-scan.ps1",
+        "digest": "fd8c1ea0a764ea3148511b81d373220d0d2ab4d63ad8fdc8642b01fbc32e267f",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-upgrade-scan.ps1"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-create.sh",
+        "digest": "6c0a2ce4e16c23526b5ac1bdbf755176519a026e89e95a0e790bf491f54d1cb3",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-create.sh"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-evidence.sh",
+        "digest": "85f6eef0a7ede41bb0dafb227387df9a0cfd4154bf629d4632ac7dfc05229132",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-evidence.sh"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-handoff.sh",
+        "digest": "2b29f43a3aacce0145704c45f3629d2de2ceeee3b09123a0d41bde0529cfcb9f",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-handoff.sh"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-lock.sh",
+        "digest": "6afdd9c6f52451f296ae4ef2c38b49e098d6ff7d855d80b5768014c1f0aa90f5",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-lock.sh"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-next.sh",
+        "digest": "7194a3df102f1b7d009985b9fcdc05d0e69e052813b901f235a88be422d49d63",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-next.sh"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-orient.sh",
+        "digest": "cafe8048aab4caf1f645db778b52cf47a59c41e93802428a4cbd348c1c0093fe",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-orient.sh"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-upgrade-scan.sh",
+        "digest": "774798a667e348550e908a8b751c344dabe0a8be9d03044e5feb1cd9ae711c04",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-upgrade-scan.sh"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/.atm/scripts/wrappers.json",
+        "digest": "5ac2c0b28fd685324272a852c9d65f9531f510057d3bdf753d11cc92ebe87083",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/.atm/scripts/wrappers.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/root-drop/AGENTS.md",
+        "digest": "d7a72c62a9ee0dcc75f43c4e36aab4d8994e18f134b6bf4fff92559ed9ee2258",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/root-drop/AGENTS.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/package.json",
         "digest": "24e3f74a42b81de9cd3c31ae5c1d8047589f1dc6d15ad9f05a522ad8db11991f",
         "origin": "source",
@@ -26437,7 +26666,7 @@
       },
       {
         "path": "packages/cli/src/commands/atm-chart/constants.ts",
-        "digest": "a878ac74fb8fc7fefbba2987cdd87a001484eea226a108be595d497c1ae25809",
+        "digest": "71d20d85c121b5bff69f5c448a3502a86d6ae657a990195e230a23c71db1d1eb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/atm-chart/constants.ts"
@@ -27652,7 +27881,7 @@
       },
       {
         "path": "packages/cli/src/commands/doctor/lifecycle.ts",
-        "digest": "596a4aee9b2bda9a464abade79cbb61d86ea4b4aaa64a087bb2ef41f1c1b141a",
+        "digest": "970316d97e35fe1f8a15146e5d6781301a021220aa1643d206240819d35dc5e0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/doctor/lifecycle.ts"
@@ -28363,7 +28592,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/__tests__/work-admission-check.test.ts",
-        "digest": "f17fbb5fdb16f8d52e860db4c80ee5816f634f6c673d9bf456b146ffaae55ea0",
+        "digest": "50eb605c1781753d9ac8cadd850635d7d527bd49d6c698340305afdd7f0bd8ae",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/__tests__/work-admission-check.test.ts"
@@ -28462,7 +28691,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-attempt-boundary.ts",
-        "digest": "4dc401a97380221b86b38cefe7f6c3d9c45f2394ae11eb139e07ad779aaf8e5a",
+        "digest": "7b67c27420caa4ab1ff4627da3f8934bed13d56ac0fce0d58f274c5c38833b2f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-attempt-boundary.ts"
@@ -28471,7 +28700,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.test.ts",
-        "digest": "40747f0d0e3b993a58e14d6eeaf31be2f3059e45a5085b193de87bb26e3b120d",
+        "digest": "00c592b380e7781ee277130f5f60217221728c0d81b85c0a4aae9474f5e1353c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.test.ts"
@@ -28480,7 +28709,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.ts",
-        "digest": "ea023b0ec765f4aa208821492dbd1b14c05756641630ff397143f1b7c1f12af3",
+        "digest": "d768e14a5e3986f7413776cb62364b691dec11f9dd4bbeec9cd0cf7e1f64dac7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-authority-scopes.ts"
@@ -28524,8 +28753,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/git-governance/implementation/commit-command.test.ts",
+        "digest": "7d6a626c4f638033bc90b80fca0798a7b452c304bdc6789c764b1f97a43fe31d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/commit-command.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
-        "digest": "f0ffee2e05d03fe0637d9eadfa643b70be8af0e36c0f77e64335662dd22b7151",
+        "digest": "8559c7372d1ed36c5fdcda957f1dc80ff28f20ba6cba69ff94e04589ca19e742",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-command.ts"
@@ -28534,7 +28772,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-execution.test.ts",
-        "digest": "89d504cdf3d05a21903dbcdcd92ed45a4aa1241bd0a711ffc8d48a2c01c8e26f",
+        "digest": "58acf960826cdaa8b1dadbf509997637a41474425cecf3102e8e0b60bbd2b80b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-execution.test.ts"
@@ -28786,7 +29024,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
-        "digest": "ea45091ffbbd14e2c6945025a5c7b3c2f2949a60fb8ac654ca50ae6a7ac6990b",
+        "digest": "bd6c1a53ed8a67a6cbb84e308f1e00c022f7f007c6821fa1845215af74d85350",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts"
@@ -28903,7 +29141,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/work-admission-check.ts",
-        "digest": "213ca9cb48dedd0360cf7c8b5a5bbccd21ed5618f9f890fdbe6aad4e775e6656",
+        "digest": "5a5a98107a52bc2400597b4615dc939e28edf226e2b3b48f9fb22d0103371293",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/work-admission-check.ts"
@@ -29280,8 +29518,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/hook/pre-commit/support.test.ts",
+        "digest": "802759f68d132e0c6ffa6ba9f31c779f6163dbf29ce3b10b3503d48376378f97",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/hook/pre-commit/support.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/hook/pre-commit/support.ts",
-        "digest": "06a194ed912afb4c206c959d12a35640fab4457e60de9447cca567e4c641955d",
+        "digest": "c956d15997e4b01eff4073c94168d7146f03dcdc4fa12c005c09a7952fa3ae06",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/support.ts"
@@ -30595,7 +30842,7 @@
       },
       {
         "path": "packages/cli/src/commands/shared/result-core.ts",
-        "digest": "a0b3abb9b8750ecee858d435b762db7800cd37f3d26b8fb5066b85bff90edf48",
+        "digest": "8a2c793bea52e0b7ee705250431e7e2efd23a92b7557bd15ef01de2145fddece",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/shared/result-core.ts"
@@ -31450,7 +31697,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
-        "digest": "aa9241de93edc7b45e25aa2f696e167731e3d6cb5b088f29a7d8ae6cfcb9ed34",
+        "digest": "29fe691fd4b98e3dc6771221fa7dde90237d8d779d119af260bc6ca3b8a84a40",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts"
@@ -32080,7 +32327,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/reconcile-orchestrator.ts",
-        "digest": "67188cdbe57fcf1dc7dc2ad03c5bc4d91484e59f0dd8116806466b24d8dce9f5",
+        "digest": "03e8615a1f1fa7085b4a16fcf387133518c244c034c321353a9c435ddb8594ea",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/reconcile-orchestrator.ts"
@@ -34951,7 +35198,7 @@
       },
       {
         "path": "packages/core/dist/git/publication-delivery-slice.js",
-        "digest": "653692f9bd4cee7ecfcdf04469d568fbf69b0819b50ad7bdd3526b358632a106",
+        "digest": "f06be8b3cf1f0c6c47d251a7979fe35222ac20184d0e982de13c0e1b162d4349",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/git/publication-delivery-slice.js"
@@ -35221,7 +35468,7 @@
       },
       {
         "path": "packages/core/dist/manager/test-runner/report-support.js",
-        "digest": "14571b08d400cb776329df9257ecaf139dfc4dd97502d3474ff5a57b7a0de5cd",
+        "digest": "7195ea35f3ee63c3b2cff96d64b6374d258991bbfe11d8a4a1cdd08d7b09a2d1",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/manager/test-runner/report-support.js"
@@ -35788,7 +36035,7 @@
       },
       {
         "path": "packages/core/dist/registry/registry/paths.js",
-        "digest": "3f3e27b594cedc9c491a12dab51f94d15914cae2f70166e201d80e0e97907597",
+        "digest": "907b73a74786e9f7b337836f59c049b498f0c09de8a23226b62032cff6946183",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/registry/registry/paths.js"
@@ -38605,7 +38852,7 @@
       },
       {
         "path": "packages/core/src/git/publication-delivery-slice.ts",
-        "digest": "ebc61177508311d5582e669b5643249fb3134bf1c93dad598abfe8abb83f3cc8",
+        "digest": "cabcdbdcb55d1b6ba626942e4043622a7b5e370f09b8795adcb0cd8a7fc689be",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/git/publication-delivery-slice.ts"
@@ -38893,7 +39140,7 @@
       },
       {
         "path": "packages/core/src/manager/test-runner/report-support.ts",
-        "digest": "95f0d0a34d2091fe8baefb665a76eea073205ad93b5fedef0dca84d5c5362aae",
+        "digest": "93ea73110a078f4e1eca17368379dbf818381ff2f1baf157849f805ada0216b9",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/manager/test-runner/report-support.ts"
@@ -39514,7 +39761,7 @@
       },
       {
         "path": "packages/core/src/registry/registry/paths.ts",
-        "digest": "a19a9a6ed97e7836299fa3e54df91b2bd6002ff87b23e0efa1e40433569204ac",
+        "digest": "0852cb8be2840c0c09579e9f2f5a846f45f1ce09b1bd676513617f2b196b16c2",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/registry/registry/paths.ts"
@@ -40531,7 +40778,7 @@
       },
       {
         "path": "packages/integrations-core/dist/compiler/compile.js",
-        "digest": "1d3d8d2095798f268250cdbec001b26ee93c40efbdfb494c09465b1b634f3e4b",
+        "digest": "3c122497e41ab3646d1f458dcbf7c8c760ff5d203eafb926c84db1c84eb8f8d8",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/dist/compiler/compile.js"
@@ -40693,7 +40940,7 @@
       },
       {
         "path": "packages/integrations-core/src/compiler/compile.ts",
-        "digest": "febad877a949e4f0aa2e0a5951e4ecd03e520724d84bf15041d787a015d1c775",
+        "digest": "cf6e73c613d0a570d9e4179aabcec23ab9223c2c8baf079169dde63a01635e06",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/src/compiler/compile.ts"
@@ -44563,7 +44810,7 @@
       },
       {
         "path": "scripts/build-package-dist.ts",
-        "digest": "c95cd7e1270225a563dd1747e6c7e475734a7492b0c6350152d0b13781fcc7ba",
+        "digest": "c21c44e6393172b42a065a7255864249728d9229798262c65ea34815cf252685",
         "origin": "source",
         "inputPaths": [
           "scripts/build-package-dist.ts"
@@ -46525,7 +46772,7 @@
       },
       {
         "path": "scripts/validate-adopter-artifact-manifest.ts",
-        "digest": "a25139763f4ed3985069a46d4ca9621f3e772e94f82aa4ff9e77bb56697f04d6",
+        "digest": "3f0971f353fd67d23f840487287a60386b76865b564e5d41268fe720f623704d",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-adopter-artifact-manifest.ts"
@@ -47569,7 +47816,7 @@
       },
       {
         "path": "scripts/validate-npm-clean-install.ts",
-        "digest": "4e3032cccae825a1586328fe7ae145cdb8f146844edcffe046f110a191728c2c",
+        "digest": "898b82220231526d3eda1dcac1699c288fa2e3e3957ad386d0dfdd2615daa0a4",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-npm-clean-install.ts"
@@ -50084,6 +50331,69 @@
         "origin": "source",
         "inputPaths": [
           "templates/skills/atm-git-pathspec-emergency-commit.skill.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+        "digest": "e0d0aa2de42dc8832cde4613dec5eb12fb13b100186494337ed87a84099fe13c",
+        "origin": "source",
+        "inputPaths": [
+          "templates/skills/atm-governance-router.files/references/boundary-confusion.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "templates/skills/atm-governance-router.files/references/entry-friction.md",
+        "digest": "c4a8dbbfc3b35a36dce9ddad0e940cdd63a0c835e476618ee513b9cec874c5ec",
+        "origin": "source",
+        "inputPaths": [
+          "templates/skills/atm-governance-router.files/references/entry-friction.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "templates/skills/atm-governance-router.files/references/fallback-design.md",
+        "digest": "8ba314d98eb87015aeee7db301c37d57425187b12567bea1611587d1c97342eb",
+        "origin": "source",
+        "inputPaths": [
+          "templates/skills/atm-governance-router.files/references/fallback-design.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "templates/skills/atm-governance-router.files/references/index.md",
+        "digest": "10b2ccdde51d59d88610ddd6121bfd929e9f4d7ee82acc3c5ade05b32e92c115",
+        "origin": "source",
+        "inputPaths": [
+          "templates/skills/atm-governance-router.files/references/index.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "templates/skills/atm-governance-router.files/references/learning-loop.md",
+        "digest": "70442b98ed5fea1a2ecc5e95dd485aa5c7db057ec0c697479df01ed7f11f8104",
+        "origin": "source",
+        "inputPaths": [
+          "templates/skills/atm-governance-router.files/references/learning-loop.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "templates/skills/atm-governance-router.files/references/route-interpretation.md",
+        "digest": "ed47ab80bbf904848621db184a35a09404312a857069bdad151f1930dab6754d",
+        "origin": "source",
+        "inputPaths": [
+          "templates/skills/atm-governance-router.files/references/route-interpretation.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
+        "digest": "c602c541280dab21b685ba114232e76b99ccc1a9669d9281d4d9926731c32315",
+        "origin": "source",
+        "inputPaths": [
+          "templates/skills/atm-governance-router.files/references/tooling-mismatch.md"
         ],
         "replaceable": true
       },
@@ -52609,7 +52919,7 @@
       },
       {
         "path": "tests/cli/npm-clean-install.test.ts",
-        "digest": "d9d6e66de35aaad239cfb844ae6a2772424485b5ac9e4f851d90b9788b61a7bb",
+        "digest": "e8ee7120ee3ab73f07510a669f1b5db2331005c303aa955482971cf0e65615a4",
         "origin": "source",
         "inputPaths": [
           "tests/cli/npm-clean-install.test.ts"
@@ -54049,7 +54359,7 @@
       },
       {
         "path": "tests/cli/root-drop-release-doctor.test.ts",
-        "digest": "e4ce2b691f746da67e29853644b614eb158911bb6182b03da0033355b0b8e599",
+        "digest": "bbcc7ac09b231189262ac67a7289d0da3754beb3e0edf2710d1956c4d443643f",
         "origin": "source",
         "inputPaths": [
           "tests/cli/root-drop-release-doctor.test.ts"
@@ -58512,7 +58822,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:6856b202d19c61e3eca0dd4f10c5d93d424cf00a66460bf137bab8bd28f2f398"
+    "treeDigest": "sha256:aee49d15d1e1d9d494b1d4840e0fb45bee90f489ce5b95a8e4ac7594a3d61b04"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -58794,6 +59104,7 @@
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
       "packages/cli/src/commands/git-governance/implementation/commit-bundle-selection.ts",
       "packages/cli/src/commands/git-governance/implementation/commit-candidate-preparation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.test.ts",
       "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
       "packages/cli/src/commands/git-governance/implementation/commit-execution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
@@ -58878,6 +59189,7 @@
       "packages/cli/src/commands/hook/pre-commit/input-state.ts",
       "packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
       "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.test.ts",
       "packages/cli/src/commands/hook/pre-commit/support.ts",
       "packages/cli/src/commands/hook/pre-commit/team-gate-findings.ts",
       "packages/cli/src/commands/hook/pre-push.ts",
@@ -59957,7 +60269,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:339704899f5fdb67cc39187c061704fc4a1e37024667ab6080768c1eb49590f4"
+    "digest": "sha256:37c7252c7d4a567fd53892bc8ee5166009da67edb04d25cd30eb3839efae25eb"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -62225,6 +62537,28 @@
       "release/atm-root-drop/packages/cli/dist/startup-known-bad.js",
       "release/atm-root-drop/packages/cli/dist/telemetry/index.js",
       "release/atm-root-drop/packages/cli/dist/temp-workspace.js",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/atm-first-principles.template.md",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/atomic-charter.template.md",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/charter-invariants.template.json",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/context/INITIAL_SUMMARY.md",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/profile/default.md",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/WRAPPER_DEDUP_PLAN.md",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-create.ps1",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-evidence.ps1",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-handoff.ps1",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-lock.ps1",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-next.ps1",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-orient.ps1",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/ps/atm-upgrade-scan.ps1",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-create.sh",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-evidence.sh",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-handoff.sh",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-lock.sh",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-next.sh",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-orient.sh",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/sh/atm-upgrade-scan.sh",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/wrappers.json",
+      "release/atm-root-drop/packages/cli/dist/templates/root-drop/AGENTS.md",
       "release/atm-root-drop/packages/cli/package.json",
       "release/atm-root-drop/packages/cli/src/atm.ts",
       "release/atm-root-drop/packages/cli/src/commands/__tests__/actor-adopt.spec.ts",
@@ -62477,6 +62811,7 @@
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-selection.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-candidate-preparation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-command.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-command.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-execution.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
@@ -62561,6 +62896,7 @@
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/input-state.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/team-gate-findings.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-push.ts",
@@ -64874,6 +65210,13 @@
       "release/atm-root-drop/templates/skills/atm-framework-quickfix.skill.md",
       "release/atm-root-drop/templates/skills/atm-framework-temp-claim.skill.md",
       "release/atm-root-drop/templates/skills/atm-git-pathspec-emergency-commit.skill.md",
+      "release/atm-root-drop/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+      "release/atm-root-drop/templates/skills/atm-governance-router.files/references/entry-friction.md",
+      "release/atm-root-drop/templates/skills/atm-governance-router.files/references/fallback-design.md",
+      "release/atm-root-drop/templates/skills/atm-governance-router.files/references/index.md",
+      "release/atm-root-drop/templates/skills/atm-governance-router.files/references/learning-loop.md",
+      "release/atm-root-drop/templates/skills/atm-governance-router.files/references/route-interpretation.md",
+      "release/atm-root-drop/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
       "release/atm-root-drop/templates/skills/atm-governance-router.skill.md",
       "release/atm-root-drop/templates/skills/atm-handoff.skill.md",
       "release/atm-root-drop/templates/skills/atm-internal-build-sync.skill.md",
@@ -65816,22 +66159,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:22b28364615b55eded7766634be51ee74c21d202b507d5f4c388bf33d441460b",
-  "sealedSourceCommit": "0b7f9d1b3935a381953a5fa196b06299be739fad",
+  "buildInputsTreeHash": "sha256:175cd89a2c4a3be6447c47e4308d8ed331c61c556097871dba74313af98a2393",
+  "sealedSourceCommit": "ece36f30dc4d847fadd7d94a063449edeb91d16e",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:06dd4feee26f28ef3cbff54ab29b97f8182b7de9ce6c7727ed148aba35cb69d5",
-  "tsBuildCacheDigest": "sha256:1973b2987179debec1cd995dd05e6e24a333d781fc090c31909bcd44162b88b4",
+  "incrementalPlanDigest": "sha256:110ba4c2f0f92f4c3c4e7f6c59d396319c01841122550fbbd00810f71131475c",
+  "tsBuildCacheDigest": "sha256:e39f76e843a091de8a255b1cb097c06daf9aae086f72d0602775acd01c2ccb9f",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 48,
-    "skipDecision": 62,
-    "worktreeSetup": 17556,
-    "typescriptBuild": 22586,
-    "rootDropReleaseAssembly": 26660,
-    "onefileReleaseAssembly": 1234,
-    "artifactSync": 5016,
+    "inputHashCalculation": 47,
+    "skipDecision": 53,
+    "worktreeSetup": 11698,
+    "typescriptBuild": 3699,
+    "rootDropReleaseAssembly": 20182,
+    "onefileReleaseAssembly": 1224,
+    "artifactSync": 19303,
     "cleanup": 0,
-    "totalElapsed": 87219
+    "totalElapsed": 77985
   }
 }

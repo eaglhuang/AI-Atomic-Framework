@@ -1,8 +1,8 @@
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolveFrameworkRoot } from '../shared.ts';
 import type { CompatibilityMatrixDocument, LegacyCompatibilityMatrixDocument } from './types.ts';
 
-export const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../../');
+export const frameworkRoot = resolveFrameworkRoot();
 export const defaultATMChartRelativePath = path.join('.atm', 'memory', 'atm-chart.md');
 export const atmChartFrontmatterSchemaVersion = 'atm.atmChart.v0.1' as const;
 export const atmChartSourceSchemas = Object.freeze({

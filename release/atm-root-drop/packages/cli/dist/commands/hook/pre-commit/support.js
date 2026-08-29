@@ -9,6 +9,7 @@ import { hasLiveFrameworkTempClaimAttribution } from './framework-temp-claim-att
 import { CliError, quoteCliValue, relativePathFrom } from '../../shared.js';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.js';
 import { isPathAllowedByScope, listActiveBatchRuns } from '../../work-channels.js';
+import { checkWorkAdmissionTicket } from '../../../_vendor/core/dist/broker/work-admission-ticket.js';
 import { buildPendingCheckpointCommitWindow } from '../../batch.js';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.js';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../../tasks/task-import-validators.js';
@@ -18,6 +19,24 @@ import { readStagedFiles } from './input-state.js';
 import { resolveCommittedTaskContext } from './committed-task-context.js';
 export const INVARIANT_TASK_AUDIT_CODES = new Set(['ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST']);
 const textFileExtensions = new Set(['.cjs', '.css', '.html', '.js', '.json', '.jsx', '.md', '.mjs', '.ps1', '.sh', '.ts', '.tsx', '.txt', '.yaml', '.yml']);
+export function hasValidTerminalRepairClosureAdmission(input) {
+    const ticket = input?.task?.workAdmissionTicket;
+    if (!ticket || ticket.origin !== 'repair-closure')
+        return false;
+    const taskOwnedAuditFiles = new Set(input.cwd
+        ? listTaskOwnedProtectedOverrideAuditFiles(input.cwd, input.taskId)
+        : []);
+    return checkWorkAdmissionTicket({
+        ticket,
+        taskId: input.taskId,
+        actorId: input.actorId,
+        laneSessionId: ticket.laneSessionId ?? null,
+        claimGeneration: ticket.claimGeneration ?? null,
+        files: (input.stagedFiles ?? []).filter((filePath) => !taskOwnedAuditFiles.has(filePath)),
+        operation: 'commit',
+        now: input.now
+    }).ok;
+}
 export function isResolutionAuthorizedCurrentTask(cwd, taskId, conflictTaskId) {
     const artifactPath = normalizeOptionalText(process.env.ATM_COMMIT_BROKER_CONFLICT_RESOLUTION);
     if (!artifactPath || !taskId)
@@ -506,7 +525,8 @@ export function inspectCommitAttribution(cwd, stagedFiles) {
     const historicalLedgerRestore = inspectHistoricalLedgerRestoreStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
     const closeCommitWindow = inspectCloseCommitWindowStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
     const pendingBatchCheckpoint = inspectPendingBatchCheckpointStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
-    const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok || pendingBatchCheckpoint.ok;
+    const terminalRepairClosure = hasValidTerminalRepairClosureAdmission({ cwd, task, taskId: effectiveTaskId, actorId, stagedFiles });
+    const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok || pendingBatchCheckpoint.ok || terminalRepairClosure;
     const claimForSession = bypassesActiveSession ? null : claim;
     const session = bypassesActiveSession && !sessionId ? null : resolveActorWorkSession(cwd, { sessionId, actorId, taskId: effectiveTaskId, claimLeaseId: claimLeaseId ?? claimForSession?.leaseId ?? null, includeNonActive: true });
     const frameworkTempClaimAttribution = hasLiveFrameworkTempClaimAttribution({ cwd, actorId, taskId: effectiveTaskId });

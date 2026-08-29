@@ -10,12 +10,11 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { renderCharterInvariantsBlock as renderCharterInvariantsBlockCore } from './charter-block.js';
 import { loadSkillTemplatesForProfile } from './skill-templates.js';
 import { selectDefaultSkillInstallProfile } from '../distribution/install-profile.js';
+import { integrationsCoreRepoRoot } from './skill-source-universe.js';
 // Private constants — inline literals so compile.ts has no import from index.ts
-const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
 const actorIdentityHandoffGatePlaceholder = '{{ACTOR_IDENTITY_HANDOFF_GATE}}';
 const actorIdentityHandoffGate = [

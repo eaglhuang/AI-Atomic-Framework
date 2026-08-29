@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-29T14-14-12-032Z-repair-claim-ff948c8a473d",
+  "taskId": "TASK-PRF-0004",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260829140401-codex-captain-TASK-PRF-0004-9e94c7d926",
+  "fromStatus": "open",
+  "toStatus": "open",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0004.json",
+  "taskSha256": "sha256:8bd15e5c3a00865c7200f932b31998e5a07bbaea76dafabf3f0841fd0139c2f7",
+  "createdAt": "2026-08-29T14:14:12.032Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0004 --actor codex-captain --write --reason \"Repair the diagnosed orphaned prior work session after its released claim; preserve the release evidence and clear only stale lifecycle linkage.\" --json"
+}

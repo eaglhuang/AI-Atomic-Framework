@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-29T15-58-23-710Z-scope-amendment-45dd3dbf1a41",
+  "taskId": "TASK-PRF-0004",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0004.json",
+  "taskSha256": "sha256:a0fba9109078e1450b20a6b7d5d62012015baf208bc43ff93180253d6033ec0d",
+  "createdAt": "2026-08-29T15:58:23.710Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0004 --actor codex-captain --add release/atm-onefile/release-manifest.json --reason \"The onefile release manifest is a deterministic generated release output paired with the already admitted onefile runner; it must be task-owned so sealed build can replace its stale provenance.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "The onefile release manifest is a deterministic generated release output paired with the already admitted onefile runner; it must be task-owned so sealed build can replace its stale provenance."
+  }
+}

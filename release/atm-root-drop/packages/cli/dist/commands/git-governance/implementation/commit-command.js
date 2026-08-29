@@ -1,5 +1,6 @@
 import { resolveCommitLaneSessionId } from './command-router.js';
 import { captureGitHeadEvidencePreparation } from './git-head-evidence-transaction.js';
+import { readWorkAdmissionTicket } from '../work-admission-check.js';
 import { actorIdEnvVar, findActorByResolvedId, resolveActorId } from "../../actor-registry.js";
 import { CliError, quoteCliValue } from "../../shared.js";
 import { prepareHookBypassRequest } from './broker-hook-bypass-preflight.js';
@@ -15,6 +16,9 @@ import { assertFrameworkCommitClaimAuthority } from './framework-commit-claim-gu
 import { assertDryRunReachedNoExecutor, resolveDryRunPurity } from './dry-run-purity.js';
 import { routeFrameworkClaimCommitBranch } from './commit-framework-branch.js';
 import { routeTaskScopedCommitBranch } from './commit-task-scoped-branch.js';
+export function permitsTerminalRepairClosureSessionBypass(ticket) {
+    return ticket?.origin === 'repair-closure';
+}
 export function runGitCommit(options) {
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
     if (!resolvedActor) {
@@ -65,9 +69,13 @@ export function runGitCommit(options) {
     const stagedCloseCommitWindow = options.taskId
         ? inspectCloseCommitWindowStagedArtifacts(options.cwd, options.taskId)
         : null;
+    const terminalRepairTicket = options.taskId
+        ? readWorkAdmissionTicket(options.cwd, options.taskId)
+        : null;
     const bypassesActiveSession = stagedMirrorSync?.ok ||
         stagedHistoricalRestore?.ok ||
         stagedCloseCommitWindow?.ok ||
+        permitsTerminalRepairClosureSessionBypass(terminalRepairTicket) ||
         Boolean(options.wip);
     const claimForTrailers = bypassesActiveSession ? null : claim;
     const session = resolveGitGovernanceSession(options.cwd, {
@@ -94,7 +102,10 @@ export function runGitCommit(options) {
             },
         });
     }
-    if (options.taskId && taskDocument && !bypassesActiveSession) {
+    // A repair-closure ticket is deliberately issued after its original claim has
+    // been released.  It bypasses the session requirement, but still needs the
+    // normal task-scoped branch to assemble a sealed preview/candidate.
+    if (options.taskId && taskDocument && (!bypassesActiveSession || permitsTerminalRepairClosureSessionBypass(terminalRepairTicket))) {
         const taskBranch = routeTaskScopedCommitBranch({ options, actorId, taskDocument, claim, claimForTrailers, session, laneSessionId });
         if (taskBranch.kind === "preview")
             return taskBranch.result;
