@@ -10,7 +10,6 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import {
   type RenderedCharterInvariants,
   renderCharterInvariantsBlock as renderCharterInvariantsBlockCore
@@ -23,11 +22,11 @@ import {
 } from './skill-templates.ts';
 import type { IntegrationSourceFile } from '../manifest/types.ts';
 import { selectDefaultSkillInstallProfile } from '../distribution/install-profile.ts';
+import { integrationsCoreRepoRoot } from './skill-source-universe.ts';
 
 export type { RenderedCharterInvariants };
 
 // Private constants — inline literals so compile.ts has no import from index.ts
-const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
 const actorIdentityHandoffGatePlaceholder = '{{ACTOR_IDENTITY_HANDOFF_GATE}}';
 const actorIdentityHandoffGate = [
