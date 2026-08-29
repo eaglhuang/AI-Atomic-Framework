@@ -1,12 +1,12 @@
 ---
-name: atm-evidence
-description: Explain missing evidence or blocked guidance before proceeding.
+name: atm-diagnostic-loop
+description: Convert a bug symptom into red reproduction, falsifiable hypotheses, regression coverage, and causal repair evidence.
 argument-hint: "<ATM context>"
 charter-invariants-injected: true
 ---
 
 
-# ATM Evidence
+# ATM Diagnostic Loop
 
 First command:
 
@@ -14,88 +14,60 @@ First command:
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
+## Purpose
+
+Use this skill when a defect, flaky behavior, dogfood failure, or field incident
+needs to become durable learning instead of a one-off patch. The goal is to
+prove the leak, map nearby joints that could leak for the same reason, add the
+right focused tests, and leave a receipt that explains why the repair is real.
+
+## Diagnostic Loop
+
+Follow this order:
+
+1. Name the exact symptom and the smallest command or fixture that reproduces
+   it.
+2. Confirm the symptom was observed. A no-crash run, broad log scrape, or
+   unrelated red failure does not admit repair.
+3. Write falsifiable hypotheses. Each hypothesis must include a predicted
+   observation and a one-variable experiment.
+4. Select the winning hypothesis only after the experiment result matches.
+5. Add or select a regression case id for the same cause family and nearby
+   failure combinations.
+6. Run green evidence for the regression case.
+7. Remove temporary instrumentation, or promote it as a maintained observability
+   seam before close.
+
 ## Route Command
 
-Use this ATM command only after the first command confirms it is the current governed route:
+Use this ATM command only after the first command confirms this specialist route:
 
 ```bash
-node atm.mjs explain --why blocked --json
+node atm.mjs evidence diagnose --task "$ARGUMENTS" --json
 ```
 
-If blocked guidance includes an `ATM_*` code, use `atm-error-code-resolver`
-for the meaning, retryability, approval requirement, and next safe action. Do
-not turn source-index context into a private remediation table here.
+The diagnostic receipt must bind: symptom, reproducer command, candidate digest,
+environment digest, reproduction rate, minimized fixture, hypotheses,
+experiment results, winning hypothesis, regression case id, green evidence, and
+temporary-instrumentation disposition.
 
-## Governance Evidence Checklist
+## Fail-Closed Rules
 
-When explaining readiness or missing evidence for a governed task, check for:
+- If the reproducer does not observe the declared symptom, stop.
+- If hypotheses are explanations without predicted observations and
+  experiments, stop.
+- If green evidence does not pass the regression case, stop.
+- If temporary instrumentation remains but is neither removed nor promoted as a
+  maintained seam, stop.
+- If an emergency or trivial compile-failure path is used, record a bounded
+  rationale with an expiry.
 
-- consumed sealed summaries;
-- missing data and assumption changes;
-- a stop rule;
-- touched shared-write gates and the `INV-ATM-008` outcome;
-- telemetry window, watermark, counters, duration/timing, source availability,
-  compact digest, and explicit unavailable receipts;
-- frozen-entry smoke evidence when runner, release, broker shared-write
-  behavior, first-layer entry behavior, skill template projection, or generated
-  integration output changed.
+## Backlog Feedback
 
-If a required signal is unavailable, say `unavailable` with the receipt or
-reason. Do not treat missing telemetry as zero latency, zero failures, or
-success.
-
-## Validation Contract Lifecycle
-
-Evidence run, auto-evidence, pre-close, write-readiness, and the advisory review
-all consume the one `evaluateValidationContract` selector. Never derive a local
-required set or recompute freshness in an adapter.
-
-When a task card declares engineering change method profile ids, carry those
-profile ids into evidence review and verify their completion evidence through
-the shared profile evaluator. Evidence may report a missing or stale method
-profile receipt, but it must not create a parallel checklist that disagrees with
-the profile source.
-
-- **Selected-case execution.** Run only the contract-selected case ids and
-  preserve each case's structured output. A shell command that exits zero
-  without executing its declared assertions is a zero-test result and fails the
-  execution contract — it is not a pass.
-- **One contract digest.** Evidence, pre-close, close packet, and pre-push must
-  thread the same validation-contract digest. A changed required set, freshness,
-  or phase owner between stages is a defect, not a refresh.
-- **Candidate freshness.** A candidate source change invalidates every TDD,
-  review, and required-case receipt whose recorded candidate digest no longer
-  matches; stale green receipts do not survive a change under them.
-- **Fail closed.** Pre-close rejects unresolved required cases, zero-test
-  results, and stale phase ownership; advisory checks stay non-blocking. A
-  missing required contract fails closed with one executable recovery manifest —
-  never a full-repository run.
-
-## Team Agents Evidence Surface
-
-When evidence or blocked guidance involves Team Agents, recognize these as
-first-class proof surfaces:
-
-- `atm.teamProviderRunArtifact.v1` proves a governed provider role run.
-- `atm.reviewAgentSignature.v1` proves formal or advisory Review Agent output.
-- `atm.teamAgentObservabilityEvent.v1` proves runtime events such as
-  `artifact.output`, `session.failure`, and `broker.conflict.blocked`.
-- `knowledge.query` is shareable advisory read access; `knowledge.index.write`
-  is coordinator-only generated cache writing.
-- `review.signature.write` is formal Review Agent authority and requires the
-  independence/quorum checks named by the task.
-
-If `decisionClass`, `decisionReason`, `requiresHumanSignoff`, `requiresAdr`,
-`violationStatus`, or `escalationTarget` appears in plan/status/start output,
-carry those fields into the evidence explanation. If `violationStatus` is
-`broker-conflict-blocked`, explain the required Broker resolution path instead
-of treating it as a warning.
-
-## Handoff
-
-```bash
-node atm.mjs handoff summarize --task "$ARGUMENTS" --json
-```
+When the fix reveals missing coverage, route the learning into the backlog as a
+cause-family test expansion: affected seam, neighboring combinations, selected
+case ids, omitted case ids with reasons, and replay command. Do not ask future
+workers to run every test; ask them to run the family selected by the receipt.
 
 ## Charter Invariants
 
@@ -130,8 +102,7 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 
 ## Guardrails
 
-- Stay inside ATM CLI routing and evidence contracts.
-- Do not create a parallel task model, registry, or approval flow.
-- Treat any planning hint as CLI output, not as template authority.
-
-Plan 4 evidence projections must preserve the sealed test-case selection, independent-oracle role separation, and explicit omitted-case reasons across every adapter; unknown mappings fail closed with an executable repair route.
+- Stay provider-neutral.
+- Do not replace the ATM bug backlog, evidence lifecycle, or TDD case-id
+  contract.
+- Do not treat a model explanation as repair evidence.

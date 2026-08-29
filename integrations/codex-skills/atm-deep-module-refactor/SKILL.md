@@ -1,103 +1,113 @@
 ---
-name: atm-evidence
-description: Explain missing evidence or blocked guidance before proceeding.
+name: atm-deep-module-refactor
+description: Review replaceable deep-module refactor candidates through a provider-neutral ATM receipt.
 argument-hint: "<ATM context>"
 charter-invariants-injected: true
 ---
 
 
-# ATM Evidence
+# ATM Deep Module Refactor
 
-First command:
+Use this skill when a task asks whether a scattered policy cluster should
+become a deeper ATM module or provider-neutral refactor card. The provider is a
+replaceable reference input. Matt Pocock's skills are cited for vocabulary and
+review heuristics, but ATM runtime authority stays in the sealed review receipt
+and task card contracts.
+
+## First Command
 
 ```bash
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
-## Route Command
+## Provider Contract
 
-Use this ATM command only after the first command confirms it is the current governed route:
+Callers submit one bounded refactor candidate plus observed friction. The
+provider returns one `atm.deepModuleReviewReport.v1` receipt. Callers do not
+copy deep-module rules into production logic.
 
-```bash
-node atm.mjs explain --why blocked --json
+Before turning the review into implementation instructions, select the
+`deep-module-refactor` engineering change method profile from
+`scripts/engineering-change-method-profiles.json` and preserve the selected
+trigger evidence, required observations, counterexamples, completion evidence,
+and rollback expectation in the review receipt. If the profile cannot be loaded,
+degrade with evidence instead of embedding a private copy of the rules here.
+
+The review uses the vocabulary `module`, `interface`, `seam`, `adapter`,
+`depth`, `leverage`, and `locality`.
+
+Actionable triggers:
+
+- repeated bugs
+- shotgun changes
+- duplicated policy
+- caller complexity
+- private-internal tests
+- missing test seams
+
+File length is advisory only. It cannot by itself require refactoring. Urgent
+fixes default to the smallest generalized repair; broader deepening becomes a
+governed follow-up unless a test seam is required for the fix.
+
+## Review Rules
+
+1. Preserve the public interface, owner atom or map, rollback path, and causal
+   validators.
+2. Apply the deletion test: if deleting the module removes little complexity,
+   the module is too shallow.
+3. Treat the interface as the test surface.
+4. Require two concrete adapters before introducing a replaceable seam.
+5. Classify dependencies as in-process, local-substitutable, remote-owned, or
+   true-external.
+6. Use replace-don't-layer tests through the proposed interface.
+
+## Progressive Disclosure
+
+Read `references/deepening.md` only when dependency classification or
+replace-don't-layer testing is the decision point.
+
+When a repository declares a module boundary policy and a supported source
+discovery adapter is available, run the module-boundary topology validator before
+promoting a deep-module refactor. If the language is unsupported, report the
+unsupported-language advisory explicitly and keep the refactor recommendation
+manual-review until an adapter exists.
+
+Read `references/design-it-twice.md` only when the user asks for alternative
+interfaces or the first proposed interface is too shallow. Do not load report
+scaffolding or broad codebase history by default.
+
+## Skill Definition
+
+```json
+{
+  "schemaId": "atm.skillDefinition.vNext",
+  "specVersion": "0.1.0",
+  "provider": {
+    "providerId": "matt-pocock-deep-module-reference",
+    "version": "2026-07-24.ed37663",
+    "provenance": {
+      "upstreamUrl": "https://github.com/mattpocock/skills",
+      "upstreamCommit": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
+      "sourceDigest": "sha256:c46b49303a81c7fc8934d0f4fbc44382cdecb73942d85d8d7db3523407fff8fa"
+    },
+    "license": "MIT"
+  },
+  "capabilities": ["deep-module-review", "refactor-provider"],
+  "compatibility": {
+    "atmContractVersions": ["atm.deepModuleRefactorProvider.v1", "atm.deepModuleReviewReport.v1"]
+  },
+  "fallbackPolicy": "degrade-with-evidence",
+  "rollbackPolicy": "provider-only",
+  "shadowRun": true,
+  "promotion": "manual-review"
+}
 ```
 
-If blocked guidance includes an `ATM_*` code, use `atm-error-code-resolver`
-for the meaning, retryability, approval requirement, and next safe action. Do
-not turn source-index context into a private remediation table here.
+Pinned secondary reference digest:
+`improve-codebase-architecture sha256:d3682058df92c259b47c36503baa02345d5811758621b5dc03081d5ba0f7b69b`.
 
-## Governance Evidence Checklist
-
-When explaining readiness or missing evidence for a governed task, check for:
-
-- consumed sealed summaries;
-- missing data and assumption changes;
-- a stop rule;
-- touched shared-write gates and the `INV-ATM-008` outcome;
-- telemetry window, watermark, counters, duration/timing, source availability,
-  compact digest, and explicit unavailable receipts;
-- frozen-entry smoke evidence when runner, release, broker shared-write
-  behavior, first-layer entry behavior, skill template projection, or generated
-  integration output changed.
-
-If a required signal is unavailable, say `unavailable` with the receipt or
-reason. Do not treat missing telemetry as zero latency, zero failures, or
-success.
-
-## Validation Contract Lifecycle
-
-Evidence run, auto-evidence, pre-close, write-readiness, and the advisory review
-all consume the one `evaluateValidationContract` selector. Never derive a local
-required set or recompute freshness in an adapter.
-
-When a task card declares engineering change method profile ids, carry those
-profile ids into evidence review and verify their completion evidence through
-the shared profile evaluator. Evidence may report a missing or stale method
-profile receipt, but it must not create a parallel checklist that disagrees with
-the profile source.
-
-- **Selected-case execution.** Run only the contract-selected case ids and
-  preserve each case's structured output. A shell command that exits zero
-  without executing its declared assertions is a zero-test result and fails the
-  execution contract — it is not a pass.
-- **One contract digest.** Evidence, pre-close, close packet, and pre-push must
-  thread the same validation-contract digest. A changed required set, freshness,
-  or phase owner between stages is a defect, not a refresh.
-- **Candidate freshness.** A candidate source change invalidates every TDD,
-  review, and required-case receipt whose recorded candidate digest no longer
-  matches; stale green receipts do not survive a change under them.
-- **Fail closed.** Pre-close rejects unresolved required cases, zero-test
-  results, and stale phase ownership; advisory checks stay non-blocking. A
-  missing required contract fails closed with one executable recovery manifest —
-  never a full-repository run.
-
-## Team Agents Evidence Surface
-
-When evidence or blocked guidance involves Team Agents, recognize these as
-first-class proof surfaces:
-
-- `atm.teamProviderRunArtifact.v1` proves a governed provider role run.
-- `atm.reviewAgentSignature.v1` proves formal or advisory Review Agent output.
-- `atm.teamAgentObservabilityEvent.v1` proves runtime events such as
-  `artifact.output`, `session.failure`, and `broker.conflict.blocked`.
-- `knowledge.query` is shareable advisory read access; `knowledge.index.write`
-  is coordinator-only generated cache writing.
-- `review.signature.write` is formal Review Agent authority and requires the
-  independence/quorum checks named by the task.
-
-If `decisionClass`, `decisionReason`, `requiresHumanSignoff`, `requiresAdr`,
-`violationStatus`, or `escalationTarget` appears in plan/status/start output,
-carry those fields into the evidence explanation. If `violationStatus` is
-`broker-conflict-blocked`, explain the required Broker resolution path instead
-of treating it as a warning.
-
-## Handoff
-
-```bash
-node atm.mjs handoff summarize --task "$ARGUMENTS" --json
-```
-
-## Charter Invariants
+Replacing this provider must not change ATM review receipt, task-card,
+test-case, claim, or close contracts.
 
 - `INV-ATM-001` ??**No second registry** (enforcement: `gate`, breaking change: yes)
   Rule: A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.
@@ -127,11 +137,3 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
   Rule: Every non-optional precondition for an ATM CLI operation must be evaluated before expensive validation, build, lock acquisition, queue admission, lease consumption, staging, or any local/cross-repository write. A failed precondition must immediately return one precise error code, the observed blocking fact, and an executable recovery command. Control-plane commands (routing, status, preflight, admission, recovery diagnosis) have a five-second response budget. Large declared test suites, builds, and external I/O are execution-plane exceptions, but must be explicitly classified before they start and expose a ticket, progress receipt, or bounded completion result. A lease, override, lock, or queue slot is consumed only after every prerequisite that can be checked without that capability has passed.
 - `INV-ATM-014` ??**Operation-owned transient artifact lifecycle** (enforcement: `doctor`, breaking change: no)
   Rule: Every governed operation owns every transient artifact it creates. Success, failure, timeout, and cancellation must either restore the exact pre-operation state or retain one durable owner-bound, digest-verifiable, resumable recovery receipt. Claim, lock, queue, lease, or capability release is forbidden while operation-created residue is unowned. Cleanup may modify only receipt-listed transient paths whose ownership and current bytes still match; user-authored source, staged foreign work, and active-owner artifacts remain fail-closed. Cleanup success never converts a failed primary operation into success.
-
-## Guardrails
-
-- Stay inside ATM CLI routing and evidence contracts.
-- Do not create a parallel task model, registry, or approval flow.
-- Treat any planning hint as CLI output, not as template authority.
-
-Plan 4 evidence projections must preserve the sealed test-case selection, independent-oracle role separation, and explicit omitted-case reasons across every adapter; unknown mappings fail closed with an executable repair route.

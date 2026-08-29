@@ -1,12 +1,19 @@
 ---
-name: atm-evidence
-description: Explain missing evidence or blocked guidance before proceeding.
+name: atm-memory-consolidate
+description: Reflective consolidation pass over a repository's keep-memory notes — merge duplicates, retire stale entries, rebuild the summary index.
 argument-hint: "<ATM context>"
 charter-invariants-injected: true
 ---
 
 
-# ATM Evidence
+# ATM Memory Consolidate
+
+Use this skill when a repository's memory-note layer (keep-memory directory)
+needs consolidation: the summary index is over budget, stale-report lists
+candidates, or a milestone closed and status notes have piled up. The target
+directory and index location come from the repository's keep registry entry
+(in the coordinating workspace: `docs/keep.registry.md`); the note contract
+lives in the keep-memory directory's README.
 
 First command:
 
@@ -14,88 +21,35 @@ First command:
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
-## Route Command
+## Phase 1 — Take stock
 
-Use this ATM command only after the first command confirms it is the current governed route:
+- Read the keep summary's memory index section and list the memory directory.
+- Run the host repository's own memory tooling for ground truth (its
+  validate and stale-report commands, if provided).
+- Mark overlapping, stale, and thin notes.
 
-```bash
-node atm.mjs explain --why blocked --json
-```
+## Phase 2 — Consolidate
 
-If blocked guidance includes an `ATM_*` code, use `atm-error-code-resolver`
-for the meaning, retryability, approval requirement, and next safe action. Do
-not turn source-index context into a private remediation table here.
+- Separate durable from dated: `gotcha`/`feedback` notes tend to be durable —
+  sharpen them; `status` snapshots expire — retire them or fold the lasting
+  takeaway into a durable note.
+- Merge notes describing the same trap or workflow; keep the richer file.
+- Convert every relative time reference into an absolute date.
+- Delete what the formal record already keeps (backlog, task cards, consensus
+  shards, git history) — memory notes carry only operator intuition.
+- Propose promotion for gotchas stable for six months or longer: list them
+  for HUMAN review as consensus-shard candidates. Never mutate the consensus
+  layer (keep-shards) from this skill.
+- Mark corrected notes `superseded` or fix them in place; never leave a known
+  false assertion active.
 
-## Governance Evidence Checklist
+## Phase 3 — Tidy the index
 
-When explaining readiness or missing evidence for a governed task, check for:
-
-- consumed sealed summaries;
-- missing data and assumption changes;
-- a stop rule;
-- touched shared-write gates and the `INV-ATM-008` outcome;
-- telemetry window, watermark, counters, duration/timing, source availability,
-  compact digest, and explicit unavailable receipts;
-- frozen-entry smoke evidence when runner, release, broker shared-write
-  behavior, first-layer entry behavior, skill template projection, or generated
-  integration output changed.
-
-If a required signal is unavailable, say `unavailable` with the receipt or
-reason. Do not treat missing telemetry as zero latency, zero failures, or
-success.
-
-## Validation Contract Lifecycle
-
-Evidence run, auto-evidence, pre-close, write-readiness, and the advisory review
-all consume the one `evaluateValidationContract` selector. Never derive a local
-required set or recompute freshness in an adapter.
-
-When a task card declares engineering change method profile ids, carry those
-profile ids into evidence review and verify their completion evidence through
-the shared profile evaluator. Evidence may report a missing or stale method
-profile receipt, but it must not create a parallel checklist that disagrees with
-the profile source.
-
-- **Selected-case execution.** Run only the contract-selected case ids and
-  preserve each case's structured output. A shell command that exits zero
-  without executing its declared assertions is a zero-test result and fails the
-  execution contract — it is not a pass.
-- **One contract digest.** Evidence, pre-close, close packet, and pre-push must
-  thread the same validation-contract digest. A changed required set, freshness,
-  or phase owner between stages is a defect, not a refresh.
-- **Candidate freshness.** A candidate source change invalidates every TDD,
-  review, and required-case receipt whose recorded candidate digest no longer
-  matches; stale green receipts do not survive a change under them.
-- **Fail closed.** Pre-close rejects unresolved required cases, zero-test
-  results, and stale phase ownership; advisory checks stay non-blocking. A
-  missing required contract fails closed with one executable recovery manifest —
-  never a full-repository run.
-
-## Team Agents Evidence Surface
-
-When evidence or blocked guidance involves Team Agents, recognize these as
-first-class proof surfaces:
-
-- `atm.teamProviderRunArtifact.v1` proves a governed provider role run.
-- `atm.reviewAgentSignature.v1` proves formal or advisory Review Agent output.
-- `atm.teamAgentObservabilityEvent.v1` proves runtime events such as
-  `artifact.output`, `session.failure`, and `broker.conflict.blocked`.
-- `knowledge.query` is shareable advisory read access; `knowledge.index.write`
-  is coordinator-only generated cache writing.
-- `review.signature.write` is formal Review Agent authority and requires the
-  independence/quorum checks named by the task.
-
-If `decisionClass`, `decisionReason`, `requiresHumanSignoff`, `requiresAdr`,
-`violationStatus`, or `escalationTarget` appears in plan/status/start output,
-carry those fields into the evidence explanation. If `violationStatus` is
-`broker-conflict-blocked`, explain the required Broker resolution path instead
-of treating it as a warning.
-
-## Handoff
-
-```bash
-node atm.mjs handoff summarize --task "$ARGUMENTS" --json
-```
+- Rebuild the index with the host repository's own tooling (its
+  rebuild-index command, if provided); confirm the index
+  section stays within its line budget.
+- Report files touched, retired, merged, and promotion candidates awaiting
+  human review.
 
 ## Charter Invariants
 
@@ -132,6 +86,6 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 
 - Stay inside ATM CLI routing and evidence contracts.
 - Do not create a parallel task model, registry, or approval flow.
-- Treat any planning hint as CLI output, not as template authority.
-
-Plan 4 evidence projections must preserve the sealed test-case selection, independent-oracle role separation, and explicit omitted-case reasons across every adapter; unknown mappings fail closed with an executable repair route.
+- Do not build a second memory store or copy notes across repositories; the
+  registry routes readers to each repository's own notes.
+- Consensus-layer promotion is always a human decision.
