@@ -51,7 +51,10 @@
     "release/atm-root-drop/release-manifest.json",
     "release/atm-root-drop/scripts/validate-breaking-changes.ts",
     "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
-    ".atm/catalog/registry/actors.json"
+    ".atm/catalog/registry/actors.json",
+    "schemas/evidence/external-benchmark-run.schema.json",
+    "scripts/fixtures/atm-external-benchmark/manifest.json",
+    "scripts/validate-external-benchmark-protocol.ts"
   ],
   "validators": [
     "node --strip-types tests/cli/external-benchmark-metrics.test.ts",
@@ -109,7 +112,7 @@
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -245,8 +248,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-29T17-46-46-842Z-scope-amendment-f7076b576ddf",
-  "lastTransitionAt": "2026-08-29T17:46:46.842Z",
+  "lastTransitionId": "2026-08-29T17-56-19-094Z-renew-e7ee0f6bdd1f",
+  "lastTransitionAt": "2026-08-29T17:56:19.094Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-27T16:54:33.813Z",
   "promotedAt": "2026-08-27T16:54:33.823Z",
@@ -254,7 +257,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-bc21db2cfe9d",
     "claimedAt": "2026-08-29T16:28:36.116Z",
-    "heartbeatAt": "2026-08-29T17:34:24.433Z",
+    "heartbeatAt": "2026-08-29T17:56:18.180Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/catalog/registry/actors.json",
@@ -277,11 +280,14 @@
       "release/atm-root-drop/release-manifest.json",
       "release/atm-root-drop/scripts/validate-breaking-changes.ts",
       "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
+      "schemas/evidence/external-benchmark-run.schema.json",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
       "scripts/lib/external-benchmark/adjudication.ts",
       "scripts/lib/external-benchmark/metrics.ts",
       "scripts/lib/external-benchmark/report.ts",
       "scripts/lib/external-benchmark/runner.ts",
       "scripts/run-atm-external-benchmark.ts",
+      "scripts/validate-external-benchmark-protocol.ts",
       "tests/cli/external-benchmark-decision.test.ts",
       "tests/cli/external-benchmark-metrics.test.ts"
     ],
@@ -298,20 +304,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-0141f3b099cda44c",
-    "ticketDigest": "sha256:0141f3b099cda44cea2f1709a9ebb11c7fd49665b983ac7460af06b0d5cda9a6",
+    "ticketId": "wat-8e8a731ba9a57965",
+    "ticketDigest": "sha256:8e8a731ba9a57965852620978fa72462923f4c9393270e74642e517ef8d738b1",
     "taskId": "TASK-PRF-0008",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260829162836-codex-captain-dace4623d3",
     "claimGeneration": "lease-bc21db2cfe9d",
-    "issuedAt": "2026-08-29T17:46:46.445Z",
-    "expiresAt": "2026-08-29T18:16:46.445Z",
-    "scopeDigest": "sha256:be5bca270dc38000d0ba67d653284312911e9db010b74d051dc9a82ffa1c8e42",
+    "issuedAt": "2026-08-29T17:56:18.180Z",
+    "expiresAt": "2026-08-29T18:26:18.180Z",
+    "scopeDigest": "sha256:507bbfb1a487ae1820b798fd2b9fb1d9611ebbde01a66f5051e42e17e499a407",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-29T17:46:46.445Z"
+      "selectedAt": "2026-08-29T17:56:18.180Z"
     },
     "grants": [
       {
@@ -319,6 +325,7 @@
         "values": [
           ".atm/catalog/registry/actors.json",
           ".atm/history/evidence/TASK-PRF-0008.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-PRF-0008/**",
           ".atm/history/tasks/TASK-PRF-0008.json",
           "docs/reports/atm-external-benchmark-decision.md",
@@ -337,15 +344,18 @@
           "release/atm-root-drop/release-manifest.json",
           "release/atm-root-drop/scripts/validate-breaking-changes.ts",
           "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
+          "schemas/evidence/external-benchmark-run.schema.json",
+          "scripts/fixtures/atm-external-benchmark/manifest.json",
           "scripts/lib/external-benchmark/adjudication.ts",
           "scripts/lib/external-benchmark/metrics.ts",
           "scripts/lib/external-benchmark/report.ts",
           "scripts/lib/external-benchmark/runner.ts",
           "scripts/run-atm-external-benchmark.ts",
+          "scripts/validate-external-benchmark-protocol.ts",
           "tests/cli/external-benchmark-decision.test.ts",
           "tests/cli/external-benchmark-metrics.test.ts"
         ],
-        "digest": "sha256:4a4c17cc9201d93fb7f6cf5a3c678dfdd56998963c0b4e184be7ffe821e25bfa"
+        "digest": "sha256:0167839b78f0b5d900475cd193bf7765b9fbf34ecbec35f986ea9723d7a8c39a"
       },
       {
         "kind": "lifecycle-operation",
@@ -369,14 +379,15 @@
       "requestedMode": "auto",
       "resolvedMode": "enabled",
       "reasons": [
-        "complex-task"
+        "complex-task",
+        "shared-surface"
       ],
       "maxSavePoints": 2,
       "perTaskByteBudget": 16777216,
       "repositoryByteBudget": 268435456,
       "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
   },
   "startedBySessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
@@ -410,11 +421,14 @@
       "release/atm-root-drop/release-manifest.json",
       "release/atm-root-drop/scripts/validate-breaking-changes.ts",
       "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
+      "schemas/evidence/external-benchmark-run.schema.json",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
       "scripts/lib/external-benchmark/adjudication.ts",
       "scripts/lib/external-benchmark/metrics.ts",
       "scripts/lib/external-benchmark/report.ts",
       "scripts/lib/external-benchmark/runner.ts",
       "scripts/run-atm-external-benchmark.ts",
+      "scripts/validate-external-benchmark-protocol.ts",
       "tests/cli/external-benchmark-decision.test.ts",
       "tests/cli/external-benchmark-metrics.test.ts"
     ],

@@ -4,7 +4,7 @@
   "title": "ATM external benchmark preregistration",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaId", "protocolVersion", "status", "sealedAt", "externalRepositories", "arms", "oracle", "counterbalancing", "metrics", "controls", "runEligibility"],
+  "required": ["schemaId", "protocolVersion", "status", "sealedAt", "externalRepositories", "arms", "oracle", "counterbalancing", "metrics", "controls", "executionPrerequisites", "runEligibility"],
   "properties": {
     "schemaId": { "const": "atm.externalBenchmarkRun.v1" },
     "protocolVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
@@ -42,6 +42,17 @@
       "minItems": 6,
       "uniqueItems": true,
       "items": { "enum": ["positive-conflict", "benign-concurrency", "semantic-conflict", "stale-base", "recovery", "negative-control"] }
+    },
+    "executionPrerequisites": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publicNpm", "hiddenCorpusAcceptance", "independentAdjudication", "providerTelemetry"],
+      "properties": {
+        "publicNpm": { "$ref": "#/$defs/executionPrerequisite" },
+        "hiddenCorpusAcceptance": { "$ref": "#/$defs/executionPrerequisite" },
+        "independentAdjudication": { "$ref": "#/$defs/executionPrerequisite" },
+        "providerTelemetry": { "$ref": "#/$defs/executionPrerequisite" }
+      }
     },
     "runEligibility": { "$ref": "#/$defs/runEligibility" }
   },
@@ -104,6 +115,15 @@
       "properties": {
         "eligible": { "type": "boolean" },
         "blockingReasons": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "executionPrerequisite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sealed", "evidenceDigest"],
+      "properties": {
+        "sealed": { "type": "boolean" },
+        "evidenceDigest": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" }
       }
     }
   }

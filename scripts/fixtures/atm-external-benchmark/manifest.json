@@ -26,10 +26,10 @@
     "atm": {
       "executionMode": "published-npm",
       "packageName": "@ai-atomic-framework/cli",
-      "packageAvailability": "unavailable",
+      "packageAvailability": "sealed",
       "workspaceLink": false,
-      "packageVersion": null,
-      "packageTarballSha256": null
+      "packageVersion": "0.1.0-beta.2",
+      "packageTarballSha256": "sha256:7d53e9c4755632ac772ffa8be0c4b32085966425e0fc4bec60184c35e37e227d"
     }
   },
   "oracle": {
@@ -55,8 +55,14 @@
     "repairTime": "raw timestamp from first failed attempt to oracle-accepted repair"
   },
   "controls": ["positive-conflict", "benign-concurrency", "semantic-conflict", "stale-base", "recovery", "negative-control"],
+  "executionPrerequisites": {
+    "publicNpm": { "sealed": true, "evidenceDigest": "sha256:7d53e9c4755632ac772ffa8be0c4b32085966425e0fc4bec60184c35e37e227d" },
+    "hiddenCorpusAcceptance": { "sealed": false, "evidenceDigest": null },
+    "independentAdjudication": { "sealed": false, "evidenceDigest": null },
+    "providerTelemetry": { "sealed": false, "evidenceDigest": null }
+  },
   "runEligibility": {
     "eligible": false,
-    "blockingReasons": ["public npm package version and tarball digest are not sealed", "independent hidden-corpus custodian has not accepted the execution packet", "raw provider cost telemetry endpoint is not sealed"]
+    "blockingReasons": ["independent hidden-corpus custodian has not accepted the execution packet", "independent adjudication destination is not sealed", "raw provider cost telemetry endpoint is not sealed"]
   }
 }

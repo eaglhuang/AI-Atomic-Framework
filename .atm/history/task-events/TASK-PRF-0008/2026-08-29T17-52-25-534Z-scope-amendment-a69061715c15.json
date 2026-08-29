@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-29T17-52-25-534Z-scope-amendment-a69061715c15",
+  "taskId": "TASK-PRF-0008",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0008.json",
+  "taskSha256": "sha256:9f10e84a35ed0ca709c0325ffc3d5f919f1d5a1fca435d0a2c9d2459e6f8e0d6",
+  "createdAt": "2026-08-29T17:52:25.534Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0008 --actor codex-captain --add \"scripts/fixtures/atm-external-benchmark/manifest.json,schemas/evidence/external-benchmark-run.schema.json,scripts/validate-external-benchmark-protocol.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -38,12 +38,18 @@ function validate(): void {
   const requiredMetrics = ['falseBlock', 'missedConflict', 'humanMinutes', 'tokens', 'billedCost', 'completion', 'retries', 'repairTime'];
   harness.assert(requiredMetrics.every((metric) => typeof manifest.metrics[metric] === 'string' && manifest.metrics[metric].length > 0), 'all product-proof metrics need executable definitions');
 
-  const canExecute = atm.packageAvailability === 'sealed' && typeof atm.packageVersion === 'string' && /^sha256:[a-f0-9]{64}$/.test(atm.packageTarballSha256 ?? '');
-  harness.assert(manifest.runEligibility.eligible === canExecute, 'run eligibility must exactly reflect the sealed public npm package state');
+  const packageSealed = atm.packageAvailability === 'sealed' && typeof atm.packageVersion === 'string' && /^sha256:[a-f0-9]{64}$/.test(atm.packageTarballSha256 ?? '');
+  const prerequisites = manifest.executionPrerequisites as Record<string, { sealed: boolean; evidenceDigest: string | null }>;
+  const missingPrerequisites = Object.entries(prerequisites)
+    .filter(([, prerequisite]) => !prerequisite.sealed || !/^sha256:[a-f0-9]{64}$/.test(prerequisite.evidenceDigest ?? ''))
+    .map(([name]) => name);
+  harness.assert(prerequisites.publicNpm.sealed === packageSealed, 'publicNpm prerequisite must exactly reflect the sealed public npm package state');
+  const canExecute = packageSealed && missingPrerequisites.length === 0;
+  harness.assert(manifest.runEligibility.eligible === canExecute, 'run eligibility must exactly reflect every sealed execution prerequisite');
   if (!canExecute) {
     harness.assert(manifest.runEligibility.blockingReasons.length > 0, 'a blocked preregistration must state blocking reasons');
   }
-  harness.ok(`status=${manifest.status} repositories=${repositories.length} execution=${canExecute ? 'eligible' : 'blocked-until-sealed-public-npm'}`);
+  harness.ok(`status=${manifest.status} repositories=${repositories.length} execution=${canExecute ? 'eligible' : `blocked:${missingPrerequisites.join(',')}`}`);
 }
 
 validate();
