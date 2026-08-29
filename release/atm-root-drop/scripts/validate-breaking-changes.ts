@@ -47,6 +47,9 @@ for (const templateVersion of matrix.agentTemplateVersions ?? []) {
 
 assert(releaseWorkflow.includes('scripts/validate-version-compatibility.ts --mode validate --release-tag "$GITHUB_REF_NAME"'), 'release workflow must validate tag/package/matrix version compatibility before publish');
 assert(releaseWorkflow.indexOf('Set npm package versions from tag') < releaseWorkflow.indexOf('Validate release version compatibility'), 'release version compatibility must run after package versions are set from tag');
+assert(releaseWorkflow.indexOf('Set npm package versions from tag') < releaseWorkflow.indexOf('Build release artifacts'), 'release artifacts must be built after tag versions are injected');
+assert(releaseWorkflow.indexOf('Set npm package versions from tag') < releaseWorkflow.indexOf('Verify npm package contents'), 'package contents must be verified after tag versions are injected');
+assert(releaseWorkflow.indexOf('Set npm package versions from tag') < releaseWorkflow.indexOf('Clean-install npx smoke (publish gate)'), 'clean-install smoke must verify the tag-versioned tarball that npm will publish');
 
 if (!process.exitCode) {
   console.log(`[breaking-changes:${mode}] ok (migration guide gate, schema version contract, release gate)`);

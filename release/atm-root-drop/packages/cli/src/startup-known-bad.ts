@@ -194,16 +194,47 @@ function parseKnownBadRange(range: string) {
   });
 }
 
-function parseSemver(version: string): [number, number, number] | null {
-  const match = version.trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?$/);
-  if (!match) return null;
-  return [Number(match[1]), Number(match[2]), Number(match[3])];
+interface ParsedSemver {
+  readonly major: number;
+  readonly minor: number;
+  readonly patch: number;
+  readonly prerelease: readonly string[] | null;
 }
 
-function compareSemver(left: [number, number, number], right: [number, number, number]): number {
-  for (let index = 0; index < 3; index += 1) {
-    if (left[index] > right[index]) return 1;
-    if (left[index] < right[index]) return -1;
+function parseSemver(version: string): ParsedSemver | null {
+  const match = version.trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?$/);
+  if (!match) return null;
+  return {
+    major: Number(match[1]),
+    minor: Number(match[2]),
+    patch: Number(match[3]),
+    prerelease: match[4] ? match[4].split('.') : null
+  };
+}
+
+function compareSemver(left: ParsedSemver, right: ParsedSemver): number {
+  for (const field of ['major', 'minor', 'patch'] as const) {
+    if (left[field] > right[field]) return 1;
+    if (left[field] < right[field]) return -1;
+  }
+
+  if (left.prerelease === null && right.prerelease === null) return 0;
+  if (left.prerelease === null) return 1;
+  if (right.prerelease === null) return -1;
+
+  const length = Math.max(left.prerelease.length, right.prerelease.length);
+  for (let index = 0; index < length; index += 1) {
+    const leftIdentifier = left.prerelease[index];
+    const rightIdentifier = right.prerelease[index];
+    if (leftIdentifier === undefined) return -1;
+    if (rightIdentifier === undefined) return 1;
+    if (leftIdentifier === rightIdentifier) continue;
+    const leftNumeric = /^\d+$/.test(leftIdentifier);
+    const rightNumeric = /^\d+$/.test(rightIdentifier);
+    if (leftNumeric && rightNumeric) return Number(leftIdentifier) - Number(rightIdentifier);
+    if (leftNumeric) return -1;
+    if (rightNumeric) return 1;
+    return leftIdentifier < rightIdentifier ? -1 : 1;
   }
   return 0;
 }

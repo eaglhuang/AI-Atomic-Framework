@@ -313,6 +313,7 @@ export function inspectRunnerPublicationDisposition(cwd: string, receiptRef?: st
   const dirtyPaths = readDirtyPaths(cwd);
   const receipts = readRunnerReceipts(cwd);
   const requested = receiptRef ? normalizeReceiptRef(receiptRef) : null;
+  const publishedSealedSourceSha = readPublishedRunnerSealedSourceSha(cwd);
   // A release transition is explicitly receipt-addressed.  Do not silently
   // fall back to directory discovery when its caller supplied one: test,
   // recovery, and alternate evidence roots are all legitimate as long as the
@@ -321,6 +322,12 @@ export function inspectRunnerPublicationDisposition(cwd: string, receiptRef?: st
   const selected = (requested
     ? readRunnerReceiptAtPath(cwd, requested)
     : null) ?? receipts.find((candidate) => {
+    // A historical receipt can name the same generated output as the current
+    // runner.  Once the release manifest binds that runner to a sealed source,
+    // path overlap alone is not authority to select older evidence.
+    if (publishedSealedSourceSha !== null && candidate.inventory.sealedSourceSha !== publishedSealedSourceSha) {
+      return false;
+    }
     const members = new Set(candidate.inventory.entries.map((entry) => entry.path));
     return dirtyPaths.some((entry) => members.has(entry));
   }) ?? null;
@@ -468,6 +475,20 @@ function readDirtyPaths(cwd: string): string[] {
 function readHeadSha(cwd: string): string {
   const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd, encoding: 'utf8' });
   return (result.status ?? 1) === 0 ? String(result.stdout ?? '').trim() : 'unknown';
+}
+
+function readPublishedRunnerSealedSourceSha(cwd: string): string | null {
+  const manifestPath = path.join(cwd, 'release', 'atm-onefile', 'release-manifest.json');
+  if (!existsSync(manifestPath)) return null;
+  try {
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as Record<string, unknown>;
+    const sealedSourceCommit = typeof manifest.sealedSourceCommit === 'string'
+      ? manifest.sealedSourceCommit.trim().toLowerCase()
+      : '';
+    return /^[a-f0-9]{40,64}$/.test(sealedSourceCommit) ? sealedSourceCommit : null;
+  } catch {
+    return null;
+  }
 }
 
 function readRunnerReceipts(cwd: string): Array<{
