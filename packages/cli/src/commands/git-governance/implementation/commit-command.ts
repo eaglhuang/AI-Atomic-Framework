@@ -1,6 +1,7 @@
 import { resolveCommitLaneSessionId } from './command-router.ts';
 import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.ts';
 import { captureGitHeadEvidencePreparation } from './git-head-evidence-transaction.ts';
+import { readWorkAdmissionTicket } from '../work-admission-check.ts';
 import { actorIdEnvVar, actorRegistryRelativePath, findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from "../../actor-registry.ts";
 import {
   classifyBlockLifecycleRecordBundle,
@@ -35,6 +36,10 @@ import { assertDryRunReachedNoExecutor, resolveDryRunPurity } from './dry-run-pu
 import { routeFrameworkClaimCommitBranch } from './commit-framework-branch.ts';
 import { routeTaskScopedCommitBranch } from './commit-task-scoped-branch.ts';
 type LegacyValue = ReturnType<typeof JSON.parse>;
+
+export function permitsTerminalRepairClosureSessionBypass(ticket: { readonly origin?: unknown } | null): boolean {
+  return ticket?.origin === 'repair-closure';
+}
 
 export function runGitCommit(options: LegacyValue) {
   const resolvedActor = resolveActorId(
@@ -124,10 +129,15 @@ const stagedCloseCommitWindow = options.taskId
     ? inspectCloseCommitWindowStagedArtifacts(options.cwd, options.taskId)
     : null;
 
+const terminalRepairTicket = options.taskId
+  ? readWorkAdmissionTicket(options.cwd, options.taskId)
+  : null;
+
 const bypassesActiveSession =
     stagedMirrorSync?.ok ||
     stagedHistoricalRestore?.ok ||
     stagedCloseCommitWindow?.ok ||
+    permitsTerminalRepairClosureSessionBypass(terminalRepairTicket) ||
     Boolean(options.wip);
 
 const claimForTrailers = bypassesActiveSession ? null : claim;
