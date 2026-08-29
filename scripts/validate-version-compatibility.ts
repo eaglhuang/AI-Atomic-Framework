@@ -28,6 +28,12 @@ function readJson(relativePath: string) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
 }
 
+function stableReleaseVersion(releaseTag: string): string | null {
+  const version = releaseTag.replace(/^v/, '');
+  const match = /^(\d+\.\d+\.\d+)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/.exec(version);
+  return match?.[1] ?? null;
+}
+
 function runAtm(args: readonly string[], cwd = root, env: Record<string, string> = {}) {
   const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd,
@@ -88,9 +94,10 @@ assert(legacyMatrix.atmChartVersions.every((entry: any) => entry.status === 'uns
 assert(legacyMatrix.atmChartVersions.some((entry: any) => entry.version === '0.0.1'), 'legacy matrix must retain the 0.0.1 unsupported chart for offline diagnostics');
 
 if (releaseTag) {
-  const expectedVersion = releaseTag.replace(/^v/, '');
-  assert(rootPackage.version === expectedVersion, `release tag ${releaseTag} must match root package version ${rootPackage.version}`);
-  assert(matrix.releaseTrain.frameworkVersion === expectedVersion, `release tag ${releaseTag} must match releaseTrain.frameworkVersion ${matrix.releaseTrain.frameworkVersion}`);
+  const expectedVersion = stableReleaseVersion(releaseTag);
+  assert(expectedVersion, `release tag ${releaseTag} must be a valid semver version`);
+  assert(rootPackage.version === expectedVersion, `release tag ${releaseTag} must share its stable version with root package version ${rootPackage.version}`);
+  assert(matrix.releaseTrain.frameworkVersion === expectedVersion, `release tag ${releaseTag} must share its stable version with releaseTrain.frameworkVersion ${matrix.releaseTrain.frameworkVersion}`);
 }
 
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-version-compat-'));

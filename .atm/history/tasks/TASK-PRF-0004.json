@@ -71,7 +71,8 @@
     "tests/cli/root-drop-release-doctor.test.ts",
     "packages/cli/src/commands/doctor/policy.ts",
     "packages/cli/src/commands/doctor/run-doctor.ts",
-    "scripts/validate-git-hooks-enforcement/context.ts"
+    "scripts/validate-git-hooks-enforcement/context.ts",
+    "scripts/validate-version-compatibility.ts"
   ],
   "validators": [
     "node --strip-types scripts/validate-package-skeleton.ts",
@@ -259,8 +260,8 @@
     "findings": []
   },
   "reopenedAt": "2026-08-28T13:31:50.235Z",
-  "lastTransitionId": "2026-08-28T23-47-33-858Z-renew-320a6b41e392",
-  "lastTransitionAt": "2026-08-28T23:47:33.858Z",
+  "lastTransitionId": "2026-08-29T00-10-59-354Z-renew-42dda8890d27",
+  "lastTransitionAt": "2026-08-29T00:10:59.354Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-08-28T13:32:12.466Z",
@@ -269,7 +270,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-922944971efb",
     "claimedAt": "2026-08-28T13:32:12.475Z",
-    "heartbeatAt": "2026-08-28T23:47:33.360Z",
+    "heartbeatAt": "2026-08-29T00:10:58.853Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0004.*",
@@ -314,6 +315,7 @@
       "scripts/validate-npm-clean-install.ts",
       "scripts/validate-package-skeleton.ts",
       "scripts/validate-release-trust.ts",
+      "scripts/validate-version-compatibility.ts",
       "tests/cli/npm-clean-install.test.ts",
       "tests/cli/root-drop-release-doctor.test.ts",
       "tests/package-skeleton.fixture.json"
@@ -331,20 +333,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-1ee1d86036c8dd28",
-    "ticketDigest": "sha256:1ee1d86036c8dd289b477ca9709922a6a54cf61d9de5c432ef4a9364f879f793",
+    "ticketId": "wat-a3b829904e35c5b8",
+    "ticketDigest": "sha256:a3b829904e35c5b80efb3047105c07bf69209d1989a319d4c3a74146d68c9e54",
     "taskId": "TASK-PRF-0004",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260827165500-codex-captain-7ef7cf210b",
     "claimGeneration": "lease-922944971efb",
-    "issuedAt": "2026-08-28T23:47:33.360Z",
-    "expiresAt": "2026-08-29T00:17:33.360Z",
-    "scopeDigest": "sha256:bfb2f266a6cdaee281f28ae641df9f1d21dadb0612c6614c6abdf38351fdfb21",
+    "issuedAt": "2026-08-29T00:10:58.853Z",
+    "expiresAt": "2026-08-29T00:40:58.853Z",
+    "scopeDigest": "sha256:93c77a2a7f565dd0b9986611a0b04f4738c456eefc05940c6b45c6411a3da3d7",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-28T23:47:33.360Z"
+      "selectedAt": "2026-08-29T00:10:58.853Z"
     },
     "grants": [
       {
@@ -393,11 +395,12 @@
           "scripts/validate-npm-clean-install.ts",
           "scripts/validate-package-skeleton.ts",
           "scripts/validate-release-trust.ts",
+          "scripts/validate-version-compatibility.ts",
           "tests/cli/npm-clean-install.test.ts",
           "tests/cli/root-drop-release-doctor.test.ts",
           "tests/package-skeleton.fixture.json"
         ],
-        "digest": "sha256:c280569f83756481093feaa8aa6ea1ce1584f12631a68f51518546a7087f5bf2"
+        "digest": "sha256:cc859b60bbcab3a11fff76aa6832613a15d723ffbf4b1b3fc10ea32adb7f56c4"
       },
       {
         "kind": "lifecycle-operation",
@@ -484,6 +487,7 @@
       "scripts/validate-npm-clean-install.ts",
       "scripts/validate-package-skeleton.ts",
       "scripts/validate-release-trust.ts",
+      "scripts/validate-version-compatibility.ts",
       "tests/cli/npm-clean-install.test.ts",
       "tests/cli/root-drop-release-doctor.test.ts",
       "tests/package-skeleton.fixture.json"
