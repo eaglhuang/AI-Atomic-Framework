@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { evaluatePhaseSuitePromotion } from '../../packages/core/src/evidence/phase-suite.ts';
 import { compileQualityAuthority, validateQualityAuthority } from '../../packages/core/src/evidence/quality-authority.ts';
 import { replayState, replayDogfoodSignals, sealReplayObservation, type ReplayDogfoodSignal } from '../../packages/core/src/evidence/state-replay.ts';
+import { loadLegacyCaseAliases, resolveLegacyCaseId } from '../../packages/core/src/evidence/test-case-catalog.ts';
 
 const root = process.cwd();
 const reportPath = join(root, 'docs', 'reports', 'plan-4-foundation-replay.json');
@@ -108,7 +109,15 @@ const authorityShard = JSON.parse(readFileSync(join(root, 'tests', 'catalog', 'g
 const incidentShard = JSON.parse(readFileSync(join(root, 'tests', 'catalog', 'groups', 'test_group_plan4_incident_replay.shard.json'), 'utf8'));
 const topologyShard = JSON.parse(readFileSync(join(root, 'tests', 'catalog', 'groups', 'test_group_plan4_foundation_topology.shard.json'), 'utf8'));
 const catalogCaseIds = [...authorityShard.cases, ...incidentShard.cases, ...topologyShard.cases].map((entry: any) => entry.caseId).sort();
-assert.deepEqual(catalogCaseIds, [...report.phaseSuite.requiredCaseIds].sort(), 'foundation phase suite must match catalog shard case ids');
+// The replay artifact is a sealed record of ATM-GOV-0336 and still names the
+// pre-migration ids. That is exactly what the shards' `legacyAliases` lineage
+// exists for: resolve through it rather than rewriting a closed card's evidence
+// or asserting against ids the catalog no longer carries.
+const foundationAliases = loadLegacyCaseAliases(root);
+const requiredCanonicalCaseIds = [...report.phaseSuite.requiredCaseIds]
+  .map((caseId: string) => resolveLegacyCaseId(caseId, foundationAliases) ?? caseId)
+  .sort();
+assert.deepEqual(catalogCaseIds, requiredCanonicalCaseIds, 'foundation phase suite must match catalog shard case ids');
 
 console.log('plan4 foundation topology: ok');
 

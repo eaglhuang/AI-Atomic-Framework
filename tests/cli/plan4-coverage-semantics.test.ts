@@ -6,6 +6,7 @@ import {
   summarizeQualityCertificate,
   validateQualityCertificate
 } from '../../packages/core/src/evidence/coverage-semantics.ts';
+import { loadLegacyCaseAliases, resolveLegacyCaseId } from '../../packages/core/src/evidence/test-case-catalog.ts';
 
 const certificate = createQualityCertificate({
   certificateId: 'cert-plan4-foundation',
@@ -92,9 +93,13 @@ assert.ok(schema.properties.claimKind.enum.includes('sufficient-under-assumption
 assert.ok(schema.properties.obligationSummary.items.properties.status.enum.includes('unsupported'));
 
 const shard = JSON.parse(readFileSync('tests/catalog/groups/test_group_plan4_coverage_semantics.shard.json', 'utf8'));
-const testCase = shard.cases.find((entry: { caseId?: string }) =>
-  entry.caseId === 'test_atm_gov_0277_model_relative_certificate_vocabulary_0d0fd68c'
-);
+// This suite is named by a closed card under its pre-migration id. Resolving
+// that id through the shard's legacyAliases lineage keeps both facts asserted:
+// the old reference still resolves, and the canonical case is really there.
+const legacyCaseId = 'test_atm_gov_0277_model_relative_certificate_vocabulary_0d0fd68c';
+const canonicalCaseId = resolveLegacyCaseId(legacyCaseId, loadLegacyCaseAliases(process.cwd()));
+assert.ok(canonicalCaseId, 'the pre-migration case id must stay resolvable through legacyAliases');
+const testCase = shard.cases.find((entry: { caseId?: string }) => entry.caseId === canonicalCaseId);
 assert.ok(testCase, 'catalog shard must include the task-required Plan 4.0 coverage semantics case');
 assert.ok(testCase.coversAcceptance.includes('ACC-5'));
 

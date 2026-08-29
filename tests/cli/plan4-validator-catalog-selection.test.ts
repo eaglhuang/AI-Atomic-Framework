@@ -142,11 +142,17 @@ assert.deepEqual(
 
 // --- the bridge works on a real shard, not just fixtures ----------------
 
+// The catalog migration moved every shard onto the canonical `cases[]` shape;
+// this bridge still read the retired `caseIds: string[]` shape and got
+// undefined, so the assertion below never ran at all. Read the shape the shards
+// actually carry, and fail loudly if a shard ever declares none.
 const shard = JSON.parse(readFileSync('tests/catalog/groups/test_group_plan4_quality_gauntlet.shard.json', 'utf8')) as {
   groupId: string;
-  caseIds: readonly string[];
+  cases: readonly { caseId: string }[];
 };
-const shardCatalog: readonly CatalogCaseEntry[] = shard.caseIds.map((caseId) => ({
+const shardCaseIds = shard.cases.map((entry) => entry.caseId);
+assert.ok(shardCaseIds.length > 0, 'the quality gauntlet shard must declare canonical case ids');
+const shardCatalog: readonly CatalogCaseEntry[] = shardCaseIds.map((caseId) => ({
   caseId,
   groupId: shard.groupId,
   command: 'node --strip-types tests/cli/plan4-quality-gauntlet.test.ts',
@@ -159,14 +165,14 @@ const shardSelection = selectValidatorCatalogEntries({
   catalog: shardCatalog,
   request: {
     taskId: 'ATM-GOV-0284',
-    requiredTestCaseIds: [...shard.caseIds],
+    requiredTestCaseIds: [...shardCaseIds],
     validatorRefs: [],
     changedPublicSeams: [],
     causalImpactEdges: []
   }
 });
 assert.equal(shardSelection.ok, true);
-assert.deepEqual(shardSelection.selected.map((entry) => entry.caseId), [...shard.caseIds].sort());
+assert.deepEqual(shardSelection.selected.map((entry) => entry.caseId), [...shardCaseIds].sort());
 assert.deepEqual(shardSelection.omitted, []);
 
 const catalogText = readFileSync('tests/catalog/groups/test_group_plan4_validator_selection.shard.json', 'utf8');
