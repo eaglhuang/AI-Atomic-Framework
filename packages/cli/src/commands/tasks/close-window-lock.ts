@@ -6,7 +6,13 @@ import { normalizeRelativePath } from './task-file-io-helpers.ts';
 import { CliError, quoteCliValue, relativePathFrom } from '../shared.ts';
 import { inspectGitIndexOwnership } from '../git-index-ownership.ts';
 import { evaluateCloseWindowStagedIndexAdmission } from './close-window-staged-index-admission.ts';
-import { classifyCloseWindowUnexpectedStaged, residueDrainCommand } from './close-window-residue-classification.ts';
+import {
+  classifyCloseWindowUnexpectedStaged,
+  residueDisclosure,
+  EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE,
+  type CloseWindowResidueDisclosure,
+  type CloseWindowResidueOwnership
+} from './close-window-residue-classification.ts';
 
 export const CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID = 'atm.closeWindowStagedIndexLock.v1';
 
@@ -18,19 +24,14 @@ export const CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID = 'atm.closeWindowStagedIn
  * its verdict. Deferral, the lease publication order, and the foreign staged
  * snapshot and restore contract are untouched.
  */
-function diagnoseUnexpectedStaged(cwd: string, unexpectedStagedFiles: readonly string[]) {
-  if (unexpectedStagedFiles.length === 0) return { provenResidueFiles: [] as readonly string[], residueDrainCommand: null as string | null };
+function diagnoseUnexpectedStaged(cwd: string, unexpectedStagedFiles: readonly string[]): CloseWindowResidueDisclosure {
+  if (unexpectedStagedFiles.length === 0) return EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE;
   try {
-    const classification = classifyCloseWindowUnexpectedStaged({ cwd, unexpectedStagedFiles });
-    const owner = classification.residueSources[0]?.receiptTaskId ?? null;
-    return {
-      provenResidueFiles: classification.provenResidueFiles,
-      residueDrainCommand: owner ? residueDrainCommand(owner) : null
-    };
+    return residueDisclosure(classifyCloseWindowUnexpectedStaged({ cwd, unexpectedStagedFiles }));
   } catch {
     // Diagnosis must never decide a close. An unreadable evidence directory
     // leaves the original foreign-staged treatment exactly as it was.
-    return { provenResidueFiles: [] as readonly string[], residueDrainCommand: null as string | null };
+    return EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE;
   }
 }
 
@@ -53,6 +54,15 @@ export interface CloseWindowStagedIndexLockRecord {
   readonly expectedStageFiles: readonly string[];
   readonly foreignStagedSnapshotPath: string | null;
   readonly foreignStagedEntries: readonly ForeignStagedIndexEntry[];
+  /**
+   * Staged paths this close proved are recorded reconciliation debt, each named
+   * with the receipt that proved it. Disclosure only: what deferral parks and
+   * restores is unchanged, and nothing here decides a close. Recording the
+   * owner per path is what makes a later cross-task authority decision
+   * expressible at all — until now the window could not tell its own receipt's
+   * residue from another card's.
+   */
+  readonly provenResidueEntries: readonly CloseWindowResidueOwnership[];
   readonly unexpectedStagedTasks: readonly CloseWindowForeignStagedTaskReport[];
   readonly releasedAt: string | null;
   readonly releaseOutcome: CloseWindowStagedIndexLockOutcome | null;
@@ -73,6 +83,9 @@ export interface CloseWindowStagedIndexLockReport {
    * clears the recorded debt instead of the defer that would recreate it.
    */
   readonly residueDrainCommand?: string | null;
+  /** One drain command per distinct receipt owner, so the set is fully recoverable. */
+  readonly residueDrainCommands?: readonly string[];
+  readonly provenResidueEntries?: readonly CloseWindowResidueOwnership[];
   readonly handoffWait?: {
     readonly waitedForTaskId: string;
     readonly waitedMs: number;
@@ -164,7 +177,10 @@ function readCloseWindowStagedIndexLock(cwd: string): CloseWindowStagedIndexLock
   try {
     const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as CloseWindowStagedIndexLockRecord;
     if (parsed?.schemaId !== CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID) return null;
-    return parsed;
+    // A record written before ownership disclosure existed carries no entries;
+    // it reads as an empty set rather than an absent field, so every consumer
+    // sees one shape.
+    return Array.isArray(parsed.provenResidueEntries) ? parsed : { ...parsed, provenResidueEntries: [] };
   } catch {
     return null;
   }
@@ -338,7 +354,8 @@ export function inspectCloseWindowStagedIndexAdmission(input: {
   return { schemaId: CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID, ok: decision.ok,
     lockPath: relativePathFrom(input.cwd, closeWindowStagedIndexLockPath(input.cwd)), lock: existing, unexpectedStagedTasks,
     foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null, blockedCode: decision.blockedCode, blockedSummary: decision.blockedSummary,
-    residueDrainCommand: diagnosis.residueDrainCommand };
+    residueDrainCommand: diagnosis.residueDrainCommand, residueDrainCommands: diagnosis.residueDrainCommands,
+    provenResidueEntries: diagnosis.provenResidueEntries };
 }
 
 export function acquireCloseWindowStagedIndexLock(input: {
@@ -401,6 +418,9 @@ export function acquireCloseWindowStagedIndexLock(input: {
       foreignStagedSnapshotPath: existing?.foreignStagedSnapshotPath ?? null,
       blockedCode: admission.blockedCode,
       blockedSummary: admission.blockedSummary,
+      residueDrainCommand: acquireDiagnosis.residueDrainCommand,
+      residueDrainCommands: acquireDiagnosis.residueDrainCommands,
+      provenResidueEntries: acquireDiagnosis.provenResidueEntries,
       handoffWait
     };
   }
@@ -416,6 +436,7 @@ export function acquireCloseWindowStagedIndexLock(input: {
     expectedStageFiles: uniqueSorted(input.expectedStageFiles),
     foreignStagedSnapshotPath: null,
     foreignStagedEntries: [],
+    provenResidueEntries: acquireDiagnosis.provenResidueEntries,
     unexpectedStagedTasks,
     releasedAt: null,
     releaseOutcome: null
@@ -445,6 +466,9 @@ export function acquireCloseWindowStagedIndexLock(input: {
     foreignStagedSnapshotPath: record.foreignStagedSnapshotPath,
     blockedCode: null,
     blockedSummary: null,
+    residueDrainCommand: acquireDiagnosis.residueDrainCommand,
+    residueDrainCommands: acquireDiagnosis.residueDrainCommands,
+    provenResidueEntries: record.provenResidueEntries,
     handoffWait
   };
 }

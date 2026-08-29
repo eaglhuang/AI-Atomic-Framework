@@ -21,6 +21,7 @@ const lock = {
   expectedStageFiles: ['governance.json'],
   foreignStagedSnapshotPath: null,
   foreignStagedEntries: [],
+  provenResidueEntries: [],
   unexpectedStagedTasks: [],
   releasedAt: null,
   releaseOutcome: null

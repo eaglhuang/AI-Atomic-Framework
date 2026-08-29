@@ -22,7 +22,9 @@ import assert from 'node:assert/strict';
 import { evaluateCloseWindowStagedIndexAdmission } from '../../packages/cli/src/commands/tasks/close-window-staged-index-admission.ts';
 import {
   classifyCloseWindowUnexpectedStaged,
-  residueDrainCommand
+  residueDisclosure,
+  residueDrainCommand,
+  residueDrainCommands
 } from '../../packages/cli/src/commands/tasks/close-window-residue-classification.ts';
 
 const DRAIN_COMMAND = residueDrainCommand('TASK-OWNER-0001');
@@ -183,6 +185,81 @@ function drainStub(drainedPaths: readonly string[]) {
     provenResidueFiles: ['src/mine.ts']
   });
   assert.equal(admission.blockedCode, 'ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED');
+}
+
+// Ownership disclosure: residue proved by several receipts must name every
+// owner. Reporting only the first told an operator to run a command that clears
+// part of the debt; the close then blocked again with an identical message, so
+// a correct instruction read as a failed one.
+{
+  const sources = [
+    { path: 'src/second.ts', receiptTaskId: 'TASK-OWNER-0002', firstUnreconciledCommit: null },
+    { path: 'src/first.ts', receiptTaskId: 'TASK-OWNER-0001', firstUnreconciledCommit: null },
+    { path: 'src/also-second.ts', receiptTaskId: 'TASK-OWNER-0002', firstUnreconciledCommit: null }
+  ];
+  const commands = residueDrainCommands(sources);
+  assert.deepEqual(commands, [residueDrainCommand('TASK-OWNER-0001'), residueDrainCommand('TASK-OWNER-0002')],
+    'each distinct receipt owner is drained on its own terms, deduplicated and ordered');
+
+  const disclosure = residueDisclosure({
+    schemaId: 'atm.closeWindowResidueClassification.v1',
+    provenResidueFiles: ['src/also-second.ts', 'src/first.ts', 'src/second.ts'],
+    residueSources: sources,
+    foreignStagedFiles: []
+  });
+  assert.deepEqual(disclosure.provenResidueEntries, [
+    { path: 'src/also-second.ts', receiptTaskId: 'TASK-OWNER-0002' },
+    { path: 'src/first.ts', receiptTaskId: 'TASK-OWNER-0001' },
+    { path: 'src/second.ts', receiptTaskId: 'TASK-OWNER-0002' }
+  ], 'every path carries the receipt that proved it');
+  assert.deepEqual(disclosure.residueDrainCommands, commands);
+  assert.equal(disclosure.residueDrainCommand, commands.join(' && '));
+  assert.ok(disclosure.residueDrainCommand?.includes('TASK-OWNER-0002'),
+    'the recovery string must not stop at the first owner');
+}
+
+// A single owner keeps the previous recovery string byte-for-byte.
+{
+  const disclosure = residueDisclosure({
+    schemaId: 'atm.closeWindowResidueClassification.v1',
+    provenResidueFiles: ['src/mine.ts'],
+    residueSources: [{ path: 'src/mine.ts', receiptTaskId: 'TASK-OWNER-0001', firstUnreconciledCommit: null }],
+    foreignStagedFiles: []
+  });
+  assert.equal(disclosure.residueDrainCommand, DRAIN_COMMAND);
+}
+
+// No residue discloses nothing and recommends nothing.
+{
+  const disclosure = residueDisclosure({
+    schemaId: 'atm.closeWindowResidueClassification.v1',
+    provenResidueFiles: [],
+    residueSources: [],
+    foreignStagedFiles: ['src/theirs.ts']
+  });
+  assert.deepEqual(disclosure.provenResidueEntries, []);
+  assert.deepEqual(disclosure.residueDrainCommands, []);
+  assert.equal(disclosure.residueDrainCommand, null);
+}
+
+// The multi-owner recovery reaches the operator through the admission summary.
+{
+  const multiOwnerCommand = residueDrainCommands([
+    { path: 'src/first.ts', receiptTaskId: 'TASK-OWNER-0001', firstUnreconciledCommit: null },
+    { path: 'src/second.ts', receiptTaskId: 'TASK-OWNER-0002', firstUnreconciledCommit: null }
+  ]).join(' && ');
+  const admission = evaluateCloseWindowStagedIndexAdmission({
+    taskId: 'TASK-CLOSING-0002',
+    activeLockTaskId: null,
+    unexpectedStagedFiles: ['src/first.ts', 'src/second.ts'],
+    unexpectedStagedTaskIds: [],
+    deferForeignStaged: false,
+    provenResidueFiles: ['src/first.ts', 'src/second.ts'],
+    residueDrainCommand: multiOwnerCommand
+  });
+  assert.equal(admission.blockedCode, 'ATM_CLOSE_WINDOW_UNRECONCILED_RESIDUE');
+  assert.ok(admission.blockedSummary?.includes('TASK-OWNER-0001'));
+  assert.ok(admission.blockedSummary?.includes('TASK-OWNER-0002'));
 }
 
 console.log('[close-window-residue-diagnosis:test] ok');

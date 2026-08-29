@@ -145,3 +145,55 @@ function classification(
 export function residueDrainCommand(receiptTaskId: string): string {
   return `node atm.mjs git reconcile-live-index --task ${receiptTaskId} --write --json`;
 }
+
+/**
+ * One path of proven residue together with the receipt that proved it.
+ *
+ * The owning task is recorded per path because residue is attributed to the
+ * task whose commit left the index behind, which need not be the task now
+ * closing, and a single staged set can carry debt from several of them.
+ */
+export interface CloseWindowResidueOwnership {
+  readonly path: string;
+  readonly receiptTaskId: string;
+}
+
+/**
+ * Every drain a residue set needs, one per distinct receipt owner.
+ *
+ * Naming only the first owner told an operator to run a command that clears
+ * part of the debt; the close then blocks again with the identical message, so
+ * the instruction reads as if it had failed. Each receipt is drained on its own
+ * terms, so the recovery is the whole set, deduplicated and ordered.
+ */
+export function residueDrainCommands(sources: readonly CloseWindowResidueSource[]): readonly string[] {
+  return [...new Set(sources.map((entry) => entry.receiptTaskId).filter(Boolean))].sort().map(residueDrainCommand);
+}
+
+export interface CloseWindowResidueDisclosure {
+  readonly provenResidueFiles: readonly string[];
+  readonly provenResidueEntries: readonly CloseWindowResidueOwnership[];
+  readonly residueDrainCommands: readonly string[];
+  /** The whole recovery as one runnable string, or null when there is none. */
+  readonly residueDrainCommand: string | null;
+}
+
+export const EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE: CloseWindowResidueDisclosure = {
+  provenResidueFiles: [],
+  provenResidueEntries: [],
+  residueDrainCommands: [],
+  residueDrainCommand: null
+};
+
+/** Reduce a classification to exactly what the close window records and reports. */
+export function residueDisclosure(classification: CloseWindowResidueClassification): CloseWindowResidueDisclosure {
+  const commands = residueDrainCommands(classification.residueSources);
+  return {
+    provenResidueFiles: classification.provenResidueFiles,
+    provenResidueEntries: classification.residueSources
+      .map((entry) => ({ path: entry.path, receiptTaskId: entry.receiptTaskId }))
+      .sort((left, right) => left.path.localeCompare(right.path) || left.receiptTaskId.localeCompare(right.receiptTaskId)),
+    residueDrainCommands: commands,
+    residueDrainCommand: commands.length > 0 ? commands.join(' && ') : null
+  };
+}
