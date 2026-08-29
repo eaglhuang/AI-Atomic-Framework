@@ -72,7 +72,9 @@
     "packages/cli/src/commands/doctor/policy.ts",
     "packages/cli/src/commands/doctor/run-doctor.ts",
     "scripts/validate-git-hooks-enforcement/context.ts",
-    "scripts/validate-version-compatibility.ts"
+    "scripts/validate-version-compatibility.ts",
+    "scripts/lib/release-version-compatibility.ts",
+    "tests/cli/release-version-compatibility.test.ts"
   ],
   "validators": [
     "node --strip-types scripts/validate-package-skeleton.ts",
@@ -260,8 +262,8 @@
     "findings": []
   },
   "reopenedAt": "2026-08-28T13:31:50.235Z",
-  "lastTransitionId": "2026-08-29T00-10-59-354Z-renew-42dda8890d27",
-  "lastTransitionAt": "2026-08-29T00:10:59.354Z",
+  "lastTransitionId": "2026-08-29T02-43-55-329Z-scope-amendment-63ab64ec745d",
+  "lastTransitionAt": "2026-08-29T02:43:55.329Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-08-28T13:32:12.466Z",
@@ -270,7 +272,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-922944971efb",
     "claimedAt": "2026-08-28T13:32:12.475Z",
-    "heartbeatAt": "2026-08-29T00:10:58.853Z",
+    "heartbeatAt": "2026-08-29T02:42:56.623Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0004.*",
@@ -311,12 +313,14 @@
       "packages/plugin-rule-guard/package.json",
       "packages/plugin-sdk/package.json",
       "scripts/build-package-dist.ts",
+      "scripts/lib/release-version-compatibility.ts",
       "scripts/validate-git-hooks-enforcement/context.ts",
       "scripts/validate-npm-clean-install.ts",
       "scripts/validate-package-skeleton.ts",
       "scripts/validate-release-trust.ts",
       "scripts/validate-version-compatibility.ts",
       "tests/cli/npm-clean-install.test.ts",
+      "tests/cli/release-version-compatibility.test.ts",
       "tests/cli/root-drop-release-doctor.test.ts",
       "tests/package-skeleton.fixture.json"
     ],
@@ -333,20 +337,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-a3b829904e35c5b8",
-    "ticketDigest": "sha256:a3b829904e35c5b80efb3047105c07bf69209d1989a319d4c3a74146d68c9e54",
+    "ticketId": "wat-37c3af90925e84b5",
+    "ticketDigest": "sha256:37c3af90925e84b5220af4dd73b5d7e80b4a6af281671ba32fe3928ec9cf3513",
     "taskId": "TASK-PRF-0004",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260827165500-codex-captain-7ef7cf210b",
     "claimGeneration": "lease-922944971efb",
-    "issuedAt": "2026-08-29T00:10:58.853Z",
-    "expiresAt": "2026-08-29T00:40:58.853Z",
-    "scopeDigest": "sha256:93c77a2a7f565dd0b9986611a0b04f4738c456eefc05940c6b45c6411a3da3d7",
+    "issuedAt": "2026-08-29T02:43:55.237Z",
+    "expiresAt": "2026-08-29T03:13:55.237Z",
+    "scopeDigest": "sha256:813d0e81904f505f86de15210c4559fd721e24e44a10d30ccaaa0d136f6f2ed6",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-29T00:10:58.853Z"
+      "selectedAt": "2026-08-29T02:43:55.237Z"
     },
     "grants": [
       {
@@ -391,16 +395,18 @@
           "packages/plugin-rule-guard/package.json",
           "packages/plugin-sdk/package.json",
           "scripts/build-package-dist.ts",
+          "scripts/lib/release-version-compatibility.ts",
           "scripts/validate-git-hooks-enforcement/context.ts",
           "scripts/validate-npm-clean-install.ts",
           "scripts/validate-package-skeleton.ts",
           "scripts/validate-release-trust.ts",
           "scripts/validate-version-compatibility.ts",
           "tests/cli/npm-clean-install.test.ts",
+          "tests/cli/release-version-compatibility.test.ts",
           "tests/cli/root-drop-release-doctor.test.ts",
           "tests/package-skeleton.fixture.json"
         ],
-        "digest": "sha256:cc859b60bbcab3a11fff76aa6832613a15d723ffbf4b1b3fc10ea32adb7f56c4"
+        "digest": "sha256:982cf42f2913ad2702aa60524f173eabc631d5ae275b715446d8f8d313b5d370"
       },
       {
         "kind": "lifecycle-operation",
@@ -483,12 +489,14 @@
       "packages/plugin-rule-guard/package.json",
       "packages/plugin-sdk/package.json",
       "scripts/build-package-dist.ts",
+      "scripts/lib/release-version-compatibility.ts",
       "scripts/validate-git-hooks-enforcement/context.ts",
       "scripts/validate-npm-clean-install.ts",
       "scripts/validate-package-skeleton.ts",
       "scripts/validate-release-trust.ts",
       "scripts/validate-version-compatibility.ts",
       "tests/cli/npm-clean-install.test.ts",
+      "tests/cli/release-version-compatibility.test.ts",
       "tests/cli/root-drop-release-doctor.test.ts",
       "tests/package-skeleton.fixture.json"
     ],

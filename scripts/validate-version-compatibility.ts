@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import { releaseVersionBase, releaseVersionSourcesAreCompatible } from './lib/release-version-compatibility.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = readArg('--mode') ?? 'validate';
@@ -26,12 +27,6 @@ function readArg(flag: string) {
 
 function readJson(relativePath: string) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
-}
-
-function stableReleaseVersion(releaseTag: string): string | null {
-  const version = releaseTag.replace(/^v/, '');
-  const match = /^(\d+\.\d+\.\d+)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/.exec(version);
-  return match?.[1] ?? null;
 }
 
 function runAtm(args: readonly string[], cwd = root, env: Record<string, string> = {}) {
@@ -82,7 +77,11 @@ assert(validateCompatibilityMatrix(legacyMatrix), `compatibility-matrix.legacy.j
 const rootPackage = readJson('package.json');
 assert(matrix.schemaVersion === 'atm.compatibilityMatrix.v0.1', 'compatibility-matrix schemaVersion must be atm.compatibilityMatrix.v0.1');
 assert(typeof matrix.lastUpdated === 'string' && matrix.lastUpdated.length > 0, 'compatibility-matrix must declare lastUpdated');
-assert(matrix.releaseTrain?.frameworkVersion === rootPackage.version, 'releaseTrain.frameworkVersion must match root package version');
+assert(releaseVersionSourcesAreCompatible({
+  releaseTag,
+  rootPackageVersion: rootPackage.version,
+  releaseTrainVersion: matrix.releaseTrain?.frameworkVersion ?? ''
+}), 'releaseTrain.frameworkVersion must match root package version');
 assert(matrix.releaseTrain?.defaultChartVersion, 'releaseTrain must declare defaultChartVersion');
 assert(matrix.releaseTrain?.defaultTemplateVersion, 'releaseTrain must declare defaultTemplateVersion');
 assert(matrix.atmChartVersions.some((entry: any) => entry.version === matrix.releaseTrain.defaultChartVersion && entry.status === 'supported'), 'default chart version must be supported');
@@ -94,10 +93,13 @@ assert(legacyMatrix.atmChartVersions.every((entry: any) => entry.status === 'uns
 assert(legacyMatrix.atmChartVersions.some((entry: any) => entry.version === '0.0.1'), 'legacy matrix must retain the 0.0.1 unsupported chart for offline diagnostics');
 
 if (releaseTag) {
-  const expectedVersion = stableReleaseVersion(releaseTag);
+  const expectedVersion = releaseVersionBase(releaseTag);
   assert(expectedVersion, `release tag ${releaseTag} must be a valid semver version`);
-  assert(rootPackage.version === expectedVersion, `release tag ${releaseTag} must share its stable version with root package version ${rootPackage.version}`);
-  assert(matrix.releaseTrain.frameworkVersion === expectedVersion, `release tag ${releaseTag} must share its stable version with releaseTrain.frameworkVersion ${matrix.releaseTrain.frameworkVersion}`);
+  assert(releaseVersionSourcesAreCompatible({
+    releaseTag,
+    rootPackageVersion: rootPackage.version,
+    releaseTrainVersion: matrix.releaseTrain.frameworkVersion
+  }), `release tag ${releaseTag} must share its stable version with root package version ${rootPackage.version}`);
 }
 
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-version-compat-'));
@@ -132,7 +134,12 @@ try {
   runAtm(['atm-chart', 'render', '--cwd', repo, '--json'], repo);
   const welcomeDryRun = runAtm(['welcome', '--cwd', repo, '--dry-run', '--json'], repo);
   assert(welcomeDryRun.exitCode === 0, 'welcome --dry-run must pass for supported versions');
-  assert(welcomeDryRun.parsed.evidence?.versions?.frameworkVersion === rootPackage.version, 'welcome --dry-run must include framework version');
+  assert(releaseVersionSourcesAreCompatible({
+    releaseTag,
+    rootPackageVersion: rootPackage.version,
+    releaseTrainVersion: matrix.releaseTrain.frameworkVersion,
+    runtimeFrameworkVersion: welcomeDryRun.parsed.evidence?.versions?.frameworkVersion ?? ''
+  }), 'welcome --dry-run must include framework version');
   assert(welcomeDryRun.parsed.evidence?.versions?.chartVersion === matrix.releaseTrain.defaultChartVersion, 'welcome --dry-run must include chart version');
   assert(welcomeDryRun.parsed.evidence?.versions?.templateVersion === matrix.releaseTrain.defaultTemplateVersion, 'welcome --dry-run must include template version');
 

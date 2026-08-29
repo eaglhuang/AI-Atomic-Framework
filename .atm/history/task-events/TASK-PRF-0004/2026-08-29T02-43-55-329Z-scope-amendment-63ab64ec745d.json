@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-29T02-43-55-329Z-scope-amendment-63ab64ec745d",
+  "taskId": "TASK-PRF-0004",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0004.json",
+  "taskSha256": "sha256:469e564ca2a63193a8ef31d6117340d2d25c0bee2b53c9b4657d8d6684f61873",
+  "createdAt": "2026-08-29T02:43:55.329Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0004 --actor codex-captain --add \"scripts/lib/release-version-compatibility.ts,tests/cli/release-version-compatibility.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
