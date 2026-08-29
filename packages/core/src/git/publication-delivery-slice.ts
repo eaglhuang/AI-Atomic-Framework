@@ -236,10 +236,38 @@ export function resolvePublicationDeliverySlice(input: {
     );
   }
 
+  const inventoryEntriesByPath = new Map(
+    validated.inventory.entries.map((entry) => [normalizePath(entry.path), entry]),
+  );
+  const retainedOwnedCurrentPaths = recoveryRetainedPaths.filter(
+    (filePath) => inventoryEntriesByPath.get(filePath)?.disposition === 'owned-current',
+  );
+  if (retainedOwnedCurrentPaths.length > 0) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID',
+      `recoveryRetainedPaths cannot suppress owned-current delivery members: ${retainedOwnedCurrentPaths.join(', ')}`,
+    );
+  }
+  const unreconciledForeignPaths = receiptDisposition === 'recovery-retained'
+    ? disposition.dirtyInventoryPaths.filter((filePath) => (
+      !recoveryRetainedPaths.includes(filePath)
+      && inventoryEntriesByPath.get(filePath)?.disposition !== 'owned-current'
+    ))
+    : [];
+  if (unreconciledForeignPaths.length > 0) {
+    return fail(
+      'ATM_GIT_COMMIT_DELIVERY_SLICE_FOREIGN_DIRTY',
+      `recovery-retained receipt leaves non-owned dirty inventory members without an explicit retention: ${unreconciledForeignPaths.join(', ')}`,
+    );
+  }
+
   const inScope = (filePath: string) =>
     input.allowedScope.some((scope) => input.pathMatchesScope(filePath, scope));
   const selectedInventoryMembers = receiptDisposition === 'recovery-retained'
-    ? disposition.dirtyInventoryPaths.filter((filePath) => recoveryRetainedPaths.includes(filePath))
+    ? disposition.dirtyInventoryPaths.filter((filePath) => (
+      !recoveryRetainedPaths.includes(filePath)
+      && inventoryEntriesByPath.get(filePath)?.disposition === 'owned-current'
+    ))
     : disposition.dirtyInventoryPaths;
   const outOfScopeMembers = selectedInventoryMembers.filter((filePath) => !inScope(filePath));
   if (outOfScopeMembers.length > 0) {

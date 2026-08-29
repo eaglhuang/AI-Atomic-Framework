@@ -21,6 +21,7 @@ function buildPublishedReceipt(input: {
   readonly outputPaths: readonly string[];
   readonly publicationDisposition?: string;
   readonly sealedSourceSha?: string;
+  readonly ownershipByPath?: Readonly<Record<string, string | null>>;
 }): Record<string, unknown> {
   const inventory = buildRunnerBuildOutputInventory({
     sealedSourceSha: input.sealedSourceSha ?? SHA,
@@ -28,7 +29,9 @@ function buildPublishedReceipt(input: {
     currentTaskId: TASK_ID,
     ownership: input.outputPaths.map((outputPath) => ({
       path: outputPath,
-      ownerTaskId: TASK_ID,
+      ownerTaskId: input.ownershipByPath && Object.hasOwn(input.ownershipByPath, outputPath)
+        ? input.ownershipByPath[outputPath]
+        : TASK_ID,
       leaseFresh: true,
     })),
   });
@@ -92,11 +95,18 @@ assert.equal(unpublished.ok, false);
 assert.equal(unpublished.code, 'ATM_GIT_COMMIT_DELIVERY_SLICE_NOT_PUBLISHED');
 
 const recoveryRetained = {
-  ...buildPublishedReceipt({ outputPaths: inventoryPaths, publicationDisposition: 'recovery-retained' }),
+  ...buildPublishedReceipt({
+    outputPaths: inventoryPaths,
+    publicationDisposition: 'recovery-retained',
+    ownershipByPath: {
+      'packages/cli/dist/gone.d.ts': null,
+    },
+  }),
   recoveryRetainedPaths: ['packages/cli/dist/gone.d.ts'],
 };
 const recoveryManifest = {
   ...manifest,
+  expectedInventoryDigest: ((recoveryRetained as Record<string, unknown>).outputInventory as { digest: string }).digest,
   expectedPublicationDisposition: 'recovery-retained',
 };
 const recoverySlice = resolvePublicationDeliverySlice({
@@ -106,14 +116,24 @@ const recoverySlice = resolvePublicationDeliverySlice({
   allowedScope: [...inventoryPaths, 'docs/reports/plan-closeback.json'],
   pathMatchesScope: pathInScope,
 });
-assert.equal(recoverySlice.ok, true);
-assert.deepEqual(recoverySlice.inventoryMembers, ['packages/cli/dist/gone.d.ts']);
-assert.ok(!recoverySlice.stageFiles.includes('packages/cli/dist/atm.d.ts'));
+assert.equal(recoverySlice.ok, true, JSON.stringify(recoverySlice));
+assert.deepEqual(recoverySlice.inventoryMembers, [
+  'packages/cli/dist/atm.d.ts',
+  'release/atm-onefile/atm.mjs',
+]);
+assert.ok(!recoverySlice.stageFiles.includes('packages/cli/dist/gone.d.ts'));
+assert.ok(recoverySlice.stageFiles.includes('packages/cli/dist/atm.d.ts'));
 assert.ok(!recoverySlice.stageFiles.includes('docs/reports/plan-closeback.json'));
 
 const recoveryWithoutPaths = resolvePublicationDeliverySlice({
   manifest: recoveryManifest,
-  receipt: buildPublishedReceipt({ outputPaths: inventoryPaths, publicationDisposition: 'recovery-retained' }),
+  receipt: buildPublishedReceipt({
+    outputPaths: inventoryPaths,
+    publicationDisposition: 'recovery-retained',
+    ownershipByPath: {
+      'packages/cli/dist/gone.d.ts': null,
+    },
+  }),
   dirtyPaths: inventoryPaths,
   allowedScope: inventoryPaths,
   pathMatchesScope: pathInScope,
