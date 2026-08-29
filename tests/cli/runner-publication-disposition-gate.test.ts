@@ -33,9 +33,16 @@ try {
 
   write('release/atm-onefile/release-manifest.json', '{}\n');
   const foreignWip = inspectRunnerPublicationDisposition(repo);
-  assert.equal(foreignWip.code, 'ATM_RUNNER_PUBLICATION_PENDING');
-  assert.equal(foreignWip.report.disposition, 'publication-pending');
+  assert.equal(foreignWip.code, 'ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE');
+  assert.equal(foreignWip.report.disposition, 'inventory-incomplete');
   assert.deepEqual(foreignWip.report.extraOutputPaths, ['release/atm-onefile/release-manifest.json']);
+
+  execFileSync('git', ['add', '.'], { cwd: repo });
+  execFileSync('git', ['-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '--quiet', '-m', 'fixture'], { cwd: repo });
+  const clean = inspectRunnerPublicationDisposition(repo);
+  assert.equal(clean.ok, true, 'a clean checkout must not inherit a historical pending receipt');
+  assert.equal(clean.receiptPath, null, 'a receipt is relevant only when it names a currently dirty runner artifact');
+  assert.equal(clean.report.disposition, 'published');
   console.log('[runner-publication-disposition-gate.test] ok');
 } finally {
   rmSync(repo, { recursive: true, force: true });
