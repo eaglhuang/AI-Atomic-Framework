@@ -5926,8 +5926,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1314,
-    "unchanged": 4577,
+    "copied": 1304,
+    "unchanged": 4587,
     "removed": 0
   },
   "buildMode": "full",
@@ -11964,7 +11964,7 @@
       },
       {
         "path": "docs/reports/atm-external-benchmark-decision.md",
-        "digest": "91416392b96b7eec70281a29b16fad091d23fb41d6e78d57c8410919a5ea9efc",
+        "digest": "879e4bc31c112aa014d927500dc52a88378f865b6c9813e3dd6b3fe3a61c9996",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-external-benchmark-decision.md"
@@ -43536,7 +43536,7 @@
       },
       {
         "path": "schemas/evidence/external-benchmark-run.schema.json",
-        "digest": "0933377cfdcc494c26dd3f2537971c3cbfe96723383055777cd97d6e1cadceb5",
+        "digest": "ca26ead0ef150d3d522be69d3db224c0344aa4888286aab8fd1aea6c57cbb343",
         "origin": "source",
         "inputPaths": [
           "schemas/evidence/external-benchmark-run.schema.json"
@@ -45597,7 +45597,7 @@
       },
       {
         "path": "scripts/fixtures/atm-external-benchmark/manifest.json",
-        "digest": "6e3bfef7a28aa90f8004a0fff59e8831bf6876c6f2f180a6468469706196e3ea",
+        "digest": "79eb68060800134c041196d5e14687fddf6a332f29ad61897be8c1195e3ec688",
         "origin": "source",
         "inputPaths": [
           "scripts/fixtures/atm-external-benchmark/manifest.json"
@@ -46263,7 +46263,7 @@
       },
       {
         "path": "scripts/lib/external-benchmark/runner.ts",
-        "digest": "c7e6eba1f1c9ecdc556b0f7431fc15581005befb9f07aa4a2ab4a876204e4060",
+        "digest": "e0c547bdb0f992dc63f5f626c302f227f294ab3eb168b21524025de9f48dbf5f",
         "origin": "source",
         "inputPaths": [
           "scripts/lib/external-benchmark/runner.ts"
@@ -47397,7 +47397,7 @@
       },
       {
         "path": "scripts/validate-external-benchmark-protocol.ts",
-        "digest": "1e7edb6e4f6118d863223fdf12e326ae3f4833d70c8bacb78c068165aa847abe",
+        "digest": "3606f66768dc1702238b8641eab5d473625ffb9c3526e03882384c4092e0cc0e",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-external-benchmark-protocol.ts"
@@ -52230,7 +52230,7 @@
       },
       {
         "path": "tests/cli/external-benchmark-decision.test.ts",
-        "digest": "543c3a3d08576b61b5711810cfd5d7a0d3fcc2ab9743fc626e8694878779c6ae",
+        "digest": "48b72c6e0dbc4c18790c6ad0e8dce3e411483529b91bda02d7b04a4fd65cd01e",
         "origin": "source",
         "inputPaths": [
           "tests/cli/external-benchmark-decision.test.ts"
@@ -58952,7 +58952,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:1a074d370e7c34426596c6a1fbb2716c558b3217299b7702ca1e1b06339671a1"
+    "treeDigest": "sha256:484e4c61213abd98628f50bdd2bd7e830194366ef8dc1d2710f3e90b895a9ede"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60410,7 +60410,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:c2747e1b81118a4ca0bc34495f353fa04dc9ee5ca9e6b105c9bd18e2bca3f949"
+    "digest": "sha256:6fe2632a9bbfa6a5c7b4e897235bd736dd7b900f90c6e8387795fcc4a81b5375"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66313,34 +66313,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:f37323e585da5b4c7704f3e508e0de1642ebe1939955a4f2c5452504cc8a040b",
-  "sealedSourceCommit": "8f72e7c61436275f7fc3f7cb0a04b8f24814661d",
-  "buildDecision": "cacheHitSkip",
-  "buildDecisionReason": "build input tree hash matches release manifests",
-  "incrementalPlanDigest": null,
-  "tsBuildCacheDigest": null,
+  "buildInputsTreeHash": "sha256:4e690a29827cc3378de904187977db9ab9667c92e1a45978fdf39e078ea6a01b",
+  "sealedSourceCommit": "4bd74d11a027f76daa9371d1c346916c913b5575",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:b9883c2f6a2c5284eecdec7dec3c8e8ebe4f341f906378d299cf99a53594a237",
+  "tsBuildCacheDigest": "sha256:d7559bcb3811dbafbedae07970d5b9b76458a2aa60ef527319df6689a9ee67d4",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 43,
-    "skipDecision": 51,
-    "worktreeSetup": 0,
-    "typescriptBuild": 0,
-    "rootDropReleaseAssembly": 0,
-    "onefileReleaseAssembly": 0,
-    "artifactSync": 0,
+    "inputHashCalculation": 44,
+    "skipDecision": 53,
+    "worktreeSetup": 12697,
+    "typescriptBuild": 8955,
+    "rootDropReleaseAssembly": 25375,
+    "onefileReleaseAssembly": 1236,
+    "artifactSync": 8351,
     "cleanup": 0,
-    "totalElapsed": 10280
-  },
-  "dominantPhaseSummary": {
-    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "skipDecision",
-    "dominantPhaseMs": 51,
-    "totalElapsedMs": 10280,
-    "dominanceRatio": 0.005,
-    "phaseMedianMs": 0,
-    "phaseP95Ms": 51,
-    "measuredPhaseCount": 8,
-    "optimizationVerdict": "inconclusive",
-    "basis": "single-run"
+    "totalElapsed": 67027
   }
 }
