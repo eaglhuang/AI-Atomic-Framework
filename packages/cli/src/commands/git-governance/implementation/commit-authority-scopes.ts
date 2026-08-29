@@ -43,18 +43,18 @@ function resolveCommitAuthorityScopes(input: LegacyValue): CommitAuthorityScopes
     ? stringScopes(rawClaim.files)
     : [];
   const ticket = input.taskDocument.workAdmissionTicket;
-  const ticketForTaskActor = ticket && typeof ticket === 'object' && !Array.isArray(ticket)
+  const ticketForTask = ticket && typeof ticket === 'object' && !Array.isArray(ticket)
     && ticket.schemaId === 'atm.workAdmissionTicket.v1'
     && ticket.taskId === input.taskId
-    && ticket.actorId === claim.actorId
       ? ticket
       : null;
-  const activeClaimTicket = ticketForTaskActor && ticketForTaskActor.claimGeneration === claim.leaseId
-    ? ticketForTaskActor
+  const activeClaimTicket = ticketForTask && ticketForTask.actorId === claim.actorId
+    && ticketForTask.claimGeneration === claim.leaseId
+    ? ticketForTask
     : null;
   const terminalClosebackTicket = claim.state === 'released'
-    && ticketForTaskActor?.origin === 'repair-closure'
-      ? ticketForTaskActor
+    && ticketForTask?.origin === 'repair-closure'
+      ? ticketForTask
       : null;
   const matchingTicket = activeClaimTicket ?? terminalClosebackTicket;
   const fileGrant = matchingTicket && Array.isArray(matchingTicket.grants)

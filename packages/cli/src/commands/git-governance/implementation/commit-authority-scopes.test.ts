@@ -35,6 +35,7 @@ assert.equal(released.evaluate('src/owned/allowed.ts').code, 'claim-not-active')
 
 const terminalClosebackTicket = {
   ...matchingTicket,
+  actorId: 'closure-steward',
   origin: 'repair-closure',
   claimGeneration: 'repair-closure:2026-08-29T14:33:19.227Z',
 };
