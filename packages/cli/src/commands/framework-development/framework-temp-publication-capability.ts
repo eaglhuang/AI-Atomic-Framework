@@ -231,6 +231,8 @@ export function frameworkTempPublicationCapabilityCovers(
 
 function toCapability(cwd: string, lock: FrameworkTempLockProjection): FrameworkTempPublicationCapability | null {
   if (!lock.heartbeatAt || lock.ttlSeconds === null) return null;
+  const receiptBound = frameworkLockClaimsRunnerReceipt(lock);
+  const receiptPath = `.atm/history/evidence/${lock.workItemId}.runner-sync-receipt.json`;
   return {
     taskId: lock.workItemId,
     actorId: lock.actorId,
@@ -242,14 +244,20 @@ function toCapability(cwd: string, lock: FrameworkTempLockProjection): Framework
     // callers cannot accidentally publish bytes without their receipt.
     allowedFiles: [
       ...lock.files.map((scope) => normalizeDirectoryScope(cwd, scope)),
-      `.atm/history/evidence/${lock.workItemId}.runner-sync-receipt.json`,
+      ...(receiptBound ? [receiptPath] : []),
       ...(lock.linkedTaskId
         ? [`.atm/history/evidence/${lock.linkedTaskId}.runner-sync-receipt.json`]
         : []),
-      ...resolveReceiptBoundGeneratedOutputPaths(cwd, lock),
+      ...(receiptBound ? resolveReceiptBoundGeneratedOutputPaths(cwd, lock) : []),
       ...resolveQueueBoundTerminalReceiptPaths(cwd, lock),
     ],
   };
+}
+
+/** A historical receipt can widen only the lock that explicitly claims it. */
+export function frameworkLockClaimsRunnerReceipt(lock: Pick<FrameworkTempLockProjection, 'workItemId' | 'files'>): boolean {
+  const receiptPath = `.atm/history/evidence/${lock.workItemId}.runner-sync-receipt.json`;
+  return lock.files.some((scope) => pathMatchesWriteScope(receiptPath, scope));
 }
 
 /**

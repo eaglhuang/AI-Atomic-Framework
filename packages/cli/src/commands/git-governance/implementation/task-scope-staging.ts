@@ -13,6 +13,7 @@ import {
   resolveGitExecutable,
   runGitCommand,
 } from './git-process-port.ts';
+import { forEachPathspecBatch } from './pathspec-argv-batching.ts';
 
 import {
   appendFileSync,
@@ -401,13 +402,28 @@ export function autoStageFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyVa
     ),
   );
   if (apply && candidates.length > 0) {
-    runGitCommand(
-      cwd,
-      ["add", "-A", "-f", "--", ...candidates],
-      ["ignore", "pipe", "pipe"],
-    );
+    stageFrameworkClaimPathspecBatches(cwd, candidates);
   }
   return candidates;
+}
+
+/**
+ * Stage a framework delivery slice without exceeding the platform argv budget.
+ *
+ * Runner publications intentionally contain hundreds of generated files.  The
+ * governed auto-stage route must preserve the same all-or-nothing candidate
+ * set while issuing several bounded Git invocations, rather than constructing
+ * one Windows-unspawnable `git add` command.
+ */
+export function stageFrameworkClaimPathspecBatches(
+  cwd: LegacyValue,
+  candidates: readonly string[],
+  invoke: (args: readonly string[]) => void = (args) => runGitCommand(cwd, args, ["ignore", "pipe", "pipe"]),
+) {
+  return forEachPathspecBatch(
+    { paths: candidates, fixedArgs: ["add", "-A", "-f", "--"] },
+    (batch) => invoke(["add", "-A", "-f", "--", ...batch]),
+  );
 }
 
 export function inspectFrameworkScopedUnstagedCommit(cwd: LegacyValue, actorId: LegacyValue, claimedFilesOverride: readonly string[] | null = null) {
