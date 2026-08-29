@@ -61,7 +61,9 @@
     "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
     "schemas/evidence/external-benchmark-run.schema.json",
     "scripts/fixtures/atm-external-benchmark/manifest.json",
-    "scripts/validate-external-benchmark-protocol.ts"
+    "scripts/validate-external-benchmark-protocol.ts",
+    "packages/core/src/spec/parse-spec.ts",
+    "scripts/validate-core-spec-parser.ts"
   ],
   "validators": [
     "node --strip-types tests/cli/external-benchmark-metrics.test.ts",
@@ -327,7 +329,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-bc21db2cfe9d",
     "claimedAt": "2026-08-29T16:28:36.116Z",
-    "heartbeatAt": "2026-08-29T17:56:18.180Z",
+    "heartbeatAt": "2026-08-29T19:27:40.386Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/catalog/registry/actors.json",
@@ -341,6 +343,7 @@
       "packages/cli/dist/startup-known-bad.js",
       "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
       "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/core/src/spec/parse-spec.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
@@ -364,6 +367,7 @@
       "scripts/lib/external-benchmark/report.ts",
       "scripts/lib/external-benchmark/runner.ts",
       "scripts/run-atm-external-benchmark.ts",
+      "scripts/validate-core-spec-parser.ts",
       "scripts/validate-external-benchmark-protocol.ts",
       "tests/cli/external-benchmark-decision.test.ts",
       "tests/cli/external-benchmark-metrics.test.ts"
@@ -399,6 +403,7 @@
       "packages/cli/dist/startup-known-bad.js",
       "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
       "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/core/src/spec/parse-spec.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
@@ -422,6 +427,7 @@
       "scripts/lib/external-benchmark/report.ts",
       "scripts/lib/external-benchmark/runner.ts",
       "scripts/run-atm-external-benchmark.ts",
+      "scripts/validate-core-spec-parser.ts",
       "scripts/validate-external-benchmark-protocol.ts",
       "tests/cli/external-benchmark-decision.test.ts",
       "tests/cli/external-benchmark-metrics.test.ts"
@@ -448,26 +454,26 @@
     "createdAt": "2026-08-29T16:28:37.957Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-08-29T18-17-21-302Z-scope-amendment-f95665edbbc9",
-  "lastTransitionAt": "2026-08-29T18:17:21.302Z",
+  "lastTransitionId": "2026-08-29T19-27-41-280Z-renew-9cbaade19c7c",
+  "lastTransitionAt": "2026-08-29T19:27:41.280Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-676ba800010d65c0",
-    "ticketDigest": "sha256:676ba800010d65c09c0209503f711670cce9d14a2320123f28c400f3d890eeab",
+    "ticketId": "wat-36d38b357e1004e5",
+    "ticketDigest": "sha256:36d38b357e1004e5d0780ccf07d4bb75b0321e6700d736b1baada3afee04bd28",
     "taskId": "TASK-PRF-0008",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260829162836-codex-captain-dace4623d3",
     "claimGeneration": "lease-bc21db2cfe9d",
-    "issuedAt": "2026-08-29T18:17:21.183Z",
-    "expiresAt": "2026-08-29T18:47:21.183Z",
-    "scopeDigest": "sha256:f31dbeb71c2fbc21540988babcbd439b322dd71fbbe4dd0d5525f901aa78b0f5",
+    "issuedAt": "2026-08-29T19:27:40.386Z",
+    "expiresAt": "2026-08-29T19:57:40.386Z",
+    "scopeDigest": "sha256:ca08dcddbb29a931b29c0c25cb8f3299b10dc1b6804e9ce32eb4395d100d8df4",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-29T18:17:21.183Z"
+      "selectedAt": "2026-08-29T19:27:40.386Z"
     },
     "grants": [
       {
@@ -484,6 +490,7 @@
           "packages/cli/dist/startup-known-bad.js",
           "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
           "packages/cli/src/commands/taskflow/write-readiness.ts",
+          "packages/core/src/spec/parse-spec.ts",
           "release/atm-onefile/atm.mjs",
           "release/atm-onefile/release-manifest.json",
           "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
@@ -507,11 +514,12 @@
           "scripts/lib/external-benchmark/report.ts",
           "scripts/lib/external-benchmark/runner.ts",
           "scripts/run-atm-external-benchmark.ts",
+          "scripts/validate-core-spec-parser.ts",
           "scripts/validate-external-benchmark-protocol.ts",
           "tests/cli/external-benchmark-decision.test.ts",
           "tests/cli/external-benchmark-metrics.test.ts"
         ],
-        "digest": "sha256:bdd203ef012ba3d80025a82713c7518b608c6c7c2349692fe1b3b6c326a436ca"
+        "digest": "sha256:d73f87a897e38a1a280cc90b551eb3e84942b39819c3f527aa9c50dbd296b834"
       },
       {
         "kind": "lifecycle-operation",
