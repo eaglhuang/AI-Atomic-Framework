@@ -156,9 +156,13 @@ export function evaluateTaskWorkAdmissionGate(input: {
   });
   return evaluateWorkAdmissionGate({
     ...input,
-    actorId: terminalRepairTicket?.actorId ?? task?.actorId ?? frameworkTemp?.actorId ?? '',
-    laneSessionId: terminalRepairTicket?.laneSessionId ?? task?.laneSessionId ?? frameworkTemp?.laneSessionId ?? null,
-    claimGeneration: terminalRepairTicket?.claimGeneration ?? task?.claimGeneration ?? (frameworkTemp?.heartbeatAt ? `framework-lock:${frameworkTemp.heartbeatAt}` : null)
+    // A terminal repair ticket is a complete identity.  In particular, its
+    // deliberate null lane must not fall back to the released claim's lane.
+    actorId: terminalRepairTicket ? terminalRepairTicket.actorId : (task?.actorId ?? frameworkTemp?.actorId ?? ''),
+    laneSessionId: terminalRepairTicket ? terminalRepairTicket.laneSessionId : (task?.laneSessionId ?? frameworkTemp?.laneSessionId ?? null),
+    claimGeneration: terminalRepairTicket
+      ? terminalRepairTicket.claimGeneration
+      : (task?.claimGeneration ?? (frameworkTemp?.heartbeatAt ? `framework-lock:${frameworkTemp.heartbeatAt}` : null))
   });
 }
 
