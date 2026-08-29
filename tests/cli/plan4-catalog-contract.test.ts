@@ -272,4 +272,74 @@ for (const file of [
   assert.ok(entries.length > 0, `${file} must retain its legacyAliases lineage`);
 }
 
+// ACC-7 — an unloadable shard fails closed and is named.
+//
+// The blind spot was never that a shard was malformed; it was that the loader
+// answered null and said nothing, so the catalog could report green over case
+// ids it had never read. Loading must therefore refuse the whole set and name
+// every offending file with its schemaId, and the reachability report must stay
+// readable while the loader refuses — a refusal is not a diagnosis.
+const unreachableRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-plan4-catalog-unreachable-'));
+const usableCase = { caseId: 'test_int_fixture_reachable_aaaaaaaa', semanticKey: 'fixture_reachable' };
+writeFileSync(path.join(unreachableRoot, 'good.shard.json'), JSON.stringify({
+  schemaId: 'atm.testCaseGroup.v1',
+  specVersion: '0.1.0',
+  groupId: 'test_group_fixture_good',
+  theme: 'Reachable fixture',
+  resourceKey: 'test-group:fixture-good',
+  maintainers: ['atm-core'],
+  cases: [usableCase]
+}, null, 2), 'utf8');
+assert.equal(loadTestCaseGroupShards(root, unreachableRoot).length, 1, 'a canonical shard must load');
+assert.deepEqual(
+  reportShardReachability(root, unreachableRoot).map((entry) => entry.unreachableReason),
+  [null],
+  'a reachable shard reports no reason'
+);
+
+writeFileSync(path.join(unreachableRoot, 'legacy-namespace.shard.json'), JSON.stringify({
+  schemaId: 'atm.testCatalogGroupShard.v1',
+  specVersion: '0.1.0',
+  groupId: 'test_group_fixture_legacy_namespace',
+  theme: 'Non-canonical schemaId fixture',
+  resourceKey: 'test-group:fixture-legacy',
+  maintainers: ['atm-core'],
+  cases: [{ caseId: 'test_int_fixture_hidden_bbbbbbbb', semanticKey: 'fixture_hidden' }]
+}, null, 2), 'utf8');
+writeFileSync(path.join(unreachableRoot, 'incomplete.shard.json'), JSON.stringify({
+  schemaId: 'atm.testCaseGroup.v1',
+  specVersion: '0.1.0',
+  groupId: 'test_group_fixture_incomplete',
+  theme: '',
+  resourceKey: '',
+  maintainers: ['atm-core'],
+  cases: [{ caseId: 'test_int_fixture_incomplete_cccccccc', semanticKey: 'fixture_incomplete' }]
+}, null, 2), 'utf8');
+
+assert.throws(
+  () => loadTestCaseGroupShards(root, unreachableRoot),
+  (error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    assert.ok(message.includes('ATM_TEST_CASE_SHARD_UNREACHABLE'), message);
+    assert.ok(message.includes('legacy-namespace.shard.json'), 'the offending file must be named');
+    assert.ok(message.includes('atm.testCatalogGroupShard.v1'), 'the rejected schemaId must be named');
+    assert.ok(message.includes('incomplete.shard.json'), 'every offender is named in one message');
+    assert.ok(/theme/.test(message) && /resourceKey/.test(message), 'the missing fields must be named');
+    return true;
+  },
+  'an unloadable shard must fail closed instead of being skipped'
+);
+
+const unreachableReport = reportShardReachability(root, unreachableRoot);
+assert.equal(unreachableReport.length, 3, 'the report must survive what the loader refuses');
+const reasons = new Map(unreachableReport.map((entry) => [entry.fileName, entry.unreachableReason]));
+assert.equal(reasons.get('good.shard.json'), null);
+assert.match(String(reasons.get('legacy-namespace.shard.json')), /not the canonical atm\.testCaseGroup\.v1/);
+assert.match(String(reasons.get('incomplete.shard.json')), /missing required field\(s\): theme, resourceKey/);
+assert.deepEqual(
+  unreachableReport.filter((entry) => !entry.reachable).map((entry) => entry.caseIds.length),
+  [1, 1],
+  'hidden case ids stay countable even when the loader refuses'
+);
+
 console.log('[plan4-catalog-contract:test] ok');
