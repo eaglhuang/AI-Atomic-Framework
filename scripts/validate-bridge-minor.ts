@@ -74,13 +74,20 @@ assert(/validate-bridge-minor\.ts --mode validate/.test(workflow), 'BRIDGE_MINOR
 // with resumable receipt"; the old indexOf returned -1 and reported a false red
 // while the ordering it guards was still correct.
 const bridgeGateStep = locateWorkflowStepByCommand(workflow, /validate-bridge-minor\.ts\s+--mode\s+validate/);
-const heavyGateStep = locateWorkflowStepByCommand(workflow, /npm run validate:(standard|full)\b/);
+const prepublishGateStep = locateWorkflowStepByCommand(workflow, /npm run validate:release-prepublish\b/);
+const fullGateStep = locateWorkflowStepByCommand(workflow, /npm run validate:full\b/);
 assert(bridgeGateStep !== null, 'BRIDGE_MINOR_WORKFLOW_GATE_STEP_MISSING', 'release workflow must contain a step running the bridge minor gate');
-assert(heavyGateStep !== null, 'BRIDGE_MINOR_WORKFLOW_HEAVY_GATE_MISSING', 'release workflow must contain a step running a validate:standard or validate:full gate');
+assert(prepublishGateStep !== null, 'BRIDGE_MINOR_WORKFLOW_PREPUBLISH_GATE_MISSING', 'release workflow must contain a step running validate:release-prepublish');
+assert(fullGateStep !== null, 'BRIDGE_MINOR_WORKFLOW_HEAVY_GATE_MISSING', 'release workflow must contain a step running a validate:full gate');
 assert(
-  bridgeGateStep !== null && heavyGateStep !== null && bridgeGateStep.index < heavyGateStep.index,
+  bridgeGateStep !== null && prepublishGateStep !== null && bridgeGateStep.index < prepublishGateStep.index,
   'BRIDGE_MINOR_WORKFLOW_ORDER_INVALID',
-  `bridge minor gate must run before the heavy validator gate (${heavyGateStep?.name ?? 'not found'})`
+  `bridge minor gate must run before the pre-publish validator gate (${prepublishGateStep?.name ?? 'not found'})`
+);
+assert(
+  prepublishGateStep !== null && fullGateStep !== null && prepublishGateStep.index < fullGateStep.index,
+  'BRIDGE_MINOR_WORKFLOW_FULL_AFTER_PREPUBLISH_INVALID',
+  'validate:full must remain a required post-publish lane after the pre-publish gate'
 );
 
 const withoutBridge = evaluateBridgeFixture(readJson('tests/bridge-minor/major-without-bridge.json'));

@@ -105,8 +105,11 @@ jobs:
           node release/atm-onefile/atm.mjs --version
           node release/atm-root-drop/atm.mjs --version
 
-      - name: Compute gate full with resumable receipt
-        run: npm run validate:full -- --run-id "release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+      - name: Seal prior package-safety evidence
+        run: node --experimental-strip-types scripts/seal-release-prepublish-evidence.ts --output .atm/runtime/release-prepublish-prior-evidence.json
+
+      - name: Compute gate release-prepublish
+        run: npm run validate:release-prepublish -- --run-id "release-prepublish-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" --prior-evidence .atm/runtime/release-prepublish-prior-evidence.json
 
       - name: Verify npm package contents
         run: npm pack --workspaces --dry-run
@@ -247,6 +250,10 @@ jobs:
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Post-publish full validation
+        if: ${{ always() && !cancelled() }}
+        run: npm run validate:full -- --run-id "release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 
       - name: Attach release artefacts to GitHub Release
         if: ${{ github.event_name != 'workflow_dispatch' }}

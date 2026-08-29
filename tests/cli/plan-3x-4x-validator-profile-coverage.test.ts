@@ -68,6 +68,7 @@ assert.match(ciWorkflow, /npm run validate:standard/);
 
 const releaseWorkflow = readText('.github/workflows/release-npm.yml');
 for (const expected of [
+  'npm run validate:release-prepublish -- --run-id',
   'npm run validate:full -- --run-id',
   'npm run validate:root-drop-release',
   'npm run validate:onefile-release',
@@ -77,6 +78,7 @@ for (const expected of [
   'release/sbom.json',
   'npm pack --workspaces --dry-run'
 ]) assert.ok(releaseWorkflow.includes(expected), `release workflow must include ${expected}`);
+assert.match(releaseWorkflow, /Post-publish full validation/);
 
 const runnerSource = readText('scripts/run-validators/implementation.ts');
 for (const contractMarker of [

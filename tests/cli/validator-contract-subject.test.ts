@@ -124,17 +124,22 @@ assert.equal(VALIDATOR_CONTRACT_SUBJECT_SCHEMA_ID, 'atm.validatorContractSubject
     '      - name: Validate bridge minor policy',
     '        run: node --strip-types scripts/validate-bridge-minor.ts --mode validate',
     '      - name: Compute gate full with resumable receipt',
-    '        run: npm run validate:full -- --run-id "x"'
+    '        run: npm run validate:full -- --run-id "x"',
+    '      - name: Compute gate release-prepublish',
+    '        run: npm run validate:release-prepublish -- --prior-evidence x.json'
   ].join('\n');
 
   const gate = locateWorkflowStepByCommand(workflow, /validate-bridge-minor\.ts\s+--mode\s+validate/);
   const heavy = locateWorkflowStepByCommand(workflow, /npm run validate:(standard|full)\b/);
+  const prepublish = locateWorkflowStepByCommand(workflow, /npm run validate:release-prepublish\b/);
   assert.equal(gate?.name, 'Validate bridge minor policy');
   assert.equal(heavy?.name, 'Compute gate full with resumable receipt', 'the renamed step must still be found by its command');
+  assert.equal(prepublish?.name, 'Compute gate release-prepublish');
   assert.ok(gate!.index < heavy!.index);
+  assert.ok(gate!.index < prepublish!.index);
 
   assert.equal(
-    locateWorkflowStepByCommand(workflow, /npm run validate:release\b/),
+    locateWorkflowStepByCommand(workflow, /npm run validate:release-absent\b/),
     null,
     'an absent gate must be null, never an index that silently satisfies an ordering check'
   );
