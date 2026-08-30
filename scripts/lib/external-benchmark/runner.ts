@@ -1,11 +1,21 @@
+import { createHash, verify } from 'node:crypto';
 import { calculateAdjudicationRates, type OracleAdjudication } from './adjudication.ts';
 import { aggregateRawRuns, type RawBenchmarkRun } from './metrics.ts';
 import { decideBenchmark, type BenchmarkDecision } from './report.ts';
 
 export interface ProtocolManifest {
+  readonly protocolVersion?: string;
+  readonly preregistrationDigest?: string;
   readonly arms: { readonly atm: { readonly packageAvailability: 'sealed' | 'unavailable'; readonly packageVersion: string | null; readonly packageTarballSha256: string | null; readonly workspaceLink: boolean } };
   readonly executionPrerequisites: Record<string, { readonly sealed: boolean; readonly evidenceDigest: string | null }>;
   readonly runEligibility: { readonly eligible: boolean; readonly blockingReasons: readonly string[] };
+}
+
+export interface ExternalPrerequisiteArtifacts {
+  readonly hiddenCorpusAcceptance?: unknown;
+  readonly independentAdjudication?: unknown;
+  readonly providerTelemetry?: unknown;
+  readonly providerRawExport?: Uint8Array;
 }
 
 const REQUIRED_EXECUTION_PREREQUISITES = [
@@ -15,7 +25,88 @@ const REQUIRED_EXECUTION_PREREQUISITES = [
   'providerTelemetry'
 ] as const;
 
-export function executeExternalBenchmark(protocol: ProtocolManifest, runs: readonly RawBenchmarkRun[], adjudications: readonly OracleAdjudication[]): BenchmarkDecision {
+const SHA256 = /^sha256:[a-f0-9]{64}$/;
+
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, child]) => `${JSON.stringify(key)}:${stableJson(child)}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function sha256Json(value: unknown): string {
+  return `sha256:${createHash('sha256').update(stableJson(value)).digest('hex')}`;
+}
+
+export function computePreregistrationDigest(protocol: ProtocolManifest): string {
+  const { preregistrationDigest: _preregistrationDigest, executionPrerequisites: _executionPrerequisites, runEligibility: _runEligibility, ...sealedProtocol } = protocol as unknown as Record<string, unknown>;
+  return sha256Json(sealedProtocol);
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
+}
+
+function verifyDetachedSignature(record: Record<string, unknown>): boolean {
+  const signature = typeof record.signature === 'string' ? record.signature : null;
+  const publicKeyPem = typeof record.publicKeyPem === 'string' ? record.publicKeyPem : null;
+  if (!signature || !publicKeyPem) return false;
+  const { signature: _signature, publicKeyPem: _publicKeyPem, ...payload } = record;
+  try {
+    return verify(null, Buffer.from(stableJson(payload)), publicKeyPem, Buffer.from(signature, 'base64'));
+  } catch {
+    return false;
+  }
+}
+
+function verifyArtifact(
+  name: string,
+  value: unknown,
+  expected: { readonly schemaId: string; readonly signerRole: string; readonly digest: string | null },
+  protocol: ProtocolManifest
+): string | null {
+  const record = asRecord(value);
+  if (!record) return `${name} artifact is missing or not a JSON object`;
+  if (record.schemaId !== expected.schemaId) return `${name} artifact schemaId is invalid`;
+  if (record.signerRole !== expected.signerRole) return `${name} artifact signer role is invalid`;
+  if (!protocol.protocolVersion || record.protocolVersion !== protocol.protocolVersion) return `${name} artifact protocol version does not match preregistration`;
+  if (!protocol.preregistrationDigest || record.protocolDigest !== protocol.preregistrationDigest) return `${name} artifact protocol digest does not match preregistration`;
+  if (!SHA256.test(expected.digest ?? '') || sha256Json(record) !== expected.digest) return `${name} artifact digest does not match sealed evidence`;
+  if (!verifyDetachedSignature(record)) return `${name} artifact detached signature is invalid`;
+  return null;
+}
+
+export function verifyExternalPrerequisites(protocol: ProtocolManifest, artifacts: ExternalPrerequisiteArtifacts | undefined): readonly string[] {
+  if (!artifacts) return ['verified external prerequisite artifacts are required'];
+  const checks: Array<[string, unknown, { readonly schemaId: string; readonly signerRole: string; readonly digest: string | null }]> = [
+    ['hidden corpus acceptance', artifacts.hiddenCorpusAcceptance, { schemaId: 'atm.hiddenCorpusAcceptance.v1', signerRole: 'hidden-corpus-custodian', digest: protocol.executionPrerequisites.hiddenCorpusAcceptance?.evidenceDigest ?? null }],
+    ['independent adjudication', artifacts.independentAdjudication, { schemaId: 'atm.adjudicationManifest.v1', signerRole: 'independent-adjudicator', digest: protocol.executionPrerequisites.independentAdjudication?.evidenceDigest ?? null }],
+    ['provider telemetry', artifacts.providerTelemetry, { schemaId: 'atm.providerCostTelemetry.v1', signerRole: 'provider-telemetry', digest: protocol.executionPrerequisites.providerTelemetry?.evidenceDigest ?? null }]
+  ];
+  const reasons = checks.map(([name, value, expected]) => verifyArtifact(name, value, expected, protocol)).filter((reason): reason is string => reason !== null);
+  const telemetry = asRecord(artifacts.providerTelemetry);
+  const hiddenCorpusAcceptance = asRecord(artifacts.hiddenCorpusAcceptance);
+  const independentAdjudication = asRecord(artifacts.independentAdjudication);
+  const signerIds = [hiddenCorpusAcceptance?.signerId, independentAdjudication?.signerId, telemetry?.signerId];
+  if (signerIds.some((signerId) => typeof signerId !== 'string' || signerId.length === 0)) {
+    reasons.push('external prerequisite artifacts must each name a signer identity');
+  } else if (new Set(signerIds).size !== signerIds.length) {
+    reasons.push('hidden corpus, adjudication, and provider telemetry artifacts must have distinct signer identities');
+  }
+  if (independentAdjudication?.hiddenCorpusOwner !== hiddenCorpusAcceptance?.signerId) {
+    reasons.push('independent adjudication must bind to the hidden-corpus custodian signer identity');
+  }
+  const rawExportDigest = typeof telemetry?.rawExportSha256 === 'string' ? telemetry.rawExportSha256 : null;
+  const observedRawExportDigest = artifacts.providerRawExport ? `sha256:${createHash('sha256').update(artifacts.providerRawExport).digest('hex')}` : null;
+  if (!SHA256.test(rawExportDigest ?? '') || rawExportDigest !== observedRawExportDigest) reasons.push('provider telemetry raw export digest does not match the supplied original export');
+  return reasons;
+}
+
+export function executeExternalBenchmark(protocol: ProtocolManifest, runs: readonly RawBenchmarkRun[], adjudications: readonly OracleAdjudication[], artifacts?: ExternalPrerequisiteArtifacts): BenchmarkDecision {
   const packageSealed = protocol.arms.atm.packageAvailability === 'sealed' && protocol.arms.atm.packageVersion !== null && protocol.arms.atm.packageTarballSha256 !== null && protocol.arms.atm.workspaceLink === false;
   const missingPrerequisites = REQUIRED_EXECUTION_PREREQUISITES.filter((name) => {
     const prerequisite = protocol.executionPrerequisites[name];
@@ -24,6 +115,8 @@ export function executeExternalBenchmark(protocol: ProtocolManifest, runs: reado
   if (!protocol.runEligibility.eligible || !packageSealed || missingPrerequisites.length > 0) {
     return decideBenchmark({ eligible: false, blockingReasons: protocol.runEligibility.blockingReasons.length ? protocol.runEligibility.blockingReasons : missingPrerequisites.length ? missingPrerequisites : ['published ATM package is not sealed'] , rounds: [] });
   }
+  const prerequisiteFailures = verifyExternalPrerequisites(protocol, artifacts);
+  if (prerequisiteFailures.length > 0) return decideBenchmark({ eligible: false, blockingReasons: prerequisiteFailures, rounds: [] });
   const baseline = aggregateRawRuns(runs, 'baseline');
   const atm = aggregateRawRuns(runs, 'atm');
   const baselineSafety = calculateAdjudicationRates(adjudications, 'baseline');

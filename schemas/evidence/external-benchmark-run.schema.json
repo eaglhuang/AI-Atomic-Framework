@@ -4,10 +4,11 @@
   "title": "ATM external benchmark preregistration",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaId", "protocolVersion", "status", "sealedAt", "externalRepositories", "arms", "oracle", "counterbalancing", "metrics", "controls", "executionPrerequisites", "runEligibility"],
+  "required": ["schemaId", "protocolVersion", "preregistrationDigest", "status", "sealedAt", "externalRepositories", "arms", "oracle", "counterbalancing", "metrics", "controls", "executionPrerequisites", "runEligibility"],
   "properties": {
     "schemaId": { "const": "atm.externalBenchmarkRun.v1" },
     "protocolVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "preregistrationDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
     "status": { "const": "preregistered" },
     "sealedAt": { "type": "string", "format": "date-time" },
     "externalRepositories": {

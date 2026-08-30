@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createValidator } from './lib/validator-harness.ts';
+import { computePreregistrationDigest, type ProtocolManifest } from './lib/external-benchmark/runner.ts';
 
 const harness = createValidator('external-benchmark-protocol', { argv: process.argv.slice(2), defaultMode: 'validate' });
 const manifestFlag = process.argv.indexOf('--manifest');
@@ -14,8 +15,14 @@ function validate(): void {
   harness.requireFile('schemas/evidence/external-benchmark-run.schema.json');
   const absoluteManifestPath = path.isAbsolute(manifestPath) ? manifestPath : harness.repoPath(manifestPath);
   const manifest = JSON.parse(readFileSync(absoluteManifestPath, 'utf8')) as Record<string, any>;
+  const expectedPreregistrationDigest = computePreregistrationDigest(manifest as ProtocolManifest);
+  if (process.argv.includes('--print-preregistration-digest')) {
+    process.stdout.write(`${expectedPreregistrationDigest}\n`);
+    return;
+  }
   const schemaValidator = harness.loadSchemaValidator('schemas/evidence/external-benchmark-run.schema.json');
   if (!schemaValidator(manifest)) failSchema((schemaValidator as any).errors);
+  harness.assert(manifest.preregistrationDigest === expectedPreregistrationDigest, 'preregistration digest must bind every immutable protocol field while excluding mutable execution seals');
 
   const repositories = manifest.externalRepositories as Array<Record<string, unknown>>;
   harness.assert(new Set(repositories.map((repository) => repository.repositoryUrl)).size === repositories.length, 'external repository URLs must be distinct');

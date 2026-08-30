@@ -13,10 +13,22 @@ const protocolPath = argument('--protocol') ?? path.join(root, 'scripts/fixtures
 const outputPath = argument('--output');
 const rawRunsPath = argument('--raw-runs');
 const adjudicationsPath = argument('--adjudications');
+const hiddenCorpusAcceptancePath = argument('--hidden-corpus-acceptance');
+const independentAdjudicationPath = argument('--independent-adjudication');
+const providerTelemetryPath = argument('--provider-telemetry');
+const providerRawExportPath = argument('--provider-raw-export');
 const protocol = JSON.parse(readFileSync(protocolPath, 'utf8'));
 const rawRuns = rawRunsPath ? JSON.parse(readFileSync(rawRunsPath, 'utf8')) : [];
 const adjudications = adjudicationsPath ? JSON.parse(readFileSync(adjudicationsPath, 'utf8')) : [];
-const decision = executeExternalBenchmark(protocol, rawRuns, adjudications);
+const artifacts = hiddenCorpusAcceptancePath || independentAdjudicationPath || providerTelemetryPath || providerRawExportPath
+  ? {
+      hiddenCorpusAcceptance: hiddenCorpusAcceptancePath ? JSON.parse(readFileSync(hiddenCorpusAcceptancePath, 'utf8')) : undefined,
+      independentAdjudication: independentAdjudicationPath ? JSON.parse(readFileSync(independentAdjudicationPath, 'utf8')) : undefined,
+      providerTelemetry: providerTelemetryPath ? JSON.parse(readFileSync(providerTelemetryPath, 'utf8')) : undefined,
+      providerRawExport: providerRawExportPath ? readFileSync(providerRawExportPath) : undefined
+    }
+  : undefined;
+const decision = executeExternalBenchmark(protocol, rawRuns, adjudications, artifacts);
 const markdown = renderDecisionMarkdown(decision);
 if (outputPath) writeFileSync(outputPath, markdown, 'utf8');
 process.stdout.write(`${JSON.stringify({ protocolPath, decision }, null, 2)}\n`);
