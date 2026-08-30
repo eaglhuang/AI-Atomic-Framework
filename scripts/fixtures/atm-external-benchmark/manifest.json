@@ -58,13 +58,13 @@
   "controls": ["positive-conflict", "benign-concurrency", "semantic-conflict", "stale-base", "recovery", "negative-control"],
   "executionPrerequisites": {
     "publicNpm": { "sealed": true, "evidenceDigest": "sha256:6b1affb435479a7bf62e0d69d504f979b2f490680273692ad747ec766f460424" },
-    "hiddenCorpusAcceptance": { "sealed": true, "evidenceDigest": "sha256:4d153373b370c8fa79910bf30d9c5fce42a2cdb2ce340c4e9798f771b789ab17" },
+    "hiddenCorpusAcceptance": { "sealed": false, "evidenceDigest": null, "artifactPath": null },
     "independentAdjudication": { "sealed": false, "evidenceDigest": null },
     "providerTelemetry": { "sealed": false, "evidenceDigest": null }
   },
   "runEligibility": {
     "phase": "pre-run",
-    "eligible": true,
-    "blockingReasons": []
+    "eligible": false,
+    "blockingReasons": ["independent hidden-corpus custodian has not supplied a signed acceptance artifact"]
   }
 }

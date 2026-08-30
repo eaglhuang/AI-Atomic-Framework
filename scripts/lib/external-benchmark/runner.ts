@@ -13,7 +13,7 @@ export interface ProtocolManifest {
     readonly baselineImplementer: string;
     readonly atmImplementer: string;
   };
-  readonly executionPrerequisites: Record<string, { readonly sealed: boolean; readonly evidenceDigest: string | null }>;
+  readonly executionPrerequisites: Record<string, { readonly sealed: boolean; readonly evidenceDigest: string | null; readonly artifactPath?: string | null }>;
   readonly runEligibility: { readonly phase?: 'pre-run'; readonly eligible: boolean; readonly blockingReasons: readonly string[] };
 }
 
@@ -130,6 +130,33 @@ function verifyArtifactSemantics(name: string, record: Record<string, unknown>):
     if (!nonEmptyString(record, 'provider') || !sha256Field(record, 'rawExportSha256') || !isoTimestamp(record, 'observedAt') || !Array.isArray(record.runIds) || record.runIds.length === 0 || record.runIds.some((runId) => typeof runId !== 'string' || runId.length === 0)) {
       return 'provider telemetry artifact must bind provider, rawExportSha256, observedAt, and non-empty runIds';
     }
+  }
+  return null;
+}
+
+/**
+ * Validates the public acceptance seal without reading the hidden corpus itself.
+ * The corpus stays oracle-only; this artifact only proves that its custodian
+ * accepted the preregistered protocol and committed to a corpus digest.
+ */
+export function verifyHiddenCorpusAcceptanceArtifact(protocol: ProtocolManifest, value: unknown): string | null {
+  const expected = protocol.executionPrerequisites.hiddenCorpusAcceptance;
+  const artifactFailure = verifyArtifact(
+    'hidden corpus acceptance',
+    value,
+    {
+      schemaId: 'atm.hiddenCorpusAcceptance.v1',
+      signerRole: 'hidden-corpus-custodian',
+      digest: expected?.evidenceDigest ?? null
+    },
+    protocol
+  );
+  if (artifactFailure) return artifactFailure;
+  const record = asRecord(value)!;
+  const semanticFailure = verifyArtifactSemantics('hidden corpus acceptance', record);
+  if (semanticFailure) return semanticFailure;
+  if (protocol.oracle && record.signerId !== protocol.oracle.hiddenCorpusOwner) {
+    return 'hidden corpus acceptance signer identity must match the preregistered hidden-corpus owner';
   }
   return null;
 }

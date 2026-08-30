@@ -1,8 +1,8 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0008",
-  "updatedAt": "2026-08-30T14:20:30.101Z",
-  "updatedBy": "codex-captain",
+  "updatedAt": "2026-08-30T15:09:04.206Z",
+  "updatedBy": "codex-gpt-5-4-mini",
   "freshValidationPasses": [
     "node --strip-types tests/cli/external-benchmark-decision.test.ts",
     "node --strip-types tests/cli/external-benchmark-metrics.test.ts",
@@ -448,6 +448,38 @@
       "durationMs": 412,
       "runnerKind": "dev-source",
       "sourceCommit": "9d77652a427ce50b10bfba5ab568d92be8dab88a",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-external-benchmark-protocol.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b9a70c55b8d26790cb777cae037a3c69bcfec7433401e29cdea63095cd517489",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:external-benchmark-protocol"
+      ],
+      "generatedAt": "2026-08-30T14:59:50.566Z",
+      "startedAt": "2026-08-30T14:59:49.858Z",
+      "finishedAt": "2026-08-30T14:59:50.566Z",
+      "durationMs": 708,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "638faa8248a3719c90a667ec2fcdf01a1c08f7eb",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-external-benchmark-protocol.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4a8a35c0d7641b524cf2086602b386efa4062d35753f1001bcbc8b12c0b2e55d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:external-benchmark-protocol"
+      ],
+      "generatedAt": "2026-08-30T15:09:04.205Z",
+      "startedAt": "2026-08-30T15:09:03.779Z",
+      "finishedAt": "2026-08-30T15:09:04.205Z",
+      "durationMs": 426,
+      "runnerKind": "dev-source",
+      "sourceCommit": "638faa8248a3719c90a667ec2fcdf01a1c08f7eb",
       "cached": false
     }
   ],

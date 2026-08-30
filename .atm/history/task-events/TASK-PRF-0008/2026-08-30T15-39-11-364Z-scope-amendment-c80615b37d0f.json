@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-30T15-39-11-364Z-scope-amendment-c80615b37d0f",
+  "taskId": "TASK-PRF-0008",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5-4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0008.json",
+  "taskSha256": "sha256:3d0d731152295d215a9241cc722ea5cdf260fb5e9e6051b7fc8e98e89f077536",
+  "createdAt": "2026-08-30T15:39:11.364Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0008 --actor codex-gpt-5-4-mini --add \"schemas/evidence/external-benchmark-run.schema.json,scripts/fixtures/atm-external-benchmark/manifest.json,scripts/lib/external-benchmark/runner.ts,scripts/validate-external-benchmark-protocol.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -1,7 +1,7 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createValidator } from './lib/validator-harness.ts';
-import { collectMissingPrerequisites, computePreregistrationDigest, type ProtocolManifest } from './lib/external-benchmark/runner.ts';
+import { collectMissingPrerequisites, computePreregistrationDigest, verifyHiddenCorpusAcceptanceArtifact, type ProtocolManifest } from './lib/external-benchmark/runner.ts';
 
 const harness = createValidator('external-benchmark-protocol', { argv: process.argv.slice(2), defaultMode: 'validate' });
 const manifestFlag = process.argv.indexOf('--manifest');
@@ -46,12 +46,21 @@ function validate(): void {
   harness.assert(requiredMetrics.every((metric) => typeof manifest.metrics[metric] === 'string' && manifest.metrics[metric].length > 0), 'all product-proof metrics need executable definitions');
 
   const packageSealed = atm.packageAvailability === 'sealed' && typeof atm.packageVersion === 'string' && /^sha256:[a-f0-9]{64}$/.test(atm.packageTarballSha256 ?? '');
-  const prerequisites = manifest.executionPrerequisites as Record<string, { sealed: boolean; evidenceDigest: string | null }>;
+  const prerequisites = manifest.executionPrerequisites as Record<string, { sealed: boolean; evidenceDigest: string | null; artifactPath?: string | null }>;
   harness.assert(prerequisites.publicNpm.sealed === packageSealed, 'publicNpm prerequisite must exactly reflect the sealed public npm package state');
   harness.assert(manifest.runEligibility.phase === 'pre-run', 'run eligibility must explicitly describe the pre-run phase; final-decision evidence is sealed only after raw runs exist');
   const missingPrerequisites = collectMissingPrerequisites(manifest as ProtocolManifest, 'pre-run');
-  const canExecute = packageSealed && missingPrerequisites.length === 0;
+  const acceptance = prerequisites.hiddenCorpusAcceptance;
+  const artifactPath = typeof acceptance.artifactPath === 'string' && acceptance.artifactPath.trim().length > 0 ? acceptance.artifactPath : null;
+  const resolvedArtifactPath = artifactPath && (path.isAbsolute(artifactPath) ? artifactPath : path.resolve(path.dirname(absoluteManifestPath), artifactPath));
+  const acceptanceFailure = acceptance.sealed && artifactPath && resolvedArtifactPath && existsSync(resolvedArtifactPath)
+    ? verifyHiddenCorpusAcceptanceArtifact(manifest as ProtocolManifest, JSON.parse(readFileSync(resolvedArtifactPath, 'utf8')))
+    : acceptance.sealed
+      ? 'hidden corpus acceptance is sealed but its signed acceptance artifact is unavailable'
+      : null;
+  const canExecute = packageSealed && missingPrerequisites.length === 0 && acceptanceFailure === null;
   harness.assert(manifest.runEligibility.eligible === canExecute, 'run eligibility must exactly reflect the public package and hidden-corpus prerequisites needed before raw runs');
+  if (acceptanceFailure) harness.assert(!manifest.runEligibility.eligible, acceptanceFailure);
   if (!canExecute) {
     harness.assert(manifest.runEligibility.blockingReasons.length > 0, 'a blocked preregistration must state blocking reasons');
   }

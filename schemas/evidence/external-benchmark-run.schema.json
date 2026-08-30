@@ -125,7 +125,8 @@
       "required": ["sealed", "evidenceDigest"],
       "properties": {
         "sealed": { "type": "boolean" },
-        "evidenceDigest": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" }
+        "evidenceDigest": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" },
+        "artifactPath": { "type": ["string", "null"], "minLength": 1 }
       }
     }
   }
