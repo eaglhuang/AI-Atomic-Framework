@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.resolve(readArg('--root') ?? path.join(path.dirname(fileURLToPath(import.meta.url)), '..'));
 const mode = readArg('--mode') ?? 'validate';
 const configPath = readArg('--config') ?? 'scripts/skew-matrix.config.json';
 const caseId = readArg('--case');
@@ -156,7 +156,7 @@ function validateConfig(input: SkewConfig, label: string) {
       continue;
     }
     const actualVersion = JSON.parse(readFileSync(packageJsonPath, 'utf8')).version;
-    if (actualVersion !== entry.version) {
+    if (!matchesConfiguredReleaseVersion(entry.version, actualVersion)) {
       add('SKEW_PACKAGE_VERSION_MISMATCH', `${label}: ${entry.id} config version ${entry.version} must match package.json ${actualVersion}`);
     }
     if (!input.supportedMinorWindow?.includes(minorKey(entry.version))) {
@@ -187,6 +187,22 @@ function axisEntries(value: unknown): SkewAxisEntry[] {
 function minorKey(version: string) {
   const match = version.match(/^v?(\d+)\.(\d+)\./);
   return match ? `${match[1]}.${match[2]}` : 'invalid';
+}
+
+function matchesConfiguredReleaseVersion(configuredVersion: string, actualVersion: string) {
+  if (configuredVersion === actualVersion) return true;
+  const configuredCore = semverCore(configuredVersion);
+  const actual = parseSemver(actualVersion);
+  return configuredCore !== null && actual !== null && configuredCore === actual.core && actual.prerelease !== null;
+}
+
+function semverCore(version: string) {
+  return parseSemver(version)?.core ?? null;
+}
+
+function parseSemver(version: string) {
+  const match = version.match(/^v?(\d+\.\d+\.\d+)(?:-([0-9A-Za-z.-]+))?$/);
+  return match ? { core: match[1], prerelease: match[2] ?? null } : null;
 }
 
 function runSmokeCase(input: SkewConfig, entry: SkewCase): SkewSummaryCase {

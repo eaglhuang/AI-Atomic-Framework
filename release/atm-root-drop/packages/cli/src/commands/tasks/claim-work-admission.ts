@@ -293,11 +293,22 @@ function producerDeclaresArtifactPath(cwd: string, taskId: string, artifactPath:
 
 export function resolveTaskWorkAdmissionFiles(taskDocument: Record<string, unknown>, fallback: readonly string[], cwd?: string): readonly string[] {
   const directionLock = readRecord(taskDocument.taskDirectionLock);
-  const declaredFiles = Array.isArray(directionLock?.allowedFiles)
+  const explicitClaimFiles = fallback.map(String).filter(Boolean);
+  const directionLockFiles = Array.isArray(directionLock?.allowedFiles)
     ? directionLock.allowedFiles.map(String)
-    : Array.isArray(taskDocument.scopePaths)
+    : [];
+  const taskScopeFiles = Array.isArray(taskDocument.scopePaths)
     ? taskDocument.scopePaths.map(String)
-    : fallback;
+    : [];
+  // A claim's explicit files have already passed claim admission.  They must
+  // take precedence over a previous direction-lock snapshot: that snapshot
+  // belongs to an earlier claim generation and may only contain lifecycle
+  // records. Renewals pass no fallback, so they reseal from the live lock.
+  const declaredFiles = explicitClaimFiles.length > 0
+    ? explicitClaimFiles
+    : directionLockFiles.length > 0
+    ? directionLockFiles
+    : taskScopeFiles;
   const taskId = normalizeTaskId(taskDocument.workItemId ?? taskDocument.taskId);
   return taskId
     ? [...new Set([...declaredFiles, ...taskLifecycleArtifactPaths(taskId, cwd)])]

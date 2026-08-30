@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -28,6 +28,22 @@ try {
   const invalid = runValidator(['--mode', 'validate', '--config', 'fixtures/skew/incompatible-version.config.json']);
   assert.equal(invalid.exitCode, 1);
   assert.match(`${invalid.stdout}\n${invalid.stderr}`, /SKEW_VERSION_OUTSIDE_WINDOW/);
+
+  const releaseRoot = path.join(tempRoot, 'release-version-fixture');
+  mkdirSync(path.join(releaseRoot, 'packages', 'cli'), { recursive: true });
+  writeFileSync(path.join(releaseRoot, 'compatibility-matrix.json'), JSON.stringify({
+    releaseTrain: { frameworkVersion: '0.1.0', defaultChartVersion: '0.1.0', defaultTemplateVersion: '0.1.0' }
+  }));
+  writeFileSync(path.join(releaseRoot, 'packages', 'cli', 'package.json'), JSON.stringify({ version: '0.1.0-beta.3' }));
+  writeFileSync(path.join(releaseRoot, 'release.config.json'), JSON.stringify({
+    schemaVersion: 'atm.skewMatrix.v0.1',
+    releaseTrain: { frameworkVersion: '0.1.0', atmChartVersion: '0.1.0', agentTemplateVersion: '0.1.0' },
+    supportedMinorWindow: ['0.1'],
+    axes: { cli: [{ id: 'cli-current', packagePath: 'packages/cli', version: '0.1.0' }], pluginSdk: [{ id: 'sdk-current', packagePath: 'packages/cli', version: '0.1.0' }], adapters: [{ id: 'adapter-current', packagePath: 'packages/cli', version: '0.1.0', smoke: 'validate-local-git-adapter' }] },
+    cases: [{ id: 'release-injected-prerelease', cli: 'cli-current', pluginSdk: 'sdk-current', adapter: 'adapter-current', expected: 'pass' }]
+  }));
+  const prerelease = runValidator(['--mode', 'matrix', '--root', releaseRoot, '--config', 'release.config.json']);
+  assert.equal(prerelease.exitCode, 0, `${prerelease.stdout}\n${prerelease.stderr}`);
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -9,7 +9,7 @@ import { releaseVersionBase, releaseVersionSourcesAreCompatible } from './lib/re
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = readArg('--mode') ?? 'validate';
-const releaseTag = readArg('--release-tag');
+const releaseTag = readArg('--release-tag') ?? process.env.ATM_RELEASE_TAG ?? null;
 
 function fail(message: string) {
   console.error(`[version-compatibility:${mode}] ${message}`);
