@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { executeExternalBenchmark } from './lib/external-benchmark/runner.ts';
+import { canonicalJson, canonicalJsonSha256, executeExternalBenchmark } from './lib/external-benchmark/runner.ts';
 import { renderDecisionMarkdown } from './lib/external-benchmark/report.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -17,6 +17,19 @@ const hiddenCorpusAcceptancePath = argument('--hidden-corpus-acceptance');
 const independentAdjudicationPath = argument('--independent-adjudication');
 const providerTelemetryPath = argument('--provider-telemetry');
 const providerRawExportPath = argument('--provider-raw-export');
+const signingPayloadPath = argument('--print-signing-payload');
+const canonicalDigestPath = argument('--print-canonical-digest');
+if (signingPayloadPath || canonicalDigestPath) {
+  const artifactPath = signingPayloadPath ?? canonicalDigestPath!;
+  const artifact = JSON.parse(readFileSync(artifactPath, 'utf8')) as Record<string, unknown>;
+  if (signingPayloadPath) {
+    const { signature: _signature, publicKeyPem: _publicKeyPem, ...payload } = artifact;
+    process.stdout.write(`${canonicalJson(payload)}\n`);
+  } else {
+    process.stdout.write(`${canonicalJsonSha256(artifact)}\n`);
+  }
+  process.exit(0);
+}
 const protocol = JSON.parse(readFileSync(protocolPath, 'utf8'));
 const rawRuns = rawRunsPath ? JSON.parse(readFileSync(rawRunsPath, 'utf8')) : [];
 const adjudications = adjudicationsPath ? JSON.parse(readFileSync(adjudicationsPath, 'utf8')) : [];

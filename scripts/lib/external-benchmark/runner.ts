@@ -33,24 +33,24 @@ const REQUIRED_EXECUTION_PREREQUISITES = [
 
 const SHA256 = /^sha256:[a-f0-9]{64}$/;
 
-function stableJson(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+export function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
   if (value && typeof value === 'object') {
     return `{${Object.entries(value as Record<string, unknown>)
       .sort(([left], [right]) => left.localeCompare(right))
-      .map(([key, child]) => `${JSON.stringify(key)}:${stableJson(child)}`)
+      .map(([key, child]) => `${JSON.stringify(key)}:${canonicalJson(child)}`)
       .join(',')}}`;
   }
   return JSON.stringify(value);
 }
 
-function sha256Json(value: unknown): string {
-  return `sha256:${createHash('sha256').update(stableJson(value)).digest('hex')}`;
+export function canonicalJsonSha256(value: unknown): string {
+  return `sha256:${createHash('sha256').update(canonicalJson(value)).digest('hex')}`;
 }
 
 export function computePreregistrationDigest(protocol: ProtocolManifest): string {
   const { preregistrationDigest: _preregistrationDigest, executionPrerequisites: _executionPrerequisites, runEligibility: _runEligibility, ...sealedProtocol } = protocol as unknown as Record<string, unknown>;
-  return sha256Json(sealedProtocol);
+  return canonicalJsonSha256(sealedProtocol);
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -75,7 +75,7 @@ function verifyDetachedSignature(record: Record<string, unknown>): boolean {
   if (!signature || !publicKeyPem) return false;
   const { signature: _signature, publicKeyPem: _publicKeyPem, ...payload } = record;
   try {
-    return verify(null, Buffer.from(stableJson(payload)), publicKeyPem, Buffer.from(signature, 'base64'));
+    return verify(null, Buffer.from(canonicalJson(payload)), publicKeyPem, Buffer.from(signature, 'base64'));
   } catch {
     return false;
   }
@@ -93,7 +93,7 @@ function verifyArtifact(
   if (record.signerRole !== expected.signerRole) return `${name} artifact signer role is invalid`;
   if (!protocol.protocolVersion || record.protocolVersion !== protocol.protocolVersion) return `${name} artifact protocol version does not match preregistration`;
   if (!protocol.preregistrationDigest || record.protocolDigest !== protocol.preregistrationDigest) return `${name} artifact protocol digest does not match preregistration`;
-  if (!SHA256.test(expected.digest ?? '') || sha256Json(record) !== expected.digest) return `${name} artifact digest does not match sealed evidence`;
+  if (!SHA256.test(expected.digest ?? '') || canonicalJsonSha256(record) !== expected.digest) return `${name} artifact digest does not match sealed evidence`;
   if (!verifyDetachedSignature(record)) return `${name} artifact detached signature is invalid`;
   return null;
 }
@@ -132,8 +132,8 @@ function verifyRunBindings(protocol: ProtocolManifest, runs: readonly RawBenchma
   const runIds = runs.map((run) => run.runId);
   const telemetryRunIds = Array.isArray(telemetry?.runIds) ? telemetry.runIds.filter((runId): runId is string => typeof runId === 'string') : [];
   if (!sameSet(runIds, telemetryRunIds)) reasons.push('provider telemetry runIds must cover each raw run exactly once');
-  if (adjudicationManifest?.inputDigest !== sha256Json(runs)) reasons.push('independent adjudication input digest does not bind the supplied raw runs');
-  if (adjudicationManifest?.outputDigest !== sha256Json(adjudications)) reasons.push('independent adjudication output digest does not bind the supplied adjudications');
+  if (adjudicationManifest?.inputDigest !== canonicalJsonSha256(runs)) reasons.push('independent adjudication input digest does not bind the supplied raw runs');
+  if (adjudicationManifest?.outputDigest !== canonicalJsonSha256(adjudications)) reasons.push('independent adjudication output digest does not bind the supplied adjudications');
   const runsById = new Map(runs.map((run) => [run.runId, run]));
   if (runsById.size !== runs.length) reasons.push('raw run IDs must be unique');
   if (new Set(adjudications.map((record) => record.runId)).size !== adjudications.length || adjudications.length !== runs.length) reasons.push('each raw run must have exactly one independent adjudication');

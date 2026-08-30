@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash, generateKeyPairSync, sign } from 'node:crypto';
-import { executeExternalBenchmark } from '../../scripts/lib/external-benchmark/runner.ts';
+import { canonicalJson, canonicalJsonSha256, executeExternalBenchmark } from '../../scripts/lib/external-benchmark/runner.ts';
 
 const unavailablePrerequisites = {
   publicNpm: { sealed: true, evidenceDigest: `sha256:${'a'.repeat(64)}` },
@@ -17,6 +17,8 @@ const stableJson = (value: unknown): string => {
   return JSON.stringify(value);
 };
 const digest = (value: unknown) => `sha256:${createHash('sha256').update(stableJson(value)).digest('hex')}`;
+assert.equal(canonicalJson({ z: [2, { b: true, a: null }], a: 1 }), '{"a":1,"z":[2,{"a":null,"b":true}]}');
+assert.equal(canonicalJsonSha256({ a: 1 }), digest({ a: 1 }));
 const signed = <T extends Record<string, unknown>>(value: T): T & { signature: string; publicKeyPem: string } => {
   const keyPair = generateKeyPairSync('ed25519');
   const publicKeyPem = keyPair.publicKey.export({ format: 'pem', type: 'spki' }).toString();
