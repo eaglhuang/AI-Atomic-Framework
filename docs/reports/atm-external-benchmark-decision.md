@@ -55,20 +55,23 @@ implementer identities.
 
 ## Neutral-steward sealing sequence
 
-1. Custodian, adjudicator, provider-telemetry signer, baseline operator, and ATM
+1. Before any raw run, the public npm seal and signed hidden-corpus acceptance must
+   be present. `runEligibility.phase` is deliberately `pre-run`: adjudication and
+   telemetry bind the raw run IDs and therefore cannot truthfully be sealed yet.
+2. Custodian, adjudicator, provider-telemetry signer, baseline operator, and ATM
    operator remain distinct. Labels/conflict graph remain oracle-only until the runs
    have been produced.
-2. Operators produce real AB and BA runs in fresh worktrees. Each raw record retains
+3. Operators produce real AB and BA runs in fresh worktrees. Each raw record retains
    timestamps, prompt, tokens, billed cost, human minutes, retries, commands,
    repairs, repository SHA, and environment digest.
-3. The adjudicator labels anonymized output and signs the manifest after the raw run
+4. The adjudicator labels anonymized output and signs the manifest after the raw run
    array is fixed. The telemetry signer supplies the unmodified provider export.
-4. A neutral steward computes each canonical artifact digest, updates only the three
+5. A neutral steward computes each canonical artifact digest, updates only the three
    mutable `executionPrerequisites.*` seals and `runEligibility` in the protocol,
    then re-runs `validate-external-benchmark-protocol`. These mutable seals are
    deliberately excluded from `preregistrationDigest`; thresholds and workload are
    not editable at this stage.
-5. Run the verifier from commit `0af98a1b3604cc6cdcf388013236f63d4b0aca17`:
+6. Run the verifier from commit `0af98a1b3604cc6cdcf388013236f63d4b0aca17`:
 
 ```text
 node --strip-types scripts/run-atm-external-benchmark.ts \
@@ -87,3 +90,7 @@ The only possible final verdicts are `keep`, `narrow`, `stop`, or `inconclusive`
 raw billed-cost improvement. Missing or non-original cost data remains
 `inconclusive`; adverse safety is `stop` and must name the smallest optional
 capability before any narrow retest.
+
+`runEligibility` never substitutes for final evidence: the verifier still requires
+sealed independent adjudication, provider telemetry, and its original export before
+it can issue any product decision.

@@ -112,8 +112,9 @@
     "runEligibility": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["eligible", "blockingReasons"],
+      "required": ["phase", "eligible", "blockingReasons"],
       "properties": {
+        "phase": { "const": "pre-run" },
         "eligible": { "type": "boolean" },
         "blockingReasons": { "type": "array", "items": { "type": "string", "minLength": 1 } }
       }

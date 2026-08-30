@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createValidator } from './lib/validator-harness.ts';
-import { computePreregistrationDigest, type ProtocolManifest } from './lib/external-benchmark/runner.ts';
+import { collectMissingPrerequisites, computePreregistrationDigest, type ProtocolManifest } from './lib/external-benchmark/runner.ts';
 
 const harness = createValidator('external-benchmark-protocol', { argv: process.argv.slice(2), defaultMode: 'validate' });
 const manifestFlag = process.argv.indexOf('--manifest');
@@ -47,12 +47,11 @@ function validate(): void {
 
   const packageSealed = atm.packageAvailability === 'sealed' && typeof atm.packageVersion === 'string' && /^sha256:[a-f0-9]{64}$/.test(atm.packageTarballSha256 ?? '');
   const prerequisites = manifest.executionPrerequisites as Record<string, { sealed: boolean; evidenceDigest: string | null }>;
-  const missingPrerequisites = Object.entries(prerequisites)
-    .filter(([, prerequisite]) => !prerequisite.sealed || !/^sha256:[a-f0-9]{64}$/.test(prerequisite.evidenceDigest ?? ''))
-    .map(([name]) => name);
   harness.assert(prerequisites.publicNpm.sealed === packageSealed, 'publicNpm prerequisite must exactly reflect the sealed public npm package state');
+  harness.assert(manifest.runEligibility.phase === 'pre-run', 'run eligibility must explicitly describe the pre-run phase; final-decision evidence is sealed only after raw runs exist');
+  const missingPrerequisites = collectMissingPrerequisites(manifest as ProtocolManifest, 'pre-run');
   const canExecute = packageSealed && missingPrerequisites.length === 0;
-  harness.assert(manifest.runEligibility.eligible === canExecute, 'run eligibility must exactly reflect every sealed execution prerequisite');
+  harness.assert(manifest.runEligibility.eligible === canExecute, 'run eligibility must exactly reflect the public package and hidden-corpus prerequisites needed before raw runs');
   if (!canExecute) {
     harness.assert(manifest.runEligibility.blockingReasons.length > 0, 'a blocked preregistration must state blocking reasons');
   }

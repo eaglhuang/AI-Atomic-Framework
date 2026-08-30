@@ -14,7 +14,7 @@ export interface ProtocolManifest {
     readonly atmImplementer: string;
   };
   readonly executionPrerequisites: Record<string, { readonly sealed: boolean; readonly evidenceDigest: string | null }>;
-  readonly runEligibility: { readonly eligible: boolean; readonly blockingReasons: readonly string[] };
+  readonly runEligibility: { readonly phase?: 'pre-run'; readonly eligible: boolean; readonly blockingReasons: readonly string[] };
 }
 
 export interface ExternalPrerequisiteArtifacts {
@@ -24,7 +24,12 @@ export interface ExternalPrerequisiteArtifacts {
   readonly providerRawExport?: Uint8Array;
 }
 
-const REQUIRED_EXECUTION_PREREQUISITES = [
+const PRE_RUN_PREREQUISITES = [
+  'publicNpm',
+  'hiddenCorpusAcceptance'
+] as const;
+
+const FINAL_DECISION_PREREQUISITES = [
   'publicNpm',
   'hiddenCorpusAcceptance',
   'independentAdjudication',
@@ -46,6 +51,17 @@ export function canonicalJson(value: unknown): string {
 
 export function canonicalJsonSha256(value: unknown): string {
   return `sha256:${createHash('sha256').update(canonicalJson(value)).digest('hex')}`;
+}
+
+export function collectMissingPrerequisites(
+  protocol: Pick<ProtocolManifest, 'executionPrerequisites'>,
+  phase: 'pre-run' | 'final-decision'
+): readonly string[] {
+  const required = phase === 'pre-run' ? PRE_RUN_PREREQUISITES : FINAL_DECISION_PREREQUISITES;
+  return required.filter((name) => {
+    const prerequisite = protocol.executionPrerequisites[name];
+    return !prerequisite || !prerequisite.sealed || !SHA256.test(prerequisite.evidenceDigest ?? '');
+  });
 }
 
 export function computePreregistrationDigest(protocol: ProtocolManifest): string {
@@ -189,10 +205,7 @@ export function verifyExternalPrerequisites(protocol: ProtocolManifest, artifact
 
 export function executeExternalBenchmark(protocol: ProtocolManifest, runs: readonly RawBenchmarkRun[], adjudications: readonly OracleAdjudication[], artifacts?: ExternalPrerequisiteArtifacts): BenchmarkDecision {
   const packageSealed = protocol.arms.atm.packageAvailability === 'sealed' && protocol.arms.atm.packageVersion !== null && protocol.arms.atm.packageTarballSha256 !== null && protocol.arms.atm.workspaceLink === false;
-  const missingPrerequisites = REQUIRED_EXECUTION_PREREQUISITES.filter((name) => {
-    const prerequisite = protocol.executionPrerequisites[name];
-    return !prerequisite || !prerequisite.sealed || !/^sha256:[a-f0-9]{64}$/.test(prerequisite.evidenceDigest ?? '');
-  });
+  const missingPrerequisites = collectMissingPrerequisites(protocol, 'final-decision');
   if (!protocol.runEligibility.eligible || !packageSealed || missingPrerequisites.length > 0) {
     return decideBenchmark({ eligible: false, blockingReasons: protocol.runEligibility.blockingReasons.length ? protocol.runEligibility.blockingReasons : missingPrerequisites.length ? missingPrerequisites : ['published ATM package is not sealed'] , rounds: [] });
   }

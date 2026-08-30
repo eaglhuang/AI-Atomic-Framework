@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash, generateKeyPairSync, sign } from 'node:crypto';
-import { canonicalJson, canonicalJsonSha256, executeExternalBenchmark } from '../../scripts/lib/external-benchmark/runner.ts';
+import { canonicalJson, canonicalJsonSha256, collectMissingPrerequisites, executeExternalBenchmark } from '../../scripts/lib/external-benchmark/runner.ts';
 
 const unavailablePrerequisites = {
   publicNpm: { sealed: true, evidenceDigest: `sha256:${'a'.repeat(64)}` },
@@ -26,6 +26,18 @@ const signed = <T extends Record<string, unknown>>(value: T): T & { signature: s
   return { ...value, publicKeyPem, signature };
 };
 const preregistrationDigest = `sha256:${'e'.repeat(64)}`;
+const preRunOnlyProtocol = {
+  arms: { atm: { packageAvailability: 'sealed' as const, packageVersion: '1.0.0', packageTarballSha256: `sha256:${'a'.repeat(64)}`, workspaceLink: false } },
+  executionPrerequisites: {
+    publicNpm: { sealed: true, evidenceDigest: `sha256:${'a'.repeat(64)}` },
+    hiddenCorpusAcceptance: { sealed: true, evidenceDigest: `sha256:${'b'.repeat(64)}` },
+    independentAdjudication: { sealed: false, evidenceDigest: null },
+    providerTelemetry: { sealed: false, evidenceDigest: null }
+  },
+  runEligibility: { phase: 'pre-run' as const, eligible: true, blockingReasons: [] }
+};
+assert.deepEqual(collectMissingPrerequisites(preRunOnlyProtocol, 'pre-run'), []);
+assert.deepEqual(collectMissingPrerequisites(preRunOnlyProtocol, 'final-decision'), ['independentAdjudication', 'providerTelemetry']);
 const providerRawExport = Buffer.from('provider export');
 const verifiedArtifacts = {
   hiddenCorpusAcceptance: signed({ schemaId: 'atm.hiddenCorpusAcceptance.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'hidden-corpus-custodian', signerId: 'custodian', corpusId: 'corpus-1', corpusDigest: `sha256:${'1'.repeat(64)}`, visibility: 'oracle-only', acceptedAt: '2026-08-30T00:00:00.000Z' }),
