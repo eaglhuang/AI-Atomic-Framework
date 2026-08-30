@@ -7,6 +7,12 @@ export interface ProtocolManifest {
   readonly protocolVersion?: string;
   readonly preregistrationDigest?: string;
   readonly arms: { readonly atm: { readonly packageAvailability: 'sealed' | 'unavailable'; readonly packageVersion: string | null; readonly packageTarballSha256: string | null; readonly workspaceLink: boolean } };
+  readonly oracle?: {
+    readonly hiddenCorpusOwner: string;
+    readonly adjudicator: string;
+    readonly baselineImplementer: string;
+    readonly atmImplementer: string;
+  };
   readonly executionPrerequisites: Record<string, { readonly sealed: boolean; readonly evidenceDigest: string | null }>;
   readonly runEligibility: { readonly eligible: boolean; readonly blockingReasons: readonly string[] };
 }
@@ -51,6 +57,18 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
 
+function nonEmptyString(record: Record<string, unknown>, field: string): boolean {
+  return typeof record[field] === 'string' && record[field].trim().length > 0;
+}
+
+function isoTimestamp(record: Record<string, unknown>, field: string): boolean {
+  return nonEmptyString(record, field) && Number.isFinite(Date.parse(record[field] as string));
+}
+
+function sha256Field(record: Record<string, unknown>, field: string): boolean {
+  return typeof record[field] === 'string' && SHA256.test(record[field] as string);
+}
+
 function verifyDetachedSignature(record: Record<string, unknown>): boolean {
   const signature = typeof record.signature === 'string' ? record.signature : null;
   const publicKeyPem = typeof record.publicKeyPem === 'string' ? record.publicKeyPem : null;
@@ -80,6 +98,56 @@ function verifyArtifact(
   return null;
 }
 
+function verifyArtifactSemantics(name: string, record: Record<string, unknown>): string | null {
+  if (!nonEmptyString(record, 'signerId')) return `${name} artifact must name a non-empty signer identity`;
+  if (name === 'hidden corpus acceptance') {
+    if (!nonEmptyString(record, 'corpusId') || !sha256Field(record, 'corpusDigest') || record.visibility !== 'oracle-only' || !isoTimestamp(record, 'acceptedAt')) {
+      return 'hidden corpus acceptance artifact must bind corpusId, corpusDigest, oracle-only visibility, and acceptedAt';
+    }
+  }
+  if (name === 'independent adjudication') {
+    if (!nonEmptyString(record, 'hiddenCorpusOwner') || !sha256Field(record, 'inputDigest') || !sha256Field(record, 'outputDigest') || !isoTimestamp(record, 'labeledAt')) {
+      return 'independent adjudication artifact must bind hiddenCorpusOwner, inputDigest, outputDigest, and labeledAt';
+    }
+  }
+  if (name === 'provider telemetry') {
+    if (!nonEmptyString(record, 'provider') || !sha256Field(record, 'rawExportSha256') || !isoTimestamp(record, 'observedAt') || !Array.isArray(record.runIds) || record.runIds.length === 0 || record.runIds.some((runId) => typeof runId !== 'string' || runId.length === 0)) {
+      return 'provider telemetry artifact must bind provider, rawExportSha256, observedAt, and non-empty runIds';
+    }
+  }
+  return null;
+}
+
+function sameSet(left: readonly string[], right: readonly string[]): boolean {
+  return left.length === right.length && new Set(left).size === left.length && new Set(right).size === right.length && left.every((value) => right.includes(value));
+}
+
+function verifyRunBindings(protocol: ProtocolManifest, runs: readonly RawBenchmarkRun[], adjudications: readonly OracleAdjudication[], artifacts: ExternalPrerequisiteArtifacts): readonly string[] {
+  if (runs.length === 0 && adjudications.length === 0) return [];
+  const reasons: string[] = [];
+  const telemetry = asRecord(artifacts.providerTelemetry);
+  const adjudicationManifest = asRecord(artifacts.independentAdjudication);
+  const oracle = protocol.oracle;
+  if (!oracle) return ['protocol oracle identities are required before external evidence can be consumed'];
+  const runIds = runs.map((run) => run.runId);
+  const telemetryRunIds = Array.isArray(telemetry?.runIds) ? telemetry.runIds.filter((runId): runId is string => typeof runId === 'string') : [];
+  if (!sameSet(runIds, telemetryRunIds)) reasons.push('provider telemetry runIds must cover each raw run exactly once');
+  if (adjudicationManifest?.inputDigest !== sha256Json(runs)) reasons.push('independent adjudication input digest does not bind the supplied raw runs');
+  if (adjudicationManifest?.outputDigest !== sha256Json(adjudications)) reasons.push('independent adjudication output digest does not bind the supplied adjudications');
+  const runsById = new Map(runs.map((run) => [run.runId, run]));
+  if (runsById.size !== runs.length) reasons.push('raw run IDs must be unique');
+  if (new Set(adjudications.map((record) => record.runId)).size !== adjudications.length || adjudications.length !== runs.length) reasons.push('each raw run must have exactly one independent adjudication');
+  for (const record of adjudications) {
+    const run = runsById.get(record.runId);
+    const expectedImplementer = record.arm === 'baseline' ? oracle.baselineImplementer : oracle.atmImplementer;
+    if (!run || run.arm !== record.arm || record.hiddenCorpusOwner !== oracle.hiddenCorpusOwner || record.adjudicator !== oracle.adjudicator || record.implementer !== expectedImplementer) {
+      reasons.push('adjudications must bind each raw run to the preregistered oracle, adjudicator, and arm implementer identities');
+      break;
+    }
+  }
+  return reasons;
+}
+
 export function verifyExternalPrerequisites(protocol: ProtocolManifest, artifacts: ExternalPrerequisiteArtifacts | undefined): readonly string[] {
   if (!artifacts) return ['verified external prerequisite artifacts are required'];
   const checks: Array<[string, unknown, { readonly schemaId: string; readonly signerRole: string; readonly digest: string | null }]> = [
@@ -91,11 +159,24 @@ export function verifyExternalPrerequisites(protocol: ProtocolManifest, artifact
   const telemetry = asRecord(artifacts.providerTelemetry);
   const hiddenCorpusAcceptance = asRecord(artifacts.hiddenCorpusAcceptance);
   const independentAdjudication = asRecord(artifacts.independentAdjudication);
+  for (const [name, record] of [['hidden corpus acceptance', hiddenCorpusAcceptance], ['independent adjudication', independentAdjudication], ['provider telemetry', telemetry]] as const) {
+    if (record) {
+      const semanticFailure = verifyArtifactSemantics(name, record);
+      if (semanticFailure) reasons.push(semanticFailure);
+    }
+  }
   const signerIds = [hiddenCorpusAcceptance?.signerId, independentAdjudication?.signerId, telemetry?.signerId];
   if (signerIds.some((signerId) => typeof signerId !== 'string' || signerId.length === 0)) {
     reasons.push('external prerequisite artifacts must each name a signer identity');
   } else if (new Set(signerIds).size !== signerIds.length) {
     reasons.push('hidden corpus, adjudication, and provider telemetry artifacts must have distinct signer identities');
+  }
+  const publicKeys = [hiddenCorpusAcceptance?.publicKeyPem, independentAdjudication?.publicKeyPem, telemetry?.publicKeyPem];
+  if (publicKeys.every((key) => typeof key === 'string' && key.length > 0) && new Set(publicKeys).size !== publicKeys.length) {
+    reasons.push('hidden corpus, adjudication, and provider telemetry artifacts must use distinct signing keys');
+  }
+  if (protocol.oracle && (hiddenCorpusAcceptance?.signerId !== protocol.oracle.hiddenCorpusOwner || independentAdjudication?.signerId !== protocol.oracle.adjudicator)) {
+    reasons.push('hidden corpus and adjudication signer identities must match the preregistered oracle roles');
   }
   if (independentAdjudication?.hiddenCorpusOwner !== hiddenCorpusAcceptance?.signerId) {
     reasons.push('independent adjudication must bind to the hidden-corpus custodian signer identity');
@@ -117,6 +198,8 @@ export function executeExternalBenchmark(protocol: ProtocolManifest, runs: reado
   }
   const prerequisiteFailures = verifyExternalPrerequisites(protocol, artifacts);
   if (prerequisiteFailures.length > 0) return decideBenchmark({ eligible: false, blockingReasons: prerequisiteFailures, rounds: [] });
+  const bindingFailures = verifyRunBindings(protocol, runs, adjudications, artifacts!);
+  if (bindingFailures.length > 0) return decideBenchmark({ eligible: false, blockingReasons: bindingFailures, rounds: [] });
   const baseline = aggregateRawRuns(runs, 'baseline');
   const atm = aggregateRawRuns(runs, 'atm');
   const baselineSafety = calculateAdjudicationRates(adjudications, 'baseline');

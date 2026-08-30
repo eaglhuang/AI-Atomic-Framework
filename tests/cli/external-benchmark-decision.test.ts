@@ -17,8 +17,8 @@ const stableJson = (value: unknown): string => {
   return JSON.stringify(value);
 };
 const digest = (value: unknown) => `sha256:${createHash('sha256').update(stableJson(value)).digest('hex')}`;
-const keyPair = generateKeyPairSync('ed25519');
 const signed = <T extends Record<string, unknown>>(value: T): T & { signature: string; publicKeyPem: string } => {
+  const keyPair = generateKeyPairSync('ed25519');
   const publicKeyPem = keyPair.publicKey.export({ format: 'pem', type: 'spki' }).toString();
   const signature = sign(null, Buffer.from(stableJson(value)), keyPair.privateKey).toString('base64');
   return { ...value, publicKeyPem, signature };
@@ -26,9 +26,9 @@ const signed = <T extends Record<string, unknown>>(value: T): T & { signature: s
 const preregistrationDigest = `sha256:${'e'.repeat(64)}`;
 const providerRawExport = Buffer.from('provider export');
 const verifiedArtifacts = {
-  hiddenCorpusAcceptance: signed({ schemaId: 'atm.hiddenCorpusAcceptance.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'hidden-corpus-custodian', signerId: 'custodian', corpusId: 'corpus-1', corpusDigest: `sha256:${'1'.repeat(64)}`, visibility: 'oracle-only' }),
-  independentAdjudication: signed({ schemaId: 'atm.adjudicationManifest.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'independent-adjudicator', signerId: 'adjudicator', hiddenCorpusOwner: 'custodian', inputDigest: `sha256:${'2'.repeat(64)}`, outputDigest: `sha256:${'3'.repeat(64)}` }),
-  providerTelemetry: signed({ schemaId: 'atm.providerCostTelemetry.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'provider-telemetry', signerId: 'billing-export', rawExportSha256: `sha256:${createHash('sha256').update(providerRawExport).digest('hex')}`, runIds: ['baseline-ab', 'atm-ab'] }),
+  hiddenCorpusAcceptance: signed({ schemaId: 'atm.hiddenCorpusAcceptance.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'hidden-corpus-custodian', signerId: 'custodian', corpusId: 'corpus-1', corpusDigest: `sha256:${'1'.repeat(64)}`, visibility: 'oracle-only', acceptedAt: '2026-08-30T00:00:00.000Z' }),
+  independentAdjudication: signed({ schemaId: 'atm.adjudicationManifest.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'independent-adjudicator', signerId: 'adjudicator', hiddenCorpusOwner: 'custodian', inputDigest: `sha256:${'2'.repeat(64)}`, outputDigest: `sha256:${'3'.repeat(64)}`, labeledAt: '2026-08-30T00:00:00.000Z' }),
+  providerTelemetry: signed({ schemaId: 'atm.providerCostTelemetry.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'provider-telemetry', signerId: 'billing-export', provider: 'provider', observedAt: '2026-08-30T00:00:00.000Z', rawExportSha256: `sha256:${createHash('sha256').update(providerRawExport).digest('hex')}`, runIds: ['baseline-ab', 'atm-ab'] }),
   providerRawExport
 };
 const prerequisites = {
@@ -40,6 +40,7 @@ const prerequisites = {
 const protocolBase = {
   protocolVersion: '1.0.0',
   preregistrationDigest,
+  oracle: { hiddenCorpusOwner: 'custodian', adjudicator: 'adjudicator', baselineImplementer: 'baseline-operator', atmImplementer: 'atm-operator' },
   arms: { atm: { packageAvailability: 'sealed' as const, packageVersion: '1.0.0', packageTarballSha256: `sha256:${'a'.repeat(64)}`, workspaceLink: false } },
   executionPrerequisites: prerequisites,
   runEligibility: { eligible: true, blockingReasons: [] }
@@ -65,5 +66,37 @@ const collapsedIdentityDecision = executeExternalBenchmark(protocolBase, [], [],
 });
 assert.equal(collapsedIdentityDecision.verdict, 'inconclusive');
 assert.match(collapsedIdentityDecision.rationale.join('\n'), /artifact digest does not match sealed evidence|artifact detached signature is invalid|distinct signer identities/i);
+const incompleteSemanticDecision = executeExternalBenchmark(protocolBase, [], [], {
+  ...verifiedArtifacts,
+  hiddenCorpusAcceptance: signed({ schemaId: 'atm.hiddenCorpusAcceptance.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'hidden-corpus-custodian', signerId: 'custodian', corpusId: 'corpus-1', corpusDigest: `sha256:${'1'.repeat(64)}`, visibility: 'public' })
+});
+assert.equal(incompleteSemanticDecision.verdict, 'inconclusive');
+assert.match(incompleteSemanticDecision.rationale.join('\n'), /oracle-only visibility/i);
+const boundRuns = [
+  { runId: 'baseline-ab', roundId: 'round-ab', sequence: 'AB' as const, arm: 'baseline' as const, repository: 'example/repo', commitSha: 'a'.repeat(40), startedAt: '2026-08-30T00:00:00.000Z', finishedAt: '2026-08-30T00:00:01.000Z', prompt: 'run', tokens: 1, billedCost: 2, humanMinutes: 0, retries: 0, commands: ['git status'], repairs: [], environmentDigest: `sha256:${'4'.repeat(64)}` },
+  { runId: 'atm-ba', roundId: 'round-ba', sequence: 'BA' as const, arm: 'atm' as const, repository: 'example/repo', commitSha: 'a'.repeat(40), startedAt: '2026-08-30T00:00:02.000Z', finishedAt: '2026-08-30T00:00:03.000Z', prompt: 'run', tokens: 1, billedCost: 1, humanMinutes: 0, retries: 0, commands: ['atm --version'], repairs: [], environmentDigest: `sha256:${'4'.repeat(64)}` }
+];
+const boundAdjudications = [
+  { runId: 'baseline-ab', adjudicator: 'adjudicator', hiddenCorpusOwner: 'custodian', implementer: 'baseline-operator', arm: 'baseline' as const, falseBlock: false, missedConflict: false, completed: true },
+  { runId: 'atm-ba', adjudicator: 'adjudicator', hiddenCorpusOwner: 'custodian', implementer: 'atm-operator', arm: 'atm' as const, falseBlock: false, missedConflict: false, completed: true }
+];
+const boundArtifacts = {
+  hiddenCorpusAcceptance: verifiedArtifacts.hiddenCorpusAcceptance,
+  independentAdjudication: signed({ schemaId: 'atm.adjudicationManifest.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'independent-adjudicator', signerId: 'adjudicator', hiddenCorpusOwner: 'custodian', inputDigest: digest(boundRuns), outputDigest: digest(boundAdjudications), labeledAt: '2026-08-30T00:00:00.000Z' }),
+  providerTelemetry: signed({ schemaId: 'atm.providerCostTelemetry.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'provider-telemetry', signerId: 'billing-export', provider: 'provider', observedAt: '2026-08-30T00:00:00.000Z', rawExportSha256: `sha256:${createHash('sha256').update(providerRawExport).digest('hex')}`, runIds: boundRuns.map((run) => run.runId) }),
+  providerRawExport
+};
+const boundProtocol = { ...protocolBase, executionPrerequisites: {
+  ...protocolBase.executionPrerequisites,
+  independentAdjudication: { sealed: true, evidenceDigest: digest(boundArtifacts.independentAdjudication) },
+  providerTelemetry: { sealed: true, evidenceDigest: digest(boundArtifacts.providerTelemetry) }
+} };
+const unboundAdjudication = signed({ schemaId: 'atm.adjudicationManifest.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'independent-adjudicator', signerId: 'adjudicator', hiddenCorpusOwner: 'custodian', inputDigest: `sha256:${'9'.repeat(64)}`, outputDigest: digest(boundAdjudications), labeledAt: '2026-08-30T00:00:00.000Z' });
+const unboundAdjudicationDecision = executeExternalBenchmark({ ...boundProtocol, executionPrerequisites: { ...boundProtocol.executionPrerequisites, independentAdjudication: { sealed: true, evidenceDigest: digest(unboundAdjudication) } } }, boundRuns, boundAdjudications, {
+  ...boundArtifacts,
+  independentAdjudication: unboundAdjudication
+});
+assert.equal(unboundAdjudicationDecision.verdict, 'inconclusive');
+assert.match(unboundAdjudicationDecision.rationale.join('\n'), /input digest/i);
 assert.throws(() => executeExternalBenchmark(protocolBase, [], [], verifiedArtifacts), /no raw runs for baseline/);
 console.log('external-benchmark-decision ok');

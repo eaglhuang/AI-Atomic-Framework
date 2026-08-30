@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-PRF-0008",
-  "updatedAt": "2026-08-30T13:05:46.140Z",
+  "updatedAt": "2026-08-30T13:14:18.690Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -1817,6 +1817,410 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:ae2562b659771719e5cc18e96d6a8f4ce418fa525dfe5e6fa13c652f19e06764",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/external-benchmark-decision.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
+      "createdAt": "2026-08-30T13:13:59.197Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/external-benchmark-decision.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.comparative-evaluation-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/atm-comparative-evaluation-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/external-benchmark-decision.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:19cf1f8c3401c3d82d6a915ed31c73884ecceb25555f9f8f35bfb3e28309868b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-30T13:13:58.898Z",
+            "finishedAt": "2026-08-30T13:13:59.197Z",
+            "durationMs": 299,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/external-benchmark-decision.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "472aac1ee13815ab47f53c5040fc9520e32cbeea",
+            "cacheKey": "sha256:a83a3b75cb1a407a241f08789b34d10fd52a2ac25d10a02774508fa318285dd3",
+            "generatedAt": "2026-08-30T13:13:59.197Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:a83a3b75cb1a407a241f08789b34d10fd52a2ac25d10a02774508fa318285dd3",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-30T13:13:59.197Z",
+              "observedAt": "2026-08-30T13:13:59.197Z",
+              "startedAt": "2026-08-30T13:13:58.898Z",
+              "finishedAt": "2026-08-30T13:13:59.197Z",
+              "durationMs": 299,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:02e847bcb3e6a96133c049946009f9577977b4718f9777bc46b4d4435a06f2b9",
+              "outputDigest": "sha256:662da1ec7db129a125a1a0f6b4df757153f8ff1e33d39e1be97010d967b9cf63",
+              "cache": {
+                "key": "sha256:a83a3b75cb1a407a241f08789b34d10fd52a2ac25d10a02774508fa318285dd3",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/external-benchmark-decision.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/external-benchmark-decision.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "472aac1ee13815ab47f53c5040fc9520e32cbeea",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:67bfda74b22708c99c01da444fec4566d461d4afaa80272999fe81e75c24c318",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/external-benchmark-metrics.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
+      "createdAt": "2026-08-30T13:14:02.676Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/external-benchmark-metrics.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.comparative-evaluation-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/atm-comparative-evaluation-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/external-benchmark-metrics.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f27ab6c327030e234a09ace1f2d492045ebbdcc51c574dfe66f78b1e4956be9e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-30T13:14:02.403Z",
+            "finishedAt": "2026-08-30T13:14:02.675Z",
+            "durationMs": 272,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/external-benchmark-metrics.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "472aac1ee13815ab47f53c5040fc9520e32cbeea",
+            "cacheKey": "sha256:f0dc2ac08bd58ea76a1887892146eb8867e9b9cb72389650366647a8434c083e",
+            "generatedAt": "2026-08-30T13:14:02.675Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:f0dc2ac08bd58ea76a1887892146eb8867e9b9cb72389650366647a8434c083e",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-30T13:14:02.675Z",
+              "observedAt": "2026-08-30T13:14:02.675Z",
+              "startedAt": "2026-08-30T13:14:02.403Z",
+              "finishedAt": "2026-08-30T13:14:02.675Z",
+              "durationMs": 272,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:214ff796ea9cd5fda5931752caefbfe54d1d13501bb6a80821513d74c3af32ba",
+              "outputDigest": "sha256:fc84d551cdd045510ed1edf88729725328587730fa40c11f796a9e4b25826d9a",
+              "cache": {
+                "key": "sha256:f0dc2ac08bd58ea76a1887892146eb8867e9b9cb72389650366647a8434c083e",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/external-benchmark-metrics.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/external-benchmark-metrics.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "472aac1ee13815ab47f53c5040fc9520e32cbeea",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:567f1e6d30554718b8b35c064a723eb956a68f267355deffe1b848321c96513b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-external-benchmark-protocol.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
+      "createdAt": "2026-08-30T13:14:06.377Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:external-benchmark-protocol"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.comparative-evaluation-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/atm-comparative-evaluation-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-external-benchmark-protocol.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:22b19d79364ecc2d2d2ae6d677a85478df22f18e5c086acc1d5f7a351db82aa7",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-30T13:14:05.978Z",
+            "finishedAt": "2026-08-30T13:14:06.376Z",
+            "durationMs": 398,
+            "cached": false,
+            "validators": [
+              "validate:external-benchmark-protocol"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "472aac1ee13815ab47f53c5040fc9520e32cbeea",
+            "cacheKey": "sha256:92a88d84a25e4f0718546729eec86eff9059a39a9dfde65c32cdbe7b39d957b8",
+            "generatedAt": "2026-08-30T13:14:06.376Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:92a88d84a25e4f0718546729eec86eff9059a39a9dfde65c32cdbe7b39d957b8",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-30T13:14:06.376Z",
+              "observedAt": "2026-08-30T13:14:06.376Z",
+              "startedAt": "2026-08-30T13:14:05.978Z",
+              "finishedAt": "2026-08-30T13:14:06.376Z",
+              "durationMs": 398,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:0451543d42a6af96e2a13b38dcc5896319fb7ab026d641c2061be91c8847daa8",
+              "outputDigest": "sha256:ecefedcbb8f3e116422490126a32ea75b41cbeb00605bcfe180bef9c5cf70ed7",
+              "cache": {
+                "key": "sha256:92a88d84a25e4f0718546729eec86eff9059a39a9dfde65c32cdbe7b39d957b8",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types scripts/validate-external-benchmark-protocol.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "validate:external-benchmark-protocol"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "472aac1ee13815ab47f53c5040fc9520e32cbeea",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:667cf989994df4ea51f73ce6db539ad5e12c1555fe1e4f5362b1973a4d7d03c7",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npx tsc --noEmit --pretty false",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
+      "createdAt": "2026-08-30T13:14:18.690Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260829162836-codex-captain-TASK-PRF-0008-f5725487da",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.comparative-evaluation-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/atm-comparative-evaluation-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npx tsc --noEmit --pretty false",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-30T13:14:09.434Z",
+            "finishedAt": "2026-08-30T13:14:18.689Z",
+            "durationMs": 9255,
+            "cached": false,
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "472aac1ee13815ab47f53c5040fc9520e32cbeea",
+            "cacheKey": "sha256:1ad7f25c54e9b679a20019113c994e9958a439f23f4affec34a07eafd7773172",
+            "generatedAt": "2026-08-30T13:14:18.689Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:1ad7f25c54e9b679a20019113c994e9958a439f23f4affec34a07eafd7773172",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-30T13:14:18.689Z",
+              "observedAt": "2026-08-30T13:14:18.689Z",
+              "startedAt": "2026-08-30T13:14:09.434Z",
+              "finishedAt": "2026-08-30T13:14:18.689Z",
+              "durationMs": 9255,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:9fe3e45597278aa47c13d15aa3e65d22a79dc131eb20c5ce3cac3b51600b4699",
+              "outputDigest": "sha256:73b4db795a7055d8fd5aadf94d2963333f0d33cd9a13d51041d00710dad53e5b",
+              "cache": {
+                "key": "sha256:1ad7f25c54e9b679a20019113c994e9958a439f23f4affec34a07eafd7773172",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npx tsc --noEmit --pretty false",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [],
+                "runnerKind": "dev-source",
+                "sourceCommit": "472aac1ee13815ab47f53c5040fc9520e32cbeea",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:01495e6cfad96819c5a6aec39a3b6e18727279820436d3aaeeb2f1c8d455f1bd",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
