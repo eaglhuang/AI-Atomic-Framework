@@ -4,7 +4,7 @@
 - Product Proof status: **not established — execution packet prepared**
 - Public ATM arm: `@ai-atomic-framework/cli@0.1.0-beta.4`
 - Public tarball SHA-256: `sha256:6b1affb435479a7bf62e0d69d504f979b2f490680273692ad747ec766f460424`
-- Verifier source commit: `0af98a1b3604cc6cdcf388013236f63d4b0aca17`
+- Verifier source commit: `253cfc907ee86438f0a3c7b85e0518bc0e52382c`
 
 No benchmark result is recorded in this report. No synthetic timing, workspace-linked
 ATM code, inferred provider cost, or self-adjudication is accepted as product proof.
@@ -71,7 +71,7 @@ implementer identities.
    then re-runs `validate-external-benchmark-protocol`. These mutable seals are
    deliberately excluded from `preregistrationDigest`; thresholds and workload are
    not editable at this stage.
-6. Run the verifier from commit `0af98a1b3604cc6cdcf388013236f63d4b0aca17`:
+6. Run the verifier from commit `253cfc907ee86438f0a3c7b85e0518bc0e52382c`:
 
 ```text
 node --strip-types scripts/run-atm-external-benchmark.ts \
