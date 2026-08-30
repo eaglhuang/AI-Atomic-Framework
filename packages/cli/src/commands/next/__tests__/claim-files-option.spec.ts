@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { runNext } from '../../next.ts';
@@ -27,6 +27,12 @@ try {
     scopePaths: ['src/a.ts', 'src/b.ts'],
     deliverables: ['src/a.ts', 'src/b.ts'],
     targetAllowedFiles: ['src/a.ts', 'src/b.ts'],
+    // A prior claim can leave a direction-lock snapshot behind. The next
+    // explicit --files claim must mint its ticket from the new claim scope,
+    // not this stale lifecycle-only snapshot.
+    taskDirectionLock: {
+      allowedFiles: ['.atm/history/tasks/TASK-FILES.json']
+    },
     targetRepo: 'fixture',
     closureAuthority: 'target_repo',
     source: { planPath: null }
@@ -43,6 +49,15 @@ try {
   assert.equal(directionLockFiles.includes('src/a.ts'), true);
   assert.equal(directionLockFiles.includes('src/b.ts'), false);
   assert.equal(directionLockFiles.includes('.atm/history/tasks/TASK-FILES.json'), true);
+  const claimedTask = JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-FILES.json'), 'utf8')) as {
+    workAdmissionTicket: { grants: Array<{ kind?: string; values?: string[] }> };
+  };
+  const fileWriteGrant = claimedTask.workAdmissionTicket.grants
+    .find((grant: { kind?: string }) => grant.kind === 'file-write');
+  assert.ok(fileWriteGrant, 'claim must persist a file-write admission grant');
+  const ticketFiles = fileWriteGrant.values ?? [];
+  assert.equal(ticketFiles.includes('src/a.ts'), true, 'explicit claim scope must be present in the admission ticket');
+  assert.equal(ticketFiles.includes('src/b.ts'), false, 'unclaimed task scope must not be widened into the admission ticket');
   console.log('claim-files-option: ok');
 } finally {
   rmSync(cwd, { recursive: true, force: true });
