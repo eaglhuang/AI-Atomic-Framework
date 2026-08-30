@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   releaseVersionBase,
   releaseVersionSourcesAreCompatible,
@@ -50,5 +53,11 @@ assert.equal(
   false,
   'a frozen runtime from another release train must still block publication'
 );
+
+const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const validatorSource = readFileSync(path.join(repositoryRoot, 'scripts', 'validate-version-compatibility.ts'), 'utf8');
+const releaseWorkflow = readFileSync(path.join(repositoryRoot, '.github', 'workflows', 'release-npm.yml'), 'utf8');
+assert.match(validatorSource, /process\.env\.ATM_RELEASE_TAG/, 'release compatibility must consume the workflow-provided tag when run through the full validator profile');
+assert.match(releaseWorkflow, /ATM_RELEASE_TAG="\$release_version" npm run validate:full/, 'post-publish full validation must pass its resolved release tag into the validator process');
 
 console.log('[release-version-compatibility:test] ok');

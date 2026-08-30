@@ -246,7 +246,13 @@ jobs:
 
       - name: Post-publish full validation
         if: ${{ always() && !cancelled() }}
-        run: npm run validate:full -- --run-id "release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+        shell: bash
+        run: |
+          release_version="${GITHUB_REF_NAME#v}"
+          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
+            release_version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
+          fi
+          ATM_RELEASE_TAG="$release_version" npm run validate:full -- --run-id "release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 
       - name: Attach release artefacts to GitHub Release
         if: ${{ github.event_name != 'workflow_dispatch' }}
