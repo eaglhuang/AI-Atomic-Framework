@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0009",
   "title": "Publish fail-closed benchmark evidence correction and verify protected-main CI",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0007"
@@ -222,14 +222,14 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-31T14-01-11-402Z-renew-2bcbe4a43173",
-  "lastTransitionAt": "2026-08-31T14:01:11.402Z",
+  "lastTransitionId": "2026-08-31T14-11-41-708Z-close-35248fa7a315",
+  "lastTransitionAt": "2026-08-31T14:11:41.708Z",
   "ledgerContractVersion": "task-ledger/v1",
   "claim": {
     "actorId": "codex-gpt-5-4-mini",
     "leaseId": "lease-aa3691cc6976",
     "claimedAt": "2026-08-31T13:58:12.314Z",
-    "heartbeatAt": "2026-08-31T14:01:10.900Z",
+    "heartbeatAt": "2026-08-31T14:11:41.706Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0009.json",
@@ -242,13 +242,14 @@
       "scripts/validate-external-benchmark-protocol.ts",
       "tests/cli/external-benchmark-protocol.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260831135812-codex-gpt-5-4-mini-1f37e6ce3d",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260831135812-codex-gpt-5-4-mini-1f37e6ce3d\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-gpt-5-4-mini",
   "startedAt": "2026-08-31T13:58:12.314Z",
@@ -357,5 +358,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
-  }
+  },
+  "closedAt": "2026-08-31T14:11:41.706Z",
+  "closedByActor": "codex-gpt-5-4-mini",
+  "closedBySessionId": "session-20260831135812-codex-gpt-5-4-mini-TASK-PRF-0009-4e5f30bcca",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0009.closure-packet.json"
 }

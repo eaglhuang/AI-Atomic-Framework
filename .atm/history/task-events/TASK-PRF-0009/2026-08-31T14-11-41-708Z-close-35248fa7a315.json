@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-31T14-11-41-708Z-close-35248fa7a315",
+  "taskId": "TASK-PRF-0009",
+  "action": "close",
+  "actorId": "codex-gpt-5-4-mini",
+  "sessionId": "session-20260831135812-codex-gpt-5-4-mini-TASK-PRF-0009-4e5f30bcca",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0009.json",
+  "taskSha256": "sha256:71c75f4e31c5af1da1cc8658d59aaf2c477edab4c44399e3c4cf5aff11208202",
+  "createdAt": "2026-08-31T14:11:41.708Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0009 --actor codex-gpt-5-4-mini --status done --historical-delivery 8027419ec5594cac25c293a0817acc6d562eebc0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260831135812-codex-gpt-5-4-mini-TASK-PRF-0009-4e5f30bcca",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0009.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "protected-main CI run for the pushed candidate commit succeeds",
+      "typecheck",
+      "validate:external-benchmark-protocol"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "protected-main CI run for the pushed candidate commit succeeds",
+      "typecheck",
+      "validate:external-benchmark-protocol"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-31T14:11:41.702Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0009.*",
+        ".atm/history/task-events/TASK-PRF-0009/**",
+        ".atm/history/tasks/TASK-PRF-0009.json",
+        "packages/cli/dist/**",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**",
+        "schemas/evidence/external-benchmark-run.schema.json",
+        "scripts/fixtures/atm-external-benchmark/manifest.json",
+        "scripts/lib/external-benchmark/runner.ts",
+        "scripts/validate-external-benchmark-protocol.ts",
+        "tests/cli/external-benchmark-protocol.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/**",
+        "schemas/evidence/external-benchmark-run.schema.json",
+        "scripts/fixtures/atm-external-benchmark/manifest.json",
+        "scripts/lib/external-benchmark/runner.ts",
+        "scripts/validate-external-benchmark-protocol.ts",
+        "tests/cli/external-benchmark-protocol.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+        "protected-main CI run for the pushed candidate commit succeeds",
+        "typecheck",
+        "validate:external-benchmark-protocol"
+      ]
+    }
+  }
+}

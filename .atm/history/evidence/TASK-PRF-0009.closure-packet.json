@@ -1,0 +1,193 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0009",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "5f7ca9abae22ac3b80c54a477154a9571176d038",
+  "governedTreeSha": "7b879f3ce39765066ea1aa014214c3566ce6d616",
+  "targetCommitDelta": {
+    "currentCommitSha": "5f7ca9abae22ac3b80c54a477154a9571176d038",
+    "parentCommitShas": [
+      "5f7ca9abae22ac3b80c54a477154a9571176d038"
+    ],
+    "governedTreeSha": "7b879f3ce39765066ea1aa014214c3566ce6d616",
+    "changedFiles": [
+      ".atm/git-hooks/pre-commit",
+      ".atm/git-hooks/pre-push",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-lane-lane-20260809225333-codex-gpt-5-4-mini-07d686dcfd.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0253.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0288.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0289.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0291.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0296.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0297.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0298.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0307.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0314.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0315.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0329.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0331.json",
+      ".atm/history/evidence/ATM-GOV-0332.json",
+      ".atm/history/evidence/ATM-GOV-0333.json",
+      ".atm/history/evidence/ATM-GOV-0336.json",
+      ".atm/history/evidence/ATM-GOV-0337.json",
+      ".atm/history/evidence/ATM-GOV-0345.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0345.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0345.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0349.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0349.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0353.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0356.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0357.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0359.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0360.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T10-16-00-875Z-close-20b4b1f83e0d.json",
+      ".atm/history/tasks/ATM-GOV-0289.json",
+      ".atm/history/tasks/ATM-GOV-0298.json",
+      ".atm/history/tasks/ATM-GOV-0314.json",
+      ".atm/history/tasks/ATM-GOV-0349.json",
+      ".atm/history/tasks/TASK-PRF-0008.json",
+      "packages/cli/dist/commands/tasks/claim-work-admission.js",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic-registry.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-work-admission.js",
+      "release/atm-root-drop/packages/cli/src/commands/next/__tests__/claim-files-option.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-skew-matrix.ts",
+      "release/atm-root-drop/scripts/validate-version-compatibility.ts",
+      "release/atm-root-drop/tests/skew/skew-matrix.test.ts",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e6592d186ba2506be78325cc4da10c134c4c7fde219d2bcef36ed7ba9436b716",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-external-benchmark-protocol.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4a8a35c0d7641b524cf2086602b386efa4062d35753f1001bcbc8b12c0b2e55d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "gh run view 33400362061 --json status,conclusion,headSha,url,workflowName",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3f77925a8f6870e1c3962a3005d628a956fc79808cc0164fa86d8dc4e539fd46",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "protected-main CI run for the pushed candidate commit succeeds",
+    "typecheck",
+    "validate:external-benchmark-protocol"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "protected-main CI run for the pushed candidate commit succeeds",
+    "typecheck",
+    "validate:external-benchmark-protocol"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-08-31T14:11:41.702Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0009.*",
+      ".atm/history/task-events/TASK-PRF-0009/**",
+      ".atm/history/tasks/TASK-PRF-0009.json",
+      "packages/cli/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "schemas/evidence/external-benchmark-run.schema.json",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/validate-external-benchmark-protocol.ts",
+      "tests/cli/external-benchmark-protocol.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/**",
+      "schemas/evidence/external-benchmark-run.schema.json",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/validate-external-benchmark-protocol.ts",
+      "tests/cli/external-benchmark-protocol.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "protected-main CI run for the pushed candidate commit succeeds",
+      "typecheck",
+      "validate:external-benchmark-protocol"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-PRF-0009.json",
+  "closedAt": "2026-08-31T14:11:41.702Z",
+  "closedByActor": "codex-gpt-5-4-mini",
+  "sessionId": "session-20260831135812-codex-gpt-5-4-mini-TASK-PRF-0009-4e5f30bcca",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "8027419ec5594cac25c293a0817acc6d562eebc0",
+    "taskMatchedFiles": [
+      "packages/cli/dist/commands/tasks/claim-work-admission.js"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic-registry.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-work-admission.js",
+      "release/atm-root-drop/packages/cli/src/commands/next/__tests__/claim-files-option.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-skew-matrix.ts",
+      "release/atm-root-drop/scripts/validate-version-compatibility.ts",
+      "release/atm-root-drop/tests/skew/skew-matrix.test.ts"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
