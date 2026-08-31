@@ -1,0 +1,94 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0009",
+  "updatedAt": "2026-08-31T14:10:17.118Z",
+  "updatedBy": "codex-gpt-5-4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "protected-main CI run for the pushed candidate commit succeeds",
+    "typecheck",
+    "validate:external-benchmark-protocol"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e6592d186ba2506be78325cc4da10c134c4c7fde219d2bcef36ed7ba9436b716",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-protocol.test.ts"
+      ],
+      "generatedAt": "2026-08-31T13:58:30.668Z",
+      "startedAt": "2026-08-31T13:58:29.393Z",
+      "finishedAt": "2026-08-31T13:58:30.668Z",
+      "durationMs": 1275,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8d1b022f49ac86429a0c67e05e0feb7a6dd9b366",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-external-benchmark-protocol.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4a8a35c0d7641b524cf2086602b386efa4062d35753f1001bcbc8b12c0b2e55d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:external-benchmark-protocol"
+      ],
+      "generatedAt": "2026-08-31T13:58:34.742Z",
+      "startedAt": "2026-08-31T13:58:34.314Z",
+      "finishedAt": "2026-08-31T13:58:34.742Z",
+      "durationMs": 428,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8d1b022f49ac86429a0c67e05e0feb7a6dd9b366",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-31T13:59:00.333Z",
+      "startedAt": "2026-08-31T13:58:47.607Z",
+      "finishedAt": "2026-08-31T13:59:00.333Z",
+      "durationMs": 12726,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8d1b022f49ac86429a0c67e05e0feb7a6dd9b366",
+      "cached": false
+    },
+    {
+      "command": "gh run view 33400362061 --json status,conclusion,headSha,url,workflowName",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3f77925a8f6870e1c3962a3005d628a956fc79808cc0164fa86d8dc4e539fd46",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-08-31T14:09:36.778Z",
+      "startedAt": "2026-08-31T14:09:35.597Z",
+      "finishedAt": "2026-08-31T14:09:36.778Z",
+      "durationMs": 1181,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8d1b022f49ac86429a0c67e05e0feb7a6dd9b366",
+      "cached": false
+    },
+    {
+      "command": "gh run view 33400362061 --json status,conclusion,headSha,url,workflowName",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3f77925a8f6870e1c3962a3005d628a956fc79808cc0164fa86d8dc4e539fd46",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "protected-main CI run for the pushed candidate commit succeeds"
+      ],
+      "generatedAt": "2026-08-31T14:10:17.117Z",
+      "startedAt": "2026-08-31T14:10:15.632Z",
+      "finishedAt": "2026-08-31T14:10:17.117Z",
+      "durationMs": 1485,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8d1b022f49ac86429a0c67e05e0feb7a6dd9b366",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

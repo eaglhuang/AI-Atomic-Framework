@@ -1,0 +1,361 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0009",
+  "title": "Publish fail-closed benchmark evidence correction and verify protected-main CI",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0007"
+  ],
+  "acceptance": [
+    "ACC-1: A manifest with `hiddenCorpusAcceptance.sealed=true` but no verifiable `atm.hiddenCorpusAcceptance.v1` artifact fails closed.",
+    "ACC-2: The pushed protected-main candidate includes the exact corrected source and generated runner projections, and its required product CI is green.",
+    "ACC-3: `TASK-PRF-0008` remains blocked with independent acceptance, adjudication, and provider-telemetry evidence unresolved; this recovery does not reseal or fabricate any of them."
+  ],
+  "deliverables": [
+    "schemas/evidence/external-benchmark-run.schema.json",
+    "scripts/fixtures/atm-external-benchmark/manifest.json",
+    "scripts/lib/external-benchmark/runner.ts",
+    "scripts/validate-external-benchmark-protocol.ts",
+    "tests/cli/external-benchmark-protocol.test.ts"
+  ],
+  "scopePaths": [
+    "schemas/evidence/external-benchmark-run.schema.json",
+    "scripts/fixtures/atm-external-benchmark/manifest.json",
+    "scripts/lib/external-benchmark/runner.ts",
+    "scripts/validate-external-benchmark-protocol.ts",
+    "tests/cli/external-benchmark-protocol.test.ts",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "node --strip-types scripts/validate-external-benchmark-protocol.ts",
+    "npm run typecheck",
+    "protected-main CI run for the pushed candidate commit succeeds"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "Revert the published fail-closed correction commit range and rerun protected-main CI; never alter benchmark evidence to make a gate pass.",
+  "rollbackNotes": "A rollback restores the prior readiness behavior and must be reported as a safety regression, not as a benchmark conclusion.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.comparative-evaluation-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.external-benchmark-acceptance-gate",
+        "pattern": "Result Contract",
+        "source": "scripts/lib/external-benchmark/runner.ts",
+        "disposition": "inline",
+        "inlineReason": "No source extraction is permitted in this transport-only recovery slice."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "severity": "info",
+      "code": "ATM_TASK_IMPORT_PLANNING_IN_PROGRESS_CLAIMABLE",
+      "message": "Task TASK-PRF-0009 declared planning status in-progress; imported target ledger status as ready so an agent can claim it through next --claim."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0009-publish-fail-closed-benchmark-evidence-correction-and-verify-protected-main-ci.task.md",
+    "sectionTitle": "TASK-PRF-0009",
+    "headingLine": 115,
+    "hash": "1cedc929e72a2e4b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0009-publish-fail-closed-benchmark-evidence-correction-and-verify-protected-main-ci.task.md",
+      "planningCommitSha": "4bdf0a8c5e3780123fce0471514e1a47db45c33e",
+      "contentDigest": "sha256:1cedc929e72a2e4b431dbe212bd076bb0c79d4d04d2bfe270bebc254a4a48fae",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-31T13:57:54.044Z"
+    }
+  },
+  "importedAt": "2026-08-31T13:57:54.044Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0007"
+    ],
+    "startConditions": [
+      "The candidate commit range only changes the external-benchmark acceptance gate and generated runner projections.",
+      "TASK-PRF-0008 remains blocked; no claimed acceptance artifact may be introduced to bypass its independent-evidence requirements."
+    ],
+    "softRelations": [
+      "TASK-PRF-0008"
+    ],
+    "changedPublicSeams": [
+      "external-benchmark-readiness-state",
+      "protected-main-product-ci"
+    ],
+    "causalImpactEdges": [
+      "digest-only-acceptance-claims-fail-closed",
+      "protected-main-exposes-corrected-readiness-state",
+      "prf-0008-external-evidence-state-remains-blocked"
+    ],
+    "parallelFrontierInputs": [
+      "published-cli-beta",
+      "preregistered-benchmark-protocol"
+    ],
+    "validatorReferences": [
+      "test_prf_hidden_acceptance_fail_closed_50ae84d8"
+    ],
+    "phaseOwner": "phase-5-benchmark-publication-recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_hidden_acceptance_fail_closed_50ae84d8",
+      "targetGroupId": "null",
+      "semanticKey": "hidden_acceptance_requires_verifiable_artifact",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "digest-only-acceptance-claims-fail-closed"
+      ],
+      "expectedRedPredicate": "A manifest that marks hidden-corpus acceptance sealed without a verifiable artifact is accepted.",
+      "contributionResourceKey": "hidden-corpus-acceptance",
+      "responsibility": "task-required",
+      "dependencyEdge": "acceptance-artifact-to-readiness",
+      "contractEdge": "external-benchmark-readiness-state",
+      "resourceKey": "external-benchmark-manifest"
+    },
+    {
+      "caseId": "test_prf_protected_main_candidate_integrity_950557f6",
+      "targetGroupId": "null",
+      "semanticKey": "protected_main_candidate_runs_corrected_protocol_gate",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "protected-main-exposes-corrected-readiness-state"
+      ],
+      "expectedRedPredicate": "The protected-main candidate does not contain the corrected protocol gate or its required product CI fails.",
+      "contributionResourceKey": "protected-main-product-ci",
+      "responsibility": "task-required",
+      "dependencyEdge": "pushed-candidate-to-required-check",
+      "contractEdge": "protected-main-product-ci",
+      "resourceKey": "github-actions-run"
+    },
+    {
+      "caseId": "test_prf_blocked_state_preservation_e95727b4",
+      "targetGroupId": "null",
+      "semanticKey": "publication_recovery_does_not_unblock_external_benchmark",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "prf-0008-external-evidence-state-remains-blocked"
+      ],
+      "expectedRedPredicate": "Publication recovery marks the external benchmark ready or sealed without independently verifiable acceptance, adjudication, and telemetry artifacts.",
+      "contributionResourceKey": "external-benchmark-readiness",
+      "responsibility": "task-required",
+      "dependencyEdge": "missing-independent-artifacts-to-blocked-state",
+      "contractEdge": "external-benchmark-readiness-state",
+      "resourceKey": "task-prf-0008-ledger"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_hidden_acceptance_fail_closed_50ae84d8",
+    "test_prf_protected_main_candidate_integrity_950557f6",
+    "test_prf_blocked_state_preservation_e95727b4"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0007",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-31T14-01-11-402Z-renew-2bcbe4a43173",
+  "lastTransitionAt": "2026-08-31T14:01:11.402Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "codex-gpt-5-4-mini",
+    "leaseId": "lease-aa3691cc6976",
+    "claimedAt": "2026-08-31T13:58:12.314Z",
+    "heartbeatAt": "2026-08-31T14:01:10.900Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0009.json",
+      "packages/cli/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "schemas/evidence/external-benchmark-run.schema.json",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/validate-external-benchmark-protocol.ts",
+      "tests/cli/external-benchmark-protocol.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260831135812-codex-gpt-5-4-mini-1f37e6ce3d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260831135812-codex-gpt-5-4-mini-1f37e6ce3d\""
+    }
+  },
+  "owner": "codex-gpt-5-4-mini",
+  "startedAt": "2026-08-31T13:58:12.314Z",
+  "startedByActor": "codex-gpt-5-4-mini",
+  "startedBySessionId": "session-20260831135812-codex-gpt-5-4-mini-TASK-PRF-0009-4e5f30bcca",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0009",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0009.*",
+      ".atm/history/task-events/TASK-PRF-0009/**",
+      ".atm/history/tasks/TASK-PRF-0009.json",
+      "packages/cli/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "schemas/evidence/external-benchmark-run.schema.json",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/validate-external-benchmark-protocol.ts",
+      "tests/cli/external-benchmark-protocol.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "73787df1b0ddf1b8dfb4107fc7dabd0fd0643d87eb304b3cbf5c2fb20e301228",
+    "actorId": "codex-gpt-5-4-mini",
+    "sessionId": "session-20260831135812-codex-gpt-5-4-mini-TASK-PRF-0009-4e5f30bcca",
+    "laneSession": {
+      "laneSessionId": "lane-20260831135812-codex-gpt-5-4-mini-1f37e6ce3d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260831135812-codex-gpt-5-4-mini-1f37e6ce3d\""
+    },
+    "createdAt": "2026-08-31T13:58:14.388Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-3c320c592aef01b0",
+    "ticketDigest": "sha256:3c320c592aef01b040c10e00ca30c7fc70492e36bebf5f3a0d196f8e330211ca",
+    "taskId": "TASK-PRF-0009",
+    "origin": "claim",
+    "actorId": "codex-gpt-5-4-mini",
+    "laneSessionId": "lane-20260831135812-codex-gpt-5-4-mini-1f37e6ce3d",
+    "claimGeneration": "lease-aa3691cc6976",
+    "issuedAt": "2026-08-31T14:01:10.900Z",
+    "expiresAt": "2026-08-31T14:31:10.900Z",
+    "scopeDigest": "sha256:d2a1760b660464fb57ea4aca7e343853a6cc2215a754b4671b66fd01d7bdc95b",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-08-31T14:01:10.900Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0009.*",
+          ".atm/history/task-events/TASK-PRF-0009/**",
+          ".atm/history/tasks/TASK-PRF-0009.json",
+          "packages/cli/dist/**",
+          "release/atm-onefile/**",
+          "release/atm-root-drop/**",
+          "schemas/evidence/external-benchmark-run.schema.json",
+          "scripts/fixtures/atm-external-benchmark/manifest.json",
+          "scripts/lib/external-benchmark/runner.ts",
+          "scripts/validate-external-benchmark-protocol.ts",
+          "tests/cli/external-benchmark-protocol.test.ts"
+        ],
+        "digest": "sha256:bd7b27ad0c1666bc10e2c8751cd05cd79982e1cf91fa6bde1b85043656eda2e7"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  }
+}
