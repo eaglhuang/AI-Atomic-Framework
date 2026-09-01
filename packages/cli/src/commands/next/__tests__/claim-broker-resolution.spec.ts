@@ -193,6 +193,7 @@ try {
       '--conflict', conflictTaskId,
       '--path', overlapAtomId,
       '--resource-kind', 'atom',
+      '--release-order', `${primaryTaskId},${conflictTaskId}`,
       '--decision-reason', 'broker-conflict-blocked until the release order grants the next task.',
       '--created-at', '2026-07-22T00:00:00.000Z',
       '--cwd', govRepo,
