@@ -3,7 +3,7 @@
  *
  * Usage: atm registry-diff <atomId> --from <v1> --to <v2> [--json] [--registry <path>] [--reason <text>]
  */
-import { computeHashDiffReport, loadRegistryDocument, resolveRegistryDiffTarget } from '../../../core/dist/registry/diff.js';
+import { computeHashDiffReport, loadRegistryDocument, resolveRegistryDiffTarget } from '../_vendor/core/dist/registry/diff.js';
 import { makeResult, message } from './shared.js';
 function parseArgs(args) {
     const parsed = {

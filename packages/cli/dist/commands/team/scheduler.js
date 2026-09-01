@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
-import { createTeamContextManifest } from '../../../../core/dist/team-runtime/context-manifest.js';
-import { createTeamContributionManifest, createCleanContextReviewerReceipt } from '../../../../core/dist/team-runtime/contribution-manifest.js';
+import { createTeamContextManifest } from '../../_vendor/core/dist/team-runtime/context-manifest.js';
+import { createTeamContributionManifest, createCleanContextReviewerReceipt } from '../../_vendor/core/dist/team-runtime/contribution-manifest.js';
 export function createTeamShadowSchedule(input) {
     const collapsedGroups = collapseNonIndependentGroups(input.workGroups);
     const reservations = collapsedGroups.map((group) => createReservation(input, group));

@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { generateAtomicMap } from '../../../core/dist/manager/map-generator.js';
-import { createAtomicMapRequestFromDecompositionPlan, readDecompositionPlan } from '../../../core/dist/registry/decomposition-plan.js';
+import { generateAtomicMap } from '../_vendor/core/dist/manager/map-generator.js';
+import { createAtomicMapRequestFromDecompositionPlan, readDecompositionPlan } from '../_vendor/core/dist/registry/decomposition-plan.js';
 import { validateAtomicSpecFileAgainstSchema } from './spec-shared.js';
 import { CliError, makeResult, message, quoteCliValue, readJsonFile, relativePathFrom } from './shared.js';
 export function runCreateMap(argv) {

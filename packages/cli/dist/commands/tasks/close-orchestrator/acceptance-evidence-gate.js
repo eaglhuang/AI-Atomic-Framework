@@ -1,4 +1,4 @@
-import { evaluateAcceptanceEvidenceMap } from '../../../../../core/dist/evidence/index.js';
+import { evaluateAcceptanceEvidenceMap } from '../../../_vendor/core/dist/evidence/index.js';
 import { CliError } from '../../shared.js';
 import { parseAcceptanceEvidenceMap } from '../acceptance-evidence-import.js';
 /** CLI adapter for the core acceptance predicate evaluator; it owns no second acceptance algorithm. */

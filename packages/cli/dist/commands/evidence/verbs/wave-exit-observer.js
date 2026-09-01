@@ -3,8 +3,8 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { resolveActorId } from '../../actor-registry.js';
 import { CliError, makeResult, message } from '../../shared.js';
-import { exclusiveAtomicCreate, writeWaveExitObserverReceipt, WaveExitObserverWriteError, WAVE_EXIT_OBSERVER_WRITE_COMMAND } from '../../../../../core/dist/evidence/wave-exit-observer-receipt-writer.js';
-import { loadWaveExitObserverPolicy, resolveWaveExitBasisProducer } from '../../../../../core/dist/evidence/wave-exit-observer-receipt.js';
+import { exclusiveAtomicCreate, writeWaveExitObserverReceipt, WaveExitObserverWriteError, WAVE_EXIT_OBSERVER_WRITE_COMMAND } from '../../../_vendor/core/dist/evidence/wave-exit-observer-receipt-writer.js';
+import { loadWaveExitObserverPolicy, resolveWaveExitBasisProducer } from '../../../_vendor/core/dist/evidence/wave-exit-observer-receipt.js';
 const ALLOWED_FLAGS = new Set([
     '--cwd',
     '--exit',

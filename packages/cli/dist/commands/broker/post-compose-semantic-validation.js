@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
-import { evaluatePostComposeSemanticValidation, toStewardSemanticAuthorizationReceipt } from '../../../../core/dist/broker/post-compose-semantic-validation-policy.js';
+import { evaluatePostComposeSemanticValidation, toStewardSemanticAuthorizationReceipt } from '../../_vendor/core/dist/broker/post-compose-semantic-validation-policy.js';
 /**
  * CLI side-effect adapter for post-compose semantic validation.
  * Selects and (optionally) executes declared validators, then applies the pure

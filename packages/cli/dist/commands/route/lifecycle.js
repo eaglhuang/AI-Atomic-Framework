@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { resumeFreeze } from '../../../../core/dist/broker/freeze.js';
+import { resumeFreeze } from '../../_vendor/core/dist/broker/freeze.js';
 import { CliError, makeResult, message } from '../shared.js';
 import { buildRouteFreezeRuntime, buildRoutePatchEnvelopeHandoff, clearRouteFreezeRuntime, readRouteFreezeRuntime, runRoutePatchEnvelopeHandoff, serializeFreezeProtocolEvidence, writePatchEnvelopeFile, writeRouteFreezeRuntime } from './freeze-patch.js';
 import { parseResourceSet, validateRouteContext } from './validation.js';

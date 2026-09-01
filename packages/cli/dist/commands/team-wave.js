@@ -9,11 +9,11 @@ import { validateStrictPathHeuristic } from './tasks/task-import-validators.js';
 import { createTeamProposalWorkspaceProviderPlan } from './team/proposal-workspace.js';
 import { findActiveTaskQueue } from './task-direction.js';
 import { readActiveBatchRun } from './work-channels.js';
-import { planWaves } from '../../../core/dist/broker/team-wave-planner.js';
-import { admitWave } from '../../../core/dist/broker/team-wave-admission.js';
-import { createTeamWaveEnvelope } from '../../../core/dist/broker/team-wave-envelope.js';
-import { createWaveManifest, evaluateWaveEligibility } from '../../../core/dist/broker/wave-manifest.js';
-import { buildTeamWorkerExecutionRuntime } from '../../../core/dist/team-agents/worker-executor.js';
+import { planWaves } from '../_vendor/core/dist/broker/team-wave-planner.js';
+import { admitWave } from '../_vendor/core/dist/broker/team-wave-admission.js';
+import { createTeamWaveEnvelope } from '../_vendor/core/dist/broker/team-wave-envelope.js';
+import { createWaveManifest, evaluateWaveEligibility } from '../_vendor/core/dist/broker/wave-manifest.js';
+import { buildTeamWorkerExecutionRuntime } from '../_vendor/core/dist/team-agents/worker-executor.js';
 const TASKS_DIR = '.atm/history/tasks';
 function readLedgerTask(cwd, taskId) {
     const file = path.join(cwd, TASKS_DIR, `${taskId}.json`);

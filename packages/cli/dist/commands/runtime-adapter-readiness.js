@@ -1,10 +1,10 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { probeProject } from '../../../core/dist/guidance/index.js';
-import { createJavaScriptLanguageAdapter, detectProjectProfile as detectJavaScriptProjectProfile } from '../../../language-js/dist/index.js';
-import { createPythonLanguageAdapter, detectPythonProjectProfile } from '../../../language-python/dist/index.js';
-import { createCSharpLanguageAdapter, detectCSharpProjectProfile } from '../../../language-csharp/dist/index.js';
+import { probeProject } from '../_vendor/core/dist/guidance/index.js';
+import { createJavaScriptLanguageAdapter, detectProjectProfile as detectJavaScriptProjectProfile } from '../_vendor/language-js/dist/index.js';
+import { createPythonLanguageAdapter, detectPythonProjectProfile } from '../_vendor/language-python/dist/index.js';
+import { createCSharpLanguageAdapter, detectCSharpProjectProfile } from '../_vendor/language-csharp/dist/index.js';
 export function inspectRuntimeAdapterReadiness(repositoryRoot) {
     const orientation = probeProject(repositoryRoot);
     const pythonOnlyHost = orientation.detectedLanguages.includes('Python')

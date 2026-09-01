@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { hasReconciliationEntitlement } from '../../../../core/dist/broker/terminal-history-entitlement.js';
+import { hasReconciliationEntitlement } from '../../_vendor/core/dist/broker/terminal-history-entitlement.js';
 export const ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE = 'ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE';
 function normalizeRelativePath(filePath) {
     return filePath.trim().replace(/\\/g, '/').replace(/^\.\/+/, '');

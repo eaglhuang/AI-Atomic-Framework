@@ -11,7 +11,7 @@ function setStdinBlocking(blocking) {
 }
 function hasNonBlockingStdinSupport() { return typeof fs.setBlocking === 'function'; }
 function readStdinBytes(scratch) { return readSync(0, scratch, 0, scratch.length, null); }
-import { ATM_ONLY_EXECUTION_ROUTE_NOTICE, describeRestrictedExecutionAdapterCapability, evaluateRestrictedExecution } from '../../../../core/dist/team-agents/restricted-execution-gateway.js';
+import { ATM_ONLY_EXECUTION_ROUTE_NOTICE, describeRestrictedExecutionAdapterCapability, evaluateRestrictedExecution } from '../../_vendor/core/dist/team-agents/restricted-execution-gateway.js';
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus, detectFrameworkRepoIdentity, isAtmCriticalNonDocSurface } from '../framework-development.js';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../task-direction.js';
 import { extractPathLikeStringsFromPrompt, isPathAllowedByScope, isQuickfixPrompt, readActiveQuickfixLock } from '../work-channels.js';

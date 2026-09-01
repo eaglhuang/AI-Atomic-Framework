@@ -4565,6 +4565,7 @@
     "release/atm-root-drop/scripts/lib/validator-envelope.ts",
     "release/atm-root-drop/scripts/lib/validator-fixture.ts",
     "release/atm-root-drop/scripts/lib/validator-harness.ts",
+    "release/atm-root-drop/scripts/lib/windows-write-retry.ts",
     "release/atm-root-drop/scripts/list-packages.ts",
     "release/atm-root-drop/scripts/migrate-evidence-ledger.ts",
     "release/atm-root-drop/scripts/module-boundaries.config.json",
@@ -5634,6 +5635,7 @@
     "release/atm-root-drop/tests/cli/vcs-neutral-commit-candidate-isolation.test.ts",
     "release/atm-root-drop/tests/cli/wave-exit-observer-receipt-writer.test.ts",
     "release/atm-root-drop/tests/cli/wave-exit-observer-receipt.test.ts",
+    "release/atm-root-drop/tests/cli/windows-write-retry.test.ts",
     "release/atm-root-drop/tests/cli/work-admission-coverage-gates.test.ts",
     "release/atm-root-drop/tests/cli/work-admission-cross-adapter-dogfood.test.ts",
     "release/atm-root-drop/tests/cli/work-admission-ticket-claim.test.ts",
@@ -5962,8 +5964,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1331,
-    "unchanged": 4596,
+    "copied": 1330,
+    "unchanged": 4599,
     "removed": 0
   },
   "buildMode": "full",
@@ -45255,7 +45257,7 @@
       },
       {
         "path": "scripts/build-package-dist.ts",
-        "digest": "c21c44e6393172b42a065a7255864249728d9229798262c65ea34815cf252685",
+        "digest": "949e51e7e67bb68bb5c0d01da4c60d3226d2b181666c626e701da681dad3fd44",
         "origin": "source",
         "inputPaths": [
           "scripts/build-package-dist.ts"
@@ -46762,6 +46764,15 @@
         "origin": "source",
         "inputPaths": [
           "scripts/lib/validator-harness.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/lib/windows-write-retry.ts",
+        "digest": "18285a58297e666c99c89a28b963e403b0fceee709b0a000f070726de0cfd939",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/windows-write-retry.ts"
         ],
         "replaceable": true
       },
@@ -56387,6 +56398,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/windows-write-retry.test.ts",
+        "digest": "28bf4ff29d2f1e8c06d1751e9f350f69b02c0ae9087efc098ca0046d7dd78d0e",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/windows-write-retry.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/work-admission-coverage-gates.test.ts",
         "digest": "a5e9d3f465a872ee211112927334db412272422ddbdd9149801c533af1b5769d",
         "origin": "source",
@@ -59312,7 +59332,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:9c74ea9e8945a927cd85a5dad64cee645150b499be4c8863109449bcd3513250"
+    "treeDigest": "sha256:2b6ae623379d12b34d074e2df514b49e8c69f433a8b39ce3deb6c56d17204926"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60773,7 +60793,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:e39df668f658edb6e7f479d2708c16e6ea15e2864d3d802ffedcaf7e5113913b"
+    "digest": "sha256:aca91deb1fc7c7c583736f1760e7cbdf952255ea4542f3e2153f01b1e56b53e0"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -65312,6 +65332,7 @@
       "release/atm-root-drop/scripts/lib/validator-envelope.ts",
       "release/atm-root-drop/scripts/lib/validator-fixture.ts",
       "release/atm-root-drop/scripts/lib/validator-harness.ts",
+      "release/atm-root-drop/scripts/lib/windows-write-retry.ts",
       "release/atm-root-drop/scripts/list-packages.ts",
       "release/atm-root-drop/scripts/migrate-evidence-ledger.ts",
       "release/atm-root-drop/scripts/module-boundaries.config.json",
@@ -66381,6 +66402,7 @@
       "release/atm-root-drop/tests/cli/vcs-neutral-commit-candidate-isolation.test.ts",
       "release/atm-root-drop/tests/cli/wave-exit-observer-receipt-writer.test.ts",
       "release/atm-root-drop/tests/cli/wave-exit-observer-receipt.test.ts",
+      "release/atm-root-drop/tests/cli/windows-write-retry.test.ts",
       "release/atm-root-drop/tests/cli/work-admission-coverage-gates.test.ts",
       "release/atm-root-drop/tests/cli/work-admission-cross-adapter-dogfood.test.ts",
       "release/atm-root-drop/tests/cli/work-admission-ticket-claim.test.ts",
@@ -66712,22 +66734,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:ea28183bca28e96e956c31fb64baa93d6e2506edd13e9e10f25e54f8ab179a72",
-  "sealedSourceCommit": "f5828178f0bdd90d31774dbd9d2a8afd7debbc9a",
+  "buildInputsTreeHash": "sha256:f3839ff61cb96dac6f6c2a5c75992922772a207c12d17c459a77cd57ccd021ac",
+  "sealedSourceCommit": "1a738d06e07e1bc004616d0e5ce873f7f8515341",
   "buildDecision": "fullRebuild",
-  "buildDecisionReason": "release artifacts are dirty or missing",
-  "incrementalPlanDigest": "sha256:d1e3929e403798a08309a560cb36e53f13a6379b842ea2fbddfe4779d93cbdc6",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:3da9806e168e5beb95dc0e4fafafc8d5573c14bc4b643e76b292b9542ee129db",
   "tsBuildCacheDigest": "sha256:9a58c5eca1ce3a1a12a4568550aaacbeddc9c4bb4b575ed6fc6680553d49ed61",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 44,
-    "skipDecision": 232,
-    "worktreeSetup": 9557,
-    "typescriptBuild": 7929,
-    "rootDropReleaseAssembly": 28410,
-    "onefileReleaseAssembly": 7216,
-    "artifactSync": 9155,
+    "inputHashCalculation": 51,
+    "skipDecision": 55,
+    "worktreeSetup": 9447,
+    "typescriptBuild": 8016,
+    "rootDropReleaseAssembly": 28670,
+    "onefileReleaseAssembly": 6883,
+    "artifactSync": 8677,
     "cleanup": 0,
-    "totalElapsed": 65451
+    "totalElapsed": 64350
   }
 }

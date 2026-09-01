@@ -1,12 +1,12 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { hashFiles, renderManifest } from '../../../agent-pack-sdk/dist/index.js';
-import { claudeCodePack } from '../../../agent-pack-claude-code/dist/index.js';
-import { copilotPack } from '../../../agent-pack-copilot/dist/index.js';
-import { cursorPack } from '../../../agent-pack-cursor/dist/index.js';
-import { geminiPack } from '../../../agent-pack-gemini/dist/index.js';
-import { windsurfPack } from '../../../agent-pack-windsurf/dist/index.js';
+import { hashFiles, renderManifest } from '../_vendor/agent-pack-sdk/dist/index.js';
+import { claudeCodePack } from '../_vendor/agent-pack-claude-code/dist/index.js';
+import { copilotPack } from '../_vendor/agent-pack-copilot/dist/index.js';
+import { cursorPack } from '../_vendor/agent-pack-cursor/dist/index.js';
+import { geminiPack } from '../_vendor/agent-pack-gemini/dist/index.js';
+import { windsurfPack } from '../_vendor/agent-pack-windsurf/dist/index.js';
 import { collectATMChartSources, collectSchemaDrift } from './atm-chart.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { getCommandSpec } from './command-specs.js';

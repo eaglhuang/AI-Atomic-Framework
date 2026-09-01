@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { transitionReplacementMode } from '../../../core/dist/registry/replacement-lane.js';
+import { transitionReplacementMode } from '../_vendor/core/dist/registry/replacement-lane.js';
 import { getCommandSpec } from './command-specs.js';
 import { CliError, makeResult, message, parseArgsForCommand, relativePathFrom } from './shared.js';
 export async function runReplacementLane(argv) {

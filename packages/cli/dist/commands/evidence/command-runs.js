@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { CliError } from '../shared.js';
-import { buildTelemetryObservation, normalizeTelemetryDurationMs } from '../../../../core/dist/telemetry/observation.js';
+import { buildTelemetryObservation, normalizeTelemetryDurationMs } from '../../_vendor/core/dist/telemetry/observation.js';
 import { canonicalizeValidatorIdentity } from './validator-classification.js';
 import { isRecord } from './shared-utils.js';
 function isSha256(value) {

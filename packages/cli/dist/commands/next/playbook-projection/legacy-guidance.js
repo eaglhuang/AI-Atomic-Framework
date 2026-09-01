@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { loadHumanReviewQueueDocument } from '../../../../../plugin-human-review/dist/index.js';
+import { loadHumanReviewQueueDocument } from '../../../_vendor/plugin-human-review/dist/index.js';
 import { dedupeStrings, quoteCliValue } from '../view-projections.js';
 import { parseJsonText } from '../../shared.js';
 import { compareGuidedLegacyQueuePriority, compareIsoDesc } from '../match-and-sort.js';

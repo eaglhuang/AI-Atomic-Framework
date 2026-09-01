@@ -10,7 +10,7 @@ import { hasLiveFrameworkTempClaimAttribution } from './framework-temp-claim-att
 import { CliError, quoteCliValue, relativePathFrom } from '../../shared.js';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.js';
 import { isPathAllowedByScope, listActiveBatchRuns } from '../../work-channels.js';
-import { checkWorkAdmissionTicket } from '../../../../../core/dist/broker/work-admission-ticket.js';
+import { checkWorkAdmissionTicket } from '../../../_vendor/core/dist/broker/work-admission-ticket.js';
 import { buildPendingCheckpointCommitWindow } from '../../batch.js';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.js';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../../tasks/task-import-validators.js';

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { loadCharterAuthorityBundle } from '../../../../integrations-core/dist/compiler/charter-block.js';
+import { loadCharterAuthorityBundle } from '../../_vendor/integrations-core/dist/compiler/charter-block.js';
 export function createCheck(name, ok, details) {
     return {
         name,

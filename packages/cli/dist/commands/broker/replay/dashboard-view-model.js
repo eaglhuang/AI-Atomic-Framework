@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { buildReplayDashboardSnapshot, createReplayRunManifest } from '../../../../../core/dist/broker/replay/dashboard.js';
+import { buildReplayDashboardSnapshot, createReplayRunManifest } from '../../../_vendor/core/dist/broker/replay/dashboard.js';
 import { summarizeLifecycleObservations } from './dashboard-lifecycle-observations.js';
 import { summarizeTicketObservations } from './dashboard-ticket-observations.js';
 export function buildReplayDashboardViewModel(options) {

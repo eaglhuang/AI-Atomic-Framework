@@ -1,10 +1,10 @@
-import { buildAnthropicTeamProviderBridgeDescriptor } from '../../../../core/dist/team-runtime/providers/anthropic.js';
-import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../../core/dist/team-runtime/providers/azure-openai.js';
-import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../../core/dist/team-runtime/providers/claude-code.js';
-import { buildGeminiTeamProviderBridgeDescriptor } from '../../../../core/dist/team-runtime/providers/gemini.js';
-import { buildGeminiDirectTeamProviderBridgeDescriptor } from '../../../../core/dist/team-runtime/providers/gemini-direct.js';
-import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../../core/dist/team-runtime/providers/microsoft-foundry.js';
-import { buildOpenAITeamProviderBridgeDescriptor } from '../../../../core/dist/team-runtime/providers/openai.js';
+import { buildAnthropicTeamProviderBridgeDescriptor } from '../../_vendor/core/dist/team-runtime/providers/anthropic.js';
+import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../_vendor/core/dist/team-runtime/providers/azure-openai.js';
+import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../_vendor/core/dist/team-runtime/providers/claude-code.js';
+import { buildGeminiTeamProviderBridgeDescriptor } from '../../_vendor/core/dist/team-runtime/providers/gemini.js';
+import { buildGeminiDirectTeamProviderBridgeDescriptor } from '../../_vendor/core/dist/team-runtime/providers/gemini-direct.js';
+import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../_vendor/core/dist/team-runtime/providers/microsoft-foundry.js';
+import { buildOpenAITeamProviderBridgeDescriptor } from '../../_vendor/core/dist/team-runtime/providers/openai.js';
 export function buildOpenAIFamilyRuntimeBridgeSummary() {
     return {
         schemaId: 'atm.openAIFamilyRuntimeBridgeSummary.v1',

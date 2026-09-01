@@ -1,6 +1,6 @@
 import { CliError, makeResult, message } from '../../shared.js';
-import { createTeamObservabilityEvent } from '../../../../../core/dist/team-runtime/observability.js';
-import { readTeamHandoffArtifacts, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../../../../../core/dist/team-runtime/handoff-ledger.js';
+import { createTeamObservabilityEvent } from '../../../_vendor/core/dist/team-runtime/observability.js';
+import { readTeamHandoffArtifacts, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../../../_vendor/core/dist/team-runtime/handoff-ledger.js';
 import { teamPermissionCatalog } from './types.js';
 import { appendTeamRuntimeObservabilityEvents, buildDirectTeamRoleInstructions, TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS } from './provider-execution.js';
 import { normalizePermissionLeaseRecords, readTeamRun } from './team-run-store.js';

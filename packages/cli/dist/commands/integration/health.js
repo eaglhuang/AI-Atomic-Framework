@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { TEAM_DIRECT_API_PROVIDER_IDS } from '../../../../core/dist/team-runtime/provider-contract.js';
+import { TEAM_DIRECT_API_PROVIDER_IDS } from '../../_vendor/core/dist/team-runtime/provider-contract.js';
 import { readJsonFile, CliError, resolveValue } from '../shared.js';
 import { createIntegrationAdapter, createIntegrationContext, isKnownIntegrationAdapter, manifestPathForIntegration } from './adapters.js';
 export async function checkIntegrationHealth(repositoryRoot) {

@@ -24,5 +24,23 @@
     "contractSurface": "release-manifest.json",
     "dependsOnRootDropManifest": "release/atm-root-drop/release-manifest.json",
     "rationale": "release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list."
+  },
+  "buildInputsTreeHash": "sha256:f3839ff61cb96dac6f6c2a5c75992922772a207c12d17c459a77cd57ccd021ac",
+  "sealedSourceCommit": "1a738d06e07e1bc004616d0e5ce873f7f8515341",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:3da9806e168e5beb95dc0e4fafafc8d5573c14bc4b643e76b292b9542ee129db",
+  "tsBuildCacheDigest": "sha256:9a58c5eca1ce3a1a12a4568550aaacbeddc9c4bb4b575ed6fc6680553d49ed61",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
+  "phaseTimingsMs": {
+    "inputHashCalculation": 51,
+    "skipDecision": 55,
+    "worktreeSetup": 9447,
+    "typescriptBuild": 8016,
+    "rootDropReleaseAssembly": 28670,
+    "onefileReleaseAssembly": 6883,
+    "artifactSync": 8677,
+    "cleanup": 0,
+    "totalElapsed": 64350
   }
 }

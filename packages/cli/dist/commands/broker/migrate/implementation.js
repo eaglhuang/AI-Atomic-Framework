@@ -1,5 +1,5 @@
-import { authorizeBrokerTicket } from '../../../../../core/dist/broker/ticket-authority/index.js';
-import { digestBrokerLifecycleState } from '../../../../../core/dist/broker/lifecycle/index.js';
+import { authorizeBrokerTicket } from '../../../_vendor/core/dist/broker/ticket-authority/index.js';
+import { digestBrokerLifecycleState } from '../../../_vendor/core/dist/broker/lifecycle/index.js';
 export function buildLegacyBcrMigrationPlan(input) {
     const entries = input.records.map((record, index) => {
         const id = normalizeToken(record.id) || `legacy-bcr-${index + 1}`;

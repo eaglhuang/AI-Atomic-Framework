@@ -1,7 +1,7 @@
 import { isAllowedGovernanceArtifactPath, isExplicitTerminalHistoryCleanupArtifact, isFileAllowedInTaskBundle, listTaskOwnedProtectedOverrideAuditFiles, readProtectedOverrideAuditTaskId, readStagedFiles, readStagedJsonFile, } from './git-index-transaction.js';
 import { isCommitAttributionSideEffectPath, isIgnorableTaskScopedDirtySideEffect, listCommitAttributionSideEffectPaths, resolveGitExecutable, runGitCommand, } from './git-process-port.js';
 import { forEachPathspecBatch } from './pathspec-argv-batching.js';
-import { resolveTaskHistoryOwnerTaskId } from '../../../../../core/dist/broker/cross-task-mutation-guard.js';
+import { resolveTaskHistoryOwnerTaskId } from '../../../_vendor/core/dist/broker/cross-task-mutation-guard.js';
 import { existsSync, readFileSync, readdirSync, rmSync, statSync, } from "node:fs";
 import path from "node:path";
 import { gitHeadEvidencePaths, } from "../../git-head-evidence.js";

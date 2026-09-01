@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message, quoteCliValue, readJsonFile } from '../../shared.js';
-import { readTeamHandoffArtifacts, renderTeamHandoffIndex, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../../../../../core/dist/team-runtime/handoff-ledger.js';
+import { readTeamHandoffArtifacts, renderTeamHandoffIndex, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../../../_vendor/core/dist/team-runtime/handoff-ledger.js';
 import { normalizeOptionalRuntimeString } from './runtime-governance.js';
 import { buildTeamPatrolFollowUp, buildTeamRunPatrolFindings, summarizePatrolSeverity, suggestedPatrolCommand, teamPatrolFinding } from './patrol-contracts.js';
 import { evaluateLargeScriptRisk } from './crew-decision-policy.js';

@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
-import { appendPlanBatchRunEvent, planExecutorPhaseChain, readPlanBatchRunEvents, readPlanBatchRun, startPlanBatchRun } from '../../../../core/dist/batch/plan-run-journal.js';
-import { buildTelemetryObservation } from '../../../../core/dist/telemetry/observation.js';
+import { appendPlanBatchRunEvent, planExecutorPhaseChain, readPlanBatchRunEvents, readPlanBatchRun, startPlanBatchRun } from '../../_vendor/core/dist/batch/plan-run-journal.js';
+import { buildTelemetryObservation } from '../../_vendor/core/dist/telemetry/observation.js';
 import { resolveActorId } from '../actor-registry.js';
 import { CliError, makeResult, message, parseOptions } from '../shared.js';
-import { evaluateValidationContract } from '../../../../core/dist/evidence/validation-contract.js';
+import { evaluateValidationContract } from '../../_vendor/core/dist/evidence/validation-contract.js';
 // Batch adapter for the causal validator selector. The batch executor no longer
 // recomputes its own required-validator set: required-set computation is
 // delegated entirely to the single evaluateValidationContract evaluator, which

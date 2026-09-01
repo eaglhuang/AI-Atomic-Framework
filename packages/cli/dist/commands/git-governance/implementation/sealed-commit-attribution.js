@@ -14,7 +14,7 @@
 import { mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { ATM_COMMIT_ATTRIBUTION_MISMATCH, ATM_COMMIT_ATTRIBUTION_UNSEALED_BUNDLE, assertSealedBundleNotEmpty, compareCommitTreeToSealedBundle, findSealedBundleProvenanceConflicts, isTombstone, sealCommitBundle } from '../../../../../core/dist/commit-attribution/sealed-commit-bundle.js';
+import { ATM_COMMIT_ATTRIBUTION_MISMATCH, ATM_COMMIT_ATTRIBUTION_UNSEALED_BUNDLE, assertSealedBundleNotEmpty, compareCommitTreeToSealedBundle, findSealedBundleProvenanceConflicts, isTombstone, sealCommitBundle } from '../../../_vendor/core/dist/commit-attribution/sealed-commit-bundle.js';
 import { CliError } from '../../shared.js';
 import { runGitCommand, runGitCommandWithEnv } from './git-process-port.js';
 import { attachLiveIndexReconciliation, captureLiveIndexSnapshot, readHeadCommit, reconcileLiveIndexAfterCommitAttempt } from './live-index-reconciliation.js';
