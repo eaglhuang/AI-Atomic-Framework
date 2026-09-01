@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { buildTaskflowCommitMessage } from './commit-messages.js';
 import { withCloseTransactionMutex } from './close-transaction-mutex.js';
-import { expandDirectoryDeliverableDeclarations } from '../tasks/historical-delivery.js';
+import { expandDirectoryDeliverableDeclarations, isHistoricalEvidenceOnlyScope } from '../tasks/historical-delivery.js';
 import { loadTaskDocumentOrThrow } from '../tasks/public-surface.js';
 import { assertCloseWindowStagingAllowed, readCloseWindowStagedIndexLockReport } from '../tasks/close-window-lock.js';
 import { validateStrictPathHeuristic } from '../tasks/task-import-validators.js';
@@ -351,6 +351,7 @@ export function buildTaskflowCommitBundle(input) {
     const dirtyFiles = getDirtyFiles(targetRepoRoot);
     const historicalCommitted = getHistoricalCommittedFiles(targetRepoRoot, input.historicalDeliveryRefs ?? []);
     const historicalCloseback = historicalCommitted.length > 0;
+    const historyOnlyCloseback = historicalCloseback && isHistoricalEvidenceOnlyScope(scopePaths);
     let allowed = uniqueSorted([...targetAllowedFiles, ...resolveTaskflowDeclaredFiles(targetRepoRoot, input.taskId, taskDocument).filter((entry) => !entry.startsWith('.atm/'))]);
     if (allowed.length === 0) {
         allowed = scopePaths;
@@ -365,7 +366,7 @@ export function buildTaskflowCommitBundle(input) {
     const scopeAmendmentCandidateFiles = [];
     let metadataFailClosed = false;
     let failClosedReason = null;
-    if (deliverables.length === 0) {
+    if (deliverables.length === 0 && !historyOnlyCloseback) {
         metadataFailClosed = true;
         failClosedReason = 'Task metadata error: "deliverables" list is empty or missing.';
     }

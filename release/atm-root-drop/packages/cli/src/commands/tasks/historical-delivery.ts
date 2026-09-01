@@ -424,12 +424,16 @@ function isDeclaredCanonicalCharterDeliverable(filePath: string, declaredFiles: 
     && declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared));
 }
 
+export function isHistoricalEvidenceOnlyScope(declaredFiles: readonly string[]): boolean {
+  const declared = declaredFiles.map((entry) => normalizeRelativePath(entry)).filter(Boolean);
+  return declared.length > 0 && declared.every((entry) => entry.startsWith('.atm/history/'));
+}
+
 function isDeclaredHistoricalEvidenceDeliverable(filePath: string, declaredFiles: readonly string[]): boolean {
   const normalized = normalizeRelativePath(filePath);
   if (!normalized.startsWith('.atm/history/')) return false;
   const declared = declaredFiles.map((entry) => normalizeRelativePath(entry)).filter(Boolean);
-  return declared.length > 0
-    && declared.every((entry) => entry.startsWith('.atm/history/'))
+  return isHistoricalEvidenceOnlyScope(declared)
     && declared.some((entry) => pathMatchesTaskScope(normalized, entry));
 }
 

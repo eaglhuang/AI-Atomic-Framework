@@ -342,13 +342,16 @@ function isDeclaredCanonicalCharterDeliverable(filePath, declaredFiles) {
     return normalized.startsWith('.atm/charter/')
         && declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared));
 }
+export function isHistoricalEvidenceOnlyScope(declaredFiles) {
+    const declared = declaredFiles.map((entry) => normalizeRelativePath(entry)).filter(Boolean);
+    return declared.length > 0 && declared.every((entry) => entry.startsWith('.atm/history/'));
+}
 function isDeclaredHistoricalEvidenceDeliverable(filePath, declaredFiles) {
     const normalized = normalizeRelativePath(filePath);
     if (!normalized.startsWith('.atm/history/'))
         return false;
     const declared = declaredFiles.map((entry) => normalizeRelativePath(entry)).filter(Boolean);
-    return declared.length > 0
-        && declared.every((entry) => entry.startsWith('.atm/history/'))
+    return isHistoricalEvidenceOnlyScope(declared)
         && declared.some((entry) => pathMatchesTaskScope(normalized, entry));
 }
 function isRealDeliverablePath(filePath) {
