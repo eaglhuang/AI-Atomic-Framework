@@ -5934,11 +5934,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1305,
-    "unchanged": 4594,
+    "copied": 3,
+    "unchanged": 1931,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -22970,7 +22970,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
-        "digest": "9ece858046ba96d85b2959629bf80df8a9d6912abb6d29f07e4a02aa90d6d69f",
+        "digest": "048f7d1ae4e9ebbd0c245068c02b05c11643655f603864a143d63260cefb4473",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js"
@@ -29243,7 +29243,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
-        "digest": "c7272b9df76f75ae7c33b3895203c60ba0a81a5b9bdbf5a8bbce5a120bd4ea55",
+        "digest": "080275bedf831d9887f092b83df7701f84f6194d5e651e07308d1374eabc647d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
@@ -29252,7 +29252,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
-        "digest": "f57c3bb882275284b0cf8dbe3e32acc3ba1e17014207e2db92c68ed8a3b528e1",
+        "digest": "f1425be141e7704c1923c2ceb378a3677abb1649cf5a798d1339cb562ab4cbbe",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
@@ -59032,7 +59032,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:b406cf8baecb0e421ff8ebf01840df643f6ea356d3d3c1627955805b6fd70715"
+    "treeDigest": "sha256:75f546cd64a0da620b9f89eefe5a5c594b0f80d7402d5cf7e619c2511787eb50"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60491,7 +60491,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:dcee6c7d6a037e65b27c25ada9f1644462838d2ff1e2cd3b63195098493d54cb"
+    "digest": "sha256:20e15eaacb082666d169882456d32574d7be2744e7a9abd508ff9606a19a9a23"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66402,22 +66402,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:e6402cd594a909aa82dc907a6cce7efe17068217967e06a0f78f0b3438da5475",
-  "sealedSourceCommit": "31ad2d35aa04e341ad8d2e6e1f82a3b09beee63e",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:e391a3fb13bdfaae7aa9e5306649ab1791978dc56df58907f20eb86c75b66569",
-  "tsBuildCacheDigest": "sha256:d557cbbe0980498aa004555c9ab47ecd899b604176e64bda675d1ea04ee2016b",
+  "buildInputsTreeHash": "sha256:43cb617dc1ee45469672ffa6a8d1ed720c65f773159d01ef41cef45ae20b4e6f",
+  "sealedSourceCommit": "769e0f0bff28eee1be174a2a2e08f173a09fd3d8",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:7fa8b5d305a70d75e8d00e99480dd7c25fa60a23570ea7dc0ad4a71912aa0f8b",
+  "tsBuildCacheDigest": "sha256:35be7c273a80da96aae0ef679787fc6b1674a51458516fa264d0fb8b2ceabc2c",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 43,
-    "skipDecision": 55,
-    "worktreeSetup": 10729,
-    "typescriptBuild": 9374,
-    "rootDropReleaseAssembly": 24779,
-    "onefileReleaseAssembly": 8342,
-    "artifactSync": 10446,
+    "inputHashCalculation": 51,
+    "skipDecision": 60,
+    "worktreeSetup": 12581,
+    "typescriptBuild": 25258,
+    "rootDropReleaseAssembly": 26487,
+    "onefileReleaseAssembly": 8922,
+    "artifactSync": 9882,
     "cleanup": 0,
-    "totalElapsed": 68773
+    "totalElapsed": 102862
   }
 }
