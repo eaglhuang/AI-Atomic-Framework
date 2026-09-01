@@ -4,11 +4,11 @@
   "date": "2026-08-21",
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
-  "severity": "P1",
-  "status": "Open",
+  "severity": "High",
+  "status": "Fixed — protected push keeps historical attestation gaps advisory while enforcing current boundaries",
   "area": "Protected push still enforced historical work-admission attestations after policy disabled per-critical history enforcement",
   "finding": "A governed protected push of the current head was rejected by ATM_HOOK_PRE_PUSH_FAILED because post-baseline historical commits lacked forward attestations. The current governance-entry readiness contract simultaneously reports perCriticalCommitGitHeadEvidence.enforcement=disabled and directs protected push enforcement to same-commit provenance and closeout boundaries. The resulting contradiction makes a clean current delivery depend on retroactively attesting an unbounded historical range.",
   "expectedBehavior": "Protected pre-push must enforce current same-commit governed provenance, closure packets, task audit, and explicit closeout boundaries. Historical work-admission attestations remain an append-only audit and repair mechanism, but missing historical records must not block a current protected push once per-critical historical enforcement is disabled.",
   "evidenceOrRepro": "At local head 5fe00f6bbe05956ed3bf68d970e6e6aca11fd642, governed git push passed admission then failed in the pre-push commit-range guard with ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED for multiple historical commits. The official post-push recovery found no remote change. Focused fixtures in packages/cli/src/commands/hook/__tests__/pre-push.spec.ts and tests/cli/pre-push-historical-attestation-advisory.test.ts prove that historical missing attestations are non-blocking while the guard remains otherwise active.",
-  "followUp": "Keep the historical attestation command and its exact-record validation for targeted forensic repair. Measure protected pre-push range cost separately; this repair removes the mandatory historical attestation scan from the critical push path."
+  "followUp": "Repaired by 18257790d: historical work-admission gaps are advisory after per-critical history enforcement was disabled, while same-commit provenance and closure boundaries remain strict. 2026-09-02 pre-push.spec.ts and pre-push-historical-attestation-advisory.test.ts passed against source; frozen commit-range guard is present. Retain git attest for targeted forensic repair and continue measuring protected range cost separately."
 }
