@@ -1,4 +1,4 @@
-import { isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, listTaskOwnedProtectedOverrideAuditFiles, readProtectedOverrideAuditTaskId, readStagedFiles, readStagedJsonFile, } from './git-index-transaction.js';
+import { isAllowedGovernanceArtifactPath, isExplicitTerminalHistoryCleanupArtifact, isFileAllowedInTaskBundle, listTaskOwnedProtectedOverrideAuditFiles, readProtectedOverrideAuditTaskId, readStagedFiles, readStagedJsonFile, } from './git-index-transaction.js';
 import { isCommitAttributionSideEffectPath, isIgnorableTaskScopedDirtySideEffect, listCommitAttributionSideEffectPaths, resolveGitExecutable, runGitCommand, } from './git-process-port.js';
 import { forEachPathspecBatch } from './pathspec-argv-batching.js';
 import { resolveTaskHistoryOwnerTaskId } from '../../../_vendor/core/dist/broker/cross-task-mutation-guard.js';
@@ -13,11 +13,14 @@ import { parseTaskClaim } from './identity-check-command.js';
 export function inspectTaskScopedStagedGovernanceBundle(cwd, taskId, taskDocument) {
     const stagedFiles = readStagedFiles(cwd);
     const claim = parseTaskClaim(taskDocument.claim);
+    const declaredScope = resolveTaskDeclaredScope(cwd, taskId, taskDocument);
     const warnings = [];
     const mismatchedTaskIds = [];
     if (claim?.state === "active") {
         for (const filePath of stagedFiles) {
             if (isIgnorableCommitStagingSideEffect(cwd, filePath, taskId))
+                continue;
+            if (isExplicitTerminalHistoryCleanupArtifact(cwd, filePath, taskId, declaredScope))
                 continue;
             if (!isAllowedGovernanceArtifactPath(cwd, filePath, taskId))
                 continue;
@@ -35,7 +38,6 @@ export function inspectTaskScopedStagedGovernanceBundle(cwd, taskId, taskDocumen
                 mismatchedTaskIds.push(filePath);
             }
         }
-        const declaredScope = resolveTaskDeclaredScope(cwd, taskId, taskDocument);
         const outOfScopeStaged = stagedFiles.filter((filePath) => !isIgnorableCommitStagingSideEffect(cwd, filePath, taskId) &&
             !isFileAllowedInTaskBundle(cwd, filePath, taskId, declaredScope));
         if (outOfScopeStaged.length > 0) {

@@ -9,6 +9,7 @@ import { isDeferrableForeignGovernanceResidue, } from "../governance-residue-pol
 import { quoteCliValue, } from "../../shared.js";
 import { ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit } from './git-head-evidence-transaction.js';
 import { parseTaskClaim, readTaskDocument } from './identity-check-command.js';
+import { isExplicitTerminalHistoryCleanupArtifact as isExplicitTerminalHistoryCleanupArtifactAt } from './terminal-history-cleanup.js';
 import { isIgnorableCommitStagingSideEffect, isTaskOwnedProtectedOverrideAuditPath } from './task-scope-staging.js';
 import { runWithSealedTaskScopedCommitIndex } from './sealed-commit-attribution.js';
 import { recordLiveIndexReconciliation } from './live-index-reconciliation.js';
@@ -141,11 +142,20 @@ export function isAllowedGovernanceArtifactPath(cwd, filePath, taskId) {
         return true;
     return isIgnorableCommitStagingSideEffect(cwd, normalized, taskId);
 }
+/**
+ * A terminal task's evidence remains owned history; it is not ordinary task
+ * scope. A bounded history-only cleanup may commit one such receipt only when
+ * it is named exactly, carries its owner id, and that owner is terminal.
+ */
+export function isExplicitTerminalHistoryCleanupArtifact(cwd, filePath, currentTaskId, declaredScope) {
+    return isExplicitTerminalHistoryCleanupArtifactAt(cwd, filePath, currentTaskId, declaredScope, (candidate) => isAllowedGovernanceArtifactPath(cwd, candidate, currentTaskId));
+}
 export function isFileAllowedInTaskBundle(cwd, filePath, taskId, declaredScope) {
     return isTaskBundleAllowedByPolicy({
         filePath,
         declaredScope,
-        allowedGovernanceArtifact: isAllowedGovernanceArtifactPath(cwd, filePath, taskId),
+        allowedGovernanceArtifact: isAllowedGovernanceArtifactPath(cwd, filePath, taskId) ||
+            isExplicitTerminalHistoryCleanupArtifact(cwd, filePath, taskId, declaredScope),
     });
 }
 export function buildHostGitCompatibilityGuidance(input) {
