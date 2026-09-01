@@ -69,6 +69,11 @@ export function categorizeHistoricalCommitFiles(input: {
       continue;
     }
 
+    if (isDeclaredHistoricalEvidenceDeliverable(normalized, input.declaredFiles)) {
+      taskMatchedFiles.push(normalized);
+      continue;
+    }
+
     if (normalized.startsWith('.atm/')) {
       if (isTaskCloseGovernanceCriticalPath(normalized, input.taskId)) {
         governanceFiles.push(normalized);
@@ -417,6 +422,15 @@ function isDeclaredCanonicalCharterDeliverable(filePath: string, declaredFiles: 
   const normalized = normalizeRelativePath(filePath);
   return normalized.startsWith('.atm/charter/')
     && declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared));
+}
+
+function isDeclaredHistoricalEvidenceDeliverable(filePath: string, declaredFiles: readonly string[]): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  if (!normalized.startsWith('.atm/history/')) return false;
+  const declared = declaredFiles.map((entry) => normalizeRelativePath(entry)).filter(Boolean);
+  return declared.length > 0
+    && declared.every((entry) => entry.startsWith('.atm/history/'))
+    && declared.some((entry) => pathMatchesTaskScope(normalized, entry));
 }
 
 function isRealDeliverablePath(filePath: string): boolean {
