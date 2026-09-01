@@ -8,12 +8,22 @@ import { runCleanup } from '../../packages/cli/src/commands/cleanup/run.ts';
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-cleanup-lifecycle-'));
 try {
   execFileSync('git', ['init', '--quiet'], { cwd: root });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root });
+  execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: root });
   const foreign = '.atm/history/evidence/TASK-FOREIGN.runner-sync-receipt.json';
   const foreignAbsolute = path.join(root, foreign);
   mkdirSync(path.dirname(foreignAbsolute), { recursive: true });
   mkdirSync(path.join(root, '.atm/runtime/locks'), { recursive: true });
   writeFileSync(foreignAbsolute, '{"foreign":true}\n');
   writeFileSync(path.join(root, '.atm/runtime/locks/TASK-FOREIGN.lock.json'), JSON.stringify({ workItemId: 'TASK-FOREIGN', actorId: 'other-actor', status: 'active' }));
+
+  const gitHead = '.atm/history/evidence/git-head.jsonl';
+  const gitHeadAbsolute = path.join(root, gitHead);
+  mkdirSync(path.dirname(gitHeadAbsolute), { recursive: true });
+  writeFileSync(gitHeadAbsolute, '{"baseline":true}\n');
+  execFileSync('git', ['add', '--', gitHead], { cwd: root, stdio: 'ignore' });
+  execFileSync('git', ['commit', '--quiet', '-m', 'seed git-head evidence'], { cwd: root });
+  writeFileSync(gitHeadAbsolute, '{"baseline":true}\n{"orphan":true}\n');
 
   const diagnose = runCleanup(['diagnose', '--cwd', root]) as any;
   assert.equal(diagnose.ok, true);
@@ -22,6 +32,10 @@ try {
   const applied = runCleanup(['apply', '--cwd', root]) as any;
   assert.equal(applied.ok, true);
   assert.equal(existsSync(foreignAbsolute), true, 'cleanup apply must never remove foreign active-owner bytes');
+  assert.doesNotThrow(() => execFileSync('git', ['diff', '--quiet', '--', gitHead], { cwd: root, stdio: 'ignore' }),
+    'cleanup apply must restore receipt-classified hook evidence to Git-clean state');
+  assert.equal(applied.evidence.report.actions.some((entry: any) => entry.path === gitHead && entry.action === 'restore' && entry.applied === true), true,
+    'cleanup apply must report the successful safe restore instead of silently deferring it');
   console.log('[transient-artifact-lifecycle] ok');
 } finally {
   rmSync(root, { recursive: true, force: true });
