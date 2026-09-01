@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-bed63cb8a42e",
+  "recordedAt": "2026-08-09T01:34:36.787Z",
+  "actorId": "codex-captain-2026-08-09",
+  "taskId": null,
+  "surface": "git commit broker-conflict override",
+  "command": "node atm.mjs git commit --actor codex-captain-2026-08-09 --message \"chore: repair Plan 4 final certification closure evidence\" --no-verify --json",
+  "flags": [
+    "--broker-conflict-override"
+  ],
+  "permission": "backend.brokerConflictOverride",
+  "leaseId": "EMG-GLOBAL-0934e07cd8",
+  "reason": "High-authority Team Broker conflict override after recorded parallel conflict resolution.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.brokerConflictOverride"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T01-34-36-786Z-EMG-GLOBAL-0934e07cd8.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

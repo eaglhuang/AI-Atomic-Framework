@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-90d8ee75bb9b",
+  "recordedAt": "2026-08-14T14:13:45.998Z",
+  "actorId": "codex-cross-task-authority-fastfix",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-cross-task-authority-fastfix --message \"fix(broker): require live authority for scope conflicts\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-c650fc7bc4",
+  "reason": "Bootstrap repair: frozen hook contains the false active-authority predicate fixed by this sealed bundle.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T14-13-45-997Z-EMG-GLOBAL-c650fc7bc4.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

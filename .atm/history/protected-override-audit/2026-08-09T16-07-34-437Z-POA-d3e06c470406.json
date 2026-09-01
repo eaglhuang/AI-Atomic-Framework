@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-d3e06c470406",
+  "recordedAt": "2026-08-09T16:07:34.437Z",
+  "actorId": null,
+  "taskId": "ATM-GOV-0298",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\governance-optimization\\tasks\\ATM-GOV-0298-property-metamorphic-model-based-generator-pack.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-ATM-GOV-0298-aff2895f92",
+  "reason": "Force import would overwrite closed target-authority task history.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T16-07-34-435Z-EMG-ATM-GOV-0298-aff2895f92.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

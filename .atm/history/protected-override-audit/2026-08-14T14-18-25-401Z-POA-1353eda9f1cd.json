@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-1353eda9f1cd",
+  "recordedAt": "2026-08-14T14:18:25.401Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": null,
+  "surface": "next --claim runner recovery",
+  "command": "node atm.mjs next --claim --allow-stale-runner --json",
+  "flags": [
+    "--allow-stale-runner"
+  ],
+  "permission": "backend.runnerRecovery",
+  "leaseId": "EMG-GLOBAL-8ea461ef63",
+  "reason": "Runner-recovery claim requires an explicit human-approved lease.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.runnerRecovery"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T14-18-25-399Z-EMG-GLOBAL-8ea461ef63.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

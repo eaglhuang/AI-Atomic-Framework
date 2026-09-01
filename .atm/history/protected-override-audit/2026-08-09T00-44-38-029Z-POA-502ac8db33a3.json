@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-502ac8db33a3",
+  "recordedAt": "2026-08-09T00:44:38.029Z",
+  "actorId": "codex-captain-2026-08-09",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-2026-08-09 --message \"chore: repair Plan 4 security closure evidence\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-14aef3801a",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T00-44-34-356Z-EMG-GLOBAL-14aef3801a.json",
+  "parentEventId": "POA-133a4266f21e",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-f9fdfe7dc616",
+  "recordedAt": "2026-08-14T10:30:10.307Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0384",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0384 --message \"fix(evidence): bind successor receipts by provenance graph\n\nATM-Work-Admission: wat-68330d62f64b311d sha256:68330d62f64b311d04ca5f756161793e1567198dfd174f5dbfa9591d60b7d4dd\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0384-947e0bff15",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T10-30-07-407Z-EMG-ATM-GOV-0384-947e0bff15.json",
+  "parentEventId": "POA-4ef19b73ca0a",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-563e62b67ee1",
+  "recordedAt": "2026-08-14T13:53:07.300Z",
+  "actorId": "codex-temp-facade-hotfix",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-temp-facade-hotfix --message \"docs(skill): clarify temporary commit authority\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-21a30c7e52",
+  "reason": "Avoid cross-scope generated-residue cleanup while committing the temporary-claim facade guidance",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T13-53-07-299Z-EMG-GLOBAL-21a30c7e52.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

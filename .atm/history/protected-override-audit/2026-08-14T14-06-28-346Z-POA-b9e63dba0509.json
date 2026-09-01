@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-b9e63dba0509",
+  "recordedAt": "2026-08-14T14:06:28.346Z",
+  "actorId": "codex-runner-incremental-fastfix",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-runner-incremental-fastfix --message \"perf(runner): reuse clean git blob identities in source seal\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-d79f48155e",
+  "reason": "Avoid known cross-lane generated-residue mutation during isolated performance repair",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T14-06-28-345Z-EMG-GLOBAL-d79f48155e.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-dbb33aba70d0",
+  "recordedAt": "2026-08-28T23:07:56.378Z",
+  "actorId": "codex-quickfix",
+  "taskId": null,
+  "surface": "git commit broker-conflict override",
+  "command": "node atm.mjs git commit --actor codex-quickfix --message \"fix(release): retain generated root-drop artifacts for smoke\" --no-verify --json",
+  "flags": [
+    "--broker-conflict-override"
+  ],
+  "permission": "backend.brokerConflictOverride",
+  "leaseId": "EMG-GLOBAL-7c73241e46",
+  "reason": "Serialized BCR-zawope release workflow repair; normal hook is independently blocked by unrelated actor-registry timestamp drift.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.brokerConflictOverride"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-28T23-07-56-377Z-EMG-GLOBAL-7c73241e46.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

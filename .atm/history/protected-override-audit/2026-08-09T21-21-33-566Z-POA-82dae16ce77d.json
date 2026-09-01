@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-82dae16ce77d",
+  "recordedAt": "2026-08-09T21:21:33.566Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": null,
+  "surface": "git commit broker-conflict override",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --message \"build(runner): publish sealed 430ed64 artifacts\" --no-verify --json",
+  "flags": [
+    "--broker-conflict-override"
+  ],
+  "permission": "backend.brokerConflictOverride",
+  "leaseId": "EMG-GLOBAL-b3bc2cef72",
+  "reason": "Publish only the sealed runner output inventory after broker-authorized serialization.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.brokerConflictOverride"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T21-21-33-564Z-EMG-GLOBAL-b3bc2cef72.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

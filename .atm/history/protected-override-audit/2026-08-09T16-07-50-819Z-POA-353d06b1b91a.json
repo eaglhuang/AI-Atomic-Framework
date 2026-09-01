@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-353d06b1b91a",
+  "recordedAt": "2026-08-09T16:07:50.819Z",
+  "actorId": null,
+  "taskId": "ATM-GOV-0300",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\governance-optimization\\tasks\\ATM-GOV-0300-acceptance-gherkin-and-acceptance-spec-mutation.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-ATM-GOV-0300-4afcdbe562",
+  "reason": "Force import would overwrite closed target-authority task history.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T16-07-50-818Z-EMG-ATM-GOV-0300-4afcdbe562.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

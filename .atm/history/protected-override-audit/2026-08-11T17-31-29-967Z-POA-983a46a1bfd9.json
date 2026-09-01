@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-983a46a1bfd9",
+  "recordedAt": "2026-08-11T17:31:29.967Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0347",
+  "surface": "git recover-index-lock",
+  "command": "node atm.mjs git recover-index-lock --task \"ATM-GOV-0347\" --actor \"codex-gpt-5.4-mini\" --force-index-lock-recovery --emergency-approval <lease-id> --reason \"<human-approved reason>\" --json",
+  "flags": [
+    "--force-index-lock-recovery"
+  ],
+  "permission": "backend.gitIndexLockRecovery",
+  "leaseId": "EMG-ATM-GOV-0347-93a321bf5d",
+  "reason": "Verified 0-byte stale lock; no active branch queue or stdin pathspec writer.",
+  "skippedChecks": [
+    "active-git-writer-liveness-is-human-confirmed"
+  ],
+  "touchedFiles": [
+    ".git/index.lock"
+  ],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-11T17-31-29-900Z-EMG-ATM-GOV-0347-93a321bf5d.json",
+  "parentEventId": "POA-7f9d424e42e0",
+  "repairCandidate": null
+}

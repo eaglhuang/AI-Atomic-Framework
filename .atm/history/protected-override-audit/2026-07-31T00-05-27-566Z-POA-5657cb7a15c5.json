@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-5657cb7a15c5",
+  "recordedAt": "2026-07-31T00:05:27.566Z",
+  "actorId": "codex-skl-captain",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-skl-captain --message \"atm: attest emergency historical work admission\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-GIT-0024-123c58d0ea",
+  "reason": "Commit append-only TASK-GIT-0024 forward attestation ledger required to satisfy protected pre-push guard for emergency framework quickfix commits.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-31T00-05-27-564Z-EMG-TASK-GIT-0024-123c58d0ea.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

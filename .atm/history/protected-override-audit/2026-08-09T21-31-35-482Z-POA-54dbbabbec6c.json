@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-54dbbabbec6c",
+  "recordedAt": "2026-08-09T21:31:35.482Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --message \"build(runner): publish remaining 430ed64 inventory\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-492593131b",
+  "reason": "Publish the sole remaining sealed runner manifest after exact dry-run.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T21-31-35-480Z-EMG-GLOBAL-492593131b.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

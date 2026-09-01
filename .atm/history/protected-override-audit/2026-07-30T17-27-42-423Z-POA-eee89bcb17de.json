@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-eee89bcb17de",
+  "recordedAt": "2026-07-30T17:27:42.423Z",
+  "actorId": "codex-skl-captain",
+  "taskId": "ATM-FRAMEWORK-TEMP-codex-skl-captain",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-skl-captain --task ATM-FRAMEWORK-TEMP-codex-skl-captain --message \"fix(taskflow): pass runner receipt stale exception\n\nATM-Work-Admission: wat-776fa90116d0508c sha256:776fa90116d0508c33c5c27ae6d0c2d9c76487836beeeb6a7005458e186749c8\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-b646deabd5",
+  "reason": "framework-temp lock lacks work-session attribution; emergency source fix is path-bounded to taskflow implementation and validated",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-30T17-27-42-421Z-EMG-GLOBAL-b646deabd5.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

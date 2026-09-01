@@ -1,0 +1,23 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-f83448e94e33",
+  "recordedAt": "2026-08-14T05:31:14.261Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0253",
+  "surface": "tasks reset",
+  "command": "node atm.mjs tasks reset --task ATM-GOV-0253 --actor codex-captain-recovery --to open --json",
+  "flags": [],
+  "permission": "backend.tasks.reset",
+  "leaseId": "EMG-ATM-GOV-0253-e28dff33b4",
+  "reason": "Replace incorrect closeout-only claim with a fresh write claim for reopened regression delivery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.reset"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T05-31-14-260Z-EMG-ATM-GOV-0253-e28dff33b4.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

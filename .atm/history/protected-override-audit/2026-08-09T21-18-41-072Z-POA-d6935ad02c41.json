@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-d6935ad02c41",
+  "recordedAt": "2026-08-09T21:18:41.072Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --message \"build(runner): publish sealed 430ed64 artifacts\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-6505f14dd7",
+  "reason": "Publish queue-head sealed runner inventory; normal hook misattributes historical lock.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T21-18-41-070Z-EMG-GLOBAL-6505f14dd7.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

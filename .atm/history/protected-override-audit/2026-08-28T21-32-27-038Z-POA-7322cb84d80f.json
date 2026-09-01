@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-7322cb84d80f",
+  "recordedAt": "2026-08-28T21:32:27.038Z",
+  "actorId": "codex-quickfix",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-quickfix --message \"fix(locks): accept numeric TTL serialization\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-5fd5a83435",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-28T21-32-27-037Z-EMG-GLOBAL-5fd5a83435.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

@@ -1,0 +1,31 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-416064aeb693",
+  "recordedAt": "2026-08-14T11:59:11.590Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0388",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0388 --actor codex-captain-recovery --status done --json",
+  "flags": [
+    "--allow-stale-runner",
+    "--historical-delivery"
+  ],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-ATM-GOV-0388-7740352a75",
+  "reason": "Direct close backend historical-delivery path.",
+  "skippedChecks": [
+    "taskflow-operator-lane",
+    "protected-backend-surface"
+  ],
+  "touchedFiles": [
+    ".atm/history/evidence/ATM-GOV-0388.closure-packet.json",
+    ".atm/history/evidence/ATM-GOV-0388.json",
+    ".atm/history/task-events/ATM-GOV-0388/2026-08-14T11-59-11-360Z-close-131e7a30694c.json",
+    ".atm/history/tasks/ATM-GOV-0388.json"
+  ],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T11-58-59-751Z-EMG-ATM-GOV-0388-7740352a75.json",
+  "parentEventId": "POA-8e4de2d4d420",
+  "repairCandidate": null
+}

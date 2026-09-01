@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-05fc3d810d76",
+  "recordedAt": "2026-08-09T01:42:26.235Z",
+  "actorId": "codex-captain-2026-08-09",
+  "taskId": null,
+  "surface": "git commit broker-conflict override",
+  "command": "node atm.mjs git commit --actor codex-captain-2026-08-09 --message \"chore: repair ATM-GOV-0313 closure metadata\" --no-verify --json",
+  "flags": [
+    "--broker-conflict-override"
+  ],
+  "permission": "backend.brokerConflictOverride",
+  "leaseId": "EMG-GLOBAL-43030502b5",
+  "reason": "High-authority Team Broker conflict override after recorded parallel conflict resolution.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.brokerConflictOverride"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T01-42-26-234Z-EMG-GLOBAL-43030502b5.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

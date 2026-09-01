@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-44102e4c93f7",
+  "recordedAt": "2026-08-13T17:32:40.743Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0349",
+  "surface": "tasks reconcile",
+  "command": "node atm.mjs tasks reconcile --task ATM-GOV-0349 --actor codex-gpt-5.4-mini --delivery-commit 1eb2122f6e35bf987e5bbaa02ed908ea2d65e7f3 --json",
+  "flags": [
+    "--waiver-out-of-scope-delivery"
+  ],
+  "permission": "backend.tasks.reconcile",
+  "leaseId": "EMG-ATM-GOV-0349-73fb23b9bc",
+  "reason": "The two additional source files are documented normal linked-surface amendments in ATM-GOV-0349 task history; the verified commit contains all three declared batch deliverables.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.reconcile"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-13T17-32-40-741Z-EMG-ATM-GOV-0349-73fb23b9bc.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

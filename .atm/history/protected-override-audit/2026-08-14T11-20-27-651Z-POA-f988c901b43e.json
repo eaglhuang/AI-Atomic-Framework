@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-f988c901b43e",
+  "recordedAt": "2026-08-14T11:20:27.651Z",
+  "actorId": "codex-captain-recovery",
+  "taskId": "ATM-GOV-0388",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-captain-recovery --task ATM-GOV-0388 --message \"fix(evidence): preserve declared validator commands\n\nATM-Work-Admission: wat-0c8b8952d0c30fd5 sha256:0c8b8952d0c30fd521f56dba29cf208939215c0ae2d839fd878ae04f2721f439\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0388-6bcbc2a430",
+  "reason": "ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED on ATM-generated ledger transition",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-14T11-20-27-649Z-EMG-ATM-GOV-0388-6bcbc2a430.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

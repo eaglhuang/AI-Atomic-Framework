@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-2bacd661f85c",
+  "recordedAt": "2026-08-09T21:28:12.557Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": null,
+  "surface": "git commit broker-conflict override",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --message \"fix(git): preserve publication transaction evidence\" --no-verify --json",
+  "flags": [
+    "--broker-conflict-override"
+  ],
+  "permission": "backend.brokerConflictOverride",
+  "leaseId": "EMG-GLOBAL-d04ebd49f5",
+  "reason": "Publish the three-file generic bootstrap correction after sealed dry-run and Broker serialization.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.brokerConflictOverride"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-09T21-28-12-556Z-EMG-GLOBAL-d04ebd49f5.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

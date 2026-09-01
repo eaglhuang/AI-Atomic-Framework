@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-9b59b1a4ad96",
+  "recordedAt": "2026-08-12T06:39:00.093Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0347",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-GOV-0347 --message \"wip: preserve bootstrap bridge for ATM-GOV-0351\n\nATM-Work-Admission: wat-040edc93b1b5ba62 sha256:040edc93b1b5ba6295c04fc63a65365ccc5fe4cf5e4cad683e154cc0fadd330f\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0347-e0507fa573",
+  "reason": "Frozen hook bootstrap circularity",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-12T06-39-00-092Z-EMG-ATM-GOV-0347-e0507fa573.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

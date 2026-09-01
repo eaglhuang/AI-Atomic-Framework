@@ -1,0 +1,23 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-48aaef69296d",
+  "recordedAt": "2026-08-13T12:17:26.663Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-GOV-0317",
+  "surface": "tasks reset",
+  "command": "node atm.mjs tasks reset --task ATM-GOV-0317 --actor codex-gpt-5.4-mini --to open --json",
+  "flags": [],
+  "permission": "backend.tasks.reset",
+  "leaseId": "EMG-ATM-GOV-0317-8572cf2c38",
+  "reason": "Final certificate was closed fail-closed before completed successor replay, backlog, release, and independent-review evidence were consumed; reopen original certificate owner to satisfy its acceptance contract.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.reset"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-13T12-17-26-661Z-EMG-ATM-GOV-0317-8572cf2c38.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

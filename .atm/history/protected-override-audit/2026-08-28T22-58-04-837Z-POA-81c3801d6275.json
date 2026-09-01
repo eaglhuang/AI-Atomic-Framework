@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-81c3801d6275",
+  "recordedAt": "2026-08-28T22:58:04.837Z",
+  "actorId": "codex-quickfix",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-quickfix --message \"fix(locks): expose temporary claim persistence diagnostics\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-9b1823b100",
+  "reason": "Unrelated actor registry timestamp drift blocks the governed pre-commit hook; exact validated diagnostic scope only.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-08-28T22-58-04-835Z-EMG-GLOBAL-9b1823b100.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
