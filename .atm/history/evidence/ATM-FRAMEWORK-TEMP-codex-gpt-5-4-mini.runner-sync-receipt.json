@@ -3,16 +3,17 @@
   "specVersion": "0.1.0",
   "taskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
   "publicationDisposition": "published",
-  "actorId": "codex-gpt-5.4-mini",
+  "recoveryRetainedPaths": [],
+  "actorId": "codex-gpt-5-4-mini",
   "actorIdentity": {
-    "actorId": "codex-gpt-5.4-mini",
-    "source": "AGENT_IDENTITY"
+    "actorId": "codex-gpt-5-4-mini",
+    "source": "ATM_ACTOR_ID"
   },
-  "stewardWorkId": "runner-sync-4004cb0c",
-  "sealedSourceSha": "29d26c27ad5a192531ea7ca8584c1183e2c4b7ea",
+  "stewardWorkId": "runner-sync-0b266a8f",
+  "sealedSourceSha": "4c9519b708ecc92bbc265859d15c1edd93792c56",
   "outputInventory": {
     "schemaId": "atm.runnerBuildOutputInventory.v1",
-    "sealedSourceSha": "29d26c27ad5a192531ea7ca8584c1183e2c4b7ea",
+    "sealedSourceSha": "4c9519b708ecc92bbc265859d15c1edd93792c56",
     "entries": [
       {
         "path": ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
@@ -21,13 +22,43 @@
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/taskflow/runner-recovery-forwarding.d.ts",
+        "path": "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
         "ownerActorId": null
       },
       {
-        "path": "packages/cli/dist/commands/taskflow/runner-recovery-forwarding.js",
+        "path": "packages/cli/dist/commands/next/__tests__/claim-readiness.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/next/claim-readiness.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/__tests__/taskflow-close-window-lock.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/taskflow/implementation.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/close-window-lock.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/task-frontmatter-fidelity.js",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
         "ownerActorId": null
@@ -45,19 +76,97 @@
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/runner-recovery-forwarding.d.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/runner-recovery-forwarding.js",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/claim-readiness.test.js",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/runner-recovery-forwarding.ts",
+        "path": "release/atm-root-drop/packages/cli/dist/commands/next/claim-readiness.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/taskflow-close-window-lock.test.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/close-window-lock.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/dist/commands/tasks/task-frontmatter-fidelity.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/next/claim-readiness.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/tasks/close-window-lock.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/dist/broker/runner-build-output-inventory.js",
+        "disposition": "owned-current",
+        "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/packages/core/src/broker/runner-build-output-inventory.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
         "ownerActorId": null
@@ -69,13 +178,13 @@
         "ownerActorId": null
       },
       {
-        "path": "release/atm-root-drop/tests/cli/taskflow-emergency-approval-forwarding.test.ts",
+        "path": "release/atm-root-drop/scripts/runner-sync-incremental-build.ts",
         "disposition": "owned-current",
         "ownerTaskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
         "ownerActorId": null
       }
     ],
-    "digest": "sha256:be238a5c69e6eb53afe481905c006224c7f0f786d8a5f07889ba3a73eb2890ab"
+    "digest": "sha256:e9304fbc25f0fc62b67bdad969b4bd3b0b4b8f2ac6e79006f82a6cf4af6233a8"
   },
   "memberTaskIds": [
     "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini"
@@ -83,40 +192,40 @@
   "linkedTaskIds": [],
   "groupManifest": {
     "schemaId": "atm.runnerSyncCoalescedGroupManifest.v1",
-    "stewardWorkId": "runner-sync-4004cb0c",
-    "sealedSourceSha": "29d26c27ad5a192531ea7ca8584c1183e2c4b7ea",
+    "stewardWorkId": "runner-sync-0b266a8f",
+    "sealedSourceSha": "4c9519b708ecc92bbc265859d15c1edd93792c56",
     "members": [
       {
         "taskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
-        "actorId": "codex-gpt-5.4-mini",
+        "actorId": "codex-gpt-5-4-mini",
         "laneFingerprint": null,
         "requestedSurfaces": [
           "release/atm-onefile/atm.mjs",
           "release/atm-root-drop"
         ],
-        "requestDigest": "sha256:3bf17de21324edb1116b0e67e6f97444ae488a7023ab1b86754deb393d16398c"
+        "requestDigest": "sha256:1c37ed84d9de2e90921957117f23830c8df3348367ac3b8ad8a5278034040a89"
       }
     ],
     "memberTaskIds": [
       "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini"
     ],
-    "sharedSealedInputDigest": "sha256:d9717c8af59b8ee493b9788d5a7e3532de091e84c4a37ed2f09cef197b97755c",
-    "sharedOutputDigest": "sha256:1beff1ce7f2815bd6f520c7a2abe353a76b59fa1ad243388e96986f4342ee752",
-    "manifestDigest": "sha256:637fb9cecdf5e8d72f2a8b157d1a6ada2c9767bac3b835f578d51dff4abb93c7",
-    "createdAt": "2026-08-13T16:27:44.018Z"
+    "sharedSealedInputDigest": "sha256:eef788df216f3b286c5023defa079597c1ce42b18cf30ec1efb84f24b5d90b47",
+    "sharedOutputDigest": "sha256:0d88904dc9622f56738855e68e621dc79fc6979aeda92621b6db96321752a821",
+    "manifestDigest": "sha256:0f8d0c18e725a18844cee69026c2fa17aa0d0e98d69e69d12358e0cfb8bcaf39",
+    "createdAt": "2026-08-24T15:30:10.744Z"
   },
   "childReceipts": [
     {
       "schemaId": "atm.runnerSyncChildReceipt.v1",
       "taskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
-      "parentStewardWorkId": "runner-sync-4004cb0c",
-      "groupManifestDigest": "sha256:637fb9cecdf5e8d72f2a8b157d1a6ada2c9767bac3b835f578d51dff4abb93c7",
-      "memberRequestDigest": "sha256:3bf17de21324edb1116b0e67e6f97444ae488a7023ab1b86754deb393d16398c",
-      "sealedSourceSha": "29d26c27ad5a192531ea7ca8584c1183e2c4b7ea",
-      "sharedSealedInputDigest": "sha256:d9717c8af59b8ee493b9788d5a7e3532de091e84c4a37ed2f09cef197b97755c",
-      "sharedOutputDigest": "sha256:1beff1ce7f2815bd6f520c7a2abe353a76b59fa1ad243388e96986f4342ee752",
-      "receiptDigest": "sha256:6e4279c0af01844bfffad4941421399bdeb6cbdf62ba0288a48eef6ab471c249",
-      "issuedAt": "2026-08-13T16:27:44.018Z"
+      "parentStewardWorkId": "runner-sync-0b266a8f",
+      "groupManifestDigest": "sha256:0f8d0c18e725a18844cee69026c2fa17aa0d0e98d69e69d12358e0cfb8bcaf39",
+      "memberRequestDigest": "sha256:1c37ed84d9de2e90921957117f23830c8df3348367ac3b8ad8a5278034040a89",
+      "sealedSourceSha": "4c9519b708ecc92bbc265859d15c1edd93792c56",
+      "sharedSealedInputDigest": "sha256:eef788df216f3b286c5023defa079597c1ce42b18cf30ec1efb84f24b5d90b47",
+      "sharedOutputDigest": "sha256:0d88904dc9622f56738855e68e621dc79fc6979aeda92621b6db96321752a821",
+      "receiptDigest": "sha256:53f576a1079a5d82a009ecee96a60327575ae27e21c964bf676370b41892b22b",
+      "issuedAt": "2026-08-24T15:30:10.744Z"
     }
   ],
   "childAttribution": {
@@ -125,9 +234,9 @@
     "members": [
       {
         "taskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
-        "actorId": "codex-gpt-5.4-mini",
+        "actorId": "codex-gpt-5-4-mini",
         "laneFingerprint": null,
-        "childReceiptDigest": "sha256:6e4279c0af01844bfffad4941421399bdeb6cbdf62ba0288a48eef6ab471c249"
+        "childReceiptDigest": "sha256:53f576a1079a5d82a009ecee96a60327575ae27e21c964bf676370b41892b22b"
       }
     ],
     "missingTaskIds": []
@@ -149,11 +258,11 @@
     "finalizable": true,
     "recoveryCommand": null
   },
-  "runnerInputTreeHash": "sha256:d9717c8af59b8ee493b9788d5a7e3532de091e84c4a37ed2f09cef197b97755c",
+  "runnerInputTreeHash": "sha256:eef788df216f3b286c5023defa079597c1ce42b18cf30ec1efb84f24b5d90b47",
   "runnerInputGraph": {
     "schemaId": "atm.runnerInputGraph.v1",
-    "sealedSourceSha": "29d26c27ad5a192531ea7ca8584c1183e2c4b7ea",
-    "aggregateInputTreeHash": "sha256:d9717c8af59b8ee493b9788d5a7e3532de091e84c4a37ed2f09cef197b97755c",
+    "sealedSourceSha": "4c9519b708ecc92bbc265859d15c1edd93792c56",
+    "aggregateInputTreeHash": "sha256:eef788df216f3b286c5023defa079597c1ce42b18cf30ec1efb84f24b5d90b47",
     "nodes": [
       {
         "segment": "packages",
@@ -168,12 +277,12 @@
           "tsconfig.build.json",
           "tsconfig.json"
         ],
-        "inputDigest": "sha256:d9717c8af59b8ee493b9788d5a7e3532de091e84c4a37ed2f09cef197b97755c",
+        "inputDigest": "sha256:eef788df216f3b286c5023defa079597c1ce42b18cf30ec1efb84f24b5d90b47",
         "outputEntries": [
           "release/atm-onefile/atm.mjs",
           "release/atm-root-drop"
         ],
-        "outputDigest": "sha256:2cba468432d6092b1b4642d64f107ae648ae78cc6cdcb43be9c8e6c16aceb59e"
+        "outputDigest": "sha256:e626f17f88e67e22cb22fce4e9e3f5d1a5c2aeef32672a00777430b2736891ce"
       }
     ]
   },
@@ -182,59 +291,49 @@
     "release/atm-root-drop"
   ],
   "buildTarget": "full",
-  "buildInputsTreeHash": "sha256:d9717c8af59b8ee493b9788d5a7e3532de091e84c4a37ed2f09cef197b97755c",
+  "buildInputsTreeHash": "sha256:eef788df216f3b286c5023defa079597c1ce42b18cf30ec1efb84f24b5d90b47",
   "buildDecision": "incrementalBuild",
   "decisionReason": "diff planner selected 1 affected package(s)",
   "incrementalPlan": {
     "schemaId": "atm.runnerIncrementalBuildPlan.v1",
     "specVersion": "0.1.0",
-    "previousSealedSourceSha": "1572d0227b90cadf7ecc05e01908634c9083e301",
-    "currentSealedSourceSha": "29d26c27ad5a192531ea7ca8584c1183e2c4b7ea",
+    "previousSealedSourceSha": "9c99b2ad065bd81c6fdce59a83cc1edb3d06b4d2",
+    "currentSealedSourceSha": "4c9519b708ecc92bbc265859d15c1edd93792c56",
     "changedPaths": [
-      "packages/cli/dist/atm.js",
-      "packages/cli/dist/commands/__tests__/framework-mode-staged-residue.spec.js",
-      "packages/cli/dist/commands/broker/steward-queues.js",
-      "packages/cli/dist/commands/command-specs/taskflow.spec.js",
-      "packages/cli/dist/commands/command-specs/tasks.spec.js",
-      "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
-      "packages/cli/dist/commands/framework-development/runner-sync-admission.js",
-      "packages/cli/dist/commands/git-governance/implementation/lease-command.js",
-      "packages/cli/dist/commands/git-index-ownership.js",
-      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
-      "packages/cli/dist/commands/hook/pre-commit/scope-ownership.js",
-      "packages/cli/dist/commands/integration-hooks/implementation.js",
-      "packages/cli/dist/commands/planning-repo-root.js",
-      "packages/cli/dist/commands/shared/command-spec-output.js",
-      "packages/cli/dist/commands/task-direction.js",
-      "packages/cli/dist/commands/taskflow/implementation.js",
-      "packages/cli/dist/commands/tasks/legacy/implementation.js",
-      "packages/cli/dist/commands/tasks/repairclose-orchestrator.js",
-      "packages/cli/src/commands/taskflow/runner-recovery-forwarding.ts"
+      "packages/cli/dist/commands/next/__tests__/claim-readiness.test.js",
+      "packages/cli/dist/commands/next/claim-readiness.js",
+      "packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js",
+      "packages/cli/dist/commands/tasks/dependency-gate.js",
+      "packages/cli/dist/commands/tasks/dependency-gates.js",
+      "packages/cli/dist/commands/tasks/import-card-contract-validation.js",
+      "packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "packages/cli/dist/commands/tasks/task-atomization-policy-import.js",
+      "packages/cli/dist/commands/tasks/task-card-contract-import.js",
+      "packages/cli/dist/commands/tasks/task-frontmatter-fidelity.js",
+      "packages/cli/dist/commands/tasks/task-import-validators.js",
+      "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts"
     ],
     "affectedPackages": [
       "packages/cli"
     ],
     "affectedGroups": {
       "packages": [
-        "packages/cli/dist/atm.js",
-        "packages/cli/dist/commands/__tests__/framework-mode-staged-residue.spec.js",
-        "packages/cli/dist/commands/broker/steward-queues.js",
-        "packages/cli/dist/commands/command-specs/taskflow.spec.js",
-        "packages/cli/dist/commands/command-specs/tasks.spec.js",
-        "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
-        "packages/cli/dist/commands/framework-development/runner-sync-admission.js",
-        "packages/cli/dist/commands/git-governance/implementation/lease-command.js",
-        "packages/cli/dist/commands/git-index-ownership.js",
-        "packages/cli/dist/commands/hook/pre-commit/implementation.js",
-        "packages/cli/dist/commands/hook/pre-commit/scope-ownership.js",
-        "packages/cli/dist/commands/integration-hooks/implementation.js",
-        "packages/cli/dist/commands/planning-repo-root.js",
-        "packages/cli/dist/commands/shared/command-spec-output.js",
-        "packages/cli/dist/commands/task-direction.js",
-        "packages/cli/dist/commands/taskflow/implementation.js",
-        "packages/cli/dist/commands/tasks/legacy/implementation.js",
-        "packages/cli/dist/commands/tasks/repairclose-orchestrator.js",
-        "packages/cli/src/commands/taskflow/runner-recovery-forwarding.ts"
+        "packages/cli/dist/commands/next/__tests__/claim-readiness.test.js",
+        "packages/cli/dist/commands/next/claim-readiness.js",
+        "packages/cli/dist/commands/tasks/__tests__/dependency-gate.test.js",
+        "packages/cli/dist/commands/tasks/dependency-gate.js",
+        "packages/cli/dist/commands/tasks/dependency-gates.js",
+        "packages/cli/dist/commands/tasks/import-card-contract-validation.js",
+        "packages/cli/dist/commands/tasks/import-orchestrator.js",
+        "packages/cli/dist/commands/tasks/task-atomization-policy-import.js",
+        "packages/cli/dist/commands/tasks/task-card-contract-import.js",
+        "packages/cli/dist/commands/tasks/task-frontmatter-fidelity.js",
+        "packages/cli/dist/commands/tasks/task-import-validators.js",
+        "packages/cli/src/commands/next/__tests__/claim-readiness.test.ts",
+        "packages/cli/src/commands/next/claim-readiness.ts",
+        "packages/cli/src/commands/tasks/task-frontmatter-fidelity.ts"
       ],
       "scripts": [],
       "templates": [],
@@ -246,15 +345,15 @@
     "incrementalEligible": true,
     "unsafeReasons": []
   },
-  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-08-13T16-27-41-336Z-runner-sync.jsonl",
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-08-24T15-30-08-650Z-runner-sync.jsonl",
   "tsBuildCache": {
     "schemaId": "atm.runnerTsBuildCacheSummary.v1",
     "cacheRoot": ".atm/runtime/runner-sync-build-cache/typescript",
     "tsBuildInfoPath": ".atm/runtime/runner-sync-build-cache/typescript/tsconfig.build.tsbuildinfo",
     "existedBefore": true,
     "existsAfter": true,
-    "digestBefore": "sha256:c07e21dadf536ab28a1d484531532e36dfbf9d5c0f40b8179aad6a61e86c51d5",
-    "digestAfter": "sha256:8628b758b0abd47d86e5541042e4057c3be016cc2c0ade6b1fd2594a5f0a2482",
+    "digestBefore": "sha256:8070f8bf48a0d1eb2d0be9aa4f38d366b542975a1c7c7dc97b45116ec45b1719",
+    "digestAfter": "sha256:8070f8bf48a0d1eb2d0be9aa4f38d366b542975a1c7c7dc97b45116ec45b1719",
     "restoredBeforeBuild": true,
     "persistedAfterBuild": true,
     "gitPolicy": {
@@ -263,7 +362,7 @@
     }
   },
   "brokerTicket": {
-    "ticketId": "runner-sync-4004cb0c:29d26c27ad5a192531ea7ca8584c1183e2c4b7ea",
+    "ticketId": "runner-sync-0b266a8f:4c9519b708ecc92bbc265859d15c1edd93792c56",
     "waitedMs": 0,
     "position": 1,
     "headOwner": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini"
@@ -271,11 +370,11 @@
   "dominantPhaseSummary": {
     "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
     "dominantPhase": "rootDropReleaseAssembly",
-    "dominantPhaseMs": 21119,
-    "totalElapsedMs": 63290,
-    "dominanceRatio": 0.3337,
-    "phaseMedianMs": 1856,
-    "phaseP95Ms": 21119,
+    "dominantPhaseMs": 18166,
+    "totalElapsedMs": 79087,
+    "dominanceRatio": 0.2297,
+    "phaseMedianMs": 1025,
+    "phaseP95Ms": 18166,
     "measuredPhaseCount": 8,
     "optimizationVerdict": "inconclusive",
     "basis": "single-run"
@@ -285,37 +384,37 @@
     "buildDecision": "incrementalBuild",
     "decisionReason": "diff planner selected 1 affected package(s)",
     "brokerTicket": {
-      "ticketId": "runner-sync-4004cb0c:29d26c27ad5a192531ea7ca8584c1183e2c4b7ea",
+      "ticketId": "runner-sync-0b266a8f:4c9519b708ecc92bbc265859d15c1edd93792c56",
       "waitedMs": 0,
       "position": 1,
       "headOwner": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini"
     },
-    "changedPathCount": 19,
+    "changedPathCount": 14,
     "affectedPackageCount": 1,
     "unsafeReasons": [],
     "dominantPhaseSummary": {
       "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
       "dominantPhase": "rootDropReleaseAssembly",
-      "dominantPhaseMs": 21119,
-      "totalElapsedMs": 63290,
-      "dominanceRatio": 0.3337,
-      "phaseMedianMs": 1856,
-      "phaseP95Ms": 21119,
+      "dominantPhaseMs": 18166,
+      "totalElapsedMs": 79087,
+      "dominanceRatio": 0.2297,
+      "phaseMedianMs": 1025,
+      "phaseP95Ms": 18166,
       "measuredPhaseCount": 8,
       "optimizationVerdict": "inconclusive",
       "basis": "single-run"
     }
   },
   "phaseTimingsMs": {
-    "inputHashCalculation": 52,
-    "skipDecision": 47,
-    "worktreeSetup": 12934,
-    "typescriptBuild": 14760,
-    "rootDropReleaseAssembly": 21119,
-    "onefileReleaseAssembly": 1856,
-    "artifactSync": 6160,
+    "inputHashCalculation": 44,
+    "skipDecision": 41,
+    "worktreeSetup": 16808,
+    "typescriptBuild": 14067,
+    "rootDropReleaseAssembly": 18166,
+    "onefileReleaseAssembly": 1025,
+    "artifactSync": 8239,
     "cleanup": 0,
-    "totalElapsed": 63290
+    "totalElapsed": 79087
   },
   "atomicWrite": {
     "schemaId": "atm.runnerSyncAtomicWrite.v1",
@@ -323,7 +422,7 @@
     "platform": "win32",
     "maxAttempts": 4
   },
-  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini\" --steward-work-id \"runner-sync-4004cb0c\" --receipt-ref \".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json\" --json",
+  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini\" --steward-work-id \"runner-sync-0b266a8f\" --receipt-ref \".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json\" --json",
   "treatmentTelemetry": {
     "schemaId": "atm.generatedWriteTreatmentTelemetry.v1",
     "executionMode": "command-executed",
@@ -332,18 +431,18 @@
     "receiptValidity": "valid",
     "buildDecision": "incrementalBuild",
     "phaseTimingsMs": {
-      "inputHashCalculation": 52,
-      "skipDecision": 47,
-      "worktreeSetup": 12934,
-      "typescriptBuild": 14760,
-      "rootDropReleaseAssembly": 21119,
-      "onefileReleaseAssembly": 1856,
-      "artifactSync": 6160,
+      "inputHashCalculation": 44,
+      "skipDecision": 41,
+      "worktreeSetup": 16808,
+      "typescriptBuild": 14067,
+      "rootDropReleaseAssembly": 18166,
+      "onefileReleaseAssembly": 1025,
+      "artifactSync": 8239,
       "cleanup": 0,
-      "totalElapsed": 63290
+      "totalElapsed": 79087
     },
     "rawTelemetryPolicy": "gitignored-runtime-only",
-    "tsBuildCacheDigest": "sha256:765b2711c1fef069887cb5e1978d98fa94e0996daa7e10d84144f68dc5e82b1b"
+    "tsBuildCacheDigest": "sha256:1b3e29e32bd19969df6bf5dab23ba271d8fcb96cfc91968513c1284002c740f0"
   },
-  "publishedAt": "2026-08-13T16:27:44.019Z"
+  "publishedAt": "2026-08-24T15:30:10.745Z"
 }

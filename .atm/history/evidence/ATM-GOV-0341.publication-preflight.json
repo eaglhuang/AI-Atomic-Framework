@@ -1,0 +1,174 @@
+{
+  "schemaId": "atm.publicationPreflight.v1",
+  "capturedAt": "2026-08-15T16:15:12.969Z",
+  "coordinatorTaskId": "ATM-GOV-0341",
+  "coordinatorActorId": "cursor-captain",
+  "waitingOn": "ATM-GOV-0369",
+  "queueAdmission": "blocked-until-0369-source-done",
+  "buildAllowed": false,
+  "enqueueAllowed": false,
+  "closeAllowed": false,
+  "head": "82c065c72ad294c18c14a1a2525f27f64ec919ba",
+  "ancestry": {
+    "source0398": "42e158daed56daa73ad12915ddbd982cacf0b9dd",
+    "evidenceReplay0398": "82c065c72ad294c18c14a1a2525f27f64ec919ba",
+    "headIs0398SourceDescendant": true,
+    "source0369": null,
+    "0369Status": "running",
+    "0369Actor": "claude-008",
+    "0369ClaimScopeNow": [".atm/history/tasks/ATM-GOV-0369.json"],
+    "sealedSourceMustBeCommonDescendantOf": [
+      "42e158daed56daa73ad12915ddbd982cacf0b9dd",
+      "<future-0369-source-sha>"
+    ]
+  },
+  "publicationInputs": {
+    "packageJson": "sha256:6a2c6ede92435992de19263d69261625fdf4cb9412819c6309ae42033dba3761",
+    "packageLock": "sha256:350b949f98b697c6a68e6f27f6e265fdfd854a4e41d83c06bab518a0866eb7c4",
+    "tsconfig": "sha256:8ded03ea029f476f8296014c7d65071981b2d7bc071fd11d9c2aab42dac69b3e",
+    "tsconfigBuild": "sha256:a97262015bd3fcb678d209b488e166470e8af2bd20ac7bbd87249a0289f4e44d",
+    "buildScript": "sha256:a729be98314156762555202b7d687370f27b85145fee0f13963ed5b1cee2d1ee",
+    "rootDropScript": "sha256:e289b201d15709eb529fc7a62e3025cff004ea0af951daca4e23f9b7d5fa3853"
+  },
+  "queue": {
+    "brokerActiveIntents": 0,
+    "runnerSyncStewardGroups": 0,
+    "queueHead": null
+  },
+  "foreignGeneratedSurface": {
+    "dirtyGeneratedCount": 31,
+    "note": "Prior publication and ATM-GOV-0395 generated residue remain dirty. Do not build or enqueue until ATM-GOV-0369 source is sealed. After the short joint publication, Claude uses the frozen runner to converge 0395 residue and close 0394/0395/0369."
+  },
+  "runbookHonesty": {
+    "expectedItemCount": 112,
+    "provenRows": 98,
+    "unprovenRows": 14,
+    "unresolved": 24,
+    "unknown": 0,
+    "overallVerdict": "not-complete",
+    "certificateOverallVerdict": "not-complete",
+    "releaseAuthorized": false,
+    "unprovenRowIds": [
+      "RB-071", "RB-072", "RB-073", "RB-074", "RB-075",
+      "RB-076", "RB-077", "RB-078", "RB-079", "RB-080",
+      "RB-109", "RB-110", "RB-111", "RB-112"
+    ],
+    "unprovenExits": [
+      "EXIT-02", "EXIT-03", "EXIT-04", "EXIT-05", "EXIT-06",
+      "EXIT-07", "EXIT-08", "EXIT-09", "EXIT-10", "EXIT-11"
+    ],
+    "provenExit": "EXIT-01"
+  },
+  "historical0331": {
+    "ledgerStatus": "done",
+    "rewriteForbidden": true,
+    "repairTask": "ATM-GOV-0398",
+    "sourceCommit": "42e158daed56daa73ad12915ddbd982cacf0b9dd",
+    "evidenceReplayCommit": "82c065c72ad294c18c14a1a2525f27f64ec919ba"
+  },
+  "independentObserverContractInputs": {
+    "producerForbidden": ["cursor-captain", "Cursor"],
+    "compiler": "scripts/compile-runbook-completion-evidence.ts#independentExitContracts",
+    "reviewerB": "scripts/review-runbook-release-authority.ts",
+    "rawInputs": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md",
+      "docs/reports/plan-3x-4x-runbook-completion-evidence.json",
+      "docs/reports/plan-3-0-objective-replay.json",
+      "docs/reports/plan-3-1-objective-replay.json",
+      "docs/reports/plan-3-2-objective-replay.json",
+      "docs/reports/plan4-successor-wave-objective-map.json",
+      "docs/reports/plan-3x-4x-backlog-disposition-census.json",
+      "docs/reports/plan-3x-4x-charter-current-verdict.json"
+    ],
+    "requiredTupleFields": [
+      "command",
+      "exitCode=0",
+      "outputDigest",
+      "observedAt",
+      "sourceCommit ancestor-of-target-HEAD",
+      "artifactPaths present",
+      "validatorContractId registered and matching taskId+command",
+      "evidenceOwner is the observer card, not the wave basis card"
+    ],
+    "contractShape": {
+      "registered": false,
+      "sameWaveAsExit": true,
+      "sharesPublicSeamsWithWaveBasis": true,
+      "dependsOnRegisteredWaveCard": true,
+      "mustNotReuseBasisEvidenceTuples": true
+    },
+    "exits": [
+      {
+        "itemId": "EXIT-02",
+        "wave": "Wave 1",
+        "requirementDigest": "sha256:9bbe5a00826055ebee9f03774e3bab5d34f9721ec17611e5a2a7c00ee3d7244b",
+        "diagnostic": "missing-independent-wave-exit-contract"
+      },
+      {
+        "itemId": "EXIT-03",
+        "wave": "Wave 2",
+        "requirementDigest": "sha256:3379cc87918ff23cb024e46c5087568a3be4ed7b95685c4905401c7d59be7d87",
+        "diagnostic": "missing-independent-wave-exit-contract"
+      },
+      {
+        "itemId": "EXIT-04",
+        "wave": "Wave 3",
+        "requirementDigest": "sha256:c5e716bb5382cd4ba4b385765131f20bf7fb16eb822e587f4a1f36444ee9d65f",
+        "diagnostic": "missing-independent-wave-exit-contract"
+      },
+      {
+        "itemId": "EXIT-05",
+        "wave": "Wave 4",
+        "requirementDigest": "sha256:54a5ccb52efb8541854a10af824b31acd18a557fdae07264b73212b555ac25d2",
+        "diagnostic": "missing-independent-wave-exit-contract"
+      },
+      {
+        "itemId": "EXIT-06",
+        "wave": "Wave 5",
+        "requirementDigest": "sha256:01fc7a0f968d1d66af204ac2a504c018340eff27c7dd631b9f787aec56e5d4a3",
+        "diagnostic": "missing-independent-wave-exit-contract"
+      },
+      {
+        "itemId": "EXIT-07",
+        "wave": "Wave 6",
+        "requirementDigest": "sha256:dfe5be300138688915c8a2257a2e63fd61c1de34956d96009dbe39b1b313ef6f",
+        "diagnostic": "missing-independent-wave-exit-contract"
+      },
+      {
+        "itemId": "EXIT-08",
+        "wave": "Wave 7",
+        "requirementDigest": "sha256:11d8b8aab3c81f99c882e85e9d8c13438e6d035572db62130fa5020e416416ce",
+        "diagnostic": "missing-independent-wave-exit-contract"
+      },
+      {
+        "itemId": "EXIT-09",
+        "wave": "Wave 8",
+        "requirementDigest": "sha256:8703f8ecaf39f363c4cc8c56c876bef4a2dce4e110e4ff7792dd3562067d3658",
+        "diagnostic": "missing-independent-wave-exit-contract"
+      },
+      {
+        "itemId": "EXIT-10",
+        "wave": "Wave 9",
+        "requirementDigest": "sha256:2cd6119fd69b843a78ded3dd3de0d366b17273b8ffbcfd8bf377c916b355749e",
+        "diagnostic": "missing-independent-wave-exit-contract"
+      },
+      {
+        "itemId": "EXIT-11",
+        "wave": "Wave 10",
+        "requirementDigest": "sha256:ad9db0d0920af112557c9e4fc3a3fc91d08a425c0e321b5919d14351c50251e0",
+        "diagnostic": ["wave-requirement-basis-not-proven", "missing-independent-wave-exit-contract"],
+        "basisUnproven": ["RB-071", "RB-072", "RB-073", "RB-074", "RB-075", "RB-076", "RB-077", "RB-078", "RB-079", "RB-080"]
+      }
+    ]
+  },
+  "nextPublicationSequence": [
+    "Wait for Claude ATM-GOV-0369 source SHA plus green validators",
+    "Short joint publication as queue-head",
+    "Build once",
+    "Prove sealed source is common descendant of 42e158da and 0369 source",
+    "Receipt/manifest/reproducibility green",
+    "Release queue immediately",
+    "Notify Claude to converge 0395 residue with frozen runner and close 0394/0395/0369",
+    "Return to 0341 independent observer, certificate, remote release/push verdict"
+  ]
+}
