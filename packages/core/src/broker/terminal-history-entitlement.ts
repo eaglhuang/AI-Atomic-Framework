@@ -11,9 +11,10 @@ import path from 'node:path';
  *
  * The replacement is a governed grant rather than a resemblance. A writer is
  * entitled to a terminal task's history path when its *own* live claim was
- * admitted for that path and declares the card it is answering for. Nothing
- * about the owner's identity — its id, its file names, the shape of the
- * writer's work-item id — participates in the decision.
+ * admitted for that path and has an answerable live-card anchor. A normal
+ * task claim anchors itself; a framework-temporary claim must declare the
+ * card it is answering for. Nothing about the terminal owner's identity — its
+ * id or file names — participates in the decision.
  */
 
 export type TerminalHistoryOwnershipState = 'live' | 'terminal-entitled' | 'terminal-unentitled';
@@ -107,7 +108,15 @@ export function hasReconciliationEntitlement(
     (entry) => isBoundedScopeEntry(entry) && scopeEntryMatches(input.candidateFile, entry)
   );
   if (!admitted) return false;
-  // The linkage is what makes the write answerable: a reconciliation is
-  // performed on behalf of a card that is still open to review it.
-  return Boolean(claim.linkedTaskId && input.isLiveTask(claim.linkedTaskId));
+  // The linkage is what makes the write answerable. A normal task claim is
+  // itself a durable, live review surface, so its own id is the anchor when
+  // no framework-temporary linkage is present. A framework temporary claim
+  // does not have a task ledger and therefore remains blocked unless it names
+  // a live linked task explicitly.
+  const writerHasLiveTaskLedger = existsSync(
+    path.join(cwd, '.atm', 'history', 'tasks', `${writerWorkItemId}.json`)
+  ) && input.isLiveTask(writerWorkItemId);
+  const answerableTaskId = claim.linkedTaskId
+    ?? (writerHasLiveTaskLedger ? writerWorkItemId : null);
+  return Boolean(answerableTaskId && input.isLiveTask(answerableTaskId));
 }
