@@ -274,6 +274,9 @@ execFileSync('git', ['add', '--', `.atm/history/tasks/${ignoredReleasedTaskId}.j
 execFileSync('git', ['commit', '-qm', 'ignored released history owner fixture'], { cwd });
 writeFileSync(path.join(cwd, ignoredReleasedEvidencePath), `${JSON.stringify({ taskId: ignoredReleasedTaskId, schemaId: 'atm.liveIndexReconciliation.v1', clean: true })}\n`);
 const ignoredHistoryCleanupTask = structuredClone(historyCleanupTask);
+ignoredHistoryCleanupTask.source = {
+  planPath: `docs/ai_atomic_framework/temporary-governance/tasks/${historyCleanupTaskId.toLowerCase()}.task.md`,
+};
 ignoredHistoryCleanupTask.scopePaths = [
   ignoredReleasedEvidencePath,
   `.atm/history/evidence/${historyCleanupTaskId}.*`,
@@ -297,6 +300,13 @@ const ignoredHistoryCleanupBundle = resolveTaskScopedCommitBundle({
   brokerConflictResolutionPath: null,
 });
 assert.ok(ignoredHistoryCleanupBundle.stageFiles.includes(ignoredReleasedEvidencePath), 'an explicitly named Git-ignored terminal receipt must enter the sealed candidate');
+execFileSync('git', ['add', '-f', '--', ignoredReleasedEvidencePath], { cwd });
+assert.equal(
+  inspectTaskScopedStagedGovernanceBundle(cwd, historyCleanupTaskId, ignoredHistoryCleanupTask).ok,
+  true,
+  'the pre-commit ownership check must preserve an exact terminal receipt when the only non-history scope is the current task planning source',
+);
+execFileSync('git', ['restore', '--staged', '--', ignoredReleasedEvidencePath], { cwd });
 
 writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${releasedTaskId}.json`), `${JSON.stringify({
   workItemId: releasedTaskId,

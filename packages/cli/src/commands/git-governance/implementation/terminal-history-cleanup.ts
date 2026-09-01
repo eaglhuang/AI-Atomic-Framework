@@ -15,12 +15,21 @@ function isCurrentTaskIntrinsicHistoryScope(scope: string, taskId: string) {
     || normalized.startsWith(`.atm/history/task-events/${task}/`);
 }
 
+function isCurrentTaskPlanningMetadataScope(
+  scope: string,
+  planningSourcePath: string | null,
+) {
+  const expected = normalizeRelativePath(planningSourcePath ?? '');
+  return Boolean(expected) && normalizeRelativePath(scope) === expected;
+}
+
 export function isExplicitTerminalHistoryCleanupArtifact(
   cwd: string,
   filePath: string,
   currentTaskId: string,
   declaredScope: readonly string[],
   isCurrentTaskGovernanceArtifact: (filePath: string) => boolean,
+  currentTaskPlanningSourcePath: string | null = null,
 ) {
   const normalized = normalizeRelativePath(filePath);
   const current = String(currentTaskId ?? '').trim().toUpperCase();
@@ -33,6 +42,7 @@ export function isExplicitTerminalHistoryCleanupArtifact(
     const candidate = normalizeRelativePath(scope);
     return Boolean(candidate) && (
       isCurrentTaskIntrinsicHistoryScope(candidate, current)
+      || isCurrentTaskPlanningMetadataScope(candidate, currentTaskPlanningSourcePath)
       || (
         !/[*?]/.test(candidate)
         && !/[\\/]$/.test(candidate)

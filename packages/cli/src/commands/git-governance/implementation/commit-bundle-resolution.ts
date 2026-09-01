@@ -104,8 +104,12 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     input.taskId,
     input.taskDocument,
   );
+  const currentTaskPlanningSourcePath =
+    typeof input.taskDocument?.source?.planPath === 'string'
+      ? input.taskDocument.source.planPath
+      : null;
   const commitAuthority = createCommitAuthorityPolicy(input);
-  const isAllowedCommitArtifact = (filePath: string) => isAllowedGovernanceArtifactPath(input.cwd, filePath, input.taskId) || isExplicitTerminalHistoryCleanupArtifact(input.cwd, filePath, input.taskId, declaredScope, (candidate) => isAllowedGovernanceArtifactPath(input.cwd, candidate, input.taskId));
+  const isAllowedCommitArtifact = (filePath: string) => isAllowedGovernanceArtifactPath(input.cwd, filePath, input.taskId) || isExplicitTerminalHistoryCleanupArtifact(input.cwd, filePath, input.taskId, declaredScope, (candidate) => isAllowedGovernanceArtifactPath(input.cwd, candidate, input.taskId), currentTaskPlanningSourcePath);
   const gitExecutable = resolveGitExecutable();
   const copyableCommitCommand = buildCopyableGitCommitCommand({
     cwd: input.cwd,

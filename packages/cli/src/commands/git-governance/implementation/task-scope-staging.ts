@@ -76,7 +76,7 @@ export function inspectTaskScopedStagedGovernanceBundle(cwd: LegacyValue, taskId
   if (claim?.state === "active") {
     for (const filePath of stagedFiles) {
       if (isIgnorableCommitStagingSideEffect(cwd, filePath, taskId)) continue;
-      if (isExplicitTerminalHistoryCleanupArtifact(cwd, filePath, taskId, declaredScope)) continue;
+      if (isExplicitTerminalHistoryCleanupArtifact(cwd, filePath, taskId, declaredScope, taskDocument)) continue;
       if (!isAllowedGovernanceArtifactPath(cwd, filePath, taskId)) continue;
       const stagedTaskId = extractGovernanceTaskIdFromPath(filePath);
       if (stagedTaskId && stagedTaskId !== taskId.toUpperCase()) {
