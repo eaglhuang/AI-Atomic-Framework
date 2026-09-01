@@ -231,7 +231,6 @@ export function frameworkTempPublicationCapabilityCovers(
 
 function toCapability(cwd: string, lock: FrameworkTempLockProjection): FrameworkTempPublicationCapability | null {
   if (!lock.heartbeatAt || lock.ttlSeconds === null) return null;
-  const receiptBound = frameworkLockClaimsRunnerReceipt(lock);
   const receiptPath = `.atm/history/evidence/${lock.workItemId}.runner-sync-receipt.json`;
   return {
     taskId: lock.workItemId,
@@ -244,11 +243,16 @@ function toCapability(cwd: string, lock: FrameworkTempLockProjection): Framework
     // callers cannot accidentally publish bytes without their receipt.
     allowedFiles: [
       ...lock.files.map((scope) => normalizeDirectoryScope(cwd, scope)),
-      ...(receiptBound ? [receiptPath] : []),
+      // A live framework temporary lock is the sole producer of its own
+      // runner-sync receipt.  Requiring that not-yet-written receipt to
+      // already appear in lock.files creates a circular publication denial.
+      // This grants only the lock's exact receipt; foreign receipts still
+      // require linked-task or queue-bound proof below.
+      receiptPath,
       ...(lock.linkedTaskId
         ? [`.atm/history/evidence/${lock.linkedTaskId}.runner-sync-receipt.json`]
         : []),
-      ...(receiptBound ? resolveReceiptBoundGeneratedOutputPaths(cwd, lock) : []),
+      ...resolveReceiptBoundGeneratedOutputPaths(cwd, lock),
       ...resolveQueueBoundTerminalReceiptPaths(cwd, lock),
     ],
   };

@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed in source; frozen runner publication and formal backlog closeout remain separate states",
   "area": "framework-mode temporary claim lifecycle",
   "finding": "framework-mode claim mints a temporary runtime scope lock but no matching task ledger record. The documented governed commit route therefore rejects the claimed temporary task with ATM_TASK_NOT_FOUND, leaving a validated framework quickfix without a normal commit or close path.",
   "expectedBehavior": "A temporary framework claim must be a complete, bounded lifecycle: either mint a task/evidence record accepted by the governed commit and close surfaces, or return a pre-claim capability result that names the supported durable commit route. A successful claim must never advertise a task id that the standard governed commit command cannot resolve.",
   "evidenceOrRepro": "2026-08-13T17:09Z, actor codex-gpt-5.4-mini: framework-mode claim acquired ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini for three taskflow quickfix files; node atm.mjs git commit --task ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini --auto-stage --dry-run returned ATM_TASK_NOT_FOUND because .atm/history/tasks/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.json does not exist. Attempting the linked ATM-GOV-0349 card instead correctly failed on an unrelated protected task-event deletion.",
-  "followUp": "Add a producer/consumer lifecycle parity test covering framework-mode claim -> governed commit dry-run -> governed close/release. The fix must be generic and must not synthesize task records by manual .atm edits. Until then, any path-bounded native emergency commit is anomaly evidence, not a normal task closure."
+  "followUp": "The direct framework-temp publication capability contract now proves a live lock may publish its exact self receipt and receipt-owned outputs without broadening to foreign outputs. Publish a fresh frozen runner before frozen CLI consumers rely on the repair; retain the claim-to-governed-commit lifecycle coverage."
 }
