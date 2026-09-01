@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MBX-0001",
   "title": "實作 editor-neutral 信箱地址與 Markdown 訊息生命週期",
-  "status": "open",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -166,54 +166,54 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-01T20-34-17-255Z-release-eb82ebff21b4",
-  "lastTransitionAt": "2026-09-01T20:34:17.255Z",
+  "lastTransitionId": "2026-09-01T21-51-15-719Z-lock-cleanup-382598918d24",
+  "lastTransitionAt": "2026-09-01T21:51:15.719Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "reservedAt": "2026-08-29T10:47:32.228Z",
-  "promotedAt": "2026-08-29T10:47:32.233Z",
+  "reservedAt": "2026-09-01T21:49:30.219Z",
+  "promotedAt": "2026-09-01T21:49:30.224Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-9201546a5bd4",
-    "claimedAt": "2026-08-29T10:47:32.237Z",
-    "heartbeatAt": "2026-09-01T20:34:16.580Z",
+    "leaseId": "lease-f55ce73a4fc6",
+    "claimedAt": "2026-09-01T21:49:30.229Z",
+    "heartbeatAt": "2026-09-01T21:51:15.532Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/tasks/TASK-MBX-0001.json",
       ".atm/history/evidence/TASK-MBX-0001.*",
       ".atm/history/task-events/TASK-MBX-0001/**",
-      ".atm/history/tasks/TASK-MBX-0001.json",
       "atomic_workbench/maps/agent-mailbox-protocol-map.json",
       "scripts/agent-mailbox.ts",
       "scripts/agent-mailbox/**",
       "tests/cli/agent-mailbox-protocol.test.ts"
     ],
     "state": "released",
-    "reason": "Preserved non-delivery WIP in governed commit 81791b515e33c02fafae52a067df91def559c034; releasing recovered stale claim for clean worktree.",
     "laneSession": {
-      "laneSessionId": "lane-20260829104732-codex-gpt-5.4-mini-1967730c1b",
+      "laneSessionId": "lane-20260901214930-codex-gpt-5.4-mini-ff285c1ce6",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260829104732-codex-gpt-5.4-mini-1967730c1b\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901214930-codex-gpt-5.4-mini-ff285c1ce6\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-08-29T10:47:32.237Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d8db0824996a0d31",
-    "ticketDigest": "sha256:d8db0824996a0d31a9c32b146e390ecc5977e1137abe965e3ebd5e9eeb15074c",
+    "ticketId": "wat-f5ac2e6c0ccde6fc",
+    "ticketDigest": "sha256:f5ac2e6c0ccde6fcef185ec5f2572f7ff404a0b030c83e1c98a58bf1d7354ded",
     "taskId": "TASK-MBX-0001",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260829104732-codex-gpt-5.4-mini-1967730c1b",
-    "claimGeneration": "lease-9201546a5bd4",
-    "issuedAt": "2026-09-01T20:31:54.258Z",
-    "expiresAt": "2026-09-01T21:01:54.258Z",
+    "laneSessionId": "lane-20260901214930-codex-gpt-5.4-mini-ff285c1ce6",
+    "claimGeneration": "lease-f55ce73a4fc6",
+    "issuedAt": "2026-09-01T21:49:30.229Z",
+    "expiresAt": "2026-09-01T22:19:30.229Z",
     "scopeDigest": "sha256:60775567563429a3ed1bc93720247e7434e2abed6be19632bb7e06afd38a3d39",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-01T20:31:54.258Z"
+      "selectedAt": "2026-09-01T21:49:30.229Z"
     },
     "grants": [
       {
@@ -261,7 +261,7 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+  "startedBySessionId": "session-20260901214930-codex-gpt-5.4-mini-TASK-MBX-0001-77d00f3ab3",
   "wipOwnership": {
     "schemaId": "atm.retainedWipOwnership.v1",
     "taskId": "TASK-MBX-0001",
@@ -289,9 +289,9 @@
     "specVersion": "0.1.0",
     "taskId": "TASK-MBX-0001",
     "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
+    "scopeKey": "TASK-MBX",
+    "queueId": "queue-46551ce243afe945",
+    "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/TASK-MBX-0001.*",
       ".atm/history/task-events/TASK-MBX-0001/**",
@@ -301,20 +301,27 @@
       "scripts/agent-mailbox/**",
       "tests/cli/agent-mailbox-protocol.test.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/agent-mailbox/tasks/TASK-MBX-0001-editor-neutral-markdown.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/agent-mailbox/",
-      "docs/ai_atomic_framework/agent-mailbox/tasks/",
-      "docs/ai_atomic_framework/agent-mailbox/tasks/TASK-MBX-0001-editor-neutral-markdown.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "f9dfc53aa7b4205b5c3a772724b1bf3c6a3ba53cb295dccc74456e2ce73d4996",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
-    "createdAt": "2026-09-01T20:31:54.423Z",
-    "status": "active"
-  }
+    "sessionId": "session-20260901214930-codex-gpt-5.4-mini-TASK-MBX-0001-77d00f3ab3",
+    "laneSession": {
+      "laneSessionId": "lane-20260901214930-codex-gpt-5.4-mini-ff285c1ce6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901214930-codex-gpt-5.4-mini-ff285c1ce6\""
+    },
+    "createdAt": "2026-09-01T21:49:31.212Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-09-01T21:51:15.716Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "closedAt": "2026-09-01T21:51:15.532Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260901214930-codex-gpt-5.4-mini-TASK-MBX-0001-77d00f3ab3",
+  "closurePacket": ".atm/history/evidence/TASK-MBX-0001.closure-packet.json"
 }

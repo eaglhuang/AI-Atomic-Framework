@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-01T21-51-15-534Z-close-01791d09fc46",
+  "taskId": "TASK-MBX-0001",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260901214930-codex-gpt-5.4-mini-TASK-MBX-0001-77d00f3ab3",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MBX-0001.json",
+  "taskSha256": "sha256:f6d485dccf298fd990c78b183080df2c293d6c1bb9caecafabe1489351700ced",
+  "createdAt": "2026-09-01T21:51:15.534Z",
+  "command": "node atm.mjs tasks close --task TASK-MBX-0001 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-ea899c051bea --historical-delivery 81791b515e33c02fafae52a067df91def559c034",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-ea899c051bea",
+    "sessionId": "session-20260901214930-codex-gpt-5.4-mini-TASK-MBX-0001-77d00f3ab3",
+    "closurePacketPath": ".atm/history/evidence/TASK-MBX-0001.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-01T21:51:15.528Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-MBX-0001.*",
+        ".atm/history/task-events/TASK-MBX-0001/**",
+        ".atm/history/tasks/TASK-MBX-0001.json",
+        "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+        "scripts/agent-mailbox.ts",
+        "scripts/agent-mailbox/**",
+        "tests/cli/agent-mailbox-protocol.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/agent-mailbox.ts",
+        "scripts/agent-mailbox/**",
+        "tests/cli/agent-mailbox-protocol.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
