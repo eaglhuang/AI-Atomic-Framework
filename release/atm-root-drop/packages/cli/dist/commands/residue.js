@@ -333,7 +333,7 @@ export function buildResidueStatusReport(cwd) {
 }
 function isSafeReconcileEntry(entry) {
     return entry.recommendedAction === 'safe-auto-clean'
-        && entry.cleanupAction === 'remove'
+        && (entry.cleanupAction === 'remove' || entry.cleanupAction === 'restore')
         && entry.ownerState !== 'active'
         && !entry.sharedIndexRisk;
 }
@@ -392,6 +392,24 @@ function removeResiduePathWithRetry(absolutePath) {
         failureMessage: messageText
     };
 }
+function restoreResiduePath(cwd, relativePath) {
+    const result = spawnSync('git', ['restore', '--staged', '--worktree', '--source=HEAD', '--', relativePath], {
+        cwd,
+        encoding: 'utf8'
+    });
+    const error = result.error;
+    const failureCode = typeof error?.code === 'string'
+        ? String(error.code)
+        : result.status === 0 ? null : 'GIT_RESTORE_FAILED';
+    return {
+        applied: result.status === 0 && !error,
+        attempts: 1,
+        failureCode,
+        failureMessage: failureCode
+            ? (error instanceof Error ? error.message : String(result.stderr ?? '').trim() || 'git restore failed')
+            : null
+    };
+}
 export function buildResidueReconcileReport(cwd, apply) {
     const statusReport = buildResidueStatusReport(cwd);
     const actions = [];
@@ -406,14 +424,16 @@ export function buildResidueReconcileReport(cwd, apply) {
             failureMessage: null
         };
         if (apply && exists) {
-            removal = removeResiduePathWithRetry(absolutePath);
-            if (removal.applied) {
+            removal = entry.cleanupAction === 'restore'
+                ? restoreResiduePath(cwd, entry.path)
+                : removeResiduePathWithRetry(absolutePath);
+            if (removal.applied && entry.cleanupAction === 'remove') {
                 removeEmptyParents(cwd, absolutePath);
             }
         }
         actions.push({
             path: entry.path,
-            action: 'remove',
+            action: entry.cleanupAction,
             applied: removal.applied,
             reason: entry.reason,
             attempts: removal.attempts,
