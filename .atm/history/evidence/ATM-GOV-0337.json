@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0337",
-  "updatedAt": "2026-08-12T18:40:59.286Z",
+  "updatedAt": "2026-08-15T10:30:39.435Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -468,6 +468,103 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:621ad49462a5b4028fa1a10482cc1b79cda87bc8dcd4e0db8cba43d8483a1016",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/core/real-shadow-comparison.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-captain",
+      "sessionId": null,
+      "createdAt": "2026-08-15T10:30:39.435Z",
+      "details": {
+        "actorId": "cursor-captain",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/core/real-shadow-comparison.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.shadow-comparison",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/core/real-shadow-comparison.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c35c558a7300e3062574e9f238fffbed67aa4454f0f84c666b837d9af1f34a92",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-15T10:30:39.136Z",
+            "finishedAt": "2026-08-15T10:30:39.434Z",
+            "durationMs": 298,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/core/real-shadow-comparison.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "103dfc3756214ef00adf426b4ab4630facf6f1b6",
+            "cacheKey": "sha256:7a48286b118e459e1d0fbc37b3ca4c523eea31a8dfab64c8d92647420964af2a",
+            "generatedAt": "2026-08-15T10:30:39.434Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:7a48286b118e459e1d0fbc37b3ca4c523eea31a8dfab64c8d92647420964af2a",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-15T10:30:39.434Z",
+              "observedAt": "2026-08-15T10:30:39.434Z",
+              "startedAt": "2026-08-15T10:30:39.136Z",
+              "finishedAt": "2026-08-15T10:30:39.434Z",
+              "durationMs": 298,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:707f4ed3184d3febc1bcfb37141256dc54fd7201e42776d5a100d2220462f886",
+              "outputDigest": "sha256:76b42ebf0c03704f6ad8712364fbe3767e493728a19157fb03e543faf2bf3052",
+              "cache": {
+                "key": "sha256:7a48286b118e459e1d0fbc37b3ca4c523eea31a8dfab64c8d92647420964af2a",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/core/real-shadow-comparison.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/core/real-shadow-comparison.test.ts"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "103dfc3756214ef00adf426b4ab4630facf6f1b6",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1f1395145dee8ce19f7764c0b3b6a3732acd53d36e59e506807b87b7bbe4064b",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

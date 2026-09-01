@@ -1,24 +1,13 @@
 {
   "schemaId": "atm.liveIndexReconciliation.v1",
   "headAdvanced": true,
-  "reconciledPaths": [
-    ".atm/history/task-events/ATM-GOV-0353/2026-08-12T23-08-50-523Z-import-ee4a0ec9020f.json",
-    ".atm/history/task-events/ATM-GOV-0353/2026-08-12T23-09-16-835Z-reserve-286898d80ab4.json",
-    ".atm/history/task-events/ATM-GOV-0353/2026-08-12T23-09-16-842Z-promote-1c72b8f8eb8c.json",
-    ".atm/history/task-events/ATM-GOV-0353/2026-08-12T23-09-22-755Z-claim-df44fc4043c2.json",
-    ".atm/history/tasks/ATM-GOV-0353.json",
-    "packages/cli/src/commands/planning-repo-root.ts",
-    "packages/cli/src/commands/planning-root-resolution-cache.ts",
-    "tests/cli/planning-root-resolution-cache.test.ts"
-  ],
-  "retainedPaths": [
-    {
-      "path": ".atm/history/evidence/git-head.jsonl",
-      "reason": "worktree-diverged"
-    }
-  ],
+  "reconciledPaths": [],
+  "retainedPaths": [],
   "clean": false,
-  "failure": null,
+  "failure": {
+    "code": "ATM_LIVE_INDEX_RECONCILIATION_FAILED",
+    "message": "Command failed: C:\\Program Files\\Git\\cmd\\git.exe update-index --add --cacheinfo 100644,b3f23527b8573d90e71f4945c5e9136072e339ff,.atm/history/evidence/ATM-GOV-0353.bundle-manifest.json\nfatal: Unable to create 'C:/Users/User/AI-Atomic-Framework/.git/index.lock': File exists.\n\nAnother git process seems to be running in this repository, e.g.\nan editor opened by 'git commit'. Please make sure all processes\nare terminated then try again. If it still fails, a git process\nmay have crashed in this repository earlier:\nremove the file manually to continue.\n"
+  },
   "taskId": "ATM-GOV-0353",
-  "createdAt": "2026-08-12T23:19:08.830Z"
+  "createdAt": "2026-08-13T05:07:52.242Z"
 }
