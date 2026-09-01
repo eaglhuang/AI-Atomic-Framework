@@ -266,7 +266,7 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
             for (const taskId of memberTaskIds)
                 attestedTemporaryProducerIds.add(taskId);
     }
-    const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat().filter((taskId) => !attestedTemporaryProducerIds.has(taskId))]);
+    const bundleTaskIds = new Set([...evidenceByPath.values()].flat().filter((taskId) => !attestedTemporaryProducerIds.has(taskId)));
     for (const [file, taskIds] of evidenceByPath) {
         const isIndependentRunnerWitness = lockBackedRunnerReceipts.has(file) && taskIds.length === 1 && Boolean(contexts.get(taskIds[0])?.event);
         const isAttestedTemporaryProducerReceipt = taskIds.length === 1 && attestedTemporaryProducerIds.has(taskIds[0]) && evidenceRecords.get(file)?.schemaId === 'atm.runnerSyncReceipt.v1';
@@ -316,6 +316,9 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
         const lower = normalized.toLowerCase();
         const absolutePath = path.join(cwd, normalized);
         if (lower.startsWith('.atm/history/evidence/') && !lower.startsWith('.atm/history/evidence/historical-batches/')) {
+            if (pendingBatchCheckpointAllowedFiles.length > 0 && isPathAllowedByScope(normalized, pendingBatchCheckpointAllowedFiles)) {
+                continue;
+            }
             const decision = protectedEvidenceBundle.decisions.get(lower);
             if (!decision?.ok) {
                 findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: `Evidence updates must carry one semantic task identity and a matching staged task ledger or transition event (${decision?.reason ?? 'missing-evidence-decision'}).` });
@@ -380,9 +383,6 @@ direct tasks close is not allowed. Use batch checkpoint so ATM can close, advanc
                 if (taskIds.length === 0 || !hasBatchTaskContext) {
                     findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: 'Historical batch evidence updates must travel with at least one staged task ledger change or transition event referenced by the batch envelope.' });
                 }
-                continue;
-            }
-            if (pendingBatchCheckpointAllowedFiles.length > 0 && isPathAllowedByScope(normalized, pendingBatchCheckpointAllowedFiles)) {
                 continue;
             }
             if (effectiveSingleStagedTaskId && isNestedEvidenceArtifactPath(normalized)) {

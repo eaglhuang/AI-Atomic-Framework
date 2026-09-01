@@ -1,0 +1,168 @@
+{
+  "taskId": "ATM-FRAMEWORK-TEMP-codex-cleanup-captain",
+  "updatedAt": "2026-09-01T16:29:19.697Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/taskflow/__tests__/task-scope-runtime-authority.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-cleanup-captain",
+      "sessionId": null,
+      "createdAt": "2026-09-01T16:29:08.249Z",
+      "details": {
+        "actorId": "codex-cleanup-captain",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/task-scope-runtime-authority.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:1a656ead52f741235492c884d1dc73a2d2e05a611ac1f482d95efe32f055be75",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-09-01T16:29:07.890Z",
+            "finishedAt": "2026-09-01T16:29:08.248Z",
+            "durationMs": 358,
+            "cached": false,
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "4c4ad61a8c46c3ea6acbefc7a8cabd5328011b29",
+            "cacheKey": "sha256:6850c854a125e5291fb27eebe94253f927603c4ec25f643c833266c38c2d2dcc",
+            "generatedAt": "2026-09-01T16:29:08.248Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:6850c854a125e5291fb27eebe94253f927603c4ec25f643c833266c38c2d2dcc",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-01T16:29:08.248Z",
+              "observedAt": "2026-09-01T16:29:08.248Z",
+              "startedAt": "2026-09-01T16:29:07.890Z",
+              "finishedAt": "2026-09-01T16:29:08.248Z",
+              "durationMs": 358,
+              "laneSessionId": null,
+              "taskId": "ATM-FRAMEWORK-TEMP-codex-cleanup-captain",
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:1f1d22b4f035ac449162c594539897907c4b7175048dbe6483a6b9a9fb7241db",
+              "outputDigest": "sha256:fe0ff95f3715216591ecdfa39e1b01d72471ad8da9f9dde04e486f17b3dcade6",
+              "cache": {
+                "key": "sha256:6850c854a125e5291fb27eebe94253f927603c4ec25f643c833266c38c2d2dcc",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/task-scope-runtime-authority.spec.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "4c4ad61a8c46c3ea6acbefc7a8cabd5328011b29",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a589500b825a3a690281662d22d6fe263397791ccfb52ca73ad96eb96406248c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npx tsc -p tsconfig.json --noEmit",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-cleanup-captain",
+      "sessionId": null,
+      "createdAt": "2026-09-01T16:29:19.697Z",
+      "details": {
+        "actorId": "codex-cleanup-captain",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "commandRuns": [
+          {
+            "command": "npx tsc -p tsconfig.json --noEmit",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-09-01T16:29:10.582Z",
+            "finishedAt": "2026-09-01T16:29:19.697Z",
+            "durationMs": 9115,
+            "cached": false,
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "4c4ad61a8c46c3ea6acbefc7a8cabd5328011b29",
+            "cacheKey": "sha256:06d7f8a368be72dd9d4e995178c19148696d048296f49a6761533cc185225588",
+            "generatedAt": "2026-09-01T16:29:19.697Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:06d7f8a368be72dd9d4e995178c19148696d048296f49a6761533cc185225588",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-01T16:29:19.697Z",
+              "observedAt": "2026-09-01T16:29:19.697Z",
+              "startedAt": "2026-09-01T16:29:10.582Z",
+              "finishedAt": "2026-09-01T16:29:19.697Z",
+              "durationMs": 9115,
+              "laneSessionId": null,
+              "taskId": "ATM-FRAMEWORK-TEMP-codex-cleanup-captain",
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:f5c706fd779803266bf61055592af82b3bd6aca33da26da7e26753011e2add13",
+              "outputDigest": "sha256:73b4db795a7055d8fd5aadf94d2963333f0d33cd9a13d51041d00710dad53e5b",
+              "cache": {
+                "key": "sha256:06d7f8a368be72dd9d4e995178c19148696d048296f49a6761533cc185225588",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npx tsc -p tsconfig.json --noEmit",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "4c4ad61a8c46c3ea6acbefc7a8cabd5328011b29",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b680c0cbc633576093311490a2b0b4c0414529042b8d74c1b0b13632483f0323",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

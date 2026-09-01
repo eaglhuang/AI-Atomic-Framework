@@ -123,7 +123,7 @@ export function normalizeEvidenceCommandRuns(input) {
         };
         return {
             ...normalized,
-            canonicalObservation: buildCommandRunObservation(normalized)
+            canonicalObservation: buildCommandRunObservation(normalized, input.taskId)
         };
     }));
 }
@@ -224,7 +224,7 @@ export function computeCommandRunCacheKey(run) {
         sourceCommit: run.sourceCommit ?? null
     });
 }
-export function buildCommandRunObservation(run) {
+export function buildCommandRunObservation(run, taskId) {
     return buildTelemetryObservation({
         observationId: run.cacheKey ?? computeCommandRunCacheKey({
             command: run.command,
@@ -247,6 +247,9 @@ export function buildCommandRunObservation(run) {
             startedAt: run.startedAt,
             finishedAt: run.finishedAt,
             durationMs: run.durationMs
+        },
+        correlation: {
+            taskId: taskId?.trim() || null
         },
         inputDigest: hashJson({
             command: run.command,
