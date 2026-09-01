@@ -1,0 +1,125 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TMP-0019",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "cdd02b748d4eef1b671cb19a1ec24a2c7f3913ad",
+  "governedTreeSha": "0bf39730592f47ae35244e030b56a73d51516af8",
+  "targetCommitDelta": {
+    "currentCommitSha": "cdd02b748d4eef1b671cb19a1ec24a2c7f3913ad",
+    "parentCommitShas": [
+      "cdd02b748d4eef1b671cb19a1ec24a2c7f3913ad"
+    ],
+    "governedTreeSha": "0bf39730592f47ae35244e030b56a73d51516af8",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-lane-lane-20260809225333-codex-gpt-5-4-mini-07d686dcfd.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/task-events/TASK-TMP-0019/2026-09-01T20-04-30-706Z-import-c9b1c8d511cb.json",
+      ".atm/history/tasks/TASK-PRF-0008.json",
+      ".atm/history/tasks/TASK-TMP-0019.json",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d4ac4c7189cdc16889b446ea9331af14d6d58e2c593d588b832e4b6014056ba",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-01T20:06:28.027Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0349.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0349.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-TMP-0019.*",
+      ".atm/history/task-events/ATM-GOV-0349/",
+      ".atm/history/task-events/ATM-GOV-0349/**",
+      ".atm/history/task-events/TASK-TMP-0019/**",
+      ".atm/history/tasks/ATM-GOV-0349.json",
+      ".atm/history/tasks/TASK-TMP-0019.json"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "git diff --check",
+      "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TMP-0019.json",
+  "closedAt": "2026-09-01T20:06:28.028Z",
+  "closedByActor": "codex-cleanup-captain",
+  "sessionId": "session-20260901195845-codex-cleanup-captain-TASK-TMP-0019-3dfec09418",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "cdd02b748d4eef1b671cb19a1ec24a2c7f3913ad",
+    "taskMatchedFiles": [
+      ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0349.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0349.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-TMP-0019.bundle-manifest.json",
+      ".atm/history/evidence/TASK-TMP-0019.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T12-23-07-884Z-renew-4de57b88c1c9.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T12-24-13-153Z-import-4b1b414a207c.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T12-28-41-565Z-renew-04a7cf690972.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T15-00-28-605Z-scope-amendment-f196922b6261.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T15-00-39-553Z-renew-8322380e1ed3.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-13T16-54-05-647Z-claim-45445860df22.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-13T17-29-10-452Z-renew-fc7056eccbf1.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-13T17-32-45-314Z-close-f00d71e79095.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-09-01T19-55-20-644Z-planning-mirror-reconcile-110bd2ecb34d.json",
+      ".atm/history/task-events/TASK-TMP-0019/2026-09-01T19-58-41-933Z-import-7d719550162c.json",
+      ".atm/history/task-events/TASK-TMP-0019/2026-09-01T19-58-45-414Z-reserve-cfbe85e6bbb4.json",
+      ".atm/history/task-events/TASK-TMP-0019/2026-09-01T19-58-45-419Z-promote-1e589827a324.json",
+      ".atm/history/task-events/TASK-TMP-0019/2026-09-01T19-58-46-211Z-claim-32e2b0a9ba67.json",
+      ".atm/history/task-events/TASK-TMP-0019/2026-09-01T20-00-54-699Z-scope-amendment-4e1f6bc1049c.json",
+      ".atm/history/tasks/ATM-GOV-0349.json",
+      ".atm/history/tasks/TASK-TMP-0019.json"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

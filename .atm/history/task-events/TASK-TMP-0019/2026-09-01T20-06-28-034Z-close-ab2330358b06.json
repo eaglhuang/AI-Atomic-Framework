@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-01T20-06-28-034Z-close-ab2330358b06",
+  "taskId": "TASK-TMP-0019",
+  "action": "close",
+  "actorId": "codex-cleanup-captain",
+  "sessionId": "session-20260901195845-codex-cleanup-captain-TASK-TMP-0019-3dfec09418",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0019.json",
+  "taskSha256": "sha256:5fd1ca5246667000f56c5f7c0b4649fe7d22f16e6f76957760d12063d8f6716c",
+  "createdAt": "2026-09-01T20:06:28.034Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0019 --actor codex-cleanup-captain --status done --historical-delivery cdd02b748d4eef1b671cb19a1ec24a2c7f3913ad",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260901195845-codex-cleanup-captain-TASK-TMP-0019-3dfec09418",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0019.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-01T20:06:28.027Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
+        ".atm/history/evidence/ATM-GOV-0349.live-index-reconciliation.json",
+        ".atm/history/evidence/ATM-GOV-0349.runner-sync-receipt.json",
+        ".atm/history/evidence/TASK-TMP-0019.*",
+        ".atm/history/task-events/ATM-GOV-0349/",
+        ".atm/history/task-events/ATM-GOV-0349/**",
+        ".atm/history/task-events/TASK-TMP-0019/**",
+        ".atm/history/tasks/ATM-GOV-0349.json",
+        ".atm/history/tasks/TASK-TMP-0019.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "git diff --check",
+        "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json"
+      ]
+    }
+  }
+}

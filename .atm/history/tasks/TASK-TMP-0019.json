@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0019",
   "title": "Commit verified ATM-GOV-0349 planning-mirror reconciliation",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -12,6 +12,9 @@
     "No product source, release artifact, MBX, PRF-0008, or foreign residue is staged, deleted, or ignored."
   ],
   "deliverables": [
+    ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
+    ".atm/history/evidence/ATM-GOV-0349.live-index-reconciliation.json",
+    ".atm/history/evidence/ATM-GOV-0349.runner-sync-receipt.json",
     ".atm/history/tasks/ATM-GOV-0349.json",
     ".atm/history/task-events/ATM-GOV-0349/"
   ],
@@ -20,10 +23,7 @@
     ".atm/history/evidence/ATM-GOV-0349.live-index-reconciliation.json",
     ".atm/history/evidence/ATM-GOV-0349.runner-sync-receipt.json",
     ".atm/history/task-events/ATM-GOV-0349/**",
-    ".atm/history/tasks/ATM-GOV-0349.json",
-    ".atm/history/evidence/TASK-TMP-0019.*",
-    ".atm/history/task-events/TASK-TMP-0019/**",
-    ".atm/history/tasks/TASK-TMP-0019.json"
+    ".atm/history/tasks/ATM-GOV-0349.json"
   ],
   "validators": [
     "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json",
@@ -68,24 +68,22 @@
   "source": {
     "planPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0019-commit-verified-atm-gov-0349-planning-mirror-reconciliation.task.md",
     "sectionTitle": "TASK-TMP-0019",
-    "headingLine": 37,
-    "hash": "975317a14dd05ca7",
+    "headingLine": 40,
+    "hash": "7956cbf9686c82c4",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0019-commit-verified-atm-gov-0349-planning-mirror-reconciliation.task.md",
       "planningCommitSha": null,
-      "contentDigest": "sha256:975317a14dd05ca709bae7b4f1c146c8be5c4428ac54817f1aa926ec97291ab2",
+      "contentDigest": "sha256:7956cbf9686c82c4c36e5a51abb5d768d368a41b30748936c2f2de49fafcc374",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-09-01T19:58:41.664Z"
+      "sealedAt": "2026-09-01T20:04:30.462Z"
     }
   },
-  "importedAt": "2026-09-01T19:58:41.664Z",
+  "importedAt": "2026-09-01T20:04:30.462Z",
   "workAdmission": {
-    "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "recoveryMode": "auto"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -146,17 +144,11 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-01T20-00-54-699Z-scope-amendment-4e1f6bc1049c",
-  "lastTransitionAt": "2026-09-01T20:00:54.699Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-cleanup-captain",
-  "reservedAt": "2026-09-01T19:58:45.414Z",
-  "promotedAt": "2026-09-01T19:58:45.419Z",
   "claim": {
     "actorId": "codex-cleanup-captain",
     "leaseId": "lease-254eaaa71c51",
     "claimedAt": "2026-09-01T19:58:45.425Z",
-    "heartbeatAt": "2026-09-01T19:58:45.425Z",
+    "heartbeatAt": "2026-09-01T20:06:28.032Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
@@ -168,82 +160,17 @@
       ".atm/history/tasks/ATM-GOV-0349.json",
       ".atm/history/tasks/TASK-TMP-0019.json"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260901195845-codex-cleanup-captain-f59d2fe4bf",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901195845-codex-cleanup-captain-f59d2fe4bf\""
-    }
-  },
-  "startedAt": "2026-09-01T19:58:45.425Z",
-  "startedByActor": "codex-cleanup-captain",
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-8f51030f350f986b",
-    "ticketDigest": "sha256:8f51030f350f986bc799d95e00b88c989eb2f2b211e784ba212b3cb16679ccac",
-    "taskId": "TASK-TMP-0019",
-    "origin": "claim",
-    "actorId": "codex-cleanup-captain",
-    "laneSessionId": "lane-20260901195845-codex-cleanup-captain-f59d2fe4bf",
-    "claimGeneration": "lease-254eaaa71c51",
-    "issuedAt": "2026-09-01T20:00:54.627Z",
-    "expiresAt": "2026-09-01T20:30:54.627Z",
-    "scopeDigest": "sha256:bbf513e9cd37d3cab70895743a480d99af36f8cf0d3733f27dba6bae87539cde",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-01T20:00:54.627Z"
     },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
-          ".atm/history/evidence/ATM-GOV-0349.live-index-reconciliation.json",
-          ".atm/history/evidence/ATM-GOV-0349.runner-sync-receipt.json",
-          ".atm/history/evidence/TASK-TMP-0019.*",
-          ".atm/history/task-events/ATM-GOV-0349/**",
-          ".atm/history/task-events/TASK-TMP-0019/**",
-          ".atm/history/tasks/ATM-GOV-0349.json",
-          ".atm/history/tasks/TASK-TMP-0019.json"
-        ],
-        "digest": "sha256:5b167ca349fb085a72f6a33bf5d3e3fd493c8f8146783144a5f299e2ce2f9ffb"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "disabled",
-      "reasons": [
-        "low-risk-task"
-      ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
-    }
+    "reason": "closed"
   },
+  "owner": "codex-cleanup-captain",
+  "startedAt": "2026-09-01T19:58:45.425Z",
   "startedBySessionId": "session-20260901195845-codex-cleanup-captain-TASK-TMP-0019-3dfec09418",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
@@ -284,5 +211,12 @@
     },
     "createdAt": "2026-09-01T19:58:46.240Z",
     "status": "active"
-  }
+  },
+  "lastTransitionId": "2026-09-01T20-06-28-034Z-close-ab2330358b06",
+  "lastTransitionAt": "2026-09-01T20:06:28.034Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-09-01T20:06:28.032Z",
+  "closedByActor": "codex-cleanup-captain",
+  "closedBySessionId": "session-20260901195845-codex-cleanup-captain-TASK-TMP-0019-3dfec09418",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0019.closure-packet.json"
 }
