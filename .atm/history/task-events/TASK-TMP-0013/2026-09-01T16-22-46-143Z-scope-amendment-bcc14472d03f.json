@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-01T16-22-46-143Z-scope-amendment-bcc14472d03f",
+  "taskId": "TASK-TMP-0013",
+  "action": "scope-amendment",
+  "actorId": "codex-cleanup-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0013.json",
+  "taskSha256": "sha256:2030983ea3041d42bbe7dfae83a280805ebce8d2cdda58c548f622badc42c19c",
+  "createdAt": "2026-09-01T16:22:46.143Z",
+  "command": "node atm.mjs tasks scope add --task TASK-TMP-0013 --actor codex-cleanup-captain --add \".atm/history/protected-override-audit/**\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

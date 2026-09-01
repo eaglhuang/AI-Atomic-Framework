@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-TMP-0013",
-  "updatedAt": "2026-09-01T16:12:20.861Z",
+  "updatedAt": "2026-09-01T16:23:08.241Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -352,6 +352,95 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:6c276c73aea048166c6fd526b4fdb84af7d3ec566c43f8b886820e1cb96f5ea7",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-cleanup-captain",
+      "sessionId": "session-20260901162226-codex-cleanup-captain-TASK-TMP-0013-1a2bfd69e9",
+      "createdAt": "2026-09-01T16:23:08.241Z",
+      "details": {
+        "actorId": "codex-cleanup-captain",
+        "sessionId": "session-20260901162226-codex-cleanup-captain-TASK-TMP-0013-1a2bfd69e9",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-09-01T16:23:07.938Z",
+            "finishedAt": "2026-09-01T16:23:08.240Z",
+            "durationMs": 302,
+            "cached": false,
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4c4ad61a8c46c3ea6acbefc7a8cabd5328011b29",
+            "cacheKey": "sha256:ee6c2ea36c68c8297c9f3bab47cd4183f30d0f2b0739dfb14c7f3fe6c9623fc8",
+            "generatedAt": "2026-09-01T16:23:08.240Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:ee6c2ea36c68c8297c9f3bab47cd4183f30d0f2b0739dfb14c7f3fe6c9623fc8",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-01T16:23:08.240Z",
+              "observedAt": "2026-09-01T16:23:08.240Z",
+              "startedAt": "2026-09-01T16:23:07.938Z",
+              "finishedAt": "2026-09-01T16:23:08.240Z",
+              "durationMs": 302,
+              "laneSessionId": null,
+              "taskId": "TASK-TMP-0013",
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:494a3f94a8e6939005350e78681fdf906564c56fd8aa3895f05bf0b66162bc6f",
+              "outputDigest": "sha256:73b4db795a7055d8fd5aadf94d2963333f0d33cd9a13d51041d00710dad53e5b",
+              "cache": {
+                "key": "sha256:ee6c2ea36c68c8297c9f3bab47cd4183f30d0f2b0739dfb14c7f3fe6c9623fc8",
+                "hit": false
+              },
+              "extensions": {
+                "command": "git diff --check",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "git diff --check"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "4c4ad61a8c46c3ea6acbefc7a8cabd5328011b29",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b5fe08d4be6b67d71c673386f942e83fd4b20fb11b91ceae21332080083941f9",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

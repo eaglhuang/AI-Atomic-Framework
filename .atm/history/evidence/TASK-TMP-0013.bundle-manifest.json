@@ -1,10 +1,11 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-TMP-0013",
-  "updatedAt": "2026-09-01T16:12:20.861Z",
+  "updatedAt": "2026-09-01T16:23:08.241Z",
   "updatedBy": "codex-cleanup-captain",
   "freshValidationPasses": [
     "evidence-command-run-task-correlation",
+    "git diff --check",
     "hook-evidence-identity-context"
   ],
   "staleValidationPasses": [],
@@ -39,6 +40,22 @@
       "durationMs": 1757,
       "runnerKind": "frozen-runner",
       "sourceCommit": "746db249a8471db45c0ce49597b8b879937b88a4",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-09-01T16:23:08.240Z",
+      "startedAt": "2026-09-01T16:23:07.938Z",
+      "finishedAt": "2026-09-01T16:23:08.240Z",
+      "durationMs": 302,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4c4ad61a8c46c3ea6acbefc7a8cabd5328011b29",
       "cached": false
     }
   ],

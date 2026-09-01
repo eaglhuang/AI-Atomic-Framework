@@ -143,7 +143,11 @@
     ".atm/history/tasks/TASK-SKL-0040.json",
     ".atm/history/evidence/TASK-TMP-0008.*",
     ".atm/history/task-events/TASK-TMP-0008/**",
-    ".atm/history/tasks/TASK-TMP-0008.json"
+    ".atm/history/tasks/TASK-TMP-0008.json",
+    ".atm/history/evidence/TASK-TMP-0013.*",
+    ".atm/history/protected-override-audit/**",
+    ".atm/history/task-events/TASK-TMP-0013/**",
+    ".atm/history/tasks/TASK-TMP-0013.json"
   ],
   "validators": [
     "git diff --check"
@@ -264,9 +268,9 @@
   },
   "claim": {
     "actorId": "codex-cleanup-captain",
-    "leaseId": "lease-9703625a1d71",
-    "claimedAt": "2026-09-01T16:12:07.176Z",
-    "heartbeatAt": "2026-09-01T16:12:07.176Z",
+    "leaseId": "lease-880d79995e4a",
+    "claimedAt": "2026-09-01T16:42:48.222Z",
+    "heartbeatAt": "2026-09-01T16:42:48.222Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TMP-0013.json",
@@ -313,6 +317,7 @@
       ".atm/history/evidence/TASK-SKL-0040.*",
       ".atm/history/evidence/TASK-TMP-0008.*",
       ".atm/history/evidence/TASK-TMP-0013.*",
+      ".atm/history/protected-override-audit/**",
       ".atm/history/task-events/ATM-GOV-0253/**",
       ".atm/history/task-events/ATM-GOV-0287/**",
       ".atm/history/task-events/ATM-GOV-0288/**",
@@ -404,15 +409,15 @@
     "state": "active",
     "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260901161207-codex-cleanup-captain-761b036a8b",
+      "laneSessionId": "lane-20260901164248-codex-cleanup-captain-e7eec0b895",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901161207-codex-cleanup-captain-761b036a8b\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901164248-codex-cleanup-captain-e7eec0b895\""
     }
   },
   "owner": "codex-cleanup-captain",
   "startedAt": "2026-09-01T15:21:35.854Z",
-  "startedBySessionId": "session-20260901161207-codex-cleanup-captain-TASK-TMP-0013-35d631a33c",
+  "startedBySessionId": "session-20260901164248-codex-cleanup-captain-TASK-TMP-0013-5431a989d7",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -465,6 +470,7 @@
       ".atm/history/evidence/TASK-SKL-0040.*",
       ".atm/history/evidence/TASK-TMP-0008.*",
       ".atm/history/evidence/TASK-TMP-0013.*",
+      ".atm/history/protected-override-audit/**",
       ".atm/history/task-events/ATM-GOV-0253/**",
       ".atm/history/task-events/ATM-GOV-0287/**",
       ".atm/history/task-events/ATM-GOV-0288/**",
@@ -559,39 +565,39 @@
     "allowPlanningMirror": false,
     "promptHash": "efdcd06a0248f2f6f3ac2980b2c7c77e41a78273098cae1688111d5eb6247225",
     "actorId": "codex-cleanup-captain",
-    "sessionId": "session-20260901161207-codex-cleanup-captain-TASK-TMP-0013-35d631a33c",
+    "sessionId": "session-20260901164248-codex-cleanup-captain-TASK-TMP-0013-5431a989d7",
     "laneSession": {
-      "laneSessionId": "lane-20260901161207-codex-cleanup-captain-761b036a8b",
+      "laneSessionId": "lane-20260901164248-codex-cleanup-captain-e7eec0b895",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901161207-codex-cleanup-captain-761b036a8b\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901164248-codex-cleanup-captain-e7eec0b895\""
     },
-    "createdAt": "2026-09-01T16:12:07.908Z",
+    "createdAt": "2026-09-01T16:42:48.988Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-09-01T16-12-07-909Z-claim-0c9beb5081d2",
-  "lastTransitionAt": "2026-09-01T16:12:07.909Z",
+  "lastTransitionId": "2026-09-01T16-42-48-989Z-claim-c57508c77b23",
+  "lastTransitionAt": "2026-09-01T16:42:48.989Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "reservedAt": "2026-09-01T16:12:07.166Z",
-  "promotedAt": "2026-09-01T16:12:07.171Z",
+  "reservedAt": "2026-09-01T16:42:48.211Z",
+  "promotedAt": "2026-09-01T16:42:48.217Z",
   "startedByActor": "codex-cleanup-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-3f948cbe25ad0c36",
-    "ticketDigest": "sha256:3f948cbe25ad0c3647c97ac1638874727cceafb3aeac6546a1f0191326eba9b0",
+    "ticketId": "wat-a340160d7d641065",
+    "ticketDigest": "sha256:a340160d7d641065be692d0573609fcabffb7bb698757cf7e6d1a48744f441ad",
     "taskId": "TASK-TMP-0013",
     "origin": "claim",
     "actorId": "codex-cleanup-captain",
-    "laneSessionId": "lane-20260901161207-codex-cleanup-captain-761b036a8b",
-    "claimGeneration": "lease-9703625a1d71",
-    "issuedAt": "2026-09-01T16:12:07.176Z",
-    "expiresAt": "2026-09-01T16:42:07.176Z",
-    "scopeDigest": "sha256:9a711502b61c959672755cdf58e465f43dd16b7c29287727a89ba79a43a37753",
+    "laneSessionId": "lane-20260901164248-codex-cleanup-captain-e7eec0b895",
+    "claimGeneration": "lease-880d79995e4a",
+    "issuedAt": "2026-09-01T16:42:48.222Z",
+    "expiresAt": "2026-09-01T17:12:48.222Z",
+    "scopeDigest": "sha256:42e8d9b9e2d64e546934792498092b71ba4ab6b094220cfc3f2f98201fc77f76",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-01T16:12:07.176Z"
+      "selectedAt": "2026-09-01T16:42:48.222Z"
     },
     "grants": [
       {
@@ -640,6 +646,7 @@
           ".atm/history/evidence/TASK-SKL-0040.*",
           ".atm/history/evidence/TASK-TMP-0008.*",
           ".atm/history/evidence/TASK-TMP-0013.*",
+          ".atm/history/protected-override-audit/**",
           ".atm/history/task-events/ATM-GOV-0253/**",
           ".atm/history/task-events/ATM-GOV-0287/**",
           ".atm/history/task-events/ATM-GOV-0288/**",
@@ -729,7 +736,7 @@
           ".atm/history/tasks/TASK-TMP-0008.json",
           ".atm/history/tasks/TASK-TMP-0013.json"
         ],
-        "digest": "sha256:fccc1030e3f8c3977611c4521f7b9d1958ed7d1fc611f40fee92f668675e8e33"
+        "digest": "sha256:b6e0ebc9a8f991a0c3cb9aa3cff41ec5738831b7e76a5314af282035fe82c2c4"
       },
       {
         "kind": "lifecycle-operation",
