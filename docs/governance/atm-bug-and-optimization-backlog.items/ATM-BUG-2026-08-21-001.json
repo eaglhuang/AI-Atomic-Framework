@@ -4,11 +4,11 @@
   "date": "2026-08-21",
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
-  "severity": "P1",
-  "status": "Open",
+  "severity": "High",
+  "status": "Fixed — no-remote-delta admission uses conservative file keys without unbounded semantic scans",
   "area": "Git admission performs unbounded semantic scans when the remote has no competing delta",
   "finding": "`git admit --no-fetch` compared 1,525 local-only paths against an unchanged origin/main. Although there was no remote mutation surface to conflict with, the command read blobs and generated text hunks per local file, exceeding the five-second control-plane budget and appearing hung. The remote transport was healthy and the branch topology showed remoteDiff=0. This is distinct from ATM-BUG-2026-08-20-001 (source-versus-frozen typecheck divergence) and ATM-BUG-2026-08-19-001 (post-commit index residue).",
   "expectedBehavior": "When the remote diff from the merge base is empty, admission must retain conservative whole-file conflict keys for local changes but must not perform per-file semantic bridge scans. The broker may admit the local-only delta because no opposing remote mutation surface exists. When remote changes exist, semantic bridge comparison remains required and fail-closed behavior is unchanged.",
   "evidenceOrRepro": "At HEAD 4c44bdcfd0e3a6c9e1d63eca053e48f6483c3a0f, merge base equaled origin/main and localFiles=1525, remoteFiles=0. Frozen `node atm.mjs git admit --actor codex-captain --branch main --remote origin --no-fetch --json` exceeded 30 seconds with no child Git process, while direct `git diff --name-status` completed in 0.06s. The source-first repair completed the same admission in 4.00s with outcome allow and no conflicts. Focused regression: tests/cli/git-admission-cli.test.ts covers a local-only divergence and asserts the conservative fallback bridge.",
-  "followUp": "Publish the frozen runner before relying on the repaired admission path for governed push. Keep the source repair, runner publication, and formal Plan closeout as separate delivery states; do not treat the latency repair as Plan completion."
+  "followUp": "Repaired by 5fe00f6bb: when remoteDiff is empty, evaluateGitAdmission uses bridgeWithoutRemoteCompetition and fallback-file-lock keys instead of per-file semantic bridge scans. 2026-09-02 tests/cli/git-admission-cli.test.ts passed; packages/core/dist/git/admission.js contains the same branch. Keep semantic comparison fail-closed when remote changes exist, and do not treat this latency repair as Plan completion."
 }
