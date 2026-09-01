@@ -216,10 +216,33 @@ export function assembleSealedCommitIndex(input: {
     [...QUIET_STDIO]
   );
   const presentEntries = input.bundle.entries.filter((entry) => !isTombstone(entry));
+  const baseRef = input.baseRef ?? 'HEAD';
+  const inheritedEntries = presentEntries.filter((entry) => isTrackedInBaseTree({
+    cwd: input.cwd,
+    env: input.env,
+    baseRef,
+    path: entry.path
+  }));
+  const newEntryPaths = presentEntries
+    .filter((entry) => !inheritedEntries.some((inherited) => inherited.path === entry.path))
+    .map((entry) => entry.path);
   for (const entry of presentEntries) {
     runGitCommandWithEnv(
       input.cwd,
       ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`],
+      input.env,
+      [...QUIET_STDIO]
+    );
+  }
+  // `update-index --cacheinfo` creates a valid sealed entry but no worktree
+  // stat data. Git then drops an ignored, newly-created path during commit as
+  // though the candidate were empty. Force-adding only new entries supplies
+  // that stat data; the attribution proof immediately below still compares
+  // their resulting blobs to the seal before any ref can move.
+  if (newEntryPaths.length > 0) {
+    runGitCommandWithEnv(
+      input.cwd,
+      ['add', '-A', '-f', '--', ...newEntryPaths],
       input.env,
       [...QUIET_STDIO]
     );
@@ -230,13 +253,37 @@ export function assembleSealedCommitIndex(input: {
   // substitution this seal exists to prevent. Marking the sealed entries
   // assume-unchanged tells the refresh to trust the index. The bit only ever
   // exists in the throwaway candidate index, never in the live one.
-  if (presentEntries.length === 0) return;
+  if (inheritedEntries.length === 0) return;
   runGitCommandWithEnv(
     input.cwd,
-    ['update-index', '--assume-unchanged', '--', ...presentEntries.map((entry) => entry.path)],
+    ['update-index', '--assume-unchanged', '--', ...inheritedEntries.map((entry) => entry.path)],
     input.env,
     [...QUIET_STDIO]
   );
+}
+
+/**
+ * A newly introduced (often ignored) governance artifact has no base-tree
+ * entry. Marking it assume-unchanged makes Git omit it from the candidate
+ * commit entirely, so retain the seal bit only for inherited paths.
+ */
+function isTrackedInBaseTree(input: {
+  readonly cwd: string;
+  readonly env: NodeJS.ProcessEnv;
+  readonly baseRef: string;
+  readonly path: string;
+}): boolean {
+  try {
+    runGitCommandWithEnv(
+      input.cwd,
+      ['cat-file', '-e', `${input.baseRef}:${input.path}`],
+      input.env,
+      [...QUIET_STDIO]
+    );
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function parseRawDiffEntries(output: string): readonly CommitTreeEntry[] {
