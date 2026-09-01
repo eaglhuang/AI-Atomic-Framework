@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-01-003",
+  "date": "2026-09-01",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Fixed in source; frozen runner publication and formal closeout remain separate states",
+  "area": "Evidence command-run canonical telemetry / governed commit identity admission",
+  "finding": "evidence run passes a task id to its evidence envelope, but normalizeEvidenceCommandRuns did not receive or forward that id into buildTelemetryObservation. Every newly written canonical command-run observation therefore persisted taskId=null, even when the enclosing evidence document and governed task ledger named a single task. The protected-state pre-commit hook correctly rejects this ambiguous evidence when it is staged with a task-history delivery bundle.",
+  "expectedBehavior": "A command run recorded through evidence add or evidence run must preserve its enclosing task id in canonical telemetry correlation. Direct normalization callers without a task context remain explicitly null; the repair must not alter command-run cache keys, hashes, source-commit binding, or external-run semantics.",
+  "evidenceOrRepro": "TASK-TMP-0013's governed historical-bundle delivery commit failed with ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT. Its evidence envelope named TASK-TMP-0013, while canonicalObservation inside its command run had taskId=null. The focused command-runs specification first failed on the exact assertion that a normalization request for TASK-EVIDENCE-0001 must emit canonicalObservation.taskId=TASK-EVIDENCE-0001, then passed after the repair.",
+  "containment": "The repair changes only the current writer path. Existing evidence remains untouched because historical null identities cannot be truthfully inferred or backfilled. A caller that does not provide task context remains null and does not gain implicit attribution.",
+  "followUp": "Rebuild and publish the frozen runner through the normal governed runner-sync route before frozen CLI sessions rely on this repair. Then reclaim TASK-TMP-0013 and retry its ordinary governed historical-bundle commit; do not use a raw Git bypass. Historical evidence with null task correlation remains a separate governed reconciliation decision."
+}
