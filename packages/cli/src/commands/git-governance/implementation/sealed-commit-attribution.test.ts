@@ -114,4 +114,37 @@ assert.match(
   'a governed transaction must include its generated git-head evidence in the final commit tree'
 );
 
+// Task-scoped cleanup commonly carries ignored governance evidence.  It must
+// survive candidate-index assembly just like an ordinary source path; otherwise
+// `git commit` sees an empty candidate and incorrectly reports no changes.
+mkdirSync(path.join(repo, '.atm', 'history', 'protected-override-audit'), { recursive: true });
+const ignoredEvidencePath = '.atm/history/protected-override-audit/audit.json';
+writeFileSync(path.join(repo, ignoredEvidencePath), '{"schemaId":"atm.protectedOverrideAudit.v1"}\n');
+const ignoredEvidenceBlob = execFileSync('git', ['hash-object', ignoredEvidencePath], { cwd: repo, encoding: 'utf8' }).trim();
+withTaskScopedCommitIndex(
+  repo,
+  [ignoredEvidencePath],
+  'validator',
+  'ATM-GOV-0371',
+  (env: NodeJS.ProcessEnv) => {
+    assert.match(
+      execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: repo, env, encoding: 'utf8' }),
+      /\.atm\/history\/protected-override-audit\/audit\.json/,
+      'the candidate index must retain an ignored governance-evidence entry before commit'
+    );
+    return execFileSync('git', ['commit', '-m', 'commit ignored governance evidence'], { cwd: repo, env, stdio: 'ignore' });
+  },
+  {
+    kind: 'sealed-bundle',
+    bundle: sealCommitBundle({
+      entries: [{ path: ignoredEvidencePath, mode: '100644', blobId: ignoredEvidenceBlob, provenance: 'governance-evidence', disposition: 'present' }]
+    })
+  }
+);
+assert.match(
+  execFileSync('git', ['show', '--format=', '--name-only', 'HEAD'], { cwd: repo, encoding: 'utf8' }),
+  /\.atm\/history\/protected-override-audit\/audit\.json/,
+  'an ignored governance-evidence path must remain in the sealed candidate commit'
+);
+
 console.log('[sealed-commit-attribution] committed-tree mismatch fails closed.');
