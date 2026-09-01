@@ -14,6 +14,7 @@ import {
   runGitCommand,
 } from './git-process-port.ts';
 import { forEachPathspecBatch } from './pathspec-argv-batching.ts';
+import { resolveTaskHistoryOwnerTaskId } from '../../../../../core/src/broker/cross-task-mutation-guard.ts';
 
 import {
   appendFileSync,
@@ -349,9 +350,23 @@ export function isFrameworkGeneratedArtifactAllowed(
   filePath: LegacyValue,
   claimedFiles: LegacyValue,
   releaseGeneratedArtifacts: LegacyValue,
+  ownerScope: { readonly cwd: string; readonly currentTaskId: LegacyValue } | null = null,
 ) {
   const normalized = normalizeRelativePath(filePath);
   const claimedScopes = [...claimedFiles];
+  // A directory scope grants reach inside the claim; it never transfers authority
+  // over another task's governance history. Naming the path exactly stays a
+  // deliberate act and is still honoured. Ownership comes from the shared
+  // cross-task seam so staging and admission cannot drift apart.
+  if (
+    ownerScope &&
+    !claimedScopes.some((scope: LegacyValue) => normalizeRelativePath(scope) === normalized)
+  ) {
+    const ownerTaskId = resolveTaskHistoryOwnerTaskId(ownerScope.cwd, normalized);
+    if (ownerTaskId && ownerTaskId !== String(ownerScope.currentTaskId ?? '').trim().toUpperCase()) {
+      return false;
+    }
+  }
   if (claimedScopes.some((scope: LegacyValue) => pathMatchesTaskScope(normalized, scope))) {
     return true;
   }
@@ -389,6 +404,7 @@ export function autoStageFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyVa
   }
   const stagedFiles = new Set(readStagedFiles(cwd));
   const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(cwd);
+  const ownerScope = { cwd, currentTaskId: frameworkTempTaskId(actorId) };
   const candidates = uniqueSorted(
     listTaskScopedWorktreeDirtyFiles(cwd).filter(
       (filePath: LegacyValue) =>
@@ -398,6 +414,7 @@ export function autoStageFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyVa
           filePath,
           claimedFiles,
           releaseGeneratedArtifacts,
+          ownerScope,
         ),
     ),
   );
@@ -439,12 +456,14 @@ export function inspectFrameworkScopedUnstagedCommit(cwd: LegacyValue, actorId: 
   if (dirtyFiles.length === 0 && stagedFiles.length === 0) {
     return null;
   }
+  const ownerScope = { cwd, currentTaskId: frameworkTempTaskId(actorId) };
   const inScopeDirtyFiles = uniqueSorted(
     dirtyFiles.filter((filePath: LegacyValue) =>
       isFrameworkGeneratedArtifactAllowed(
         filePath,
         claimedFiles,
         releaseGeneratedArtifacts,
+        ownerScope,
       ),
     ),
   );
@@ -458,6 +477,7 @@ export function inspectFrameworkScopedUnstagedCommit(cwd: LegacyValue, actorId: 
         filePath,
         claimedFiles,
         releaseGeneratedArtifacts,
+        ownerScope,
       ),
   );
   if (unstagedInScopeDirtyFiles.length === 0) {
@@ -484,6 +504,7 @@ export function inspectFrameworkScopedUnstagedCommit(cwd: LegacyValue, actorId: 
           filePath,
           claimedFiles,
           releaseGeneratedArtifacts,
+          ownerScope,
         ),
     ),
   );

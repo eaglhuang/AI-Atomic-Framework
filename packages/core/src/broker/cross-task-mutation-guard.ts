@@ -100,6 +100,19 @@ function isKnownTaskId(cwd: string, taskId: string): boolean {
   return existsSync(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`));
 }
 
+/**
+ * Resolve the task that owns a governance history path, or null when the path is
+ * not task history or names a task this repository does not know. Admission and
+ * governed staging must never disagree about who owns `.atm/history/**`, so this
+ * is the only place that answer is derived.
+ */
+export function resolveTaskHistoryOwnerTaskId(cwd: string, filePath: string): string | null {
+  const match = normalizeRelativePath(filePath).match(/^\.atm\/history\/(?:evidence|task-events|tasks)\/([^/.]+)/i);
+  if (!match) return null;
+  const ownerTaskId = match[1].toUpperCase();
+  return isKnownTaskId(cwd, ownerTaskId) ? ownerTaskId : null;
+}
+
 function collectTaskFileValues(value: unknown, target: Set<string>) {
   if (!value) return;
   if (Array.isArray(value)) {
@@ -306,11 +319,10 @@ export function detectCrossTaskMutation(
   };
 
   for (const file of modifiedFiles) {
-    const evidenceMatch = file.match(/^\.atm\/history\/(?:evidence|task-events|tasks)\/([^/.]+)/i);
+    const ownerTaskId = resolveTaskHistoryOwnerTaskId(cwd, file);
     let taskHistoryConflict = false;
-    if (evidenceMatch) {
-      const ownerTaskId = evidenceMatch[1].toUpperCase();
-      if (isKnownTaskId(cwd, ownerTaskId) && normCurrentTaskId !== ownerTaskId) {
+    if (ownerTaskId) {
+      if (normCurrentTaskId !== ownerTaskId) {
         // The file name identifies the owner; it does not establish that the
         // owner still holds anything. Ask the authority snapshot before
         // refusing, and record what it said.
