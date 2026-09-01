@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MBX-0001",
   "title": "實作 editor-neutral 信箱地址與 Markdown 訊息生命週期",
-  "status": "running",
+  "status": "open",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -166,8 +166,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-01T20-31-54-493Z-renew-25584b1fc0b0",
-  "lastTransitionAt": "2026-09-01T20:31:54.493Z",
+  "lastTransitionId": "2026-09-01T20-34-17-255Z-release-eb82ebff21b4",
+  "lastTransitionAt": "2026-09-01T20:34:17.255Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-08-29T10:47:32.228Z",
   "promotedAt": "2026-08-29T10:47:32.233Z",
@@ -175,7 +175,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-9201546a5bd4",
     "claimedAt": "2026-08-29T10:47:32.237Z",
-    "heartbeatAt": "2026-09-01T20:31:54.258Z",
+    "heartbeatAt": "2026-09-01T20:34:16.580Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-MBX-0001.*",
@@ -186,8 +186,8 @@
       "scripts/agent-mailbox/**",
       "tests/cli/agent-mailbox-protocol.test.ts"
     ],
-    "state": "active",
-    "reason": "Original owner lease expired more than three days ago; no live Codex task is executing it, and cleanup objective requires resolving its owned dirty work through governed recovery.",
+    "state": "released",
+    "reason": "Preserved non-delivery WIP in governed commit 81791b515e33c02fafae52a067df91def559c034; releasing recovered stale claim for clean worktree.",
     "laneSession": {
       "laneSessionId": "lane-20260829104732-codex-gpt-5.4-mini-1967730c1b",
       "status": "active",
