@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Open",
+  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
   "area": "Wave-exit observer receipts were emitted without a registered validator-contract family",
   "finding": "The completion compiler emitted evidence tuples with validatorContractId atm.waveExitObserverReceipt/EXIT-NN, but its validator contract registry contained only task-card validators. Reviewer B correctly rejected every otherwise valid Wave receipt as unregistered because it could not distinguish the sealed receipt-policy contract from a task-card contract.",
   "expectedBehavior": "Every evidence tuple must resolve to one explicitly registered contract kind. Wave receipt contracts must bind exit id, evidence owner, approved command, and sealed policy digest. Independent consumers must replay the receipt against the policy and input digests at the completion target commit; unknown, duplicate, malformed, or drifted contracts remain fail-closed.",
   "evidenceOrRepro": "On 2026-08-21 Reviewer B reported seven unregistered-validator-contract findings for EXIT-02, EXIT-03, EXIT-04, EXIT-05, EXIT-08, EXIT-09, and EXIT-10 while the completion compiler had already accepted their immutable receipts. Registering a Wave receipt contract family and independently re-consuming receipts removed only those false findings; the 14 final-certificate requirements and three genuinely unproven exits remained unresolved.",
-  "followUp": "Keep compiler, completion validator, and independent reviewer coverage for both task-card and Wave receipt contracts. Do not suppress unregistered findings or coerce receipt contracts into synthetic task cards."
+  "followUp": "On 2026-09-01, the regenerated canonical completion report passed runbook-completion-evidence, runbook-release-authority-review, wave-exit-observer-receipt, and validate-runbook-completion-evidence. The remaining not-complete verdict concerns independent EXIT-04, EXIT-05, and EXIT-11 evidence, not this contract-registration defect. Keep compiler, completion validator, and independent reviewer coverage for both task-card and Wave receipt contracts; do not suppress unregistered findings or coerce receipt contracts into synthetic task cards."
 }
