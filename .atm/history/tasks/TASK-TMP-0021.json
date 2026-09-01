@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0021",
   "title": "Commit verified historical batch and index recovery receipts",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -127,8 +127,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-01T20-13-04-775Z-claim-c6d825a4be85",
-  "lastTransitionAt": "2026-09-01T20:13:04.775Z",
+  "lastTransitionId": "2026-09-01T20-16-52-829Z-close-ebbd0f16dfc2",
+  "lastTransitionAt": "2026-09-01T20:16:52.829Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-cleanup-captain",
   "reservedAt": "2026-09-01T20:13:03.989Z",
@@ -137,7 +137,7 @@
     "actorId": "codex-cleanup-captain",
     "leaseId": "lease-486f7e2da6bb",
     "claimedAt": "2026-09-01T20:13:04.001Z",
-    "heartbeatAt": "2026-09-01T20:13:04.001Z",
+    "heartbeatAt": "2026-09-01T20:16:52.827Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TMP-0021.json",
@@ -150,14 +150,14 @@
       ".atm/history/evidence/live-index-reconciliation.b4034f82d54fc0d923f0e9e9e18b871d256d46ed.json",
       ".atm/history/evidence/live-index-reconciliation.f81d9a586819b04ea3c454c4ac330ee63e39e294.json"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260901201304-codex-cleanup-captain-d5a483a382",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901201304-codex-cleanup-captain-d5a483a382\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-01T20:13:04.001Z",
   "startedByActor": "codex-cleanup-captain",
@@ -265,5 +265,9 @@
     },
     "createdAt": "2026-09-01T20:13:04.774Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-01T20:16:52.827Z",
+  "closedByActor": "codex-cleanup-captain",
+  "closedBySessionId": "session-20260901201304-codex-cleanup-captain-TASK-TMP-0021-0730c605dc",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0021.closure-packet.json"
 }

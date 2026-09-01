@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-01T20-16-52-829Z-close-ebbd0f16dfc2",
+  "taskId": "TASK-TMP-0021",
+  "action": "close",
+  "actorId": "codex-cleanup-captain",
+  "sessionId": "session-20260901201304-codex-cleanup-captain-TASK-TMP-0021-0730c605dc",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0021.json",
+  "taskSha256": "sha256:d1db3793a4b63c2c450dc2253c84907fcd696ad5b6b0dd2b92be821194f61762",
+  "createdAt": "2026-09-01T20:16:52.829Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0021 --actor codex-cleanup-captain --status done --historical-delivery c0410141d41d218e19ce34f40b0f475fad3ca9a4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260901201304-codex-cleanup-captain-TASK-TMP-0021-0730c605dc",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0021.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check"
+    ],
+    "requiredGates": [
+      "git diff --check"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-01T20:16:52.822Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/historical-batches/",
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-23-59-339Z.json",
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-29-34-081Z.json",
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-37-33-954Z.json",
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-15-09-387Z.json",
+        ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-42-40-037Z.json",
+        ".atm/history/evidence/live-index-reconciliation.39a4bad9d9f39c63d647a7cc48f93aafeeeebf26.json",
+        ".atm/history/evidence/live-index-reconciliation.b4034f82d54fc0d923f0e9e9e18b871d256d46ed.json",
+        ".atm/history/evidence/live-index-reconciliation.f81d9a586819b04ea3c454c4ac330ee63e39e294.json",
+        ".atm/history/evidence/TASK-TMP-0021.*",
+        ".atm/history/task-events/TASK-TMP-0021/**",
+        ".atm/history/tasks/TASK-TMP-0021.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "git diff --check"
+      ]
+    }
+  }
+}
