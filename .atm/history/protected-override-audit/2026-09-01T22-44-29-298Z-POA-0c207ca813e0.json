@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-0c207ca813e0",
+  "recordedAt": "2026-09-01T22:44:29.298Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+  "surface": "git recover-index-lock",
+  "command": "node atm.mjs git recover-index-lock --task \"ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini\" --actor \"codex-gpt-5.4-mini\" --force-index-lock-recovery --emergency-approval <lease-id> --reason \"<human-approved reason>\" --json",
+  "flags": [
+    "--force-index-lock-recovery"
+  ],
+  "permission": "backend.gitIndexLockRecovery",
+  "leaseId": "EMG-ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-003c39183c",
+  "reason": "Owner-approved removal of the verified zero-byte stale index lock after confirming no active Git writer.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitIndexLockRecovery"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-01T22-44-29-295Z-EMG-ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-003c39183c.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
