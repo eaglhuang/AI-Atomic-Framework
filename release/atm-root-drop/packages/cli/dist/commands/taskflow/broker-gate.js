@@ -28,7 +28,7 @@ function buildBrokerConflictResolveCommand(taskId, overlappingTaskIds, declaredF
     const sharedPath = declaredFiles[0];
     if (!conflictTaskId || !sharedPath)
         return null;
-    return `node atm.mjs team broker resolve --task ${taskId} --conflict ${conflictTaskId} --path ${quoteCliValue(sharedPath)} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
+    return `node atm.mjs team broker resolve --task ${taskId} --conflict ${conflictTaskId} --path ${quoteCliValue(sharedPath)} --release-order ${taskId},${conflictTaskId} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
 }
 function noConflictGate(summary, brokerVerdict = null) {
     return {

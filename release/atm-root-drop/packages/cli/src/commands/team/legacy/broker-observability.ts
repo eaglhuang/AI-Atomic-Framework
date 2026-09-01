@@ -84,7 +84,7 @@ export function buildBrokerConflictUxProjection(input: {
   const decisionReason = String(input.decisionReason ?? '').trim()
     || 'broker-conflict-blocked until the release order grants the next task.';
   const nextSafeResolutionCommand = input.requiredCommand?.trim()
-    || `node atm.mjs team broker resolve --task ${primaryTaskId} --conflict ${conflictingTaskIds[0] ?? '<task-id>'} --path ${sharedPaths[0] ?? '<shared-path>'} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
+    || `node atm.mjs team broker resolve --task ${primaryTaskId} --conflict ${conflictingTaskIds[0] ?? '<task-id>'} --path ${sharedPaths[0] ?? '<shared-path>'} --release-order ${[primaryTaskId, ...conflictingTaskIds].join(',')} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
   return {
     schemaId: 'atm.brokerConflictUx.v1',
     playbookSlice: 'broker-conflict-resolution',
@@ -271,6 +271,25 @@ export function runTeamBrokerConflictResolve(argv: string[], defaultCwd: string)
   const decisionClass = normalizeBrokerDecisionClass(readOptionValue(argv, '--decision-class'));
   const violationStatus = normalizeBrokerViolationStatus(readOptionValue(argv, '--violation-status'));
   const releaseOrder = readOptionValues(argv, '--release-order');
+  const expectedParticipants = [...new Set([primaryTaskId, ...conflictingTaskIds].map((taskId) => taskId.toUpperCase()))];
+  const normalizedReleaseOrder = releaseOrder.map((taskId) => taskId.toUpperCase());
+  const releaseOrderParticipants = new Set(normalizedReleaseOrder);
+  if (releaseOrder.length === 0) {
+    throw new CliError('ATM_TEAM_BROKER_RESOLVE_RELEASE_ORDER_REQUIRED', 'team broker resolve requires --release-order listing every participating task in execution order.', {
+      exitCode: 2,
+      details: { expectedParticipants }
+    });
+  }
+  if (
+    normalizedReleaseOrder.length !== expectedParticipants.length
+    || releaseOrderParticipants.size !== expectedParticipants.length
+    || !expectedParticipants.every((taskId) => releaseOrderParticipants.has(taskId))
+  ) {
+    throw new CliError('ATM_TEAM_BROKER_RESOLVE_RELEASE_ORDER_INVALID', 'team broker resolve --release-order must contain each --task and --conflict task exactly once.', {
+      exitCode: 2,
+      details: { expectedParticipants, releaseOrder }
+    });
+  }
   const createdAt = readOptionValue(argv, '--created-at')?.trim();
   const actorId = readOptionValue(argv, '--actor')?.trim();
   const authorizationResourceKind = normalizeAuthorizationResourceKind(readOptionValue(argv, '--resource-kind'));
@@ -281,7 +300,7 @@ export function runTeamBrokerConflictResolve(argv: string[], defaultCwd: string)
     decisionClass,
     decisionReason,
     violationStatus,
-    releaseOrder: releaseOrder.length ? releaseOrder : undefined,
+    releaseOrder,
     createdAt,
     actorId,
     authorizationResourceKind
@@ -302,7 +321,7 @@ export function runTeamBrokerConflictResolve(argv: string[], defaultCwd: string)
     statusCode: artifact.statusCode,
     currentAllowedTaskId: artifact.currentAllowedTaskId,
     blockedTaskIds: artifact.blockedTaskIds,
-    requiredCommand: `node atm.mjs team broker resolve --task ${artifact.primaryTaskId} ${artifact.conflictingTaskIds.map((taskId) => `--conflict ${taskId}`).join(' ')} ${artifact.sharedPaths.map((sharedPath) => `--path ${sharedPath}`).join(' ')} --decision-reason "${artifact.decisionReason}" --json`
+    requiredCommand: `node atm.mjs team broker resolve --task ${artifact.primaryTaskId} ${artifact.conflictingTaskIds.map((taskId) => `--conflict ${taskId}`).join(' ')} ${artifact.sharedPaths.map((sharedPath) => `--path ${sharedPath}`).join(' ')} --release-order ${artifact.releaseOrder.join(',')} --decision-reason "${artifact.decisionReason}" --json`
   });
 
   return makeResult({

@@ -417,6 +417,45 @@ try {
   assert.match(committedFiles, /\.atm\/history\/tasks\/TASK-RECORD-0001\.json/);
   assert.match(committedFiles, /\.atm\/history\/evidence\/git-head\.jsonl/);
 
+  // ATM-BUG-2026-09-02-002: an explicit record-only path must be staged by
+  // the governed command itself, while an unrelated source file remains out
+  // of both the index and the resulting commit.
+  const explicitRecordPath = '.atm/history/evidence/TASK-RECORD-0001.note.json';
+  writeJson(path.join(repo, 'package.json'), { name: 'ai-atomic-framework' });
+  mkdirSync(path.join(repo, 'packages/core/src'), { recursive: true });
+  writeFileSync(path.join(repo, 'packages/core/src/index.ts'), 'export {};\n', 'utf8');
+  writeJson(path.join(repo, explicitRecordPath), { taskId: 'TASK-RECORD-0001', kind: 'record-only' });
+  writeFileSync(path.join(repo, 'foreign-source.ts'), 'export const foreignSource = true;\n', 'utf8');
+  const explicitDryRun = await runAtmGit([
+    'record-commit', '--cwd', repo, '--actor', 'record-actor',
+    '--message', 'atm: explicit record fixture', '--paths', explicitRecordPath,
+    '--dry-run', '--json'
+  ]);
+  assert.equal(explicitDryRun.ok, true);
+  assert.deepEqual((explicitDryRun.evidence as Record<string, unknown>).stagedFiles, [explicitRecordPath]);
+  assert.equal(runGit(repo, ['diff', '--cached', '--name-only']).trim(), '', 'dry-run must not stage a record path');
+  const explicitCommit = await runAtmGit([
+    'record-commit', '--cwd', repo, '--actor', 'record-actor',
+    '--message', 'atm: explicit record fixture', '--paths', explicitRecordPath,
+    '--json'
+  ]);
+  assert.equal(explicitCommit.ok, true);
+  const explicitCommittedFiles = runGit(repo, ['show', '--name-only', '--format=', 'HEAD']);
+  assert.match(explicitCommittedFiles, /TASK-RECORD-0001\.note\.json/);
+  assert.doesNotMatch(explicitCommittedFiles, /foreign-source\.ts/);
+  assert.equal(runGit(repo, ['diff', '--cached', '--name-only']).trim(), '', 'record-only commit must leave no staged residue');
+  let unsafePathError: unknown = null;
+  try {
+    await runAtmGit([
+      'record-commit', '--cwd', repo, '--actor', 'record-actor',
+      '--message', 'atm: unsafe path', '--paths', 'foreign-source.ts', '--dry-run', '--json'
+    ]);
+  } catch (error) {
+    unsafePathError = error;
+  }
+  assert.ok(unsafePathError instanceof CliError);
+  assert.equal((unsafePathError as CliError).code, 'ATM_GIT_RECORD_COMMIT_SCOPE_VIOLATION');
+
   writeJson(path.join(repo, '.atm/history/tasks/TASK-RECORD-0001.json'), {
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: 'TASK-RECORD-0001',

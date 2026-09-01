@@ -30,6 +30,7 @@ const FOREIGN_TASK = 'TASK-FOREIGN-0001';
 const FOREIGN_RECEIPT = `.atm/history/evidence/${FOREIGN_TASK}.runner-sync-receipt.json`;
 const SELF_RECEIPT = `.atm/history/evidence/${TEMP_TASK}.runner-sync-receipt.json`;
 const HOOK_FILE = '.atm/git-hooks/pre-commit';
+const PINNED_RUNNER = '.atm/runtime/pinned-runner.json';
 
 function buildFixture(claimedFiles: readonly string[]): string {
   const root = path.join(os.tmpdir(), `atm-foreign-history-${process.pid}-${Math.random().toString(16).slice(2)}`);
@@ -46,6 +47,7 @@ function buildFixture(claimedFiles: readonly string[]): string {
   git('config', 'user.email', 'fixture@local');
 
   write(HOOK_FILE, 'baseline\n');
+  write(PINNED_RUNNER, '{"runner":"baseline"}\n');
   // A foreign task must be a *known* task before its history paths are owned.
   write(`.atm/history/tasks/${FOREIGN_TASK}.json`, JSON.stringify({
     workItemId: FOREIGN_TASK,
@@ -76,6 +78,7 @@ function buildFixture(claimedFiles: readonly string[]): string {
   }));
 
   write(HOOK_FILE, 'lane change\n');
+  write(PINNED_RUNNER, '{"runner":"synced"}\n');
   write(FOREIGN_RECEIPT, JSON.stringify({ foreign: true }));
   write(SELF_RECEIPT, JSON.stringify({ self: true }));
   return root;
@@ -116,6 +119,17 @@ assert.ok(
 assert.ok(
   rootClaim.includes(SELF_RECEIPT),
   'a repository-wide .atm claim must still reach the claiming task\'s own history path'
+);
+assert.ok(
+  !rootClaim.includes(PINNED_RUNNER),
+  'a directory-scoped .atm claim must not absorb runtime metadata'
+);
+
+const exactPinnedRunnerClaim = candidatesFor([PINNED_RUNNER]);
+assert.deepEqual(
+  [...exactPinnedRunnerClaim],
+  [PINNED_RUNNER],
+  'an exact runner-sync metadata claim must be stageable without widening runtime directory scope'
 );
 
 // Exact-path claims are unchanged: naming a path is a deliberate authority act.
