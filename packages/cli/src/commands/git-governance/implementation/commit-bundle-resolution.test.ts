@@ -259,6 +259,45 @@ assert.equal(
 );
 execFileSync('git', ['restore', '--staged', '--', releasedEvidencePath], { cwd });
 
+// A real claimed task's effective scope includes its own evidence/event
+// patterns.  Those intrinsic wildcard entries must not make an otherwise
+// history-only cleanup ineligible to preserve one exactly named released
+// receipt; no foreign wildcard is allowed.
+const ignoredReleasedTaskId = 'TASK-IGNORED-RELEASED';
+const ignoredReleasedEvidencePath = `.atm/history/evidence/${ignoredReleasedTaskId}.live-index-reconciliation.json`;
+writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${ignoredReleasedTaskId}.json`), `${JSON.stringify({
+  workItemId: ignoredReleasedTaskId,
+  status: 'done',
+  claim: { state: 'released', actorId: 'prior-agent' },
+})}\n`);
+execFileSync('git', ['add', '--', `.atm/history/tasks/${ignoredReleasedTaskId}.json`], { cwd });
+execFileSync('git', ['commit', '-qm', 'ignored released history owner fixture'], { cwd });
+writeFileSync(path.join(cwd, ignoredReleasedEvidencePath), `${JSON.stringify({ taskId: ignoredReleasedTaskId, schemaId: 'atm.liveIndexReconciliation.v1', clean: true })}\n`);
+const ignoredHistoryCleanupTask = structuredClone(historyCleanupTask);
+ignoredHistoryCleanupTask.scopePaths = [
+  ignoredReleasedEvidencePath,
+  `.atm/history/evidence/${historyCleanupTaskId}.*`,
+  `.atm/history/task-events/${historyCleanupTaskId}/**`,
+  `.atm/history/tasks/${historyCleanupTaskId}.json`,
+];
+ignoredHistoryCleanupTask.targetAllowedFiles = ignoredHistoryCleanupTask.scopePaths;
+ignoredHistoryCleanupTask.claim.files = ignoredHistoryCleanupTask.scopePaths;
+ignoredHistoryCleanupTask.workAdmissionTicket.grants[0].values = ignoredHistoryCleanupTask.scopePaths;
+const ignoredHistoryCleanupBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: historyCleanupTaskId,
+  actorId: 'test-actor',
+  taskDocument: ignoredHistoryCleanupTask,
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.ok(ignoredHistoryCleanupBundle.stageFiles.includes(ignoredReleasedEvidencePath), 'an explicitly named Git-ignored terminal receipt must enter the sealed candidate');
+
 writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${releasedTaskId}.json`), `${JSON.stringify({
   workItemId: releasedTaskId,
   status: 'running',
