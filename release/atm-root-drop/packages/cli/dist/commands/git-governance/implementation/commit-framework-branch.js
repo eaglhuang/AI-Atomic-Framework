@@ -16,7 +16,7 @@ import { recordOnlyClaimScopeExemptCovers } from '../record-only-block-lifecycle
 import { uniqueSorted } from '../commit-scope-policy.js';
 import { CliError, makeResult, message, quoteCliValue } from '../../shared.js';
 import { buildCopyableGitCommitCommand, readStagedFiles } from './git-index-transaction.js';
-import { autoStageFrameworkClaimFiles, inspectFrameworkScopedUnstagedCommit, isFrameworkGeneratedArtifactAllowed, isIgnorableFrameworkCommitStagingSideEffect, readActiveFrameworkClaimFiles, readReleaseGeneratedArtifactPaths } from './task-scope-staging.js';
+import { autoStageFrameworkClaimFiles, frameworkTempTaskId, inspectFrameworkScopedUnstagedCommit, isFrameworkGeneratedArtifactAllowed, isIgnorableFrameworkCommitStagingSideEffect, readActiveFrameworkClaimFiles, readReleaseGeneratedArtifactPaths } from './task-scope-staging.js';
 export function routeFrameworkClaimCommitBranch(input) {
     const { options, actorId, usesFrameworkClaimCommit, frameworkClaimFiles } = input;
     const autoStagedFrameworkPaths = usesFrameworkClaimCommit && options.autoStage
@@ -97,8 +97,9 @@ export function routeFrameworkClaimCommitBranch(input) {
         const claimedFiles = new Set(frameworkClaimFiles ?? readActiveFrameworkClaimFiles(options.cwd, actorId));
         if (claimedFiles.size > 0) {
             const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(options.cwd);
+            const ownerScope = { cwd: options.cwd, currentTaskId: frameworkTempTaskId(actorId) };
             frameworkClaimCommitFiles = uniqueSorted(readStagedFiles(options.cwd).filter((filePath) => (!options.deferForeignStaged && isIgnorableFrameworkCommitStagingSideEffect(filePath)) ||
-                isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
+                isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope)));
         }
     }
     return { kind: "staged", autoStagedFrameworkPaths, frameworkClaimCommitFiles };

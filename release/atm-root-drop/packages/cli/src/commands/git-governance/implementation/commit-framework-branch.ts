@@ -16,7 +16,7 @@ import { recordOnlyClaimScopeExemptCovers } from '../record-only-block-lifecycle
 import { uniqueSorted } from '../commit-scope-policy.ts';
 import { CliError, makeResult, message, quoteCliValue } from '../../shared.ts';
 import { buildCopyableGitCommitCommand, readStagedFiles } from './git-index-transaction.ts';
-import { autoStageFrameworkClaimFiles, inspectFrameworkScopedUnstagedCommit, isFrameworkGeneratedArtifactAllowed, isIgnorableFrameworkCommitStagingSideEffect, readActiveFrameworkClaimFiles, readReleaseGeneratedArtifactPaths } from './task-scope-staging.ts';
+import { autoStageFrameworkClaimFiles, frameworkTempTaskId, inspectFrameworkScopedUnstagedCommit, isFrameworkGeneratedArtifactAllowed, isIgnorableFrameworkCommitStagingSideEffect, readActiveFrameworkClaimFiles, readReleaseGeneratedArtifactPaths } from './task-scope-staging.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
@@ -155,6 +155,7 @@ if (usesFrameworkClaimCommit) {
       const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(
         options.cwd,
       );
+      const ownerScope = { cwd: options.cwd, currentTaskId: frameworkTempTaskId(actorId) };
       frameworkClaimCommitFiles = uniqueSorted(
         readStagedFiles(options.cwd).filter(
           (filePath: LegacyValue) =>
@@ -163,6 +164,7 @@ if (usesFrameworkClaimCommit) {
               filePath,
               claimedFiles,
               releaseGeneratedArtifacts,
+              ownerScope,
             ),
         ),
       );

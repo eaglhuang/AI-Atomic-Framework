@@ -640,6 +640,7 @@
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-29-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-30-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-30-002.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-01-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
     "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
     "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -766,6 +767,7 @@
     "release/atm-root-drop/docs/reports/proposal-gated-write-admission-dogfood/team-runs/team-9c09a4183a4e.json",
     "release/atm-root-drop/docs/reports/proposal-gated-write-admission-handoff.md",
     "release/atm-root-drop/docs/reports/rescue-worktree-cleanup-receipt.json",
+    "release/atm-root-drop/docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md",
     "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
     "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-runbook-release-review.input.json",
     "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
@@ -5189,6 +5191,7 @@
     "release/atm-root-drop/tests/cli/four-plan-independent-certificate.test.ts",
     "release/atm-root-drop/tests/cli/four-plan-objective-authority-review.test.ts",
     "release/atm-root-drop/tests/cli/four-plan-objective-denominator.test.ts",
+    "release/atm-root-drop/tests/cli/framework-auto-stage-foreign-task-history.test.ts",
     "release/atm-root-drop/tests/cli/framework-auto-stage-pathspec-batching.test.ts",
     "release/atm-root-drop/tests/cli/framework-temp-claim-lifecycle-parity.test.ts",
     "release/atm-root-drop/tests/cli/framework-temp-lock-admission-parity.test.ts",
@@ -5927,8 +5930,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1313,
-    "unchanged": 4579,
+    "copied": 1315,
+    "unchanged": 4580,
     "removed": 0
   },
   "buildMode": "full",
@@ -11415,8 +11418,17 @@
         "replaceable": true
       },
       {
+        "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-01-001.json",
+        "digest": "7ca34eea4382e6431cba5bb68db78965a0fc305e60136b7632e23e023bc15835",
+        "origin": "source",
+        "inputPaths": [
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-01-001.json"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "docs/governance/atm-bug-and-optimization-backlog.md",
-        "digest": "d584f19e7bc8d527c9fa7f3d3e3f8fbd419ec3281bfa63540fcf01e1594a5939",
+        "digest": "aa3bb76d5d45958ab57a30f32fefbd90cdd48853a21407183819aa98870e3228",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.md"
@@ -12545,6 +12557,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/reports/rescue-worktree-cleanup-receipt.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md",
+        "digest": "6ee60e069568a983817e02923355590d83959badae537301b328a3b637a58cb2",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md"
         ],
         "replaceable": true
       },
@@ -16699,7 +16720,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/broker/cross-task-mutation-guard.js",
-        "digest": "48fe0ec81e2e7c89a15d609bfa4e71fe7d7294d4df579a533bcec9cab5422e5b",
+        "digest": "82fb633143405b5417ce1bf9b51fa0c90740a23f2643a51326a2fba12249b917",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/cross-task-mutation-guard.js"
@@ -22711,7 +22732,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-framework-branch.js",
-        "digest": "395dd89d3ac71bf0b1ef26cb1603e9ee8c670a172542ae4ca1e5c2b6c6137207",
+        "digest": "a84f5f54a8491e19f091317e7b0d1464e7c45b942b75f2de66b524bb599d26ac",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-framework-branch.js"
@@ -22927,7 +22948,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
-        "digest": "53654732fc9265ccf2a3cd6d0aa4adc489ff782387577233742c3938d25a99c2",
+        "digest": "5415fffe6e40c0b325967f552b88b5f58ab99b2e751d4feebd96d83ac6967a08",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js"
@@ -28921,7 +28942,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-framework-branch.ts",
-        "digest": "a02ffae50f5bab818e40719a188d1a1961de5d78340c6790c5c61099352e3764",
+        "digest": "3c3ddd9d13d94c873a5340497f321f16f6720a643843659fbb122ad90fb08784",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-framework-branch.ts"
@@ -29209,7 +29230,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
-        "digest": "09acdf9ccbc850465fac00ab7a7b145d110c7e28b19911e5d60b464c0632b0c7",
+        "digest": "5650b4272a05b24d512c5347dd4acd8c00d86cc98c1d905829d62f6755537b44",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts"
@@ -33916,7 +33937,7 @@
       },
       {
         "path": "packages/core/dist/broker/cross-task-mutation-guard.js",
-        "digest": "48fe0ec81e2e7c89a15d609bfa4e71fe7d7294d4df579a533bcec9cab5422e5b",
+        "digest": "82fb633143405b5417ce1bf9b51fa0c90740a23f2643a51326a2fba12249b917",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/cross-task-mutation-guard.js"
@@ -37561,7 +37582,7 @@
       },
       {
         "path": "packages/core/src/broker/cross-task-mutation-guard.ts",
-        "digest": "73dc9f255e263be807bdb704a312fad8cf31e0fad9d65766a45178066c708662",
+        "digest": "33edb14905288f403cde08455488b67aff069aba88d2c54d816c45d29cf9dabd",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/broker/cross-task-mutation-guard.ts"
@@ -43546,7 +43567,7 @@
       },
       {
         "path": "schemas/evidence/external-benchmark-run.schema.json",
-        "digest": "a977cffac11580173effb527114563950eae46f8ca7267dc101191ad86b7051d",
+        "digest": "6e2661ce71ff5d356185a22bee3c3642445ed80c9193ea3ac0e3be43a2790586",
         "origin": "source",
         "inputPaths": [
           "schemas/evidence/external-benchmark-run.schema.json"
@@ -45607,7 +45628,7 @@
       },
       {
         "path": "scripts/fixtures/atm-external-benchmark/manifest.json",
-        "digest": "fe840d88a2b58dad4e3dff2053f6d419fab5c937ce5bf9bb532d6f33d43b70b2",
+        "digest": "6de75bc48977b538a7c5451d6863f7b46968a37ddaa925ca6a20b20521987ca6",
         "origin": "source",
         "inputPaths": [
           "scripts/fixtures/atm-external-benchmark/manifest.json"
@@ -46273,7 +46294,7 @@
       },
       {
         "path": "scripts/lib/external-benchmark/runner.ts",
-        "digest": "9ff74586caf8137b55bfaebb41f3de3664abf4e72abffb5f1772c512340c8458",
+        "digest": "b1e8e69234c1a812b1fb81bdff67bc438577314fcdbbdd0da76b4cfa436509f8",
         "origin": "source",
         "inputPaths": [
           "scripts/lib/external-benchmark/runner.ts"
@@ -47407,7 +47428,7 @@
       },
       {
         "path": "scripts/validate-external-benchmark-protocol.ts",
-        "digest": "0062a7b1ff8e9cddbddda6d667302900b7f24a074a1ecb7a5e79962633b69b08",
+        "digest": "f734239ce905a878856abe906dc014c0ae94c38fcc2a2f01ea75ed61ea6b0918",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-external-benchmark-protocol.ts"
@@ -52258,7 +52279,7 @@
       },
       {
         "path": "tests/cli/external-benchmark-protocol.test.ts",
-        "digest": "e9a5323449c7d0e5398ead320fd19f26d901b4e1d106e46f9ba7a5f3228faa42",
+        "digest": "0f3f39ab0ff595c7ddd12c25fad23a3f7212abf65a00fd6e4cb840debd28d982",
         "origin": "source",
         "inputPaths": [
           "tests/cli/external-benchmark-protocol.test.ts"
@@ -52343,6 +52364,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/four-plan-objective-denominator.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/framework-auto-stage-foreign-task-history.test.ts",
+        "digest": "5ce118aebf258f64ecc3e857b2319caaac1f4e848591f520a9d102fc6ec39b19",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/framework-auto-stage-foreign-task-history.test.ts"
         ],
         "replaceable": true
       },
@@ -58962,7 +58992,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:c303e9fc912138827d8732df90aa54b67c3b784b06079adc84f19a0f07df70e8"
+    "treeDigest": "sha256:b3f462e1c785913ab545c59a04a7dde7306a5109c82e8f407066bd43cae30c4e"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60420,7 +60450,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:fe25388b400148a7cebac76c47202f19be433ac8e3845dbb218f90792f7d86b5"
+    "digest": "sha256:2a6af735117978bc49a498e8ef256f9f7265a773e1e3ae308b8bffae3b0e577a"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -61034,6 +61064,7 @@
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-29-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-30-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-30-002.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-01-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
       "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
       "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -61160,6 +61191,7 @@
       "release/atm-root-drop/docs/reports/proposal-gated-write-admission-dogfood/team-runs/team-9c09a4183a4e.json",
       "release/atm-root-drop/docs/reports/proposal-gated-write-admission-handoff.md",
       "release/atm-root-drop/docs/reports/rescue-worktree-cleanup-receipt.json",
+      "release/atm-root-drop/docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md",
       "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-objective-authority-review.json",
       "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-runbook-release-review.input.json",
       "release/atm-root-drop/docs/reports/reviews/plan-3x-4x-runbook-release-review.json",
@@ -65583,6 +65615,7 @@
       "release/atm-root-drop/tests/cli/four-plan-independent-certificate.test.ts",
       "release/atm-root-drop/tests/cli/four-plan-objective-authority-review.test.ts",
       "release/atm-root-drop/tests/cli/four-plan-objective-denominator.test.ts",
+      "release/atm-root-drop/tests/cli/framework-auto-stage-foreign-task-history.test.ts",
       "release/atm-root-drop/tests/cli/framework-auto-stage-pathspec-batching.test.ts",
       "release/atm-root-drop/tests/cli/framework-temp-claim-lifecycle-parity.test.ts",
       "release/atm-root-drop/tests/cli/framework-temp-lock-admission-parity.test.ts",
@@ -66324,22 +66357,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:a2c12ab9a556fd5a501c176a64bf474d3dfec52c0085cffd368c91520d16217a",
-  "sealedSourceCommit": "4d218663ceced1f78c4b97ff521aa59c19fae06e",
+  "buildInputsTreeHash": "sha256:c70894a7a70d6149c042637880eb57ac526b2a53ee7df8bc68a300f8c36b6e9b",
+  "sealedSourceCommit": "9c1a68bb4a258e8b75103ff0f6837bb0b614de01",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:16f5f1384538f572f6975116c1a3e516f8295b3a14679c1480c78ded07ab0013",
-  "tsBuildCacheDigest": "sha256:ed30966634163e9eb41ce55729c3d88d201497138e87a3180ab7f9cb1ec07bad",
+  "incrementalPlanDigest": "sha256:fd72da3213e93c2a713a10ed4df24097a2e5668cc7970be3c6637d95df2bbf9c",
+  "tsBuildCacheDigest": "sha256:baea5b4b44f2669e78f98f90a8646ede4ee3f10a0a02709a2540193f5c0ff1e4",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 47,
-    "skipDecision": 57,
-    "worktreeSetup": 12719,
-    "typescriptBuild": 11287,
-    "rootDropReleaseAssembly": 31073,
-    "onefileReleaseAssembly": 8872,
-    "artifactSync": 10334,
+    "inputHashCalculation": 58,
+    "skipDecision": 89,
+    "worktreeSetup": 24177,
+    "typescriptBuild": 18359,
+    "rootDropReleaseAssembly": 35447,
+    "onefileReleaseAssembly": 11114,
+    "artifactSync": 13641,
     "cleanup": 0,
-    "totalElapsed": 122243
+    "totalElapsed": 143618
   }
 }

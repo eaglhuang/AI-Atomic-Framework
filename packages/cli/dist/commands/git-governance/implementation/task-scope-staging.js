@@ -1,6 +1,7 @@
 import { isAllowedGovernanceArtifactPath, isFileAllowedInTaskBundle, listTaskOwnedProtectedOverrideAuditFiles, readProtectedOverrideAuditTaskId, readStagedFiles, readStagedJsonFile, } from './git-index-transaction.js';
 import { isCommitAttributionSideEffectPath, isIgnorableTaskScopedDirtySideEffect, listCommitAttributionSideEffectPaths, resolveGitExecutable, runGitCommand, } from './git-process-port.js';
 import { forEachPathspecBatch } from './pathspec-argv-batching.js';
+import { resolveTaskHistoryOwnerTaskId } from '../../../_vendor/core/dist/broker/cross-task-mutation-guard.js';
 import { existsSync, readFileSync, readdirSync, rmSync, statSync, } from "node:fs";
 import path from "node:path";
 import { gitHeadEvidencePaths, } from "../../git-head-evidence.js";
@@ -245,9 +246,20 @@ export function readReleaseGeneratedArtifactPaths(cwd) {
     }
     return generated;
 }
-export function isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts) {
+export function isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope = null) {
     const normalized = normalizeRelativePath(filePath);
     const claimedScopes = [...claimedFiles];
+    // A directory scope grants reach inside the claim; it never transfers authority
+    // over another task's governance history. Naming the path exactly stays a
+    // deliberate act and is still honoured. Ownership comes from the shared
+    // cross-task seam so staging and admission cannot drift apart.
+    if (ownerScope &&
+        !claimedScopes.some((scope) => normalizeRelativePath(scope) === normalized)) {
+        const ownerTaskId = resolveTaskHistoryOwnerTaskId(ownerScope.cwd, normalized);
+        if (ownerTaskId && ownerTaskId !== String(ownerScope.currentTaskId ?? '').trim().toUpperCase()) {
+            return false;
+        }
+    }
     if (claimedScopes.some((scope) => pathMatchesTaskScope(normalized, scope))) {
         return true;
     }
@@ -277,9 +289,10 @@ export function autoStageFrameworkClaimFiles(cwd, actorId, apply = true, claimed
     }
     const stagedFiles = new Set(readStagedFiles(cwd));
     const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(cwd);
+    const ownerScope = { cwd, currentTaskId: frameworkTempTaskId(actorId) };
     const candidates = uniqueSorted(listTaskScopedWorktreeDirtyFiles(cwd).filter((filePath) => !stagedFiles.has(filePath) &&
         !isIgnorableFrameworkCommitStagingSideEffect(filePath) &&
-        isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
+        isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope)));
     if (apply && candidates.length > 0) {
         stageFrameworkClaimPathspecBatches(cwd, candidates);
     }
@@ -307,10 +320,11 @@ export function inspectFrameworkScopedUnstagedCommit(cwd, actorId, claimedFilesO
     if (dirtyFiles.length === 0 && stagedFiles.length === 0) {
         return null;
     }
-    const inScopeDirtyFiles = uniqueSorted(dirtyFiles.filter((filePath) => isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
+    const ownerScope = { cwd, currentTaskId: frameworkTempTaskId(actorId) };
+    const inScopeDirtyFiles = uniqueSorted(dirtyFiles.filter((filePath) => isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope)));
     const unstagedInScopeDirtyFiles = inScopeDirtyFiles.filter((filePath) => !stagedFiles.includes(filePath));
     const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isIgnorableFrameworkCommitStagingSideEffect(filePath) &&
-        !isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts));
+        !isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope));
     if (unstagedInScopeDirtyFiles.length === 0) {
         if (outOfScopeStagedFiles.length > 0) {
             return {
@@ -328,7 +342,7 @@ export function inspectFrameworkScopedUnstagedCommit(cwd, actorId, claimedFilesO
             outOfScopeStagedFiles: uniqueSorted(outOfScopeStagedFiles),
         };
     }
-    const skippedExternalDirtyFiles = uniqueSorted(dirtyFiles.filter((filePath) => !isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
+    const skippedExternalDirtyFiles = uniqueSorted(dirtyFiles.filter((filePath) => !isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope)));
     return {
         kind: "staging-required",
         inScopeDirtyFiles: uniqueSorted(inScopeDirtyFiles),
