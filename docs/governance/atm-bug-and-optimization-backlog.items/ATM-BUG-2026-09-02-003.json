@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source; frozen runner publication and formal closeout remain separate states",
+  "status": "Closed — source repair, sealed runner build, runner reproducibility, root-drop, and onefile release validation verified; formal backlog closeout recorded 2026-09-02",
   "area": "Sealed root-drop release reproducibility",
   "finding": "buildRootDropRelease inventories packages/**/dist but assumed its caller had already rebuilt those generated inputs. The runner reproducibility verifier built root-drop before onefile, while onefile then rebuilt package dist; the next root-drop pass therefore emitted a different release-manifest.json from the same source tree.",
   "expectedBehavior": "A root-drop release build must materialize its generated package-dist inputs before it derives the artifact inventory, so identical source trees produce byte-identical root-drop and onefile manifests regardless of caller order.",

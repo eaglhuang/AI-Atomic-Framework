@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Critical",
-  "status": "Fixed in source; frozen publication pending",
+  "status": "Closed — source repair is publication-independent and verified in the sealed runner build; formal backlog closeout recorded 2026-09-02",
   "area": "Sealed runner publication does not recognize live framework-temp wildcard authority",
   "finding": "resolveActiveRunnerPublicationTask independently scanned runtime locks, accepted only literal release/atm-onefile/atm.mjs or release/atm-root-drop entries, and treated every explicitly selected task as ledger-backed. A live ATM-FRAMEWORK-TEMP claim for release/** therefore appeared valid to framework-mode status but yielded zero release-surface claimants to runner publication.",
   "expectedBehavior": "Runner publication must consume the canonical TTL-aware framework-temp lock projection. Framework-temp claims may authorize release surfaces through the standard write-scope matcher; ordinary task claims remain ledger-validated. The resolver must reject expired, released, partial, ambiguous, and actor-mismatched authority.",

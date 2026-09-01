@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Critical",
-  "status": "Fixed in source; frozen publication pending",
+  "status": "Closed — source and frozen-runner publication verified; formal backlog closeout recorded 2026-09-02",
   "area": "Framework temporary-claim producer and pre-commit consumer authority split",
   "finding": "framework-mode status correctly read a live ATM-FRAMEWORK-TEMP runtime lock and reported no blocker, but the temporary-index pre-commit hook still emitted active-framework-claim-required for the same covered generated files. The hook only used framework-temp allowed files after a separate task direction lock existed, and did not use that coverage to resolve the framework blocker.",
   "expectedBehavior": "All consumers of framework temporary write authority must read the same TTL-aware authority projection. A live temporary claim whose allowed files fully cover the candidate suppresses only the matching framework-claim blocker; an expired, released, partial, or unrelated claim remains fail-closed.",
