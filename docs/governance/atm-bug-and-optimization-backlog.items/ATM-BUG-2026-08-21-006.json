@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Open",
+  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
   "area": "Taskflow crash-matrix fixture lost its owner lane before historical reconciliation",
   "finding": "The crash-matrix fixture successfully claimed its synthetic task and preserved the lane for its injected close driver, but its deliberate 30-second pre-commit stall made the fixture claim stale before post-crash reconciliation. After renewing, the fixture still passed the target repository's later close HEAD as --historical-delivery instead of the delivery_commit sealed in the dirty planning closeback, creating a deliberate pre-edit mismatch.",
   "expectedBehavior": "A fixture that tests a two-step taskflow transaction must restore its own owner lane, renew its own active claim, and use the closeback's addressable delivery_commit as historical delivery evidence. Product enforcement remains fail-closed when capability, freshness, or delivery identity is absent or inconsistent.",
   "evidenceOrRepro": "On 2026-08-20, npm run validate:full reached tests/cli/pre-team-foundation-gate.test.ts. The fixture first failed with ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED because its hook stall expired the claim. After owner-lane renewal, it failed with ATM_TASKFLOW_PRECLOSE_PLANNING_MIRROR_PREEDIT_INVALID: the mirror held a valid delivery_commit distinct from the target's later HEAD. The fixture now extracts and supplies that sealed 40-hex commit.",
-  "followUp": "Keep this a fixture repair, not an authorization or pre-edit relaxation; retain direct coverage for missing lane, stale claim, and mismatched delivery reference refusal."
+  "followUp": "On 2026-09-01 the direct taskflow-close-crash-matrix fixture passed (exit 0), including the injected crash/recovery sequence. Keep this a fixture repair, not an authorization or pre-edit relaxation; retain direct coverage for missing lane, stale claim, and mismatched delivery reference refusal."
 }
