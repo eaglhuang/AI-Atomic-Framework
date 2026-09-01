@@ -50,6 +50,8 @@ import { buildCopyableGitCommitCommand, readStagedFiles } from './git-index-tran
 
 import { runGitCommand } from './git-process-port.ts';
 
+import { forEachPathspecBatch } from './pathspec-argv-batching.ts';
+
 import { requireExplicitGitActor } from './identity-check-command.ts';
 
 import { assertRecordCommitSingleTaskOwner, isRecordCommitAllowedPath } from './record-bundle-inspection.ts';
@@ -99,7 +101,24 @@ export function runGitRecordCommit(options: LegacyValue) {
       },
     );
   }
-  const stagedFiles = readStagedFiles(options.cwd);
+  const explicitPaths = resolveExplicitRecordPaths(options.cwd, options.paths ?? []);
+  let stagedFiles: readonly string[] = readStagedFiles(options.cwd);
+  if (explicitPaths.length > 0 && stagedFiles.length > 0) {
+    throw new CliError(
+      "ATM_GIT_RECORD_COMMIT_STAGING_AMBIGUOUS",
+      "git record-commit --paths requires an empty index so it cannot absorb pre-existing staged work.",
+      { exitCode: 1, details: { stagedFiles, explicitPaths } },
+    );
+  }
+  if (explicitPaths.length > 0) {
+    assertExplicitRecordPathsAreDirty(options.cwd, explicitPaths);
+    if (!options.dryRun) {
+      stageExplicitRecordPaths(options.cwd, explicitPaths);
+      stagedFiles = readStagedFiles(options.cwd);
+    } else {
+      stagedFiles = [...explicitPaths];
+    }
+  }
   if (stagedFiles.length === 0) {
     throw new CliError(
       "ATM_GIT_RECORD_COMMIT_EMPTY_INDEX",
@@ -310,9 +329,10 @@ export function runGitRecordCommit(options: LegacyValue) {
           recordOnlyBlockBridgeAuth.nonce;
       }
       result = runGitCommit({
-        ...options,
-        action: "commit",
-        taskId: null,
+      ...options,
+      action: "commit",
+      taskId: null,
+      recordOnlyCommit: true,
         autoStage: false,
         deferForeignStaged: false,
         noVerify: false,
@@ -380,4 +400,49 @@ export function runGitRecordCommit(options: LegacyValue) {
       },
     },
   };
+}
+
+function resolveExplicitRecordPaths(cwd: string, paths: readonly string[]): readonly string[] {
+  const normalized = Array.from(new Set(paths.map((entry) => entry.trim().replace(/\\/g, "/")).filter(Boolean))).sort();
+  const invalidPaths = normalized.filter((entry) => {
+    const absolute = path.resolve(cwd, entry);
+    const relative = path.relative(cwd, absolute).replace(/\\/g, "/");
+    return path.isAbsolute(entry) || relative === ".." || relative.startsWith("../") || !isRecordCommitAllowedPath(relative);
+  });
+  if (invalidPaths.length > 0) {
+    throw new CliError(
+      "ATM_GIT_RECORD_COMMIT_SCOPE_VIOLATION",
+      "git record-commit --paths only accepts low-risk .atm/history record files.",
+      { exitCode: 1, details: { invalidPaths, allowedPrefixes: [".atm/history/tasks/", ".atm/history/task-events/", ".atm/history/evidence/", ".atm/history/reports/task-import/"] } },
+    );
+  }
+  return normalized.map((entry) => path.relative(cwd, path.resolve(cwd, entry)).replace(/\\/g, "/"));
+}
+
+function assertExplicitRecordPathsAreDirty(cwd: string, paths: readonly string[]): void {
+  const changed = new Set<string>();
+  for (const args of [
+    ["diff", "--name-only", "--", ...paths],
+    ["ls-files", "--others", "--exclude-standard", "--", ...paths],
+  ]) {
+    for (const entry of runGitCommand(cwd, args).split(/\r?\n/)) {
+      const normalized = entry.trim().replace(/\\/g, "/");
+      if (normalized) changed.add(normalized);
+    }
+  }
+  const unchangedPaths = paths.filter((entry) => !changed.has(entry));
+  if (unchangedPaths.length > 0) {
+    throw new CliError(
+      "ATM_GIT_RECORD_COMMIT_PATH_NOT_DIRTY",
+      "git record-commit --paths requires every declared record path to be currently dirty or untracked.",
+      { exitCode: 1, details: { unchangedPaths, paths } },
+    );
+  }
+}
+
+function stageExplicitRecordPaths(cwd: string, paths: readonly string[]): void {
+  forEachPathspecBatch(
+    { paths, fixedArgs: ["add", "-A", "-f", "--"] },
+    (batch) => runGitCommand(cwd, ["add", "-A", "-f", "--", ...batch], ["ignore", "pipe", "pipe"]),
+  );
 }

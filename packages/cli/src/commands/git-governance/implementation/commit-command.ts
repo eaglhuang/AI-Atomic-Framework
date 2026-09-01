@@ -113,7 +113,13 @@ const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, f
   cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
 });
 
-assertFrameworkCommitClaimAuthority({ actorId, laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null, authority: { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution } });
+// `git record-commit` reaches this executor only after its own strict
+// low-risk record allowlist, single-owner check, and payload assertion path
+// have admitted the exact staged files.  It is a governed taskless maintenance
+// lane, not a request to infer framework authority from the shared index.
+if (options.recordOnlyCommit !== true) {
+  assertFrameworkCommitClaimAuthority({ actorId, laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null, authority: { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution } });
+}
 
 const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
 
