@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-01-004",
+  "date": "2026-09-01",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Fixed in source (4fa7bff2c44d70beee4d7877c7631b26c1ac1040); frozen runner publication and formal closeout remain separate states",
+  "area": "Batch checkpoint / close-commit window / governed commit lifecycle",
+  "finding": "A terminal batch checkpoint closed its task, immediately ran tasks lock cleanup, and released the completed batch before the required governed checkpoint commit could consume the close-commit window. The subsequent git commit dry run therefore failed with ATM_GIT_COMMIT_DRY_RUN_PURITY_VIOLATED; batch repair could not recover because the run had already been released.",
+  "expectedBehavior": "When checkpoint continuation names pendingCommitTaskId, the checkpoint must retain that task's close-commit window until the governed checkpoint commit consumes it. Lock cleanup remains required when no checkpoint commit is pending, and no task or foreign scope may gain authority.",
+  "evidenceOrRepro": "TASK-MBX-0001 reproduced the lifecycle on 2026-09-01: evidence verify and batch checkpoint succeeded using historical delivery commit 81791b515e33c02fafae52a067df91def559c034, then the mandated git commit dry run failed because checkpoint had removed the authority window. An authorized emergency preservation commit 7b44b9b4bc9863fed668198222940e8e2e5bbf44 retained only that task's nine closure artifacts. The focused checkpoint-commit-window-policy test failed before and passes after source repair 4fa7bff2c44d70beee4d7877c7631b26c1ac1040.",
+  "containment": "Only TASK-MBX-0001 closure evidence was preserved under the explicit emergency authorization; no foreign paths, staged bytes, active broker intents, or task scopes were absorbed. The normal source repair is limited to batch checkpoint cleanup timing and its focused regression test.",
+  "followUp": "Publish the repaired frozen runner through the governed runner-sync path before frozen CLI users rely on this fix. Then perform formal backlog closeout with a fresh end-to-end checkpoint-to-governed-commit receipt; do not infer historical close-window authority or modify unrelated task evidence."
+}
