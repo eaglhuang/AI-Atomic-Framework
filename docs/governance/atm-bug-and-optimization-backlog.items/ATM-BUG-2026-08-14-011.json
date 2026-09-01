@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Open",
+  "status": "Fixed — pre-commit now reports foreign generated residue without mutating it; source and frozen runner verified",
   "area": "Pre-commit generated-residue cleanup isolation",
   "finding": "A pre-commit invocation with no staged files auto-removed generated bundle manifests belonging to previously released tasks. The cleanup is observable but is outside the current candidate and can mutate a shared worktree during an otherwise read/validate operation.",
   "expectedBehavior": "Automatic cleanup must be candidate- or explicitly-owned-scope bounded. Cross-task generated residue should be reported as a separately actionable cleanup batch, not silently mutated by an unrelated hook invocation. Any cleanup write must carry an owner, receipt, and exact-path attribution.",
-  "evidenceOrRepro": "2026-08-14 source-first node atm.dev.mjs hook pre-commit --json after commit 7e7573c5149a2f83e84b9424aee2ea4c00216718 passed in 4314 ms with stagedFileCount 0, while reporting ATM_HOOK_AUTO_CLEANED_GENERATED_RESIDUE for 22 released-task bundle-manifest files (including ATM-GOV-0298 through ATM-GOV-0383 and TASK-ERR-0014).",
-  "followUp": "Move residue deletion to an explicit, task-owned cleanup command or bounded post-transaction finalizer. Preserve the fast hook budget by reporting cleanup candidates without writing them, and add a shared-worktree regression proving an empty-candidate hook never changes foreign paths."
+  "evidenceOrRepro": "2026-08-14 source-first node atm.dev.mjs hook pre-commit --json after commit 7e7573c5149a2f83e84b9424aee2ea4c00216718 passed in 4314 ms with stagedFileCount 0, while reporting ATM_HOOK_AUTO_CLEANED_GENERATED_RESIDUE for 22 released-task bundle-manifest files. Commit bfbdf894f changed pre-commit to an admission observer: it classifies but does not delete generated residue. 2026-09-02 regression packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts passed and proves a released foreign bundle-manifest survives a hook run; current frozen packages/cli/dist/commands/hook/pre-commit/implementation.js contains the same no-mutation implementation.",
+  "followUp": "Use an explicit, task-owned cleanup command or bounded post-transaction finalizer when a released bundle-manifest must be removed. Preserve the fast hook budget by reporting candidates without writes; do not reintroduce hook-side deletion."
 }
