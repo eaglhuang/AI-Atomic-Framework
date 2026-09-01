@@ -1,0 +1,269 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0021",
+  "title": "Commit verified historical batch and index recovery receipts",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Only the eight listed receipts and this task's governed records are committed.",
+    "No active-owner, MBX, PRF-0008, or source path is staged, deleted, or ignored.",
+    "The task is formally closed after its historical delivery is committed."
+  ],
+  "deliverables": [
+    ".atm/history/evidence/historical-batches/",
+    ".atm/history/evidence/live-index-reconciliation.39a4bad9d9f39c63d647a7cc48f93aafeeeebf26.json",
+    ".atm/history/evidence/live-index-reconciliation.b4034f82d54fc0d923f0e9e9e18b871d256d46ed.json",
+    ".atm/history/evidence/live-index-reconciliation.f81d9a586819b04ea3c454c4ac330ee63e39e294.json"
+  ],
+  "scopePaths": [
+    ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-23-59-339Z.json",
+    ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-29-34-081Z.json",
+    ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-37-33-954Z.json",
+    ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-15-09-387Z.json",
+    ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-42-40-037Z.json",
+    ".atm/history/evidence/live-index-reconciliation.39a4bad9d9f39c63d647a7cc48f93aafeeeebf26.json",
+    ".atm/history/evidence/live-index-reconciliation.b4034f82d54fc0d923f0e9e9e18b871d256d46ed.json",
+    ".atm/history/evidence/live-index-reconciliation.f81d9a586819b04ea3c454c4ac330ee63e39e294.json"
+  ],
+  "validators": [
+    "git diff --check"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0021-commit-verified-historical-batch-and-index-recovery-receipts.task.md",
+    "sectionTitle": "TASK-TMP-0021",
+    "headingLine": 41,
+    "hash": "f3813731d94a4a6d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0021-commit-verified-historical-batch-and-index-recovery-receipts.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:f3813731d94a4a6ddb7fe83e0e5f8e960109b9b244c37d907375986e690b7041",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-01T20:13:00.439Z"
+    }
+  },
+  "importedAt": "2026-09-01T20:13:00.439Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-01T20-13-04-775Z-claim-c6d825a4be85",
+  "lastTransitionAt": "2026-09-01T20:13:04.775Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-cleanup-captain",
+  "reservedAt": "2026-09-01T20:13:03.989Z",
+  "promotedAt": "2026-09-01T20:13:03.994Z",
+  "claim": {
+    "actorId": "codex-cleanup-captain",
+    "leaseId": "lease-486f7e2da6bb",
+    "claimedAt": "2026-09-01T20:13:04.001Z",
+    "heartbeatAt": "2026-09-01T20:13:04.001Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TMP-0021.json",
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-23-59-339Z.json",
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-29-34-081Z.json",
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-37-33-954Z.json",
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-15-09-387Z.json",
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-42-40-037Z.json",
+      ".atm/history/evidence/live-index-reconciliation.39a4bad9d9f39c63d647a7cc48f93aafeeeebf26.json",
+      ".atm/history/evidence/live-index-reconciliation.b4034f82d54fc0d923f0e9e9e18b871d256d46ed.json",
+      ".atm/history/evidence/live-index-reconciliation.f81d9a586819b04ea3c454c4ac330ee63e39e294.json"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260901201304-codex-cleanup-captain-d5a483a382",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901201304-codex-cleanup-captain-d5a483a382\""
+    }
+  },
+  "startedAt": "2026-09-01T20:13:04.001Z",
+  "startedByActor": "codex-cleanup-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-ff71fc91e4fe677f",
+    "ticketDigest": "sha256:ff71fc91e4fe677ff39167b1f04e3eeffd3265bb1338cc22832c38b2bfdf6f4d",
+    "taskId": "TASK-TMP-0021",
+    "origin": "claim",
+    "actorId": "codex-cleanup-captain",
+    "laneSessionId": "lane-20260901201304-codex-cleanup-captain-d5a483a382",
+    "claimGeneration": "lease-486f7e2da6bb",
+    "issuedAt": "2026-09-01T20:13:04.001Z",
+    "expiresAt": "2026-09-01T20:43:04.001Z",
+    "scopeDigest": "sha256:0b8164990d1365ca085e347c5dad84dd0856f24fa5756ab10864fce43c3e1d2f",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-01T20:13:04.001Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-TMP-0021.*",
+          ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-23-59-339Z.json",
+          ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-29-34-081Z.json",
+          ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-37-33-954Z.json",
+          ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-15-09-387Z.json",
+          ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-42-40-037Z.json",
+          ".atm/history/evidence/live-index-reconciliation.39a4bad9d9f39c63d647a7cc48f93aafeeeebf26.json",
+          ".atm/history/evidence/live-index-reconciliation.b4034f82d54fc0d923f0e9e9e18b871d256d46ed.json",
+          ".atm/history/evidence/live-index-reconciliation.f81d9a586819b04ea3c454c4ac330ee63e39e294.json",
+          ".atm/history/task-events/TASK-TMP-0021/**",
+          ".atm/history/tasks/TASK-TMP-0021.json"
+        ],
+        "digest": "sha256:d450aedb939798db6a5c29cfcee189f6e5facdaae57da5ba7fdebf20887bf642"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260901201304-codex-cleanup-captain-TASK-TMP-0021-0730c605dc",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0021",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-23-59-339Z.json",
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-29-34-081Z.json",
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-09T19-37-33-954Z.json",
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-15-09-387Z.json",
+      ".atm/history/evidence/historical-batches/hist-batch-2026-08-14T09-42-40-037Z.json",
+      ".atm/history/evidence/live-index-reconciliation.39a4bad9d9f39c63d647a7cc48f93aafeeeebf26.json",
+      ".atm/history/evidence/live-index-reconciliation.b4034f82d54fc0d923f0e9e9e18b871d256d46ed.json",
+      ".atm/history/evidence/live-index-reconciliation.f81d9a586819b04ea3c454c4ac330ee63e39e294.json",
+      ".atm/history/evidence/TASK-TMP-0021.*",
+      ".atm/history/task-events/TASK-TMP-0021/**",
+      ".atm/history/tasks/TASK-TMP-0021.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0e3af83cbe7b3ab6721b654e8a377eb86b2f778fe6bbfe3d3a6bda36e0392d73",
+    "actorId": "codex-cleanup-captain",
+    "sessionId": "session-20260901201304-codex-cleanup-captain-TASK-TMP-0021-0730c605dc",
+    "laneSession": {
+      "laneSessionId": "lane-20260901201304-codex-cleanup-captain-d5a483a382",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901201304-codex-cleanup-captain-d5a483a382\""
+    },
+    "createdAt": "2026-09-01T20:13:04.774Z",
+    "status": "active"
+  }
+}

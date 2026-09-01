@@ -1,0 +1,551 @@
+{
+  "schemaId": "atm.historicalBatchEvidence.v1",
+  "batchId": "hist-batch-2026-08-14T09-42-40-037Z",
+  "createdAt": "2026-08-14T09:42:40.037Z",
+  "producedBy": "codex-captain-recovery",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+  "deliveryRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "commits": [
+    "0b1ab54a603261df07bfb1fc25295c4ae2a37490",
+    "33c0695772a47e4f7f32d7a78b5d994366bd516a",
+    "660df5b7b87bc2eb0011052634f9b1f047beb027",
+    "84236fa50a399e3f84d4aced2bea3fdee805f7dc",
+    "8eceb27566402aac90506a636bd47473c2ad417e",
+    "b89e0bd79b0bfe16acc290c740c71e4b3323a178",
+    "dc89a9a98eed253ea58ca9a2ffed8d713a500715",
+    "e6b3360d0cce374d2747387262ca8ecca4073ec9"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
+    "node --strip-types tests/cli/transient-artifact-lifecycle.test.ts",
+    "typecheck",
+    "validate:charter",
+    "validate:skill-templates",
+    "validate:transient-artifact-lifecycle"
+  ],
+  "validatorRuns": [
+    {
+      "command": "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e269da75a86a04db8554edbd45b5fb9eb43fdee584f64bf2f654df198bacf9d2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts"
+      ],
+      "generatedAt": "2026-08-14T09:42:40.290Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "node --strip-types scripts/validate-skill-templates.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6966c5f0078df7dc6a0064cb1f205c1df998aba90891e17773332781d4544c08",
+      "stderrSha256": "sha256:62db8036e803b150fa32f0b193b257144e94ed506bdacec1be880a2236a16e38",
+      "validators": [
+        "validate:skill-templates"
+      ],
+      "generatedAt": "2026-08-14T09:42:43.788Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "node --strip-types scripts/validate-transient-artifact-lifecycle.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c35d5f853b55e45c0eab0a60eddb165805e7b45f6bb94ad86a36c645e18b86a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:transient-artifact-lifecycle"
+      ],
+      "generatedAt": "2026-08-14T09:42:44.387Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "node --strip-types tests/cli/transient-artifact-lifecycle.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9df73e6b830580757e3285ce116bee212fe2ce4718c95993f49423ffbd579150",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/transient-artifact-lifecycle.test.ts"
+      ],
+      "generatedAt": "2026-08-14T09:42:44.832Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-14T09:42:53.527Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "npm run validate:charter",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:35f7c060f358008b76472bbef5fc46642ef08e3f367c78ea123f918c593259f4",
+      "stderrSha256": "sha256:315f260be964d9ce6b13463662f301c3087c22c7cf5d86774ba928d5da18c005",
+      "validators": [
+        "validate:charter"
+      ],
+      "generatedAt": "2026-08-14T09:42:54.265Z",
+      "runnerKind": "unknown"
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "ATM-GOV-0363",
+      "ok": true,
+      "coverageStatus": "complete",
+      "okToRecordEvidence": true,
+      "okToCloseTask": true,
+      "diagnosticOnly": false,
+      "declaredDeliverables": [
+        ".atm/charter/atomic-charter.md",
+        ".atm/charter/charter-invariants.json",
+        "templates/root-drop/.atm/charter/charter-invariants.template.json",
+        "fixtures/charter/default-charter.json",
+        "docs/governance/transient-artifact-lifecycle-charter.md",
+        "packages/core/src/governance/operation-cleanup-contract.ts",
+        "packages/core/src/governance/operation-cleanup-contract.test.ts",
+        "packages/cli/src/commands/cleanup/index.ts",
+        "packages/cli/src/commands/cleanup/run.ts",
+        "templates/skills/atm-residue-cleanup.skill.md",
+        "templates/skills/atm-dispatch.skill.md",
+        "scripts/validate-transient-artifact-lifecycle.ts",
+        "tests/cli/transient-artifact-lifecycle.test.ts"
+      ],
+      "matchedDeliverables": [
+        ".atm/charter/atomic-charter.md",
+        ".atm/charter/charter-invariants.json",
+        "templates/root-drop/.atm/charter/charter-invariants.template.json",
+        "fixtures/charter/default-charter.json",
+        "docs/governance/transient-artifact-lifecycle-charter.md",
+        "packages/core/src/governance/operation-cleanup-contract.ts",
+        "packages/core/src/governance/operation-cleanup-contract.test.ts",
+        "packages/cli/src/commands/cleanup/index.ts",
+        "packages/cli/src/commands/cleanup/run.ts",
+        "templates/skills/atm-residue-cleanup.skill.md",
+        "templates/skills/atm-dispatch.skill.md",
+        "scripts/validate-transient-artifact-lifecycle.ts",
+        "tests/cli/transient-artifact-lifecycle.test.ts"
+      ],
+      "missingCoverage": [],
+      "validatorClaims": [
+        {
+          "gate": "node --strip-types packages/core/src/governance/operation-cleanup-contract.test.ts",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "node --strip-types tests/cli/transient-artifact-lifecycle.test.ts",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "typecheck",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "validate:charter",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "validate:skill-templates",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "validate:transient-artifact-lifecycle",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        }
+      ],
+      "atomHealthClaims": [
+        {
+          "atomOrMapId": "atm.governed-operation-lifecycle",
+          "kind": "owner",
+          "generatedByTask": true,
+          "validatorHealthy": true
+        }
+      ],
+      "matchedCommits": [
+        "0b1ab54a603261df07bfb1fc25295c4ae2a37490",
+        "660df5b7b87bc2eb0011052634f9b1f047beb027",
+        "84236fa50a399e3f84d4aced2bea3fdee805f7dc",
+        "8eceb27566402aac90506a636bd47473c2ad417e",
+        "b89e0bd79b0bfe16acc290c740c71e4b3323a178",
+        "e6b3360d0cce374d2747387262ca8ecca4073ec9"
+      ],
+      "matchedFiles": [
+        ".atm/charter/atomic-charter.md",
+        ".atm/charter/charter-invariants.json",
+        "docs/governance/transient-artifact-lifecycle-charter.md",
+        "fixtures/charter/default-charter.json",
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/cleanup/index.ts",
+        "packages/cli/src/commands/cleanup/run.ts",
+        "packages/cli/src/commands/command-specs.ts",
+        "packages/cli/src/commands/command-specs/cleanup.spec.ts",
+        "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+        "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+        "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+        "packages/cli/src/commands/tasks/historical-delivery.ts",
+        "packages/core/src/governance/operation-cleanup-contract.test.ts",
+        "packages/core/src/governance/operation-cleanup-contract.ts",
+        "packages/core/src/index.ts",
+        "scripts/validate-transient-artifact-lifecycle.ts",
+        "templates/root-drop/.atm/charter/charter-invariants.template.json",
+        "templates/skills/atm-dispatch.skill.md",
+        "templates/skills/atm-residue-cleanup.skill.md",
+        "tests/cli-fixtures/help-snapshots/command-list.json",
+        "tests/cli/transient-artifact-lifecycle.test.ts"
+      ],
+      "outOfScopeFiles": [],
+      "reports": [
+        {
+          "requestedRef": "0b1ab54a603261df07bfb1fc25295c4ae2a37490",
+          "commitSha": "0b1ab54a603261df07bfb1fc25295c4ae2a37490",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-23-56-508Z-scope-amendment-2735e9b0e0dc.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-25-40-680Z-renew-31dd3c42fc95.json",
+            ".atm/history/tasks/ATM-GOV-0363.json",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "release/atm-root-drop/fixtures/charter/default-charter.json",
+            "release/atm-root-drop/templates/root-drop/.atm/charter/charter-invariants.template.json",
+            "release/atm-root-drop/templates/skills/atm-dispatch.skill.md"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "release/atm-root-drop/fixtures/charter/default-charter.json",
+            "release/atm-root-drop/templates/root-drop/.atm/charter/charter-invariants.template.json",
+            "release/atm-root-drop/templates/skills/atm-dispatch.skill.md"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/governance/operation-cleanup-contract.test.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-23-56-508Z-scope-amendment-2735e9b0e0dc.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-25-40-680Z-renew-31dd3c42fc95.json",
+              ".atm/history/tasks/ATM-GOV-0363.json"
+            ],
+            "allowedRunnerOutputFiles": [
+              "release/atm-root-drop/fixtures/charter/default-charter.json",
+              "release/atm-root-drop/templates/root-drop/.atm/charter/charter-invariants.template.json",
+              "release/atm-root-drop/templates/skills/atm-dispatch.skill.md"
+            ],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": []
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "33c0695772a47e4f7f32d7a78b5d994366bd516a",
+          "commitSha": "33c0695772a47e4f7f32d7a78b5d994366bd516a",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/ATM-GOV-0363.runner-sync-receipt.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-22-38-525Z-scope-amendment-2c93c4f32567.json",
+            ".atm/history/tasks/ATM-GOV-0363.json",
+            "release/atm-onefile/atm.mjs",
+            "release/atm-onefile/release-manifest.json",
+            "release/atm-root-drop/release-manifest.json"
+          ],
+          "deliverableFiles": [
+            "release/atm-onefile/atm.mjs",
+            "release/atm-onefile/release-manifest.json",
+            "release/atm-root-drop/release-manifest.json"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [],
+            "governanceFiles": [
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-22-38-525Z-scope-amendment-2c93c4f32567.json",
+              ".atm/history/tasks/ATM-GOV-0363.json"
+            ],
+            "allowedRunnerOutputFiles": [
+              "release/atm-onefile/atm.mjs",
+              "release/atm-onefile/release-manifest.json",
+              "release/atm-root-drop/release-manifest.json"
+            ],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": [
+              ".atm/history/evidence/ATM-GOV-0363.runner-sync-receipt.json"
+            ]
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "660df5b7b87bc2eb0011052634f9b1f047beb027",
+          "commitSha": "660df5b7b87bc2eb0011052634f9b1f047beb027",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/ATM-GOV-0363.bundle-manifest.json",
+            ".atm/history/evidence/ATM-GOV-0363.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-35-13-949Z-scope-amendment-91bbc9f7f746.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-36-21-389Z-renew-9740254ea2f4.json",
+            ".atm/history/tasks/ATM-GOV-0363.json",
+            "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+            "packages/cli/src/commands/tasks/historical-delivery.ts"
+          ],
+          "deliverableFiles": [
+            "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+            "packages/cli/src/commands/tasks/historical-delivery.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+              "packages/cli/src/commands/tasks/historical-delivery.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/ATM-GOV-0363.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-35-13-949Z-scope-amendment-91bbc9f7f746.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-36-21-389Z-renew-9740254ea2f4.json",
+              ".atm/history/tasks/ATM-GOV-0363.json"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": [
+              ".atm/history/evidence/ATM-GOV-0363.bundle-manifest.json"
+            ]
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "84236fa50a399e3f84d4aced2bea3fdee805f7dc",
+          "commitSha": "84236fa50a399e3f84d4aced2bea3fdee805f7dc",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            "templates/skills/atm-residue-cleanup.skill.md"
+          ],
+          "deliverableFiles": [
+            "templates/skills/atm-residue-cleanup.skill.md"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "templates/skills/atm-residue-cleanup.skill.md"
+            ],
+            "governanceFiles": [],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": []
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "8eceb27566402aac90506a636bd47473c2ad417e",
+          "commitSha": "8eceb27566402aac90506a636bd47473c2ad417e",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/ATM-GOV-0363.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T02-48-53-014Z-import-852ef2214bcb.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T02-49-03-879Z-reserve-f4b96e307881.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T02-49-03-882Z-promote-e81097019841.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T02-49-08-116Z-claim-3570d727dc40.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-19-20-654Z-repair-claim-dea636491a2c.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-23-09-081Z-takeover-9b09b44991d3.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-27-01-742Z-repair-claim-c38ba822ef0f.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-27-18-806Z-claim-35eadbfe9d64.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-27-18-810Z-takeover-3101e4643ead.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-51-44-116Z-renew-53346407f42b.json",
+            ".atm/history/tasks/ATM-GOV-0363.json",
+            "packages/cli/src/atm.ts",
+            "packages/cli/src/commands/cleanup/index.ts",
+            "packages/cli/src/commands/cleanup/run.ts",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "packages/core/src/governance/operation-cleanup-contract.ts",
+            "packages/core/src/index.ts",
+            "scripts/validate-transient-artifact-lifecycle.ts"
+          ],
+          "deliverableFiles": [
+            "packages/cli/src/atm.ts",
+            "packages/cli/src/commands/cleanup/index.ts",
+            "packages/cli/src/commands/cleanup/run.ts",
+            "packages/core/src/governance/operation-cleanup-contract.test.ts",
+            "packages/core/src/governance/operation-cleanup-contract.ts",
+            "packages/core/src/index.ts",
+            "scripts/validate-transient-artifact-lifecycle.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/cli/src/atm.ts",
+              "packages/cli/src/commands/cleanup/index.ts",
+              "packages/cli/src/commands/cleanup/run.ts",
+              "packages/core/src/governance/operation-cleanup-contract.test.ts",
+              "packages/core/src/governance/operation-cleanup-contract.ts",
+              "packages/core/src/index.ts",
+              "scripts/validate-transient-artifact-lifecycle.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/ATM-GOV-0363.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T02-48-53-014Z-import-852ef2214bcb.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T02-49-03-879Z-reserve-f4b96e307881.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T02-49-03-882Z-promote-e81097019841.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T02-49-08-116Z-claim-3570d727dc40.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-19-20-654Z-repair-claim-dea636491a2c.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-23-09-081Z-takeover-9b09b44991d3.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-27-01-742Z-repair-claim-c38ba822ef0f.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-27-18-806Z-claim-35eadbfe9d64.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-27-18-810Z-takeover-3101e4643ead.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T03-51-44-116Z-renew-53346407f42b.json",
+              ".atm/history/tasks/ATM-GOV-0363.json"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": []
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "b89e0bd79b0bfe16acc290c740c71e4b3323a178",
+          "commitSha": "b89e0bd79b0bfe16acc290c740c71e4b3323a178",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/charter/atomic-charter.md",
+            ".atm/charter/charter-invariants.json",
+            ".atm/history/evidence/ATM-GOV-0363.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-16-03-867Z-scope-amendment-250c488ae06d.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-16-11-777Z-renew-3d4201108324.json",
+            ".atm/history/tasks/ATM-GOV-0363.json",
+            "docs/governance/transient-artifact-lifecycle-charter.md",
+            "fixtures/charter/default-charter.json",
+            "templates/root-drop/.atm/charter/charter-invariants.template.json",
+            "templates/skills/atm-dispatch.skill.md",
+            "tests/cli/transient-artifact-lifecycle.test.ts"
+          ],
+          "deliverableFiles": [
+            ".atm/charter/atomic-charter.md",
+            ".atm/charter/charter-invariants.json",
+            "docs/governance/transient-artifact-lifecycle-charter.md",
+            "fixtures/charter/default-charter.json",
+            "templates/root-drop/.atm/charter/charter-invariants.template.json",
+            "templates/skills/atm-dispatch.skill.md",
+            "tests/cli/transient-artifact-lifecycle.test.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              ".atm/charter/atomic-charter.md",
+              ".atm/charter/charter-invariants.json",
+              "docs/governance/transient-artifact-lifecycle-charter.md",
+              "fixtures/charter/default-charter.json",
+              "templates/root-drop/.atm/charter/charter-invariants.template.json",
+              "templates/skills/atm-dispatch.skill.md",
+              "tests/cli/transient-artifact-lifecycle.test.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/ATM-GOV-0363.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-16-03-867Z-scope-amendment-250c488ae06d.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T09-16-11-777Z-renew-3d4201108324.json",
+              ".atm/history/tasks/ATM-GOV-0363.json"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": []
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "dc89a9a98eed253ea58ca9a2ffed8d713a500715",
+          "commitSha": "dc89a9a98eed253ea58ca9a2ffed8d713a500715",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/ATM-GOV-0363.runner-sync-receipt.json",
+            "release/atm-onefile/atm.mjs",
+            "release/atm-onefile/release-manifest.json",
+            "release/atm-root-drop/release-manifest.json"
+          ],
+          "deliverableFiles": [
+            "release/atm-onefile/atm.mjs",
+            "release/atm-onefile/release-manifest.json",
+            "release/atm-root-drop/release-manifest.json"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [],
+            "governanceFiles": [],
+            "allowedRunnerOutputFiles": [
+              "release/atm-onefile/atm.mjs",
+              "release/atm-onefile/release-manifest.json",
+              "release/atm-root-drop/release-manifest.json"
+            ],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": [
+              ".atm/history/evidence/ATM-GOV-0363.runner-sync-receipt.json"
+            ]
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "e6b3360d0cce374d2747387262ca8ecca4073ec9",
+          "commitSha": "e6b3360d0cce374d2747387262ca8ecca4073ec9",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/ATM-GOV-0363.bundle-manifest.json",
+            ".atm/history/evidence/ATM-GOV-0363.json",
+            ".atm/history/evidence/ATM-GOV-0363.live-index-reconciliation.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T06-21-55-284Z-renew-ead818546764.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T06-22-02-751Z-scope-amendment-32771d8f785d.json",
+            ".atm/history/task-events/ATM-GOV-0363/2026-08-14T06-24-29-768Z-renew-8b16553a7b36.json",
+            ".atm/history/tasks/ATM-GOV-0363.json",
+            "packages/cli/src/commands/command-specs.ts",
+            "packages/cli/src/commands/command-specs/cleanup.spec.ts",
+            "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+            "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+            "tests/cli-fixtures/help-snapshots/command-list.json"
+          ],
+          "deliverableFiles": [
+            "packages/cli/src/commands/command-specs.ts",
+            "packages/cli/src/commands/command-specs/cleanup.spec.ts",
+            "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+            "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+            "tests/cli-fixtures/help-snapshots/command-list.json"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/cli/src/commands/command-specs.ts",
+              "packages/cli/src/commands/command-specs/cleanup.spec.ts",
+              "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.test.ts",
+              "packages/cli/src/commands/git-governance/implementation/live-index-reconciliation.ts",
+              "tests/cli-fixtures/help-snapshots/command-list.json"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/ATM-GOV-0363.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T06-21-55-284Z-renew-ead818546764.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T06-22-02-751Z-scope-amendment-32771d8f785d.json",
+              ".atm/history/task-events/ATM-GOV-0363/2026-08-14T06-24-29-768Z-renew-8b16553a7b36.json",
+              ".atm/history/tasks/ATM-GOV-0363.json"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": [
+              ".atm/history/evidence/ATM-GOV-0363.bundle-manifest.json",
+              ".atm/history/evidence/ATM-GOV-0363.live-index-reconciliation.json"
+            ]
+          },
+          "waiverApplied": false
+        }
+      ]
+    }
+  ]
+}

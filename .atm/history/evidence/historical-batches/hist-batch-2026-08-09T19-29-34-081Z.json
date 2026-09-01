@@ -1,0 +1,179 @@
+{
+  "schemaId": "atm.historicalBatchEvidence.v1",
+  "batchId": "hist-batch-2026-08-09T19-29-34-081Z",
+  "createdAt": "2026-08-09T19:29:34.081Z",
+  "producedBy": "codex-gpt-5.4-mini",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+  "deliveryRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "commits": [
+    "3dfad6969f5d307e47c82fa6168eb6cabd2f274f"
+  ],
+  "validators": [
+    "generate:error-codes",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "validatorRuns": [
+    {
+      "command": "node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0e8a36e47eb39a270e47a0c56fe6b9a2f3447001968a0485763b23c2caba05da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-08-09T19:31:20.928Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "npm run generate:error-codes",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ba5b11d37dcb595749b7b44a479ce2ee4304ab287f13a0ece04c305d4986b3ed",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "generate:error-codes"
+      ],
+      "generatedAt": "2026-08-09T19:31:21.872Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-08-09T19:31:30.607Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c920dbfa44da0987ea3f84fbbae7ad3919881a994eb0d33973f9e87ec1741e43",
+      "stderrSha256": "sha256:c4d436c9d308b36c839e0697a874f487a329f4bc1bab638ff966879042597e86",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-08-09T19:32:05.403Z",
+      "runnerKind": "unknown"
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "TASK-ERR-0007",
+      "ok": true,
+      "coverageStatus": "complete",
+      "okToRecordEvidence": true,
+      "okToCloseTask": false,
+      "diagnosticOnly": true,
+      "declaredDeliverables": [
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts",
+        "packages/core/src/error-code-registry.generated.ts"
+      ],
+      "matchedDeliverables": [
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts",
+        "packages/core/src/error-code-registry.generated.ts"
+      ],
+      "missingCoverage": [],
+      "validatorClaims": [
+        {
+          "gate": "generate:error-codes",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "node --strip-types packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+          "kind": "taskSpecific",
+          "satisfied": false,
+          "requiredForClose": true
+        },
+        {
+          "gate": "typecheck",
+          "kind": "batchWide",
+          "satisfied": true,
+          "requiredForClose": false
+        },
+        {
+          "gate": "validate:cli",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "validate:git-head-evidence",
+          "kind": "batchWide",
+          "satisfied": true,
+          "requiredForClose": false
+        }
+      ],
+      "atomHealthClaims": [
+        {
+          "atomOrMapId": "atm.error-code-registry",
+          "kind": "owner",
+          "generatedByTask": true,
+          "validatorHealthy": false
+        }
+      ],
+      "matchedCommits": [
+        "3dfad6969f5d307e47c82fa6168eb6cabd2f274f"
+      ],
+      "matchedFiles": [
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+        "packages/cli/src/commands/next/planning-root-preference.ts",
+        "packages/core/src/error-code-registry.generated.ts"
+      ],
+      "outOfScopeFiles": [],
+      "reports": [
+        {
+          "requestedRef": "3dfad6969f5d307e47c82fa6168eb6cabd2f274f",
+          "commitSha": "3dfad6969f5d307e47c82fa6168eb6cabd2f274f",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "deliverableFiles": [
+            "docs/ERROR_CODES.md",
+            "docs/governance/error-code-registry.json",
+            "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+            "packages/cli/src/commands/next/planning-root-preference.ts",
+            "packages/core/src/error-code-registry.generated.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "docs/ERROR_CODES.md",
+              "docs/governance/error-code-registry.json",
+              "packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts",
+              "packages/cli/src/commands/next/planning-root-preference.ts",
+              "packages/core/src/error-code-registry.generated.ts"
+            ],
+            "governanceFiles": [],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": []
+          },
+          "waiverApplied": false
+        }
+      ]
+    }
+  ]
+}
