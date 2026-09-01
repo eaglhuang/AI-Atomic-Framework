@@ -1,0 +1,133 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TMP-0020",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "780c54b3deb10831dfa941ee669a1adf7bba2425",
+  "governedTreeSha": "ae86a27196efa7fe5432e206063b2a0edf6bf0f0",
+  "targetCommitDelta": {
+    "currentCommitSha": "780c54b3deb10831dfa941ee669a1adf7bba2425",
+    "parentCommitShas": [
+      "780c54b3deb10831dfa941ee669a1adf7bba2425"
+    ],
+    "governedTreeSha": "ae86a27196efa7fe5432e206063b2a0edf6bf0f0",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TMP-0020.json",
+      ".atm/history/task-events/TASK-TMP-0020/2026-09-01T20-08-55-942Z-import-e5c8d357712d.json",
+      ".atm/history/task-events/TASK-TMP-0020/2026-09-01T20-09-04-172Z-reserve-d4df74d48f8a.json",
+      ".atm/history/task-events/TASK-TMP-0020/2026-09-01T20-09-04-176Z-promote-8b9f69403881.json",
+      ".atm/history/task-events/TASK-TMP-0020/2026-09-01T20-09-04-928Z-claim-4456019595e3.json",
+      ".atm/history/tasks/TASK-PRF-0008.json",
+      ".atm/history/tasks/TASK-TMP-0020.json",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-01T20:11:26.759Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-close-handoff.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-close-handoff.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-close-hotfix.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-close-hotfix.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-hotfix.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-hotfix.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-lane-*.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0316.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0337.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0339.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0340.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0341.publication-preflight.json",
+      ".atm/history/evidence/ATM-GOV-0349.seal-and-commit.json",
+      ".atm/history/evidence/ATM-GOV-0353.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0358.seal-and-commit.json",
+      ".atm/history/evidence/ATM-GOV-0370.publication-input-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0388.seal-and-commit.json",
+      ".atm/history/evidence/TASK-LANE-0023.runner-publication-takeover.json",
+      ".atm/history/evidence/TASK-LANE-0023.seal-and-commit.json",
+      ".atm/history/evidence/TASK-TMP-0020.*",
+      ".atm/history/task-events/TASK-TMP-0020/**",
+      ".atm/history/tasks/TASK-TMP-0020.json"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "git diff --check"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TMP-0020.json",
+  "closedAt": "2026-09-01T20:11:26.760Z",
+  "closedByActor": "codex-cleanup-captain",
+  "sessionId": "session-20260901200904-codex-cleanup-captain-TASK-TMP-0020-03096137c6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "780c54b3deb10831dfa941ee669a1adf7bba2425",
+    "taskMatchedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-close-handoff.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-close-handoff.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-close-hotfix.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-close-hotfix.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-hotfix.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-hotfix.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-lane-lane-20260809192155-codex-gpt-5-4-mini-ade50bd5ad.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-lane-lane-20260809225333-codex-gpt-5-4-mini-07d686dcfd.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-lane-lane-20260810000724-codex-gpt-5-4-mini-dde73647fb.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0316.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0337.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0339.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0340.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0341.publication-preflight.json",
+      ".atm/history/evidence/ATM-GOV-0349.seal-and-commit.json",
+      ".atm/history/evidence/ATM-GOV-0353.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0358.seal-and-commit.json",
+      ".atm/history/evidence/ATM-GOV-0370.publication-input-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0388.seal-and-commit.json",
+      ".atm/history/evidence/TASK-LANE-0023.runner-publication-takeover.json",
+      ".atm/history/evidence/TASK-LANE-0023.seal-and-commit.json"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
