@@ -292,9 +292,13 @@ export function autoStageFrameworkClaimFiles(cwd, actorId, apply = true, claimed
     const stagedFiles = new Set(readStagedFiles(cwd));
     const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(cwd);
     const ownerScope = { cwd, currentTaskId: frameworkTempTaskId(actorId) };
-    const candidates = uniqueSorted(listTaskScopedWorktreeDirtyFiles(cwd).filter((filePath) => !stagedFiles.has(filePath) &&
-        !isIgnorableFrameworkCommitStagingSideEffect(filePath) &&
-        isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope)));
+    const candidates = uniqueSorted(listTaskScopedWorktreeDirtyFiles(cwd).filter((filePath) => {
+        const normalized = normalizeRelativePath(filePath);
+        const exactClaim = [...claimedFiles].some((scope) => normalizeRelativePath(scope) === normalized);
+        return !stagedFiles.has(filePath)
+            && (exactClaim || !isIgnorableFrameworkCommitStagingSideEffect(filePath))
+            && isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope);
+    }));
     if (apply && candidates.length > 0) {
         stageFrameworkClaimPathspecBatches(cwd, candidates);
     }
