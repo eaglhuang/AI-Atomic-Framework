@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
   "area": "Taskflow close runner gate / generated-output ownership",
   "finding": "A taskflow close that requires runner publication can absorb generated release artifacts and a framework-temp runner receipt from a different producing lane into the consumer task's close bundle. The guarded commit then fails and rolls the close back, although the consumer's delivery was already committed and the foreign artifacts are outside its scope.",
   "expectedBehavior": "Runner-gate outputs must carry the producing task or framework-lane authority snapshot. A close transaction may include only outputs produced for its own authority; foreign generated outputs must be excluded, preserved in place, and reported through one durable diagnostic without requiring the consumer to stage, defer, or mutate their bytes.",
   "evidenceOrRepro": "2026-08-14, ATM-GOV-0362: after governed delivery commit fc4c29d4a1483af5bb1c23677749e1a730b99247, taskflow close --historical-delivery ... --defer-foreign-staged --write returned ATM_TASKFLOW_CLOSE_WRITE_ROLLED_BACK. The dry-run bundle listed .atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json plus release and packages/cli/dist artifacts outside ATM-GOV-0362 scope; the write transaction rolled back the ledger rather than committing them.",
-  "followUp": "Open one scoped repair card at the runner-publication/close-bundle ownership seam. Cover own output inclusion, foreign active/released output exclusion with byte preservation, stale producer authority, and rollback after a runner-gate failure. Keep the producer snapshot canonical for both bundle construction and close diagnostics."
+  "followUp": "On 2026-09-01, runner-publication bundle-authority, lifecycle continuation, and taskflow close auto-handoff contracts passed. Retain these ownership boundaries: own output inclusion, foreign active/released output exclusion, stale-producer refusal, and rollback-safe handoff."
 }
