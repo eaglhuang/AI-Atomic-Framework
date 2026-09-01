@@ -94,6 +94,7 @@ export function readCommandRunsInputFile(filePath: string): CommandRunEvidenceIn
 
 export function normalizeEvidenceCommandRuns(input: {
   readonly cwd: string;
+  readonly taskId?: string;
   readonly inlineRun: CommandRunEvidenceInput | null;
   readonly fileRuns: readonly CommandRunEvidenceInput[];
   readonly runnerKind: string | null;
@@ -129,7 +130,7 @@ export function normalizeEvidenceCommandRuns(input: {
     };
     return {
       ...normalized,
-      canonicalObservation: buildCommandRunObservation(normalized)
+      canonicalObservation: buildCommandRunObservation(normalized, input.taskId)
     };
   }));
 }
@@ -238,7 +239,7 @@ export function computeCommandRunCacheKey(run: {
   });
 }
 
-export function buildCommandRunObservation(run: CommandRunEvidenceInput) {
+export function buildCommandRunObservation(run: CommandRunEvidenceInput, taskId?: string) {
   return buildTelemetryObservation({
     observationId: run.cacheKey ?? computeCommandRunCacheKey({
       command: run.command,
@@ -261,6 +262,9 @@ export function buildCommandRunObservation(run: CommandRunEvidenceInput) {
       startedAt: run.startedAt,
       finishedAt: run.finishedAt,
       durationMs: run.durationMs
+    },
+    correlation: {
+      taskId: taskId?.trim() || null
     },
     inputDigest: hashJson({
       command: run.command,
