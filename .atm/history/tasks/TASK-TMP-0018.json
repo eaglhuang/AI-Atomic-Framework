@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0018",
   "title": "Commit semantically verified released history receipts",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -200,7 +200,7 @@
     "actorId": "codex-cleanup-captain",
     "leaseId": "lease-1d618fe2876d",
     "claimedAt": "2026-09-01T19:16:23.578Z",
-    "heartbeatAt": "2026-09-01T19:43:29.684Z",
+    "heartbeatAt": "2026-09-01T19:53:56.964Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TMP-0018.json",
@@ -236,13 +236,14 @@
       ".atm/history/evidence/TASK-TMP-0018.*",
       ".atm/history/task-events/TASK-TMP-0018/**"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260901185931-codex-cleanup-captain-88a89937b6",
       "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901185931-codex-cleanup-captain-88a89937b6\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-cleanup-captain",
   "startedAt": "2026-09-01T18:59:30.888Z",
@@ -304,8 +305,8 @@
     "createdAt": "2026-09-01T19:16:24.342Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-09-01T19-43-29-893Z-renew-877f06a3be03",
-  "lastTransitionAt": "2026-09-01T19:43:29.893Z",
+  "lastTransitionId": "2026-09-01T19-53-56-966Z-close-d981390a5605",
+  "lastTransitionAt": "2026-09-01T19:53:56.966Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
@@ -395,5 +396,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
-  }
+  },
+  "closedAt": "2026-09-01T19:53:56.964Z",
+  "closedByActor": "codex-cleanup-captain",
+  "closedBySessionId": "session-20260901191623-codex-cleanup-captain-TASK-TMP-0018-ce6bb421ad",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0018.closure-packet.json"
 }
