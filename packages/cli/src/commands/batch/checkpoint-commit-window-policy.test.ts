@@ -24,5 +24,6 @@ const checkpointSlice = implementation.slice(implementation.indexOf("if (action 
 assert.doesNotMatch(checkpointSlice, /await runNext\(/, 'checkpoint wiring must not claim the next task before commit');
 assert.match(implementation, /ATM_BATCH_PENDING_COMMIT_REQUIRED/, 'resume wiring must fail closed while the checkpoint window remains dirty');
 assert.match(implementation, /pendingCommitTaskId: null/, 'successful resume must clear the durable pending-commit marker');
+assert.match(checkpointSlice, /if \(!continuation\.pendingCommitTaskId\) \{ try \{ cleanupResult = await runTasks/, 'checkpoint must retain the task close-commit window while a governed checkpoint commit is pending');
 
 console.log('[checkpoint-commit-window-policy.test] ok');
