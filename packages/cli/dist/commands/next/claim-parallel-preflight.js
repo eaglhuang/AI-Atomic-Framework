@@ -156,7 +156,7 @@ export async function runClaimParallelPreflight(input) {
                         const decisionReason = insufficientMutationIntent
                             ? 'broker-conflict-blocked because active task overlap lacks a confirmed Broker mutation intent or resolution artifact.'
                             : 'broker-conflict-blocked because the Broker confirmed an active task ownership conflict.';
-                        const requiredCommand = `node atm.mjs team broker resolve --task ${input.claimableTask.workItemId} --conflict ${candidate.taskId} --path ${sharedConflictSurfaces[0] ?? '<shared-path>'} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
+                        const requiredCommand = `node atm.mjs team broker resolve --task ${input.claimableTask.workItemId} --conflict ${candidate.taskId} --path ${sharedConflictSurfaces[0] ?? '<shared-path>'} --release-order ${input.claimableTask.workItemId},${candidate.taskId} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
                         const conflictUx = buildBrokerConflictUxProjection({
                             primaryTaskId: input.claimableTask.workItemId,
                             conflictingTaskIds: [candidate.taskId],
