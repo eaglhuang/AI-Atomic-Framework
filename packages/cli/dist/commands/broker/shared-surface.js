@@ -2,9 +2,9 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../shared.js';
-import { projectTeamBrokerRearbitrationSnapshot } from '../../_vendor/core/dist/broker/team-lane.js';
-import { enqueueSharedSurface } from '../../_vendor/core/dist/broker/shared-surface-queue.js';
-import { createFreezeSignal } from '../../_vendor/core/dist/broker/freeze.js';
+import { projectTeamBrokerRearbitrationSnapshot } from '../../../../core/dist/broker/team-lane.js';
+import { enqueueSharedSurface } from '../../../../core/dist/broker/shared-surface-queue.js';
+import { createFreezeSignal } from '../../../../core/dist/broker/freeze.js';
 import { readSharedSurfaceQueues, writeSharedSurfaceQueues } from './persistence.js';
 export function updateSharedSurfaceQueues(input) {
     const queues = readSharedSurfaceQueues(input.queuePath);

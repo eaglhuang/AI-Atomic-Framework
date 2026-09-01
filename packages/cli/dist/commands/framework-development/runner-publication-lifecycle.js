@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { buildRunnerPublicationReceipt } from './runner-publication-receipt.js';
-import { captureRunnerBuildOutputSnapshot, deriveRunnerBuildOutputInventory, evaluateRunnerPublicationDisposition, planRunnerPublicationTakeover, validateRunnerBuildOutputInventory } from '../../_vendor/core/dist/broker/runner-build-output-inventory.js';
+import { captureRunnerBuildOutputSnapshot, deriveRunnerBuildOutputInventory, evaluateRunnerPublicationDisposition, planRunnerPublicationTakeover, validateRunnerBuildOutputInventory } from '../../../../core/dist/broker/runner-build-output-inventory.js';
 export function authorizeRunnerPublicationTakeover(input) {
     // Authority is checked above; the takeover plan must describe the physical dirty surface seen by the publisher.
     const snapshot = captureRunnerBuildOutputSnapshot({ cwd: input.cwd, buildTarget: input.buildTarget, currentTaskId: null, currentTaskAllowedFiles: [] });

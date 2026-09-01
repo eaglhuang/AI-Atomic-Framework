@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readActiveGuidanceSession, toGuidanceNextAction } from '../_vendor/core/dist/guidance/index.js';
+import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/dist/guidance/index.js';
 import { buildFirstUseUserNotice } from './first-use-notice.js';
 import { runDoctor } from './doctor.js';
 import { decideRuntimeNextAction } from './next/channel-strategy.js';
@@ -8,7 +8,7 @@ import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.j
 import { inspectIntegrationBootstrap } from './integration.js';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
 import { createFrameworkModeStatus } from './framework-development.js';
-import { describeRestrictedExecutionPolicy } from '../_vendor/core/dist/team-agents/restricted-execution-gateway.js';
+import { describeRestrictedExecutionPolicy } from '../../../core/dist/team-agents/restricted-execution-gateway.js';
 import { makeResult, message, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.js';
 import { uniqueInOrder } from './next/view-projections.js';
 import { hasPromptScopedWorkItems, inspectImportedTaskQueue, resolveTaskIntent } from './next/route-resolution.js';

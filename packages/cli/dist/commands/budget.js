@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { createLocalGovernanceAdapter } from '../_vendor/plugin-governance-local/dist/index.js';
+import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/dist/index.js';
 import { CliError, makeResult, message, resolveValue } from './shared.js';
 export async function runBudget(argv) {
     const options = parseBudgetArgs(argv);

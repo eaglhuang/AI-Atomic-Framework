@@ -1,4 +1,4 @@
-import { enableGuideCache, disableGuideCache, clearCache, getCacheStatus } from '../_vendor/core/dist/cache/guide-cache.js';
+import { enableGuideCache, disableGuideCache, clearCache, getCacheStatus } from '../../../core/dist/cache/guide-cache.js';
 import { CliError, makeResult, message } from './shared.js';
 import { existsSync, readdirSync, rmSync, statSync } from 'node:fs';
 import os from 'node:os';

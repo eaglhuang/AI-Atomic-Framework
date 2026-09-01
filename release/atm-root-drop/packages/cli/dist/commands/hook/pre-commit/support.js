@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows } from '../../framework-development.js';
+import { isFreshFrameworkTempLock, isLockBackedRunnerPublicationEvidence, runnerPublicationEvidencePath } from '../../framework-development/runner-publication-evidence-context.js';
 import { findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from '../../actor-registry.js';
 import { resolveActorWorkSession } from '../../actor-session.js';
 import { hasLiveFrameworkTempClaimAttribution } from './framework-temp-claim-attribution.js';
@@ -179,7 +180,7 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
     const evidenceRecords = new Map();
     const lockBackedRunnerReceipts = new Set();
     const linkedRunnerReceiptTaskId = (file, evidence, taskId) => {
-        if (evidence?.schemaId !== 'atm.runnerSyncReceipt.v1' || !taskId)
+        if (!taskId || !isLockBackedRunnerPublicationEvidence(file, evidence, taskId))
             return taskId;
         const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
         for (const entry of existsSync(lockRoot) ? readdirSync(lockRoot) : []) {
@@ -187,7 +188,11 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
                 continue;
             const lock = readJsonFile(path.join(lockRoot, entry));
             const declaredFiles = Array.isArray(lock?.files) ? lock.files.map(normalizeRelativePath) : [];
-            if (lock?.workItemId === taskId && normalizeRelativePath(file) === `.atm/history/evidence/${taskId}.runner-sync-receipt.json` && lock?.actorId === evidence?.actorId) {
+            const isRunnerReceipt = evidence.schemaId === 'atm.runnerSyncReceipt.v1';
+            const expectedPath = runnerPublicationEvidencePath(taskId, evidence.schemaId);
+            const lockFresh = isFreshFrameworkTempLock(lock);
+            const actorMatches = isRunnerReceipt ? lock?.actorId === evidence?.actorId : isPathAllowedByScope(expectedPath, declaredFiles);
+            if (expectedPath && lockFresh && lock?.workItemId === taskId && normalizeRelativePath(file) === expectedPath && actorMatches) {
                 const context = contexts.get(taskId) ?? { ledger: false, event: false };
                 context.event = true;
                 contexts.set(taskId, context);

@@ -1,5 +1,5 @@
-import { TEAM_PROVIDER_IDS } from '../../_vendor/core/dist/team-runtime/provider-contract.js';
-import { resolveTeamProviderSelection } from '../../_vendor/core/dist/team-runtime/provider-selection.js';
+import { TEAM_PROVIDER_IDS } from '../../../../core/dist/team-runtime/provider-contract.js';
+import { resolveTeamProviderSelection } from '../../../../core/dist/team-runtime/provider-selection.js';
 export function buildTeamRoleSkillPackContract(recipe) {
     const rolePackDefaults = {
         coordinator: {

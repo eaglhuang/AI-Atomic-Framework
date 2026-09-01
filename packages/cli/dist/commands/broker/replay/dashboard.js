@@ -1,5 +1,5 @@
 import { makeResult, message } from '../../shared.js';
-import { renderReplayDashboardHuman } from '../../../_vendor/core/dist/broker/replay/dashboard.js';
+import { renderReplayDashboardHuman } from '../../../../../core/dist/broker/replay/dashboard.js';
 import { buildReplayDashboardViewModel } from './dashboard-view-model.js';
 export function brokerReplayDashboard(options, requiredIntersection) {
     const { snapshot } = buildReplayDashboardViewModel({

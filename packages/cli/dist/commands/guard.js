@@ -1,7 +1,7 @@
 import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { validateAtomRefReadability } from '../_vendor/core/dist/registry/atom-ref-readability.js';
+import { validateAtomRefReadability } from '../../../core/dist/registry/atom-ref-readability.js';
 import { resolveActorId } from './actor-registry.js';
 import { runFrameworkDevelopmentGuard } from './framework-development.js';
 import { evaluateGitGovernanceCheck } from './git-governance.js';

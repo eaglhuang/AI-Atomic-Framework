@@ -1,4 +1,4 @@
-import { issueWorkAdmissionTicket } from '../../_vendor/core/dist/broker/work-admission-ticket.js';
+import { issueWorkAdmissionTicket } from '../../../../core/dist/broker/work-admission-ticket.js';
 /**
  * Import gets a deliberately tiny ticket: one imported ledger and its matching
  * transition. A later task claim replaces it with the normal write ticket.

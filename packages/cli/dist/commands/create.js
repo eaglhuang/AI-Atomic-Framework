@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { generateAtom } from '../_vendor/core/dist/manager/atom-generator.js';
+import { generateAtom } from '../../../core/dist/manager/atom-generator.js';
 import { CliError, makeResult, message } from './shared.js';
 export function runCreate(argv) {
     const { options } = parseCreateOptions(argv);

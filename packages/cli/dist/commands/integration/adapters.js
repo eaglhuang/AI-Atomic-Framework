@@ -1,10 +1,10 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { createClaudeCodeIntegrationAdapter } from '../../_vendor/integration-claude-code/dist/index.js';
-import { createCopilotIntegrationAdapter } from '../../_vendor/integration-copilot/dist/index.js';
-import { createCodexIntegrationAdapter } from '../../_vendor/integration-codex/dist/index.js';
-import { createCursorIntegrationAdapter } from '../../_vendor/integration-cursor/dist/index.js';
-import { createAntigravityIntegrationAdapter, createGeminiIntegrationAdapter } from '../../_vendor/integration-gemini/dist/index.js';
+import { createClaudeCodeIntegrationAdapter } from '../../../../integration-claude-code/dist/index.js';
+import { createCopilotIntegrationAdapter } from '../../../../integration-copilot/dist/index.js';
+import { createCodexIntegrationAdapter } from '../../../../integration-codex/dist/index.js';
+import { createCursorIntegrationAdapter } from '../../../../integration-cursor/dist/index.js';
+import { createAntigravityIntegrationAdapter, createGeminiIntegrationAdapter } from '../../../../integration-gemini/dist/index.js';
 import { CliError } from '../shared.js';
 export const integrationAdapterFactories = Object.freeze({
     'claude-code': createClaudeCodeIntegrationAdapter,

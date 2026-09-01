@@ -1,5 +1,5 @@
-import { createRunnerVersionRegistry, selectRunnerVersionWithReceipt } from '../../_vendor/core/dist/broker/runner-version-registry.js';
-import { RUNNER_SYNC_ERROR_CODES } from '../../_vendor/core/dist/broker/runner-version-contract.js';
+import { createRunnerVersionRegistry, selectRunnerVersionWithReceipt } from '../../../../core/dist/broker/runner-version-registry.js';
+import { RUNNER_SYNC_ERROR_CODES } from '../../../../core/dist/broker/runner-version-contract.js';
 export function buildRunnerSelectionEvidence(input) {
     const registry = createRunnerVersionRegistry(input.registrySnapshot?.versions ?? input.publishedVersions);
     const receipt = selectRunnerVersionWithReceipt(registry, input.requirement, input.issuedAt, {

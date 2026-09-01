@@ -6,7 +6,7 @@
  * Experimental API gating for the upgrade command.
  */
 import path from 'node:path';
-import { ExperimentalApiError, invokeExperimentalApi, listExperimentalApis } from '../../_vendor/agent-pack-sdk/dist/experimental/index.js';
+import { ExperimentalApiError, invokeExperimentalApi, listExperimentalApis } from '../../../../agent-pack-sdk/dist/experimental/index.js';
 import { CliError, makeResult, message } from '../shared.js';
 import { requireOptionValue } from './path-helpers.js';
 export function firstExperimentalUpgradeAction(argv) {

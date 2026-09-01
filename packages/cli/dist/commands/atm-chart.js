@@ -20,7 +20,7 @@ export async function runATMChart(argv) {
         if (!mapId) {
             throw new CliError('ATM_CLI_USAGE', 'atm-chart --mermaid requires --map <mapId>', { exitCode: 2 });
         }
-        const { generateMermaidFromMapSpec } = await import('../_vendor/core/dist/maps/mermaid-gen.js');
+        const { generateMermaidFromMapSpec } = await import('../../../core/dist/maps/mermaid-gen.js');
         const result = generateMermaidFromMapSpec(cwd, mapId);
         return makeResult({
             ok: true,

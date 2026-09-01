@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { createLocalGovernanceAdapter } from '../../_vendor/plugin-governance-local/dist/index.js';
-import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../../_vendor/core/dist/broker/lifecycle.js';
+import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
+import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../../../../core/dist/broker/lifecycle.js';
 import { resolveActorId } from '../actor-registry.js';
 import { updateActorWorkSessionState } from '../actor-session.js';
 import { buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, assessCloseoutProvenanceGap } from './closeout-provenance.js';

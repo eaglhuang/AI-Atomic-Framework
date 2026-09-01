@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { pathMatchesWriteScope } from '../../_vendor/core/dist/broker/write-scope-policy.js';
+import { pathMatchesWriteScope } from '../../../../core/dist/broker/write-scope-policy.js';
 export function readFrameworkTempLockProjection(cwd, now = Date.now()) {
     return inspectFrameworkTempLockProjection(cwd, now).locks;
 }

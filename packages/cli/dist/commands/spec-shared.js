@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { makeResult, message, readJsonFile, relativePathFrom } from './shared.js';
-import { defaultAtomicSpecSchemaPath, parseAtomicSpecFile } from '../_vendor/core/dist/spec/parse-spec.js';
+import { defaultAtomicSpecSchemaPath, parseAtomicSpecFile } from '../../../core/dist/spec/parse-spec.js';
 const atomicSpecSchemaPath = defaultAtomicSpecSchemaPath;
 const frameworkRoot = path.resolve(path.dirname(atomicSpecSchemaPath), '..');
 const requireFromSpecShared = createRequire(import.meta.url);

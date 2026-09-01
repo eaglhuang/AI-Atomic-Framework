@@ -2,9 +2,9 @@ import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isDaemonEnabled, enableDaemon, disableDaemon, readDaemonPid, clearDaemonPid, isProcessRunning, readDaemonNotifications } from '../_vendor/core/dist/daemon/daemon-config.js';
-import { buildDefaultWatchPaths } from '../_vendor/core/dist/daemon/daemon-watcher.js';
-import { runRescuePolice } from '../_vendor/core/dist/police/rescue-family.js';
+import { isDaemonEnabled, enableDaemon, disableDaemon, readDaemonPid, clearDaemonPid, isProcessRunning, readDaemonNotifications } from '../../../core/dist/daemon/daemon-config.js';
+import { buildDefaultWatchPaths } from '../../../core/dist/daemon/daemon-watcher.js';
+import { runRescuePolice } from '../../../core/dist/police/rescue-family.js';
 import { CliError, makeResult, message } from './shared.js';
 const KNOWN_DAEMON_ACTIONS = ['enable', 'disable', 'start', 'stop', 'status', 'log', '_watcher'];
 function parseDaemonArgs(argv) {
@@ -30,7 +30,7 @@ export async function runDaemon(argv) {
     const options = parseDaemonArgs(argv);
     // Internal: _watcher is spawned as a child process
     if (options.action === '_watcher') {
-        const { startDaemonWatcher, buildDefaultWatchPaths: bwp } = await import('../_vendor/core/dist/daemon/daemon-watcher.js');
+        const { startDaemonWatcher, buildDefaultWatchPaths: bwp } = await import('../../../core/dist/daemon/daemon-watcher.js');
         const watchPaths = bwp(options.cwd);
         startDaemonWatcher({ repositoryRoot: options.cwd, watchPaths });
         return makeResult({

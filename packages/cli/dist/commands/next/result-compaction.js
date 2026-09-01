@@ -1,4 +1,4 @@
-import { buildFirstLayerCommandContract } from '../../_vendor/core/dist/guidance/index.js';
+import { buildFirstLayerCommandContract } from '../../../../core/dist/guidance/index.js';
 const NEXT_LARGE_ARRAY_TRUNCATION_LIMIT = 20;
 const NEXT_TRUNCATABLE_FRAMEWORK_STATUS_FIELDS = ['changedFiles', 'criticalChangedFiles', 'docsOnlyChangedFiles'];
 const NEXT_DUPLICATED_TOP_LEVEL_KEYS = [

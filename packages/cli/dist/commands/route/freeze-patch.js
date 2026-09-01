@@ -1,8 +1,8 @@
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { acknowledgeFreeze, createFreezeSignal, resolveFreezeDecision, resolveFreezeSnapshotDefaults } from '../../_vendor/core/dist/broker/freeze.js';
-import { comparePatchEnvelopes, createHandoffPatchEnvelope, summarizePatchEnvelope, validatePatchEnvelope } from '../../_vendor/core/dist/broker/patch-envelope.js';
-import { createRouteFreezeRuntimeRecord } from '../../_vendor/core/dist/broker/types.js';
+import { acknowledgeFreeze, createFreezeSignal, resolveFreezeDecision, resolveFreezeSnapshotDefaults } from '../../../../core/dist/broker/freeze.js';
+import { comparePatchEnvelopes, createHandoffPatchEnvelope, summarizePatchEnvelope, validatePatchEnvelope } from '../../../../core/dist/broker/patch-envelope.js';
+import { createRouteFreezeRuntimeRecord } from '../../../../core/dist/broker/types.js';
 import { CliError } from '../shared.js';
 import { relativePath, routeContextDir, routeFreezeRuntimePath, sanitizeRouteFileName, unique, writeJson } from './files.js';
 export function buildRouteFreezeRuntime(route, options) {

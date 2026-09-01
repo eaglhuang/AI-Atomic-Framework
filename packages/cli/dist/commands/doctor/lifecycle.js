@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { computeSha256ForFile } from '../../_vendor/core/dist/hash-lock/hash-lock.js';
+import { computeSha256ForFile } from '../../../../core/dist/hash-lock/hash-lock.js';
 import { message, relativePathFrom } from '../shared.js';
 import { readJsonIfExists } from './utilities.js';
 export function checkOnboardingLifecycle(root, runtime) {

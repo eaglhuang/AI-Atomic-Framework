@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { createContinuationRunReport, createContinuationSummaryRecord, createLocalGovernanceAdapter, estimateContextBudgetTokens } from '../../../_vendor/plugin-governance-local/dist/index.js';
-import { renderQualityReportMarkdown } from '../../../_vendor/core/dist/police/regression-compare.js';
+import { createContinuationRunReport, createContinuationSummaryRecord, createLocalGovernanceAdapter, estimateContextBudgetTokens } from '../../../../../plugin-governance-local/dist/index.js';
+import { renderQualityReportMarkdown } from '../../../../../core/dist/police/regression-compare.js';
 import { CliError, readJsonFile, resolveValue } from '../../shared.js';
 import { inferInputKind } from './inputs.js';
 import { sanitizeUpgradeBudgetId } from './guided-legacy.js';

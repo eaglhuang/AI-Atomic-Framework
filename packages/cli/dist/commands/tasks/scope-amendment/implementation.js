@@ -1,5 +1,5 @@
-import { rearbitrateLinkedSurfaceScope } from '../../../_vendor/core/dist/scope/linked-surface/index.js';
-import { pathMatchesWriteScope } from '../../../_vendor/core/dist/broker/write-scope-policy.js';
+import { rearbitrateLinkedSurfaceScope } from '../../../../../core/dist/scope/linked-surface/index.js';
+import { pathMatchesWriteScope } from '../../../../../core/dist/broker/write-scope-policy.js';
 import { CliError } from '../../shared.js';
 export function buildScopeAmendmentRearbitration(input) {
     const current = new Set(input.currentScope.map((surface) => surface.replace(/\\/g, '/')));

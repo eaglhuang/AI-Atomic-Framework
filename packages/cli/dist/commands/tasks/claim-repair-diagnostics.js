@@ -1,15 +1,15 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-import { planWipTransition, retainReleasedWipOwnership } from '../../_vendor/core/dist/lane/wip-ownership-transition.js';
-import { createLocalGovernanceAdapter } from '../../_vendor/plugin-governance-local/dist/index.js';
+import { planWipTransition, retainReleasedWipOwnership } from '../../../../core/dist/lane/wip-ownership-transition.js';
+import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
 import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-session.js';
 import { CliError, resolveValue } from '../shared.js';
 import { diagnoseTaskDirectionLockAllowedFiles } from '../task-direction.js';
 import { isClaimExpired, parseClaimRecord } from './task-ledger-readers.js';
 import { compareClaimLifecycleOwners } from '../next/claim-admission.js';
 import { pathMatchesTaskScope, uniqueSorted } from '../git-governance/commit-scope-policy.js';
-import { classifyTerminalLifecycleOwnership } from '../../_vendor/core/dist/broker/historical-work-admission-attestation.js';
+import { classifyTerminalLifecycleOwnership } from '../../../../core/dist/broker/historical-work-admission-attestation.js';
 import { inspectReferencedLaneSession } from '../lane-session/resolve.js';
 const CLOSEOUT_OWNER_RULE = 'Only the active lifecycle owner may mutate deliverables or run taskflow close --write. During lane migration, compare lane ids when both lifecycle records have them; otherwise fall back to claim.actorId with a valid lease and work session.';
 function normalizeTaskStatus(value) {

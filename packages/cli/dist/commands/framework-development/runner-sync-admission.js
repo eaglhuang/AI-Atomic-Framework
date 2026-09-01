@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { isRunnerBuildOutputPath } from '../../_vendor/core/dist/broker/runner-build-output-inventory.js';
+import { isRunnerBuildOutputPath } from '../../../../core/dist/broker/runner-build-output-inventory.js';
 import { attachSharedWriteActorAuthority, buildCommandManifest, buildOrderedCommandStep, renderCommandManifest } from '../shared/command-manifest.js';
 import { buildSharedWriteActorRecoveryCommand, explicitActorIdEnvVar, legacyActorIdEnvVar, mintFrameworkTempTaskId, resolveSharedWriteActorAuthority, sanitizeIdentityValue } from '../shared/identity-normalization.js';
 import { inspectRunnerSyncQueueHeadOwnership, normalizeInputRunnerSyncSteward, readRunnerSyncStewardForSealedSource, resolveActiveClaimOwnerActorId, resolveActiveLaneSessionId } from './runner-sync-queue-ownership.js';

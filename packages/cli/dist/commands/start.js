@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { buildLegacyRoutePlan, createGuidanceSession, decideGuidanceRoute, probeProject } from '../_vendor/core/dist/guidance/index.js';
+import { buildLegacyRoutePlan, createGuidanceSession, decideGuidanceRoute, probeProject } from '../../../core/dist/guidance/index.js';
 import { getCommandSpec } from './command-specs.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 export async function runStart(argv = []) {

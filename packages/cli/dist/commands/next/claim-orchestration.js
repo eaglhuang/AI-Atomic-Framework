@@ -7,7 +7,7 @@ import { resolveActorWorkSession, upsertActorWorkSession } from '../actor-sessio
 import { tryBuildQuickfixClaimResult, buildNoClaimableTaskResult } from './claim-early-results.js';
 import { cleanupPreviousBatchQueueLocks } from './claim-cleanup.js';
 import { assertClaimRunnerWriteAuthority, assertRunnerRecoveryClaimPreflight } from './runner-recovery-claim-authorization.js';
-import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../_vendor/core/dist/broker/lifecycle.js';
+import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../../core/dist/broker/lifecycle.js';
 import { buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, writeTaskDirectionLock } from '../task-direction.js';
 import { inspectBatchRunConsistency, readActiveBatchRun, writeBatchRun } from '../work-channels.js';
 import { buildTeamKnowledgeSummary } from '../team-knowledge.js';

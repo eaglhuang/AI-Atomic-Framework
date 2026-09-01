@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { probeProject } from '../_vendor/core/dist/guidance/index.js';
+import { probeProject } from '../../../core/dist/guidance/index.js';
 import { getCommandSpec } from './command-specs.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 export function runOrient(argv = []) {

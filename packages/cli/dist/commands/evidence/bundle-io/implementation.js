@@ -9,7 +9,7 @@ import { CliError, makeResult, message, relativePathFrom, } from "../../shared.j
 import { gitHeadEvidencePath } from "../../git-head-evidence.js";
 import { resolveTaskRunnerArbitration } from "../../validate.js";
 import { readTestCatalog, resolveTestPlanForTask, selectTestEntries, } from "../../test-catalog.js";
-import { generateDiffEvidence, mergeDiffEvidenceWithExisting, validateDiffEvidence, } from "../../../_vendor/core/dist/evidence/diff-evidence.js";
+import { generateDiffEvidence, mergeDiffEvidenceWithExisting, validateDiffEvidence, } from "../../../../../core/dist/evidence/diff-evidence.js";
 import { inspectHistoricalDelivery, pathMatchesTaskScope, } from "../../tasks/historical-delivery.js";
 import { normalizeValidatorGateName, normalizeValidatorToken, canonicalizeValidatorIdentity, classifyValidatorTier, isClosureRequiredValidator, resolveValidatorExpectedCommand, looksLikeLiteralValidatorCommand, detectAutoLinkedValidator, } from "../validator-classification.js";
 import { collectRecordCommandRuns, readRecordValidationPasses, readRecordFreshness, hashString, readCommandRunsInputFile, normalizeEvidenceCommandRuns, normalizeCommandRunInput, normalizeRunnerKind, inferRunnerKindFromCommand, hashJson, uniqueStrings, readCurrentCommit, } from "../command-runs.js";

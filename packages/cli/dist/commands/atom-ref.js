@@ -1,4 +1,4 @@
-import { sweepAtomRefReadability } from '../_vendor/core/dist/registry/atom-ref-readability.js';
+import { sweepAtomRefReadability } from '../../../core/dist/registry/atom-ref-readability.js';
 import { CliError, makeResult, message } from './shared.js';
 export function runAtomRef(argv) {
     const options = parseAtomRefArgs(argv);

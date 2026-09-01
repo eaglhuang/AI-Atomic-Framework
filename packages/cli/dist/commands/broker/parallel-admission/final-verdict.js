@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { applyParallelAdmissionSafetyDecision, defaultParallelAdmissionPolicy, evaluateParallelAdmissionSafety } from '../../../_vendor/core/dist/broker/parallel-admission-policy.js';
+import { applyParallelAdmissionSafetyDecision, defaultParallelAdmissionPolicy, evaluateParallelAdmissionSafety } from '../../../../../core/dist/broker/parallel-admission-policy.js';
 export function buildAtm3FinalClosureVerdictFromObservation(input) {
     return buildAtm3FinalClosureVerdict({
         actorId: input.actorId,

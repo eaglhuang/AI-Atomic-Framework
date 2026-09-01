@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
+import { writeTextWithRetry } from './lib/windows-write-retry.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_PACKAGE_DIR = 'packages/cli';
@@ -200,7 +201,7 @@ console.log(`[build-package-dist] built ${packageDirs.length} packages (${mode})
 
 function writeTextIfChanged(filePath: string, content: string): void {
   if (existsSync(filePath) && readFileSync(filePath, 'utf8') === content) return;
-  writeFileSync(filePath, content, 'utf8');
+  writeTextWithRetry(filePath, content);
 }
 
 function copyFileIfChanged(source: string, target: string): void {

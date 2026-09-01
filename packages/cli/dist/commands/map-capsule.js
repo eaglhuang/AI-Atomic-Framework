@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
-import { exportMapCapsule, importMapCapsule, convertSpecToMapBundle, validateMapCidFormat, mapCidToShortId, MapCapsuleError } from '../_vendor/core/dist/registry/map-capsule.js';
-import { loadMapRegistry, saveMapRegistry, upsertMapEntry, linkMapChain, markMapRolledBack, getGlobalMapRegistryPath, getRepoMapRegistryPath } from '../_vendor/core/dist/registry/map-capsule-registry.js';
-import { loadCapsuleRegistry, getGlobalRegistryPath } from '../_vendor/core/dist/registry/capsule-registry.js';
+import { exportMapCapsule, importMapCapsule, convertSpecToMapBundle, validateMapCidFormat, mapCidToShortId, MapCapsuleError } from '../../../core/dist/registry/map-capsule.js';
+import { loadMapRegistry, saveMapRegistry, upsertMapEntry, linkMapChain, markMapRolledBack, getGlobalMapRegistryPath, getRepoMapRegistryPath } from '../../../core/dist/registry/map-capsule-registry.js';
+import { loadCapsuleRegistry, getGlobalRegistryPath } from '../../../core/dist/registry/capsule-registry.js';
 import { CliError, makeResult, message } from './shared.js';
 function parseMapCapsuleArgs(argv) {
     const options = { cwd: process.cwd(), vendor: true };

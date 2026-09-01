@@ -1,7 +1,7 @@
-import { createLocalGovernanceAdapter } from '../../_vendor/plugin-governance-local/dist/index.js';
-import { classifyForeignGeneratedResidue } from '../../_vendor/core/dist/broker/foreign-generated-residue-disposition.js';
-import { isRunnerBuildOutputPath } from '../../_vendor/core/dist/broker/runner-build-output-inventory.js';
-import { issueWorkAdmissionTicket } from '../../_vendor/core/dist/broker/work-admission-ticket.js';
+import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
+import { classifyForeignGeneratedResidue } from '../../../../core/dist/broker/foreign-generated-residue-disposition.js';
+import { isRunnerBuildOutputPath } from '../../../../core/dist/broker/runner-build-output-inventory.js';
+import { issueWorkAdmissionTicket } from '../../../../core/dist/broker/work-admission-ticket.js';
 import { existsSync, readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';

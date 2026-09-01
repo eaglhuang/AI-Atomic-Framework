@@ -2,7 +2,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../shared.js';
-import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, loadBrokerProposalStore, readBrokerProposalFile } from '../../_vendor/core/dist/broker/proposal.js';
+import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, loadBrokerProposalStore, readBrokerProposalFile } from '../../../../core/dist/broker/proposal.js';
 const defaultFallbackBrokerRunEvidenceRelativeDir = path.join('.atm', 'runtime', 'broker-collision-evidence', 'runs');
 export function parseBrokerArgs(argv) {
     const state = {

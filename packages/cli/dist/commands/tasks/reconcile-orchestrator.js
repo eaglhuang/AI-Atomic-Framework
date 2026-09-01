@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { createLocalGovernanceAdapter } from '../../_vendor/plugin-governance-local/dist/index.js';
+import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
 import { assertRunnerFreshForWriteAction, createClosurePacket, createFrameworkModeStatus, executeTaskCloseTransaction, normalizeSha256FieldsDeep, registerCloseCommitWindow, validateClosurePacket, writeClosurePacket } from '../framework-development.js';
 import { assertEmergencyApproval } from '../emergency/gate.js';
 import { resolveActorId } from '../actor-registry.js';

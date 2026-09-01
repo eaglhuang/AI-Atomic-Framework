@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
-import { createEmptyWaveBrokerSchedulerDocument, enqueueWaveBrokerTicket, planWaveBrokerBatch } from '../../_vendor/core/dist/broker/wave-broker-scheduler.js';
+import { createEmptyWaveBrokerSchedulerDocument, enqueueWaveBrokerTicket, planWaveBrokerBatch } from '../../../../core/dist/broker/wave-broker-scheduler.js';
 function readScheduler(pathName) {
     if (!existsSync(pathName))
         return createEmptyWaveBrokerSchedulerDocument();

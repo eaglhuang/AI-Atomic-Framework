@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
-import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerProposalSummaries, loadBrokerProposalStore, readBrokerProposalFile, saveBrokerProposalStore, upsertBrokerProposalStore, validateBrokerProposal } from '../../_vendor/core/dist/broker/proposal.js';
+import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerProposalSummaries, loadBrokerProposalStore, readBrokerProposalFile, saveBrokerProposalStore, upsertBrokerProposalStore, validateBrokerProposal } from '../../../../core/dist/broker/proposal.js';
 import { relativeStorePath } from './parser.js';
 import { isProposalLanePrivatePath, isLiveSharedMutationPath } from '../next/proposal-lane.js';
 export function validateProposalLaneDurableRef(filePath) {

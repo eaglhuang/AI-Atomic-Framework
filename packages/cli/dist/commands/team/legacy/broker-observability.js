@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { TEAM_PROVIDER_IDS } from '../../../_vendor/core/dist/team-runtime/provider-contract.js';
-import { createBrokerConflictResolutionArtifact } from '../../../_vendor/core/dist/team-runtime/permission-broker.js';
-import { buildTeamObservabilityContract, createBrokerConflictObservabilityEvents, queryTeamObservabilityEvents } from '../../../_vendor/core/dist/team-runtime/observability.js';
+import { TEAM_PROVIDER_IDS } from '../../../../../core/dist/team-runtime/provider-contract.js';
+import { createBrokerConflictResolutionArtifact } from '../../../../../core/dist/team-runtime/permission-broker.js';
+import { buildTeamObservabilityContract, createBrokerConflictObservabilityEvents, queryTeamObservabilityEvents } from '../../../../../core/dist/team-runtime/observability.js';
 import { CliError, makeResult, message } from '../../shared.js';
 import { runtimeBackendAdmissionForTeam } from '../team-execution-lane.js';
 import { listTeamRuns, readTeamRun, teamRunsDirectory } from './team-run-store.js';

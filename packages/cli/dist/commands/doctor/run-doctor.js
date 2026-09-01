@@ -11,7 +11,7 @@ import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from '../g
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from '../integration.js';
 import { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.js';
 import { makeResult, message, parseOptions, relativePathFrom } from '../shared.js';
-import { detectCrossTaskMutation, readIncidentFlag } from '../../_vendor/core/dist/broker/cross-task-mutation-guard.js';
+import { detectCrossTaskMutation, readIncidentFlag } from '../../../../core/dist/broker/cross-task-mutation-guard.js';
 import { inspectRunnerSourceDrift } from '../framework-development/closure-packet-schema.js';
 import { inspectRunnerPublicationDisposition } from '../framework-development/runner-publication-lifecycle.js';
 import { knownTsNoCheckBaseline, knownTsNoCheckCleanupOwners, legacyBehaviorPackageNames } from './constants.js';

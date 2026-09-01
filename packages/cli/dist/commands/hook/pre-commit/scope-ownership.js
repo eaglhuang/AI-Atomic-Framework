@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { readBrokerLifecycleState } from '../../../_vendor/core/dist/broker/lifecycle.js';
-import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID, evaluateSharedWriteAdmission } from '../../../_vendor/core/dist/broker/shared-write-provenance-policy.js';
+import { readBrokerLifecycleState } from '../../../../../core/dist/broker/lifecycle.js';
+import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID, evaluateSharedWriteAdmission } from '../../../../../core/dist/broker/shared-write-provenance-policy.js';
 import { inspectTrackedActorRegistryState } from '../../actor-registry.js';
 import { readActiveCloseCommitWindows } from '../../framework-development.js';
 import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.js';

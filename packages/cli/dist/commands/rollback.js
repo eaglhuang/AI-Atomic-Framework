@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { createLocalGovernanceAdapter } from '../_vendor/plugin-governance-local/dist/index.js';
-import { applyRegistryRollback, validateRollbackProof } from '../_vendor/core/dist/registry/rollback.js';
+import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/dist/index.js';
+import { applyRegistryRollback, validateRollbackProof } from '../../../core/dist/registry/rollback.js';
 import { CliError, makeResult, message, relativePathFrom, resolveValue } from './shared.js';
 export async function runRollback(argv) {
     const options = parseRollbackOptions(argv);

@@ -7,7 +7,7 @@
  */
 import path from 'node:path';
 import { existsSync } from 'node:fs';
-import { scanEvidencePatternReports } from '../../_vendor/core/dist/upgrade/evolution-draft.js';
+import { scanEvidencePatternReports } from '../../../../core/dist/upgrade/evolution-draft.js';
 import { CliError, makeResult, message, readJsonFile } from '../shared.js';
 import { collectJsonFiles } from './path-helpers.js';
 import { loadExplicitInputDocuments } from './proposal.js';

@@ -5,7 +5,7 @@ import { runTasks } from '../../tasks.js';
 import { evaluateBrokerQueueAdmission, restrictTeamWriteScopeForQueueAdmission } from '../../next/broker-queue-admission.js';
 import { findTaskClaimDependencyBlockers } from '../../tasks/dependency-gates.js';
 import { buildTeamKnowledgeSummary } from '../../team-knowledge.js';
-import { readBrokerProposalFile, validateBrokerProposal } from '../../../_vendor/core/dist/broker/proposal.js';
+import { readBrokerProposalFile, validateBrokerProposal } from '../../../../../core/dist/broker/proposal.js';
 import { inspectGitIndexOwnership } from '../../git-index-ownership.js';
 import { buildPermissionFinding, deriveAllowedWriteScope, mergeValidation, validateTeamPermissionModel } from './permission-lease-policy.js';
 import { buildTeamPlan, planTeamBrokerLane } from './plan-orchestration.js';

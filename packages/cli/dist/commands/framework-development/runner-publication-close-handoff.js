@@ -1,4 +1,4 @@
-import { validateRunnerBuildOutputInventory } from '../../_vendor/core/dist/broker/runner-build-output-inventory.js';
+import { validateRunnerBuildOutputInventory } from '../../../../core/dist/broker/runner-build-output-inventory.js';
 function normalizedStringSet(value) {
     if (!Array.isArray(value))
         return [];

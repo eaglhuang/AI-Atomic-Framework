@@ -1,4 +1,4 @@
-import { evaluateValidationContract } from '../../_vendor/core/dist/evidence/validation-contract.js';
+import { evaluateValidationContract } from '../../../../core/dist/evidence/validation-contract.js';
 import { resolveActorWorkSession } from '../actor-session.js';
 import { evaluateTaskDoneCloseAdmission } from '../tasks/lifecycle-state.js';
 import { detectHistoricalDeliveryCommit, inspectHistoricalDelivery } from '../tasks/historical-delivery.js';

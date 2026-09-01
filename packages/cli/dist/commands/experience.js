@@ -1,9 +1,9 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { BehaviorRegistry } from '../_vendor/plugin-sdk/dist/behavior-registry.js';
-import { registerExperienceLoopBehaviors } from '../_vendor/plugin-experience-loop/dist/index.js';
-import { createReviewAdvisoryReport } from '../_vendor/plugin-review-advisory/dist/index.js';
-import { createHumanReviewQueueDocument, createHumanReviewQueueRecord, loadHumanReviewQueueDocument, renderHumanReviewQueueMarkdown, validateHumanReviewQueueDocument, writeHumanReviewQueueDocument } from '../_vendor/plugin-human-review/dist/index.js';
+import { BehaviorRegistry } from '../../../plugin-sdk/dist/behavior-registry.js';
+import { registerExperienceLoopBehaviors } from '../../../plugin-experience-loop/dist/index.js';
+import { createReviewAdvisoryReport } from '../../../plugin-review-advisory/dist/index.js';
+import { createHumanReviewQueueDocument, createHumanReviewQueueRecord, loadHumanReviewQueueDocument, renderHumanReviewQueueMarkdown, validateHumanReviewQueueDocument, writeHumanReviewQueueDocument } from '../../../plugin-human-review/dist/index.js';
 import { CliError, makeResult, message, readJsonFile, relativePathFrom } from './shared.js';
 export async function runExperience(argv) {
     const { action, options } = parseExperienceOptions(argv);

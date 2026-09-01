@@ -79,10 +79,46 @@ function appendTaskBundle(root: string, taskId: string): string[] {
   const taskId = 'ATM-FRAMEWORK-TEMP-captain';
   const receiptPath = `.atm/history/evidence/${taskId}.runner-sync-receipt.json`;
   writeJson(fixture.root, receiptPath, { schemaId: 'atm.runnerSyncReceipt.v1', taskId, actorId: 'captain', outputInventory: { entries: [] } });
-  writeJson(fixture.root, `.atm/runtime/locks/${taskId}.lock.json`, { workItemId: taskId, actorId: 'captain', files: [receiptPath] });
+  writeJson(fixture.root, `.atm/runtime/locks/${taskId}.lock.json`, { workItemId: taskId, actorId: 'captain', heartbeatAt: new Date().toISOString(), ttlSeconds: 3600, files: [receiptPath] });
   stageAll(fixture.root);
   const decision = classifyProtectedEvidenceBundle(fixture.root, [...fixture.staged, receiptPath]).decisions.get(receiptPath.toLowerCase());
   assert.deepEqual(decision, { ok: true, taskId, reason: null });
+}
+
+{
+  const fixture = taskBundle('ATM-GOV-0328', true, true);
+  const taskId = 'ATM-FRAMEWORK-TEMP-publication-steward';
+  const takeoverPath = `.atm/history/evidence/${taskId}.runner-publication-takeover.json`;
+  writeJson(fixture.root, takeoverPath, {
+    schemaId: 'atm.runnerPublicationTakeoverPlan.v1', taskId,
+    sealedSourceSha: 'a'.repeat(40), snapshotDigest: `sha256:${'b'.repeat(64)}`,
+    digest: `sha256:${'c'.repeat(64)}`,
+    entries: [{ path: 'release/atm-onefile/atm.mjs', observedDigest: `sha256:${'d'.repeat(64)}` }]
+  });
+  writeJson(fixture.root, `.atm/runtime/locks/${taskId}.lock.json`, {
+    workItemId: taskId, actorId: 'publication-steward', heartbeatAt: new Date().toISOString(), ttlSeconds: 3600, files: [takeoverPath]
+  });
+  stageAll(fixture.root);
+  const decision = classifyProtectedEvidenceBundle(fixture.root, [...fixture.staged, takeoverPath]).decisions.get(takeoverPath.toLowerCase());
+  assert.deepEqual(decision, { ok: true, taskId, reason: null }, 'an active lock may commit its exact, structurally complete broker takeover plan without inventing a task ledger');
+}
+
+{
+  const fixture = taskBundle('ATM-GOV-0328', true, true);
+  const taskId = 'ATM-FRAMEWORK-TEMP-expired-publication-steward';
+  const takeoverPath = `.atm/history/evidence/${taskId}.runner-publication-takeover.json`;
+  writeJson(fixture.root, takeoverPath, {
+    schemaId: 'atm.runnerPublicationTakeoverPlan.v1', taskId,
+    sealedSourceSha: 'a'.repeat(40), snapshotDigest: `sha256:${'b'.repeat(64)}`,
+    digest: `sha256:${'c'.repeat(64)}`,
+    entries: [{ path: 'release/atm-onefile/atm.mjs', observedDigest: `sha256:${'d'.repeat(64)}` }]
+  });
+  writeJson(fixture.root, `.atm/runtime/locks/${taskId}.lock.json`, {
+    workItemId: taskId, actorId: 'publication-steward', heartbeatAt: new Date(Date.now() - 7_200_000).toISOString(), ttlSeconds: 60, files: [takeoverPath]
+  });
+  stageAll(fixture.root);
+  const decision = classifyProtectedEvidenceBundle(fixture.root, [...fixture.staged, takeoverPath]).decisions.get(takeoverPath.toLowerCase());
+  assert.equal(decision?.ok, false, 'an expired lock must not manufacture protected evidence context');
 }
 
 {

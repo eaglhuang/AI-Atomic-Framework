@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { buildTeamBrokerEvidence, brokerLaneToFindings, evaluateTeamBrokerLane } from '../../../_vendor/core/dist/broker/team-lane.js';
-import { buildTeamObservabilityContract } from '../../../_vendor/core/dist/team-runtime/observability.js';
+import { buildTeamBrokerEvidence, brokerLaneToFindings, evaluateTeamBrokerLane } from '../../../../../core/dist/broker/team-lane.js';
+import { buildTeamObservabilityContract } from '../../../../../core/dist/team-runtime/observability.js';
 import { readJsonFile } from '../../shared.js';
 import { buildTeamGrowthContract, buildTeamRoleGrowthObservabilityContract } from '../growth-contract.js';
 import { buildProviderNeutralRoleSkillPackManifest, buildTeamRoleRoutingMatrix, buildTeamRoleSkillPackContract } from '../role-skill-packs.js';

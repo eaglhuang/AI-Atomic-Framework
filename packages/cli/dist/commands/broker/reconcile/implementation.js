@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { CliError, makeResult, message } from '../../shared.js';
-import { createBrokerTicketStore } from '../../../_vendor/core/dist/broker/ticket-store.js';
-import { authorityFromTicketStore } from '../../../_vendor/core/dist/broker/projections/atomic-broker-projection.js';
-import { reconcileBrokerProjection } from '../../../_vendor/core/dist/broker/reconcile/broker-projection-reconcile.js';
+import { createBrokerTicketStore } from '../../../../../core/dist/broker/ticket-store.js';
+import { authorityFromTicketStore } from '../../../../../core/dist/broker/projections/atomic-broker-projection.js';
+import { reconcileBrokerProjection } from '../../../../../core/dist/broker/reconcile/broker-projection-reconcile.js';
 export function handleBrokerReconcile(options) {
     const reconcileOptions = options;
     if (reconcileOptions.action !== 'reconcile')

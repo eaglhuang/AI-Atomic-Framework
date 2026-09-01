@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import os from "node:os";
 import path from "node:path";
 import { gitHeadEvidencePath, gitHeadEvidencePaths, } from "../../git-head-evidence.js";
-import { clearIncidentFlags, detectCrossTaskMutation, readIncidentFlag, } from "../../../_vendor/core/dist/broker/cross-task-mutation-guard.js";
+import { clearIncidentFlags, detectCrossTaskMutation, readIncidentFlag, } from "../../../../../core/dist/broker/cross-task-mutation-guard.js";
 import { normalizeRelativePath, } from "../commit-scope-policy.js";
 import { readStagedFiles } from './git-index-transaction.js';
 import { runGitCommand, runGitCommandWithEnv, shouldStageGovernedGitHeadEvidenceBeforeCommit } from './git-process-port.js';

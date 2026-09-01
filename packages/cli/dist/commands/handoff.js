@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { createContinuationSummaryRecord, createLocalGovernanceAdapter } from '../_vendor/plugin-governance-local/dist/index.js';
+import { createContinuationSummaryRecord, createLocalGovernanceAdapter } from '../../../plugin-governance-local/dist/index.js';
 import { detectGovernanceRuntime } from './governance-runtime.js';
 import { CliError, makeResult, message, resolveValue } from './shared.js';
 export async function runHandoff(argv) {

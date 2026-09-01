@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { makePoliceFamilyReport, runPoliceFamilyGate } from '../_vendor/core/dist/police/family.js';
+import { makePoliceFamilyReport, runPoliceFamilyGate } from '../../../core/dist/police/family.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';
 import { evaluateTaskWorkAdmissionGate } from './git-governance/work-admission-check.js';
 export async function runPolice(argv) {

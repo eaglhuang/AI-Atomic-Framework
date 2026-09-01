@@ -26,7 +26,7 @@
  *     the operator)
  *   - broker `takeover` → admitted with an advisory
  */
-import { evaluateBrokerAdmission } from '../../_vendor/core/dist/broker/admission/evaluate-broker-admission.js';
+import { evaluateBrokerAdmission } from '../../../../core/dist/broker/admission/evaluate-broker-admission.js';
 /**
  * Return true iff the broker verdict is admissible.
  */

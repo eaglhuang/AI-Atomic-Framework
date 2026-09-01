@@ -3,7 +3,7 @@ import { existsSync, readFileSync, } from "node:fs";
 import path from "node:path";
 import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor, } from "../../actor-registry.js";
 import { resolveActorWorkSession } from "../../actor-session.js";
-import { detectCrossTaskMutation, recordIncidentFlag, } from "../../../_vendor/core/dist/broker/cross-task-mutation-guard.js";
+import { detectCrossTaskMutation, recordIncidentFlag, } from "../../../../../core/dist/broker/cross-task-mutation-guard.js";
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom, } from "../../shared.js";
 import { inspectCurrentBranchCommitQueueStatus } from './branch-commit-window.js';
 import { laneSessionIdFromRecord } from './command-router.js';

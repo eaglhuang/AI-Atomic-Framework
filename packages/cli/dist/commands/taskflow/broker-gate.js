@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { loadRegistry } from '../../_vendor/core/dist/broker/registry.js';
-import { calculateBrokerDecision } from '../../_vendor/core/dist/broker/decision.js';
+import { loadRegistry } from '../../../../core/dist/broker/registry.js';
+import { calculateBrokerDecision } from '../../../../core/dist/broker/decision.js';
 import { resolveCanonicalDecisionClass } from '../broker/replay/closure-policy.js';
 import { quoteCliValue } from '../shared.js';
 function uniqueTaskIds(values) {

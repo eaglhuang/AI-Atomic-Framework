@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { collectGitDiffMutationRequests } from '../_vendor/core/dist/git/index.js';
+import { collectGitDiffMutationRequests } from '../../../core/dist/git/index.js';
 const atmPrePushHookMarker = 'ATM_GIT_PRE_PUSH_HOOK_V1';
 const atmPrePushHookScriptVersion = '0.1.0';
 const atmPrePushHookOutputJsonRelativePath = '.atm/runtime/pre-push-hook-last.json';

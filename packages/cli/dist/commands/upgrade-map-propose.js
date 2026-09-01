@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { proposeAtomicUpgrade } from '../_vendor/core/dist/upgrade/propose.js';
+import { proposeAtomicUpgrade } from '../../../core/dist/upgrade/propose.js';
 import { readJsonFile, relativePathFrom } from './shared.js';
 export function runUpgradeMapPropose(options) {
     return proposeAtomicUpgrade({

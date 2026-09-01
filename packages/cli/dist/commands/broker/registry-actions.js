@@ -2,14 +2,14 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
-import { loadRegistry, saveRegistry, cleanupStale } from '../../_vendor/core/dist/broker/registry.js';
-import { cleanupBrokerRuntimeSnapshots } from '../../_vendor/core/dist/broker/lifecycle.js';
-import { createBrokerTransactionAuthority } from '../../_vendor/core/dist/broker/transaction-authority.js';
-import { calculateBrokerDecision } from '../../_vendor/core/dist/broker/decision.js';
-import { projectTeamBrokerRearbitrationSnapshot } from '../../_vendor/core/dist/broker/team-lane.js';
-import { planSharedSurfaceAcquisition, removeSharedSurfaceEntry } from '../../_vendor/core/dist/broker/shared-surface-queue.js';
-import { releaseRunnerSyncStewardTaskRequests } from '../../_vendor/core/dist/broker/runner-sync-steward-queue.js';
-import { acknowledgeFreeze, resolveFreezeDecision } from '../../_vendor/core/dist/broker/freeze.js';
+import { loadRegistry, saveRegistry, cleanupStale } from '../../../../core/dist/broker/registry.js';
+import { cleanupBrokerRuntimeSnapshots } from '../../../../core/dist/broker/lifecycle.js';
+import { createBrokerTransactionAuthority } from '../../../../core/dist/broker/transaction-authority.js';
+import { calculateBrokerDecision } from '../../../../core/dist/broker/decision.js';
+import { projectTeamBrokerRearbitrationSnapshot } from '../../../../core/dist/broker/team-lane.js';
+import { planSharedSurfaceAcquisition, removeSharedSurfaceEntry } from '../../../../core/dist/broker/shared-surface-queue.js';
+import { releaseRunnerSyncStewardTaskRequests } from '../../../../core/dist/broker/runner-sync-steward-queue.js';
+import { acknowledgeFreeze, resolveFreezeDecision } from '../../../../core/dist/broker/freeze.js';
 import { readSharedSurfaceFreezeRecords, writeSharedSurfaceFreezeRecords, readSharedSurfaceQueues, writeSharedSurfaceQueues, readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue } from './persistence.js';
 import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleasedSharedSurfaceFreezes, shouldQueueSharedSurface, resolveSharedSurfaceQueueAdmission, replaceIntentLane, assertBrokerRegisterCliParity, syncTeamRunRearbitrationSnapshots } from './shared-surface.js';
 function readBrokerWriteIntent(intentFilePath, displayPath) {

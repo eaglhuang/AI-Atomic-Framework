@@ -1,8 +1,8 @@
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.js';
 import { listSupportedAgentIds, verifyAgentsMarkdown } from './agent-confidence.js';
 import { evaluateSeedSelfVerification, registryFilePath, validateRegistryDocumentAgainstSchema } from './registry-shared.js';
-import { defaultNeutralityPolicyRelativePath, scanNeutralityRepository } from '../_vendor/plugin-rule-guard/dist/neutrality-scanner.js';
-import { checkGuardJustification } from '../_vendor/plugin-rule-guard/dist/rule-justification.js';
+import { defaultNeutralityPolicyRelativePath, scanNeutralityRepository } from '../../../plugin-rule-guard/dist/neutrality-scanner.js';
+import { checkGuardJustification } from '../../../plugin-rule-guard/dist/rule-justification.js';
 import { existsSync, readFileSync } from 'node:fs';
 export function runVerify(argv) {
     const { options } = parseOptions(argv, 'verify');

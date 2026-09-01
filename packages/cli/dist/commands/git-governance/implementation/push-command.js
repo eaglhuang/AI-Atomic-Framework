@@ -3,8 +3,8 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync, } from "node:fs";
 import path from "node:path";
 import { actorIdEnvVar, } from "../../actor-registry.js";
-import { evaluateGitAdmission } from "../../../_vendor/core/dist/git/admission.js";
-import { buildGitBoundaryEvidenceEnvelope } from "../../../_vendor/core/dist/evidence/index.js";
+import { evaluateGitAdmission } from "../../../../../core/dist/git/admission.js";
+import { buildGitBoundaryEvidenceEnvelope } from "../../../../../core/dist/evidence/index.js";
 import { CliError, makeResult, message, quoteCliValue, } from "../../shared.js";
 export function gitPushAttemptStatusRelativePath(actorId, branch, remote) {
     const safeActor = actorId.replace(/[^a-zA-Z0-9_.-]/g, "_");

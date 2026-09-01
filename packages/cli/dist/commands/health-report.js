@@ -1,4 +1,4 @@
-import { generateMapHealthReport } from '../_vendor/core/dist/maps/map-health-report.js';
+import { generateMapHealthReport } from '../../../core/dist/maps/map-health-report.js';
 import { CliError, makeResult, message, parseOptions } from './shared.js';
 export function runHealthReport(argv) {
     const { options } = parseOptions(argv, 'health-report');

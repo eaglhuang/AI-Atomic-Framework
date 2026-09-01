@@ -1,9 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { isCacheEnabled, computeCacheKey, getGitCommitHash, hasUncommittedChanges, getPolicyHash, readCacheEntry, writeCacheEntry } from '../_vendor/core/dist/cache/guide-cache.js';
-import { buildSourceInventoryReport } from '../_vendor/core/dist/source-inventory/source-inventory.js';
-import { makePoliceFamilyReport, runPoliceFamilyGate } from '../_vendor/core/dist/police/family.js';
-import { classifyGuidanceIntent, probeProject } from '../_vendor/core/dist/guidance/index.js';
+import { isCacheEnabled, computeCacheKey, getGitCommitHash, hasUncommittedChanges, getPolicyHash, readCacheEntry, writeCacheEntry } from '../../../core/dist/cache/guide-cache.js';
+import { buildSourceInventoryReport } from '../../../core/dist/source-inventory/source-inventory.js';
+import { makePoliceFamilyReport, runPoliceFamilyGate } from '../../../core/dist/police/family.js';
+import { classifyGuidanceIntent, probeProject } from '../../../core/dist/guidance/index.js';
 import { detectFrameworkRepoIdentity } from './framework-development.js';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { deriveAtmScopeClass } from '../../_vendor/core/dist/broker/atm-core-scope.js';
+import { deriveAtmScopeClass } from '../../../../core/dist/broker/atm-core-scope.js';
 import { taskPathFor } from './task-file-io-helpers.js';
 import { parseYamlList } from './task-import-validators.js';
 import { normalizeWorkItemStatus } from './task-transition-helpers.js';

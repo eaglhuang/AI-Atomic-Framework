@@ -3,10 +3,10 @@ import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { CliError, makeResult, message } from '../shared.js';
-import { buildTeamBrokerRunRecord, buildTeamBrokerRunRecordEnvelope } from '../../_vendor/core/dist/broker/team-lane.js';
-import { defaultAdapterRegistry, resolveAdapter } from '../../_vendor/core/dist/broker/adapters/registry.js';
-import { planMutationBatch } from '../../_vendor/core/dist/broker/adapters/batch-planner.js';
-import { computeCasResult, hashContent } from '../../_vendor/core/dist/broker/adapters/cas.js';
+import { buildTeamBrokerRunRecord, buildTeamBrokerRunRecordEnvelope } from '../../../../core/dist/broker/team-lane.js';
+import { defaultAdapterRegistry, resolveAdapter } from '../../../../core/dist/broker/adapters/registry.js';
+import { planMutationBatch } from '../../../../core/dist/broker/adapters/batch-planner.js';
+import { computeCasResult, hashContent } from '../../../../core/dist/broker/adapters/cas.js';
 import { normalizeEvidencePath, resolveBrokerRunEvidenceDir } from './parser.js';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.js';
 export function handleBrokerPlanBatch(options) {

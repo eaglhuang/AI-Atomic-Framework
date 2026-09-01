@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { TEAM_CLOSURE_ATTESTATION_SCHEMA_ID } from '../../evidence.js';
 import { CliError } from '../../shared.js';
-import { resolveNodejsTeamWorkerAdapter } from '../../../_vendor/core/dist/team-runtime/nodejs-worker-adapter.js';
+import { resolveNodejsTeamWorkerAdapter } from '../../../../../core/dist/team-runtime/nodejs-worker-adapter.js';
 import { resolveTeamRuntimeProviderSelection } from '../role-provider-resolution.js';
 import { buildTeamArtifactHandoffContract, buildTeamRetryBudgetContract, buildTeamRoleArtifactContract } from './runtime-contracts.js';
 export function buildTeamRuntimeContract(input) {

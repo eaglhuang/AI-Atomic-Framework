@@ -1,4 +1,4 @@
-import { isEvidenceRealness } from '../../_vendor/core/dist/evidence/index.js';
+import { isEvidenceRealness } from '../../../../core/dist/evidence/index.js';
 /** Preserve an authored acceptance-evidence contract without inferring stronger evidence. */
 export function parseAcceptanceEvidenceMap(value) {
     if (value === undefined || value === null || value === '')

@@ -1,5 +1,5 @@
-import { runRescuePolice } from '../_vendor/core/dist/police/rescue-family.js';
-import { diagnoseRecovery, clearCache, factoryReset, rebuildCapsuleRegistry, rebuildMapRegistry, reloadAtomsFromCapsules, replayLineageFromEvidence } from '../_vendor/core/dist/rescue/disaster-recovery.js';
+import { runRescuePolice } from '../../../core/dist/police/rescue-family.js';
+import { diagnoseRecovery, clearCache, factoryReset, rebuildCapsuleRegistry, rebuildMapRegistry, reloadAtomsFromCapsules, replayLineageFromEvidence } from '../../../core/dist/rescue/disaster-recovery.js';
 import { repairClosurePacketForTask } from './framework-development.js';
 import { CliError, makeResult, message } from './shared.js';
 function parseRescueArgs(argv) {

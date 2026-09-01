@@ -1,13 +1,13 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { normalizeValidatorResponsibility } from '../_vendor/core/dist/evidence/test-case-catalog.js';
+import { normalizeValidatorResponsibility } from '../../../core/dist/evidence/test-case-catalog.js';
 // atm.causal-validator-selector — the Selection Policy now lives in
 // packages/core/src/evidence/validation-contract.ts (the pure
 // evaluateValidationContract evaluator) and the decentralized shard machinery in
 // packages/core/src/evidence/test-case-catalog.ts. This module keeps the
 // catalog-reading and profile/tier selection surface and re-exports the
 // extracted contract types and helpers for backward compatibility.
-export { buildTestCaseId, generateReadOnlyTestCaseCatalog, loadAllShardCaseIds, loadLegacyCaseAliases, loadTestCaseGroupShards, normalizeSemanticKey, normalizeValidatorResponsibility, readRawShardFiles, reportShardReachability, resolveCaseGroupShardsRoot, resolveLegacyCaseId, validateLegacyCaseAliases, validateTestCaseGroupShards, VALIDATOR_RESPONSIBILITIES } from '../_vendor/core/dist/evidence/test-case-catalog.js';
+export { buildTestCaseId, generateReadOnlyTestCaseCatalog, loadAllShardCaseIds, loadLegacyCaseAliases, loadTestCaseGroupShards, normalizeSemanticKey, normalizeValidatorResponsibility, readRawShardFiles, reportShardReachability, resolveCaseGroupShardsRoot, resolveLegacyCaseId, validateLegacyCaseAliases, validateTestCaseGroupShards, VALIDATOR_RESPONSIBILITIES } from '../../../core/dist/evidence/test-case-catalog.js';
 const tierRank = {
     quick: 1,
     standard: 2,

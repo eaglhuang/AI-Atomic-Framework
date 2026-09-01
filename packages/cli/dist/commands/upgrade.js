@@ -1,4 +1,4 @@
-import { proposeAtomicUpgrade } from '../_vendor/core/dist/upgrade/propose.js';
+import { proposeAtomicUpgrade } from '../../../core/dist/upgrade/propose.js';
 import { runUpgradeMapPropose } from './upgrade-map-propose.js';
 import { makeResult, message } from './shared.js';
 import { buildUpgradeNextActionHint } from './upgrade/next-action-hint.js';

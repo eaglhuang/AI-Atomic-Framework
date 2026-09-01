@@ -2,8 +2,8 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { observeCommandRunRecords, observeProcessExecution } from '../observed-source-loader.js';
-import { evaluateTddPhaseReceipt } from '../../../_vendor/core/dist/evidence/tdd-cycle.js';
-import { evaluateValidationContract } from '../../../_vendor/core/dist/evidence/validation-contract.js';
+import { evaluateTddPhaseReceipt } from '../../../../../core/dist/evidence/tdd-cycle.js';
+import { evaluateValidationContract } from '../../../../../core/dist/evidence/validation-contract.js';
 import { CliError, makeResult, message } from '../../shared.js';
 import { runEvidenceRun as runEvidenceRunBase } from '../bundle-io.js';
 const TDD_FLAG_KEYS = new Set([
