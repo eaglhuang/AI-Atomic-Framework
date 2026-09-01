@@ -409,15 +409,20 @@ export function autoStageFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyVa
   const ownerScope = { cwd, currentTaskId: frameworkTempTaskId(actorId) };
   const candidates = uniqueSorted(
     listTaskScopedWorktreeDirtyFiles(cwd).filter(
-      (filePath: LegacyValue) =>
-        !stagedFiles.has(filePath) &&
-        !isIgnorableFrameworkCommitStagingSideEffect(filePath) &&
-        isFrameworkGeneratedArtifactAllowed(
-          filePath,
-          claimedFiles,
-          releaseGeneratedArtifacts,
-          ownerScope,
-        ),
+      (filePath: LegacyValue) => {
+        const normalized = normalizeRelativePath(filePath);
+        const exactClaim = [...claimedFiles].some(
+          (scope: LegacyValue) => normalizeRelativePath(scope) === normalized,
+        );
+        return !stagedFiles.has(filePath)
+          && (exactClaim || !isIgnorableFrameworkCommitStagingSideEffect(filePath))
+          && isFrameworkGeneratedArtifactAllowed(
+            filePath,
+            claimedFiles,
+            releaseGeneratedArtifacts,
+            ownerScope,
+          );
+      },
     ),
   );
   if (apply && candidates.length > 0) {
