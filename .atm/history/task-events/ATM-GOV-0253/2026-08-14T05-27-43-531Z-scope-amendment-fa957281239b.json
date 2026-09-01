@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T05-27-43-531Z-scope-amendment-fa957281239b",
+  "taskId": "ATM-GOV-0253",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-recovery",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0253.json",
+  "taskSha256": "sha256:f38e486f91236c50acfeb1ffb5595cdab383177780954cbfdd31ec124423acae",
+  "createdAt": "2026-08-14T05:27:43.531Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0253 --actor codex-captain-recovery --add packages/cli/src/commands/taskflow/historical-close-preflight.ts --reason \"Reopened ATM-GOV-0253 regression: this shared preflight consumer must use the existing canonical index ownership classification rather than recreate stale-residue state.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Reopened ATM-GOV-0253 regression: this shared preflight consumer must use the existing canonical index ownership classification rather than recreate stale-residue state."
+  }
+}

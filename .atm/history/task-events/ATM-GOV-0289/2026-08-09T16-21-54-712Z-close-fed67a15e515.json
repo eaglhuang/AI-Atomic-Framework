@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-09T16-21-54-712Z-close-fed67a15e515",
+  "taskId": "ATM-GOV-0289",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260809162041-codex-gpt-5.4-mini-ATM-GOV-0289-8d618148a8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0289.json",
+  "taskSha256": "sha256:00f026794bf62067772d3f524ac57f16a8f105209c5e04ee3b304b099d530cdf",
+  "createdAt": "2026-08-09T16:21:54.712Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0289 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-bf062e1586ae --historical-delivery 4fa69c38c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-bf062e1586ae",
+    "sessionId": "session-20260809162041-codex-gpt-5.4-mini-ATM-GOV-0289-8d618148a8",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0289.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts",
+      "node --strip-types tests/cli/plan4-coverage-ratchet-baseline.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-08-09T16:21:54.701Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0289.*",
+        ".atm/history/task-events/ATM-GOV-0289/**",
+        ".atm/history/tasks/ATM-GOV-0289.json",
+        "packages/core/src/evidence/coverage-ratchet-baseline.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/coverage-ratchet-baseline.schema.json",
+        "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json",
+        "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts",
+        "tests/cli/plan4-coverage-ratchet-baseline.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/evidence/coverage-ratchet-baseline.ts",
+        "packages/core/src/evidence/index.ts",
+        "schemas/evidence/coverage-ratchet-baseline.schema.json",
+        "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json",
+        "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts",
+        "tests/cli/plan4-coverage-ratchet-baseline.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-14T11-07-33-483Z-repair-claim-652bb1611146",
+  "taskId": "ATM-GOV-0253",
+  "action": "repair-claim",
+  "actorId": "codex-captain-recovery",
+  "sessionId": "session-20260814053241-codex-captain-recovery-ATM-GOV-0253-4109e059a2",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0253.json",
+  "taskSha256": "sha256:2e1d0ffe0345da926b84f115225c086d2468bb76ac4e22f18d130f6cbcc65030",
+  "createdAt": "2026-08-14T11:07:33.483Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0253 --actor codex-captain-recovery --write --reason \"Repair expired source-done closeback claim drift so the broker-authorized P0 task-close contract consumer fix can hold the shared seam.\" --json"
+}

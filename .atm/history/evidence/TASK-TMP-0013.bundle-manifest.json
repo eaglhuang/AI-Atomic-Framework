@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TMP-0013",
+  "updatedAt": "2026-09-01T16:12:20.861Z",
+  "updatedBy": "codex-cleanup-captain",
+  "freshValidationPasses": [
+    "evidence-command-run-task-correlation",
+    "hook-evidence-identity-context"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/evidence/__tests__/command-runs.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a0434169fd67e79f0f0fc28566236dbc5fd86fce6a3e3e6707ac725bafb72fdd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "evidence-command-run-task-correlation"
+      ],
+      "generatedAt": "2026-09-01T15:58:14.356Z",
+      "startedAt": "2026-09-01T15:58:13.939Z",
+      "finishedAt": "2026-09-01T15:58:14.356Z",
+      "durationMs": 417,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "7f30c008e92c1df7ab866197b1007ee39bcc2beb",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-hook-batch-evidence-context.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7afc23f4c18d1dbd050c07339d1acac44a724d888c2fdcbfe1100b4a66addb04",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "hook-evidence-identity-context"
+      ],
+      "generatedAt": "2026-09-01T16:12:20.860Z",
+      "startedAt": "2026-09-01T16:12:19.103Z",
+      "finishedAt": "2026-09-01T16:12:20.860Z",
+      "durationMs": 1757,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "746db249a8471db45c0ce49597b8b879937b88a4",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

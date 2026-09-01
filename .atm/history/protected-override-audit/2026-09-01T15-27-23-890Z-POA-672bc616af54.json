@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-672bc616af54",
+  "recordedAt": "2026-09-01T15:27:23.890Z",
+  "actorId": null,
+  "taskId": "TASK-TMP-0013",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\temporary-governance\\tasks\\TASK-TMP-0013-commit-durable-history-bundles-for-released-tasks.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-TASK-TMP-0013-19457d5cdb",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-01T15-27-23-888Z-EMG-TASK-TMP-0013-19457d5cdb.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

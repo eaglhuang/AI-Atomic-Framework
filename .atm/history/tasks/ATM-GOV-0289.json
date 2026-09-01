@@ -93,17 +93,15 @@
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "governance-optimization/tasks/ATM-GOV-0289-changed-impacted-repository-coverage-ratchet-and-baseline-migration.task.md",
-      "planningCommitSha": null,
+      "planningCommitSha": "5ab9c1863ae0667c137ac77110b81ed1ffc5f3fa",
       "contentDigest": "sha256:c83e1fe67fd0547ec9f55189f11cab410b29b7872d690bc68d85fefc31f0b3f2",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-07-31T16:05:54.311Z"
+      "sealedAt": "2026-08-09T16:06:51.563Z"
     }
   },
-  "importedAt": "2026-07-31T16:05:54.311Z",
+  "importedAt": "2026-08-09T16:06:51.563Z",
   "workAdmission": {
-    "recoveryMode": "auto",
-    "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    "recoveryMode": "auto"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -172,17 +170,17 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-08-08T19-32-55-127Z-lock-cleanup-7b8993b975f7",
-  "lastTransitionAt": "2026-08-08T19:32:55.127Z",
+  "lastTransitionId": "2026-08-09T16-24-01-973Z-close-4772a7ffba58",
+  "lastTransitionAt": "2026-08-09T16:24:01.973Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-captain-2026-08-09",
-  "reservedAt": "2026-08-08T19:25:07.329Z",
-  "promotedAt": "2026-08-08T19:25:07.332Z",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-08-09T16:20:41.902Z",
+  "promotedAt": "2026-08-09T16:20:41.906Z",
   "claim": {
-    "actorId": "codex-captain-2026-08-09",
-    "leaseId": "lease-b6a082ca4883",
-    "claimedAt": "2026-08-08T19:25:07.335Z",
-    "heartbeatAt": "2026-08-08T19:32:54.580Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-9f7c2f5ddc6c",
+    "claimedAt": "2026-08-09T16:20:41.908Z",
+    "heartbeatAt": "2026-08-09T16:24:01.972Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0289.json",
@@ -195,99 +193,23 @@
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260808192507-codex-captain-2026-08-09-83bbedc009",
+      "laneSessionId": "lane-20260809162042-codex-gpt-5.4-mini-83d33ad409",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808192507-codex-captain-2026-08-09-83bbedc009\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809162042-codex-gpt-5.4-mini-83d33ad409\""
     },
-    "reason": "closed"
+    "reason": "reconciled"
   },
-  "startedAt": "2026-08-08T19:25:07.335Z",
-  "startedByActor": "codex-captain-2026-08-09",
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-6445922b728aa01b",
-    "ticketDigest": "sha256:6445922b728aa01b4de7dfe6e7a37aa86e9244d8aaa2269a4547a67d79382799",
-    "taskId": "ATM-GOV-0289",
-    "origin": "claim",
-    "actorId": "codex-captain-2026-08-09",
-    "laneSessionId": "lane-20260808192507-codex-captain-2026-08-09-83bbedc009",
-    "claimGeneration": "lease-b6a082ca4883",
-    "issuedAt": "2026-08-08T19:25:07.335Z",
-    "expiresAt": "2026-08-08T19:55:07.335Z",
-    "scopeDigest": "sha256:661b6484ac552df36882efb021f71419950318f93367e6a114f618a332fd7afc",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-08-08T19:25:07.335Z"
-    },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/history/evidence/ATM-GOV-0289.*",
-          ".atm/history/evidence/git-head.jsonl",
-          ".atm/history/task-events/ATM-GOV-0289/**",
-          ".atm/history/tasks/ATM-GOV-0289.json",
-          "packages/core/src/evidence/coverage-ratchet-baseline.ts",
-          "packages/core/src/evidence/index.ts",
-          "schemas/evidence/coverage-ratchet-baseline.schema.json",
-          "tests/catalog/groups/test_group_plan4_coverage-ratchet-baseline.shard.json",
-          "tests/cli/plan4-coverage-ratchet-baseline-negative.test.ts",
-          "tests/cli/plan4-coverage-ratchet-baseline.test.ts"
-        ],
-        "digest": "sha256:87c06083be0ccf8845eeb35bd5c1ab6dcf35a4ba4390d574eab78f6008ba2dd1"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [
-      {
-        "path": "artifacts/generated/skill-corpus-audit.json",
-        "observedDigest": "sha256:befc74c4ffeb48724de232c79015cfc2c6115fabdbe9c2a7cba053924dc3adb6",
-        "producerTaskId": "TASK-SKL-0028",
-        "artifactSchemaId": "atm.skillCorpusAudit.v1",
-        "sourceSnapshotSchemaId": "atm.skillCorpusSourceSnapshot.v1",
-        "sourceDigest": "sha256:a65646e417c786943986232fa4c41292e21c9339d96fb317050fea84e5853ebc"
-      }
-    ],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "enabled",
-      "reasons": [
-        "shared-surface"
-      ],
-      "maxSavePoints": 2,
-      "perTaskByteBudget": 16777216,
-      "repositoryByteBudget": 268435456,
-      "handoffTtlSeconds": 604800,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
-    }
-  },
-  "startedBySessionId": "session-20260808192507-codex-captain-2026-08-09-ATM-GOV-0289-c28feff3c7",
+  "startedAt": "2026-08-09T16:20:41.908Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260809162041-codex-gpt-5.4-mini-ATM-GOV-0289-8d618148a8",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "ATM-GOV-0289",
-    "batchId": "batch-e641205eb5c4",
-    "scopeKey": "tasks-0670222abab7",
-    "queueId": "queue-bcc00487708fe2b0",
+    "batchId": "batch-bf062e1586ae",
+    "scopeKey": "ATM-GOV",
+    "queueId": "queue-9230dafbe142710f",
     "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/ATM-GOV-0289.*",
@@ -304,22 +226,20 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "0502b8fd196404da4ce749cbf78655192370ba31abc903fd81bc0272e6602741",
-    "actorId": "codex-captain-2026-08-09",
-    "sessionId": "session-20260808192507-codex-captain-2026-08-09-ATM-GOV-0289-c28feff3c7",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260809162041-codex-gpt-5.4-mini-ATM-GOV-0289-8d618148a8",
     "laneSession": {
-      "laneSessionId": "lane-20260808192507-codex-captain-2026-08-09-83bbedc009",
+      "laneSessionId": "lane-20260809162042-codex-gpt-5.4-mini-83d33ad409",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260808192507-codex-captain-2026-08-09-83bbedc009\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260809162042-codex-gpt-5.4-mini-83d33ad409\""
     },
-    "createdAt": "2026-08-08T19:25:16.813Z",
-    "status": "released",
-    "released": true,
-    "releasedAt": "2026-08-08T19:32:55.124Z",
-    "releasedBy": "codex-captain-2026-08-09"
+    "createdAt": "2026-08-09T16:20:44.850Z",
+    "status": "active"
   },
-  "closedAt": "2026-08-08T19:32:54.580Z",
-  "closedByActor": "codex-captain-2026-08-09",
-  "closedBySessionId": "session-20260808192507-codex-captain-2026-08-09-ATM-GOV-0289-c28feff3c7",
+  "closedAt": "2026-08-09T16:24:01.972Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 4fa69c38c0e8153daac735432b95b464d9d394ea",
   "closurePacket": ".atm/history/evidence/ATM-GOV-0289.closure-packet.json"
 }
