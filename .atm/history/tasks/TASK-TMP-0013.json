@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0013",
   "title": "Commit durable history bundles for released tasks",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -268,9 +268,9 @@
   },
   "claim": {
     "actorId": "codex-cleanup-captain",
-    "leaseId": "lease-880d79995e4a",
-    "claimedAt": "2026-09-01T16:42:48.222Z",
-    "heartbeatAt": "2026-09-01T17:24:33.332Z",
+    "leaseId": "lease-18a7165418c7",
+    "claimedAt": "2026-09-01T18:30:00.119Z",
+    "heartbeatAt": "2026-09-01T18:30:40.818Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TMP-0013.json",
@@ -406,17 +406,18 @@
       ".atm/history/tasks/TASK-SKL-0040.json",
       ".atm/history/tasks/TASK-TMP-0008.json"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260901164248-codex-cleanup-captain-e7eec0b895",
       "status": "adopted",
-      "source": "minted",
+      "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901164248-codex-cleanup-captain-e7eec0b895\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-cleanup-captain",
   "startedAt": "2026-09-01T15:21:35.854Z",
-  "startedBySessionId": "session-20260901164248-codex-cleanup-captain-TASK-TMP-0013-5431a989d7",
+  "startedBySessionId": "session-20260901183000-codex-cleanup-captain-TASK-TMP-0013-9ec597abfc",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -564,39 +565,39 @@
     "allowPlanningMirror": false,
     "promptHash": "efdcd06a0248f2f6f3ac2980b2c7c77e41a78273098cae1688111d5eb6247225",
     "actorId": "codex-cleanup-captain",
-    "sessionId": "session-20260901164248-codex-cleanup-captain-TASK-TMP-0013-5431a989d7",
+    "sessionId": "session-20260901183000-codex-cleanup-captain-TASK-TMP-0013-9ec597abfc",
     "laneSession": {
       "laneSessionId": "lane-20260901164248-codex-cleanup-captain-e7eec0b895",
-      "status": "active",
-      "source": "minted",
+      "status": "adopted",
+      "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901164248-codex-cleanup-captain-e7eec0b895\""
     },
-    "createdAt": "2026-09-01T16:42:48.988Z",
+    "createdAt": "2026-09-01T18:30:00.688Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-09-01T17-24-33-548Z-renew-ed49fa054201",
-  "lastTransitionAt": "2026-09-01T17:24:33.548Z",
+  "lastTransitionId": "2026-09-01T18-30-40-820Z-close-4f43deb763e5",
+  "lastTransitionAt": "2026-09-01T18:30:40.820Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "reservedAt": "2026-09-01T16:42:48.211Z",
-  "promotedAt": "2026-09-01T16:42:48.217Z",
+  "reservedAt": "2026-09-01T18:30:00.111Z",
+  "promotedAt": "2026-09-01T18:30:00.114Z",
   "startedByActor": "codex-cleanup-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-b69afb2ef76f60c2",
-    "ticketDigest": "sha256:b69afb2ef76f60c214dfd89b40d4e36264c7c682fbc562a1c0eec46f520dd66e",
+    "ticketId": "wat-fdd9cf619549b46e",
+    "ticketDigest": "sha256:fdd9cf619549b46eba3a17dd3e7eefd72f0063e86da835f3a4d1b1fefc0e4c52",
     "taskId": "TASK-TMP-0013",
     "origin": "claim",
     "actorId": "codex-cleanup-captain",
     "laneSessionId": "lane-20260901164248-codex-cleanup-captain-e7eec0b895",
-    "claimGeneration": "lease-880d79995e4a",
-    "issuedAt": "2026-09-01T17:24:33.332Z",
-    "expiresAt": "2026-09-01T17:54:33.332Z",
-    "scopeDigest": "sha256:3e401e6bcf544fe03d5fa4e91b6e160b93012a63f1ca7a376a126095bd72ef0d",
+    "claimGeneration": "lease-18a7165418c7",
+    "issuedAt": "2026-09-01T18:30:00.119Z",
+    "expiresAt": "2026-09-01T19:00:00.119Z",
+    "scopeDigest": "sha256:42e8d9b9e2d64e546934792498092b71ba4ab6b094220cfc3f2f98201fc77f76",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-01T17:24:33.332Z"
+      "selectedAt": "2026-09-01T18:30:00.119Z"
     },
     "grants": [
       {
@@ -645,7 +646,6 @@
           ".atm/history/evidence/TASK-SKL-0040.*",
           ".atm/history/evidence/TASK-TMP-0008.*",
           ".atm/history/evidence/TASK-TMP-0013.*",
-          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/protected-override-audit/**",
           ".atm/history/task-events/ATM-GOV-0253/**",
           ".atm/history/task-events/ATM-GOV-0287/**",
@@ -736,7 +736,7 @@
           ".atm/history/tasks/TASK-TMP-0008.json",
           ".atm/history/tasks/TASK-TMP-0013.json"
         ],
-        "digest": "sha256:bd64d3c188a80f8e209ca0d93ef8ab5c172f077ba2f90ee22e59c04b2e3013ef"
+        "digest": "sha256:b6e0ebc9a8f991a0c3cb9aa3cff41ec5738831b7e76a5314af282035fe82c2c4"
       },
       {
         "kind": "lifecycle-operation",
@@ -769,5 +769,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
-  }
+  },
+  "closedAt": "2026-09-01T18:30:40.818Z",
+  "closedByActor": "codex-cleanup-captain",
+  "closedBySessionId": "session-20260901183000-codex-cleanup-captain-TASK-TMP-0013-9ec597abfc",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0013.closure-packet.json"
 }
