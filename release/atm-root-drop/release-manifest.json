@@ -1925,6 +1925,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/protected-governance-state.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/record-commit-payload-assertion.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/record-only-block-lifecycle-bridge.js",
@@ -2623,6 +2624,7 @@
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/record-commit-payload-assertion.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
@@ -5934,8 +5936,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 5,
-    "unchanged": 1929,
+    "copied": 9,
+    "unchanged": 1927,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -22718,7 +22720,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
-        "digest": "da296595eb29e762d4f433e2886e1a7bdb49f6541fa7bab3cbe4855142b12cf3",
+        "digest": "2288eddea8133cd53ecbeea19c645a1ea60b301a71c3badef945aaff0d395cab",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js"
@@ -22844,7 +22846,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
-        "digest": "4548d87ce6e6800835ca7701c2dd0028c27ea9fa641f7e7ec2a7cc6ecc660d77",
+        "digest": "debbf6a666f4fe119f9d703bd18b7eb4490ca34d37b11e907b79ac8ab50ec2cf",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js"
@@ -22979,10 +22981,19 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
-        "digest": "5415fffe6e40c0b325967f552b88b5f58ab99b2e751d4feebd96d83ac6967a08",
+        "digest": "6a287152c8c29531daee2dafd7c8d5b06e538d3cc6093a10c66fbe67285d6098",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js",
+        "digest": "ff3af63312c6d5c3e4559a38b4aa322b33ac1fa0c5bbd9419fcd502623f577be",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js"
         ],
         "replaceable": true
       },
@@ -28901,7 +28912,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
-        "digest": "2d8a964c1177c54f11a114862acdd1aabea6882afb48045cee3b7464a62a7509",
+        "digest": "be43065b97795c88be3c4d607b08604f4c5d14daaaff83d3078f58b9d1b6d901",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts"
@@ -28910,7 +28921,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
-        "digest": "1e1867da3b20a11abbacf831cee3c401d19a2fd89101f21bb3c32c42ce1b817b",
+        "digest": "aabbf73b89f914d95aba445a7301c6df839ae444be2581a1c9a548f011a24319",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts"
@@ -29063,7 +29074,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
-        "digest": "6b7f3c29b57b1d0556e38338af56ba590e87474ea364b9b72dda2b00797264fb",
+        "digest": "a3b5e714c8354ba7714d9b0e4da19da58fbd9271915195493cba100064dfe06f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts"
@@ -29261,10 +29272,19 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
-        "digest": "5650b4272a05b24d512c5347dd4acd8c00d86cc98c1d905829d62f6755537b44",
+        "digest": "c092a876dd03d981aa51005e96982c759dcd1a0d7b107c1fb787eb2a843fa715",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
+        "digest": "c40e34377b5b7b686263c5fe91093068989768593d40f7bccca6002bd5fec18f",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts"
         ],
         "replaceable": true
       },
@@ -59032,7 +59052,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:a44567e7794af754582c4cd38c0792dbb069b54ef0ce8d20d993a28722e253e5"
+    "treeDigest": "sha256:fbf579fa2c5ecbbc6ed7bb0e02dc737628409690089dfd2854a12457f9648bc9"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -59362,6 +59382,7 @@
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
       "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
+      "packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
       "packages/cli/src/commands/git-governance/protected-governance-state.ts",
       "packages/cli/src/commands/git-governance/record-commit-payload-assertion.ts",
       "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
@@ -60491,7 +60512,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:2aa472abdf6dbaa7540c95fcfd2de41047237083b8013821f9c3a4cb1b0fefd2"
+    "digest": "sha256:ed385e902abd8e3cd0260d27ed5a4b017776e53aba879a6e1a722e1d1ee8776d"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -62390,6 +62411,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/protected-governance-state.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/record-commit-payload-assertion.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/record-only-block-lifecycle-bridge.js",
@@ -63088,6 +63110,7 @@
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/record-commit-payload-assertion.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
@@ -66402,22 +66425,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:dfc25401d6e7345d7c50b560f4637167ef49fb49402f330eba9898d1bf2a43f0",
-  "sealedSourceCommit": "cefad07aea687c2e7b3629d38116eb875c2a5444",
+  "buildInputsTreeHash": "sha256:27970b063680be9d177622a6d35f1a10f96de92017e04482bae21b348d0bbf84",
+  "sealedSourceCommit": "1669bf851589df6d445b519b93ed60b900070b78",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:932045ed45fbe283a1c8d12b6dbfffcd28260eb4e65587815a488a76905c6d1a",
-  "tsBuildCacheDigest": "sha256:2f9a2bd88ba3a162755882cf197ef834d0877aa54c8a48e9351f66b0b2eb603a",
+  "incrementalPlanDigest": "sha256:5c77974af25e3ba40c83aba09322a9361a58b8545ea66f01a111a2eaa6af5bcf",
+  "tsBuildCacheDigest": "sha256:fd5c92ccde3f2453d7012eaed0ea436cb17cb0dbe2eddba4cafa0e93b091ad56",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 49,
-    "skipDecision": 54,
-    "worktreeSetup": 10838,
-    "typescriptBuild": 21733,
-    "rootDropReleaseAssembly": 25480,
-    "onefileReleaseAssembly": 8143,
-    "artifactSync": 9851,
+    "inputHashCalculation": 46,
+    "skipDecision": 57,
+    "worktreeSetup": 10582,
+    "typescriptBuild": 22633,
+    "rootDropReleaseAssembly": 26111,
+    "onefileReleaseAssembly": 8496,
+    "artifactSync": 10538,
     "cleanup": 0,
-    "totalElapsed": 88426
+    "totalElapsed": 90327
   }
 }

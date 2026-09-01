@@ -1,5 +1,6 @@
 import {
   isAllowedGovernanceArtifactPath,
+  isExplicitTerminalHistoryCleanupArtifact,
   isFileAllowedInTaskBundle,
   listTaskOwnedProtectedOverrideAuditFiles,
   readProtectedOverrideAuditTaskId,
@@ -69,11 +70,13 @@ type LegacyValue = ReturnType<typeof JSON.parse>;
 export function inspectTaskScopedStagedGovernanceBundle(cwd: LegacyValue, taskId: LegacyValue, taskDocument: LegacyValue) {
   const stagedFiles = readStagedFiles(cwd);
   const claim = parseTaskClaim(taskDocument.claim);
+  const declaredScope = resolveTaskDeclaredScope(cwd, taskId, taskDocument);
   const warnings = [];
   const mismatchedTaskIds = [];
   if (claim?.state === "active") {
     for (const filePath of stagedFiles) {
       if (isIgnorableCommitStagingSideEffect(cwd, filePath, taskId)) continue;
+      if (isExplicitTerminalHistoryCleanupArtifact(cwd, filePath, taskId, declaredScope)) continue;
       if (!isAllowedGovernanceArtifactPath(cwd, filePath, taskId)) continue;
       const stagedTaskId = extractGovernanceTaskIdFromPath(filePath);
       if (stagedTaskId && stagedTaskId !== taskId.toUpperCase()) {
@@ -91,7 +94,6 @@ export function inspectTaskScopedStagedGovernanceBundle(cwd: LegacyValue, taskId
         mismatchedTaskIds.push(filePath);
       }
     }
-    const declaredScope = resolveTaskDeclaredScope(cwd, taskId, taskDocument);
     const outOfScopeStaged = stagedFiles.filter(
       (filePath: LegacyValue) =>
         !isIgnorableCommitStagingSideEffect(cwd, filePath, taskId) &&
