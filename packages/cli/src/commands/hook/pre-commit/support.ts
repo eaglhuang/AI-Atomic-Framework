@@ -185,7 +185,7 @@ if (evidence?.schemaId !== 'atm.runnerSyncReceipt.v1' || typeof evidence?.taskId
 const closingTaskId = evidence.taskId.trim(); const linkedTaskIds = normalizedStringSet(evidence.linkedTaskIds); const memberTaskIds = normalizedStringSet(evidence.memberTaskIds); const groupTaskIds = normalizedStringSet(evidence?.groupManifest?.memberTaskIds); const childTaskIds = normalizedStringSet(Array.isArray(evidence?.childAttribution?.members) ? evidence.childAttribution.members.map((entry) => entry?.taskId) : []);
 if (!closingTaskId.startsWith('ATM-FRAMEWORK-TEMP-') && linkedTaskIds.includes(closingTaskId) && memberTaskIds.length > 0 && memberTaskIds.every((taskId) => taskId.startsWith('ATM-FRAMEWORK-TEMP-')) && sameStringSet(memberTaskIds, groupTaskIds) && evidence?.childAttribution?.complete === true && sameStringSet(memberTaskIds, childTaskIds)) for (const taskId of memberTaskIds) attestedTemporaryProducerIds.add(taskId);
 }
-const bundleTaskIds = new Set([...contexts.keys(), ...[...evidenceByPath.values()].flat().filter((taskId) => !attestedTemporaryProducerIds.has(taskId))]);
+const bundleTaskIds = new Set([...evidenceByPath.values()].flat().filter((taskId) => !attestedTemporaryProducerIds.has(taskId)));
 for (const [file, taskIds] of evidenceByPath) { const isIndependentRunnerWitness = lockBackedRunnerReceipts.has(file) && taskIds.length === 1 && Boolean(contexts.get(taskIds[0])?.event); const isAttestedTemporaryProducerReceipt = taskIds.length === 1 && attestedTemporaryProducerIds.has(taskIds[0]) && evidenceRecords.get(file)?.schemaId === 'atm.runnerSyncReceipt.v1'; if (bundleTaskIds.size > 1 && !isIndependentRunnerWitness && !isAttestedTemporaryProducerReceipt) { decisions.set(file, { ok: false, taskId: null, reason: 'bundle-with-ambiguous-task-ids' }); continue; }
 if (taskIds.length !== 1) { decisions.set(file, { ok: false, taskId: null, reason: taskIds.length === 0 ? 'evidence-without-semantic-task-id' : 'evidence-with-ambiguous-task-ids' }); continue; }
 const taskId = taskIds[0]; const context = contexts.get(taskId);
@@ -216,7 +216,7 @@ const protectedEvidenceBundle = classifyProtectedEvidenceBundle(cwd, stagedFiles
 for (const file of protectedFiles) { const normalized = normalizeRelativePath(file);
 const lower = normalized.toLowerCase();
 const absolutePath = path.join(cwd, normalized);
-if (lower.startsWith('.atm/history/evidence/') && !lower.startsWith('.atm/history/evidence/historical-batches/')) { const decision = protectedEvidenceBundle.decisions.get(lower);
+if (lower.startsWith('.atm/history/evidence/') && !lower.startsWith('.atm/history/evidence/historical-batches/')) { if (pendingBatchCheckpointAllowedFiles.length > 0 && isPathAllowedByScope(normalized, pendingBatchCheckpointAllowedFiles)) { continue; } const decision = protectedEvidenceBundle.decisions.get(lower);
 if (!decision?.ok) { findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: `Evidence updates must carry one semantic task identity and a matching staged task ledger or transition event (${decision?.reason ?? 'missing-evidence-decision'}).` }); }
 continue;
 }
@@ -257,7 +257,6 @@ return hasSiblingTask || hasSiblingEvent;
 });
 if (taskIds.length === 0 || !hasBatchTaskContext) { findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: 'Historical batch evidence updates must travel with at least one staged task ledger change or transition event referenced by the batch envelope.' });
 } continue;
-} if (pendingBatchCheckpointAllowedFiles.length > 0 && isPathAllowedByScope(normalized, pendingBatchCheckpointAllowedFiles)) { continue;
 } if (effectiveSingleStagedTaskId && isNestedEvidenceArtifactPath(normalized)) { const taskIdLower = effectiveSingleStagedTaskId.toLowerCase();
 const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${effectiveSingleStagedTaskId}.json`);
 const hasSiblingEvent = protectedFiles.some((entry) => { const candidate = normalizeRelativePath(entry).toLowerCase();
