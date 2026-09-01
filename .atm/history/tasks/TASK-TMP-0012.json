@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0012",
+  "title": "Rebuild the sealed runner under a release-surface claim",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Deliverables and validators are filled before import or implementation."
+  ],
+  "deliverables": [
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/release-manifest.json"
+  ],
+  "scopePaths": [
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/**",
+    "packages/cli/dist/**"
+  ],
+  "validators": [
+    "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+    "node atm.mjs --version"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0012-rebuild-the-sealed-runner-under-a-release-surface-claim.task.md",
+    "sectionTitle": "TASK-TMP-0012",
+    "headingLine": 48,
+    "hash": "dc6309861026f696",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0012-rebuild-the-sealed-runner-under-a-release-surface-claim.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:dc6309861026f6966edd205516eb27b73ecd14aa7c902e2d56c4419c781f6da8",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-01T15:15:48.005Z"
+    }
+  },
+  "importedAt": "2026-09-01T15:15:48.005Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "sealed-runner-publication"
+    ],
+    "causalImpactEdges": [
+      "release-surface-claim-enables-runner-sync"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-TMP-0011-closeout"
+    ],
+    "validatorReferences": [
+      "sealed-runner-build"
+    ],
+    "phaseOwner": "codex-cleanup-captain"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_atm.retain.release.artifacts.1.npm.run.build",
+      "command": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.version",
+      "command": "node atm.mjs --version",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-cleanup-captain",
+    "leaseId": "lease-e069cf763c70",
+    "claimedAt": "2026-09-01T15:10:20.275Z",
+    "heartbeatAt": "2026-09-01T15:17:08.461Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TMP-0012.json",
+      "packages/cli/dist/**",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260901151020-codex-cleanup-captain-bda8d4f155",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901151020-codex-cleanup-captain-bda8d4f155\""
+    },
+    "reason": "closed"
+  },
+  "owner": "codex-cleanup-captain",
+  "startedAt": "2026-09-01T15:10:20.275Z",
+  "startedBySessionId": "session-20260901151020-codex-cleanup-captain-TASK-TMP-0012-6817a8650c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0012",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TMP-0012.*",
+      ".atm/history/task-events/TASK-TMP-0012/**",
+      ".atm/history/tasks/TASK-TMP-0012.json",
+      "packages/cli/dist/**",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "209aafde024b805d1f6db7cfc88fe41ba7795e3789fac53207a226b82d5925b3",
+    "actorId": "codex-cleanup-captain",
+    "sessionId": "session-20260901151020-codex-cleanup-captain-TASK-TMP-0012-6817a8650c",
+    "laneSession": {
+      "laneSessionId": "lane-20260901151020-codex-cleanup-captain-bda8d4f155",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901151020-codex-cleanup-captain-bda8d4f155\""
+    },
+    "createdAt": "2026-09-01T15:10:25.861Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-09-01T15-17-08-463Z-close-f87cd2249084",
+  "lastTransitionAt": "2026-09-01T15:17:08.463Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-09-01T15:17:08.461Z",
+  "closedByActor": "codex-cleanup-captain",
+  "closedBySessionId": "session-20260901151020-codex-cleanup-captain-TASK-TMP-0012-6817a8650c",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0012.closure-packet.json"
+}

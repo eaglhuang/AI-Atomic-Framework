@@ -1,0 +1,95 @@
+{
+  "taskId": "TASK-TMP-0012",
+  "updatedAt": "2026-09-01T15:14:17.072Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs --version",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-cleanup-captain",
+      "sessionId": "session-20260901151020-codex-cleanup-captain-TASK-TMP-0012-6817a8650c",
+      "createdAt": "2026-09-01T15:14:17.072Z",
+      "details": {
+        "actorId": "codex-cleanup-captain",
+        "sessionId": "session-20260901151020-codex-cleanup-captain-TASK-TMP-0012-6817a8650c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs --version"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs --version",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6d41103c13f9e70be50dcdd705f68a478fbdb3a58444e9b9dd7d974599013e2f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-09-01T15:14:14.904Z",
+            "finishedAt": "2026-09-01T15:14:17.071Z",
+            "durationMs": 2167,
+            "cached": false,
+            "validators": [
+              "node atm.mjs --version"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "9c1a68bb4a258e8b75103ff0f6837bb0b614de01",
+            "cacheKey": "sha256:135c9d2cc3bee750ede980a1a0f07c9939047d2748eca6f51601c1a591e034de",
+            "generatedAt": "2026-09-01T15:14:17.071Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:135c9d2cc3bee750ede980a1a0f07c9939047d2748eca6f51601c1a591e034de",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-01T15:14:17.071Z",
+              "observedAt": "2026-09-01T15:14:17.071Z",
+              "startedAt": "2026-09-01T15:14:14.904Z",
+              "finishedAt": "2026-09-01T15:14:17.071Z",
+              "durationMs": 2167,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:15a583756847e025f79f862cb548550b28381687064bd2d5d757ec82eb64c4f9",
+              "outputDigest": "sha256:dcd464a5b728793c8ca2d952ef621e2429428c902b4d91dc4fbb996373101517",
+              "cache": {
+                "key": "sha256:135c9d2cc3bee750ede980a1a0f07c9939047d2748eca6f51601c1a591e034de",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node atm.mjs --version",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node atm.mjs --version"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "9c1a68bb4a258e8b75103ff0f6837bb0b614de01",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:375a3ccc48c2cbb6c40c348f01550d578383e619d38b36c81d56dfbf80431c4a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
