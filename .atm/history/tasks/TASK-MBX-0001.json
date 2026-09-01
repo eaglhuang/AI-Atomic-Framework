@@ -1,0 +1,320 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MBX-0001",
+  "title": "實作 editor-neutral 信箱地址與 Markdown 訊息生命週期",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`register` returns a unique address and creates only that session's private mailbox layout.",
+    "Sender publication never exposes a partial message to inbox enumeration.",
+    "Re-reading after acknowledgement does not reprocess the same message.",
+    "Messages may preserve ATM context fields but cannot execute work or grant write authority.",
+    "The focused test supplies a red-to-green proof for all three causal impact edges."
+  ],
+  "deliverables": [
+    "scripts/agent-mailbox.ts",
+    "scripts/agent-mailbox/**",
+    "tests/cli/agent-mailbox-protocol.test.ts",
+    "atomic_workbench/maps/agent-mailbox-protocol-map.json"
+  ],
+  "scopePaths": [
+    "scripts/agent-mailbox/**",
+    "tests/cli/agent-mailbox-protocol.test.ts",
+    "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+    ".atm/history/evidence/TASK-MBX-0001.*",
+    ".atm/history/task-events/TASK-MBX-0001/**",
+    ".atm/history/tasks/TASK-MBX-0001.json",
+    "scripts/agent-mailbox.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "closureAuthority": "local",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit; retain user mailbox roots",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "agent-mailbox-protocol",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/agent-mailbox-protocol-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "agent-mailbox-protocol",
+        "pattern": "Deep Module",
+        "source": "scripts/agent-mailbox.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "agent-mailbox/tasks/TASK-MBX-0001-editor-neutral-markdown.task.md",
+    "sectionTitle": "TASK-MBX-0001",
+    "headingLine": 80,
+    "hash": "1c8d185458183424",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "agent-mailbox/tasks/TASK-MBX-0001-editor-neutral-markdown.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:1c8d1854581834243e0dabed871e83ff2af159d2953d4052bb73002a155e4687",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-29T10:46:54.197Z"
+    }
+  },
+  "importedAt": "2026-08-29T10:46:54.197Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The MBX plan is registered and this source card imports cleanly into the ATM framework ledger."
+    ],
+    "softRelations": [
+      "Existing captain-dispatch mailbox remains untouched because it owns queue and stop-loss behavior, not peer conversation delivery."
+    ],
+    "changedPublicSeams": [
+      "agent-mailbox protocol API"
+    ],
+    "causalImpactEdges": [
+      "mailbox-address-isolation",
+      "mailbox-atomic-delivery",
+      "mailbox-idempotent-consumption"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "test_mbx_protocol_lifecycle_1f9d2a7c"
+    ],
+    "phaseOwner": "TASK-MBX-0001"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_mbx_protocol_lifecycle_1f9d2a7c",
+      "targetGroupId": "null",
+      "semanticKey": "agent_mailbox_protocol_lifecycle",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "mailbox-address-isolation",
+        "mailbox-atomic-delivery",
+        "mailbox-idempotent-consumption"
+      ],
+      "expectedRedPredicate": "A missing protocol implementation cannot create isolated addresses, hide partial files, consume safely without authority, or make acknowledgement idempotent.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "agent-mailbox-protocol-api",
+      "resourceKey": "mailbox-filesystem-fixture"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_mbx_protocol_lifecycle_1f9d2a7c"
+  ],
+  "phaseTestCaseIds": [
+    "legacy_cmd_typecheck"
+  ],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-01T20-31-54-493Z-renew-25584b1fc0b0",
+  "lastTransitionAt": "2026-09-01T20:31:54.493Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-08-29T10:47:32.228Z",
+  "promotedAt": "2026-08-29T10:47:32.233Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-9201546a5bd4",
+    "claimedAt": "2026-08-29T10:47:32.237Z",
+    "heartbeatAt": "2026-09-01T20:31:54.258Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-MBX-0001.*",
+      ".atm/history/task-events/TASK-MBX-0001/**",
+      ".atm/history/tasks/TASK-MBX-0001.json",
+      "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+      "scripts/agent-mailbox.ts",
+      "scripts/agent-mailbox/**",
+      "tests/cli/agent-mailbox-protocol.test.ts"
+    ],
+    "state": "active",
+    "reason": "Original owner lease expired more than three days ago; no live Codex task is executing it, and cleanup objective requires resolving its owned dirty work through governed recovery.",
+    "laneSession": {
+      "laneSessionId": "lane-20260829104732-codex-gpt-5.4-mini-1967730c1b",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260829104732-codex-gpt-5.4-mini-1967730c1b\""
+    }
+  },
+  "startedAt": "2026-08-29T10:47:32.237Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d8db0824996a0d31",
+    "ticketDigest": "sha256:d8db0824996a0d31a9c32b146e390ecc5977e1137abe965e3ebd5e9eeb15074c",
+    "taskId": "TASK-MBX-0001",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260829104732-codex-gpt-5.4-mini-1967730c1b",
+    "claimGeneration": "lease-9201546a5bd4",
+    "issuedAt": "2026-09-01T20:31:54.258Z",
+    "expiresAt": "2026-09-01T21:01:54.258Z",
+    "scopeDigest": "sha256:60775567563429a3ed1bc93720247e7434e2abed6be19632bb7e06afd38a3d39",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-01T20:31:54.258Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-MBX-0001.*",
+          ".atm/history/task-events/TASK-MBX-0001/**",
+          ".atm/history/tasks/TASK-MBX-0001.json",
+          "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+          "scripts/agent-mailbox.ts",
+          "scripts/agent-mailbox/**",
+          "tests/cli/agent-mailbox-protocol.test.ts"
+        ],
+        "digest": "sha256:bd2d6d84a645fc02ca9163b5804d4b739b65771138e593e81b72768d180b4847"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "TASK-MBX-0001",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260829104732-codex-gpt-5.4-mini-1967730c1b",
+    "dirtyPaths": [
+      ".atm/history/evidence/TASK-MBX-0001.bundle-manifest.json",
+      ".atm/history/evidence/TASK-MBX-0001.json",
+      ".atm/history/evidence/TASK-MBX-0001.runner-sync-receipt.json",
+      ".atm/history/task-events/TASK-MBX-0001/2026-08-29T10-46-54-499Z-import-299b0a410266.json",
+      ".atm/history/task-events/TASK-MBX-0001/2026-08-29T10-47-32-228Z-reserve-4c01aafcfc84.json",
+      ".atm/history/task-events/TASK-MBX-0001/2026-08-29T10-47-32-233Z-promote-9374d4ec774f.json",
+      ".atm/history/task-events/TASK-MBX-0001/2026-08-29T10-47-36-735Z-claim-d039eaecc2ba.json",
+      ".atm/history/task-events/TASK-MBX-0001/2026-08-29T10-50-25-312Z-scope-amendment-2d8ecce639bc.json",
+      ".atm/history/tasks/TASK-MBX-0001.json",
+      "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+      "scripts/agent-mailbox.ts",
+      "tests/cli/agent-mailbox-protocol.test.ts"
+    ],
+    "retainedAt": "2026-09-01T20:31:09.557Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MBX-0001",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MBX-0001.*",
+      ".atm/history/task-events/TASK-MBX-0001/**",
+      ".atm/history/tasks/TASK-MBX-0001.json",
+      "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+      "scripts/agent-mailbox.ts",
+      "scripts/agent-mailbox/**",
+      "tests/cli/agent-mailbox-protocol.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/agent-mailbox/tasks/TASK-MBX-0001-editor-neutral-markdown.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/agent-mailbox/",
+      "docs/ai_atomic_framework/agent-mailbox/tasks/",
+      "docs/ai_atomic_framework/agent-mailbox/tasks/TASK-MBX-0001-editor-neutral-markdown.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "f9dfc53aa7b4205b5c3a772724b1bf3c6a3ba53cb295dccc74456e2ce73d4996",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+    "createdAt": "2026-09-01T20:31:54.423Z",
+    "status": "active"
+  }
+}

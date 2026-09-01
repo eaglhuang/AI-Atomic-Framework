@@ -1,0 +1,418 @@
+{
+  "taskId": "TASK-MBX-0001",
+  "updatedAt": "2026-08-29T10:56:23.894Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+      "createdAt": "2026-08-29T10:52:46.508Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/agent-mailbox-protocol.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "agent-mailbox-protocol",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:72b7499038a3327de8821a00c6144ac22cd67fa97947d0e1218cd6bba23b5d6b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-29T10:52:46.152Z",
+            "finishedAt": "2026-08-29T10:52:46.508Z",
+            "durationMs": 356,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/agent-mailbox-protocol.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "386bb284ddc69ee9e46edeac4c07afc6af52f982",
+            "cacheKey": "sha256:a4fba3f70ccb8a6b1be3ebada9da97ce49b491bbbff7f3d747aff92646eae179",
+            "generatedAt": "2026-08-29T10:52:46.508Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:a4fba3f70ccb8a6b1be3ebada9da97ce49b491bbbff7f3d747aff92646eae179",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-29T10:52:46.508Z",
+              "observedAt": "2026-08-29T10:52:46.508Z",
+              "startedAt": "2026-08-29T10:52:46.152Z",
+              "finishedAt": "2026-08-29T10:52:46.508Z",
+              "durationMs": 356,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:64daa49c0baefab0dfea38b04002b42650e79d2dd4cdd6b56f75c410ab0ee416",
+              "outputDigest": "sha256:6237829e2ba9eeafcf7e306ed0cd028e73249f06a3f513eefddc0c87a9a68eb3",
+              "cache": {
+                "key": "sha256:a4fba3f70ccb8a6b1be3ebada9da97ce49b491bbbff7f3d747aff92646eae179",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/agent-mailbox-protocol.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "386bb284ddc69ee9e46edeac4c07afc6af52f982",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c59261267b65a222714b4faea3a7fcf75d4a1a899dab341a184a2432d0a76786",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+      "createdAt": "2026-08-29T10:53:01.409Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "agent-mailbox-protocol",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-29T10:52:49.649Z",
+            "finishedAt": "2026-08-29T10:53:01.408Z",
+            "durationMs": 11759,
+            "cached": false,
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "386bb284ddc69ee9e46edeac4c07afc6af52f982",
+            "cacheKey": "sha256:7c1d9070b81e83e6392048011d1b46c76a850a4318a389f272583cc615bdc1ab",
+            "generatedAt": "2026-08-29T10:53:01.408Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:7c1d9070b81e83e6392048011d1b46c76a850a4318a389f272583cc615bdc1ab",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-29T10:53:01.408Z",
+              "observedAt": "2026-08-29T10:53:01.408Z",
+              "startedAt": "2026-08-29T10:52:49.649Z",
+              "finishedAt": "2026-08-29T10:53:01.408Z",
+              "durationMs": 11759,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:6f8dfcab8eaf106cef13fae6c3eb3ae6712fb1999232c3d1d7ecb66f19b10c75",
+              "outputDigest": "sha256:cb6206dcd66e4f4792c0bf9aa91e2996183c1e272e5c9c01f8b74d9e4162ac1d",
+              "cache": {
+                "key": "sha256:7c1d9070b81e83e6392048011d1b46c76a850a4318a389f272583cc615bdc1ab",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run typecheck",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "386bb284ddc69ee9e46edeac4c07afc6af52f982",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7dde2620644d8f05ed57bbd2b200042e97459cb16a4d3e8c6032ba1edca15eae",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+      "createdAt": "2026-08-29T10:56:12.081Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/agent-mailbox-protocol.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "agent-mailbox-protocol",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:72b7499038a3327de8821a00c6144ac22cd67fa97947d0e1218cd6bba23b5d6b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-29T10:56:11.754Z",
+            "finishedAt": "2026-08-29T10:56:12.080Z",
+            "durationMs": 326,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/agent-mailbox-protocol.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "386bb284ddc69ee9e46edeac4c07afc6af52f982",
+            "cacheKey": "sha256:a4fba3f70ccb8a6b1be3ebada9da97ce49b491bbbff7f3d747aff92646eae179",
+            "generatedAt": "2026-08-29T10:56:12.080Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:a4fba3f70ccb8a6b1be3ebada9da97ce49b491bbbff7f3d747aff92646eae179",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-29T10:56:12.080Z",
+              "observedAt": "2026-08-29T10:56:12.080Z",
+              "startedAt": "2026-08-29T10:56:11.754Z",
+              "finishedAt": "2026-08-29T10:56:12.080Z",
+              "durationMs": 326,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:64daa49c0baefab0dfea38b04002b42650e79d2dd4cdd6b56f75c410ab0ee416",
+              "outputDigest": "sha256:6237829e2ba9eeafcf7e306ed0cd028e73249f06a3f513eefddc0c87a9a68eb3",
+              "cache": {
+                "key": "sha256:a4fba3f70ccb8a6b1be3ebada9da97ce49b491bbbff7f3d747aff92646eae179",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/agent-mailbox-protocol.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/agent-mailbox-protocol.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "386bb284ddc69ee9e46edeac4c07afc6af52f982",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c59261267b65a222714b4faea3a7fcf75d4a1a899dab341a184a2432d0a76786",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+      "createdAt": "2026-08-29T10:56:23.894Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "agent-mailbox-protocol",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/maps/agent-mailbox-protocol-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-08-29T10:56:14.478Z",
+            "finishedAt": "2026-08-29T10:56:23.893Z",
+            "durationMs": 9415,
+            "cached": false,
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "386bb284ddc69ee9e46edeac4c07afc6af52f982",
+            "cacheKey": "sha256:7c1d9070b81e83e6392048011d1b46c76a850a4318a389f272583cc615bdc1ab",
+            "generatedAt": "2026-08-29T10:56:23.893Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:7c1d9070b81e83e6392048011d1b46c76a850a4318a389f272583cc615bdc1ab",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-08-29T10:56:23.893Z",
+              "observedAt": "2026-08-29T10:56:23.893Z",
+              "startedAt": "2026-08-29T10:56:14.478Z",
+              "finishedAt": "2026-08-29T10:56:23.893Z",
+              "durationMs": 9415,
+              "laneSessionId": null,
+              "taskId": null,
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:6f8dfcab8eaf106cef13fae6c3eb3ae6712fb1999232c3d1d7ecb66f19b10c75",
+              "outputDigest": "sha256:cb6206dcd66e4f4792c0bf9aa91e2996183c1e272e5c9c01f8b74d9e4162ac1d",
+              "cache": {
+                "key": "sha256:7c1d9070b81e83e6392048011d1b46c76a850a4318a389f272583cc615bdc1ab",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run typecheck",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "386bb284ddc69ee9e46edeac4c07afc6af52f982",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7dde2620644d8f05ed57bbd2b200042e97459cb16a4d3e8c6032ba1edca15eae",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

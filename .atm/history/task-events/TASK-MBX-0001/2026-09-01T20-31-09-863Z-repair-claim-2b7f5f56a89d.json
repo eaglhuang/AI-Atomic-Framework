@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-01T20-31-09-863Z-repair-claim-2b7f5f56a89d",
+  "taskId": "TASK-MBX-0001",
+  "action": "repair-claim",
+  "actorId": "codex-cleanup-captain",
+  "sessionId": "session-20260829104732-codex-gpt-5.4-mini-TASK-MBX-0001-c6d49f8588",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-MBX-0001.json",
+  "taskSha256": "sha256:a471c3c79aefbd53beac6eb77d84a76fa07cfe3ccc6e9a98583861f33f9ef347",
+  "createdAt": "2026-09-01T20:31:09.863Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-MBX-0001 --actor codex-cleanup-captain --write --reason \"Original owner lease expired more than three days ago; no live Codex task is executing it, and cleanup objective requires resolving its owned dirty work through governed recovery.\" --json"
+}

@@ -1,0 +1,32 @@
+{
+  "schemaId": "atm.atomicMap",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Capability map for the editor-neutral Agent Mailbox protocol."
+  },
+  "mapId": "map-agent-mailbox-protocol-0001",
+  "mapName": "atm.agent-mailbox-protocol-map",
+  "mapVersion": "0.1.0",
+  "capability": "Portable local-file delivery between isolated editor conversation sessions.",
+  "members": [
+    { "atomId": "agent-mailbox-protocol", "version": "0.1.0", "status": "generatedDraft" }
+  ],
+  "edges": [],
+  "entrypoints": ["agent-mailbox-protocol"],
+  "qualityTargets": {
+    "promoteGateRequired": true,
+    "requiredChecks": 2,
+    "testCoverage": "protocol-lifecycle",
+    "rollbackEvidenceRequired": true
+  },
+  "sourcePathPatterns": [
+    "scripts/agent-mailbox.ts",
+    "tests/cli/agent-mailbox-protocol.test.ts"
+  ],
+  "ownsUnattachedPaths": true,
+  "reviewStatus": "generatedDraft",
+  "mapHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "semanticFingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+}
