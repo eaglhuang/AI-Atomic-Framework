@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-02-002",
+  "date": "2026-09-02",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Open",
+  "area": "Taskflow close / record-only governance evidence",
+  "finding": "A successful taskflow close can leave an append-only git-head receipt dirty. The normal record-commit command requires an already staged record-only set, but exposes no path-bounded staging route. Creating an ATM-only cleanup task is correctly rejected because done requires a real non-.atm deliverable.",
+  "expectedBehavior": "ATM should provide one governed, path-bounded route that persists a generated git-head receipt without absorbing foreign dirty work and without requiring a synthetic product deliverable or native Git emergency commit.",
+  "evidenceOrRepro": "TASK-TMP-0022 closed successfully at framework commit 8be92971134f53b32dcaa0f7723241f12d86ef26 and left only .atm/history/evidence/git-head.jsonl outside the active TASK-MBX-0001 WIP. TASK-TMP-0023 demonstrated that taskflow close fails closed for an ATM-only card, while git record-commit returns ATM_GIT_RECORD_COMMIT_EMPTY_INDEX because there is no governed path-bounded staging operation.",
+  "containment": "The emergency keep-list is restricted to the generated git-head receipt and this backlog shard. TASK-MBX-0001 and mailbox-protocol files remain excluded and untouched.",
+  "followUp": "Implement and test a scoped record-commit staging option or make successful taskflow close atomically include its generated git-head receipt. Retire the emergency path after the governed route exists."
+}
