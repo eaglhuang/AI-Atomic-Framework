@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-01T20-24-01-488Z-close-8cdb365f5663",
+  "taskId": "TASK-TMP-0022",
+  "action": "close",
+  "actorId": "codex-cleanup-captain",
+  "sessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0022.json",
+  "taskSha256": "sha256:8fe0e0a173ff3109c6e9c423c6b1f2171b4eb94bbdeab32cb0fccf6cf3fe6eb7",
+  "createdAt": "2026-09-01T20:24:01.488Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0022 --actor codex-cleanup-captain --status done --historical-delivery ff850b6da1fe2d0d87fcd74d083b17662f073510",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0022.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "node --strip-types tests/cli/six-editor-adapter-parity.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "node --strip-types tests/cli/six-editor-adapter-parity.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-01T20:24:01.481Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0022.*",
+        ".atm/history/task-events/ATM-GOV-0397/2026-08-15T13-43-05-511Z-import-6714943a01b7.json",
+        ".atm/history/task-events/ATM-GOV-0397/2026-08-20T17-27-36-320Z-import-0c44811d1783.json",
+        ".atm/history/task-events/TASK-PRF-0008/2026-08-31T13-49-25-157Z-repair-claim-e349d482702e.json",
+        ".atm/history/task-events/TASK-TMP-0022/**",
+        ".atm/history/tasks/ATM-GOV-0397.json",
+        ".atm/history/tasks/TASK-PRF-0008.json",
+        ".atm/history/tasks/TASK-TMP-0022.json",
+        "atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-005.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-006.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-008.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-009.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-014.json",
+        "docs/governance/canonical-authority-snapshot-charter.md",
+        "docs/governance/model-bound-agent-capability-benchmark.md",
+        "docs/governance/skills/",
+        "docs/governance/skills/ATM-SKL-backlog-family-mapping-2026-08-08-claude-007.md",
+        "docs/governance/skills/ATM-SKL-captain-audit-2026-08-08-claude-007.md",
+        "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-01-claude-007.md",
+        "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-08-codex.md",
+        "docs/reports/wave-exit-observer-receipts/",
+        "docs/reports/wave-exit-observer-receipts/EXIT-07/ca39ef007a6238efb293099a25f6db0bcaceee2e.json",
+        "docs/reports/wave-exit-observer-receipts/EXIT-11/71aac841a45a19a8d9318ed3371a231bf3bb3c1d.json",
+        "docs/reports/wave-exit-observer-receipts/EXIT-11/d0fcd88bfb48b91225210ad889ce601767d1bed1.json",
+        "tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+        "tests/cli/six-editor-adapter-parity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+        "tests/cli/six-editor-adapter-parity.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+        "node --strip-types tests/cli/six-editor-adapter-parity.test.ts"
+      ]
+    }
+  }
+}
