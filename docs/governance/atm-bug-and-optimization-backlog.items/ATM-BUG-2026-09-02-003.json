@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-02-003",
+  "date": "2026-09-02",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Fixed in source; frozen runner publication and formal closeout remain separate states",
+  "area": "Sealed root-drop release reproducibility",
+  "finding": "buildRootDropRelease inventories packages/**/dist but assumed its caller had already rebuilt those generated inputs. The runner reproducibility verifier built root-drop before onefile, while onefile then rebuilt package dist; the next root-drop pass therefore emitted a different release-manifest.json from the same source tree.",
+  "expectedBehavior": "A root-drop release build must materialize its generated package-dist inputs before it derives the artifact inventory, so identical source trees produce byte-identical root-drop and onefile manifests regardless of caller order.",
+  "evidenceOrRepro": "node --strip-types scripts/validate-runner-reproducibility.ts reproduced the failure serially: release/atm-root-drop/release-manifest.json was not byte-identical across consecutive builds. The initial overlapping invocation caused a separate Windows file-write error and was discarded; the serial run reached the deterministic manifest comparison and failed there.",
+  "containment": "The repair is limited to the root-drop builder and its release artifacts. It does not weaken the reproducibility assertion, exclude generated files from the manifest, or depend on a caller-specific build order.",
+  "followUp": "Run the runner reproducibility validator after the repair, then rebuild and publish the sealed runner through the runner-sync steward queue before marking frozen publication complete."
+}
