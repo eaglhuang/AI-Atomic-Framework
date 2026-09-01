@@ -147,8 +147,11 @@ export async function validateAaoThroughputAgentJourney(tempRoot: string) {
   assert(preCommit.ok === true, `checkpoint commit window must pass after checkpoint --hold. Got: ${JSON.stringify((preCommit.evidence as any)?.blockingFindings ?? preCommit.messages ?? [])}`);
   const preCommitFindings = ((preCommit.evidence as any).blockingFindings ?? []) as Array<Record<string, any>>;
   assert(!preCommitFindings.some((entry) => entry.code === 'ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT'), 'held checkpoint commit window must not expose ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT');
-  runGit(repo, ['reset', '--', '.']);
-  runGit(repo, ['checkout', '--', '.']);
+  // The hook was just exercised in-process. Commit the identical staged
+  // fixture transaction so resume observes the consumed checkpoint window;
+  // running the native hook a second time would test Git wiring, not batch
+  // lifecycle authority.
+  runGit(repo, ['-c', 'user.name=ATM Test', '-c', 'user.email=atm-test@example.invalid', 'commit', '--no-verify', '-m', 'complete TASK-ADOPT-0001']);
 
   const resume = await runBatch(['resume', '--cwd', repo, '--actor', 'adopter-agent', '--batch', batchId, '--json']);
   assert(resume.ok === true, 'AAO throughput journey must resume the held batch');
@@ -177,6 +180,14 @@ export async function validateBatchCheckpointHold(tempRoot: string) {
   assert(current.hold?.afterTaskId === 'TASK-ADOPT-0001', 'held state must record the task that was just checkpointed');
   assert(String(current.resumeCommand ?? '').includes('batch resume'), 'held status must include an exact batch resume command');
   assert(current.commitInstruction?.timing === 'after-checkpoint', 'held status must expose after-checkpoint commit instruction. Got: ' + JSON.stringify(current));
+
+  runGit(repo, ['add',
+    'src/one.ts',
+    '.atm/history/tasks/TASK-ADOPT-0001.json',
+    '.atm/history/evidence/TASK-ADOPT-0001.json',
+    '.atm/history/task-events/TASK-ADOPT-0001'
+  ]);
+  runGit(repo, ['-c', 'user.name=ATM Test', '-c', 'user.email=atm-test@example.invalid', 'commit', '--no-verify', '-m', 'complete held TASK-ADOPT-0001']);
 
   const resume = await runBatch(['resume', '--cwd', repo, '--actor', 'adopter-agent', '--batch', batchId, '--json']);
   assert(resume.ok === true, 'batch resume must succeed after checkpoint --hold');
