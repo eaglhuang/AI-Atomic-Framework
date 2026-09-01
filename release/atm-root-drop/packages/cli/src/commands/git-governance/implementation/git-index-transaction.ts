@@ -224,8 +224,11 @@ export function isAllowedGovernanceArtifactPath(cwd: LegacyValue, filePath: Lega
  * scope. A bounded history-only cleanup may commit one such receipt only when
  * it is named exactly, carries its owner id, and that owner is terminal.
  */
-export function isExplicitTerminalHistoryCleanupArtifact(cwd: LegacyValue, filePath: LegacyValue, currentTaskId: LegacyValue, declaredScope: readonly string[]) {
-  return isExplicitTerminalHistoryCleanupArtifactAt(cwd, filePath, currentTaskId, declaredScope, (candidate) => isAllowedGovernanceArtifactPath(cwd, candidate, currentTaskId));
+export function isExplicitTerminalHistoryCleanupArtifact(cwd: LegacyValue, filePath: LegacyValue, currentTaskId: LegacyValue, declaredScope: readonly string[], taskDocument: LegacyValue = null) {
+  const planningSourcePath = typeof taskDocument?.source?.planPath === 'string'
+    ? taskDocument.source.planPath
+    : null;
+  return isExplicitTerminalHistoryCleanupArtifactAt(cwd, filePath, currentTaskId, declaredScope, (candidate) => isAllowedGovernanceArtifactPath(cwd, candidate, currentTaskId), planningSourcePath);
 }
 
 export function isFileAllowedInTaskBundle(cwd: LegacyValue, filePath: LegacyValue, taskId: LegacyValue, declaredScope: LegacyValue) {

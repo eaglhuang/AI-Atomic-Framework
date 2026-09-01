@@ -62,8 +62,11 @@ function isUncommittableTaskEvidenceArtifact(cwd, filePath, taskId, taskDocument
 }
 export function resolveTaskScopedCommitBundle(input) {
     const declaredScope = resolveTaskDeclaredScope(input.cwd, input.taskId, input.taskDocument);
+    const currentTaskPlanningSourcePath = typeof input.taskDocument?.source?.planPath === 'string'
+        ? input.taskDocument.source.planPath
+        : null;
     const commitAuthority = createCommitAuthorityPolicy(input);
-    const isAllowedCommitArtifact = (filePath) => isAllowedGovernanceArtifactPath(input.cwd, filePath, input.taskId) || isExplicitTerminalHistoryCleanupArtifact(input.cwd, filePath, input.taskId, declaredScope, (candidate) => isAllowedGovernanceArtifactPath(input.cwd, candidate, input.taskId));
+    const isAllowedCommitArtifact = (filePath) => isAllowedGovernanceArtifactPath(input.cwd, filePath, input.taskId) || isExplicitTerminalHistoryCleanupArtifact(input.cwd, filePath, input.taskId, declaredScope, (candidate) => isAllowedGovernanceArtifactPath(input.cwd, candidate, input.taskId), currentTaskPlanningSourcePath);
     const gitExecutable = resolveGitExecutable();
     const copyableCommitCommand = buildCopyableGitCommitCommand({
         cwd: input.cwd,

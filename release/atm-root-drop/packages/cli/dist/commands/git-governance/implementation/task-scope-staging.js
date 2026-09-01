@@ -20,7 +20,7 @@ export function inspectTaskScopedStagedGovernanceBundle(cwd, taskId, taskDocumen
         for (const filePath of stagedFiles) {
             if (isIgnorableCommitStagingSideEffect(cwd, filePath, taskId))
                 continue;
-            if (isExplicitTerminalHistoryCleanupArtifact(cwd, filePath, taskId, declaredScope))
+            if (isExplicitTerminalHistoryCleanupArtifact(cwd, filePath, taskId, declaredScope, taskDocument))
                 continue;
             if (!isAllowedGovernanceArtifactPath(cwd, filePath, taskId))
                 continue;
