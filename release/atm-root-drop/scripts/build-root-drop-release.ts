@@ -55,6 +55,11 @@ export function buildRootDropRelease(options: any = {}) {
   const releaseRoot = path.resolve(options.releaseRoot ?? defaultReleaseRoot);
   assertStableLauncherTemplatePresent(repositoryRoot);
   assertRootLauncherSafeForReleaseBuild(repositoryRoot);
+  // The root-drop inventory includes package dist output.  Build it here rather
+  // than relying on a caller (such as the onefile builder) having happened to
+  // do so first; otherwise two consecutive root-drop builds can seal different
+  // inputs into their manifests.
+  ensureBuiltPackageDist(repositoryRoot);
   mkdirSync(releaseRoot, { recursive: true });
 
   const sourceFiles = listReleaseSourceFiles(repositoryRoot);
@@ -157,6 +162,16 @@ export function buildRootDropRelease(options: any = {}) {
     entryCount: releaseEntries.length,
     copyReport
   };
+}
+
+function ensureBuiltPackageDist(repositoryRoot: string) {
+  const result = spawnSync(process.execPath, ['--strip-types', 'scripts/build-package-dist.ts'], {
+    cwd: repositoryRoot,
+    stdio: 'inherit'
+  });
+  if ((result.status ?? 1) !== 0) {
+    throw new Error(`Failed to build package dist before root-drop release (exit ${result.status ?? 1}).`);
+  }
 }
 
 export function hydrateVerifiedRootDropBase(input: { readonly sourceReleaseRoot: string; readonly targetReleaseRoot: string; readonly previousSealedSourceSha: string | null; readonly removeTree: (path: string) => void; }): boolean {

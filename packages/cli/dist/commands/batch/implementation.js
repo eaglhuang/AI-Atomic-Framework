@@ -113,16 +113,18 @@ export async function runBatch(argv) {
                     historicalDeliveryRefs: batchHistoricalDeliveryRefs, historicalBatchRefs: batchHistoricalBatchRefs, closeHeadCapture: { schemaId: 'atm.batchCheckpointHeadCapture.v1', taskId: currentTaskId, batchId: active.batchId, headBeforeClose: capturedHeadBeforeClose, headAfterClose: readGitHead(options.cwd) }, closeResult: closeResult.evidence, failureCategory: closeCategory }
             });
         }
-        let cleanupResult = null;
-        try {
-            cleanupResult = await runTasks(['lock', 'cleanup', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--reason', 'batch checkpoint cleanup', '--json']);
-        }
-        catch {
-            cleanupResult = null;
-        }
         const queue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId });
         const nextTaskId = queue?.taskIds[queue.currentIndex] ?? null;
         const continuation = decideCheckpointContinuation({ closedTaskId: currentTaskId, nextTaskId });
+        let cleanupResult = null;
+        if (!continuation.pendingCommitTaskId) {
+            try {
+                cleanupResult = await runTasks(['lock', 'cleanup', '--cwd', options.cwd, '--task', currentTaskId, '--actor', resolvedActor.actorId, '--reason', 'batch checkpoint cleanup', '--json']);
+            }
+            catch {
+                cleanupResult = null;
+            }
+        }
         const updated = updateBatchRun(options.cwd, active, { currentIndex: queue?.currentIndex ?? active.currentIndex, currentTaskId: nextTaskId, pendingCommitTaskId: continuation.pendingCommitTaskId, status: queue?.status === 'completed' || !nextTaskId ? 'completed' : 'active', hold: nextTaskId ? { schemaId: 'atm.batchHold.v1', status: 'held', afterTaskId: currentTaskId, currentTaskId: nextTaskId,
                 heldByActor: resolvedActor.actorId, heldAt: new Date().toISOString(), resumeCommand: `node atm.mjs batch resume --actor ${resolvedActor.actorId} --batch ${active.batchId} --json` }
                 : null });
