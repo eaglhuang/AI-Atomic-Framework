@@ -1,0 +1,147 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TMP-0011",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "bb21f8f8369beb39b60aab0543ad5e562860ee2c",
+  "governedTreeSha": "047f684a9c384a147efdfc56c96dabee144e451a",
+  "targetCommitDelta": {
+    "currentCommitSha": "bb21f8f8369beb39b60aab0543ad5e562860ee2c",
+    "parentCommitShas": [
+      "bb21f8f8369beb39b60aab0543ad5e562860ee2c"
+    ],
+    "governedTreeSha": "047f684a9c384a147efdfc56c96dabee144e451a",
+    "changedFiles": [
+      ".atm/git-hooks/pre-commit",
+      ".atm/git-hooks/pre-push",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-lane-lane-20260809225333-codex-gpt-5-4-mini-07d686dcfd.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0253.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0288.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0289.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0291.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0296.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0297.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0298.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0307.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0314.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0315.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0329.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0331.json",
+      ".atm/history/evidence/ATM-GOV-0332.json",
+      ".atm/history/evidence/ATM-GOV-0333.json",
+      ".atm/history/evidence/ATM-GOV-0336.json",
+      ".atm/history/evidence/ATM-GOV-0337.json",
+      ".atm/history/evidence/ATM-GOV-0345.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0345.runner-publication-takeover.json",
+      ".atm/history/evidence/ATM-GOV-0345.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
+      ".atm/history/evidence/ATM-GOV-0349.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0349.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0353.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0356.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0357.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0359.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-GOV-0360.json",
+      ".atm/history/evidence/TASK-TMP-0011.json",
+      ".atm/history/task-events/ATM-GOV-0349/2026-08-12T10-16-00-875Z-close-20b4b1f83e0d.json",
+      ".atm/history/task-events/TASK-TMP-0011/2026-09-01T14-48-45-691Z-import-0b437385e078.json",
+      ".atm/history/task-events/TASK-TMP-0011/2026-09-01T14-48-51-232Z-reserve-51eeca55b423.json",
+      ".atm/history/task-events/TASK-TMP-0011/2026-09-01T14-48-51-237Z-promote-cceab5c34dfa.json",
+      ".atm/history/task-events/TASK-TMP-0011/2026-09-01T14-48-53-344Z-claim-18574b4d6122.json",
+      ".atm/history/task-events/TASK-TMP-0011/2026-09-01T14-59-28-783Z-release-fd740ee85e7b.json",
+      ".atm/history/task-events/TASK-TMP-0011/2026-09-01T15-00-28-708Z-import-81434e1ef84b.json",
+      ".atm/history/task-events/TASK-TMP-0011/2026-09-01T15-01-08-767Z-reserve-718f8eca9b20.json",
+      ".atm/history/task-events/TASK-TMP-0011/2026-09-01T15-01-08-792Z-promote-415215bf5a8d.json",
+      ".atm/history/task-events/TASK-TMP-0011/2026-09-01T15-01-15-618Z-claim-4048b5fe0adf.json",
+      ".atm/history/tasks/ATM-GOV-0289.json",
+      ".atm/history/tasks/ATM-GOV-0298.json",
+      ".atm/history/tasks/ATM-GOV-0314.json",
+      ".atm/history/tasks/ATM-GOV-0349.json",
+      ".atm/history/tasks/TASK-PRF-0008.json",
+      ".atm/history/tasks/TASK-TMP-0011.json",
+      "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs cleanup diagnose --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3e248e0a39cb4b70d7e8c3d7d31f31dc9ba34b6cad878f60deaa77340d3d478c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node atm.mjs cleanup diagnose --json"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node atm.mjs cleanup diagnose --json"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-01T15:18:41.840Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TMP-0011.*",
+      ".atm/history/task-events/TASK-TMP-0011/**",
+      ".atm/history/tasks/TASK-TMP-0011.json",
+      "1",
+      "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md",
+      "tmp/proposal.TASK-PRF-0006.v3.atmArtifactBudget.json",
+      "tmp/proposal.TASK-PRF-0006.v4.atmArtifactBudget.json"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "git diff --check",
+      "node atm.mjs cleanup diagnose --json"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TMP-0011.json",
+  "closedAt": "2026-09-01T15:18:41.841Z",
+  "closedByActor": "codex-cleanup-captain",
+  "sessionId": "session-20260901150108-codex-cleanup-captain-TASK-TMP-0011-8c0b393f6b",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "fcc6568a881e63ee69d8acf52d10236c3ce1ac4d",
+    "taskMatchedFiles": [
+      "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

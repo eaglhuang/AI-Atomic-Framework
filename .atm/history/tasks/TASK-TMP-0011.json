@@ -1,0 +1,263 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0011",
+  "title": "Reconcile and eliminate dual-repository dirty residue",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "The report names every deleted path, its pre-delete SHA-256, and the canonical evidence that makes deletion safe.",
+    "The two proposal IDs remain present in `.atm/runtime/broker-proposals.json` after the ingest files are removed.",
+    "The validator pointer is proven to name an expired file under the system temporary directory, not a repository asset.",
+    "No `.atm/history/**`, MBX, or unverified source path is changed by this task."
+  ],
+  "deliverables": [
+    "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md"
+  ],
+  "scopePaths": [
+    "1",
+    "tmp/proposal.TASK-PRF-0006.v3.atmArtifactBudget.json",
+    "tmp/proposal.TASK-PRF-0006.v4.atmArtifactBudget.json",
+    "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md"
+  ],
+  "validators": [
+    "node atm.mjs cleanup diagnose --json",
+    "git diff --check"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0011-reconcile-and-eliminate-dual-repository-dirty-residue.task.md",
+    "sectionTitle": "TASK-TMP-0011",
+    "headingLine": 35,
+    "hash": "213539a8d26c21d5",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0011-reconcile-and-eliminate-dual-repository-dirty-residue.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:213539a8d26c21d57e81e7fd80e6d842934aa5b36ce436579d377429a3bfb7cd",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-01T15:00:28.396Z"
+    }
+  },
+  "importedAt": "2026-09-01T15:00:28.396Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.cleanup.diagnose.json",
+      "command": "node atm.mjs cleanup diagnose --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-01T15-18-41-849Z-close-88a82de83251",
+  "lastTransitionAt": "2026-09-01T15:18:41.849Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-cleanup-captain",
+  "reservedAt": "2026-09-01T15:01:08.767Z",
+  "promotedAt": "2026-09-01T15:01:08.792Z",
+  "claim": {
+    "actorId": "codex-cleanup-captain",
+    "leaseId": "lease-91bebcb13575",
+    "claimedAt": "2026-09-01T15:01:08.798Z",
+    "heartbeatAt": "2026-09-01T15:18:41.847Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TMP-0011.json",
+      "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md",
+      "tmp/proposal.TASK-PRF-0006.v3.atmArtifactBudget.json",
+      "tmp/proposal.TASK-PRF-0006.v4.atmArtifactBudget.json"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260901150109-codex-cleanup-captain-e283705c5e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901150109-codex-cleanup-captain-e283705c5e\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-09-01T15:01:08.798Z",
+  "startedByActor": "codex-cleanup-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-966b0a664851efb7",
+    "ticketDigest": "sha256:966b0a664851efb7ba9465b926ff0eca585e02198682c8efcbeb2500b5784c22",
+    "taskId": "TASK-TMP-0011",
+    "origin": "claim",
+    "actorId": "codex-cleanup-captain",
+    "laneSessionId": "lane-20260901150109-codex-cleanup-captain-e283705c5e",
+    "claimGeneration": "lease-91bebcb13575",
+    "issuedAt": "2026-09-01T15:01:08.798Z",
+    "expiresAt": "2026-09-01T15:31:08.798Z",
+    "scopeDigest": "sha256:4c2b68c49a9ad05efa5752cfbdaacced7d39beecbceba052f7ed1c4f67cd27be",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-01T15:01:08.798Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-TMP-0011.*",
+          ".atm/history/task-events/TASK-TMP-0011/**",
+          ".atm/history/tasks/TASK-TMP-0011.json",
+          "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md",
+          "tmp/proposal.TASK-PRF-0006.v3.atmArtifactBudget.json",
+          "tmp/proposal.TASK-PRF-0006.v4.atmArtifactBudget.json"
+        ],
+        "digest": "sha256:5968b8f5c2a22aeaa3fddd16508aa0fe14fcea6060f702f48aa57e9bcaca2d54"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260901150108-codex-cleanup-captain-TASK-TMP-0011-8c0b393f6b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0011",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TMP-0011.*",
+      ".atm/history/task-events/TASK-TMP-0011/**",
+      ".atm/history/tasks/TASK-TMP-0011.json",
+      "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md",
+      "tmp/proposal.TASK-PRF-0006.v3.atmArtifactBudget.json",
+      "tmp/proposal.TASK-PRF-0006.v4.atmArtifactBudget.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "80056070a7429c8acca58f1b95be6bd31247afb4bc0ecaa13cbeb3c93668e618",
+    "actorId": "codex-cleanup-captain",
+    "sessionId": "session-20260901150108-codex-cleanup-captain-TASK-TMP-0011-8c0b393f6b",
+    "laneSession": {
+      "laneSessionId": "lane-20260901150109-codex-cleanup-captain-e283705c5e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901150109-codex-cleanup-captain-e283705c5e\""
+    },
+    "createdAt": "2026-09-01T15:01:15.617Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-01T15:18:41.847Z",
+  "closedByActor": "codex-cleanup-captain",
+  "closedBySessionId": "session-20260901150108-codex-cleanup-captain-TASK-TMP-0011-8c0b393f6b",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0011.closure-packet.json"
+}

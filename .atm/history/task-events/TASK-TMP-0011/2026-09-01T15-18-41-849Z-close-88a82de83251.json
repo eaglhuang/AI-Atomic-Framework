@@ -1,0 +1,52 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-01T15-18-41-849Z-close-88a82de83251",
+  "taskId": "TASK-TMP-0011",
+  "action": "close",
+  "actorId": "codex-cleanup-captain",
+  "sessionId": "session-20260901150108-codex-cleanup-captain-TASK-TMP-0011-8c0b393f6b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0011.json",
+  "taskSha256": "sha256:0616e41c22e85853b3721f39dcf50db8a6691a3bf10cec683f070fdeb42eba4e",
+  "createdAt": "2026-09-01T15:18:41.849Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0011 --actor codex-cleanup-captain --status done --historical-delivery fcc6568a881e63ee69d8acf52d10236c3ce1ac4d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260901150108-codex-cleanup-captain-TASK-TMP-0011-8c0b393f6b",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0011.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node atm.mjs cleanup diagnose --json"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node atm.mjs cleanup diagnose --json"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-01T15:18:41.840Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0011.*",
+        ".atm/history/task-events/TASK-TMP-0011/**",
+        ".atm/history/tasks/TASK-TMP-0011.json",
+        "1",
+        "docs/reports/residue-disposition/TASK-TMP-0011-first-bounded-slice.md",
+        "tmp/proposal.TASK-PRF-0006.v3.atmArtifactBudget.json",
+        "tmp/proposal.TASK-PRF-0006.v4.atmArtifactBudget.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "git diff --check",
+        "node atm.mjs cleanup diagnose --json"
+      ]
+    }
+  }
+}
