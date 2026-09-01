@@ -31,6 +31,10 @@ type ResidueReconcileAction = {
   readonly failureMessage?: string | null;
 };
 
+type SafeResidueEntry = ResidueEntry & {
+  readonly cleanupAction: 'remove' | 'restore';
+};
+
 const RESIDUE_REMOVE_MAX_ATTEMPTS = 3;
 const RESIDUE_RETRYABLE_REMOVE_CODES = new Set(['EPERM', 'EBUSY', 'ENOTEMPTY']);
 
@@ -364,7 +368,7 @@ export function buildResidueStatusReport(cwd: string) {
   };
 }
 
-function isSafeReconcileEntry(entry: ResidueEntry): boolean {
+function isSafeReconcileEntry(entry: ResidueEntry): entry is SafeResidueEntry {
   return entry.recommendedAction === 'safe-auto-clean'
     && (entry.cleanupAction === 'remove' || entry.cleanupAction === 'restore')
     && entry.ownerState !== 'active'
