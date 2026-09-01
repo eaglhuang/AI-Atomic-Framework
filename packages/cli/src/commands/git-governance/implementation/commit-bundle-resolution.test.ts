@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { isTombstone } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
 import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.ts';
+import { inspectTaskScopedStagedGovernanceBundle } from './task-scope-staging.ts';
 
 const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-foreign-residue-'));
 execFileSync('git', ['init', '-q'], { cwd });
@@ -204,4 +205,124 @@ const deletionBundle = resolveTaskScopedCommitBundle({
 });
 assert.ok(deletionBundle.stageFiles.includes('src/delete-me.ts'));
 assert.ok(isTombstone(deletionBundle.sealedBundle.entries.find((entry: { path: string }) => entry.path === 'src/delete-me.ts')!), 'auto-staged deletion must be sealed as a tombstone');
+
+// A history-only cleanup task may preserve a released task's explicitly named
+// evidence record, but must never receive a directory-shaped cross-task grant.
+// This is the recovery path for receipts stranded after their original owner
+// has already released its claim.
+const releasedTaskId = 'TASK-RELEASED';
+const historyCleanupTaskId = 'TASK-HISTORY-CLEANUP';
+const releasedEvidencePath = `.atm/history/evidence/${releasedTaskId}.live-index-reconciliation.json`;
+writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${releasedTaskId}.json`), `${JSON.stringify({
+  workItemId: releasedTaskId,
+  status: 'done',
+  claim: { state: 'released', actorId: 'prior-agent' },
+})}\n`);
+writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${historyCleanupTaskId}.json`), `${JSON.stringify({
+  workItemId: historyCleanupTaskId,
+  status: 'running',
+  claim: { state: 'active', actorId: 'test-actor', leaseId: 'lease-history-cleanup', files: [releasedEvidencePath] },
+})}\n`);
+writeFileSync(path.join(cwd, releasedEvidencePath), `${JSON.stringify({ taskId: releasedTaskId, schemaId: 'atm.liveIndexReconciliation.v1', clean: false })}\n`);
+execFileSync('git', ['add', '--', `.atm/history/tasks/${releasedTaskId}.json`, `.atm/history/tasks/${historyCleanupTaskId}.json`, releasedEvidencePath], { cwd });
+execFileSync('git', ['commit', '-qm', 'released history fixture'], { cwd });
+writeFileSync(path.join(cwd, releasedEvidencePath), `${JSON.stringify({ taskId: releasedTaskId, schemaId: 'atm.liveIndexReconciliation.v1', clean: true })}\n`);
+const historyCleanupTask = JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${historyCleanupTaskId}.json`), 'utf8'));
+historyCleanupTask.scopePaths = [releasedEvidencePath];
+historyCleanupTask.targetAllowedFiles = [releasedEvidencePath];
+historyCleanupTask.workAdmissionTicket = {
+  schemaId: 'atm.workAdmissionTicket.v1',
+  taskId: historyCleanupTaskId,
+  actorId: 'test-actor',
+  claimGeneration: 'lease-history-cleanup',
+  grants: [{ kind: 'file-write', values: [releasedEvidencePath] }],
+};
+const historyCleanupBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: historyCleanupTaskId,
+  actorId: 'test-actor',
+  taskDocument: historyCleanupTask,
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.ok(historyCleanupBundle.stageFiles.includes(releasedEvidencePath), 'an explicitly named receipt owned by a released task must be stageable by a history-only cleanup task');
+execFileSync('git', ['add', '--', releasedEvidencePath], { cwd });
+assert.equal(
+  inspectTaskScopedStagedGovernanceBundle(cwd, historyCleanupTaskId, historyCleanupTask).ok,
+  true,
+  'the pre-commit ownership check must accept the same explicitly entitled terminal receipt',
+);
+execFileSync('git', ['restore', '--staged', '--', releasedEvidencePath], { cwd });
+
+writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${releasedTaskId}.json`), `${JSON.stringify({
+  workItemId: releasedTaskId,
+  status: 'running',
+  claim: { state: 'active', actorId: 'prior-agent' },
+})}\n`);
+const activeOwnerBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: historyCleanupTaskId,
+  actorId: 'test-actor',
+  taskDocument: historyCleanupTask,
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.ok(!activeOwnerBundle.stageFiles.includes(releasedEvidencePath), 'a live owner must retain exclusive authority over its evidence');
+
+writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${releasedTaskId}.json`), `${JSON.stringify({
+  workItemId: releasedTaskId,
+  status: 'done',
+  claim: { state: 'released', actorId: 'prior-agent' },
+})}\n`);
+const wildcardCleanupTask = structuredClone(historyCleanupTask);
+wildcardCleanupTask.scopePaths = [`.atm/history/evidence/${releasedTaskId}.*`];
+wildcardCleanupTask.targetAllowedFiles = [`.atm/history/evidence/${releasedTaskId}.*`];
+wildcardCleanupTask.claim.files = [`.atm/history/evidence/${releasedTaskId}.*`];
+wildcardCleanupTask.workAdmissionTicket.grants[0].values = [`.atm/history/evidence/${releasedTaskId}.*`];
+const wildcardBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: historyCleanupTaskId,
+  actorId: 'test-actor',
+  taskDocument: wildcardCleanupTask,
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.ok(!wildcardBundle.stageFiles.includes(releasedEvidencePath), 'a wildcard must not transfer a released task evidence ownership');
+
+const foreignClosurePath = `.atm/history/evidence/${releasedTaskId}.closure-packet.json`;
+writeFileSync(path.join(cwd, foreignClosurePath), `${JSON.stringify({ taskId: releasedTaskId, schemaId: 'atm.closurePacket.v1' })}\n`);
+const closureCleanupTask = structuredClone(historyCleanupTask);
+closureCleanupTask.scopePaths = [foreignClosurePath];
+closureCleanupTask.targetAllowedFiles = [foreignClosurePath];
+closureCleanupTask.claim.files = [foreignClosurePath];
+closureCleanupTask.workAdmissionTicket.grants[0].values = [foreignClosurePath];
+const closureBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: historyCleanupTaskId,
+  actorId: 'test-actor',
+  taskDocument: closureCleanupTask,
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.ok(!closureBundle.stageFiles.includes(foreignClosurePath), 'a closure packet must never be admitted through historical cleanup');
 console.log('commit-bundle-resolution: foreign released residue preserved');
