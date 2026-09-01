@@ -67,7 +67,8 @@ try {
     schemaId: 'atm.batchRun.v1',
     batchId: 'batch-demo',
     status: 'active',
-    taskIds: ['TASK-X'],
+    taskIds: ['TASK-X', 'TASK-NEXT'],
+    currentIndex: 0,
     currentTaskId: 'TASK-NEXT'
   }, null, 2));
   writeFileSync(path.join(tempRoot, 'docs', 'example.md'), 'deliverable\n', 'utf8');

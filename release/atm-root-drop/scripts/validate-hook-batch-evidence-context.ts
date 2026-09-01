@@ -15,6 +15,7 @@ function assert(condition: unknown, message: string): asserts condition {
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-hook-batch-evidence-'));
 mkdirSync(path.join(tempRoot, '.atm', 'history', 'tasks'), { recursive: true });
 mkdirSync(path.join(tempRoot, '.atm', 'history', 'task-events', 'TASK-X'), { recursive: true });
+mkdirSync(path.join(tempRoot, '.atm', 'history', 'task-events', 'TASK-Y'), { recursive: true });
 mkdirSync(path.join(tempRoot, '.atm', 'history', 'evidence', 'nested-runs'), { recursive: true });
 
 const stagedTaskDocument = JSON.stringify({
@@ -31,6 +32,13 @@ writeFileSync(path.join(tempRoot, '.atm', 'history', 'task-events', 'TASK-X', 't
   taskSha256: createHash('sha256').update(stagedTaskDocument).digest('hex'),
   command: 'node atm.mjs tasks claim --task TASK-X --json'
 }, null, 2));
+writeFileSync(path.join(tempRoot, '.atm', 'history', 'task-events', 'TASK-Y', 'transition-2.json'), JSON.stringify({
+  schemaId: 'atm.taskTransition.v1',
+  transitionId: 'transition-2',
+  taskId: 'TASK-Y',
+  taskPath: '.atm/history/tasks/TASK-Y.json',
+  command: 'node atm.mjs tasks close --task TASK-Y --json'
+}, null, 2));
 writeFileSync(path.join(tempRoot, '.atm', 'history', 'evidence', 'nested-runs', 'artifact.json'), JSON.stringify({
   taskId: 'TASK-X',
   scenario: 'nested artifact'
@@ -45,6 +53,7 @@ writeFileSync(path.join(tempRoot, '.atm', 'history', 'evidence', 'TASK-X.json'),
 const staged = [
   '.atm/history/tasks/TASK-X.json',
   '.atm/history/task-events/TASK-X/transition-1.json',
+  '.atm/history/task-events/TASK-Y/transition-2.json',
   '.atm/history/evidence/TASK-X.bundle-manifest.json',
   '.atm/history/evidence/TASK-X.json',
   '.atm/history/evidence/nested-runs/artifact.json'
@@ -64,6 +73,10 @@ assert(
 assert(
   !withoutExemption.findings.some((finding) => finding.file.endsWith('TASK-X.bundle-manifest.json') && finding.reason === 'evidence-file-missing-task-context'),
   'bundle manifest must resolve to the owning task id instead of creating a synthetic staged task id'
+);
+assert(
+  !withoutExemption.findings.some((finding) => finding.file.endsWith('TASK-X.json') && finding.reason === 'evidence-file-missing-task-context'),
+  'one task-bound evidence receipt must remain valid when the delivery bundle also carries another task history context'
 );
 
 function runGit(cwd: string, args: readonly string[]) {
