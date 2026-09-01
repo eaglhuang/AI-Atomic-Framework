@@ -180,11 +180,11 @@ stage(RESIDUE, '{"seed":true}\n');
  * silent relaxation.
  */
 
-// caseId: test_atm_gov_0369_live_card_writer_still_declares_its_reconciliation
-// A writer that is itself a live card, admitted for the exact bounded path, but
-// declaring nothing. Scope admission proves which bytes were considered; it
-// does not record on whose behalf they are being rewritten. Being live is not
-// the same as being answerable, so this stays blocked.
+// caseId: test_terminal_history_exact_scope_live_successor_is_answerable
+// A writer that is itself a live card and is admitted for the exact bounded
+// path already has a durable review surface: its own task ledger. It may
+// reconcile the listed terminal history without a framework-temporary
+// linkedTaskId. The exact-scope condition remains mandatory.
 {
   const LIVE_CARD_WRITER = 'ATM-GOV-9004';
   writeTask(OWNER, { status: 'done', claimState: 'released' });
@@ -192,17 +192,10 @@ stage(RESIDUE, '{"seed":true}\n');
   writeLock(OWNER, { released: true, files: [`.atm/history/evidence/${OWNER}.*`] });
   writeLock(LIVE_CARD_WRITER, { released: false, files: [RESIDUE], linkedTaskId: null });
 
-  const block = detectCrossTaskMutation(repo, LIVE_CARD_WRITER, 'pre-commit');
-  assert(
-    block,
-    'a live card admitted for the path but declaring no reconciliation target must not be entitled by its own liveness'
-  );
-  const conflict = block.conflicts.find((entry) => entry.surface === 'task-history');
-  assert(conflict, 'the refusal must name the task-history surface');
   assert.equal(
-    conflict.ownershipState,
-    'terminal-unentitled',
-    'the owner is terminal and the writer unentitled; the refusal may not describe either state it did not read'
+    detectCrossTaskMutation(repo, LIVE_CARD_WRITER, 'pre-commit'),
+    null,
+    'a live successor card admitted for the exact path must be able to reconcile that terminal history through the governed hook'
   );
 }
 
