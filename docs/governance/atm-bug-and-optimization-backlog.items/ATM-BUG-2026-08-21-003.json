@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Open",
+  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
   "area": "Completion evidence publication delta excludes a first-class governance projection namespace",
   "finding": "The completion-evidence compiler can declare publication artifacts only under docs/reports/**, although the same closeout contract emits governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json. A legitimate sealed closeout bundle therefore becomes permanently stale after that audit projection changes. This is distinct from ATM-BUG-2026-08-18-001, which concerns governed commit staging of a runner output inventory rather than the compiler's semantic publication-delta allowlist.",
   "expectedBehavior": "Publication-delta validation accepts only explicitly declared JSON projections from the contract's supported output namespaces, including docs/reports/** and governance-optimization/**, plus durable ATM receipts. Traversal, absolute paths, source files, and undeclared artifacts remain fail-closed. A compiler must be able to seal every output it owns without admitting arbitrary repository files.",
   "evidenceOrRepro": "At the Plan 3.x/4.0 closeout chain, the certificate compiler emitted governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json while scripts/compile-runbook-completion-evidence.ts rejected that path in normalizePublicationArtifacts because it only allowed docs/reports/**. The focused contract in tests/cli/runbook-completion-evidence.test.ts now covers the declared governance projection alongside report outputs and durable receipts. The repair keeps the namespace list explicit and requires .json paths.",
-  "followUp": "Publish and exercise the repaired completion compiler before treating its closeout projection as fresh. This backlog item records the compiler contract defect; it does not authorize a certificate to become complete while requirement rows remain unproven."
+  "followUp": "Current tests/cli/runbook-completion-evidence.test.ts accepts the explicit governance-optimization JSON projection namespace together with report outputs and durable receipts, while rejecting scripts/compile-runbook-completion-evidence.ts. This backlog item records the compiler contract defect; it does not authorize a certificate to become complete while requirement rows remain unproven."
 }
