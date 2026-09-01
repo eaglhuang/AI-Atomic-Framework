@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-08-31T13-49-25-157Z-repair-claim-e349d482702e",
+  "taskId": "TASK-PRF-0008",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5-4-mini",
+  "sessionId": "session-20260830151408-codex-gpt-5-4-mini-TASK-PRF-0008-23ded6eae1",
+  "fromStatus": "blocked",
+  "toStatus": "blocked",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0008.json",
+  "taskSha256": "sha256:ce2c273d552bec0b5a0edb53d1b54efce0d3d52b53f84fdd3cb0724673284b55",
+  "createdAt": "2026-08-31T13:49:25.157Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0008 --actor codex-gpt-5-4-mini --write --reason \"Repair orphaned PRF-0008 work session before governed publication of already-committed fail-closed safety correction.\" --json"
+}

@@ -28,6 +28,16 @@ try {
   mkdirSync(path.join(tempDir, '.atm/history/tasks'), { recursive: true });
   writeFileSync(path.join(tempDir, '.atm/history/tasks', `${foreignTaskId}.json`), `${JSON.stringify({
     workItemId: foreignTaskId,
+    status: 'running',
+    claim: {
+      actorId: 'foreign-agent',
+      leaseId: 'lease-foreign-0008',
+      claimedAt: new Date().toISOString(),
+      heartbeatAt: new Date().toISOString(),
+      ttlSeconds: 3600,
+      files: [stagedPath],
+      state: 'active'
+    },
     workAdmissionTicket: {
       schemaId: 'atm.workAdmissionTicket.v1',
       grants: [{ kind: 'file-write', values: [stagedPath] }]
@@ -87,6 +97,7 @@ try {
     [{ taskId: foreignTaskId, stagedFiles: [stagedPath] }],
     'close preflight must consume the same active-owner snapshot as lease issuance'
   );
+
   console.log(JSON.stringify({ marker: '[git-index-override-lease-snapshot-consistency] ok' }));
 } finally {
   rmSync(tempDir, { recursive: true, force: true });

@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0397",
+  "title": "Make cross-task mutation admission resolve terminal ownership canonically and restore index atomically on failure",
+  "status": "abandoned",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/core/src/broker/cross-task-mutation-guard.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-terminal-ownership.spec.ts",
+    "tests/cli/git-commit-failure-index-restoration.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/cross-task-mutation-guard.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-attempt-boundary.ts",
+    "packages/core/src/broker/__tests__/cross-task-mutation-terminal-ownership.spec.ts",
+    "tests/cli/git-commit-failure-index-restoration.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-ownership.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "release",
+    "templates"
+  ],
+  "nonGoals": [
+    "Hand-cleaning the two ATM-GOV-0392 residue records, or any per-file remedy. They are preserved reproduction evidence, not the deliverable.",
+    "Relaxing who may write. A terminal task's artifacts must become reachable to an entitled successor, not generally writable.",
+    "Re-opening ATM-GOV-0395. Its lane-ownership repair is committed and was verified live during this incident.",
+    "Any runner build, runner-sync enqueue, or release mirror write."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cross-task-mutation-guard",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.cross-task-mutation-guard",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "disposition": "inline",
+        "inlineReason": "The lifecycle authority already exists in this file as getActiveTasks; the repair is to route the task-history surface through it, not to add a second ownership resolver."
+      },
+      {
+        "atom": "atm.git-governance-commit",
+        "pattern": "Transaction Boundary",
+        "source": "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-attempt-boundary.ts",
+        "packages/core/src/broker/__tests__/cross-task-mutation-terminal-ownership.spec.ts",
+        "tests/cli/git-commit-failure-index-restoration.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "The framework-temp claim identity\n(`ATM-FRAMEWORK-TEMP-<actor>-lane-<lane>`) can never equal a card id, so under\nthe current rule no framework-mode claim can ever satisfy the `task-history`\nsurface for another task's history files. Any entitlement design must therefore\nbe expressed over the claim's declared scope and its governed linkage\n(`linkedTaskId`), not over id equality.\n\nATM-GOV-0395 is a soft relation, not a dependency: its lane-ownership repair is\ncommitted and was independently verified live during this incident (the\nframework claim's on-disk lock carried its `laneSessionId` correctly). This card\nis a distinct downstream seam.\n\n<!-- atmPlanningCreationSeal {\"schemaId\":\"atm.planningCreationSeal.v1\",\"command\":\"atm plan card create\",\"createdAt\":\"2026-08-15T13:25:59.067Z\",\"planningRoot\":\"C:/Users/User/3KLife/docs/ai_atomic_framework\",\"relativePath\":\"governance-optimization/tasks/ATM-GOV-0397-make-cross-task-mutation-admission-resolve-terminal-ownership-canonically-and-restore-index-atomically-on-failure.task.md\",\"contentDigest\":\"sha256:39ddfbde6b783128266c74a17f9dd94926555588cbc17eb0431b713708c68b80\"} -->",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0397-make-cross-task-mutation-admission-resolve-terminal-ownership-canonically-and-restore-index-atomically-on-failure.task.md",
+    "sectionTitle": "ATM-GOV-0397",
+    "headingLine": 102,
+    "hash": "965e49a31789aee7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0397-make-cross-task-mutation-admission-resolve-terminal-ownership-canonically-and-restore-index-atomically-on-failure.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:965e49a31789aee7344b1d7b8516b044c8666ce877e3794ab7ef299764cc75bd",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-08-20T17:27:36.011Z"
+    }
+  },
+  "importedAt": "2026-08-20T17:27:36.011Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A task's history files stay permanently blocked by their own filename once the task has ever existed, so a terminal task's generated residue has no governed writer.",
+      "A refused governed commit leaves part of what it staged behind, so a failed admission is not a no-op."
+    ],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "cross-task-mutation-admission-terminal-ownership",
+      "governed-commit-failure-index-restoration"
+    ],
+    "causalImpactEdges": [
+      "history-filename-ownership -> admission-verdict -> terminal-residue-unwritable",
+      "admission-failure -> partial-index-rollback -> unowned-residue"
+    ],
+    "parallelFrontierInputs": [
+      "ATM-GOV-0395 lane-ownership repair is committed and verified live; this card is its downstream seam and must not re-open it"
+    ],
+    "validatorReferences": [
+      "packages/core/src/broker/__tests__/cross-task-mutation-terminal-ownership.spec.ts",
+      "npm run typecheck"
+    ],
+    "phaseOwner": "Wave-1-framework-foundation"
+  },
+  "testContributions": [
+    {
+      "caseId": "terminal_history_ownership_resolves_through_lifecycle_0397",
+      "targetGroupId": "null",
+      "semanticKey": "history-ownership-is-a-lifecycle-fact",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "history-filename-ownership -> admission-verdict -> terminal-residue-unwritable"
+      ],
+      "expectedRedPredicate": "a done task whose claim and lock are both released still blocks mutation of its own history files, and the refusal calls it active without having checked",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "cross-task-mutation-admission-terminal-ownership",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "admission_failure_restores_index_exactly_0397",
+      "targetGroupId": "null",
+      "semanticKey": "a-refused-commit-is-a-no-op",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "admission-failure -> partial-index-rollback -> unowned-residue"
+      ],
+      "expectedRedPredicate": "after a refused governed commit the index retains a staged entry the operation created, while an unchanged HEAD is reported as evidence of no residue",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "governed-commit-failure-index-restoration",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "terminal_history_ownership_resolves_through_lifecycle_0397",
+    "admission_failure_restores_index_exactly_0397"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.startConditions",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-08-20T17-27-36-320Z-import-0c44811d1783",
+  "lastTransitionAt": "2026-08-20T17:27:36.320Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

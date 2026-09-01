@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TMP-0022",
+  "updatedAt": "2026-09-01T20:20:49.781Z",
+  "updatedBy": "codex-cleanup-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+    "node --strip-types tests/cli/six-editor-adapter-parity.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-09-01T20:20:43.333Z",
+      "startedAt": "2026-09-01T20:20:43.073Z",
+      "finishedAt": "2026-09-01T20:20:43.333Z",
+      "durationMs": 260,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c403844e916d11a8012126e547c99d77a5963ed7",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:87c69c64afb814d6ff768044cc19034220d48b75db6750755d19dcbc91116066",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+      ],
+      "generatedAt": "2026-09-01T20:20:47.284Z",
+      "startedAt": "2026-09-01T20:20:45.632Z",
+      "finishedAt": "2026-09-01T20:20:47.284Z",
+      "durationMs": 1652,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c403844e916d11a8012126e547c99d77a5963ed7",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/six-editor-adapter-parity.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:54036922afe47ece991efe2409cd7f45036beee4dcc4d4406c3b9edfff50a3f8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/six-editor-adapter-parity.test.ts"
+      ],
+      "generatedAt": "2026-09-01T20:20:49.780Z",
+      "startedAt": "2026-09-01T20:20:49.492Z",
+      "finishedAt": "2026-09-01T20:20:49.780Z",
+      "durationMs": 288,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c403844e916d11a8012126e547c99d77a5963ed7",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

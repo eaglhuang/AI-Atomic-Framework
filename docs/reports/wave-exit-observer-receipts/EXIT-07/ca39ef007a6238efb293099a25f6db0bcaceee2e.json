@@ -1,0 +1,24 @@
+{
+  "schemaId": "atm.waveExitObserverReceipt.v1",
+  "schemaVersion": "0.1.0",
+  "exitItemId": "EXIT-07",
+  "wave": "Wave 6",
+  "observerActor": "codex-wave-exit-observer",
+  "observerRole": "wave-exit-observer.codex-sidecar",
+  "declaredBasisActor": "codex-gpt-5.4-mini",
+  "independenceVerdict": "independent",
+  "command": "node --strip-types scripts/validate-four-plan-objectives.ts --mode validate",
+  "exitCode": 0,
+  "stdoutDigest": "sha256:c1b7eb8995ece5bff75e59c81630a9da5b39eca4d28ddf65c5669e1b90aa379b",
+  "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observedAt": "2026-08-21T00:25:34.112Z",
+  "observedHead": "ca39ef007a6238efb293099a25f6db0bcaceee2e",
+  "policyDigest": "sha256:d38aeeec106d5b0bbb6346dad1bcc479b04ed46e4c21f161c206274a2c8e4b16",
+  "inputDigests": [
+    {
+      "path": "governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json",
+      "digest": "sha256:4ce2e3d35792d5c1bbc398b79417a8ea7affd9805240427ca07311eade1ac8ce"
+    }
+  ],
+  "artifactPath": "docs/reports/wave-exit-observer-receipts/EXIT-07/ca39ef007a6238efb293099a25f6db0bcaceee2e.json"
+}

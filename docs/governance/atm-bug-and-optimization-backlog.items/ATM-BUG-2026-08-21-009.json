@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-21-009",
+  "date": "2026-08-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Open",
+  "area": "Evidence-command child processes inherited the caller lane authority",
+  "finding": "The evidence runner spawned declared validator commands with the full parent environment. When a governed evidence run carried ATM_LANE_SESSION_ID, isolated fixture repositories inherited that lane and could classify it as a fresh foreign reservation. The fixture then failed before exercising its intended rule. This is distinct from lane-adopt and claim-renewal UX defects: the erroneous authority crossed a parent-to-child execution boundary where no child command contract requested it.",
+  "expectedBehavior": "Evidence-command children receive the task and actor attribution required for evidence, but ambient lane-session authority is not propagated. A child that needs an explicit lane must establish it through its own governed command path. Fixture and validator isolation must not depend on the caller's lane lifetime or identity.",
+  "evidenceOrRepro": "At source commit 7c352a457ae5ee43abc5efdfcddbdc385a9fe80e, packages/cli/src/commands/evidence/bundle-io/implementation.ts constructs a child environment that preserves ATM_ACTOR_ID and ATM_TASK_ID while removing ATM_LANE_SESSION_ID. Regression packages/cli/src/commands/evidence/__tests__/run.spec.ts sets a synthetic parent lane and runs a child command that exits nonzero if it observes that variable; the evidence run succeeds. Source-first command node atm.dev.mjs evidence run --task ATM-GOV-0341 --actor codex-gpt-5.4-mini --command \"npm run validate:task-direction-governance\" --runner-kind dev-source --json then exited 0 and wrote command-backed evidence, replacing the prior ATM_NEXT_FRESH_FOREIGN_TASK_RESERVED fixture failure.",
+  "followUp": "Publish the source repair in the frozen runner and rerun the affected validator through the frozen evidence path. Add sibling coverage only where a subprocess is intended to inherit a lane; do not globally strip unrelated authority variables without a contract. Keep source repair, frozen publication, and formal closeout separate."
+}

@@ -1,0 +1,273 @@
+{
+  "taskId": "TASK-TMP-0022",
+  "updatedAt": "2026-09-01T20:20:49.781Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-cleanup-captain",
+      "sessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+      "createdAt": "2026-09-01T20:20:43.334Z",
+      "details": {
+        "actorId": "codex-cleanup-captain",
+        "sessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-09-01T20:20:43.073Z",
+            "finishedAt": "2026-09-01T20:20:43.333Z",
+            "durationMs": 260,
+            "cached": false,
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "c403844e916d11a8012126e547c99d77a5963ed7",
+            "cacheKey": "sha256:10a15b63a7bcce1c1ef425ce157db0a7dcce22a258054aaf700e48220250b646",
+            "generatedAt": "2026-09-01T20:20:43.333Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:10a15b63a7bcce1c1ef425ce157db0a7dcce22a258054aaf700e48220250b646",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-01T20:20:43.333Z",
+              "observedAt": "2026-09-01T20:20:43.333Z",
+              "startedAt": "2026-09-01T20:20:43.073Z",
+              "finishedAt": "2026-09-01T20:20:43.333Z",
+              "durationMs": 260,
+              "laneSessionId": null,
+              "taskId": "TASK-TMP-0022",
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:4b0b4fc2bb309fa1f208d9f9dcefabf3423dd2adb98cc013764d692393dbd83f",
+              "outputDigest": "sha256:73b4db795a7055d8fd5aadf94d2963333f0d33cd9a13d51041d00710dad53e5b",
+              "cache": {
+                "key": "sha256:10a15b63a7bcce1c1ef425ce157db0a7dcce22a258054aaf700e48220250b646",
+                "hit": false
+              },
+              "extensions": {
+                "command": "git diff --check",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "git diff --check"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "c403844e916d11a8012126e547c99d77a5963ed7",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:86799ab9f990ee9af648465d8879bb788728455b33bbb8064e58f3a5c5dc1652",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-cleanup-captain",
+      "sessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+      "createdAt": "2026-09-01T20:20:47.285Z",
+      "details": {
+        "actorId": "codex-cleanup-captain",
+        "sessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:87c69c64afb814d6ff768044cc19034220d48b75db6750755d19dcbc91116066",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-09-01T20:20:45.632Z",
+            "finishedAt": "2026-09-01T20:20:47.284Z",
+            "durationMs": 1652,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "c403844e916d11a8012126e547c99d77a5963ed7",
+            "cacheKey": "sha256:30b6ed5d3ed7dc00b908039cf2da8e0a12e707fbd436f7488c51bfc451dd7441",
+            "generatedAt": "2026-09-01T20:20:47.284Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:30b6ed5d3ed7dc00b908039cf2da8e0a12e707fbd436f7488c51bfc451dd7441",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-01T20:20:47.284Z",
+              "observedAt": "2026-09-01T20:20:47.284Z",
+              "startedAt": "2026-09-01T20:20:45.632Z",
+              "finishedAt": "2026-09-01T20:20:47.284Z",
+              "durationMs": 1652,
+              "laneSessionId": null,
+              "taskId": "TASK-TMP-0022",
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:9be724c6f3910fd6909393a076eb71a993447d448c6288f85ddc8c0f65f892d9",
+              "outputDigest": "sha256:801c61cae01ec79a01d24ce65d5aa0d4a871287f2200ecb5d14e858b095f9ffc",
+              "cache": {
+                "key": "sha256:30b6ed5d3ed7dc00b908039cf2da8e0a12e707fbd436f7488c51bfc451dd7441",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "c403844e916d11a8012126e547c99d77a5963ed7",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6a20d6d27cb82ab88a5f72eaf23c8cbdc5146ee50717078a438f84d05e040c70",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/six-editor-adapter-parity.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-cleanup-captain",
+      "sessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+      "createdAt": "2026-09-01T20:20:49.781Z",
+      "details": {
+        "actorId": "codex-cleanup-captain",
+        "sessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/six-editor-adapter-parity.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/six-editor-adapter-parity.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:54036922afe47ece991efe2409cd7f45036beee4dcc4d4406c3b9edfff50a3f8",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-09-01T20:20:49.492Z",
+            "finishedAt": "2026-09-01T20:20:49.780Z",
+            "durationMs": 288,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/six-editor-adapter-parity.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "frozen-runner",
+            "sourceCommit": "c403844e916d11a8012126e547c99d77a5963ed7",
+            "cacheKey": "sha256:78a202f21f1eca4ce263a7bec391ea9ca2375a6d60212e47c8426c1147acb13f",
+            "generatedAt": "2026-09-01T20:20:49.780Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:78a202f21f1eca4ce263a7bec391ea9ca2375a6d60212e47c8426c1147acb13f",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-01T20:20:49.780Z",
+              "observedAt": "2026-09-01T20:20:49.780Z",
+              "startedAt": "2026-09-01T20:20:49.492Z",
+              "finishedAt": "2026-09-01T20:20:49.780Z",
+              "durationMs": 288,
+              "laneSessionId": null,
+              "taskId": "TASK-TMP-0022",
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:81b72f83e398c6b107c1eafc6670a2e9169c97941fd32d0feff08166bf9e7019",
+              "outputDigest": "sha256:5c62d970e02c4ed8cf02a41a6cae5c30b85cde7911bcc8edfa8a024f76dee87f",
+              "cache": {
+                "key": "sha256:78a202f21f1eca4ce263a7bec391ea9ca2375a6d60212e47c8426c1147acb13f",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/six-editor-adapter-parity.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/six-editor-adapter-parity.test.ts"
+                ],
+                "runnerKind": "frozen-runner",
+                "sourceCommit": "c403844e916d11a8012126e547c99d77a5963ed7",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:fd6bc807e2e368027771d30d91d83af9f3f7a90074db531829689562666d64b5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

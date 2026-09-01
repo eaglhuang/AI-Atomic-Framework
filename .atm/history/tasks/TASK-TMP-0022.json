@@ -1,0 +1,353 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0022",
+  "title": "Retain released governance evidence and verified cleanup artifacts",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "The exact scoped PRF-0008 repair event and ledger update are retained, while TASK-PRF-0008 remains blocked and released.",
+    "The exact abandoned ATM-GOV-0397 import history and ledger are retained without reopening that task.",
+    "The scoped governance artifacts and two focused regression tests are committed without staging mailbox/MBX files, source mailbox files, or active-owner evidence.",
+    "`git diff --check` and both focused test commands pass."
+  ],
+  "deliverables": [
+    "atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/",
+    "docs/governance/canonical-authority-snapshot-charter.md",
+    "docs/governance/model-bound-agent-capability-benchmark.md",
+    "docs/governance/skills/",
+    "docs/reports/wave-exit-observer-receipts/",
+    "tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+    "tests/cli/six-editor-adapter-parity.test.ts"
+  ],
+  "scopePaths": [
+    ".atm/history/tasks/TASK-PRF-0008.json",
+    ".atm/history/task-events/TASK-PRF-0008/2026-08-31T13-49-25-157Z-repair-claim-e349d482702e.json",
+    ".atm/history/tasks/ATM-GOV-0397.json",
+    ".atm/history/task-events/ATM-GOV-0397/2026-08-15T13-43-05-511Z-import-6714943a01b7.json",
+    ".atm/history/task-events/ATM-GOV-0397/2026-08-20T17-27-36-320Z-import-0c44811d1783.json",
+    "atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-005.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-006.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-008.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-009.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-014.json",
+    "docs/governance/canonical-authority-snapshot-charter.md",
+    "docs/governance/model-bound-agent-capability-benchmark.md",
+    "docs/governance/skills/ATM-SKL-backlog-family-mapping-2026-08-08-claude-007.md",
+    "docs/governance/skills/ATM-SKL-captain-audit-2026-08-08-claude-007.md",
+    "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-01-claude-007.md",
+    "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-08-codex.md",
+    "docs/reports/wave-exit-observer-receipts/EXIT-07/ca39ef007a6238efb293099a25f6db0bcaceee2e.json",
+    "docs/reports/wave-exit-observer-receipts/EXIT-11/71aac841a45a19a8d9318ed3371a231bf3bb3c1d.json",
+    "docs/reports/wave-exit-observer-receipts/EXIT-11/d0fcd88bfb48b91225210ad889ce601767d1bed1.json",
+    "tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+    "tests/cli/six-editor-adapter-parity.test.ts"
+  ],
+  "validators": [
+    "git diff --check",
+    "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+    "node --strip-types tests/cli/six-editor-adapter-parity.test.ts"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0022-retain-released-governance-evidence-and-verified-cleanup-artifacts.task.md",
+    "sectionTitle": "TASK-TMP-0022",
+    "headingLine": 61,
+    "hash": "cccb4de1510293fe",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0022-retain-released-governance-evidence-and-verified-cleanup-artifacts.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:cccb4de1510293fea19b063cd45b425113a4a0364da8daf0be065b2b38bcedc9",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-01T20:20:21.923Z"
+    }
+  },
+  "importedAt": "2026-09-01T20:20:21.923Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.git.index.override.lease.snapshot.consistency.test.ts",
+      "command": "node --strip-types tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.six.editor.adapter.parity.test.ts",
+      "command": "node --strip-types tests/cli/six-editor-adapter-parity.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-01T20-20-31-152Z-claim-6a2f40c8d187",
+  "lastTransitionAt": "2026-09-01T20:20:31.152Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-cleanup-captain",
+  "reservedAt": "2026-09-01T20:20:25.555Z",
+  "promotedAt": "2026-09-01T20:20:25.559Z",
+  "claim": {
+    "actorId": "codex-cleanup-captain",
+    "leaseId": "lease-3923c69a7a3c",
+    "claimedAt": "2026-09-01T20:20:25.563Z",
+    "heartbeatAt": "2026-09-01T20:20:25.563Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TMP-0022.json",
+      ".atm/history/task-events/ATM-GOV-0397/2026-08-15T13-43-05-511Z-import-6714943a01b7.json",
+      ".atm/history/task-events/ATM-GOV-0397/2026-08-20T17-27-36-320Z-import-0c44811d1783.json",
+      ".atm/history/task-events/TASK-PRF-0008/2026-08-31T13-49-25-157Z-repair-claim-e349d482702e.json",
+      ".atm/history/tasks/ATM-GOV-0397.json",
+      ".atm/history/tasks/TASK-PRF-0008.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-005.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-006.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-008.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-009.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-014.json",
+      "docs/governance/canonical-authority-snapshot-charter.md",
+      "docs/governance/model-bound-agent-capability-benchmark.md",
+      "docs/governance/skills/ATM-SKL-backlog-family-mapping-2026-08-08-claude-007.md",
+      "docs/governance/skills/ATM-SKL-captain-audit-2026-08-08-claude-007.md",
+      "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-01-claude-007.md",
+      "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-08-codex.md",
+      "docs/reports/wave-exit-observer-receipts/EXIT-07/ca39ef007a6238efb293099a25f6db0bcaceee2e.json",
+      "docs/reports/wave-exit-observer-receipts/EXIT-11/71aac841a45a19a8d9318ed3371a231bf3bb3c1d.json",
+      "docs/reports/wave-exit-observer-receipts/EXIT-11/d0fcd88bfb48b91225210ad889ce601767d1bed1.json",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "tests/cli/six-editor-adapter-parity.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260901202025-codex-cleanup-captain-93df7c54bc",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901202025-codex-cleanup-captain-93df7c54bc\""
+    }
+  },
+  "startedAt": "2026-09-01T20:20:25.563Z",
+  "startedByActor": "codex-cleanup-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-660fd701e01cd021",
+    "ticketDigest": "sha256:660fd701e01cd021bd87d4f90b1e4408dd90ff528df6f745850d81f3b79317b0",
+    "taskId": "TASK-TMP-0022",
+    "origin": "claim",
+    "actorId": "codex-cleanup-captain",
+    "laneSessionId": "lane-20260901202025-codex-cleanup-captain-93df7c54bc",
+    "claimGeneration": "lease-3923c69a7a3c",
+    "issuedAt": "2026-09-01T20:20:25.563Z",
+    "expiresAt": "2026-09-01T20:50:25.563Z",
+    "scopeDigest": "sha256:ab8822078c1d61b866150f57b52e42d5d24f67f0d0566059c427ae7306959bb9",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-01T20:20:25.563Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-TMP-0022.*",
+          ".atm/history/task-events/ATM-GOV-0397/2026-08-15T13-43-05-511Z-import-6714943a01b7.json",
+          ".atm/history/task-events/ATM-GOV-0397/2026-08-20T17-27-36-320Z-import-0c44811d1783.json",
+          ".atm/history/task-events/TASK-PRF-0008/2026-08-31T13-49-25-157Z-repair-claim-e349d482702e.json",
+          ".atm/history/task-events/TASK-TMP-0022/**",
+          ".atm/history/tasks/ATM-GOV-0397.json",
+          ".atm/history/tasks/TASK-PRF-0008.json",
+          ".atm/history/tasks/TASK-TMP-0022.json",
+          "atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-005.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-006.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-008.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-009.json",
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-014.json",
+          "docs/governance/canonical-authority-snapshot-charter.md",
+          "docs/governance/model-bound-agent-capability-benchmark.md",
+          "docs/governance/skills/ATM-SKL-backlog-family-mapping-2026-08-08-claude-007.md",
+          "docs/governance/skills/ATM-SKL-captain-audit-2026-08-08-claude-007.md",
+          "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-01-claude-007.md",
+          "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-08-codex.md",
+          "docs/reports/wave-exit-observer-receipts/EXIT-07/ca39ef007a6238efb293099a25f6db0bcaceee2e.json",
+          "docs/reports/wave-exit-observer-receipts/EXIT-11/71aac841a45a19a8d9318ed3371a231bf3bb3c1d.json",
+          "docs/reports/wave-exit-observer-receipts/EXIT-11/d0fcd88bfb48b91225210ad889ce601767d1bed1.json",
+          "tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+          "tests/cli/six-editor-adapter-parity.test.ts"
+        ],
+        "digest": "sha256:90f71fb57a3aa800e6e6f510ad0d601d771110e956d46662a920a4287621f960"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0022",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TMP-0022.*",
+      ".atm/history/task-events/ATM-GOV-0397/2026-08-15T13-43-05-511Z-import-6714943a01b7.json",
+      ".atm/history/task-events/ATM-GOV-0397/2026-08-20T17-27-36-320Z-import-0c44811d1783.json",
+      ".atm/history/task-events/TASK-PRF-0008/2026-08-31T13-49-25-157Z-repair-claim-e349d482702e.json",
+      ".atm/history/task-events/TASK-TMP-0022/**",
+      ".atm/history/tasks/ATM-GOV-0397.json",
+      ".atm/history/tasks/TASK-PRF-0008.json",
+      ".atm/history/tasks/TASK-TMP-0022.json",
+      "atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-005.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-006.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-14-008.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-009.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-014.json",
+      "docs/governance/canonical-authority-snapshot-charter.md",
+      "docs/governance/model-bound-agent-capability-benchmark.md",
+      "docs/governance/skills/ATM-SKL-backlog-family-mapping-2026-08-08-claude-007.md",
+      "docs/governance/skills/ATM-SKL-captain-audit-2026-08-08-claude-007.md",
+      "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-01-claude-007.md",
+      "docs/governance/skills/ATM-SKL-captain-handoff-2026-08-08-codex.md",
+      "docs/reports/wave-exit-observer-receipts/EXIT-07/ca39ef007a6238efb293099a25f6db0bcaceee2e.json",
+      "docs/reports/wave-exit-observer-receipts/EXIT-11/71aac841a45a19a8d9318ed3371a231bf3bb3c1d.json",
+      "docs/reports/wave-exit-observer-receipts/EXIT-11/d0fcd88bfb48b91225210ad889ce601767d1bed1.json",
+      "tests/cli/git-index-override-lease-snapshot-consistency.test.ts",
+      "tests/cli/six-editor-adapter-parity.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "eb4677f8bdb83b5455b952d093011706ce9f0eda959d871d3418c4612b3404cf",
+    "actorId": "codex-cleanup-captain",
+    "sessionId": "session-20260901202025-codex-cleanup-captain-TASK-TMP-0022-dc34db2e22",
+    "laneSession": {
+      "laneSessionId": "lane-20260901202025-codex-cleanup-captain-93df7c54bc",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260901202025-codex-cleanup-captain-93df7c54bc\""
+    },
+    "createdAt": "2026-09-01T20:20:31.151Z",
+    "status": "active"
+  }
+}
