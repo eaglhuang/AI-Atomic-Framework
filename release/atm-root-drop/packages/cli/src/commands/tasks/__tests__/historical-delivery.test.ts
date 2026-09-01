@@ -68,6 +68,21 @@ assert(buckets.allowedRunnerOutputFiles.includes('release/atm-onefile/atm.mjs'),
 assert(buckets.outOfScopeSourceFiles.includes('src/unrelated.ts'), 'unrelated source must be out of scope');
 assert(buckets.ignoredFiles.includes('.atm/history/evidence/OTHER.json'), 'other-task governance must be ignored');
 
+const historicalCleanupFiles = ['.atm/history/evidence/TASK-HIST.*', '.atm/history/task-events/TASK-HIST/**'];
+const historicalCleanupBuckets = categorizeHistoricalCommitFiles({
+  taskId: 'TASK-HIST',
+  changedFiles: [
+    '.atm/history/evidence/TASK-HIST.json',
+    '.atm/history/task-events/TASK-HIST/claim.json'
+  ],
+  declaredFiles: historicalCleanupFiles
+});
+assertDeepEqual(
+  historicalCleanupBuckets.taskMatchedFiles,
+  ['.atm/history/evidence/TASK-HIST.json', '.atm/history/task-events/TASK-HIST/claim.json'],
+  'a history-only cleanup scope must treat its declared durable history as a deliverable'
+);
+
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-historical-delivery-'));
 try {
   git(repo, ['init']);
@@ -75,9 +90,35 @@ try {
   writeFileSync(path.join(repo, 'src', 'task-owned.ts'), 'export const owned = true;\n', 'utf8');
   commitAll(repo, 'base');
 
+  mkdirSync(path.join(repo, '.atm', 'history', 'evidence'), { recursive: true });
+  writeFileSync(path.join(repo, '.atm', 'history', 'evidence', 'TASK-HIST.json'), '{"durable":true}\n', 'utf8');
+  const historyOnlyCommit = commitAll(repo, 'durable history bundle');
+  let report = inspectHistoricalDelivery({
+    cwd: repo,
+    taskId: 'TASK-HIST',
+    requestedRef: historyOnlyCommit,
+    declaredFiles: historicalCleanupFiles,
+    enforceDeclaredScope: true,
+    waiverOutOfScopeDelivery: false,
+    waiverReason: null
+  });
+  assert(report.ok, 'a declared history-only cleanup task must accept its committed durable history bundle');
+  assertDeepEqual(report.deliverableFiles, ['.atm/history/evidence/TASK-HIST.json'], 'history-only delivery must name the committed scoped history file');
+
+  report = inspectHistoricalDelivery({
+    cwd: repo,
+    taskId: 'TASK-HIST',
+    requestedRef: historyOnlyCommit,
+    declaredFiles,
+    enforceDeclaredScope: true,
+    waiverOutOfScopeDelivery: false,
+    waiverReason: null
+  });
+  assert(!report.ok, 'an ordinary source task must not use a history receipt as its deliverable');
+
   writeFileSync(path.join(repo, 'src', 'unrelated-only.ts'), 'export const unrelated = true;\n', 'utf8');
   const unrelatedCommit = commitAll(repo, 'unrelated');
-  let report = inspectHistoricalDelivery({
+  report = inspectHistoricalDelivery({
     cwd: repo,
     taskId: 'TASK-HIST',
     requestedRef: unrelatedCommit,
