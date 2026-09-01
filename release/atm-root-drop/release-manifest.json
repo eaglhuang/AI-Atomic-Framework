@@ -2855,6 +2855,7 @@
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+    "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/task-scope-runtime-authority.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
@@ -5933,8 +5934,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1307,
-    "unchanged": 4591,
+    "copied": 1305,
+    "unchanged": 4594,
     "removed": 0
   },
   "buildMode": "full",
@@ -24814,7 +24815,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/task-scope.js",
-        "digest": "218a7fc09ff9979789befdf2fbbd6235e7dedf64fa6dbd4db27ebd22737736cd",
+        "digest": "cccc3be46570035b49c35eef05657a0d03fca45a4d9b5b5b6a81303c7fdab873",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/task-scope.js"
@@ -31356,6 +31357,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/taskflow/__tests__/task-scope-runtime-authority.spec.ts",
+        "digest": "62920c8de6ecc140a20ba68cd41dd7cf5f439d6ae02ad64cceaf4f8a73372c33",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/taskflow/__tests__/task-scope-runtime-authority.spec.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
         "digest": "15b04ff8151efe19a1c1a9f743f6ee2ac814e801d20abdc38a68bd215d710e5c",
         "origin": "source",
@@ -31627,7 +31637,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/task-scope.ts",
-        "digest": "2a2597e784c26a64e0fc088c2735227f3a72d1a8f1f3c043c45cfd541175d9ff",
+        "digest": "5fa47a78d7e37c1f0bb5d559d31f11151874c664671a6763a34e882950ff9c94",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/task-scope.ts"
@@ -59022,7 +59032,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:22c16ddc04e5158994a11cddee50d24e350df3460250adc83ad75b2e0fd0d121"
+    "treeDigest": "sha256:b406cf8baecb0e421ff8ebf01840df643f6ea356d3d3c1627955805b6fd70715"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -59584,6 +59594,7 @@
       "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/task-scope-runtime-authority.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
       "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
@@ -60480,7 +60491,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:802ae69fbadcb5b3f38c42880e10e1d13dcef68156960a1cda02b63b28af9540"
+    "digest": "sha256:dcee6c7d6a037e65b27c25ada9f1644462838d2ff1e2cd3b63195098493d54cb"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63309,6 +63320,7 @@
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/task-scope-runtime-authority.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
@@ -66389,5 +66401,23 @@
     "requiresExplicitStaging": true,
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
+  },
+  "buildInputsTreeHash": "sha256:e6402cd594a909aa82dc907a6cce7efe17068217967e06a0f78f0b3438da5475",
+  "sealedSourceCommit": "31ad2d35aa04e341ad8d2e6e1f82a3b09beee63e",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:e391a3fb13bdfaae7aa9e5306649ab1791978dc56df58907f20eb86c75b66569",
+  "tsBuildCacheDigest": "sha256:d557cbbe0980498aa004555c9ab47ecd899b604176e64bda675d1ea04ee2016b",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
+  "phaseTimingsMs": {
+    "inputHashCalculation": 43,
+    "skipDecision": 55,
+    "worktreeSetup": 10729,
+    "typescriptBuild": 9374,
+    "rootDropReleaseAssembly": 24779,
+    "onefileReleaseAssembly": 8342,
+    "artifactSync": 10446,
+    "cleanup": 0,
+    "totalElapsed": 68773
   }
 }

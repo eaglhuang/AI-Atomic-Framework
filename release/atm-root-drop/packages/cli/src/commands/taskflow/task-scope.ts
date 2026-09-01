@@ -72,7 +72,12 @@ export function resolveTaskflowDeclaredFiles(cwd: string, taskId: string, taskDo
   ]);
   const runtimeTargetFiles = extractRuntimeScopeFiles(taskDocument, cwd, taskId)
     .filter((entry) => !isPlanningScopedPath(cwd, entry, planningScopedFiles));
-  return normalizeTaskScopePaths(cwd, [...declaredTargetFiles, ...runtimeTargetFiles]);
+  // Once a task has an active direction lock, it is the write authority.  The
+  // card's deliverable labels remain useful before claim, but must not widen a
+  // bounded runtime claim during pre-close or governed auto-staging.
+  return runtimeTargetFiles.length > 0
+    ? runtimeTargetFiles
+    : declaredTargetFiles;
 }
 
 export function resolveTaskflowEffectiveDeliverables(cwd: string, taskId: string, taskDocument: Record<string, unknown>): readonly string[] {
@@ -83,6 +88,9 @@ export function resolveTaskflowEffectiveDeliverables(cwd: string, taskId: string
   ]);
   const runtimeTargetFiles = extractRuntimeScopeFiles(taskDocument, cwd, taskId)
     .filter((entry) => !isPlanningScopedPath(cwd, entry, planningScopedFiles));
-  return normalizeTaskScopePaths(cwd, [...declaredTargetFiles, ...runtimeTargetFiles])
+  const effectiveFiles = runtimeTargetFiles.length > 0
+    ? runtimeTargetFiles
+    : declaredTargetFiles;
+  return effectiveFiles
     .filter((entry) => !entry.startsWith('.atm/'));
 }
