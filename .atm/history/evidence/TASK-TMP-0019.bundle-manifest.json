@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TMP-0019",
+  "updatedAt": "2026-09-01T19:59:49.195Z",
+  "updatedBy": "codex-cleanup-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-09-01T19:59:44.927Z",
+      "startedAt": "2026-09-01T19:59:44.652Z",
+      "finishedAt": "2026-09-01T19:59:44.927Z",
+      "durationMs": 275,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2820cc629bcb1ba6e800cc7caf88f2e25aada7d9",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d4ac4c7189cdc16889b446ea9331af14d6d58e2c593d588b832e4b6014056ba",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs tasks status --task ATM-GOV-0349 --residue --json"
+      ],
+      "generatedAt": "2026-09-01T19:59:49.194Z",
+      "startedAt": "2026-09-01T19:59:47.317Z",
+      "finishedAt": "2026-09-01T19:59:49.194Z",
+      "durationMs": 1877,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2820cc629bcb1ba6e800cc7caf88f2e25aada7d9",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

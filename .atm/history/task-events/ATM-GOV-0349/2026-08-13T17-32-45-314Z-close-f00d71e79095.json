@@ -1,21 +1,21 @@
 {
   "schemaId": "atm.taskTransition.v1",
   "specVersion": "0.1.0",
-  "transitionId": "2026-08-12T10-16-00-875Z-close-20b4b1f83e0d",
+  "transitionId": "2026-08-13T17-32-45-314Z-close-f00d71e79095",
   "taskId": "ATM-GOV-0349",
   "action": "close",
   "actorId": "codex-gpt-5.4-mini",
-  "sessionId": "session-20260812052927-codex-gpt-5.4-mini-ATM-GOV-0349-4b9513c918",
+  "sessionId": null,
   "fromStatus": "running",
   "toStatus": "done",
   "taskPath": ".atm/history/tasks/ATM-GOV-0349.json",
-  "taskSha256": "sha256:c08630278da4e9b55f7b96f9b98c747086f97a620add07537fed35a2632b23dc",
-  "createdAt": "2026-08-12T10:16:00.875Z",
-  "command": "node atm.mjs tasks close --task ATM-GOV-0349 --actor codex-gpt-5.4-mini --status done --historical-delivery 1eb2122f6e35bf987e5bbaa02ed908ea2d65e7f3",
+  "taskSha256": "sha256:6ecbcf2ba4c40a5b472d1544daf85b33d214158eb7f5a6819094548d4eda8b1d",
+  "createdAt": "2026-08-13T17:32:45.314Z",
+  "command": "node atm.mjs tasks reconcile --task ATM-GOV-0349 --actor codex-gpt-5.4-mini --delivery-commit 1eb2122f6e35bf987e5bbaa02ed908ea2d65e7f3 --json",
   "closure": {
     "schemaId": "atm.taskClosureTransition.v1",
     "batchId": null,
-    "sessionId": "session-20260812052927-codex-gpt-5.4-mini-ATM-GOV-0349-4b9513c918",
+    "sessionId": null,
     "closurePacketPath": ".atm/history/evidence/ATM-GOV-0349.closure-packet.json",
     "evidenceFreshness": "fresh",
     "validationPasses": [
@@ -25,13 +25,17 @@
       "validate:git-head-evidence"
     ],
     "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
       "typecheck",
       "validate:cli",
       "validate:git-head-evidence"
     ],
     "requiredGatesSnapshot": {
       "schemaId": "atm.requiredGatesSnapshot.v1",
-      "generatedAt": "2026-08-12T10:16:00.857Z",
+      "generatedAt": "2026-08-13T17:32:45.309Z",
       "source": "frameworkStatus.requiredGates",
       "ruleVersion": "0.1.0",
       "frameworkMode": "required",
@@ -42,18 +46,18 @@
         ".atm/history/tasks/ATM-GOV-0349.json",
         "packages/cli/src/commands/batch/implementation.ts",
         "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
-        "packages/cli/src/commands/tasks/close-orchestrator.ts",
-        "packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
         "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
       ],
       "criticalChangedFiles": [
         "packages/cli/src/commands/batch/implementation.ts",
         "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
-        "packages/cli/src/commands/tasks/close-orchestrator.ts",
-        "packages/cli/src/commands/tasks/close-orchestrator/runner-recovery.ts",
         "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
       ],
       "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
         "typecheck",
         "validate:cli",
         "validate:git-head-evidence"
