@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Fixed in current working tree; needs commit",
+  "status": "Closed — active-work summary regression re-verified on 2026-09-02",
   "area": "Active claim radar / Team Agent Broker auto-admission",
   "finding": "ATM can store active task claims, direction locks, heartbeats, and staged residue, but `next --prompt`, `next --claim`, and framework temp-claim entrypoints do not present a compact \"who is active now\" actor map before another AI starts work. This makes concurrent captains depend on the human to notice that another actor such as `claude-fable-5` is already moving.",
   "expectedBehavior": "ATM should automatically surface recent active claims, actor ids, task ids, touched files, heartbeat age, TTL, and staged/index ownership at every work-admission route. If another active actor or conflicting staged residue is present, ATM should emit a clear Team Agent Broker arbitration recommendation or required command without waiting for a human instruction.",

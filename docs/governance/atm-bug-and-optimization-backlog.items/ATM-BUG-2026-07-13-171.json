@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in current working tree",
+  "status": "Closed — root-drop tracked-mirror cleanup regression re-verified on 2026-09-02",
   "area": "Release build hygiene / root-drop mirror residue",
   "finding": "`ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` and closeout validation can leave a large `release/atm-root-drop/**` tracked mirror diff in the framework worktree, while `scripts/build-release-hygiene.ts --mode cleanup` only restores `release/atm-onefile/atm.mjs`, `release/atm-onefile/release-manifest.json`, and `release/atm-root-drop/release-manifest.json`. Operators then inherit dozens of generated mirror modifications that are not owned by the current task and are unsafe to silently include or raw-restore.",
   "expectedBehavior": "ATM governance actions must be self-cleaning by default: build/runner-sync/validation flows should leave the working tree as clean as they found it unless the workflow is intentionally publishing release artifacts or is forced to pause for human/foreign-owner intervention. When residue is unavoidable, ATM must write an explicit owner/status/next-action packet and provide a governed cleanup/apply command. Cleanup should cover the entire generated root-drop mirror when it was produced only as validation/sync residue.",
