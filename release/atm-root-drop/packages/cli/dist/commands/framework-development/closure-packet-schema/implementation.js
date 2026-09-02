@@ -500,7 +500,16 @@ function newestFrameworkSourceMtime(rootDir) { let newest = 0; for (const entryP
 } return newest; }
 function runnerAffectingMtimeRoots(rootDir) { const manifest = readRunnerBuildScopeManifest(rootDir); if (!manifest)
     return ['packages/cli/src', 'scripts']; const roots = runnerAffectingPatterns(manifest).filter((pattern) => !pattern.startsWith('release/')).map((pattern) => pattern.includes('*') ? pattern.slice(0, pattern.indexOf('*')) : pattern).map((pattern) => pattern.replace(/\/$/, '')).filter((pattern) => pattern.length > 0); return [...new Set(roots)]; }
-function verifyRunnerSourceSeal(rootDir) { const manifestPath = path.join(rootDir, 'release-manifest.json'); if (!existsSync(manifestPath))
+function readRunnerSourceSealBlobIds(rootDir) { const dirtyResult = spawnSync('git', ['diff', '--name-only'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const dirty = new Set(String(dirtyResult.stdout ?? '').split(/\r?\n/).filter(Boolean).map((entry) => entry.replace(/\\/g, '/'))); const indexResult = spawnSync('git', ['ls-files', '-s'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const blobs = new Map(); if ((indexResult.status ?? 1) !== 0)
+    return blobs; for (const line of String(indexResult.stdout ?? '').split(/\r?\n/)) {
+    const match = line.match(/^\d+\s+([0-9a-f]+)\s+\d+\t(.+)$/);
+    if (!match)
+        continue;
+    const relativePath = match[2].replace(/\\/g, '/');
+    if (!dirty.has(relativePath))
+        blobs.set(relativePath, match[1]);
+} return blobs; }
+function verifyRunnerSourceSeal(rootDir) { const manifestPath = path.join(rootDir, 'release', 'atm-root-drop', 'release-manifest.json'); if (!existsSync(manifestPath))
     return { present: false, valid: false, digest: null }; try {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
     const seal = manifest.runnerSourceSeal;
@@ -509,11 +518,16 @@ function verifyRunnerSourceSeal(rootDir) { const manifestPath = path.join(rootDi
     const files = seal.files.filter((entry) => typeof entry === 'string' && entry.length > 0);
     if (files.length !== seal.files.length || files.some((entry) => !existsSync(path.join(rootDir, entry))))
         return { present: true, valid: false, digest: null };
+    const blobIds = readRunnerSourceSealBlobIds(rootDir);
     const hash = createHash('sha256');
     for (const relativePath of files) {
         const content = readFileSync(path.join(rootDir, relativePath));
         hash.update(String(Buffer.byteLength(relativePath))).update(':').update(relativePath);
-        hash.update(String(content.byteLength)).update(':').update(content);
+        const blobId = blobIds.get(relativePath);
+        if (blobId)
+            hash.update('git:').update(blobId);
+        else
+            hash.update(String(content.byteLength)).update(':').update(content);
     }
     const digest = `sha256:${hash.digest('hex')}`;
     return { present: true, valid: digest.toLowerCase() === String(seal.digest).toLowerCase(), digest };

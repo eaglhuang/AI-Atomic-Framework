@@ -248,15 +248,12 @@ export function buildRunnerSourceSeal(repositoryRoot: string, sourceFiles: reado
   const trackedBlobIds = readCleanTrackedBlobIds(repositoryRoot);
   const hash = createHash('sha256');
   for (const relativePath of files) {
-    const blobId = trackedBlobIds.get(relativePath);
-    // A clean Git index blob is a content identity.  Avoid rereading thousands of
-    // unchanged files during an incremental sealed build; dirty and generated
-    // inputs deliberately fall back to direct byte hashing.
     hash.update(String(Buffer.byteLength(relativePath))).update(':').update(relativePath);
+    const content = readFileSync(path.join(repositoryRoot, relativePath));
+    const blobId = trackedBlobIds.get(relativePath);
     if (blobId) {
       hash.update('git:').update(blobId);
     } else {
-      const content = readFileSync(path.join(repositoryRoot, relativePath));
       hash.update(String(content.byteLength)).update(':').update(content);
     }
   }
