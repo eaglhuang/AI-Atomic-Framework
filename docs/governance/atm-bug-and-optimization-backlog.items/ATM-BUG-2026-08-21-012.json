@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in quickfix pending governed commit",
+  "status": "Fixed in source and verified through the current frozen runner; formal closeout remains a separate state",
   "area": "Taskflow close / isolated index commit assembly",
   "finding": "Taskflow close builds a temporary Git index and invokes a bare commit. An actor registry update made by the official identity command can be explicitly authorized by the current task claim and direction lock, yet the bundle omitted the tracked dirty registry file. The pre-commit hook then rejected the isolated commit as ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED, leaving a valid close transaction unable to finish.",
   "expectedBehavior": "A tracked .atm/catalog/registry/actors.json change joins a taskflow isolated close bundle only when it is dirty and the current task's declared runtime scope explicitly permits it. Untracked registry files, unchanged registries, and registry changes outside the current task's claim or direction lock remain excluded.",
   "evidenceOrRepro": "ATM-GOV-0369 reached taskflow close write after a successful runner publication. The close backend rolled back because its temporary-index bare Git commit did not stage .atm/catalog/registry/actors.json, while the pre-commit hook correctly required that currently authorized actor-registry change. The focused commit-bundle assembly fixture seeds a tracked registry, modifies it, grants the exact task claim and direction lock, and verifies that only then the bundle contains the registry path.",
-  "followUp": "Publish the quickfix, retry taskflow close through the normal dry-run then write sequence, and retain the registry admission predicate narrowly scoped to the actor registry rather than broadening .atm governance dirty admission."
+  "followUp": "The repair commit 4c98afd0ccd02fb4063284a55b758491e914b6e1 is reachable from the current source seal, and packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts passes through the frozen runner. Retry taskflow close through its normal dry-run then write sequence when its independent closeout prerequisites are ready, and retain the registry admission predicate narrowly scoped to the actor registry rather than broadening .atm governance dirty admission."
 }
