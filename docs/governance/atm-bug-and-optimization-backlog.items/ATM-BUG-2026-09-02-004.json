@@ -5,11 +5,11 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source — frozen runner publication pending",
+  "status": "Fixed in source and verified through the current frozen runner; formal closeout remains a separate state",
   "area": "Framework temporary claim / runner publication evidence",
   "finding": "The protected-evidence hook recognised an active temporary framework lock only for atm.runnerSyncReceipt.v1. A broker-authorized atm.runnerPublicationTakeoverPlan.v1 written to that same lock's exact evidence path carried taskId but was rejected as missing task context, forcing a one-off hook bypass to commit publication governance evidence.",
   "expectedBehavior": "A fresh temporary framework lock may establish protected-evidence context only for its own official runner publication receipt forms: the actor-bound runner-sync receipt, or a structurally complete takeover plan at the exact path explicitly claimed by that lock. Expired, mismatched, unscoped, malformed, or unrelated evidence must remain rejected.",
   "evidenceOrRepro": "The runner publication recovery on 2026-09-02 committed a runner-sync receipt through the normal facade but required a bounded hook bypass for .atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-publication-takeover.json. Focused pre-commit parity tests now prove that a fresh exact lock admits the takeover plan and that the otherwise identical plan is rejected after the lock expires.",
   "containment": "The repair is confined to protected evidence classification. It does not accept a filename as authority, does not allow arbitrary temp evidence, and requires the active lock, exact task identity, official schema/path, structural plan fields, and explicit receipt scope to agree.",
-  "followUp": "Rebuild and publish the frozen runner before claiming release coverage. Audit the earlier runner-sync governance backlog entries separately; this item closes only the takeover-receipt context seam."
+  "followUp": "Frozen-runner publication is now verified: source repair 85d4f605a is an ancestor of the current sealed runner, whose sourceSeal.valid=true and syncRequired=false. The focused regression node --strip-types tests/cli/pre-commit-evidence-context-parity.test.ts passed again against that runner generation. Formal closeout remains separate. Audit the earlier runner-sync governance backlog entries separately; this item covers only the takeover-receipt context seam."
 }
