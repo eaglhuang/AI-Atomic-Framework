@@ -1,0 +1,301 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0408",
+  "title": "Prove bounded validator deadlines and single-writer evidence concurrency",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A validator deadline owns termination and wait of its child; a completed outer run cannot leave a live child able to overlap a subsequent run.",
+    "ACC-2: Two concurrent writers for the same task produce exactly one successful evidence mutation while the other returns `ATM_EVIDENCE_WRITE_LOCK_CONFLICT` with a retryable recovery.",
+    "ACC-3: The losing writer neither truncates nor adds a partial record to the evidence bundle, and the winner leaves no lock residue after completion."
+  ],
+  "deliverables": [
+    "tests/cli/evidence-write-lock-concurrency.test.ts",
+    "packages/cli/src/commands/evidence/__tests__/run.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+    "packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+    "tests/cli/evidence-write-lock-concurrency.test.ts",
+    "tests/cli/test-facade-timeout-policy.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/evidence-write-lock-concurrency.test.ts",
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+    "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the bounded deadline/lock regression changes; preserve evidence files and never rewrite another task's bundle.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-evidence-tracking",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0408-prove-bounded-validator-deadlines-and-single-writer-evidence-concurrency.task.md",
+    "sectionTitle": "ATM-GOV-0408",
+    "headingLine": 92,
+    "hash": "4ba234ffaaf3b892",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0408-prove-bounded-validator-deadlines-and-single-writer-evidence-concurrency.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4ba234ffaaf3b892d5c89d0742d9a095be6bd22e499c108ab309391ef4620e2b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-02T02:47:29.766Z"
+    }
+  },
+  "importedAt": "2026-09-02T02:47:29.766Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [
+      "ATM-BUG-2026-08-09-006",
+      "ATM-BUG-2026-07-19-018"
+    ],
+    "changedPublicSeams": [
+      "validator-deadline-policy",
+      "task-evidence-single-writer-lock"
+    ],
+    "causalImpactEdges": [
+      "validator-deadline-terminates-owned-child-before-return",
+      "same-task-evidence-writes-never-overlap",
+      "lock-contention-returns-actionable-retry-without-corrupting-evidence"
+    ],
+    "parallelFrontierInputs": [
+      "task-id-scoped-evidence-lock",
+      "validator-timeout-policy"
+    ],
+    "validatorReferences": [
+      "test_gov_evidence_write_lock_concurrency_0408",
+      "test_gov_test_facade_timeout_policy_0408"
+    ],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_gov_evidence_write_lock_concurrency_0408",
+      "targetGroupId": "null",
+      "semanticKey": "task_scoped_evidence_write_lock",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "same-task-evidence-writes-never-overlap",
+        "lock-contention-returns-actionable-retry-without-corrupting-evidence"
+      ],
+      "expectedRedPredicate": "A second concurrent evidence writer either succeeds while the first writer owns the lock or leaves a partial/corrupt evidence bundle.",
+      "contributionResourceKey": "evidence-write-lock",
+      "responsibility": "task-required",
+      "dependencyEdge": "evidence-command-to-task-scoped-lock",
+      "contractEdge": "task-evidence-single-writer-lock",
+      "resourceKey": "task-evidence-path"
+    },
+    {
+      "caseId": "test_gov_test_facade_timeout_policy_0408",
+      "targetGroupId": "null",
+      "semanticKey": "owned_validator_deadline",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "validator-deadline-terminates-owned-child-before-return"
+      ],
+      "expectedRedPredicate": "An outer validator deadline returns while its child remains live and can overlap a later run.",
+      "contributionResourceKey": "test-facade-timeout",
+      "responsibility": "task-required",
+      "dependencyEdge": "validator-policy-to-child-process-lifecycle",
+      "contractEdge": "validator-deadline-policy",
+      "resourceKey": "validator-subprocess"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_gov_evidence_write_lock_concurrency_0408",
+    "test_gov_test_facade_timeout_policy_0408"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-02T02-48-49-305Z-close-046f59a345cd",
+  "lastTransitionAt": "2026-09-02T02:48:49.305Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-02T02:47:40.411Z",
+  "promotedAt": "2026-09-02T02:47:40.415Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-6ca2a5afd2cc",
+    "claimedAt": "2026-09-02T02:47:40.419Z",
+    "heartbeatAt": "2026-09-02T02:48:49.304Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0408.json",
+      "packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "tests/cli/evidence-write-lock-concurrency.test.ts",
+      "tests/cli/test-facade-timeout-policy.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260902024740-codex-gpt-5.4-mini-53636c8e66",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260902024740-codex-gpt-5.4-mini-53636c8e66\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-09-02T02:47:40.419Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-1a4d237f5258fd97",
+    "ticketDigest": "sha256:1a4d237f5258fd97e8c43a984315db44963b9e44ec634c4ebfa64119f2944d48",
+    "taskId": "ATM-GOV-0408",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260902024740-codex-gpt-5.4-mini-53636c8e66",
+    "claimGeneration": "lease-6ca2a5afd2cc",
+    "issuedAt": "2026-09-02T02:47:40.419Z",
+    "expiresAt": "2026-09-02T03:17:40.419Z",
+    "scopeDigest": "sha256:1468495eccf6c66af59c24bbf01c39ee0cfa5c611f1e087dd3d971a0a361f6c7",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-02T02:47:40.419Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0408.*",
+          ".atm/history/task-events/ATM-GOV-0408/**",
+          ".atm/history/tasks/ATM-GOV-0408.json",
+          "packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+          "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+          "tests/cli/evidence-write-lock-concurrency.test.ts",
+          "tests/cli/test-facade-timeout-policy.test.ts"
+        ],
+        "digest": "sha256:37d7c46d5c15798cce23ed6221d8e1e516074a39d000d160872eceee74d38533"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260902024740-codex-gpt-5.4-mini-ATM-GOV-0408-98b7b3f4dd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0408",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0408.*",
+      ".atm/history/task-events/ATM-GOV-0408/**",
+      ".atm/history/tasks/ATM-GOV-0408.json",
+      "packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "tests/cli/evidence-write-lock-concurrency.test.ts",
+      "tests/cli/test-facade-timeout-policy.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bad0b3fe6e9100eb8763cee3e1910653ab18486cf5fe30bfc8cb4f361829ef2a",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260902024740-codex-gpt-5.4-mini-ATM-GOV-0408-98b7b3f4dd",
+    "laneSession": {
+      "laneSessionId": "lane-20260902024740-codex-gpt-5.4-mini-53636c8e66",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260902024740-codex-gpt-5.4-mini-53636c8e66\""
+    },
+    "createdAt": "2026-09-02T02:47:45.984Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-02T02:48:49.304Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260902024740-codex-gpt-5.4-mini-ATM-GOV-0408-98b7b3f4dd",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0408.closure-packet.json"
+}

@@ -1,0 +1,139 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0408",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d288484883b67f007328f10ca42c08789f54a572",
+  "governedTreeSha": "61d57311ae4f5fceb27da1cd82b037e0bab63bc8",
+  "targetCommitDelta": {
+    "currentCommitSha": "d288484883b67f007328f10ca42c08789f54a572",
+    "parentCommitShas": [
+      "d288484883b67f007328f10ca42c08789f54a572"
+    ],
+    "governedTreeSha": "61d57311ae4f5fceb27da1cd82b037e0bab63bc8",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0408.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-37-42-246Z-import-1dba08c60c06.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-37-45-993Z-reserve-52df7713ecdd.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-37-45-996Z-promote-7510619d7bb4.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-37-51-539Z-claim-fe72aee571d3.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-41-56-709Z-renew-bed352a6e6bb.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-46-40-275Z-renew-3347b17fabca.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-47-08-450Z-renew-5df9f2976d6e.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-47-30-059Z-import-7159776a676c.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-47-30-063Z-claim-displaced-by-import-3e03aefa40da.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-47-40-411Z-reserve-0454e7e288d6.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-47-40-415Z-promote-72eefbd9ecc6.json",
+      ".atm/history/task-events/ATM-GOV-0408/2026-09-02T02-47-45-985Z-claim-11beac119a30.json",
+      ".atm/history/tasks/ATM-GOV-0408.json",
+      "tests/cli/evidence-write-lock-concurrency.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/evidence-write-lock-concurrency.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:63155459108e96e88eaa8eab1fe4e2542afc975b951293984dfd1da1cb9df957",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f7a8fc16392fef12b3d5f2b971df333ea210068bf8e1f8a0ebb5579b14b4af77",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4608582129bd51282ea88af8846cceafc2c06b8b0b4649c18d6aeb7ca2a43539",
+      "stderrSha256": "sha256:08d6fb969349e0e717d29b1ede38a7a7f044d7ef785235660caaaa114f289249",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+    "node --strip-types tests/cli/evidence-write-lock-concurrency.test.ts",
+    "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+    "node --strip-types tests/cli/evidence-write-lock-concurrency.test.ts",
+    "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-02T02:48:49.299Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0408.*",
+      ".atm/history/task-events/ATM-GOV-0408/**",
+      ".atm/history/tasks/ATM-GOV-0408.json",
+      "packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "tests/cli/evidence-write-lock-concurrency.test.ts",
+      "tests/cli/test-facade-timeout-policy.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "tests/cli/evidence-write-lock-concurrency.test.ts",
+      "tests/cli/test-facade-timeout-policy.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+      "node --strip-types tests/cli/evidence-write-lock-concurrency.test.ts",
+      "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0408.json",
+  "closedAt": "2026-09-02T02:48:49.300Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260902024740-codex-gpt-5.4-mini-ATM-GOV-0408-98b7b3f4dd",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d288484883b67f007328f10ca42c08789f54a572",
+    "taskMatchedFiles": [
+      "tests/cli/evidence-write-lock-concurrency.test.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

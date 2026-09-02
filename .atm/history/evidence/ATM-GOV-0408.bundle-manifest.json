@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0408",
+  "updatedAt": "2026-09-02T02:42:26.226Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+    "node --strip-types tests/cli/evidence-write-lock-concurrency.test.ts",
+    "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/evidence-write-lock-concurrency.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:63155459108e96e88eaa8eab1fe4e2542afc975b951293984dfd1da1cb9df957",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/evidence-write-lock-concurrency.test.ts"
+      ],
+      "generatedAt": "2026-09-02T02:42:07.000Z",
+      "startedAt": "2026-09-02T02:41:58.930Z",
+      "finishedAt": "2026-09-02T02:42:07.000Z",
+      "durationMs": 8070,
+      "runnerKind": "dev-source",
+      "sourceCommit": "02a2a3c7fad08cfd6ae0a6058140c8438486607b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/evidence/__tests__/run.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f7a8fc16392fef12b3d5f2b971df333ea210068bf8e1f8a0ebb5579b14b4af77",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/evidence/__tests__/run.spec.ts"
+      ],
+      "generatedAt": "2026-09-02T02:42:11.426Z",
+      "startedAt": "2026-09-02T02:42:09.304Z",
+      "finishedAt": "2026-09-02T02:42:11.426Z",
+      "durationMs": 2122,
+      "runnerKind": "dev-source",
+      "sourceCommit": "02a2a3c7fad08cfd6ae0a6058140c8438486607b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/test-facade-timeout-policy.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4608582129bd51282ea88af8846cceafc2c06b8b0b4649c18d6aeb7ca2a43539",
+      "stderrSha256": "sha256:08d6fb969349e0e717d29b1ede38a7a7f044d7ef785235660caaaa114f289249",
+      "validators": [
+        "node --strip-types tests/cli/test-facade-timeout-policy.test.ts"
+      ],
+      "generatedAt": "2026-09-02T02:42:15.200Z",
+      "startedAt": "2026-09-02T02:42:13.721Z",
+      "finishedAt": "2026-09-02T02:42:15.200Z",
+      "durationMs": 1479,
+      "runnerKind": "dev-source",
+      "sourceCommit": "02a2a3c7fad08cfd6ae0a6058140c8438486607b",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-02T02:42:26.226Z",
+      "startedAt": "2026-09-02T02:42:17.468Z",
+      "finishedAt": "2026-09-02T02:42:26.226Z",
+      "durationMs": 8758,
+      "runnerKind": "dev-source",
+      "sourceCommit": "02a2a3c7fad08cfd6ae0a6058140c8438486607b",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
