@@ -64,12 +64,21 @@ try {
   assert.deepEqual(seal.files, ['packages/cli/src/atm.ts', 'scripts/AtmCore/runner-build-scope.json']);
   assert.match(seal.digest, /^sha256:[a-f0-9]{64}$/);
   const expectedHash = createHash('sha256');
+  const blobIds = new Map(
+    git(repo, ['ls-files', '-s'])
+      .split(/\r?\n/)
+      .map((line) => line.match(/^\d+\s+([0-9a-f]+)\s+\d+\t(.+)$/))
+      .filter((match): match is RegExpMatchArray => match !== null)
+      .map((match) => [match[2], match[1]] as const)
+  );
   for (const relativePath of seal.files) {
     const content = readFileSync(path.join(repo, relativePath));
     expectedHash.update(String(Buffer.byteLength(relativePath))).update(':').update(relativePath);
-    expectedHash.update(String(content.byteLength)).update(':').update(content);
+    const blobId = blobIds.get(relativePath);
+    if (blobId) expectedHash.update('git:').update(blobId);
+    else expectedHash.update(String(content.byteLength)).update(':').update(content);
   }
-  assert.equal(seal.digest, `sha256:${expectedHash.digest('hex')}`, 'seal must use the same byte digest that the frozen runner verifies');
+  assert.equal(seal.digest, `sha256:${expectedHash.digest('hex')}`, 'seal must use the same clean-Git/blob fallback digest that the frozen runner verifies');
   const rootDropManifest = path.join(repo, 'release', 'atm-root-drop', 'release-manifest.json');
   const frozenRunner = path.join(repo, 'release', 'atm-onefile', 'atm.mjs');
   mkdirSync(path.dirname(rootDropManifest), { recursive: true });
