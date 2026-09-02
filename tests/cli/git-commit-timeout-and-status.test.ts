@@ -22,6 +22,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { CliError } from '../../packages/cli/src/commands/shared.ts';
 import { runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
+import { runFrameworkTempClaim } from '../../packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts';
 
 function runGit(cwd: string, args: string[]) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -101,6 +102,17 @@ try {
 
   mkdirSync(path.join(repo, 'src'), { recursive: true });
   writeFileSync(path.join(repo, 'src/hangs.ts'), 'export const value = 1;\n', 'utf8');
+
+  // The framework commit facade now requires a scoped temporary claim before
+  // it can reach the hook process. Establish that normal prerequisite so this
+  // fixture continues to test timeout/status behaviour rather than admission.
+  const claim = await runFrameworkTempClaim(
+    repo,
+    'opt08-actor',
+    ['src/hangs.ts', 'src/succeeds.ts'],
+    'exercise governed commit timeout regression'
+  );
+  assert.equal(claim.ok, true, 'fixture claim must admit the governed commit path');
 
   let timeoutCaught: unknown = null;
   const timeoutStart = Date.now();
