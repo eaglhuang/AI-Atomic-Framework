@@ -5971,11 +5971,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1366,
-    "unchanged": 4570,
+    "copied": 1,
+    "unchanged": 1937,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -26994,7 +26994,7 @@
       },
       {
         "path": "packages/cli/src/commands/__tests__/broker-shared-surface-workflow.test.ts",
-        "digest": "0efd5c0477ae6aa6bf1be249b0208640ef603190e768dcf70eb5e35adb005207",
+        "digest": "52e4c23e78d76e1c90a337e52aed177079bf04e4a16927eec71685ec5dd043c1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/__tests__/broker-shared-surface-workflow.test.ts"
@@ -59402,7 +59402,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:5212f1f9dcb48791bc8596ba87310a7f512afcc011c10eba67b108f22e0d52ca"
+    "treeDigest": "sha256:be7e4fd6b25f613f4f30f0fd3366e5afc9405c1d33e5d7439aa74a37bd72965a"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60863,7 +60863,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:d7ddbcf5084758ab105a6c3701c180f514f6860fd8c4e33adcbf6196e3161f31"
+    "digest": "sha256:f114a53783289028a3148a1b9bb36052ba1a02491d7abae0a8ca4da25aab7ed4"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66811,22 +66811,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:a88c29b1bcc4f1beff45c2d1940fba3a1e2f5c53230ca482fe96b13ed39cc1bf",
-  "sealedSourceCommit": "318db5936acc563d42a175fd9bf7ef66cd206cf4",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:5f64496afaf6e40cf4e3c5caa2543a76ef7d4cb72b5c9c404994b1e086805bbb",
-  "tsBuildCacheDigest": "sha256:1825b550ad048ed56ccc3d4eaac677681bf4a7fad9f6230047b58e7cf6ed38e6",
+  "buildInputsTreeHash": "sha256:f7cb0a62d0e67586091bb8d4e256b8eb6b46d4031d5905b406f1ba4a484298e9",
+  "sealedSourceCommit": "415c7665c1f264ca1b38cf9045c110d63d4017fe",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:8f1e6d01fd7993c3b858732a9f8bb6dc9d43544a1d27fc88a0e2506509debbee",
+  "tsBuildCacheDigest": "sha256:7cc0604cdd960464d4bd0df69c4a4f799ad9ce34494ede2f3b30fcd886e02fd3",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 43,
-    "skipDecision": 53,
-    "worktreeSetup": 8640,
-    "typescriptBuild": 7761,
-    "rootDropReleaseAssembly": 29383,
-    "onefileReleaseAssembly": 6799,
-    "artifactSync": 10186,
+    "inputHashCalculation": 42,
+    "skipDecision": 54,
+    "worktreeSetup": 8675,
+    "typescriptBuild": 15799,
+    "rootDropReleaseAssembly": 32995,
+    "onefileReleaseAssembly": 6500,
+    "artifactSync": 9402,
     "cleanup": 0,
-    "totalElapsed": 76459
+    "totalElapsed": 93518
   }
 }
