@@ -204,6 +204,7 @@ export function findActiveTaskQueue(cwd: string, sourcePrompt?: string | null, s
   const promptHash = sourcePrompt?.trim() ? sha256(sourcePrompt.trim()) : null;
   const queues = listTaskQueues(cwd)
     .filter((queue) => queue.status === 'active')
+    .map((queue) => normalizeTaskQueueForTerminalBatchRun(cwd, queue))
     .map((queue) => normalizeTaskQueueForTerminalLedgerTasks(cwd, queue))
     .filter((queue) => queue.status === 'active');
   if (selector.queueId) return queues.find((queue) => queue.queueId === selector.queueId) ?? null;
@@ -215,6 +216,26 @@ export function findActiveTaskQueue(cwd: string, sourcePrompt?: string | null, s
     return exact ?? null;
   }
   return queues.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0] ?? null;
+}
+
+function normalizeTaskQueueForTerminalBatchRun(cwd: string, queue: TaskQueueRecord): TaskQueueRecord {
+  if (!queue.batchId) return queue;
+  const batchPath = path.join(cwd, '.atm', 'runtime', 'batch-runs', `${queue.batchId}.json`);
+  if (!existsSync(batchPath)) return queue;
+  try {
+    const parsed = JSON.parse(readFileSync(batchPath, 'utf8')) as Record<string, unknown>;
+    const status = typeof parsed.status === 'string' ? parsed.status.toLowerCase() : '';
+    if (status !== 'completed' && status !== 'abandoned') return queue;
+    const updated: TaskQueueRecord = {
+      ...queue,
+      status,
+      updatedAt: new Date().toISOString()
+    };
+    writeTaskQueue(cwd, updated);
+    return updated;
+  } catch {
+    return queue;
+  }
 }
 
 export function abandonTaskQueue(input: {
@@ -435,6 +456,5 @@ export function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, a
 export function toProjectPath(cwd: string, absolutePath: string) {
   return relativePathFrom(cwd, absolutePath).replace(/\\/g, '/');
 }
-
 
 

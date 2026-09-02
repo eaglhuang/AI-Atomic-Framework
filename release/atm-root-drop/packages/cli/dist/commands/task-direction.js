@@ -92,6 +92,7 @@ export function findActiveTaskQueue(cwd, sourcePrompt, selector = {}) {
     const promptHash = sourcePrompt?.trim() ? sha256(sourcePrompt.trim()) : null;
     const queues = listTaskQueues(cwd)
         .filter((queue) => queue.status === 'active')
+        .map((queue) => normalizeTaskQueueForTerminalBatchRun(cwd, queue))
         .map((queue) => normalizeTaskQueueForTerminalLedgerTasks(cwd, queue))
         .filter((queue) => queue.status === 'active');
     if (selector.queueId)
@@ -107,6 +108,29 @@ export function findActiveTaskQueue(cwd, sourcePrompt, selector = {}) {
         return exact ?? null;
     }
     return queues.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0] ?? null;
+}
+function normalizeTaskQueueForTerminalBatchRun(cwd, queue) {
+    if (!queue.batchId)
+        return queue;
+    const batchPath = path.join(cwd, '.atm', 'runtime', 'batch-runs', `${queue.batchId}.json`);
+    if (!existsSync(batchPath))
+        return queue;
+    try {
+        const parsed = JSON.parse(readFileSync(batchPath, 'utf8'));
+        const status = typeof parsed.status === 'string' ? parsed.status.toLowerCase() : '';
+        if (status !== 'completed' && status !== 'abandoned')
+            return queue;
+        const updated = {
+            ...queue,
+            status,
+            updatedAt: new Date().toISOString()
+        };
+        writeTaskQueue(cwd, updated);
+        return updated;
+    }
+    catch {
+        return queue;
+    }
 }
 export function abandonTaskQueue(input) {
     const record = readTaskQueue(input.cwd, input.queueId);
