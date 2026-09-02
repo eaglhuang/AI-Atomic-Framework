@@ -5,11 +5,11 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source; frozen runner publication and formal closeout remain separate states",
+  "status": "Fixed in source and verified through the current frozen runner; formal closeout remains a separate state",
   "area": "Protected evidence pre-commit classification / historical delivery bundles",
   "finding": "classifyProtectedEvidenceBundle combined every staged task-ledger and task-event context with task identities declared by staged evidence payloads. A bounded cleanup delivery that intentionally stages historical events for several released tasks plus one current task-bound evidence receipt was therefore rejected as bundle-with-ambiguous-task-ids, although the evidence payload itself named only one task and its matching current ledger was staged.",
   "expectedBehavior": "The ambiguity decision for an evidence file must be based on semantic task identities declared by staged evidence payloads, not on unrelated historical contexts carried by the same governed delivery bundle. Staged ledgers and events still prove the declared evidence identity. Multiple distinct evidence task identities remain fail-closed.",
   "evidenceOrRepro": "TASK-TMP-0013's governed delivery dry-run correctly selected historical task events for multiple released tasks and a single TASK-TMP-0013 evidence envelope. The actual pre-commit hook rejected both TASK-TMP-0013.json and its bundle manifest with bundle-with-ambiguous-task-ids. The focused hook fixture first failed after adding a TASK-Y transition alongside TASK-X evidence, then passed after the classifier separated context IDs from evidence identity IDs; its existing multi-evidence TASK-COMMITTED plus TASK-SECOND negative case remains in place.",
   "containment": "No historical evidence or foreign task history is rewritten. The change narrows only the accidental cross-context ambiguity condition while retaining per-evidence identity validation and the required matching staged or committed task context.",
-  "followUp": "Rebuild and publish the frozen runner through the normal governed runner-sync route. Then reclaim TASK-TMP-0013 and retry its governed history-bundle commit; do not use raw Git bypass."
+  "followUp": "Repair commit f1270a4f0c0408dd5d514c550ea63ccfdf5a0da1 is reachable from the current source seal, and tests/cli/pre-commit-evidence-context-parity.test.ts passes through the frozen runner. Reclaim TASK-TMP-0013 and retry its governed history-bundle commit when its independent closeout prerequisites are ready; do not use raw Git bypass."
 }
