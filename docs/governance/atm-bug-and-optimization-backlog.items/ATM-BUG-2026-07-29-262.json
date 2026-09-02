@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Closed — stale runner-sync reservation lifecycle verified",
   "area": "Runner-sync / sealed build queue lifecycle",
   "finding": "A sealed runner-sync build that fails before publishing can leave the runner-sync steward queue held until TTL, even when the failed generation is no longer usable and a later generation has superseded it.",
   "expectedBehavior": "Failed sealed builds should release or supersede their runner-sync queue hold through a governed failure receipt, with deterministic lineage from failed generation to replacement generation. A later valid generation should not be blocked by an expired or failed sealed-build reservation.",
   "evidenceOrRepro": "Plan 3.1 Git recovery handoff recorded that a failed sealed build held the runner-sync queue until TTL during the 2026-07-29 recovery sequence. The operator had to treat a later frozen runner generation as separately published/released and avoid reusing the expired earlier queue.",
-  "followUp": "Add runner-sync failure receipts and queue supersession tests: failed sealed build, replacement generation, TTL expiry, explicit release, and close-time verification that stale failed generations are advisory rather than blocking."
+  "followUp": "Closed on 2026-09-02. The governed stale-reservation lifecycle landed in 3dd569bf26050040f2ec08e8f21383a84bf5c4f9, after orphan-head release work in 211d2ab5fe27cc118f02bbc41fd8355d054958f5 and queue-health admission in 1f7e50fdf29e9db2e72e8b795ea565c400f203dc. Focused verification passed: tests/cli/runner-sync-stale-reservation-lifecycle.test.ts, tests/cli/runner-sync-orphan-head.test.ts, tests/cli/runner-sync-stale-sha-recovery.test.ts, and packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts. These cover stale/expired reservation release, orphan/terminal queue-head advancement, safe retry against a newer sealed source, and receipt-backed owner release. Future failure-receipt regressions require a new incident item."
 }
