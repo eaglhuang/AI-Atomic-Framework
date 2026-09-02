@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-3acee89aca46",
+  "recordedAt": "2026-09-02T15:19:01.106Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini",
+  "surface": "git recover-index-lock",
+  "command": "node atm.mjs git recover-index-lock --task \"ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini\" --actor \"codex-gpt-5.4-mini\" --force-index-lock-recovery --emergency-approval <lease-id> --reason \"<human-approved reason>\" --json",
+  "flags": [
+    "--force-index-lock-recovery"
+  ],
+  "permission": "backend.gitIndexLockRecovery",
+  "leaseId": "EMG-ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-4bbfb1ab63",
+  "reason": "Confirmed stale index lock; only fsmonitor daemons remained and no Git writer was active.",
+  "skippedChecks": [
+    "active-git-writer-liveness-is-human-confirmed"
+  ],
+  "touchedFiles": [
+    ".git/index.lock"
+  ],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-02T15-19-01-031Z-EMG-ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini-4bbfb1ab63.json",
+  "parentEventId": "POA-4bc7227929a1",
+  "repairCandidate": null
+}
