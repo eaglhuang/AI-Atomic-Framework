@@ -9,9 +9,10 @@ import { inspectIntegrationBootstrap } from './integration.js';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
 import { createFrameworkModeStatus } from './framework-development.js';
 import { describeRestrictedExecutionPolicy } from '../_vendor/core/dist/team-agents/restricted-execution-gateway.js';
+import { isQuickfixPrompt } from './work-channels.js';
 import { makeResult, message, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.js';
 import { uniqueInOrder } from './next/view-projections.js';
-import { hasPromptScopedWorkItems, inspectImportedTaskQueue, resolveTaskIntent } from './next/route-resolution.js';
+import { hasPromptScopedWorkItems, inspectImportedTaskQueue, resolveTaskIntent, resolveQuickfixScope } from './next/route-resolution.js';
 import { buildActiveTaskDivergenceResult, buildAgentPackHint, buildNextMessages, enrichWithLegacyPlan, shouldInspectCrossRepoFrameworkStatus } from './next/playbook-projection.js';
 import { buildPromptScopedNextResult } from './next/prompt-results.js';
 export { resolvePromptScopedTaskContext, resolveHandoffResumeTaskRoute, shouldSkipExternalTaskCardScan, shouldSkipMarkdownTaskDiscovery } from './next/route-resolution.js';
@@ -86,7 +87,12 @@ async function runNextRoute(argv) {
         explicitTaskIds
     });
     profile.mark('resolve-task-intent');
-    if (taskIntent && taskIntent.taskScopeMentioned === false) {
+    const unscopedPrompt = taskIntent?.userPrompt?.trim() ?? '';
+    const claimedQuickfixPrompt = Boolean(options.claim
+        && taskIntent?.taskScopeMentioned === false
+        && isQuickfixPrompt(unscopedPrompt)
+        && resolveQuickfixScope(unscopedPrompt).length > 0);
+    if (taskIntent && taskIntent.taskScopeMentioned === false && !claimedQuickfixPrompt) {
         const unscopedGuidance = buildPromptGuidanceNextResult({
             cwd: options.cwd,
             actor: options.agent,
