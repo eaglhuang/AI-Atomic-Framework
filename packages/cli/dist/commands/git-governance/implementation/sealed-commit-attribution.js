@@ -176,6 +176,14 @@ export function assembleSealedCommitIndex(input) {
     // their resulting blobs to the seal before any ref can move.
     if (newEntryPaths.length > 0) {
         runGitCommandWithEnv(input.cwd, ['add', '-A', '-f', '--', ...newEntryPaths], input.env, [...QUIET_STDIO]);
+        // `add` is allowed here only to populate the index stat cache for an
+        // otherwise-new path.  It reads the mutable worktree, so it must never be
+        // the final content authority: restore the exact sealed blob immediately.
+        // This keeps the stat-cache workaround while closing the same-path
+        // substitution window between sealing and candidate assembly.
+        for (const entry of presentEntries.filter((entry) => newEntryPaths.includes(entry.path))) {
+            runGitCommandWithEnv(input.cwd, ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], input.env, [...QUIET_STDIO]);
+        }
     }
     // `update-index --cacheinfo` writes entries with no stat data, which makes
     // `git commit` refresh them against the worktree and silently re-hash
