@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source and verified through the current frozen runner; formal closeout remains a separate state",
+  "status": "Closed — completed TASK-TMP-0013 and frozen regression re-verified",
   "area": "Protected evidence pre-commit classification / historical delivery bundles",
   "finding": "classifyProtectedEvidenceBundle combined every staged task-ledger and task-event context with task identities declared by staged evidence payloads. A bounded cleanup delivery that intentionally stages historical events for several released tasks plus one current task-bound evidence receipt was therefore rejected as bundle-with-ambiguous-task-ids, although the evidence payload itself named only one task and its matching current ledger was staged.",
   "expectedBehavior": "The ambiguity decision for an evidence file must be based on semantic task identities declared by staged evidence payloads, not on unrelated historical contexts carried by the same governed delivery bundle. Staged ledgers and events still prove the declared evidence identity. Multiple distinct evidence task identities remain fail-closed.",

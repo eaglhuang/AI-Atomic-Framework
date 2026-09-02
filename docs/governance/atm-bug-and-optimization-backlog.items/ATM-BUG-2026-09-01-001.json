@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source and verified through the current frozen runner; formal closeout remains a separate state",
+  "status": "Closed — source repair and frozen regression re-verified",
   "area": "Governed commit auto-stage / framework claim scope / cross-task ownership",
   "finding": "isFrameworkGeneratedArtifactAllowed admitted any path matching a claimed scope through pathMatchesTaskScope, so a directory-shaped framework temporary claim inherited every path beneath it. When the claim declared a directory such as .atm/ or .atm/history/evidence/, governed auto-stage swept another known task's governance history file into the commit candidate set, including untracked ones. The cross-task mutation guard then correctly refused the commit and named a path the operator had never staged; the wrapper rolled the index back, so the operator afterwards observed an empty git diff --cached and read the refusal as a pre-commit admission defect rather than a staging-scope defect.",
   "expectedBehavior": "A directory scope grants reach inside a claim; it never transfers authority over another task's governance history. Directory-scope inheritance must not admit .atm/history/{evidence,task-events,tasks} paths owned by a different known task. Naming a path exactly in the claim remains a deliberate authority act and stays admitted. Generated release surfaces such as release/** and packages/cli/dist/** are not task history and keep their existing directory semantics. Ownership must be resolved through the single cross-task owner seam so governed staging and cross-task admission cannot drift apart.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source and verified through the current frozen runner; formal closeout remains a separate state",
+  "status": "Closed — source repair and frozen regression re-verified",
   "area": "Cross-task mutation guard / terminal task-history reconciliation",
   "finding": "A normal live successor task can receive a bounded work-admission ticket for terminal task-history paths, but terminal-history-entitlement ignored that task's own live ledger and accepted only a framework temporary lock with linkedTaskId. Ordinary successor cleanup cards are not created with linkedTaskId, so every exact-scope attempt was rejected as terminal-unentitled by the pre-commit hook.",
   "expectedBehavior": "A live task claim that explicitly and narrowly covers a terminal history path is an answerable successor review surface and may reconcile that path. A framework temporary claim remains ineligible without an explicit linkedTaskId. Missing ledgers, broad scopes, inactive writers, and live terminal owners remain fail-closed.",
