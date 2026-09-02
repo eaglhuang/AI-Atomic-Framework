@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed in current source and frozen runner; formal backlog closeout recorded 2026-09-02",
   "area": "Batch / Taskflow",
   "finding": "ATM-GOV-0195 surfaced a batch queue-head playbook that instructed batch checkpoint, but batch checkpoint failed because no active batch run existed; a later next --claim switched the same task to normal single-task playbook.",
   "expectedBehavior": "The router and playbook should not oscillate between batch and normal for the same active queue-head. If checkpoint is required, next --claim should create or recover the active batch run; if normal close is correct, the preview should not instruct batch checkpoint.",
-  "evidenceOrRepro": "node atm.mjs next --prompt \"Continue active task ATM-GOV-0195...\" --json returned channel=batch and checkpointCommand. node atm.mjs batch checkpoint --actor codex-governance-optimizer --json then failed with ATM_BATCH_RUN_MISSING. node atm.mjs next --claim ... later returned recommendedChannel=normal.",
-  "followUp": "Create a lifecycle parity test covering active imported task -> next preview -> claim -> checkpoint/close surface, and make ATM_BATCH_RUN_MISSING provide a repair command that actually converges."
+  "evidenceOrRepro": "Historical repro: node atm.mjs next --prompt \"Continue active task ATM-GOV-0195...\" --json returned channel=batch and checkpointCommand; node atm.mjs batch checkpoint then failed with ATM_BATCH_RUN_MISSING; a later next --claim returned normal. Current source closes that seam: claimNextImportedTask persists writeBatchRun for every promptScope.status=queue before selectPostClaimChannel derives the returned channel, so a batch claim creates the active batch run before it advertises checkpoint. Active batches route next through task-batch-context-active or batch-state-repair-required, never normal. Focused current checks passed on 2026-09-02: tests/cli/next-active-batch-route.test.ts, tests/cli/batch-final-600.test.ts, and packages/cli/src/commands/batch/checkpoint-commit-window-policy.test.ts. Frozen runner source seal is current (next reported syncRequired=false).",
+  "followUp": "Source repair and frozen runner coverage are current. No further quickfix is required. If a future real task reproduces ATM_BATCH_RUN_MISSING after a successful queue-scoped next --claim, capture its batchId, task queue, and active batch runtime as a new incident rather than reopening this historical item."
 }

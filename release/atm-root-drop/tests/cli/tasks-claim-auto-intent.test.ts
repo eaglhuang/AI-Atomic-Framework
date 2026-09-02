@@ -90,6 +90,10 @@ try {
   assert.match(nextRoute.parsed.evidence.nextAction.command, /--auto-intent/);
   assert.match(nextRoute.parsed.evidence.nextAction.taskScopedClaimCommand, /--auto-intent/);
 
+  const sameActorRenew = runAtm(['tasks', 'renew', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--json']);
+  assert.equal(sameActorRenew.exitCode, 0, sameActorRenew.stderr || sameActorRenew.stdout);
+  assert.equal(sameActorRenew.parsed.evidence.claim?.laneSession?.laneSessionId, reclaimedTask.claim?.laneSession?.laneSessionId);
+
   runAtm(['tasks', 'release', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--reason', 'fixture reset', '--json']);
 
   const conflictPlan = path.join(planning, 'docs', 'ai_atomic_framework', 'multi-agent-orchestration', 'tasks', 'TASK-MAO-AUTO-0003.task.md');

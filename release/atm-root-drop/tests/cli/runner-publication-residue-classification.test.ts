@@ -24,22 +24,23 @@ function writeJson(relativePath: string, value: unknown) {
 
 try {
   const now = new Date().toISOString();
+  const nowMs = Date.parse(now);
   writeJson('.atm/runtime/locks/ATM-FRAMEWORK-TEMP-g9.lock.json', {
     workItemId: 'ATM-FRAMEWORK-TEMP-g9',
     actorId,
     heartbeatAt: now,
     ttlSeconds: 1800,
-    files: ['packages/cli/dist', 'release/atm-onefile']
+    files: ['packages/cli/dist/**', 'release/atm-onefile/**']
   });
   writeJson('.atm/runtime/locks/ATM-FRAMEWORK-TEMP-stale.lock.json', {
     workItemId: 'ATM-FRAMEWORK-TEMP-stale',
     actorId: 'older-worker',
     heartbeatAt: '2020-01-01T00:00:00.000Z',
     ttlSeconds: 1,
-    files: ['release/atm-root-drop']
+    files: ['release/atm-root-drop/**']
   });
 
-  const locks = readFrameworkTempLockProjection(repo, Date.parse('2026-07-28T00:00:00.000Z'));
+  const locks = readFrameworkTempLockProjection(repo, nowMs);
   assert.equal(frameworkTempLockOwnsPath(locks, 'packages/cli/dist/atm.js')?.workItemId, 'ATM-FRAMEWORK-TEMP-g9');
   assert.equal(frameworkTempLockOwnsPath(locks, 'release/atm-root-drop/atm.mjs')?.leaseFresh, false);
 

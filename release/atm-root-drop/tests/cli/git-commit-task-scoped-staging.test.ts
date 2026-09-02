@@ -8,6 +8,7 @@ import {
   assertBranchCommitQueueSchema,
   createFixtureRepository,
   expectCliError,
+  removeFixtureRepository,
   runGit,
   tempDir,
   writeJson
@@ -227,12 +228,14 @@ try {
       '--session', sessionId,
       '--message', 'feat: branch queue busy',
       '--auto-stage',
+      '--timeout-ms', '100',
       '--json'
     ]),
     'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY'
   );
   const queueBusyDetails = (await queueBusy).details ?? {};
   assert.equal(queueBusyDetails.retryable, true);
+  assert.equal(queueBusyDetails.queueLockTimeoutMs, 100);
   assert.ok(String(queueBusyDetails.lockPath).includes('git-commit-queue-refs-heads-'));
   rmSync(branchQueueLockPath, { recursive: true, force: true });
 
@@ -564,7 +567,10 @@ try {
     stagedManifestPath
   ]).decisions.get(stagedManifestPath.toLowerCase());
   assert.equal(stagedManifestDecision?.ok, true, 'protected evidence must use the staged manifest blob, not divergent worktree bytes');
-  runGit(tempDir, ['restore', '--staged', '--worktree', '--', `.atm/history/tasks/${taskId}.json`]);
+  // Restore both staged fixture files before removing the temporary manifest.
+  // Leaving its index entry behind would manufacture a protected-state
+  // deletion and mask the index-ownership scenario that follows.
+  runGit(tempDir, ['restore', '--staged', '--worktree', '--', `.atm/history/tasks/${taskId}.json`, stagedManifestPath]);
   rmSync(path.join(tempDir, stagedManifestPath), { force: true });
 
   await runIndexLeaseTransactionScenarios({
@@ -582,6 +588,6 @@ try {
   if (inheritedLaneSessionId === undefined) delete process.env.ATM_LANE_SESSION_ID;
   else process.env.ATM_LANE_SESSION_ID = inheritedLaneSessionId;
   if (existsSync(tempDir)) {
-    rmSync(tempDir, { recursive: true, force: true });
+    removeFixtureRepository();
   }
 }

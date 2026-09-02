@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Closed — task-scoped evidence write lease verified on 2026-09-02",
   "area": "Evidence / Journal Concurrency",
   "finding": "Parallel `node atm.mjs evidence run` commands for the same task can race on the same `.atm/history/evidence/<task>.json` bundle, risking overwritten validator records.",
   "expectedBehavior": "Evidence writes for a task should be serialized, append/CAS-protected, or brokered so parallel validators cannot silently clobber each other's results.",
   "evidenceOrRepro": "ATM-GOV-0186 evidence collection launched multiple evidence runs against `.atm/history/evidence/ATM-GOV-0186.json`; the operator had to rerun validators sequentially to restore confidence.",
-  "followUp": "Add a task-scoped evidence write lease or append-only event journal plus a focused race test that runs two evidence writers concurrently and verifies both records survive."
+  "followUp": "Resolved by ATM-GOV-0408 / d28848488. Evidence writes now acquire a task-scoped lock under .atm/runtime/evidence-write-locks; the losing concurrent writer returns ATM_EVIDENCE_WRITE_LOCK_CONFLICT without appending partial evidence. tests/cli/evidence-write-lock-concurrency.test.ts was rerun on 2026-09-02 and passed."
 }

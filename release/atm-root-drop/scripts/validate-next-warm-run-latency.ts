@@ -22,9 +22,10 @@
 //   node --strip-types scripts/validate-next-warm-run-latency.ts
 //   node --strip-types scripts/validate-next-warm-run-latency.ts --json
 
-import { rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { buildOnefileRelease } from './build-onefile-release.ts';
@@ -56,8 +57,9 @@ type TimedRun = {
   stderr: string;
 };
 
-const tempRoot = createTempWorkspace('atm-next-warm-run-latency-');
-try {
+function main(): void {
+  const tempRoot = createTempWorkspace('atm-next-warm-run-latency-');
+  try {
   buildCurrentPackageDist();
   const rootDrop = buildRootDropRelease({
     repositoryRoot: repoRoot,
@@ -68,24 +70,25 @@ try {
     rootDropRoot: rootDrop.releaseRoot,
     outputRoot: path.join(tempRoot, 'release', 'atm-onefile')
   });
+  const measuredArtifact = materializeStableOnefileMeasurementArtifact(release.outputFilePath);
   const cacheRoot = path.join(tempRoot, 'onefile-cache');
 
   // Prime the onefile extraction cache; these runs are intentionally excluded
   // from the warm-run sample set (they pay one-time decompression cost).
   for (let primeIndex = 0; primeIndex < budget.cachePrimeCount; primeIndex += 1) {
-    runTimed(release.outputFilePath, workload.args, cacheRoot);
+    runTimed(measuredArtifact.outputFilePath, workload.args, cacheRoot);
   }
 
   const samples: number[] = [];
   for (let index = 0; index < budget.sampleCount; index += 1) {
-    const run = runTimed(release.outputFilePath, workload.args, cacheRoot);
+    const run = runTimed(measuredArtifact.outputFilePath, workload.args, cacheRoot);
     if (run.exitCode !== 0) {
       throw new Error(`warm-run sample ${index + 1} exited ${run.exitCode}: ${run.stderr.slice(0, 2000)}`);
     }
     samples.push(run.elapsedMs);
   }
 
-  const profiledRun = runTimed(release.outputFilePath, workload.args, cacheRoot, { ATM_NEXT_PROFILE: '1' });
+  const profiledRun = runTimed(measuredArtifact.outputFilePath, workload.args, cacheRoot, { ATM_NEXT_PROFILE: '1' });
   const cliLogicMs = extractCliLogicMsFromProfileOutput(profiledRun.stderr);
 
   const sorted = [...samples].sort((left, right) => left - right);
@@ -112,7 +115,7 @@ try {
   const report = {
     ok: findings.length === 0,
     budget,
-    measuredArtifact: path.relative(repoRoot, release.outputFilePath).replace(/\\/g, '/'),
+    measuredArtifact: measuredArtifact.artifactKey,
     measuredAgainstRepo: repoRoot,
     workload,
     platform: process.platform,
@@ -126,8 +129,33 @@ try {
 
   emitReport(report);
   process.exitCode = report.ok ? 0 : 1;
-} finally {
-  rmSync(tempRoot, { recursive: true, force: true });
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+}
+
+// Measuring a newly named temp launcher on Windows measures the security
+// scanner's treatment of that path, not the warm launcher users retain.
+// Keep the generated source fresh, but materialize byte-identical launchers
+// at a content-addressed path so a warm sample has a stable executable file.
+export function materializeStableOnefileMeasurementArtifact(
+  sourceFilePath: string,
+  stableRoot = path.join(repoRoot, '.atm', 'runtime', 'next-warm-run-artifacts')
+): { outputFilePath: string; artifactKey: string; reused: boolean } {
+  const source = readFileSync(sourceFilePath);
+  const artifactKey = createHash('sha256').update(source).digest('hex');
+  const artifactRoot = path.join(stableRoot, artifactKey);
+  const outputFilePath = path.join(artifactRoot, 'atm.mjs');
+  const reused = existsSync(outputFilePath) && readFileSync(outputFilePath).equals(source);
+  if (!reused) {
+    mkdirSync(artifactRoot, { recursive: true });
+    copyFileSync(sourceFilePath, outputFilePath);
+  }
+  return { outputFilePath, artifactKey, reused };
+}
+
+if (path.resolve(process.argv[1] || '') === fileURLToPath(import.meta.url)) {
+  main();
 }
 
 function readBudgetNumber(name: string, defaultValue: number): number {
