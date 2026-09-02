@@ -1,13 +1,12 @@
 // ATM-BUG-2026-07-07-047 (OPT-07) regression test.
 //
-// `atm git commit --auto-stage` stages provenance files (git-head.jsonl, the
-// tracked actor registry) directly onto the LIVE index before attempting the
-// real `git commit`. If that commit ultimately fails (e.g. a hook or a signing
-// misconfiguration rejects it), nothing previously unstaged that residue --
-// the live index looked "dirty" with ATM-internal files even though the
-// governed commit never happened. Confirm the wrapper now rolls back exactly
-// what it staged for this attempt, while raw-git commit failures on
-// unrelated repos are outside ATM's control and stay untouched.
+// `atm git commit --auto-stage` may stage claim-scoped source and provenance
+// paths directly onto the LIVE index before attempting the real `git commit`.
+// If that commit ultimately fails (e.g. a signing misconfiguration rejects
+// it), nothing newly staged for that attempt may remain in the live index.
+// Confirm the wrapper restores exactly the caller's pre-attempt staged state;
+// raw-git commit failures on unrelated repos are outside ATM's control and
+// stay untouched.
 //
 // Runnable directly via:
 //   node --strip-types tests/cli/git-commit-failure-residue-rollback.test.ts
@@ -19,6 +18,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { CliError } from '../../packages/cli/src/commands/shared.ts';
 import { runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
+import { runFrameworkTempClaim } from '../../packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts';
 
 function runGit(cwd: string, args: string[]) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -61,6 +61,17 @@ try {
   mkdirSync(path.join(repo, 'src'), { recursive: true });
   writeFileSync(path.join(repo, 'src/app.ts'), 'export const value = 1;\n', 'utf8');
 
+  // The framework commit facade requires a scoped temporary claim before it
+  // can reach the underlying signing failure. Establish the normal
+  // prerequisite so this fixture continues to test rollback, not admission.
+  const claim = await runFrameworkTempClaim(
+    repo,
+    'opt07-actor',
+    ['src/app.ts'],
+    'exercise governed commit failure residue rollback regression'
+  );
+  assert.equal(claim.ok, true, 'fixture claim must admit the governed commit path');
+
   // Force the underlying `git commit` invocation to fail deterministically and
   // portably (no hook/shebang platform dependence): request GPG signing but
   // point at a nonexistent signing program.
@@ -69,7 +80,7 @@ try {
 
   let caught: unknown = null;
   try {
-    await runAtmGit(['commit', '--cwd', repo, '--actor', 'opt07-actor', '--message', 'feat: should fail to sign', '--auto-stage', '--json']);
+    await runAtmGit(['commit', '--cwd', repo, '--actor', 'opt07-actor', '--message', 'feat: should fail to sign', '--auto-stage', '--defer-foreign-staged', '--json']);
   } catch (error) {
     caught = error;
   }
@@ -95,8 +106,8 @@ try {
     ? details!.liveIndexResidueRollback as string[]
     : [];
   assert.ok(
-    liveIndexResidueRollback.some((entry) => entry.endsWith('git-head.jsonl')),
-    `expected the failed commit to report rolling back staged git-head evidence, got ${JSON.stringify(liveIndexResidueRollback)}`
+    liveIndexResidueRollback.includes('src/app.ts'),
+    `expected the failed commit to report rolling back its auto-staged claim path, got ${JSON.stringify(liveIndexResidueRollback)}`
   );
 
   const stagedAfterFailure = readStagedFiles(repo);
