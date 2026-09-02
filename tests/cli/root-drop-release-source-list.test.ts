@@ -1,9 +1,11 @@
 import { strict as assert } from 'node:assert';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildRunnerSourceSeal, listReleaseSourceFiles } from '../../scripts/build-root-drop-release.ts';
+import { inspectRunnerSourceDrift } from '../../packages/cli/src/commands/framework-development/closure-packet-schema.ts';
 
 function git(cwd: string, args: readonly string[]): string {
   return execFileSync('git', [...args], { cwd, encoding: 'utf8' }).trim();
@@ -52,6 +54,8 @@ try {
     nonCorePlanningUtilities: []
   })}\n`, 'utf8');
   writeFileSync(cliSource, 'export const source = true;\n', 'utf8');
+  git(repo, ['add', 'packages/cli/src/atm.ts', 'scripts/AtmCore/runner-build-scope.json']);
+  git(repo, ['commit', '-m', 'seal inputs']);
   const seal = buildRunnerSourceSeal(repo, [
     'packages/cli/src/atm.ts',
     'scripts/AtmCore/runner-build-scope.json'
@@ -59,6 +63,22 @@ try {
   assert.equal(seal.schemaId, 'atm.runnerSourceSeal.v1');
   assert.deepEqual(seal.files, ['packages/cli/src/atm.ts', 'scripts/AtmCore/runner-build-scope.json']);
   assert.match(seal.digest, /^sha256:[a-f0-9]{64}$/);
+  const expectedHash = createHash('sha256');
+  for (const relativePath of seal.files) {
+    const content = readFileSync(path.join(repo, relativePath));
+    expectedHash.update(String(Buffer.byteLength(relativePath))).update(':').update(relativePath);
+    expectedHash.update(String(content.byteLength)).update(':').update(content);
+  }
+  assert.equal(seal.digest, `sha256:${expectedHash.digest('hex')}`, 'seal must use the same byte digest that the frozen runner verifies');
+  const rootDropManifest = path.join(repo, 'release', 'atm-root-drop', 'release-manifest.json');
+  const frozenRunner = path.join(repo, 'release', 'atm-onefile', 'atm.mjs');
+  mkdirSync(path.dirname(rootDropManifest), { recursive: true });
+  mkdirSync(path.dirname(frozenRunner), { recursive: true });
+  writeFileSync(rootDropManifest, `${JSON.stringify({ runnerSourceSeal: seal })}\n`, 'utf8');
+  writeFileSync(frozenRunner, '#!/usr/bin/env node\n', 'utf8');
+  const drift = inspectRunnerSourceDrift(repo);
+  assert.equal(drift.sourceSeal.present, true, 'drift inspection must discover the root-drop release manifest');
+  assert.equal(drift.sourceSeal.valid, true, 'a fresh root-drop source seal must validate against the same source bytes');
 
   console.log('ok: root-drop release source list excludes stale tracked generated outputs');
 } finally {

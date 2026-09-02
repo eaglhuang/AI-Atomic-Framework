@@ -245,20 +245,13 @@ export function buildRunnerSourceSeal(repositoryRoot: string, sourceFiles: reado
   const files = sourceFiles
     .filter((relativePath) => classifyAtmCorePath(scopeManifest, relativePath).kind === 'atm-core')
     .sort();
-  const trackedBlobIds = readCleanTrackedBlobIds(repositoryRoot);
   const hash = createHash('sha256');
   for (const relativePath of files) {
-    const blobId = trackedBlobIds.get(relativePath);
-    // A clean Git index blob is a content identity.  Avoid rereading thousands of
-    // unchanged files during an incremental sealed build; dirty and generated
-    // inputs deliberately fall back to direct byte hashing.
     hash.update(String(Buffer.byteLength(relativePath))).update(':').update(relativePath);
-    if (blobId) {
-      hash.update('git:').update(blobId);
-    } else {
-      const content = readFileSync(path.join(repositoryRoot, relativePath));
-      hash.update(String(content.byteLength)).update(':').update(content);
-    }
+    // The verification path reads source bytes. The seal must use the same
+    // representation, otherwise a clean Git blob-id seal can never validate.
+    const content = readFileSync(path.join(repositoryRoot, relativePath));
+    hash.update(String(content.byteLength)).update(':').update(content);
   }
   return {
     schemaId: 'atm.runnerSourceSeal.v1',
