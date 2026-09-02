@@ -51,6 +51,27 @@ function appendTaskBundle(root: string, taskId: string): string[] {
   stageAll(root); return [`.atm/history/evidence/${taskId}.historical-work-admission-attestations.json`, ledgerPath, eventPath];
 }
 
+function standaloneBulkClosureManifest(valid: boolean): { root: string; staged: string[] } {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'atm-bulk-closure-'));
+  execFileSync('git', ['init', '--quiet'], { cwd: root, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'validator@example.test'], { cwd: root, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Validator'], { cwd: root, stdio: 'ignore' });
+  const taskId = 'TASK-BULK-0001';
+  const closurePacket = `.atm/history/evidence/${taskId}.closure-packet.json`;
+  const bundleManifest = `.atm/history/evidence/${taskId}.bundle-manifest.json`;
+  writeJson(root, closurePacket, { schemaId: 'atm.closurePacket.v1', taskId });
+  writeJson(root, bundleManifest, { schemaId: 'atm.bundleManifest.v1', taskId });
+  stageAll(root); execFileSync('git', ['commit', '--quiet', '-m', 'closure evidence fixture'], { cwd: root, stdio: 'ignore' });
+  const bundleCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+  const manifestPath = 'atomic_workbench/evidence/bulk-closure-manifest-fixture.json';
+  writeJson(root, manifestPath, {
+    schemaId: 'atm.bulkClosureManifest.v1', bundleCommit,
+    tasks: [{ taskId, closurePacket: valid ? closurePacket : '.atm/history/evidence/TASK-OTHER.closure-packet.json', bundleManifest }]
+  });
+  execFileSync('git', ['add', '--', manifestPath], { cwd: root, stdio: 'ignore' });
+  return { root, staged: [manifestPath] };
+}
+
 {
   const fixture = taskBundle('TASK-GIT-0024', true, true);
   const decision = classifyProtectedEvidenceBundle(fixture.root, fixture.staged).decisions.get('.atm/history/evidence/task-git-0024.historical-work-admission-attestations.json');
@@ -131,6 +152,16 @@ function appendTaskBundle(root: string, taskId: string): string[] {
   writeJson(fixture.root, producerReceiptPath, { schemaId: 'atm.runnerSyncReceipt.v1', taskId: producerTaskId, memberTaskIds: members });
   stageAll(fixture.root);
   assert.equal(inspectProtectedAtmStateChanges(fixture.root, [...fixture.staged, closingReceiptPath, producerReceiptPath]).ok, true, 'a sealed runner receipt may carry its explicitly attested temporary producer receipt in the same close bundle');
+}
+
+{
+  const fixture = standaloneBulkClosureManifest(true);
+  assert.equal(inspectProtectedAtmStateChanges(fixture.root, fixture.staged).ok, true, 'a structurally verified bulk closure manifest may carry its own historical closure context');
+}
+
+{
+  const fixture = standaloneBulkClosureManifest(false);
+  assert.equal(inspectProtectedAtmStateChanges(fixture.root, fixture.staged).ok, false, 'a bulk closure manifest with an unverified closure reference must remain blocked');
 }
 
 console.log('pre-commit-evidence-context-parity: ok');

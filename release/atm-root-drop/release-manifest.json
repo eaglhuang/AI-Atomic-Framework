@@ -95,6 +95,7 @@
     "release/atm-root-drop/atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
     "release/atm-root-drop/atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
     "release/atm-root-drop/atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+    "release/atm-root-drop/atomic_workbench/evidence/bulk-closure-manifest-2026-07-11-mirror-sync.json",
     "release/atm-root-drop/atomic_workbench/generator-provenance-audit.json",
     "release/atm-root-drop/atomic_workbench/graduation-gate/final-checklist.json",
     "release/atm-root-drop/atomic_workbench/graduation-gate/graduation-decision-record.md",
@@ -5973,8 +5974,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1377,
-    "unchanged": 4561,
+    "copied": 1343,
+    "unchanged": 4596,
     "removed": 0
   },
   "buildMode": "full",
@@ -6552,6 +6553,15 @@
         "origin": "source",
         "inputPaths": [
           "atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "atomic_workbench/evidence/bulk-closure-manifest-2026-07-11-mirror-sync.json",
+        "digest": "9f4e6a088f6db24596530e4d135d830ca76365c3a13baab86ecf443c85608b60",
+        "origin": "source",
+        "inputPaths": [
+          "atomic_workbench/evidence/bulk-closure-manifest-2026-07-11-mirror-sync.json"
         ],
         "replaceable": true
       },
@@ -8384,7 +8394,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-11-113.json",
-        "digest": "991e5a6a9829d505a6c062f82c053f8c4ad4171e596606b2801d5c59d30b8f2d",
+        "digest": "20c8ca8727dac642143e9abf6e11260315b216169cf01055adc9a0351801f32b",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-11-113.json"
@@ -23639,7 +23649,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/support.js",
-        "digest": "012aa8bbc06f2c76aa890f58c0dfc2c507a320febb297b3f6cf2f41e9272c867",
+        "digest": "1545449112f4d770f601d75a5a86739f639bc57d6acf322a94bbe0f0d1095656",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/support.js"
@@ -30020,7 +30030,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/support.ts",
-        "digest": "dedef7e55f845dd998fd4862b9f09932cbda15c7905c5add77978d9ec8f9a60e",
+        "digest": "37b854ac763aa5382b8fa114fceb43d94406f62477d76af1f94e03983f4955b1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/support.ts"
@@ -54635,7 +54645,7 @@
       },
       {
         "path": "tests/cli/pre-commit-evidence-context-parity.test.ts",
-        "digest": "ccb93313f8218fa87df279ce8f02804391fd1747addf3df05492ece8af66ee67",
+        "digest": "118eeec9ed3836b59f053fe90819d6597426806ef8254c29b8fc025afdbbd6dd",
         "origin": "source",
         "inputPaths": [
           "tests/cli/pre-commit-evidence-context-parity.test.ts"
@@ -59422,7 +59432,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:58af9c716ca83c52c83602ab34dc64188375bbe2cdac21bb54c9c0974e41c32a"
+    "treeDigest": "sha256:8e6b537df611845e7a1b6817049a79c287f78eaab361b0c5b09c8e40a1f84847"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60883,7 +60893,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:39c83cc8176245ca52d15aaac57328df5435b35d4d0469113708452ff5a9dfcc"
+    "digest": "sha256:9c9a634f45dfd35cd4a31c2fbd1adbe25d5949152c10098c37d76942e204e502"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -60952,6 +60962,7 @@
       "release/atm-root-drop/atomic_workbench/atoms/ATM-GOV-0001/atom.spec.json",
       "release/atm-root-drop/atomic_workbench/atoms/ATM-GOV-0001/atom.test.report.json",
       "release/atm-root-drop/atomic_workbench/atoms/ATM-GOV-0001/atom.test.ts",
+      "release/atm-root-drop/atomic_workbench/evidence/bulk-closure-manifest-2026-07-11-mirror-sync.json",
       "release/atm-root-drop/atomic_workbench/generator-provenance-audit.json",
       "release/atm-root-drop/atomic_workbench/graduation-gate/final-checklist.json",
       "release/atm-root-drop/atomic_workbench/graduation-gate/graduation-decision-record.md",
@@ -66833,22 +66844,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:241c1ff75801d22221236254aa9503a145061611fb6c5a2d8756fcaea4413fa5",
-  "sealedSourceCommit": "20e24aa1f845c1fc4e17fad7c7233db455088995",
+  "buildInputsTreeHash": "sha256:ddebb5b861c16577c55217bd84ef8dd2f7038b1eb94ab00c6f418563841f5274",
+  "sealedSourceCommit": "51f3a19bd216b70e70472eacaed7f332c735f3a9",
   "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:8b6295f997aa76268063284ae492c826b4f35b4b3ff8c3b8e1beea9b6762a8d2",
-  "tsBuildCacheDigest": "sha256:281bda96d6c1c5e37f83324681e2b11b46a6a6b7e17e54dfe369d351e9a4dd9c",
+  "buildDecisionReason": "release artifacts are dirty or missing",
+  "incrementalPlanDigest": "sha256:c42919d1be1c24d883f3fcc648f3b9acbc305beead1de43298e699e4f42e1df0",
+  "tsBuildCacheDigest": "sha256:8e1c0784de1f3b42f330c49bf53bf143fe4c268f468f4c4ce24788d5ca655bdc",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 54,
-    "skipDecision": 65,
-    "worktreeSetup": 15211,
-    "typescriptBuild": 13340,
-    "rootDropReleaseAssembly": 42369,
-    "onefileReleaseAssembly": 11211,
-    "artifactSync": 10926,
+    "inputHashCalculation": 53,
+    "skipDecision": 287,
+    "worktreeSetup": 10237,
+    "typescriptBuild": 9776,
+    "rootDropReleaseAssembly": 33860,
+    "onefileReleaseAssembly": 9031,
+    "artifactSync": 11801,
     "cleanup": 0,
-    "totalElapsed": 105130
+    "totalElapsed": 82066
   }
 }
