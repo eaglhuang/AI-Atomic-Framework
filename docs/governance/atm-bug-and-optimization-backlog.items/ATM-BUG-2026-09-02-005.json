@@ -5,11 +5,11 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source — frozen runner publication pending",
+  "status": "Closed — source repair and governed frozen-runner publication verified 2026-09-02",
   "area": "Frozen runner source-seal verification",
   "finding": "The root-drop builder writes atm.runnerSourceSeal.v1 to release/atm-root-drop/release-manifest.json and calculates its digest from clean Git blob identifiers, while the frozen CLI checks a nonexistent repository-root release-manifest.json and recalculates direct source bytes. A freshly built runner can therefore report source drift even when its sealed source is unchanged.",
   "expectedBehavior": "A frozen runner must discover the durable root-drop manifest and validate a source seal using exactly the same byte-level digest contract used by the builder. An unchanged seal clears the drift warning; missing, malformed, or byte-mismatched seals remain fail-closed.",
   "evidenceOrRepro": "Before the repair, node atm.mjs --version reported sourceSeal.present=false even though release/atm-root-drop/release-manifest.json contained atm.runnerSourceSeal.v1. The recorded seal used Git blob identifiers while the verifier used source bytes, proving a second deterministic mismatch. The focused root-drop fixture now commits the inputs, builds a seal, writes the release manifest at its production path, and proves inspectRunnerSourceDrift reports the seal present and valid.",
   "containment": "The repair only aligns existing source-seal location and hashing semantics. It does not weaken the missing/malformed/mismatch failure path, bypass runner-sync stewardship, or alter taskflow close authority.",
-  "followUp": "Run one governed frozen-runner publication after this source repair and then verify node atm.mjs --version no longer emits ATM_RUNNER_SOURCE_DRIFT. Resolve the pre-existing runner-sync queue receipt separately if its requested-surface contract still prevents release."
+  "followUp": "Governed runner-sync publication completed at source commit 2a025a3ba830a387998629c76a9e8c5c4b14af50 and publication commit 83456256c405dd4de7bdd8b25a158964f9ed5702. node atm.mjs --version reported sourceSeal.present=true, sourceSeal.valid=true, and syncRequired=false; the steward queue was empty afterward. Retain the root-drop source-list regression and the source-seal verifier coverage."
 }
