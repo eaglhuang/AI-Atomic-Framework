@@ -8,7 +8,7 @@ import {
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { listActiveBatchRuns, readBatchRunById, writeBatchRun } from '../work-channels.ts';
+import { listActiveBatchRuns, readBatchRunById, updateBatchRun, writeBatchRun } from '../work-channels.ts';
 
 function fail(message: string): never {
   console.error(`[task-direction-queue.test] ${message}`);
@@ -114,6 +114,32 @@ const terminalOnlyBatch = writeBatchRun({
 });
 assert(listActiveBatchRuns(ghostRepo).every((entry) => entry.batchId !== terminalOnlyBatch.batchId), 'terminal-only ghost batches must not remain active');
 assert(readBatchRunById(ghostRepo, terminalOnlyBatch.batchId)?.status === 'completed', 'terminal-only ghost batches should be completed when normalized');
+
+const completedBatchQueue = createOrRefreshTaskQueue({
+  cwd: ghostRepo,
+  sourcePrompt: 'completed batch leaves stale queue regression',
+  tasks: [task({ workItemId: 'TASK-BATCH-GHOST-0001', title: 'historical head' })],
+  taskIds: ['TASK-BATCH-GHOST-0001']
+});
+const completedBatchRun = writeBatchRun({
+  cwd: ghostRepo,
+  actorId: 'validator',
+  sourcePrompt: 'completed batch leaves stale queue regression',
+  tasks: [task({ workItemId: 'TASK-BATCH-GHOST-0001', title: 'historical head' })],
+  queue: completedBatchQueue
+});
+updateBatchRun(ghostRepo, completedBatchRun, { status: 'completed' });
+createOrRefreshTaskQueue({
+  cwd: ghostRepo,
+  sourcePrompt: 'completed batch leaves stale queue regression',
+  tasks: [task({ workItemId: 'TASK-BATCH-GHOST-0001', title: 'historical head' })],
+  taskIds: ['TASK-BATCH-GHOST-0001'],
+  batchId: completedBatchRun.batchId
+});
+assert(
+  findActiveTaskQueue(ghostRepo, null, { taskId: 'TASK-BATCH-GHOST-0001' }) === null,
+  'a queue attached to a completed batch must not remain active and block unrelated task closeback'
+);
 
 const unfinishedBlockedRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-task-direction-queue-blocked-'));
 const unfinishedTaskRoot = path.join(unfinishedBlockedRepo, '.atm', 'history', 'tasks');
