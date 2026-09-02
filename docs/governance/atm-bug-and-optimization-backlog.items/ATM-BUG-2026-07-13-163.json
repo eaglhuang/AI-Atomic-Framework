@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug / Product gap",
   "severity": "High",
-  "status": "Fixed and verified in 2026-09-02 cleanup lane",
+  "status": "Closed — task-owned protected-audit scope and foreign exclusion regressions re-verified on 2026-09-02",
   "area": "Protected override audit scoping",
   "finding": "Protected override audit files can be selected into a governed commit bundle as task-owned artifacts, but the active task direction lock may not automatically include them.",
   "expectedBehavior": "Any generated task-owned protected override audit included by the commit bundle should either be automatically allowed by the direction-lock gate or trigger a precise scope-amendment flow before staging.",
