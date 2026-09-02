@@ -20,7 +20,9 @@ try {
     claim: {
       state: 'active',
       actorId: laneOwner,
-      leaseId: 'lease-continuity-fixture'
+      leaseId: 'lease-continuity-fixture',
+      heartbeatAt: new Date().toISOString(),
+      ttlSeconds: 60
     }
   }, null, 2)}\n`, 'utf8');
 

@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Closed — sealed publication continuity and fixture parity re-verified 2026-09-02",
   "area": "Runner sync / publication closure",
   "finding": "Committing runner publication outputs can advance HEAD through runner-affecting paths, causing taskflow pre-close to mark the just-published runner-sync receipt as rebuild-required and forcing a second sealed build/publication cycle.",
   "expectedBehavior": "Runner-sync publication should converge in one governed transaction, or classify publication-only commits so dist/release output commits do not recursively invalidate their own receipt when the source input tree remains semantically sealed.",
-  "evidenceOrRepro": "During ATM-GOV-0252, runner-sync release for sealed source 56a506b3e was blocked by ATM_RUNNER_PUBLICATION_PENDING. After an exact pathspec publication commit 02ad794d, pre-close reported runnerReceiptPublicationClosure.status=rebuild-required because HEAD advanced through packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js. A second build and second publication commit e491455c were required before the receipt was accepted.",
-  "followUp": "Design a single canonical publication transaction or receipt supersession rule that separates source input sealing from release-output publication commits, with regression coverage for package dist plus release manifest updates."
+  "evidenceOrRepro": "Original incident: ATM-GOV-0252 publication commit advanced HEAD through generated `packages/cli/dist/**`, then pre-close reported `rebuild-required` and required a second build. Current runner-input classification excludes generated `packages/*/dist/**` from both affected-input classification and the sealed input hash. On 2026-09-02, the stale-runner lane regression initially failed because its fixture omitted the now-required `groupManifest.memberTaskIds` and `childAttribution.members`, making the receipt intentionally invalid under the current handoff contract. The fixture now supplies the canonical single-member attribution and the test verifies the ancestor receipt is accepted; true source-input drift, missing attribution, and stale child receipts remain asserted as `rebuild-required` cases.",
+  "followUp": "Closed. Keep the stale-runner publication continuity regression together with runner publication lifecycle validation."
 }

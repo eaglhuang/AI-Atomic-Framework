@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Needs triage",
+  "status": "Closed — close-readiness, terminal broker cleanup, and bundle parity re-verified",
   "area": "Taskflow close / broker and commit-bundle recovery",
   "finding": "A terminal task's stale broker intent required a separate `broker release` after lock cleanup, and `taskflow close` dry-run reported ready while `--write` first revealed a missing closure-packet validator and then twice rolled back after `ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED`, including with `--defer-foreign-state`. Reconfirmed on 2026-07-12 during `TASK-AAO-0163`: `pre-close` reported ready and dry-run treated `validate:cli` / `validate:git-head-evidence` as advisory skipped, but `close --write` failed with `ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID` until both validators were added.",
   "expectedBehavior": "Close preflight should expose every closure-packet requirement; terminal lock cleanup or close should release stale broker intents; and taskflow's own governed bundle must not deadlock with its deferred-governance hook.",
   "evidenceOrRepro": "TASK-TEAM-0068 close required `broker release TASK-TEAM-0067`, then `validate:git-head-evidence`, then protected backend close after two taskflow write rollbacks. TASK-AAO-0163 close additionally proved pre-close readiness and closure-packet validation can disagree on required validators.",
-  "followUp": "Add focused coverage for ready-to-write parity, terminal broker-intent cleanup, close-window deferred-governance self-ownership, and pre-close versus closure-packet validator parity."
+  "followUp": "Closed on 2026-09-02. Current regression coverage passed: tests/cli/taskflow-close-readiness-parity.test.ts, tests/cli/broker-release-order-contract.test.ts, packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts, tests/cli/taskflow-close-saga-plan-parity.test.ts, and tests/cli/closure-required-gates-contract.test.ts. Together these prove pre-close/closure-packet validator parity, terminal broker-intent release, governed close-bundle self-ownership, and saga-plan parity. Future close recovery regressions require a new incident item."
 }

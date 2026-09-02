@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Critical",
-  "status": "Fixed; formal closeout verified 2026-09-01 via TASK-TEAM-0084",
+  "status": "Closed — formal closeout and protected staged bundle regression re-verified on 2026-09-02",
   "area": "Protected staged bundle / Broker release-order deadlock",
   "finding": "A Broker resolution can correctly grant task A the current shared-surface release order, but A's governed commit cannot use `--defer-foreign-staged` when task B's protected `.atm/history` bundle is staged. B cannot commit first because the same resolution blocks B.",
   "expectedBehavior": "A resolution-authorized current task must be able to snapshot and temporarily unstage a complete protected foreign task bundle, commit only its own scope, then return a deterministic restage command; incomplete or non-resolution foreign bundles remain protected.",

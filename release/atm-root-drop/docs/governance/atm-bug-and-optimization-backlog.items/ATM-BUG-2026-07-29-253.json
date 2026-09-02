@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Closed — checkpoint commit-window repair re-verified 2026-09-02",
   "area": "Batch checkpoint atomicity",
   "finding": "A source-first `batch checkpoint` invocation can mutate the queue-head task close state and stage close artifacts, then fail later when the batch runner tries to auto-claim the next task through a source-first lifecycle write guard. The command is therefore not atomic from the operator's perspective.",
   "expectedBehavior": "Batch checkpoint should either preflight all post-close lifecycle writes before mutating the queue head, or complete the close and stop with a deliberate checkpoint-complete/next-claim-deferred result. It must not leave operators to infer whether the close succeeded after a later source-first refusal.",
-  "evidenceOrRepro": "After the batch checkpoint repair was tested through `node atm.dev.mjs`, TASK-GIT-0026 was closed and close artifacts were staged, but the command returned `ATM_SOURCE_FIRST_WRITE_REFUSED` while trying to continue to the next claim. The close bundle then had to be committed separately.",
-  "followUp": "Add transaction boundaries or a two-phase checkpoint result for close-then-next-claim. Include source-first runner tests proving no partial mutation occurs unless the result explicitly reports the committed sub-step."
+  "evidenceOrRepro": "Original incident: after a source-first batch checkpoint, TASK-GIT-0026 was closed and close artifacts were staged, then the command returned `ATM_SOURCE_FIRST_WRITE_REFUSED` while attempting the next claim. Current verification on 2026-09-02: `packages/cli/src/commands/batch/checkpoint-commit-window-policy.test.ts` passed and asserts the checkpoint implementation contains no `await runNext`, creates a pending commit window after close, and blocks resume while that window is dirty. `tests/cli/batch-checkpoint-runner-sync-recovery.test.ts` and `tests/cli/batch-done-task-pruning.test.ts` also passed, covering recovery routing and terminal queue-head pruning.",
+  "followUp": "Closed. Retain the checkpoint commit-window and runner-sync recovery regressions in the batch validation set."
 }

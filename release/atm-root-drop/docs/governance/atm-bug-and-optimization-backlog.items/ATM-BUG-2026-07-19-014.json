@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Resolved",
+  "status": "Closed — duplicate orphaned claim/scope repair outcome re-verified",
   "area": "Task lifecycle / scope repair",
   "finding": "An imported planning card with target ledger `status: in_progress` and `claim: null` could be selected by `next`, but `tasks claim`, `tasks scope add --claim-first`, and `tasks repair-claim` could not repair or adopt it. Scope expansion for the source fix also deadlocked because scope add depends on the same claim path.",
   "expectedBehavior": "Orphaned `in_progress` target-ledger tasks with no active claim should be diagnosed as repairable and normalized to a claimable state without emergency reset. Scope amendment should either run through `next --claim` preparation or expose a repair command that can add the unblocker files safely.",
   "evidenceOrRepro": "Resolved by ATM-GOV-0232 evidence: node --strip-types tests/cli/next-claim-orphaned-in-progress.test.ts proves orphaned in_progress/null-claim target-ledger tasks are treated as claim-preparable and normalized through the standard claim preparation path.",
-  "followUp": "No duplicate lifecycle repair card is needed for null-claim adoption. Future scope-add deadlocks should be recorded against scope amendment diagnostics only if reproduced after ATM-GOV-0232."
+  "followUp": "Closed on 2026-09-02 with the shared ATM-GOV-0232 regression tests/cli/next-claim-orphaned-in-progress.test.ts. The standard claim preparation path adopts in_progress/null-claim ledger tasks without an emergency reset, including the prerequisite needed before scope amendment. This card duplicated ATM-BUG-2026-07-19-012's lifecycle defect; future scope-add deadlocks should be recorded only when reproduced after this repair."
 }

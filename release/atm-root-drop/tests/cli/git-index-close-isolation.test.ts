@@ -72,7 +72,7 @@ try {
   });
   assert.equal(plan.status, 'park-and-restore');
   assert.deepEqual(plan.parkEntries.map((entry) => entry.path), [foreignFile]);
-  assert.deepEqual(plan.restoreEntries.map((entry) => entry.restoreIdentity), [`${foreignApprovedBlob}`]);
+  assert.deepEqual(plan.restoreEntries.map((entry) => entry.restoreIdentity), [`present:${foreignApprovedBlob}`]);
   assert.deepEqual(plan.approvedPartialStagedBlobIds, [foreignApprovedBlob.split(':')[1]]);
 
   assert.deepEqual(parkGitIndexLease(repo, plan), [foreignFile]);

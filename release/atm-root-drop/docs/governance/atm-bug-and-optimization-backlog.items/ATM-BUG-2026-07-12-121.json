@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in current working tree; needs governed closeout",
+  "status": "Closed — file-only intent parity regression and frozen runner publication re-verified on 2026-09-02",
   "area": "Broker intent schema parity",
   "finding": "A file-scoped task claim registered as `parallel-safe`, but effective arbitration reinterpreted the same active intent as malformed because it required non-empty `atomRefs` even though the registry contract permits task-level file-only writes.",
   "expectedBehavior": "Register and effective arbitration must accept the same valid intent shape; file-scoped task claims with non-empty target files must not self-block solely because atom refs are absent.",

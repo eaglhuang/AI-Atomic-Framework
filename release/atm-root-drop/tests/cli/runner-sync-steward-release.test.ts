@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { deriveRunnerBuildOutputInventory } from '../../packages/core/src/broker/runner-build-output-inventory.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-sync-release-'));
 const root = process.cwd();
@@ -226,6 +227,11 @@ function writeRunnerSyncReceiptFixture(
 ): void {
   const evidenceDir = path.join(repo, '.atm/history/evidence');
   mkdirSync(evidenceDir, { recursive: true });
+  const outputInventory = deriveRunnerBuildOutputInventory({
+    sealedSourceSha,
+    observedPaths: [`.atm/history/evidence/${taskId}.runner-sync-receipt.json`],
+    currentTaskId: taskId
+  });
   writeFileSync(path.join(evidenceDir, `${taskId}.runner-sync-receipt.json`), `${JSON.stringify({
     schemaId: 'atm.runnerSyncReceipt.v1',
     specVersion: '0.1.0',
@@ -234,6 +240,30 @@ function writeRunnerSyncReceiptFixture(
     stewardWorkId,
     sealedSourceSha,
     requestedSurfaces,
+    outputInventory,
+    memberTaskIds: ['TASK-A', 'TASK-B'],
+    linkedTaskIds: [],
+    groupManifest: {
+      memberTaskIds: ['TASK-A', 'TASK-B']
+    },
+    childReceipts: [
+      { taskId: 'TASK-A' },
+      { taskId: 'TASK-B' }
+    ],
+    childAttribution: {
+      complete: true
+    },
+    lifecycle: {
+      provisionalState: 'built-provisional',
+      publicationReadyState: 'publication-ready',
+      reconcilePhase: 'reconciled',
+      finalizable: true
+    },
+    runnerInputTreeHash: 'sha256:fixture',
+    runnerInputGraph: {
+      sealedSourceSha,
+      aggregateInputTreeHash: 'sha256:fixture'
+    },
     buildTarget: 'full',
     buildInputsTreeHash: 'sha256:fixture',
     buildDecision: 'cacheHitSkip',

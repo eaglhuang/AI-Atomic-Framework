@@ -152,6 +152,9 @@ function writeRunnerSyncReceipt(taskId: string, sealedSourceSha: string, runnerI
     taskId,
     sealedSourceSha,
     memberTaskIds: [taskId],
+    groupManifest: {
+      memberTaskIds: [taskId]
+    },
     childReceipts: complete ? [{
       taskId,
       sealedSourceSha,
@@ -160,6 +163,7 @@ function writeRunnerSyncReceipt(taskId: string, sealedSourceSha: string, runnerI
     childAttribution: {
       schemaId: 'atm.runnerSyncChildAttribution.v1',
       complete,
+      members: complete ? [{ taskId }] : [],
       missingTaskIds: complete ? [] : [taskId]
     },
     lifecycle: {

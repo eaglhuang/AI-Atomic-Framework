@@ -137,7 +137,11 @@ const abba = Array.from({ length: 10 }, (_, index) => summarizeDominantPhase({
   totalElapsedMs: index % 2 === 0 ? 120 : 125
 }, 'ab-ba'));
 assert.equal(abba.length, 10);
-assert.equal(abba.filter((entry) => entry.optimizationVerdict === 'improved').length, 10);
+assert.equal(
+  abba.filter((entry) => entry.optimizationVerdict === 'improved').length,
+  0,
+  'a sequence label without matched baseline timings must not claim a runner optimization improved'
+);
 
 console.log('[runner-sync-incremental-build-dogfood.test] ok');
 

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Closed — governed retained-WIP claim recovery re-verified on 2026-09-02",
   "area": "Task claim and WIP recovery",
   "finding": "A task with exact in-scope dirty WIP can be blocked from claim as unowned, while the returned `tasks release --wip-commit` recovery command itself rejects the task because no active claim exists. The operator has no normal ATM path to preserve and reclaim the same task's work.",
   "expectedBehavior": "Admission must offer a governed same-task recovery path for an exact declared-scope WIP bundle, either by attaching a recovery claim before preservation or by creating a brokered non-delivery commit candidate that can be adopted by the task without a raw Git escape.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Critical",
-  "status": "Fixed in TASK-TEAM-0079",
+  "status": "Closed — TASK-TEAM-0079 partial-staged projection repair re-verified by byte-identity isolation regression on 2026-09-02",
   "area": "Governed commit / composer projection",
   "finding": "`withTaskScopedCommitIndex` built the temporary index from HEAD and re-added bundle files from the working tree, overwriting a composer partial-staged projection with foreign worktree content before pre-commit ran.",
   "expectedBehavior": "The temporary index must plant the exact approved live-index blobs for selected paths instead of re-reading the working tree, preserving partial staging and excluding other tasks' index content.",

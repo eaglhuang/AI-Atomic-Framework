@@ -1,4 +1,5 @@
 export { inspectSameFileClaimOwnership } from './scope-ownership.js';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -422,7 +423,9 @@ direct tasks close is not allowed. Use batch checkpoint so ATM can close, advanc
                 return candidate.startsWith('.atm/history/tasks/') || candidate.startsWith('.atm/history/task-events/');
             });
             if (!hasSiblingEvidence || !hasSiblingTaskOrEvent) {
-                findings.push({ file: normalized, reason: 'static-evidence-artifact-without-cli-context', detail: `Static evidence artifacts under atomic_workbench/evidence or atomic_workbench/reports cannot stand alone; commit them together with ATM CLI evidence/task transition context.` });
+                if (!isVerifiedStandaloneBulkClosureManifest(cwd, normalized)) {
+                    findings.push({ file: normalized, reason: 'static-evidence-artifact-without-cli-context', detail: `Static evidence artifacts under atomic_workbench/evidence or atomic_workbench/reports cannot stand alone; commit them together with ATM CLI evidence/task transition context.` });
+                }
             }
         }
     }
@@ -434,6 +437,27 @@ function isNestedEvidenceArtifactPath(value) {
         return false;
     const relative = normalized.slice('.atm/history/evidence/'.length);
     return relative.includes('/');
+}
+function isVerifiedStandaloneBulkClosureManifest(cwd, filePath) {
+    const normalized = normalizeRelativePath(filePath);
+    if (!/^atomic_workbench\/evidence\/bulk-closure-manifest-[^/]+\.json$/i.test(normalized))
+        return false;
+    const manifest = readJsonFile(path.join(cwd, normalized));
+    if (manifest?.schemaId !== 'atm.bulkClosureManifest.v1' || typeof manifest?.bundleCommit !== 'string' || !/^[0-9a-f]{7,40}$/i.test(manifest.bundleCommit) || !Array.isArray(manifest?.tasks) || manifest.tasks.length === 0)
+        return false;
+    try {
+        execFileSync('git', ['merge-base', '--is-ancestor', manifest.bundleCommit, 'HEAD'], { cwd, stdio: 'ignore' });
+    }
+    catch {
+        return false;
+    }
+    return manifest.tasks.every((entry) => {
+        const taskId = typeof entry?.taskId === 'string' ? entry.taskId.trim() : '';
+        if (!taskId || entry?.closurePacket !== `.atm/history/evidence/${taskId}.closure-packet.json` || entry?.bundleManifest !== `.atm/history/evidence/${taskId}.bundle-manifest.json`)
+            return false;
+        const closure = readJsonFile(path.join(cwd, entry.closurePacket));
+        return closure?.schemaId === 'atm.closurePacket.v1' && closure?.taskId === taskId && existsSync(path.join(cwd, entry.bundleManifest));
+    });
 }
 function hasStagedBatchCheckpointClosure(cwd, protectedFiles, batchTaskIds, batchId = null) {
     const protectedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
