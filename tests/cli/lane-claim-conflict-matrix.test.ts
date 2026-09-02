@@ -6,6 +6,7 @@ import { runTasksClaimLifecycle } from '../../packages/cli/src/commands/tasks/cl
 import { mintLaneSession } from '../../packages/cli/src/commands/lane-session/store.ts';
 import {
   evaluateSameTaskClaimOwnership,
+  resolveSameActorClaimLaneSessionId,
   readClaimLaneSessionId
 } from '../../packages/cli/src/commands/tasks/claim-ownership.ts';
 
@@ -67,13 +68,26 @@ async function main(): Promise<void> {
   assert.equal(sameLane.sameOwner, true);
   assert.equal(sameLane.mode, 'lane-id');
 
-  const differentLane = evaluateSameTaskClaimOwnership({
+const differentLane = evaluateSameTaskClaimOwnership({
     currentActorId: 'agent-a',
     currentLaneSessionId: 'lane-a',
     requestedActorId: 'agent-a',
     requestedLaneSessionId: 'lane-b'
   });
-  assert.equal(differentLane.sameOwner, false);
+assert.equal(differentLane.sameOwner, false);
+
+assert.equal(resolveSameActorClaimLaneSessionId({
+  existingClaimActorId: 'captain',
+  existingClaimLaneSessionId: 'lane-holding',
+  requestedActorId: 'captain',
+  requestedLaneSessionId: 'lane-fresh'
+}), 'lane-holding');
+assert.equal(resolveSameActorClaimLaneSessionId({
+  existingClaimActorId: 'captain',
+  existingClaimLaneSessionId: 'lane-holding',
+  requestedActorId: 'other-captain',
+  requestedLaneSessionId: 'lane-fresh'
+}), 'lane-fresh');
   assert.equal(differentLane.mode, 'lane-id');
 
   const actorFallback = evaluateSameTaskClaimOwnership({
