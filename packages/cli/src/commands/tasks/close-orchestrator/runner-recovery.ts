@@ -1,4 +1,4 @@
-import { assertRunnerFreshForWriteAction } from '../../framework-development.ts';
+import { assertRunnerFreshForWriteAction, assertSourceFirstRunnerReadOnlyAction } from '../../framework-development.ts';
 import { assertEmergencyApproval } from '../../emergency/gate.ts';
 import { recordStaleRunnerOverride, type EmergencyUseEvidence } from '../../tasks.ts';
 
@@ -10,6 +10,7 @@ export async function authorizeCloseRunnerRecovery(input: {
   readonly emergencyApproval: string | null;
   readonly reason: string | null;
 }): Promise<EmergencyUseEvidence> {
+  assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'tasks close' });
   const staleGate = assertRunnerFreshForWriteAction({
     cwd: input.cwd,
     action: 'tasks-close',
