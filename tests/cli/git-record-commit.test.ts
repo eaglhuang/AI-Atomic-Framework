@@ -417,6 +417,34 @@ try {
   assert.match(committedFiles, /\.atm\/history\/tasks\/TASK-RECORD-0001\.json/);
   assert.match(committedFiles, /\.atm\/history\/evidence\/git-head\.jsonl/);
 
+  // ATM-BUG-2026-07-31-007: task-import recovery must preserve dry-run/write
+  // parity. A single task ledger and its matching import transition are a
+  // low-risk record bundle, not a cross-task mutation merely because the task
+  // was imported rather than delivered through a live claim.
+  const importedTaskId = 'TASK-IMPORT-0001';
+  const importedLedgerPath = `.atm/history/tasks/${importedTaskId}.json`;
+  const importedEventPath = `.atm/history/task-events/${importedTaskId}/2026-09-02T09-00-00-000Z-import-fixture.json`;
+  writeJson(path.join(repo, importedLedgerPath), {
+    schemaVersion: 'atm.workItem.v0.2', workItemId: importedTaskId, status: 'planned', title: 'Imported record fixture'
+  });
+  writeJson(path.join(repo, importedEventPath), {
+    schemaId: 'atm.taskTransition.v1', taskId: importedTaskId, action: 'import', toStatus: 'planned', taskPath: importedLedgerPath
+  });
+  runGit(repo, ['add', importedLedgerPath, importedEventPath]);
+  const importDryRun = await runAtmGit([
+    'record-commit', '--cwd', repo, '--actor', 'record-actor',
+    '--message', 'atm: import record fixture', '--dry-run', '--json'
+  ]);
+  assert.equal(importDryRun.ok, true);
+  const importCommit = await runAtmGit([
+    'record-commit', '--cwd', repo, '--actor', 'record-actor',
+    '--message', 'atm: import record fixture', '--json'
+  ]);
+  assert.equal(importCommit.ok, true, 'an import record bundle accepted by dry-run must commit through the same hook boundary');
+  const importCommittedFiles = runGit(repo, ['show', '--name-only', '--format=', 'HEAD']);
+  assert.match(importCommittedFiles, /TASK-IMPORT-0001\.json/);
+  assert.equal(runGit(repo, ['diff', '--cached', '--name-only']).trim(), '', 'import record commit must leave no staged residue');
+
   // ATM-BUG-2026-09-02-002: an explicit record-only path must be staged by
   // the governed command itself, while an unrelated source file remains out
   // of both the index and the resulting commit.
