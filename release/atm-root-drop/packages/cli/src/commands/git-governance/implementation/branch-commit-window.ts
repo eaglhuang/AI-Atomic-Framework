@@ -33,6 +33,17 @@ export const branchCommitQueueLockRetryMs = 200;
 
 export const branchCommitQueueStaleSelfHealMs = 5 * 60 * 1000;
 
+export function resolveBranchCommitQueueLockTimeoutMs(timeoutMs: LegacyValue) {
+  if (
+    typeof timeoutMs === "number" &&
+    Number.isFinite(timeoutMs) &&
+    timeoutMs > 0
+  ) {
+    return Math.min(branchCommitQueueLockTimeoutMs, timeoutMs);
+  }
+  return branchCommitQueueLockTimeoutMs;
+}
+
 export function branchCommitQueueLockPath(cwd: LegacyValue, branchRef: LegacyValue) {
   const rawName =
     branchRef && branchRef.trim().length > 0 ? branchRef : "detached-head";
@@ -200,6 +211,7 @@ export function withBranchCommitQueueLock(input: LegacyValue, operation: LegacyV
   const lockPath = branchCommitQueueLockPath(input.cwd, input.branchRef);
   mkdirSync(path.dirname(lockPath), { recursive: true });
   const startedAt = Date.now();
+  const timeoutMs = resolveBranchCommitQueueLockTimeoutMs(input.timeoutMs);
   while (true) {
     try {
       mkdirSync(lockPath, { recursive: false });
@@ -240,7 +252,8 @@ export function withBranchCommitQueueLock(input: LegacyValue, operation: LegacyV
       ) {
         continue;
       }
-      if (Date.now() - startedAt >= branchCommitQueueLockTimeoutMs) {
+      const elapsedMs = Date.now() - startedAt;
+      if (elapsedMs >= timeoutMs) {
         throw new CliError(
           "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY",
           `Another ATM commit is already finalizing ${input.branchName}; retry after the active writer finishes.`,
@@ -254,6 +267,7 @@ export function withBranchCommitQueueLock(input: LegacyValue, operation: LegacyV
               headShaAtAcquire: input.headShaAtAcquire,
               headShaCurrent,
               lockPath: relativePathFrom(input.cwd, lockPath),
+              queueLockTimeoutMs: timeoutMs,
               retryable: true,
               requiredCommand:
                 "Retry the same node atm.mjs git commit command after the active writer releases the branch queue lock.",
@@ -261,7 +275,7 @@ export function withBranchCommitQueueLock(input: LegacyValue, operation: LegacyV
           },
         );
       }
-      sleepMs(branchCommitQueueLockRetryMs);
+      sleepMs(Math.min(branchCommitQueueLockRetryMs, timeoutMs - elapsedMs));
     }
   }
   try {

@@ -27,7 +27,7 @@ import { quoteCliValue, uniqueSorted } from './view-projections.js';
 import { resolveQuickfixScope, findActiveBatchRunForIntent, findActiveTaskQueueForIntent, assertPromptBatchDoesNotConflict, reconcilePromptScopeRuntimeForClaim, inspectImportedTaskQueue, createDeterministicTaskIntent, checkPendingTaskArtifactScopeExpansion } from './route-resolution.js';
 import { buildActiveWorkSummary, buildChannelPlaybook, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath } from './playbook-projection.js';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.js';
-import { evaluateSameTaskClaimOwnership, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.js';
+import { evaluateSameTaskClaimOwnership, resolveSameActorClaimLaneSessionId, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.js';
 import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.js';
 import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.js';
 export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag } from './claim-readiness.js';
@@ -67,7 +67,12 @@ export async function claimNextImportedTask(input) {
         }
     }
     const requestedLaneSessionIdForReuse = selectedTask
-        ? resolveCurrentLaneSessionIdForFreshReservation(input.cwd, input.actor?.trim() ?? '')
+        ? resolveSameActorClaimLaneSessionId({
+            existingClaimActorId: selectedTask.activeClaimActorId,
+            existingClaimLaneSessionId: selectedTask.activeClaimLaneSessionId,
+            requestedActorId: input.actor?.trim() ?? '',
+            requestedLaneSessionId: resolveCurrentLaneSessionIdForFreshReservation(input.cwd, input.actor?.trim() ?? '')
+        })
         : null;
     const reusesOwnActiveClaim = Boolean(selectedTask && isTaskAlreadyActivelyClaimed(selectedTask)
         && typeof input.actor === 'string' && input.actor.trim().length > 0
@@ -178,7 +183,7 @@ export async function claimNextImportedTask(input) {
             claimableTask = activeBatchClaimDecision.task;
         }
     }
-    const currentLaneSessionId = resolveCurrentLaneSessionIdForFreshReservation(input.cwd, resolvedActor.actorId);
+    let currentLaneSessionId = resolveCurrentLaneSessionIdForFreshReservation(input.cwd, resolvedActor.actorId);
     const freshForeignReservation = inspectFreshTaskReservationForTask(input.cwd, claimableTask, resolvedActor.actorId, Date.now(), currentLaneSessionId);
     if (freshForeignReservation && !input.forceClaim) {
         const activeWorkSummary = buildActiveWorkSummary(input.cwd, resolvedActor.actorId, buildAllowedFilesForTask(claimableTask));
@@ -226,6 +231,12 @@ export async function claimNextImportedTask(input) {
     }
     const existingClaimActorId = claimableTask.activeClaimActorId;
     const existingClaimLaneSessionId = claimableTask.activeClaimLaneSessionId ?? null;
+    currentLaneSessionId = resolveSameActorClaimLaneSessionId({
+        existingClaimActorId,
+        existingClaimLaneSessionId,
+        requestedActorId: resolvedActor.actorId,
+        requestedLaneSessionId: currentLaneSessionId
+    });
     const requestedLaneSessionId = currentLaneSessionId;
     const alreadyOwnsActiveClaim = throwIfNextClaimForeignActiveOwner({
         taskId: claimableTask.workItemId,

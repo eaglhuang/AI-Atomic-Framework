@@ -46,6 +46,7 @@ export function executeGitCommit(options, context) {
             branchRef,
             branchName,
             headShaAtAcquire: headShaBeforeCommit,
+            timeoutMs: commitTimeoutMs,
         }, () => {
             headShaAtCommitStart = readHeadCommitSha(options.cwd);
             if (headShaAtCommitStart !== headShaBeforeCommit) {

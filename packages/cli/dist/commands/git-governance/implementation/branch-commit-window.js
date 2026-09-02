@@ -5,6 +5,14 @@ import { readHeadBranchRef, readHeadCommitSha } from './push-command.js';
 export const branchCommitQueueLockTimeoutMs = 15_000;
 export const branchCommitQueueLockRetryMs = 200;
 export const branchCommitQueueStaleSelfHealMs = 5 * 60 * 1000;
+export function resolveBranchCommitQueueLockTimeoutMs(timeoutMs) {
+    if (typeof timeoutMs === "number" &&
+        Number.isFinite(timeoutMs) &&
+        timeoutMs > 0) {
+        return Math.min(branchCommitQueueLockTimeoutMs, timeoutMs);
+    }
+    return branchCommitQueueLockTimeoutMs;
+}
 export function branchCommitQueueLockPath(cwd, branchRef) {
     const rawName = branchRef && branchRef.trim().length > 0 ? branchRef : "detached-head";
     const safeName = rawName.replace(/[^A-Za-z0-9._-]+/g, "-");
@@ -139,6 +147,7 @@ export function withBranchCommitQueueLock(input, operation) {
     const lockPath = branchCommitQueueLockPath(input.cwd, input.branchRef);
     mkdirSync(path.dirname(lockPath), { recursive: true });
     const startedAt = Date.now();
+    const timeoutMs = resolveBranchCommitQueueLockTimeoutMs(input.timeoutMs);
     while (true) {
         try {
             mkdirSync(lockPath, { recursive: false });
@@ -173,7 +182,8 @@ export function withBranchCommitQueueLock(input, operation) {
             })) {
                 continue;
             }
-            if (Date.now() - startedAt >= branchCommitQueueLockTimeoutMs) {
+            const elapsedMs = Date.now() - startedAt;
+            if (elapsedMs >= timeoutMs) {
                 throw new CliError("ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY", `Another ATM commit is already finalizing ${input.branchName}; retry after the active writer finishes.`, {
                     exitCode: 1,
                     details: {
@@ -184,12 +194,13 @@ export function withBranchCommitQueueLock(input, operation) {
                         headShaAtAcquire: input.headShaAtAcquire,
                         headShaCurrent,
                         lockPath: relativePathFrom(input.cwd, lockPath),
+                        queueLockTimeoutMs: timeoutMs,
                         retryable: true,
                         requiredCommand: "Retry the same node atm.mjs git commit command after the active writer releases the branch queue lock.",
                     },
                 });
             }
-            sleepMs(branchCommitQueueLockRetryMs);
+            sleepMs(Math.min(branchCommitQueueLockRetryMs, timeoutMs - elapsedMs));
         }
     }
     try {

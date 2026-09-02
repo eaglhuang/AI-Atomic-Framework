@@ -17,6 +17,17 @@ export function evaluateSameTaskClaimOwnership(input) {
         }
     });
 }
+/**
+ * A held active claim remains bound to its lane.  The same actor must reuse
+ * that lane for idempotent claim/renew flows; only a different actor may
+ * present a distinct lane as a conflicting identity.
+ */
+export function resolveSameActorClaimLaneSessionId(input) {
+    if (input.existingClaimActorId === input.requestedActorId && input.existingClaimLaneSessionId) {
+        return input.existingClaimLaneSessionId;
+    }
+    return input.requestedLaneSessionId ?? null;
+}
 export function buildSameTaskClaimConflictDetails(input) {
     const holdingLaneSessionId = input.comparison.currentLaneSessionId;
     const requestedLaneSessionId = input.comparison.conflictingLaneSessionId;
@@ -96,10 +107,16 @@ export function throwIfClaimOwnerMismatch(input) {
     });
 }
 export function assertCurrentClaimOwnerForAction(input) {
+    const holdingLaneSessionId = readClaimLaneSessionId(input.currentClaim);
     const laneSession = resolveLaneSession({
         cwd: input.cwd,
         actorId: input.actorId,
         taskId: input.taskId,
+        laneSessionId: resolveSameActorClaimLaneSessionId({
+            existingClaimActorId: input.currentClaim.actorId,
+            existingClaimLaneSessionId: holdingLaneSessionId,
+            requestedActorId: input.actorId
+        }),
         command: `node atm.mjs tasks ${input.action} --task ${input.taskId} --actor ${input.actorId} --json`
     });
     throwIfClaimOwnerMismatch({
