@@ -65,7 +65,7 @@ export function summarizeDominantPhase(timings: SealedBuildTimings, basis: Runne
   return { schemaId: 'atm.runnerSyncDominantPhaseSummary.v1', dominantPhase: dominant[0], dominantPhaseMs: dominant[1], totalElapsedMs,
     dominanceRatio: totalElapsedMs > 0 ? Number((dominant[1] / totalElapsedMs).toFixed(4)) : 0,
     phaseMedianMs: percentile(sorted, 0.5), phaseP95Ms: percentile(sorted, 0.95), measuredPhaseCount: sorted.length,
-    optimizationVerdict: basis === 'ab-ba' ? 'improved' : 'inconclusive', basis };
+    optimizationVerdict: 'inconclusive', basis };
 }
 
 export function prepareTsBuildCache(input: { readonly cwd: string; readonly worktreeRoot: string; }): TsBuildCacheSummary {
