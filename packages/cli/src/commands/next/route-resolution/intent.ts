@@ -208,7 +208,7 @@ export function normalizeOptionalString(value: unknown): string | null {
 export const TASK_ACTION_LEXICON: readonly { readonly action: RequestedTaskAction; readonly pattern: RegExp }[] = [
   { action: 'redo', pattern: /\u91cd\u505a|redo/i },
   { action: 'reopen', pattern: /\u91cd\u65b0\u6253\u958b|reopen/i },
-  { action: 'close', pattern: /\u95dc\u9589|\u6536\u53e3|\u5b8c\u6210|(?<![A-Za-z0-9-])close(?![A-Za-z0-9-])|(?<![A-Za-z0-9-])done(?![A-Za-z0-9-])/i },
+  { action: 'close', pattern: /\u95dc\u9589|\u6536\u53e3|\u6536\u55ae|\u7d50\u6848|\u5b8c\u6210|\u6536(?=\s*(?:ATM|TASK)-)|(?<![A-Za-z0-9-])close(?![A-Za-z0-9-])|(?<![A-Za-z0-9-])done(?![A-Za-z0-9-])/i },
   { action: 'audit', pattern: /audit|\u7a3d\u6838|\u6aa2\u8a0e/i },
   { action: 'cleanup', pattern: /cleanup|\u6e05\u7406/i },
   { action: 'analyze', pattern: /\u5206\u6790|analy[sz]e/i },
@@ -220,7 +220,7 @@ export const TASK_ACTION_LEXICON: readonly { readonly action: RequestedTaskActio
  * task-scoped continuation. `\u7e7c\u7e8c` = continue, `\u6536\u53e3` = close out.
  */
 export const TASK_CONTINUATION_VERB_PATTERN =
-  /\u7e7c\u7e8c|\u63a5\u8457|\u6536\u53e3|\u5b8c\u6210|continue|resume|carry\s*on|proceed|finish|close\s*out/i;
+  /\u7e7c\u7e8c|\u63a5\u8457|\u6536\u53e3|\u6536\u55ae|\u7d50\u6848|\u5b8c\u6210|\u6536(?=\s*(?:ATM|TASK)-)|continue|resume|carry\s*on|proceed|finish|close\s*out/i;
 
 export function matchesTaskContinuationVerb(prompt: string): boolean {
   return TASK_CONTINUATION_VERB_PATTERN.test(prompt);

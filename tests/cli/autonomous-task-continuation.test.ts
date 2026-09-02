@@ -18,13 +18,17 @@ import {
 assert.equal(detectRequestedTaskAction('please close ATM-GOV-0263'), 'close');
 assert.equal(detectRequestedTaskAction('關閉 ATM-GOV-0263'), 'close');
 assert.equal(detectRequestedTaskAction('收口 ATM-GOV-0263'), 'close');
+assert.equal(detectRequestedTaskAction('收 ATM-GOV-0263'), 'close');
+assert.equal(detectRequestedTaskAction('收單 TASK-PRF-0004'), 'close');
+assert.equal(detectRequestedTaskAction('結案 TASK-PRF-0004'), 'close');
+assert.equal(detectRequestedTaskAction('收集 ATM-GOV-0263'), null, 'the short close verb must not match unrelated Chinese words');
 assert.equal(detectRequestedTaskAction('redo the card'), 'redo');
 assert.equal(detectRequestedTaskAction('重做這張卡'), 'redo');
 assert.equal(detectRequestedTaskAction('no action verb here'), null);
 assert.ok(TASK_ACTION_LEXICON.length >= 5);
 
 // Continuation verbs are recognized across languages.
-for (const prompt of ['continue ATM-GOV-0263', '繼續 ATM-GOV-0263', '接著做', 'proceed', 'finish it', '收口']) {
+for (const prompt of ['continue ATM-GOV-0263', '繼續 ATM-GOV-0263', '接著做', 'proceed', 'finish it', '收口', '收 ATM-GOV-0263', '收單 TASK-PRF-0004', '結案 TASK-PRF-0004']) {
   assert.equal(matchesTaskContinuationVerb(prompt), true, `${prompt} must match a continuation verb`);
 }
 assert.equal(matchesTaskContinuationVerb('start something new'), false);
