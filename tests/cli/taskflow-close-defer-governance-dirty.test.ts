@@ -64,6 +64,16 @@ try {
     schemaVersion: 'atm.gitHeadEvidence.v0.1',
     evidence: [{ details: { taskId } }]
   });
+  // A foreign receipt is advisory only after its ledger proves it is terminal.
+  // Keep this fixture aligned with the fail-closed provenance contract rather
+  // than treating an unowned receipt as safe to defer.
+  writeJson(path.join(
+    foreignProvenanceFixture.targetRepo,
+    '.atm/history/tasks/FOREIGN-PRODUCER-002.json'
+  ), {
+    status: 'done',
+    claim: { state: 'released' }
+  });
   writeFileSync(gitHeadPath, `${receipt('FOREIGN-PRODUCER-001')}\n`, 'utf8');
   execFileSync('git', ['add', '--', path.relative(foreignProvenanceFixture.targetRepo, gitHeadPath)], { cwd: foreignProvenanceFixture.targetRepo, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'seed governed git-head provenance'], { cwd: foreignProvenanceFixture.targetRepo, stdio: 'ignore' });
