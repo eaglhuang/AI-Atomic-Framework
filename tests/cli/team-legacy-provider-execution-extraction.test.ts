@@ -24,7 +24,7 @@ assert.ok(
 );
 
 const shard = JSON.parse(readFileSync(
-  path.join(repoRoot, 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json'),
+  path.join(repoRoot, 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json'),
   'utf8'
 ));
 const mappings = Array.isArray(shard.mappings) ? shard.mappings : [];

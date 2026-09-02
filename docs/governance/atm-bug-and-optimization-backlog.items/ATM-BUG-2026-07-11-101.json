@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Fixed and verified in 2026-09-02 cleanup lane",
   "area": "Team Agents / direct provider artifact handoff",
   "finding": "Direct-provider roles currently receive independent generic role prompts. The persisted artifact handoff contract says Review Agent consumes implementation artifacts, but concrete vendor orchestration does not yet pass the Anthropic Implementer output into the OpenAI Review Agent request.",
   "expectedBehavior": "Real-provider orchestration should carry bounded, redacted prior-role artifacts through declared `consumesFrom`/`producesTo` edges and prove that reviewer input references the implementer artifact.",
-  "evidenceOrRepro": "Paid L5 runs invoked the intended providers and roles, but observability proves per-role execution only; it does not prove cross-vendor content handoff.",
-  "followUp": "Author a separate implementation task with deterministic chaining coverage and a paid retry once OpenAI quota is available."
+  "evidenceOrRepro": "Current provider execution materializes each successful role artifact into the handoff ledger, verifies its digest, then passes bounded prior-role context into the next role. Deterministic three-vendor coverage in `scripts/validate-team-agents.ts --case three-vendor-direct-artifact-handoff` asserts that a reviewer request contains `[implementer/anthropic]` and that telemetry records `implementer/anthropic` as consumed. The extraction gate was separately repaired to read the owning `owner-shard-cli-team.json` mapping rather than the generic CLI shard.",
+  "followUp": "Keep the deterministic three-vendor handoff case and the Team owner-shard extraction gate. A future paid run may extend operational evidence, but is not required to establish the source contract."
 }
