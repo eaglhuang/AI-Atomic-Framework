@@ -106,6 +106,7 @@ try {
         branchRef,
         branchName,
         headShaAtAcquire: headShaBeforeCommit,
+        timeoutMs: commitTimeoutMs,
       },
       () => {
         headShaAtCommitStart = readHeadCommitSha(options.cwd);

@@ -228,12 +228,14 @@ try {
       '--session', sessionId,
       '--message', 'feat: branch queue busy',
       '--auto-stage',
+      '--timeout-ms', '100',
       '--json'
     ]),
     'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY'
   );
   const queueBusyDetails = (await queueBusy).details ?? {};
   assert.equal(queueBusyDetails.retryable, true);
+  assert.equal(queueBusyDetails.queueLockTimeoutMs, 100);
   assert.ok(String(queueBusyDetails.lockPath).includes('git-commit-queue-refs-heads-'));
   rmSync(branchQueueLockPath, { recursive: true, force: true });
 
