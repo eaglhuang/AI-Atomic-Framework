@@ -281,7 +281,14 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
     explicitTaskIds
   });
   profile.mark('resolve-task-intent');
-  if (taskIntent && taskIntent.taskScopeMentioned === false) {
+  const unscopedPrompt = taskIntent?.userPrompt?.trim() ?? '';
+  const claimedQuickfixPrompt = Boolean(
+    options.claim
+    && taskIntent?.taskScopeMentioned === false
+    && isQuickfixPrompt(unscopedPrompt)
+    && resolveQuickfixScope(unscopedPrompt).length > 0,
+  );
+  if (taskIntent && taskIntent.taskScopeMentioned === false && !claimedQuickfixPrompt) {
     const unscopedGuidance = buildPromptGuidanceNextResult({
       cwd: options.cwd,
       actor: options.agent,

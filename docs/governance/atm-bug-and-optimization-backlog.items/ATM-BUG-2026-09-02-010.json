@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-02-010",
+  "date": "2026-09-02",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Closed",
+  "area": "Next quickfix claim routing",
+  "finding": "`next --claim` accepted a path-scoped quickfix prompt at routing time but returned the unscoped guidance result before claim orchestration. The command then reported success without the `atm.quickfixLock.v1` authority that guards quickfix writes.",
+  "expectedBehavior": "A path-scoped quickfix with no selected task must create a quickfix lock. A selected task or queue must remain authoritative and must not be bypassed by quickfix routing.",
+  "evidenceOrRepro": "2026-09-02: `node --strip-types scripts/validate-prompt-scoped-next.ts` failed at `quickfix next --claim must persist atm.quickfixLock.v1`. The diagnostic showed no imported queue in the result because `next.ts` returned `buildPromptGuidanceNextResult` before `claimNextImportedTask` ran. The repair keeps that guidance shortcut for non-claim requests only; claim requests continue to task selection or fast-channel lock acquisition.",
+  "followUp": "Fixed in the governed commit recorded below. Frozen runner publication remains separate and is not claimed by this quickfix."
+}
