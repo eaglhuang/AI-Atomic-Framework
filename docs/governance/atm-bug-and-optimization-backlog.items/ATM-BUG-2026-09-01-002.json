@@ -5,11 +5,11 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source; frozen runner publication and formal closeout remain separate states",
+  "status": "Fixed in source and verified through the current frozen runner; formal closeout remains a separate state",
   "area": "Cross-task mutation guard / terminal task-history reconciliation",
   "finding": "A normal live successor task can receive a bounded work-admission ticket for terminal task-history paths, but terminal-history-entitlement ignored that task's own live ledger and accepted only a framework temporary lock with linkedTaskId. Ordinary successor cleanup cards are not created with linkedTaskId, so every exact-scope attempt was rejected as terminal-unentitled by the pre-commit hook.",
   "expectedBehavior": "A live task claim that explicitly and narrowly covers a terminal history path is an answerable successor review surface and may reconcile that path. A framework temporary claim remains ineligible without an explicit linkedTaskId. Missing ledgers, broad scopes, inactive writers, and live terminal owners remain fail-closed.",
   "evidenceOrRepro": "TASK-TMP-0013 claimed 129 exact released-history paths through a valid atm.workAdmissionTicket.v1, including .atm/history/task-events/ATM-GOV-0253/**. Governed commit was rejected with ATM_CROSS_TASK_MUTATION_BLOCKED / terminal-unentitled because .atm/runtime/locks/TASK-TMP-0013.lock.json had linkedTaskId=null. The focused test first failed against the old rule, then passed after the repair; it also preserves the negative framework-temporary-without-linkage case.",
   "containment": "The repair requires both an existing live task ledger and a bounded matching scope entry before self-anchoring the writer. It does not grant a framework-temporary writer self-entitlement, and it does not admit any path excluded from the task's governed scope.",
-  "followUp": "Rebuild and publish the frozen runner through the normal governed runner-sync route before ordinary frozen CLI sessions rely on this repair. Reclaim TASK-TMP-0013 with its exact history scope and retry the governed commit; do not use raw Git bypass."
+  "followUp": "Frozen-runner publication is now verified: source repair 1bea12f108df1826f3bb311f783daba3d2ea47e2 is an ancestor of the current sealed runner, whose sourceSeal.valid=true and syncRequired=false. The current semantic-family regression node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts passed. Formal closeout remains separate; any retry of TASK-TMP-0013 must stay on the ordinary governed route."
 }
