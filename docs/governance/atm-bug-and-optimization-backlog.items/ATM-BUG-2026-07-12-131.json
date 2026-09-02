@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Critical",
-  "status": "Fixed in TASK-TEAM-0079",
+  "status": "Closed — TASK-TEAM-0079 queue/freeze repair re-verified by broker shared-surface workflow regression and frozen runner publication on 2026-09-02",
   "area": "Broker CID-to-queue routing",
   "finding": "A same-CID write on a known common target file is returned as `blocked-cid-conflict` before the physical file queue is considered. The Broker therefore creates neither a per-file queue nor a freeze/ack sidecar, even though it has enough evidence to serialize the shared paths while admitting private paths.",
   "expectedBehavior": "Retain CID as a hard conflict signal, but route a conflict with concrete common writable paths into the canonical per-file queue/freeze lane. Reserve global `blocked-cid-conflict` for semantic identity conflicts without a bounded queueable surface.",

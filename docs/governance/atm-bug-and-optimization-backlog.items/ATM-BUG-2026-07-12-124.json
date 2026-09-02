@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Critical",
-  "status": "Fixed in TASK-AAO-0160",
+  "status": "Closed — TASK-AAO-0160 repair re-verified by governance command validation and frozen runner publication on 2026-09-02",
   "area": "Governed commit / protected override audit deferral and lease renewal",
   "finding": "`git commit --auto-stage --defer-foreign-staged` could resolve a task-scoped bundle successfully while retaining pre-existing protected-override audit files in `commitFiles`; pre-commit then rejected those files as direction-lock scope drift. Long validation and the failed commit attempt could also expire the same actor's claim, forcing repair before retry.",
   "expectedBehavior": "Bundle resolution, index deferral, and hook scope checks must agree on whether pre-existing protected audit is task-owned or foreign; foreign audit must be deferred with a durable snapshot, while owned audit must be admitted by the active direction lock. Long evidence/commit operations must renew the active self-claim or expose an automatic retry-safe renewal.",

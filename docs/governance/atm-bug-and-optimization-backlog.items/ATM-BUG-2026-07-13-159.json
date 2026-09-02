@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Critical",
-  "status": "Fixed in TASK-AAO-FABLE-005",
+  "status": "Closed — TASK-AAO-FABLE-005 ownership repair re-verified by pre-commit support regression and frozen runner publication on 2026-09-02",
   "area": "Pre-commit residue ownership under multi-claim parallelism",
   "finding": "`resolveResidueTaskId` ignored `ATM_COMMIT_TASK_ID` and fell back to a single-active-lock heuristic, so with two captains (multiple active locks) every governance artifact resolved to \"no active task ownership\" and every governed commit was blocked. Foreign in-flight evidence also blocked unconditionally.",
   "expectedBehavior": "The committing task id from the wrapper is the primary ownership context; a foreign governance artifact with a live direction lock or live ledger claim is in-flight parallel work and passes; orphaned artifacts stay fail-closed.",

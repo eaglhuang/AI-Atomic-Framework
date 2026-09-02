@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { runBroker } from '../broker.ts';
@@ -62,7 +62,7 @@ async function testQueueFreezeAckReleaseWorkflow() {
     const acknowledged = await runBroker(['acknowledge', '--cwd', cwd, '--task', 'TASK-OWNER', '--actor', 'owner-agent', '--freeze-id', freezeId]) as any;
     assert.equal(acknowledged.evidence.freeze.status, 'acknowledged');
 
-    await runBroker(['release', '--cwd', cwd, '--task', 'TASK-OWNER']);
+    const released = await runBroker(['release', '--cwd', cwd, '--task', 'TASK-OWNER']) as any;
     const unblocked = evaluateBrokerQueueAdmission({
       cwd,
       taskId: 'TASK-WAITER',
@@ -70,8 +70,12 @@ async function testQueueFreezeAckReleaseWorkflow() {
       overlappingFiles: ['src/shared.ts']
     });
     assert.equal(unblocked.status, 'queue-head');
-    const freezeDocument = JSON.parse(readFileSync(path.join(cwd, '.atm/runtime/broker-shared-surface-freezes.json'), 'utf8'));
-    assert.equal(freezeDocument.records[0].status, 'released');
+    assert.equal(released.evidence.sharedSurfaceFreezes[0]?.status, 'released');
+    assert.equal(
+      existsSync(path.join(cwd, '.atm/runtime/broker-shared-surface-freezes.json')),
+      false,
+      'released freeze records must be returned in the release receipt, then removed from runtime state'
+    );
     console.log('ok: shared file queues, notifies, acknowledges, and releases without blocking private work');
   } finally {
     rmSync(cwd, { recursive: true, force: true });
