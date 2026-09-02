@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source and verified through the current frozen runner; formal closeout remains a separate state",
+  "status": "Closed — source repair and frozen regression re-verified",
   "area": "Framework temporary claim / runner publication evidence",
   "finding": "The protected-evidence hook recognised an active temporary framework lock only for atm.runnerSyncReceipt.v1. A broker-authorized atm.runnerPublicationTakeoverPlan.v1 written to that same lock's exact evidence path carried taskId but was rejected as missing task context, forcing a one-off hook bypass to commit publication governance evidence.",
   "expectedBehavior": "A fresh temporary framework lock may establish protected-evidence context only for its own official runner publication receipt forms: the actor-bound runner-sync receipt, or a structurally complete takeover plan at the exact path explicitly claimed by that lock. Expired, mismatched, unscoped, malformed, or unrelated evidence must remain rejected.",

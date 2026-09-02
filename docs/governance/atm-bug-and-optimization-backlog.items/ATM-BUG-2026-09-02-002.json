@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source and verified through the current frozen runner; formal closeout remains a separate state",
+  "status": "Closed — source repair and frozen regression re-verified",
   "area": "Taskflow close / record-only governance evidence",
   "finding": "A successful taskflow close can leave an append-only git-head receipt dirty. The normal record-commit command requires an already staged record-only set, but exposes no path-bounded staging route. Creating an ATM-only cleanup task is correctly rejected because done requires a real non-.atm deliverable.",
   "expectedBehavior": "ATM should provide one governed, path-bounded route that persists a generated git-head receipt without absorbing foreign dirty work and without requiring a synthetic product deliverable or native Git emergency commit.",
