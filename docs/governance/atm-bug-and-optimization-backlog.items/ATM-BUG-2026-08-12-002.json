@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Closed — sealed candidate ownership regression verified on 2026-09-02",
   "area": "Task-scoped commit candidate authority",
   "finding": "Commit candidate resolution expands from the task's declared scope paths into dirty source bytes currently owned by another active claim. A narrow claim or explicit --files selection does not narrow this candidate, so the current task can become responsible for another lane's unfinished bytes and then cannot release without ATM_RELEASE_DIRTY_WIP_BLOCKED.",
   "expectedBehavior": "A task-scoped commit candidate must be derived from task-owned delivery intent plus ownership-attributed changes, not from every dirty path matching a broad card scope. Foreign active dirty bytes must remain outside the candidate and be reported as an overlap diagnostic; only a true semantic dependency may require compose/revalidation or a short queue boundary.",
   "evidenceOrRepro": "Observed on 2026-08-12 in the shared canonical worktree: an active claim over a card whose scopePaths included a source file being edited by another lane absorbed that dirty file into candidate resolution even when the claimant used a narrowed file set. Release then failed with ATM_RELEASE_DIRTY_WIP_BLOCKED and every offered recovery path required mutating the foreign bytes. Detailed command receipts remain available from the reporting captain.",
-  "followUp": "Create a cohesive successor card for the commit-candidate authority seam. Add a two-lane regression with a broad declared scope, a narrow current-task intent, and foreign active dirty bytes inside the broad scope; prove the sealed candidate excludes the foreign bytes, reports their owner, and never forces release to mutate them. Keep ownership and semantic dependency separate and do not special-case task IDs or paths."
+  "followUp": "Resolved by the sealed commit candidate authority path. packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts was rerun on 2026-09-02: its broad-scope/narrow-claim two-lane fixture proves foreign active dirty bytes remain outside the current task's candidate, while released residue is preserved rather than mutated. The test passed."
 }
