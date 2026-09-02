@@ -567,7 +567,10 @@ try {
     stagedManifestPath
   ]).decisions.get(stagedManifestPath.toLowerCase());
   assert.equal(stagedManifestDecision?.ok, true, 'protected evidence must use the staged manifest blob, not divergent worktree bytes');
-  runGit(tempDir, ['restore', '--staged', '--worktree', '--', `.atm/history/tasks/${taskId}.json`]);
+  // Restore both staged fixture files before removing the temporary manifest.
+  // Leaving its index entry behind would manufacture a protected-state
+  // deletion and mask the index-ownership scenario that follows.
+  runGit(tempDir, ['restore', '--staged', '--worktree', '--', `.atm/history/tasks/${taskId}.json`, stagedManifestPath]);
   rmSync(path.join(tempDir, stagedManifestPath), { force: true });
 
   await runIndexLeaseTransactionScenarios({
