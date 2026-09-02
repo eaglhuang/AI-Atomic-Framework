@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed in ATM-GOV-0408 / d28848488 / ef0689feb",
   "area": "Evidence validator timeout and commit-hook concurrency",
   "finding": "During ATM-GOV-0326, validate:git-head-evidence completed successfully only after 194886ms and 204069ms. A 120000ms outer caller timeout returned control while the validator process continued, allowing a duplicate concurrent evidence run. Separately, the governed commit hook intermittently reported validate:cli exit 1 although an immediately repeated direct run passed in 86400ms.",
   "expectedBehavior": "Evidence and commit validation must have one explicitly owned deadline, terminate or await child work deterministically on timeout, prevent duplicate concurrent writes for the same receipt, and report a reproducible failure rather than an environment-dependent false red.",
-  "evidenceOrRepro": "ATM-GOV-0326 evidence receipts on 2026-08-09: node atm.dev.mjs validate:git-head-evidence completed in 194886ms and 204069ms; the first invocation exceeded its 120000ms caller boundary but later wrote evidence. The same governed commit path later passed after a direct npm run validate:cli completed in 86400ms.",
-  "followUp": "Create a bounded remediation card after profiling the validator and hook orchestration. It must define a single timeout owner, child-process cancellation or awaited completion semantics, per-receipt concurrency exclusion, and regression coverage for both timeout cleanup and the valid long-running path. Do not increase a timeout or reclassify the result as pass without those receipts."
+  "evidenceOrRepro": "Historical reproduction: ATM-GOV-0326 evidence receipts on 2026-08-09 showed node atm.dev.mjs validate:git-head-evidence completing in 194886ms and 204069ms after a 120000ms caller boundary had returned. Closure evidence: ATM-GOV-0408 added a cross-process same-task evidence-writer regression in d28848488 and closed in ef0689feb. The task's command-backed evidence records a passing concurrency test, evidence run.spec, timeout-policy test, and npm run typecheck; its closure packet preserves the validator digests.",
+  "followUp": "Closed. Keep the bounded deadline and same-task single-writer regressions in the relevant validator suites. A future independently reproduced false validate:cli result requires a new incident record; it is not established by the 2026-08-09 historical observation alone."
 }
