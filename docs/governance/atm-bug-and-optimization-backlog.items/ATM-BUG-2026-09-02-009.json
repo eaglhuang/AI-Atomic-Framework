@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-02-009",
+  "date": "2026-09-02",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Source repair committed; full Windows regression pending",
+  "area": "Windows regression-fixture cleanup",
+  "finding": "The git commit task-scoped staging regression deleted its fixed temporary repository immediately after Git/CLI work completed. On Windows, a short-lived file handle could make the final rmSync return EPERM, turning otherwise completed regression assertions into exit 1.",
+  "expectedBehavior": "Fixture cleanup must remain bounded and retry transient Windows directory-lock errors, while preserving a real failure for persistent cleanup errors.",
+  "evidenceOrRepro": "Reproduced 2026-09-02: `node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts` reached final cleanup and threw `EPERM` on `.atm-temp-test-git-commit-task-scoped-staging`. The fixture now uses Node rmSync recursive retry semantics (10 retries, 100ms delay) both before setup and after assertions. `npx tsc --noEmit` passed after the change; the complete fixture needs a long-running Windows/CI execution because this terminal session enforces a shorter command window.",
+  "followUp": "Run the complete task-scoped staging regression in Windows CI and mark Fixed only after it exits cleanly. No production governance behavior changed."
+}

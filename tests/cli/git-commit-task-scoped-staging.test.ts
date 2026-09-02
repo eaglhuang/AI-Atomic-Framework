@@ -8,6 +8,7 @@ import {
   assertBranchCommitQueueSchema,
   createFixtureRepository,
   expectCliError,
+  removeFixtureRepository,
   runGit,
   tempDir,
   writeJson
@@ -582,6 +583,6 @@ try {
   if (inheritedLaneSessionId === undefined) delete process.env.ATM_LANE_SESSION_ID;
   else process.env.ATM_LANE_SESSION_ID = inheritedLaneSessionId;
   if (existsSync(tempDir)) {
-    rmSync(tempDir, { recursive: true, force: true });
+    removeFixtureRepository();
   }
 }

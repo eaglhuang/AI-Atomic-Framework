@@ -12,6 +12,20 @@ import { issueTaskImportAdmissionTicket } from '../../../packages/cli/src/comman
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 export const tempDir = path.resolve(root, '.atm-temp-test-git-commit-task-scoped-staging');
 
+/**
+ * Windows can retain a handle briefly after the final Git/CLI subprocess in
+ * this fixture exits.  Keep cleanup bounded, but retry the documented
+ * transient lock errors so a completed regression is not reported as failed.
+ */
+export function removeFixtureRepository(): void {
+  rmSync(tempDir, {
+    recursive: true,
+    force: true,
+    maxRetries: 10,
+    retryDelay: 100
+  });
+}
+
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 const branchCommitQueueSchema = JSON.parse(readFileSync(path.join(root, 'schemas', 'governance', 'branch-commit-queue.schema.json'), 'utf8'));
@@ -55,7 +69,7 @@ export function expectCliError(promise: Promise<unknown>, code: string | readonl
 }
 
 export async function createFixtureRepository(): Promise<FixtureContext> {
-  rmSync(tempDir, { recursive: true, force: true });
+  removeFixtureRepository();
   mkdirSync(tempDir, { recursive: true });
   runGit(tempDir, ['init']);
   runGit(tempDir, ['config', 'user.name', 'fixture-agent']);
