@@ -29,7 +29,7 @@ import { resolveQuickfixScope, findActiveBatchRunForIntent, findActiveTaskQueueF
 import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath } from './playbook-projection.ts';
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
-import { evaluateSameTaskClaimOwnership, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts'; import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
+import { evaluateSameTaskClaimOwnership, resolveSameActorClaimLaneSessionId, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts'; import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
 export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly allowStaleRunner?: boolean; readonly emergencyApproval?: string | null; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
   const claimStartedAt = Date.now();
   const claimLatencyPhases: Array<{ readonly phase: string; readonly durationMs: number }> = [];
@@ -64,7 +64,12 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     }
   }
   const requestedLaneSessionIdForReuse = selectedTask
-    ? resolveCurrentLaneSessionIdForFreshReservation(input.cwd, input.actor?.trim() ?? '')
+    ? resolveSameActorClaimLaneSessionId({
+      existingClaimActorId: selectedTask.activeClaimActorId,
+      existingClaimLaneSessionId: selectedTask.activeClaimLaneSessionId,
+      requestedActorId: input.actor?.trim() ?? '',
+      requestedLaneSessionId: resolveCurrentLaneSessionIdForFreshReservation(input.cwd, input.actor?.trim() ?? '')
+    })
     : null;
   const reusesOwnActiveClaim = Boolean(selectedTask && isTaskAlreadyActivelyClaimed(selectedTask)
     && typeof input.actor === 'string' && input.actor.trim().length > 0
@@ -175,7 +180,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       claimableTask = activeBatchClaimDecision.task;
     }
   }
-  const currentLaneSessionId = resolveCurrentLaneSessionIdForFreshReservation(input.cwd, resolvedActor.actorId);
+  let currentLaneSessionId = resolveCurrentLaneSessionIdForFreshReservation(input.cwd, resolvedActor.actorId);
   const freshForeignReservation = inspectFreshTaskReservationForTask(input.cwd, claimableTask, resolvedActor.actorId, Date.now(), currentLaneSessionId);
   if (freshForeignReservation && !input.forceClaim) {
     const activeWorkSummary = buildActiveWorkSummary(input.cwd, resolvedActor.actorId, buildAllowedFilesForTask(claimableTask));
@@ -223,6 +228,12 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   }
   const existingClaimActorId = claimableTask.activeClaimActorId;
   const existingClaimLaneSessionId = claimableTask.activeClaimLaneSessionId ?? null;
+  currentLaneSessionId = resolveSameActorClaimLaneSessionId({
+    existingClaimActorId,
+    existingClaimLaneSessionId,
+    requestedActorId: resolvedActor.actorId,
+    requestedLaneSessionId: currentLaneSessionId
+  });
   const requestedLaneSessionId = currentLaneSessionId;
   const alreadyOwnsActiveClaim = throwIfNextClaimForeignActiveOwner({
     taskId: claimableTask.workItemId,
