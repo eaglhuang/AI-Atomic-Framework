@@ -355,7 +355,24 @@ function summarizeAutoBatchPipeline(events: readonly LaneSessionEvent[]) {
   const waited = tickets.map((ticket) => Number(ticket.waitedMs)).filter((value) => Number.isFinite(value) && value >= 0).sort((a, b) => a - b);
   const waveTickets = tickets.filter((ticket) => typeof ticket.waveId === 'string' && ticket.waveId);
   const bySurface = (needle: string) => tickets.filter((ticket) => String(ticket.sharedSurface ?? ticket.surfaceFamily ?? '').includes(needle)).length;
-  return { schemaId: 'atm.autoBatchPipelineAnalysis.v1' as const, evidenceSources: { brokerTickets: tickets.length, waveTickets: waveTickets.length, laneEvents: events.length }, metrics: { waitedMs: { p50: percentile(waited, 0.5), p95: percentile(waited, 0.95) }, batchRate: tickets.length ? tickets.filter((ticket) => ticket.batchEligible === true).length / tickets.length : null, commitsPerWave: bySurface('commit'), buildsPerWave: bySurface('build'), projectionsPerWave: bySurface('projection'), laneInterventionCount: events.filter((event) => event.action === 'repair-claim' || event.action === 'takeover' || event.action === 'adopt').length }, rolloutVerdict: !tickets.length ? { verdict: 'inconclusive', reason: 'missing broker ticket evidence' } : tickets.filter((ticket) => ticket.batchEligible === true).length / tickets.length >= 0.7 && bySurface('build') <= 1 && bySurface('projection') <= 1 ? { verdict: 'improved', reason: 'eligible batchRate and generated-write thresholds satisfied' } : { verdict: 'regressed', reason: 'auto-batch thresholds not satisfied' }, failureMatrix: ['happy-path-wave', 'conflict', 'docs-only-runner-skip', 'worker-partial-failure', 'head-moved', 'build-retry', 'projection-retry', 'checkpoint-retry', 'lane-conflict', 'kill-switch', 'serial-fallback'].map((scenario) => ({ scenario, status: tickets.length ? 'observable' : 'observability-gap' })), observabilityGaps: tickets.length ? [] : ['broker ticket lane-session events are absent'] };
+  const batchRate = tickets.length ? tickets.filter((ticket) => ticket.batchEligible === true).length / tickets.length : null;
+  const generatedWriteThresholdsSatisfied = batchRate !== null && batchRate >= 0.7 && bySurface('build') <= 1 && bySurface('projection') <= 1;
+  const controlWaveIds = new Set(tickets
+    .filter((ticket) => ticket.baselineOrTreatmentRole === 'control' && typeof ticket.waveId === 'string' && ticket.waveId)
+    .map((ticket) => ticket.waveId as string));
+  const pairedRealLaneEvidence = tickets.some((ticket) => ticket.baselineOrTreatmentRole === 'treatment'
+    && typeof ticket.waveId === 'string'
+    && controlWaveIds.has(ticket.waveId)
+    && typeof ticket.outcomeRef === 'string'
+    && ticket.outcomeRef.length > 0);
+  const rolloutVerdict = generatedWriteThresholdsSatisfied && pairedRealLaneEvidence
+    ? { verdict: 'improved' as const, reason: 'paired control/treatment lane evidence and generated-write thresholds satisfied' }
+    : { verdict: 'inconclusive' as const, reason: !tickets.length
+    ? 'missing broker ticket evidence and paired serial/treatment performance evidence'
+    : generatedWriteThresholdsSatisfied
+      ? 'broker ticket thresholds are diagnostic only; paired serial/treatment makespan, throughput, and cost evidence is required'
+      : 'broker ticket thresholds are not satisfied; paired serial/treatment performance evidence is also required' };
+  return { schemaId: 'atm.autoBatchPipelineAnalysis.v1' as const, evidenceSources: { brokerTickets: tickets.length, waveTickets: waveTickets.length, laneEvents: events.length }, metrics: { waitedMs: { p50: percentile(waited, 0.5), p95: percentile(waited, 0.95) }, batchRate, commitsPerWave: bySurface('commit'), buildsPerWave: bySurface('build'), projectionsPerWave: bySurface('projection'), laneInterventionCount: events.filter((event) => event.action === 'repair-claim' || event.action === 'takeover' || event.action === 'adopt').length }, rolloutVerdict, failureMatrix: ['happy-path-wave', 'conflict', 'docs-only-runner-skip', 'worker-partial-failure', 'head-moved', 'build-retry', 'projection-retry', 'checkpoint-retry', 'lane-conflict', 'kill-switch', 'serial-fallback'].map((scenario) => ({ scenario, status: tickets.length ? 'observable' : 'observability-gap' })), observabilityGaps: pairedRealLaneEvidence ? [] : ['paired serial/treatment lane evidence is absent'] };
 }
 
 function readJsonIfExists(filePath: string | null): unknown {

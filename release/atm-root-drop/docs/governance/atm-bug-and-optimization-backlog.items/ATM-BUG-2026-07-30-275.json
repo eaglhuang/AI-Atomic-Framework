@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Fixed in release-tier close classification lane",
   "area": "Task Planning / Validation Governance",
   "finding": "A single task card listed `npm run validate:standard -- --json` as closure-required evidence, which promoted an all-repository release gate into every close attempt and made unrelated baseline failures block ATM-GOV-0245.",
   "expectedBehavior": "Task-card close validators should be focused semantic gates for the task. Whole-repo release health should be represented as a separate release/readiness card or advisory gate unless the task explicitly owns every failing surface.",
-  "evidenceOrRepro": "ATM-GOV-0245 pre-close required `npm run validate:standard -- --json`; the standard run reached about 29.5 minutes with 55 passed, 13 failed, 18 pending, and 1 running validators before timeout/status inspection. The task closed only after replacing the validator with `node atm.mjs broker replay final-verdict --json` plus existing focused gates.",
-  "followUp": "Add validator-tier guidance and import/pre-close diagnostics that flag release-wide validators in single-task cards, with an explicit task-card amendment path for replacing them with focused validators."
+  "evidenceOrRepro": "Historical incident: ATM-GOV-0245 pre-close required `npm run validate:standard -- --json`; the repository-wide run reached about 29.5 minutes and unrelated baseline failures blocked the bounded task. Current repair classifies `validate:standard` and `validate:full` as release tier. A release-tier validator remains closure-required only when the task owns a release surface; a legacy explicit declaration on a bounded source task no longer silently promotes the full release gate. `node --strip-types packages/cli/src/commands/evidence/__tests__/validator-classification.spec.ts` covers both directions.",
+  "followUp": "Source repair is verified. Task-card authors should amend legacy declarations to focused semantic gates for clarity; the close classifier now fails closed again when a task actually touches release surfaces. Frozen publication and formal governance closeout are separate from this backlog status."
 }

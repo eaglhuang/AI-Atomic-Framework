@@ -445,6 +445,29 @@ try {
   assert.match(importCommittedFiles, /TASK-IMPORT-0001\.json/);
   assert.equal(runGit(repo, ['diff', '--cached', '--name-only']).trim(), '', 'import record commit must leave no staged residue');
 
+  // ATM-BUG-2026-07-29-274: a forward historical-attestation ledger is a
+  // single-task record. It must cross the actual pre-commit hook, not merely
+  // pass record-commit dry-run classification.
+  const attestedTaskId = 'TASK-GIT-0024';
+  const attestationPath = `.atm/history/evidence/${attestedTaskId}.historical-work-admission-attestations.json`;
+  writeJson(path.join(repo, attestationPath), {
+    schemaId: 'atm.historicalWorkAdmissionAttestationLedger.v1',
+    attestations: [{ taskId: attestedTaskId, commitSha: 'a'.repeat(40) }]
+  });
+  runGit(repo, ['add', attestationPath]);
+  const attestationDryRun = await runAtmGit([
+    'record-commit', '--cwd', repo, '--actor', 'record-actor',
+    '--message', 'atm: historical attestation fixture', '--dry-run', '--json'
+  ]);
+  assert.equal(attestationDryRun.ok, true);
+  const attestationCommit = await runAtmGit([
+    'record-commit', '--cwd', repo, '--actor', 'record-actor',
+    '--message', 'atm: historical attestation fixture', '--json'
+  ]);
+  assert.equal(attestationCommit.ok, true, 'attestation record dry-run/write must cross the same hook boundary');
+  assert.match(runGit(repo, ['show', '--name-only', '--format=', 'HEAD']), /historical-work-admission-attestations\.json/);
+  assert.equal(runGit(repo, ['diff', '--cached', '--name-only']).trim(), '', 'attestation record commit must leave no staged residue');
+
   // ATM-BUG-2026-09-02-002: an explicit record-only path must be staged by
   // the governed command itself, while an unrelated source file remains out
   // of both the index and the resulting commit.

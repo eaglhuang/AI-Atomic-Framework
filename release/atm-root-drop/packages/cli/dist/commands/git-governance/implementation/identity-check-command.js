@@ -326,9 +326,7 @@ export function writePreparedRuntimeIdentity(cwd, actorId, gitName, gitEmail, ac
     });
 }
 export function buildIdentitySetRequiredCommand(cwd, actorId) {
-    const gitName = readGitConfig(cwd, "user.name") ?? "<git user.name>";
-    const gitEmail = readGitConfig(cwd, "user.email") ?? "<git user.email>";
-    return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name ${quoteCliValue(gitName)} --git-email ${quoteCliValue(gitEmail)} --json`;
+    return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name "<git user.name>" --git-email "<git user.email>" --json`;
 }
 export function readTaskDocument(cwd, taskId) {
     const taskPath = path.join(cwd, ".atm", "history", "tasks", `${taskId}.json`);

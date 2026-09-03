@@ -7,6 +7,7 @@ import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows } from
 import { isFreshFrameworkTempLock, isLockBackedRunnerPublicationEvidence, runnerPublicationEvidencePath } from '../../framework-development/runner-publication-evidence-context.js';
 import { findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from '../../actor-registry.js';
 import { resolveActorWorkSession } from '../../actor-session.js';
+import { normalizeIdentitySegment } from '../../shared/identity-normalization.js';
 import { hasLiveFrameworkTempClaimAttribution } from './framework-temp-claim-attribution.js';
 import { CliError, quoteCliValue, relativePathFrom } from '../../shared.js';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.js';
@@ -192,7 +193,9 @@ export function classifyProtectedEvidenceBundle(cwd, stagedFiles) {
             const isRunnerReceipt = evidence.schemaId === 'atm.runnerSyncReceipt.v1';
             const expectedPath = runnerPublicationEvidencePath(taskId, evidence.schemaId);
             const lockFresh = isFreshFrameworkTempLock(lock);
-            const actorMatches = isRunnerReceipt ? lock?.actorId === evidence?.actorId : isPathAllowedByScope(expectedPath, declaredFiles);
+            const actorMatches = isRunnerReceipt
+                ? normalizeIdentitySegment(String(lock?.actorId ?? '')) === normalizeIdentitySegment(String(evidence?.actorId ?? ''))
+                : isPathAllowedByScope(expectedPath, declaredFiles);
             if (expectedPath && lockFresh && lock?.workItemId === taskId && normalizeRelativePath(file) === expectedPath && actorMatches) {
                 const context = contexts.get(taskId) ?? { ledger: false, event: false };
                 context.event = true;
@@ -947,9 +950,7 @@ export function collectIdentityProvenanceFindings(actorId, expectedIdentity) {
     return findings;
 }
 export function buildIdentitySetRequiredCommand(cwd, actorId) {
-    const gitName = runGitScalar(cwd, ['config', '--local', '--get', 'user.name']) ?? '<git user.name>';
-    const gitEmail = runGitScalar(cwd, ['config', '--local', '--get', 'user.email']) ?? '<git user.email>';
-    return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name ${quoteCliValue(gitName)} --git-email ${quoteCliValue(gitEmail)} --json`;
+    return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name "<git user.name>" --git-email "<git user.email>" --json`;
 }
 export function isPathAllowedByTaskDirection(filePath, allowedFiles) {
     const normalizedFile = normalizeRelativePath(filePath).toLowerCase();

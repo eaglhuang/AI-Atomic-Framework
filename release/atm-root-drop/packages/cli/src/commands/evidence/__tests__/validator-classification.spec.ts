@@ -11,6 +11,7 @@ import {
 assert.equal(classifyValidatorTier('typecheck'), 'focused');
 assert.equal(classifyValidatorTier('doctor'), 'batch');
 assert.equal(classifyValidatorTier('validate:root-drop-release'), 'release');
+assert.equal(classifyValidatorTier('validate:standard'), 'release');
 
 assert.equal(normalizeValidatorGateName('npm run typecheck'), 'typecheck');
 assert.equal(resolveValidatorExpectedCommand('typecheck'), 'npm run typecheck');
@@ -32,5 +33,15 @@ assert.equal(isClosureRequiredValidator('validate:git-head-evidence', [], ['docs
 assert.equal(isClosureRequiredValidator('validate:git-head-evidence', [], ['packages/cli/src/commands/evidence/bundle-io.ts']), true);
 assert.equal(isClosureRequiredValidator('validate:git-head-evidence', ['validate:git-head-evidence'], ['docs/readme.md']), true);
 assert.equal(isClosureRequiredValidator('custom-gate', ['custom-gate']), true);
+assert.equal(
+  isClosureRequiredValidator('validate:standard', ['validate:standard'], ['packages/cli/src/commands/evidence.ts']),
+  false,
+  'a bounded task must not be blocked by a release-wide validator merely because a legacy card declared it'
+);
+assert.equal(
+  isClosureRequiredValidator('validate:standard', ['validate:standard'], ['release/atm-onefile/atm.mjs']),
+  true,
+  'a release-surface task must retain its explicitly declared release validator'
+);
 
 console.log('[validator-classification.spec] ok');

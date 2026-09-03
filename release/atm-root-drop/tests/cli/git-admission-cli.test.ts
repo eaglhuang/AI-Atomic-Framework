@@ -4,7 +4,19 @@ import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
+import { buildPostPushRecoveryRecommendation } from '../../packages/cli/src/commands/git-governance/implementation/push-command.ts';
 import { gitBoundaryFixtures } from '../../scripts/lib/git-boundary-fixtures.ts';
+
+const historicalAttestationRecovery = buildPostPushRecoveryRecommendation({
+  outcome: 'block',
+  likelyNonFastForward: false,
+  remoteChangedAfterFetch: false,
+  likelyRemoteChanged: false,
+  conflictingFiles: [],
+  defaultRecommendation: 'ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED: run node atm.mjs git attest --commit abc --task TASK-GIT-0024 --actor fixture-agent --lane lane-fixture --provenance-kind emergency --provenance-ref git:abc --provenance-digest sha256:deadbeef --json'
+});
+assert.match(historicalAttestationRecovery, /git attest --commit abc/);
+assert.doesNotMatch(historicalAttestationRecovery, /Rebase, split/i);
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tempRoot = path.resolve(root, '.atm-temp-test-git-admission-cli');

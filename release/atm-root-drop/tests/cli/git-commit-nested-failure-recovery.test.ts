@@ -63,6 +63,16 @@ try {
     workItemId: taskId,
     title: 'Nested failure recovery fixture',
     status: 'running',
+    claim: {
+      actorId,
+      leaseId: 'lease-nested-failure',
+      state: 'active',
+      intent: 'write',
+      files: ['packages/cli/src/oversized.ts'],
+    },
+    taskDirectionLock: {
+      allowedFiles: ['packages/cli/src/oversized.ts'],
+    },
     deliverables: ['packages/cli/src/oversized.ts'],
     scopePaths: ['packages/cli/src/oversized.ts'],
     validators: [],

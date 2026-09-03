@@ -77,7 +77,9 @@ export function canonicalizeValidatorIdentity(raw) {
 }
 export function classifyValidatorTier(gate) {
     // Release gates — 只有 release 類 task 才需要重跑
-    if (gate === 'validate:integration-adapter' ||
+    if (gate === 'validate:standard' ||
+        gate === 'validate:full' ||
+        gate === 'validate:integration-adapter' ||
         gate === 'validate:skill-templates' ||
         gate === 'validate:root-drop-release' ||
         gate === 'validate:onefile-release') {
@@ -103,8 +105,14 @@ export function classifyValidatorTier(gate) {
  * - task card 顯式宣告的 validator 一律視為 closure-required
  */
 export function isClosureRequiredValidator(gate, taskDeclaredValidators, scopePaths = []) {
-    if (taskDeclaredValidators.includes(gate))
-        return true;
+    const tier = classifyValidatorTier(gate);
+    if (taskDeclaredValidators.includes(gate)) {
+        // A task card may name a release-wide validator as historical context, but
+        // that must not promote the full repository release gate into a close
+        // blocker for an otherwise bounded delivery.  Release work remains held to
+        // its declared release gate when it actually owns a release surface.
+        return tier !== 'release' || touchesReleaseSurface(scopePaths);
+    }
     // ATM-BUG-2026-07-09-065: Derive minimal validator set based on scope paths.
     // If the gate is validate:cli, only require it if the task's scopePaths touch cli code.
     if (gate === 'validate:cli') {
@@ -121,8 +129,17 @@ export function isClosureRequiredValidator(gate, taskDeclaredValidators, scopePa
     if (gate === 'validate:git-head-evidence' && !touchesProtectedGitHeadEvidenceSurface(scopePaths)) {
         return false;
     }
-    const tier = classifyValidatorTier(gate);
-    return tier === 'focused' || tier === 'release';
+    return tier === 'focused' || (tier === 'release' && touchesReleaseSurface(scopePaths));
+}
+function touchesReleaseSurface(scopePaths) {
+    return scopePaths.some((path) => {
+        const normalized = path.replace(/\\/g, '/').toLowerCase();
+        return normalized.startsWith('release/')
+            || normalized.startsWith('.github/workflows/')
+            || normalized === 'package.json'
+            || normalized === 'package-lock.json'
+            || normalized.startsWith('packages/cli/dist/');
+    });
 }
 function touchesProtectedGitHeadEvidenceSurface(scopePaths) {
     return scopePaths.some((p) => {

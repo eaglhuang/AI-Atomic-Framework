@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Fixed in paired-evidence fail-closed lane",
   "area": "Auto-batch analyzer / Performance evidence",
-  "finding": "The current auto-batch rollout analyzer can classify a run as improved from synthetic broker-ticket events when batchRate is at least 0.70 and build/projection ticket counts are within limits, without requiring paired serial/treatment makespan, throughput, cost, or real lane evidence. ATM-GOV-0179's focused test exercises this synthetic path rather than a real paired A/B dogfood run.",
+  "finding": "The auto-batch rollout analyzer could classify a run as improved from synthetic broker-ticket events when batchRate was at least 0.70 and build/projection ticket counts were within limits, without requiring paired control/treatment lane evidence. ATM-GOV-0179's focused test exercised this synthetic path rather than a real paired A/B dogfood run.",
   "expectedBehavior": "An improved verdict must require real plan-run control and treatment samples joined through durable task, wave, broker, checkpoint, and lane-session evidence. Missing makespan, throughput, cost, sample-size, or safety evidence must produce inconclusive, never improved.",
-  "evidenceOrRepro": "In scripts/analyze-captain-parallel-ledger.ts, summarizeAutoBatchPipeline derives improved from ticket batch eligibility and generated-write counts. tests/cli/strict-paired-ab-dogfood.test.ts supplies three synthetic broker-ticket lane events and expects improved without a serial/treatment timing comparison. ATM-GOV-0179 remains historically done, but its performance claim is unproven.",
-  "followUp": "ATM-GOV-0190 in doc_atm_gov_auto_batch_perf_plan_v2 must deliver Analyzer v3, real lane-session joins, deterministic replay, prospective paired GOV dogfood, sample thresholds, and a verdict that gates on speed, cost, safety, and batching evidence."
+  "evidenceOrRepro": "Red/green regression `strict-paired-ab-dogfood.test.ts` now supplies three synthetic broker-ticket lane events and proves they produce `inconclusive`, not `improved`. The analyzer now requires a same-wave control/treatment pair with outcome references in addition to the generated-write thresholds. The paired auto-batch fixture retains `improved`; typecheck, encoding guard, and analyzer failure-matrix regression pass.",
+  "followUp": "The larger performance claim remains governed by Analyzer v3 / real paired A/B evidence: makespan, throughput, cost, safety, sample thresholds, deterministic replay, and prospective dogfood are not fabricated or closed by this fail-open repair. The existing v3 overall test currently observes its default sealed cohort as inconclusive; that fixture/rollout inconsistency is outside this bounded analyzer repair."
 }
