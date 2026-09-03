@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Closed — deferred foreign closure residue re-verified 2026-09-03",
   "area": "Cross-task closure residue recovery",
   "finding": "A completed task's stale close event can block another task's governed commit, while the only offered `repair-closure` path refuses to run until that other task's dirty delivery is committed. This creates a circular close dependency with no governed escape hatch.",
   "expectedBehavior": "A stale completed-task close event must be repairable in a scoped main-worktree lane, or commit bundling must classify it as known stale-import advisory residue without weakening protection for live foreign tasks.",
-  "evidenceOrRepro": "`TASK-TEAM-0075` commit returned `ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED` for `TASK-TEAM-0076/...close...json`; `tasks status --residue` proved 0076 is `done/released` and stale-import. With human-approved `backend.tasks.repairClosure` lease `EMG-TASK-TEAM-0076-bf05b44d7c`, `tasks repair-closure --scope TASK-TEAM-0076` still returned `ATM_CLOSURE_REPAIR_DIRTY_WORKTREE` because active 0075/0079 dirty delivery exists. Its only remediation recommends an isolated worktree, which is prohibited for this main-worktree workflow.",
-  "followUp": "Add a regression for done/released stale-import residue beside an active unrelated task; provide a scoped main-worktree repair or deterministic advisory classification, never manual history deletion or a compulsory worktree fork."
+  "evidenceOrRepro": "Closed 2026-09-03 after current-source verification. `tests/cli/git-commit-task-scoped-staging.test.ts` constructs a foreign bundle manifest, closure packet, and close event beside an active unrelated task. It proves both dry-run and real `node atm.mjs git commit --auto-stage --defer-foreign-staged` admit the current delivery, exclude all three foreign governance paths from the new commit, preserve the foreign bytes, and leave an explicit deferred-residue warning. This supplies the deterministic advisory/defer classification that removes the circular dependency: the active task can commit without repairing another completed task's history. `tests/cli/closure-repair-write-ticket-commit.test.ts` separately proves a terminal repair issues the ticket required for its later governed commit. Focused suites passed on 2026-09-03.",
+  "followUp": "No source repair remains for the circular cross-task commit blocker. Reopen only if a done/released foreign closure artifact re-blocks an unrelated path-bounded commit despite the deferred-residue contract."
 }
