@@ -223,7 +223,7 @@ for (const file of protectedFiles) { const normalized = normalizeRelativePath(fi
 const lower = normalized.toLowerCase();
 const absolutePath = path.join(cwd, normalized);
 if (lower.startsWith('.atm/history/evidence/') && !lower.startsWith('.atm/history/evidence/historical-batches/')) { if (pendingBatchCheckpointAllowedFiles.length > 0 && isPathAllowedByScope(normalized, pendingBatchCheckpointAllowedFiles)) { continue; } const decision = protectedEvidenceBundle.decisions.get(lower);
-if (!decision?.ok) { findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: `Evidence updates must carry one semantic task identity and a matching staged task ledger or transition event (${decision?.reason ?? 'missing-evidence-decision'}).` }); }
+if (!decision?.ok) { findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: `Evidence updates must carry one semantic task identity and a matching staged task ledger or transition event (${decision?.reason ?? 'missing-evidence-decision'}).`, requiredCommand: buildEvidenceTaskContextCommand(decision?.taskId ?? null) }); }
 continue;
 }
 if (isProtectedAtmRuntimeStatePath(normalized)) { findings.push({ file: normalized, reason: 'runtime-state-must-not-be-committed', detail: 'Runtime lock, queue, or active-session state must stay ephemeral and must not be committed.' });
@@ -275,7 +275,7 @@ const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${taskId}.json`);
 const hasSiblingEvent = protectedFiles.some((entry) => { const candidate = normalizeRelativePath(entry).toLowerCase();
 return candidate.startsWith(`.atm/history/task-events/${taskId.toLowerCase()}/`);
 });
-if (!hasSiblingTask && !hasSiblingEvent) { findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: 'Evidence updates must travel with the related staged task ledger change or transition event.' });
+if (!hasSiblingTask && !hasSiblingEvent) { findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: 'Evidence updates must travel with the related staged task ledger change or transition event.', requiredCommand: buildEvidenceTaskContextCommand(taskId) });
 } } if (isStaticEvidenceArtifactPath(normalized)) { const hasSiblingEvidence = protectedFiles.some((entry) => { const candidate = normalizeRelativePath(entry).toLowerCase();
 return candidate.startsWith('.atm/history/evidence/');
 });
@@ -284,7 +284,7 @@ return candidate.startsWith('.atm/history/tasks/') || candidate.startsWith('.atm
 });
 if (!hasSiblingEvidence || !hasSiblingTaskOrEvent) { if (!isVerifiedStandaloneBulkClosureManifest(cwd, normalized)) { findings.push({ file: normalized, reason: 'static-evidence-artifact-without-cli-context', detail: `Static evidence artifacts under atomic_workbench/evidence or atomic_workbench/reports cannot stand alone; commit them together with ATM CLI evidence/task transition context.` });
 } } } } return { ok: findings.length === 0, files: protectedFiles, findings };
-} function isNestedEvidenceArtifactPath(value) { const normalized = normalizeRelativePath(value).toLowerCase();
+} function buildEvidenceTaskContextCommand(taskId) { const normalizedTaskId = typeof taskId === 'string' ? taskId.trim() : ''; if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(normalizedTaskId)) return null; return `git add -- .atm/history/tasks/${normalizedTaskId}.json .atm/history/task-events/${normalizedTaskId}`; } function isNestedEvidenceArtifactPath(value) { const normalized = normalizeRelativePath(value).toLowerCase();
 if (!normalized.startsWith('.atm/history/evidence/')) return false;
 const relative = normalized.slice('.atm/history/evidence/'.length);
 return relative.includes('/');

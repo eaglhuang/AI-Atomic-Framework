@@ -327,7 +327,7 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
             }
             const decision = protectedEvidenceBundle.decisions.get(lower);
             if (!decision?.ok) {
-                findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: `Evidence updates must carry one semantic task identity and a matching staged task ledger or transition event (${decision?.reason ?? 'missing-evidence-decision'}).` });
+                findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: `Evidence updates must carry one semantic task identity and a matching staged task ledger or transition event (${decision?.reason ?? 'missing-evidence-decision'}).`, requiredCommand: buildEvidenceTaskContextCommand(decision?.taskId ?? null) });
             }
             continue;
         }
@@ -410,7 +410,7 @@ direct tasks close is not allowed. Use batch checkpoint so ATM can close, advanc
                 return candidate.startsWith(`.atm/history/task-events/${taskId.toLowerCase()}/`);
             });
             if (!hasSiblingTask && !hasSiblingEvent) {
-                findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: 'Evidence updates must travel with the related staged task ledger change or transition event.' });
+                findings.push({ file: normalized, reason: 'evidence-file-missing-task-context', detail: 'Evidence updates must travel with the related staged task ledger change or transition event.', requiredCommand: buildEvidenceTaskContextCommand(taskId) });
             }
         }
         if (isStaticEvidenceArtifactPath(normalized)) {
@@ -431,6 +431,8 @@ direct tasks close is not allowed. Use batch checkpoint so ATM can close, advanc
     }
     return { ok: findings.length === 0, files: protectedFiles, findings };
 }
+function buildEvidenceTaskContextCommand(taskId) { const normalizedTaskId = typeof taskId === 'string' ? taskId.trim() : ''; if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(normalizedTaskId))
+    return null; return `git add -- .atm/history/tasks/${normalizedTaskId}.json .atm/history/task-events/${normalizedTaskId}`; }
 function isNestedEvidenceArtifactPath(value) {
     const normalized = normalizeRelativePath(value).toLowerCase();
     if (!normalized.startsWith('.atm/history/evidence/'))
