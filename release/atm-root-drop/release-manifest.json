@@ -1954,6 +1954,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-bundle-inspection.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-candidate-index.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/protected-governance-state.js",
@@ -2655,6 +2656,7 @@
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
@@ -5978,8 +5980,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 6,
-    "unchanged": 1935,
+    "copied": 4,
+    "unchanged": 1938,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -23284,10 +23286,19 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
-        "digest": "af2cef64576745ebacfb0aa1112292279fef4ca0e0cd1582b9654ca9efb2ee58",
+        "digest": "83fbcb7b99bc80bd5aaea24338b9435334d08be7b80f0817512d24577d1952c7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/sealed-commit-candidate-index.js",
+        "digest": "4767d2ca8549b1ae2e64c37f7c09b50bcd10874307b20b29fc6c7d686afff52d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/git-governance/implementation/sealed-commit-candidate-index.js"
         ],
         "replaceable": true
       },
@@ -29593,10 +29604,19 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
-        "digest": "cdeaa6e13ad43b7c2edfd3e2aeb05b9c2044e90321213f8c2b084b6d9bfbecf9",
+        "digest": "aeadf0b26a97f45309dc3552082b33e01dce05ca413f7bf46e71cbf2658e4eef",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+        "digest": "2ae186d3c4d23cc59bb16fb90d4220bbd629fe1d806418a2d7f7728e6a7e000c",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts"
         ],
         "replaceable": true
       },
@@ -59472,7 +59492,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:425a226d87cecc73a149a0810be4a2a14a7074c82596f41f4f6ed73849e096a7"
+    "treeDigest": "sha256:72e3f58685e8092102e3270c254bcce1799766a8e322935e9a132c6e7ef250ab"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -59803,6 +59823,7 @@
       "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
       "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
       "packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
       "packages/cli/src/commands/git-governance/protected-governance-state.ts",
@@ -60934,7 +60955,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:c1362d5ca078de256525fe4a754b1567a11120da29d74c06f50fabbcacfe3941"
+    "digest": "sha256:0d453b87a65f90d222a5dd67385937fe9f4d9941a9c6c6b4e0ddd387eddbfa78"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -62862,6 +62883,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-bundle-inspection.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-candidate-index.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/protected-governance-state.js",
@@ -63563,6 +63585,7 @@
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
@@ -66889,22 +66912,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:d92e53cb86ce74aa1a0cbcc4ef1ed4b2b0c3ed1e464135a41678efed228558ab",
-  "sealedSourceCommit": "bb3f45649a8d684eb71a25b807886cb3c24b5053",
+  "buildInputsTreeHash": "sha256:5268ca51414838416f4987d013df8a2b01b74f54158ed8d13addf7753a1db682",
+  "sealedSourceCommit": "eabc89bebd1eaab6b951feb5c5244aa1310c1a86",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:b2cf4691b776c9e294411b6a273a81653195a4a77abe27086d5b2e272be347a8",
-  "tsBuildCacheDigest": "sha256:8f7231df5ce92664435fff9192080531fc8a1d3aa397f5f354af2bd1b07b3e44",
+  "incrementalPlanDigest": "sha256:e6a0650fef911d282341cd65a71979bef5ac785b19e7332a8faf6527fb0a45e1",
+  "tsBuildCacheDigest": "sha256:c23fd2b0326d3a06e866a0898edb0af40d3e434cbe9ca3ec406aedd1461bf999",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 44,
-    "skipDecision": 56,
-    "worktreeSetup": 9260,
-    "typescriptBuild": 18336,
-    "rootDropReleaseAssembly": 31049,
-    "onefileReleaseAssembly": 7648,
-    "artifactSync": 9306,
+    "inputHashCalculation": 45,
+    "skipDecision": 52,
+    "worktreeSetup": 9053,
+    "typescriptBuild": 17210,
+    "rootDropReleaseAssembly": 30337,
+    "onefileReleaseAssembly": 7210,
+    "artifactSync": 9176,
     "cleanup": 0,
-    "totalElapsed": 93012
+    "totalElapsed": 89992
   }
 }
