@@ -1,6 +1,6 @@
 /**
- * ATM_TASK_CLAIM_OWNER_MISMATCH must name the identity that actually decided
- * ownership.
+ * Claim-ownership errors must identify the dimension that actually decided
+ * ownership: lane when both lifecycle records have lane ids, otherwise actor.
  *
  * `compareClaimLifecycleOwners` decides on lane ids whenever both lifecycle
  * records carry one, and only falls back to actor ids when a lane id is
@@ -104,7 +104,7 @@ import {
     }),
     (error: unknown) => {
       const cliError = error as { code?: string; details?: Record<string, unknown> };
-      assert.equal(cliError.code, 'ATM_TASK_CLAIM_OWNER_MISMATCH');
+      assert.equal(cliError.code, 'ATM_LANE_SESSION_OWNERSHIP_MISMATCH');
       assert.equal(cliError.details?.ownershipMode, 'lane-id');
       assert.equal(cliError.details?.holdingLaneSessionId, 'lane-holding');
       assert.equal(cliError.details?.requestedLaneSessionId, 'lane-requested');
@@ -113,6 +113,24 @@ import {
         'node atm.mjs lane adopt lane-holding --actor claude-008 --json'
       );
       assert.ok(String(cliError.details?.ownerComparisonReason ?? '').length > 0);
+      return true;
+    }
+  );
+}
+
+// Without a holding lane, the older actor-specific code remains the public
+// contract; the lane-specific error must not broaden into unrelated claims.
+{
+  assert.throws(
+    () => throwIfClaimOwnerMismatch({
+      taskId: 'TASK-PRF-0004',
+      currentActorId: 'cursor-captain',
+      currentLaneSessionId: null,
+      requestedActorId: 'claude-008',
+      requestedLaneSessionId: 'lane-requested'
+    }),
+    (error: unknown) => {
+      assert.equal((error as { code?: string }).code, 'ATM_TASK_CLAIM_OWNER_MISMATCH');
       return true;
     }
   );
