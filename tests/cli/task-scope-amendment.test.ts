@@ -66,11 +66,15 @@ console.log('Test B scope add required flags: PASS');
 
 // === Test B1: normal scope shrink is part of the published command contract ===
 {
-  const removeOption = tasksSpec.options.find((option) => option.flag === '--remove');
+  const removeOption = (tasksSpec.options ?? []).find((option) => option.flag === '--remove');
   assert.ok(removeOption, 'scope shrink must expose --remove in the public task command spec');
-  assert.match(String(removeOption.summary), /non-deliverable/i);
+  assert.match(String((removeOption as { summary?: unknown }).summary), /non-deliverable/i);
   assert.ok(
-    tasksSpec.examples.some((example) => example.includes('tasks scope remove') && example.includes('--remove')),
+    (tasksSpec.examples ?? []).some((example) => {
+      const legacyExample = example as unknown;
+      const command = typeof legacyExample === 'string' ? legacyExample : example.command;
+      return command?.includes('tasks scope remove') && command.includes('--remove');
+    }),
     'scope shrink must have a copyable non-emergency example'
   );
   console.log('Test B1 normal scope shrink public contract: PASS');
