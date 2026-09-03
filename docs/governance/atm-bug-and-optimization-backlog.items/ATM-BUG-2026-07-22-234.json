@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Fixed in sealed-detached runner sync recovery lane",
   "area": "Runner sync / emergency landed source recovery",
   "finding": "After an emergency source fix landed and was pushed, frozen runner sync remained blocked because runner-sync admission treated nearby foreign non-release WIP and landed-not-closed build input risk as a terminal refusal rather than providing a safe queue or sealed-source recovery route.",
   "expectedBehavior": "Runner-sync should provide a broker ticket or recovery plan for rebuilding from a sealed committed source while excluding uncommitted foreign WIP, or should expose a narrow steward workflow that preserves INV-ATM-008 without requiring manual arbitration.",
-  "evidenceOrRepro": "After commit 957a333fbc51085ee9968f437401d7527612c199, `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` failed with ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED and reasonCode landed-not-closed-build-input-risk while broker status was clean.",
-  "followUp": "Add runner-sync sealed-source isolation/revalidation for emergency landed commits, or a first-class queue-head steward path with precise foreign WIP exclusions and recoveryCommand."
+  "evidenceOrRepro": "Historical incident: after commit 957a333fbc51085ee9968f437401d7527612c199, `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` failed with ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED and reasonCode landed-not-closed-build-input-risk while broker status was clean. Current source repair: c3b27f643 introduced `candidateSourceIsolation: sealed-detached`; `ensureRunnerPublicationReservation()` now uses it while the candidate is built in a detached worktree. `node --strip-types tests/cli/runner-sync-foreign-dirty-owner.test.ts` proves foreign source WIP remains auditable but is not a blocker for the sealed candidate; `node --strip-types tests/cli/runner-sync-build-source-preservation.test.ts` proves the same source-preservation boundary.",
+  "followUp": "Source repair is verified. A later runner publication may still retain conflicting foreign generated outputs instead of overwriting them; that is the intentional INV-ATM-008 preservation boundary, not this historical source-WIP blocker. Frozen publication and formal governance closeout remain separate from this backlog status."
 }
