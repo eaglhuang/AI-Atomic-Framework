@@ -129,7 +129,7 @@ assert.equal(resolveSameActorClaimLaneSessionId({
     (error: unknown) => {
       assert.ok(error && typeof error === 'object');
       const cliError = error as { code?: string; details?: Record<string, unknown> };
-      assert.equal(cliError.code, 'ATM_LOCK_CONFLICT');
+      assert.equal(cliError.code, 'ATM_LANE_SESSION_OWNERSHIP_MISMATCH');
       assert.equal(cliError.details?.holdingLaneSessionId, 'lane-a');
       assert.equal(cliError.details?.requestedLaneSessionId, 'lane-b');
       assert.match(String(cliError.details?.laneAdoptCommand ?? ''), /lane adopt lane-a/);

@@ -165,13 +165,16 @@ export type RunnerSyncReceipt = {
   readonly buildInputsTreeHash: string;
   readonly buildDecision: BuildDecision;
   readonly decisionReason: string;
-  readonly incrementalPlan: RunnerIncrementalBuildPlan | null;
+  /** Digest of the complete incremental plan, retained only in runtime telemetry. */
+  readonly incrementalPlanDigest: string | null;
   readonly runtimeTelemetryRef: string | null;
-  readonly tsBuildCache: TsBuildCacheSummary | null;
+  /** Digest of the runtime-only build-cache summary. */
+  readonly tsBuildCacheDigest: string | null;
+  /** Digest binding the runtime-only plan/cache/timing telemetry to this receipt. */
+  readonly telemetryDigest: string;
   readonly brokerTicket: RunnerSyncBuildObservation['brokerTicket'];
   readonly dominantPhaseSummary: RunnerSyncDominantPhaseSummary;
   readonly buildObservation: RunnerSyncBuildObservation;
-  readonly phaseTimingsMs: RunnerSyncPhaseTimings;
   readonly atomicWrite: {
     readonly schemaId: 'atm.runnerSyncAtomicWrite.v1';
     readonly strategy: 'temp-file-rename-with-retry';
@@ -179,17 +182,6 @@ export type RunnerSyncReceipt = {
     readonly maxAttempts: number;
   };
   readonly autoReleaseCommand: string;
-  readonly treatmentTelemetry: {
-    readonly schemaId: 'atm.generatedWriteTreatmentTelemetry.v1';
-    readonly executionMode: 'cache-hit-skip' | 'command-executed';
-    readonly commandExecuted: boolean;
-    readonly outputObserved: boolean;
-    readonly receiptValidity: 'valid';
-    readonly buildDecision: BuildDecision;
-    readonly phaseTimingsMs: RunnerSyncPhaseTimings;
-    readonly rawTelemetryPolicy: 'gitignored-runtime-only';
-    readonly tsBuildCacheDigest: string | null;
-  };
   readonly publishedAt: string;
 };
 
@@ -288,6 +280,13 @@ export function buildRunnerSyncReceipt(input: {
     throw new Error('ATM_RUNNER_SYNC_RECEIPT_INVALID: queue-head task and steward work id are required to publish a runner-sync receipt.');
   }
   const brokerTicket = input.brokerTicket ?? normalizeBrokerTicket(input.admission);
+  const incrementalPlanDigest = input.incrementalPlan ? digestJson(input.incrementalPlan) : null;
+  const tsBuildCacheDigest = input.tsBuildCache ? digestJson(input.tsBuildCache) : null;
+  const telemetryDigest = digestJson({
+    incrementalPlan: input.incrementalPlan ?? null,
+    tsBuildCache: input.tsBuildCache ?? null,
+    phaseTimingsMs: phaseTimingsRecord(input.timings),
+  });
   const runnerInputGraph = buildReceiptRunnerInputGraph(input.sealedSourceSha, input.buildInputsTreeHash, input.admission.runnerSyncSteward?.requestedSurfaces ?? []);
   const session = buildReceiptSession({
     admission: input.admission,
@@ -344,9 +343,10 @@ export function buildRunnerSyncReceipt(input: {
     buildInputsTreeHash: input.buildInputsTreeHash,
     buildDecision: input.buildDecision,
     decisionReason: input.decisionReason ?? '',
-    incrementalPlan: input.incrementalPlan ?? null,
+    incrementalPlanDigest,
     runtimeTelemetryRef: input.runtimeTelemetryRef ?? null,
-    tsBuildCache: input.tsBuildCache ?? null,
+    tsBuildCacheDigest,
+    telemetryDigest,
     brokerTicket,
     dominantPhaseSummary: input.dominantPhaseSummary ?? summarizeDominantPhase(input.timings),
     buildObservation: buildRunnerSyncBuildObservation({
@@ -356,7 +356,6 @@ export function buildRunnerSyncReceipt(input: {
       timings: input.timings,
       brokerTicket
     }),
-    phaseTimingsMs: phaseTimingsRecord(input.timings),
     atomicWrite: {
       schemaId: 'atm.runnerSyncAtomicWrite.v1',
       strategy: 'temp-file-rename-with-retry',
@@ -368,17 +367,6 @@ export function buildRunnerSyncReceipt(input: {
       stewardWorkId,
       receiptRef: path.join('.atm', 'history', 'evidence', `${taskId}.runner-sync-receipt.json`).replace(/\\/g, '/')
     }),
-    treatmentTelemetry: {
-      schemaId: 'atm.generatedWriteTreatmentTelemetry.v1',
-      executionMode: input.buildDecision === 'cacheHitSkip' ? 'cache-hit-skip' : 'command-executed',
-      commandExecuted: input.buildDecision !== 'cacheHitSkip',
-      outputObserved: true,
-      receiptValidity: 'valid',
-      buildDecision: input.buildDecision,
-      phaseTimingsMs: phaseTimingsRecord(input.timings),
-      rawTelemetryPolicy: 'gitignored-runtime-only',
-      tsBuildCacheDigest: input.tsBuildCache ? digestJson(input.tsBuildCache) : null
-    },
     publishedAt: input.publishedAt ?? new Date().toISOString()
   };
 }

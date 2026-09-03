@@ -182,13 +182,13 @@ try {
   heartbeat(laneA);
   heartbeat(laneB);
 
-  // Step 3 — lane B steals T1 → LOCK_CONFLICT + holdingLaneSessionId + adopt hint
+  // Step 3 — lane B steals T1 → lane-specific ownership mismatch + adopt hint
   const conflict = runAtm(
     ['tasks', 'claim', '--task', 'TASK-DUAL-T1', '--actor', actor],
     { ATM_LANE_SESSION_ID: laneB }
   );
   const conflictCode = firstCode(conflict.json);
-  const conflictData = messageData(conflict.json, 'ATM_LOCK_CONFLICT')
+  const conflictData = messageData(conflict.json, 'ATM_LANE_SESSION_OWNERSHIP_MISMATCH')
     ?? (conflict.json?.messages?.[0]?.data ?? null);
   const step3 = {
     ok: conflict.json?.ok,
@@ -200,7 +200,7 @@ try {
   };
   console.log('STEP3', JSON.stringify(step3, null, 2));
   assert.equal(conflict.json?.ok, false);
-  assert.equal(conflictCode, 'ATM_LOCK_CONFLICT');
+  assert.equal(conflictCode, 'ATM_LANE_SESSION_OWNERSHIP_MISMATCH');
   assert.equal(conflictData?.holdingLaneSessionId, laneA);
   assert.equal(conflictData?.requestedLaneSessionId, laneB);
   assert.match(String(conflictData?.laneAdoptCommand ?? ''), new RegExp(`lane adopt ${laneA}`));

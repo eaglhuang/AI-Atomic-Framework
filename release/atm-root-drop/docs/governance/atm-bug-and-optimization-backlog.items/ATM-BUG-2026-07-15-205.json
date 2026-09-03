@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Closed — transactional index queue and deferred-index admission regressions verified 2026-09-03",
   "area": "Team Broker / Git index lane",
   "finding": "ATM can admit two non-overlapping tasks as parallel-safe while the shared Git index is still a single global staged surface; once TASK-RFT-0044 owns foreign-active staged files, ATM-GOV-0151 cannot create its governed delivery commit without waiting or requesting a human stage-override lease.",
   "expectedBehavior": "Unified admission should expose the Git index as a canonical Broker resource before staging, provide a non-disruptive index lane or stewarded commit path for disjoint task bundles, and return owner, queue position, retry command, and safe next action instead of discovering ATM_INDEX_FOREIGN_ACTIVE_STAGED only at commit time.",
   "evidenceOrRepro": "On 2026-07-15, ATM-GOV-0151 passed generated projection steward tests, global-resource projection tests, typecheck, validate:cli, and validate:git-head-evidence, but `node atm.mjs git commit --actor codex-gpt-5-5-captain --task ATM-GOV-0151 --message \"feat(broker): add generated projection steward\" --defer-foreign-staged --dry-run --json` failed with ATM_INDEX_FOREIGN_ACTIVE_STAGED because TASK-RFT-0044 had staged governance and source files in the same index.",
-  "followUp": "Close ATM-GOV-0152 with a real unified admission alias that projects git-index and branch-commit-queue into the same Broker keyspace, then add a commit-time or pre-stage steward path that can serialize disjoint commit bundles without unstaging foreign-active files."
+  "followUp": "Current evidence on 2026-09-03: transactional commit queue isolation, deferred-index work-admission parity, and index override lease consumption all pass. The current path exposes a governed index decision and preserves foreign staged work rather than requiring the historical manual override path. Record any new index-lane failure as a new item with a current reproduction."
 }

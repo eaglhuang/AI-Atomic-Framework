@@ -129,8 +129,13 @@ const receipt = buildRunnerSyncReceipt({
   tsBuildCache: persisted,
   timings: timings()
 });
-assert.equal(receipt.tsBuildCache?.gitPolicy.rawCacheCommitted, false);
-assert.match(receipt.treatmentTelemetry.tsBuildCacheDigest ?? '', /^sha256:[a-f0-9]{64}$/);
+assert.match(receipt.incrementalPlanDigest ?? '', /^sha256:[a-f0-9]{64}$/);
+assert.match(receipt.tsBuildCacheDigest ?? '', /^sha256:[a-f0-9]{64}$/);
+assert.match(receipt.telemetryDigest, /^sha256:[a-f0-9]{64}$/);
+assert.equal('incrementalPlan' in receipt, false, 'tracked receipt must not retain raw incremental paths');
+assert.equal('tsBuildCache' in receipt, false, 'tracked receipt must not retain raw cache internals');
+assert.equal('phaseTimingsMs' in receipt, false, 'tracked receipt must not retain raw phase timings');
+assert.equal('treatmentTelemetry' in receipt, false, 'tracked receipt must not retain duplicated treatment telemetry');
 
 const recoveryReceipt = buildRunnerSyncReceipt({
   admission: {

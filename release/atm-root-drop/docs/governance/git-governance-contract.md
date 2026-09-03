@@ -226,6 +226,23 @@ Each amendment records a `scope-amendment` event carrying its class, phase,
 it stayed inside the original intent. The amendment history stays visible in
 `tasks status` and in the `taskflow close` close plan.
 
+Normal scope shrink — also non-emergency, but available only to the active
+claim owner. Use it when delivery evidence proves that a broad runtime scope
+would otherwise classify another editor's dirty file as in scope:
+
+```bash
+node atm.mjs tasks scope remove \
+  --task <task-id> \
+  --actor <actor-id> \
+  --remove <comma-separated-non-deliverable-paths> \
+  --reason "why these paths are not this task's delivery" \
+  --json
+```
+
+The command rejects declared deliverables. It narrows the active direction
+lock and claim used by taskflow's runtime scope authority; it does not rewrite
+the sealed planning card or require `tasks import --force`.
+
 Emergency maintenance lane — protected, requires explicit approval:
 
 ```bash

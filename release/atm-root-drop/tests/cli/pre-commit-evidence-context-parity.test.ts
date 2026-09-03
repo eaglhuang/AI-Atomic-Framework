@@ -81,7 +81,9 @@ function standaloneBulkClosureManifest(valid: boolean): { root: string; staged: 
 
 {
   const fixture = taskBundle('TASK-GIT-0024', false, false);
-  assert.equal(inspectProtectedAtmStateChanges(fixture.root, fixture.staged).ok, false);
+  const report = inspectProtectedAtmStateChanges(fixture.root, fixture.staged);
+  assert.equal(report.ok, false);
+  assert.equal(report.findings[0]?.requiredCommand, 'git add -- .atm/history/tasks/TASK-GIT-0024.json .atm/history/task-events/TASK-GIT-0024');
 }
 
 {
