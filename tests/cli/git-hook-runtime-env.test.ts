@@ -1,6 +1,16 @@
 import assert from "node:assert/strict";
 
-import { addTrustedGitHookRuntimePath } from "../../packages/cli/src/commands/git-governance/implementation/git-process-port.ts";
+import {
+  addTrustedGitHookRuntimePath,
+  createSanitizedGitEnv,
+} from "../../packages/cli/src/commands/git-governance/implementation/git-process-port.ts";
+
+const readOnlyGitEnv = createSanitizedGitEnv();
+assert.equal(
+  readOnlyGitEnv.GIT_OPTIONAL_LOCKS,
+  "0",
+  "ATM read-only Git subprocesses must opt out of optional index locks",
+);
 
 const hookRuntime = "C:\\Program Files\\Git\\usr\\bin";
 const windowsEnv = addTrustedGitHookRuntimePath(
