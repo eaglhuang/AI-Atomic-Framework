@@ -556,9 +556,8 @@ const currentProvider = normalizeOptionalText(process.env.ATM_PROVIDER_ID);
 if (expectedIdentity.editor && currentEditor && expectedIdentity.editor !== currentEditor) { findings.push({ code: 'ATM_COMMIT_IDENTITY_EDITOR_MISMATCH', source: 'commit-attribution', detail: `Actor ${actorId} identity is bound to editor ${expectedIdentity.editor}, but the current environment reports ${currentEditor}.`, requiredCommand: `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --editor ${quoteCliValue(currentEditor)} --git-name "<git user.name>" --git-email "<git user.email>" --json`, classification: 'current-task' });
 } if (expectedIdentity.provider && currentProvider && expectedIdentity.provider !== currentProvider) { findings.push({ code: 'ATM_COMMIT_IDENTITY_PROVIDER_MISMATCH', source: 'commit-attribution', detail: `Actor ${actorId} identity is bound to provider ${expectedIdentity.provider}, but the current environment reports ${currentProvider}.`, requiredCommand: `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --provider ${quoteCliValue(currentProvider)} --git-name "<git user.name>" --git-email "<git user.email>" --json`, classification: 'current-task' });
 } return findings;
-} export function buildIdentitySetRequiredCommand(cwd, actorId) { const gitName = runGitScalar(cwd, ['config', '--local', '--get', 'user.name']) ?? '<git user.name>';
-const gitEmail = runGitScalar(cwd, ['config', '--local', '--get', 'user.email']) ?? '<git user.email>';
-return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name ${quoteCliValue(gitName)} --git-email ${quoteCliValue(gitEmail)} --json`;
+} export function buildIdentitySetRequiredCommand(cwd, actorId) {
+return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name "<git user.name>" --git-email "<git user.email>" --json`;
 } export function isPathAllowedByTaskDirection(filePath, allowedFiles) { const normalizedFile = normalizeRelativePath(filePath).toLowerCase();
 const cwd = process.cwd();
 return allowedFiles.some((candidate) => { let relCandidate = candidate;

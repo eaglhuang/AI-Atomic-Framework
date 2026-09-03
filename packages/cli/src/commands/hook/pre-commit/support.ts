@@ -25,6 +25,7 @@ import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows } from
 import { isFreshFrameworkTempLock, isLockBackedRunnerPublicationEvidence, runnerPublicationEvidencePath } from '../../framework-development/runner-publication-evidence-context.ts';
 import { findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from '../../actor-registry.ts';
 import { resolveActorWorkSession } from '../../actor-session.ts';
+import { normalizeIdentitySegment } from '../../shared/identity-normalization.ts';
 import { hasLiveFrameworkTempClaimAttribution } from './framework-temp-claim-attribution.ts';
 import { CliError, quoteCliValue, relativePathFrom } from '../../shared.ts';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.ts';
@@ -155,7 +156,9 @@ const declaredFiles = Array.isArray(lock?.files) ? lock.files.map(normalizeRelat
 const isRunnerReceipt = evidence.schemaId === 'atm.runnerSyncReceipt.v1';
 const expectedPath = runnerPublicationEvidencePath(taskId, evidence.schemaId);
 const lockFresh = isFreshFrameworkTempLock(lock);
-const actorMatches = isRunnerReceipt ? lock?.actorId === evidence?.actorId : isPathAllowedByScope(expectedPath, declaredFiles);
+const actorMatches = isRunnerReceipt
+  ? normalizeIdentitySegment(String(lock?.actorId ?? '')) === normalizeIdentitySegment(String(evidence?.actorId ?? ''))
+  : isPathAllowedByScope(expectedPath, declaredFiles);
 if (expectedPath && lockFresh && lock?.workItemId === taskId && normalizeRelativePath(file) === expectedPath && actorMatches) { const context = contexts.get(taskId) ?? { ledger: false, event: false }; context.event = true; contexts.set(taskId, context); lockBackedRunnerReceipts.add(file.toLowerCase()); return taskId; }
 }
 return taskId;

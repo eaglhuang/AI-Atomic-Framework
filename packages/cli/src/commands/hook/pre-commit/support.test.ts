@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { issueWorkAdmissionTicket } from '../../../../../core/src/broker/work-admission-ticket.ts';
-import { buildIdentitySetRequiredCommand, hasValidTerminalRepairClosureAdmission } from './support.ts';
+import { buildIdentitySetRequiredCommand, classifyProtectedEvidenceBundle, hasValidTerminalRepairClosureAdmission } from './support.ts';
 
 const taskId = 'ATM-GOV-terminal-hook';
 const taskPath = `.atm/history/tasks/${taskId}.json`;
@@ -48,6 +49,37 @@ try {
   }), false, 'a terminal ticket must still reject another task\'s protected override receipt');
 } finally {
   rmSync(auditFixture, { recursive: true, force: true });
+}
+
+const runnerReceiptFixture = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-receipt-attribution-'));
+try {
+  const temporaryTaskId = 'ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini';
+  const receiptPath = `.atm/history/evidence/${temporaryTaskId}.runner-sync-receipt.json`;
+  mkdirSync(path.join(runnerReceiptFixture, '.atm', 'history', 'evidence'), { recursive: true });
+  mkdirSync(path.join(runnerReceiptFixture, '.atm', 'runtime', 'locks'), { recursive: true });
+  execFileSync('git', ['init', '--quiet'], { cwd: runnerReceiptFixture });
+  execFileSync('git', ['config', 'user.email', 'test@atm.local'], { cwd: runnerReceiptFixture });
+  execFileSync('git', ['config', 'user.name', 'ATM Test'], { cwd: runnerReceiptFixture });
+  writeFileSync(path.join(runnerReceiptFixture, '.atm', 'runtime', 'locks', `${temporaryTaskId}.lock.json`), JSON.stringify({
+    workItemId: temporaryTaskId,
+    actorId: 'codex-gpt-5-4-mini',
+    heartbeatAt: new Date().toISOString(),
+    ttlSeconds: 60,
+    files: ['release/atm-onefile/**'],
+  }));
+  writeFileSync(path.join(runnerReceiptFixture, receiptPath), JSON.stringify({
+    schemaId: 'atm.runnerSyncReceipt.v1',
+    taskId: temporaryTaskId,
+    actorId: 'codex-gpt-5.4-mini',
+  }));
+  execFileSync('git', ['add', '--', receiptPath], { cwd: runnerReceiptFixture });
+  assert.equal(
+    classifyProtectedEvidenceBundle(runnerReceiptFixture, [receiptPath]).decisions.get(receiptPath.toLowerCase())?.ok,
+    true,
+    'equivalent actor spellings must preserve lock-backed runner receipt attribution',
+  );
+} finally {
+  rmSync(runnerReceiptFixture, { recursive: true, force: true });
 }
 
 console.log('pre-commit support: terminal repair-closure admission ok');
