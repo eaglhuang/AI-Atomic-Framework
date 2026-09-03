@@ -299,18 +299,20 @@ function readSource(relative: string): string {
 
   // The remaining live-index route is named, carries its reason into the
   // outcome, and is never what a governed commit resolves to.
-  const diagnostic = runWithSealedTaskScopedCommitIndex({
-    cwd: root,
-    paths: ['stray.txt'],
-    provenance: 'pre-staged-index',
-    surface: 'test',
-    sealSource: { kind: 'live-index-diagnostic', reason: 'attribution probe' },
-    run: () => 'observed'
-  });
-  assert.equal(diagnostic.result, 'observed');
-  assert.equal(diagnostic.sealSource, 'live-index-diagnostic');
-  assert.deepEqual(diagnostic.liveIndexSealDiagnostic, { reason: 'attribution probe' });
-  assert.equal(head(root), beforeHead, 'the diagnostic route must not move a ref by itself');
+  // A no-op callback never produces a committed tree, so the transaction must
+  // fail rather than treating a pre-commit diagnostic as post-commit proof.
+  expectThrows(
+    () => runWithSealedTaskScopedCommitIndex({
+      cwd: root,
+      paths: ['stray.txt'],
+      provenance: 'pre-staged-index',
+      surface: 'test',
+      sealSource: { kind: 'live-index-diagnostic', reason: 'attribution probe' },
+      run: () => 'observed'
+    }),
+    ATM_COMMIT_ATTRIBUTION_MISMATCH
+  );
+  assert.equal(head(root), beforeHead, 'a no-op diagnostic callback must not move a ref');
 
   const governed = resolveGovernedCommitSeal({
     cwd: root,
