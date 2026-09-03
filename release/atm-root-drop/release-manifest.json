@@ -5589,6 +5589,7 @@
     "release/atm-root-drop/tests/cli/tdd-case-id-red-green-lifecycle.test.ts",
     "release/atm-root-drop/tests/cli/team-admission-projection.test.ts",
     "release/atm-root-drop/tests/cli/team-agents-dogfood.test.ts",
+    "release/atm-root-drop/tests/cli/team-broker-proposal-consumption.test.ts",
     "release/atm-root-drop/tests/cli/team-command-facade-atomization.test.ts",
     "release/atm-root-drop/tests/cli/team-contribution-composer.test.ts",
     "release/atm-root-drop/tests/cli/team-cost-accounting.test.ts",
@@ -5974,7 +5975,7 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 2,
+    "copied": 3,
     "unchanged": 1936,
     "removed": 0
   },
@@ -22263,7 +22264,7 @@
       },
       {
         "path": "packages/cli/dist/commands/command-specs/tasks.spec.js",
-        "digest": "2e2cf3f5350b57b4923ccce8b46038818607be4a43ec4d6fbbd14f04b165fe86",
+        "digest": "115b1de9eca1afea84010ae5432b3452c2a6eb1961f5541a917fa0b84fca1b43",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/command-specs/tasks.spec.js"
@@ -28239,7 +28240,7 @@
       },
       {
         "path": "packages/cli/src/commands/command-specs/tasks.spec.ts",
-        "digest": "eb895f15bf184c991ca1bb300a9e3aa3d0343f1904bf26d9b3d0e000eb8c3408",
+        "digest": "d9b7c2f2cfed7f6f726c43b719c0000fd175d83e5f1c4e39f510533c61f432fc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/command-specs/tasks.spec.ts"
@@ -55994,6 +55995,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/team-broker-proposal-consumption.test.ts",
+        "digest": "8a16ef4a8d84c12319c09130584eb4d4f795faf11cc131ad1a6efaceceaaddca",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/team-broker-proposal-consumption.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/team-command-facade-atomization.test.ts",
         "digest": "f3db9866eee985dd37758a989c0869cc71affa9e69f272ba96fcf6d2d4f06e27",
         "origin": "source",
@@ -59432,7 +59442,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:f9459314b3dda2c0d910f1634846f81ab57b164b9b952fba801bc664cab6a4d9"
+    "treeDigest": "sha256:28b0594f7961d6f1bcb0676ca094194e3033c1b56aa52e8890944e6c085b7075"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60893,7 +60903,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:8bd7c3add6665b791fb4ce0123e9e80f7beece2defc4f9987f5f763d4438548c"
+    "digest": "sha256:65cf3af7908ef5263bb1336c572ba66f0f007be7c1111e80d1a9b65038b0ef72"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66456,6 +66466,7 @@
       "release/atm-root-drop/tests/cli/tdd-case-id-red-green-lifecycle.test.ts",
       "release/atm-root-drop/tests/cli/team-admission-projection.test.ts",
       "release/atm-root-drop/tests/cli/team-agents-dogfood.test.ts",
+      "release/atm-root-drop/tests/cli/team-broker-proposal-consumption.test.ts",
       "release/atm-root-drop/tests/cli/team-command-facade-atomization.test.ts",
       "release/atm-root-drop/tests/cli/team-contribution-composer.test.ts",
       "release/atm-root-drop/tests/cli/team-cost-accounting.test.ts",
@@ -66844,22 +66855,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:993666d625a065c55e12faa1fd079c58c93e284bbd3a4933dc401fcdf12f4762",
-  "sealedSourceCommit": "094e16a30a3732898359709c5230a30d5d8d597f",
+  "buildInputsTreeHash": "sha256:18ff7722aefebfeab698296a1f4ed5a75f584500138aff8f24c5d73d54a44a8b",
+  "sealedSourceCommit": "ee3f7a0ad0e6ce85370eae3ab6c3a90237d2544a",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:dc84f637c746860d5566c73a6212ab51ae5dedd464854bb03c023edb95a66b64",
-  "tsBuildCacheDigest": "sha256:06f9be1b2f176f6f2e7e3783d6760df3fcb9f9061170a53acbb8d5b7c2f21c8d",
+  "incrementalPlanDigest": "sha256:fc59fc11a3c07eee0fcc55d9e0715f75f6ef2c87d5d3e2c08f6bca22922c45c0",
+  "tsBuildCacheDigest": "sha256:254802b08d36c879bf54f8f570da464f6779c0e2fbe346b41db6e6dfb99911b0",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 41,
-    "skipDecision": 48,
-    "worktreeSetup": 12223,
-    "typescriptBuild": 16084,
-    "rootDropReleaseAssembly": 29800,
-    "onefileReleaseAssembly": 7222,
-    "artifactSync": 9260,
+    "inputHashCalculation": 36,
+    "skipDecision": 44,
+    "worktreeSetup": 8922,
+    "typescriptBuild": 20415,
+    "rootDropReleaseAssembly": 29933,
+    "onefileReleaseAssembly": 7152,
+    "artifactSync": 8981,
     "cleanup": 0,
-    "totalElapsed": 111295
+    "totalElapsed": 91849
   }
 }
