@@ -16,6 +16,7 @@ import {
   parseScopeRepairOptions
 } from '../../packages/cli/src/commands/tasks/task-option-parsers.ts';
 import { buildScopeAmendmentCommand } from '../../packages/cli/src/commands/tasks/task-transition-helpers.ts';
+import tasksSpec from '../../packages/cli/src/commands/command-specs/tasks.spec.ts';
 
 function expectCliError(fn: () => unknown, expectedCode: string, label: string) {
   try {
@@ -62,6 +63,18 @@ expectCliError(
   'Test B scope add without --task'
 );
 console.log('Test B scope add required flags: PASS');
+
+// === Test B1: normal scope shrink is part of the published command contract ===
+{
+  const removeOption = tasksSpec.options.find((option) => option.flag === '--remove');
+  assert.ok(removeOption, 'scope shrink must expose --remove in the public task command spec');
+  assert.match(String(removeOption.summary), /non-deliverable/i);
+  assert.ok(
+    tasksSpec.examples.some((example) => example.includes('tasks scope remove') && example.includes('--remove')),
+    'scope shrink must have a copyable non-emergency example'
+  );
+  console.log('Test B1 normal scope shrink public contract: PASS');
+}
 
 // === Test B2: scope add accepts --paths as a discoverability alias ===
 {

@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Closed — runtime scope shrink and foreign-dirty isolation re-verified 2026-09-03",
   "area": "Taskflow / Team Broker",
   "finding": "TASK-RFT-0049 used a broad `packages/cli/src/commands/next/**/*.ts` scope. During close, taskflow treated another actor's dirty playbook-projection files as this task's in-scope delivery, blocking close or encouraging an unsafe auto-stage. Narrowing the task card scope after claim required protected `tasks import --write --force` emergency approval because the planning source seal drifted.",
   "expectedBehavior": "ATM should provide a non-emergency governed way to narrow broad glob scopes to exact files after delivery evidence proves the actual touched set, and pre-close should distinguish same-glob foreign actor/editor dirty files before recommending delivery commit.",
   "evidenceOrRepro": "`node atm.mjs taskflow pre-close --task TASK-RFT-0049 --actor codex-task-rft-0049 --json` reported `packages/cli/src/commands/next/playbook-projection/active-work-summary.ts` and `task-routing.ts` as in-scope dirty even though they belonged to another captain's work; `tasks import --write --force` then required `ATM_EMERGENCY_LANE_APPROVAL_REQUIRED`.",
-  "followUp": "Open a governed task to add a `tasks scope narrow` or equivalent exact-scope amendment flow, plus pre-close/Broker tests for cross-agent dirty files matched only by broad globs."
+  "followUp": "Re-verified 2026-09-03: `tasks scope remove --remove <paths>` is the non-emergency exact runtime-scope amendment for the active claim owner; it rejects declared deliverables and changes the direction lock/claim that taskflow runtime scope authority consumes, without rewriting the sealed planning card. `task-scope-runtime-authority.spec.ts` proves that an active direction lock constrains broad static scope declarations, and `git-commit-task-scoped-staging.test.ts` proves foreign dirty/staged files remain outside the current task's governed bundle. The public command spec and governance contract now expose the route explicitly. No frozen-runner publication or formal task-card closeout is claimed by this backlog-only verification."
 }
