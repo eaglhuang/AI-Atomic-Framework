@@ -5,10 +5,9 @@ import { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts'
 import { makeResult, message } from '../shared.ts';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, selectQuickfixChannel } from './channel-strategy.ts';
 import { buildNonPlaybookRouteHints, resolveQuickfixScope } from './route-resolution.ts';
-import { isJournalingPrompt } from './intent-normalizers.ts';
+import { isJournalingPrompt, type TaskIntent } from './intent-normalizers.ts';
 import { isQuickfixPrompt } from '../work-channels.ts';
 import { type ImportedTaskQueue, isFrameworkMaintenancePrompt } from './route-predicates.ts';
-import type { TaskIntent } from './intent-normalizers.ts';
 import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages } from './playbook-projection.ts';
 
 import { quoteCliValue, toTaskCandidateView } from './view-projections.ts';

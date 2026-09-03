@@ -662,6 +662,7 @@
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-02-008.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-02-009.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-02-010.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-03-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
     "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
     "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -1906,6 +1907,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-evidence-context.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-receipt.js",
+    "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-residue.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-lease-health.js",
     "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-queue-ownership.js",
@@ -2588,6 +2590,7 @@
     "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+    "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-residue.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-lease-health.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-lease-health.ts",
@@ -5975,8 +5978,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 5,
-    "unchanged": 1933,
+    "copied": 6,
+    "unchanged": 1935,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -11657,6 +11660,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-02-010.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-03-001.json",
+        "digest": "88de252b7b7fead0176e558c4908c927e5f454dddb4eda4e23360fb5b487c064",
+        "origin": "source",
+        "inputPaths": [
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-03-001.json"
         ],
         "replaceable": true
       },
@@ -22840,7 +22852,7 @@
       },
       {
         "path": "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
-        "digest": "6b28511a4fe0c4942fc1919d06b2ed890b5f29da13c3b53c516d47710ea67c33",
+        "digest": "7b2214db1086ecfa7aa3b7976e80294db0a94caef8dfc83114f27a0d9128b6bc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js"
@@ -22853,6 +22865,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/framework-development/runner-publication-receipt.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/framework-development/runner-publication-residue.js",
+        "digest": "8ca447b0d863f6f4513939080b2a744d365ab5228bbf6fa6d1d5237c476f16da",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/framework-development/runner-publication-residue.js"
         ],
         "replaceable": true
       },
@@ -28978,7 +28999,7 @@
       },
       {
         "path": "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
-        "digest": "a808c10cf5afc73be018f7334ea4749c77ed1da3cb9b3f448b2904ce0c5c0709",
+        "digest": "6cfee4759654d3255ae9268d658a81fd35f52e925c7c1a5cd4d74cc758dc88cc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts"
@@ -28991,6 +29012,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/framework-development/runner-publication-receipt.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/framework-development/runner-publication-residue.ts",
+        "digest": "fd5485102fd8f230fba615458613252b2a151b76e1f7e528421762eaf24ca38a",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/framework-development/runner-publication-residue.ts"
         ],
         "replaceable": true
       },
@@ -30859,7 +30889,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/prompt-guidance-result.ts",
-        "digest": "afec309c56e418826d4148da0886d254ac008d529ec998061b18e952585461df",
+        "digest": "976ebe6f14b74e0b85863319f1c7813ccc4cf0df92c3d17cdbee7e08388858b8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/prompt-guidance-result.ts"
@@ -59442,7 +59472,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:774bc87b9c2bffc3885b929a581e55e0e2a6aeba2fc34ab497c5cd02caa1133d"
+    "treeDigest": "sha256:425a226d87cecc73a149a0810be4a2a14a7074c82596f41f4f6ed73849e096a7"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -59708,6 +59738,7 @@
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
       "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-residue.ts",
       "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
       "packages/cli/src/commands/framework-development/runner-sync-lease-health.test.ts",
       "packages/cli/src/commands/framework-development/runner-sync-lease-health.ts",
@@ -60903,7 +60934,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:0b8a7a43ed8abd007a5bc3c04c627888ed191b144f7ca80226fd7ec71689b185"
+    "digest": "sha256:c1362d5ca078de256525fe4a754b1567a11120da29d74c06f50fabbcacfe3941"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -61539,6 +61570,7 @@
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-02-008.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-02-009.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-02-010.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-03-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
       "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
       "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -62783,6 +62815,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-evidence-context.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-lifecycle.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-receipt.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-residue.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-lease-health.js",
       "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-queue-ownership.js",
@@ -63465,6 +63498,7 @@
       "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-residue.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-lease-health.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-lease-health.ts",
@@ -66855,22 +66889,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:54f83a549302527347127831d0d2d66b927a2b513380fcb79de1987748d50926",
-  "sealedSourceCommit": "0ca2bffc31512c765542013ad966aefa8ee6c948",
+  "buildInputsTreeHash": "sha256:d92e53cb86ce74aa1a0cbcc4ef1ed4b2b0c3ed1e464135a41678efed228558ab",
+  "sealedSourceCommit": "bb3f45649a8d684eb71a25b807886cb3c24b5053",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:ad7332ce086d82821e4a33906eaef9d44d1c80c911e98fdad1fd47befd0ce2c2",
-  "tsBuildCacheDigest": "sha256:e885d47691737fb30062ec1c3ef23ff75d34abe04b60adfd85f881564a66ab83",
+  "incrementalPlanDigest": "sha256:b2cf4691b776c9e294411b6a273a81653195a4a77abe27086d5b2e272be347a8",
+  "tsBuildCacheDigest": "sha256:8f7231df5ce92664435fff9192080531fc8a1d3aa397f5f354af2bd1b07b3e44",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 45,
-    "skipDecision": 58,
-    "worktreeSetup": 9466,
-    "typescriptBuild": 15305,
-    "rootDropReleaseAssembly": 30469,
-    "onefileReleaseAssembly": 7174,
+    "inputHashCalculation": 44,
+    "skipDecision": 56,
+    "worktreeSetup": 9260,
+    "typescriptBuild": 18336,
+    "rootDropReleaseAssembly": 31049,
+    "onefileReleaseAssembly": 7648,
     "artifactSync": 9306,
     "cleanup": 0,
-    "totalElapsed": 93138
+    "totalElapsed": 93012
   }
 }
