@@ -68,13 +68,13 @@ interface ImportedTaskQueue {
 
 function isFrameworkMaintenancePrompt(prompt: string) {
   const normalized = normalizeSearchText(prompt);
+  if (isJournalingPrompt(prompt)) return false;
   if (
     normalized.includes(normalizeSearchText('atm-bug'))
     || (normalized.includes(normalizeSearchText('atm')) && (normalized.includes(normalizeSearchText('backlog')) || normalized.includes(normalizeSearchText('bug'))))
   ) {
     return true;
   }
-  if (isJournalingPrompt(prompt)) return false;
   return [
     'framework',
     'atm',
