@@ -568,6 +568,13 @@ export function classifyPostPushRecoveryKind(input: LegacyValue) {
 }
 
 export function buildPostPushRecoveryRecommendation(input: LegacyValue) {
+  const defaultRecommendation = String(input.defaultRecommendation ?? '').trim();
+  if (
+    /ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED/i.test(defaultRecommendation) ||
+    /\bnode\s+atm\.mjs\s+git\s+attest\b/i.test(defaultRecommendation)
+  ) {
+    return `Push recovery preserved the historical-attestation admission guidance. ${defaultRecommendation}`;
+  }
   if (input.outcome === "composer-routed") {
     return input.conflictingFiles.length > 0
       ? `Push rejection recovery reran admission after fetch and found a mergeable same-file conflict in ${input.conflictingFiles.join(", ")}. Use git admit --steward-plan or --apply-to-working-tree, then validate and retry the push manually.`
@@ -576,7 +583,7 @@ export function buildPostPushRecoveryRecommendation(input: LegacyValue) {
   if (input.outcome === "block" || input.likelyNonFastForward) {
     return input.remoteChangedAfterFetch || input.likelyRemoteChanged
       ? `Push rejection likely came from a non-fast-forward remote change. Rebase or otherwise replay your local commits on top of the refreshed remote branch before retrying push. ${input.defaultRecommendation}`
-      : `Push rejection still maps to a blocked admission lane. Rebase, split the work, or reroute through the governed conflict workflow before retrying push. ${input.defaultRecommendation}`;
+      : `Push rejection still maps to a blocked admission lane. Rebase, split the work, or reroute through the governed conflict workflow before retrying push. ${defaultRecommendation}`;
   }
   if (input.outcome === "no-op") {
     return input.remoteChangedAfterFetch
@@ -588,7 +595,7 @@ export function buildPostPushRecoveryRecommendation(input: LegacyValue) {
       ? "Admission is now clean, but the remote advanced during the failed push. Integrate the refreshed remote branch locally, then retry the push."
       : "Admission is clean after the failed push and the remote did not move during recovery. Retry the push if the previous rejection was transient.";
   }
-  return `Post-push recovery could not classify the rejection cleanly. ${input.defaultRecommendation}`;
+  return `Post-push recovery could not classify the rejection cleanly. ${defaultRecommendation}`;
 }
 
 export function isHeadRaceCommitFailure(stderr: LegacyValue) {
