@@ -448,10 +448,11 @@ try {
   // ATM-BUG-2026-07-29-274: a forward historical-attestation ledger is a
   // single-task record. It must cross the actual pre-commit hook, not merely
   // pass record-commit dry-run classification.
-  const attestationPath = `.atm/history/evidence/${importedTaskId}.historical-work-admission-attestations.json`;
+  const attestedTaskId = 'TASK-GIT-0024';
+  const attestationPath = `.atm/history/evidence/${attestedTaskId}.historical-work-admission-attestations.json`;
   writeJson(path.join(repo, attestationPath), {
     schemaId: 'atm.historicalWorkAdmissionAttestationLedger.v1',
-    attestations: [{ taskId: importedTaskId, commitSha: 'a'.repeat(40) }]
+    attestations: [{ taskId: attestedTaskId, commitSha: 'a'.repeat(40) }]
   });
   runGit(repo, ['add', attestationPath]);
   const attestationDryRun = await runAtmGit([

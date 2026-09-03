@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Fixed in record-commit attestation parity lane",
   "area": "Git record-commit / historical attestation lane",
-  "finding": "git record-commit --dry-run accepted a low-risk TASK-GIT-0024 historical work-admission attestation bundle, but the real record-commit failed in the host pre-commit hook with ATM_CROSS_TASK_MUTATION_BLOCKED because the hook saw the files as owned by active task TASK-GIT-0024 while record-commit is task-session-free and forbids --task.",
-  "expectedBehavior": "record-commit dry-run and write must share the same ownership predicate. If TASK-GIT-0024 owns the global historical attestation ledger, record-commit should either carry that owner context into the hook or fail during dry-run with the exact recovery command before staging/commit is attempted.",
-  "evidenceOrRepro": "After creating .atm/history/evidence/TASK-GIT-0024.forward-provenance-2026-07-31-skl-plan4.json and updating .atm/history/evidence/TASK-GIT-0024.historical-work-admission-attestations.json, node atm.mjs git record-commit --actor codex-skl-captain --message \"chore(git): attest historical work admission\" --dry-run --json returned ATM_GIT_RECORD_COMMIT_DRY_RUN. The matching write command failed with ATM_GIT_COMMIT_FAILED wrapping ATM_CROSS_TASK_MUTATION_BLOCKED for the same two files. Retrying record-commit with --task TASK-GIT-0024 was rejected with ATM_GIT_RECORD_COMMIT_TASK_FORBIDDEN.",
-  "followUp": "Add parity tests for record-commit dry-run/write on TASK-GIT-0024 attestation files and decide whether record-commit should be able to pass a read-only owner context to pre-commit, or whether a dedicated git attest commit surface should own this ledger."
+  "finding": "git record-commit --dry-run previously accepted a low-risk TASK-GIT-0024 historical work-admission attestation bundle, but the real record-commit failed in the host pre-commit hook with ATM_CROSS_TASK_MUTATION_BLOCKED because the hook saw the files as owned by active task TASK-GIT-0024 while record-commit is task-session-free and forbids --task.",
+  "expectedBehavior": "record-commit dry-run and write share the same ownership predicate for a TASK-GIT-0024 historical-attestation ledger, and the successful write leaves no staged residue.",
+  "evidenceOrRepro": "Revalidated on 2026-09-03 by tests/cli/git-record-commit.test.ts: the fixture writes `.atm/history/evidence/TASK-GIT-0024.historical-work-admission-attestations.json`, runs `git record-commit` dry-run, then crosses the actual pre-commit hook through the write command. Both return success and the cached index is empty after the commit.",
+  "followUp": "Closed as a duplicate of the historical-attestation parity repair covered by ATM-BUG-2026-07-29-274. Frozen-runner publication remains separately governed."
 }
