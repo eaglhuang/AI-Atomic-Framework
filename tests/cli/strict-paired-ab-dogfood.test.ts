@@ -72,7 +72,8 @@ async function testAnalyzerRolloutVerdict() {
     events.forEach((event, index) => writeJson(path.join(laneRoot, `${index}.json`), event));
     const output = execFileSync(process.execPath, ['--strip-types', 'scripts/analyze-captain-parallel-ledger.ts', '--session-event-root', path.join(repo, '.atm/history/session-events'), '--json'], { cwd: process.cwd(), encoding: 'utf8' });
     const parsed = JSON.parse(output);
-    assert.equal(parsed.autoBatchPipeline.rolloutVerdict.verdict, 'improved');
+    assert.equal(parsed.autoBatchPipeline.rolloutVerdict.verdict, 'inconclusive', 'synthetic broker tickets are not paired performance evidence');
+    assert.match(parsed.autoBatchPipeline.rolloutVerdict.reason, /paired serial\/treatment/);
   } finally {
     rmSync(repo, { recursive: true, force: true });
   }
