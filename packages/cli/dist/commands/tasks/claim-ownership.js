@@ -48,11 +48,22 @@ export function buildSameTaskClaimConflictDetails(input) {
             : `Continue with the existing claim owner ${input.currentActorId}, or release/take over the task before claiming as ${input.requestedActorId}.`
     };
 }
+/**
+ * A lifecycle owner comparison can fail either because its actor differs or
+ * because the same actor is operating through a different lane.  The latter
+ * has a distinct safe recovery (adopt or hand off the holding lane), so it
+ * must not be flattened into the generic lock-conflict error.
+ */
+export function claimOwnershipMismatchCode(comparison, actorFallbackCode = 'ATM_LOCK_CONFLICT') {
+    return comparison.mode === 'lane-id'
+        ? 'ATM_LANE_SESSION_OWNERSHIP_MISMATCH'
+        : actorFallbackCode;
+}
 export function throwIfForeignSameTaskClaim(input) {
     const comparison = evaluateSameTaskClaimOwnership(input);
     if (comparison.sameOwner)
         return comparison;
-    throw new CliError('ATM_LOCK_CONFLICT', `Task ${input.taskId} is already claimed by ${input.currentActorId}`
+    throw new CliError(claimOwnershipMismatchCode(comparison), `Task ${input.taskId} is already claimed by ${input.currentActorId}`
         + (comparison.currentLaneSessionId ? ` on lane ${comparison.currentLaneSessionId}` : '')
         + '.', {
         exitCode: 1,
@@ -85,7 +96,7 @@ export function throwIfClaimOwnerMismatch(input) {
     const comparison = evaluateSameTaskClaimOwnership(input);
     if (comparison.sameOwner)
         return comparison;
-    throw new CliError('ATM_TASK_CLAIM_OWNER_MISMATCH', describeClaimOwnerMismatch({
+    throw new CliError(claimOwnershipMismatchCode(comparison, 'ATM_TASK_CLAIM_OWNER_MISMATCH'), describeClaimOwnerMismatch({
         taskId: input.taskId,
         currentActorId: input.currentActorId,
         requestedActorId: input.requestedActorId,
@@ -144,7 +155,7 @@ export function throwIfNextClaimForeignActiveOwner(input) {
         : input.existingClaimActorId === input.actorResolution.repoDefaultActorId
             ? `Continue with the existing claim owner ${input.existingClaimActorId}, or rerun with --actor ${input.existingClaimActorId}.`
             : `Continue with the existing claim owner ${input.existingClaimActorId}, or release/take over the task before claiming as ${input.requestedActorId}.`;
-    throw new CliError('ATM_LOCK_CONFLICT', `Task ${input.taskId} is already claimed by ${input.existingClaimActorId}`
+    throw new CliError(claimOwnershipMismatchCode(ownership), `Task ${input.taskId} is already claimed by ${input.existingClaimActorId}`
         + (ownership.currentLaneSessionId ? ` on lane ${ownership.currentLaneSessionId}` : '')
         + '.', {
         exitCode: 1,

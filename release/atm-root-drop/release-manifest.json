@@ -5974,11 +5974,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1343,
-    "unchanged": 4596,
+    "copied": 2,
+    "unchanged": 1936,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -25188,7 +25188,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/claim-ownership.js",
-        "digest": "b706fc974f2b947139710cbe2c8277678d3dc4169f7888f3076ef6e0c08b54c8",
+        "digest": "b31056996ec60ebad368b7e8483b2b916291e92e4f2ab4f074f31676d14446f0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/claim-ownership.js"
@@ -32379,7 +32379,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/claim-ownership.ts",
-        "digest": "aefa4ed586094c1370aecfd8fdc7df6a371961cd90674d15a0fe04c7f1d445c8",
+        "digest": "bd2d306c1527b98e44f12f5b46b3cd1383532a18e5c6948f416271b8d398ba45",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/claim-ownership.ts"
@@ -59432,7 +59432,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:8e6b537df611845e7a1b6817049a79c287f78eaab361b0c5b09c8e40a1f84847"
+    "treeDigest": "sha256:f9459314b3dda2c0d910f1634846f81ab57b164b9b952fba801bc664cab6a4d9"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60893,7 +60893,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:9c9a634f45dfd35cd4a31c2fbd1adbe25d5949152c10098c37d76942e204e502"
+    "digest": "sha256:8bd7c3add6665b791fb4ce0123e9e80f7beece2defc4f9987f5f763d4438548c"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66844,22 +66844,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:ddebb5b861c16577c55217bd84ef8dd2f7038b1eb94ab00c6f418563841f5274",
-  "sealedSourceCommit": "51f3a19bd216b70e70472eacaed7f332c735f3a9",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "release artifacts are dirty or missing",
-  "incrementalPlanDigest": "sha256:c42919d1be1c24d883f3fcc648f3b9acbc305beead1de43298e699e4f42e1df0",
-  "tsBuildCacheDigest": "sha256:8e1c0784de1f3b42f330c49bf53bf143fe4c268f468f4c4ce24788d5ca655bdc",
+  "buildInputsTreeHash": "sha256:993666d625a065c55e12faa1fd079c58c93e284bbd3a4933dc401fcdf12f4762",
+  "sealedSourceCommit": "094e16a30a3732898359709c5230a30d5d8d597f",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:dc84f637c746860d5566c73a6212ab51ae5dedd464854bb03c023edb95a66b64",
+  "tsBuildCacheDigest": "sha256:06f9be1b2f176f6f2e7e3783d6760df3fcb9f9061170a53acbb8d5b7c2f21c8d",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 53,
-    "skipDecision": 287,
-    "worktreeSetup": 10237,
-    "typescriptBuild": 9776,
-    "rootDropReleaseAssembly": 33860,
-    "onefileReleaseAssembly": 9031,
-    "artifactSync": 11801,
+    "inputHashCalculation": 41,
+    "skipDecision": 48,
+    "worktreeSetup": 12223,
+    "typescriptBuild": 16084,
+    "rootDropReleaseAssembly": 29800,
+    "onefileReleaseAssembly": 7222,
+    "artifactSync": 9260,
     "cleanup": 0,
-    "totalElapsed": 82066
+    "totalElapsed": 111295
   }
 }
