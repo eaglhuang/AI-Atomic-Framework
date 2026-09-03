@@ -14,6 +14,7 @@ import {
   type RunnerBuildOutputTarget
 } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import { getActiveTasks } from '../packages/core/src/broker/cross-task-mutation-guard.ts';
+import { normalizeIdentitySegment } from '../packages/cli/src/commands/shared/identity-normalization.ts';
 
 /**
  * The narrow publication boundary for a sealed candidate. Candidate compilation
@@ -152,7 +153,7 @@ export function readActivePublicationLockFiles(input: {
     const active = lock.released !== true
       && String(lock.status ?? '').trim().toLowerCase() !== 'released'
       && lockTaskId === input.taskId
-      && lockActorId === input.actorId
+      && sameActorIdentity(lockActorId, input.actorId)
       && Number.isFinite(nowMs)
       && Number.isFinite(heartbeatAt)
       && Number.isFinite(ttlSeconds)
@@ -186,7 +187,7 @@ function readLinkedTemporaryPublicationLockFiles(
 ): readonly string[] {
   if (!taskId) return [];
   return readFrameworkTempLockProjection(cwd)
-    .filter((lock) => lock.actorId === actorId && lock.linkedTaskId === taskId && lock.leaseFresh === true)
+    .filter((lock) => sameActorIdentity(lock.actorId, actorId) && lock.linkedTaskId === taskId && lock.leaseFresh === true)
     .flatMap((lock) => lock.files);
 }
 
@@ -263,7 +264,7 @@ export function resolveActiveRunnerPublicationTask(input: {
   const explicitlyRequested = input.taskId?.trim();
   const frameworkTempCandidates = readFrameworkTempLockProjection(input.cwd, nowMs)
     .filter((lock) => lock.workItemId.startsWith('ATM-FRAMEWORK-TEMP-'))
-    .filter((lock) => lock.actorId === input.actorId && lock.disposition === 'foreign-live')
+    .filter((lock) => sameActorIdentity(lock.actorId, input.actorId) && lock.disposition === 'foreign-live')
     .filter((lock) => !explicitlyRequested || lock.workItemId === explicitlyRequested || lock.linkedTaskId === explicitlyRequested)
     .filter((lock) => ownsReleaseSurface(lock.files))
     // A temporary claim linked to a live delivery card delegates the runner
@@ -277,7 +278,7 @@ export function resolveActiveRunnerPublicationTask(input: {
   // same active-task snapshot used by the cross-task mutation guard, then keep
   // the claim TTL check here because publication is a time-sensitive write.
   const ledgerCandidates = getActiveTasks(input.cwd)
-    .filter((task) => task.owner === input.actorId)
+    .filter((task) => sameActorIdentity(task.owner, input.actorId))
     .filter((task) => !task.taskId.startsWith('ATM-FRAMEWORK-TEMP-'))
     .filter((task) => !explicitlyRequested || task.taskId === explicitlyRequested.toUpperCase())
     .filter((task) => ownsReleaseSurface(task.allowedFiles))
@@ -297,7 +298,7 @@ export function resolveActiveRunnerPublicationTask(input: {
           && Number.isFinite(heartbeatAt)
           && Number.isFinite(ttlSeconds)
           && nowMs < heartbeatAt + ttlSeconds * 1000;
-        return actorId === input.actorId
+        return sameActorIdentity(actorId, input.actorId)
           && !taskId.startsWith('ATM-FRAMEWORK-TEMP-')
           && (explicitlyRequested ? hasActiveLedgerClaim(input.cwd, taskId, input.actorId, nowMs) : lockActive)
           && (explicitlyRequested
@@ -317,6 +318,12 @@ export function resolveActiveRunnerPublicationTask(input: {
   return unique[0];
 }
 
+function sameActorIdentity(left: unknown, right: unknown): boolean {
+  const normalizedLeft = normalizeIdentitySegment(String(left ?? ''));
+  const normalizedRight = normalizeIdentitySegment(String(right ?? ''));
+  return normalizedLeft.length > 0 && normalizedLeft === normalizedRight;
+}
+
 function ownsReleaseSurface(files: readonly string[]): boolean {
   return ['release/atm-onefile/atm.mjs', 'release/atm-root-drop']
     .some((surface) => files.some((file) => pathMatchesWriteScope(surface, file)));
@@ -328,7 +335,7 @@ function hasActiveLedgerClaim(cwd: string, taskId: string, actorId: string, nowM
     const claim = task.claim;
     const heartbeatAt = Date.parse(String(claim?.heartbeatAt ?? claim?.claimedAt ?? ''));
     const ttlSeconds = Number(claim?.ttlSeconds ?? 0);
-    return claim?.state === 'active' && claim.actorId === actorId && Number.isFinite(nowMs) && Number.isFinite(heartbeatAt) && Number.isFinite(ttlSeconds) && nowMs < heartbeatAt + ttlSeconds * 1000;
+    return claim?.state === 'active' && sameActorIdentity(claim.actorId, actorId) && Number.isFinite(nowMs) && Number.isFinite(heartbeatAt) && Number.isFinite(ttlSeconds) && nowMs < heartbeatAt + ttlSeconds * 1000;
   } catch { return false; }
 }
 

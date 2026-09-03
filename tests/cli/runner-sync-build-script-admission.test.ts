@@ -103,6 +103,12 @@ try {
     'ATM-FRAMEWORK-TEMP-runner-steward-current',
     'a live framework-temp wildcard claim must authorize runner publication without a task-ledger row'
   );
+
+  assert.equal(
+    resolveActiveRunnerPublicationTask({ cwd: fixtureRoot, actorId: 'runner.steward', now, taskId: 'ATM-FRAMEWORK-TEMP-runner-steward-current' }),
+    'ATM-FRAMEWORK-TEMP-runner-steward-current',
+    'equivalent actor spellings must resolve the same live temporary publication claim'
+  );
 } finally {
   rmSync(fixtureRoot, { recursive: true, force: true });
 }
