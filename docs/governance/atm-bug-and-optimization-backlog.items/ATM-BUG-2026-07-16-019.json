@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Closed — file include support re-verified 2026-09-03",
   "area": "Candidate Ranking",
   "finding": "The candidate ranking CLI throws ENOTDIR when --include points at a specific source file instead of a directory.",
   "expectedBehavior": "candidates rank should either accept file includes or return a structured ATM_CLI_USAGE diagnostic with a safe directory-based retry hint.",
   "evidenceOrRepro": "During TASK-RFT-0095, `node atm.mjs candidates rank --include \"packages/cli/src/commands/upgrade/proposal.ts\" --goal \"Split packages/cli/src/commands/upgrade/proposal.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve upgrade proposal behavior and ATM evidence.\" --json` failed with ATM_CLI_UNHANDLED / ENOTDIR.",
-  "followUp": "Add file-path include support or validation in candidates rank, plus a focused regression covering file includes and directory includes."
+  "followUp": "Current frozen CLI replay: `node atm.mjs candidates rank --include README.md --json` returned `ATM_CANDIDATES_RANK_READY` with `sourceFiles: 1` and `filePath: README.md`. The original single-file include failure is no longer reproducible; retain ordinary candidates-rank coverage for file and directory includes."
 }
