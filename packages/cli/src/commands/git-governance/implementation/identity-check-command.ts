@@ -497,9 +497,7 @@ export function writePreparedRuntimeIdentity(
 }
 
 export function buildIdentitySetRequiredCommand(cwd: LegacyValue, actorId: LegacyValue) {
-  const gitName = readGitConfig(cwd, "user.name") ?? "<git user.name>";
-  const gitEmail = readGitConfig(cwd, "user.email") ?? "<git user.email>";
-  return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name ${quoteCliValue(gitName)} --git-email ${quoteCliValue(gitEmail)} --json`;
+  return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name "<git user.name>" --git-email "<git user.email>" --json`;
 }
 
 export function readTaskDocument(cwd: LegacyValue, taskId: LegacyValue) {

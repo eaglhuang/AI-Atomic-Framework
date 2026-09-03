@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { issueWorkAdmissionTicket } from '../../../../../core/src/broker/work-admission-ticket.ts';
-import { hasValidTerminalRepairClosureAdmission } from './support.ts';
+import { buildIdentitySetRequiredCommand, hasValidTerminalRepairClosureAdmission } from './support.ts';
 
 const taskId = 'ATM-GOV-terminal-hook';
 const taskPath = `.atm/history/tasks/${taskId}.json`;
@@ -30,6 +30,11 @@ assert.equal(hasValidTerminalRepairClosureAdmission({
 
 const auditFixture = mkdtempSync(path.join(os.tmpdir(), 'atm-terminal-audit-'));
 try {
+  assert.equal(
+    buildIdentitySetRequiredCommand(auditFixture, 'unregistered-actor'),
+    'node atm.mjs identity set --actor "unregistered-actor" --git-name "<git user.name>" --git-email "<git user.email>" --json',
+    'hook remediation must preserve an explicit identity choice',
+  );
   const auditPath = '.atm/history/protected-override-audit/own.json';
   const foreignAuditPath = '.atm/history/protected-override-audit/foreign.json';
   mkdirSync(path.join(auditFixture, '.atm', 'history', 'protected-override-audit'), { recursive: true });
