@@ -2,11 +2,15 @@ import assert from 'node:assert/strict';
 import { createDeterministicTaskIntent } from '../route-resolution/intent.ts';
 import { isFrameworkMaintenancePrompt } from '../route-predicates.ts';
 import { isJournalingPrompt } from '../intent-normalizers.ts';
+import { buildPromptGuidanceNextResult } from '../prompt-guidance-result.ts';
+import { inspectIntegrationBootstrap } from '../../integration.ts';
+import { inspectRuntimeAdapterReadiness } from '../../runtime-adapter-readiness.ts';
 
 const journalingPrompts = [
   '請把 ATM-BUG-2026-07-16-999 記錄到 ATM bug backlog：runner-sync admission 需要 queue-head enforcement',
   '記一筆 ATM bug backlog，RFT broad scope 會吸入 foreign dirty files',
-  '回寫 backlog item JSON，不要 claim RFT 任務'
+  '回寫 backlog item JSON，不要 claim RFT 任務',
+  '請把 ATM friction 寫入 backlog，並稽核已完成治理計畫'
 ];
 
 for (const prompt of journalingPrompts) {
@@ -17,6 +21,18 @@ for (const prompt of journalingPrompts) {
   assert.deepEqual(intent.mentionedTaskIds, [], prompt);
   assert.deepEqual(intent.taskRootHints, [], prompt);
   assert.equal(intent.queueRequested, false, prompt);
+}
+
+{
+  const prompt = '請把 ATM friction 寫入 backlog，並稽核已完成治理計畫';
+  const result = buildPromptGuidanceNextResult({
+    cwd: process.cwd(),
+    taskIntent: createDeterministicTaskIntent(prompt),
+    integrationBootstrap: inspectIntegrationBootstrap(process.cwd()),
+    runtimeAdapterReadiness: inspectRuntimeAdapterReadiness(process.cwd())
+  });
+  assert.equal((result?.evidence as any)?.nextAction?.status, 'journaling-ready');
+  assert.equal((result?.evidence as any)?.nextAction?.command, 'node atm.mjs guide first-layer --json');
 }
 
 assert.equal(isFrameworkMaintenancePrompt('修 runner-sync admission 的 queue-head enforcement'), true);

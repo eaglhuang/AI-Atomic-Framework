@@ -3,6 +3,7 @@ import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from '../fr
 import { makeResult, message } from '../shared.js';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands } from './channel-strategy.js';
 import { buildNonPlaybookRouteHints, resolveQuickfixScope } from './route-resolution.js';
+import { isJournalingPrompt } from './intent-normalizers.js';
 import { isQuickfixPrompt } from '../work-channels.js';
 import { isFrameworkMaintenancePrompt } from './route-predicates.js';
 import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages } from './playbook-projection.js';
@@ -11,6 +12,8 @@ export function buildPromptGuidanceNextResult(input) {
     const prompt = input.taskIntent?.userPrompt?.trim();
     if (!prompt || input.taskIntent?.taskScopeMentioned === true)
         return null;
+    if (isJournalingPrompt(prompt))
+        return buildJournalingPromptResult(input, prompt);
     const quickfixScope = resolveQuickfixScope(prompt);
     if (isQuickfixPrompt(prompt) && quickfixScope.length > 0) {
         const nextAction = {
@@ -103,6 +106,31 @@ export function buildPromptGuidanceNextResult(input) {
         });
     }
     return buildGeneralPromptGuidanceResult(input, prompt);
+}
+function buildJournalingPromptResult(input, prompt) {
+    const nextAction = {
+        status: 'journaling-ready',
+        command: 'node atm.mjs guide first-layer --json',
+        reason: 'the prompt explicitly records ATM backlog or optimization work, so ATM routes to the first-layer backlog contract instead of atom discovery',
+        recommendedChannel: null,
+        riskLevel: 'low',
+        governanceReadiness: buildGovernanceReadinessHint(input.cwd, { channel: null, prompt, actorId: input.actor }),
+        allowedCommands: ['node atm.mjs guide first-layer --json', 'node atm.mjs next --prompt "<current user prompt>" --json'],
+        blockedCommands: ['node atm.mjs guide create-atom --json for an explicit backlog or bug-record request']
+    };
+    return makeResult({
+        ok: true,
+        command: 'next',
+        cwd: input.cwd,
+        messages: buildNextMessages(nextAction, null, input.integrationBootstrap, input.runtimeAdapterReadiness, message('info', 'ATM_NEXT_JOURNALING_ROUTE_READY', 'ATM routed the explicit backlog request to the first-layer backlog contract.', { command: nextAction.command })),
+        evidence: {
+            nextAction,
+            agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
+            taskIntent: input.taskIntent,
+            integrationBootstrap: input.integrationBootstrap,
+            runtimeAdapterReadiness: input.runtimeAdapterReadiness
+        }
+    });
 }
 function buildGeneralPromptGuidanceResult(input, prompt) {
     const nextAction = {
