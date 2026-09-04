@@ -69,6 +69,37 @@ assert.ok(!contextlessEvidenceBundle.stageFiles.includes('.atm/history/evidence/
 assert.ok(!contextlessEvidenceBundle.commitFiles.includes('.atm/history/evidence/TASK-CURRENT.runner-publication-takeover.json'));
 assert.equal(existsSync(contextlessEvidence), true, 'contextless diagnostic bytes must remain available for inspection');
 
+// Git ignore rules must not make a task-declared deliverable invisible to the
+// governed candidate index.  Discovery stays path-bounded: a sibling ignored
+// file that is absent from the sealed task scope must remain excluded.
+writeFileSync(path.join(cwd, '.gitignore'), 'ignored-deliverables/\n');
+mkdirSync(path.join(cwd, 'ignored-deliverables'), { recursive: true });
+const declaredIgnoredPath = 'ignored-deliverables/declared.md';
+const undeclaredIgnoredPath = 'ignored-deliverables/foreign.md';
+writeFileSync(path.join(cwd, declaredIgnoredPath), 'declared task deliverable\n');
+writeFileSync(path.join(cwd, undeclaredIgnoredPath), 'must remain excluded\n');
+const ignoredDeliverableTask = structuredClone(JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-CURRENT.json'), 'utf8')));
+ignoredDeliverableTask.scopePaths = ['src/delivery.ts', declaredIgnoredPath];
+ignoredDeliverableTask.targetAllowedFiles = ignoredDeliverableTask.scopePaths;
+ignoredDeliverableTask.claim.files = ignoredDeliverableTask.scopePaths;
+const ignoredDeliverableBundle = resolveTaskScopedCommitBundle({
+  cwd,
+  taskId: 'TASK-CURRENT',
+  actorId: 'test-actor',
+  taskDocument: ignoredDeliverableTask,
+  message: 'fixture',
+  trailers: [],
+  apply: true,
+  autoStage: true,
+  deferForeignStaged: false,
+  stageOverrideLease: null,
+  brokerConflictResolutionPath: null,
+});
+assert.equal(ignoredDeliverableBundle.ok, true, `declared ignored deliverable must be admitted: ${ignoredDeliverableBundle.blockedCode} ${ignoredDeliverableBundle.blockedSummary}`);
+assert.ok(ignoredDeliverableBundle.stageFiles.includes(declaredIgnoredPath), 'the declared ignored deliverable must enter the sealed candidate');
+assert.ok(!ignoredDeliverableBundle.stageFiles.includes(undeclaredIgnoredPath), 'an ignored sibling outside sealed scope must remain excluded');
+assert.ok(ignoredDeliverableBundle.sealedBundle.entries.some((entry: { path: string }) => entry.path === declaredIgnoredPath), 'the sealed candidate must bind the declared ignored deliverable bytes');
+
 // A retained foreign deletion must likewise stay out of a different task's
 // bounded commit.  The safety gate protects destructive writes that enter the
 // commit, not unrelated index residue that the transaction explicitly parks.

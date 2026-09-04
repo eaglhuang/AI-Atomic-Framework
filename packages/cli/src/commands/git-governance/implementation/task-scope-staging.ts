@@ -16,7 +16,6 @@ import {
 } from './git-process-port.ts';
 import { forEachPathspecBatch } from './pathspec-argv-batching.ts';
 import { resolveTaskHistoryOwnerTaskId } from '../../../../../core/src/broker/cross-task-mutation-guard.ts';
-
 import {
   appendFileSync,
   existsSync,
@@ -28,14 +27,11 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-
 import path from "node:path";
-
 import {
   gitHeadEvidencePath,
   gitHeadEvidencePaths,
 } from "../../git-head-evidence.ts";
-
 import {
   getCanonicalAllowedFilesForTask,
   sanitizeTaskDirectionAllowedFiles,
@@ -541,6 +537,15 @@ export function listTaskScopedWorktreeDirtyFiles(cwd: LegacyValue) {
   return uniqueSorted([...files]);
 }
 
+/**
+ * Return only ignored, untracked files that a task has already declared.
+ *
+ * Ordinary dirty discovery intentionally honours ignore rules, but a sealed
+ * task can explicitly own a generated or template deliverable hidden by a
+ * local ignore rule.  Listing ignored files is safe only after intersecting
+ * them with the declared scope; callers still apply their normal authority
+ * and ownership gates before any candidate-index force add occurs.
+ */
 export function buildTaskScopedStagingRequiredCommand(cwd: LegacyValue, files: LegacyValue) {
   const normalizedFiles = uniqueSorted(
     files.map(normalizeRelativePath).filter(Boolean),
