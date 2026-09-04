@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Closed — validator run heartbeat, timeout envelopes, status, and resume route re-verified 2026-09-04",
   "area": "Validator Scheduler",
   "finding": "`npm run validate:standard -- --json` can exceed 30 minutes without emitting a bounded terminal summary or a clearly discoverable run id for the timed-out invocation.",
   "expectedBehavior": "Long validator profiles should always emit progress, run id, currently running validator, failed validator summary, and a resume/status command before or at timeout. Evidence capture should never need another manual forensic pass to identify the blocking validator set.",
   "evidenceOrRepro": "During ATM-GOV-0245 close evidence refresh, `node atm.mjs evidence run --command \"npm run validate:standard -- --json\"` timed out after about 1,804 seconds with no JSON summary. `.atm/runtime/validator-runs/atm-gov-0245-standard/summary.partial.json` later showed 13 failed validators and one running validator.",
-  "followUp": "Make run-validators/evidence-run cooperate on heartbeat output, terminal timeout envelopes, and automatic status artifact attachment for long profiles."
+  "followUp": "The current runner emits `atm.validatorProgress.v1` records with run id, active validator set, and heartbeat; it writes a durable partial summary and exposes `--status --run-id` with terminal totals and an exact resume command when unfinished. `tests/cli/validator-run-resume-and-status.test.ts` passed on 2026-09-04, including the deterministic timeout path. A live quick run `backlog-0730276-current` completed 7/7 and its status readback reported `completed=true`, no outstanding validators, and no resume command. Retain this regression when changing validator scheduling or evidence-run integration."
 }
