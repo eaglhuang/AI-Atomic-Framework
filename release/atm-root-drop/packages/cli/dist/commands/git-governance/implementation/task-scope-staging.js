@@ -370,6 +370,15 @@ export function listTaskScopedWorktreeDirtyFiles(cwd) {
     }
     return uniqueSorted([...files]);
 }
+/**
+ * Return only ignored, untracked files that a task has already declared.
+ *
+ * Ordinary dirty discovery intentionally honours ignore rules, but a sealed
+ * task can explicitly own a generated or template deliverable hidden by a
+ * local ignore rule.  Listing ignored files is safe only after intersecting
+ * them with the declared scope; callers still apply their normal authority
+ * and ownership gates before any candidate-index force add occurs.
+ */
 export function buildTaskScopedStagingRequiredCommand(cwd, files) {
     const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
     const cwdFlag = path.resolve(cwd) === path.resolve(process.cwd())

@@ -1950,11 +1950,14 @@
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-lock-retry.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-reconciliation.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/pathspec-argv-batching.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/publication-slice-admission.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/push-command.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-bundle-inspection.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-candidate-index.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-evidence-admission.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-ignored-deliverable-discovery.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/protected-governance-state.js",
@@ -2651,12 +2654,15 @@
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/publication-slice-admission.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/push-command.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-evidence-admission.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
@@ -5980,8 +5986,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 2,
-    "unchanged": 1940,
+    "copied": 11,
+    "unchanged": 1937,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -23034,7 +23040,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
-        "digest": "4064cb6a56a6224479a6094099ad9d6525c09fc7744e6b7f1eb128d494622302",
+        "digest": "b27653151ce3b102f4f695a513cf1093dbb840116e4959a88ae44274544003fa",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js"
@@ -23258,6 +23264,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/git-governance/implementation/publication-slice-admission.js",
+        "digest": "022ff83250fee7103b0385e2f850d5e3b295e23dff9ef0ddcc556c83e0ca03c0",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/git-governance/implementation/publication-slice-admission.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/git-governance/implementation/push-command.js",
         "digest": "f1d8b30e93d23436facb56894094d43d4b68c413e8d2373325b3274098de1c0d",
         "origin": "source",
@@ -23303,8 +23318,26 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/git-governance/implementation/task-evidence-admission.js",
+        "digest": "d60b566ce59e7214c0619048a08a7f2bbcb1cf5bf37013b55dcb202f91477e34",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/git-governance/implementation/task-evidence-admission.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/task-ignored-deliverable-discovery.js",
+        "digest": "8a3e6dc0de9433ee62d464bd4c073ef504b4a21d7f9203ab7c3785f1d9a20f73",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/git-governance/implementation/task-ignored-deliverable-discovery.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
-        "digest": "8acc30737f7b4de1b6079b9968c46312c59f716cb3977b41b9a94f05dd53f962",
+        "digest": "a6dbce5cb9a1b7ef6e13856f265aa78fc98420f053d07f788810fb0353609180",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js"
@@ -29253,7 +29286,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
-        "digest": "9fa205bff1ef9031430ceefea4e47cd2f8e97aff582c97c791e85ab53173cb2e",
+        "digest": "0a3d284d0463a194e6106d2d1b4ab343fd7747471913d248e6e405e3438324e2",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts"
@@ -29262,7 +29295,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
-        "digest": "deb134cae891308917b72150bde116631a9ff140c768d2399ad3392b8a880c22",
+        "digest": "01d295182f053fc2135e872f48c903543681fe765219d63a809814ac63acb119",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts"
@@ -29567,6 +29600,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/git-governance/implementation/publication-slice-admission.ts",
+        "digest": "fddf4926902293f182fc741b82c6009bc06331d21433ab35e08e0585f9c81e0c",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/publication-slice-admission.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/git-governance/implementation/push-command.ts",
         "digest": "5957f61874dc0784693673fe8df6798537fba0693e9f46347fe00f9258c32e4b",
         "origin": "source",
@@ -29621,8 +29663,26 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/git-governance/implementation/task-evidence-admission.ts",
+        "digest": "717b0b92de724c6edfc033d6e6f14e8f0f712cb83cae13ca17f97a265375e16d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/task-evidence-admission.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
+        "digest": "e160759142255960178d42a3684fea8e75bdb7a4076a739b26451d547c43483c",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
-        "digest": "82a2439e1ae937fdf474cb57744a14693760a2b5840566e097c111b5f1fbee77",
+        "digest": "d9c5f36a8903b7bd562556a91bc762e61105698d102f138b640dba523d01c067",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts"
@@ -59492,7 +59552,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:3806381439b506a037b521660895e246305aec40192d123e955bb7b59bfa7991"
+    "treeDigest": "sha256:052cce59be463cedd6ca71d882e5a9a4c2aaf0394313cbbfbe82def448ab7250"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -59818,12 +59878,15 @@
       "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
       "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
       "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/publication-slice-admission.ts",
       "packages/cli/src/commands/git-governance/implementation/push-command.ts",
       "packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
       "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+      "packages/cli/src/commands/git-governance/implementation/task-evidence-admission.ts",
+      "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
       "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
       "packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
       "packages/cli/src/commands/git-governance/protected-governance-state.ts",
@@ -60955,7 +61018,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:6d9cb6c16af6b7a5a8aff4e4c77201dd2262edcb70e2e1bd59a4f7785b32d9b3"
+    "digest": "sha256:5b4f351e61dac66cde6e1e6039b34858c020ef0df5450f0142efc26b5208f230"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -62879,11 +62942,14 @@
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-lock-retry.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/live-index-reconciliation.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/pathspec-argv-batching.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/publication-slice-admission.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/push-command.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-bundle-inspection.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-candidate-index.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-evidence-admission.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-ignored-deliverable-discovery.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-scope-staging.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/protected-governance-state.js",
@@ -63580,12 +63646,15 @@
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/publication-slice-admission.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/push-command.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-evidence-admission.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
@@ -66912,22 +66981,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:4757847b2f85660077d77380358abd15ae4be861708780eba5a28f538d842f68",
-  "sealedSourceCommit": "d04defb7c1b3b3a540f70185926367e8dae7ee1f",
+  "buildInputsTreeHash": "sha256:34abe8ef1c1d4453d02329fdece4101f193844a1cc631c9fc788c69910d6407b",
+  "sealedSourceCommit": "e920670ce0ce25fc9e35b9bfe04252386e0bdf77",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:7cc48370031dd8115a5eba612f1a6676bacb11dd766685a0530c6f48661c7d3a",
-  "tsBuildCacheDigest": "sha256:b723df9235e8ba98472139fce77b7ab4e96367e787e442fa83c824f937fa1efe",
+  "incrementalPlanDigest": "sha256:34bacdfeeba2bdbc0de3cad01bee37139bb7fc634e66d3c0838e5578fe8c4095",
+  "tsBuildCacheDigest": "sha256:7a3203e8565adc14d6b541f48c66d1c3e02cbd105dc7798a78f530af4eb9ddd0",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 59,
-    "skipDecision": 73,
-    "worktreeSetup": 46242,
-    "typescriptBuild": 16140,
-    "rootDropReleaseAssembly": 36289,
-    "onefileReleaseAssembly": 21384,
-    "artifactSync": 12618,
+    "inputHashCalculation": 43,
+    "skipDecision": 53,
+    "worktreeSetup": 9495,
+    "typescriptBuild": 17202,
+    "rootDropReleaseAssembly": 29760,
+    "onefileReleaseAssembly": 7461,
+    "artifactSync": 8395,
     "cleanup": 0,
-    "totalElapsed": 163335
+    "totalElapsed": 87542
   }
 }
