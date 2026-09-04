@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-05-001",
+  "date": "2026-09-05",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Open — reproducible release blocker",
+  "area": "Onefile release packaging / startup budget / release build boundary",
+  "finding": "The frozen onefile release currently violates its enforced artifact and startup budget, while its validator also reports that the package-script entrypoint has drifted from the canonical TypeScript build boundary. This blocks release-quality acceptance even when root-drop validation succeeds.",
+  "expectedBehavior": "A release candidate must keep the onefile artifact within its declared size and cold/warm startup budgets, and the package build script must invoke scripts/build-onefile-release.ts so the build boundary remains reviewable and deterministic.",
+  "evidenceOrRepro": "After the governed runner-sync build for source commit e920670ce0ce25fc9e35b9bfe04252386e0bdf77, node --strip-types scripts/validate-onefile-budget.ts reported onefile size 5,964,059 / 4,500,000 bytes, cold startup 9,901.30ms / 4,000ms, warm startup 8,062.55ms / 2,500ms, and ONEFILE_BUILD_SCRIPT_BOUNDARY_DRIFT. The same build passed scripts/validate-root-drop-release.ts, so this is isolated to the onefile release surface rather than a general runner-sync failure. Largest reported payloads include packages/cli/dist/commands/tasks/legacy/implementation.js (147,588 bytes) and docs/governance/error-code-registry.json (134,476 bytes).",
+  "containment": "Do not publish a release candidate as onefile-budget compliant while this validator fails. Keep the current validated root-drop artifact intact; do not loosen size or timing budgets merely to make the gate green.",
+  "followUp": "Perform a bounded onefile composition inventory: identify non-runtime payloads and duplicate/legacy command closures, restore the package script to the canonical TypeScript build boundary, add regression evidence for size and cold/warm startup, then rebuild and rerun validate-onefile-budget.ts. This is deliberately not repaired in this record-only pass."
+}
