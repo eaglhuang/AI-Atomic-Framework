@@ -5980,11 +5980,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1369,
-    "unchanged": 4576,
+    "copied": 2,
+    "unchanged": 1940,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -23169,7 +23169,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/git-process-port.js",
-        "digest": "9b86ee4b181baa3315f2874b5c50cdf8fe2fa32e1fdce366f4cd07c481bd9723",
+        "digest": "9bfa0b994d7fe595bc43df6b610bb0d42cdddd82fe6bfb924c48919b2fd0fe39",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/git-process-port.js"
@@ -29424,7 +29424,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
-        "digest": "25c9734a24d1fffca19184454aebd06b4785b31c20f38db6a85c3a84829b9330",
+        "digest": "5deebac58e4f9f1061605af6c9f6ae75336b59267b3a357b104352bd3339b964",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/git-process-port.ts"
@@ -59492,7 +59492,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:2c74a8a415ca6f8e68a88fa7ff141b8c48ebf4e059a4327750e50b6997273cac"
+    "treeDigest": "sha256:3806381439b506a037b521660895e246305aec40192d123e955bb7b59bfa7991"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60955,7 +60955,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:b39c5980ce527585d4d798335e630adb93fc7368bd061652efec3b6e8ce55877"
+    "digest": "sha256:6d9cb6c16af6b7a5a8aff4e4c77201dd2262edcb70e2e1bd59a4f7785b32d9b3"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66912,22 +66912,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:f96aa9906ac6dcb6d6ca581e6d276a6bd93df9b72137241d7341037add09cd17",
-  "sealedSourceCommit": "53081da39ad8923f4a6500867df895e154073aa4",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:eb548a3a2213ffd94c219a276febb8a07dc622824a1073353a95fba0f76fc045",
-  "tsBuildCacheDigest": "sha256:be7f1ec40fd3860bfc46ff840fb3a5874c281803b5cb745a2e67a2445968ae5e",
+  "buildInputsTreeHash": "sha256:4757847b2f85660077d77380358abd15ae4be861708780eba5a28f538d842f68",
+  "sealedSourceCommit": "d04defb7c1b3b3a540f70185926367e8dae7ee1f",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:7cc48370031dd8115a5eba612f1a6676bacb11dd766685a0530c6f48661c7d3a",
+  "tsBuildCacheDigest": "sha256:b723df9235e8ba98472139fce77b7ab4e96367e787e442fa83c824f937fa1efe",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 88,
-    "skipDecision": 152,
-    "worktreeSetup": 14500,
-    "typescriptBuild": 10336,
-    "rootDropReleaseAssembly": 35206,
-    "onefileReleaseAssembly": 12292,
-    "artifactSync": 10544,
+    "inputHashCalculation": 59,
+    "skipDecision": 73,
+    "worktreeSetup": 46242,
+    "typescriptBuild": 16140,
+    "rootDropReleaseAssembly": 36289,
+    "onefileReleaseAssembly": 21384,
+    "artifactSync": 12618,
     "cleanup": 0,
-    "totalElapsed": 90369
+    "totalElapsed": 163335
   }
 }

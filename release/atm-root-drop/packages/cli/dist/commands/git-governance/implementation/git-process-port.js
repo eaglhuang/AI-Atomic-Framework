@@ -204,6 +204,11 @@ export function createSanitizedGitEnv(extra = {}) {
     if (!("GIT_INDEX_FILE" in extra)) {
         delete env.GIT_INDEX_FILE;
     }
+    // Read-oriented Git commands may otherwise opportunistically refresh the
+    // index. That is unnecessary for ATM's inspected snapshots and can strand
+    // an index.lock when an editor or host terminates the child process.
+    // Required locks for explicit add/commit operations remain available.
+    env.GIT_OPTIONAL_LOCKS = "0";
     return addTrustedGitHookRuntimePath(env);
 }
 /**
