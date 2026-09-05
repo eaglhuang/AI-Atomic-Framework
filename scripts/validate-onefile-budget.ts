@@ -176,7 +176,7 @@ async function validateExtractionLockHandoff(input: {
   }, null, 2) + '\n');
 
   const startedAt = process.hrtime.bigint();
-  const child = spawn(process.execPath, [input.entrypointPath, '--version'], {
+  const child = spawn(process.execPath, [input.entrypointPath, 'help', '--json'], {
     cwd: repoRoot,
     env: {
       ...process.env,
@@ -235,7 +235,7 @@ async function validateExtractionLockHandoff(input: {
   } else {
     try {
       const parsed = JSON.parse((stdout || stderr).trim());
-      if (parsed.command !== 'version' || parsed.ok !== true) {
+      if (parsed.command !== 'help' || parsed.ok !== true) {
         findings.push({
           code: 'ONEFILE_EXTRACTION_LOCK_WAIT_OUTPUT_INVALID',
           message: 'runner returned unexpected output after extraction lock handoff.',
