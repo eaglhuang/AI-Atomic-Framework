@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Partially fixed — taskflow pre-close now blocks incomplete telemetry obligations; historical backfill remains open",
+  "status": "Resolved — taskflow pre-close blocks incomplete telemetry obligations; historical backfill remains separate",
   "area": "Taskflow close / Telemetry obligations",
   "finding": "The 2.0 task cards require every card to seal an `atm.gateTelemetryTaskSummary.v1` and produce a data-driven decision before close, but all cards were allowed to close without those machine-readable artifacts. This breaks the intended producer-consumer chain and leaves later cards unable to consume prior-card evidence.",
   "expectedBehavior": "When a task card declares telemetry producer/consumer obligations, taskflow pre-close must verify a sealed task summary or an explicit observability-missing decision receipt with history/config digests. Missing data may not fail the underlying product command, but it must prevent the card from claiming the telemetry obligation complete or silently disappearing from close evidence.",
