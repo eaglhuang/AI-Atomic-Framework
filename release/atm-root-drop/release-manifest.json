@@ -6009,11 +6009,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1387,
-    "unchanged": 4587,
+    "copied": 2,
+    "unchanged": 1951,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -23855,7 +23855,7 @@
       },
       {
         "path": "packages/cli/dist/commands/integration/health.js",
-        "digest": "43bc972934c3723bce52fb7b6a9c791ab4ab7930b7b249a4593b2e65fb5bcc39",
+        "digest": "ac27b5da9b378efcc0a0d8e46e45e2f863d50083a6b498697e7710ae5e6552f1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/integration/health.js"
@@ -30317,7 +30317,7 @@
       },
       {
         "path": "packages/cli/src/commands/integration/health.ts",
-        "digest": "8157cebf457d64261183fb831566b5c9db1512fdb52ff301fec8e62e57d4deed",
+        "digest": "0a3d6580ee3accb772bce59802f742030e0811c9f96fc3275e90c1a8f43c4cfa",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/integration/health.ts"
@@ -59782,7 +59782,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:08e26eac1b19bebf628ef637601e03370932dadd87b52166f0eab9880ae33ac9"
+    "treeDigest": "sha256:8b22ea10b11645dc88f62ed2d71f7badec3887b5adc508422a8bff77d5b212b7"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61312,7 +61312,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:bdd26a3be067f64045c1b124efe282c7c72b111d6e552f304f47c7c09f991ffe"
+    "digest": "sha256:5271dd6c330bd48ecdc97f6f32de8275780674dcd27011edc37c49e3501f084c"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -67298,22 +67298,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:bdaf04ec2d0da7a6008086f9ef69fc7e3a279224e1ab54d343e785017bb19fe9",
-  "sealedSourceCommit": "8b5d620a43fa7fada46da281dab28104f7036aea",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "release artifacts are dirty or missing",
-  "incrementalPlanDigest": "sha256:d2741dc9a2adc0f2f348af5f105557fe8e060014db3a1c6eea63d0815d157d9f",
-  "tsBuildCacheDigest": "sha256:6f26ea333111f18cf02e9410c7454633136c1ffd5871dd0d1b199040cf7b3fc2",
+  "buildInputsTreeHash": "sha256:2c55eee9e7fe2662894ce23e7757f4648c3edfcf46e1d54cfd746614a4655f12",
+  "sealedSourceCommit": "965623c09923bccf313152b8696f26e2421bae98",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:5dea11da82c070f9ba93d5555fd758def99a2a5f160eb1e0d8a9563f0b057fd0",
+  "tsBuildCacheDigest": "sha256:e4bb770d4fd787be5eff57ab19b97b942a87f59e10e340f92662355a17d9ce31",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 50,
-    "skipDecision": 212,
-    "worktreeSetup": 15217,
-    "typescriptBuild": 27476,
-    "rootDropReleaseAssembly": 31509,
-    "onefileReleaseAssembly": 9089,
-    "artifactSync": 9766,
+    "inputHashCalculation": 64,
+    "skipDecision": 57,
+    "worktreeSetup": 14081,
+    "typescriptBuild": 21163,
+    "rootDropReleaseAssembly": 34129,
+    "onefileReleaseAssembly": 9032,
+    "artifactSync": 8193,
     "cleanup": 0,
-    "totalElapsed": 104380
+    "totalElapsed": 106553
   }
 }

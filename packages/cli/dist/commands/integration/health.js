@@ -159,7 +159,9 @@ export async function verifyInstalledManifest(repositoryRoot, manifestPath, adap
     // `sourceFileCount` counts source entries. A projection may legitimately
     // contain additional generated/reference files, so compare against the
     // source count recorded in the manifest metadata rather than all files.
-    const projectedSourceFileCount = dryRunInstall.manifest.metadata?.sourceFileCount;
+    // `sourceFileCount` includes expanded reference files; managedSkillCount
+    // is the source-corpus count represented by adapter.sourceCoverage.
+    const projectedSourceFileCount = dryRunInstall.manifest.metadata?.managedSkillCount;
     const coverageMismatch = sourceCoverage
         && (typeof projectedSourceFileCount !== 'number'
             || sourceCoverage.sourceFileCount !== projectedSourceFileCount);
