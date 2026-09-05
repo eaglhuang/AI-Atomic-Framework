@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Resolved — source-first hook routing and WIP recovery repair verified; delivery closeout remains separate",
+  "status": "Closed — source-first hook routing and WIP recovery repair verified; delivery closeout remains separate",
   "area": "Source-first validation / frozen hook bootstrap",
   "finding": "`node atm.dev.mjs tasks release --wip-commit` can reach an inner `git commit`, but Git still invokes the installed pre-commit hook through frozen `node atm.mjs hook pre-commit`. When the frozen runner lacks the new WIP bypass or candidate-line policy, source-first recovery deadlocks on stale hook behavior.",
   "expectedBehavior": "Source-first governed commands that perform commits should either route hooks through the same source-first runner, pass a sealed hook runner override, or fail early with an executable recoveryCommand that updates the frozen runner without requiring the blocked commit.",

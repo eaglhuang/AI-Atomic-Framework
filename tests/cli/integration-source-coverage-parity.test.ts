@@ -57,11 +57,11 @@ try {
       fileFormat: 'markdown',
       placeholderStyle: 'none',
       sourceFiles: [
-        { relativePath: 'one.md', content: 'one\n', source: 'template' as const, fileFormat: 'markdown' as const },
-        { relativePath: 'references/detail.md', content: 'detail\n', source: 'template' as const, fileFormat: 'markdown' as const }
+        { relativePath: 'one.md', content: 'one\n', source: 'template' as const, fileFormat: 'markdown' as const, skillId: 'one' },
+        { relativePath: 'references/detail.md', content: 'detail\n', source: 'template' as const, fileFormat: 'markdown' as const, skillId: 'one' }
       ]
     }),
-    sourceCoverage: () => ({ sourceFileCount: 2 })
+    sourceCoverage: () => ({ sourceFileCount: 1 })
   } as any;
   const projectedInstall = projectedWithReference.install({
     repositoryRoot,

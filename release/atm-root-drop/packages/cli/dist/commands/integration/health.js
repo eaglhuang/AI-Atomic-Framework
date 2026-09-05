@@ -156,7 +156,13 @@ export async function verifyInstalledManifest(repositoryRoot, manifestPath, adap
     const sourceCoverage = adapter.sourceCoverage
         ? adapter.sourceCoverage(createIntegrationContext(repositoryRoot, adapter, { dryRun: true }))
         : null;
-    const coverageMismatch = sourceCoverage && sourceCoverage.sourceFileCount !== dryRunInstall.manifest.files.length;
+    // `sourceFileCount` counts source entries. A projection may legitimately
+    // contain additional generated/reference files, so compare against the
+    // source count recorded in the manifest metadata rather than all files.
+    const projectedSourceFileCount = dryRunInstall.manifest.metadata?.sourceFileCount;
+    const coverageMismatch = sourceCoverage
+        && (typeof projectedSourceFileCount !== 'number'
+            || sourceCoverage.sourceFileCount !== projectedSourceFileCount);
     if (coverageMismatch) {
         return createManifestHealthReport({
             ok: false,
