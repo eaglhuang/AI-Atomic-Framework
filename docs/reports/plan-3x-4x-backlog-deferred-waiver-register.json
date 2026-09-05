@@ -1,17 +1,17 @@
 {
   "schemaId": "atm.backlogDeferredWaiverRegister.v1",
   "specVersion": "0.1.0",
-  "generatedAt": "2026-08-13T00:00:00.000Z",
+  "generatedAt": "2026-09-06T00:00:00.000Z",
   "status": "waived-for-release-closeout",
   "nonClaim": "This register does not mark deferred backlog bugs fixed; it waives the unowned deferred set from this release certificate into follow-up backlog ownership lanes.",
   "sourceReports": [
     {
       "path": "docs/reports/plan-3x-4x-backlog-disposition-census.json",
-      "digest": "sha256:a2074fc99dbc7ff8faf9ae3670839f73058cf4103082034dd2f1ff6331170906"
+      "digest": "sha256:d7db0e638aa6f5ca30430a199c8f00db32a4a58b39c5b8d281d09f52b244047f"
     },
     {
       "path": "docs/reports/plan-3x-4x-backlog-release-blocking-subset.json",
-      "digest": "sha256:991fff85e018c6ab235207861728b8aa3cc07e9d2281e772ccf90de4a7fb9829"
+      "digest": "sha256:728392fad054bf9656c01291ae81aeebb1bf6f8eac695ce9a88d8e285dbb21b1"
     }
   ],
   "selectionPredicate": {
@@ -25,12 +25,12 @@
     ]
   },
   "totals": {
-    "waivedUnownedDeferred": 133,
-    "ownerTrackedDeferred": 37,
+    "waivedUnownedDeferred": 50,
+    "ownerTrackedDeferred": 7,
     "releaseBlockingNow": 0,
     "unclassified": 0
   },
-  "waivedUnownedDeferredIdsDigest": "sha256:ef40f398ceea113319dddc4d66d50538d8906e1f9512ba0130ab98cc5515460e",
+  "waivedUnownedDeferredIdsDigest": "sha256:034590a3aa77664a67dfef863227e4996e2304aed2a19da0a2de0ded538032b9",
   "sampleIds": {
     "first": [
       "ATM-BUG-2026-07-11-098",
@@ -60,7 +60,7 @@
   "principlesApplied": [
     "first-principles: a release blocker is current unreconciled correctness risk, not every known deferred improvement",
     "deep-module: the census remains source of truth; this register adds a replaceable release-waiver decision layer",
-    "80/20: close the objective/certificate path now and carry deferred backlog by digest rather than hand-authoring 133 low-signal cards",
+    "80/20: close the objective/certificate path now and carry deferred backlog by digest rather than hand-authoring 50 low-signal cards",
     "false-green prevention: waiver explicitly says not fixed and binds the exact waived ID set by digest"
   ]
 }
