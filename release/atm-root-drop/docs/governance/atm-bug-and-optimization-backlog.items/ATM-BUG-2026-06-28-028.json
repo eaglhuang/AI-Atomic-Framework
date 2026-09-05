@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 repair lane (`c589f1250`)",
+  "status": "Closed — Fixed in 2026-06-28 repair lane (`c589f1250`)",
   "area": "Git governance / git-head evidence scope",
   "finding": "`hook pre-commit`, `doctor`, and `framework-mode status` treated any staged or latest HEAD change as if it required git-head evidence, so small docs/backlog/fixture edits and emergency repair lanes could be blocked by a commit-boundary evidence check that was not actually needed for low-risk files.",
   "expectedBehavior": "Git-head evidence should remain strict for critical framework commits, governed ledger/closure bundles, protected pre-push, and commit-range checks, but docs-only or low-risk maintenance changes should pass without generating or requiring git-head evidence.",

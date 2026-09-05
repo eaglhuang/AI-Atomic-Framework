@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Closed — ATM-GOV-0409 orchestration loop and dogfood closeout verified 2026-09-05",
   "area": "Auto-batch / Governance performance",
   "finding": "ATM-GOV-0168 through ATM-GOV-0190 delivered auto-batch primitives and a plan-executor decision surface, but the end-to-end operator path remains mostly manual. `batch execute-plan` appends a journal event and returns the next `atm next --claim` command; it does not itself run workers, validators, generated writes, delivery, checkpoint, target push, planning closeback, and analysis as one managed loop. The completed 2.0 dogfood therefore still lacks a real one-command plan execution sample.",
   "expectedBehavior": "A plan-level GOV wave should run through one guided command path that selects cards, executes Team Wave work, routes shared writes through Broker, checkpoints closure, records lane/session ticket evidence, and emits a performance report without repeated manual lifecycle decisions.",

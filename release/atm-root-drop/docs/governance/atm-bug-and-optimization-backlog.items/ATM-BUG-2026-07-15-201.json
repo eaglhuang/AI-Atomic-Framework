@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in codex/bug-201",
+  "status": "Closed — fixed in codex/bug-201; formal backlog closeout recorded 2026-09-05",
   "area": "Governance / Multi-editor session identity",
   "finding": "Two agent sessions from Codex or another editor integration can operate through the same actor id and claim surface, making active-work warnings look like self-continuation instead of a distinct concurrent operator.",
   "expectedBehavior": "ATM should surface a distinct session, ticket, and editor identity for each operator instance and warn when another live session touches the same task or shared Git/index lane, even if actor id and task id match.",

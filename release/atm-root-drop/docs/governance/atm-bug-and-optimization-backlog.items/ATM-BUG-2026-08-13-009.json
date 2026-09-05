@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Low",
-  "status": "Resolved",
+  "status": "Closed — diagnostic consumption issue withdrawn with evidence 2026-09-05",
   "area": "Withdrawn: pre-close does disclose every prerequisite at once",
   "finding": "This item claimed that taskflow pre-close reveals close prerequisites one class at a time, costing a round trip per class. That claim is false and the item is withdrawn. The first pre-close run on ATM-GOV-0360 returned four blockers, and the fourth was staleEvidence carrying the exact list ['validate:cli','validate:git-head-evidence']. Every prerequisite was disclosed on the first call. The appearance of batched disclosure was created entirely by the consumer: the command output was piped through a reader that truncated at 3000 characters, so the last two blockers were never read.",
   "expectedBehavior": "Behaviour as built is already correct. buildHistoricalClosePreflight computes computeMissingValidatorReport unconditionally on every run and appends the stale-evidence blocker alongside the operational ones, so the blocker list is complete regardless of which other classes are currently present.",

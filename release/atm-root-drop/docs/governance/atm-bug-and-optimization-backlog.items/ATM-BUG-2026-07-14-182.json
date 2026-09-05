@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0205",
+  "status": "Closed — fixed in TASK-AAO-0205; formal backlog closeout recorded 2026-09-05",
   "area": "Governed commit / framework-claim absorbs unstaged release mirror residue",
   "finding": "After `integration add --force` refreshed adapter skill mirrors, a framework temp claim scoped only to those skill paths plus `git commit --auto-stage --defer-foreign-staged` still produced commit `abc11c61b` that included unrelated tracked `release/atm-onefile/**` and `release/atm-root-drop/**` files (backlog mirror, closure-packet-schema, validate-cli, release manifests) that were dirty in the worktree but outside the declared claim scope. This is adjacent to ATM-BUG-2026-07-13-177 (ordinary-unowned *staged* absorption) but reproduced with *unstaged* release-mirror dirt and an explicit skill-only claim file list.",
   "expectedBehavior": "Framework-claim commits with `--defer-foreign-staged` must keep the isolated claim-allowed index closed over unstaged out-of-claim dirty files as well as staged ones; release mirrors generated or dirtied by hooks/build hygiene must not be auto-absorbed into an unrelated skill/docs commit. Prefer fail-closed with a copyable defer/widen command, or leave release dirt untouched for the owner.",

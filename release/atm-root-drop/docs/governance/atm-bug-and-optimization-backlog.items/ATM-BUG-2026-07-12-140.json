@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — auto-intent delivery evidence gate verified 2026-09-05",
   "area": "Next claim / auto-intent UX",
   "finding": "`next --claim --auto-intent` can still classify a backlog/doc delivery as `closeout-only`, and the operator only discovers the mismatch when `git commit --auto-stage` rejects source mutations with `ATM_GIT_COMMIT_CLOSEOUT_ONLY_MUTATION`.",
   "expectedBehavior": "Auto-intent should infer `write` for open tasks with declared non-.atm deliverables or prompts that ask to update backlog/source, or `next --claim` should print a stronger warning and copyable `--claim-intent write` recovery before work begins.",
-  "evidenceOrRepro": "During TASK-TEAM-0084, auto-intent claimed `closeout-only`; the commit wrapper correctly failed early and required `node atm.mjs next --claim --actor \"Codex-GPT5.6 Terra\" --task \"TASK-TEAM-0084\" --claim-intent write --json`. Earlier preflight guard row `ATM-BUG-2026-07-07-043` remains fixed; this row tracks the remaining UX friction.",
-  "followUp": "Add an auto-intent regression for backlog/document delivery prompts and surface a pre-edit warning or default write intent."
+  "evidenceOrRepro": "The original TASK-TEAM-0084 incident is superseded by the delivery-evidence gate in `973f85402` (`fix(tasks): require delivery evidence for auto-intent closeout`). Current `tests/cli/tasks-claim-auto-intent.test.ts` passes and proves: dirty in-scope source resolves to `write`; declared deliverables present in HEAD without scoped delivery evidence resolve to `write` with reason `delivery-evidence-not-found`; only a delivered task with matching scoped delivery evidence resolves to `closeout-only`; and an explicit closeout-only claim with dirty source is rejected by `ATM_CLAIM_INTENT_CONFLICT`. The `next` orchestration forwards `--auto-intent` to the same canonical task-claim resolver, so no separate intent rule exists at the next seam.",
+  "followUp": "Keep the next/task claim paths on the shared `resolveTaskClaimIntent` seam. If a new incident demonstrates a next-specific divergence, add a reproduction at the next route before reopening this item."
 }

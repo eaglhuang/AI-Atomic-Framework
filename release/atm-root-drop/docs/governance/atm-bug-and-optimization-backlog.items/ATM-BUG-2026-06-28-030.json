@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "P0",
-  "status": "Fixed in 2026-06-28 repair lane",
+  "status": "Closed — fixed in 2026-06-28 repair lane; formal backlog closeout recorded 2026-09-05",
   "area": "Guidance UX / skill-CLI routing",
   "finding": "Skill-first guidance and CLI JSON are much better than the old CLI-only flow, but the boundary is still easy to misread: agents can expect a playbook when none exists, treat long CLI JSON as manual prose instead of structured tool output, miss that `artifacts/` evidence requires `git add -f`, or lose track of which dirty files belong to the current task. `guide` can also overgeneralize small evidence backfill work into a heavy `create-atom` route.",
   "expectedBehavior": "ATM should make the skill/CLI contract explicit and low-friction: tell the agent when there is no playbook, surface the one next structured action, distinguish skill authority from CLI evidence, warn when target artifacts are ignored and need force-add, and classify dirty files as in-scope versus unrelated before mutation.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0177",
+  "status": "Closed — Fixed in TASK-AAO-0177; parser regressions retained",
   "area": "Team Agents / role-provider parser",
   "finding": "`--role-provider role=provider:model::real-agent` contains an empty SDK segment, but parser behavior can shift the fields so `real-agent` is consumed as the SDK/mode boundary incorrectly, causing roles to silently downgrade or skip execution.",
   "expectedBehavior": "Role-provider parsing should reject empty required segments with a clear error, or normalize four-segment input without field drift; `team start --execute` should fail before writing a run if requested real-agent roles select no provider execution.",

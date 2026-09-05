@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Low",
-  "status": "Resolved",
+  "status": "Closed — stale-evidence interpretation issue withdrawn with evidence 2026-09-05",
   "area": "Withdrawn: a delivery commit does not expire task validator evidence",
   "finding": "This item claimed that evidence freshness is keyed on HEAD, so the delivery commit pre-close requires is what expires the evidence pre-close requires, forcing every card to record its validators twice. That claim is false and the item is withdrawn. Across three pre-close runs on ATM-GOV-0360, spanning two governed delivery commits, staleEvidence was the identical pair ['validate:cli','validate:git-head-evidence'] every time. The four card validators recorded before the first commit were never reported stale. The second recording of those four was work the author chose to do, not work the system asked for.",
   "expectedBehavior": "Behaviour as built is already correct on the point this item raised. The two entries that persisted were repo-level validators that had genuinely never been recorded, not card validators invalidated by a commit.",

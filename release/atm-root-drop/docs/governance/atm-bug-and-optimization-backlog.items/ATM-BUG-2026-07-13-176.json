@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization / AI routing",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0193",
+  "status": "Closed — TASK-AAO-0193 planning-root preflight repair verified 2026-09-05; guidance maintenance remains follow-up",
   "area": "Framework-repo task open / planning-root reminder",
   "finding": "When an agent opens or imports a framework-development task from inside `AI-Atomic-Framework`, ATM does not remind them to first author the plan MD and formal task card under the canonical 3KLife planning root (`docs/ai_atomic_framework/**/tasks/`). Agents can therefore claim/import/close using only `.atm/task-plans/` in the target repo, leaving the AAO/TEAM planning roster incomplete until someone notices later.",
   "expectedBehavior": "For framework-repo task creation/import/open routes, ATM should detect missing planning-root authorship and emit a blocking or high-priority notice with the exact 3KLife path pattern and next command (for example write `.../atm-agent-first-operability/tasks/TASK-AAO-NNNN-....task.md`, update the roster README, then import from that path). Target-repo-only task-plans should be treated as incomplete for AAO/TEAM-style work unless an explicit waiver is recorded.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 repair lane (`c589f1250`, push verified by `f57dbfe0b`)",
+  "status": "Closed — Fixed in 2026-06-28 repair lane (`c589f1250`, push verified by `f57dbfe0b`)",
   "area": "Git governance / pre-push evidence visibility",
   "finding": "`hook pre-push` commit-range inspection only scanned git-head evidence from committed refs, so a valid worktree-local `git-head` backfill for the current `HEAD` was invisible to the guard and protected-branch pushes were still blocked as missing evidence.",
   "expectedBehavior": "Pre-push commit-range inspection should also read worktree-local `git-head` evidence, so a freshly backfilled current `HEAD` can satisfy the push guard without requiring an extra evidence-only commit.",

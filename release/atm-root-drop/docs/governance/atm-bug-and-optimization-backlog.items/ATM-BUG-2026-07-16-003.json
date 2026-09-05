@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Fixed in ATM-GOV-0154",
+  "status": "Closed — ATM-GOV-0154 runner-sync release route and regression coverage verified 2026-09-05",
   "area": "Broker runner-sync steward",
   "finding": "The source runner-sync steward queue supports enqueue, status, and stale cleanup, but has no explicit release or complete subcommand for a live queue-head steward work item after the build is published.",
   "expectedBehavior": "The Broker runner-sync steward lifecycle should expose a governed release/complete operation that records the steward receipt, clears the queue-head work item, and reports the next waiting tasks or empty queue without hand-editing .atm/runtime.",

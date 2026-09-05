@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in ATM-GOV-0158 / 14f1a2f46 (building on f0b8bbe99)",
+  "status": "Closed — ATM-GOV-0158 verification complete 2026-09-05",
   "area": "Runner Sync / Governance",
   "finding": "Runner-sync admission can self-block because broker runner-sync enqueue creates .atm/runtime/runner-sync-steward-queue.json, but assert-runner-sync-admission classifies that required queue-head file as foreign non-release WIP.",
   "expectedBehavior": "A queue-head runner-sync reservation should be admitted without treating its own runtime queue file as foreign WIP; ordinary unrelated non-release WIP should still block release publication.",

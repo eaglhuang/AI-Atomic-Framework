@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Fixed in Team Agents closeback ledger lane",
+  "status": "Closed — Fixed in Team Agents closeback ledger lane",
   "area": "Team Agents / task ledger closeback",
   "finding": "The Team Agents completion slice for `TASK-TEAM-0053` through `TASK-TEAM-0065` existed in source history, but those task ids were not present in `.atm/history/tasks/**` or the 3KLife planning-card directory, so operators could not prove the 13-card plan was imported and closed through normal task ledger governance.",
   "expectedBehavior": "A bulk Team completion delivery should have planning cards or an equivalent governed historical closeback path before it is treated as ledger-complete. Source commits can be used as historical delivery evidence, but `.atm/history/tasks/**` must be created by official import/close commands, not hand-authored.",

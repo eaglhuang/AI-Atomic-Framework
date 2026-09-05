@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "P0",
-  "status": "Fixed in 2026-06-30 git-head-evidence downgrade lane",
+  "status": "Closed — Fixed in 2026-06-30 git-head-evidence downgrade lane",
   "area": "Git governance / commit-range git-head evidence lifecycle",
   "finding": "Protected-branch push could discover missing commit-range `git-head` evidence too late, after a normal series of local commits already existed. Recovery required historical backfill records and sometimes a separate evidence-only commit, turning ordinary delivery into governance archaeology.",
   "expectedBehavior": "Historical per-critical commit evidence should not be a protected-push hard gate. ATM should keep strict same-commit governed provenance plus closeout/repair cross-checks, while ordinary protected push treats missing historical `git-head` records as diagnostic only.",

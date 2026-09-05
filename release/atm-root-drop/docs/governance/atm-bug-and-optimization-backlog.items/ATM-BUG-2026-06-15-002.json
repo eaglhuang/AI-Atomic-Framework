@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-TEAM-0029 / 48d5b55a",
+  "status": "Closed — Fixed in TASK-TEAM-0029 / 48d5b55a",
   "area": "Task lifecycle",
   "finding": "`tasks close --status abandoned` attempted to stage `.atm/history/evidence/<task>.json` even when no evidence file exists, causing `git add` failure after the ledger had already mutated.",
   "expectedBehavior": "Abandoned close should require only a reason, write ledger/event state, and stage only artifacts that actually exist.",

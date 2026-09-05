@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in 2026-06-28 repair lane",
+  "status": "Closed — Fixed in 2026-06-28 repair lane",
   "area": "Git governance / worktree hygiene",
   "finding": "A normal framework worktree can carry repo-local `.git/config` state with `core.bare=true`, causing standard `git -C <repo> status` and Git-backed evidence commands to fail until the local config is repaired.",
   "expectedBehavior": "ATM preflight, doctor, or framework-mode status should detect a bare/worktree mismatch and report or repair the safe local setting before benchmark/evidence work begins.",

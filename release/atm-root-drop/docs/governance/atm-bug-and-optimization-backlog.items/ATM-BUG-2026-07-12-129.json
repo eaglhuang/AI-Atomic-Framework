@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-TEAM-0079",
+  "status": "Closed — Fixed in TASK-TEAM-0079; disjoint/same-file CID regressions retained",
   "area": "Broker CID admission",
   "finding": "The atom-ID and atom-CID gates treated equal strings as unconditional write/write freezes even after intent shape, lease, and shared-surface gates had established that two transactions wrote no common file or shared surface. This blocked independent work such as TASK-TEAM-0075 and TASK-AAO-0160.",
   "expectedBehavior": "CID write ownership is a semantic refinement of a common writable surface, not a global mutex. Preserve read-set visibility, but require a common target file or shared surface before a CID write conflict can freeze admission.",

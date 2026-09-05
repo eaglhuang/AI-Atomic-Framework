@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in close residue-advisory lane",
+  "status": "Closed — Fixed in close residue-advisory lane",
   "area": "Taskflow close / exit semantics",
   "finding": "`taskflow close --write` can land delivery and closure commits, set ledger `status: done`, and push planning commits, yet still exit `1` when planning-mirror residue remains classified in target `tasks status`. Operators interpret exit `1` as a failed close and retry closeout unnecessarily.",
   "expectedBehavior": "Close should distinguish hard failure from advisory residue: exit `0` with explicit residue warnings when ledger closure and governed commits succeeded, or return a dedicated residue status code with recovery commands instead of a generic failure exit.",

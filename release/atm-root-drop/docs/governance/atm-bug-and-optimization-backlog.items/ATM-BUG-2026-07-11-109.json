@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in current working tree",
+  "status": "Closed — catalog-backed team permission hard gate and regression coverage verified 2026-09-05",
   "area": "Team Agents / permission hard gate",
   "finding": "`team validate/start` checked the permission catalog, but direct `team lease/release` mutation accepted an unknown permission or a missing required scope after bypassing recipe validation.",
   "expectedBehavior": "Every permission lease mutation must pass one fail-closed hard gate that verifies catalog membership and required scope before writing runtime state.",

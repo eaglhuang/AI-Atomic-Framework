@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in ATM-GOV-0266 (pending delivery)",
+  "status": "Partially fixed — repair recorded in ATM-GOV-0266; delivery remains pending",
   "area": "Governance",
   "finding": "`tasks block` can leave one staged ledger plus block-event pair for each of several parked cards. While an unrelated framework task has an active claim, `git record-commit` rejects even one exact parked-card pair as out-of-claim staging. Releasing the active recovery task just to persist those records can make its uncommitted source WIP unowned again, creating a lifecycle serialization deadlock.",
   "expectedBehavior": "A narrow record-only path must persist exactly one complete `blocked`/`released` task's ledger and matching block event while another framework claim remains active. It must reject mixed tasks, source, evidence, close/release records, incomplete pairs, and any mutation of the active task's source bundle.",

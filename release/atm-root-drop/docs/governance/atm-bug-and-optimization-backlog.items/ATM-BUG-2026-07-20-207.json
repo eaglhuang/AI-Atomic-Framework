@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in 2b85526b3",
+  "status": "Closed — canonical evidence-run timing contract verified 2026-09-05; broader telemetry migration remains follow-up",
   "area": "Evidence / telemetry / validator timing",
   "finding": "`evidence run` records command, exitCode, stdout/stderr digests, generatedAt, runnerKind, sourceCommit, cacheKey, and cached state, but the commandRuns stored in task evidence and bundle manifests do not include durationMs/start/end timing. Long validators such as `npm run typecheck` and `npm run validate:cli` are therefore command-backed but weak for future performance analysis.",
   "expectedBehavior": "Every command-backed evidence run should persist compact timing fields suitable for later analysis, at minimum durationMs and preferably startedAt/finishedAt or equivalent phase timing. Raw logs and detailed timing traces should stay in gitignored runtime, while Git-tracked evidence keeps compact digests and summary timing.",

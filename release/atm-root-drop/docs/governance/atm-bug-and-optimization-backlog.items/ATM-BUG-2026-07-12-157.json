@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-FABLE-004",
+  "status": "Closed — TASK-AAO-FABLE-004 done and backlog-continuation routing regression verified 2026-09-05",
   "area": "Backlog intent routing / Captain continuation",
   "finding": "A prompt explicitly asking to continue repairing all backlog items was routed by `next --prompt`/`guide` to the generic `create-atom` route, requiring bucket/title/description/logical-name evidence instead of selecting the existing backlog/task queue. This can send Captain continuation work into an unrelated atom-birth flow.",
   "expectedBehavior": "Backlog-repair and Captain-continuation language should resolve to the existing governed backlog queue or a task-selection route; generic create-atom fallback must not be selected when the prompt names backlog repair and ongoing continuation.",

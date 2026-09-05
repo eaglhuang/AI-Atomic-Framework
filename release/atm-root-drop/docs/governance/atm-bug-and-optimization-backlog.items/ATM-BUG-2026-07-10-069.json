@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in validator timeout/status lane",
+  "status": "Closed — Fixed in validator timeout/status lane",
   "area": "Evidence validators / closeout baseline",
   "finding": "`taskflow pre-close` can require heavyweight global validators such as `validate:git-head-evidence` for a narrow atomized task even when focused specs, atomic-map validation, and typecheck have passed in an isolated Team Broker lane. During `TASK-RFT-0018`, the evidence command for `validate:git-head-evidence` exceeded a 184s agent timeout and left a live Node subprocess chain, forcing manual process inspection and cleanup before closeout could continue.",
   "expectedBehavior": "Closeout should derive the smallest validator set from the task's atom map, scope paths, and Team Broker isolation context, or provide a bounded/resumable validator status path. Heavy global validators should not become mandatory per-card blockers unless the touched paths or protected surface truly require them, and timed-out validator runs must clean up owned child processes.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0175",
+  "status": "Closed — Fixed in TASK-AAO-0175; handoff regressions retained",
   "area": "`next` prompt scope resolution / handoff resume",
   "finding": "A prompt that explicitly asks to read `WORKSPACE-UNFINISHED-WORK.md` was classified as task-scoped, but `next --prompt` could not resolve the active task from the handoff filename and failed with `ATM_NEXT_TASK_SCOPE_NOT_FOUND` instead of offering the uniquely active governed task.",
   "expectedBehavior": "Handoff/task-root hints should resolve to the active task when the live ledger has exactly one matching running claim, or emit the exact task id and a bounded resume command without falling back to unrelated tasks.",

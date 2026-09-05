@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed",
+  "status": "Closed — post-commit payload assertion and task-scoped temporary-index isolation are implemented and regression-verified",
   "resolution": {
     "fixedDate": "2026-07-18",
     "fixedByTask": "ATM-GOV-0166",
@@ -18,5 +18,5 @@
   "expectedBehavior": "record-commit must verify after committing that every explicitly staged record file is actually contained in the created commit, and fail loudly (with rollback guidance) when the payload was dropped. Success with a lost payload is the worst possible outcome for a governance wrapper.",
   "evidenceOrRepro": "2026-07-17 session: commit 5dafa4416 says 'realign TASK-AAO-0149 ledger planPath' but its stat contains only .atm/history/evidence/git-head.jsonl (1 insertion). Reproduced continuously by scratchpad batch_record_commits.sh while the ATM-GOV-0155 lane was active.",
   "proposedDirection": "Add a post-commit payload assertion to the record-commit wrapper (diff the created commit against the requested staged set), plus a commit-from-temporary-index path so a concurrent lane's index reset cannot evict the payload between staging and commit.",
-  "followUp": "Add a post-commit payload assertion to the record-commit wrapper (diff the created commit against the requested staged set), plus a commit-from-temporary-index path so a concurrent lane's index reset cannot evict the payload between staging and commit."
+  "followUp": "Broader temporary-index coverage across every governed commit surface remains tracked separately by ATM-BUG-2026-07-17-003; bulk closed-task planning-source realignment remains tracked separately by ATM-BUG-2026-07-17-004. Evidence for this item: node --strip-types tests/cli/git-record-commit.test.ts; node --strip-types tests/cli/ledger-realign.test.ts (recordCommitPayloadAssertion=true); node --strip-types tests/cli/transactional-commit-queue-isolation.test.ts — all exited 0 on 2026-09-05."
 }

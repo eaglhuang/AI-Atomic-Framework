@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0159",
+  "status": "Closed — Fixed in TASK-AAO-0159; scoped encoding regression retained",
   "area": "Encoding guard / temporary artifact isolation",
   "finding": "`check:encoding:touched` scanned unrelated untracked `tmp/` command transcripts and blocked a governed task when those transcripts contained U+FFFD, even though the claimed source and backlog files were clean.",
   "expectedBehavior": "Touched/staged encoding checks must isolate claimed or staged delivery scope, classify diagnostic temp transcripts separately, and offer a safe cleanup/quarantine command without requiring an agent to delete another owner's files.",

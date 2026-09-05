@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Fixed — observed coverage is evidence-backed; broader cohort closeout remains separate",
+  "status": "Partially fixed — observed coverage is evidence-backed; broader cohort closeout remains separate",
   "area": "Governance telemetry",
   "finding": "ATM-GOV-0193 and the ATM-GOV-0195 coverage repair are marked done, but coverage status still conflates registry declaration with observed runtime emission. Five node families are labeled `instrumented`, while the retained runtime gate journal contains only `next.route-resolution` events; this is insufficient proof that claim, doctor, guard, taskflow, batch, broker, team, or checkpoint paths actually emitted during dogfood.",
   "expectedBehavior": "Before any M2 effectiveness, retirement, or matched A/B analysis, ATM should require a machine-readable registry coverage report proving each claim, gate, validator, checkpoint, close, evidence readback, git governance, runner-sync, batch, broker, team, and telemetry self-operation node is classified as instrumented, read-only-summary, out-of-scope, or not-yet-covered. Missing coverage must block causal claims and force inconclusive or a repair task, not silently pass.",

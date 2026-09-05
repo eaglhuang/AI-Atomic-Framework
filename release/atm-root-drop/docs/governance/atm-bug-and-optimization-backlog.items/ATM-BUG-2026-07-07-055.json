@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in taskflow close atomicity lane",
+  "status": "Closed — Fixed in taskflow close atomicity lane",
   "area": "Taskflow close / staged residue",
   "finding": "`node atm.mjs taskflow close --write` can successfully create the close commit while leaving an older version of the bundle manifest staged in the git index, producing an `MM` state that requires manual diff interpretation.",
   "expectedBehavior": "Successful taskflow close should leave the target repo index clean, or emit an explicit cleanup command when advisory post-close evidence rewrites cannot be auto-reconciled.",

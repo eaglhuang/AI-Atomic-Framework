@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-TEAM-0079",
+  "status": "Closed — Fixed in TASK-TEAM-0079",
   "area": "Broker stale queue ownership",
   "finding": "A task that remains only `planned` with no live claim or Broker registry intent can still remain queue head, blocking a valid waiter indefinitely.",
   "expectedBehavior": "Queue cleanup/status must identify entries without a live task claim or active Broker intent as stale and provide a governed release/re-arbitration action; planned tasks must never retain write ownership.",

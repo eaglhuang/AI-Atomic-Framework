@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 governance-entry-readiness lane",
+  "status": "Closed — Fixed in 2026-06-28 governance-entry-readiness lane",
   "area": "Multi-agent governance / observability",
   "finding": "ATM already had branch queue retry codes and protected-push diagnostics, but those signals were spread across hook, taskflow, and git-governance lanes instead of showing up as one early operator summary. That made captain-style巡檢 slow because the agent had to hit several subsystems before it could explain the likely race / retry path.",
   "expectedBehavior": "Governance entry points should surface one compact observability summary for protected branches and multi-agent commit lanes, including ahead-of-upstream context and the branch queue retry codes.",

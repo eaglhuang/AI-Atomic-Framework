@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "Medium",
-  "status": "Fixed in historical-batch diagnostic disposition lane",
+  "status": "Closed — Fixed in historical-batch diagnostic disposition lane",
   "area": "Historical batch evidence / partial slices",
   "finding": "Historical batch import can leave unclosed partial or diagnostic-only task slices as untracked `.atm/history/tasks`, evidence, and task-events, while completed slices close cleanly. The operator previously had no clear governed command to archive, abandon, or commit diagnostic-only slices without pretending they are done.",
   "expectedBehavior": "Batch evidence should provide an explicit partial-slice disposition: keep diagnostic evidence, abandon with reason, or remove generated diagnostic evidence through a governed cleanup path. Close-ready slices must remain fail-closed to taskflow close.",

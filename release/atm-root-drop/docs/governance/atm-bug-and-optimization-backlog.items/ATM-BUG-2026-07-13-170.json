@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0195",
+  "status": "Closed — Fixed in TASK-AAO-0195",
   "area": "Team plan dry-run / proposal-first side effects",
   "finding": "Optional `team plan` can fail with `ATM_TEAM_PLAN_INVALID` and register or expose a provisional proposal-first broker lane when the operator only wants a read-only readiness projection. It also used legacy actor `codex-gpt-5.4-mini` while the active task session actor was `codex-backlog-captain`.",
   "expectedBehavior": "Team planning should have an explicitly read-only projection mode for diagnostics such as `indexLane`; if it needs broker admission, it should prefer the active claim actor or require explicit `--actor` before writing/provisioning any lane state.",

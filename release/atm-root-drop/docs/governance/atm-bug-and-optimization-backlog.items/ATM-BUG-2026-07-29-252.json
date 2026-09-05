@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in 10e283f6 / 3269f80a",
+  "status": "Closed — batch checkpoint waiver forwarding repair and runner publication verified 2026-09-05",
   "area": "Batch checkpoint historical delivery",
   "finding": "`batch checkpoint` did not expose or forward `--waiver-out-of-scope-delivery` and `--emergency-approval` to the underlying `tasks close` call. A batch queue head with already-verified historical delivery commits that included necessary out-of-scope context could not close through the only legal batch checkpoint route.",
   "expectedBehavior": "Batch checkpoint should support the same explicit historical-delivery waiver and emergency approval controls as task close, and forward them unchanged to the close orchestrator. The route must remain explicit and auditable, not implicit.",

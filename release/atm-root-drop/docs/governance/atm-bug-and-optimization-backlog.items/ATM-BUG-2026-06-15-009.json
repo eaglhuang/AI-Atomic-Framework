@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 claim-readiness / latency lane",
+  "status": "Closed — Fixed in 2026-06-28 claim-readiness / latency lane",
   "area": "Claim / lifecycle routing",
   "finding": "`tasks claim` and `taskflow close` for CID tasks took many rounds of reserve/promote/status probes and even a 300s `next --claim` timeout before surfacing the real blocker, so the operator path felt slow even though `path-to-atom-map.json` is only ~56 KB.",
   "expectedBehavior": "Claim should fail fast or converge quickly with one blocker summary when lifecycle state is already inconsistent; sharding should reduce shared-file contention, but it should not be needed to explain long claim latency.",

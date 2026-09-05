@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-CODEX-0204",
+  "status": "Closed — TASK-CODEX-0204 foreign-dirty WIP admission repair verified 2026-09-05; validator-surface follow-up remains separate",
   "area": "Team Agents / Multi-captain coordination",
   "finding": "A concurrently active captain landed ATM-GOV-0150/0151 changes while TASK-RFT-0044 had uncommitted extracted source files, causing the RFT worktree changes to disappear and later blocking TASK-RFT-0044 close because the claimed ATM-GOV-0151 lane introduced repository-wide typecheck failures.",
   "expectedBehavior": "ATM should warn or fail closed when another active captain is about to commit/close while the shared worktree contains uncommitted changes owned by a different active task, and it should surface claimed-task validator failures as explicit cross-task blockers with owner/session identity.",

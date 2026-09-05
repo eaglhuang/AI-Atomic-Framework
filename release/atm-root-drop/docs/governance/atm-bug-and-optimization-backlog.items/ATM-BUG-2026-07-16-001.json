@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in pending taskflow markdown path normalization patch",
+  "status": "Closed — taskflow Markdown deliverable path normalization and focused regression verified 2026-09-05; file-size refactor remains follow-up",
   "area": "Taskflow close / Commit bundle",
   "finding": "Taskflow close fails at write time when task-card deliverables are Markdown code spans such as `tests/cli/example.test.ts`; close dry-run can still report ready while close --write fails with ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE.",
   "expectedBehavior": "Taskflow close should normalize path declarations consistently across deliverables, scopePaths, targetAllowedFiles, claim files, and direction locks, while still rejecting narrative non-path text.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in the current frozen runner; formal backlog closeout",
+  "status": "Closed — Fixed in the current frozen runner; preserve the existing delivery and zero-residue regressions",
   "area": "Runner-sync / lane events / git governance",
   "finding": "After ATM-GOV-0173 closed successfully, runner-sync left .atm/history/evidence/ATM-GOV-0173.runner-sync-receipt.json and .atm/history/session-events/<laneId>/... untracked. The governed git wrapper could not commit the runner-sync receipt after close because pre-commit classified the singleton evidence file as ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT, while residue classified both the receipt and lane session event as manual-review with no requiredCommand.",
   "expectedBehavior": "Runner-sync release should either stage/commit its receipt and broker lane events in the close bundle, write them to a committable record-only surface, or classify them as safe runtime residue with an exact cleanup command. A completed task should not leave the operator choosing between dirty worktree residue and unguided manual deletion.",

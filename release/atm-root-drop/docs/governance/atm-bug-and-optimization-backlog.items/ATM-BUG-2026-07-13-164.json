@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed",
+  "status": "Closed — Fixed",
   "area": "Task scope amendment UX",
   "finding": "`tasks scope add` can require a claim, while `next --claim` can require scope expansion; the successful escape hatch is `--claim-first`, but the error path and help text do not lead there clearly enough.",
   "expectedBehavior": "When claim is blocked by scope expansion, ATM should suggest the exact `tasks scope add --claim-first ...` command. Help text should distinguish task-card scope/deliverables from runtime lock repair.",

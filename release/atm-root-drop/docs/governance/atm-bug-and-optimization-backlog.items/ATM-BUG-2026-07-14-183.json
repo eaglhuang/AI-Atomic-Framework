@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed — runner source drift now includes the full template source tree",
+  "status": "Closed — runner source-drift scope includes the full template source tree; red-green regression verified 2026-09-05",
   "area": "Frozen vs source-first write deadlock under parallel captains",
   "finding": "Frozen `node atm.mjs` refuses writes with `ATM_RUNNER_STALE_WRITE_REFUSED` when source is newer; `--allow-stale-runner` needs emergency; `node atm.dev.mjs` refuses lifecycle claim with `ATM_SOURCE_FIRST_WRITE_REFUSED`. Parallel captains told to prefer Frozen cannot sync without dirtying `release/**`. Template-only changes can also leave frozen integration source snapshots stale while `runnerMode.sourceDrift.syncRequired` remains false.",
   "expectedBehavior": "Playbooks should offer a non-emergency source-delivery lane or a scoped runner rebuild that does not absorb foreign release WIP. Runner drift inventory must include integration templates and compiler inputs.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in TASK-AAO-0203",
+  "status": "Closed — Fixed in TASK-AAO-0203",
   "area": "Task-ledger residue validator contract drift",
   "finding": "Several residue fixtures still asserted superseded behavior: `done` without governed closeout expected `planning-mirror-only` instead of fail-closed `source-done-governance-incomplete`, and stale-import guidance expected `--force` instead of governed `--reconcile-mirror`.",
   "expectedBehavior": "Validator fixtures must be updated with the public residue classification contract whenever fail-closed precedence or recovery commands change; stale assertions should identify the current bucket and safe command.",

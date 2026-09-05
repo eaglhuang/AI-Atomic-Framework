@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in ATM-GOV-0180 / d66c3b2de",
+  "status": "Closed — fixed in ATM-GOV-0180 / d66c3b2de; formal backlog closeout recorded 2026-09-05",
   "area": "Governance / Git commit bundle",
   "finding": "During TASK-RFT-0052, the task scope and deliverables included scripts/validate-cli/**/*.ts, but node atm.mjs git commit --auto-stage committed only tracked delivery files and left newly created validate-cli shard files untracked. Later, taskflow close dry-run accepted two historical delivery refs, but close --write rejected the second ref because the same glob-matched shard files were classified as out-of-scope source files.",
   "expectedBehavior": "The governed commit bundle and historical-delivery close gate should share the same glob expansion semantics for allowed untracked files. Newly created in-scope shard files should be included and accepted, or the dry-run should fail closed with the same blocker that --write will enforce.",

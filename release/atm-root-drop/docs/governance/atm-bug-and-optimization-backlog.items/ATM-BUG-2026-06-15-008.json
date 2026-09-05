@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in this cleanup commit",
+  "status": "Closed — Fixed in this cleanup commit",
   "area": "Team Agents",
   "finding": "`team plan` / `team validate` reject imported cross-repo planning tasks whose `scopePaths` are absolute 3KLife paths, so Phase 0 planning tasks cannot start through Team Agents even after broker cleanup.",
   "expectedBehavior": "Team Agents should normalize or classify cross-repo planning paths before building `file.write` leases, or choose a read-only/planning recipe that does not request unsafe writes.",

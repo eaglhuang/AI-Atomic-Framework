@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0191",
+  "status": "Closed — fixed in TASK-AAO-0191; formal backlog closeout recorded 2026-09-05",
   "area": "Governed commit / defer-foreign-staged absorbs ordinary-unowned staged residue",
   "finding": "`node atm.dev.mjs git commit --auto-stage --defer-foreign-staged` for a framework temp claim scoped only to backlog + task-plan still included a long-lived staged foreign file (`packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts`, ownership `ordinary-unowned`) in the resulting commit `a6aa957a3`. Pre-push then treated that path as a critical changed file even though it was not part of the claim scope.",
   "expectedBehavior": "Task/temp-claim scoped commits must never stage or commit ordinary-unowned / foreign staged files when `--defer-foreign-staged` is set; deferral must cover unattributable staged source, not only governance artifacts with task ids.",
