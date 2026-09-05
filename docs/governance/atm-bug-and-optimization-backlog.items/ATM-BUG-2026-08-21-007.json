@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
+  "status": "Closed — source verified; formal backlog closeout recorded 2026-09-01",
   "area": "Runbook validator-contract consumer used raw task-card bytes instead of the sealed semantic digest",
   "finding": "The completion compiler and its validator both seal task-card contracts with semanticTaskCardDigest, which intentionally excludes lifecycle-only fields. The independent release reviewer independently hashed the entire card file. A normal lifecycle update therefore made every valid contract appear invalid, producing 247 invalid-validator-contract findings and their dependent unregistered findings.",
   "expectedBehavior": "All producer and consumer paths must resolve a validator contract through one shared semantic task-card digest implementation. Missing cards, semantic content changes, duplicate contracts, malformed IDs, and command mismatches must remain fail-closed.",

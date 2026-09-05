@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
+  "status": "Closed — source verified; formal backlog closeout recorded 2026-09-01",
   "area": "Taskflow close runner gate / generated-output ownership",
   "finding": "A taskflow close that requires runner publication can absorb generated release artifacts and a framework-temp runner receipt from a different producing lane into the consumer task's close bundle. The guarded commit then fails and rolls the close back, although the consumer's delivery was already committed and the foreign artifacts are outside its scope.",
   "expectedBehavior": "Runner-gate outputs must carry the producing task or framework-lane authority snapshot. A close transaction may include only outputs produced for its own authority; foreign generated outputs must be excluded, preserved in place, and reported through one durable diagnostic without requiring the consumer to stage, defer, or mutate their bytes.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
+  "status": "Closed — source verified; formal backlog closeout recorded 2026-09-01",
   "area": "Completion evidence copied mutable certificate diagnostics into its own terminal dependency",
   "finding": "The completion compiler treated the independent certificate as both a terminal authorization input and a source of detailed mutable diagnostics. Certificate details can legitimately change when reviewer or publication state changes, so copying them into completion evidence creates a reverse certificate-to-completion freshness edge and prevents the closeout chain from reaching a stable fixed point. This is distinct from certificate pending self-digest validation: the defect is the dependency direction, not a digest comparison.",
   "expectedBehavior": "Completion evidence consumes only the certificate's terminal authorization state: proven requires a readable, non-pending, diagnostic-free, release-authorized certificate; otherwise the affected requirement remains fail-closed with final-certificate-not-proven. Detailed certificate diagnostics remain addressable on the certificate itself and must not be mirrored into an upstream completion projection.",

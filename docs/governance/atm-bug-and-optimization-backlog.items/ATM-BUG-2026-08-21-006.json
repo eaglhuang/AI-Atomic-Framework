@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
+  "status": "Closed — source verified; formal backlog closeout recorded 2026-09-01",
   "area": "Taskflow crash-matrix fixture lost its owner lane before historical reconciliation",
   "finding": "The crash-matrix fixture successfully claimed its synthetic task and preserved the lane for its injected close driver, but its deliberate 30-second pre-commit stall made the fixture claim stale before post-crash reconciliation. After renewing, the fixture still passed the target repository's later close HEAD as --historical-delivery instead of the delivery_commit sealed in the dirty planning closeback, creating a deliberate pre-edit mismatch.",
   "expectedBehavior": "A fixture that tests a two-step taskflow transaction must restore its own owner lane, renew its own active claim, and use the closeback's addressable delivery_commit as historical delivery evidence. Product enforcement remains fail-closed when capability, freshness, or delivery identity is absent or inconsistent.",

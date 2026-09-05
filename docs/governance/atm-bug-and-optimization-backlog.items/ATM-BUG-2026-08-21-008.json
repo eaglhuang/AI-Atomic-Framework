@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
+  "status": "Closed — source verified; formal backlog closeout recorded 2026-09-01",
   "area": "Wave-exit observer receipts were emitted without a registered validator-contract family",
   "finding": "The completion compiler emitted evidence tuples with validatorContractId atm.waveExitObserverReceipt/EXIT-NN, but its validator contract registry contained only task-card validators. Reviewer B correctly rejected every otherwise valid Wave receipt as unregistered because it could not distinguish the sealed receipt-policy contract from a task-card contract.",
   "expectedBehavior": "Every evidence tuple must resolve to one explicitly registered contract kind. Wave receipt contracts must bind exit id, evidence owner, approved command, and sealed policy digest. Independent consumers must replay the receipt against the policy and input digests at the completion target commit; unknown, duplicate, malformed, or drifted contracts remain fail-closed.",

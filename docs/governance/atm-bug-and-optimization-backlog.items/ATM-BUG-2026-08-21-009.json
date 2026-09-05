@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed and verified in source and frozen runner; formal backlog closeout recorded 2026-09-01",
+  "status": "Closed — source and frozen runner verified; formal backlog closeout recorded 2026-09-01",
   "area": "Evidence-command child processes inherited the caller lane authority",
   "finding": "The evidence runner spawned declared validator commands with the full parent environment. When a governed evidence run carried ATM_LANE_SESSION_ID, isolated fixture repositories inherited that lane and could classify it as a fresh foreign reservation. The fixture then failed before exercising its intended rule. This is distinct from lane-adopt and claim-renewal UX defects: the erroneous authority crossed a parent-to-child execution boundary where no child command contract requested it.",
   "expectedBehavior": "Evidence-command children receive the task and actor attribution required for evidence, but ambient lane-session authority is not propagated. A child that needs an explicit lane must establish it through its own governed command path. Fixture and validator isolation must not depend on the caller's lane lifetime or identity.",

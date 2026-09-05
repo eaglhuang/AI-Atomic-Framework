@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source; formal backlog closeout recorded 2026-09-01",
+  "status": "Closed — source verified; formal backlog closeout recorded 2026-09-01",
   "area": "Completion evidence publication delta excludes a first-class governance projection namespace",
   "finding": "The completion-evidence compiler can declare publication artifacts only under docs/reports/**, although the same closeout contract emits governance-optimization/plan-3x-4x-objective-audit-2026-07-31.json. A legitimate sealed closeout bundle therefore becomes permanently stale after that audit projection changes. This is distinct from ATM-BUG-2026-08-18-001, which concerns governed commit staging of a runner output inventory rather than the compiler's semantic publication-delta allowlist.",
   "expectedBehavior": "Publication-delta validation accepts only explicitly declared JSON projections from the contract's supported output namespaces, including docs/reports/** and governance-optimization/**, plus durable ATM receipts. Traversal, absolute paths, source files, and undeclared artifacts remain fail-closed. A compiler must be able to seal every output it owns without admitting arbitrary repository files.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed and verified in source and frozen runner; formal backlog closeout recorded 2026-09-01",
+  "status": "Closed — source and frozen runner verified; formal backlog closeout recorded 2026-09-01",
   "area": "Fuzzy pending-worktree matching can deadlock a task claim before an adapter projection is audited",
   "finding": "The next-route pending-worktree check treated two-token title, plan, or filename resemblance as proof that a tracked file belonged to the candidate task. A source-first adapter-projection task could therefore be blocked before claim by generated editor files that were not yet declared in its exact scope. The matcher had discovered a plausible candidate, but the claim gate treated discovery evidence as mutation authority. This is distinct from task-direction scope enforcement: the observed failure happens before a task can run the compiler or installer that would enumerate the exact projection set.",
   "expectedBehavior": "Fuzzy task-artifact resemblance remains visible as advisory preflight evidence. It must not require scope expansion or grant write authority. A task may mutate a projection only after the compiler or installer emits its exact paths and the task explicitly adds those paths to its direction lock and work-admission ticket. Untracked and tracked foreign WIP remain non-mutating; scope and ticket checks remain fail-closed at every write boundary.",
