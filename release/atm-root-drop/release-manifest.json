@@ -5232,6 +5232,7 @@
     "release/atm-root-drop/tests/cli/encoding-guard-argv-budget.test.ts",
     "release/atm-root-drop/tests/cli/engineering-change-method-profiles.test.ts",
     "release/atm-root-drop/tests/cli/error-recovery-contract.test.ts",
+    "release/atm-root-drop/tests/cli/eslint-generated-path-boundaries.test.ts",
     "release/atm-root-drop/tests/cli/evidence-bundle-io-extraction.test.ts",
     "release/atm-root-drop/tests/cli/evidence-bundle-manifest.test.ts",
     "release/atm-root-drop/tests/cli/evidence-ledger-migration.test.ts",
@@ -5995,8 +5996,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 2,
-    "unchanged": 1950,
+    "copied": 5,
+    "unchanged": 2729,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -6183,7 +6184,7 @@
       },
       {
         "path": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
-        "digest": "95288dcfd46b26b74659f0307e9572922781129cdea72562c5024c6c3d186070",
+        "digest": "dbe1df3099f2b78146b25f615d531c35a43990f43a136c3ab553ac719c3f9f62",
         "origin": "source",
         "inputPaths": [
           "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
@@ -17604,7 +17605,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/broker/shared-delivery-saga.js",
-        "digest": "2bad46db280cb2cddd88c5539c492077a737aff655a8b155acd81f1f1cae93f7",
+        "digest": "cb59ad8f87b834b40cf37ee8b6a9fbfd6c7c09ca61aed302fdeb8482f60dc878",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/shared-delivery-saga.js"
@@ -34992,7 +34993,7 @@
       },
       {
         "path": "packages/core/dist/broker/shared-delivery-saga.js",
-        "digest": "2bad46db280cb2cddd88c5539c492077a737aff655a8b155acd81f1f1cae93f7",
+        "digest": "cb59ad8f87b834b40cf37ee8b6a9fbfd6c7c09ca61aed302fdeb8482f60dc878",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/shared-delivery-saga.js"
@@ -38646,7 +38647,7 @@
       },
       {
         "path": "packages/core/src/broker/shared-delivery-saga.ts",
-        "digest": "a4936eb30476f9c22e61543c32888ee6f1fe17fd0134cc52da7d4befb5906b44",
+        "digest": "a01e4a7d0dc4f9decb31a593ee8758cffa5eb578269e798eb1cd2ad59e65cd2e",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/broker/shared-delivery-saga.ts"
@@ -52802,6 +52803,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/eslint-generated-path-boundaries.test.ts",
+        "digest": "39ec3719fb55b694bac67dfa1ef7b9ce0511c5ff378cc3bc5419170f50ece541",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/eslint-generated-path-boundaries.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/evidence-bundle-io-extraction.test.ts",
         "digest": "6dde22d0e4495cf241d8badef619e284283e33e7f895dd8cd39a2b75ee0939b0",
         "origin": "source",
@@ -59642,7 +59652,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:ecda201e2cdf5c331f004a5d496988c6ad9aac7555d9e4a6cbcea393576c3baa"
+    "treeDigest": "sha256:4f2c9749a9d65c9e10be4f715bb60cbc25cb41ed98d031c20ed796d2592ce2ec"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61171,7 +61181,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:3c61fec05f52f00379e4b3bc101ecb6b6739582aa6b1bf95461d8c5e87107ccc"
+    "digest": "sha256:d8a4a6836e66659c889a66db431c92e65d6452074a645d245f081f648b2febe1"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66377,6 +66387,7 @@
       "release/atm-root-drop/tests/cli/encoding-guard-argv-budget.test.ts",
       "release/atm-root-drop/tests/cli/engineering-change-method-profiles.test.ts",
       "release/atm-root-drop/tests/cli/error-recovery-contract.test.ts",
+      "release/atm-root-drop/tests/cli/eslint-generated-path-boundaries.test.ts",
       "release/atm-root-drop/tests/cli/evidence-bundle-io-extraction.test.ts",
       "release/atm-root-drop/tests/cli/evidence-bundle-manifest.test.ts",
       "release/atm-root-drop/tests/cli/evidence-ledger-migration.test.ts",
@@ -67143,22 +67154,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:2d48e5f0d0676033d8f0210f98b9f9f9e9b02a1bc75501a94f53d69f01b3bbbc",
-  "sealedSourceCommit": "efe19ddcb199ed433875e7419ee26091b4825dc6",
+  "buildInputsTreeHash": "sha256:68c398fa392f0dbfab31331bea45fcbffd58d4dcb52896b1558de49c32987b86",
+  "sealedSourceCommit": "5627844d89627aa4c739a72f9f2962805850743e",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:39eb863b5484a3f8b446c0e2233312826f5bc536232a140508f6d31c54ce4f06",
-  "tsBuildCacheDigest": "sha256:f3ff7e3e076eb74cd36f6585a83691d378535b0afb9b854f2064c756c711119b",
+  "buildDecisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlanDigest": "sha256:b216226fcdbb7d980b02b330eeb5c62b747291fdef69c41fb00d3732a85b04a5",
+  "tsBuildCacheDigest": "sha256:76b3c36df8ebbafc5129c2c432c6494210bcc5a11eb7921a278dcf7a8f6dca5c",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 50,
     "skipDecision": 61,
-    "worktreeSetup": 14478,
-    "typescriptBuild": 17808,
-    "rootDropReleaseAssembly": 33912,
-    "onefileReleaseAssembly": 9166,
-    "artifactSync": 10026,
+    "worktreeSetup": 11088,
+    "typescriptBuild": 21260,
+    "rootDropReleaseAssembly": 32416,
+    "onefileReleaseAssembly": 7997,
+    "artifactSync": 9344,
     "cleanup": 0,
-    "totalElapsed": 109131
+    "totalElapsed": 101052
   }
 }
