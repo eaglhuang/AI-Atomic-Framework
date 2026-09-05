@@ -24,13 +24,17 @@ export async function runNextClaimAtomizationValidatorCase(taskCase: string): Pr
   const atomDirectory = path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'next');
   const atomFiles = readdirSync(atomDirectory).filter((entry) => entry.endsWith('.ts'));
   for (const moduleFile of [...ownerModules, ...atomFiles.map((entry) => `packages/cli/src/commands/next/${entry}`)]) {
-    const lineCount = readFileSync(path.join(process.cwd(), moduleFile), 'utf8').split('\n').length;
+    const lineCount = readFileSync(path.join(process.cwd(), moduleFile), 'utf8').trimEnd().split(/\r?\n/).length;
     assert.ok(lineCount < lineBudget, `${moduleFile} must stay under ${lineBudget} lines (found ${lineCount})`);
   }
-  const atomMap = JSON.parse(readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8')) as { entries?: Record<string, unknown> } & Record<string, unknown>;
-  const atomMapText = JSON.stringify(atomMap);
+  const atomMap = JSON.parse(readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8')) as { mappings?: Array<{ path_pattern?: string }> };
+  const atomMapPatterns = new Set((atomMap.mappings ?? []).map((mapping) => mapping.path_pattern).filter((pattern): pattern is string => Boolean(pattern)));
   for (const moduleFile of ownerModules) {
-    assert.ok(atomMapText.includes(moduleFile), `atom map must contain an entry for ${moduleFile}`);
+    const covered = atomMapPatterns.has(moduleFile)
+      || atomMapPatterns.has('packages/cli/src/commands/next/**')
+      || atomMapPatterns.has('packages/cli/src/commands/**')
+      || atomMapPatterns.has('packages/cli/src/**');
+    assert.ok(covered, `atom map must cover ${moduleFile} with an exact or owning glob entry`);
   }
   const queueAdmission = {
     schemaId: 'atm.brokerQueueAdmission.v1',

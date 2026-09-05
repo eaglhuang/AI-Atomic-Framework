@@ -1,7 +1,12 @@
 export function buildTeamArtifactHandoffContract(input) {
-    const requiredRoles = uniqueStrings((input.requiredRoles ?? ['implementer', 'reviewer', 'validator', 'evidence-collector'])
+    const requestedRoles = uniqueStrings((input.requiredRoles ?? ['implementer', 'reviewer', 'validator', 'evidence-collector'])
         .map((entry) => String(entry).trim())
         .filter(Boolean));
+    const roleOrder = ['evidence-collector', 'implementer', 'reviewer', 'validator'];
+    const requiredRoles = [
+        ...roleOrder.filter((role) => requestedRoles.includes(role)),
+        ...requestedRoles.filter((role) => !roleOrder.includes(role))
+    ];
     const recipeAgents = input.recipe?.agents ?? [];
     const roleContracts = requiredRoles.map((role) => {
         const agent = recipeAgents.find((entry) => entry.role === role);

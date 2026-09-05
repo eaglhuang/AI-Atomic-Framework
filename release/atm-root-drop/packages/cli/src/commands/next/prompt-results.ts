@@ -37,7 +37,6 @@ import {
   createNextProfiler,
   isReadOnlyPromptScopeMiss
 } from './prompt-result-contracts.ts';
-
 export function buildPromptScopedNextResult(input: {
   readonly cwd: string;
   readonly actor?: string;

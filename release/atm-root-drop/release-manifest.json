@@ -4936,6 +4936,7 @@
     "release/atm-root-drop/scripts/validators/team-agents/broker-run-scan-index.ts",
     "release/atm-root-drop/scripts/validators/team-agents/broker-shared-surface.ts",
     "release/atm-root-drop/scripts/validators/team-agents/capture-broker-evidence.ts",
+    "release/atm-root-drop/scripts/validators/team-agents/cases.json",
     "release/atm-root-drop/scripts/validators/team-agents/claim-gate-parity.ts",
     "release/atm-root-drop/scripts/validators/team-agents/claude-gemini-bridges.ts",
     "release/atm-root-drop/scripts/validators/team-agents/closure-summary.ts",
@@ -6009,11 +6010,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 2,
-    "unchanged": 1951,
+    "copied": 1388,
+    "unchanged": 4587,
     "removed": 0
   },
-  "buildMode": "overlay",
+  "buildMode": "full",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -16205,7 +16206,7 @@
       },
       {
         "path": "package.json",
-        "digest": "234c273879f7752ce1631c010e68f4034c7a6bce444550320aee94f9dda3b28e",
+        "digest": "3ce5a8088652e6bdb41650b44a70ce78844f78b36e17cede9b07fab9a6da5682",
         "origin": "source",
         "inputPaths": [
           "package.json"
@@ -26420,7 +26421,7 @@
       },
       {
         "path": "packages/cli/dist/commands/team/legacy/runtime-contracts.js",
-        "digest": "26951a36a82ac82fc8bf83a30117b3bb63c215ca0094204f9b3a4867a654a411",
+        "digest": "27f8c4e5209f978d3b119238dc0775f1bd4676e49d07e266c7a7d113003c8344",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/team/legacy/runtime-contracts.js"
@@ -31055,7 +31056,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/prompt-results.ts",
-        "digest": "589a5f5943f607dc7b66f813668244c47b7fc7fb1e250d0456251a4ff07b15e1",
+        "digest": "c6357e948666120ee03a56bbe467f33dd26e98fb9b6eb23671bde0fa1dff5a10",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/prompt-results.ts"
@@ -33728,7 +33729,7 @@
       },
       {
         "path": "packages/cli/src/commands/team/legacy/runtime-contracts.ts",
-        "digest": "c9e3777878b3c85031171972b67f324c1e8614dd743df6bd4bbbb1303dd3c62e",
+        "digest": "9e4a0e462f8e083f73c51d486b072f1a1e3ad49ca4f818045208f81c7a5f845d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/team/legacy/runtime-contracts.ts"
@@ -44411,7 +44412,7 @@
       },
       {
         "path": "schemas/governance/broker-conflict-resolution.schema.json",
-        "digest": "e3faf8ced88ee911447175d962e8e600e999591f79b444b1319712ad298a442d",
+        "digest": "6466225ec81c4485d0da0cf481803bdd30c6725b6a5a21001b06acc2cca4be7c",
         "origin": "source",
         "inputPaths": [
           "schemas/governance/broker-conflict-resolution.schema.json"
@@ -49685,7 +49686,7 @@
       },
       {
         "path": "scripts/validate-team-agents.ts",
-        "digest": "1017123181adb1b0dc567ab0040a385bc528f94cbe728229b5028a666833d1d3",
+        "digest": "5c1c270756d85c6405df8441166a530c5ba7661ab4f588cfe60ebc1c8bce3ec9",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-team-agents.ts"
@@ -50099,7 +50100,7 @@
       },
       {
         "path": "scripts/validators/team-agents/broker-conflict-resolution.ts",
-        "digest": "6ecf44a7e0ce62ecd822edd7e7b61320b2e3929a79df64937ea5e80739e07f54",
+        "digest": "c9279056f664276203e5ba0b52e3e7ccdc15f9c4c88d4a1eddc8413bbea6521a",
         "origin": "source",
         "inputPaths": [
           "scripts/validators/team-agents/broker-conflict-resolution.ts"
@@ -50108,7 +50109,7 @@
       },
       {
         "path": "scripts/validators/team-agents/broker-conflict-ux.ts",
-        "digest": "c66c702dfc08d7f50c3b25cd56f9bda12780ad44fdb17e6d48fd6494b3bb6084",
+        "digest": "9c3b015d6e738de02a612c758bdd9906fda7d6155be7f994a66b24aa3a05a14f",
         "origin": "source",
         "inputPaths": [
           "scripts/validators/team-agents/broker-conflict-ux.ts"
@@ -50117,7 +50118,7 @@
       },
       {
         "path": "scripts/validators/team-agents/broker-override-gate-parity.ts",
-        "digest": "cd6fb3d2ee80c94fc6e60b4a981610040009003fda036420e6cf42726d028908",
+        "digest": "8bff5fb9c204025b096659468570915fe6c67029c2664c58570b734bac771d70",
         "origin": "source",
         "inputPaths": [
           "scripts/validators/team-agents/broker-override-gate-parity.ts"
@@ -50148,6 +50149,15 @@
         "origin": "source",
         "inputPaths": [
           "scripts/validators/team-agents/capture-broker-evidence.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/validators/team-agents/cases.json",
+        "digest": "79ea73b19a84726d76bc7c7e6ef5d7a1c69b54a08460b76eaf0fc81a48d0bbf4",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/validators/team-agents/cases.json"
         ],
         "replaceable": true
       },
@@ -50198,7 +50208,7 @@
       },
       {
         "path": "scripts/validators/team-agents/direct-provider-execute-admission.ts",
-        "digest": "59a6f53648a7f43912dd76dc555b9a99ca3b281288aa5aeed55f313c048347e7",
+        "digest": "bc1544ead0161748e16327e8ca0d8ffc6ce6214f208e032c4403845e7b6834fc",
         "origin": "source",
         "inputPaths": [
           "scripts/validators/team-agents/direct-provider-execute-admission.ts"
@@ -50270,7 +50280,7 @@
       },
       {
         "path": "scripts/validators/team-agents/integration-capability-wiring.ts",
-        "digest": "e6dffca9633cece445a21f0abfd512e37cb16ff999d199afa31aa62aeefb37ce",
+        "digest": "cefe9d872a545ce5788c3bfd0563598420a51151d27f1c354dd21c4b216414d7",
         "origin": "source",
         "inputPaths": [
           "scripts/validators/team-agents/integration-capability-wiring.ts"
@@ -50351,7 +50361,7 @@
       },
       {
         "path": "scripts/validators/team-agents/next-claim-atomization.ts",
-        "digest": "efdc932ae823d5d145add2b26840ef50113b92595487a964383b54bd44e925a0",
+        "digest": "d40383f9d934bb1db4e6fbbc54919027f4340ca7dcbb3d599f5f33a7f6163af8",
         "origin": "source",
         "inputPaths": [
           "scripts/validators/team-agents/next-claim-atomization.ts"
@@ -50423,7 +50433,7 @@
       },
       {
         "path": "scripts/validators/team-agents/provider-neutral-role-skill-pack-manifest.ts",
-        "digest": "da308da674c1e5678e1dd8b48709561eade9716e6c209a9880c5cb05e21f0abb",
+        "digest": "60abc2f20efb1685afc1a7884e193458b1071659b3eb1460c70fbf8b3d274fa3",
         "origin": "source",
         "inputPaths": [
           "scripts/validators/team-agents/provider-neutral-role-skill-pack-manifest.ts"
@@ -53528,7 +53538,7 @@
       },
       {
         "path": "tests/cli/integration-source-coverage-parity.test.ts",
-        "digest": "07ef87680e50e0814782f850b5a93c211e290edc0753736208a7d2a675a78f64",
+        "digest": "2143bd181b2f1a3148dcb28a21de60089a4809a2b542d358bc6f13ad107149c0",
         "origin": "source",
         "inputPaths": [
           "tests/cli/integration-source-coverage-parity.test.ts"
@@ -59782,7 +59792,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:8b22ea10b11645dc88f62ed2d71f7badec3887b5adc508422a8bff77d5b212b7"
+    "treeDigest": "sha256:96e62bca4eba53fb3089fd3dcf94d267c0309802d61ed4f9a371c665a7fe4201"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61312,7 +61322,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:5271dd6c330bd48ecdc97f6f32de8275780674dcd27011edc37c49e3501f084c"
+    "digest": "sha256:79e3be0ea4a6e83ac484c73ba23847d394decb5417d0a5a2dbe8c2575d82b756"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66222,6 +66232,7 @@
       "release/atm-root-drop/scripts/validators/team-agents/broker-run-scan-index.ts",
       "release/atm-root-drop/scripts/validators/team-agents/broker-shared-surface.ts",
       "release/atm-root-drop/scripts/validators/team-agents/capture-broker-evidence.ts",
+      "release/atm-root-drop/scripts/validators/team-agents/cases.json",
       "release/atm-root-drop/scripts/validators/team-agents/claim-gate-parity.ts",
       "release/atm-root-drop/scripts/validators/team-agents/claude-gemini-bridges.ts",
       "release/atm-root-drop/scripts/validators/team-agents/closure-summary.ts",
@@ -67298,22 +67309,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:2c55eee9e7fe2662894ce23e7757f4648c3edfcf46e1d54cfd746614a4655f12",
-  "sealedSourceCommit": "965623c09923bccf313152b8696f26e2421bae98",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:5dea11da82c070f9ba93d5555fd758def99a2a5f160eb1e0d8a9563f0b057fd0",
-  "tsBuildCacheDigest": "sha256:e4bb770d4fd787be5eff57ab19b97b942a87f59e10e340f92662355a17d9ce31",
+  "buildInputsTreeHash": "sha256:7e4cc1d60c68a6dd751016ce5055bbb082a8b379ebac716e658006d0d34053b3",
+  "sealedSourceCommit": "1beb98fbee7c145fd49b7714feb2ca7d2987e4b8",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:01070dd5479197c7b6fad3c18552fac9caa83c49e38b8bd8a583cbced9d45db2",
+  "tsBuildCacheDigest": "sha256:a0e4427c61ede80204b28f8ad07014d2400545ef94e6269d7cbd7244d9bdc870",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 64,
-    "skipDecision": 57,
-    "worktreeSetup": 14081,
-    "typescriptBuild": 21163,
-    "rootDropReleaseAssembly": 34129,
-    "onefileReleaseAssembly": 9032,
-    "artifactSync": 8193,
+    "inputHashCalculation": 51,
+    "skipDecision": 60,
+    "worktreeSetup": 13923,
+    "typescriptBuild": 10801,
+    "rootDropReleaseAssembly": 33870,
+    "onefileReleaseAssembly": 9456,
+    "artifactSync": 8380,
     "cleanup": 0,
-    "totalElapsed": 106553
+    "totalElapsed": 84868
   }
 }

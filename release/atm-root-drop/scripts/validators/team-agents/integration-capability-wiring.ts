@@ -48,7 +48,7 @@ export async function runIntegrationCapabilityWiringValidatorCase(taskCase: stri
   assert.equal((validateResult.evidence as any)?.runtimeContract?.runtimeMode, 'editor-subagent');
   assert.equal((validateResult.evidence as any)?.runtimeContract?.providerId, 'claude-code');
 
-  const teamSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'team.ts'), 'utf8');
+  const teamSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'team', 'legacy', 'command-runner.ts'), 'utf8');
   assert.ok(teamSource.includes('ATM_TEAM_RUNTIME_BACKEND_MISSING'));
   assert.ok(teamSource.includes('evaluateTeamRuntimeBackendAdmission'));
 
@@ -56,7 +56,7 @@ export async function runIntegrationCapabilityWiringValidatorCase(taskCase: stri
   assert.ok(onboarding.includes('teamRuntimeCapabilities'));
   assert.ok(onboarding.includes('ATM_TEAM_RUNTIME_BACKEND_MISSING'));
 
-  const integrationSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'integration.ts'), 'utf8');
+  const integrationSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'integration', 'health.ts'), 'utf8');
   assert.ok(integrationSource.includes('export function inspectTeamRuntimeBackendCapabilities'));
 
   console.log('[validate-team-agents] ok (integration-capability-wiring)');

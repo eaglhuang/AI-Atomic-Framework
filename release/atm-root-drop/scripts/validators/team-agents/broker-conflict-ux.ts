@@ -19,6 +19,8 @@ export async function runBrokerConflictUxValidatorCase(taskCase: string): Promis
     'TASK-TEAM-0048-B',
     '--path',
     'packages/cli/src/commands/team.ts',
+    '--release-order',
+    'TASK-TEAM-0048-A,TASK-TEAM-0048-B',
     '--decision-reason',
     'broker-conflict-blocked by shared Team Broker UX surface; release sequentially.',
     '--created-at',

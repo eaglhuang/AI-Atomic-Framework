@@ -62,6 +62,8 @@ export async function runBrokerConflictResolutionValidatorCase(taskCase: string)
       'TASK-TEAM-0046-B',
       '--path',
       'packages/core/src/team-runtime/permission-broker.ts',
+      '--release-order',
+      'TASK-TEAM-0046-A,TASK-TEAM-0046-B',
       '--decision-reason',
       'broker-conflict-blocked by atom overlap; release sequentially.',
       '--created-at',
