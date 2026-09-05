@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-CODEX-011190",
+  "status": "Closed — TASK-CODEX-011190 batch checkpoint contract repair verified 2026-09-05",
   "area": "Governance",
   "finding": "The task-direction governance validator exposed a batch checkpoint --hold contract mismatch: after a held checkpoint, compact batch current reports hold state and commitInstruction, but pre-commit still blocks the staged just-checkpointed deliverable with ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT.",
   "expectedBehavior": "A held checkpoint should either preserve a commit window that pre-commit accepts for the just-checkpointed task, or the batch current/close guidance should clearly state that commits are intentionally blocked until a different governed resume/commit path is used.",
