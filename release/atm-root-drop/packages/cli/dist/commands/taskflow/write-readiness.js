@@ -9,6 +9,7 @@ import { quoteCliValue } from '../shared.js';
 import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.js';
 import { inspectCloseWindowStagedIndexAdmission } from '../tasks/close-window-lock.js';
 import { evaluateAcceptanceEvidenceClosureGate } from '../tasks/close-orchestrator/acceptance-evidence-gate.js';
+import { evaluateTaskflowTelemetryObligationGate } from './telemetry-obligation-close-gate.js';
 // TASK-SKL-0029 — write-readiness lifecycle adapter.
 //
 // Write-readiness must not recompute a task's required-case set or freshness; it
@@ -116,6 +117,18 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
             code: blocker.code,
             summary: `Taskflow close requires closure-critical acceptance evidence for ${blocker.predicateId}: ${blocker.reasons.join(', ')}.`,
             requiredCommand: null
+        });
+    }
+    const telemetryObligationGate = evaluateTaskflowTelemetryObligationGate({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        taskDocument: input.taskDocument
+    });
+    if (telemetryObligationGate.result?.verdict === 'incomplete') {
+        blockers.push({
+            code: 'ATM_TASKFLOW_CLOSE_TELEMETRY_OBLIGATION_INCOMPLETE',
+            summary: `Taskflow close requires a sealed telemetry obligation for ${input.taskId}; missing: ${telemetryObligationGate.result.missingObligations.join(', ')}.`,
+            requiredCommand: telemetryObligationGate.result.recoveryCommand
         });
     }
     const brokerConflictGate = evaluateTaskflowBrokerConflictGate({

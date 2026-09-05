@@ -254,4 +254,38 @@ assert.ok(
   'taskflow preview must surface the same missing acceptance observation that blocks tasks close'
 );
 
+// A declared telemetry obligation is closure-critical: close must not claim
+// completion while the task has neither a sealed summary nor an explicit
+// observability-missing receipt.
+const telemetryObligationHint = buildTaskflowCloseWriteReadinessHint({
+  cwd: repo,
+  taskId: 'TASK-WRITE-0005',
+  actorId: 'validator',
+  taskDocument: {
+    status: 'done',
+    claim: { state: 'released', actorId: 'validator', leaseId: 'lease-5' },
+    telemetryObligations: ['atm.gateTelemetryTaskSummary.v1', 'dataDrivenDecision']
+  },
+  declaredFiles: ['src/app.ts'],
+  closebackPlan: {
+    writerBoundary: { planningMirrorPath: null },
+    closebackPathResolution: null,
+    historicalDeliveryGate: { required: false }
+  } as any,
+  previewCommitBundle: { targetDeliveryFiles: [] },
+  historicalDeliveryRefs: [],
+  planningAuthorityDeliveryGate: {
+    required: false,
+    ok: false,
+    repoRoot: null,
+    matchedFiles: [],
+    reason: null
+  }
+});
+assert.equal(telemetryObligationHint.status, 'blocked');
+assert.ok(
+  telemetryObligationHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_TELEMETRY_OBLIGATION_INCOMPLETE'),
+  'taskflow preview must block an undeclared telemetry seal'
+);
+
 console.log('ok: write readiness spec passed');

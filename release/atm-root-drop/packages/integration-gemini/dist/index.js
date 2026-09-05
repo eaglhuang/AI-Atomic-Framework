@@ -66,6 +66,7 @@ export function createAntigravitySourceFiles(repositoryRoot = process.cwd()) {
         '- `.agents/skills/atm-next/SKILL.md`',
         '- `.agents/skills/atm-orient/SKILL.md`',
         '- `.agents/skills/atm-governance-router/SKILL.md`',
+        '- Use `node atm.mjs write-ticket ... --json` before governed editor writes; scope amendments must use the ATM task route.',
         '- `.agents/skills/atm-create/SKILL.md`',
         '- `.agents/skills/atm-lock/SKILL.md`',
         '- `.agents/skills/atm-evidence/SKILL.md`',

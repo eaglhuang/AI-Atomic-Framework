@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Fixed — Antigravity entry now exposes governed write-ticket enforcement; broader interception remains follow-up",
   "area": "Editor integration / write-ticket enforcement",
   "finding": "An AI worker could edit files outside its task scope before ATM commit/claim gates noticed. Gemini 0258 produced broad dirty WIP and formatter spillover beyond the intended keep-list, and ATM only surfaced the problem after the shared worktree was already polluted.",
   "expectedBehavior": "ATM should provide a write-ticket or editor adapter pre-write guard that checks the current task allowedFiles before filesystem mutation, with post-write fallback evidence for tools that cannot intercept writes. Normal out-of-scope needs should route through governed scope amendment, not silent dirty spillover.",
-  "evidenceOrRepro": "Plan 3.1 Gemini 0258 counterexample: worktree included out-of-scope/formatter changes such as actor-registry, identity, bootstrap, command-manifest, identity-normalization, and commit-bundle-assembly while the intended task focused on dirty-release/WIP recovery.",
-  "followUp": "Prioritize ATM-GOV-0259 write-ticket/scope amendment guard. Require adapter pre-write checks, post-write violation records, actor mismatch diagnostics, and no second permission model."
+  "evidenceOrRepro": "Plan 3.1 Gemini 0258 counterexample: worktree included out-of-scope/formatter changes such as actor-registry, identity, bootstrap, command-manifest, identity-normalization, and commit-bundle-assembly while the intended task focused on dirty-release/WIP recovery. Reproduced the remaining adapter-surface gap with node --strip-types tests/cli/write-ticket-command-registration.test.ts: GEMINI.md lacked the governed write-ticket instruction while the generated manifest remained self-consistent. Source-first regeneration via node atm.dev.mjs integration add antigravity --force --json restored the instruction; the command-registration, scope-guard, scope-amendment, and error-code-registry tests, node atm.dev.mjs integration verify antigravity --json, and typecheck all pass. Frozen runner was rebuilt and published at 9f55c1d8e689367ff8e3e2e398bb16be53b88f7f.",
+  "followUp": "The identified Antigravity entry-surface defect is fixed. Broader pre-write interception for editors that cannot intercept filesystem writes, post-write violation records, and any cross-editor adoption audit remain separate governance work; do not reopen this source repair without a new red reproduction."
 }

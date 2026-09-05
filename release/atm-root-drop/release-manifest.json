@@ -2165,6 +2165,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/runner-recovery-forwarding.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/runner-selection-evidence.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/task-scope.js",
+    "release/atm-root-drop/packages/cli/dist/commands/taskflow/telemetry-obligation-close-gate.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/transaction-status.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
@@ -2931,6 +2932,7 @@
     "release/atm-root-drop/packages/cli/src/commands/taskflow/runner-recovery-forwarding.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/task-scope.ts",
+    "release/atm-root-drop/packages/cli/src/commands/taskflow/telemetry-obligation-close-gate.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/transaction-status.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
@@ -5993,8 +5995,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 4,
-    "unchanged": 778,
+    "copied": 10,
+    "unchanged": 1946,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -19879,7 +19881,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/telemetry/index.js",
-        "digest": "82ca01cb888d95f1b3e56406cec0efcf6b9247d9d2578edd66c6cbc82eb06f46",
+        "digest": "ad55d935139c56121e8f0c4e6181dc9fcb0c4dc5de450f20c91b91ec9ac1644a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/telemetry/index.js"
@@ -19906,7 +19908,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/telemetry/shared-write-coverage.js",
-        "digest": "c4414b720f50e970d17a1611543e93eab04b4cb7402c7c28c5e914ae06f52d15",
+        "digest": "498220ad6806f07f93bffe4e425a39d2a01ee4dff41556f156a833d9568663aa",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/telemetry/shared-write-coverage.js"
@@ -20095,7 +20097,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/integration-gemini/dist/index.js",
-        "digest": "af02ae2eba46aa65cb3f47ea0da3f507ec1ffc1669ca1f490d0d1a4d209d081b",
+        "digest": "affa01f111795b8dc6553ee47cf5165750822d0d5830d60891a8087043384795",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/integration-gemini/dist/index.js"
@@ -25206,6 +25208,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/taskflow/telemetry-obligation-close-gate.js",
+        "digest": "19275883f159127d30a27730f0920c72fa9aed5904399942fd89159c5314cbb9",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/taskflow/telemetry-obligation-close-gate.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/taskflow/transaction-status.js",
         "digest": "1e67594d3ae2e1fbc6f26ad80153a446be25038e72454f5022bad66546019990",
         "origin": "source",
@@ -25216,7 +25227,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/write-readiness.js",
-        "digest": "30f4ad556bdc37d95e2343f02f940b35032e3542322b7bd835fa5c18e28f029a",
+        "digest": "47d83711b8e6cc35b000e4288b150d520fc5fbe85cfff7b7e9990f885bd3d0e6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/write-readiness.js"
@@ -31867,7 +31878,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts",
-        "digest": "3107867e5d6e4d92b083210b1adf2fbdd2882410495c9fa543b04323884b6a15",
+        "digest": "f4677558fb75d0df9b1cd3fa695f0573cb369626a8569d35e714de1243ac5d62",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts"
@@ -32100,6 +32111,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/taskflow/telemetry-obligation-close-gate.ts",
+        "digest": "b4a8fcc2640f004d9bc51bdd7b020268de487b5d1fe3df499eda2089a356093f",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/taskflow/telemetry-obligation-close-gate.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/taskflow/transaction-status.ts",
         "digest": "d79c523adb99801142a2da6693efc4de14b2eb88300c0e342bede2abd311fb6a",
         "origin": "source",
@@ -32110,7 +32130,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/write-readiness.ts",
-        "digest": "ded30c947d550556f67cb1d29f98e988c49ac9cf9d1152e951911a9a30eee2cd",
+        "digest": "835c80bb03679b22d87386f673613fb1e60c05102b13f02e3674fc9377421e3c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/write-readiness.ts"
@@ -41380,7 +41400,7 @@
       },
       {
         "path": "packages/integration-gemini/dist/index.js",
-        "digest": "af02ae2eba46aa65cb3f47ea0da3f507ec1ffc1669ca1f490d0d1a4d209d081b",
+        "digest": "affa01f111795b8dc6553ee47cf5165750822d0d5830d60891a8087043384795",
         "origin": "source",
         "inputPaths": [
           "packages/integration-gemini/dist/index.js"
@@ -41398,7 +41418,7 @@
       },
       {
         "path": "packages/integration-gemini/src/index.ts",
-        "digest": "9e2d86ea46f87678b2fe092b48030a45f73bb56f547e533a9ba773dc7de9d695",
+        "digest": "e831314ea10652364c452331797d0355021079a91411efe10a50a71d8efae50b",
         "origin": "source",
         "inputPaths": [
           "packages/integration-gemini/src/index.ts"
@@ -59622,7 +59642,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:d03b12f39f767028051b064c4d8ad2bbb22b563fc7a3911d7326b643e33478f6"
+    "treeDigest": "sha256:f797f1e7396c65ac8ac4d461d301c622e65542a52c058eee26b6651a080f8521"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60223,6 +60243,7 @@
       "packages/cli/src/commands/taskflow/runner-recovery-forwarding.ts",
       "packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
       "packages/cli/src/commands/taskflow/task-scope.ts",
+      "packages/cli/src/commands/taskflow/telemetry-obligation-close-gate.ts",
       "packages/cli/src/commands/taskflow/transaction-status.ts",
       "packages/cli/src/commands/taskflow/write-readiness.ts",
       "packages/cli/src/commands/tasks.ts",
@@ -61150,7 +61171,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:a70dbbe6fd0ac668b3463240d54b5faabb84ab13d9d457c7057172692f0d619b"
+    "digest": "sha256:2148946d60c0aba294e4e4c4bfc15e548dc9d745e9380aa6240029f300980f6d"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63289,6 +63310,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/runner-recovery-forwarding.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/runner-selection-evidence.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/task-scope.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/telemetry-obligation-close-gate.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/transaction-status.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
@@ -64055,6 +64077,7 @@
       "release/atm-root-drop/packages/cli/src/commands/taskflow/runner-recovery-forwarding.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/runner-selection-evidence.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/task-scope.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/telemetry-obligation-close-gate.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/transaction-status.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
@@ -67120,22 +67143,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:5fcc561c9beb77cd0ab69661d69ffa654243bca3547ddf8e059c86103360456c",
-  "sealedSourceCommit": "4816b3308ff24e729c71cba0a6db40fb51c0cb32",
+  "buildInputsTreeHash": "sha256:cef18a26af7527ef4d5dbd4073ba69d6d6436e3a8905e864d3b5c19c40b04dd8",
+  "sealedSourceCommit": "9f55c1d8e689367ff8e3e2e398bb16be53b88f7f",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:3479d02d772461bf2d0b5a53c3864ff8d01a83c3c6a5bb66f5dfc51ffc8b3582",
-  "tsBuildCacheDigest": "sha256:9e6c7b1bccbc9b82904c7fdeab678c650fd1da62d2da181bc92c9f9d553b241c",
+  "buildDecisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlanDigest": "sha256:69b20142b00149400e73dd0bc739e2a71d1492b928f3107017101b9a7c35f1ec",
+  "tsBuildCacheDigest": "sha256:fb5c20292062c91d54c3ce81226207bdb9c6f67faa43418654bd94b8c686d45f",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 47,
+    "inputHashCalculation": 48,
     "skipDecision": 59,
-    "worktreeSetup": 14022,
-    "typescriptBuild": 11166,
-    "rootDropReleaseAssembly": 28820,
-    "onefileReleaseAssembly": 8658,
-    "artifactSync": 9137,
+    "worktreeSetup": 14565,
+    "typescriptBuild": 17446,
+    "rootDropReleaseAssembly": 33457,
+    "onefileReleaseAssembly": 9279,
+    "artifactSync": 11458,
     "cleanup": 0,
-    "totalElapsed": 100226
+    "totalElapsed": 109108
   }
 }

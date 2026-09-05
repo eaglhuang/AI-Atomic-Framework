@@ -20,6 +20,7 @@ import { quoteCliValue } from '../shared.ts';
 import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.ts';
 import { inspectCloseWindowStagedIndexAdmission } from '../tasks/close-window-lock.ts';
 import { evaluateAcceptanceEvidenceClosureGate } from '../tasks/close-orchestrator/acceptance-evidence-gate.ts';
+import { evaluateTaskflowTelemetryObligationGate } from './telemetry-obligation-close-gate.ts';
 
 export interface TaskflowCloseKnownBlocker {
   readonly code: string;
@@ -207,6 +208,18 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
       code: blocker.code,
       summary: `Taskflow close requires closure-critical acceptance evidence for ${blocker.predicateId}: ${blocker.reasons.join(', ')}.`,
       requiredCommand: null
+    });
+  }
+  const telemetryObligationGate = evaluateTaskflowTelemetryObligationGate({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    taskDocument: input.taskDocument
+  });
+  if (telemetryObligationGate.result?.verdict === 'incomplete') {
+    blockers.push({
+      code: 'ATM_TASKFLOW_CLOSE_TELEMETRY_OBLIGATION_INCOMPLETE',
+      summary: `Taskflow close requires a sealed telemetry obligation for ${input.taskId}; missing: ${telemetryObligationGate.result.missingObligations.join(', ')}.`,
+      requiredCommand: telemetryObligationGate.result.recoveryCommand
     });
   }
   const brokerConflictGate = evaluateTaskflowBrokerConflictGate({
