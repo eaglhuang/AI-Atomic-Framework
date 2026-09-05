@@ -131,7 +131,11 @@ export function planSharedDeliverySaga(input: {
   }
 
   const sideEffects = normalizeSideEffects(input.attemptedSideEffects, input.sharedWriteReceipt);
-  const duplicateAcknowledged = findDuplicateAcknowledgedEffects(sideEffects);
+  // Check the raw journal input before normalization.  `normalizeSideEffects`
+  // intentionally deduplicates operation ids for the replay journal, but doing
+  // the exactly-once check after that loss of information turns a repeated
+  // acknowledged side effect into a false green result.
+  const duplicateAcknowledged = findDuplicateAcknowledgedEffects(input.attemptedSideEffects ?? sideEffects);
   if (duplicateAcknowledged.length > 0) blockers.push(`duplicate acknowledged side effect: ${duplicateAcknowledged.join(', ')}`);
 
   const completedPhases = completedPhasesFor(input.killpoint, input.sharedWriteReceipt);
@@ -249,7 +253,10 @@ function dedupeSideEffects(sideEffects: readonly SharedDeliverySagaSideEffect[])
 function findDuplicateAcknowledgedEffects(sideEffects: readonly SharedDeliverySagaSideEffect[]): readonly string[] {
   const counts = new Map<string, number>();
   for (const effect of sideEffects) {
-    if (!effect.acknowledged) continue;
+    // A replay is the recorded recovery of an already acknowledged operation,
+    // not a second acknowledgement.  Only two acknowledged attempts for the
+    // same operation violate the exactly-once contract.
+    if (!effect.acknowledged || effect.state !== 'acknowledged') continue;
     counts.set(effect.operationId, (counts.get(effect.operationId) ?? 0) + 1);
   }
   return [...counts.entries()].filter(([, count]) => count > 1).map(([operationId]) => operationId).sort();
