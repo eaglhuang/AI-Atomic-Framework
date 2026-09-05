@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in ATM-GOV-0180 / d66c3b2de",
+  "status": "Closed — fixed in ATM-GOV-0180 / d66c3b2de; formal backlog closeout recorded 2026-09-05",
   "area": "Taskflow / Scope",
   "finding": "TASK-RFT-0062 declared scripts/validate-prompt-scoped-next/**/*.ts in scope, but taskflow pre-close initially excluded the newly created module files from the governed close bundle until tasks scope add listed each file explicitly.",
   "expectedBehavior": "Taskflow close and pre-close should expand in-scope glob patterns against newly created files, or surface a direct scope-amendment command before excluding those files from the governed bundle.",

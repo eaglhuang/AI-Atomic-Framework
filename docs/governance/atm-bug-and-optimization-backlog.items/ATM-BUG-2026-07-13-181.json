@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug / AI routing",
   "severity": "High",
-  "status": "Fixed in `cf883b8f3`",
+  "status": "Closed — fixed in `cf883b8f3`; formal backlog closeout recorded 2026-09-05",
   "area": "Next claim / fresh foreign-created task reservation",
   "finding": "`next --prompt` can select and `next --claim` can claim a task that was just imported or opened by another captain but not yet actively claimed, because active-work radar only sees live claims/locks and does not treat fresh task creation provenance as a soft reservation. A second captain can therefore steal a newly created task card before the creator starts work.",
   "expectedBehavior": "Fresh task imports/opens should carry creator actor, created/imported timestamp, source planning owner, and a short reservation/grace policy. `next --prompt` and `next --claim` should avoid auto-claiming another actor's fresh unclaimed task unless the creator explicitly handed it off, the reservation TTL expired, or a human/Team Broker override authorizes takeover. The one-glance active-work summary should include these fresh reserved tasks and recommend Team Broker level based on creator/claim/scope overlap; for framework/source compiler work, default at least L3 and escalate if shared foundation files overlap.",
