@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in ab3fe28fe75717146a9c8aa9ffc4ffc2607ec58b; regression tests/cli/next-active-batch-route.test.ts",
+  "status": "Closed — batch claim route binding and regression verified in frozen runner 2026-09-05",
   "area": "Next routing / batch claim",
   "finding": "`next --claim` can fail with an unhandled CLI exception instead of a governed ATM error when routing batch work.",
   "expectedBehavior": "Batch-route claim failures must return structured ATM diagnostics, a playbook, and a safe next action. Internal helper lookup failures should be covered by tests and never surface as `ATM_CLI_UNHANDLED`.",
