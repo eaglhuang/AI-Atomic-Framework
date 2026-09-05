@@ -7,6 +7,7 @@ import {
   createEmptyWaveBrokerSchedulerDocument,
   enqueueWaveBrokerTicket
 } from '../../packages/core/src/broker/wave-broker-scheduler.ts';
+import { issueWorkAdmissionTicket } from '../../packages/core/src/broker/work-admission-ticket.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-real-generated-executor-'));
 runGit(repo, ['init']);
@@ -19,7 +20,15 @@ const head = runGit(repo, ['rev-parse', 'HEAD']).stdout.trim();
 
 mkdirSync(path.join(repo, '.atm', 'runtime'), { recursive: true });
 mkdirSync(path.join(repo, '.atm', 'history', 'evidence'), { recursive: true });
+mkdirSync(path.join(repo, '.atm', 'history', 'tasks'), { recursive: true });
 mkdirSync(path.join(repo, 'generated'), { recursive: true });
+mkdirSync(path.join(repo, 'tools'), { recursive: true });
+writeFileSync(
+  path.join(repo, 'tools', 'emit-generated-output.mjs'),
+  "import { writeFileSync } from 'node:fs';\nwriteFileSync('generated/build-output.txt', 'built from command\\n');\n",
+  'utf8'
+);
+writeFileSync(path.join(repo, 'tools', 'fail-generated-output.mjs'), 'process.exit(7);\n', 'utf8');
 
 let scheduler = createEmptyWaveBrokerSchedulerDocument('2026-07-19T00:00:00.000Z');
 for (const taskId of ['ATM-GOV-A', 'ATM-GOV-B']) {
@@ -36,12 +45,37 @@ writeFileSync(path.join(repo, '.atm', 'runtime', 'wave-broker-scheduler.json'), 
 
 const outputRelativePath = 'generated/build-output.txt';
 const receiptRelativePath = '.atm/history/evidence/build.json';
-const shellNode = JSON.stringify(process.execPath);
-const command = [
-  shellNode,
-  '-e',
-  JSON.stringify("require('fs').writeFileSync('generated/build-output.txt','built from command\\n','utf8')")
-].join(' ');
+const commandManifestPath = 'build-command.json';
+writeFileSync(path.join(repo, commandManifestPath), `${JSON.stringify({
+  schemaId: 'atm.commandManifest.v1',
+  specVersion: '0.1.0',
+  migration: { strategy: 'none', fromVersion: null, notes: 'runner-sync executor regression' },
+  executable: process.execPath,
+  cwd: '.',
+  argv: ['tools/emit-generated-output.mjs'],
+  timeoutMs: 30000
+}, null, 2)}\n`, 'utf8');
+const failedCommandManifestPath = 'failed-command.json';
+writeFileSync(path.join(repo, failedCommandManifestPath), `${JSON.stringify({
+  schemaId: 'atm.commandManifest.v1',
+  specVersion: '0.1.0',
+  migration: { strategy: 'none', fromVersion: null, notes: 'runner-sync executor regression' },
+  executable: process.execPath,
+  cwd: '.',
+  argv: ['tools/fail-generated-output.mjs'],
+  timeoutMs: 30000
+}, null, 2)}\n`, 'utf8');
+for (const taskId of ['ATM-GOV-A', 'ATM-GOV-B']) {
+  const ticket = issueWorkAdmissionTicket({
+    taskId,
+    actorId: 'fixture-coordinator',
+    laneSessionId: 'wave-real-generated',
+    claimGeneration: 'wave-real-generated',
+    allowedFiles: [outputRelativePath, 'generated/failed-output.txt'],
+    runnerSelection: { runnerKind: 'frozen', runnerRef: 'fixture', selectedAt: new Date().toISOString() }
+  });
+  writeFileSync(path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`), `${JSON.stringify({ taskId, workAdmissionTicket: ticket }, null, 2)}\n`, 'utf8');
+}
 const ok = runCli([
   'broker',
   'batch',
@@ -66,8 +100,8 @@ const ok = runCli([
   head,
   '--payload-digest',
   'sha256:source',
-  '--run-command',
-  command,
+  '--command-manifest',
+  commandManifestPath,
   '--output-file',
   outputRelativePath,
   '--evidence-out',
@@ -81,7 +115,7 @@ assert.equal(existsSync(path.join(repo, receiptRelativePath)), true, 'successful
 const receipt = JSON.parse(readFileSync(path.join(repo, receiptRelativePath), 'utf8'));
 assert.equal(receipt.schemaId, 'atm.waveGeneratedWriteReceipt.v1');
 assert.equal(receipt.surfaceKind, 'build');
-assert.equal(receipt.command, command);
+assert.match(receipt.command, /emit-generated-output\.mjs/);
 assert.equal(receipt.commandExitCode, 0);
 assert.equal(receipt.telemetry.schemaId, 'atm.generatedWriteTreatmentTelemetry.v1');
 assert.equal(receipt.telemetry.executionMode, 'command-executed');
@@ -121,8 +155,8 @@ const failed = spawnSync(process.execPath, [
   head,
   '--payload-digest',
   'sha256:source',
-  '--run-command',
-  `${shellNode} -e "process.exit(7)"`,
+  '--command-manifest',
+  failedCommandManifestPath,
   '--output-file',
   'generated/failed-output.txt',
   '--evidence-out',

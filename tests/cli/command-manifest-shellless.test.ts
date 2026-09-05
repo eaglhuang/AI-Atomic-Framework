@@ -8,6 +8,7 @@ import {
   createEmptyWaveBrokerSchedulerDocument,
   enqueueWaveBrokerTicket
 } from '../../packages/core/src/broker/wave-broker-scheduler.ts';
+import { issueWorkAdmissionTicket } from '../../packages/core/src/broker/work-admission-ticket.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-command-manifest-'));
 mkdirSync(path.join(repo, '.atm', 'runtime'), { recursive: true });
@@ -26,6 +27,18 @@ for (const taskId of ['ATM-GOV-A', 'ATM-GOV-B']) {
 writeFileSync(path.join(repo, '.atm', 'runtime', 'wave-broker-scheduler.json'), `${JSON.stringify(scheduler, null, 2)}\n`, 'utf8');
 
 const outputFile = 'generated-output.txt';
+mkdirSync(path.join(repo, '.atm', 'history', 'tasks'), { recursive: true });
+for (const taskId of ['ATM-GOV-A', 'ATM-GOV-B']) {
+  const ticket = issueWorkAdmissionTicket({
+    taskId,
+    actorId: 'fixture',
+    laneSessionId: 'wave-generated',
+    claimGeneration: 'wave-generated',
+    allowedFiles: [outputFile],
+    runnerSelection: { runnerKind: 'frozen', runnerRef: 'fixture', selectedAt: new Date().toISOString() }
+  });
+  writeFileSync(path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`), `${JSON.stringify({ taskId, workAdmissionTicket: ticket }, null, 2)}\n`, 'utf8');
+}
 
 // A generated write is a declared build script with an observable output
 // contract, not an inline program handed to an interpreter.

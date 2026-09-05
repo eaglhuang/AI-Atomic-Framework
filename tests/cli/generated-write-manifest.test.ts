@@ -8,9 +8,12 @@ import {
   createEmptyWaveBrokerSchedulerDocument,
   enqueueWaveBrokerTicket
 } from '../../packages/core/src/broker/wave-broker-scheduler.ts';
+import { issueWorkAdmissionTicket } from '../../packages/core/src/broker/work-admission-ticket.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-generated-write-manifest-'));
 mkdirSync(path.join(repo, '.atm', 'runtime'), { recursive: true });
+mkdirSync(path.join(repo, '.atm', 'history', 'tasks'), { recursive: true });
+mkdirSync(path.join(repo, 'tools'), { recursive: true });
 let scheduler = createEmptyWaveBrokerSchedulerDocument('2026-07-20T00:00:00.000Z');
 for (const taskId of ['ATM-GOV-A', 'ATM-GOV-B']) {
   scheduler = enqueueWaveBrokerTicket(scheduler, {
@@ -24,12 +27,14 @@ for (const taskId of ['ATM-GOV-A', 'ATM-GOV-B']) {
 }
 writeFileSync(path.join(repo, '.atm', 'runtime', 'wave-broker-scheduler.json'), `${JSON.stringify(scheduler, null, 2)}\n`, 'utf8');
 
+writeFileSync(path.join(repo, 'tools', 'emit-generated.mjs'), "import { mkdirSync, writeFileSync } from 'node:fs';\nmkdirSync('out', { recursive: true });\nwriteFileSync('out/generated.json', JSON.stringify({ ok: true }) + '\\n');\n", 'utf8');
+writeFileSync(path.join(repo, 'tools', 'fail-generated.mjs'), 'process.exit(7);\n', 'utf8');
 writeFileSync(path.join(repo, 'ok-manifest.json'), `${JSON.stringify({
   schemaId: 'atm.commandManifest.v1',
   specVersion: '0.1.0',
   migration: { strategy: 'none', fromVersion: null, notes: 'command manifest baseline' },
   executable: process.execPath,
-  argv: ['-e', "require('fs').mkdirSync('out',{recursive:true});require('fs').writeFileSync('out/generated.json', JSON.stringify({ok:true})+'\\n')"],
+  argv: ['tools/emit-generated.mjs'],
   timeoutMs: 30000
 }, null, 2)}\n`, 'utf8');
 writeFileSync(path.join(repo, 'fail-manifest.json'), `${JSON.stringify({
@@ -37,9 +42,20 @@ writeFileSync(path.join(repo, 'fail-manifest.json'), `${JSON.stringify({
   specVersion: '0.1.0',
   migration: { strategy: 'none', fromVersion: null, notes: 'command manifest baseline' },
   executable: process.execPath,
-  argv: ['-e', 'process.exit(7)'],
+  argv: ['tools/fail-generated.mjs'],
   timeoutMs: 30000
 }, null, 2)}\n`, 'utf8');
+for (const taskId of ['ATM-GOV-A', 'ATM-GOV-B']) {
+  const ticket = issueWorkAdmissionTicket({
+    taskId,
+    actorId: 'fixture',
+    laneSessionId: 'wave-generated',
+    claimGeneration: 'wave-generated',
+    allowedFiles: ['out/generated.json'],
+    runnerSelection: { runnerKind: 'frozen', runnerRef: 'fixture', selectedAt: new Date().toISOString() }
+  });
+  writeFileSync(path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`), `${JSON.stringify({ taskId, workAdmissionTicket: ticket }, null, 2)}\n`, 'utf8');
+}
 
 const failedReceipt = '.atm/history/evidence/failed-generated.json';
 const failed = runCli(['--command-manifest', 'fail-manifest.json', '--evidence-out', failedReceipt]);
