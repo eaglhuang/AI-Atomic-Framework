@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed and published in sealed runner; producer-consumer contract follow-up remains",
+  "status": "Partially fixed — source repair is published in sealed runner; producer-consumer contract follow-up remains",
   "area": "Runner publication evidence semantic attribution",
   "finding": "authorizeRunnerPublicationTakeover persisted a digest-valid plan without taskId. Taskflow close included that protected evidence solely from its task-shaped filename, while the pre-commit protected-state validator correctly refuses filenames as authority. A legitimate close therefore rolled back with ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT.",
   "expectedBehavior": "Every protected evidence producer must persist one semantic task identity. Close bundle assembly must include takeover evidence only when its payload taskId matches the closing task; legacy contextless diagnostics remain visible in the worktree but cannot be staged or committed by filename inference.",

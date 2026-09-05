@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed and published in current sealed runner; formal backlog closeout and regression retention remain separate",
+  "status": "Partially fixed — repair is published in current sealed runner; formal backlog closeout and regression retention remain separate",
   "area": "framework-mode temporary claim lifecycle",
   "finding": "framework-mode claim mints a temporary runtime scope lock but no matching task ledger record. The documented governed commit route therefore rejects the claimed temporary task with ATM_TASK_NOT_FOUND, leaving a validated framework quickfix without a normal commit or close path.",
   "expectedBehavior": "A temporary framework claim must be a complete, bounded lifecycle: either mint a task/evidence record accepted by the governed commit and close surfaces, or return a pre-claim capability result that names the supported durable commit route. A successful claim must never advertise a task id that the standard governed commit command cannot resolve.",

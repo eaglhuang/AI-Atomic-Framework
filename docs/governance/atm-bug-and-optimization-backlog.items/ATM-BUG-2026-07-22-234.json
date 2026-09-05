@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in sealed-detached runner sync recovery lane",
+  "status": "Partially fixed — sealed-detached runner sync recovery repair landed; remaining publication closeout remains",
   "area": "Runner sync / emergency landed source recovery",
   "finding": "After an emergency source fix landed and was pushed, frozen runner sync remained blocked because runner-sync admission treated nearby foreign non-release WIP and landed-not-closed build input risk as a terminal refusal rather than providing a safe queue or sealed-source recovery route.",
   "expectedBehavior": "Runner-sync should provide a broker ticket or recovery plan for rebuilding from a sealed committed source while excluding uncommitted foreign WIP, or should expose a narrow steward workflow that preserves INV-ATM-008 without requiring manual arbitration.",

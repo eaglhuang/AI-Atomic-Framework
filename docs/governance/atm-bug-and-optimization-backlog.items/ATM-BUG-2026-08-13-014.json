@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed and published in sealed runner; takeover-diagnostics follow-up remains",
+  "status": "Partially fixed — source repair is published in sealed runner; takeover-diagnostics follow-up remains",
   "area": "Framework-temp runner publication recovery authority",
   "finding": "Runner-sync accepts an active ATM-FRAMEWORK-TEMP claim as a queue member and publication authority, but broker runner-sync takeover-publication previously required a conventional task ledger file. When a sealed build found pre-existing generated outputs, the only official digest-bound takeover command rejected its own queue-head task with ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE, creating a bootstrap dead end.",
   "expectedBehavior": "Every runner-sync recovery operation must recognize the same authority forms as runner-sync admission. A framework-temp takeover is valid only while its lock is live, its actor matches, its task is the current queue-head member, and its sealed source SHA matches exactly. Missing, expired, released, foreign-actor, non-head, or SHA-mismatched requests must fail closed.",

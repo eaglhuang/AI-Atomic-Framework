@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source (invocation batching and spawn-failure reporting); the untracked .atm-runtime-cache residue the repaired guard now reports is open",
+  "status": "Partially fixed — invocation batching and spawn-failure reporting landed; .atm-runtime-cache residue and caller audit remain",
   "area": "Encoding guard invocation / argv budget",
   "finding": "scripts/check-encoding-touched.ts built a single --files argument holding every touched text file and spawned the guard once. On a busy worktree that argument reaches tens of kilobytes and exceeds the Windows command-line ceiling, so process creation fails with ENAMETOOLONG, spawnSync returns status null with no stdout or stderr, and the script's fallback reported that as a bare exit 1. The failure mode is byte-identical to a genuine encoding violation: same exit code, no output either way. The guard therefore stopped guarding precisely when the tree was busiest, which is exactly the parallel-captain condition it exists for, and every caller that reads its exit code was silently misinformed.",
   "expectedBehavior": "The encoding guard must remain runnable regardless of how many files are touched, and must never terminate non-zero without naming why. Invocations must be batched against the shared platform argv budget rather than assembled unbounded, every touched file must still reach the guard exactly once, and a spawn that never ran must be distinguishable from a guard that found a violation.",

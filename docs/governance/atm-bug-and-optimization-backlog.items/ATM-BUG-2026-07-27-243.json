@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in branch commit orphan-recovery lane",
+  "status": "Partially fixed — branch commit orphan-recovery repair landed; remaining delivery closeout remains",
   "area": "Governance",
   "finding": "Live reproduction of the ATM-GOV-0265 branch-commit-queue deadlock. A governed `atm git commit` whose pre-commit hook runs longer than the caller's timeout was killed (SIGTERM); it left its OWN branch-commit-queue lock (.atm/runtime/locks/git-commit-queue-refs-heads-main.lock) with ownerPid dead and headShaAtAcquire == current HEAD. Retrying failed with ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY forever, because live self-heal only reclaims a stale lock when HEAD has moved (headMoved); a dead-pid, same-actor, same-HEAD lock is never reclaimed. The only remedy was owner-approved manual lock deletion, which dispatched agents are forbidden to perform.",
   "expectedBehavior": "Two mitigations: (1) The governed commit wrapper should install a SIGTERM/SIGINT cleanup handler that releases its own branch-commit-queue lock before exiting, so a timeout never orphans the queue. (2) Lock acquisition should reclaim a stale lock when the recorded ownerPid is confirmed dead AND actorId/sessionId match the requester, independent of headMoved — a dead process holding its own lock is never a real concurrent writer.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Fixed in nested commit-failure recovery lane",
+  "status": "Partially fixed — nested commit-failure recovery repair landed; publication and formal closeout remain",
   "area": "Git governance / line-budget recovery",
   "finding": "When a governed commit is blocked by `ATM_TOUCHED_PHYSICAL_LINE_BUDGET_BLOCKED`, ATM reports only the wrapper-level `ATM_GIT_COMMIT_FAILED` in the operator flow and leaves the captain to inspect `.atm/runtime/git-commit-attempts/*` plus manually reconstruct a minimal patch from a formatter-contaminated file.",
   "expectedBehavior": "The governed commit path should surface the nested line-budget error, affected files, numstat, and a copyable recovery path. For formatter or bulk-rewrite contamination, ATM should offer a first-class minimal-patch rebuild or split-policy recovery that preserves intended semantic hunks without requiring each captain to rediscover the same procedure.",

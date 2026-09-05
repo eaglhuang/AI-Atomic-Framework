@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in release-tier close classification lane",
+  "status": "Partially fixed — release-tier close classification repair landed; remaining governance closeout remains",
   "area": "Task Planning / Validation Governance",
   "finding": "A single task card listed `npm run validate:standard -- --json` as closure-required evidence, which promoted an all-repository release gate into every close attempt and made unrelated baseline failures block ATM-GOV-0245.",
   "expectedBehavior": "Task-card close validators should be focused semantic gates for the task. Whole-repo release health should be represented as a separate release/readiness card or advisory gate unless the task explicitly owns every failing surface.",

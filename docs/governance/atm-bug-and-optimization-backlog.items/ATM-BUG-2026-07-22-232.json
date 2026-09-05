@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Fixed — Antigravity entry now exposes governed write-ticket enforcement; broader interception remains follow-up",
+  "status": "Partially fixed — Antigravity entry now exposes governed write-ticket enforcement; broader interception remains follow-up",
   "area": "Editor integration / write-ticket enforcement",
   "finding": "An AI worker could edit files outside its task scope before ATM commit/claim gates noticed. Gemini 0258 produced broad dirty WIP and formatter spillover beyond the intended keep-list, and ATM only surfaced the problem after the shared worktree was already polluted.",
   "expectedBehavior": "ATM should provide a write-ticket or editor adapter pre-write guard that checks the current task allowedFiles before filesystem mutation, with post-write fallback evidence for tools that cannot intercept writes. Normal out-of-scope needs should route through governed scope amendment, not silent dirty spillover.",

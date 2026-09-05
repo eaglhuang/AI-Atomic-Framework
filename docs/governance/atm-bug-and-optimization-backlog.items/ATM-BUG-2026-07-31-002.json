@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in durable repair-closure ticket bridge",
+  "status": "Partially fixed — durable repair-closure ticket bridge landed; remaining delivery evidence remains",
   "area": "Closure repair / write-ticket commit adapter",
   "finding": "tasks repair-closure can successfully stage a closure-packet repair bundle and return a governed git commit command, but the returned git commit path can still fail with ATM_WRITE_TICKET_STALE. A fresh write-ticket acquired through write-ticket acquire is emitted in stdout but is not persisted or accepted by git commit because the commit facade exposes no --ticket bridge.",
   "expectedBehavior": "A successful repair-closure mutation should either mint and persist the exact write-ticket required by its returned commit command, or return a copyable reseal/commit command that the git commit adapter can consume without manual native-git fallback.",

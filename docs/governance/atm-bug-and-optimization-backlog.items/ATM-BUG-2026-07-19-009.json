@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source change pending frozen release",
+  "status": "Partially fixed — source repair landed; frozen release evidence remains",
   "area": "Batch checkpoint / taskflow close atomicity",
   "finding": "batch checkpoint can partially mutate and close the queue-head task before failing on the next queued task's owner mismatch. This violates the playbook expectation that checkpoint is the safe boundary before commit.",
   "expectedBehavior": "batch checkpoint should be atomic per queue head: either finish the current queue-head checkpoint and return a committable bundle, or fail before mutating close state. It should not close the queue head and then fail because the next queued task is blocked/owned by another actor.",

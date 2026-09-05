@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source; durable framework-temp lifecycle pending",
+  "status": "Partially fixed — source repair landed; durable framework-temp lifecycle remains pending",
   "area": "Framework close dirty guard / framework-mode temporary claim admission",
   "finding": "A change intended to defer shared git-head provenance classified every parseable latest receipt as advisory. A task could therefore close while a foreign task's git-head receipt was dirty. During repair, framework-mode claim correctly rejected ambiguous active task bindings for the same actor, but offered no independent quickfix binding.",
   "expectedBehavior": "Only a parseable git-head receipt whose task identity equals the closing task may be advisory. Foreign, malformed, and unowned receipts must remain blocking. Framework-mode must either support a bounded standalone quickfix claim under concurrent same-actor task lanes or fail before mutation with a durable, governed recovery route that does not require binding the change to an unrelated task.",

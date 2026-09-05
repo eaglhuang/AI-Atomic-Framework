@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed — same-commit git-head provenance is covered by the committed-tree regression; compatibility and timeout hardening remain follow-up",
+  "status": "Partially fixed — same-commit git-head provenance is covered; compatibility and timeout hardening remain follow-up",
   "area": "Frozen runner provenance / task-scoped commit transaction",
   "finding": "A frozen runner can execute a historical task-scoped commit implementation that appends generated git-head provenance to the live worktree but does not preserve that exact line in the final commit tree. The result is a committed delivery plus an uncommitted provenance residue, which later blocks unrelated task close admission.",
   "expectedBehavior": "Before any governed write, ATM must prove the frozen execution artifact is semantically compatible with the source transaction contract. A task-scoped transaction must either commit its generated evidence in the same final tree or roll back only its own append when the commit cannot include it. The post-commit tree remains the authority, not a candidate-index receipt.",

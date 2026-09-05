@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in paired-evidence fail-closed lane",
+  "status": "Partially fixed — paired-evidence fail-closed repair landed; broader Analyzer v3 evidence remains",
   "area": "Auto-batch analyzer / Performance evidence",
   "finding": "The auto-batch rollout analyzer could classify a run as improved from synthetic broker-ticket events when batchRate was at least 0.70 and build/projection ticket counts were within limits, without requiring paired control/treatment lane evidence. ATM-GOV-0179's focused test exercised this synthetic path rather than a real paired A/B dogfood run.",
   "expectedBehavior": "An improved verdict must require real plan-run control and treatment samples joined through durable task, wave, broker, checkpoint, and lane-session evidence. Missing makespan, throughput, cost, sample-size, or safety evidence must produce inconclusive, never improved.",

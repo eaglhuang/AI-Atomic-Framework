@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed and published in sealed runner; lifecycle-test follow-up remains",
+  "status": "Partially fixed — source repair is published in sealed runner; lifecycle-test follow-up remains",
   "area": "Taskflow protected-backend recovery forwarding",
   "finding": "The public taskflow close operator lane automatically selects --allow-stale-runner after it accepts a runner publication receipt, but it neither declares nor forwards --emergency-approval to the protected tasks close backend. The backend correctly returns ATM_EMERGENCY_LANE_APPROVAL_REQUIRED, yet the operator cannot execute the prescribed recovery through the same public seam. This creates a bootstrap circularity: a delivered framework task cannot close until the runner is current, while publishing the current runner is itself serialized behind in-flight framework work.",
   "expectedBehavior": "Any public orchestration command that selects a protected backend operation must expose and losslessly forward the corresponding bounded approval capability. The lease must only be forwarded when that protected operation is selected, must remain task/actor/flag bounded, and must still fail closed when absent, stale, mismatched, exhausted, or used for a different operation.",
