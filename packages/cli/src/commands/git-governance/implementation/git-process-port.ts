@@ -68,6 +68,22 @@ export function resolveGitExecutable() {
 
 export const DEFAULT_GIT_COMMIT_TIMEOUT_MS = 420_000;
 
+/**
+ * Host Git push/failure-recovery calls are control-plane children too. Keep a
+ * bounded default while allowing the governed command to pass an explicit
+ * budget for a measured environment.
+ */
+export const DEFAULT_GIT_BOUNDARY_TIMEOUT_MS = 420_000;
+
+export function resolveGitBoundaryTimeoutMs(explicitTimeoutMs: LegacyValue) {
+  if (explicitTimeoutMs !== null && Number.isFinite(explicitTimeoutMs) && explicitTimeoutMs > 0) {
+    return explicitTimeoutMs;
+  }
+  const envValue = Number(process.env.ATM_GIT_BOUNDARY_TIMEOUT_MS);
+  if (Number.isFinite(envValue) && envValue > 0) return envValue;
+  return DEFAULT_GIT_BOUNDARY_TIMEOUT_MS;
+}
+
 export function resolveGitCommitTimeoutMs(explicitTimeoutMs: LegacyValue) {
   if (
     explicitTimeoutMs !== null &&
@@ -115,6 +131,23 @@ export function runGitCommand(cwd: LegacyValue, args: LegacyValue, stdio: Legacy
     cwd,
     encoding: "utf8",
     stdio,
+    env: createSanitizedGitEnv(),
+  });
+}
+
+export function runGitCommandWithTimeout(
+  cwd: LegacyValue,
+  args: LegacyValue,
+  timeoutMs: LegacyValue,
+  stdio: LegacyValue = ["ignore", "pipe", "ignore"],
+) {
+  return execFileSync(resolveGitExecutable(), args, {
+    cwd,
+    encoding: "utf8",
+    stdio,
+    timeout: resolveGitBoundaryTimeoutMs(timeoutMs),
+    killSignal: "SIGTERM",
+    windowsHide: true,
     env: createSanitizedGitEnv(),
   });
 }
