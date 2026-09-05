@@ -5,10 +5,13 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed",
   "area": "Taskflow Close / Runner Sync Scope",
   "finding": "taskflow close can require runner-sync, but the closeback bundle excludes generated release artifacts and may leave runner-sync receipt files staged or release outputs dirty, creating an ambiguous post-close worktree.",
   "expectedBehavior": "When runner-sync is required for a framework task, closeback should either include a governed release artifact bundle and runner-sync receipt, or explicitly produce a follow-up work item with a clean index/worktree strategy.",
   "evidenceOrRepro": "ATM-GOV-0187 taskflow close succeeded at commit 1d836a0ef6ae7b4459092b4e8c153edee412f587, but release/atm-onefile and release/atm-root-drop files remained dirty and .atm/history/evidence/ATM-GOV-0187.runner-sync-receipt.json remained staged. record-commit dry-run accepted the receipt, but record-commit failed because release dirty made framework staging ambiguous.",
-  "followUp": "Extend runner-sync closeback/scope admission to bind generated release artifacts and receipts to the steward work id, or update the workflow to create an explicit release-sync follow-up task before close."
+  "followUp": "Closed by the runner-sync publication/closeback repairs recorded in commits 3c68fb3db, 045b5d89f, and ec6e65e95. The governed receipt path binds the steward work, durable delivery task, requested release surfaces, and reconstructible release command; publication is idempotent and release residue is explicitly classified. Passing receipts: tests/cli/runner-sync-post-close-receipt-publication.test.ts, tests/cli/runner-sync-clean-close-pathway.test.ts, tests/cli/runner-sync-receipt-closeout.test.ts, and tests/cli/runner-sync-terminal-task-parity.test.ts.",
+  "terminalDisposition": "closed-by-existing-runner-sync-repairs",
+  "closedAt": "2026-09-06T21:13:00.000Z",
+  "passingReceipt": "node --strip-types tests/cli/runner-sync-post-close-receipt-publication.test.ts"
 }
