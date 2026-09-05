@@ -2,7 +2,7 @@ import {
   compareClaimLifecycleOwners,
   type ClaimOwnerComparison
 } from '../next/claim-admission.ts';
-import { resolveLaneSession } from '../lane-session/resolve.ts';
+import { inspectReferencedLaneSession, resolveLaneSession } from '../lane-session/resolve.ts';
 import { CliError } from '../shared.ts';
 import type { TaskClaimRecordWithLane } from './task-ledger-readers.ts';
 
@@ -183,6 +183,10 @@ export function assertCurrentClaimOwnerForAction(input: {
   readonly currentClaim: TaskClaimRecordWithLane;
 }) {
   const holdingLaneSessionId = readClaimLaneSessionId(input.currentClaim);
+  const referencedLane = inspectReferencedLaneSession({
+    cwd: input.cwd,
+    laneSessionId: holdingLaneSessionId
+  });
   const laneSession = resolveLaneSession({
     cwd: input.cwd,
     actorId: input.actorId,
@@ -194,6 +198,12 @@ export function assertCurrentClaimOwnerForAction(input: {
     }),
     command: `node atm.mjs tasks ${input.action} --task ${input.taskId} --actor ${input.actorId} --json`
   });
+  const sameActorExpiredRenewal = input.action === 'renew'
+    && input.currentClaim.actorId === input.actorId
+    && referencedLane.availability === 'expired'
+    && laneSession.source === 'minted'
+    && laneSession.session.actorId === input.actorId;
+  if (sameActorExpiredRenewal) return laneSession;
   throwIfClaimOwnerMismatch({
     taskId: input.taskId,
     currentActorId: input.currentClaim.actorId,
