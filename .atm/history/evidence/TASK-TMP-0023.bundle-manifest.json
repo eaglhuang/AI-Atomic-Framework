@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TMP-0023",
+  "updatedAt": "2026-09-05T12:17:02.183Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "doctor",
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae44054cdeaaaec0e89b55f525c9f20fc59eda26e7a1b88edcdc23a675d5dff3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-09-05T12:16:52.384Z",
+      "startedAt": "2026-09-05T12:16:44.042Z",
+      "finishedAt": "2026-09-05T12:16:52.384Z",
+      "durationMs": 8342,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9b4d9ea0652dfe576a83be76186bf296230d76d7",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1589b7874a904975a2a0aba6f8129a1d26c75a346ac06f56529d23097ac27155",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts"
+      ],
+      "generatedAt": "2026-09-05T12:16:57.718Z",
+      "startedAt": "2026-09-05T12:16:56.161Z",
+      "finishedAt": "2026-09-05T12:16:57.718Z",
+      "durationMs": 1557,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9b4d9ea0652dfe576a83be76186bf296230d76d7",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ff4351d1ef0589396c76a522e2c3528d7bec856a9ed68e583cf55723762aebec",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+      ],
+      "generatedAt": "2026-09-05T12:17:02.181Z",
+      "startedAt": "2026-09-05T12:17:01.370Z",
+      "finishedAt": "2026-09-05T12:17:02.181Z",
+      "durationMs": 811,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9b4d9ea0652dfe576a83be76186bf296230d76d7",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

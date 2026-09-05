@@ -383,7 +383,10 @@ function hasActiveBrokerIntentForTasks(cwd, taskIds) {
     return false;
 }
 export function isIncidentStillActive(cwd, block, currentTaskId = null) {
-    if (detectCrossTaskMutation(cwd, currentTaskId, 'incident-review', block.conflictFiles)) {
+    // Incident conflictFiles are historical evidence from when the block was
+    // recorded. Replaying them as current candidates makes a clean worktree
+    // look mutated forever, especially for terminal task-history records.
+    if (detectCrossTaskMutation(cwd, currentTaskId, 'incident-review')) {
         return true;
     }
     const conflictTaskIds = collectIncidentConflictTaskIds(block);
@@ -398,7 +401,7 @@ export function isIncidentStillActive(cwd, block, currentTaskId = null) {
     return false;
 }
 function reconcileIncidentBlock(cwd, block, currentTaskId) {
-    const current = detectCrossTaskMutation(cwd, currentTaskId, 'incident-review', block.conflictFiles);
+    const current = detectCrossTaskMutation(cwd, currentTaskId, 'incident-review');
     if (current)
         return current;
     const conflictTaskIds = collectIncidentConflictTaskIds(block);

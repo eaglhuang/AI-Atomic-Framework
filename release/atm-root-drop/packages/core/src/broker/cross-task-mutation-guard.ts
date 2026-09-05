@@ -434,7 +434,10 @@ export function isIncidentStillActive(
   block: CrossTaskMutationBlock,
   currentTaskId: string | null = null
 ): boolean {
-  if (detectCrossTaskMutation(cwd, currentTaskId, 'incident-review', block.conflictFiles)) {
+  // Incident conflictFiles are historical evidence from when the block was
+  // recorded. Replaying them as current candidates makes a clean worktree
+  // look mutated forever, especially for terminal task-history records.
+  if (detectCrossTaskMutation(cwd, currentTaskId, 'incident-review')) {
     return true;
   }
 
@@ -455,7 +458,7 @@ function reconcileIncidentBlock(
   block: CrossTaskMutationBlock,
   currentTaskId: string | null
 ): CrossTaskMutationBlock | null {
-  const current = detectCrossTaskMutation(cwd, currentTaskId, 'incident-review', block.conflictFiles);
+  const current = detectCrossTaskMutation(cwd, currentTaskId, 'incident-review');
   if (current) return current;
 
   const conflictTaskIds = collectIncidentConflictTaskIds(block);
