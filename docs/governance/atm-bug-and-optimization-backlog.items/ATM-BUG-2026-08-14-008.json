@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed — validation-contract parity verified in source and frozen runner; importer-fidelity hardening remains follow-up",
+  "status": "Closed — validation-contract parity verified in source and frozen runner 2026-09-05; importer-fidelity hardening remains follow-up",
   "area": "Validation-contract consumer parity / historical taskflow close",
   "finding": "Historical taskflow close derives closure-required validators from framework requiredGates through requiredValidationPassesForClosure instead of consuming the task's evaluateValidationContract result. A docs/evidence-only task is therefore blocked by unrelated typecheck and validate:cli receipts after its declared command-backed validator is fresh.",
   "expectedBehavior": "Evidence run, historical preflight, closure-packet creation and validation, pre-push, and phase promotion must consume one digestible validation-contract selection. Only task-required cases block a task close; phase-suite cases block their declared phase owner; advisory cases never block. Scope classification may add a requirement only through that same evaluator.",
