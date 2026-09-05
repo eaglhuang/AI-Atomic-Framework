@@ -178,7 +178,7 @@ function idempotencyKey(input: {
 }
 
 function defaultRecoveryCommand(taskId: string): string {
-  return `node atm.mjs taskflow diagnose --task ${taskId} --json`;
+  return `node atm.mjs tasks status --task ${taskId} --json`;
 }
 
 function recoveryCommand(

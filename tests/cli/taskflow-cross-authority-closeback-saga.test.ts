@@ -54,7 +54,7 @@ assert.deepEqual(pending.authorityCas, {
 });
 assert(pending.steps.some((step) => step.id === 'target:commit'));
 assert(pending.steps.some((step) => step.id === 'planning:commit'));
-assert(pending.steps.every((step) => step.recoveryCommand === 'node atm.mjs taskflow diagnose --task ATM-GOV-0253 --json'));
+assert(pending.steps.every((step) => step.recoveryCommand === 'node atm.mjs tasks status --task ATM-GOV-0253 --json'));
 assert.equal(pending.nextLegalRecoveryLane.disposition, 'execute-now');
 assert.equal(pending.nextLegalRecoveryLane.owner, 'global');
 assert.equal(pending.emergencyLanes.length, 0);

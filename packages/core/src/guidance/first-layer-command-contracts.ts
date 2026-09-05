@@ -104,7 +104,7 @@ export const firstLayerTicketStates: readonly FirstLayerTicketState[] = Object.f
     state: 'reconcile-required',
     errorCode: null,
     nextAction: 'Run the returned reconcile command, then rerun next or claim.',
-    statusCommand: 'node atm.mjs taskflow diagnose --task <task-id> --json',
+    statusCommand: 'node atm.mjs tasks status --task <task-id> --json',
     continuation: 'Continue inspection and planning; avoid shared mutations until reconciliation succeeds.'
   },
   {
