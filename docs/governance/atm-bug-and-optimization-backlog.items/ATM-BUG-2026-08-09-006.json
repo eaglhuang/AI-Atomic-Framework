@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in ATM-GOV-0408 / d28848488 / ef0689feb",
+  "status": "Closed — ATM-GOV-0408 bounded deadline repair verified 2026-09-05",
   "area": "Evidence validator timeout and commit-hook concurrency",
   "finding": "During ATM-GOV-0326, validate:git-head-evidence completed successfully only after 194886ms and 204069ms. A 120000ms outer caller timeout returned control while the validator process continued, allowing a duplicate concurrent evidence run. Separately, the governed commit hook intermittently reported validate:cli exit 1 although an immediately repeated direct run passed in 86400ms.",
   "expectedBehavior": "Evidence and commit validation must have one explicitly owned deadline, terminate or await child work deterministically on timeout, prevent duplicate concurrent writes for the same receipt, and report a reproducible failure rather than an environment-dependent false red.",

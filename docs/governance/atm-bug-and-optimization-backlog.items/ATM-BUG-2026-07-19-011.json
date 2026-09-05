@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in ATM-GOV-0230",
+  "status": "Closed — ATM-GOV-0230 terminal-task parity verified 2026-09-05",
   "area": "Runner sync / Batch routing / Broker",
   "finding": "Frozen runner can continue surfacing a terminal imported task (TASK-SYNC-0001) after source-first routing correctly excludes it, and runner-sync admission can then deadlock because the completed sync task is terminal while the only frozen queue head is the ghost task.",
   "expectedBehavior": "Release runner artifacts must contain the same terminal-task exclusion logic as source, closedAt/closedByActor tasks must not appear in fallback open queues, and runner-sync broker/admission should expose a first-layer recovery path when a release/source split blocks normal build.",

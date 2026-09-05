@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in ATM-GOV-0230",
+  "status": "Closed — ATM-GOV-0230 runner-sync reservation lifecycle verified 2026-09-05",
   "area": "Runner sync / steward lifecycle / closeout UX",
   "finding": "After a runner-sync cache-hit build published a receipt for the previous sealed source, the steward queue kept that completed source at queue head. Enqueuing the next sealed source for the same task then landed at position 2 and required the operator to manually compute the receipt digest and release the old steward work before the new build could proceed.",
   "expectedBehavior": "Runner-sync should expose a first-layer, copyable release-or-advance command after build publication, and should consider an automatic same-task advancement path when the current queue-head receipt is already present and digest-verifiable. The lifecycle should be generic across tasks and must not depend on manual SHA/digest spelunking.",
