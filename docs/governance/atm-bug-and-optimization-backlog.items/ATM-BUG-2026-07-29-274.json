@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in historical-attestation recovery lane",
+  "status": "Closed — fixed; historical-attestation recovery and record-commit regressions reverified",
   "area": "Git governance / historical attestation recovery",
   "finding": "Historical work-admission recovery previously had three route mismatches: pre-push correctly blocked a critical emergency commit without forward attestation, but `git recover-push-fail` replaced the attestation blocker with generic retry guidance; `git attest` was reported absent from help; and the generated fixed-path attestation ledger could pass `git record-commit --dry-run` but fail the real commit hook as a cross-task mutation owned by TASK-GIT-0024.",
   "expectedBehavior": "Protected-push recovery preserves the exact authority-provided `git attest` command whenever the remaining blocker is historical attestation, without inventing task, commit, or lane values. The help surface lists `attest`. A generated attestation ledger has the same governed commit outcome in dry-run and write modes.",

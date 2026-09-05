@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug / Optimization",
   "severity": "Medium",
-  "status": "Fixed in ATM-GOV-0124",
+  "status": "Closed — fixed in ATM-GOV-0124; protected-scope enumeration regression verified",
   "area": "Product charter validator / ignored residue isolation",
   "finding": "`validate:cli` failed during ATM-GOV-0124 because `validate-product-charter` scanned `templates/skills/atm-memory-consolidate.skill.md`, an ignored/untracked residue excluded by `.git/info/exclude`, and treated its `tools_node/` text as a protected downstream-only term violation.",
   "expectedBehavior": "Product charter validation should check governed tracked files and intentional unignored new files, while ignored/untracked residue remains outside close gates unless explicitly claimed.",

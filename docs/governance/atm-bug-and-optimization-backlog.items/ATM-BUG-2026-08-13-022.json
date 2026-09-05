@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in identity-remediation safety lane",
+  "status": "Closed — fixed; identity-remediation safety regressions reverified",
   "area": "Commit identity: the facade accepts an identity the hook does not, and its remediation names another actor",
   "finding": "Two separate defects in one governed commit refusal. First, git commit --name/--email documents itself as seeding the actor runtime identity profile, but seeding it there does not satisfy the pre-commit attribution check: the same command that reported ATM_GIT_COMMIT_IDENTITY_MISSING accepted --name and --email on the retry, got past the facade, and was then blocked by ATM_COMMIT_IDENTITY_PROFILE_MISSING from the hook. Only a prior identity set --actor call resolved it. Second, the remediation template the hook prints substitutes a hard-coded example identity — git-name \"Codex\", git-email \"codex@openai.local\" — into a command that names the blocked actor. Copying the prescribed command verbatim registers the blocked actor under a different agent's name and email, and every commit it then authors is misattributed.",
   "expectedBehavior": "A facade option that advertises identity seeding must satisfy the same identity requirement the hook enforces, or must not advertise it. A generated remediation command must contain no identity value the caller did not supply: unknown fields belong in placeholders such as <git-name> and <git-email>, which fail loudly if pasted unedited, rather than in a real identity borrowed from whichever actor happened to seed the template.",

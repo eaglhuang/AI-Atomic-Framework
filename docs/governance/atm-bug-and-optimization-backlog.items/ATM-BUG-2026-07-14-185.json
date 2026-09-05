@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in TASK-AAO-0202",
+  "status": "Closed — fixed in TASK-AAO-0202; claim-release and lock-cleanup regressions verified",
   "area": "Task ledger / claim release transition evidence",
   "finding": "Batch checkpoint and governed closeout can leave a post-delivery task ledger mutation that changes `claim.status` from `active` to `released` and adds release metadata after the task delivery commit, but no matching task-event file is generated. The protected-state pre-commit guard then rejects staging that ledger file alone with `ATM_PROTECTED_STATE_TASK_FILE_MISSING_TRANSITION`, leaving durable manual-review residue.",
   "expectedBehavior": "Claim release metadata should be written before the delivery commit, written with a matching transition/audit event, or classified by residue reconcile as a safe post-close claim-release state mutation with an accepted governed cleanup lane.",

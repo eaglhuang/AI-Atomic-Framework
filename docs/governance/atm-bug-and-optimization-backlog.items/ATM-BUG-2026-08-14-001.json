@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in source; regression validator verified",
+  "status": "Closed — source fix and regression validator verified",
   "area": "Task-ledger governance integration fixture authority drift",
   "finding": "The stale-framework-lock fixture created only a generic scope lock after framework temporary claims began requiring an active task-direction lock. A separate historical-close fixture inherited a lane-bound claim while asserting pre-capability historical-delivery behavior. Both tests therefore failed before reaching the rule they were intended to verify.",
   "expectedBehavior": "Integration fixtures must model every authority prerequisite of the public seam they exercise, while deliberately testing legacy or unbound behavior only when that state is explicit. Production claim and lane-capability gates remain fail-closed and are not weakened to accommodate fixtures.",
