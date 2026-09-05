@@ -101,6 +101,7 @@ export interface IntegrationAdapter {
   readonly placeholderStyle: IntegrationPlaceholderStyle;
   targetDir(context?: IntegrationInstallContext): string;
   install(context: IntegrationInstallContext): Promise<IntegrationInstallResult> | IntegrationInstallResult;
+  readonly sourceCoverage?: (context: IntegrationInstallContext) => IntegrationSourceCoverage;
   verify(context: IntegrationInstallContext, manifest: InstallManifest): Promise<IntegrationVerifyResult> | IntegrationVerifyResult;
   uninstall(context: IntegrationInstallContext, manifest: InstallManifest): Promise<IntegrationUninstallResult> | IntegrationUninstallResult;
 }
@@ -113,6 +114,12 @@ export interface StaticIntegrationAdapterInput {
   readonly fileFormat: IntegrationFileFormat;
   readonly placeholderStyle: IntegrationPlaceholderStyle;
   readonly sourceFiles: readonly IntegrationSourceFile[] | ((context: IntegrationInstallContext) => readonly IntegrationSourceFile[]);
+  readonly sourceCoverage?: (context: IntegrationInstallContext) => IntegrationSourceCoverage;
+}
+
+export interface IntegrationSourceCoverage {
+  readonly sourceFileCount: number;
+  readonly sourceCatalogDigest?: Sha256Digest | null;
 }
 
 export interface CodexSkillsAdapterOptions {
