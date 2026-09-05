@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P2",
-  "status": "Fixed — structured proposal-first recovery contract shipped in 6843a288 and current regression verified green on 2026-09-05",
+  "status": "Closed — structured proposal-first recovery contract shipped and verified 2026-09-05",
   "area": "Team Agents proposal-first rejections lacked machine-actionable recovery contract with requiredCommands and schema bindings",
   "finding": "When team plan or team start encountered a hot shared surface requiring proposal-first broker admission, the command failed closed with proposal-first-required but only emitted human-targeted text hints without a structured, machine-actionable recovery payload. Automated caller agents and CLI integrations could not programmatically parse the required schema, hotFiles, broker subject decision, or exact recovery commands (such as node atm.mjs team plan --task <task> --broker-proposal-file <proposal.json> --json), hindering agentic auto-recovery.",
   "expectedBehavior": "When broker lane evaluation rejects a team run on hot shared surfaces (state: proposal-submitted), the resulting PermissionFinding and CLI messages/evidence must attach a structured TeamProposalRecoveryContract with schemaId: 'atm.patchProposal.v1', hotFiles, brokerSubject, requiredCommands (planPreview, teamStart, brokerActivate), and explicit assertions that runtimeWritten, teamRunMinted, and writeLeaseGranted are false.",

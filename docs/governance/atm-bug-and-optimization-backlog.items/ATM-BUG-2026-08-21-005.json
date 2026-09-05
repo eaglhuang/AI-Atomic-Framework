@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P2",
-  "status": "Fixed — repository ESLint now excludes both ATM runtime-cache and generated hook-host trees; focused regression and lint passed on 2026-09-05",
+  "status": "Closed — ESLint generated-tree boundaries and regression verified 2026-09-05",
   "area": "Runtime cache files can enter the repository-wide ESLint source universe",
   "finding": "ATM commands write transient TypeScript extracts under .atm-runtime-cache, but the repository ESLint configuration did not exclude that runtime-only directory. A partially generated extract was then parsed as product source and blocked the required lint gate. The same lint run also exposed duplicate imports in tracked source files, but those are ordinary source defects; the governance defect is that a non-source cache can make lint nondeterministic with respect to the tracked tree.",
   "expectedBehavior": "Repository lint must evaluate tracked source and declared generated source only. ATM runtime cache directories are transient operational state and must be ignored explicitly, so an interrupted cache write cannot create a parser error in the product lint gate. Real tracked-source lint errors remain visible and fail the command normally.",
