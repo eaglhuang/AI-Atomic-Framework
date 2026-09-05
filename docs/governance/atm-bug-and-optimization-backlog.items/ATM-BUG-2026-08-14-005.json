@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Partially fixed — source repair landed; durable framework-temp lifecycle remains pending",
+  "status": "Closed — framework-temp lifecycle authority and standalone quickfix recovery are verified",
   "area": "Framework close dirty guard / framework-mode temporary claim admission",
   "finding": "A change intended to defer shared git-head provenance classified every parseable latest receipt as advisory. A task could therefore close while a foreign task's git-head receipt was dirty. During repair, framework-mode claim correctly rejected ambiguous active task bindings for the same actor, but offered no independent quickfix binding.",
   "expectedBehavior": "Only a parseable git-head receipt whose task identity equals the closing task may be advisory. Foreign, malformed, and unowned receipts must remain blocking. Framework-mode must either support a bounded standalone quickfix claim under concurrent same-actor task lanes or fail before mutation with a durable, governed recovery route that does not require binding the change to an unrelated task.",
   "evidenceOrRepro": "2026-08-14: packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts failed with 'foreign latest receipt must remain blocking'; npm run validate:cli failed in the same focused gate. The defect was introduced by b6febba2d changing the predicate from equality with input.taskId to non-null. Restoring equality makes the focused test and validate:cli pass. A scoped framework-mode claim then returned ATM_FRAMEWORK_TEMP_CLAIM_TASK_BINDING_AMBIGUOUS because ATM-GOV-0355 and ATM-GOV-0362 were both active for the same actor.",
-  "followUp": "Keep the foreign/latest/malformed receipt matrix in the close-dirty guard regression suite. Add lifecycle parity coverage for framework-mode quickfix under multiple same-actor lanes: the route must produce a durable, bounded recovery path without silently attaching a source fix to an unrelated governed task."
+  "followUp": "No remaining repair follow-up for this finding. The foreign/latest/malformed receipt matrix and framework-mode lifecycle parity cover same-actor lanes, same-lane ambiguity, lane mismatch, expiry, and standalone quickfix binding; broader lifecycle policy review remains separate."
 }
