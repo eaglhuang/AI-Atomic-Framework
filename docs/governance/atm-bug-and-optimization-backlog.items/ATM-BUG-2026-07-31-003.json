@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Partially fixed — record-commit attestation parity repair landed; remaining closeout evidence remains",
+  "status": "Closed — duplicate of ATM-BUG-2026-07-29-274; repair revalidated on 2026-09-03",
   "area": "Git record-commit / historical attestation lane",
   "finding": "git record-commit --dry-run previously accepted a low-risk TASK-GIT-0024 historical work-admission attestation bundle, but the real record-commit failed in the host pre-commit hook with ATM_CROSS_TASK_MUTATION_BLOCKED because the hook saw the files as owned by active task TASK-GIT-0024 while record-commit is task-session-free and forbids --task.",
   "expectedBehavior": "record-commit dry-run and write share the same ownership predicate for a TASK-GIT-0024 historical-attestation ledger, and the successful write leaves no staged residue.",
