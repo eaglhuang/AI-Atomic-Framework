@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-a4c6a069a17c",
+  "recordedAt": "2026-09-05T09:19:48.533Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": null,
+  "surface": "git commit broker-conflict override",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --message \"atm: commit TASK-GIT-0032 closure records\" --no-verify --json",
+  "flags": [
+    "--broker-conflict-override"
+  ],
+  "permission": "backend.brokerConflictOverride",
+  "leaseId": "EMG-TASK-GIT-0032-650027c212",
+  "reason": "One-time exact-scope terminal closure record commit after checkpoint ordering failure.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.brokerConflictOverride"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-05T09-19-48-532Z-EMG-TASK-GIT-0032-650027c212.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

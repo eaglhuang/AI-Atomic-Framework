@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-a0bf21219dec",
+  "recordedAt": "2026-09-05T09:22:29.432Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-GIT-0032",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task TASK-GIT-0032 --message \"atm: commit TASK-GIT-0032 closure records\n\nATM-Work-Admission: wat-24fa7b503b7d56c3 sha256:24fa7b503b7d56c3dec24f76999691908e6a7c3162ceccd78ee8cf26e09a286d\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-GIT-0032-8f6ec24578",
+  "reason": "One-time exact-scope terminal closure record commit after checkpoint ordering failure.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-05T09-22-29-431Z-EMG-TASK-GIT-0032-8f6ec24578.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
