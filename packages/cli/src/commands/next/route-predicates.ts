@@ -165,12 +165,14 @@ function isTaskRoutable(status: string, intent: TaskIntent | null): boolean {
 }
 
 function isTaskExplicitlyMentioned(task: ImportedTaskSummary, intent: TaskIntent | null): boolean {
-  if (!intent || intent.mentionedTaskIds.length === 0) return false;
+  if (!intent) return false;
   const normalizedStatus = normalizeTaskRouteStatus(task.status);
   if (normalizedStatus === 'abandoned' || normalizedStatus === 'cancelled') {
     return false;
   }
-  return intent.mentionedTaskIds.includes(task.workItemId.toUpperCase());
+  const taskId = task.workItemId.toUpperCase();
+  return intent.mentionedTaskIds.includes(taskId)
+    || intent.explicitTaskIds.includes(taskId);
 }
 
 function shouldDiscoverMarkdownTaskCards(intent: TaskIntent | null): boolean {
