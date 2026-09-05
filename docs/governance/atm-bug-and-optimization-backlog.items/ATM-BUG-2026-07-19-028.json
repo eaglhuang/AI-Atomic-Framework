@@ -5,10 +5,13 @@
   "repo": "AI-Atomic-Framework",
   "type": "Documentation / AI routing",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Closed",
   "area": "Taskflow / Routing",
   "finding": "During ATM-GOV-0195, a continuation prompt that mentioned the external 3KLife plan path was blocked as active-task divergence even though the operator intent was to continue the active task.",
   "expectedBehavior": "When an active task has planningMirrorPaths or planningReadOnlyPaths matching the mentioned external plan, next should either recognize it as same-task context or provide a concise continuation command that preserves the active task without treating the planning path as foreign scope.",
-  "evidenceOrRepro": "Command: node atm.mjs next --prompt \"... C:\\\\Users\\\\User\\\\3KLife\\\\docs\\\\ai_atomic_framework\\\\governance-optimization\\\\end-to-end-auto-batch-performance-plan-v2.md ...\" --json. Result: ATM_NEXT_ACTIVE_TASK_DIVERGENCE_BLOCKED for active task ATM-GOV-0195, promptPaths: docs.",
-  "followUp": "Add planning-root-aware divergence handling and a regression test where an active task prompt references its external planning root or parent plan."
+  "evidenceOrRepro": "The historical failure is fixed by making active-task divergence planning-root aware. The prompt path extractor may retain only a repository-relative `docs/...` fragment from an absolute Windows path; the router now compares both canonical absolute planning paths and paths relative to the task's planning repository. `node --strip-types tests/cli/active-task-planning-root-continuation.test.ts` passes: a prompt naming the active task's external plan is accepted as continuation context, while an unrelated plan remains blocked. `node --strip-types tests/cli/autonomous-task-continuation.test.ts` and `npx tsc -p tsconfig.json --noEmit` also pass.",
+  "followUp": "Retain the planning-root continuation regression. Reopen only if a new supported planning-path form bypasses same-task recognition.",
+  "terminalDisposition": "closed-by-planning-root-aware-continuation-repair",
+  "closedAt": "2026-09-06T21:30:00.000Z",
+  "passingReceipt": "node --strip-types tests/cli/active-task-planning-root-continuation.test.ts"
 }
