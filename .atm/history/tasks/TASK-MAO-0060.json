@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0060",
   "title": "frozen runner checkpoint recovery bridge",
-  "status": "running",
+  "status": "done",
   "milestone": "M8F",
   "dependencies": [
     "TASK-MAO-0058"
@@ -212,8 +212,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-05T06-20-49-347Z-renew-32027aa2df20",
-  "lastTransitionAt": "2026-09-05T06:20:49.347Z",
+  "lastTransitionId": "2026-09-05T06-31-24-265Z-close-3145a3584935",
+  "lastTransitionAt": "2026-09-05T06:31:24.265Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-09-05T06:11:08.509Z",
@@ -222,7 +222,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-95298fd2a029",
     "claimedAt": "2026-09-05T06:11:08.517Z",
-    "heartbeatAt": "2026-09-05T06:20:48.255Z",
+    "heartbeatAt": "2026-09-05T06:31:24.263Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-MAO-0060.*",
@@ -238,39 +238,41 @@
       "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
       "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260905061108-codex-gpt-5.4-mini-eb06b73546",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905061108-codex-gpt-5.4-mini-eb06b73546\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-05T06:03:33.587Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-0d9894acc211c786",
-    "ticketDigest": "sha256:0d9894acc211c786f97c83e46f7016fc506ad4e6f052b202ab8749af9d74ab78",
+    "ticketId": "wat-8e4f7b061e02afab",
+    "ticketDigest": "sha256:8e4f7b061e02afabfb14849c50cafa83f1f8ce4ae3558fade78d9bb384b286fc",
     "taskId": "TASK-MAO-0060",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260905061108-codex-gpt-5.4-mini-eb06b73546",
     "claimGeneration": "lease-95298fd2a029",
-    "issuedAt": "2026-09-05T06:20:48.255Z",
-    "expiresAt": "2026-09-05T06:50:48.255Z",
-    "scopeDigest": "sha256:e58090ba1bec244bc40843c9a59b40557557d93f9eb0d005c7d3e6fd18639c24",
+    "issuedAt": "2026-09-05T06:30:03.572Z",
+    "expiresAt": "2026-09-05T07:00:03.572Z",
+    "scopeDigest": "sha256:a3ffd0af20c1ce77784b3b570831ef05558d1ca3d8b8e7b04b8c0f77f41992bb",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-05T06:20:48.255Z"
+      "selectedAt": "2026-09-05T06:30:03.572Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-MAO-0060.*",
+          ".atm/history/evidence/git-head.jsonl",
           ".atm/history/task-events/TASK-MAO-0060/**",
           ".atm/history/tasks/TASK-MAO-0060.json",
           "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
@@ -283,7 +285,7 @@
           "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
           "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
         ],
-        "digest": "sha256:fe03a24d362144cb7b3e795ba97224d1b6bd5254aae3a7aeeb3a3ee8c78862f1"
+        "digest": "sha256:beb75c4fd744e13748a701cd807876bb11ec57ca50ef03d2f1fa946b3c133650"
       },
       {
         "kind": "lifecycle-operation",
@@ -361,5 +363,9 @@
     },
     "createdAt": "2026-09-05T06:11:12.015Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-05T06:31:24.263Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260905061108-codex-gpt-5.4-mini-TASK-MAO-0060-15c78f0d01",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0060.closure-packet.json"
 }

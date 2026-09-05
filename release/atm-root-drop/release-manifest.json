@@ -5160,6 +5160,7 @@
     "release/atm-root-drop/tests/cli/backlog-census-authority.test.ts",
     "release/atm-root-drop/tests/cli/backlog-deferred-waiver-register.test.ts",
     "release/atm-root-drop/tests/cli/backlog-release-blocking-subset.test.ts",
+    "release/atm-root-drop/tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
     "release/atm-root-drop/tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
     "release/atm-root-drop/tests/cli/batch-deliver-and-close-forwarding.test.ts",
     "release/atm-root-drop/tests/cli/batch-done-task-pruning.test.ts",
@@ -5996,11 +5997,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 5,
-    "unchanged": 2729,
+    "copied": 1384,
+    "unchanged": 4578,
     "removed": 0
   },
-  "buildMode": "overlay",
+  "buildMode": "full",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -6184,7 +6185,7 @@
       },
       {
         "path": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
-        "digest": "dbe1df3099f2b78146b25f615d531c35a43990f43a136c3ab553ac719c3f9f62",
+        "digest": "ee7c08f477988fd1a5feb7a22d3473f826f9608c738c86bd9c2de9dd7d69e710",
         "origin": "source",
         "inputPaths": [
           "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
@@ -6229,7 +6230,7 @@
       },
       {
         "path": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
-        "digest": "3584e325c73feb73767dcc582ede9a7880885728a0dd9f8821393bbef3ce0407",
+        "digest": "bb1d8d42a0fcf2632353fb4c15e767fc0684d99ed73545e5dec6e38570209572",
         "origin": "source",
         "inputPaths": [
           "atomic_workbench/atomization-coverage/path-to-atom-map.json"
@@ -8434,7 +8435,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-11-115.json",
-        "digest": "e6829f027903b00c181d2c7b62efa9b8b48a9615bca17318fcad173c0dfd12d3",
+        "digest": "11746342c389c1ef54b54caf61d3a8028e9a7e2b3cdcac0283b611562ec837a6",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-11-115.json"
@@ -9496,7 +9497,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-001.json",
-        "digest": "61cd52d4ee082cd97d2009734c5c9dc15ad0bd56cbc5a1ddd59fbe6c6aebe7be",
+        "digest": "472740298c85e7865a591602517cfb6a9ad4373880284e012298e9e5e05fe8a1",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-001.json"
@@ -9613,7 +9614,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-005.json",
-        "digest": "db045655d77789fb80fb7df6542fe4e56c7bc463d286f7fdb0f5284bd64a888f",
+        "digest": "e39ca484552ef5329b5c335662d3e363d8f424b4ea25e6137f74318ae5fd24a9",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-005.json"
@@ -9811,7 +9812,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-027.json",
-        "digest": "13312a2e063f6c0965ef1205c396b49f68291106eef4b7e29147a5dd41d14360",
+        "digest": "b5a842b7153d9e592c9f634195457529ec763350cd4aeb6672ec66ca8281da0f",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-027.json"
@@ -9964,7 +9965,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-044.json",
-        "digest": "087a71c5841465f261c9793adac0f6e166fcf5b34d898dcb08f41f7962a87ae8",
+        "digest": "52f939decf1da0fede7bed47142ae050f16b6d163e47508ef7ceaabbae10f219",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-044.json"
@@ -10198,7 +10199,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-228.json",
-        "digest": "31050cac43aa57f5082f8f223d196078a1fbcfc8b5cef10e54f93c7c4c7a6be1",
+        "digest": "40fdafe38af9ce4a3b02a8bd1242f9f6757d551673df6de324e4647f4ce53fe6",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-228.json"
@@ -10207,7 +10208,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-229.json",
-        "digest": "aecbc8ca6a761523890649b0f4ab8c4db631ebc4e7c25e9dbef2f322ceeb25b3",
+        "digest": "12456f019a9b4a77759bfd70adbd73e708abc88dab2969603030af0078bd21fa",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-229.json"
@@ -10234,7 +10235,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-232.json",
-        "digest": "163355d8f3e87150a74131aecb30b7064e13edcd9fa14bda9945d13fff504b93",
+        "digest": "3ad7b3d626e3ace79e2f0a9274af9f823e9e9453136b09c799ef188117e499f1",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-232.json"
@@ -10306,7 +10307,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-24-240.json",
-        "digest": "fff4fd22b710da72712abd0d4d00d3602aa4f0bffaab5f27fd07969659ba0df1",
+        "digest": "59bc444d310b98180a67ea22b6fd3d388f2221c6c06e38edc118b97471f975f5",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-24-240.json"
@@ -10747,7 +10748,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-005.json",
-        "digest": "603fbc01ec6a979fd3ff53b1801f18765b5aa218f36c77df22d8f7df0934edf6",
+        "digest": "451956992bfd96c2c96e2ea52aee4d2a76f90cceae2d11a5e7ce2cf9d23a8062",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-31-005.json"
@@ -11098,7 +11099,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-019.json",
-        "digest": "88ca851b32220e866b14c6e11f50dad2e286b701b6bb42a0dbae8b7fcac79b39",
+        "digest": "0619ae2a6f55cf069499b526eb16446c0b17c6217223a72961aa96655cf43732",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-019.json"
@@ -11107,7 +11108,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-020.json",
-        "digest": "6fff7f669c623aa5c65a62ffd61157f8b6637341969a093fe45ab9599556ad55",
+        "digest": "69a3007087515ddb7c83bdbaaefb74a82d9cb7e884e48d208a1294846a685107",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-020.json"
@@ -11152,7 +11153,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
-        "digest": "a0e3411aa91bfa3ee868757924b7b500222ee5bdfe48dfb8906538c8058f2891",
+        "digest": "e1c396077988559fb18fe158d6c919297a4f6007008cb863a3cd9405bc508509",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json"
@@ -11287,7 +11288,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json",
-        "digest": "f8dfda4123d649b4aac3577f1c4ca72bcc60a773483c766c7530893c2e1c4be4",
+        "digest": "57c48ad1505ca38be644db56556455ed29a13b837dd58b9ca821adc178b2f565",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-002.json"
@@ -11296,7 +11297,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json",
-        "digest": "218ff050b3a93e82d7e7e0b01dfa55030492f7c464eaa87efa9322f727089745",
+        "digest": "b2a011fe0d29f7ca4cea0c87b3ec86c30255b27b9fa52e96d3b012d2e5e15e56",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-15-003.json"
@@ -11305,7 +11306,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-001.json",
-        "digest": "91d6f03abed6b85ef0653e0d2fa7e3e08c73f7e10828fe9a011ace495d25e5e1",
+        "digest": "1503ce48dca2121c0796d2b0ac467f1046c1e434228a86b194160fffc80c1f91",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-001.json"
@@ -11314,7 +11315,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-002.json",
-        "digest": "ea0ebfc88ea2c0da05a46e20428e09ce9c69d506e467c9c523b19e6955ec84cc",
+        "digest": "d6c1a8c6ed36e85cb841d0f4f5556b406348997597cf320594e5a33c713d37b3",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-002.json"
@@ -11323,7 +11324,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-003.json",
-        "digest": "3cbb2ea8924007e70baa3435b4bc299bae4c080b05f127cad588fa6ba154438c",
+        "digest": "30781a582cdd61afcc0f164b012c848bb9f036e1c323b5d288e1b5c63ccdc2f4",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-003.json"
@@ -11350,7 +11351,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-17-001.json",
-        "digest": "cf46e90c08f87d7fc558c7aba789bc29aeed9b93c00372ff19f5d3c753921481",
+        "digest": "695b5d09f311596f29a240bf1e7e6e7f5527a656ab69d565a24c96e3d91378dd",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-17-001.json"
@@ -11422,7 +11423,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-005.json",
-        "digest": "2cd19f70459340943f096fe8fa657d8556c431804125d509fc1024ef86f826a9",
+        "digest": "a631b31c3ae6871a5d54f8c1eca26d9ee7d2ad19d64f5ea2e2e563d0cc55673d",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-21-005.json"
@@ -11692,7 +11693,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-05-001.json",
-        "digest": "3e87c914af8d675e62d0dbe2772c465582b5c4e4e7288f27e7acaed6895d6f58",
+        "digest": "6382e051630990acc40c91dae87be288f7d80510072af7fcb74336fcf3a57a0f",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-05-001.json"
@@ -11701,7 +11702,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.md",
-        "digest": "63bab5eab03ef6c3361fe76cf3512fac2a6657bb03ff566187c48e7e480abaad",
+        "digest": "84bf0da1c0ddb6dd5266277f3f552cf66186b7afa450cb90bfc6215cf0642eb2",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.md"
@@ -13627,7 +13628,7 @@
       },
       {
         "path": "eslint.config.mjs",
-        "digest": "c056cb208b87afcb70ac7b61860abcb364902be2c13c1658b7c842bb7c442b32",
+        "digest": "aebd8f62793a67bb1953a58af3435b8063753ff774030246e48e1b608152c71e",
         "origin": "source",
         "inputPaths": [
           "eslint.config.mjs"
@@ -21349,7 +21350,7 @@
       },
       {
         "path": "packages/cli/dist/commands/batch/runner-recovery-forwarding.js",
-        "digest": "edaa3235bfa1227c3a5b4ad274ac61be2758ca96211752ea25082db3ab9459c2",
+        "digest": "e6b937773d2499edd644b8501e0be23de7066872007c9780ce0bc7a0384c5801",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/batch/runner-recovery-forwarding.js"
@@ -27379,7 +27380,7 @@
       },
       {
         "path": "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
-        "digest": "b1b7303d8acc9cff43be5b795b04d6791fb84c2f3b045cb664f1fd12686c1ece",
+        "digest": "a454d9bf0e8ddebbf374462168b73832a07c38e8eff281966a8520916e29577d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/batch/runner-recovery-forwarding.ts"
@@ -51355,7 +51356,7 @@
       },
       {
         "path": "tests/atomic-map-physical-cap.test.ts",
-        "digest": "1100ce9249eb7e4b5d87e6c6761a3e6269099289b95ffd340c2b4cc9457c6fdb",
+        "digest": "eddd2ae1d20e64cc3f6928e777dd7d040763a02d84ba1f894b0efe0766ea7fb2",
         "origin": "source",
         "inputPaths": [
           "tests/atomic-map-physical-cap.test.ts"
@@ -52155,6 +52156,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+        "digest": "d7f5d816182d3afbaed56702326e016cce6b850b3aa54b8fa6e7a4ef91d8721c",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
         "digest": "d17515fbc3704683867ce446936604a89392d3f978e0f19acbb975f55939dd6d",
         "origin": "source",
@@ -52399,7 +52409,7 @@
       },
       {
         "path": "tests/cli/canonical-telemetry-observation.test.ts",
-        "digest": "75bef42a52abcc6d815736541fdbbe21fb24982ed8b283c01ce4687e81419322",
+        "digest": "c0c0c2319f7954ffd86ce12b7acff60ebab3bc245c064399fa3a78c73d08ee40",
         "origin": "source",
         "inputPaths": [
           "tests/cli/canonical-telemetry-observation.test.ts"
@@ -54811,7 +54821,7 @@
       },
       {
         "path": "tests/cli/planning-source-seal.test.ts",
-        "digest": "a683624e464d0d8bb8f5b8ab009aee0edb23d169396f17a1620bff01dadc52ee",
+        "digest": "f5e853d2d3a0486d789a7b9b7b08cd500928a79d01995a229714739d7abb24f5",
         "origin": "source",
         "inputPaths": [
           "tests/cli/planning-source-seal.test.ts"
@@ -54982,7 +54992,7 @@
       },
       {
         "path": "tests/cli/real-shared-delivery-commit-executor.test.ts",
-        "digest": "a1e21e38be99ebe8a8922e00f8d2b2aa574cad5a55be775d89e912ae76b7d22e",
+        "digest": "f078814ffd2e2a82cb57902e0d56408f2b87a96bb8f72efff8a1c8e2c4018e96",
         "origin": "source",
         "inputPaths": [
           "tests/cli/real-shared-delivery-commit-executor.test.ts"
@@ -56827,7 +56837,7 @@
       },
       {
         "path": "tests/cli/write-ticket-scope-amendment.test.ts",
-        "digest": "67005eb3e95f51e32bf62a2644bcfbbd663fadcdc08c73f928116546b3ba7233",
+        "digest": "03d579081866015f1af670bd71bf6b629aff5a9eea004d099bb7e7b48d5bcfc5",
         "origin": "source",
         "inputPaths": [
           "tests/cli/write-ticket-scope-amendment.test.ts"
@@ -59652,7 +59662,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:4f2c9749a9d65c9e10be4f715bb60cbc25cb41ed98d031c20ed796d2592ce2ec"
+    "treeDigest": "sha256:6e132984cdd0fe7287be909d2ee51c598436b12ad0ee217d0684c01cbde8e8a6"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61181,7 +61191,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:d8a4a6836e66659c889a66db431c92e65d6452074a645d245f081f648b2febe1"
+    "digest": "sha256:7bdb66bf6ba3f28f6ed944616d1edfb10a79816e5f37de7a2907472cae20c5c4"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66315,6 +66325,7 @@
       "release/atm-root-drop/tests/cli/backlog-census-authority.test.ts",
       "release/atm-root-drop/tests/cli/backlog-deferred-waiver-register.test.ts",
       "release/atm-root-drop/tests/cli/backlog-release-blocking-subset.test.ts",
+      "release/atm-root-drop/tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
       "release/atm-root-drop/tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
       "release/atm-root-drop/tests/cli/batch-deliver-and-close-forwarding.test.ts",
       "release/atm-root-drop/tests/cli/batch-done-task-pruning.test.ts",
@@ -67154,22 +67165,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:68c398fa392f0dbfab31331bea45fcbffd58d4dcb52896b1558de49c32987b86",
-  "sealedSourceCommit": "5627844d89627aa4c739a72f9f2962805850743e",
+  "buildInputsTreeHash": "sha256:f51e0be010d6a4de9256879dc73f84e414939ccbe1b7a407392d489c46fae193",
+  "sealedSourceCommit": "6c51ccf74870ec8d929ec0e333d99a59c9c01759",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:b216226fcdbb7d980b02b330eeb5c62b747291fdef69c41fb00d3732a85b04a5",
-  "tsBuildCacheDigest": "sha256:76b3c36df8ebbafc5129c2c432c6494210bcc5a11eb7921a278dcf7a8f6dca5c",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:f40967720f85640a5d4cee6ebf74015b0a95ba7fd9ced140c2ffa7b3025b0572",
+  "tsBuildCacheDigest": "sha256:8f93a52f48e9eb9fed27af1cb9937ab9327a38f45a6af21ba3e9c8e23713fdbf",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 50,
     "skipDecision": 61,
-    "worktreeSetup": 11088,
-    "typescriptBuild": 21260,
-    "rootDropReleaseAssembly": 32416,
-    "onefileReleaseAssembly": 7997,
-    "artifactSync": 9344,
+    "worktreeSetup": 15630,
+    "typescriptBuild": 10221,
+    "rootDropReleaseAssembly": 30467,
+    "onefileReleaseAssembly": 8101,
+    "artifactSync": 9597,
     "cleanup": 0,
-    "totalElapsed": 101052
+    "totalElapsed": 86029
   }
 }

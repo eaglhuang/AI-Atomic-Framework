@@ -1,0 +1,187 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MAO-0060",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6c51ccf74870ec8d929ec0e333d99a59c9c01759",
+  "governedTreeSha": "92621259733cd448bcfea3305d6fbeca45500185",
+  "targetCommitDelta": {
+    "currentCommitSha": "6c51ccf74870ec8d929ec0e333d99a59c9c01759",
+    "parentCommitShas": [
+      "6c51ccf74870ec8d929ec0e333d99a59c9c01759"
+    ],
+    "governedTreeSha": "92621259733cd448bcfea3305d6fbeca45500185",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/evidence/TASK-MAO-0060.json",
+      ".atm/history/evidence/TASK-MAO-0060.runner-sync-receipt.json",
+      ".atm/history/task-events/TASK-MAO-0060/2026-09-05T06-30-04-506Z-renew-6eae829f3342.json",
+      ".atm/history/tasks/TASK-MAO-0060.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-11-115.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-001.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-005.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-027.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-044.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-228.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-229.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-232.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-24-240.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-025.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-001.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-002.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-16-003.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/eslint.config.mjs",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/atomic-map-physical-cap.test.ts",
+      "release/atm-root-drop/tests/cli/canonical-telemetry-observation.test.ts",
+      "release/atm-root-drop/tests/cli/planning-source-seal.test.ts",
+      "release/atm-root-drop/tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "release/atm-root-drop/tests/cli/write-ticket-scope-amendment.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8b00811ca0aa160d5dae2f79df5ecabb24d60d8ea582847c89f081df88f66d07",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d1d0bfdc70e4642f953120cfe9b8935ab0aeb89994c306398fef147d85ba331",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:db8cc38e978fee7b730c0f38c14cc0d6842b6aeb460786a62fab43232894faa7",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-05T06:31:24.252Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-MAO-0060.*",
+      ".atm/history/task-events/TASK-MAO-0060/**",
+      ".atm/history/tasks/TASK-MAO-0060.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/runner/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/core/src/broker/**",
+      "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/runner/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/core/src/broker/**",
+      "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "typecheck",
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MAO-0060.json",
+  "closedAt": "2026-09-05T06:31:24.252Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260905061108-codex-gpt-5.4-mini-TASK-MAO-0060-15c78f0d01",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "6c51ccf74870ec8d929ec0e333d99a59c9c01759",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-MAO-0060/2026-09-05T06-11-08-509Z-reserve-e9c4a3ef6f9a.json",
+      ".atm/history/task-events/TASK-MAO-0060/2026-09-05T06-11-08-513Z-promote-0d228fd72922.json",
+      ".atm/history/task-events/TASK-MAO-0060/2026-09-05T06-11-11-936Z-claim-0460cf040f4d.json",
+      ".atm/history/task-events/TASK-MAO-0060/2026-09-05T06-20-37-861Z-scope-amendment-763d98310a74.json",
+      ".atm/history/task-events/TASK-MAO-0060/2026-09-05T06-20-49-347Z-renew-32027aa2df20.json",
+      ".atm/history/tasks/TASK-MAO-0060.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

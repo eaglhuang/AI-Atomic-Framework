@@ -3,10 +3,14 @@ import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
 const maxLines = 600;
+const shardManifest = JSON.parse(readFileSync(
+  'atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json',
+  'utf8'
+)) as { shardPaths?: string[] };
 const cappedFiles = [
   'atomic_workbench/atomization-coverage/path-to-atom-map.json',
-  'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json',
-  'atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js'
+  'atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js',
+  ...(shardManifest.shardPaths ?? [])
 ];
 
 for (const relativePath of cappedFiles) {

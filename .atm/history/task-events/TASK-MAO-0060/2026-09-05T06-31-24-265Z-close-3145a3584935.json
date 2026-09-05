@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-05T06-31-24-265Z-close-3145a3584935",
+  "taskId": "TASK-MAO-0060",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260905061108-codex-gpt-5.4-mini-TASK-MAO-0060-15c78f0d01",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0060.json",
+  "taskSha256": "sha256:26228d730bf23facba82fecad8f88e7fb961b77cf65411e0d80b87124ec3f281",
+  "createdAt": "2026-09-05T06:31:24.265Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0060 --actor codex-gpt-5.4-mini --status done --historical-delivery 6c51ccf74870ec8d929ec0e333d99a59c9c01759",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260905061108-codex-gpt-5.4-mini-TASK-MAO-0060-15c78f0d01",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0060.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-05T06:31:24.252Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-MAO-0060.*",
+        ".atm/history/task-events/TASK-MAO-0060/**",
+        ".atm/history/tasks/TASK-MAO-0060.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/batch/implementation.ts",
+        "packages/cli/src/commands/runner/**",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/core/src/broker/**",
+        "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+        "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/**",
+        "packages/cli/src/commands/batch/implementation.ts",
+        "packages/cli/src/commands/runner/**",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/core/src/broker/**",
+        "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+        "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+        "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+        "typecheck",
+        "validate:cli"
+      ]
+    }
+  }
+}

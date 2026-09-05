@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Fixed — observed coverage is evidence-backed; broader cohort closeout remains separate",
   "area": "Governance telemetry",
   "finding": "ATM-GOV-0193 and the ATM-GOV-0195 coverage repair are marked done, but coverage status still conflates registry declaration with observed runtime emission. Five node families are labeled `instrumented`, while the retained runtime gate journal contains only `next.route-resolution` events; this is insufficient proof that claim, doctor, guard, taskflow, batch, broker, team, or checkpoint paths actually emitted during dogfood.",
   "expectedBehavior": "Before any M2 effectiveness, retirement, or matched A/B analysis, ATM should require a machine-readable registry coverage report proving each claim, gate, validator, checkpoint, close, evidence readback, git governance, runner-sync, batch, broker, team, and telemetry self-operation node is classified as instrumented, read-only-summary, out-of-scope, or not-yet-covered. Missing coverage must block causal claims and force inconclusive or a repair task, not silently pass.",
-  "evidenceOrRepro": "`.atm/runtime/telemetry/analysis-inputs/ATM-GOV-0190-coverage.json` labels claim/reservation, next/preflight, task close/checkpoint, batch/broker/team, and telemetry self-health as instrumented. Enumerating `.atm/runtime/telemetry/gate-events/**` finds 22 files and 22 events, all with checkId `next.route-resolution`. The same coverage report still marks validator and evidence readback as not-yet-covered and git/runner-sync as read-only-summary, so M2 remains inconclusive.",
-  "followUp": "Extend coverage to report separate `registered`, `code-wired`, `observed`, and `sealed/read-back` states with event counts and last-observed timestamps per checkId. M2 readiness must require observed emissions for the selected cohort, not registry membership alone."
+  "evidenceOrRepro": "Red reproduction: `tests/cli/canonical-telemetry-observation.test.ts` created a clean repository with no telemetry events, while `buildSharedWriteGateCoverageReport` returned `observedProducerCount == producerCount` and `coveragePercentage == 100`. The repair now derives observation counts from sealed history plus runtime gate-events; the same clean repository returns zero observed producers and 0% coverage. Focused telemetry regressions, typecheck, runner-build-scope validation, and encoding guard pass.",
+  "followUp": "Source repair is complete. Broader cohort evidence still requires real emissions for each selected checkId and separate formal closeout/frozen publication receipts; this quickfix does not claim M2 effectiveness."
 }

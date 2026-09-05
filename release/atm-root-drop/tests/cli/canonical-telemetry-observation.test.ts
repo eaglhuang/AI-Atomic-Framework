@@ -32,8 +32,8 @@ try {
 
   const coverage = buildSharedWriteGateCoverageReport(tmp);
   assert.equal(coverage.schemaId, 'atm.sharedWriteGateCoverage.v1');
-  assert.equal(coverage.coveragePercentage, 100);
-  assert.equal(coverage.observedProducerCount, coverage.producerCount);
+  assert.equal(coverage.coveragePercentage, 0);
+  assert.equal(coverage.observedProducerCount, 0);
   assert.match(coverage.inputDigest, /^sha256:[a-f0-9]{64}$/);
   assert.match(coverage.sealedDigest, /^sha256:[a-f0-9]{64}$/);
   assert.ok(coverage.producers.every((producer) => producer.sourceAvailability !== 'unavailable' || producer.receiptRef));
@@ -42,7 +42,7 @@ try {
   assert.equal(cli.status, 0, cli.combined);
   const payload = JSON.parse(cli.stdout);
   assert.equal(payload.evidence.schemaId, 'atm.sharedWriteGateCoverage.v1');
-  assert.equal(payload.evidence.coveragePercentage, 100);
+  assert.equal(payload.evidence.coveragePercentage, 0);
 } finally {
   rmSync(tmp, { recursive: true, force: true });
 }

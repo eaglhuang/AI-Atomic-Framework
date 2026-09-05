@@ -7,6 +7,7 @@ import {
   createEmptyWaveBrokerSchedulerDocument,
   enqueueWaveBrokerTicket
 } from '../../packages/core/src/broker/wave-broker-scheduler.ts';
+import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID } from '../../packages/core/src/broker/shared-write-provenance-policy.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-real-shared-delivery-'));
 runGit(['init']);
@@ -21,6 +22,37 @@ const base = runGit(['rev-parse', 'HEAD']).stdout.trim();
 writeFileSync(path.join(repo, 'README.md'), 'shared delivery payload\n', 'utf8');
 writeFileSync(path.join(repo, 'foreign.txt'), 'foreign staged by another lane\n', 'utf8');
 runGit(['add', 'foreign.txt']);
+runGit(['add', 'README.md']);
+
+const stagedReadmeBlob = runGit(['rev-parse', ':README.md']).stdout.trim();
+mkdirSync(path.join(repo, '.atm', 'history', 'evidence'), { recursive: true });
+writeFileSync(path.join(repo, '.atm', 'history', 'evidence', 'real.shared-write-provenance.json'), `${JSON.stringify({
+  schemaId: SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID,
+  receiptId: 'receipt-real-shared-delivery',
+  canonicalRoot: repo,
+  baseSha: base,
+  headSha: base,
+  compositionPlanDigest: `sha256:${'1'.repeat(64)}`,
+  candidateOutputDigest: `sha256:${'2'.repeat(64)}`,
+  serializabilityProofDigest: `sha256:${'3'.repeat(64)}`,
+  stewardId: 'fixture-neutral-steward',
+  stewardRole: 'neutral-steward',
+  memberTaskIds: ['ATM-GOV-A', 'ATM-GOV-B'],
+  fileDigests: { 'README.md': `git-blob:${stagedReadmeBlob}` },
+  canonicalWriteCount: 1,
+  semanticAuthorization: {
+    schemaId: 'atm.stewardSemanticValidationReceipt.v1',
+    candidateDigest: `sha256:${'1'.repeat(64)}`,
+    outputDigest: `sha256:${'2'.repeat(64)}`,
+    decisionVerdict: 'pass',
+    ok: true
+  },
+  semanticBaseHeadSha: base,
+  semanticSealedSelectionSourceDigest: `sha256:${'4'.repeat(64)}`,
+  semanticRunnerBuildDigest: `sha256:${'5'.repeat(64)}`,
+  issuedAt: '2026-07-19T00:00:00.000Z',
+  consumedAt: null
+}, null, 2)}\n`, 'utf8');
 
 mkdirSync(path.join(repo, '.atm', 'runtime'), { recursive: true });
 let scheduler = createEmptyWaveBrokerSchedulerDocument('2026-07-19T00:00:00.000Z');
