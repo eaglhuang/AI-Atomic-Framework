@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Partially fixed — release-tier close classification repair landed; remaining governance closeout remains",
+  "status": "Closed — release-tier close classification repair reverified on 2026-09-05",
   "area": "Task Planning / Validation Governance",
   "finding": "A single task card listed `npm run validate:standard -- --json` as closure-required evidence, which promoted an all-repository release gate into every close attempt and made unrelated baseline failures block ATM-GOV-0245.",
   "expectedBehavior": "Task-card close validators should be focused semantic gates for the task. Whole-repo release health should be represented as a separate release/readiness card or advisory gate unless the task explicitly owns every failing surface.",
   "evidenceOrRepro": "Historical incident: ATM-GOV-0245 pre-close required `npm run validate:standard -- --json`; the repository-wide run reached about 29.5 minutes and unrelated baseline failures blocked the bounded task. Current repair classifies `validate:standard` and `validate:full` as release tier. A release-tier validator remains closure-required only when the task owns a release surface; a legacy explicit declaration on a bounded source task no longer silently promotes the full release gate. `node --strip-types packages/cli/src/commands/evidence/__tests__/validator-classification.spec.ts` covers both directions.",
-  "followUp": "Source repair is verified. Task-card authors should amend legacy declarations to focused semantic gates for clarity; the close classifier now fails closed again when a task actually touches release surfaces. Frozen publication and formal governance closeout are separate from this backlog status."
+  "followUp": "Source repair is verified by validator-classification.spec.ts and is included in the current sealed runner lineage. Task-card authors may still amend legacy declarations for clarity; that documentation improvement is separate and does not indicate an unresolved defect."
 }
