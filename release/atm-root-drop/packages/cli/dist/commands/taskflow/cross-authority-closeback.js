@@ -19,7 +19,7 @@ function idempotencyKey(input) {
     ].join(':');
 }
 function defaultRecoveryCommand(taskId) {
-    return `node atm.mjs taskflow diagnose --task ${taskId} --json`;
+    return `node atm.mjs tasks status --task ${taskId} --json`;
 }
 function recoveryCommand(ports, taskId, authority, phase, disposition) {
     return ports.recoveryCommandFor?.({ taskId, authority, phase, disposition }) ?? defaultRecoveryCommand(taskId);
