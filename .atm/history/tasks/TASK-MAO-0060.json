@@ -1,0 +1,350 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0060",
+  "title": "frozen runner checkpoint recovery bridge",
+  "status": "running",
+  "milestone": "M8F",
+  "dependencies": [
+    "TASK-MAO-0058"
+  ],
+  "acceptance": [
+    "**ACC-1:** stale frozen runner produces a brokered, candidate-bound recovery ticket rather than an unstructured refusal.",
+    "**ACC-2:** when runner publication is not admissible, a VCS-neutral commit-candidate bridge is returned with an executable next command and no lifecycle mutation.",
+    "**ACC-3:** successful publication is bound to candidate HEAD and seal digest; checkpoint resumes only after both match.",
+    "**ACC-4:** source-first and failure paths are byte-identical in task ledger, close packet, and task events."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch/**",
+    "packages/cli/src/commands/runner/**",
+    "packages/cli/src/commands/taskflow/**",
+    "packages/core/src/broker/**",
+    "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch/implementation.ts",
+    "packages/cli/src/commands/batch/**",
+    "packages/cli/src/commands/runner/**",
+    "packages/cli/src/commands/taskflow/**",
+    "packages/core/src/broker/**",
+    "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "Do not decide cross-card shared-index authority; ATM-BUG-2026-08-12-001 remains owner-policy deferred.",
+    "Do not run npm publication or modify release tags.",
+    "Do not edit .atm/runtime/** directly or use native Git as the normal recovery path."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the recovery bridge, receipts, and focused tests together if candidate publication or bridge atomicity is not deterministic.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.batch-checkpoint-runner-sync",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.batch-checkpoint-recovery-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/batch/implementation.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "multi-agent-orchestration/tasks/TASK-MAO-0060-frozen-runner-checkpoint-recovery-bridge.task.md",
+    "sectionTitle": "TASK-MAO-0060",
+    "headingLine": 133,
+    "hash": "d7d08172589feb35",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "multi-agent-orchestration/tasks/TASK-MAO-0060-frozen-runner-checkpoint-recovery-bridge.task.md",
+      "planningCommitSha": "bc4c8d499966022928b7d03e9367576c41868324",
+      "contentDigest": "sha256:d7d08172589feb35463606b5200ec2e0acfe9233f17eefba0fe672dc0a8ee628",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-05T06:03:21.930Z"
+    }
+  },
+  "importedAt": "2026-09-05T06:03:21.930Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-MAO-0058 governed branch/commit queue behavior remains green",
+      "candidate source and frozen runner base are both digest-addressable"
+    ],
+    "softRelations": [
+      "ATM-BUG-2026-08-12-001 cross-card index authority policy remains out of scope"
+    ],
+    "changedPublicSeams": [
+      "batch checkpoint",
+      "runner publication recovery"
+    ],
+    "causalImpactEdges": [
+      "stale frozen runner -> governed recovery ticket",
+      "publication refusal -> commit-candidate bridge"
+    ],
+    "parallelFrontierInputs": [
+      "broker shared-write admission",
+      "runner publication receipt"
+    ],
+    "validatorReferences": [
+      "batch-checkpoint-runner-sync-recovery",
+      "batch-checkpoint-runner-sync-recovery-bridge"
+    ],
+    "phaseOwner": "neutral-steward"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_batch_checkpoint_runner_sync_recovery_5c7e6c2a",
+      "targetGroupId": "null",
+      "semanticKey": "batch_checkpoint_runner_sync_recovery",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "stale frozen runner -> governed recovery ticket"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "TASK-MAO-0058",
+      "contractEdge": "runner_recovery_contract",
+      "resourceKey": "batch_checkpoint_runner_sync"
+    },
+    {
+      "caseId": "test_batch_checkpoint_runner_sync_bridge_9a4d1f73",
+      "targetGroupId": "null",
+      "semanticKey": "batch_checkpoint_runner_sync_bridge",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "publication refusal -> commit-candidate bridge"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "runner_recovery_bridge_contract",
+      "resourceKey": "batch_checkpoint_runner_sync_bridge"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_batch_checkpoint_runner_sync_recovery_5c7e6c2a",
+    "test_batch_checkpoint_runner_sync_bridge_9a4d1f73"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-MAO-0058",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-05T06-03-35-845Z-claim-7235dffd666a",
+  "lastTransitionAt": "2026-09-05T06:03:35.845Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-05T06:03:33.579Z",
+  "promotedAt": "2026-09-05T06:03:33.582Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-85ad970ab681",
+    "claimedAt": "2026-09-05T06:03:33.587Z",
+    "heartbeatAt": "2026-09-05T06:03:33.587Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MAO-0060.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/runner/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/core/src/broker/**",
+      "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c\""
+    }
+  },
+  "startedAt": "2026-09-05T06:03:33.587Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-1b42306378b951d6",
+    "ticketDigest": "sha256:1b42306378b951d63909226d57ca116572744fef083c1d425c91a9cfd5b53dfc",
+    "taskId": "TASK-MAO-0060",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c",
+    "claimGeneration": "lease-85ad970ab681",
+    "issuedAt": "2026-09-05T06:03:33.587Z",
+    "expiresAt": "2026-09-05T06:33:33.587Z",
+    "scopeDigest": "sha256:55c02ea2d677a4a9acf2521d8b4eb0bd78366128458dcb3b7d893f56d711d0e8",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-05T06:03:33.587Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-MAO-0060.*",
+          ".atm/history/task-events/TASK-MAO-0060/**",
+          ".atm/history/tasks/TASK-MAO-0060.json",
+          "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+          "packages/cli/src/commands/batch/**",
+          "packages/cli/src/commands/batch/implementation.ts",
+          "packages/cli/src/commands/runner/**",
+          "packages/cli/src/commands/taskflow/**",
+          "packages/core/src/broker/**",
+          "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+          "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+        ],
+        "digest": "sha256:cbab09dd2b5d6d225a0603e23e95fd0c9ee623172dcf32e24b193eea4e44cd6e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260905060333-codex-gpt-5.4-mini-TASK-MAO-0060-2331a4fa1b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0060",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0060.*",
+      ".atm/history/task-events/TASK-MAO-0060/**",
+      ".atm/history/tasks/TASK-MAO-0060.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch/**",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/runner/**",
+      "packages/cli/src/commands/taskflow/**",
+      "packages/core/src/broker/**",
+      "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9fdc676aaed5f4ff7356cd5538e26b0bb40a85006e28e245d28a9392d4995fa3",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260905060333-codex-gpt-5.4-mini-TASK-MAO-0060-2331a4fa1b",
+    "laneSession": {
+      "laneSessionId": "lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c\""
+    },
+    "createdAt": "2026-09-05T06:03:35.844Z",
+    "status": "active"
+  }
+}
