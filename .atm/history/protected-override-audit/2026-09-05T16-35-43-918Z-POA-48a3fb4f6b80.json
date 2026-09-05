@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-48a3fb4f6b80",
+  "recordedAt": "2026-09-05T16:35:43.918Z",
+  "actorId": "codex-backlog-audit-20260905",
+  "taskId": null,
+  "surface": "git commit broker-conflict override",
+  "command": "node atm.mjs git commit --actor codex-backlog-audit-20260905 --message \"record ATM-GOV-0411 closeout artifacts\" --no-verify --json",
+  "flags": [
+    "--broker-conflict-override"
+  ],
+  "permission": "backend.brokerConflictOverride",
+  "leaseId": "EMG-ATM-FRAMEWORK-TEMP-codex-backlog-audit-20260905-5094ead675",
+  "reason": "Scoped terminal-task reconciliation using BCR-0oxfkp.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.brokerConflictOverride"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-05T16-35-43-917Z-EMG-ATM-FRAMEWORK-TEMP-codex-backlog-audit-20260905-5094ead675.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
