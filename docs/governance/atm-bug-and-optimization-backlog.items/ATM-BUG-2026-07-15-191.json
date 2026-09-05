@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P0",
-  "status": "Fixed in 88af0d7b4 and 6c8149a89",
+  "status": "Closed — fixed in 88af0d7b4 and 6c8149a89; formal backlog closeout recorded 2026-09-05",
   "area": "Git governance / governed commit UX",
   "finding": "A Codex-side staging helper spawned git add --pathspec-from-file=- --pathspec-file-nul and waited on stdin, making the user-facing flow look like node atm.mjs git commit was hung even though no commit was running and no files were staged.",
   "expectedBehavior": "ATM git commit and git commit-status should fail fast or report a first-class diagnostic when a stdin pathspec git add helper is active, so operators can distinguish a stuck staging helper from a slow governed commit hook.",

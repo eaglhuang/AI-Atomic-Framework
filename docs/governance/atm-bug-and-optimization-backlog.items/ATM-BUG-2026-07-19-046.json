@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P0",
-  "status": "Fixed in ATM-GOV-0230",
+  "status": "Closed — fixed in ATM-GOV-0230; formal backlog closeout recorded 2026-09-05",
   "area": "Runner sync / framework temp hotfix lane",
   "finding": "After a framework temp-claim hotfix commits source changes, the frozen runner becomes stale and `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` requires a broker runner-sync queue-head reservation. The required enqueue path rejects `ATM-FRAMEWORK-TEMP-*` owners as `task-missing`, leaving no legal runner-sync path for urgent framework hotfixes or post-checkpoint release sync work that is intentionally scoped by framework-mode rather than a normal active task ledger.",
   "expectedBehavior": "Runner-sync enqueue/admission should accept a valid live framework temp claim as an active steward owner for `ATM-FRAMEWORK-TEMP-*` work, while continuing to reject ordinary missing, terminal, or stale task ids. The admission failure should also surface a runnable enqueue command instead of a prose-only requiredCommand.",

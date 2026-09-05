@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed — pre-commit now reports foreign generated residue without mutating it; source and frozen runner verified",
+  "status": "Closed — pre-commit now reports foreign generated residue without mutating it; source and frozen runner verified; formal backlog closeout recorded 2026-09-05",
   "area": "Pre-commit generated-residue cleanup isolation",
   "finding": "A pre-commit invocation with no staged files auto-removed generated bundle manifests belonging to previously released tasks. The cleanup is observable but is outside the current candidate and can mutate a shared worktree during an otherwise read/validate operation.",
   "expectedBehavior": "Automatic cleanup must be candidate- or explicitly-owned-scope bounded. Cross-task generated residue should be reported as a separately actionable cleanup batch, not silently mutated by an unrelated hook invocation. Any cleanup write must carry an owner, receipt, and exact-path attribution.",
