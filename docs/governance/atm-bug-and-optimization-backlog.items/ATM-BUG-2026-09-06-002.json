@@ -5,11 +5,11 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Open",
+  "status": "Closed — Fixed in 634fb5a515dc9835b3c03fcab4657d097fcf9eb6",
   "area": "Repository physical-line-budget gate / push governance",
   "finding": "The repository-wide physical-line-budget validator currently reports a hard violation in the governed push implementation: packages/cli/src/commands/git-governance/implementation/push-command.ts is 608 lines against the 600-line hard limit. This leaves the canonical repository gate red even though the previously reported oversized extraction targets are within budget.",
   "expectedBehavior": "Every committed source tree must remain within the 600-line hard limit, and a long governance command should be split along stable responsibilities without changing push admission, recovery, or error semantics. The repair must retain focused regression coverage and make the repository-wide physical-line validator green.",
-  "evidenceOrRepro": "On 2026-09-05/06, `node --strip-types scripts/validate-physical-line-budget.ts --json` scanned 2,493 files and returned `ok: false`, `hardViolationCount: 1`, with `topFile: packages/cli/src/commands/git-governance/implementation/push-command.ts` at 608 lines. The working tree was clean, so this is committed baseline debt rather than unstaged residue. Existing related cards 2026-07-29-248 and 2026-08-15-003 do not own this file or symptom.",
+  "evidenceOrRepro": "On 2026-09-05/06, `node --strip-types scripts/validate-physical-line-budget.ts --json` scanned 2,493 files and returned `ok: false`, `hardViolationCount: 1`, with `topFile: packages/cli/src/commands/git-governance/implementation/push-command.ts` at 608 lines. The behavior-preserving extraction in commit `634fb5a515dc9835b3c03fcab4657d097fcf9eb6` moved the three pure recovery helpers to `push-recovery.ts`; `git-admission-cli.test.ts`, the physical-line-budget gate, typecheck, diff check, and encoding guard all passed. The gate then reported `hardViolationCount: 0` across 2,494 files.",
   "containment": "Do not lower the 600-line threshold, exclude push-command.ts, or mix this item with foreign worktree cleanup. Preserve the current governed push facade and use a bounded extraction with behavior-preserving tests.",
-  "followUp": "Add a red regression around the current repository gate or extracted seam, split only the stable helper responsibility, run focused push/admission tests plus typecheck and the physical-line validator, then update this card with the repair commit and frozen publication state."
+  "followUp": "Keep the physical-line gate and push recovery regression coverage. Frozen runner publication is not required for this source-only refactor until the next release-surface build."
 }
