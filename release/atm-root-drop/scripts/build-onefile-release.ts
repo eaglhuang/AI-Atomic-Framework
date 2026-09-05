@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { finalizeBuildReleaseHygiene } from './build-release-hygiene.ts';
 import { assertPayloadLauncherIsNotNested } from './launcher-entrypoint-guards.ts';
+import { renderOnefileFastVersionRuntime } from './onefile-fast-version-runtime.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rootDropReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
@@ -58,9 +59,11 @@ export function buildOnefileRelease(options: any = {}) {
   const payloadCompressed = gzipSync(payloadBuffer, { level: 9 });
   const payloadBase64 = payloadCompressed.toString('base64');
   const payloadSha256 = createHash('sha256').update(payloadCompressed).digest('hex');
+  const frameworkVersion = String(JSON.parse(readFileSync(path.join(repositoryRoot, 'package.json'), 'utf8')).version ?? '0.0.0');
   const runtimeSource = renderOnefileRuntime({
     payloadBase64,
-    payloadSha256
+    payloadSha256,
+    frameworkVersion
   });
 
   mkdirSync(outputRoot, { recursive: true });
@@ -177,10 +180,15 @@ const onefilePayloadPrefixes = [
 const onefilePayloadFrameworkMarkers = new Set([
   'packages/cli/src/atm.ts',
   'packages/cli/src/commands/self-host-alpha.ts',
-  'packages/core/seed.js',
-  'packages/core/src/index.ts',
   'scripts/validate-seed-registry.ts',
   'scripts/validate-seed-spec.ts'
+]);
+
+// These records are read by shipped CLI diagnostics. Governance projections
+// and backlog shards belong to the host repository, not the embedded runtime.
+const onefilePayloadGovernanceFiles = new Set([
+  'docs/governance/error-code-registry.json',
+  'docs/governance/tasks-audit-warning-baseline.json'
 ]);
 
 function collectPayloadFiles(root: any) {
@@ -212,9 +220,16 @@ export function isOnefilePayloadPath(relativePath: string) {
     return false;
   }
   if (normalized.startsWith('docs/governance/')) {
-    return normalized.endsWith('.json');
+    return onefilePayloadGovernanceFiles.has(normalized);
   }
   if (normalized.startsWith('packages/')) {
+    // The CLI dist owns its complete runtime dependency closure under
+    // packages/cli/dist/_vendor. Embedding root copies of every workspace
+    // duplicates those modules and turns the onefile launcher into a source
+    // archive instead of a portable runtime.
+    if (!normalized.startsWith('packages/cli/')) {
+      return false;
+    }
     if (normalized.includes('/dist/') && normalized.includes('/__tests__/')) {
       return false;
     }
@@ -271,7 +286,7 @@ function digestJson(value: unknown): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 }
 
-function renderOnefileRuntime({ payloadBase64, payloadSha256 }: any) {
+function renderOnefileRuntime({ payloadBase64, payloadSha256, frameworkVersion }: any) {
   return `#!/usr/bin/env node
 import { chmodSync, existsSync, mkdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -283,6 +298,7 @@ import { pathToFileURL } from 'node:url';
 
 const payloadBase64 = ${JSON.stringify(payloadBase64)};
 const payloadSha256 = ${JSON.stringify(payloadSha256)};
+const frameworkVersion = ${JSON.stringify(frameworkVersion)};
 
 function fail(message, code = 1) {
   process.stderr.write(\`[atm-onefile] \${message}\\n\`);
@@ -468,8 +484,15 @@ function firstPositionalCommand(args) {
   return null;
 }
 
+${renderOnefileFastVersionRuntime()}
+
 async function run() {
   try {
+    const userArgs = process.argv.slice(2);
+    if (isVersionRequest(userArgs)) {
+      writeFastVersionResult();
+      return;
+    }
     const extractedRoot = ensureExtractedRoot();
     const distEntrypoint = path.join(extractedRoot, 'packages', 'cli', 'dist', 'atm.js');
     const sourceEntrypoint = path.join(extractedRoot, 'packages', 'cli', 'src', 'atm.ts');
@@ -483,7 +506,6 @@ async function run() {
       fail('Extracted payload is missing an ATM runtime entrypoint.');
       return;
     }
-    const userArgs = process.argv.slice(2);
     const commandName = firstPositionalCommand(userArgs);
     const hasExplicitCwd = userArgs.includes('--cwd');
     const shouldUseExtractedFrameworkCwd = commandName === 'self-host-alpha' && hasExplicitCwd === false;
