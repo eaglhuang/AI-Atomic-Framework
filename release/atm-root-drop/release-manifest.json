@@ -2151,6 +2151,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-side-effect-reconcile.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-hook-receipt.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.js",
+    "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-status.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/closeback-orchestration.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-messages.js",
@@ -2922,6 +2923,8 @@
     "release/atm-root-drop/packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+    "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-status.test.ts",
+    "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-status.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/closeback-orchestration.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-messages.ts",
@@ -6018,8 +6021,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 2,
-    "unchanged": 1955,
+    "copied": 9,
+    "unchanged": 1951,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -22325,7 +22328,7 @@
       },
       {
         "path": "packages/cli/dist/commands/command-specs/taskflow.spec.js",
-        "digest": "eeac6f7a393d201c9fa6937bb69fd1f373690413824f035713c1783e0e36cc47",
+        "digest": "687af6053f1964f92fcf4176e052f33cae949c633d9c266c0ac4622ebaf8c81a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/command-specs/taskflow.spec.js"
@@ -25105,6 +25108,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/taskflow/close-transaction-status.js",
+        "digest": "3d62e1643bda69f002d2199c230ca43b632dd7e5cc723fd1a103ad78eb0492ec",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/taskflow/close-transaction-status.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/taskflow/closeback-orchestration.js",
         "digest": "3ff19f91c8ff32fa9373c06842503d2ce3d19a874923650c318b58c57d246b34",
         "origin": "source",
@@ -25187,7 +25199,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/implementation.js",
-        "digest": "b5d2f0ae3735b4e7d4f74e3a6f32daa90ea4127b1a16f985a02e3e8af6c2bd65",
+        "digest": "9d7211d062f1ef7f7963fa7d4aff603a29320caa555c2cab69cf34066657df90",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/implementation.js"
@@ -25430,7 +25442,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-orchestrator/close-write.js",
-        "digest": "656e3d1dbd59d84d299c6e3e247c5e140925406d7bf04cf15b9f42e0f5c19159",
+        "digest": "4507015004b7093294ec359c568241eb90c133ea84d438b4f7976d5296574f04",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-orchestrator/close-write.js"
@@ -28373,7 +28385,7 @@
       },
       {
         "path": "packages/cli/src/commands/command-specs/taskflow.spec.ts",
-        "digest": "44cfc46716bd0f4b92045ca2f62379af9453639b795e66dd3173932ce95cdefc",
+        "digest": "0ad18ecf721c16b98727b8e87359a882120ebe7103b57d5aef34266daa22d3cd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/command-specs/taskflow.spec.ts"
@@ -32044,6 +32056,24 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/taskflow/close-transaction-status.test.ts",
+        "digest": "c0a1aa8e8995893caaac3a5180633c2dca87f9c56556529ff39736a1f91ef9c5",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/taskflow/close-transaction-status.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/taskflow/close-transaction-status.ts",
+        "digest": "ac327e347fb28b189cc2f3a0ca87a01ce9477cf94077ed8fabc19075f5301c6b",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/taskflow/close-transaction-status.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
         "digest": "37836ea0cc96ad56a0dc0e70cdbe2fe18d84e8d0e6b1f82078de3b4c0ba9d496",
         "origin": "source",
@@ -32126,7 +32156,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/implementation.ts",
-        "digest": "4d5fae53530a79866f2620841b263dc0205e1e7ca47780a4e12fb611080f2757",
+        "digest": "7966c8807f1e8f4778d04164d22151cec2eaa322f342bdadec326c76723f3ede",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/implementation.ts"
@@ -32720,7 +32750,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
-        "digest": "66b96dcf70edfc1d9c18a1fe48f73e2fd1e534d0c2f7266d2643ad01a4f28bb5",
+        "digest": "f98c0a1fe67a03785749b226c6d4e386808ee4190d0d89b635516e2c044e842b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts"
@@ -59872,7 +59902,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:0dd9c126bb1388647d95d7f60df64a2cb49e5bf00ac4917446b37071f3236825"
+    "treeDigest": "sha256:20dcc202a562be2dc56e7293cb90abe716428dceddffe8b975674e06d9444943"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60461,6 +60491,8 @@
       "packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
       "packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
       "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-status.test.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-status.ts",
       "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
       "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
       "packages/cli/src/commands/taskflow/commit-messages.ts",
@@ -61405,7 +61437,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:7362cfd594e508d926f1d1a3cd24c37213b9ef242930a897533cb480501d5b68"
+    "digest": "sha256:01435d735978de6ee5b434b5429a5fd4dfb8d719b65c1c8f97dbc7f9396c074b"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63530,6 +63562,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-side-effect-reconcile.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-hook-receipt.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-status.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/closeback-orchestration.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-messages.js",
@@ -64301,6 +64334,8 @@
       "release/atm-root-drop/packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-hook-receipt.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-status.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-status.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/closeback-orchestration.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-messages.ts",
@@ -67400,22 +67435,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:16901b3db3130a455ee3b10185b3b863b61182ca8f862a403faf1a9eb6d8dd97",
-  "sealedSourceCommit": "0bd2d9abcc54073483c9177aa002a01a450cfc89",
+  "buildInputsTreeHash": "sha256:d774a7dbb2a0bc6b60440326f8a6d16915050130b171d53bbe886bf40a41d661",
+  "sealedSourceCommit": "e375ae48834d22dbc8cf951412242e2c57e1f2ba",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:d0fb39512801a965d486b3ba286d35352312cd025ca015f025f3a678c878ccb3",
-  "tsBuildCacheDigest": "sha256:ab3528885dd8f1fa261ce96d290d1071048eeb5cb448f18bd999567b8608b4aa",
+  "incrementalPlanDigest": "sha256:133edd42c12b8a7a5d0baf2f777ab61f5f039f55da275660ed074eb70e079ac0",
+  "tsBuildCacheDigest": "sha256:1aba797fdc58eae36e991cb513296194869a1f6d1aa591c5e707f002217234bc",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 51,
-    "skipDecision": 59,
-    "worktreeSetup": 13573,
-    "typescriptBuild": 17608,
-    "rootDropReleaseAssembly": 33208,
-    "onefileReleaseAssembly": 9059,
-    "artifactSync": 8244,
+    "inputHashCalculation": 53,
+    "skipDecision": 91,
+    "worktreeSetup": 11736,
+    "typescriptBuild": 18952,
+    "rootDropReleaseAssembly": 31826,
+    "onefileReleaseAssembly": 8302,
+    "artifactSync": 7839,
     "cleanup": 0,
-    "totalElapsed": 100467
+    "totalElapsed": 95891
   }
 }

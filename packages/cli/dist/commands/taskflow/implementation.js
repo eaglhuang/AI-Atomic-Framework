@@ -20,6 +20,7 @@ import { resolveTaskflowDeclaredFiles } from './task-scope.js';
 import { deriveAtmScopeClass } from '../../_vendor/core/dist/broker/atm-core-scope.js';
 import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, readStagedFiles, restoreDeferredGovernanceDirtyFiles } from './commit-bundle-assembly.js';
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.js';
+import { readCloseTransactionStatus } from './close-transaction-status.js';
 import { resolveRunnerPublicationCloseHandoff } from '../framework-development/runner-publication-close-handoff.js';
 import { buildTaskflowRunnerRecoveryArgs } from './runner-recovery-forwarding.js';
 import { enqueueTaskflowClosePublication } from './runner-publication-close-queue.js';
@@ -601,6 +602,13 @@ export async function runTaskflow(argv = []) {
     const parsed = parseArgsForCommand(spec, argv);
     const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
     const action = parsed.positional[0];
+    if (action === 'status') {
+        const taskId = parsed.options.task ? String(parsed.options.task) : '';
+        if (!taskId)
+            throw new CliError('ATM_CLI_USAGE', 'taskflow status requires --task <id>.', { exitCode: 2 });
+        const status = readCloseTransactionStatus(cwd, taskId);
+        return { ...makeResult({ ok: true, command: 'taskflow status', cwd, mode: 'read-only', messages: [message(status ? 'info' : 'warn', status ? 'ATM_TASKFLOW_CLOSE_STATUS_READ' : 'ATM_TASKFLOW_CLOSE_STATUS_MISSING', status ? `Close transaction status found for ${taskId}.` : `No close transaction status receipt found for ${taskId}.`, { taskId, status })], evidence: { taskId, closeTransactionStatus: status } }), schemaId: 'atm.taskflowCloseStatusResult.v1', writeEnabled: false };
+    }
     if (action === 'close') {
         return runTaskflowClose(parsed, cwd, 'close');
     }

@@ -5,6 +5,7 @@ import { executeTaskCloseTransaction, writeClosurePacket } from '../../framework
 import { buildTaskTransitionCommand, createClosureTransitionMetadata, writeTaskDocumentWithTransition } from '../close-helpers/task-transition-writer.js';
 import { existingTaskCloseArtifacts, stageTaskCloseArtifacts } from '../close-helpers/close-artifact-staging.js';
 import { relativePathFrom } from '../../shared.js';
+import { writeCloseTransactionStatus } from '../../taskflow/close-transaction-status.js';
 function normalizeRel(filePath) {
     return filePath.replace(/\\/g, '/');
 }
@@ -120,6 +121,7 @@ export function applyAbandonedResidueDisposition(input) {
 }
 export async function executeCloseWrites(input) {
     const { options, actorId } = input;
+    writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: 'started' });
     let closurePacketPath = input.closurePacketPath;
     let closurePacket = input.closurePacket;
     const closeTransitionCommand = buildTaskTransitionCommand({
@@ -193,6 +195,7 @@ export async function executeCloseWrites(input) {
             return { transitionPath, closurePacketPath, abandonResidueDispositionPath };
         }
     });
+    writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: 'ledger-written' });
     return {
         transitionPath: closeWriteResult.transitionPath,
         closurePacketPath: closeWriteResult.closurePacketPath ?? closurePacketPath
