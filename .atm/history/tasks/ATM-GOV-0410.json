@@ -1,0 +1,375 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0410",
+  "title": "Complete governed temporary-index isolation across commit surfaces",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`git commit --task` and shared-delivery commit paths use a temporary index whose committed file set is exactly the admitted task/bundle scope.",
+    "`git record-commit --paths` fails closed when pre-existing staged files are present and never absorbs them into a record-only commit.",
+    "Focused regressions cover foreign staged files, payload/tree equality, and the negative non-empty-index route; tests must execute their assertions.",
+    "A doctor or equivalent audit reports cross-task commit file sets without turning a read-only finding into mutation authority.",
+    "Deliverables, validators, and command-backed red/green evidence are complete before close; runner publication is required if frozen surfaces change."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+    "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+    "tests/cli/real-shared-delivery-commit-executor.test.ts",
+    "tests/cli/governed-commit-surface-audit.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+    "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/broker/batch-execute-actions.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+    "tests/cli/real-shared-delivery-commit-executor.test.ts",
+    "tests/cli/governed-commit-surface-audit.test.ts",
+    ".atm/history/evidence/ATM-GOV-0410.*",
+    ".atm/history/task-events/ATM-GOV-0410/**",
+    ".atm/history/tasks/ATM-GOV-0410.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+    "node --strip-types tests/cli/governed-commit-surface-audit.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the governed commit-surface isolation change while retaining any independent evidence receipts.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.task-scoped-commit-transaction",
+        "pattern": "Transaction Script",
+        "source": "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+        "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts",
+        "tests/cli/governed-commit-surface-audit.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0410-complete-governed-temporary-index-isolation-across-commit-surfaces.task.md",
+    "sectionTitle": "ATM-GOV-0410",
+    "headingLine": 119,
+    "hash": "433f4861e20f6b0d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0410-complete-governed-temporary-index-isolation-across-commit-surfaces.task.md",
+      "planningCommitSha": "e1f5a792741edef05450e1f8fb6b9a7bcdf23c5b",
+      "contentDigest": "sha256:433f4861e20f6b0d8297525be439fb27212059ff090fa956852c5d1d20517f6d",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-05T15:42:04.105Z"
+    }
+  },
+  "importedAt": "2026-09-05T15:42:04.105Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [
+      "ATM-BUG-2026-07-17-003"
+    ],
+    "changedPublicSeams": [
+      "governed-commit-temporary-index-isolation"
+    ],
+    "causalImpactEdges": [
+      "foreign-staged-files-cannot-enter-governed-commit"
+    ],
+    "parallelFrontierInputs": [
+      "shared-git-index"
+    ],
+    "validatorReferences": [
+      "test_git_commit_task_scoped_staging_001",
+      "test_real_shared_delivery_commit_executor_001"
+    ],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_git_commit_task_scoped_staging_001",
+      "targetGroupId": "null",
+      "semanticKey": "governed_commit_foreign_staged_isolation",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "foreign-staged-files-cannot-enter-governed-commit"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "governed-commit-temporary-index-isolation",
+      "resourceKey": "shared-git-index"
+    },
+    {
+      "caseId": "test_real_shared_delivery_commit_executor_001",
+      "targetGroupId": "null",
+      "semanticKey": "shared_delivery_payload_isolation",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "foreign-staged-files-cannot-enter-governed-commit"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "shared-delivery-temporary-index-isolation",
+      "resourceKey": "shared-git-index"
+    },
+    {
+      "caseId": "test_governed_commit_surface_audit_0410",
+      "targetGroupId": "null",
+      "semanticKey": "governed_commit_surface_audit",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "foreign-staged-files-cannot-enter-governed-commit"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "governed-commit-surface-audit",
+      "resourceKey": "shared-git-index"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_git_commit_task_scoped_staging_001",
+    "test_real_shared_delivery_commit_executor_001",
+    "test_governed_commit_surface_audit_0410"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-backlog-audit-20260905",
+    "leaseId": "lease-208e3965a7d7",
+    "claimedAt": "2026-09-05T15:32:10.668Z",
+    "heartbeatAt": "2026-09-05T15:46:23.718Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0410.*",
+      ".atm/history/task-events/ATM-GOV-0410/**",
+      ".atm/history/tasks/ATM-GOV-0410.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+      "tests/cli/governed-commit-surface-audit.test.ts",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260905153210-codex-backlog-audit-20260905-12155f4df8",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905153210-codex-backlog-audit-20260905-12155f4df8\""
+    },
+    "reason": "closed"
+  },
+  "owner": "codex-backlog-audit-20260905",
+  "startedAt": "2026-09-05T15:32:10.668Z",
+  "startedBySessionId": "session-20260905153210-codex-backlog-audit-20260905-ATM-GOV-0410-25519067c0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0410",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0410.*",
+      ".atm/history/task-events/ATM-GOV-0410/**",
+      ".atm/history/tasks/ATM-GOV-0410.json",
+      "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+      "tests/cli/governed-commit-surface-audit.test.ts",
+      "tests/cli/real-shared-delivery-commit-executor.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0410-complete-governed-temporary-index-isolation-across-commit-surfaces.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0410-complete-governed-temporary-index-isolation-across-commit-surfaces.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "8d57e68024a6920fdbaac9a5b88a23c160691d02cd00f4d44acec8d3a8935b53",
+    "actorId": "codex-backlog-audit-20260905",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260905153210-codex-backlog-audit-20260905-12155f4df8",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905153210-codex-backlog-audit-20260905-12155f4df8\""
+    },
+    "createdAt": "2026-09-05T15:32:16.919Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-09-05T15-46-23-720Z-close-049cf7c19d12",
+  "lastTransitionAt": "2026-09-05T15:46:23.720Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-cd190ece6800256b",
+    "ticketDigest": "sha256:cd190ece6800256b6cd7187b995ba0dd74c2b990260c07a3ffd19f1bc9cc50b8",
+    "taskId": "ATM-GOV-0410",
+    "origin": "claim",
+    "actorId": "codex-backlog-audit-20260905",
+    "laneSessionId": "lane-20260905153210-codex-backlog-audit-20260905-12155f4df8",
+    "claimGeneration": "lease-208e3965a7d7",
+    "issuedAt": "2026-09-05T15:43:48.233Z",
+    "expiresAt": "2026-09-05T16:13:48.233Z",
+    "scopeDigest": "sha256:1a31bbc965ecdf2dafe64f00abd6c93c795f6eedeb48a40db4d6cfb58bae3113",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-05T15:43:48.233Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0410.*",
+          ".atm/history/task-events/ATM-GOV-0410/**",
+          ".atm/history/tasks/ATM-GOV-0410.json",
+          "packages/cli/src/commands/broker/batch-execute-actions.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+          "tests/cli/git-commit-task-scoped-staging.test.ts",
+          "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+          "tests/cli/governed-commit-surface-audit.test.ts",
+          "tests/cli/real-shared-delivery-commit-executor.test.ts"
+        ],
+        "digest": "sha256:a6e613eb94e4007486502f2c1315c3f9ca590b001d29e50aa4cbb01941d0a9cb"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "closedAt": "2026-09-05T15:46:23.718Z",
+  "closedByActor": "codex-backlog-audit-20260905",
+  "closedBySessionId": "session-20260905153210-codex-backlog-audit-20260905-ATM-GOV-0410-25519067c0",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0410.closure-packet.json"
+}

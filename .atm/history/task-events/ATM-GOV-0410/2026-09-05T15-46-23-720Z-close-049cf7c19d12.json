@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-05T15-46-23-720Z-close-049cf7c19d12",
+  "taskId": "ATM-GOV-0410",
+  "action": "close",
+  "actorId": "codex-backlog-audit-20260905",
+  "sessionId": "session-20260905153210-codex-backlog-audit-20260905-ATM-GOV-0410-25519067c0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0410.json",
+  "taskSha256": "sha256:59d3a4f82d21c916dd0e99fefd7decc59bbc8808723af23859a3af6fbea19629",
+  "createdAt": "2026-09-05T15:46:23.720Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0410 --actor codex-backlog-audit-20260905 --status done --historical-delivery bb3cb26db0a27bb85989a428c44a330777c3b988",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260905153210-codex-backlog-audit-20260905-ATM-GOV-0410-25519067c0",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0410.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "node --strip-types tests/cli/governed-commit-surface-audit.test.ts",
+      "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "node --strip-types tests/cli/governed-commit-surface-audit.test.ts",
+      "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-05T15:46:23.712Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0410.*",
+        ".atm/history/task-events/ATM-GOV-0410/**",
+        ".atm/history/tasks/ATM-GOV-0410.json",
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+        "tests/cli/governed-commit-surface-audit.test.ts",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/batch-execute-actions.ts",
+        "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+        "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+        "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+        "tests/cli/governed-commit-surface-audit.test.ts",
+        "tests/cli/real-shared-delivery-commit-executor.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+        "node --strip-types tests/cli/governed-commit-surface-audit.test.ts",
+        "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
