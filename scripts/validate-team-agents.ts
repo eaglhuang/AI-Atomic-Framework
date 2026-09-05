@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
@@ -80,7 +81,7 @@ import { reportTeamAgentsCaseOk } from './validators/team-agents/reporter.ts';
 import { runBrokerRunScanIndexValidatorCase } from './validators/team-agents/broker-run-scan-index.ts';
 import { validateWaveMode } from './validators/team-agents/wave-mode.ts';
 
-const taskCase = getArg('--case') ?? 'lieutenant-escalation';
+const taskCase = getArg('--case') ?? (process.argv.includes('--all') ? 'all' : 'lieutenant-escalation');
 
 const sourceTeamRunSnapshot = snapshotSourceTeamRunFiles(process.cwd());
 try {
@@ -93,6 +94,11 @@ async function main() {
   // TASK-MAO-0027: Team Agents Wave Mode runtime self-check. Runs on every
   // invocation so any caller of this validator also asserts wave behavior.
   validateWaveMode();
+
+  if (taskCase === 'all') {
+    runManifestCases();
+    return;
+  }
 
   if (await runNextClaimAtomizationValidatorCase(taskCase)) return;
   if (await runBrokerOverrideGateParityValidatorCase(taskCase)) return;
@@ -181,6 +187,35 @@ async function main() {
   if (await runCaptureBrokerEvidenceValidatorCase(taskCase)) return;
 
   fail(`unsupported or missing --case value: ${taskCase}`);
+}
+
+function runManifestCases(): void {
+  const manifestPath = path.join(process.cwd(), 'scripts', 'validators', 'team-agents', 'cases.json');
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
+    readonly schemaId?: string;
+    readonly cases?: readonly { readonly id?: string; readonly execution?: string }[];
+  };
+  if (manifest.schemaId !== 'atm.teamAgentsCaseManifest.v1' || !Array.isArray(manifest.cases) || manifest.cases.length === 0) {
+    fail(`invalid Team Agents case manifest: ${manifestPath}`);
+  }
+  const cases = manifest.cases.map((entry) => entry.id).filter((id): id is string => typeof id === 'string' && id.length > 0);
+  if (cases.length !== manifest.cases.length || new Set(cases).size !== cases.length) {
+    fail(`Team Agents case manifest contains missing or duplicate case ids: ${manifestPath}`);
+  }
+  for (const caseId of cases) {
+    const result = spawnSync(process.execPath, ['--strip-types', path.join(process.cwd(), 'scripts', 'validate-team-agents.ts'), '--case', caseId], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    if (result.status !== 0) {
+      const detail = [result.stdout, result.stderr].filter(Boolean).join('\n').trim();
+      fail(`Team Agents case ${caseId} failed in manifest run${detail ? `:\n${detail}` : '.'}`);
+    }
+    const summary = (result.stdout ?? '').split(/\r?\n/).filter(Boolean).at(-1) ?? `[validate-team-agents] ok (${caseId})`;
+    console.log(summary);
+  }
+  console.log(`[validate-team-agents] ok (all cases: ${cases.length})`);
 }
 
 function getArg(flag: string): string | undefined {

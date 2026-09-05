@@ -93,8 +93,8 @@ export async function runDirectProviderExecuteAdmissionValidatorCase(taskCase: s
 
   const undeclaredEditorBackend = await runTeam([
     'start', '--task', taskId, '--actor', 'validator', '--cwd', cwd,
-    '--runtime-mode', 'editor-subagent', '--provider', 'claude-code',
-    '--role-provider', 'coordinator=claude-code:claude-test:claude-code:editor-subagent', '--json'
+    '--runtime-mode', 'editor-subagent', '--provider', 'unregistered-editor', '--execute',
+    '--role-provider', 'coordinator=unregistered-editor:unregistered-editor:claude-test:editor-subagent', '--json'
   ]);
   assert.equal(undeclaredEditorBackend.ok, false);
   assert.ok(undeclaredEditorBackend.messages.some((entry) => entry.code === 'ATM_TEAM_RUNTIME_BACKEND_MISSING'));

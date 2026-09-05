@@ -79,7 +79,7 @@ export async function runProviderNeutralRoleSkillPackManifestValidatorCase(taskC
   assert.ok(vendorRuntimeDoc.includes('capability-driven'));
   assert.ok(vendorRuntimeDoc.includes('atm.teamRoleSkillPackManifest.v1'));
 
-  const teamSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'team.ts'), 'utf8');
+  const teamSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'team', 'role-skill-packs.ts'), 'utf8');
   assert.ok(teamSource.includes('buildProviderNeutralRoleSkillPackManifest'));
   const validatorSource = readFileSync(new URL(import.meta.url), 'utf8');
   assert.ok(validatorSource.includes("taskCase !== 'provider-neutral-role-skill-pack-manifest'"));

@@ -101,10 +101,10 @@ export async function runBrokerOverrideGateParityValidatorCase(taskCase: string)
   assert.ok(sharedVocabulary?.decisionReason.includes('broker-conflict-blocked'));
   assert.equal(sharedVocabulary?.violationStatus, 'broker-conflict-blocked');
 
-  const gitGovernanceSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'git-governance.ts'), 'utf8');
-  assert.ok(gitGovernanceSource.includes("'decisionClass'"));
-  assert.ok(gitGovernanceSource.includes("'decisionReason'"));
-  assert.ok(gitGovernanceSource.includes("'violationStatus'"));
+  const gitGovernanceSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'git-governance', 'implementation', 'broker-hook-bypass-preflight.ts'), 'utf8');
+  assert.match(gitGovernanceSource, /["']decisionClass["']/);
+  assert.match(gitGovernanceSource, /["']decisionReason["']/);
+  assert.match(gitGovernanceSource, /["']violationStatus["']/);
   assert.ok(gitGovernanceSource.includes('ATM_GIT_COMMIT_BROKER_CONFLICT_OVERRIDE_REQUIRED'));
 
   console.log('[validate-team-agents] ok (broker-override-gate-parity)');
