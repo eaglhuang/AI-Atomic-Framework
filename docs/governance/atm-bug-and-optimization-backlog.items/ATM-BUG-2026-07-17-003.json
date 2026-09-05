@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Partially fixed — source repair landed; governed temporary-index coverage across all commit surfaces remains",
+  "status": "Partially fixed — task-scoped and shared-delivery temporary-index isolation is verified; complete cross-surface proof remains",
   "resolution": {
     "fixedDate": "2026-07-18",
     "fixedByTask": "ATM-GOV-0166",
@@ -18,5 +18,5 @@
   "expectedBehavior": "Governed commit paths must never include staged paths outside their own declared bundle/claim scope. Every governed commit should stage into a temporary index (or use git commit --only with its declared path set) so foreign staged files are physically excluded, matching the taskflow close temporary-index fix already shipped for AAF.",
   "evidenceOrRepro": "3KLife commits 15eebaf6 (foreign commit containing this captain's renames) and e8f6908b (follow-up content commit) on 2026-07-17; AAF side repeatedly saw ATM-GOV-0155 lane files appear in this captain's index (ATM_GIT_RECORD_COMMIT_SCOPE_VIOLATION listing packages/cli/src/commands/doctor/run-doctor.ts).",
   "proposedDirection": "Extend the temporary-index commit discipline to all governed commit surfaces in both repos (record-commit, git commit --task, planning-repo commit helpers), and add a doctor patrol that flags commits whose file set spans multiple task scopes.",
-  "followUp": "Extend the temporary-index commit discipline to all governed commit surfaces in both repos (record-commit, git commit --task, planning-repo commit helpers), and add a doctor patrol that flags commits whose file set spans multiple task scopes."
+  "followUp": "Current evidence verifies the real shared-delivery executor, task-scoped commit staging, sealed attribution, and pathspec batching; record-commit separately rejects a non-empty index before staging. Complete the remaining cross-surface proof for planning-repository commit helpers and add a doctor patrol that flags commits whose file set spans multiple task scopes before closing this item."
 }
