@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source; separate next --task routing follow-up remains open",
+  "status": "Fixed in source; frozen runner publication remains",
   "area": "Task claim ownership / lane session diagnostics",
   "finding": "ATM_TASK_CLAIM_OWNER_MISMATCH originally decided ownership on lane session ids but rendered its message from actor ids. The message seam was repaired first. A second defect then remained: same-actor next --claim and renew flows could mint a fresh lane before comparing it with the active claim, producing ATM_LOCK_CONFLICT even though the actor was unchanged. The repair binds an idempotent same-actor flow to the active claim's holding lane; a different actor still presents its own lane and remains a conflict.",
   "expectedBehavior": "The mismatch message must name whichever identity actually discriminated. In lane-id mode it must name the holding lane and the requested lane, and when both sides share one actor it must say so explicitly. An idempotent same-actor active-claim flow must reuse the holding lane rather than minting a competing lane; a different actor must preserve the existing conflict behaviour. In actor-fallback mode the existing actor wording remains byte-for-byte stable.",
   "evidenceOrRepro": "Reproduced five times on 2026-08-25 across TASK-PRF-0002 and TASK-PRF-0004 during Product Proof parallel-claim runs. Source repair is covered by tests/cli/claim-owner-mismatch-message.test.ts, tests/cli/lane-claim-conflict-matrix.test.ts, and tests/cli/tasks-claim-auto-intent.test.ts: same actor with holding lane lane-holding resolves to that lane, a different actor retains lane-fresh, and a real task renew preserves the original claim lane without a fresh-lane conflict.",
-  "followUp": "The same-actor lane re-claim defect is resolved. The remaining adjacent issue is next --task on an already-claimed task returning ATM_NEXT_TASK_SCOPE_NOT_FOUND because a held task is excluded from importedTaskQueue; it needs a separately bounded routing repair."
+  "followUp": "The same-actor lane re-claim defect and the adjacent explicit next --task routing defect are resolved in source. Frozen runner publication remains pending because the packaged runner is stale; formal backlog closeout follows runner publication."
 }
