@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Fixed in current working tree; validating for commit",
+  "status": "Closed — owner-aware residue reconcile repair and frozen runner coverage verified 2026-09-05",
   "area": "ATM runtime residue reconciler / abandoned or foreign governance artifacts",
   "finding": "Governed workflows can leave untracked `.atm/history/**`, `.atm/task-plans/**`, `.atm/runtime/**`, and handoff artifacts from abandoned, released, or foreign tasks. Later agents cannot safely delete, stage, or commit these files because they may be audit evidence from another task, but leaving them in the worktree makes every closeout noisy and can block generated-residue guards.",
   "expectedBehavior": "Every ATM governance action should own its environment cleanup contract: normal completion should either commit/archive its durable evidence or remove disposable runtime files; only forced pauses, active foreign ownership, or explicit human-decision states may leave residue. ATM should provide a first-class residue reconciler that classifies `.atm` artifacts by task id, ledger state, actor/claim ownership, provenance, and disposability, then offers safe actions: attach to owning task, archive as governed evidence, discard only disposable runtime residue, or defer with a clear owner/queue.",
