@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Low",
-  "status": "Fixed in planning-index advisory lane",
+  "status": "Closed — fixed; planning-index advisory regression and typecheck verified",
   "area": "Cross-repo planning docs / closeout sync",
   "finding": "After `taskflow close --write` lands planning commits in `3KLife`, the planning task index (`docs/ai_atomic_framework/rft-hardening/tasks/README.md`) and plan snapshot can still list completed RFT cards as `planned` or in the open-priority queue until an operator manually edits and commits planning docs.",
   "expectedBehavior": "Planning close bundles should either update the index/README as part of governed closeout, or emit an explicit post-close advisory with the exact docs paths and frontmatter fields that still lag ledger reality.",

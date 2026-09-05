@@ -206,7 +206,7 @@ export function buildActiveTaskDivergenceResult(input: {
   });
 }
 
-function detectActiveTaskDivergence(
+export function detectActiveTaskDivergence(
   cwd: string,
   taskIntent: TaskIntent | null,
   importedTaskQueue: ImportedTaskQueue
@@ -238,13 +238,32 @@ function detectActiveTaskDivergence(
     ...task.scopePaths,
     ...task.targetAllowedFiles
   ]));
-  const outsidePromptPaths = promptPaths.filter((entry) => !isPathAllowedByScope(entry, activeScope));
+  // An active-task continuation may mention the external planning document that
+  // authored the task.  It is read-only context, not a new target-repo write
+  // scope, so compare it separately by canonical absolute path.
+  const activePlanningPaths = activeTasks.flatMap((task) => {
+    const planningPaths = [...task.planningReadOnlyPaths, ...task.planningMirrorPaths];
+    const aliases = planningPaths.map((entry) => canonicalPromptPath(entry));
+    if (task.planningRepo && path.isAbsolute(task.planningRepo)) {
+      aliases.push(...planningPaths.map((entry) => canonicalPromptPath(path.relative(task.planningRepo!, entry))));
+    }
+    return aliases;
+  }).filter(Boolean);
+  const outsidePromptPaths = promptPaths.filter((entry) => {
+    if (isPathAllowedByScope(entry, activeScope)) return false;
+    return !activePlanningPaths.includes(canonicalPromptPath(entry));
+  });
   if (outsidePromptPaths.length > 0) {
     reasons.push(`prompt path(s) are outside active task scope(s): ${outsidePromptPaths.join(', ')}`);
   }
   return reasons.length > 0
     ? { activeTask: activeTasks[0], reasons, promptPaths, mentionedOtherTaskIds }
     : null;
+}
+
+function canonicalPromptPath(value: string): string {
+  const normalized = value.replace(/\\/g, '/').trim();
+  return path.isAbsolute(normalized) ? path.normalize(normalized).replace(/\\/g, '/').toLowerCase() : normalized.toLowerCase();
 }
 
 function readActiveClaimedTasks(cwd: string): ImportedTaskSummary[] {

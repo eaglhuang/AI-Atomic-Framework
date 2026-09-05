@@ -169,6 +169,9 @@ export function buildHostGitCompatibilityGuidance(input) {
         `If the wrapper cannot complete, inspect copyableCommitCommand only when hooks can still pass: ${input.copyableCommitCommand}`,
     ];
     const combined = `${input.stderr}\n${input.stdout}`.toLowerCase();
+    if (combined.includes('enametoolong') || combined.includes('argument list too long')) {
+        lines.push('Windows pathspec fallback: the pre-commit hook reads ATM_COMMIT_ACTOR_ID, ATM_COMMIT_TASK_ID, ATM_COMMIT_CLAIM_ID, ATM_COMMIT_SESSION_ID, and ATM_COMMIT_LANE_SESSION_ID; ATM_TASK_ID is not a substitute. Preserve the exact values from the governed commit attempt.');
+    }
     if (combined.includes("trailer") &&
         (combined.includes("unknown option") || combined.includes("unrecognized"))) {
         lines.push("Host git rejected trailer flags injected by the editor shell; rerun through node atm.mjs git commit instead of a wrapped git commit command.");

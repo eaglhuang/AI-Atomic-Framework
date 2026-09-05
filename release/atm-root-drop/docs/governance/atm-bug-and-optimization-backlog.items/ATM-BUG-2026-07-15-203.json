@@ -5,10 +5,13 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Closed",
   "area": "Governance",
   "finding": "During TASK-RFT-0042, the task direction lock allowed `packages/cli/src/commands/team/legacy/**/*.ts`, but the pre-commit hook still flagged newly staged files under that path as `ATM_TASK_DIRECTION_SCOPE_DRIFT` until each file was added explicitly with `tasks scope add`.",
   "expectedBehavior": "Direction-lock scope matching should apply the same glob semantics across task claim, scope amendment, taskflow pre-close, and pre-commit staging checks so new files under an allowed recursive path do not require redundant explicit amendments.",
-  "evidenceOrRepro": "TASK-RFT-0042 governed commit attempt failed on `packages/cli/src/commands/team/legacy/crew-decision-policy.ts` and `packages/cli/src/commands/team/legacy/implementer-selector-policy.ts`; explicit `node atm.mjs tasks scope add ... --add <file>` for each path allowed commit `10aba7558106de9ed1d9cd580876a85479c007b5` to pass.",
-  "followUp": "Add a regression for direction-lock glob parity across pre-commit and taskflow scope checks, then remove the need for explicit per-file scope additions when a recursive allowed path already covers the file."
+  "evidenceOrRepro": "The historical failure is no longer reproducible against the current source. `node --strip-types tests/cli/taskflow-scope-untracked-glob.test.ts` passed matcher parity and confirmed a newly created direct child under `packages/cli/src/commands/next/playbook-projection/**/*.ts` is included in the taskflow commit bundle; `node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts` passed the canonical work-admission matcher across write/stage/commit/close/push. The shared matcher repair is present in commit `d66c3b2de`.",
+  "followUp": "Retain the glob-parity regressions. Reopen only if a new direction-lock scope form diverges between pre-commit, taskflow bundle assembly, and work-admission validation.",
+  "terminalDisposition": "closed-by-existing-scope-glob-repair",
+  "closedAt": "2026-09-06T21:16:00.000Z",
+  "passingReceipt": "node --strip-types tests/cli/taskflow-scope-untracked-glob.test.ts"
 }

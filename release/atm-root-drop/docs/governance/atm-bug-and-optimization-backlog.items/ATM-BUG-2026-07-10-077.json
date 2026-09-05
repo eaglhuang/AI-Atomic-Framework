@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in done-task mirror reconciliation lane",
+  "status": "Closed — fixed; done-task mirror reconciliation and residue diagnostics passed",
   "area": "Tasks import / done-task reconciliation",
   "finding": "`tasks import --write` on an already `done` task fails with `ATM_TASKS_IMPORT_DONE_REQUIRES_REOPEN`, and `tasks import --write --force` requires an emergency approval lane (`ATM_EMERGENCY_LANE_APPROVAL_REQUIRED`). After cross-repo planning close updates 3KLife frontmatter, target operators cannot cleanly re-import planning mirror metadata to clear residue without reopening or emergency override.",
   "expectedBehavior": "Provide a governed read-only reconciliation import for done tasks that updates planning mirror fields without mutating delivery scope, or let `taskflow close` write authoritative mirror metadata back into the target ledger when planning commits succeed.",

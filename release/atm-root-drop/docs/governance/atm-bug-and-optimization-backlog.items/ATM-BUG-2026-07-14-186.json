@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in TASK-AAO-0201",
+  "status": "Closed — fixed in TASK-AAO-0201; mixed-delivery close UX regression verified",
   "area": "Multi-task shared delivery close UX",
   "finding": "Closing sibling tasks against one intentional shared delivery commit (`--historical-delivery`) fails without `--waiver-out-of-scope-delivery`, and dry-run/write messaging mixes `MIXED_DELIVERY_COMMIT`, `OUT_OF_SCOPE_WAIVER_REQUIRED`, and `DELIVERABLE_DIFF_REQUIRED` until the waiver is present.",
   "expectedBehavior": "When the operator already passes `--historical-delivery` for co-delivered siblings owned by the same actor batch, ATM should offer a first-class multi-task delivery acknowledgment (or auto-suggest the exact waiver command with the sibling task list) instead of looking like a failed delivery.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in TASK status residue classification lane",
+  "status": "Closed — fixed; task status residue classification and frozen status verification passed",
   "area": "Tasks status / planning mirror reconcile",
   "finding": "ATM治理流程/收口UX自身不順：`tasks status` could continue classifying a task as `planning-mirror-only` after `tasks import --reconcile-mirror --write` succeeded and both the live ledger plus planning frontmatter reported `done` with no divergence. This left operators with a stale-looking residue recommendation even after following the official reconcile command, and the generated reconcile artifacts could then block later normal commits. This was an ATM workflow/closeout UX bug, not an adopter project feature bug.",
   "expectedBehavior": "After a successful reconcile-mirror write, status should clear the `planning-mirror-only` residue bucket when live ledger, planning mirror, task events, and closeout provenance agree. ATM-generated reconcile/event residue should not be left as a blocker for unrelated framework fixes.",

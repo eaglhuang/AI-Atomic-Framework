@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Documentation / AI routing",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Closed",
   "area": "Agent Skills / Windows Text IO",
   "finding": "Agents repeatedly use PowerShell text IO or range-slicing patterns despite repository instructions requiring Node.js UTF-8 helpers for Markdown, JSON, and text planning files.",
   "expectedBehavior": "First-layer ATM skills and playbooks should expose copy-paste-safe Node.js UTF-8 read/compare snippets and warn against PowerShell Get-Content/Set-Content/Out-File/range slicing for document work.",
-  "evidenceOrRepro": "During ATM-GOV-0186/ATM-GOV-0194 dogfood, the operator used PowerShell content commands before noticing the Windows Text Document IO Rule in atm-dispatch/atm-plan-authoring.",
-  "followUp": "Update source-of-truth ATM skills and integration pack templates so Windows text IO guidance appears in the first visible workflow layer, then reinstall/regenerate derived skill copies."
+  "evidenceOrRepro": "During ATM-GOV-0186/ATM-GOV-0194 dogfood, the operator used PowerShell content commands before noticing the Windows Text Document IO Rule in atm-dispatch/atm-plan-authoring. Closed by the focused Windows text IO regression: the source template and all six installed atm-dispatch projections expose a copy-paste-safe Node.js UTF-8 read example and prohibit evaluated Node or PowerShell content IO in that example.",
+  "followUp": "Closed on 2026-09-06 after template/projection parity, captain-dispatch protocol, focused regression, typecheck, encoding guard, and diff checks passed. Reopen only if a supported first-layer entry loses the safe example or diverges from the source template."
 }

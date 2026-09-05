@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed by current imported-record bundle lane",
+  "status": "Closed — fixed; imported-record bundle lane reverified",
   "area": "Git governance / task import record commit",
   "finding": "`tasks import --write` for new planned task cards can create task-owned ledger and task-event files that `git record-commit` refuses to combine across tasks, while a per-task staged record commit is then blocked by the pre-commit hook as `ATM_CROSS_TASK_MUTATION_BLOCKED` because the imported planned task record is treated as an active task-owned mutation.",
   "expectedBehavior": "Task-import ledger records should have a governed record-only commit lane that can commit one or more newly imported planned task records, or the import command should emit an explicit commit/recovery command that pre-commit accepts. A normal planning import should not require emergency no-verify.",

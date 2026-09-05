@@ -5,10 +5,13 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed",
   "area": "Task scope / closeout",
   "finding": "During TASK-RFT-0067, the task card declared scripts/validate-git-hooks-enforcement/**/*.ts, but taskflow close dry-run still classified newly extracted modules under that glob as excluded dirty files until an explicit tasks scope add listed each module. The scope-amendment event also preserved stray quote characters around the first and last CSV entries in amendmentHistory.",
   "expectedBehavior": "Imported task scope globs should admit newly created matching files consistently across claim, delivery commit, close preview, and close write. Scope amendment history should normalize CSV path values without embedded shell quote characters.",
-  "evidenceOrRepro": "TASK-RFT-0067 close dry-run before scope amendment excluded scripts/validate-git-hooks-enforcement/context.ts, initial-lanes.ts, pre-push-regressions.ts, closure-cross-checks.ts, root-emergency-audit.ts, and main.ts despite the imported glob. The later amendment event 2026-07-16T05-58-57-613Z-scope-amendment-b5d5c934e8b0 shows quoted first/last path values.",
-  "followUp": "Open a focused task to align taskflow glob expansion with task import/claim allowedFiles and to normalize tasks scope add --add CSV parsing before writing amendmentHistory."
+  "evidenceOrRepro": "The historical failure is no longer reproducible against the current source. `node --strip-types tests/cli/task-scope-amendment.test.ts` passed quote-artifact normalization and the governed amendment lane; `node --strip-types tests/cli/tasks-scope-add-multi-flag.test.ts` passed CSV plus repeated `--add` accumulation; `node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts` passed the amendment admission contract. Glob expansion and untracked-child inclusion are additionally covered by `node --strip-types tests/cli/taskflow-scope-untracked-glob.test.ts`. Repairs are present in commits `04a80bdfb`, `708a3e424`, and `d66c3b2de`.",
+  "followUp": "Retain the scope amendment and glob-parity regressions. A separate fixture-path repair is needed for `tests/cli/tasks-scope-add-error-clarity.test.ts`; its current failure is an empty external planning fixture, not evidence that this card's repair regressed.",
+  "terminalDisposition": "closed-by-existing-scope-amendment-and-glob-repairs",
+  "closedAt": "2026-09-06T21:20:00.000Z",
+  "passingReceipt": "node --strip-types tests/cli/task-scope-amendment.test.ts"
 }
