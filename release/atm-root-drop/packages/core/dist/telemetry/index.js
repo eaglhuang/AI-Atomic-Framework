@@ -230,6 +230,14 @@ export function reportGateTelemetry(cwd, includeRuntime = false) {
         return eventReport;
     return mergeReports(reportFromCompactSeals(compactSeals, historyEvents.malformed, historyEvents.warnings), eventReport, includeRuntime ? 'sealed-history+runtime' : 'sealed-history');
 }
+/** Registry declarations are not observations; count only sealed/runtime events. */
+export function buildObservedGateTelemetryCheckCounts(cwd) {
+    const report = reportGateTelemetry(cwd, true);
+    return Object.freeze(Object.fromEntries(Object.entries(report.byCheckId).map(([checkId, bucket]) => [
+        checkId,
+        Object.values(bucket.resultCounts).reduce((sum, count) => sum + count, 0)
+    ])));
+}
 function reportEvents(events, malformedEvents, warnings, source) {
     const byCheckId = {};
     const uniqueBlocks = new Set();

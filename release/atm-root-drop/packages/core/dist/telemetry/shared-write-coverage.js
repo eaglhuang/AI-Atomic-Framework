@@ -1,15 +1,19 @@
 import { createHash } from 'node:crypto';
-import { buildGateTelemetryRegistryCoverageReport, canonicalGateCheckRegistry } from './index.js';
+import { buildObservedGateTelemetryCheckCounts, buildGateTelemetryRegistryCoverageReport, canonicalGateCheckRegistry } from './index.js';
 export function buildSharedWriteGateCoverageReport(cwd) {
     const coverage = buildGateTelemetryRegistryCoverageReport(cwd);
+    const observedCheckCounts = buildObservedGateTelemetryCheckCounts(cwd);
     const producers = canonicalGateCheckRegistry.map((entry) => {
         const matchingNode = coverage.requiredNodes.find((node) => node.producerCheckIds.includes(entry.checkId));
         const sourceAvailability = matchingNode?.sourceAvailability ?? 'unavailable';
+        const observationCount = observedCheckCounts[entry.checkId] ?? 0;
         return {
             checkId: entry.checkId,
             owner: entry.owner,
             status: matchingNode?.coverageStatus ?? 'instrumented',
             sourceAvailability,
+            observed: observationCount > 0,
+            observationCount,
             receiptRef: sourceAvailability === 'unavailable' ? `unavailable:${entry.checkId}` : null
         };
     });
@@ -34,15 +38,15 @@ export function buildSharedWriteGateCoverageReport(cwd) {
         },
         generatedAt: new Date().toISOString(),
         producerCount: producers.length,
-        observedProducerCount: producers.length,
-        coveragePercentage: 100,
+        observedProducerCount: producers.filter((producer) => producer.observed).length,
+        coveragePercentage: producers.length === 0 ? 100 : (producers.filter((producer) => producer.observed).length / producers.length) * 100,
         producers,
         unavailableReceipts,
         inputDigest,
         sealedDigest: digestJson({
             inputDigest,
             producerCount: producers.length,
-            observedProducerCount: producers.length,
+            observedProducerCount: producers.filter((producer) => producer.observed).length,
             unavailableReceipts
         })
     };
