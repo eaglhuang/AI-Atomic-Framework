@@ -1,0 +1,382 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0032",
+  "title": "Broker-managed transactional commit queue and receipt closeout",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-GIT-0029",
+    "TASK-GIT-0030",
+    "TASK-GIT-0031"
+  ],
+  "acceptance": [
+    "ACC-1 Two disjoint scoped requests in one canonical worktree can prepare in parallel and enter one broker-owned transactional commit queue without mixing staged files or requiring manual captain staging.",
+    "ACC-2 Queue ordering, queue-head ownership, CAS/head movement, success, rejection, and resumable failure are explicit receipts with executable status/wait/recovery commands; queue residency covers only the shared index/ref transition.",
+    "ACC-3 Each successful delivery stages exactly the admitted sealed bundle, preserves foreign staged bytes, emits governed attribution, and leaves no unowned index residue.",
+    "ACC-4 Runner-sync publication and post-close receipt disposition consume the existing build-output inventory and end in a durable terminal disposition without manual cleanup or a second artifact registry.",
+    "ACC-5 The Critical cross-card residue authority boundary remains fail-closed; this card does not consume or mutate another task's reconciliation debt.",
+    "ACC-6 Red/green evidence binds both required case IDs to the same public seams, acceptance criteria, and candidate lineage; rollback is a revert commit plus removal of any generated runtime receipt listed by that commit."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/broker/command-router.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+    "tests/cli/broker-transactional-commit-queue.test.ts",
+    "tests/cli/runner-sync-receipt-closeout.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/broker/command-router.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+    "tests/cli/broker-transactional-commit-queue.test.ts",
+    "tests/cli/runner-sync-receipt-closeout.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/broker-transactional-commit-queue.test.ts",
+    "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed red/green evidence runs bound to both declared case IDs, plus queue and receipt digests",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and remove only receipt-listed generated runtime artifacts whose owner and digest still match.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker.shared-delivery-commit-transaction",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-broker-shared-delivery-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker.transactional-commit-queue",
+        "pattern": "Adapter/Port",
+        "source": "packages/cli/src/commands/broker/steward-queues.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.broker.receipt-terminal-disposition",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0032-broker-managed-transactional-commit-queue-and-receipt-closeout.task.md",
+    "sectionTitle": "TASK-GIT-0032",
+    "headingLine": 116,
+    "hash": "ff2e5c85fb0f1180",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/git-boundary-admission/tasks/TASK-GIT-0032-broker-managed-transactional-commit-queue-and-receipt-closeout.task.md",
+      "planningCommitSha": "5fcc0ab1ebb75ccbdf42cabc1059ea5f92a15c30",
+      "contentDigest": "sha256:ff2e5c85fb0f1180b62feb5e8b7949a4a7eccfbcd0454cd5b704c62924291e12",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-05T08:31:47.636Z"
+    }
+  },
+  "importedAt": "2026-09-05T08:31:47.636Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-GIT-0029",
+      "TASK-GIT-0030",
+      "TASK-GIT-0031"
+    ],
+    "startConditions": [
+      "sealed commit attribution and deletion tombstones are available",
+      "runner publication inventory remains the canonical artifact authority"
+    ],
+    "softRelations": [
+      "ATM-BUG-2026-07-22-228"
+    ],
+    "changedPublicSeams": [
+      "broker transactional commit request and receipt status",
+      "governed runner-sync receipt disposition"
+    ],
+    "causalImpactEdges": [
+      "broker-shared-index-transaction",
+      "runner-sync-receipt-closeout"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-commit-bundle",
+      "build-output-inventory"
+    ],
+    "validatorReferences": [
+      "broker-transactional-commit-queue",
+      "runner-sync-receipt-closeout"
+    ],
+    "phaseOwner": "atm-core"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_broker_transactional_commit_queue_6d2a9f41",
+      "targetGroupId": "null",
+      "semanticKey": "broker_transactional_commit_queue",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "broker-shared-index-transaction"
+      ],
+      "expectedRedPredicate": "concurrent scoped requests cannot currently complete through one broker receipt",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "broker-transactional-submit-status-wait",
+      "resourceKey": "git-index"
+    },
+    {
+      "caseId": "test_runner_sync_receipt_closeout_91c0d4a2",
+      "targetGroupId": "null",
+      "semanticKey": "runner_sync_receipt_closeout",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "runner-sync-receipt-closeout"
+      ],
+      "expectedRedPredicate": "runner-sync completion still requires manual receipt cleanup or leaves unowned residue",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "runner-sync-terminal-disposition",
+      "resourceKey": "runner-sync-receipt"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_broker_transactional_commit_queue_6d2a9f41",
+    "test_runner_sync_receipt_closeout_91c0d4a2"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-GIT-0029",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-GIT-0030",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-GIT-0031",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-05T08-32-53-793Z-claim-f018f2244321",
+  "lastTransitionAt": "2026-09-05T08:32:53.793Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-05T08:32:47.923Z",
+  "promotedAt": "2026-09-05T08:32:47.927Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-238433b985e6",
+    "claimedAt": "2026-09-05T08:32:47.932Z",
+    "heartbeatAt": "2026-09-05T08:32:47.932Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0032.json",
+      "packages/cli/src/commands/broker/command-router.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "tests/cli/broker-transactional-commit-queue.test.ts",
+      "tests/cli/runner-sync-receipt-closeout.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260905083248-codex-gpt-5.4-mini-2be3f8d359",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905083248-codex-gpt-5.4-mini-2be3f8d359\""
+    }
+  },
+  "startedAt": "2026-09-05T08:32:47.932Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-1d7ad28a9cedd2f0",
+    "ticketDigest": "sha256:1d7ad28a9cedd2f0964737ed9ce59981a9f46b14b3ad588f49f8426ad9b6251e",
+    "taskId": "TASK-GIT-0032",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260905083248-codex-gpt-5.4-mini-2be3f8d359",
+    "claimGeneration": "lease-238433b985e6",
+    "issuedAt": "2026-09-05T08:32:47.932Z",
+    "expiresAt": "2026-09-05T09:02:47.932Z",
+    "scopeDigest": "sha256:c4d73b2b6ca902487ee331b7fbf4f4d6076d449da08860ab4306871d70e48669",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-05T08:32:47.932Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0032.*",
+          ".atm/history/task-events/TASK-GIT-0032/**",
+          ".atm/history/tasks/TASK-GIT-0032.json",
+          "packages/cli/src/commands/broker/command-router.ts",
+          "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+          "packages/cli/src/commands/broker/steward-queues.ts",
+          "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+          "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+          "tests/cli/broker-transactional-commit-queue.test.ts",
+          "tests/cli/runner-sync-receipt-closeout.test.ts"
+        ],
+        "digest": "sha256:a1078177ad010c3a31e5a2174915d67ffd6cf7021ae9732e9bb82df31f96d28e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260905083247-codex-gpt-5.4-mini-TASK-GIT-0032-b2fb486400",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0032",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0032.*",
+      ".atm/history/task-events/TASK-GIT-0032/**",
+      ".atm/history/tasks/TASK-GIT-0032.json",
+      "packages/cli/src/commands/broker/command-router.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "tests/cli/broker-transactional-commit-queue.test.ts",
+      "tests/cli/runner-sync-receipt-closeout.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "dd886a57cbf2dad4fcb57fb06fe71ff3074a6a8923495d6964d4a82a5c1a38a0",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260905083247-codex-gpt-5.4-mini-TASK-GIT-0032-b2fb486400",
+    "laneSession": {
+      "laneSessionId": "lane-20260905083248-codex-gpt-5.4-mini-2be3f8d359",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905083248-codex-gpt-5.4-mini-2be3f8d359\""
+    },
+    "createdAt": "2026-09-05T08:32:53.793Z",
+    "status": "active"
+  }
+}
