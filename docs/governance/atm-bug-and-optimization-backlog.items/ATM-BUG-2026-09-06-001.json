@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-06-001",
+  "date": "2026-09-06",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Closed — task-scoped admission now preserves the precise staging-required diagnostic; regression and frozen runner publication verified",
+  "area": "Git work-admission facade / task-scoped commit diagnostics",
+  "finding": "When a task-scoped commit had a valid file-write ticket but no staged files yet, the work-admission facade passed an empty file set to the ticket gate. The gate rejected the request before the task-scoped commit branch could report ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED, masking the actionable staging guidance and producing a misleading refusal shape.",
+  "expectedBehavior": "A task with an explicit valid file-write ticket must be admitted for diagnostic inspection even when nothing is staged yet. The task-scoped branch must then report the precise staging-required result. Foreign staged files must remain subject to the existing scope and deferral gates, and auto-stage must continue to validate the ticket bundle.",
+  "evidenceOrRepro": "Reproduced on 2026-09-05 by node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts: the first unstaged task-scoped commit was resolved by runAtmGit as a work-admission result rather than reaching the expected ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED path. The fix in packages/cli/src/commands/git-governance.ts uses the declared ticket file scope only when stagedFiles is empty, leaving foreign-only staged cases unchanged. After the fix, the task-scoped staging regression, work-admission coverage gates, git-record-commit regression, npm run typecheck, and git diff --check passed. Frozen runner publication was committed as 9ca1b13946406c3f246df93b144d3e071ecb859b and pushed to origin/main.",
+  "containment": "The change is limited to the empty-staged-set admission boundary. It does not stage, unstage, defer, restore, or absorb foreign work; the existing ticket scope, temporary-index, and foreign-residue protections remain unchanged. A simultaneous test attempt that shared the fixture directory was discarded and the regression was rerun serially before acceptance.",
+  "followUp": "Keep the work-admission facade and task-scoped staging regression aligned when future ticket-gate result contracts change. Any broader diagnostic payload improvement should be a separate bounded task; no remaining source defect is claimed by this item."
+}
