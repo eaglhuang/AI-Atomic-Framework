@@ -100,7 +100,7 @@ export function buildPlanningSourceSeal(input: {
   };
 }
 
-function readStoredSeal(taskDocument: Record<string, unknown>): PlanningSourceSeal | null {
+export function readPlanningSourceSeal(taskDocument: Record<string, unknown>): PlanningSourceSeal | null {
   const source = taskDocument.source;
   const seal = source && typeof source === 'object' && !Array.isArray(source)
     ? (source as Record<string, unknown>).planningSourceSeal
@@ -122,6 +122,21 @@ function readStoredSeal(taskDocument: Record<string, unknown>): PlanningSourceSe
   };
 }
 
+export function advancePlanningSourceSeal(
+  seal: PlanningSourceSeal,
+  previousSeals: readonly PlanningSourceSeal[]
+): PlanningSourceSeal {
+  const previousEpoch = previousSeals.reduce(
+    (maximum, previous) => Math.max(maximum, previous.amendmentEpoch),
+    seal.amendmentEpoch
+  );
+  const contentChanged = previousSeals.some((previous) => previous.contentDigest !== seal.contentDigest);
+  return {
+    ...seal,
+    amendmentEpoch: contentChanged ? Math.max(seal.amendmentEpoch, previousEpoch + 1) : previousEpoch
+  };
+}
+
 export function attachPlanningSourceSeal<TTask extends { source: object }>(
   task: TTask,
   seal: PlanningSourceSeal
@@ -139,7 +154,7 @@ export function validatePlanningSourceSeal(input: {
   readonly cwd: string;
   readonly taskDocument: Record<string, unknown>;
 }): PlanningSourceSealValidation {
-  const sealed = readStoredSeal(input.taskDocument);
+  const sealed = readPlanningSourceSeal(input.taskDocument);
   if (!sealed) {
     return {
       ok: true,

@@ -141,6 +141,19 @@ await assert.rejects(
   }
 );
 
+const reimportResult = await runTasksImport([
+  '--cwd', targetRepo,
+  '--from', cardPath,
+  '--write',
+  '--force',
+  '--json'
+]) as any;
+assert.equal(reimportResult.ok, true);
+const reimportedTask = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+const reimportedSeal = ((reimportedTask.source as Record<string, unknown>).planningSourceSeal) as any;
+assert.notEqual(reimportedSeal.contentDigest, (source.planningSourceSeal as any).contentDigest);
+assert.equal(reimportedSeal.amendmentEpoch, 1, 're-importing changed planning content must advance amendmentEpoch');
+
 const profile = {
   schemaId: 'taskflow.profile.v1' as const,
   id: 'planning-source-seal-profile',
