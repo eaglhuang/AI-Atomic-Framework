@@ -1255,6 +1255,7 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/agr.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/apply-evidence.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/atm-core-scope.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/batch-recovery-admission.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/boundaries/content-anchor.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/boundaries/index.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/boundaries/resolver.js",
@@ -3197,6 +3198,7 @@
     "release/atm-root-drop/packages/core/dist/broker/agr.js",
     "release/atm-root-drop/packages/core/dist/broker/apply-evidence.js",
     "release/atm-root-drop/packages/core/dist/broker/atm-core-scope.js",
+    "release/atm-root-drop/packages/core/dist/broker/batch-recovery-admission.js",
     "release/atm-root-drop/packages/core/dist/broker/boundaries/content-anchor.js",
     "release/atm-root-drop/packages/core/dist/broker/boundaries/index.js",
     "release/atm-root-drop/packages/core/dist/broker/boundaries/resolver.js",
@@ -3602,6 +3604,7 @@
     "release/atm-root-drop/packages/core/src/broker/agr.ts",
     "release/atm-root-drop/packages/core/src/broker/apply-evidence.ts",
     "release/atm-root-drop/packages/core/src/broker/atm-core-scope.ts",
+    "release/atm-root-drop/packages/core/src/broker/batch-recovery-admission.ts",
     "release/atm-root-drop/packages/core/src/broker/boundaries/content-anchor.ts",
     "release/atm-root-drop/packages/core/src/broker/boundaries/index.ts",
     "release/atm-root-drop/packages/core/src/broker/boundaries/resolver.ts",
@@ -5484,6 +5487,7 @@
     "release/atm-root-drop/tests/cli/post-close-zero-release-residue.test.ts",
     "release/atm-root-drop/tests/cli/post-compose-semantic-validation-error-contract.test.ts",
     "release/atm-root-drop/tests/cli/post-compose-semantic-validation.test.ts",
+    "release/atm-root-drop/tests/cli/pre-commit-batch-recovery.test.ts",
     "release/atm-root-drop/tests/cli/pre-commit-evidence-context-parity.test.ts",
     "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
     "release/atm-root-drop/tests/cli/pre-commit-no-explicit-any.test.ts",
@@ -6025,8 +6029,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 5,
-    "unchanged": 1958,
+    "copied": 7,
+    "unchanged": 2739,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -17048,6 +17052,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/_vendor/core/dist/broker/batch-recovery-admission.js",
+        "digest": "2d50d271ba764ce091c0e9bc401c58185bbb3a26178d5af1b0006edb897cd1a9",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/broker/batch-recovery-admission.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/_vendor/core/dist/broker/boundaries/content-anchor.js",
         "digest": "b8c2dcd151943191d8dab922f897dfb77b882a42f0cd7e99d339f3fdb856c62e",
         "origin": "source",
@@ -17121,7 +17134,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/broker/cross-task-mutation-guard.js",
-        "digest": "bea2a34c3f4b13d447422fce121f1e8e0ff04e35117a2c68ed406c37da2bca34",
+        "digest": "c6699f2f23d6c4fa6630a21fca6db835650d04a46c29b63c2266d7b22cf0f7de",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/cross-task-mutation-guard.js"
@@ -34526,6 +34539,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/core/dist/broker/batch-recovery-admission.js",
+        "digest": "2d50d271ba764ce091c0e9bc401c58185bbb3a26178d5af1b0006edb897cd1a9",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/broker/batch-recovery-admission.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/core/dist/broker/boundaries/content-anchor.js",
         "digest": "b8c2dcd151943191d8dab922f897dfb77b882a42f0cd7e99d339f3fdb856c62e",
         "origin": "source",
@@ -34599,7 +34621,7 @@
       },
       {
         "path": "packages/core/dist/broker/cross-task-mutation-guard.js",
-        "digest": "bea2a34c3f4b13d447422fce121f1e8e0ff04e35117a2c68ed406c37da2bca34",
+        "digest": "c6699f2f23d6c4fa6630a21fca6db835650d04a46c29b63c2266d7b22cf0f7de",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/cross-task-mutation-guard.js"
@@ -38171,6 +38193,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/core/src/broker/batch-recovery-admission.ts",
+        "digest": "60fbfcd0d503778ad69104de8feb38a6ff9db946de3e035d56b7119070a62324",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/src/broker/batch-recovery-admission.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/core/src/broker/boundaries/content-anchor.ts",
         "digest": "096ed3aa476d5d2dd5da5aecc3aed3db22d7abc8900671527c491ac6353520de",
         "origin": "source",
@@ -38244,7 +38275,7 @@
       },
       {
         "path": "packages/core/src/broker/cross-task-mutation-guard.ts",
-        "digest": "a53283d9bbd13522f6930a59bb2281d894be8e8305e5f2a60b551d2eb2882fc6",
+        "digest": "96a1717c96ba311805c08ef0546870e351ce749083b5fd6ae2e4fadb0e8097d9",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/broker/cross-task-mutation-guard.ts"
@@ -55100,6 +55131,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/pre-commit-batch-recovery.test.ts",
+        "digest": "00d7a98dca5f9123b992eb9e2cb4ee4278aab5f7c5c942f803527737e27a3e2a",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/pre-commit-batch-recovery.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/pre-commit-evidence-context-parity.test.ts",
         "digest": "f7e7bc482b9a17068b55cac6fd88b745542e0171572d22505c9af6474532ad40",
         "origin": "source",
@@ -59942,7 +59982,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:ab71b4da12e2c557b5d9f910f6fafb50c70575915ba1adbac5cb40e23e43f9a0"
+    "treeDigest": "sha256:8b3550d55c7d9b9e18e9e3a4a5efa1728b4e8d4f7d10328064aff661e29ef20c"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60843,6 +60883,7 @@
       "packages/core/src/broker/agr.ts",
       "packages/core/src/broker/apply-evidence.ts",
       "packages/core/src/broker/atm-core-scope.ts",
+      "packages/core/src/broker/batch-recovery-admission.ts",
       "packages/core/src/broker/boundaries/content-anchor.ts",
       "packages/core/src/broker/boundaries/index.ts",
       "packages/core/src/broker/boundaries/resolver.ts",
@@ -61478,7 +61519,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:6134658c4afb3693cf50339916ce9da74a991bf0bc409f4cef0d090ea6dacf2b"
+    "digest": "sha256:bc1fecbf350dd9148751148ee95cb1b2a6b4e8f4feaf045d15147b65defefa29"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -62707,6 +62748,7 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/agr.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/apply-evidence.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/atm-core-scope.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/batch-recovery-admission.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/boundaries/content-anchor.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/boundaries/index.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/boundaries/resolver.js",
@@ -64649,6 +64691,7 @@
       "release/atm-root-drop/packages/core/dist/broker/agr.js",
       "release/atm-root-drop/packages/core/dist/broker/apply-evidence.js",
       "release/atm-root-drop/packages/core/dist/broker/atm-core-scope.js",
+      "release/atm-root-drop/packages/core/dist/broker/batch-recovery-admission.js",
       "release/atm-root-drop/packages/core/dist/broker/boundaries/content-anchor.js",
       "release/atm-root-drop/packages/core/dist/broker/boundaries/index.js",
       "release/atm-root-drop/packages/core/dist/broker/boundaries/resolver.js",
@@ -65054,6 +65097,7 @@
       "release/atm-root-drop/packages/core/src/broker/agr.ts",
       "release/atm-root-drop/packages/core/src/broker/apply-evidence.ts",
       "release/atm-root-drop/packages/core/src/broker/atm-core-scope.ts",
+      "release/atm-root-drop/packages/core/src/broker/batch-recovery-admission.ts",
       "release/atm-root-drop/packages/core/src/broker/boundaries/content-anchor.ts",
       "release/atm-root-drop/packages/core/src/broker/boundaries/index.ts",
       "release/atm-root-drop/packages/core/src/broker/boundaries/resolver.ts",
@@ -66936,6 +66980,7 @@
       "release/atm-root-drop/tests/cli/post-close-zero-release-residue.test.ts",
       "release/atm-root-drop/tests/cli/post-compose-semantic-validation-error-contract.test.ts",
       "release/atm-root-drop/tests/cli/post-compose-semantic-validation.test.ts",
+      "release/atm-root-drop/tests/cli/pre-commit-batch-recovery.test.ts",
       "release/atm-root-drop/tests/cli/pre-commit-evidence-context-parity.test.ts",
       "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
       "release/atm-root-drop/tests/cli/pre-commit-no-explicit-any.test.ts",
@@ -67480,22 +67525,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:c5d4efc84e7bc74f260fe9aa2a2f68bc270f25e25642b35448a2c560a4b51a7b",
-  "sealedSourceCommit": "8e5b7857528e4e3dd470f8e9257430e33374c338",
+  "buildInputsTreeHash": "sha256:7c99cd278cf756ce8bbfd2b20f73b92c4b129e15bfa0350bd6785e088143fbb9",
+  "sealedSourceCommit": "dd24490fdc4f285f9bb36bbbdd548ac5ddbfbed2",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:d40d95eafec82ad8a5c4144de8d465a467bac81c9beb2764acfdbc590b282662",
-  "tsBuildCacheDigest": "sha256:ead169ed019cb3a84572b444771632de1817a11df6a396aed183ef8845d47e0f",
+  "buildDecisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlanDigest": "sha256:b0086379190f0f7545fb26f0a32c9604a076fe7550aa4fcefdfced068baae8a8",
+  "tsBuildCacheDigest": "sha256:6d452782b3513deb8c951bdca5ce63e01109496dde04bba663242e528f0690e4",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 49,
-    "skipDecision": 54,
-    "worktreeSetup": 11896,
-    "typescriptBuild": 16688,
-    "rootDropReleaseAssembly": 31165,
-    "onefileReleaseAssembly": 8493,
-    "artifactSync": 7841,
+    "inputHashCalculation": 50,
+    "skipDecision": 55,
+    "worktreeSetup": 12553,
+    "typescriptBuild": 23553,
+    "rootDropReleaseAssembly": 32707,
+    "onefileReleaseAssembly": 8501,
+    "artifactSync": 7968,
     "cleanup": 0,
-    "totalElapsed": 92842
+    "totalElapsed": 103279
   }
 }

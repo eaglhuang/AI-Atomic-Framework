@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { isAuthorizedBatchRecoveryEvent } from './batch-recovery-admission.ts';
 import { readBrokerLifecycleState } from './lifecycle.ts';
 import { classifyTerminalLifecycleOwnership } from './historical-work-admission-attestation.ts';
 import {
@@ -323,6 +324,7 @@ export function detectCrossTaskMutation(
     let taskHistoryConflict = false;
     if (ownerTaskId) {
       if (normCurrentTaskId !== ownerTaskId) {
+        if (isAuthorizedBatchRecoveryEvent(cwd, normCurrentTaskId, file)) continue;
         // The file name identifies the owner; it does not establish that the
         // owner still holds anything. Ask the authority snapshot before
         // refusing, and record what it said.
