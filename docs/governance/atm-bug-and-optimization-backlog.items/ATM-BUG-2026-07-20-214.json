@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Closed — stale-SHA orphan recovery and cleanup reporting verified in ATM-GOV-0218",
   "area": "Broker / Runner-sync queue",
   "finding": "A runner-sync steward reservation is pinned to a sealed-source-sha. Once HEAD advances past that sha the entry can no longer be satisfied: broker runner-sync release requires --receipt-ref from a completed build for that exact sha, which can never legitimately be produced again. The entry stays queue-head and blocks all later reservations with waiting-different-source. broker cleanup does not reap it while a framework temp claim with the same task id is active, because health resolves to task-active.",
   "expectedBehavior": "A reservation whose sealed source sha is no longer reachable should be reapable without fabricating a receipt, via an explicit cancel/expire action or automatic orphan detection that does not depend on the transient framework temp claim being absent.",
