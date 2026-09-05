@@ -1,7 +1,7 @@
 import {
   createSanitizedGitEnv,
   resolveGitExecutable,
-  runGitCommand,
+  runGitCommandWithTimeout,
 } from './git-process-port.ts';
 import { execFileSync } from "node:child_process";
 import {
@@ -204,9 +204,10 @@ export function runGitPush(options: LegacyValue) {
     });
   }
   try {
-    const stdout = runGitCommand(
+    const stdout = runGitCommandWithTimeout(
       options.cwd,
       ["push", remote, `HEAD:${branch}`],
+      null,
       ["ignore", "pipe", "pipe"],
     );
     const updatedAt = new Date().toISOString();
