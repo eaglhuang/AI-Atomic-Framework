@@ -30,6 +30,34 @@ Delegation modes:
 External write is forbidden unless the user explicitly grants write authority
 and scope.
 
+## Compact command surface (Windows-safe)
+
+Use the ATM CLI from the repository root; these are the common continuation and
+release commands. Keep actor and task values explicit so copied commands do not
+depend on ambient editor state.
+
+```text
+# Continue or inspect the current route
+node atm.mjs next --prompt "<current request>" --json
+node atm.mjs lane status --actor <actor-id> --json
+
+# Release a framework temporary claim or a brokered task
+node atm.mjs framework-mode release --actor <actor-id> --json
+node atm.mjs broker release --task <task-id> --actor <actor-id> --json
+
+# Continue a runner-sync steward session
+node atm.mjs broker runner-sync status --json
+node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <work-id> --receipt-ref <receipt-path> --json
+
+# Governed commit fallback (diagnose first; do not use native git commit)
+node atm.mjs git commit --actor <actor-id> --task <task-id> --message "<summary>" --auto-stage --dry-run --json
+```
+
+On PowerShell, prefer the explicit `--actor` flag. If a command surface accepts
+ambient identity, the supported fallback is `$env:ATM_ACTOR_ID = '<actor-id>'`
+(commit hooks may also consume `ATM_COMMIT_ACTOR_ID`); do not invent a new
+continuation variable or use `git commit`/`git push` directly.
+
 ## Highest Parallel Governance Principle
 
 Treat ATM parallel governance as a tiered authority model:
