@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0032",
   "title": "Broker-managed transactional commit queue and receipt closeout",
-  "status": "running",
+  "status": "open",
   "milestone": null,
   "dependencies": [
     "TASK-GIT-0029",
@@ -243,8 +243,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-05T08-47-17-067Z-claim-0186d4ffcbe7",
-  "lastTransitionAt": "2026-09-05T08:47:17.067Z",
+  "lastTransitionId": "2026-09-05T08-47-54-607Z-release-3fade3938946",
+  "lastTransitionAt": "2026-09-05T08:47:54.607Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-09-05T08:47:10.164Z",
@@ -253,7 +253,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-718f2e9e2d93",
     "claimedAt": "2026-09-05T08:47:10.173Z",
-    "heartbeatAt": "2026-09-05T08:47:10.173Z",
+    "heartbeatAt": "2026-09-05T08:47:47.331Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-GIT-0032.json",
@@ -267,14 +267,14 @@
       "tests/cli/broker-transactional-commit-queue.test.ts",
       "tests/cli/runner-sync-receipt-closeout.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260905084710-codex-gpt-5.4-mini-1d3990c061",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905084710-codex-gpt-5.4-mini-1d3990c061\""
-    }
+    },
+    "reason": "Release unfinished task before next backlog selection; no implementation deliverable claimed."
   },
   "startedAt": "2026-09-05T08:32:47.932Z",
   "startedByActor": "codex-gpt-5.4-mini",
