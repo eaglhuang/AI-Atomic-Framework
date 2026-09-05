@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source — frozen runner publication pending",
+  "status": "Closed — source repair and frozen runner publication verified on 2026-09-05",
   "area": "Runner sync governance",
   "finding": "Runner-sync temp framework claims can build and write `.atm/history/evidence/<temp-task>.runner-sync-receipt.json`, but the governed git commit wrapper rejects the temp task with `ATM_TASK_NOT_FOUND`, and native pre-commit rejects the receipt with `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT` because no matching task ledger/event exists.",
   "expectedBehavior": "A runner-sync steward lane must have a normal governed publication route for release artifacts and its receipt, either through a temp-task ledger record or an explicit runner-sync publication commit adapter.",
   "evidenceOrRepro": "ATM-GOV-0271 runner sync originally reproduced both failures: `node atm.mjs git commit --task ATM-FRAMEWORK-TEMP-codex-skl-captain --auto-stage --json` returned `ATM_TASK_NOT_FOUND`, while a native path-bounded commit lacked protected evidence context. Current framework-temp publication capability tests prove the normal taskless facade binds one live lock to its allowed release and runner-sync receipt files. ATM-BUG-2026-09-02-004 adds the remaining protected-hook admission for a fresh, exact runner-publication takeover plan and proves that an expired lock remains rejected.",
-  "followUp": "Rebuild and publish the frozen runner before treating the repaired source behavior as available to frozen-runner consumers."
+  "followUp": "Closed on 2026-09-05. The repaired behavior is included in the current sealed frozen runner and its publication is aligned with origin/main."
 }

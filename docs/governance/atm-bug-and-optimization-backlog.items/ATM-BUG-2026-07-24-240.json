@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Fixed in source; frozen runner publication remains required",
+  "status": "Closed — source repair and frozen runner publication verified on 2026-09-05",
   "area": "Taskflow / Git admission",
   "finding": "ATM has no governed admission path for required task deliverables that are hidden by local ignore rules such as .git/info/exclude. TASK-SKL-0027 required new templates/skills deliverables, but normal governed auto-stage could not see them because the local target worktree ignores templates/. The only obvious workaround was native git add -f, which is not ledgered as an ATM authority decision.",
   "expectedBehavior": "When a sealed task card declares an ignored deliverable, ATM should fail closed with a structured recovery command that records an explicit ignored-deliverable admission receipt, binds the path to the active task/actor/lane, verifies the path is in allowedFiles/deliverables, and stages/commits it through governed taskflow without native ad hoc force-add.",
   "evidenceOrRepro": "TASK-SKL-0027 dogfood: templates/skills/atm-deep-module-refactor.skill.md and references were declared deliverables, but .git/info/exclude contains templates/. SKL captain reported governed commit dry-run excluded the ignored deliverables and stopped rather than using native git add -f. Source repair verified 2026-09-04: commit-bundle-resolution test first failed because a declared ignored deliverable was absent from the sealed candidate; after repair it is admitted and sealed, while an ignored sibling outside declared scope remains excluded.",
-  "followUp": "Source repair adds ignored-file discovery only after intersection with sealed declared scope, then retains normal commit-authority and ownership gates before candidate-index force-add. Publish the frozen runner before closing this backlog item."
+  "followUp": "Closed on 2026-09-05. The current frozen runner source seal is valid after governed publication; the repair remains bounded by sealed declared scope and normal ownership gates."
 }
