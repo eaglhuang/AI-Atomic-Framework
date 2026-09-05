@@ -20,6 +20,7 @@ import { applyDoctorPolicyToCheck, downgradeAdopterGitHeadEvidenceCheck, resolve
 import { checkOnboardingLifecycle, createVersionSummaryMessages } from './lifecycle.ts';
 import { createBacklogSyncCheck, createGovernanceEntryReadinessCheck, hasRequiredScripts, isFrameworkContractExpected } from './readiness.ts';
 import { checkCharterIntegrityV2, listFiles, listPackageDirs, packageDirLabel, readJsonIfExists, createCheck, createIntegrationDriftRemediation } from './utilities.ts';
+import { inspectHistoricalCommitScopePatrol } from './commit-scope-patrol.ts';
 
 function hasTsNoCheckPragma(source: string): boolean {
   const withoutBom = source.replace(/^\uFEFF/, '');
@@ -121,6 +122,7 @@ export async function runDoctor(argv: readonly string[]) {
   );
   const governanceEntryReadiness = createGovernanceEntryReadinessCheck(root, repoIdentity, rawGitHeadEvidenceCheck);
   const backlogSyncCheck = createBacklogSyncCheck(root, repoIdentity);
+  const commitScopePatrol = inspectHistoricalCommitScopePatrol(root);
   const checks = [
     createCheck('package-manager', !frameworkContractExpected || (rootPackage.packageManager === undefined && existsSync(path.join(root, 'package-lock.json')) && !existsSync(path.join(root, 'pnpm-workspace.yaml'))), {
       official: 'npm', packageLock: existsSync(path.join(root, 'package-lock.json')), packageManagerField: rootPackage.packageManager ?? null, pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
@@ -188,6 +190,7 @@ export async function runDoctor(argv: readonly string[]) {
     gitHeadEvidenceCheck,
     governanceEntryReadiness,
     backlogSyncCheck,
+    createCheck('historical-commit-scope-patrol', true, commitScopePatrol),
     createCheck('cross-task-mutation-incident', (() => {
       const activeTaskId = runtime.currentTaskId ?? process.env.ATM_TASK_ID ?? null;
       const block = detectCrossTaskMutation(root, activeTaskId, 'doctor');
@@ -370,6 +373,7 @@ export async function runDoctor(argv: readonly string[]) {
       gitWorktreeReadiness,
       governanceEntryReadiness: governanceEntryReadiness.details,
       backlogSync: backlogSyncCheck.details,
+      commitScopePatrol,
       runtimeAdapterReadiness,
       trustIntegrity: trustMode ? trustIntegrity : undefined,
       knownBadStatus: knownBadMode ? knownBadStatus : undefined,

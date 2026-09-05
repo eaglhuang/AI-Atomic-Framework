@@ -1856,6 +1856,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/create.js",
     "release/atm-root-drop/packages/cli/dist/commands/daemon.js",
     "release/atm-root-drop/packages/cli/dist/commands/doctor.js",
+    "release/atm-root-drop/packages/cli/dist/commands/doctor/commit-scope-patrol.js",
     "release/atm-root-drop/packages/cli/dist/commands/doctor/constants.js",
     "release/atm-root-drop/packages/cli/dist/commands/doctor/lifecycle.js",
     "release/atm-root-drop/packages/cli/dist/commands/doctor/policy.js",
@@ -2527,6 +2528,7 @@
     "release/atm-root-drop/packages/cli/src/commands/create.ts",
     "release/atm-root-drop/packages/cli/src/commands/daemon.ts",
     "release/atm-root-drop/packages/cli/src/commands/doctor.ts",
+    "release/atm-root-drop/packages/cli/src/commands/doctor/commit-scope-patrol.ts",
     "release/atm-root-drop/packages/cli/src/commands/doctor/constants.ts",
     "release/atm-root-drop/packages/cli/src/commands/doctor/lifecycle.ts",
     "release/atm-root-drop/packages/cli/src/commands/doctor/policy.ts",
@@ -5228,6 +5230,7 @@
     "release/atm-root-drop/tests/cli/deep-module-refactor-provider.test.ts",
     "release/atm-root-drop/tests/cli/diagnostic-feedback-loop.test.ts",
     "release/atm-root-drop/tests/cli/dirty-release-wip-recovery-0258.test.ts",
+    "release/atm-root-drop/tests/cli/doctor-commit-scope-patrol.test.ts",
     "release/atm-root-drop/tests/cli/doctor-final-600.test.ts",
     "release/atm-root-drop/tests/cli/doctor-typescript-escape-hatches.test.ts",
     "release/atm-root-drop/tests/cli/durable-broker-scheduler.test.ts",
@@ -6012,7 +6015,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 5,
-    "unchanged": 1949,
+    "unchanged": 1951,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -22443,6 +22446,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/doctor/commit-scope-patrol.js",
+        "digest": "cff78c167a159211224fb166f784aeec375b6e78934f8680f5d3d727f2110217",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/doctor/commit-scope-patrol.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/doctor/constants.js",
         "digest": "65eb625dffeb3570c034016130b0ea59fe436cf920119ef22e67131f92b7955a",
         "origin": "source",
@@ -22480,7 +22492,7 @@
       },
       {
         "path": "packages/cli/dist/commands/doctor/run-doctor.js",
-        "digest": "9e5a4d603b1f4857f01964caa78d1c2b2067ad3e1436823bac40b789b9d10361",
+        "digest": "c792e361fb4658c2ea85897f650e150ac0039368bc102d29eaa04ad0c65ec4a9",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/doctor/run-doctor.js"
@@ -28482,6 +28494,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/doctor/commit-scope-patrol.ts",
+        "digest": "b6b3bd75b031721bb3e22f2189fd2d3e527ec7d79d20b92f40f44c93da6d7de0",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/doctor/commit-scope-patrol.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/doctor/constants.ts",
         "digest": "01b01caef87458e6e564d23791e51490a203b66c49eb49c5a153626c47368629",
         "origin": "source",
@@ -28519,7 +28540,7 @@
       },
       {
         "path": "packages/cli/src/commands/doctor/run-doctor.ts",
-        "digest": "9aca70d45e0948c55645c51d20c0251807b64d876cc51dcef92bc4cfb1653efb",
+        "digest": "8e00bf310b22b40162fd4e82ca634e274572d96c531b6749f6acf2e23b0985b6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/doctor/run-doctor.ts"
@@ -52782,6 +52803,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/doctor-commit-scope-patrol.test.ts",
+        "digest": "b6e831a13d2d9db7f5277ab8d05529519de1b015ed3a3ef853f1e3a33e802779",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/doctor-commit-scope-patrol.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/doctor-final-600.test.ts",
         "digest": "fd3caf985c4640f8ef04308f7025263e0ea5518f866785ca713ee32d4a9972cd",
         "origin": "source",
@@ -59802,7 +59832,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:2530c066248cefd78aea4c6fdd19af24b760332d87b17626ed08bf6a537c8ce0"
+    "treeDigest": "sha256:3624b030a4f838997a5edf1c5c4e86ba3fe1e21787410fc89b8626ffed472894"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -59997,6 +60027,7 @@
       "packages/cli/src/commands/create.ts",
       "packages/cli/src/commands/daemon.ts",
       "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/doctor/commit-scope-patrol.ts",
       "packages/cli/src/commands/doctor/constants.ts",
       "packages/cli/src/commands/doctor/lifecycle.ts",
       "packages/cli/src/commands/doctor/policy.ts",
@@ -61332,7 +61363,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:e7200c608b728b78761f8c0980bd8c86dc780bcbe2a8e84b6c043f4859960f68"
+    "digest": "sha256:dd981f0ca2e4e2be8542715aff2ddb3a702083dffb98e4b085cf30d6778fea90"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63162,6 +63193,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/create.js",
       "release/atm-root-drop/packages/cli/dist/commands/daemon.js",
       "release/atm-root-drop/packages/cli/dist/commands/doctor.js",
+      "release/atm-root-drop/packages/cli/dist/commands/doctor/commit-scope-patrol.js",
       "release/atm-root-drop/packages/cli/dist/commands/doctor/constants.js",
       "release/atm-root-drop/packages/cli/dist/commands/doctor/lifecycle.js",
       "release/atm-root-drop/packages/cli/dist/commands/doctor/policy.js",
@@ -63833,6 +63865,7 @@
       "release/atm-root-drop/packages/cli/src/commands/create.ts",
       "release/atm-root-drop/packages/cli/src/commands/daemon.ts",
       "release/atm-root-drop/packages/cli/src/commands/doctor.ts",
+      "release/atm-root-drop/packages/cli/src/commands/doctor/commit-scope-patrol.ts",
       "release/atm-root-drop/packages/cli/src/commands/doctor/constants.ts",
       "release/atm-root-drop/packages/cli/src/commands/doctor/lifecycle.ts",
       "release/atm-root-drop/packages/cli/src/commands/doctor/policy.ts",
@@ -66534,6 +66567,7 @@
       "release/atm-root-drop/tests/cli/deep-module-refactor-provider.test.ts",
       "release/atm-root-drop/tests/cli/diagnostic-feedback-loop.test.ts",
       "release/atm-root-drop/tests/cli/dirty-release-wip-recovery-0258.test.ts",
+      "release/atm-root-drop/tests/cli/doctor-commit-scope-patrol.test.ts",
       "release/atm-root-drop/tests/cli/doctor-final-600.test.ts",
       "release/atm-root-drop/tests/cli/doctor-typescript-escape-hatches.test.ts",
       "release/atm-root-drop/tests/cli/durable-broker-scheduler.test.ts",
@@ -67320,22 +67354,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:015746c88a005ad61f6a0ff528c3e0c1f146167d5837fcaaf4d447bb7b85c7af",
-  "sealedSourceCommit": "9ed61e65af4f70da8722e2231a0bd8dd261935b9",
+  "buildInputsTreeHash": "sha256:445daed3a893d2973dea5e7bd08ff341d61db73714727d025addaffd2762a6b7",
+  "sealedSourceCommit": "9c498d94e3f0693e50ea0fabedfbd26f058ee515",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:ff98017e975a3192d0d8a53d68a72a58c60972d09b921f706d1a8fd22948c336",
-  "tsBuildCacheDigest": "sha256:c7e63ca7608a56a4ba449a4817c5a4331db4f2fc06e8ca1f4fb8bc444e0893b1",
+  "incrementalPlanDigest": "sha256:6ed23232033173a1b64c5d6cca7855df2547cb7df212627e143de840a1b9f13a",
+  "tsBuildCacheDigest": "sha256:02817a0bbe799c067de4f3fec9d41c04e455ce10d415dbe8f83a06075204427d",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 51,
-    "skipDecision": 62,
-    "worktreeSetup": 13542,
-    "typescriptBuild": 20503,
-    "rootDropReleaseAssembly": 32861,
-    "onefileReleaseAssembly": 9029,
-    "artifactSync": 7994,
+    "skipDecision": 70,
+    "worktreeSetup": 14286,
+    "typescriptBuild": 19449,
+    "rootDropReleaseAssembly": 33800,
+    "onefileReleaseAssembly": 9049,
+    "artifactSync": 8082,
     "cleanup": 0,
-    "totalElapsed": 102962
+    "totalElapsed": 104125
   }
 }
