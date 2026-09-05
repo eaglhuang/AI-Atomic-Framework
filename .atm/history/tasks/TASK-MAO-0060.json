@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0060",
   "title": "frozen runner checkpoint recovery bridge",
-  "status": "open",
+  "status": "running",
   "milestone": "M8F",
   "dependencies": [
     "TASK-MAO-0058"
@@ -30,7 +30,11 @@
     "packages/core/src/broker/**",
     "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
     "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
-    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    ".atm/history/evidence/TASK-MAO-0060.*",
+    ".atm/history/task-events/TASK-MAO-0060/**",
+    ".atm/history/tasks/TASK-MAO-0060.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
   ],
   "validators": [
     "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
@@ -208,20 +212,23 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-05T06-04-37-195Z-release-f78693afd3c1",
-  "lastTransitionAt": "2026-09-05T06:04:37.195Z",
+  "lastTransitionId": "2026-09-05T06-20-49-347Z-renew-32027aa2df20",
+  "lastTransitionAt": "2026-09-05T06:20:49.347Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-09-05T06:03:33.579Z",
-  "promotedAt": "2026-09-05T06:03:33.582Z",
+  "reservedAt": "2026-09-05T06:11:08.509Z",
+  "promotedAt": "2026-09-05T06:11:08.513Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-85ad970ab681",
-    "claimedAt": "2026-09-05T06:03:33.587Z",
-    "heartbeatAt": "2026-09-05T06:04:34.878Z",
+    "leaseId": "lease-95298fd2a029",
+    "claimedAt": "2026-09-05T06:11:08.517Z",
+    "heartbeatAt": "2026-09-05T06:20:48.255Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-MAO-0060.*",
+      ".atm/history/task-events/TASK-MAO-0060/**",
       ".atm/history/tasks/TASK-MAO-0060.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
       "atomic_workbench/atomization-coverage/path-to-atom-map.json",
       "packages/cli/src/commands/batch/**",
       "packages/cli/src/commands/batch/implementation.ts",
@@ -231,34 +238,33 @@
       "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
       "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
     ],
-    "state": "released",
+    "state": "active",
     "laneSession": {
-      "laneSessionId": "lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c",
+      "laneSessionId": "lane-20260905061108-codex-gpt-5.4-mini-eb06b73546",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c\""
-    },
-    "reason": "Planning card and import contract committed; implementation intentionally deferred to the next governed work window."
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905061108-codex-gpt-5.4-mini-eb06b73546\""
+    }
   },
   "startedAt": "2026-09-05T06:03:33.587Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-1b42306378b951d6",
-    "ticketDigest": "sha256:1b42306378b951d63909226d57ca116572744fef083c1d425c91a9cfd5b53dfc",
+    "ticketId": "wat-0d9894acc211c786",
+    "ticketDigest": "sha256:0d9894acc211c786f97c83e46f7016fc506ad4e6f052b202ab8749af9d74ab78",
     "taskId": "TASK-MAO-0060",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c",
-    "claimGeneration": "lease-85ad970ab681",
-    "issuedAt": "2026-09-05T06:03:33.587Z",
-    "expiresAt": "2026-09-05T06:33:33.587Z",
-    "scopeDigest": "sha256:55c02ea2d677a4a9acf2521d8b4eb0bd78366128458dcb3b7d893f56d711d0e8",
+    "laneSessionId": "lane-20260905061108-codex-gpt-5.4-mini-eb06b73546",
+    "claimGeneration": "lease-95298fd2a029",
+    "issuedAt": "2026-09-05T06:20:48.255Z",
+    "expiresAt": "2026-09-05T06:50:48.255Z",
+    "scopeDigest": "sha256:e58090ba1bec244bc40843c9a59b40557557d93f9eb0d005c7d3e6fd18639c24",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-05T06:03:33.587Z"
+      "selectedAt": "2026-09-05T06:20:48.255Z"
     },
     "grants": [
       {
@@ -267,6 +273,7 @@
           ".atm/history/evidence/TASK-MAO-0060.*",
           ".atm/history/task-events/TASK-MAO-0060/**",
           ".atm/history/tasks/TASK-MAO-0060.json",
+          "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
           "atomic_workbench/atomization-coverage/path-to-atom-map.json",
           "packages/cli/src/commands/batch/**",
           "packages/cli/src/commands/batch/implementation.ts",
@@ -276,7 +283,7 @@
           "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
           "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
         ],
-        "digest": "sha256:cbab09dd2b5d6d225a0603e23e95fd0c9ee623172dcf32e24b193eea4e44cd6e"
+        "digest": "sha256:fe03a24d362144cb7b3e795ba97224d1b6bd5254aae3a7aeeb3a3ee8c78862f1"
       },
       {
         "kind": "lifecycle-operation",
@@ -310,7 +317,7 @@
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
   },
-  "startedBySessionId": "session-20260905060333-codex-gpt-5.4-mini-TASK-MAO-0060-2331a4fa1b",
+  "startedBySessionId": "session-20260905061108-codex-gpt-5.4-mini-TASK-MAO-0060-15c78f0d01",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -323,6 +330,7 @@
       ".atm/history/evidence/TASK-MAO-0060.*",
       ".atm/history/task-events/TASK-MAO-0060/**",
       ".atm/history/tasks/TASK-MAO-0060.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
       "atomic_workbench/atomization-coverage/path-to-atom-map.json",
       "packages/cli/src/commands/batch/**",
       "packages/cli/src/commands/batch/implementation.ts",
@@ -332,19 +340,26 @@
       "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
       "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0060-frozen-runner-checkpoint-recovery-bridge.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/multi-agent-orchestration/",
+      "docs/ai_atomic_framework/multi-agent-orchestration/tasks/",
+      "docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0060-frozen-runner-checkpoint-recovery-bridge.task.md"
+    ],
     "allowPlanningMirror": false,
-    "promptHash": "9fdc676aaed5f4ff7356cd5538e26b0bb40a85006e28e245d28a9392d4995fa3",
+    "promptHash": "73d7292c5507e36d4a71e477d002d1915d0cc11479d1fff5d43aac356dbfe3e0",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260905060333-codex-gpt-5.4-mini-TASK-MAO-0060-2331a4fa1b",
+    "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c",
+      "laneSessionId": "lane-20260905061108-codex-gpt-5.4-mini-eb06b73546",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905060333-codex-gpt-5.4-mini-e9a11cbb9c\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905061108-codex-gpt-5.4-mini-eb06b73546\""
     },
-    "createdAt": "2026-09-05T06:03:35.844Z",
+    "createdAt": "2026-09-05T06:11:12.015Z",
     "status": "active"
   }
 }

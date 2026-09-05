@@ -6,6 +6,15 @@ type CheckpointCloseResult = {
   evidence?: unknown;
 };
 
+export type BatchCheckpointRecoveryBridge = {
+  readonly schemaId: 'atm.batchCheckpointRecoveryBridge.v1';
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly candidateHead: string | null;
+  readonly lifecycleMutation: false;
+  readonly nextCommand: string;
+};
+
 export function buildBatchCheckpointRunnerRecoveryArgs(emergencyApproval: string | null): readonly string[] {
   return emergencyApproval
     ? ['--emergency-approval', emergencyApproval, '--allow-stale-runner']
@@ -24,6 +33,7 @@ export function categorizeCheckpointCloseFailure(
   tldr: string | null;
   missingValidationPasses: readonly unknown[];
   blockingFindings: readonly unknown[];
+  recoveryBridge: BatchCheckpointRecoveryBridge | null;
 } {
   const messages = Array.isArray(closeResult.messages) ? closeResult.messages : [];
   const errorMsg = messages.find((item) => typeof item.code === 'string' && item.code.startsWith('ATM_TASK_CLOSE'))
@@ -42,9 +52,13 @@ export function categorizeCheckpointCloseFailure(
   }
   if (code === 'ATM_RUNNER_STALE_WRITE_REFUSED' || code === 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED') {
     const sealedSourceSha = readGitHead(cwd) ?? '<sealed-source-sha>';
-    return checkpointCloseFailure('runner-sync-required', tldr ?? `Task ${taskId} checkpoint needs a runner-sync steward ticket before frozen-runner write close can proceed.`, `node atm.mjs broker runner-sync enqueue --task ${taskId} --actor ${actorId} --sealed-source-sha ${sealedSourceSha} --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --json`, tldr, missingValidationPasses, blockingFindings);
+    const nextCommand = `node atm.mjs broker runner-sync enqueue --task ${taskId} --actor ${actorId} --sealed-source-sha ${sealedSourceSha} --surface release/atm-onefile/atm.mjs --surface release/atm-root-drop --json`;
+    return checkpointCloseFailure('runner-sync-required', tldr ?? `Task ${taskId} checkpoint needs a runner-sync steward ticket before frozen-runner write close can proceed.`, nextCommand, tldr, missingValidationPasses, blockingFindings, buildRecoveryBridge(taskId, actorId, sealedSourceSha, nextCommand));
   }
-  if (code === 'ATM_SOURCE_FIRST_WRITE_REFUSED') return checkpointCloseFailure('source-first-write-refused', tldr ?? `Task ${taskId} checkpoint attempted source-first write semantics; rerun through frozen node atm.mjs after runner-sync is satisfied.`, `node atm.mjs batch checkpoint --actor ${actorId} --json`, tldr, missingValidationPasses, blockingFindings);
+  if (code === 'ATM_SOURCE_FIRST_WRITE_REFUSED') {
+    const nextCommand = `node atm.mjs batch checkpoint --actor ${actorId} --json`;
+    return checkpointCloseFailure('source-first-write-refused', tldr ?? `Task ${taskId} checkpoint attempted source-first write semantics; rerun through frozen node atm.mjs after runner-sync is satisfied.`, nextCommand, tldr, missingValidationPasses, blockingFindings, buildRecoveryBridge(taskId, actorId, readGitHead(cwd), nextCommand));
+  }
   if (code === 'ATM_BROKER_SHARED_QUEUE_BLOCKED') return checkpointCloseFailure('broker-shared-queue-blocked', tldr ?? `Task ${taskId} checkpoint is blocked by a shared-surface broker queue; inspect the broker ticket/status before retrying.`, `node atm.mjs broker status --task ${taskId} --json`, tldr, missingValidationPasses, blockingFindings);
   if (code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED') return checkpointCloseFailure('missing-deliverable', `Task ${taskId} has no real non-.atm deliverable diff; implement the required files first.`, null, tldr, missingValidationPasses, blockingFindings);
   if (code === 'ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE' || code === 'ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED') return checkpointCloseFailure('framework-gate-failed', tldr ?? `Task ${taskId} cannot close due to ATM framework delivery window or gate blocker.`, typeof errorMsg?.data?.requiredCommand === 'string' ? errorMsg.data.requiredCommand : null, tldr, missingValidationPasses, blockingFindings);
@@ -53,8 +67,19 @@ export function categorizeCheckpointCloseFailure(
   return checkpointCloseFailure('close-failed', `Task ${taskId} close returned ok=false (code: ${code}).`, null, tldr, missingValidationPasses, blockingFindings);
 }
 
-function checkpointCloseFailure(category: string, reason: string, requiredCommand: string | null, tldr: string | null, missingValidationPasses: readonly unknown[], blockingFindings: readonly unknown[]) {
-  return { category, reason, requiredCommand, tldr, missingValidationPasses, blockingFindings };
+function checkpointCloseFailure(category: string, reason: string, requiredCommand: string | null, tldr: string | null, missingValidationPasses: readonly unknown[], blockingFindings: readonly unknown[], recoveryBridge: BatchCheckpointRecoveryBridge | null = null) {
+  return { category, reason, requiredCommand, tldr, missingValidationPasses, blockingFindings, recoveryBridge };
+}
+
+function buildRecoveryBridge(taskId: string, actorId: string, candidateHead: string | null, nextCommand: string): BatchCheckpointRecoveryBridge {
+  return {
+    schemaId: 'atm.batchCheckpointRecoveryBridge.v1',
+    taskId,
+    actorId,
+    candidateHead,
+    lifecycleMutation: false,
+    nextCommand
+  };
 }
 
 function readGitHead(cwd: string): string | null {
