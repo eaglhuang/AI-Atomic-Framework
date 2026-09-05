@@ -102,6 +102,27 @@ assert.equal(noProfile.evidence.orchestrationPlan.targetRepository, 'adopter-rep
 assert.equal(noProfile.evidence.orchestrationPlan.nextDryRunCommand, 'node atm.mjs taskflow open --dry-run --title "New Task" --json');
 assert.equal(noProfile.evidence.orchestrationPlan.nextImportCommand, null);
 
+// ATM-BUG-2026-07-12-160: explicit task-id/output are sufficient for the
+// framework fallback; a missing host profile must not reject an otherwise
+// fully bounded opener request.
+const explicitFallbackFixture = makeFixture();
+const explicitFallback = await runTaskflow([
+  'open',
+  '--cwd', explicitFallbackFixture.targetRepo,
+  '--write',
+  '--task-id', 'TASK-FALLBACK-0001',
+  '--output', 'docs/tasks/TASK-FALLBACK-0001.task.md',
+  '--title', 'Explicit no-profile fallback',
+  '--json'
+]) as any;
+assert.equal(explicitFallback.ok, true);
+assert.equal(explicitFallback.writeEnabled, true);
+assert.equal(explicitFallback.evidence.openerMode, 'template-only-fallback');
+assert.equal(explicitFallback.evidence.hostPolicyDecision.sources.taskId, 'explicit');
+assert.equal(explicitFallback.evidence.hostPolicyDecision.sources.outputPath, 'explicit');
+assert.ok(readFileSync(path.join(explicitFallbackFixture.targetRepo, 'docs/tasks/TASK-FALLBACK-0001.task.md'), 'utf8').includes('TASK-FALLBACK-0001'));
+assert.ok(readFileSync(path.join(explicitFallbackFixture.targetRepo, '.atm/history/tasks/TASK-FALLBACK-0001.json'), 'utf8').includes('TASK-FALLBACK-0001'));
+
 const fixture = makeFixture();
 writeProfile(fixture.planningRepo, { family: 'ATM-GOV' });
 const profilePath = path.join(fixture.planningRepo, 'taskflow.profile.json');
