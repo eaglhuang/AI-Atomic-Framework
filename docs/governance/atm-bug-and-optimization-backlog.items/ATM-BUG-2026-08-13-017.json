@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed — takeover aggregate rollback restores predecessor authority and removes partial successor surfaces",
+  "status": "Closed — takeover aggregate rollback and injected-failure regression verified 2026-09-05",
   "area": "Claim identity transitions are not atomic across ledger, runtime lock, direction lock, and admission ticket",
   "finding": "Official import and takeover transitions can update only part of the claim identity aggregate. A successful takeover updated the ledger claim and runtime lock actor but retained an expired workAdmissionTicket for the predecessor and emitted a runtime lock without the taskDirectionLock required for scope amendment. Renew resealed the ticket, but could not reconstruct the missing direction-lock authority. The new owner was therefore recognized as active while the public scope-amendment and governed-commit seams still refused it.",
   "expectedBehavior": "Every claim identity transition must commit one atomic aggregate: ledger claim, runtime lock, embedded direction lock, work-admission ticket, actor, lane session, lease generation, and authorized scope must either all move to the successor or all remain unchanged. Post-transition validation must fail closed and roll back before success is reported if any identity surface disagrees.",
