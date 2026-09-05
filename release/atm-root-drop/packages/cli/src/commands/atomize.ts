@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { CliError, makeResult, message } from './shared.ts';
+import { pathToFileURL } from 'node:url';
+import { CliError, makeResult, message, resolveFrameworkRoot } from './shared.ts';
 
 type AtomizeOptions = {
   cwd: string;
@@ -11,6 +11,10 @@ type AtomizeOptions = {
   dryRun: boolean;
   passthroughArgs: string[];
 };
+
+export function resolveAtomizeHelperPath(moduleUrl = import.meta.url): string {
+  return path.join(resolveFrameworkRoot(moduleUrl), 'scripts', 'src', 'atomization-register-receipt.js');
+}
 
 export async function runAtomize(argv: string[]) {
   const options = parseAtomizeArgs(argv);
@@ -60,10 +64,7 @@ export async function runAtomize(argv: string[]) {
 async function runAtomizationRegistrationTool(options: AtomizeOptions) {
   const subcommand = options.subcommand as 'register-receipt' | 'snapshot' | 'verify-task';
   try {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const repoRoot = path.resolve(__dirname, '../../../../');
-    const scriptPath = path.join(repoRoot, 'scripts', 'src', 'atomization-register-receipt.js');
+    const scriptPath = resolveAtomizeHelperPath();
     const command = subcommand === 'register-receipt' ? 'register-path' : subcommand;
     const output = execFileSync(process.execPath, [scriptPath, command, '--repo', options.repo, ...options.passthroughArgs], {
       cwd: options.cwd,
@@ -107,9 +108,7 @@ async function runAtomizeInventory(options: AtomizeOptions) {
   try {
     // 解析到 atomize-inventory.js 的正確路徑
     // 從 packages/cli/src/commands/atomize.ts 相對於 repo root
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const repoRoot = path.resolve(__dirname, '../../../../');
+    const repoRoot = resolveFrameworkRoot();
     const inventoryScriptPath = path.join(repoRoot, 'scripts', 'src', 'atomize-inventory.js');
 
     // 動態導入 atomize-inventory 模組
@@ -174,9 +173,7 @@ async function runAtomizeInventory(options: AtomizeOptions) {
 async function runAtomizeScore(options: AtomizeOptions) {
   try {
     // 解析到 atomize-score.js 的正確路徑
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const repoRoot = path.resolve(__dirname, '../../../../');
+    const repoRoot = resolveFrameworkRoot();
     const scoreScriptPath = path.join(repoRoot, 'scripts', 'src', 'atomize-score.js');
 
     // 動態導入 atomize-score 模組
@@ -251,9 +248,7 @@ async function runAtomizeScore(options: AtomizeOptions) {
 
 async function runAtomizeBackfill(options: AtomizeOptions) {
   try {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const repoRoot = path.resolve(__dirname, '../../../../');
+    const repoRoot = resolveFrameworkRoot();
     const scriptPath = path.join(repoRoot, 'scripts', 'src', 'atomize-backfill.js');
 
     const { atomizeBackfill } = await import(pathToFileURL(scriptPath).href);

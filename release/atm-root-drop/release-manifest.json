@@ -5155,6 +5155,7 @@
     "release/atm-root-drop/tests/cli/atm-chart-final-600.test.ts",
     "release/atm-root-drop/tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
     "release/atm-root-drop/tests/cli/atomization-max-lines.test.ts",
+    "release/atm-root-drop/tests/cli/atomize-bundled-helper-resolution.test.ts",
     "release/atm-root-drop/tests/cli/autonomous-task-continuation.test.ts",
     "release/atm-root-drop/tests/cli/autonomous-validator-review-lifecycle.test.ts",
     "release/atm-root-drop/tests/cli/backlog-census-authority.test.ts",
@@ -5187,6 +5188,7 @@
     "release/atm-root-drop/tests/cli/broker-ticket-fairness-scale.test.ts",
     "release/atm-root-drop/tests/cli/broker-ticket-fairness.test.ts",
     "release/atm-root-drop/tests/cli/broker-transaction-authority.test.ts",
+    "release/atm-root-drop/tests/cli/broker-transactional-commit-queue.test.ts",
     "release/atm-root-drop/tests/cli/build-release-hygiene.test.ts",
     "release/atm-root-drop/tests/cli/canonical-telemetry-observation.test.ts",
     "release/atm-root-drop/tests/cli/captain-parallel-ledger-analysis.test.ts",
@@ -5529,6 +5531,7 @@
     "release/atm-root-drop/tests/cli/runner-sync-orphan-head.test.ts",
     "release/atm-root-drop/tests/cli/runner-sync-post-close-receipt-publication.test.ts",
     "release/atm-root-drop/tests/cli/runner-sync-publication-residue.test.ts",
+    "release/atm-root-drop/tests/cli/runner-sync-receipt-closeout.test.ts",
     "release/atm-root-drop/tests/cli/runner-sync-sealed-input-continuity.test.ts",
     "release/atm-root-drop/tests/cli/runner-sync-self-hosting-loop.test.ts",
     "release/atm-root-drop/tests/cli/runner-sync-stale-reservation-lifecycle.test.ts",
@@ -5998,8 +6001,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 15,
-    "unchanged": 1938,
+    "copied": 5,
+    "unchanged": 1950,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -21288,7 +21291,7 @@
       },
       {
         "path": "packages/cli/dist/commands/atomize.js",
-        "digest": "24d6fe8343dd4896b3b5b92be1f18e3193c983d83f57c95fbd7626927a515d5d",
+        "digest": "c46b153647b2b4e837480033bd2977ca46b86d8d1439a1298b5fec69300aaa49",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/atomize.js"
@@ -27309,7 +27312,7 @@
       },
       {
         "path": "packages/cli/src/commands/atomize.ts",
-        "digest": "38b5262b49986e62dc036e299015377062b602fe326b2ceaf18366e59a68f739",
+        "digest": "a0df53da3653fd079b0889b16765144c3d4b99a100e2f8218fd36d80ba5ad247",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/atomize.ts"
@@ -52112,6 +52115,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/atomize-bundled-helper-resolution.test.ts",
+        "digest": "ec89834aed8828945b70f8b0b89e504ee073b592159c8a0ce05350619f4fbaff",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/atomize-bundled-helper-resolution.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/autonomous-task-continuation.test.ts",
         "digest": "7f79ab8b51098b08a0e824735ae81521d3d5d09c3b7033b5f8a65dec8e60a209",
         "origin": "source",
@@ -52396,6 +52408,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/broker-transaction-authority.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/broker-transactional-commit-queue.test.ts",
+        "digest": "9f3013ae4ddb8cd2b27684e19bc297f86e239cccef2ba6a1bdf7cf8ba6d2373f",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/broker-transactional-commit-queue.test.ts"
         ],
         "replaceable": true
       },
@@ -55474,6 +55495,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/runner-sync-publication-residue.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/runner-sync-receipt-closeout.test.ts",
+        "digest": "7c486544444c1b550845f9d336ee3541b598b237cdbf3feca1537a5916d84ccb",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/runner-sync-receipt-closeout.test.ts"
         ],
         "replaceable": true
       },
@@ -59672,7 +59702,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:cb4c4ff1a8ff09bee3fe61c86b099a740eb48a209ec99801a243937109185564"
+    "treeDigest": "sha256:2b27210dde4b5cdef3a6776df2f4f7437b95b7b546a19b743b27a7b833982329"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61201,7 +61231,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:26567f136e24838442f9841f3c129ece97b473b2b91aabb1a406f3c72b57ab99"
+    "digest": "sha256:a252f148ac1d28cb72c68c0cbfa3d3dd99495e943c0fed2eb8381957acd5e8df"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66330,6 +66360,7 @@
       "release/atm-root-drop/tests/cli/atm-chart-final-600.test.ts",
       "release/atm-root-drop/tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
       "release/atm-root-drop/tests/cli/atomization-max-lines.test.ts",
+      "release/atm-root-drop/tests/cli/atomize-bundled-helper-resolution.test.ts",
       "release/atm-root-drop/tests/cli/autonomous-task-continuation.test.ts",
       "release/atm-root-drop/tests/cli/autonomous-validator-review-lifecycle.test.ts",
       "release/atm-root-drop/tests/cli/backlog-census-authority.test.ts",
@@ -66362,6 +66393,7 @@
       "release/atm-root-drop/tests/cli/broker-ticket-fairness-scale.test.ts",
       "release/atm-root-drop/tests/cli/broker-ticket-fairness.test.ts",
       "release/atm-root-drop/tests/cli/broker-transaction-authority.test.ts",
+      "release/atm-root-drop/tests/cli/broker-transactional-commit-queue.test.ts",
       "release/atm-root-drop/tests/cli/build-release-hygiene.test.ts",
       "release/atm-root-drop/tests/cli/canonical-telemetry-observation.test.ts",
       "release/atm-root-drop/tests/cli/captain-parallel-ledger-analysis.test.ts",
@@ -66704,6 +66736,7 @@
       "release/atm-root-drop/tests/cli/runner-sync-orphan-head.test.ts",
       "release/atm-root-drop/tests/cli/runner-sync-post-close-receipt-publication.test.ts",
       "release/atm-root-drop/tests/cli/runner-sync-publication-residue.test.ts",
+      "release/atm-root-drop/tests/cli/runner-sync-receipt-closeout.test.ts",
       "release/atm-root-drop/tests/cli/runner-sync-sealed-input-continuity.test.ts",
       "release/atm-root-drop/tests/cli/runner-sync-self-hosting-loop.test.ts",
       "release/atm-root-drop/tests/cli/runner-sync-stale-reservation-lifecycle.test.ts",
@@ -67176,22 +67209,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:823fe8513105916c506204f0ebbcf73e04879c8273b896f9518de388b635878d",
-  "sealedSourceCommit": "d904f249ac2ea2f3788af0ed7524ec5819cc60ea",
+  "buildInputsTreeHash": "sha256:79e465ab7d447ea018b51ddde8a5a09d33e3a489c9d00c9c35c1da23126be646",
+  "sealedSourceCommit": "2eb0db3182a6a0f582858e3174dab71ef9006fa1",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:645eb1cd3d86d4dbbc73b6077514847ea45da8d1809a95ada986abbc203d5b27",
-  "tsBuildCacheDigest": "sha256:c70d7f7c6a6b0e70f6abfa3360a3f5c73ecd3ef0af7240c8e9616d970624032f",
+  "incrementalPlanDigest": "sha256:610471d0ef11be37c97dd490cdc379e7547601690f1eebb93c7c93668812f2ed",
+  "tsBuildCacheDigest": "sha256:e7c18f24b2621cf2bc449401e52bc7b49cbabd6340cfe36f815aa3e8e2b07342",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 50,
-    "skipDecision": 83,
-    "worktreeSetup": 10838,
-    "typescriptBuild": 26007,
-    "rootDropReleaseAssembly": 32362,
-    "onefileReleaseAssembly": 8047,
-    "artifactSync": 9599,
+    "inputHashCalculation": 52,
+    "skipDecision": 61,
+    "worktreeSetup": 13544,
+    "typescriptBuild": 25757,
+    "rootDropReleaseAssembly": 32352,
+    "onefileReleaseAssembly": 8767,
+    "artifactSync": 8037,
     "cleanup": 0,
-    "totalElapsed": 105896
+    "totalElapsed": 103863
   }
 }
