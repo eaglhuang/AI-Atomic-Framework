@@ -2,6 +2,8 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { brokerAdapterMigration, type MutationRequest } from '../broker/types.ts';
 
+const DEFAULT_GIT_BOUNDARY_TIMEOUT_MS = 420_000;
+
 export interface GitDiffMutationRequestOptions {
   readonly cwd: string;
   readonly actorId: string;
@@ -199,12 +201,18 @@ function resolveBranch(input: GitDiffMutationRequestOptions): string {
 }
 
 function runGit(cwd: string, args: readonly string[], gitExecutable = 'git', timeoutMs?: number): string {
+  const effectiveTimeoutMs = timeoutMs ?? resolveGitBoundaryTimeoutMs();
   return execFileSync(gitExecutable, args, {
     cwd,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
-    ...(timeoutMs !== undefined ? { timeout: timeoutMs } : {})
+    timeout: effectiveTimeoutMs
   });
+}
+
+function resolveGitBoundaryTimeoutMs(): number {
+  const raw = Number(process.env.ATM_GIT_BOUNDARY_TIMEOUT_MS);
+  return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : DEFAULT_GIT_BOUNDARY_TIMEOUT_MS;
 }
 
 function runGitScalar(cwd: string, args: readonly string[], gitExecutable = 'git', timeoutMs?: number): string {
