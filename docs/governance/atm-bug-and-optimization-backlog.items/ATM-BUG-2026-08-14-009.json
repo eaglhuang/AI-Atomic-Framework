@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Partially fixed — same-commit git-head provenance is covered; compatibility and timeout hardening remain follow-up",
+  "status": "Partially fixed — same-commit git-head provenance and bounded push/recovery execution are published; runner compatibility digest remains follow-up",
   "area": "Frozen runner provenance / task-scoped commit transaction",
   "finding": "A frozen runner can execute a historical task-scoped commit implementation that appends generated git-head provenance to the live worktree but does not preserve that exact line in the final commit tree. The result is a committed delivery plus an uncommitted provenance residue, which later blocks unrelated task close admission.",
   "expectedBehavior": "Before any governed write, ATM must prove the frozen execution artifact is semantically compatible with the source transaction contract. A task-scoped transaction must either commit its generated evidence in the same final tree or roll back only its own append when the commit cannot include it. The post-commit tree remains the authority, not a candidate-index receipt.",
   "evidenceOrRepro": "ATM-GOV-0388 on 2026-08-14: commit 82f17c1adca80cccf6ee0ccb3b9cfa9d89ff73bb recorded a governed git-head receipt at 2026-08-14T11:20:26.953Z but its tree omitted .atm/history/evidence/git-head.jsonl. The residue subsequently blocked ATM-GOV-0386 pre-close. Emergency commit 2859001db115c465af8fe6469aefff502f12486e preserved exactly that one line after validate-git-head-evidence passed. Source now has an end-to-end transaction regression test that asserts final-tree inclusion.",
-  "followUp": "Make runner compatibility a fail-fast precondition for governed commit execution, using a digest of the public transaction contract rather than timestamp-only freshness. Keep the transaction test as the contract. Separately bound git push/recover-push-fail control-plane execution: both exceeded their response budget and left orphan child processes after host timeout; emit a terminal receipt and terminate only owned children on timeout."
+  "followUp": "Make runner compatibility a fail-fast precondition for governed commit execution, using a digest of the public transaction contract rather than timestamp-only freshness. Keep the transaction test as the contract. Push and recovery now use the shared 420000ms Git boundary; retain focused timeout coverage and add a real recover-push-fail timeout receipt/owned-child termination test before marking this item closed."
 }
