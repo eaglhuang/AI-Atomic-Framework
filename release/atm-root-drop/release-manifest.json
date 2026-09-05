@@ -2237,6 +2237,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/sha256-helper.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/status-triangulation.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/surface-invariants.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/takeover-aggregate-transaction.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/takeover-evidence.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/task-atomization-policy-import.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/task-card-contract-import.js",
@@ -3041,6 +3042,7 @@
     "release/atm-root-drop/packages/cli/src/commands/tasks/sha256-helper.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/status-triangulation.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/surface-invariants.ts",
+    "release/atm-root-drop/packages/cli/src/commands/tasks/takeover-aggregate-transaction.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/takeover-evidence.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/task-card-contract-import.ts",
@@ -5556,6 +5558,7 @@
     "release/atm-root-drop/tests/cli/steward-receipt-pre-commit-gate.test.ts",
     "release/atm-root-drop/tests/cli/strict-lint-release-contract.test.ts",
     "release/atm-root-drop/tests/cli/strict-paired-ab-dogfood.test.ts",
+    "release/atm-root-drop/tests/cli/takeover-aggregate-rollback.test.ts",
     "release/atm-root-drop/tests/cli/task-audit-bulk-close-mirror.test.ts",
     "release/atm-root-drop/tests/cli/task-card-causal-graph-authoring.test.ts",
     "release/atm-root-drop/tests/cli/task-dependency-semantics-census.test.ts",
@@ -5990,7 +5993,7 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 3,
+    "copied": 5,
     "unchanged": 1946,
     "removed": 0
   },
@@ -25258,7 +25261,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/claim-orchestrator.js",
-        "digest": "955d2d05631da7183fa3de807870365ecdc92527daa8d688d9b0080a34fd3e2b",
+        "digest": "6c330cd7841a47c281ac1955fc1974b16f07ca02ea64d911d802e4a9434e011b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/claim-orchestrator.js"
@@ -25847,6 +25850,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/surface-invariants.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/takeover-aggregate-transaction.js",
+        "digest": "f21a32a1f2a28fcd246df19e7a53f1d8425b72894921b4272aefaf6a870f3131",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/tasks/takeover-aggregate-transaction.js"
         ],
         "replaceable": true
       },
@@ -32494,7 +32506,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/claim-orchestrator.ts",
-        "digest": "6ad4ca67911a8961ece0391de1ca97e06172f51b84cf03631852ca484469eaac",
+        "digest": "7a11ffb7e3606f30222627571e98a7033f4cb0c8ddb1d98e0d1b110bfe1b1154",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/claim-orchestrator.ts"
@@ -33083,6 +33095,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/surface-invariants.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/tasks/takeover-aggregate-transaction.ts",
+        "digest": "43e3ff1a18e8d170c7cac02bd9b1ec085f09578ade48cfb2fd5635d89f2056df",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/tasks/takeover-aggregate-transaction.ts"
         ],
         "replaceable": true
       },
@@ -55713,6 +55734,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/takeover-aggregate-rollback.test.ts",
+        "digest": "db399575e3740982b8c7b57976d83afe72fbb51a4bd0f888581423bc499a1ce3",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/takeover-aggregate-rollback.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/task-audit-bulk-close-mirror.test.ts",
         "digest": "83f82c6363ccdc957c3d01649f500cc745e2b2716963f6debb576d37c7feba6f",
         "origin": "source",
@@ -59592,7 +59622,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:52cd08d2a1d103a8870087f3ef522b67b0450b53708b15701ba39bc07c8b37e4"
+    "treeDigest": "sha256:cf5026005135eb1555a219e79c87feddcb2abff2dcbfee0a8e165094b1645d1a"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60304,6 +60334,7 @@
       "packages/cli/src/commands/tasks/sha256-helper.ts",
       "packages/cli/src/commands/tasks/status-triangulation.ts",
       "packages/cli/src/commands/tasks/surface-invariants.ts",
+      "packages/cli/src/commands/tasks/takeover-aggregate-transaction.ts",
       "packages/cli/src/commands/tasks/takeover-evidence.ts",
       "packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
       "packages/cli/src/commands/tasks/task-card-contract-import.ts",
@@ -61058,7 +61089,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:39b29e748ead84ed89fb2b352e926c4e49378882aec7d7947d77b9a8f918c9c8"
+    "digest": "sha256:9eab2c9ceb7c99e9c3baf63948ed3b4df4069871f5c423448283f5821fa7c76c"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63269,6 +63300,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/sha256-helper.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/status-triangulation.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/surface-invariants.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/takeover-aggregate-transaction.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/takeover-evidence.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/task-atomization-policy-import.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/task-card-contract-import.js",
@@ -64073,6 +64105,7 @@
       "release/atm-root-drop/packages/cli/src/commands/tasks/sha256-helper.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/status-triangulation.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/surface-invariants.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/takeover-aggregate-transaction.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/takeover-evidence.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/task-atomization-policy-import.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/task-card-contract-import.ts",
@@ -66588,6 +66621,7 @@
       "release/atm-root-drop/tests/cli/steward-receipt-pre-commit-gate.test.ts",
       "release/atm-root-drop/tests/cli/strict-lint-release-contract.test.ts",
       "release/atm-root-drop/tests/cli/strict-paired-ab-dogfood.test.ts",
+      "release/atm-root-drop/tests/cli/takeover-aggregate-rollback.test.ts",
       "release/atm-root-drop/tests/cli/task-audit-bulk-close-mirror.test.ts",
       "release/atm-root-drop/tests/cli/task-card-causal-graph-authoring.test.ts",
       "release/atm-root-drop/tests/cli/task-dependency-semantics-census.test.ts",
@@ -67025,22 +67059,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:fd475a30cd99f672edc0f7e53be5443d11e373cb29d2bf608ddde7db921bf21a",
-  "sealedSourceCommit": "46ee3c0bbea878cd74fcb47ed982a85a34de5951",
+  "buildInputsTreeHash": "sha256:a7bf93444e0d7bfc01eb44d47e092e3efae236690f4fe049302c04859906bbe7",
+  "sealedSourceCommit": "ad7894c3d5966a4128b57e375de6302cf9d8a8c8",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:0ae45e9559cad9c87b9a2beb5dcf43c1e4dcb80058190253b6f4e26eb8e27922",
-  "tsBuildCacheDigest": "sha256:d459ea15385042b98821690f591e626ba2d9d28c544c7fa7a01301cce9700720",
+  "incrementalPlanDigest": "sha256:c293f9313281e16e7640acfdb2a08987884e5385af8cc5dfe41724e7544d8e7c",
+  "tsBuildCacheDigest": "sha256:5e1e7195dad4d0a864f737f48334531ff94da3e97f7897844dc9425ec87a6717",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 47,
-    "skipDecision": 60,
-    "worktreeSetup": 10753,
-    "typescriptBuild": 15371,
-    "rootDropReleaseAssembly": 31251,
-    "onefileReleaseAssembly": 8116,
-    "artifactSync": 9051,
+    "inputHashCalculation": 58,
+    "skipDecision": 73,
+    "worktreeSetup": 14923,
+    "typescriptBuild": 23807,
+    "rootDropReleaseAssembly": 34007,
+    "onefileReleaseAssembly": 9432,
+    "artifactSync": 9406,
     "cleanup": 0,
-    "totalElapsed": 115489
+    "totalElapsed": 119824
   }
 }

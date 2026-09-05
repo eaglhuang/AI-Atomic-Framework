@@ -1,8 +1,9 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
+import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../_vendor/plugin-governance-local/dist/index.js';
 import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../../_vendor/core/dist/broker/lifecycle.js';
 import { resolveActorId } from '../actor-registry.js';
-import { updateActorWorkSessionState } from '../actor-session.js';
+import { listActorWorkSessions, updateActorWorkSessionState } from '../actor-session.js';
 import { buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, assessCloseoutProvenanceGap } from './closeout-provenance.js';
 import { findTaskClaimDependencyBlockers } from './dependency-gates.js';
 import { evaluateTaskClaimAdmission } from './lifecycle-state.js';
@@ -17,8 +18,10 @@ import { completeTaskClaimWithWorkAdmission, resealWorkAdmissionTicketForRenewal
 import { writeTakeoverEvidence } from './takeover-evidence.js';
 import { assertPlanningSourceSealValid } from './import-task.js';
 import { resolveLaneSession } from '../lane-session/resolve.js';
+import { laneSessionPathFor } from '../lane-session/store.js';
 import { readClaimLaneSessionId, throwIfForeignSameTaskClaim, assertCurrentClaimOwnerForAction } from './claim-ownership.js';
 import { prepareReleaseWip } from './release-wip-transaction.js';
+import { withTakeoverAggregateRollback } from './takeover-aggregate-transaction.js';
 function normalizeTaskStatus(value) {
     return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
 }
@@ -486,74 +489,103 @@ export async function runTasksClaimLifecycle(action, argv) {
     // constructor as an ordinary claim so the successor has a live lane,
     // admission ticket, session, and direction lock.  `taken_over` belongs in
     // the append-only transition/evidence history, not in claim.state: consumers
-    // treat only `active` as live authority.
-    await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, currentClaim.actorId));
-    const laneSession = resolveLaneSession({
-        cwd: options.cwd,
-        actorId,
-        taskId: options.taskId,
-        command: `node atm.mjs tasks takeover --task ${options.taskId} --actor ${actorId} --json`
-    });
-    const previousStatus = String(taskDocument.status ?? '');
-    const claimCompletion = await completeTaskClaimWithWorkAdmission({
-        cwd: options.cwd,
-        taskId: options.taskId,
-        actorId,
-        taskPath,
-        taskRef,
-        taskDocument,
-        files,
-        ttlSeconds: options.ttlSeconds,
-        claimIntent: options.claimIntent,
-        laneSession,
-        previousStatus,
-        planningReadOnlyPaths: Array.isArray(taskDocument.planningReadOnlyPaths) ? taskDocument.planningReadOnlyPaths : [],
-        planningMirrorPaths: Array.isArray(taskDocument.planningMirrorPaths) ? taskDocument.planningMirrorPaths : [],
-        allowPlanningMirror: taskDocument.allowPlanningMirror === true,
-        nowIso,
-        phases: claimLifecyclePhases
-    });
-    // The successor active claim is now the sole live authority for these paths;
-    // retaining the predecessor's released-WIP marker would create split-brain.
-    delete taskDocument.wipOwnership;
-    const takeoverClaim = {
-        ...claimCompletion.claim,
-        reason: options.reason
-    };
-    taskDocument.claim = takeoverClaim;
-    const transitionPath = writeTaskDocumentWithTransition({
-        cwd: options.cwd,
-        taskPath,
-        taskId: options.taskId,
-        taskDocument,
-        action,
-        actorId,
-        sessionId: claimCompletion.session.sessionId,
-        previousStatus: 'running'
-    });
-    writeTakeoverEvidence(options.cwd, options.taskId, actorId, currentClaim, takeoverClaim);
-    return makeResult({
-        ok: true,
-        command: 'tasks',
-        cwd: options.cwd,
-        messages: [message('info', 'ATM_TASKS_CLAIM_TAKEOVER', `Takeover completed for ${options.taskId}.`, {
+    // treat only `active` as live authority.  The predecessor release and all
+    // successor projections are one rollback unit; otherwise a late failure can
+    // leave a half-successor with no recoverable predecessor authority.
+    const originalTaskDocument = structuredClone(taskDocument);
+    const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
+    const directionSidecarPath = path.join(options.cwd, '.atm', 'runtime', 'task-direction-locks', `${options.taskId}.json`);
+    const evidencePath = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.json`);
+    const priorSessionIds = new Set(listActorWorkSessions(options.cwd).map((session) => session.sessionId));
+    let laneSession = null;
+    let transitionPath = null;
+    return await withTakeoverAggregateRollback({
+        paths: [taskPath, lockPath, directionSidecarPath, evidencePath],
+        run: async () => {
+            await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, currentClaim.actorId));
+            laneSession = resolveLaneSession({
+                cwd: options.cwd,
+                actorId,
+                taskId: options.taskId,
+                command: `node atm.mjs tasks takeover --task ${options.taskId} --actor ${actorId} --json`
+            });
+            const previousStatus = String(taskDocument.status ?? '');
+            const claimCompletion = await completeTaskClaimWithWorkAdmission({
+                cwd: options.cwd,
                 taskId: options.taskId,
                 actorId,
-                previousActor: currentClaim.actorId
-            })],
-        evidence: {
-            action,
-            taskId: options.taskId,
-            actorId,
-            previousClaim: currentClaim,
-            claim: takeoverClaim,
-            evidencePath: `.atm/history/evidence/${options.taskId}.json`,
-            transitionPath,
-            sessionId: claimCompletion.session.sessionId,
-            session: claimCompletion.session,
-            laneSession: laneSession.envelope,
-            workAdmissionTicket: claimCompletion.ticket,
-            taskDirectionLock: claimCompletion.taskDirectionLock
+                taskPath,
+                taskRef,
+                taskDocument,
+                files,
+                ttlSeconds: options.ttlSeconds,
+                claimIntent: options.claimIntent,
+                laneSession,
+                previousStatus,
+                planningReadOnlyPaths: Array.isArray(taskDocument.planningReadOnlyPaths) ? taskDocument.planningReadOnlyPaths : [],
+                planningMirrorPaths: Array.isArray(taskDocument.planningMirrorPaths) ? taskDocument.planningMirrorPaths : [],
+                allowPlanningMirror: taskDocument.allowPlanningMirror === true,
+                nowIso,
+                phases: claimLifecyclePhases
+            });
+            // The successor active claim is now the sole live authority for these paths;
+            // retaining the predecessor's released-WIP marker would create split-brain.
+            delete taskDocument.wipOwnership;
+            const takeoverClaim = {
+                ...claimCompletion.claim,
+                reason: options.reason ?? undefined
+            };
+            taskDocument.claim = takeoverClaim;
+            transitionPath = writeTaskDocumentWithTransition({
+                cwd: options.cwd,
+                taskPath,
+                taskId: options.taskId,
+                taskDocument,
+                action,
+                actorId,
+                sessionId: claimCompletion.session.sessionId,
+                previousStatus: 'running'
+            });
+            writeTakeoverEvidence(options.cwd, options.taskId, actorId, currentClaim, takeoverClaim);
+            return makeResult({
+                ok: true,
+                command: 'tasks',
+                cwd: options.cwd,
+                messages: [message('info', 'ATM_TASKS_CLAIM_TAKEOVER', `Takeover completed for ${options.taskId}.`, {
+                        taskId: options.taskId,
+                        actorId,
+                        previousActor: currentClaim.actorId
+                    })],
+                evidence: {
+                    action,
+                    taskId: options.taskId,
+                    actorId,
+                    previousClaim: currentClaim,
+                    claim: takeoverClaim,
+                    evidencePath: `.atm/history/evidence/${options.taskId}.json`,
+                    transitionPath: transitionPath ?? '',
+                    sessionId: claimCompletion.session.sessionId,
+                    session: claimCompletion.session,
+                    laneSession: laneSession.envelope,
+                    workAdmissionTicket: claimCompletion.ticket,
+                    taskDirectionLock: claimCompletion.taskDirectionLock
+                }
+            });
+        },
+        onRollback: () => {
+            for (const session of listActorWorkSessions(options.cwd)) {
+                if (session.actorId !== actorId || session.taskId !== options.taskId || priorSessionIds.has(session.sessionId))
+                    continue;
+                rmSync(path.join(options.cwd, '.atm', 'runtime', 'sessions', `${session.sessionId}.json`), { force: true });
+            }
+            if (laneSession?.source === 'minted') {
+                rmSync(laneSessionPathFor(options.cwd, laneSession.session.laneId), { force: true });
+            }
+            if (transitionPath)
+                rmSync(path.resolve(options.cwd, transitionPath), { force: true });
+            for (const key of Object.keys(taskDocument))
+                delete taskDocument[key];
+            Object.assign(taskDocument, originalTaskDocument);
         }
     });
 }
