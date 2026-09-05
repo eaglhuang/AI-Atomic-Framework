@@ -10,6 +10,7 @@ import { assertRunnerFreshForWriteAction } from '../framework-development.ts';
 import { assertEmergencyApproval } from '../emergency/gate.ts';
 import {
   buildExtractionFirstPatrolDiagnostics,
+  buildAtomMapProjectionScopeDiagnostic,
   extractFrontMatter,
   parseAcceptanceEvidenceMap,
   validateDeliverablesList
@@ -366,6 +367,13 @@ export async function runTasksImport(argv: string[]) {
     for (const violation of violations) {
       strictPathViolations.push({ taskId: task.workItemId, ...violation });
     }
+  }
+  for (const task of parsed.tasks) {
+    const projectionDiagnostic = buildAtomMapProjectionScopeDiagnostic({
+      taskId: task.workItemId,
+      declaredFiles: [...(task.scopePaths ?? []), ...(task.deliverables ?? [])]
+    });
+    if (projectionDiagnostic) parsed.diagnostics.push(projectionDiagnostic);
   }
   if (strictPathViolations.length > 0) {
     throw new CliError('ATM_TASK_IMPORT_DELIVERABLE_PATH_INVALID', 'tasks import rejected deliverables that are not repository path declarations.', {
