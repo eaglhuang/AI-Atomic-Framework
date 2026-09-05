@@ -177,7 +177,10 @@ export async function createFixtureRepository(): Promise<FixtureContext> {
     }
   });
 
-  runGit(tempDir, ['add', '.atm/runtime/locks/TASK-UNRELATED-LOCK.lock.json']);
+  // The fixture intentionally models an active runtime lock.  Framework
+  // repositories exclude .atm/runtime/** by default, so force-add this one
+  // explicit fixture artifact instead of weakening the repository policy.
+  runGit(tempDir, ['add', '-f', '.atm/runtime/locks/TASK-UNRELATED-LOCK.lock.json']);
   runGit(tempDir, ['commit', '-m', 'chore: add unrelated active direction lock fixture']);
 
   const importedTaskId = 'TASK-OPEN-0001';
