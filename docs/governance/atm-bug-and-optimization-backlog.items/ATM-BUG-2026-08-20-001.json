@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed — source and frozen TypeScript build gate agree on nullable HEAD handling",
+  "status": "Closed — Fixed; source and frozen TypeScript build gate agree on nullable HEAD handling",
   "area": "Source-first execution can succeed while frozen tsc cannot compile the same tree",
   "finding": "A source-first CLI path can execute and a focused test can pass while `tsc -p tsconfig.build.json` still fails, so a sealed runner-sync build is refused even though operators already treated the source as runnable. The observed seam was optional/nullable HEAD metadata (`string | null`) assigned into a report field typed as definite `string`. Duplicate census: ATM-BUG-2026-08-19-001 is live-index parent-blob residue after a successful commit, not this compile gate. ATM-BUG-2026-07-14-183 is runner-sync/stale-runner dogfood, not a source-vs-frozen typecheck split. The rule is type-flow shaped: runtime-optional metadata must stay optional in the public report type until a fail-closed assertion narrows it.",
   "expectedBehavior": "Optional or nullable HEAD metadata is typed as optional or nullable until a fail-closed check proves it is present. After that check, TypeScript must treat the value as `string` so frozen `tsc -p tsconfig.build.json` and source-first execution agree. Missing HEAD remains fail-closed and must not mutate parent/index/worktree verification. Passing source-first execution is not evidence that the frozen build compiler will accept the same tree.",

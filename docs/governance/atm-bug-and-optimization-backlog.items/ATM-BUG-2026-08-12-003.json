@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in sealed candidate commit analysis lane",
+  "status": "Closed — Fixed; sealed candidate commit analysis lane verified in current runner",
   "area": "Sealed-candidate hook and record-commit analysis",
   "finding": "Pre-commit cross-file consistency and git record-commit scope analysis enumerate the live worktree or entire staged index instead of the sealed candidate being committed. Unrelated half-staged symbols from another lane can therefore block a task-scoped commit and be misclassified as classification=current-task even though the candidate contains none of those bytes.",
   "expectedBehavior": "Every validator and scope guard participating in a governed commit must analyze the same sealed candidate tree and attribution envelope. Live worktree/index state outside that candidate may be preserved and reported as foreign context, but cannot become current-task content or block an unrelated commit unless a proven dependency edge intersects the candidate.",

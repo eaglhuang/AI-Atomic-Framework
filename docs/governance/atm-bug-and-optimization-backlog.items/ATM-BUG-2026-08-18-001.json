@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed — receipt-backed publication delivery slice is available in source and frozen runner",
+  "status": "Closed — Fixed; receipt-backed publication delivery slice verified in source and frozen runner",
   "area": "Governed git commit auto-stage absorbs every in-scope dirty path, so a published runner receipt cannot be committed as an exact inventory∩dirty delivery slice",
   "finding": "Task-scoped `git commit --auto-stage` builds its candidate from all dirty files that match the live claim/scope. After a sealed runner publication, that set includes receipt-exact generated members and deletions, but it also includes later same-task certificate, closeout, and audit reports that legitimately remain in the full task scope. There is no explicit, receipt-backed delivery-slice input, so operators cannot record the publication outputs without either shrinking scope (which destroys later certificate work) or committing an oversized bundle.",
   "expectedBehavior": "A verified publication delivery-slice manifest naming a published runner-sync receipt, sealed source SHA, and inventory digest must restrict auto-stage to outputInventory ∩ current dirty plus receipt-derived required task/evidence/event records. Same-task certificate/closeout dirt stays unstaged. Inventory deletions are staged as deletions. Unpublished receipts, SHA/digest mismatch, inventory members outside allowed scope, and foreign publication dirty fail closed. The rule is receipt/manifest-shaped, not a task-id, path-prefix, actor, or commit-message special case.",
