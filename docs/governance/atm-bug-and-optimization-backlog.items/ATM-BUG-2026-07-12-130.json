@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-TEAM-0078",
+  "status": "Closed — Fixed in TASK-TEAM-0078",
   "area": "Team L5 Broker admission",
   "finding": "`team plan` calls Broker decision directly and treats any shared-file conflict as a global `broker-conflict-blocked`, without consuming the canonical per-file queue or retaining the task's disjoint private paths.",
   "expectedBehavior": "Team plan/start must use the same queue-aware admission projection as `next --claim`: queued shared paths stay blocked, while the role runtime receives only its private allowed files; a team with no private paths remains blocked.",

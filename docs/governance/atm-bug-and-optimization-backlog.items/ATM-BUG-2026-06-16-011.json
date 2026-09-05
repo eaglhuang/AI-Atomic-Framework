@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 deferred-governance diagnosis lane",
+  "status": "Closed — Fixed in 2026-06-28 deferred-governance diagnosis lane",
   "area": "Pre-commit governance / framework-mode",
   "finding": "Pre-commit governance blocks can fail a legitimate framework-repo commit because `framework claim` / direction-lock state is missing, even when the diff content, validators, and historical governance intent are otherwise correct. The hook currently treats governance timing gaps as a hard commit failure instead of distinguishing them from content-integrity failures.",
   "expectedBehavior": "Framework-repo pre-commit should surface a precise deferred-governance diagnosis, and historical-batch or closeback flows should have an explicit, governed path to satisfy or defer framework claim / direction-lock requirements without forcing blanket `--no-verify`.",

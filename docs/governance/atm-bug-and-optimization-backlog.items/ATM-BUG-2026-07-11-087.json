@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in generated-residue defer lane",
+  "status": "Closed — Fixed in generated-residue defer lane",
   "area": "Taskflow close / lock cleanup / record commit",
   "finding": "ATM治理流程/收口UX自身不順：released task locks can retain an embedded `taskDirectionLock.status: active`, and `tasks lock cleanup --task` plus emergency `tasks lock cleanup --all-stale` can report success without clearing the lock. At the same time, `git record-commit --dry-run` accepts a cross-task `.atm/history` record packet that the real pre-commit hook later rejects as `ATM_CROSS_TASK_MUTATION_BLOCKED`, forcing operators into manual lock clearing and temporary generated-residue isolation during historical closeback. This is an ATM workflow bug, not an adopter project feature bug.",
   "expectedBehavior": "Released locks should not be treated as active by broker/pre-commit gates, cleanup commands should either remove or fully deactivate nested direction locks, and record-commit dry-run must match real hook behavior for cross-task history packets. Generated residue from sibling task evidence should have a governed defer/reconcile lane instead of blocking unrelated task-scoped closeback.",

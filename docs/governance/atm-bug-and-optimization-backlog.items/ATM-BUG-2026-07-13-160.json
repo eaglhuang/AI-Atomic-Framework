@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0200",
+  "status": "Closed — Fixed in TASK-AAO-0200",
   "area": "Claim admission / broker resolution consumption",
   "finding": "`next --claim` freezes on a CID-name collision (`insufficient-mutation-intent`) even when a valid `atm.brokerConflictResolution.v1` artifact authorizes the pair, and the requiredCommand it prints (team broker resolve) therefore cannot unblock the claim.",
   "expectedBehavior": "Claim admission must consume matching broker conflict resolution artifacts the same way the governed commit lane does (`readResolutionAuthorizedForeignTaskIds`).",

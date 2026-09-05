@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0198",
+  "status": "Closed — Fixed in TASK-AAO-0198",
   "area": "Team Agents / runtime selection precedence",
   "finding": "A global `--runtime-mode real-agent` is ignored for the Coordinator because `buildTeamRuntimeContract` always resolves the merged selection config first; the implicit repo default has `runtimeMode: broker-only`, so a CLI-requested paid run silently becomes broker-only.",
   "expectedBehavior": "Explicit global CLI runtime/provider/model options should override implicit defaults. Role-specific CLI overrides may then override the global selection for their own roles.",

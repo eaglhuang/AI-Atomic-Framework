@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-TEAM-0079",
+  "status": "Closed — Fixed in TASK-TEAM-0079",
   "area": "Pre-commit cross-file consistency guard",
   "finding": "The cross-file guard treated pre-existing, unmodified handoff imports in a staged validator file as a dependency on another task's uncommitted handoff changes and blocked the commit.",
   "expectedBehavior": "Only imports added or changed by the staged patch may require the dependency to land in the same commit; untouched import contracts must not couple tasks.",

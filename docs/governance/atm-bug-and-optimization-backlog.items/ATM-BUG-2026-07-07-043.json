@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in this cleanup commit",
+  "status": "Closed — Fixed in this cleanup commit",
   "area": "Claim intent / pre-commit governance",
   "finding": "`next --claim --auto-intent` can classify a task as `closeout-only` even when the agent is about to make source or backlog delivery changes, causing pre-commit to fail later with `ATM_PRE_COMMIT_CLOSEOUT_ONLY_CLAIM_MUTATION`.",
   "expectedBehavior": "Auto-intent should infer write intent when the task is open and delivery files are modified or when the prompt asks to implement/fix, or `git commit --task` should surface the re-claim command before staging and hook failure.",

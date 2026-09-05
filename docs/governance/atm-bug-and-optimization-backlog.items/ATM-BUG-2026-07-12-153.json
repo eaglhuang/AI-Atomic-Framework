@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-AAO-0181",
+  "status": "Closed — Fixed in TASK-AAO-0181",
   "area": "Task intent routing / claim mode",
   "finding": "A source-changing backlog fix with an uncommitted deliverable was classified by `next --claim --auto-intent` as `closeout-only`, forcing release and an explicit `--claim-intent write` reclaim before work could begin.",
   "expectedBehavior": "Auto-intent now requires scoped delivery evidence before treating existing deliverables in `HEAD` as closeout-only; pre-existing deliverables without a task delivery commit resolve to `write` with reason `delivery-evidence-not-found`.",

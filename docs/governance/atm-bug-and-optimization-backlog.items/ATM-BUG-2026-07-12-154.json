@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in TASK-AAO-FABLE-002",
+  "status": "Closed — Fixed in TASK-AAO-FABLE-002",
   "area": "Frozen runner / write preflight",
   "finding": "`taskflow close` dry-run passed, but `taskflow close --write` was rejected late by `ATM_RUNNER_STALE_WRITE_REFUSED` because the frozen runner was older than source; the operator had to infer and run the release build before retrying.",
   "expectedBehavior": "Pre-close and close dry-run should surface stale-runner write readiness and the required sync command before any write attempt; the write path should report this condition as a readiness blocker rather than a late refusal.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in Team overlap diagnostics lane",
+  "status": "Closed — Fixed in Team overlap diagnostics lane",
   "area": "Frozen release dependency sync",
   "finding": "A scope-aware Team git-owner gate correctly blocks commits that overlap an active run's `file.write` lease, but its aggregated failure previously omitted the overlapping staged files. That made a valid Coordinator requirement look like unrelated stale-run residue.",
   "expectedBehavior": "When Team ownership blocks a commit, ATM should show the exact staged files that overlap active `file.write` leases so the operator can distinguish a real scoped handoff from unrelated run residue.",

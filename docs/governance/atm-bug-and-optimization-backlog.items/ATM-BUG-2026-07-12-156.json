@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Low",
-  "status": "Fixed in TASK-AAO-0183",
+  "status": "Closed — Fixed in TASK-AAO-0183",
   "area": "Tasks import CLI / operator guidance",
   "finding": "Invoking `node atm.mjs tasks import --from plan --write --json` without a path produced `ATM_TASKS_PLAN_NOT_FOUND` for a literal file named `plan`, rather than explaining that `--from` requires a markdown path and showing the copyable command.",
   "expectedBehavior": "Missing or malformed task import paths should produce targeted usage guidance with the expected `--from <path>` form and a valid example; avoid interpreting the subcommand token as a filesystem path when parsing fails.",

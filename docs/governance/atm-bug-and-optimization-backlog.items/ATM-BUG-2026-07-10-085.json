@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in team-validator runtime-cleanup lane",
+  "status": "Closed — Fixed in team-validator runtime-cleanup lane",
   "area": "Validator harness / Team runtime residue",
   "finding": "A successful pre-commit run can leave an untracked active Team run under `.atm/runtime/team-runs/**` in the real repository because `validate:cli` executes a Team start smoke against the working tree instead of an isolated temp repo or guaranteed cleanup lane.",
   "expectedBehavior": "Validators and pre-commit hooks should leave no untracked `.atm/runtime/**` residue in the operator repository; Team runtime smoke tests should run in temp fixtures or clean up through an official CLI lifecycle/cleanup command.",

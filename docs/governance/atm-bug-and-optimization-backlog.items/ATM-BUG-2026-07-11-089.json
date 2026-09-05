@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in taskflow target-scope precedence lane",
+  "status": "Closed — Fixed in taskflow target-scope precedence lane",
   "area": "Prompt-scoped next / planning path classification",
   "finding": "A target-repo deliverable could be projected into both `targetAllowedFiles` and `planningReadOnlyPaths` during `next --claim`, causing `taskflow pre-close` / commit-bundle preview to treat a valid declared deliverable as outside the active direction lock. This blocked historical closeback even when the task ledger `scopePaths`, `deliverables`, `claim.files`, and runtime lock `files` all included the path.",
   "expectedBehavior": "Prompt-scoped routing must never classify the same target-repo path as planning read-only when it is also a target allowed file or declared deliverable. Planning read-only paths should be limited to external planning-card context or explicitly read-only host documents, and commit-bundle validation should prefer target scope for overlapping paths in the target repository.",

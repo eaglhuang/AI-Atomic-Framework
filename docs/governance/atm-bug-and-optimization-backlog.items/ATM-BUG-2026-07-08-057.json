@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in this cleanup commit",
+  "status": "Closed — Fixed in this cleanup commit",
   "area": "Task audit / warning baseline",
   "finding": "`tasks audit` returned `ATM_TASKS_AUDIT_WARNINGS` on every clean run because 24 permanent historical warnings were mixed with genuinely actionable new warnings, causing alert fatigue and hiding fresh audit drift.",
   "expectedBehavior": "Known benign historical task-audit warnings should remain visible in JSON evidence but be acknowledged by a repo-local baseline so only baseline-external warnings trigger `ATM_TASKS_AUDIT_WARNINGS`. Errors must never be suppressible by the baseline.",

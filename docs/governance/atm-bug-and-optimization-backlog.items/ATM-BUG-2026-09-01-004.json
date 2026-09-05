@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Fixed in source; end-to-end validator evidence and formal backlog closeout recorded 2026-09-01",
+  "status": "Closed — source and end-to-end validator evidence verified; formal backlog closeout recorded 2026-09-01",
   "area": "Batch checkpoint / close-commit window / governed commit lifecycle",
   "finding": "A terminal batch checkpoint closed its task, immediately ran tasks lock cleanup, and released the completed batch before the required governed checkpoint commit could consume the close-commit window. The subsequent git commit dry run therefore failed with ATM_GIT_COMMIT_DRY_RUN_PURITY_VIOLATED; batch repair could not recover because the run had already been released.",
   "expectedBehavior": "When checkpoint continuation names pendingCommitTaskId, the checkpoint must retain that task's close-commit window until the governed checkpoint commit consumes it. Lock cleanup remains required when no checkpoint commit is pending, and no task or foreign scope may gain authority.",

@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 governance-skill-checklist lane",
+  "status": "Closed — Fixed in 2026-06-28 governance-skill-checklist lane",
   "area": "Governance entry / skill preflight clarity",
   "finding": "`doctor` and prompt-scoped `next` already emitted governance-readiness data, but the top-level `atm-next` and `atm-governance-router` skill surfaces still left too much preparation implicit. Agents could see `governanceReadiness`, yet still miss that they should immediately translate it into actor, claim, `doctor`, and `hook pre-push` preflight steps before editing or pushing.",
   "expectedBehavior": "Canonical skill entrypoints should turn `governanceReadiness` into an explicit preflight checklist, including actor resolution, framework claim, proactive `doctor`, proactive `hook pre-push`, and branch-queue retry interpretation.",

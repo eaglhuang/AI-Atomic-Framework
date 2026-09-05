@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in foreign governance deferral lane",
+  "status": "Closed — Fixed in foreign governance deferral lane",
   "area": "Git governance / Team Broker parallel lanes",
   "finding": "In a valid two-lane hotfile split, `node atm.mjs git commit --task TASK-RFT-0017 --auto-stage --defer-foreign-staged` still fail-closes when another active lane leaves a foreign `.atm/history/evidence/<other-task>.bundle-manifest.json` dirty. The bundle resolver already classifies the foreign file correctly, but it blocks the unrelated lane instead of offering a task-aware deferral or advisory path.",
   "expectedBehavior": "Team Broker style parallel lanes should be able to defer or ignore foreign same-repo generated evidence residue when the owning task is still active, as long as the file is outside the current task scope and is already attributed to a different task id. ATM must still fail closed for user-authored source overlap, but deterministic foreign bundle-manifest byproducts should have an explicit multi-lane policy instead of requiring manual lane-to-lane coordination every time.",

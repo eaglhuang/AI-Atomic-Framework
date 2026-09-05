@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in Team pre-commit compaction lane",
+  "status": "Closed — Fixed in Team pre-commit compaction lane",
   "area": "Team Agents / pre-commit governance UX",
   "finding": "A valid Team hook gate can make commit recovery noisy and slow when several stale active Team runs exist: pre-commit repeats `ATM_TEAM_GIT_OWNER_REQUIRED` for each active run and prints the full staged file list many times, while also reporting the separate framework-claim prerequisite.",
   "expectedBehavior": "Pre-commit should compact duplicate Team git-owner blockers by task/run family, show one staged-file summary, and prioritize the shortest ordered recovery path: framework-mode claim first, then retry with `ATM_COMMIT_ACTOR_ID=coordinator git commit`. Stale active Team runs should be summarized with exact lifecycle cleanup commands when they are not related to the current commit.",

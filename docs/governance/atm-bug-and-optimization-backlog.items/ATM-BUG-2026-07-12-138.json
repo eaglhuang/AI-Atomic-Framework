@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in TASK-TEAM-0082",
+  "status": "Closed — Fixed in TASK-TEAM-0082",
   "area": "Task card deliverables path validation",
   "finding": "Prose (non-path) deliverables pass `tasks import` with only a mechanical-split warning, then make `taskflow close` fail with `ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE` because the bundle cannot map the deliverable to the direction lock; the only repair lane is an emergency-lease `tasks import --write --force`.",
   "expectedBehavior": "Import should fail closed (or normalize with an explicit diagnostic) when a deliverable is not a repo path, and a governed non-emergency metadata-repair lane should exist for claimed tasks whose card text needs correction.",

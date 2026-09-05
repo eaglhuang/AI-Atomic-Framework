@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 hook-scope filtering lane",
+  "status": "Closed — Fixed in 2026-06-28 hook-scope filtering lane",
   "area": "Taskflow close / pre-commit scope filtering",
   "finding": "Same-repo `taskflow close` could be blocked by unrelated active planning-mirror / direction-lock findings because the pre-commit protected-state checks evaluated all active direction locks instead of only the locks relevant to the staged governed bundle.",
   "expectedBehavior": "Pre-commit scope checks for taskflow close should filter active direction locks down to the staged bundle so foreign planning mirrors do not raise false `ATM_PLANNING_MIRROR_DRIFT` or `ATM_TASK_DIRECTION_SCOPE_DRIFT` failures.",

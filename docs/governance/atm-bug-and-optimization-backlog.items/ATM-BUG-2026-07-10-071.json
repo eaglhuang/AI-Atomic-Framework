@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in historical scratch-residue lane",
+  "status": "Closed — Fixed in historical scratch-residue lane",
   "area": "Taskflow close / commit bundle scope classification",
   "finding": "`taskflow close --historical-delivery` can include unrelated untracked backup files from broad task scope in `targetDeliveryFiles`, even after the real delivery has already landed in a valid historical delivery commit. This can pressure operators to stage or commit another agent's scratch/WIP files just to finish closeout.",
   "expectedBehavior": "Historical-delivery close should restrict delivery-file requirements to files proven to belong to the historical delivery, or classify unrelated untracked backup/scratch files as advisory residue with an exact remediation. Broad scopes such as `packages/**` should not turn arbitrary `.bak` files into required close-bundle delivery.",

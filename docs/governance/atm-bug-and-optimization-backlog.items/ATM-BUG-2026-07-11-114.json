@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in TASK-AAO-0164",
+  "status": "Closed — Fixed in TASK-AAO-0164",
   "area": "Pre-commit guidance / requiredCommand accuracy",
   "finding": "When a protected evidence file is staged without task context, pre-commit suggested `node atm.mjs git commit --task <basename-of-staged-file>`, deriving a task id from the filename; running the suggested command failed with `ATM_TASK_NOT_FOUND` because no such task existed.",
   "expectedBehavior": "requiredCommand now only references task ids that exist in the ledger or are staged as task ledger files; otherwise it falls back to the generic governed commit wrapper without a fabricated task id.",

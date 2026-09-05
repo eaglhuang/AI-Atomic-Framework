@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 hook runner routing lane",
+  "status": "Closed — Fixed in 2026-06-28 hook runner routing lane",
   "area": "Governance lifecycle / framework hook lane",
   "finding": "Framework source can fix pre-commit protected-state logic, but the repo-local Git hook still hard-codes `node atm.mjs hook pre-commit --json`, so batch `deliver-and-close` and pending commit windows continue to execute the stale frozen hook path until a release rebuild/install step updates the hook lane.",
   "expectedBehavior": "In the framework repo, source-first governance validation should have an explicit, governed way to run the matching hook logic for the same source tree being validated, or the hook installer should understand a framework-development mode instead of silently pinning every commit to the frozen runner.",

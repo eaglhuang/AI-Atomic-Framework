@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework / 3KLife",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in taskflow close atomicity lane",
+  "status": "Closed — Fixed in taskflow close atomicity lane",
   "area": "Taskflow close / planning mirror index cleanup",
   "finding": "`taskflow close --write` can report a successful planning mirror commit but leave the planning repo index staged with the inverse closeback diff, making the card look reopened/deleted in `git status` even though the just-created commit contains the correct done frontmatter and close event.",
   "expectedBehavior": "A successful taskflow close transaction should leave both target and planning repos with no task-owned staged residue; if cleanup cannot complete, the command should fail closed or emit an explicit recovery command before reporting the transaction committed.",

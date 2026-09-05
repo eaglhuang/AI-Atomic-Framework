@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in integration adapter drift repair",
+  "status": "Closed — Fixed in integration adapter drift repair",
   "area": "Integration adapters / doctor",
   "finding": "`node atm.mjs doctor --json` failed on `ATM_DOCTOR_INTEGRATION_DRIFT` after framework source/template changes left installed adapter files and `.atm/integrations/*.manifest.json` out of sync. The drift was unrelated to the Team vendor execution backend but still made doctor look red after a successful guarded push.",
   "expectedBehavior": "Installed integration adapters should be refreshed through `node atm.mjs integration add <adapter> --force --json`, then `doctor` should pass or report only unrelated active worktree residue.",

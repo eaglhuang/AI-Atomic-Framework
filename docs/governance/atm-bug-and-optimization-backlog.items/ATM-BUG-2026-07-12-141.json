@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in TASK-AAO-0161",
+  "status": "Closed — Fixed in TASK-AAO-0161",
   "area": "Broker intent lifecycle / task close",
   "finding": "After governed task close, Broker write intents were not automatically released, so captains had to remember a separate `broker release --task <id>` step or later unrelated claims could see stale queue/intent state.",
   "expectedBehavior": "Successful `taskflow close --write` should release the closed task's Broker intent; `broker release` and `broker cleanup` should also prune stale/empty runtime snapshots while preserving live intents.",
