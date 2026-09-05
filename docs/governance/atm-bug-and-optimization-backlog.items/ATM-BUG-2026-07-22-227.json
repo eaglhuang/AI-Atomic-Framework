@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — Fixed in current guidance command-contract repair",
   "area": "CLI guidance / broker observability",
   "finding": "`atm next` can recommend non-runnable status commands during active-work or broker coordination. In Plan 3.1 dogfood, `brokerStatusCommand` advertised `node atm.mjs team broker status --json`, but the CLI only supports `team broker resolve`, so copy-pasting the suggested command returns `ATM_CLI_USAGE`. The same guidance surface also advertised `node atm.mjs tasks status --json` even though `tasks status` requires `--task`.",
   "expectedBehavior": "Every statusCommand / brokerStatusCommand emitted in `next`, readiness hints, and first-layer compact orientation must be copy-paste runnable or explicitly marked as a template with required placeholders. Broker observability should route to the supported command surface, e.g. `node atm.mjs broker status --json`, and task status hints should include a concrete task id when one is known.",
-  "evidenceOrRepro": "Plan 3.1 dogfood on 2026-07-22 after closing ATM-GOV-0249: `node atm.mjs next --prompt \"Plan 3.1 broker resolution authority parity gap: prepare ATM-GOV-0255 for external captain claim\" --json` emitted `brokerStatusCommand: node atm.mjs team broker status --json` and `statusCommand: node atm.mjs tasks status --json`. Running `node atm.mjs team broker status --json` returned `ATM_CLI_USAGE` with text `team broker supports: resolve`.",
-  "followUp": "Consumed by ATM-GOV-0244 closeback as absorbed-by-existing-card: audit all guidance-emitted statusCommand fields for runnable-command parity. Add regressions that execute the emitted active-work broker/status commands from `next` output and fail if any command returns usage-error."
+  "evidenceOrRepro": "The original reproduction emitted unsupported `node atm.mjs team broker status --json` and an incomplete task status command. Current source emits `node atm.mjs broker status --json`; `packages/cli/src/commands/next/playbook-projection/active-work-summary.ts`, `packages/core/src/guidance/first-layer-command-contracts.ts`, and command specs now use the supported surface. `tests/cli/next-emitted-command-executability.test.ts` verifies the broker recommendation is executable, and the frozen runner accepts `node atm.mjs broker status --json`.",
+  "followUp": "Keep executable-command regression coverage for all future `next` status and recovery recommendations."
 }
