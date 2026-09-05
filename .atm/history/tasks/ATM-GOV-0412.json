@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0412",
   "title": "Enforce runner compatibility digest before governed writes",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -17,25 +17,78 @@
     "tests/cli/runner-compatibility-digest-precondition.test.ts",
     "tests/cli/recover-push-fail-timeout.test.ts"
   ],
+  "scopePaths": [
+    ".atm/history/evidence/ATM-GOV-0412.*",
+    ".atm/history/task-events/ATM-GOV-0412/**",
+    ".atm/history/tasks/ATM-GOV-0412.json",
+    "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+    "tests/cli/recover-push-fail-timeout.test.ts",
+    "tests/cli/runner-compatibility-digest-precondition.test.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runner-compatibility-digest-precondition.test.ts",
+    "node --strip-types tests/cli/recover-push-fail-timeout.test.ts",
+    "node --strip-types tests/cli/runner-publication-disposition-gate.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the compatibility admission and focused regressions together; preserve the prior published runner and timeout boundary.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm-release-build",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-release-build/map.spec.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-sync-admission",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "disposition": "inline",
+        "inlineReason": "Existing runner-sync admission seam is below the extraction threshold and already owns the compatibility decision."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
   "tags": [],
   "notes": null,
   "source": {
-    "planPath": "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
-    "sectionTitle": "Enforce runner compatibility digest before governed writes",
-    "headingLine": 96,
-    "hash": "6c66cc78a13fd4fd",
+    "planPath": "docs/ai_atomic_framework/governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+    "sectionTitle": "ATM-GOV-0412",
+    "headingLine": 97,
+    "hash": "6114069dc296e313",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
-      "taskCardPath": "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
-      "planningCommitSha": "2dbc7789d6d758d34d00ee21077c71aed28f054d",
-      "contentDigest": "sha256:3f1b00da3f6c37bfdf4700f1e3689f1b9f3c192af9f21c5e0e8f37c4df01f9f9",
-      "amendmentEpoch": 3,
-      "sealedAt": "2026-09-05T17:20:06.661Z"
+      "taskCardPath": "docs/ai_atomic_framework/governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+      "planningCommitSha": "e2ad94e71a9cf3cc81ec45f0932f3c4155283007",
+      "contentDigest": "sha256:6114069dc296e313ea819e691a74088c177f6522136bde2422d807c5ae7a1924",
+      "amendmentEpoch": 4,
+      "sealedAt": "2026-09-05T17:38:26.443Z"
     }
   },
-  "importedAt": "2026-09-05T17:20:06.661Z",
+  "importedAt": "2026-09-05T17:38:26.443Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "disabled",
@@ -55,7 +108,6 @@
   "requiredTestCaseIds": [],
   "phaseTestCaseIds": [],
   "advisoryTestCaseIds": [],
-  "importDiagnostics": [],
   "dependencyClassification": {
     "schemaId": "atm.taskDependencyClassification.v1",
     "semantics": "legacy",
@@ -72,7 +124,7 @@
     "actorId": "codex-goal-20260906",
     "leaseId": "lease-741a14db06e4",
     "claimedAt": "2026-09-05T17:11:23.952Z",
-    "heartbeatAt": "2026-09-05T17:11:23.952Z",
+    "heartbeatAt": "2026-09-05T17:36:07.995Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0412.*",
@@ -85,14 +137,14 @@
       "tests/cli/recover-push-fail-timeout.test.ts",
       "tests/cli/runner-compatibility-digest-precondition.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260905171124-codex-goal-20260906-c9306b2326",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905171124-codex-goal-20260906-c9306b2326\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-goal-20260906",
   "startedAt": "2026-09-05T17:11:23.952Z",
@@ -138,20 +190,9 @@
     "createdAt": "2026-09-05T17:11:25.630Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-09-05T17-21-51-870Z-scope-amendment-80d4f627e3fb",
-  "lastTransitionAt": "2026-09-05T17:21:51.870Z",
+  "lastTransitionId": "2026-09-05T17-38-26-701Z-planning-mirror-reconcile-7a550f63f029",
+  "lastTransitionAt": "2026-09-05T17:38:26.701Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "scopePaths": [
-    ".atm/history/evidence/ATM-GOV-0412.*",
-    ".atm/history/task-events/ATM-GOV-0412/**",
-    ".atm/history/tasks/ATM-GOV-0412.json",
-    "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
-    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
-    "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
-    "tests/cli/recover-push-fail-timeout.test.ts",
-    "tests/cli/runner-compatibility-digest-precondition.test.ts",
-    "packages/cli/src/commands/framework-development/runner-sync-admission.ts"
-  ],
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
@@ -217,5 +258,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  }
+  },
+  "closedAt": "2026-09-05T17:36:07.995Z",
+  "closedByActor": "codex-goal-20260906",
+  "closedBySessionId": "session-20260905171123-codex-goal-20260906-ATM-GOV-0412-b00f405f92",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0412.closure-packet.json"
 }

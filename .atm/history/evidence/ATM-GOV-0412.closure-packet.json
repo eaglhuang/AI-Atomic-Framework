@@ -1,0 +1,131 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0412",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2a4896598b1b98583fef31480e4006bf6075f42e",
+  "governedTreeSha": "c62df5129eeb13e78b887c908c0c55afb6942356",
+  "targetCommitDelta": {
+    "currentCommitSha": "2a4896598b1b98583fef31480e4006bf6075f42e",
+    "parentCommitShas": [
+      "2a4896598b1b98583fef31480e4006bf6075f42e"
+    ],
+    "governedTreeSha": "c62df5129eeb13e78b887c908c0c55afb6942356",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0412.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.jsonl",
+      "packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/recover-push-fail-timeout.test.ts",
+      "tests/cli/runner-compatibility-digest-precondition.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/runner-compatibility-digest-precondition.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fe0ab466afdac3871ed038b78a18935d326b1a453237b6cd0b2127c283a7f059",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/recover-push-fail-timeout.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b277306fde600e73e5d5c012577274e274d647ec287642c3ce3fe9d03b6ec28a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-05T17:36:07.984Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0412.*",
+      ".atm/history/task-events/ATM-GOV-0412/**",
+      ".atm/history/tasks/ATM-GOV-0412.json",
+      "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+      "tests/cli/recover-push-fail-timeout.test.ts",
+      "tests/cli/runner-compatibility-digest-precondition.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+      "tests/cli/recover-push-fail-timeout.test.ts",
+      "tests/cli/runner-compatibility-digest-precondition.test.ts"
+    ],
+    "requiredGates": []
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0412.json",
+  "closedAt": "2026-09-05T17:36:07.984Z",
+  "closedByActor": "codex-goal-20260906",
+  "sessionId": "session-20260905171123-codex-goal-20260906-ATM-GOV-0412-b00f405f92",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "2a4896598b1b98583fef31480e4006bf6075f42e",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "tests/cli/recover-push-fail-timeout.test.ts",
+      "tests/cli/runner-compatibility-digest-precondition.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0412.json",
+      ".atm/history/task-events/ATM-GOV-0412/2026-09-05T17-11-02-354Z-import-ea8f5d9ad477.json",
+      ".atm/history/task-events/ATM-GOV-0412/2026-09-05T17-11-23-937Z-reserve-fb24690769b3.json",
+      ".atm/history/task-events/ATM-GOV-0412/2026-09-05T17-11-23-947Z-promote-5590df3842ac.json",
+      ".atm/history/task-events/ATM-GOV-0412/2026-09-05T17-11-25-507Z-claim-81f911af6c54.json",
+      ".atm/history/task-events/ATM-GOV-0412/2026-09-05T17-17-15-348Z-import-90c4ee9ed61d.json",
+      ".atm/history/task-events/ATM-GOV-0412/2026-09-05T17-18-52-707Z-import-a3bfeaa03837.json",
+      ".atm/history/task-events/ATM-GOV-0412/2026-09-05T17-20-06-806Z-import-275f011f81f0.json",
+      ".atm/history/task-events/ATM-GOV-0412/2026-09-05T17-21-22-455Z-scope-amendment-aa8a4570ae8f.json",
+      ".atm/history/task-events/ATM-GOV-0412/2026-09-05T17-21-51-870Z-scope-amendment-80d4f627e3fb.json",
+      ".atm/history/tasks/ATM-GOV-0412.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
