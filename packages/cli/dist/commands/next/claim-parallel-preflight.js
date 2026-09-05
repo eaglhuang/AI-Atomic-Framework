@@ -85,7 +85,13 @@ export async function runClaimParallelPreflight(input) {
                             insufficientMutationIntent,
                             overlappingAtomIdCount: overlappingAtomIds.length
                         });
-                        if (!shouldBlockPerCid) {
+                        const queueAdmission = evaluateBrokerQueueAdmission({
+                            cwd: input.cwd,
+                            taskId: input.claimableTask.workItemId,
+                            allowedFiles: claimAllowedFiles,
+                            overlappingFiles
+                        });
+                        if (!shouldBlockPerCid && queueAdmission.status !== 'queued-blocked') {
                             if (!parallelAdvisory) {
                                 parallelAdvisory = {
                                     ...finding,
@@ -106,12 +112,6 @@ export async function runClaimParallelPreflight(input) {
                             continue;
                         }
                         const resolutionAuthorizedForeignTaskIds = collectResolutionAuthorizedForeignTaskIds(input.cwd, input.claimableTask.workItemId);
-                        const queueAdmission = evaluateBrokerQueueAdmission({
-                            cwd: input.cwd,
-                            taskId: input.claimableTask.workItemId,
-                            allowedFiles: claimAllowedFiles,
-                            overlappingFiles
-                        });
                         if (queueAdmission.status === 'invalid') {
                             throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `broker-conflict-blocked: ${queueAdmission.reason}`, {
                                 exitCode: 1,

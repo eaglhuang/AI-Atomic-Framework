@@ -648,12 +648,9 @@ export async function runTaskflow(argv = []) {
                     template, title }) } });
     }
     if (writeRequested && writeSupport.allowed) {
-        if (!profileData) {
-            throw new CliError('ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK', 'taskflow open --write requires a governed profile.', { exitCode: 1 });
-        }
-        const resolved = hostPolicyDecision ?? resolveHostOpenerPolicyDecision({ cwd: openOutputRoot, profile: profileData, delegationContract, taskId, outputPath, title });
+        const resolved = hostPolicyDecision ?? (profileData ? resolveHostOpenerPolicyDecision({ cwd: openOutputRoot, profile: profileData, delegationContract, taskId, outputPath, title }) : { taskId: taskId, outputPath: outputPath, sources: { taskId: 'explicit', outputPath: 'explicit' }, diagnostics: ['No host profile loaded; using the explicitly bounded task-id and output path.'], familyDrift: null });
         if (resolved.familyDrift) {
-            throw new CliError('ATM_TASK_ID_FAMILY_DRIFT', resolved.familyDrift.message, { exitCode: 1, details: { familyDrift: resolved.familyDrift, planningCard: resolved.outputPath, targetRepository: profileData.ownerRepo, nextDryRunCommand: orchestrationPlan.nextDryRunCommand, nextImportCommand: orchestrationPlan.nextImportCommand } });
+            throw new CliError('ATM_TASK_ID_FAMILY_DRIFT', resolved.familyDrift.message, { exitCode: 1, details: { familyDrift: resolved.familyDrift, planningCard: resolved.outputPath, targetRepository: profileData?.ownerRepo ?? 'adopter-repo', nextDryRunCommand: orchestrationPlan.nextDryRunCommand, nextImportCommand: orchestrationPlan.nextImportCommand } });
         }
         const targetAbsolute = resolveOutputAbsolute(openOutputRoot, resolved.outputPath);
         const hadExistingTarget = existsSync(targetAbsolute);

@@ -5329,6 +5329,7 @@
     "release/atm-root-drop/tests/cli/next-prompt-results-contract-extraction.test.ts",
     "release/atm-root-drop/tests/cli/next-route-resolution-strategy-map.test.ts",
     "release/atm-root-drop/tests/cli/next-route-selector.test.ts",
+    "release/atm-root-drop/tests/cli/next-running-explicit-route.test.ts",
     "release/atm-root-drop/tests/cli/next-warm-latency-workload.test.ts",
     "release/atm-root-drop/tests/cli/next-warm-run-latency-measurement.test.ts",
     "release/atm-root-drop/tests/cli/npm-clean-install.test.ts",
@@ -5997,11 +5998,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1384,
-    "unchanged": 4578,
+    "copied": 15,
+    "unchanged": 1938,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -24185,7 +24186,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/claim-orchestration.js",
-        "digest": "6fc07bd46464916d23a8cca7069cfbeed54ed9496a969d193dd22628cc777841",
+        "digest": "e5a797ac3cb220ca4e47b07e5e0b1c5d68e0b030254d761cb45ef2aad543662f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/claim-orchestration.js"
@@ -24194,7 +24195,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/claim-parallel-preflight.js",
-        "digest": "9df1b7230d4243a34e80553ae65751bfee450fb194095002d6d79be93c69cfc8",
+        "digest": "9891555c91cb4a9f59a304646c7e6b06df22d5f6649b3cc7cffa1ca6f3023690",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/claim-parallel-preflight.js"
@@ -24437,7 +24438,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/route-predicates.js",
-        "digest": "0bf2722dffcaa942ed502a553b801c3c503c3d46f8429bb8c6410226afcac5a4",
+        "digest": "ae0c6cb0de879d678716c2c91baf45ca95fda8c0dbaa6bdfab4682003cface7a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/route-predicates.js"
@@ -25148,7 +25149,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/implementation.js",
-        "digest": "5e7e209653de62efe96a2a0eb322bf0c2d2d3de68ded03051a306dd50d7d7218",
+        "digest": "b5d2f0ae3735b4e7d4f74e3a6f32daa90ea4127b1a16f985a02e3e8af6c2bd65",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/implementation.js"
@@ -25166,7 +25167,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/profile-loader.js",
-        "digest": "ff3bb4a53ba7f3ed14a0ebdeaec347f36c1d5ce34565457aa3d2d1ff8c463128",
+        "digest": "e5eed755e55a6f68d5051f81915a835425aef6c99f082ab45c30ce19e2b7fed5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/profile-loader.js"
@@ -25427,7 +25428,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-window-lock.js",
-        "digest": "9a884f82002bc2ba1f1b338503826d673de4ec806fc6882d1a00fe187e192190",
+        "digest": "76a8039ed7a0f56348643d7f9208abe458c5307a35e7626d91a6bda08f0063a0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-window-lock.js"
@@ -30809,7 +30810,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/claim-orchestration.ts",
-        "digest": "f57e8538bf74172966b1de4afaf3252255682723055394d02a0913ec9f55eb78",
+        "digest": "939b86beec41ab22440e3e1b3b0229b33f3841a9d0a139806db097238cf1e633",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/claim-orchestration.ts"
@@ -30818,7 +30819,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/claim-parallel-preflight.ts",
-        "digest": "2b3fe2435b1dd5f191220922b422dd0af86fdbcc4956de1460a8d8391b02c32e",
+        "digest": "f94812dabd2a11d979874ce73d41d2960cd7e1c23f18c83331796ba59a974a33",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/claim-parallel-preflight.ts"
@@ -31061,7 +31062,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/route-predicates.ts",
-        "digest": "e51513b30c2c0c33b3164299c22538fd8e441948c954062db730cd60e470e048",
+        "digest": "c1b9807250980854ace89008060c6f8cd3db305561d22dbc37098e744495b3ce",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/route-predicates.ts"
@@ -31790,7 +31791,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/framework-opener.spec.ts",
-        "digest": "b7c2faf26317b0e426d606cd36dd303893a88a34cb45b786186023729729c510",
+        "digest": "5c785011421cda833c4f167707f056b7b5393e41d9e443277a87d8678d0a405e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/framework-opener.spec.ts"
@@ -31853,7 +31854,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
-        "digest": "13b635b531f698ddad96a509c6af9b1a948bea2693b1a3d8b90442f0b542216b",
+        "digest": "93dd07ae74b9cc84ef01e73c24b80c1c52e8a25fafdebe8c3663566f57842d68",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts"
@@ -32051,7 +32052,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/implementation.ts",
-        "digest": "c0b1dbc6efc21529eb3c70fb60d636156584a20c02c3c61779252e9b57577230",
+        "digest": "4d5fae53530a79866f2620841b263dc0205e1e7ca47780a4e12fb611080f2757",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/implementation.ts"
@@ -32069,7 +32070,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/profile-loader.ts",
-        "digest": "e08f45b45fd56fba631d2f59373c18ec543e82733b50ad8b14822c12746fd162",
+        "digest": "90a7ddcca5439fd846b84fa92b01b31d52c61dc269ccaff4e98f4221cb18c5a2",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/profile-loader.ts"
@@ -32681,7 +32682,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-window-lock.ts",
-        "digest": "b70ee8d3df4b47661bab6e1b6149f2228e2b61707beb8058fe3e4a2c81671324",
+        "digest": "8ea4922bc30989fab314a42c7d78187419f221c534a211d9c98fb9c70b0bf58f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-window-lock.ts"
@@ -53677,6 +53678,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/next-running-explicit-route.test.ts",
+        "digest": "ee156c43b12ade46fd98a3f4f278a11515ffa8556cbd17c536e5f2646f330e3d",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/next-running-explicit-route.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/next-warm-latency-workload.test.ts",
         "digest": "328cdbd5d89c307544bc633775f03366a5e53243a5c9f6901a5ee0ca79b010aa",
         "origin": "source",
@@ -59662,7 +59672,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:6e132984cdd0fe7287be909d2ee51c598436b12ad0ee217d0684c01cbde8e8a6"
+    "treeDigest": "sha256:cb4c4ff1a8ff09bee3fe61c86b099a740eb48a209ec99801a243937109185564"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61191,7 +61201,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:7bdb66bf6ba3f28f6ed944616d1edfb10a79816e5f37de7a2907472cae20c5c4"
+    "digest": "sha256:26567f136e24838442f9841f3c129ece97b473b2b91aabb1a406f3c72b57ab99"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66494,6 +66504,7 @@
       "release/atm-root-drop/tests/cli/next-prompt-results-contract-extraction.test.ts",
       "release/atm-root-drop/tests/cli/next-route-resolution-strategy-map.test.ts",
       "release/atm-root-drop/tests/cli/next-route-selector.test.ts",
+      "release/atm-root-drop/tests/cli/next-running-explicit-route.test.ts",
       "release/atm-root-drop/tests/cli/next-warm-latency-workload.test.ts",
       "release/atm-root-drop/tests/cli/next-warm-run-latency-measurement.test.ts",
       "release/atm-root-drop/tests/cli/npm-clean-install.test.ts",
@@ -67165,22 +67176,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:f51e0be010d6a4de9256879dc73f84e414939ccbe1b7a407392d489c46fae193",
-  "sealedSourceCommit": "6c51ccf74870ec8d929ec0e333d99a59c9c01759",
+  "buildInputsTreeHash": "sha256:823fe8513105916c506204f0ebbcf73e04879c8273b896f9518de388b635878d",
+  "sealedSourceCommit": "d904f249ac2ea2f3788af0ed7524ec5819cc60ea",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:f40967720f85640a5d4cee6ebf74015b0a95ba7fd9ced140c2ffa7b3025b0572",
-  "tsBuildCacheDigest": "sha256:8f93a52f48e9eb9fed27af1cb9937ab9327a38f45a6af21ba3e9c8e23713fdbf",
+  "incrementalPlanDigest": "sha256:645eb1cd3d86d4dbbc73b6077514847ea45da8d1809a95ada986abbc203d5b27",
+  "tsBuildCacheDigest": "sha256:c70d7f7c6a6b0e70f6abfa3360a3f5c73ecd3ef0af7240c8e9616d970624032f",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 50,
-    "skipDecision": 61,
-    "worktreeSetup": 15630,
-    "typescriptBuild": 10221,
-    "rootDropReleaseAssembly": 30467,
-    "onefileReleaseAssembly": 8101,
-    "artifactSync": 9597,
+    "skipDecision": 83,
+    "worktreeSetup": 10838,
+    "typescriptBuild": 26007,
+    "rootDropReleaseAssembly": 32362,
+    "onefileReleaseAssembly": 8047,
+    "artifactSync": 9599,
     "cleanup": 0,
-    "totalElapsed": 86029
+    "totalElapsed": 105896
   }
 }

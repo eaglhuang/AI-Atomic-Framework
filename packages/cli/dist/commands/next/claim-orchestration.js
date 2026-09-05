@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { buildFirstUseUserNotice } from '../first-use-notice.js';
-import { runBroker } from '../broker.js';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, selectPostClaimChannel } from './channel-strategy.js';
 import { describeActorResolution } from '../actor-registry.js';
 import { resolveActorWorkSession, upsertActorWorkSession } from '../actor-session.js';
@@ -309,12 +308,13 @@ export async function claimNextImportedTask(input) {
         });
         preClaimBrokerTransaction = transaction;
         const queueAdmission = transaction.queueAdmission;
+        // A task whose entire live scope is behind a queue head is not rejected
+        // here. The parallel preflight must get the same admission first so it can
+        // open an isolated proposal lane and replace the live shared paths with
+        // private proposal/evidence paths. Rejecting at this earlier registration
+        // point made the proposal-lane route unreachable.
         if (queueAdmission.status === 'queued-blocked') {
-            await runBroker(['release', '--cwd', input.cwd, '--task', claimableTask.workItemId]);
-            throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `broker-conflict-blocked: ${queueAdmission.reason}`, {
-                exitCode: 1,
-                details: { taskId: claimableTask.workItemId, brokerQueueAdmission: queueAdmission }
-            });
+            brokerQueueAdmission = queueAdmission;
         }
         if (queueAdmission.status === 'queued-private-work') {
             brokerQueueAdmission = queueAdmission;

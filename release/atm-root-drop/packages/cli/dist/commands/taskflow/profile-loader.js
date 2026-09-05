@@ -131,6 +131,16 @@ export function resolveWriteSupport(input) {
             reason: 'Write was not requested; taskflow open returned an orchestration plan only.'
         };
     }
+    // A host profile is required when ATM must allocate an id or derive a
+    // canonical output path. When both are explicit, the fallback is still
+    // deterministic and bounded without inventing host policy.
+    if (!input.profile && input.taskIdSupplied && input.outputPathSupplied) {
+        return {
+            requested: true,
+            allowed: true,
+            reason: 'Explicit task-id and output path provide a bounded no-profile fallback.'
+        };
+    }
     if (!delegation.invocable) {
         return {
             requested: true,

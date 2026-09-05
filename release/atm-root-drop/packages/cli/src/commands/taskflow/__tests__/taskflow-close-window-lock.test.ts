@@ -206,6 +206,8 @@ try {
   // may act on another card's debt (ATM-BUG-2026-08-12-001, slice B1).
   assert.deepEqual(deferred.lock?.provenResidueEntries, []);
   assert.deepEqual(deferred.provenResidueEntries, []);
+  assert.equal(deferred.lock?.foreignStagedEntries[0]?.path, foreignStageFile);
+  assert.equal(deferred.lock?.foreignStagedEntries[0]?.receiptTaskId, foreignTaskId);
 
   const stagedAfterDefer = execFileSync('git', ['diff', '--cached', '--name-only'], {
     cwd: repoRoot,
@@ -243,7 +245,7 @@ try {
     deferForeignStaged: true
   });
   assert.equal(deletionDeferred.ok, true);
-  assert.deepEqual(deletionDeferred.lock?.foreignStagedEntries, [{ path: foreignDeletionFile, mode: null, blobId: null }]);
+  assert.deepEqual(deletionDeferred.lock?.foreignStagedEntries, [{ path: foreignDeletionFile, mode: null, blobId: null, receiptTaskId: null }]);
   assert.equal(execFileSync('git', ['diff', '--cached', '--name-only', '--', foreignDeletionFile], { cwd: repoRoot, encoding: 'utf8' }).trim(), '');
   releaseCloseWindowStagedIndexLock({ cwd: repoRoot, taskId, actorId: 'fixture-agent', outcome: 'aborted' });
   assert.equal(execFileSync('git', ['diff', '--cached', '--name-only', '--', foreignDeletionFile], { cwd: repoRoot, encoding: 'utf8' }).trim(), foreignDeletionFile);

@@ -92,13 +92,15 @@ function isTaskRoutable(status, intent) {
     return ['ready', 'open', 'planned', 'blocked', 'waiting_target_evidence', 'reserved'].includes(normalized);
 }
 function isTaskExplicitlyMentioned(task, intent) {
-    if (!intent || intent.mentionedTaskIds.length === 0)
+    if (!intent)
         return false;
     const normalizedStatus = normalizeTaskRouteStatus(task.status);
     if (normalizedStatus === 'abandoned' || normalizedStatus === 'cancelled') {
         return false;
     }
-    return intent.mentionedTaskIds.includes(task.workItemId.toUpperCase());
+    const taskId = task.workItemId.toUpperCase();
+    return intent.mentionedTaskIds.includes(taskId)
+        || intent.explicitTaskIds.includes(taskId);
 }
 function shouldDiscoverMarkdownTaskCards(intent) {
     if (!intent)
