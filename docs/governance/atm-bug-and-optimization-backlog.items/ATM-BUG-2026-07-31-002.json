@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Partially fixed — durable repair-closure ticket bridge landed; remaining delivery evidence remains",
+  "status": "Closed — durable repair-closure ticket bridge and sealed-runner delivery reverified on 2026-09-05",
   "area": "Closure repair / write-ticket commit adapter",
   "finding": "tasks repair-closure can successfully stage a closure-packet repair bundle and return a governed git commit command, but the returned git commit path can still fail with ATM_WRITE_TICKET_STALE. A fresh write-ticket acquired through write-ticket acquire is emitted in stdout but is not persisted or accepted by git commit because the commit facade exposes no --ticket bridge.",
   "expectedBehavior": "A successful repair-closure mutation should either mint and persist the exact write-ticket required by its returned commit command, or return a copyable reseal/commit command that the git commit adapter can consume without manual native-git fallback.",
   "evidenceOrRepro": "Historical incident: TASK-SKL-0036 repair-closure staged its bundle but the returned governed commit failed with ATM_WRITE_TICKET_STALE because the acquired ticket was stdout-only. Current source repair: `issueRepairClosureAdmissionTicket()` produces the bounded `origin: repair-closure` ticket, `evaluateTaskWorkAdmissionGate()` consumes the persisted task-ledger ticket, and `runGitCommit()` permits that terminal repair authority through the normal task-scoped commit branch without reviving a released claim. `node --strip-types tests/cli/closure-repair-write-ticket-commit.test.ts` passes the persisted-ticket commit admission; `node --strip-types packages/cli/src/commands/git-governance/implementation/commit-command.test.ts` passes the terminal repair session-bypass contract.",
-  "followUp": "Source repair is verified. Retain the durable ticket bridge and its regression tests; frozen publication and formal governance closeout are separate from this backlog status."
+  "followUp": "Source repair is verified by closure-repair-write-ticket-commit.test.ts and commit-command.test.ts. The repair is included in the current sealed runner lineage; no unresolved defect remains on this card. Future publication work is ordinary release governance."
 }
