@@ -10,12 +10,12 @@ import { assertEmergencyApproval } from '../emergency/gate.js';
 import { buildExtractionFirstPatrolDiagnostics, extractFrontMatter, parseAcceptanceEvidenceMap, validateDeliverablesList } from './task-import-validators.js';
 import { applySingleCardContractValidation } from './import-card-contract-validation.js';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
-import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
+import { advancePlanningSourceSeal, attachPlanningSourceSeal, buildPlanningSourceSeal, readPlanningSourceSeal } from './import-task.js';
 import { classifyForceImportAdmission } from './import-validation.js';
 import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.js';
 import { issueTaskImportAdmissionTicket, validateWorkAdmissionImport } from './task-work-admission-import.js';
 import { preparePlanningMirrorReconcile } from './planning-mirror-reconcile.js';
-import { classifyResetOpenImportForOptions, collectActiveClaimImportSkips, detectPlanHeadings, enrichParsedTasksFromSiblingTaskCards, parseImportOptions, parseSingleCardFromPlugin, parsePlanMarkdown, writeImportEvidence, writeTaskFiles, assertLocalTaskLedgerEnabled, recordStaleRunnerOverride } from '../tasks.js';
+import { classifyResetOpenImportForOptions, collectActiveClaimImportSkips, detectPlanHeadings, enrichParsedTasksFromSiblingTaskCards, parseImportOptions, parseSingleCardFromPlugin, parsePlanMarkdown, writeImportEvidence, writeTaskFiles, taskPathFor, assertLocalTaskLedgerEnabled, recordStaleRunnerOverride } from '../tasks.js';
 export async function runTasksImport(argv) {
     const options = parseImportOptions(argv);
     if (!options.from) {
@@ -202,9 +202,21 @@ export async function runTasksImport(argv) {
         planText,
         sealedAt: generatedAt
     });
+    const previousSeals = parsed.tasks.flatMap((task) => {
+        const taskPath = taskPathFor(options.cwd, task.workItemId);
+        if (!existsSync(taskPath))
+            return [];
+        try {
+            return [readPlanningSourceSeal(JSON.parse(readFileSync(taskPath, 'utf8')))].filter((seal) => seal !== null);
+        }
+        catch {
+            return [];
+        }
+    });
+    const advancedPlanningSourceSeal = advancePlanningSourceSeal(planningSourceSeal, previousSeals);
     parsed = {
         ...enrichedParsed,
-        tasks: enrichedParsed.tasks.map((task) => attachPlanningSourceSeal(task, planningSourceSeal))
+        tasks: enrichedParsed.tasks.map((task) => attachPlanningSourceSeal(task, advancedPlanningSourceSeal))
     };
     const forceImportAdmission = options.write
         ? classifyForceImportAdmission({ cwd: options.cwd, tasks: parsed.tasks, force: options.force })

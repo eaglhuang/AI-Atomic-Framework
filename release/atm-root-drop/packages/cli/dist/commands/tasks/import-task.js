@@ -53,7 +53,7 @@ export function buildPlanningSourceSeal(input) {
         sealedAt: input.sealedAt
     };
 }
-function readStoredSeal(taskDocument) {
+export function readPlanningSourceSeal(taskDocument) {
     const source = taskDocument.source;
     const seal = source && typeof source === 'object' && !Array.isArray(source)
         ? source.planningSourceSeal
@@ -78,6 +78,14 @@ function readStoredSeal(taskDocument) {
         sealedAt: record.sealedAt
     };
 }
+export function advancePlanningSourceSeal(seal, previousSeals) {
+    const previousEpoch = previousSeals.reduce((maximum, previous) => Math.max(maximum, previous.amendmentEpoch), seal.amendmentEpoch);
+    const contentChanged = previousSeals.some((previous) => previous.contentDigest !== seal.contentDigest);
+    return {
+        ...seal,
+        amendmentEpoch: contentChanged ? Math.max(seal.amendmentEpoch, previousEpoch + 1) : previousEpoch
+    };
+}
 export function attachPlanningSourceSeal(task, seal) {
     return {
         ...task,
@@ -88,7 +96,7 @@ export function attachPlanningSourceSeal(task, seal) {
     };
 }
 export function validatePlanningSourceSeal(input) {
-    const sealed = readStoredSeal(input.taskDocument);
+    const sealed = readPlanningSourceSeal(input.taskDocument);
     if (!sealed) {
         return {
             ok: true,

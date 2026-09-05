@@ -17,7 +17,12 @@ import {
 import { type ContractImportRecoveryManifest } from './contract-import-recovery.ts';
 import { applySingleCardContractValidation } from './import-card-contract-validation.ts';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.ts';
-import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.ts';
+import {
+  advancePlanningSourceSeal,
+  attachPlanningSourceSeal,
+  buildPlanningSourceSeal,
+  readPlanningSourceSeal
+} from './import-task.ts';
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
 import { classifyForceImportAdmission } from './import-validation.ts';
 import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.ts';
@@ -34,6 +39,7 @@ import {
   parsePlanMarkdown,
   writeImportEvidence,
   writeTaskFiles,
+  taskPathFor,
   assertLocalTaskLedgerEnabled,
   recordStaleRunnerOverride,
   type EmergencyUseEvidence,
@@ -234,9 +240,21 @@ export async function runTasksImport(argv: string[]) {
     planText,
     sealedAt: generatedAt
   });
+  const previousSeals = parsed.tasks.flatMap((task) => {
+    const taskPath = taskPathFor(options.cwd, task.workItemId);
+    if (!existsSync(taskPath)) return [];
+    try {
+      return [readPlanningSourceSeal(JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>)].filter(
+        (seal): seal is NonNullable<typeof seal> => seal !== null
+      );
+    } catch {
+      return [];
+    }
+  });
+  const advancedPlanningSourceSeal = advancePlanningSourceSeal(planningSourceSeal, previousSeals);
   parsed = {
     ...enrichedParsed,
-    tasks: enrichedParsed.tasks.map((task) => attachPlanningSourceSeal(task, planningSourceSeal))
+    tasks: enrichedParsed.tasks.map((task) => attachPlanningSourceSeal(task, advancedPlanningSourceSeal))
   };
 
   const forceImportAdmission = options.write
