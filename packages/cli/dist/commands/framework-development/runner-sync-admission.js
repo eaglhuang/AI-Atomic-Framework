@@ -1,10 +1,12 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { isRunnerBuildOutputPath } from '../../_vendor/core/dist/broker/runner-build-output-inventory.js';
 import { attachSharedWriteActorAuthority, buildCommandManifest, buildOrderedCommandStep, renderCommandManifest } from '../shared/command-manifest.js';
 import { buildSharedWriteActorRecoveryCommand, explicitActorIdEnvVar, legacyActorIdEnvVar, mintFrameworkTempTaskId, resolveSharedWriteActorAuthority, sanitizeIdentityValue } from '../shared/identity-normalization.js';
 import { inspectRunnerSyncQueueHeadOwnership, normalizeInputRunnerSyncSteward, readRunnerSyncStewardForSealedSource, resolveActiveClaimOwnerActorId, resolveActiveLaneSessionId } from './runner-sync-queue-ownership.js';
+import { inspectRunnerSourceDrift } from './closure-packet-schema/implementation.js';
 export function inspectRunnerSyncAdmission(input) {
     const dirtyFiles = normalizePaths(input.dirtyFiles ?? readGitDirtyFiles(input.cwd));
     const releaseWip = dirtyFiles.filter(isRunnerBuildOutputPath);
@@ -19,6 +21,7 @@ export function inspectRunnerSyncAdmission(input) {
     // Keep those conflicts in the report for auditability, but only live-source
     // candidates may turn them into publication blockers.
     const candidateSourceIsolation = input.candidateSourceIsolation ?? 'live-worktree';
+    const runnerCompatibilityDigest = readRunnerCompatibilityDigest(input.cwd);
     const foreignNonReleaseWip = candidateSourceIsolation === 'sealed-detached'
         ? []
         : uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
@@ -63,22 +66,24 @@ export function inspectRunnerSyncAdmission(input) {
         || (actorAuthority.legacyEnvDisagrees
             && queueHeadOwnership.ownerActorIds.length > 0
             && !queueHeadOwnership.ownerActorIds.includes(input.stewardActorId));
-    const requiredCommand = foreignNonReleaseWip.length > 0
-        ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
-        : continuityBlocked
-            ? (actorAuthority.recoveryCommand
-                ?? buildSharedWriteActorRecoveryCommand({
-                    actorId: queueHeadOwnership.ownerActorIds[0] ?? envActorId ?? continuityActorId,
-                    buildCommand: 'npm run build'
-                }))
-            : queueHeadOwnership.ok
-                ? null
-                : queueHeadOwnership.stewardWorkId
-                    ? (queueHeadOwnership.cleanupCommand ?? queueHeadOwnership.reason)
-                    : buildRunnerSyncEnqueueCommand(recoveryInput);
+    const requiredCommand = !runnerCompatibilityDigest.compatible
+        ? 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build'
+        : foreignNonReleaseWip.length > 0
+            ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
+            : continuityBlocked
+                ? (actorAuthority.recoveryCommand
+                    ?? buildSharedWriteActorRecoveryCommand({
+                        actorId: queueHeadOwnership.ownerActorIds[0] ?? envActorId ?? continuityActorId,
+                        buildCommand: 'npm run build'
+                    }))
+                : queueHeadOwnership.ok
+                    ? null
+                    : queueHeadOwnership.stewardWorkId
+                        ? (queueHeadOwnership.cleanupCommand ?? queueHeadOwnership.reason)
+                        : buildRunnerSyncEnqueueCommand(recoveryInput);
     return {
         schemaId: 'atm.runnerSyncAdmission.v1',
-        ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok && !continuityBlocked,
+        ok: runnerCompatibilityDigest.compatible && foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok && !continuityBlocked,
         stewardActorId: input.stewardActorId,
         sealedSourceSha: input.sealedSourceSha ?? null,
         candidateSourceIsolation,
@@ -88,10 +93,34 @@ export function inspectRunnerSyncAdmission(input) {
         foreignNonReleaseWip,
         foreignBuildInputConflicts,
         releaseWip,
+        runnerCompatibilityDigest,
         ordinaryTaskReleaseAutoStageAllowed: false,
         brokerTicket,
         orderedCommandManifests,
         requiredCommand
+    };
+}
+function digestFile(filePath) {
+    if (!filePath || !existsSync(filePath))
+        return null;
+    try {
+        return `sha256:${createHash('sha256').update(readFileSync(filePath)).digest('hex')}`;
+    }
+    catch {
+        return null;
+    }
+}
+export function readRunnerCompatibilityDigest(cwd) {
+    const drift = inspectRunnerSourceDrift(cwd);
+    const runnerPath = drift.runnerPath ? path.join(cwd, drift.runnerPath) : null;
+    const compatible = !drift.frozenEntrypoint || !runnerPath || !drift.syncRequired;
+    return {
+        schemaId: 'atm.runnerCompatibilityDigest.v1',
+        sourceSealDigest: drift.sourceSeal.digest ?? null,
+        frozenRunnerPath: drift.runnerPath ?? null,
+        frozenRunnerDigest: digestFile(runnerPath),
+        sourceDriftSyncRequired: drift.syncRequired,
+        compatible
     };
 }
 function buildAdmissionBrokerTicket(input, ownership) {
@@ -201,23 +230,28 @@ function buildRunnerSyncEnqueueManifest(input) {
 }
 export function assertRunnerSyncAdmission(report) {
     if (!report.ok) {
-        const reason = report.foreignNonReleaseWip.length > 0
-            ? `Runner sync refused foreign non-release WIP: ${report.foreignNonReleaseWip.join(', ')}`
-            : report.actorAuthority.ok === false && report.actorAuthority.reason
-                ? report.actorAuthority.reason
-                : report.queueHeadOwnership.reason ?? 'Runner sync requires steward queue-head ownership.';
+        const compatibility = report.runnerCompatibilityDigest;
+        const reason = compatibility && !compatibility.compatible
+            ? 'Frozen runner is incompatible with the current framework source seal.'
+            : report.foreignNonReleaseWip.length > 0
+                ? `Runner sync refused foreign non-release WIP: ${report.foreignNonReleaseWip.join(', ')}`
+                : report.actorAuthority.ok === false && report.actorAuthority.reason
+                    ? report.actorAuthority.reason
+                    : report.queueHeadOwnership.reason ?? 'Runner sync requires steward queue-head ownership.';
         const recoveryCommand = report.requiredCommand
             ?? report.actorAuthority.recoveryCommand
             ?? null;
         const error = new Error(recoveryCommand ? `${reason} Recovery: ${recoveryCommand}` : reason);
         Object.assign(error, {
-            code: report.foreignNonReleaseWip.length > 0
-                ? 'ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED'
-                : report.actorAuthority.ok === false && report.queueHeadOwnership.ownerActorIds.length > 0
-                    ? 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED'
-                    : report.queueHeadOwnership.queueHeadHealth !== 'task-active'
-                        ? 'ATM_RUNNER_SYNC_QUEUE_HEAD_ORPHANED'
-                        : 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED',
+            code: compatibility && !compatibility.compatible
+                ? 'ATM_RUNNER_COMPATIBILITY_DIGEST_MISMATCH'
+                : report.foreignNonReleaseWip.length > 0
+                    ? 'ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED'
+                    : report.actorAuthority.ok === false && report.queueHeadOwnership.ownerActorIds.length > 0
+                        ? 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED'
+                        : report.queueHeadOwnership.queueHeadHealth !== 'task-active'
+                            ? 'ATM_RUNNER_SYNC_QUEUE_HEAD_ORPHANED'
+                            : 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED',
             details: {
                 ...report,
                 recoveryCommand

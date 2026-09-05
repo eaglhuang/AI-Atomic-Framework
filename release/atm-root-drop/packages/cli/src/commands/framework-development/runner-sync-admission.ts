@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { isRunnerBuildOutputPath } from '../../../../core/src/broker/runner-build-output-inventory.ts';
@@ -25,6 +26,7 @@ import {
   resolveActiveClaimOwnerActorId,
   resolveActiveLaneSessionId
 } from './runner-sync-queue-ownership.ts';
+import { inspectRunnerSourceDrift } from './closure-packet-schema/implementation.ts';
 
 export type RunnerSyncAdmissionReport = {
   readonly schemaId: 'atm.runnerSyncAdmission.v1';
@@ -54,10 +56,20 @@ export type RunnerSyncAdmissionReport = {
   readonly foreignNonReleaseWip: readonly string[];
   readonly foreignBuildInputConflicts: readonly RunnerSyncForeignBuildInputConflict[];
   readonly releaseWip: readonly string[];
+  readonly runnerCompatibilityDigest?: RunnerCompatibilityDigest;
   readonly ordinaryTaskReleaseAutoStageAllowed: false;
   readonly brokerTicket: RunnerSyncAdmissionBrokerTicket | null;
   readonly requiredCommand: string | null;
   readonly orderedCommandManifests?: readonly OrderedCommandManifestStep[];
+};
+
+export type RunnerCompatibilityDigest = {
+  readonly schemaId: 'atm.runnerCompatibilityDigest.v1';
+  readonly sourceSealDigest: string | null;
+  readonly frozenRunnerPath: string | null;
+  readonly frozenRunnerDigest: string | null;
+  readonly sourceDriftSyncRequired: boolean;
+  readonly compatible: boolean;
 };
 
 export type RunnerSyncAdmissionBrokerTicket = {
@@ -124,6 +136,7 @@ export function inspectRunnerSyncAdmission(input: {
   // Keep those conflicts in the report for auditability, but only live-source
   // candidates may turn them into publication blockers.
   const candidateSourceIsolation = input.candidateSourceIsolation ?? 'live-worktree';
+  const runnerCompatibilityDigest = readRunnerCompatibilityDigest(input.cwd);
   const foreignNonReleaseWip = candidateSourceIsolation === 'sealed-detached'
     ? []
     : uniqueSorted(foreignBuildInputConflicts.flatMap((conflict) => conflict.intersectingFiles));
@@ -172,7 +185,9 @@ export function inspectRunnerSyncAdmission(input: {
     || (actorAuthority.legacyEnvDisagrees
       && queueHeadOwnership.ownerActorIds.length > 0
       && !queueHeadOwnership.ownerActorIds.includes(input.stewardActorId));
-  const requiredCommand = foreignNonReleaseWip.length > 0
+  const requiredCommand = !runnerCompatibilityDigest.compatible
+    ? 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build'
+    : foreignNonReleaseWip.length > 0
     ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
     : continuityBlocked
       ? (actorAuthority.recoveryCommand
@@ -187,7 +202,7 @@ export function inspectRunnerSyncAdmission(input: {
           : buildRunnerSyncEnqueueCommand(recoveryInput);
   return {
     schemaId: 'atm.runnerSyncAdmission.v1',
-    ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok && !continuityBlocked,
+    ok: runnerCompatibilityDigest.compatible && foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok && !continuityBlocked,
     stewardActorId: input.stewardActorId,
     sealedSourceSha: input.sealedSourceSha ?? null,
     candidateSourceIsolation,
@@ -197,10 +212,34 @@ export function inspectRunnerSyncAdmission(input: {
     foreignNonReleaseWip,
     foreignBuildInputConflicts,
     releaseWip,
+    runnerCompatibilityDigest,
     ordinaryTaskReleaseAutoStageAllowed: false,
     brokerTicket,
     orderedCommandManifests,
     requiredCommand
+  };
+}
+
+function digestFile(filePath: string | null): string | null {
+  if (!filePath || !existsSync(filePath)) return null;
+  try {
+    return `sha256:${createHash('sha256').update(readFileSync(filePath)).digest('hex')}`;
+  } catch {
+    return null;
+  }
+}
+
+export function readRunnerCompatibilityDigest(cwd: string): RunnerCompatibilityDigest {
+  const drift = inspectRunnerSourceDrift(cwd);
+  const runnerPath = drift.runnerPath ? path.join(cwd, drift.runnerPath) : null;
+  const compatible = !drift.frozenEntrypoint || !runnerPath || !drift.syncRequired;
+  return {
+    schemaId: 'atm.runnerCompatibilityDigest.v1',
+    sourceSealDigest: drift.sourceSeal.digest ?? null,
+    frozenRunnerPath: drift.runnerPath ?? null,
+    frozenRunnerDigest: digestFile(runnerPath),
+    sourceDriftSyncRequired: drift.syncRequired,
+    compatible
   };
 }
 
@@ -336,7 +375,10 @@ export type RunnerSyncForeignClaimInput = {
 
 export function assertRunnerSyncAdmission(report: RunnerSyncAdmissionReport): void {
   if (!report.ok) {
-    const reason = report.foreignNonReleaseWip.length > 0
+    const compatibility = report.runnerCompatibilityDigest;
+    const reason = compatibility && !compatibility.compatible
+      ? 'Frozen runner is incompatible with the current framework source seal.'
+      : report.foreignNonReleaseWip.length > 0
       ? `Runner sync refused foreign non-release WIP: ${report.foreignNonReleaseWip.join(', ')}`
       : report.actorAuthority.ok === false && report.actorAuthority.reason
         ? report.actorAuthority.reason
@@ -346,7 +388,9 @@ export function assertRunnerSyncAdmission(report: RunnerSyncAdmissionReport): vo
       ?? null;
     const error = new Error(recoveryCommand ? `${reason} Recovery: ${recoveryCommand}` : reason);
     Object.assign(error, {
-      code: report.foreignNonReleaseWip.length > 0
+      code: compatibility && !compatibility.compatible
+        ? 'ATM_RUNNER_COMPATIBILITY_DIGEST_MISMATCH'
+        : report.foreignNonReleaseWip.length > 0
         ? 'ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED'
         : report.actorAuthority.ok === false && report.queueHeadOwnership.ownerActorIds.length > 0
           ? 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED'

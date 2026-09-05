@@ -5485,6 +5485,7 @@
     "release/atm-root-drop/tests/cli/real-shared-delivery-commit-executor.test.ts",
     "release/atm-root-drop/tests/cli/real-team-wave-worker-executor.test.ts",
     "release/atm-root-drop/tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+    "release/atm-root-drop/tests/cli/recover-push-fail-timeout.test.ts",
     "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
     "release/atm-root-drop/tests/cli/release-prepublish-gate.test.ts",
     "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
@@ -5512,6 +5513,7 @@
     "release/atm-root-drop/tests/cli/runbook-release-authority-review.test.ts",
     "release/atm-root-drop/tests/cli/runner-arbitration-evidence.test.ts",
     "release/atm-root-drop/tests/cli/runner-build-scope.test.ts",
+    "release/atm-root-drop/tests/cli/runner-compatibility-digest-precondition.test.ts",
     "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
     "release/atm-root-drop/tests/cli/runner-publication-inventory-parity.test.ts",
     "release/atm-root-drop/tests/cli/runner-publication-physical-takeover.test.ts",
@@ -6005,11 +6007,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 5,
-    "unchanged": 1948,
+    "copied": 1374,
+    "unchanged": 4598,
     "removed": 0
   },
-  "buildMode": "overlay",
+  "buildMode": "full",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -22915,7 +22917,7 @@
       },
       {
         "path": "packages/cli/dist/commands/framework-development/runner-sync-admission.js",
-        "digest": "79fd4051bc2b8ec5aa9fba19069888a9d24c9e7d7e216e161e4a3a9fc11d53d8",
+        "digest": "351ba4ec909e6c2a4b615c3384c4b5def915552cff32069efca6a3e1c6eb5ddc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/framework-development/runner-sync-admission.js"
@@ -29116,7 +29118,7 @@
       },
       {
         "path": "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
-        "digest": "d65a01e729b08bc9d76f6816a0b7624231760a87775465bd291eec363fcedb68",
+        "digest": "ef3949ac378d45f2e0f6e971a9ae57fbaf016e112c90abd52d2e01809d7d3ce3",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/framework-development/runner-sync-admission.ts"
@@ -55089,6 +55091,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/recover-push-fail-timeout.test.ts",
+        "digest": "4d169298c2153862d6a26296d1fb9f29dbaebc9ae9f92eecefdf27c730a94507",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/recover-push-fail-timeout.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/related-task-batching-wave-surface.test.ts",
         "digest": "e03edb4c7fe6e279914d34b76f5b5efcedf51b50042aac57ce1fd2996aba6eaf",
         "origin": "source",
@@ -55328,6 +55339,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/runner-build-scope.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/runner-compatibility-digest-precondition.test.ts",
+        "digest": "14e43e5ffc8b92a9ae91e11ac0d8dcf54d828869cef7af48f75e413603c4ded4",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/runner-compatibility-digest-precondition.test.ts"
         ],
         "replaceable": true
       },
@@ -59742,7 +59762,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:6311807cafde2e5055fd06774463d9a0891b457b07ce1089562313107dbe95ab"
+    "treeDigest": "sha256:27329381ff08b653ebe695b7c5098699acbba8c9e62ce096f403ab5ac570ae61"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61272,7 +61292,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:af715eb75e48110a026807fe919cf7c19c0df75eb6deb137e76e4a9a51ae404c"
+    "digest": "sha256:97e9d21119e4664af444554bbe4ffaa838c14fdc425c24fdcbae6419916440a6"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66731,6 +66751,7 @@
       "release/atm-root-drop/tests/cli/real-shared-delivery-commit-executor.test.ts",
       "release/atm-root-drop/tests/cli/real-team-wave-worker-executor.test.ts",
       "release/atm-root-drop/tests/cli/receipt-bound-shared-delivery-commit.test.ts",
+      "release/atm-root-drop/tests/cli/recover-push-fail-timeout.test.ts",
       "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
       "release/atm-root-drop/tests/cli/release-prepublish-gate.test.ts",
       "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
@@ -66758,6 +66779,7 @@
       "release/atm-root-drop/tests/cli/runbook-release-authority-review.test.ts",
       "release/atm-root-drop/tests/cli/runner-arbitration-evidence.test.ts",
       "release/atm-root-drop/tests/cli/runner-build-scope.test.ts",
+      "release/atm-root-drop/tests/cli/runner-compatibility-digest-precondition.test.ts",
       "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
       "release/atm-root-drop/tests/cli/runner-publication-inventory-parity.test.ts",
       "release/atm-root-drop/tests/cli/runner-publication-physical-takeover.test.ts",
@@ -67254,22 +67276,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:557f130000d211e70ef0c90457f99c938ba7451bec9852075dd38b5e279bab38",
-  "sealedSourceCommit": "c28cc2c7b1529ac9eee8f59ae9a0990636cfb0c0",
+  "buildInputsTreeHash": "sha256:43b90863a2fd696879234500b944d9a811a1163072a86d4372687e8df1531de4",
+  "sealedSourceCommit": "2a4896598b1b98583fef31480e4006bf6075f42e",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:e70cd10aa02916f5f74b027f766e65c43987dee81ac5d2c3dc9df72abca07642",
-  "tsBuildCacheDigest": "sha256:cef3e65b7070631f68ef9658a6074fae27562446c3e2af86d731fa077481de82",
+  "incrementalPlanDigest": "sha256:c558e88db14255a81b684e64bd8b2ce76ba4f965724e5faee923f8e094b5df15",
+  "tsBuildCacheDigest": "sha256:77174cb81627845c228b9f5bbe81ececaa2effab0d2d1748702e784fd700b171",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 52,
-    "skipDecision": 73,
-    "worktreeSetup": 15964,
-    "typescriptBuild": 17505,
-    "rootDropReleaseAssembly": 35316,
-    "onefileReleaseAssembly": 9583,
-    "artifactSync": 11243,
+    "inputHashCalculation": 50,
+    "skipDecision": 57,
+    "worktreeSetup": 14943,
+    "typescriptBuild": 11418,
+    "rootDropReleaseAssembly": 32823,
+    "onefileReleaseAssembly": 9372,
+    "artifactSync": 9516,
     "cleanup": 0,
-    "totalElapsed": 109803
+    "totalElapsed": 92195
   }
 }
