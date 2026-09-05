@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 backlog follow-up lane",
+  "status": "Closed — Fixed in 2026-06-28 backlog follow-up lane; regression retained",
   "area": "Task audit / completion report detector",
   "finding": "`ATM_TASK_AUDIT_COMPLETION_REPORT_UNVERIFIED` can misclassify ordinary governance documents such as `docs/governance/atm-bug-and-optimization-backlog.md` as closeout reports, even when they are just bug-tracking prose and not closure evidence.",
   "expectedBehavior": "Completion-report detection should be path-aware and structure-aware: it should target explicit closeout/completion report documents instead of scanning every Markdown file in the repository for a few completion phrases.",

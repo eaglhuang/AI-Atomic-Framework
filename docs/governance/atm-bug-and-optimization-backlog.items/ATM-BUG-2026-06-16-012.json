@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in 2026-06-28 historical-batch validator attestation lane",
+  "status": "Closed — Fixed in 2026-06-28 historical-batch validator attestation lane; dual-record contract retained",
   "area": "Historical batch evidence / validators",
   "finding": "`taskflow close --historical-batch` can use a batch envelope slice, but each task close still needs fresh per-task `evidence run` validator records. `evidence run --recent-run` records `historical-reference`, which is useful for diagnosis but not enough for close, so a 4-card batch still reruns expensive validators multiple times.",
   "expectedBehavior": "A batch close wave should support one fresh validator execution set with signed per-task validator slices, preserving task-specific acceptance while avoiding repeated `npm test` / `typecheck` runs for the same delivery commit.",
