@@ -665,6 +665,7 @@
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-03-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-05-001.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-06-001.json",
+    "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-06-002.json",
     "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
     "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
     "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -1955,6 +1956,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/pathspec-argv-batching.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/publication-slice-admission.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/push-command.js",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/push-recovery.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-bundle-inspection.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
     "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
@@ -2665,6 +2667,7 @@
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/publication-slice-admission.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/push-command.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/push-recovery.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
@@ -6021,8 +6024,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 9,
-    "unchanged": 1951,
+    "copied": 5,
+    "unchanged": 1958,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -11730,6 +11733,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-06-001.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-06-002.json",
+        "digest": "795ca29262f2be449a465efee8c77e6821cef403cf5840f0ab1b9ed3c91a988e",
+        "origin": "source",
+        "inputPaths": [
+          "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-06-002.json"
         ],
         "replaceable": true
       },
@@ -23336,10 +23348,19 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/push-command.js",
-        "digest": "1b92cbb44e2675b73278791a73595442709c0c64cdbc0525a6f3e1ebd86332c8",
+        "digest": "a5adb29ead2462fb9654b2297776070e94d236e6266b039dff48b90656620bb1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/push-command.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/git-governance/implementation/push-recovery.js",
+        "digest": "eda7ea4ecd775620db5655703515b2daa300024eb03415a490699881775ef2ee",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/git-governance/implementation/push-recovery.js"
         ],
         "replaceable": true
       },
@@ -29726,10 +29747,19 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/push-command.ts",
-        "digest": "6324971e783453ab16a7f896db5b62114d9f24d4d443f662bc360dd7afd6d6b5",
+        "digest": "7bcdceea3b681a51da409f6136e29c21ae9249d31c1aeff429953bfe55e3d11e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/push-command.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/git-governance/implementation/push-recovery.ts",
+        "digest": "ecc6b57da7a228b77ce7f71eeb32a69942a12e87b560037ac97059de552a567d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/push-recovery.ts"
         ],
         "replaceable": true
       },
@@ -59902,7 +59932,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:20dcc202a562be2dc56e7293cb90abe716428dceddffe8b975674e06d9444943"
+    "treeDigest": "sha256:f3991b003d0747a1f20ecfe6c2facccfdecb9aabbf0a022f5b6d2f845bc26dbc"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60233,6 +60263,7 @@
       "packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
       "packages/cli/src/commands/git-governance/implementation/publication-slice-admission.ts",
       "packages/cli/src/commands/git-governance/implementation/push-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/push-recovery.ts",
       "packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
       "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
@@ -61437,7 +61468,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:01435d735978de6ee5b434b5429a5fd4dfb8d719b65c1c8f97dbc7f9396c074b"
+    "digest": "sha256:035f6be0fbff9274068b4cf2c986d3266d868e540c7514e5d892fd0a931583b3"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -62076,6 +62107,7 @@
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-03-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-05-001.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-06-001.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-09-06-002.json",
       "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
       "release/atm-root-drop/docs/governance/atm-test-governance-management-plan.md",
       "release/atm-root-drop/docs/governance/atomization-registration-and-receipts.md",
@@ -63366,6 +63398,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/pathspec-argv-batching.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/publication-slice-admission.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/push-command.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/push-recovery.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-bundle-inspection.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/record-commit-command.js",
       "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
@@ -64076,6 +64109,7 @@
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/publication-slice-admission.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/push-command.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/push-recovery.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
@@ -67435,22 +67469,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:d774a7dbb2a0bc6b60440326f8a6d16915050130b171d53bbe886bf40a41d661",
-  "sealedSourceCommit": "e375ae48834d22dbc8cf951412242e2c57e1f2ba",
+  "buildInputsTreeHash": "sha256:e710c5f82435914f68059b7a16141e5fef789a3965e75aa0596be05afd9aec04",
+  "sealedSourceCommit": "ab2e1798e287a2beb8a04594f7e6986fd7d45d5f",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:133edd42c12b8a7a5d0baf2f777ab61f5f039f55da275660ed074eb70e079ac0",
-  "tsBuildCacheDigest": "sha256:1aba797fdc58eae36e991cb513296194869a1f6d1aa591c5e707f002217234bc",
+  "incrementalPlanDigest": "sha256:7f02899152872be808e98eee4442cf7f856b46c3e4a9c8624c353def0b80866e",
+  "tsBuildCacheDigest": "sha256:70cff6850fbaa8d4cc8d8be8d80868dda854ffeda23ed650e692825bb060c69b",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 53,
-    "skipDecision": 91,
-    "worktreeSetup": 11736,
-    "typescriptBuild": 18952,
-    "rootDropReleaseAssembly": 31826,
-    "onefileReleaseAssembly": 8302,
-    "artifactSync": 7839,
+    "inputHashCalculation": 47,
+    "skipDecision": 52,
+    "worktreeSetup": 16552,
+    "typescriptBuild": 18991,
+    "rootDropReleaseAssembly": 31198,
+    "onefileReleaseAssembly": 8400,
+    "artifactSync": 7488,
     "cleanup": 0,
-    "totalElapsed": 95891
+    "totalElapsed": 103004
   }
 }
