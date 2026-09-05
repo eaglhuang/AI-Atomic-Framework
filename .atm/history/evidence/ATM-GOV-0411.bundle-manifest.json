@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0411",
+  "updatedAt": "2026-09-05T16:05:42.087Z",
+  "updatedBy": "codex-backlog-audit-20260905",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d010e2354829b4c8a6ffea9d65f686711bb0959ec61a593eac26c142a20bf008",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts"
+      ],
+      "generatedAt": "2026-09-05T16:04:45.811Z",
+      "startedAt": "2026-09-05T16:04:45.495Z",
+      "finishedAt": "2026-09-05T16:04:45.811Z",
+      "durationMs": 316,
+      "runnerKind": "dev-source",
+      "sourceCommit": "aaf8eec4c694324dd44a24c52795b2e51c0a6f16",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d0d81b035fe5893d9014475a64ffdc8d14d4088eba4637298eaebc130ed3171",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts"
+      ],
+      "generatedAt": "2026-09-05T16:05:26.080Z",
+      "startedAt": "2026-09-05T16:05:20.531Z",
+      "finishedAt": "2026-09-05T16:05:26.080Z",
+      "durationMs": 5549,
+      "runnerKind": "dev-source",
+      "sourceCommit": "aaf8eec4c694324dd44a24c52795b2e51c0a6f16",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "generatedAt": "2026-09-05T16:05:30.045Z",
+      "startedAt": "2026-09-05T16:04:49.830Z",
+      "finishedAt": "2026-09-05T16:05:30.045Z",
+      "durationMs": 40215,
+      "runnerKind": "dev-source",
+      "sourceCommit": "aaf8eec4c694324dd44a24c52795b2e51c0a6f16",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-05T16:05:42.086Z",
+      "startedAt": "2026-09-05T16:05:30.542Z",
+      "finishedAt": "2026-09-05T16:05:42.086Z",
+      "durationMs": 11544,
+      "runnerKind": "dev-source",
+      "sourceCommit": "aaf8eec4c694324dd44a24c52795b2e51c0a6f16",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

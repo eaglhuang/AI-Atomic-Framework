@@ -48,6 +48,7 @@ import {
   isActionableManualResidue,
   isDeferrableForeignGovernanceResidue,
 } from "../governance-residue-policy.ts";
+import { forEachPathspecBatch } from './pathspec-argv-batching.ts';
 
 import {
   CliError,
@@ -452,15 +453,19 @@ export function deferStagedFilePaths(cwd: LegacyValue, taskId: LegacyValue, file
     filesInput.map(normalizeRelativePath).filter(Boolean),
   );
   if (files.length === 0) return null;
-  const entries = runGitCommand(cwd, ["ls-files", "-s", "--", ...files])
-    .split(/\r?\n/)
-    .map((line: LegacyValue) => line.match(/^(\d+) ([0-9a-f]+) \d+\t(.+)$/i))
-    .filter((match: LegacyValue) => match !== null)
-    .map(([, mode, blobId, filePath]: LegacyValue) => ({
-      path: normalizeRelativePath(filePath),
-      mode,
-      blobId,
-    }));
+  const entries: LegacyValue[] = [];
+  forEachPathspecBatch(
+    { paths: files, fixedArgs: ["ls-files", "-s", "--"] },
+    (batch) => {
+      for (const match of runGitCommand(cwd, ["ls-files", "-s", "--", ...batch])
+        .split(/\r?\n/)
+        .map((line: LegacyValue) => line.match(/^(\d+) ([0-9a-f]+) \d+\t(.+)$/i))
+        .filter((candidate: LegacyValue) => candidate !== null)) {
+        const [, mode, blobId, filePath] = match;
+        entries.push({ path: normalizeRelativePath(filePath), mode, blobId });
+      }
+    },
+  );
   if (entries.length !== files.length) {
     throw new Error(
       `Cannot defer foreign staged files without a complete index snapshot: expected ${files.length} entries, captured ${entries.length}.`,
@@ -473,10 +478,9 @@ export function deferStagedFilePaths(cwd: LegacyValue, taskId: LegacyValue, file
     `${JSON.stringify({ schemaId: "atm.foreignStagedSnapshot.v1", taskId, createdAt: new Date().toISOString(), files, entries }, null, 2)}\n`,
     "utf8",
   );
-  runGitCommand(
-    cwd,
-    ["restore", "--staged", "--", ...files],
-    ["ignore", "pipe", "pipe"],
+  forEachPathspecBatch(
+    { paths: files, fixedArgs: ["restore", "--staged", "--"] },
+    (batch) => runGitCommand(cwd, ["restore", "--staged", "--", ...batch], ["ignore", "pipe", "pipe"]),
   );
   return snapshotPath;
 }

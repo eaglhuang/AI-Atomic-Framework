@@ -1,0 +1,287 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0411",
+  "title": "Bound every git-derived path argv caller",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+    ".atm/history/evidence/ATM-GOV-0411.*",
+    ".atm/history/task-events/ATM-GOV-0411/**",
+    ".atm/history/tasks/ATM-GOV-0411.json",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-git-governance-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.pathspec-argv-budget",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+        "disposition": "inline",
+        "inlineReason": "Reuse the existing canonical planner; duplicating it would create a second budget authority."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0411-bound-every-git-derived-path-argv-caller.task.md",
+    "sectionTitle": "ATM-GOV-0411",
+    "headingLine": 74,
+    "hash": "964465fdc815345e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0411-bound-every-git-derived-path-argv-caller.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:964465fdc815345ed9f80dfaf8372bbc5ee9d93bcf34b5bb0d99dc802fdeac74",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-05T15:53:55.999Z"
+    }
+  },
+  "importedAt": "2026-09-05T15:53:55.999Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_git_index_ownership_argv_budget_0411",
+      "targetGroupId": "null",
+      "semanticKey": "git_index_ownership_argv_budget",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "git-derived-path-argv-budget"
+      ],
+      "expectedRedPredicate": "repository-sized staged path metadata calls exceed the platform argv budget without batching",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "pathspec-argv-budget",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_git_index_ownership_argv_budget_0411"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-05T16-06-31-088Z-renew-72139419c6be",
+  "lastTransitionAt": "2026-09-05T16:06:31.088Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-audit-20260905",
+  "reservedAt": "2026-09-05T15:54:06.482Z",
+  "promotedAt": "2026-09-05T15:54:06.486Z",
+  "claim": {
+    "actorId": "codex-backlog-audit-20260905",
+    "leaseId": "lease-33083b414960",
+    "claimedAt": "2026-09-05T15:54:06.491Z",
+    "heartbeatAt": "2026-09-05T16:06:30.554Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0411.*",
+      ".atm/history/task-events/ATM-GOV-0411/**",
+      ".atm/history/tasks/ATM-GOV-0411.json",
+      "packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260905155406-codex-backlog-audit-20260905-5502a6b2ce",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905155406-codex-backlog-audit-20260905-5502a6b2ce\""
+    }
+  },
+  "startedAt": "2026-09-05T15:54:06.491Z",
+  "startedByActor": "codex-backlog-audit-20260905",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-3033831bc2a44a42",
+    "ticketDigest": "sha256:3033831bc2a44a42cd03d9f9250e463d0d714e7ac428b9dbe778bbd169301de4",
+    "taskId": "ATM-GOV-0411",
+    "origin": "claim",
+    "actorId": "codex-backlog-audit-20260905",
+    "laneSessionId": "lane-20260905155406-codex-backlog-audit-20260905-5502a6b2ce",
+    "claimGeneration": "lease-33083b414960",
+    "issuedAt": "2026-09-05T16:06:30.554Z",
+    "expiresAt": "2026-09-05T16:36:30.554Z",
+    "scopeDigest": "sha256:f22d6d28c9ab0a298e11c04b79f7d9dc22ee841510c743bccfb3f00d342029d1",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-05T16:06:30.554Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0411.*",
+          ".atm/history/task-events/ATM-GOV-0411/**",
+          ".atm/history/tasks/ATM-GOV-0411.json",
+          "packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+          "packages/cli/src/commands/git-index-ownership.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop"
+        ],
+        "digest": "sha256:045ca631465ede63588f1c6c9f501d99929412cc4e2fd6c692d9d0931ee1ef51"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260905155406-codex-backlog-audit-20260905-ATM-GOV-0411-436e2d7acf",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0411",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0411.*",
+      ".atm/history/task-events/ATM-GOV-0411/**",
+      ".atm/history/tasks/ATM-GOV-0411.json",
+      "packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0411-bound-every-git-derived-path-argv-caller.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0411-bound-every-git-derived-path-argv-caller.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "eaac7bbeeb97cecd0799e18b67f2c29547c0bcb029fcccc3e747d1ae166d0765",
+    "actorId": "codex-backlog-audit-20260905",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260905155406-codex-backlog-audit-20260905-5502a6b2ce",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905155406-codex-backlog-audit-20260905-5502a6b2ce\""
+    },
+    "createdAt": "2026-09-05T15:54:12.930Z",
+    "status": "active"
+  }
+}
