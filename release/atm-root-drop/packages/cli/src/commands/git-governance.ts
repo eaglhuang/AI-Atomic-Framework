@@ -133,6 +133,12 @@ export function selectTicketValidatedCommitFiles(
   const fileScopes = ticket.grants.find((grant) => grant.kind === 'file-write')?.values ?? [];
   const filtered = stagedFiles.filter((file) => fileScopes.some((scope) => pathMatchesWriteScope(file, scope)));
   if (filtered.length > 0) return filtered;
+  // An explicit task ticket is enough to admit the request for inspection
+  // even before the caller stages anything.  Let the task-scoped branch then
+  // report its precise STAGING_REQUIRED diagnostic; using an empty set here
+  // makes the work-admission gate reject the request before that diagnostic
+  // can be produced.
+  if (stagedFiles.length === 0 && fileScopes.length > 0) return fileScopes;
   if (stagesExactlyTheTicketBundle) return fileScopes;
   return deferForeignStaged ? filtered : stagedFiles;
 }
