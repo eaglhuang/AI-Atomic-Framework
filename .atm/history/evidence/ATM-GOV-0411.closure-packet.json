@@ -1,0 +1,170 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0411",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c28cc2c7b1529ac9eee8f59ae9a0990636cfb0c0",
+  "governedTreeSha": "d624751dd0d5577838c69c7311628768b309a480",
+  "targetCommitDelta": {
+    "currentCommitSha": "c28cc2c7b1529ac9eee8f59ae9a0990636cfb0c0",
+    "parentCommitShas": [
+      "c28cc2c7b1529ac9eee8f59ae9a0990636cfb0c0"
+    ],
+    "governedTreeSha": "d624751dd0d5577838c69c7311628768b309a480",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0411.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0411.json",
+      ".atm/history/evidence/ATM-GOV-0411.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T16-13-37-514Z-renew-98707e7acfb6.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T16-14-52-188Z-scope-amendment-8fcace881c9d.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T16-15-00-596Z-renew-8631233bc958.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T16-15-27-832Z-scope-amendment-ffd4f97d980a.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T16-15-30-847Z-renew-4a49464d7be3.json",
+      ".atm/history/tasks/ATM-GOV-0411.json",
+      "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+      "packages/cli/dist/commands/git-index-ownership.js",
+      "packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-003.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-index-ownership.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-index-ownership.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/git-commit-task-scoped-staging/fixture.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d010e2354829b4c8a6ffea9d65f686711bb0959ec61a593eac26c142a20bf008",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d0d81b035fe5893d9014475a64ffdc8d14d4088eba4637298eaebc130ed3171",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-05T16:21:01.502Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0411.*",
+      ".atm/history/task-events/ATM-GOV-0411/**",
+      ".atm/history/tasks/ATM-GOV-0411.json",
+      "packages/cli/dist",
+      "packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist",
+      "packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts",
+      "packages/cli/src/commands/git-index-ownership.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "node --strip-types tests/cli/real-shared-delivery-commit-executor.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0411.json",
+  "closedAt": "2026-09-05T16:21:01.502Z",
+  "closedByActor": "codex-backlog-audit-20260905",
+  "sessionId": "session-20260905155406-codex-backlog-audit-20260905-ATM-GOV-0411-436e2d7acf",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c28cc2c7b1529ac9eee8f59ae9a0990636cfb0c0",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/git-governance/implementation/git-index-ownership-argv-budget.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-index-ownership.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0411.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T15-53-56-327Z-import-34d6e8653153.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T15-54-06-482Z-reserve-fcc901e1cfb3.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T15-54-06-486Z-promote-26d313a844c4.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T15-54-12-838Z-claim-241b70ddaab3.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T15-58-24-948Z-scope-amendment-657b4d606ada.json",
+      ".atm/history/task-events/ATM-GOV-0411/2026-09-05T16-06-31-088Z-renew-72139419c6be.json",
+      ".atm/history/tasks/ATM-GOV-0411.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-17-003.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/git-commit-task-scoped-staging/fixture.ts"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

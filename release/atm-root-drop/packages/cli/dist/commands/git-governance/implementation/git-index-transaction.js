@@ -6,6 +6,7 @@ import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows, } fro
 import { extractGovernanceTaskIdFromPath, isProtectedStagedGovernanceOwnershipPath, normalizeRelativePath, pathMatchesTaskScope, uniqueSorted, } from "../commit-scope-policy.js";
 import { isFileAllowedInTaskBundle as isTaskBundleAllowedByPolicy, } from "../commit-bundle-filter.js";
 import { isDeferrableForeignGovernanceResidue, } from "../governance-residue-policy.js";
+import { forEachPathspecBatch } from './pathspec-argv-batching.js';
 import { quoteCliValue, } from "../../shared.js";
 import { ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit } from './git-head-evidence-transaction.js';
 import { parseTaskClaim, readTaskDocument } from './identity-check-command.js';
@@ -326,22 +327,23 @@ export function deferStagedFilePaths(cwd, taskId, filesInput) {
     const files = uniqueSorted(filesInput.map(normalizeRelativePath).filter(Boolean));
     if (files.length === 0)
         return null;
-    const entries = runGitCommand(cwd, ["ls-files", "-s", "--", ...files])
-        .split(/\r?\n/)
-        .map((line) => line.match(/^(\d+) ([0-9a-f]+) \d+\t(.+)$/i))
-        .filter((match) => match !== null)
-        .map(([, mode, blobId, filePath]) => ({
-        path: normalizeRelativePath(filePath),
-        mode,
-        blobId,
-    }));
+    const entries = [];
+    forEachPathspecBatch({ paths: files, fixedArgs: ["ls-files", "-s", "--"] }, (batch) => {
+        for (const match of runGitCommand(cwd, ["ls-files", "-s", "--", ...batch])
+            .split(/\r?\n/)
+            .map((line) => line.match(/^(\d+) ([0-9a-f]+) \d+\t(.+)$/i))
+            .filter((candidate) => candidate !== null)) {
+            const [, mode, blobId, filePath] = match;
+            entries.push({ path: normalizeRelativePath(filePath), mode, blobId });
+        }
+    });
     if (entries.length !== files.length) {
         throw new Error(`Cannot defer foreign staged files without a complete index snapshot: expected ${files.length} entries, captured ${entries.length}.`);
     }
     const snapshotPath = `.atm/runtime/snapshots/foreign-staged-${taskId}-${Date.now()}.json`;
     mkdirSync(path.dirname(path.join(cwd, snapshotPath)), { recursive: true });
     writeFileSync(path.join(cwd, snapshotPath), `${JSON.stringify({ schemaId: "atm.foreignStagedSnapshot.v1", taskId, createdAt: new Date().toISOString(), files, entries }, null, 2)}\n`, "utf8");
-    runGitCommand(cwd, ["restore", "--staged", "--", ...files], ["ignore", "pipe", "pipe"]);
+    forEachPathspecBatch({ paths: files, fixedArgs: ["restore", "--staged", "--"] }, (batch) => runGitCommand(cwd, ["restore", "--staged", "--", ...batch], ["ignore", "pipe", "pipe"]));
     return snapshotPath;
 }
 export function cleanupDeferredForeignStagedSnapshot(cwd, snapshotPath) {

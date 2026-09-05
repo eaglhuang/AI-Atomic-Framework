@@ -5,6 +5,7 @@ import { listActorWorkSessions } from './actor-session.js';
 import { readActiveTaskDirectionLocks } from './task-direction.js';
 import { readWorkAdmissionTicket } from './git-governance/work-admission-check.js';
 import { isPathAllowedByScope } from './work-channels.js';
+import { forEachPathspecBatch } from './git-governance/implementation/pathspec-argv-batching.js';
 export const ATM_INDEX_FOREIGN_ACTIVE_STAGED = 'ATM_INDEX_FOREIGN_ACTIVE_STAGED';
 /**
  * Validates the capability against the live index before any foreign entry is
@@ -339,17 +340,19 @@ function readStagedBlobMap(cwd, stagedFiles) {
     if (stagedFiles.length === 0)
         return map;
     try {
-        const output = execFileSync('git', ['ls-files', '-s', '--', ...stagedFiles], {
-            cwd,
-            encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore']
+        forEachPathspecBatch({ paths: stagedFiles, fixedArgs: ['ls-files', '-s', '--'] }, (batch) => {
+            const output = execFileSync('git', ['ls-files', '-s', '--', ...batch], {
+                cwd,
+                encoding: 'utf8',
+                stdio: ['ignore', 'pipe', 'ignore']
+            });
+            for (const line of output.split(/\r?\n/)) {
+                const match = line.match(/^(\d+)\s+([0-9a-f]+)\s+\d+\t(.+)$/i);
+                if (!match)
+                    continue;
+                map.set(normalizeRelativePath(match[3]).toLowerCase(), { mode: match[1], objectId: match[2] });
+            }
         });
-        for (const line of output.split(/\r?\n/)) {
-            const match = line.match(/^(\d+)\s+([0-9a-f]+)\s+\d+\t(.+)$/i);
-            if (!match)
-                continue;
-            map.set(normalizeRelativePath(match[3]).toLowerCase(), { mode: match[1], objectId: match[2] });
-        }
     }
     catch {
         // Missing blob metadata should not hide ownership classification.
@@ -361,16 +364,18 @@ function readStagedDeletionSet(cwd, stagedFiles) {
     if (stagedFiles.length === 0)
         return deletions;
     try {
-        const output = execFileSync('git', ['diff', '--cached', '--diff-filter=D', '--name-only', '--', ...stagedFiles], {
-            cwd,
-            encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore']
+        forEachPathspecBatch({ paths: stagedFiles, fixedArgs: ['diff', '--cached', '--diff-filter=D', '--name-only', '--'] }, (batch) => {
+            const output = execFileSync('git', ['diff', '--cached', '--diff-filter=D', '--name-only', '--', ...batch], {
+                cwd,
+                encoding: 'utf8',
+                stdio: ['ignore', 'pipe', 'ignore']
+            });
+            for (const filePath of output.split(/\r?\n/)) {
+                const normalized = normalizeRelativePath(filePath).toLowerCase();
+                if (normalized)
+                    deletions.add(normalized);
+            }
         });
-        for (const filePath of output.split(/\r?\n/)) {
-            const normalized = normalizeRelativePath(filePath).toLowerCase();
-            if (normalized)
-                deletions.add(normalized);
-        }
     }
     catch {
         // Unknown metadata remains fail-closed rather than being inferred as a deletion.
