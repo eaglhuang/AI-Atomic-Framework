@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0412",
+  "title": "Enforce runner compatibility digest before governed writes",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "The runner-sync admission report includes a digest-bound compatibility result.",
+    "A stale frozen runner is rejected before governed writes.",
+    "Recover-push child processes remain bounded by the governed timeout policy."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+    "tests/cli/runner-compatibility-digest-precondition.test.ts",
+    "tests/cli/recover-push-fail-timeout.test.ts"
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+    "sectionTitle": "Enforce runner compatibility digest before governed writes",
+    "headingLine": 96,
+    "hash": "6c66cc78a13fd4fd",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+      "planningCommitSha": "2dbc7789d6d758d34d00ee21077c71aed28f054d",
+      "contentDigest": "sha256:3f1b00da3f6c37bfdf4700f1e3689f1b9f3c192af9f21c5e0e8f37c4df01f9f9",
+      "amendmentEpoch": 3,
+      "sealedAt": "2026-09-05T17:20:06.661Z"
+    }
+  },
+  "importedAt": "2026-09-05T17:20:06.661Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "importDiagnostics": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-goal-20260906",
+    "leaseId": "lease-741a14db06e4",
+    "claimedAt": "2026-09-05T17:11:23.952Z",
+    "heartbeatAt": "2026-09-05T17:11:23.952Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0412.*",
+      ".atm/history/task-events/ATM-GOV-0412/**",
+      ".atm/history/tasks/ATM-GOV-0412.json",
+      "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+      "tests/cli/recover-push-fail-timeout.test.ts",
+      "tests/cli/runner-compatibility-digest-precondition.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260905171124-codex-goal-20260906-c9306b2326",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905171124-codex-goal-20260906-c9306b2326\""
+    }
+  },
+  "owner": "codex-goal-20260906",
+  "startedAt": "2026-09-05T17:11:23.952Z",
+  "startedBySessionId": "session-20260905171123-codex-goal-20260906-ATM-GOV-0412-b00f405f92",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0412",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0412.*",
+      ".atm/history/task-events/ATM-GOV-0412/**",
+      ".atm/history/tasks/ATM-GOV-0412.json",
+      "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+      "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+      "tests/cli/recover-push-fail-timeout.test.ts",
+      "tests/cli/runner-compatibility-digest-precondition.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/follow-ups/",
+      "docs/ai_atomic_framework/governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4d563879718a19e8af1aa519de3542baf26a9eaa07e603d128818e7d06e7f02f",
+    "actorId": "codex-goal-20260906",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260905171124-codex-goal-20260906-c9306b2326",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905171124-codex-goal-20260906-c9306b2326\""
+    },
+    "createdAt": "2026-09-05T17:11:25.630Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-09-05T17-21-51-870Z-scope-amendment-80d4f627e3fb",
+  "lastTransitionAt": "2026-09-05T17:21:51.870Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "scopePaths": [
+    ".atm/history/evidence/ATM-GOV-0412.*",
+    ".atm/history/task-events/ATM-GOV-0412/**",
+    ".atm/history/tasks/ATM-GOV-0412.json",
+    "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+    "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+    "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+    "tests/cli/recover-push-fail-timeout.test.ts",
+    "tests/cli/runner-compatibility-digest-precondition.test.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts"
+  ],
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6a5e0f3581b69565",
+    "ticketDigest": "sha256:6a5e0f3581b69565d7c0063c35ae5182e808f552d4fc6453e2b276b19043fd1a",
+    "taskId": "ATM-GOV-0412",
+    "origin": "claim",
+    "actorId": "codex-goal-20260906",
+    "laneSessionId": "lane-20260905171124-codex-goal-20260906-c9306b2326",
+    "claimGeneration": "lease-741a14db06e4",
+    "issuedAt": "2026-09-05T17:21:51.808Z",
+    "expiresAt": "2026-09-05T17:51:51.808Z",
+    "scopeDigest": "sha256:ce56203d24d333bed3c2407d43b08a2162b96ad54a66098ec101eea9420c98c7",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-05T17:21:51.808Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0412.*",
+          ".atm/history/task-events/ATM-GOV-0412/**",
+          ".atm/history/tasks/ATM-GOV-0412.json",
+          "governance-optimization/follow-ups/ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md",
+          "packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts",
+          "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+          "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
+          "tests/cli/recover-push-fail-timeout.test.ts",
+          "tests/cli/runner-compatibility-digest-precondition.test.ts"
+        ],
+        "digest": "sha256:0b0498492f54c688f10a355be41e8c2ba85a0c937578c966427af61cc8cbe11e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

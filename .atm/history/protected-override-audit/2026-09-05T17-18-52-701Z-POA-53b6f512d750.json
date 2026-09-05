@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-53b6f512d750",
+  "recordedAt": "2026-09-05T17:18:52.701Z",
+  "actorId": null,
+  "taskId": "ATM-GOV-0412",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\governance-optimization\\follow-ups\\ATM-GOV-0412-runner-compatibility-digest-precondition.plan.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-ATM-GOV-0412-475fe58abd",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-05T17-18-52-700Z-EMG-ATM-GOV-0412-475fe58abd.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

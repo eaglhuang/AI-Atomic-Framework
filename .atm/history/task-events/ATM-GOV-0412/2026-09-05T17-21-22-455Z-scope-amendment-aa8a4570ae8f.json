@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-05T17-21-22-455Z-scope-amendment-aa8a4570ae8f",
+  "taskId": "ATM-GOV-0412",
+  "action": "scope-amendment",
+  "actorId": "codex-goal-20260906",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0412.json",
+  "taskSha256": "sha256:a511fb25dde7bfeda41cb0eae22beb085a131ba9d59d5365dc5e94f4875460af",
+  "createdAt": "2026-09-05T17:21:22.455Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0412 --actor codex-goal-20260906 --add \"packages/cli/src/commands/framework-development/runner-publication-lifecycle.ts,packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts,tests/cli/runner-compatibility-digest-precondition.test.ts,tests/cli/recover-push-fail-timeout.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
