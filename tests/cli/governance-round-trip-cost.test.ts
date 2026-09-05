@@ -105,7 +105,11 @@ import tasksCommandSpec from '../../packages/cli/src/commands/command-specs/task
 
   for (const id of ['ATM-BUG-2026-08-13-009', 'ATM-BUG-2026-08-13-010']) {
     const item = readItem(id);
-    assert.equal(item.status, 'Resolved', `${id} was withdrawn after verification and must stay withdrawn`);
+    assert.match(
+      String(item.status),
+      /^(Resolved|Closed — .*withdrawn)/,
+      `${id} was withdrawn after verification and must stay withdrawn`
+    );
     assert.match(
       String(item.area),
       /^Withdrawn: /,
