@@ -5304,6 +5304,7 @@
     "release/atm-root-drop/tests/cli/hook-audit-scope-classification.test.ts",
     "release/atm-root-drop/tests/cli/identity-per-actor-routing.test.ts",
     "release/atm-root-drop/tests/cli/incident-learning-backlog-skill.test.ts",
+    "release/atm-root-drop/tests/cli/integration-editor-detection.test.ts",
     "release/atm-root-drop/tests/cli/integration-final-600.test.ts",
     "release/atm-root-drop/tests/cli/integration-hooks-final-600.test.ts",
     "release/atm-root-drop/tests/cli/integration-profile-parity.test.ts",
@@ -6007,11 +6008,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1374,
-    "unchanged": 4598,
+    "copied": 3,
+    "unchanged": 1951,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -23826,7 +23827,7 @@
       },
       {
         "path": "packages/cli/dist/commands/integration/adapters.js",
-        "digest": "397d83032508c22f2d02c36b68b50c939ba7940ddfce4f8f5a25d2e5815a9e2f",
+        "digest": "2f14596424d062c4bccae8547bde0c2a0fe5bc4072bdfe4fad6671fd518b4816",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/integration/adapters.js"
@@ -30288,7 +30289,7 @@
       },
       {
         "path": "packages/cli/src/commands/integration/adapters.ts",
-        "digest": "aff0248defb654c88e46b5b0aca25ecf4f7807c62e934f7a3bbaa7932513e59b",
+        "digest": "9ef86efab17630be22ee89082288cbfdc253d7ab4d1c91668cd74747fb947519",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/integration/adapters.ts"
@@ -53462,6 +53463,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/integration-editor-detection.test.ts",
+        "digest": "cd80d96bdbf0e1f4226092e8fdbfce4dede467677b60b895a061490bf74f6e69",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/integration-editor-detection.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/integration-final-600.test.ts",
         "digest": "a7ed646b017297de19284d89d95173f78d8adea236b6a0127fb55aac3552aa0f",
         "origin": "source",
@@ -59762,7 +59772,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:27329381ff08b653ebe695b7c5098699acbba8c9e62ce096f403ab5ac570ae61"
+    "treeDigest": "sha256:a792df47d7af30caeedc24979c1a53c64be564ab47748420443bba993feb31a7"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61292,7 +61302,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:97e9d21119e4664af444554bbe4ffaa838c14fdc425c24fdcbae6419916440a6"
+    "digest": "sha256:0fba92d7d07f6ccd53e6cd5e61e3c9c93cf54bcddc9d1e9b3e007cd1d1563c9f"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66570,6 +66580,7 @@
       "release/atm-root-drop/tests/cli/hook-audit-scope-classification.test.ts",
       "release/atm-root-drop/tests/cli/identity-per-actor-routing.test.ts",
       "release/atm-root-drop/tests/cli/incident-learning-backlog-skill.test.ts",
+      "release/atm-root-drop/tests/cli/integration-editor-detection.test.ts",
       "release/atm-root-drop/tests/cli/integration-final-600.test.ts",
       "release/atm-root-drop/tests/cli/integration-hooks-final-600.test.ts",
       "release/atm-root-drop/tests/cli/integration-profile-parity.test.ts",
@@ -67276,22 +67287,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:43b90863a2fd696879234500b944d9a811a1163072a86d4372687e8df1531de4",
-  "sealedSourceCommit": "2a4896598b1b98583fef31480e4006bf6075f42e",
+  "buildInputsTreeHash": "sha256:ae589f0ce01e4b0e0837ec55b35b6b5949d59574be413bd8e590dd4958c61758",
+  "sealedSourceCommit": "3bbb3d7270d679a84c8299a41796d283cfadcf4f",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:c558e88db14255a81b684e64bd8b2ce76ba4f965724e5faee923f8e094b5df15",
-  "tsBuildCacheDigest": "sha256:77174cb81627845c228b9f5bbe81ececaa2effab0d2d1748702e784fd700b171",
+  "incrementalPlanDigest": "sha256:47ca6528d66d043957da71d890638ab1b44482814252d613b285ecb21e86ec8a",
+  "tsBuildCacheDigest": "sha256:8ab1d65109846a76a44228ec928ff707bbfdbe814283ae2c381b2432d0774c87",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 50,
-    "skipDecision": 57,
-    "worktreeSetup": 14943,
-    "typescriptBuild": 11418,
-    "rootDropReleaseAssembly": 32823,
-    "onefileReleaseAssembly": 9372,
-    "artifactSync": 9516,
+    "skipDecision": 59,
+    "worktreeSetup": 21317,
+    "typescriptBuild": 28141,
+    "rootDropReleaseAssembly": 44815,
+    "onefileReleaseAssembly": 10739,
+    "artifactSync": 10977,
     "cleanup": 0,
-    "totalElapsed": 92195
+    "totalElapsed": 142772
   }
 }

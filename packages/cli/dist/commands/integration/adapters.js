@@ -26,20 +26,18 @@ export function availableAdapters(repositoryRoot) {
     return Object.keys(integrationAdapterFactories).map((adapterId) => describeAdapter(createIntegrationAdapter(adapterId), repositoryRoot));
 }
 export function detectCurrentEditorIntegrationId(env = process.env) {
-    const explicitCandidates = [
-        { source: 'ATM_EDITOR_ID', value: env.ATM_EDITOR_ID },
-        { source: 'ATM_ACTOR_ID', value: env.ATM_ACTOR_ID },
-        { source: 'AGENT_IDENTITY', value: env.AGENT_IDENTITY }
-    ];
-    for (const candidate of explicitCandidates) {
-        const normalizedId = normalizeDetectedEditorId(candidate.value);
-        if (normalizedId) {
-            return {
-                id: normalizedId,
-                source: candidate.source,
-                rawValue: candidate.value ?? null
-            };
-        }
+    // Actor/model environment variables are identity provenance, not editor
+    // selection.  In particular, values such as `codex-gpt-5.4-mini` must not
+    // be reduced to the `codex` editor and cause stale model metadata to drive
+    // integration guidance.  An editor must be explicit at this boundary.
+    const explicitEditor = env.ATM_EDITOR_ID;
+    const normalizedEditorId = normalizeDetectedEditorId(explicitEditor);
+    if (normalizedEditorId) {
+        return {
+            id: normalizedEditorId,
+            source: 'ATM_EDITOR_ID',
+            rawValue: explicitEditor ?? null
+        };
     }
     if (typeof env.CODEX_HOME === 'string' && env.CODEX_HOME.trim().length > 0) {
         return {
