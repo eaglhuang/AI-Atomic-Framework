@@ -18,12 +18,22 @@ export const tempDir = path.resolve(root, '.atm-temp-test-git-commit-task-scoped
  * transient lock errors so a completed regression is not reported as failed.
  */
 export function removeFixtureRepository(): void {
-  rmSync(tempDir, {
-    recursive: true,
-    force: true,
-    maxRetries: 10,
-    retryDelay: 100
-  });
+  const waitForWindowsHandle = () => {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
+  };
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    try {
+      rmSync(tempDir, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (code !== 'EPERM' && code !== 'EBUSY' && code !== 'ENFILE' && code !== 'EMFILE') {
+        throw error;
+      }
+      waitForWindowsHandle();
+    }
+  }
+  rmSync(tempDir, { recursive: true, force: true });
 }
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
