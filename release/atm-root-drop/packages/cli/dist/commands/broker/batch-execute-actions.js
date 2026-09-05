@@ -9,6 +9,7 @@ import { runSharedDeliveryCommitTransaction } from './shared-delivery-commit-tra
 import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID } from '../../_vendor/core/dist/broker/shared-write-provenance-policy.js';
 import { planSharedDeliverySaga } from '../../_vendor/core/dist/broker/shared-delivery-saga.js';
 import { planWaveGeneratedWrite } from '../../_vendor/core/dist/broker/wave-generated-executor.js';
+import { readWorkAdmissionTicket } from '../git-governance/work-admission-check.js';
 import { ATM_ONLY_EXECUTION_ROUTE_NOTICE, evaluateRestrictedExecution } from '../../_vendor/core/dist/team-agents/restricted-execution-gateway.js';
 function readJson(pathName) {
     if (!existsSync(pathName)) {
@@ -199,7 +200,8 @@ function admitGeneratedCommandManifest(input) {
         argv: input.manifest.argv,
         cwd: input.manifest.cwd ?? input.cwd,
         declaredOutputs: input.declaredOutputs,
-        adapterCapability: 'enforced'
+        adapterCapability: 'enforced',
+        workAdmissionTicket: input.workAdmissionTicket
     });
     if (evaluation.decision === 'deny') {
         throw new CliError('ATM_RESTRICTED_EXECUTION_BLOCKED', `command manifest execution is not an approved worker route: ${evaluation.reasonCode}`, {
@@ -250,7 +252,8 @@ function admitDeprecatedGeneratedShellCommand(input) {
         argv: tokens.slice(1),
         cwd: input.cwd,
         declaredOutputs: input.declaredOutputs,
-        adapterCapability: 'enforced'
+        adapterCapability: 'enforced',
+        workAdmissionTicket: input.workAdmissionTicket
     });
     if (evaluation.decision === 'deny') {
         throw new CliError('ATM_RESTRICTED_EXECUTION_BLOCKED', `deprecated generated shell command is not an approved worker route: ${evaluation.reasonCode}`, {
@@ -311,14 +314,17 @@ export function handleBrokerBatchExecute(options, context) {
         }
         const surfaceKind = selectedSurface;
         const commandManifest = options.commandManifestPath ? readCommandManifest(options.cwd, options.commandManifestPath) : null;
+        const generatedTaskId = options.expectedTasks[0] ?? null;
+        const workAdmissionTicket = generatedTaskId ? readWorkAdmissionTicket(options.cwd, generatedTaskId) : null;
         const commandManifestAdmission = commandManifest
             ? admitGeneratedCommandManifest({
                 cwd: options.cwd,
                 manifest: commandManifest,
                 actorId: options.actorId,
-                taskId: options.expectedTasks[0] ?? null,
+                taskId: generatedTaskId,
                 laneSessionId: options.waveId,
-                declaredOutputs: options.outputFiles
+                declaredOutputs: options.outputFiles,
+                workAdmissionTicket
             })
             : null;
         const commandRun = options.apply
@@ -329,9 +335,10 @@ export function handleBrokerBatchExecute(options, context) {
                         cwd: options.cwd,
                         command: options.runCommand,
                         actorId: options.actorId,
-                        taskId: options.expectedTasks[0] ?? null,
+                        taskId: generatedTaskId,
                         laneSessionId: options.waveId,
-                        declaredOutputs: options.outputFiles
+                        declaredOutputs: options.outputFiles,
+                        workAdmissionTicket
                     }), runDeprecatedGeneratedShellCommand(options.cwd, options.runCommand))
                     : null
             : null;
