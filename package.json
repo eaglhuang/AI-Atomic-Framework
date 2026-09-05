@@ -16,7 +16,7 @@
     "build:packages": "node --strip-types scripts/run-sealed-runner-build.ts packages",
     "build:release-hygiene:cleanup": "node --strip-types scripts/build-release-hygiene.ts --mode cleanup",
     "build:root-drop-release": "node --strip-types scripts/run-sealed-runner-build.ts root-drop",
-    "build:onefile-release": "node --strip-types scripts/build-onefile-release.ts",
+    "build:onefile-release": "node --strip-types scripts/run-sealed-runner-build.ts onefile",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "check:encoding:touched": "node --strip-types scripts/check-encoding-touched.ts --mode touched",
