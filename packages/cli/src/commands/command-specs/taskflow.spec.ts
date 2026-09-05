@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'taskflow',
   summary: 'Official operator lane for governed task open and close. taskflow open is the normal opener lane; its dry-run returns a writeReadinessHint that names exactly what is missing when --write would fail closed, names the planning card, target repository, and next dry-run/import commands, and warns with ATM_TASK_ID_FAMILY_DRIFT when a new task family duplicates an existing semantic family. taskflow pre-close is the read-only first checkpoint before historical close --write; it reports scopeTrackedDirtyFiles, unexpectedStagedTasks, mixedDeliveryCommit, staleEvidence, autoEvidencePlan, and missingApprovalLease without mutating the worktree. taskflow close expands directory-style deliverables into explicit file manifests before metadata validation and stages optional evidence bundle manifests when present; it enforces validator scope taxonomy for close gates. taskflow close --write acquires an exclusive close-window staged-index lock before staging, blocks competing stage operations, and releases the lock on commit, rollback, or abort while surfacing closeWriteTransaction phase pending, committed, or rolled_back in JSON. taskflow close --auto-evidence runs missing declared validators through evidence run before backend close; explicit evidence --validators remains an override. Use task-view for a single-task read-only dashboard (status, evidence blockers, close completion checklist, next safe command) without replacing next routing. tasks new is a low-level template generator surface (no governed lifecycle). tasks import is the runtime synchronization surface (backend). Direct tasks close, tasks reconcile, tasks repair-closure are protected backend / emergency surfaces and must not be used as normal operator paths.',
   positional: [
-    { name: 'action', summary: 'open | close | pre-close', required: true }
+    { name: 'action', summary: 'open | close | pre-close | status', required: true }
   ],
   options: [
     commonCwdOption,
@@ -51,7 +51,8 @@ export default defineCommandSpec({
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --dry-run --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --write --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-staged --write --json',
-    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-state --write --json'
+    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-state --write --json',
+    'node atm.mjs taskflow status --task TASK-ADOPTER-0001 --json'
   ],
   help: {
     audience: 'agent',

@@ -16,6 +16,7 @@ import {
   stageTaskCloseArtifacts
 } from '../close-helpers/close-artifact-staging.ts';
 import { relativePathFrom } from '../../shared.ts';
+import { writeCloseTransactionStatus } from '../../taskflow/close-transaction-status.ts';
 
 type AbandonResidueDispositionClass = 'keep-diagnostic' | 'abandon' | 'remove-evidence';
 
@@ -171,6 +172,7 @@ export async function executeCloseWrites(input: {
   readonly closurePacket: ClosurePacket | null;
 }) {
   const { options, actorId } = input;
+  writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: 'started' });
   let closurePacketPath = input.closurePacketPath;
   let closurePacket = input.closurePacket;
   const closeTransitionCommand = buildTaskTransitionCommand({
@@ -242,6 +244,7 @@ export async function executeCloseWrites(input: {
       return { transitionPath, closurePacketPath, abandonResidueDispositionPath };
     }
   });
+  writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: 'ledger-written' });
   return {
     transitionPath: closeWriteResult.transitionPath,
     closurePacketPath: closeWriteResult.closurePacketPath ?? closurePacketPath
