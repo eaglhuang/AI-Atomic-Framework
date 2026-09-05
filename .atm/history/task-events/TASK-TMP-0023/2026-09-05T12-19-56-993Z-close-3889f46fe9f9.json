@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-05T12-19-56-993Z-close-3889f46fe9f9",
+  "taskId": "TASK-TMP-0023",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260905120642-codex-gpt-5.4-mini-TASK-TMP-0023-0f9bdef751",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0023.json",
+  "taskSha256": "sha256:42b6d0b310bf7e213051a29887e95eed8104b63a7c952bb482a4a93dddf9b6e9",
+  "createdAt": "2026-09-05T12:19:56.993Z",
+  "command": "node atm.mjs tasks close --task TASK-TMP-0023 --actor codex-gpt-5.4-mini --status done --historical-delivery 7d660768ae56f055152180731e9510dd6a9f3870",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260905120642-codex-gpt-5.4-mini-TASK-TMP-0023-0f9bdef751",
+    "closurePacketPath": ".atm/history/evidence/TASK-TMP-0023.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+    ],
+    "requiredGates": [
+      "build",
+      "doctor",
+      "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-05T12:19:56.985Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TMP-0023.*",
+        ".atm/history/task-events/TASK-TMP-0023/**",
+        ".atm/history/tasks/TASK-TMP-0023.json",
+        "atm.mjs",
+        "packages/cli/dist",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**"
+      ],
+      "criticalChangedFiles": [
+        "atm.mjs",
+        "packages/cli/dist"
+      ],
+      "requiredGates": [
+        "build",
+        "doctor",
+        "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+        "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+      ]
+    }
+  }
+}

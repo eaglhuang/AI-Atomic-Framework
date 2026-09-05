@@ -1,0 +1,138 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TMP-0023",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "7d660768ae56f055152180731e9510dd6a9f3870",
+  "governedTreeSha": "7c7343d567e747478d011e6a9f0f6d9604726312",
+  "targetCommitDelta": {
+    "currentCommitSha": "7d660768ae56f055152180731e9510dd6a9f3870",
+    "parentCommitShas": [
+      "7d660768ae56f055152180731e9510dd6a9f3870"
+    ],
+    "governedTreeSha": "7c7343d567e747478d011e6a9f0f6d9604726312",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      "atm.mjs",
+      "packages/cli/dist/_vendor/core/dist/broker/cross-task-mutation-guard.js",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/cross-task-mutation-guard.js",
+      "release/atm-root-drop/packages/core/dist/broker/cross-task-mutation-guard.js",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/cross-task-mutation-guard.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae44054cdeaaaec0e89b55f525c9f20fc59eda26e7a1b88edcdc23a675d5dff3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1589b7874a904975a2a0aba6f8129a1d26c75a346ac06f56529d23097ac27155",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ff4351d1ef0589396c76a522e2c3528d7bec856a9ed68e583cf55723762aebec",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "doctor",
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "build",
+    "doctor",
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-05T12:19:56.985Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TMP-0023.*",
+      ".atm/history/task-events/TASK-TMP-0023/**",
+      ".atm/history/tasks/TASK-TMP-0023.json",
+      "atm.mjs",
+      "packages/cli/dist",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**"
+    ],
+    "criticalChangedFiles": [
+      "atm.mjs",
+      "packages/cli/dist"
+    ],
+    "requiredGates": [
+      "build",
+      "doctor",
+      "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "node --strip-types packages/core/src/broker/__tests__/cross-task-mutation-terminal-entitlement.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TMP-0023.json",
+  "closedAt": "2026-09-05T12:19:56.985Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260905120642-codex-gpt-5.4-mini-TASK-TMP-0023-0f9bdef751",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "7d660768ae56f055152180731e9510dd6a9f3870",
+    "taskMatchedFiles": [
+      "packages/cli/dist/_vendor/core/dist/broker/cross-task-mutation-guard.js"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-TMP-0023.json",
+      ".atm/history/task-events/TASK-TMP-0023/2026-09-05T12-16-12-433Z-scope-amendment-4dfc30bddd34.json",
+      ".atm/history/task-events/TASK-TMP-0023/2026-09-05T12-17-09-275Z-renew-4b4b49b17df1.json",
+      ".atm/history/task-events/TASK-TMP-0023/2026-09-05T12-17-46-388Z-renew-c97baba84f0b.json",
+      ".atm/history/tasks/TASK-TMP-0023.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/cross-task-mutation-guard.js",
+      "release/atm-root-drop/packages/core/dist/broker/cross-task-mutation-guard.js",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/cross-task-mutation-guard.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
