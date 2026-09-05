@@ -130,11 +130,14 @@ export function validatePlanningSourceSeal(input) {
             }
         };
     }
-    const current = buildPlanningSourceSeal({
+    let current = buildPlanningSourceSeal({
         cwd: input.cwd,
         planAbsolute,
         sealedAt: sealed.sealedAt
     });
+    if (current.contentDigest === sealed.contentDigest && current.amendmentEpoch < sealed.amendmentEpoch) {
+        current = { ...current, amendmentEpoch: sealed.amendmentEpoch };
+    }
     const classification = classifyPlanningSourceSeal({ sealed, current, sourcePlanPath });
     return {
         ok: classification.ok,
