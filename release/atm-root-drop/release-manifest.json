@@ -5993,11 +5993,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 5,
-    "unchanged": 1946,
+    "copied": 1364,
+    "unchanged": 4594,
     "removed": 0
   },
-  "buildMode": "overlay",
+  "buildMode": "full",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -9124,7 +9124,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-14-183.json",
-        "digest": "862ce53af09e3f95a2960b3714874890f65c443639a053fabadbb4af90025070",
+        "digest": "ed4f68069ac154f5ce1949b7cc9b845e4c476e72e271cc8516fcee7587d9e615",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-14-183.json"
@@ -10204,7 +10204,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-229.json",
-        "digest": "03bc73a7757d62929402eb5fdef8f41f60a4ad5b572c91a8770bc289bb107524",
+        "digest": "aecbc8ca6a761523890649b0f4ab8c4db631ebc4e7c25e9dbef2f322ceeb25b3",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-229.json"
@@ -10393,7 +10393,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-29-250.json",
-        "digest": "ac8543ae2f8f7947c9470666e6c9a187e92baedd6463517d78e935f7fdc747ec",
+        "digest": "57133d9e60496e82c8eac28aff3be9efc1fd2a7979f01ce4cea6fa086735c0ff",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-29-250.json"
@@ -11077,7 +11077,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-017.json",
-        "digest": "a5b686c6a0aede88b2e7c454cc4f0b6efd472911c4cece5c74472b3711fcae98",
+        "digest": "15793491b99f5c0dc717ae9028ce6cd2e3b8d5a1da9f04fb5f9a1c32c776b674",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-13-017.json"
@@ -11698,7 +11698,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.md",
-        "digest": "8523ff349ba353f71d148b74e966a720716387bf7106cb9b4cdd2463bffcaa63",
+        "digest": "63bab5eab03ef6c3361fe76cf3512fac2a6657bb03ff566187c48e7e480abaad",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.md"
@@ -45358,7 +45358,7 @@
       },
       {
         "path": "scripts/AtmCore/runner-build-scope.json",
-        "digest": "6430751c94a5bb65faa26a5d8bf8895d96c8178038c6b3980f807b7c02c400a4",
+        "digest": "c32f6984f9b5837cb46c39de2e0b8dc993100b5c8aa84908618a69533dbe0af8",
         "origin": "source",
         "inputPaths": [
           "scripts/AtmCore/runner-build-scope.json"
@@ -49174,7 +49174,7 @@
       },
       {
         "path": "scripts/validate-runner-build-scope.ts",
-        "digest": "574c078a6afaa2f9fdc52beb4520239435a1a9614353e1cd6cf5e5448e0368dc",
+        "digest": "ddd6011bb47f7d279959d47a629f0a3cc6f19d6e733804f831d44ce8ddea3f5d",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-runner-build-scope.ts"
@@ -59622,7 +59622,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:cf5026005135eb1555a219e79c87feddcb2abff2dcbfee0a8e165094b1645d1a"
+    "treeDigest": "sha256:a74ac92a981028d4385533eebd3568a767ddc8bee464249c454a308f0cc12253"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61086,10 +61086,71 @@
       "templates/agent-pack/batch-playbook-fragment.md",
       "templates/agent-pack/fast-playbook-fragment.md",
       "templates/agent-pack/normal-playbook-fragment.md",
+      "templates/atom.spec.template.json",
+      "templates/atom.test.template.ts",
+      "templates/enforcement/ci-atm-onboarding.yml",
+      "templates/enforcement/pre-commit.sh",
+      "templates/root-drop/.atm/charter/atm-first-principles.template.md",
+      "templates/root-drop/.atm/charter/atomic-charter.template.md",
+      "templates/root-drop/.atm/charter/charter-invariants.template.json",
+      "templates/root-drop/.atm/context/INITIAL_SUMMARY.md",
+      "templates/root-drop/.atm/profile/default.md",
+      "templates/root-drop/.atm/scripts/WRAPPER_DEDUP_PLAN.md",
+      "templates/root-drop/.atm/scripts/ps/atm-create.ps1",
+      "templates/root-drop/.atm/scripts/ps/atm-evidence.ps1",
+      "templates/root-drop/.atm/scripts/ps/atm-handoff.ps1",
+      "templates/root-drop/.atm/scripts/ps/atm-lock.ps1",
+      "templates/root-drop/.atm/scripts/ps/atm-next.ps1",
+      "templates/root-drop/.atm/scripts/ps/atm-orient.ps1",
+      "templates/root-drop/.atm/scripts/ps/atm-upgrade-scan.ps1",
+      "templates/root-drop/.atm/scripts/sh/atm-create.sh",
+      "templates/root-drop/.atm/scripts/sh/atm-evidence.sh",
+      "templates/root-drop/.atm/scripts/sh/atm-handoff.sh",
+      "templates/root-drop/.atm/scripts/sh/atm-lock.sh",
+      "templates/root-drop/.atm/scripts/sh/atm-next.sh",
+      "templates/root-drop/.atm/scripts/sh/atm-orient.sh",
+      "templates/root-drop/.atm/scripts/sh/atm-upgrade-scan.sh",
+      "templates/root-drop/.atm/scripts/wrappers.json",
+      "templates/root-drop/AGENTS.md",
+      "templates/skills/atm-atom-map-refactor.skill.md",
+      "templates/skills/atm-bug-backlog.skill.md",
+      "templates/skills/atm-create.skill.md",
+      "templates/skills/atm-deep-module-refactor.files/references/deepening.md",
+      "templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md",
+      "templates/skills/atm-deep-module-refactor.skill.md",
+      "templates/skills/atm-diagnostic-loop.skill.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-error-code-resolver.skill.md",
+      "templates/skills/atm-evidence.skill.md",
+      "templates/skills/atm-framework-quickfix.skill.md",
+      "templates/skills/atm-framework-temp-claim.skill.md",
+      "templates/skills/atm-git-pathspec-emergency-commit.skill.md",
+      "templates/skills/atm-governance-router.files/references/boundary-confusion.md",
+      "templates/skills/atm-governance-router.files/references/entry-friction.md",
+      "templates/skills/atm-governance-router.files/references/fallback-design.md",
+      "templates/skills/atm-governance-router.files/references/index.md",
+      "templates/skills/atm-governance-router.files/references/learning-loop.md",
+      "templates/skills/atm-governance-router.files/references/route-interpretation.md",
+      "templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-handoff.skill.md",
+      "templates/skills/atm-internal-build-sync.skill.md",
+      "templates/skills/atm-lock.skill.md",
+      "templates/skills/atm-memory-consolidate.skill.md",
+      "templates/skills/atm-minimal-patch-rebuilder.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "templates/skills/atm-orient.skill.md",
+      "templates/skills/atm-plan-authoring.skill.md",
+      "templates/skills/atm-residue-cleanup.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "templates/skills/atm-task-intent-resolver.skill.md",
+      "templates/skills/atm-upgrade-scan.skill.md",
+      "templates/skills/mailbox-worker-execution.skill.md",
+      "templates/skills/skill.schema.json",
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:9eab2c9ceb7c99e9c3baf63948ed3b4df4069871f5c423448283f5821fa7c76c"
+    "digest": "sha256:7e6c253c62b8dabe8667b6523cf621beddc56abcbece9c3f07c608fe0c49e205"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -67059,22 +67120,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:a7bf93444e0d7bfc01eb44d47e092e3efae236690f4fe049302c04859906bbe7",
-  "sealedSourceCommit": "ad7894c3d5966a4128b57e375de6302cf9d8a8c8",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:c293f9313281e16e7640acfdb2a08987884e5385af8cc5dfe41724e7544d8e7c",
-  "tsBuildCacheDigest": "sha256:5e1e7195dad4d0a864f737f48334531ff94da3e97f7897844dc9425ec87a6717",
+  "buildInputsTreeHash": "sha256:8a3e2ca6edb9422a601373a69b2e1ef0154e3351dc0f714cd132796a77cd4317",
+  "sealedSourceCommit": "888d897f782ecf258702cf9b16dd34499433b49c",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:c33517aa53a2da1bf9dafae9f6a08bb1d7ef6f5dd6b2c0a24de276c376e8804f",
+  "tsBuildCacheDigest": "sha256:04059c4a496c67eddcf63ac6f342533db3d5011bbe849f1b63fa94c731cce225",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 58,
-    "skipDecision": 73,
-    "worktreeSetup": 14923,
-    "typescriptBuild": 23807,
-    "rootDropReleaseAssembly": 34007,
-    "onefileReleaseAssembly": 9432,
-    "artifactSync": 9406,
+    "inputHashCalculation": 48,
+    "skipDecision": 60,
+    "worktreeSetup": 14363,
+    "typescriptBuild": 11211,
+    "rootDropReleaseAssembly": 33414,
+    "onefileReleaseAssembly": 9005,
+    "artifactSync": 9883,
     "cleanup": 0,
-    "totalElapsed": 119824
+    "totalElapsed": 92108
   }
 }

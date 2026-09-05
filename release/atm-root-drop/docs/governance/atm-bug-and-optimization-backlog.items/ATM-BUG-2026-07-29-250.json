@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Closed — source supersession guard, frozen runner publication, and regression verification complete",
   "area": "Broker reservation supersession",
   "finding": "Broker conflict resolution can leave opposing release-order artifacts for the same shared path without a formal supersession rule. A later `team broker resolve` can return resolution-ready, but close can still observe the older opposite artifact and re-block the task.",
   "expectedBehavior": "Shared-path reservation and conflict artifacts need a canonical supersession interface with deterministic last-authority semantics, artifact lineage, and close-time consumption rules. Opposing artifacts for the same path must not both remain authoritative.",
-  "evidenceOrRepro": "TASK-AAO-0206 handoff found `BCR-2ki403.json` with primary `TASK-AAO-0206` and conflict `TASK-RFT-0101`, while existing `BCR-snim65.json` claimed the opposite order for the same shared atom path. Close re-surfaced `ATM_TASKFLOW_CLOSE_BROKER_CONFLICT_BLOCKED` after resolve returned ready.",
-  "followUp": "Implement a formal broker reservation supersession API and tests for opposing artifacts, last-writer or priority policy, close-time artifact consumption, and audit trail preservation."
+  "evidenceOrRepro": "The original opposing-artifact symptom was reproduced deterministically on 2026-09-05: two canonical artifacts for TASK-A/TASK-B and the same shared path, with opposite release orders, caused both tasks to receive foreign-task authorization. Red test `tests/cli/broker-conflict-supersession.test.ts` failed on the pre-fix source. The repair now groups artifacts by the normalized participant set and shared paths, validates broker authority, and accepts only the newest deterministic authority (createdAt plus resolutionId tie-break). The red test passes after repair; `packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts`, `tests/cli/broker-release-order-contract.test.ts`, `npx tsc --noEmit`, encoding guard, and `git diff --check` also pass.",
+  "followUp": "No remaining source or runner-publication work is in scope. Future changes to broker priority policy must open a new backlog item; the published receipt and governed commits are the closure evidence for this item."
 }
