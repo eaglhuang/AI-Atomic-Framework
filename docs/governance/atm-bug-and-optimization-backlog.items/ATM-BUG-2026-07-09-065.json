@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in scope-derived validator selection lane",
+  "status": "Closed — fixed; scope-derived validator classification regression and typecheck passed",
   "area": "Task card authoring / validator selection",
   "finding": "RFT planning cards can over-prescribe broad validators such as `npm run validate:cli` even when the task's atom map and touched paths only require focused specs, a focused atomic-map validator, and typecheck. During TASK-RFT-0017, `validate:cli` exceeded both 124s and 304s agent command timeouts without returning actionable failure output, while the task-specific validator, focused specs, and typecheck passed.",
   "expectedBehavior": "Task card authoring/import should derive or recommend a minimal validator set from scope paths, atom ownership, and risk level, while making broad validators explicit escalation gates instead of default per-card requirements. The close playbook should distinguish required focused evidence from optional full-suite confidence checks.",

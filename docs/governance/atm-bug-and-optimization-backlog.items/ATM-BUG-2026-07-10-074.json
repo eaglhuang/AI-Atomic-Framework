@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in planning-root status triangulation lane",
+  "status": "Closed — fixed; planning-root status triangulation regression passed",
   "area": "Task status triangulation / planning mirror closeback",
   "finding": "After a successful adopter-aware planning closeback commit, `tasks status` can still report `planningFrontmatter.status: null` and classify the task as `stale-import` or `ledger-ahead-of-planning-mirror`, even though live ledger is `done` and the planning repo close commit exists. Target ledger `source.planPath` values imported from `3KLife` are often relative planning-tree paths that do not resolve from the target repo working tree.",
   "expectedBehavior": "Status triangulation should resolve the task's `source.planPath` back to the planning repo via `ATM_PLANNING_REPO_ROOT` (or an absolute stored path) after taskflow closeback and report the actual planning frontmatter status, or explain precisely why the mirror cannot be read. A successful closeback should not immediately look stale.",

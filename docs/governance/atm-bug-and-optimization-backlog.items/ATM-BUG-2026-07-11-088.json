@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed in validate fast/full split lane",
+  "status": "Closed — fixed; fast/full validator split and targeted close-gate regressions passed",
   "area": "Evidence runner / validator performance UX",
   "finding": "Routine closeback evidence can spend about five minutes in `npm run validate:cli` during a single task evidence pass, with the operator UI showing a long-running shell step rather than a compact validator phase breakdown, cache hit/miss explanation, or task-scope-based fast path. A related closeback contract mismatch can also mark `validate:cli` and `validate:git-head-evidence` as advisory/out-of-scope in pre-close, then fail `taskflow close --write` because the closure packet still requires those entries. This makes Captain closeback loops feel stalled and undermines trust in pre-close guidance.",
   "expectedBehavior": "ATM evidence runs should expose validator phase timing, reuse fresh task-compatible evidence where safe, and derive the smallest required validator set from task scope and protected-surface impact. Long validators should stream or report progress and offer resumable/status commands so operators can distinguish healthy long work from a stuck run. Pre-close, auto-evidence, closure-packet generation, and close-write gates must agree on which validators are blocking versus advisory.",
