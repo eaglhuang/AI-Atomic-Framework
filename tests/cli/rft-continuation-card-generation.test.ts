@@ -68,6 +68,24 @@ assert.match(report.candidates[0]?.cardText ?? '', /rollback:/);
 assert.match(report.candidates[0]?.cardText ?? '', /atomization_impact:/);
 assert.equal(report.skippedCandidates[0]?.reason, 'duplicate-existing-card');
 
+const oversizedReport = generateRftContinuationCards({
+  cwd: targetRoot,
+  planningRoot,
+  targetRoot,
+  planningRootExplicit: true,
+  targetRootExplicit: true,
+  lineBudgetReport: {
+    ...baseLineBudget,
+    hardViolationCount: 1,
+    hardViolations: [{ file: 'scripts/giant-module.ts', lines: 5234 }]
+  },
+  semanticMetricsReport: metricsReport([])
+});
+assert.equal(oversizedReport.candidateCount, 1);
+assert.match(oversizedReport.candidates[0]?.cardText ?? '', /Phase 1: establish a behavior-preserving extraction seam/);
+assert.match(oversizedReport.candidates[0]?.cardText ?? '', /below 2,000 physical lines/);
+assert.match(oversizedReport.candidates[0]?.cardText ?? '', /explicit successor card/);
+
 const writeRefusal = generateRftContinuationCards({
   cwd: targetRoot,
   write: true,

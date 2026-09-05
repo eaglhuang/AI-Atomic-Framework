@@ -184,8 +184,9 @@ function createCandidate(taskId: string, item: { readonly source: CandidateSourc
   const writePath = planningRoot
     ? path.join(planningRoot, 'docs/ai_atomic_framework/rft-hardening/tasks', `${taskId}-${slug}.task.md`)
     : null;
+  const phasedAcceptance = buildPhasedLineAcceptance(item.detail);
   const deliverables = [
-    `Review and split or map ${item.file} according to the reported RFT inventory.`,
+    ...(phasedAcceptance.length > 0 ? phasedAcceptance : [`Review and split or map ${item.file} according to the reported RFT inventory.`]),
     'Record line-budget and atomization-metric evidence after the adjustment.',
     'Preserve behavior and avoid claiming or closing this generated card automatically.'
   ];
@@ -202,7 +203,7 @@ function createCandidate(taskId: string, item: { readonly source: CandidateSourc
     item.detail,
     'Expected impact: reduce residual RFT follow-up inventory and improve semantic ownership evidence.'
   ];
-  const cardText = renderCard({ taskId, title, item, deliverables, validators, rollbackNotes, atomizationImpact });
+  const cardText = renderCard({ taskId, title, item, deliverables, validators, rollbackNotes, atomizationImpact, phasedAcceptance });
   return {
     taskId,
     title,
@@ -218,6 +219,17 @@ function createCandidate(taskId: string, item: { readonly source: CandidateSourc
   };
 }
 
+function buildPhasedLineAcceptance(detail: string): readonly string[] {
+  const match = detail.match(/(?:has|above)\s+([\d,]+)\s+lines/i);
+  const lines = match ? Number.parseInt(match[1].replace(/,/g, ''), 10) : 0;
+  if (!Number.isFinite(lines) || lines <= 2000) return [];
+  return [
+    'Phase 1: establish a behavior-preserving extraction seam and record the affected atom/map ownership.',
+    'Phase 2: reduce the source below 2,000 physical lines with fresh line-budget evidence.',
+    'Phase 3: continue through an explicit follow-up card until the source is at or below the 600-line target; do not require the first slice to reach 600 lines.'
+  ];
+}
+
 function renderCard(input: {
   readonly taskId: string;
   readonly title: string;
@@ -226,6 +238,7 @@ function renderCard(input: {
   readonly validators: readonly string[];
   readonly rollbackNotes: readonly string[];
   readonly atomizationImpact: readonly string[];
+  readonly phasedAcceptance: readonly string[];
 }): string {
   const list = (values: readonly string[]) => values.map((value) => `  - ${value}`).join('\n');
   return `---
@@ -260,6 +273,7 @@ ${input.item.detail}
 
 - Scope, deliverables, validators, rollback notes, and atomization impact are reviewed by a human before import.
 - The final implementation preserves behavior and records fresh RFT validation evidence.
+- ${input.phasedAcceptance.length > 0 ? 'This oversized-module card is phased: establish the seam first, then reduce below 2,000 lines, and track the final 600-line target in an explicit successor card.' : 'The generated card may be completed as one bounded continuation slice when no oversized-module phase is reported.'}
 - Any generated successor remains a candidate until explicitly imported through ATM governance.
 `;
 }
