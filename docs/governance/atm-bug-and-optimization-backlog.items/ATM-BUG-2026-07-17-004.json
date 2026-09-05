@@ -5,18 +5,18 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Partially fixed — source repair landed; governed bulk plan-path realignment remains",
+  "status": "Closed — governed plan-source realignment is implemented and successfully applied to 21 closed ledger records",
   "resolution": {
-    "fixedDate": "2026-07-18",
+    "fixedDate": "2026-09-06",
     "fixedByTask": "ATM-GOV-0166",
     "deliveryCommit": "b0c91abd5",
-    "closureCommit": "2c916a6c5",
-    "summary": "新增 `atm tasks realign-plan-source`（pure-move digest 閘 + closure 欄位保護 + 單一 batch commit）。"
+    "closureCommit": "a080009a76a97a57869645ac0f7c529c5b451e92",
+    "summary": "新增並實際執行 `atm tasks realign-plan-source`：21 筆 closed ledger record 以 contentDigest 證明純移動後完成單一治理提交並推送。"
   },
   "area": "Task ledger / planning-source maintenance lane",
   "finding": "There is no governed lane for bulk planning-source path realignment. After the owner-ordered planning-repo reorganization (79 task cards moved to their canonical family directories), every ledger file's source.planPath went stale, but: (a) git record-commit refuses multi-task record batches (ATM_CROSS_TASK_MUTATION_BLOCKED) and silently drops single task-owned files (see ATM-BUG-2026-07-17-002); (b) tasks claim on done tasks returns ATM_TASK_CLAIM_NOT_READY so git commit --task is unreachable; (c) tasks reconcile requires --delivery-commit; (d) tasks import --write refuses on hash conflict and --force is gated behind the emergency lease lane. Net effect: 79 stale planPath entries cannot be corrected through any normal governed path.",
   "expectedBehavior": "A first-class maintenance verb (e.g. `atm tasks realign-plan-source --map <from,to json>` or import --refresh-paths) that re-resolves planPath/planningSourceSeal.taskCardPath against the planning repo for closed tasks, verifies contentDigest is unchanged (proving a pure move), and commits the batch as one governed maintenance commit without requiring per-task claims or an emergency lease.",
-  "evidenceOrRepro": "2026-07-17 session after 3KLife commits 1cfaf8e2/15eebaf6/e8f6908b: all four governed routes above were attempted and blocked; the only remaining route was `emergency approve` + `tasks import --write --force` per card.",
+  "evidenceOrRepro": "2026-07-17 session after 3KLife commits 1cfaf8e2/15eebaf6/e8f6908b: all four governed routes above were attempted and blocked. On 2026-09-06, official `node atm.mjs tasks realign-plan-source --cwd C:/Users/User/3KLife --planning-repo C:/Users/User/3KLife --map <validated-map> --dry-run --json` proposed 21 pure moves; the write route completed them with `commitSha=a080009a76a97a57869645ac0f7c529c5b451e92`, preserving status, closedAt, closurePacket, owner, claim, and taskDirectionLock. The same commit was pushed to `origin/master`.",
   "proposedDirection": "Build the realign verb on top of the existing planningSourceSeal contentDigest check (content-only digest is move-invariant), classify the resulting ledger diff as low-risk metadata, and allow a single batch commit when every changed field is planPath/taskCardPath only.",
-  "followUp": "Build the realign verb on top of the existing planningSourceSeal contentDigest check (content-only digest is move-invariant), classify the resulting ledger diff as low-risk metadata, and allow a single batch commit when every changed field is planPath/taskCardPath only."
+  "followUp": "TASK-TMP-0015 remains a separate manual-review item because its current planning card digest differs from the sealed digest; no overwrite or force realignment was performed. Non-closed records remain intentionally unchanged."
 }
