@@ -92,6 +92,7 @@ function main(): void {
     'packages/core/src/',
     'packages/cli/src/',
     'packages/plugin-governance-local/src/',
+    'templates/',
     'schemas/',
     'scripts/AtmCore/'
   ], 'runnerAffectingSourceRoots');
