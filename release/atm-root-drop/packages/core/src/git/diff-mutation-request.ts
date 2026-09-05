@@ -2,6 +2,8 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { brokerAdapterMigration, type MutationRequest } from '../broker/types.ts';
 
+const DEFAULT_GIT_BOUNDARY_TIMEOUT_MS = 420_000;
+
 export interface GitDiffMutationRequestOptions {
   readonly cwd: string;
   readonly actorId: string;
@@ -10,6 +12,7 @@ export interface GitDiffMutationRequestOptions {
   readonly remote?: string | null;
   readonly fetch?: boolean;
   readonly gitExecutable?: string;
+  readonly timeoutMs?: number;
 }
 
 export interface GitBranchTopologySnapshot {
@@ -45,13 +48,13 @@ export function collectGitDiffMutationRequests(input: GitDiffMutationRequestOpti
   const remote = (input.remote?.trim() || 'origin');
   const remoteRef = `${remote}/${branch}`;
   if (input.fetch !== false) {
-    runGit(input.cwd, ['fetch', '--quiet', '--no-tags', remote, branch], input.gitExecutable);
+    runGit(input.cwd, ['fetch', '--quiet', '--no-tags', remote, branch], input.gitExecutable, input.timeoutMs);
   }
-  const headSha = runGitScalar(input.cwd, ['rev-parse', 'HEAD'], input.gitExecutable);
-  const remoteSha = runGitScalar(input.cwd, ['rev-parse', remoteRef], input.gitExecutable);
-  const mergeBaseSha = runGitScalar(input.cwd, ['merge-base', 'HEAD', remoteRef], input.gitExecutable);
-  const localDiff = parseGitNameStatusZ(runGit(input.cwd, ['diff', '--name-status', '-z', `${mergeBaseSha}..HEAD`], input.gitExecutable));
-  const remoteDiff = parseGitNameStatusZ(runGit(input.cwd, ['diff', '--name-status', '-z', `${mergeBaseSha}..${remoteRef}`], input.gitExecutable));
+  const headSha = runGitScalar(input.cwd, ['rev-parse', 'HEAD'], input.gitExecutable, input.timeoutMs);
+  const remoteSha = runGitScalar(input.cwd, ['rev-parse', remoteRef], input.gitExecutable, input.timeoutMs);
+  const mergeBaseSha = runGitScalar(input.cwd, ['merge-base', 'HEAD', remoteRef], input.gitExecutable, input.timeoutMs);
+  const localDiff = parseGitNameStatusZ(runGit(input.cwd, ['diff', '--name-status', '-z', `${mergeBaseSha}..HEAD`], input.gitExecutable, input.timeoutMs));
+  const remoteDiff = parseGitNameStatusZ(runGit(input.cwd, ['diff', '--name-status', '-z', `${mergeBaseSha}..${remoteRef}`], input.gitExecutable, input.timeoutMs));
   const topology: GitBranchTopologySnapshot = {
     branch,
     remote,
@@ -194,17 +197,24 @@ function decodeStatus(rawStatus: string): { status: GitDiffChangeKind; similarit
 function resolveBranch(input: GitDiffMutationRequestOptions): string {
   const explicit = input.branch?.trim();
   if (explicit) return explicit;
-  return runGitScalar(input.cwd, ['rev-parse', '--abbrev-ref', 'HEAD'], input.gitExecutable);
+  return runGitScalar(input.cwd, ['rev-parse', '--abbrev-ref', 'HEAD'], input.gitExecutable, input.timeoutMs);
 }
 
-function runGit(cwd: string, args: readonly string[], gitExecutable = 'git'): string {
+function runGit(cwd: string, args: readonly string[], gitExecutable = 'git', timeoutMs?: number): string {
+  const effectiveTimeoutMs = timeoutMs ?? resolveGitBoundaryTimeoutMs();
   return execFileSync(gitExecutable, args, {
     cwd,
     encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: effectiveTimeoutMs
   });
 }
 
-function runGitScalar(cwd: string, args: readonly string[], gitExecutable = 'git'): string {
-  return runGit(cwd, args, gitExecutable).trim();
+function resolveGitBoundaryTimeoutMs(): number {
+  const raw = Number(process.env.ATM_GIT_BOUNDARY_TIMEOUT_MS);
+  return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : DEFAULT_GIT_BOUNDARY_TIMEOUT_MS;
+}
+
+function runGitScalar(cwd: string, args: readonly string[], gitExecutable = 'git', timeoutMs?: number): string {
+  return runGit(cwd, args, gitExecutable, timeoutMs).trim();
 }

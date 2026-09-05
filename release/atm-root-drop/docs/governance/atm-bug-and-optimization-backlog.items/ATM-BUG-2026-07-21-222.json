@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Partially fixed — recovery repair landed; publication and formal governance closeout remain",
+  "status": "Resolved — recovery repair verified; publication and formal governance closeout remain separate",
   "area": "Batch checkpoint / runner-sync / shared-surface recovery",
   "finding": "ATM-GOV-0234 exposed a governed batch deadlock: batch checkpoint refused stale frozen runner writes, runner-sync build required a sealed HEAD commit, source-first checkpoint partially closed live ledger before refusing, terminal tasks could not enqueue runner-sync, and the broker kept a stale ATM-GOV-0234 write intent that blocked ATM-GOV-0235 shared-surface claim with ATM_BROKER_SHARED_QUEUE_BLOCKED.",
   "expectedBehavior": "Batch queue-head delivery should expose one executable broker-ticket recovery path: either checkpoint can reserve a runner-sync/build ticket for staged queue-head source, or ATM provides a safe pre-checkpoint delivery commit lane and then auto-releases task broker intents during lock cleanup. Source-first refusal must not leave partial close side effects.",

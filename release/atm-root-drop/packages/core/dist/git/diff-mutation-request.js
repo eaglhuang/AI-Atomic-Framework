@@ -1,18 +1,19 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { brokerAdapterMigration } from '../broker/types.js';
+const DEFAULT_GIT_BOUNDARY_TIMEOUT_MS = 420_000;
 export function collectGitDiffMutationRequests(input) {
     const branch = resolveBranch(input);
     const remote = (input.remote?.trim() || 'origin');
     const remoteRef = `${remote}/${branch}`;
     if (input.fetch !== false) {
-        runGit(input.cwd, ['fetch', '--quiet', '--no-tags', remote, branch], input.gitExecutable);
+        runGit(input.cwd, ['fetch', '--quiet', '--no-tags', remote, branch], input.gitExecutable, input.timeoutMs);
     }
-    const headSha = runGitScalar(input.cwd, ['rev-parse', 'HEAD'], input.gitExecutable);
-    const remoteSha = runGitScalar(input.cwd, ['rev-parse', remoteRef], input.gitExecutable);
-    const mergeBaseSha = runGitScalar(input.cwd, ['merge-base', 'HEAD', remoteRef], input.gitExecutable);
-    const localDiff = parseGitNameStatusZ(runGit(input.cwd, ['diff', '--name-status', '-z', `${mergeBaseSha}..HEAD`], input.gitExecutable));
-    const remoteDiff = parseGitNameStatusZ(runGit(input.cwd, ['diff', '--name-status', '-z', `${mergeBaseSha}..${remoteRef}`], input.gitExecutable));
+    const headSha = runGitScalar(input.cwd, ['rev-parse', 'HEAD'], input.gitExecutable, input.timeoutMs);
+    const remoteSha = runGitScalar(input.cwd, ['rev-parse', remoteRef], input.gitExecutable, input.timeoutMs);
+    const mergeBaseSha = runGitScalar(input.cwd, ['merge-base', 'HEAD', remoteRef], input.gitExecutable, input.timeoutMs);
+    const localDiff = parseGitNameStatusZ(runGit(input.cwd, ['diff', '--name-status', '-z', `${mergeBaseSha}..HEAD`], input.gitExecutable, input.timeoutMs));
+    const remoteDiff = parseGitNameStatusZ(runGit(input.cwd, ['diff', '--name-status', '-z', `${mergeBaseSha}..${remoteRef}`], input.gitExecutable, input.timeoutMs));
     const topology = {
         branch,
         remote,
@@ -147,15 +148,21 @@ function resolveBranch(input) {
     const explicit = input.branch?.trim();
     if (explicit)
         return explicit;
-    return runGitScalar(input.cwd, ['rev-parse', '--abbrev-ref', 'HEAD'], input.gitExecutable);
+    return runGitScalar(input.cwd, ['rev-parse', '--abbrev-ref', 'HEAD'], input.gitExecutable, input.timeoutMs);
 }
-function runGit(cwd, args, gitExecutable = 'git') {
+function runGit(cwd, args, gitExecutable = 'git', timeoutMs) {
+    const effectiveTimeoutMs = timeoutMs ?? resolveGitBoundaryTimeoutMs();
     return execFileSync(gitExecutable, args, {
         cwd,
         encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
+        timeout: effectiveTimeoutMs
     });
 }
-function runGitScalar(cwd, args, gitExecutable = 'git') {
-    return runGit(cwd, args, gitExecutable).trim();
+function resolveGitBoundaryTimeoutMs() {
+    const raw = Number(process.env.ATM_GIT_BOUNDARY_TIMEOUT_MS);
+    return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : DEFAULT_GIT_BOUNDARY_TIMEOUT_MS;
+}
+function runGitScalar(cwd, args, gitExecutable = 'git', timeoutMs) {
+    return runGit(cwd, args, gitExecutable, timeoutMs).trim();
 }
