@@ -5,11 +5,11 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Partially fixed — source repair landed; next tag CI receipt is still required to prove the reordered gate",
+  "status": "Closed — beta.4 CI verified tag-versioned artifacts before all publish gates on 2026-08-30",
   "area": "npm release workflow / package provenance",
   "finding": "The release workflow injected tag-derived workspace versions only after build, package-content, artifact-budget, and clean-install gates. Those gates therefore verified an unversioned tarball rather than the exact version npm would publish.",
   "expectedBehavior": "A tag release must inject the final version before building any release artifact. Every pre-publish package gate must observe the same versioned tarball that the publish step sends to npm.",
   "evidenceOrRepro": "In .github/workflows/release-npm.yml, Set npm package versions from tag followed Clean-install npx smoke (publish gate). The published beta.2 registry package reported its own version at runtime, proving manifest version is runtime-relevant. scripts/validate-breaking-changes.ts now asserts version injection precedes build, package verification, and clean-install smoke.",
   "containment": "The workflow is reordered without removing any gate. 0.1.0-beta.1 is deny-listed with 0.1.0-beta.2 as its replacement because beta.1 was known to lack standalone tarball closure.",
-  "followUp": "Run one subsequent prerelease tag and retain its CI receipt showing the final tag-versioned tarball passed the existing clean-install gate. Trusted Publishing remains a separate credential-hardening follow-up."
+  "followUp": "Run 33312011105 on v0.1.0-beta.4 injected the tag version before build, package verification, artifact budget, and clean-install smoke; all steps passed, and npm exposes @ai-atomic-framework/cli@0.1.0-beta.4 under next. Trusted Publishing remains a separate credential-hardening follow-up."
 }
