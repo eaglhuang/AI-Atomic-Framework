@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Closed — original timeout observation no longer reproduces; current bounded timing evidence is recorded",
   "area": "Planning route performance",
   "finding": "`node atm.mjs next --prompt ... --json` in the 3KLife planning repository timed out while scanning a large task ledger, preventing normal preflight from returning a playbook in an interactive window.",
   "expectedBehavior": "Planning-ledger discovery should use indexed or bounded task lookup and emit progress/timeout diagnostics with a recovery command.",
-  "evidenceOrRepro": "Reproduced while creating Cross-Vendor Team Markdown Handoff cards 0072-0074: 120s and 180s attempts did not return a route.",
-  "followUp": "Benchmark the planner against large ledgers, introduce task-id/path prefiltering, and add a focused timeout regression."
+  "evidenceOrRepro": "Historical reproduction while creating Cross-Vendor Team Markdown Handoff cards 0072-0074: 120s and 180s attempts did not return a route. Rechecked on the current 3KLife ledger with three consecutive `node atm.mjs next --prompt \"Audit planning-ledger route performance\" --json` runs: 1548ms, 1627ms, and 1515ms; no timeout or missing route occurred.",
+  "followUp": "No source change is justified by the current evidence. Keep bounded timing coverage if the planning ledger or route discovery algorithm changes; reopen only on a fresh reproduction."
 }
