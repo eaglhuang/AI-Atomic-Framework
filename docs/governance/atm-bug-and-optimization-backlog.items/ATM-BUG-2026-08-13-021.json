@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Resolved",
+  "status": "Closed — lane capability refusal disclosure repair published and verified 2026-09-05",
   "area": "Lane refusal does not disclose the owner lane it is comparing against",
   "finding": "ATM_LANE_BORROWED_ACTOR_BLOCKED refuses a governed mutation when the executing lane is not the owner lane, but the message names neither the owner lane it expected nor where that value is recorded. The owner lane is already in the caller's hands: the ledger claim carries claim.laneSession.laneSessionId together with an exportHint that is the exact command needed to proceed. An actor that has minted more than one lane session in a session therefore has no way to tell which of them is authoritative except by guessing, and guessing across lanes is exactly the shape of probing a governed gate that the framework otherwise forbids.",
   "expectedBehavior": "A refusal must disclose the record that decided it. The lane refusal should report the ledger path it read the owner claim from, whether that claim records a lane and an export hint, and a command that reads it. It must not disclose the lane value itself under any condition — --actor is attribution, not authority, so a rule of the form 'reveal the hint when the caller presents the owner actor string' would hand the capability to precisely the borrowed-actor attempt the gate exists to stop. Location is safe because the ledger is already readable by anyone holding the repository; the capability is not.",

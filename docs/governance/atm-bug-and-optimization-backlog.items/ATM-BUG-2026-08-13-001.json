@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Low",
-  "status": "Resolved",
+  "status": "Closed — branch-commit queue stale self-heal and durable audit verified 2026-09-05",
   "area": "Branch commit queue stale self-heal cross-actor boundary",
   "finding": "validate-branch-commit-queue asserted the source contract 'record.actorId !== input.actorId' and reported 'branch queue stale self-heal must not clean cross-actor locks'. Adjudication shows the guard was removed deliberately, not lost: commit 6301d93860bfa424d22a6be49af9fd36f7b188cc, 'fix(git): recover dead branch commit queues' (2026-07-29, codex-git-series-captain), removed both the cross-actor guard and the headMoved requirement in the same change. Keeping either meant an orphan lock left by a crashed peer could deadlock the queue permanently: reclamation required HEAD to have moved, but nothing could move HEAD while the lock was held. That is the same deadlock shape as an orphaned .git/index.lock.",
   "expectedBehavior": "Reclaiming a dead owner's lock is the purpose of self-heal, so the bound cannot be the owner's identity. The replacement bound is provable owner death (isBranchCommitQueueOwnerAlive over the recorded ownerPid, with only false or unknown treated as reclaimable), plus a staleness threshold, plus a durable audit record naming the reclaiming actor. The validator anchor was updated to assert exactly that bound. The protection was replaced, not weakened, and the anchor now describes the contract the code actually holds.",
