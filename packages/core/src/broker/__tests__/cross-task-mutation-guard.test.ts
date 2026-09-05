@@ -145,7 +145,23 @@ const staleBlock = {
     }
   ]
 };
-recordIncidentFlag(incidentRepo, staleBlock);
+const historicalPathBlock = {
+  ...staleBlock,
+  conflictFiles: ['.atm/history/tasks/TASK-B.json'],
+  conflicts: [
+    {
+      ...staleBlock.conflicts[0],
+      conflictFiles: ['.atm/history/tasks/TASK-B.json'],
+      surface: 'task-history' as const,
+      ownershipState: 'terminal-unentitled' as const
+    }
+  ]
+};
+recordIncidentFlag(incidentRepo, historicalPathBlock);
+assert.ok(
+  detectCrossTaskMutation(incidentRepo, null, 'incident-review', historicalPathBlock.conflictFiles),
+  'the historical-path probe must reproduce the stale incident block'
+);
 assert.equal(
   readIncidentFlag(incidentRepo),
   null,
@@ -158,6 +174,16 @@ const archivedFiles = readdirSync(archiveDir).filter((fileName) => fileName.ends
 assert.equal(archivedFiles.length, 1, 'archived incident count');
 const archived = JSON.parse(readFileSync(path.join(archiveDir, archivedFiles[0]), 'utf8'));
 assert.equal(typeof archived.resolvedAt, 'string', 'archive should record resolution timestamp');
+
+// An incident stores the paths that were dirty when it was recorded, but a
+// later reconciliation must consult the live Git state rather than replaying
+// those historical paths as if they were still modified.
+recordIncidentFlag(incidentRepo, staleBlock);
+assert.equal(
+  readIncidentFlag(incidentRepo),
+  null,
+  'a clean worktree must clear an incident even when its historical conflict paths are explicit'
+);
 
 writeText(path.join(incidentRepo, 'src/b.ts'), 'export const b = 2;\n');
 writeJson(path.join(incidentRepo, '.atm/history/tasks/TASK-B.json'), {
@@ -194,6 +220,8 @@ writeJson(path.join(incidentRepo, '.atm/history/tasks/TASK-C.json'), {
   status: 'done',
   claim: { actorId: 'actor-c', state: 'released' }
 });
+writeText(path.join(incidentRepo, '.atm/history/evidence/TASK-C.json'), '{"late":true}\n');
+execFileSync('git', ['add', '.atm/history/evidence/TASK-C.json'], { cwd: incidentRepo, stdio: 'ignore' });
 const mixedIncident = {
   conflictTaskId: 'TASK-B',
   conflictFiles: ['src/b.ts', '.atm/history/evidence/TASK-C.json'],
