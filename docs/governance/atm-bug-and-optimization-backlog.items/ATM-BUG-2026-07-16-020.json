@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Closed — quoted validator command identity verified 2026-09-05",
   "area": "Evidence / Taskflow Close",
   "finding": "Evidence validator linking splits literal task-card validator commands on commas even when the comma appears inside a quoted command argument, causing taskflow pre-close to report stale evidence for a command that already passed.",
   "expectedBehavior": "Evidence run/add and taskflow pre-close should preserve a task-declared literal validator command as one validator identity, including quoted arguments that contain commas.",
-  "evidenceOrRepro": "During TASK-RFT-0096, the declared candidate-rank validator contained a --goal string with commas. `node atm.mjs evidence run ... --validators \"<literal command>\"` and command auto-link recorded split validation passes such as `schema validation` and `normalized model output`, so pre-close kept reporting ATM_TASKFLOW_PRECLOSE_STALE_EVIDENCE until the command run was relinked through a JSON command-runs array.",
-  "followUp": "Replace CSV-only validator parsing with quote-aware parsing or prefer JSON-array validator input for literal command validators, then add a regression where a task-card declared validator contains quoted commas."
+  "evidenceOrRepro": "The historical TASK-RFT-0096 failure is repaired by `d69187291` (`fix(evidence): normalize quoted validator commands`). Current `packages/cli/src/commands/evidence/validator-classification.ts` canonicalizes shell-quoted command tokens before validator matching, and `packages/cli/src/commands/evidence/missing-report.ts` compares command runs through that canonical identity. Current focused evidence tests `validator-classification.spec.ts`, `run.spec.ts`, and `command-runs.spec.ts` all pass; `npm run validate:cli` also passes its 42-command fast profile. The original split-command stale-evidence path is therefore no longer reproducible on current main.",
+  "followUp": "Keep literal validator commands represented as command-run records and preserve canonical command identity when adding new evidence transports. Reopen only if a quoted-argument regression reproduces under the current canonicalization seam."
 }
