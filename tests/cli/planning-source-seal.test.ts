@@ -153,6 +153,7 @@ const reimportedTask = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<stri
 const reimportedSeal = ((reimportedTask.source as Record<string, unknown>).planningSourceSeal) as any;
 assert.notEqual(reimportedSeal.contentDigest, (source.planningSourceSeal as any).contentDigest);
 assert.equal(reimportedSeal.amendmentEpoch, 1, 're-importing changed planning content must advance amendmentEpoch');
+assert.equal(validatePlanningSourceSeal({ cwd: targetRepo, taskDocument: reimportedTask }).status, 'match');
 
 const profile = {
   schemaId: 'taskflow.profile.v1' as const,
