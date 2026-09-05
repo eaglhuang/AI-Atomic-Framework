@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "High",
-  "status": "Fixed in compact runner-sync receipt lane",
+  "status": "Closed — compact runner-sync receipt contract verified 2026-09-05; historical retention decision remains separate",
   "area": "Runtime Telemetry / Build Telemetry",
   "finding": "ATM-GOV-0193/0194 added gitignored runtime telemetry, but raw/high-frequency build statistics were also duplicated into tracked runner-sync receipts. At repair time the repository retains 139 historical `*.runner-sync-receipt.json` files, including legacy receipts with full incremental plans, phase timings, cache details, and runtime telemetry references rather than a minimal decision digest.",
   "expectedBehavior": "All raw statistics and logs should be written to local disk under .atm/runtime/telemetry or another gitignored log surface. This includes counters, per-run timing events, validation usage, debug logs, broker decision traces, runner-sync receipts, and other high-frequency telemetry. Git history should keep only compact decision digests, close summaries, or deliberately selected baselines; repeated raw telemetry/log/receipt streams must not be committed by default.",
