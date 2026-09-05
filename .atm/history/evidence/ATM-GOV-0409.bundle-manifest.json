@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0409",
+  "updatedAt": "2026-09-05T09:25:40.487Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+    "node --strip-types tests/cli/managed-plan-executor.test.ts",
+    "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d1d0bfdc70e4642f953120cfe9b8935ab0aeb89994c306398fef147d85ba331",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
+      ],
+      "generatedAt": "2026-09-05T09:25:13.142Z",
+      "startedAt": "2026-09-05T09:25:12.587Z",
+      "finishedAt": "2026-09-05T09:25:13.142Z",
+      "durationMs": 555,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c66291839f1467c91cc61e317eccb45f3b71b654",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:998fa955a69e657d7a7fad1b5a1982bb6aceba40e4d929bb980f1243bf971ccb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts"
+      ],
+      "generatedAt": "2026-09-05T09:25:17.135Z",
+      "startedAt": "2026-09-05T09:25:16.809Z",
+      "finishedAt": "2026-09-05T09:25:17.135Z",
+      "durationMs": 326,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c66291839f1467c91cc61e317eccb45f3b71b654",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/managed-plan-executor.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d26f61ceb0154cda25023add142fc11112fefe97d9e66d5648a8e8cbfa2e56a8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/managed-plan-executor.test.ts"
+      ],
+      "generatedAt": "2026-09-05T09:25:21.742Z",
+      "startedAt": "2026-09-05T09:25:20.599Z",
+      "finishedAt": "2026-09-05T09:25:21.742Z",
+      "durationMs": 1143,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c66291839f1467c91cc61e317eccb45f3b71b654",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ef873f16a2c198e3fef38bb686b25ab0dbae2af0ee222e3a865e2f850af5545f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts"
+      ],
+      "generatedAt": "2026-09-05T09:25:26.578Z",
+      "startedAt": "2026-09-05T09:25:25.381Z",
+      "finishedAt": "2026-09-05T09:25:26.578Z",
+      "durationMs": 1197,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c66291839f1467c91cc61e317eccb45f3b71b654",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-05T09:25:40.487Z",
+      "startedAt": "2026-09-05T09:25:30.114Z",
+      "finishedAt": "2026-09-05T09:25:40.487Z",
+      "durationMs": 10373,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c66291839f1467c91cc61e317eccb45f3b71b654",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

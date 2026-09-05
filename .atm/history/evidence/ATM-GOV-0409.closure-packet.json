@@ -1,0 +1,159 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0409",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c66291839f1467c91cc61e317eccb45f3b71b654",
+  "governedTreeSha": "824a1f98d67676ed71b9b58756a7c7c315d5f03f",
+  "targetCommitDelta": {
+    "currentCommitSha": "c66291839f1467c91cc61e317eccb45f3b71b654",
+    "parentCommitShas": [
+      "c66291839f1467c91cc61e317eccb45f3b71b654"
+    ],
+    "governedTreeSha": "824a1f98d67676ed71b9b58756a7c7c315d5f03f",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0409.json",
+      ".atm/history/task-events/ATM-GOV-0409/2026-09-05T09-00-15-213Z-import-624b1d18aab6.json",
+      ".atm/history/task-events/ATM-GOV-0409/2026-09-05T09-24-15-423Z-reserve-0c5708882acf.json",
+      ".atm/history/task-events/ATM-GOV-0409/2026-09-05T09-24-15-428Z-promote-24de3e50bc4a.json",
+      ".atm/history/task-events/ATM-GOV-0409/2026-09-05T09-24-21-378Z-claim-85c39089a9bb.json",
+      ".atm/history/tasks/ATM-GOV-0409.json",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d1d0bfdc70e4642f953120cfe9b8935ab0aeb89994c306398fef147d85ba331",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:998fa955a69e657d7a7fad1b5a1982bb6aceba40e4d929bb980f1243bf971ccb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/managed-plan-executor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d26f61ceb0154cda25023add142fc11112fefe97d9e66d5648a8e8cbfa2e56a8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ef873f16a2c198e3fef38bb686b25ab0dbae2af0ee222e3a865e2f850af5545f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+    "node --strip-types tests/cli/managed-plan-executor.test.ts",
+    "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+    "node --strip-types tests/cli/managed-plan-executor.test.ts",
+    "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-05T09:27:54.411Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0409.*",
+      ".atm/history/task-events/ATM-GOV-0409/**",
+      ".atm/history/tasks/ATM-GOV-0409.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "packages/cli/src/commands/batch/deliver-and-close-forwarding.ts",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "tests/cli/managed-plan-executor.test.ts",
+      "tests/cli/plan-level-executor-live-loop.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch/deliver-and-close-forwarding.ts",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "tests/cli/managed-plan-executor.test.ts",
+      "tests/cli/plan-level-executor-live-loop.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "node --strip-types tests/cli/managed-plan-executor.test.ts",
+      "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0409.json",
+  "closedAt": "2026-09-05T09:27:54.412Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260905092415-codex-gpt-5.4-mini-ATM-GOV-0409-b2f4ba3a1c",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "6c51ccf74870ec8d929ec0e333d99a59c9c01759",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts"
+    ],
+    "waiverReason": "Shared delivery 6c51ccf7 intentionally co-delivered ATM-GOV-0409 with sibling batch recovery files; acknowledge the three listed sibling paths without treating them as this task's deliverables."
+  },
+  "teamSummary": null
+}

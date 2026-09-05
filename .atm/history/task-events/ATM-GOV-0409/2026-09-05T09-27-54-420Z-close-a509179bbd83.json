@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-05T09-27-54-420Z-close-a509179bbd83",
+  "taskId": "ATM-GOV-0409",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260905092415-codex-gpt-5.4-mini-ATM-GOV-0409-b2f4ba3a1c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0409.json",
+  "taskSha256": "sha256:af9ab7170c4a40758fe2ae511868055431de02901468c14e707aceed63be1f4d",
+  "createdAt": "2026-09-05T09:27:54.420Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0409 --actor codex-gpt-5.4-mini --status done --historical-delivery 6c51ccf74870ec8d929ec0e333d99a59c9c01759",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260905092415-codex-gpt-5.4-mini-ATM-GOV-0409-b2f4ba3a1c",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0409.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "node --strip-types tests/cli/managed-plan-executor.test.ts",
+      "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "node --strip-types tests/cli/managed-plan-executor.test.ts",
+      "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-05T09:27:54.411Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0409.*",
+        ".atm/history/task-events/ATM-GOV-0409/**",
+        ".atm/history/tasks/ATM-GOV-0409.json",
+        "docs/reports/captain-parallel-ledger-analysis.md",
+        "packages/cli/src/commands/batch/deliver-and-close-forwarding.ts",
+        "packages/cli/src/commands/batch/implementation.ts",
+        "packages/cli/src/commands/batch/plan-executor.ts",
+        "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+        "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+        "tests/cli/batch-deliver-and-close-forwarding.test.ts",
+        "tests/cli/managed-plan-executor.test.ts",
+        "tests/cli/plan-level-executor-live-loop.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/deliver-and-close-forwarding.ts",
+        "packages/cli/src/commands/batch/implementation.ts",
+        "packages/cli/src/commands/batch/plan-executor.ts",
+        "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+        "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+        "tests/cli/batch-deliver-and-close-forwarding.test.ts",
+        "tests/cli/managed-plan-executor.test.ts",
+        "tests/cli/plan-level-executor-live-loop.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+        "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+        "node --strip-types tests/cli/managed-plan-executor.test.ts",
+        "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

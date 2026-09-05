@@ -1,0 +1,328 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0409",
+  "title": "End-to-end auto-batch orchestration dogfood and closure",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "The loop executes the declared phases from one governed entry path and resumes after an injected phase failure without duplicate effects.",
+    "Shared writes, checkpoint, closeback, and push remain Coordinator/Broker owned; workers cannot self-close or write Git.",
+    "Serial and auto-batch dogfood runs each have command-backed raw evidence, with no manual per-card lifecycle choreography except explicit owner stop.",
+    "Performance report includes wall-clock phase timings, queue residency, retries, manual interventions, and a truthful terminal verdict.",
+    "All listed validators pass on the delivered source and evidence.",
+    "Deliverables and validators are filled before import or implementation."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch/plan-executor.ts",
+    "packages/cli/src/commands/batch/implementation.ts",
+    "packages/cli/src/commands/batch/deliver-and-close-forwarding.ts",
+    "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+    "tests/cli/plan-level-executor-live-loop.test.ts",
+    "tests/cli/managed-plan-executor.test.ts",
+    "docs/reports/captain-parallel-ledger-analysis.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch/plan-executor.ts",
+    "packages/cli/src/commands/batch/implementation.ts",
+    "packages/cli/src/commands/batch/deliver-and-close-forwarding.ts",
+    "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+    "tests/cli/plan-level-executor-live-loop.test.ts",
+    "tests/cli/managed-plan-executor.test.ts",
+    "tests/cli/batch-deliver-and-close-forwarding.test.ts",
+    "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "docs/reports/captain-parallel-ledger-analysis.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+    "node --strip-types tests/cli/managed-plan-executor.test.ts",
+    "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0409-end-to-end-auto-batch-orchestration-dogfood-and-closure.task.md",
+    "sectionTitle": "ATM-GOV-0409",
+    "headingLine": 49,
+    "hash": "3b44739b8c33af86",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0409-end-to-end-auto-batch-orchestration-dogfood-and-closure.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:3b44739b8c33af8610bd3ba6977d7cac37478ffb34dedb75a77b258f9a027b45",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-05T09:00:14.889Z"
+    }
+  },
+  "importedAt": "2026-09-05T09:00:14.889Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.plan.level.executor.live.loop.test.ts",
+      "command": "node --strip-types tests/cli/plan-level-executor-live-loop.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.managed.plan.executor.test.ts",
+      "command": "node --strip-types tests/cli/managed-plan-executor.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.batch.deliver.and.close.forwarding.test.ts",
+      "command": "node --strip-types tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.batch.checkpoint.runner.sync.recovery.test.ts",
+      "command": "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-05T09-27-54-420Z-close-a509179bbd83",
+  "lastTransitionAt": "2026-09-05T09:27:54.420Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-05T09:24:15.423Z",
+  "promotedAt": "2026-09-05T09:24:15.428Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-f82547a59d09",
+    "claimedAt": "2026-09-05T09:24:15.433Z",
+    "heartbeatAt": "2026-09-05T09:27:54.417Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0409.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "packages/cli/src/commands/batch/deliver-and-close-forwarding.ts",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "tests/cli/managed-plan-executor.test.ts",
+      "tests/cli/plan-level-executor-live-loop.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260905092415-codex-gpt-5.4-mini-6eea8e52c6",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905092415-codex-gpt-5.4-mini-6eea8e52c6\""
+    },
+    "reason": "Shared delivery 6c51ccf7 intentionally co-delivered ATM-GOV-0409 with sibling batch recovery files; acknowledge the three listed sibling paths without treating them as this task's deliverables."
+  },
+  "startedAt": "2026-09-05T09:24:15.433Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6830494536ff85af",
+    "ticketDigest": "sha256:6830494536ff85af8d20858e7ada98c549ba6882b09240916579c89348574fd7",
+    "taskId": "ATM-GOV-0409",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260905092415-codex-gpt-5.4-mini-6eea8e52c6",
+    "claimGeneration": "lease-f82547a59d09",
+    "issuedAt": "2026-09-05T09:24:15.433Z",
+    "expiresAt": "2026-09-05T09:54:15.433Z",
+    "scopeDigest": "sha256:d94d342f1e6762a78f778e1b8c56bb40783c045cde1fdbae8b8756c6937af4fa",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-05T09:24:15.433Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0409.*",
+          ".atm/history/task-events/ATM-GOV-0409/**",
+          ".atm/history/tasks/ATM-GOV-0409.json",
+          "docs/reports/captain-parallel-ledger-analysis.md",
+          "packages/cli/src/commands/batch/deliver-and-close-forwarding.ts",
+          "packages/cli/src/commands/batch/implementation.ts",
+          "packages/cli/src/commands/batch/plan-executor.ts",
+          "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+          "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+          "tests/cli/batch-deliver-and-close-forwarding.test.ts",
+          "tests/cli/managed-plan-executor.test.ts",
+          "tests/cli/plan-level-executor-live-loop.test.ts"
+        ],
+        "digest": "sha256:0b18c82730be6b038622c50ae4f647b3af9b4a50f422dcc19a4fefdc7d8d294a"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260905092415-codex-gpt-5.4-mini-ATM-GOV-0409-b2f4ba3a1c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0409",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0409.*",
+      ".atm/history/task-events/ATM-GOV-0409/**",
+      ".atm/history/tasks/ATM-GOV-0409.json",
+      "docs/reports/captain-parallel-ledger-analysis.md",
+      "packages/cli/src/commands/batch/deliver-and-close-forwarding.ts",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/plan-executor.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/batch-deliver-and-close-forwarding.test.ts",
+      "tests/cli/managed-plan-executor.test.ts",
+      "tests/cli/plan-level-executor-live-loop.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "df1284491559b9f05880e9451e558abff6813bbe5d984b60edadf75b8d3846b2",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260905092415-codex-gpt-5.4-mini-ATM-GOV-0409-b2f4ba3a1c",
+    "laneSession": {
+      "laneSessionId": "lane-20260905092415-codex-gpt-5.4-mini-6eea8e52c6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905092415-codex-gpt-5.4-mini-6eea8e52c6\""
+    },
+    "createdAt": "2026-09-05T09:24:21.377Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-05T09:27:54.418Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260905092415-codex-gpt-5.4-mini-ATM-GOV-0409-b2f4ba3a1c",
+  "closeReason": "Shared delivery 6c51ccf7 intentionally co-delivered ATM-GOV-0409 with sibling batch recovery files; acknowledge the three listed sibling paths without treating them as this task's deliverables.",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0409.closure-packet.json"
+}
