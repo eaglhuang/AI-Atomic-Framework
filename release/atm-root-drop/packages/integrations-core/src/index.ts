@@ -156,6 +156,7 @@ export type {
   Sha256Digest,
   IntegrationInstallContext,
   IntegrationSourceFile,
+  IntegrationSourceCoverage,
   InstallManifestFile,
   InstallManifest,
   CreateInstallManifestInput,

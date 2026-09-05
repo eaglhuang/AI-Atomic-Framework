@@ -66,6 +66,7 @@ export function createStaticIntegrationAdapter(input) {
         fileFormat: input.fileFormat,
         placeholderStyle: input.placeholderStyle,
         targetDir: () => targetDirectory,
+        ...(input.sourceCoverage ? { sourceCoverage: input.sourceCoverage } : {}),
         install: (context) => installSourceFiles({
             adapterId: input.id,
             adapterVersion: input.adapterVersion,

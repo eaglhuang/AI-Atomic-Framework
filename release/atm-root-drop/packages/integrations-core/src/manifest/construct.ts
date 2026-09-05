@@ -26,6 +26,7 @@ import type {
   IntegrationInstallContext,
   IntegrationInstallResult,
   IntegrationSourceFile,
+  IntegrationSourceCoverage,
   StaticIntegrationAdapterInput
 } from './types.ts';
 import { verifyManifestFiles } from '../verify/verify-installed.ts';
@@ -93,6 +94,7 @@ export function createStaticIntegrationAdapter(input: StaticIntegrationAdapterIn
     fileFormat: input.fileFormat,
     placeholderStyle: input.placeholderStyle,
     targetDir: () => targetDirectory,
+    ...(input.sourceCoverage ? { sourceCoverage: input.sourceCoverage } : {}),
     install: (context) => installSourceFiles({
       adapterId: input.id,
       adapterVersion: input.adapterVersion,

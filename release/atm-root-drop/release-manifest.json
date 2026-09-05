@@ -5306,6 +5306,7 @@
     "release/atm-root-drop/tests/cli/integration-profile-parity.test.ts",
     "release/atm-root-drop/tests/cli/integration-raw-git-command-guard.test.ts",
     "release/atm-root-drop/tests/cli/integration-reconciliation.test.ts",
+    "release/atm-root-drop/tests/cli/integration-source-coverage-parity.test.ts",
     "release/atm-root-drop/tests/cli/lane-adopt-phase.test.ts",
     "release/atm-root-drop/tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
     "release/atm-root-drop/tests/cli/lane-claim-conflict-matrix.test.ts",
@@ -6001,11 +6002,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1587,
-    "unchanged": 4379,
+    "copied": 23,
+    "unchanged": 2022,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -20067,7 +20068,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/integration-claude-code/dist/index.js",
-        "digest": "5fa1f298247c9d92de97573db2a301b3bed7a42ce1a5f80980893e7c82888510",
+        "digest": "15e74dd9be1fa7bd485323c30fd24be9a4394175fe6e2889a76c9bb039614bfc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/integration-claude-code/dist/index.js"
@@ -20076,7 +20077,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/integration-codex/dist/index.js",
-        "digest": "2cb14dcf6f3bb4f5a40e9e608ec1e8cee8fd9279cc7cacbf1d1281aea18c60f6",
+        "digest": "b577643a558570a38d56b071eff5046cb5d9ea734a248a11a278a17fed024eef",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/integration-codex/dist/index.js"
@@ -20085,7 +20086,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/integration-copilot/dist/index.js",
-        "digest": "71393ed1174b6adb0e0ece033a0aded43a03acd0062e0273ebbf788054fe141b",
+        "digest": "6c53f0de1b46e52184177a097e9db859d153f25c6ba8e579ee3b49690333fbdb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/integration-copilot/dist/index.js"
@@ -20094,7 +20095,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/integration-cursor/dist/index.js",
-        "digest": "20c788ad7194696cff667c9df3a474adf4d1142ff9abcbc30f03e7a198665035",
+        "digest": "251d8446ce618014a2622e8d6bc416c32923312fd6689a6dd4278d79ae213091",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/integration-cursor/dist/index.js"
@@ -20103,7 +20104,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/integration-gemini/dist/index.js",
-        "digest": "affa01f111795b8dc6553ee47cf5165750822d0d5830d60891a8087043384795",
+        "digest": "d597587155bcba2bdc165cec623a6a0883dffa06685ba1abdbc88a19da919ffe",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/integration-gemini/dist/index.js"
@@ -20211,7 +20212,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/integrations-core/dist/manifest/construct.js",
-        "digest": "8ba7c9e609b71764760f771deacebc9ed079f76584bf51c2f41ca4bdf30c8ed2",
+        "digest": "1b05b698c569696e0dd9d67549b0575a49903114aab7417e3905b8dda0e9c61c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/integrations-core/dist/manifest/construct.js"
@@ -23838,7 +23839,7 @@
       },
       {
         "path": "packages/cli/dist/commands/integration/health.js",
-        "digest": "9cec6f16f6ef7cda1dff7b2a8210df40f52ca09ec2ee738c4496ccd4bdcb9782",
+        "digest": "e026e93dc5d9958c1e77b0b7b3d7aff8bcc3787b7340ffc47c37add07cda86b3",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/integration/health.js"
@@ -30291,7 +30292,7 @@
       },
       {
         "path": "packages/cli/src/commands/integration/health.ts",
-        "digest": "6a90f49d4b11fdb2ac27411e86dee526310561ed805cfa6cb134c49788ec7a4a",
+        "digest": "9722b040c748bf5941b5f74014a8e7c1717b64c01ca57f0f31022bc1b2a517cb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/integration/health.ts"
@@ -41262,7 +41263,7 @@
       },
       {
         "path": "packages/integration-claude-code/dist/index.js",
-        "digest": "5fa1f298247c9d92de97573db2a301b3bed7a42ce1a5f80980893e7c82888510",
+        "digest": "15e74dd9be1fa7bd485323c30fd24be9a4394175fe6e2889a76c9bb039614bfc",
         "origin": "source",
         "inputPaths": [
           "packages/integration-claude-code/dist/index.js"
@@ -41280,7 +41281,7 @@
       },
       {
         "path": "packages/integration-claude-code/src/index.ts",
-        "digest": "a43a167ac029bfa18892b2bba9b5839e80f4f56bb6dfc64a0b0f04ebf10d65f5",
+        "digest": "830895364d7c38d8935b343abd1a65951fa0fa2282e85fed22cc03c1541f6f39",
         "origin": "source",
         "inputPaths": [
           "packages/integration-claude-code/src/index.ts"
@@ -41298,7 +41299,7 @@
       },
       {
         "path": "packages/integration-codex/dist/index.js",
-        "digest": "2cb14dcf6f3bb4f5a40e9e608ec1e8cee8fd9279cc7cacbf1d1281aea18c60f6",
+        "digest": "b577643a558570a38d56b071eff5046cb5d9ea734a248a11a278a17fed024eef",
         "origin": "source",
         "inputPaths": [
           "packages/integration-codex/dist/index.js"
@@ -41316,7 +41317,7 @@
       },
       {
         "path": "packages/integration-codex/src/index.ts",
-        "digest": "78876380471d2c019cb6539ece92ac0ab387dfe12055c52b44c83bfc473d7c00",
+        "digest": "f53614301a88ac2d45c1f92b17d6f56341bb96baf4ad66b496f4f68642334e58",
         "origin": "source",
         "inputPaths": [
           "packages/integration-codex/src/index.ts"
@@ -41334,7 +41335,7 @@
       },
       {
         "path": "packages/integration-copilot/dist/index.js",
-        "digest": "71393ed1174b6adb0e0ece033a0aded43a03acd0062e0273ebbf788054fe141b",
+        "digest": "6c53f0de1b46e52184177a097e9db859d153f25c6ba8e579ee3b49690333fbdb",
         "origin": "source",
         "inputPaths": [
           "packages/integration-copilot/dist/index.js"
@@ -41352,7 +41353,7 @@
       },
       {
         "path": "packages/integration-copilot/src/index.ts",
-        "digest": "d922f6a35de51bcd31347e6ec0e2bd03f0cae970bf24f4283b026333c843cc6b",
+        "digest": "3cc004c22d622a7bfa797f87c5a1c41e518682c6051f979ad07d7f4b0db48bcc",
         "origin": "source",
         "inputPaths": [
           "packages/integration-copilot/src/index.ts"
@@ -41370,7 +41371,7 @@
       },
       {
         "path": "packages/integration-cursor/dist/index.js",
-        "digest": "20c788ad7194696cff667c9df3a474adf4d1142ff9abcbc30f03e7a198665035",
+        "digest": "251d8446ce618014a2622e8d6bc416c32923312fd6689a6dd4278d79ae213091",
         "origin": "source",
         "inputPaths": [
           "packages/integration-cursor/dist/index.js"
@@ -41388,7 +41389,7 @@
       },
       {
         "path": "packages/integration-cursor/src/index.ts",
-        "digest": "763a76e08ae3b6cb94f349d6007f2e753f204222e6d00f4597db4aa71be53838",
+        "digest": "bbed093db297798b82b54240309e2a3a695c8713610f05c67250f97fd995a200",
         "origin": "source",
         "inputPaths": [
           "packages/integration-cursor/src/index.ts"
@@ -41406,7 +41407,7 @@
       },
       {
         "path": "packages/integration-gemini/dist/index.js",
-        "digest": "affa01f111795b8dc6553ee47cf5165750822d0d5830d60891a8087043384795",
+        "digest": "d597587155bcba2bdc165cec623a6a0883dffa06685ba1abdbc88a19da919ffe",
         "origin": "source",
         "inputPaths": [
           "packages/integration-gemini/dist/index.js"
@@ -41424,7 +41425,7 @@
       },
       {
         "path": "packages/integration-gemini/src/index.ts",
-        "digest": "e831314ea10652364c452331797d0355021079a91411efe10a50a71d8efae50b",
+        "digest": "bde0eba986c4c4b3da0176e398df2aa530027f753116ec18ac3ab5e701b6e918",
         "origin": "source",
         "inputPaths": [
           "packages/integration-gemini/src/index.ts"
@@ -41550,7 +41551,7 @@
       },
       {
         "path": "packages/integrations-core/dist/manifest/construct.js",
-        "digest": "8ba7c9e609b71764760f771deacebc9ed079f76584bf51c2f41ca4bdf30c8ed2",
+        "digest": "1b05b698c569696e0dd9d67549b0575a49903114aab7417e3905b8dda0e9c61c",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/dist/manifest/construct.js"
@@ -41703,7 +41704,7 @@
       },
       {
         "path": "packages/integrations-core/src/index.ts",
-        "digest": "e468da0ef7f61c180e8a12abff7d7c64450af8c1718815db57ae6c84998d896b",
+        "digest": "58dafe8db12efd8fe780d0399a13be5f1ed915afba527ddb75b43f4fa7d2cf4f",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/src/index.ts"
@@ -41712,7 +41713,7 @@
       },
       {
         "path": "packages/integrations-core/src/manifest/construct.ts",
-        "digest": "d45ffd5e86fe145297bc76d6d014301071d09125c60f94560e0f32961167ae39",
+        "digest": "6098d704734493f75beafcd33e12889d014d9f1769dde41d3792fc9a49741733",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/src/manifest/construct.ts"
@@ -41730,7 +41731,7 @@
       },
       {
         "path": "packages/integrations-core/src/manifest/types.ts",
-        "digest": "71aa3eb7bd371e76bb8b32908da1a27948e736dd99fbf0a6a279cef4da65762d",
+        "digest": "c47c22d7bd61bedf8006f82ffab4275626ec7eac673f1260e1fd6383a9158bfa",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/src/manifest/types.ts"
@@ -53474,6 +53475,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/integration-source-coverage-parity.test.ts",
+        "digest": "7b62329178d0ba6abd1938a562b4795117f0cf04abc8c1ea6ff7e15206e10b4f",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/integration-source-coverage-parity.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/lane-adopt-phase.test.ts",
         "digest": "2f2dfc5086dc94d10b73676ad1814b89a485527784445fed19d532a90131a077",
         "origin": "source",
@@ -59702,7 +59712,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:a60fc91f6a3a7448e7ed3d7629fc0d064f843e8a612b646d6723556a96d5ff8e"
+    "treeDigest": "sha256:9693a9e2aef2fa549c740a2d6a69d99a1fd6c3542480dd46c7e94310704e8d21"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61231,7 +61241,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:0de5234f4a545544461a97abf7978e1547cb5e82080e32d6c89a5c9129c47ccf"
+    "digest": "sha256:cc2749cb1b375be23549a9debdc1a78529f0d041cee49f35b65b3a8ef691dcbb"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66511,6 +66521,7 @@
       "release/atm-root-drop/tests/cli/integration-profile-parity.test.ts",
       "release/atm-root-drop/tests/cli/integration-raw-git-command-guard.test.ts",
       "release/atm-root-drop/tests/cli/integration-reconciliation.test.ts",
+      "release/atm-root-drop/tests/cli/integration-source-coverage-parity.test.ts",
       "release/atm-root-drop/tests/cli/lane-adopt-phase.test.ts",
       "release/atm-root-drop/tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
       "release/atm-root-drop/tests/cli/lane-claim-conflict-matrix.test.ts",
@@ -67209,22 +67220,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:34c6683eaa4f728bc3ab36008c3e5a2d082658cbce1f815cc167d8a156c274f6",
-  "sealedSourceCommit": "0b9780a284743ca759e1f3440c4b5595e40d8c8b",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "root-config-change",
-  "incrementalPlanDigest": "sha256:1116090eeaa2513ef1fdd7e7f4e29041ea8ecfb27b9dd698ab64501bdc14b844",
-  "tsBuildCacheDigest": "sha256:8316531e0ea7cfaea14c589bcd213df6fdacb164db25956452d0a88c54091702",
+  "buildInputsTreeHash": "sha256:7affc998e2e23e46880a9958c7182419628e8e0e8cf407e53dbb7333583e73dd",
+  "sealedSourceCommit": "d720045f85773822be173112629691982d1d4aeb",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 7 affected package(s)",
+  "incrementalPlanDigest": "sha256:33ab09d6d7a27c63b5af7108ffc73cb77d7beec163b6813e1a9ee34bb2658501",
+  "tsBuildCacheDigest": "sha256:e43dad6f2d39d74f5a7b0dc7b86ecd33b722b53a632799c12f6986c2e378e570",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 47,
-    "skipDecision": 67,
-    "worktreeSetup": 13449,
-    "typescriptBuild": 11045,
-    "rootDropReleaseAssembly": 31645,
-    "onefileReleaseAssembly": 9236,
-    "artifactSync": 10407,
+    "inputHashCalculation": 51,
+    "skipDecision": 70,
+    "worktreeSetup": 13598,
+    "typescriptBuild": 26619,
+    "rootDropReleaseAssembly": 33831,
+    "onefileReleaseAssembly": 8933,
+    "artifactSync": 9728,
     "cleanup": 0,
-    "totalElapsed": 106486
+    "totalElapsed": 112190
   }
 }

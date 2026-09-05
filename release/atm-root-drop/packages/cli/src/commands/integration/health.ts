@@ -171,6 +171,29 @@ export async function verifyInstalledManifest(
   }
   const dryRunInstall = await resolveValue(adapter.install(createIntegrationContext(repositoryRoot, adapter, { dryRun: true })));
   const parity = compareManifestParity(manifest, dryRunInstall.manifest);
+  const sourceCoverage = adapter.sourceCoverage
+    ? adapter.sourceCoverage(createIntegrationContext(repositoryRoot, adapter, { dryRun: true }))
+    : null;
+  const coverageMismatch = sourceCoverage && sourceCoverage.sourceFileCount !== dryRunInstall.manifest.files.length;
+  if (coverageMismatch) {
+    return createManifestHealthReport({
+      ok: false,
+      status: 'stale',
+      manifestPath,
+      adapterId: adapter.id,
+      findings: [
+        ...verifyReport.findings,
+        {
+          level: 'error',
+          code: 'source-coverage-mismatch',
+          path: manifestPath,
+          message: `Integration source coverage declares ${sourceCoverage.sourceFileCount} source file(s), but the current projection contains ${dryRunInstall.manifest.files.length} file(s).`
+        }
+      ],
+      driftedFiles: [],
+      staleFields: ['sourceCoverage']
+    });
+  }
   if (!parity.ok) {
     return createManifestHealthReport({
       ok: false,
