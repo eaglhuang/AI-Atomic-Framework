@@ -7,7 +7,7 @@ import { readPluginRegistry } from '../../plugin-registry.js';
 import { toStoredPlanningPath, resolvePlanAbsoluteFromStored } from '../planning-repo-root.js';
 import { assertRunnerFreshForWriteAction } from '../framework-development.js';
 import { assertEmergencyApproval } from '../emergency/gate.js';
-import { buildExtractionFirstPatrolDiagnostics, extractFrontMatter, parseAcceptanceEvidenceMap, validateDeliverablesList } from './task-import-validators.js';
+import { buildExtractionFirstPatrolDiagnostics, buildAtomMapProjectionScopeDiagnostic, extractFrontMatter, parseAcceptanceEvidenceMap, validateDeliverablesList } from './task-import-validators.js';
 import { applySingleCardContractValidation } from './import-card-contract-validation.js';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { advancePlanningSourceSeal, attachPlanningSourceSeal, buildPlanningSourceSeal, readPlanningSourceSeal } from './import-task.js';
@@ -325,6 +325,14 @@ export async function runTasksImport(argv) {
         for (const violation of violations) {
             strictPathViolations.push({ taskId: task.workItemId, ...violation });
         }
+    }
+    for (const task of parsed.tasks) {
+        const projectionDiagnostic = buildAtomMapProjectionScopeDiagnostic({
+            taskId: task.workItemId,
+            declaredFiles: [...(task.scopePaths ?? []), ...(task.deliverables ?? [])]
+        });
+        if (projectionDiagnostic)
+            parsed.diagnostics.push(projectionDiagnostic);
     }
     if (strictPathViolations.length > 0) {
         throw new CliError('ATM_TASK_IMPORT_DELIVERABLE_PATH_INVALID', 'tasks import rejected deliverables that are not repository path declarations.', {

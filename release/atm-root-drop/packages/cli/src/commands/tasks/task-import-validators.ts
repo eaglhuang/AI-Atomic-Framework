@@ -427,6 +427,37 @@ export function validateDeliverablesList(
   return violations;
 }
 
+/**
+ * Generated atom-map projections are not mutation sources.  Keep this check at
+ * import time so a task card cannot accidentally authorize an edit to the
+ * projection without also naming the owner shard (or its governed glob).
+ */
+export function buildAtomMapProjectionScopeDiagnostic(input: {
+  readonly taskId: string;
+  readonly declaredFiles: readonly string[];
+}): { readonly level: 'warning'; readonly code: string; readonly text: string; readonly workItemId: string } | null {
+  const normalized = input.declaredFiles
+    .map((entry) => normalizeRelativePath(entry))
+    .filter(Boolean);
+  const projection = 'atomic_workbench/atomization-coverage/path-to-atom-map.json';
+  if (!normalized.includes(projection)) return null;
+
+  const hasOwnerShard = normalized.some((entry) =>
+    entry === 'atomic_workbench/atomization-coverage/path-to-atom-map-shards'
+    || entry === 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json'
+    || /^atomic_workbench\/atomization-coverage\/path-to-atom-map-shards\/owner-shard-[^/]+\.json$/.test(entry)
+    || entry === 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-*.json'
+  );
+  if (hasOwnerShard) return null;
+
+  return {
+    level: 'warning',
+    code: 'ATM_TASK_IMPORT_GENERATED_ATOM_MAP_PROJECTION_ONLY',
+    text: `Task ${input.taskId} scopes generated atom-map projection ${projection} without an owner shard. Update the owner shard under atomic_workbench/atomization-coverage/path-to-atom-map-shards/, then rebuild the projection with node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js <repo> write-projection.`,
+    workItemId: input.taskId
+  };
+}
+
 // ─── 私有 helper（被本模組函式使用） ─────────────────────────────────────────
 
 function cleanCellText(value: string): string {

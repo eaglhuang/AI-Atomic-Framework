@@ -5581,6 +5581,7 @@
     "release/atm-root-drop/tests/cli/task-dependency-semantics-census.test.ts",
     "release/atm-root-drop/tests/cli/task-id-casing.test.ts",
     "release/atm-root-drop/tests/cli/task-import-acceptance-evidence.test.ts",
+    "release/atm-root-drop/tests/cli/task-import-atom-map-projection-warning.test.ts",
     "release/atm-root-drop/tests/cli/task-import-canonical-id-boundary.test.ts",
     "release/atm-root-drop/tests/cli/task-import-diagnostic-contract.test.ts",
     "release/atm-root-drop/tests/cli/task-lane-lifecycle-repair.test.ts",
@@ -6010,11 +6011,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1388,
-    "unchanged": 4587,
+    "copied": 5,
+    "unchanged": 1949,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -25566,7 +25567,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/import-orchestrator.js",
-        "digest": "eba8fa1cdb7e700a8b01113a1aff672a333318eabcf204a7140e07662fd89544",
+        "digest": "1918ebdae393c85d1a3b58f37858157f3a7beac0f0ba7cac94f3141251353d95",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/import-orchestrator.js"
@@ -25980,7 +25981,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/task-import-validators.js",
-        "digest": "a5ea9400bfdf2c9248e6c3dbc98e8eefe3a515d8a56b6b50266a614a86887714",
+        "digest": "4e414ec6f9e59f863b08bda8456fdaaee88d7e69a089d967e7863916ff258f87",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/task-import-validators.js"
@@ -32829,7 +32830,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/import-orchestrator.ts",
-        "digest": "3c526c043ed58f06e7c9c6769f0ec45ca960bbec1c3aa6472ca20e04fd628c70",
+        "digest": "34639b746a9170661439c132d090c87639506f9757e9248fe722ff89250709a0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/import-orchestrator.ts"
@@ -33243,7 +33244,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/task-import-validators.ts",
-        "digest": "d66a608b918c66e4257392c57af9c7a41ef58b7c0ee86682c20df480fd0af351",
+        "digest": "fa1fa46ba4b058707410ea1781718378975b0277d95730cae79bc962cb411f5b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/task-import-validators.ts"
@@ -55958,6 +55959,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/task-import-atom-map-projection-warning.test.ts",
+        "digest": "93bf874d546e57ebc8c463cc00e9563286b458bfa7db26f3d31c6312c6437956",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/task-import-atom-map-projection-warning.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/task-import-canonical-id-boundary.test.ts",
         "digest": "a8e8a9646cd4fb85e1d2065593b9fe731e15500a3a40a56f05f7cd8e711cedd3",
         "origin": "source",
@@ -59792,7 +59802,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:96e62bca4eba53fb3089fd3dcf94d267c0309802d61ed4f9a371c665a7fe4201"
+    "treeDigest": "sha256:2530c066248cefd78aea4c6fdd19af24b760332d87b17626ed08bf6a537c8ce0"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61322,7 +61332,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:79e3be0ea4a6e83ac484c73ba23847d394decb5417d0a5a2dbe8c2575d82b756"
+    "digest": "sha256:e7200c608b728b78761f8c0980bd8c86dc780bcbe2a8e84b6c043f4859960f68"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66877,6 +66887,7 @@
       "release/atm-root-drop/tests/cli/task-dependency-semantics-census.test.ts",
       "release/atm-root-drop/tests/cli/task-id-casing.test.ts",
       "release/atm-root-drop/tests/cli/task-import-acceptance-evidence.test.ts",
+      "release/atm-root-drop/tests/cli/task-import-atom-map-projection-warning.test.ts",
       "release/atm-root-drop/tests/cli/task-import-canonical-id-boundary.test.ts",
       "release/atm-root-drop/tests/cli/task-import-diagnostic-contract.test.ts",
       "release/atm-root-drop/tests/cli/task-lane-lifecycle-repair.test.ts",
@@ -67309,22 +67320,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:7e4cc1d60c68a6dd751016ce5055bbb082a8b379ebac716e658006d0d34053b3",
-  "sealedSourceCommit": "1beb98fbee7c145fd49b7714feb2ca7d2987e4b8",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:01070dd5479197c7b6fad3c18552fac9caa83c49e38b8bd8a583cbced9d45db2",
-  "tsBuildCacheDigest": "sha256:a0e4427c61ede80204b28f8ad07014d2400545ef94e6269d7cbd7244d9bdc870",
+  "buildInputsTreeHash": "sha256:015746c88a005ad61f6a0ff528c3e0c1f146167d5837fcaaf4d447bb7b85c7af",
+  "sealedSourceCommit": "9ed61e65af4f70da8722e2231a0bd8dd261935b9",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:ff98017e975a3192d0d8a53d68a72a58c60972d09b921f706d1a8fd22948c336",
+  "tsBuildCacheDigest": "sha256:c7e63ca7608a56a4ba449a4817c5a4331db4f2fc06e8ca1f4fb8bc444e0893b1",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 51,
-    "skipDecision": 60,
-    "worktreeSetup": 13923,
-    "typescriptBuild": 10801,
-    "rootDropReleaseAssembly": 33870,
-    "onefileReleaseAssembly": 9456,
-    "artifactSync": 8380,
+    "skipDecision": 62,
+    "worktreeSetup": 13542,
+    "typescriptBuild": 20503,
+    "rootDropReleaseAssembly": 32861,
+    "onefileReleaseAssembly": 9029,
+    "artifactSync": 7994,
     "cleanup": 0,
-    "totalElapsed": 84868
+    "totalElapsed": 102962
   }
 }
