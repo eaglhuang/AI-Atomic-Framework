@@ -38,3 +38,12 @@ test('does not flag a single task commit', () => {
   const result = inspectHistoricalCommitScopePatrol(root);
   assert.equal(result.findings.length, 0);
 });
+
+test('extracts complete dated backlog IDs instead of the year prefix', () => {
+  const root = createRepo();
+  writeFileSync(path.join(root, 'ATM-BUG-2026-09-001.json'), 'a');
+  git(root, 'add', '.');
+  git(root, 'commit', '-q', '-m', 'backlog scope');
+  const result = inspectHistoricalCommitScopePatrol(root);
+  assert.equal(result.findings.length, 0);
+});

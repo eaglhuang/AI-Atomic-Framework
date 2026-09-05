@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 
-const TASK_ID_PATTERN = /\b(?:TASK|ATM)-[A-Z0-9]+-\d{4,5}\b/gi;
+const TASK_ID_PATTERN = /\b(?:TASK-[A-Z0-9]+-\d{4}|ATM-BUG-\d{4}-\d{2}-\d{3}|ATM-[A-Z0-9]+-\d{4})\b/gi;
 
 export interface CommitScopePatrolFinding {
   code: 'ATM_DOCTOR_COMMIT_TASK_SCOPE_SPAN';
