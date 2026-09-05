@@ -49,14 +49,20 @@ node atm.mjs broker release --task <task-id> --actor <actor-id> --json
 node atm.mjs broker runner-sync status --json
 node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <work-id> --receipt-ref <receipt-path> --json
 
+# Resume a lane or identify the task carried by a commit hook
+$env:ATM_LANE_SESSION_ID = '<lane-session-id>'
+$env:ATM_COMMIT_TASK_ID = '<task-id>'
+
 # Governed commit fallback (diagnose first; do not use native git commit)
 node atm.mjs git commit --actor <actor-id> --task <task-id> --message "<summary>" --auto-stage --dry-run --json
 ```
 
 On PowerShell, prefer the explicit `--actor` flag. If a command surface accepts
-ambient identity, the supported fallback is `$env:ATM_ACTOR_ID = '<actor-id>'`
-(commit hooks may also consume `ATM_COMMIT_ACTOR_ID`); do not invent a new
-continuation variable or use `git commit`/`git push` directly.
+ambient identity, the supported fallbacks are `$env:ATM_ACTOR_ID = '<actor-id>'`,
+`$env:ATM_LANE_SESSION_ID = '<lane-session-id>'`, and
+`$env:ATM_COMMIT_TASK_ID = '<task-id>'` (commit hooks may also consume
+`ATM_COMMIT_ACTOR_ID`); do not invent a new continuation variable or use
+`git commit`/`git push` directly.
 
 ## Highest Parallel Governance Principle
 
