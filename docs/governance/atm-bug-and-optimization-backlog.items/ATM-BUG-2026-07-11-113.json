@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source; frozen runner publication remains required",
+  "status": "Closed — Fixed; accepted bulk-closure evidence path and current sealed runner publication verified",
   "area": "Governance attestation / no committable lane",
   "finding": "The bulk-closure manifest demanded by `ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST` has no governed committable home: `.atm/history/evidence/` placement is blocked by protected-state rules (plain commit and `git record-commit` both fail with `evidence-file-missing-task-context`, record-commit additionally with `ATM_COMMIT_SESSION_MISSING`), while the alternative accepted path `atomic_workbench/evidence/` is gitignored. The only working state is an untracked local file, so the attestation that unblocks pre-push is not durable and every fresh clone or teammate hits the same block again.",
   "expectedBehavior": "Provide a governed lane to commit audit-required attestations (tracked manifest location or a record-only lane that accepts them with attribution), so passing the audit leaves a durable, shared artifact.",
   "evidenceOrRepro": "2026-07-11 while pushing main: manifest in `.atm/history/evidence/` blocked twice; moving it to `atomic_workbench/evidence/` satisfied `hasBulkClosureManifest` from disk and the push succeeded, but the file remains untracked.",
-  "followUp": "The accepted atomic_workbench/evidence location now ignores all other generated evidence but explicitly permits bulk-closure-manifest-*.json. Pre-commit accepts a standalone manifest only when it is atm.bulkClosureManifest.v1, its bundle commit is an ancestor of HEAD, and every listed task has the exact closure packet and bundle manifest already present. The verified 2026-07-11 manifest is tracked with this repair, so fresh clones retain the audit attestation. Frozen runner publication and formal backlog closeout remain."
+  "followUp": "No source follow-up. The accepted atomic_workbench/evidence contract remains protected by its existing pre-commit checks and current sealed runner publication."
 }
