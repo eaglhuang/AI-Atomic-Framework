@@ -192,6 +192,8 @@ interface ForeignStagedIndexEntry {
   readonly mode: string | null;
   /** Null represents an intentional staged deletion. */
   readonly blobId: string | null;
+  /** The task receipt that established ownership of this staged path. */
+  readonly receiptTaskId: string | null;
 }
 
 const INDEX_LOCK_RETRY_DELAYS_MS = [25, 50, 100, 200, 400, 800, 1600] as const;
@@ -246,7 +248,7 @@ export function runGitIndexMutationWithRetry(input: {
   }
 }
 
-function readStagedIndexEntries(cwd: string, files: readonly string[]): ForeignStagedIndexEntry[] {
+function readStagedIndexEntries(cwd: string, files: readonly string[], receiptTaskIds = new Map<string, string>()): ForeignStagedIndexEntry[] {
   const requested = uniqueSorted(files);
   if (requested.length === 0) return [];
   const output = execFileSync(resolveGitExecutable(), ['ls-files', '-s', '--', ...requested], {
@@ -258,11 +260,17 @@ function readStagedIndexEntries(cwd: string, files: readonly string[]): ForeignS
     const match = /^(\d+)\s+([0-9a-f]{40,})\s+\d+\t(.+)$/.exec(line.trim());
     return match ? [{ mode: match[1], blobId: match[2], path: normalizeRelativePath(match[3]) }] : [];
   }).filter((entry) => entry.path).map((entry) => [entry.path, entry] as const));
-  return requested.map((filePath) => present.get(filePath) ?? { path: filePath, mode: null, blobId: null });
+  return requested.map((filePath) => {
+    const entry = present.get(filePath);
+    return {
+      ...(entry ?? { path: filePath, mode: null, blobId: null }),
+      receiptTaskId: receiptTaskIds.get(filePath) ?? null
+    };
+  });
 }
 
-function writeForeignStagedSnapshot(cwd: string, taskId: string, files: readonly string[]): { snapshotPath: string; entries: ForeignStagedIndexEntry[] } {
-  const entries = readStagedIndexEntries(cwd, files);
+function writeForeignStagedSnapshot(cwd: string, taskId: string, files: readonly string[], receiptTaskIds = new Map<string, string>()): { snapshotPath: string; entries: ForeignStagedIndexEntry[] } {
+  const entries = readStagedIndexEntries(cwd, files, receiptTaskIds);
   const snapshotPath = `.atm/runtime/snapshots/close-window-foreign-staged-${taskId}-${Date.now()}.json`;
   mkdirSync(path.dirname(path.join(cwd, snapshotPath)), { recursive: true });
   writeFileSync(path.join(cwd, snapshotPath), `${JSON.stringify({
@@ -314,10 +322,16 @@ function restoreForeignStagedEntries(cwd: string, entries: readonly ForeignStage
   }
 }
 
-function deferForeignStagedFiles(cwd: string, taskId: string, files: readonly string[]): { snapshotPath: string; entries: ForeignStagedIndexEntry[] } | null {
+function deferForeignStagedFiles(cwd: string, taskId: string, files: readonly string[], ownership: readonly CloseWindowForeignStagedTaskReport[] = []): { snapshotPath: string; entries: ForeignStagedIndexEntry[] } | null {
   const normalizedFiles = uniqueSorted(files);
   if (normalizedFiles.length === 0) return null;
-  const snapshot = writeForeignStagedSnapshot(cwd, taskId, normalizedFiles);
+  const receiptTaskIds = new Map<string, string>();
+  for (const owner of ownership) {
+    for (const filePath of owner.stagedFiles) {
+      receiptTaskIds.set(normalizeRelativePath(filePath), normalizeTaskId(owner.taskId));
+    }
+  }
+  const snapshot = writeForeignStagedSnapshot(cwd, taskId, normalizedFiles, receiptTaskIds);
   runGitIndexMutationWithRetry({
     cwd,
     args: ['restore', '--staged', '--', ...files],
@@ -445,7 +459,7 @@ export function acquireCloseWindowStagedIndexLock(input: {
   writeFileSync(lockPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
   try {
     if (unexpectedStagedFiles.length > 0 && input.deferForeignStaged) {
-      const deferred = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles);
+      const deferred = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles, unexpectedStagedTasks);
       record = {
         ...record,
         foreignStagedSnapshotPath: deferred?.snapshotPath ?? null,
