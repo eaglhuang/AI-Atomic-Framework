@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Fixed in source; requires the next tag release to prove the reordered gate in CI",
+  "status": "Partially fixed — source repair landed; next tag CI receipt is still required to prove the reordered gate",
   "area": "npm release workflow / package provenance",
   "finding": "The release workflow injected tag-derived workspace versions only after build, package-content, artifact-budget, and clean-install gates. Those gates therefore verified an unversioned tarball rather than the exact version npm would publish.",
   "expectedBehavior": "A tag release must inject the final version before building any release artifact. Every pre-publish package gate must observe the same versioned tarball that the publish step sends to npm.",
