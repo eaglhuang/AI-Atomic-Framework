@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-05T09-12-30-685Z-close-2f456fa997f1",
+  "taskId": "TASK-GIT-0032",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260905090355-codex-gpt-5.4-mini-TASK-GIT-0032-0ccb510925",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0032.json",
+  "taskSha256": "sha256:90d813ad60398c21bd4aba73aa9b3cc3c3315abe423f340225dc3db0e196b11d",
+  "createdAt": "2026-09-05T09:12:30.685Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0032 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-e467d48ded9c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-e467d48ded9c",
+    "sessionId": "session-20260905090355-codex-gpt-5.4-mini-TASK-GIT-0032-0ccb510925",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0032.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/broker-transactional-commit-queue.test.ts",
+      "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/broker-transactional-commit-queue.test.ts",
+      "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-05T09:12:30.677Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0032.*",
+        ".atm/history/task-events/TASK-GIT-0032/**",
+        ".atm/history/tasks/TASK-GIT-0032.json",
+        "packages/cli/src/commands/broker/command-router.ts",
+        "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "tests/cli/broker-transactional-commit-queue.test.ts",
+        "tests/cli/runner-sync-receipt-closeout.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/command-router.ts",
+        "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "tests/cli/broker-transactional-commit-queue.test.ts",
+        "tests/cli/runner-sync-receipt-closeout.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/broker-transactional-commit-queue.test.ts",
+        "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+        "typecheck",
+        "validate:cli"
+      ]
+    }
+  }
+}

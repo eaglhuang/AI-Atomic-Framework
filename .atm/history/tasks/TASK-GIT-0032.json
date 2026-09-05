@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0032",
   "title": "Broker-managed transactional commit queue and receipt closeout",
-  "status": "open",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-GIT-0029",
@@ -243,17 +243,17 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-05T08-47-54-607Z-release-3fade3938946",
-  "lastTransitionAt": "2026-09-05T08:47:54.607Z",
+  "lastTransitionId": "2026-09-05T09-12-30-685Z-close-2f456fa997f1",
+  "lastTransitionAt": "2026-09-05T09:12:30.685Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-09-05T08:47:10.164Z",
-  "promotedAt": "2026-09-05T08:47:10.168Z",
+  "reservedAt": "2026-09-05T09:03:55.090Z",
+  "promotedAt": "2026-09-05T09:03:55.094Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-718f2e9e2d93",
-    "claimedAt": "2026-09-05T08:47:10.173Z",
-    "heartbeatAt": "2026-09-05T08:47:47.331Z",
+    "leaseId": "lease-db1160496723",
+    "claimedAt": "2026-09-05T09:03:55.098Z",
+    "heartbeatAt": "2026-09-05T09:12:30.683Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-GIT-0032.json",
@@ -269,32 +269,32 @@
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260905084710-codex-gpt-5.4-mini-1d3990c061",
+      "laneSessionId": "lane-20260905090355-codex-gpt-5.4-mini-0c411176ee",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905084710-codex-gpt-5.4-mini-1d3990c061\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905090355-codex-gpt-5.4-mini-0c411176ee\""
     },
-    "reason": "Release unfinished task before next backlog selection; no implementation deliverable claimed."
+    "reason": "closed"
   },
   "startedAt": "2026-09-05T08:32:47.932Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-c1fca53c544b2fe7",
-    "ticketDigest": "sha256:c1fca53c544b2fe7351ba29ed2a84f6d99e8d949e925e4440b951867cee4bbca",
+    "ticketId": "wat-24fa7b503b7d56c3",
+    "ticketDigest": "sha256:24fa7b503b7d56c3dec24f76999691908e6a7c3162ceccd78ee8cf26e09a286d",
     "taskId": "TASK-GIT-0032",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260905084710-codex-gpt-5.4-mini-1d3990c061",
-    "claimGeneration": "lease-718f2e9e2d93",
-    "issuedAt": "2026-09-05T08:47:10.173Z",
-    "expiresAt": "2026-09-05T09:17:10.173Z",
+    "laneSessionId": "lane-20260905090355-codex-gpt-5.4-mini-0c411176ee",
+    "claimGeneration": "lease-db1160496723",
+    "issuedAt": "2026-09-05T09:04:10.349Z",
+    "expiresAt": "2026-09-05T09:34:10.349Z",
     "scopeDigest": "sha256:c4d73b2b6ca902487ee331b7fbf4f4d6076d449da08860ab4306871d70e48669",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-05T08:47:10.173Z"
+      "selectedAt": "2026-09-05T09:04:10.349Z"
     },
     "grants": [
       {
@@ -345,15 +345,15 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260905084710-codex-gpt-5.4-mini-TASK-GIT-0032-e34135dd7c",
+  "startedBySessionId": "session-20260905090355-codex-gpt-5.4-mini-TASK-GIT-0032-0ccb510925",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "TASK-GIT-0032",
     "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
+    "scopeKey": "TASK-GIT",
+    "queueId": "queue-b8d668bb1c193f0a",
+    "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/TASK-GIT-0032.*",
       ".atm/history/task-events/TASK-GIT-0032/**",
@@ -371,14 +371,18 @@
     "allowPlanningMirror": false,
     "promptHash": "dd886a57cbf2dad4fcb57fb06fe71ff3074a6a8923495d6964d4a82a5c1a38a0",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260905084710-codex-gpt-5.4-mini-TASK-GIT-0032-e34135dd7c",
+    "sessionId": "session-20260905090355-codex-gpt-5.4-mini-TASK-GIT-0032-0ccb510925",
     "laneSession": {
-      "laneSessionId": "lane-20260905084710-codex-gpt-5.4-mini-1d3990c061",
+      "laneSessionId": "lane-20260905090355-codex-gpt-5.4-mini-0c411176ee",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905084710-codex-gpt-5.4-mini-1d3990c061\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260905090355-codex-gpt-5.4-mini-0c411176ee\""
     },
-    "createdAt": "2026-09-05T08:47:17.066Z",
+    "createdAt": "2026-09-05T09:04:01.622Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-05T09:12:30.683Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260905090355-codex-gpt-5.4-mini-TASK-GIT-0032-0ccb510925",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0032.closure-packet.json"
 }

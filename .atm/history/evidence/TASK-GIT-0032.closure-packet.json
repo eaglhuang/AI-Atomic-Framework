@@ -1,0 +1,325 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0032",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "ae928e605f6b5591f2fc1abe2a7050eb508872ae",
+  "governedTreeSha": "83f7960904d186f9ba4205bb40782633c0b6a8e6",
+  "targetCommitDelta": {
+    "currentCommitSha": "ae928e605f6b5591f2fc1abe2a7050eb508872ae",
+    "parentCommitShas": [
+      "ae928e605f6b5591f2fc1abe2a7050eb508872ae"
+    ],
+    "governedTreeSha": "83f7960904d186f9ba4205bb40782633c0b6a8e6",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0032.json",
+      ".atm/history/task-events/TASK-GIT-0032/2026-09-05T09-03-55-090Z-reserve-0a8e706946bd.json",
+      ".atm/history/task-events/TASK-GIT-0032/2026-09-05T09-03-55-094Z-promote-fbbc68d255bd.json",
+      ".atm/history/task-events/TASK-GIT-0032/2026-09-05T09-04-01-623Z-claim-4a39d1e342ad.json",
+      ".atm/history/task-events/TASK-GIT-0032/2026-09-05T09-04-10-805Z-renew-29ef74eaf517.json",
+      ".atm/history/tasks/TASK-GIT-0032.json",
+      "tests/cli/broker-transactional-commit-queue.test.ts",
+      "tests/cli/runner-sync-receipt-closeout.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/broker-transactional-commit-queue.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ba493033c67ad647a6c2e6e70fd5c5e0ca68ca6c3391b72860db3f7cb081bf03",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:662c0decc32bc42dd0a606e67faa0a2e0ec56c1f392aa2788b9ff27edc2b81ac",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:db8cc38e978fee7b730c0f38c14cc0d6842b6aeb460786a62fab43232894faa7",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/broker-transactional-commit-queue.test.ts",
+    "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/broker-transactional-commit-queue.test.ts",
+    "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-05T09:12:30.677Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0032.*",
+      ".atm/history/task-events/TASK-GIT-0032/**",
+      ".atm/history/tasks/TASK-GIT-0032.json",
+      "packages/cli/src/commands/broker/command-router.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "tests/cli/broker-transactional-commit-queue.test.ts",
+      "tests/cli/runner-sync-receipt-closeout.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker/command-router.ts",
+      "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "tests/cli/broker-transactional-commit-queue.test.ts",
+      "tests/cli/runner-sync-receipt-closeout.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/broker-transactional-commit-queue.test.ts",
+      "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+      "typecheck",
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-GIT-0032.json",
+  "closedAt": "2026-09-05T09:12:30.677Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260905090355-codex-gpt-5.4-mini-TASK-GIT-0032-0ccb510925",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": {
+    "schemaId": "atm.closurePacketTeamSummary.v1",
+    "capturedAt": "2026-09-05T09:12:30.682Z",
+    "source": {
+      "kind": "team-run",
+      "teamRunPath": ".atm/runtime/team-runs/team-35f1e0785f9e.json"
+    },
+    "teamRunId": "team-35f1e0785f9e",
+    "captainDecision": {
+      "schemaId": "atm.teamCaptainDecision.v1",
+      "captain": {
+        "role": "Task Captain",
+        "agentId": "coordinator"
+      },
+      "taskId": "TASK-GIT-0032",
+      "authorityChain": {
+        "broker": "Broker verdicts override Coordinator decisions inside broker-governed conflict domains.",
+        "coordinator": "Coordinator retains team-local lifecycle authority outside broker-governed conflict domains."
+      },
+      "conflictRules": [
+        "If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.",
+        "If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.",
+        "Coordinator must not silently override broker verdicts inside broker-governed conflict domains."
+      ],
+      "teamLevel": "L2",
+      "teamLevelSource": "automatic",
+      "teamSize": "medium",
+      "requiredRoles": [
+        "Task Captain",
+        "Atomization Planner",
+        "Code Builder",
+        "Check Runner"
+      ],
+      "optionalRoles": [
+        "Reader",
+        "Evidence Collector",
+        "Scope Guardian"
+      ],
+      "reason": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+      "confidence": "medium",
+      "implementerSelector": {
+        "schemaId": "atm.teamImplementerSelector.v1",
+        "selectedImplementer": {
+          "agentId": "implementer-generic",
+          "role": "implementer",
+          "profile": "atm.implementer.generic.v1",
+          "language": "generic",
+          "recipeId": "atm.default.batch"
+        },
+        "languageMatch": "unknown",
+        "roleMatch": "typescript-implementer",
+        "fallbackReason": "TypeScript-heavy paths were detected, but the selected recipe only exposed implementer-generic as the available implementer.",
+        "confidence": "medium",
+        "deterministicHints": {
+          "scopePaths": [
+            "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+            "packages/cli/src/commands/broker/steward-queues.ts",
+            "packages/cli/src/commands/broker/command-router.ts",
+            "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+            "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+            "tests/cli/broker-transactional-commit-queue.test.ts",
+            "tests/cli/runner-sync-receipt-closeout.test.ts"
+          ],
+          "deliverables": [
+            "packages/cli/src/commands/broker/shared-delivery-commit-transaction.ts",
+            "packages/cli/src/commands/broker/steward-queues.ts",
+            "packages/cli/src/commands/broker/command-router.ts",
+            "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+            "packages/cli/src/commands/framework-development/runner-publication-receipt.ts",
+            "tests/cli/broker-transactional-commit-queue.test.ts",
+            "tests/cli/runner-sync-receipt-closeout.test.ts"
+          ],
+          "fileExtensions": [
+            ".ts"
+          ],
+          "pathHints": [
+            "typescript-heavy",
+            "typescript-file"
+          ],
+          "pythonHeavy": false,
+          "typescriptHeavy": true,
+          "uiPaths": false
+        }
+      },
+      "stopConditions": [
+        "scope must stay within declared allowed files",
+        "required roles must each be uniquely represented",
+        "validators must not report blocking permission conflicts",
+        "a broader or stronger lane must stop the plan"
+      ],
+      "escalationRequired": true,
+      "escalationReason": "Scope spans 7 declared paths, so coordination should be escalated. Scope crosses repo boundaries and should retain a lieutenant coordination boundary. Large script risk indicates the captain should not keep all coordination signals inline. Validator fan-out is 10, which merits lieutenant tracking.",
+      "needLieutenant": true,
+      "nextTeamShape": {
+        "schemaId": "atm.teamLieutenantEscalationShape.v1",
+        "captain": {
+          "role": "Task Captain",
+          "permissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ]
+        },
+        "lieutenant": {
+          "role": "Task Lieutenant",
+          "recommended": true,
+          "permissions": [
+            "file.read",
+            "exec.validator"
+          ],
+          "forbiddenPermissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "coordinationFocus": [
+            "phase coordination",
+            "blocker tracking",
+            "handoff summarization"
+          ]
+        },
+        "teamSizeHint": "medium",
+        "coordinationBoundary": "captain+lieutenant",
+        "signals": {
+          "scopeCount": 7,
+          "crossRepoScope": true,
+          "validatorCount": 10,
+          "largeScriptRisk": true,
+          "closureSignals": false,
+          "validationOk": true,
+          "brokerVerdict": "parallel-safe"
+        },
+        "suggestedPermissions": {
+          "captain": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "lieutenant": [
+            "file.read",
+            "exec.validator"
+          ]
+        }
+      },
+      "decisionSurface": {
+        "validationOk": true,
+        "brokerVerdict": "parallel-safe",
+        "largeScriptRisk": {
+          "level": "high",
+          "threshold": 3,
+          "reasons": [
+            "touched files 7 exceed planning threshold 3"
+          ]
+        },
+        "mapUpdateNeed": false,
+        "escalationRequired": true,
+        "needLieutenant": true,
+        "authorityChain": "Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them."
+      }
+    },
+    "agentReports": [],
+    "patrolFindings": [],
+    "evidenceCuratorSummary": null,
+    "teamSummary": {
+      "decision": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+      "implementationSummary": "broker-only selected; no agents are spawned, language=node, atm.node.broker-only-fallback, selection=repo-default role=coordinator; closure remains governed by command-backed evidence.",
+      "validators": [
+        "node --strip-types tests/cli/broker-transactional-commit-queue.test.ts",
+        "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+        "npm run typecheck",
+        "npm run validate:cli"
+      ],
+      "evidence": [],
+      "brokerGovernance": {
+        "schemaId": "atm.teamBrokerGovernanceSummary.v1",
+        "brokerSubagentEnabled": true,
+        "brokerDecisionSurface": "brokerLane",
+        "brokerStewardId": "neutral-write-steward",
+        "brokerGoverns": [
+          "write-intents",
+          "scope-conflicts",
+          "steward-apply",
+          "commit-lane"
+        ],
+        "brokerEvidenceRequired": [
+          "atm.teamBrokerLaneEvidence.v1",
+          "atm.stewardApplyEvidence.v1",
+          "atm.brokerOperationRunRecordEnvelope.v1"
+        ],
+        "commitLaneSerializedBy": "branch-commit-queue",
+        "commitLaneOwnerRole": "coordinator",
+        "workerGitWrite": false,
+        "workerTaskLifecycle": false,
+        "workerSelfClose": false
+      },
+      "risk": "medium",
+      "closeReady": false
+    }
+  }
+}
