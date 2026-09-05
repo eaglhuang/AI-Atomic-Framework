@@ -1,4 +1,4 @@
-import { createSanitizedGitEnv, resolveGitExecutable, runGitCommand, } from './git-process-port.js';
+import { createSanitizedGitEnv, resolveGitExecutable, runGitCommandWithTimeout, } from './git-process-port.js';
 import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync, } from "node:fs";
 import path from "node:path";
@@ -147,7 +147,7 @@ export function runGitPush(options) {
         });
     }
     try {
-        const stdout = runGitCommand(options.cwd, ["push", remote, `HEAD:${branch}`], ["ignore", "pipe", "pipe"]);
+        const stdout = runGitCommandWithTimeout(options.cwd, ["push", remote, `HEAD:${branch}`], null, ["ignore", "pipe", "pipe"]);
         const updatedAt = new Date().toISOString();
         const remoteShaAfterPush = readRevisionIfExists(options.cwd, `${remote}/${branch}`);
         writeGitPushAttemptStatus(options.cwd, statusPath, {
