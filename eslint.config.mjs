@@ -10,6 +10,7 @@ export default [
       '.atm/**',
       '.atm-temp/**',
       '.atm-runtime-cache/**',
+      'atm-git-hooks-*/**',
       'release/**',
       '.turbo/**',
       'coverage/**',
