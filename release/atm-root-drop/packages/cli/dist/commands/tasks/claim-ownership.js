@@ -1,5 +1,5 @@
 import { compareClaimLifecycleOwners } from '../next/claim-admission.js';
-import { resolveLaneSession } from '../lane-session/resolve.js';
+import { inspectReferencedLaneSession, resolveLaneSession } from '../lane-session/resolve.js';
 import { CliError } from '../shared.js';
 export function readClaimLaneSessionId(claim) {
     const laneSessionId = claim?.laneSession?.laneSessionId;
@@ -119,6 +119,10 @@ export function throwIfClaimOwnerMismatch(input) {
 }
 export function assertCurrentClaimOwnerForAction(input) {
     const holdingLaneSessionId = readClaimLaneSessionId(input.currentClaim);
+    const referencedLane = inspectReferencedLaneSession({
+        cwd: input.cwd,
+        laneSessionId: holdingLaneSessionId
+    });
     const laneSession = resolveLaneSession({
         cwd: input.cwd,
         actorId: input.actorId,
@@ -130,6 +134,13 @@ export function assertCurrentClaimOwnerForAction(input) {
         }),
         command: `node atm.mjs tasks ${input.action} --task ${input.taskId} --actor ${input.actorId} --json`
     });
+    const sameActorExpiredRenewal = input.action === 'renew'
+        && input.currentClaim.actorId === input.actorId
+        && referencedLane.availability === 'expired'
+        && laneSession.source === 'minted'
+        && laneSession.session.actorId === input.actorId;
+    if (sameActorExpiredRenewal)
+        return laneSession;
     throwIfClaimOwnerMismatch({
         taskId: input.taskId,
         currentActorId: input.currentClaim.actorId,

@@ -5213,6 +5213,7 @@
     "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
     "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
     "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
+    "release/atm-root-drop/tests/cli/claim-renew-expired-lane.test.ts",
     "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
     "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
     "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
@@ -6025,7 +6026,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 5,
-    "unchanged": 2737,
+    "unchanged": 1958,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -25346,7 +25347,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/claim-orchestrator.js",
-        "digest": "6c330cd7841a47c281ac1955fc1974b16f07ca02ea64d911d802e4a9434e011b",
+        "digest": "e386df2a14b3058d8baa30a7eb6397b98814e14dc43765bd0d90c9921d07ef1e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/claim-orchestrator.js"
@@ -25355,7 +25356,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/claim-ownership.js",
-        "digest": "b31056996ec60ebad368b7e8483b2b916291e92e4f2ab4f074f31676d14446f0",
+        "digest": "45948da991be83d63e8cc796699b58c299385450eec5d4aa9c12885d3ca0f5e9",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/claim-ownership.js"
@@ -32663,7 +32664,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/claim-orchestrator.ts",
-        "digest": "7a11ffb7e3606f30222627571e98a7033f4cb0c8ddb1d98e0d1b110bfe1b1154",
+        "digest": "9f6272293dca99b75a0bd2ac77683e3c26b37d64ab1b5459721600466e1100e7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/claim-orchestrator.ts"
@@ -32672,7 +32673,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/claim-ownership.ts",
-        "digest": "bd2d306c1527b98e44f12f5b46b3cd1383532a18e5c6948f416271b8d398ba45",
+        "digest": "9319e93284768783ec41d6803dd7dfaaf686573c928152aa060ed08597261f8f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/claim-ownership.ts"
@@ -52660,6 +52661,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/claim-renew-expired-lane.test.ts",
+        "digest": "370dbaeb58154bbfbdea3167e21dbdc6312bad8c7a07b1a20a2076f52cf44188",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/claim-renew-expired-lane.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/claim-repair-wip-ownership-continuity.test.ts",
         "digest": "26912a48948dc320bd849f06d4d4ddf110ffc35ee314124188f00d5618d46217",
         "origin": "source",
@@ -59932,7 +59942,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:b74be1fc4d92a39a3e702c0427831b03645d7ec4d890ac4c8d12a6d9e2b8a547"
+    "treeDigest": "sha256:ab71b4da12e2c557b5d9f910f6fafb50c70575915ba1adbac5cb40e23e43f9a0"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61468,7 +61478,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:130cf58169757ce2ac6f316d035c2142f28d1166925d1a36bae70791bb7be102"
+    "digest": "sha256:6134658c4afb3693cf50339916ce9da74a991bf0bc409f4cef0d090ea6dacf2b"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66655,6 +66665,7 @@
       "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
       "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
       "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
+      "release/atm-root-drop/tests/cli/claim-renew-expired-lane.test.ts",
       "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
       "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
       "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
@@ -67469,22 +67480,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:01a36f9f49b6deaec8f0e5f7f16b45e5f40917f76a0dbf345ee14c83efbf09b7",
-  "sealedSourceCommit": "4766943ce109b382f3cb78d053cc883cccb2d7d6",
+  "buildInputsTreeHash": "sha256:c5d4efc84e7bc74f260fe9aa2a2f68bc270f25e25642b35448a2c560a4b51a7b",
+  "sealedSourceCommit": "8e5b7857528e4e3dd470f8e9257430e33374c338",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:6cf6d6338e556cb125c47dba37c31ed7c854c2c4d4b55b4b9d94f65ef18af8f6",
-  "tsBuildCacheDigest": "sha256:fb1faf2b72a297eef47ebe2242357fd01f04e63f7ec9218e951c2bf572667e9f",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:d40d95eafec82ad8a5c4144de8d465a467bac81c9beb2764acfdbc590b282662",
+  "tsBuildCacheDigest": "sha256:ead169ed019cb3a84572b444771632de1817a11df6a396aed183ef8845d47e0f",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 48,
-    "skipDecision": 62,
-    "worktreeSetup": 11768,
-    "typescriptBuild": 17823,
-    "rootDropReleaseAssembly": 31337,
-    "onefileReleaseAssembly": 8516,
-    "artifactSync": 7600,
+    "inputHashCalculation": 49,
+    "skipDecision": 54,
+    "worktreeSetup": 11896,
+    "typescriptBuild": 16688,
+    "rootDropReleaseAssembly": 31165,
+    "onefileReleaseAssembly": 8493,
+    "artifactSync": 7841,
     "cleanup": 0,
-    "totalElapsed": 93805
+    "totalElapsed": 92842
   }
 }

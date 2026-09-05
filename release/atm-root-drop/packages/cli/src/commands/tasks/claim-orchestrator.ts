@@ -247,18 +247,19 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
   }
 
   if (action === 'renew') {
-    assertCurrentClaimOwnerForAction({
+    const laneSession = assertCurrentClaimOwnerForAction({
       cwd: options.cwd,
       taskId: options.taskId,
       actorId,
       action: 'renew',
       currentClaim
     });
-    const renewed: TaskClaimRecord = {
+    const renewed = {
       ...currentClaim,
       heartbeatAt: nowIso,
       ttlSeconds: options.ttlSeconds > 0 ? options.ttlSeconds : currentClaim.ttlSeconds,
-      state: 'active'
+      state: 'active' as const,
+      laneSession: laneSession.envelope
     };
     taskDocument.claim = renewed;
     const workAdmissionTicket = resealWorkAdmissionTicketForRenewal({

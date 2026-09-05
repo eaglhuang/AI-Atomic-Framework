@@ -241,7 +241,7 @@ export async function runTasksClaimLifecycle(action, argv) {
         });
     }
     if (action === 'renew') {
-        assertCurrentClaimOwnerForAction({
+        const laneSession = assertCurrentClaimOwnerForAction({
             cwd: options.cwd,
             taskId: options.taskId,
             actorId,
@@ -252,7 +252,8 @@ export async function runTasksClaimLifecycle(action, argv) {
             ...currentClaim,
             heartbeatAt: nowIso,
             ttlSeconds: options.ttlSeconds > 0 ? options.ttlSeconds : currentClaim.ttlSeconds,
-            state: 'active'
+            state: 'active',
+            laneSession: laneSession.envelope
         };
         taskDocument.claim = renewed;
         const workAdmissionTicket = resealWorkAdmissionTicketForRenewal({
