@@ -327,15 +327,16 @@ async function validateExtractionLockWait(input: {
   const stderrChunks: Buffer[] = [];
   child.stdout.on('data', (chunk) => stdoutChunks.push(Buffer.from(chunk)));
   child.stderr.on('data', (chunk) => stderrChunks.push(Buffer.from(chunk)));
+  const exitCodePromise = new Promise<number>((resolve, reject) => {
+    child.once('error', reject);
+    child.once('exit', (code) => resolve(code ?? 1));
+  });
 
   await delay(150);
   renameSync(stagingRoot, cacheRoot);
   rmSync(lockRoot, { recursive: true, force: true });
 
-  const exitCode = await new Promise<number>((resolve, reject) => {
-    child.once('error', reject);
-    child.once('exit', (code) => resolve(code ?? 1));
-  });
+  const exitCode = await exitCodePromise;
   const payload = (Buffer.concat(stdoutChunks).toString('utf8') || Buffer.concat(stderrChunks).toString('utf8')).trim();
   assert(exitCode === 0, 'onefile runner must survive extraction-lock handoff');
   const parsed = payload ? JSON.parse(payload) : {};

@@ -1,9 +1,10 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0419",
-  "updatedAt": "2026-09-06T23:01:23.408Z",
+  "updatedAt": "2026-09-06T23:19:29.738Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
+    "validate:onefile-release",
     "validate:runner-reproducibility",
     "validate:self-hosting-alpha"
   ],
@@ -55,6 +56,22 @@
       "durationMs": 98906,
       "runnerKind": "frozen-runner",
       "sourceCommit": "a58ae829e1058655b216aae9895c928f06a48f21",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:15a4b8c60f18a7c214fd8dadd3a5c2bb7d9baf140a7ca0b1bdaa3bec946f299a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-09-06T23:19:29.737Z",
+      "startedAt": "2026-09-06T23:18:10.964Z",
+      "finishedAt": "2026-09-06T23:19:29.737Z",
+      "durationMs": 78773,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "d78faaaf8581dd2c8de6387d9d79ab5603adc8ce",
       "cached": false
     }
   ],
