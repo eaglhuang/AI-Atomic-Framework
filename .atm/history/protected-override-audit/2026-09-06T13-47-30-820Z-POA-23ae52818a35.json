@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-23ae52818a35",
+  "recordedAt": "2026-09-06T13:47:30.820Z",
+  "actorId": "codex-captain",
+  "taskId": null,
+  "surface": "git commit broker-conflict override",
+  "command": "node atm.mjs git commit --actor codex-captain --message \"chore: preserve abandoned ATM-GOV-0417 evidence\" --no-verify --json",
+  "flags": [
+    "--broker-conflict-override"
+  ],
+  "permission": "backend.brokerConflictOverride",
+  "leaseId": "EMG-GLOBAL-371836573e",
+  "reason": "One-time exact-path preservation after recorded ATM-GOV-0417 conflict resolution; no source or foreign files.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.brokerConflictOverride"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-06T13-47-30-819Z-EMG-GLOBAL-371836573e.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
