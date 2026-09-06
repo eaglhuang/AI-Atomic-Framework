@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Low",
-  "status": "Open",
+  "status": "Fixed",
   "area": "Governance",
   "finding": "Direct release-artifact follow-up commits created after taskflow close repeatedly trigger ATM_HOOK_COMMIT_ACTOR_NOT_EXPLICIT even when the commit message includes ATM-Actor, ATM-Task, and ATM-Surface trailers.",
   "expectedBehavior": "Release-artifact follow-up commits should have a governed path that passes explicit actor attribution without requiring a raw git commit fallback or misleading hook warning.",
-  "evidenceOrRepro": "ATM-GOV-0228 release artifact commit a2ceb6f4f emitted ATM_HOOK_COMMIT_ACTOR_NOT_EXPLICIT; the same friction was previously observed during ATM-GOV-0231 release artifact publication.",
-  "followUp": "Add a runner-sync release-artifact commit facade or teach the hook to recognize explicit ATM trailers/env for this post-close release-artifact lane."
+  "evidenceOrRepro": "The historical ATM-GOV-0228 and ATM-GOV-0231 reports are reproduced by the current governed commit-attribution tests: git-record-commit.test.ts, identity-command-windows-safe.test.ts, and git-commit-closeout-only-preflight.test.ts all pass. The current release-artifact route supplies explicit actor context through the ATM facade and preserves the hook warning for genuinely ambient commits.",
+  "followUp": "Fixed by the governed actor-scoped commit facade and explicit-identity preflight. Keep the post-close release-artifact regression coverage; reopen only if a governed release-artifact commit with explicit actor context emits ATM_HOOK_COMMIT_ACTOR_NOT_EXPLICIT again."
 }
