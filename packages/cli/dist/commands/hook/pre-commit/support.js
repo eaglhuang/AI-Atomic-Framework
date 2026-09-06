@@ -10,6 +10,7 @@ import { resolveActorWorkSession } from '../../actor-session.js';
 import { normalizeIdentitySegment } from '../../shared/identity-normalization.js';
 import { hasLiveFrameworkTempClaimAttribution } from './framework-temp-claim-attribution.js';
 import { CliError, quoteCliValue, relativePathFrom } from '../../shared.js';
+import { gitHeadEvidencePath } from '../../git-head-evidence.js';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from '../../task-direction.js';
 import { isPathAllowedByScope, listActiveBatchRuns } from '../../work-channels.js';
 import { checkWorkAdmissionTicket } from '../../../_vendor/core/dist/broker/work-admission-ticket.js';
@@ -833,7 +834,7 @@ export function inspectHistoricalLedgerRestoreStagedArtifacts(cwd, taskId, stage
     const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
     const expectedEvidencePath = `.atm/history/evidence/${taskId}.json`.toLowerCase();
     const expectedClosurePacketPath = `.atm/history/evidence/${taskId}.closure-packet.json`.toLowerCase();
-    const expectedGitHeadEvidencePath = '.atm/history/evidence/git-head.jsonl';
+    const expectedGitHeadEvidencePath = gitHeadEvidencePath;
     let hasTaskLedger = false;
     let hasEvidenceBundle = false;
     let hasClosurePacket = false;

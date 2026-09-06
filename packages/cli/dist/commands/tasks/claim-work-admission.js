@@ -10,7 +10,7 @@ import { CliError, relativePathFrom, resolveValue } from '../shared.js';
 import { findActiveTaskQueue, writeTaskDirectionLock } from '../task-direction.js';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.js';
 import { createClaimRecord, isLiveActiveClaim } from './task-ledger-readers.js';
-import { readLatestGitHeadReceiptTaskId } from '../git-head-evidence.js';
+import { gitHeadEvidencePath, readLatestGitHeadReceiptTaskId } from '../git-head-evidence.js';
 /**
  * Restores only a released runtime direction lock that still belongs to a
  * live renewal.  The caller has already verified actor/lane ownership; this
@@ -264,7 +264,7 @@ export function resolveTaskWorkAdmissionFiles(taskDocument, fallback, cwd) {
 }
 function taskLifecycleArtifactPaths(taskId, cwd) {
     return [
-        ...(cwd && readLatestGitHeadReceiptTaskId(cwd) === taskId ? ['.atm/history/evidence/git-head.jsonl'] : []),
+        ...(cwd && readLatestGitHeadReceiptTaskId(cwd) === taskId ? [gitHeadEvidencePath] : []),
         `.atm/history/evidence/${taskId}.*`,
         `.atm/history/task-events/${taskId}/**`,
         `.atm/history/tasks/${taskId}.json`

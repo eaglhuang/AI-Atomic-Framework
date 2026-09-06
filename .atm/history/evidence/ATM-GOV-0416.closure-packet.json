@@ -1,0 +1,212 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0416",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c7eff27dc2d1cfad9e70982c2bd5cedd1fb95f45",
+  "governedTreeSha": "88ccea3440429e989c6478af36160a5da556a653",
+  "targetCommitDelta": {
+    "currentCommitSha": "c7eff27dc2d1cfad9e70982c2bd5cedd1fb95f45",
+    "parentCommitShas": [
+      "c7eff27dc2d1cfad9e70982c2bd5cedd1fb95f45"
+    ],
+    "governedTreeSha": "88ccea3440429e989c6478af36160a5da556a653",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/tasks/ATM-GOV-0415.json",
+      ".gitignore",
+      "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
+      "packages/cli/dist/commands/git-head-evidence.js",
+      "packages/cli/dist/commands/hook/pre-commit/input-state.js",
+      "packages/cli/dist/commands/hook/pre-commit/support.js",
+      "packages/cli/dist/commands/tasks/claim-work-admission.js",
+      "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook/pre-commit/input-state.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-head-evidence.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/input-state.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/support.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-work-admission.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-head-evidence.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/input-state.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli-fixtures/help-snapshots/orient.json",
+      "tests/cli/git-head-admission-owner-boundary.test.ts",
+      "tests/cli/git-head-runtime-only-receipt.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:632d10fae4f8fab83eaa5aa23af40cd00b976e9ce338c5df6e3eb9ed3bc49171",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a6061e2ab3e497eed912f212b3293c8797100189d18a15b54e175d233cf438fd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli:surface",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94f111203d886af32d33d82836ecd033c62060a8c0daf61cd1d3a7a8fb3befdf",
+      "stderrSha256": "sha256:22c893684535d6614dcbef3ed4d1be704355bb9223f0210da4135cce5aeb0a30",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+    "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+    "typecheck",
+    "validate:cli:surface",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+    "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+    "typecheck",
+    "validate:cli:surface",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T12:57:49.876Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0416.*",
+      ".atm/history/task-events/ATM-GOV-0416/**",
+      ".atm/history/tasks/ATM-GOV-0416.json",
+      ".gitignore",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook/pre-commit/**",
+      "packages/cli/src/commands/hook/pre-push/**",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "tests/cli-fixtures/help-snapshots/orient.json",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-head-admission-owner-boundary.test.ts",
+      "tests/cli/git-head-runtime-only-receipt.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook/pre-commit/**",
+      "packages/cli/src/commands/hook/pre-push/**",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "tests/cli-fixtures/help-snapshots/orient.json",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-head-admission-owner-boundary.test.ts",
+      "tests/cli/git-head-runtime-only-receipt.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+      "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+      "typecheck",
+      "validate:cli:surface",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0416.json",
+  "closedAt": "2026-09-06T12:57:49.876Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260906123147-codex-captain-ATM-GOV-0416-4b72596d4a",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c7eff27dc2d1cfad9e70982c2bd5cedd1fb95f45",
+    "taskMatchedFiles": [
+      ".gitignore",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook/pre-commit/input-state.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "packages/cli/src/commands/tasks/claim-work-admission.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "tests/cli-fixtures/help-snapshots/orient.json",
+      "tests/cli/git-head-admission-owner-boundary.test.ts",
+      "tests/cli/git-head-runtime-only-receipt.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0416.json",
+      ".atm/history/task-events/ATM-GOV-0416/2026-09-06T12-31-26-769Z-import-c03559e1183d.json",
+      ".atm/history/task-events/ATM-GOV-0416/2026-09-06T12-31-47-174Z-reserve-49da006041de.json",
+      ".atm/history/task-events/ATM-GOV-0416/2026-09-06T12-31-47-181Z-promote-2cfeeefab1b2.json",
+      ".atm/history/task-events/ATM-GOV-0416/2026-09-06T12-31-53-737Z-claim-f597d1e26d13.json",
+      ".atm/history/task-events/ATM-GOV-0416/2026-09-06T12-47-12-909Z-scope-amendment-0fe7629fb2ff.json",
+      ".atm/history/task-events/ATM-GOV-0416/2026-09-06T12-47-58-458Z-scope-amendment-2216d190a709.json",
+      ".atm/history/tasks/ATM-GOV-0416.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

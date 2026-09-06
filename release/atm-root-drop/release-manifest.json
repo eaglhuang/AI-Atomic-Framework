@@ -5303,6 +5303,7 @@
     "release/atm-root-drop/tests/cli/git-format-adapter-bridge.test.ts",
     "release/atm-root-drop/tests/cli/git-governance-command-extraction.test.ts",
     "release/atm-root-drop/tests/cli/git-head-admission-owner-boundary.test.ts",
+    "release/atm-root-drop/tests/cli/git-head-runtime-only-receipt.test.ts",
     "release/atm-root-drop/tests/cli/git-hook-runtime-env.test.ts",
     "release/atm-root-drop/tests/cli/git-index-close-isolation.test.ts",
     "release/atm-root-drop/tests/cli/git-index-lock-recovery.test.ts",
@@ -6036,8 +6037,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 5,
-    "unchanged": 1959,
+    "copied": 13,
+    "unchanged": 1951,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -23243,7 +23244,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js",
-        "digest": "f2dac95f5290bd8bdd48e6c0f34fcc6011936b2fa4c5d7c399ac542ff524a6d0",
+        "digest": "72f3bbb74728873032b7cea02c3d0915798a39b689d6f9016722103ef413c3bc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/git-head-evidence-transaction.js"
@@ -23513,7 +23514,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-head-evidence.js",
-        "digest": "cafc12771748cc95690e8a3cc9b667f9bb75c56df3c43b44e08803044c4b7f8a",
+        "digest": "cd934a9ca25e9f19fc60b534634014f89516e7ea76633081dd9bd82f23001c76",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-head-evidence.js"
@@ -23792,7 +23793,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/input-state.js",
-        "digest": "ac3c42b501baf5413cb3a3cfc2364c744dc4590f8ab37870cb7df62cb1df1ac7",
+        "digest": "e4c4b94be4e56cf0205868afaa97fd55d10b793a1eabbecdf947a3ab69073619",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/input-state.js"
@@ -23819,7 +23820,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/support.js",
-        "digest": "6c02835de19d7f042943081aa6c90546481b95a3ac09f804b4aede2ad30023b1",
+        "digest": "74a589ff9584d4b99319388b63a035616ff23b8bafd4f781a018e34e0261b084",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/support.js"
@@ -25403,7 +25404,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/claim-work-admission.js",
-        "digest": "ce87f1ce70bccb5406ed683c49d07986cde0d93c34f308481fdba53b3f601d60",
+        "digest": "c82f635d0a2f92ff680cb0c35cace1f8b945911bfc5e576d8d3d6053722f77aa",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/claim-work-admission.js"
@@ -25898,7 +25899,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
-        "digest": "2c48896258d468ce1659d32a5622f2bc6e0585c9853d48bb4a4a7b897a169c0a",
+        "digest": "e2e808f6f2ce2d257707a8471842e4e5e9fcc3028d17ddda454df5b63405d152",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js"
@@ -29570,7 +29571,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
-        "digest": "e7cee1791399284c641f93d2c77e406399d4931755c59d00e88eb98745a801e0",
+        "digest": "d1cbbe670ddaee691601ceb3864411694809399952aa0f1bb033668c66d4d99d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts"
@@ -29930,7 +29931,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-head-evidence.ts",
-        "digest": "5441499fbef9bec983f47ae29ab1eb61a48c0573b57d9b67c66029dfa2f4251a",
+        "digest": "d529a9306ad5c29a8878086785a767cf70bd676695f3ac7779ee2886ac0e6337",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-head-evidence.ts"
@@ -30272,7 +30273,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/input-state.ts",
-        "digest": "a35d42e71a4b382d4956eddb19942e6d3572abefd50e8aaf0a263227efe9d60f",
+        "digest": "0998150e9920ae7dbec12799eb3a32becc49b3183298d1eabb600d30a31bfe90",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/input-state.ts"
@@ -30308,7 +30309,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/support.ts",
-        "digest": "eb11854d871ec88e4d6d7bd8fb4a8217108d2f6c7897e0b929f6e1ba8b6662d2",
+        "digest": "b0b844762efe17c5fbb92fabea30e5bcacc83006791c1201adaed85064f33f6e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/support.ts"
@@ -32720,7 +32721,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/claim-work-admission.ts",
-        "digest": "b1d4ea2f55de04e7904069baacf8a491d3a1eab8f008e284dc9129e3b42979b0",
+        "digest": "34d37947e09465f4b23b16b576cc213c5d6d48e5cf94d872f90f9bec27f08380",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/claim-work-admission.ts"
@@ -33215,7 +33216,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
-        "digest": "c4a16c9f3312e92d3954422e03e8a5fca53fb463e22b3e657b71a2120f74caf4",
+        "digest": "aafe78d30295d9d8792f3f977d7eda0ddaacd7adc3d8e68d2010281c6d6451fa",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts"
@@ -53482,6 +53483,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/git-head-runtime-only-receipt.test.ts",
+        "digest": "35cf5a163f78249a30e72e833f35e1603d4154066aa0296d13b7a4d508de7a5d",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/git-head-runtime-only-receipt.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/git-hook-runtime-env.test.ts",
         "digest": "b3b08cede46f712e9e01af98b62f5566a48d318df95fd9d705cb5b7ff61ea745",
         "origin": "source",
@@ -60052,7 +60062,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:e2370963d144719f37b8d30ab73439cdde5ec6db24f66a5b50593d87b9f24ac2"
+    "treeDigest": "sha256:6b74a504a4142ef98d91cb334a9799b4684c2f775260ab430844303cc2b7ee61"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61589,7 +61599,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:f5ccdb253839706a9fce2b72887f978ead8e5dadaaf0273525cba0cdaa09b090"
+    "digest": "sha256:55c5fd1c3024e89ae9236a4826035a54dba046f742e1ee62fde2663fa74f7a25"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66866,6 +66876,7 @@
       "release/atm-root-drop/tests/cli/git-format-adapter-bridge.test.ts",
       "release/atm-root-drop/tests/cli/git-governance-command-extraction.test.ts",
       "release/atm-root-drop/tests/cli/git-head-admission-owner-boundary.test.ts",
+      "release/atm-root-drop/tests/cli/git-head-runtime-only-receipt.test.ts",
       "release/atm-root-drop/tests/cli/git-hook-runtime-env.test.ts",
       "release/atm-root-drop/tests/cli/git-index-close-isolation.test.ts",
       "release/atm-root-drop/tests/cli/git-index-lock-recovery.test.ts",
@@ -67602,22 +67613,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:4ab01f5dbae6f6beddaa5907c7bd72eb731beb0e6723d6eb7b43e23f54aeca2d",
-  "sealedSourceCommit": "e1a09c3ed5b1a9ff36aa0bbf78314c89d57c13b6",
+  "buildInputsTreeHash": "sha256:40c4d5e0e3bff63a17c03deeac14419e78d8691c95d695b8c18b23cb349e33ac",
+  "sealedSourceCommit": "c7eff27dc2d1cfad9e70982c2bd5cedd1fb95f45",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:18110fdf84451fd3ed81facb7f6f7609fe1601daa8b6d952091fbeb83bd5c404",
-  "tsBuildCacheDigest": "sha256:3f3e1b84c128c932a434d507aad345df205314885f7360f313a09f5cbee703f4",
+  "incrementalPlanDigest": "sha256:f60cc32f6ccd864739249d1cd77a4bda1c1ffb88ce6675c556088de57b052e72",
+  "tsBuildCacheDigest": "sha256:84e9d63b8e45284bc9aa90e03afe955ff160face31bdd6c853c817cbd0e5715f",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 54,
-    "skipDecision": 59,
-    "worktreeSetup": 11327,
-    "typescriptBuild": 18194,
-    "rootDropReleaseAssembly": 32652,
-    "onefileReleaseAssembly": 8258,
-    "artifactSync": 9744,
+    "inputHashCalculation": 51,
+    "skipDecision": 61,
+    "worktreeSetup": 15200,
+    "typescriptBuild": 19970,
+    "rootDropReleaseAssembly": 29526,
+    "onefileReleaseAssembly": 10215,
+    "artifactSync": 10908,
     "cleanup": 0,
-    "totalElapsed": 124911
+    "totalElapsed": 107361
   }
 }

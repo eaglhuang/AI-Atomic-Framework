@@ -6,7 +6,7 @@ import { sanitizeTaskDirectionAllowedFiles } from '../task-direction.js';
 import { normalizeRelativePath } from './task-file-io-helpers.js';
 import { pathMatchesTaskScope } from './historical-delivery.js';
 import { readCloseWindowStagedIndexLockReport } from './close-window-lock.js';
-import { gitHeadEvidencePath, readLatestGitHeadReceiptTaskId } from '../git-head-evidence.js';
+import { gitHeadEvidencePath, gitHeadEvidencePaths, readLatestGitHeadReceiptTaskId } from '../git-head-evidence.js';
 function isHistoricalDeliveredFile(filePath, deliverableFiles, historicalDeliveredFiles) {
     return deliverableFiles.some((declared) => pathMatchesTaskScope(filePath, declared)
         && historicalDeliveredFiles.some((historical) => pathMatchesTaskScope(historical, declared)));
@@ -33,7 +33,8 @@ const dirtyBucketStrategies = [
     },
     {
         id: 'governanceTrackedDirtyFiles',
-        includes: (filePath, input) => isTaskCloseGovernanceCriticalPath(filePath, input.taskId)
+        includes: (filePath, input) => filePath === gitHeadEvidencePaths.jsonl
+            || isTaskCloseGovernanceCriticalPath(filePath, input.taskId)
     },
     {
         id: 'scopeTrackedDirtyFiles',
@@ -84,6 +85,9 @@ export function evaluateFrameworkCloseDirtyGuard(input) {
     if (readLatestGitHeadReceiptTaskId(input.cwd) === input.taskId
         || latestGitHeadReceiptBelongsToTerminalForeignTask(input.cwd, input.taskId)) {
         allowedAdvisoryGovernanceFiles.add(gitHeadEvidencePath);
+        // Keep legacy JSONL receipts observable and correctly classified while
+        // repositories migrate to the compact tracked receipt.
+        allowedAdvisoryGovernanceFiles.add(gitHeadEvidencePaths.jsonl);
     }
     const allowedAdvisoryDirtyFiles = new Set(uniqueStrings((input.allowedAdvisoryDirtyFiles ?? []).map(normalizeRelativePath).filter(Boolean)));
     const buckets = {

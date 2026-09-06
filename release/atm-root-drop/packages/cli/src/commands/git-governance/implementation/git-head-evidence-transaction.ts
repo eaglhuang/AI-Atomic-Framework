@@ -11,6 +11,8 @@ import {
   writeFileSync,
 } from "node:fs";
 
+import { createHash } from "node:crypto";
+
 import os from "node:os";
 
 import path from "node:path";
@@ -174,10 +176,25 @@ export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
 
 export function appendGitHeadEvidenceJsonl(evidenceAbsolute: LegacyValue, payload: LegacyValue) {
   const nextLine = `${JSON.stringify(payload)}\n`;
-  const existingText = existsSync(evidenceAbsolute)
-    ? readFileSync(evidenceAbsolute, "utf8")
-    : "";
-  writeFileSync(evidenceAbsolute, `${existingText}${nextLine}`, "utf8");
+  mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
+  const repoRoot = path.resolve(path.dirname(evidenceAbsolute), "..", "..", "..");
+  const runtimeAbsolute = path.join(repoRoot, gitHeadEvidencePaths.runtimeJsonl);
+  mkdirSync(path.dirname(runtimeAbsolute), { recursive: true });
+  appendFileSync(runtimeAbsolute, nextLine, "utf8");
+
+  const rawEventDigest = `sha256:${createHash("sha256").update(nextLine, "utf8").digest("hex")}`;
+  const compact = {
+    schemaVersion: "atm.gitHeadAcceptance.v1",
+    storagePolicy: "runtime-raw-tracked-digest",
+    source: {
+      availability: "runtime-local",
+      rawJournalPath: gitHeadEvidencePaths.runtimeJsonl,
+      rawEventDigest,
+    },
+    evidence: payload.evidence ?? [],
+  };
+  const compactDigest = `sha256:${createHash("sha256").update(JSON.stringify(compact), "utf8").digest("hex")}`;
+  writeFileSync(evidenceAbsolute, `${JSON.stringify({ ...compact, digest: compactDigest })}\n`, "utf8");
 }
 
 export function captureGitHeadEvidencePreparation(cwd: LegacyValue) {

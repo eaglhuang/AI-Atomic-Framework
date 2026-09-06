@@ -2,31 +2,40 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { hasAtmCriticalNonDocSurface } from './framework-development/path-classification.js';
 import { inspectGitWorktreeReadiness } from './git-worktree-readiness.js';
 export const gitHeadEvidencePaths = {
     legacyJson: '.atm/history/evidence/git-head.json',
-    jsonl: '.atm/history/evidence/git-head.jsonl'
+    jsonl: '.atm/history/evidence/git-head.jsonl',
+    runtimeJsonl: '.atm/runtime/telemetry/git-head.jsonl',
+    trackedReceipt: '.atm/history/evidence/git-head.json'
 };
-export const gitHeadEvidencePath = gitHeadEvidencePaths.jsonl;
+export const gitHeadEvidencePath = gitHeadEvidencePaths.trackedReceipt;
 /**
  * Returns the task identity asserted by the newest parseable governed Git-head
  * receipt.  Callers must treat null as unowned: a path name, an older record,
  * or malformed JSON is never an ownership grant.
  */
 export function readLatestGitHeadReceiptTaskId(cwd) {
-    const receipt = path.join(cwd, gitHeadEvidencePaths.jsonl);
-    if (!existsSync(receipt))
-        return null;
-    try {
-        const entries = readFileSync(receipt, 'utf8').trim().split(/\r?\n/).filter(Boolean);
-        const latest = JSON.parse(entries.at(-1) ?? '{}');
-        const taskId = latest.evidence?.[0]?.details?.taskId;
-        return typeof taskId === 'string' && taskId.trim() ? taskId.trim() : null;
+    for (const relativePath of [gitHeadEvidencePaths.trackedReceipt, gitHeadEvidencePaths.jsonl]) {
+        const receipt = path.join(cwd, relativePath);
+        if (!existsSync(receipt))
+            continue;
+        try {
+            const entries = readFileSync(receipt, 'utf8').trim().split(/\r?\n/).filter(Boolean);
+            const latest = JSON.parse(entries.at(-1) ?? '{}');
+            if (isCompactReceipt(latest) && !isValidCompactReceipt(latest))
+                continue;
+            const taskId = latest.evidence?.[0]?.details?.taskId;
+            if (typeof taskId === 'string' && taskId.trim())
+                return taskId.trim();
+        }
+        catch {
+            continue;
+        }
     }
-    catch {
-        return null;
-    }
+    return null;
 }
 export function createGitHeadEvidenceCheck(cwd, runtime) {
     const workTree = readGitWorkTree(cwd);
@@ -240,14 +249,16 @@ function readParentCommitShasForCommit(cwd, commitSha) {
     return result.stdout.trim().split(/\s+/).slice(1).filter(Boolean);
 }
 function readEvidenceRecords(cwd, runtime) {
-    const evidenceRoot = runtime?.layoutVersion === 1
-        ? path.join(cwd, '.atm', 'evidence')
-        : path.join(cwd, '.atm', 'history', 'evidence');
-    if (!existsSync(evidenceRoot)) {
-        return [];
-    }
-    return listJsonFiles(evidenceRoot).flatMap((filePath) => {
+    const evidenceRoots = runtime?.layoutVersion === 1
+        ? [path.join(cwd, '.atm', 'evidence')]
+        : [path.join(cwd, '.atm', 'history', 'evidence')];
+    return evidenceRoots.filter(existsSync).flatMap((evidenceRoot) => listJsonFiles(evidenceRoot)).flatMap((filePath) => {
         const isJsonl = filePath.endsWith('.jsonl');
+        if (!isJsonl && toPortablePath(path.relative(cwd, filePath)) === gitHeadEvidencePaths.trackedReceipt) {
+            const compact = readJsonIfPossible(filePath);
+            if (isCompactReceipt(compact) && !isValidCompactReceipt(compact))
+                return [];
+        }
         const records = isJsonl
             ? readJsonlObjects(filePath).flatMap(extractEvidenceRecords)
             : extractEvidenceRecords(readJsonIfPossible(filePath));
@@ -260,6 +271,29 @@ function readEvidenceRecords(cwd, runtime) {
             };
         }).filter((entry) => entry.git !== null);
     });
+}
+function isCompactReceipt(value) {
+    return Boolean(value && typeof value === 'object' && value.schemaVersion === 'atm.gitHeadAcceptance.v1');
+}
+function isValidCompactReceipt(value) {
+    if (value.storagePolicy !== 'runtime-raw-tracked-digest')
+        return false;
+    const source = value.source;
+    if (!source || typeof source !== 'object')
+        return false;
+    const sourceValue = source;
+    if (sourceValue.availability !== 'runtime-local'
+        || sourceValue.rawJournalPath !== gitHeadEvidencePaths.runtimeJsonl
+        || !isSha256(sourceValue.rawEventDigest))
+        return false;
+    if (!Array.isArray(value.evidence) || !isSha256(value.digest))
+        return false;
+    const { digest: _digest, ...withoutDigest } = value;
+    const expected = `sha256:${createHash('sha256').update(JSON.stringify(withoutDigest), 'utf8').digest('hex')}`;
+    return value.digest === expected;
+}
+function isSha256(value) {
+    return typeof value === 'string' && /^sha256:[a-f0-9]{64}$/.test(value);
 }
 function extractEvidenceRecords(value) {
     if (Array.isArray(value)) {

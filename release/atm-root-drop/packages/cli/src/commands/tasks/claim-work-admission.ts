@@ -12,7 +12,7 @@ import { findActiveTaskQueue, writeTaskDirectionLock, type TaskDirectionLock } f
 import type { LaneSessionResolution } from '../lane-session/resolve.ts';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.ts';
 import { createClaimRecord, isLiveActiveClaim } from './task-ledger-readers.ts';
-import { readLatestGitHeadReceiptTaskId } from '../git-head-evidence.ts';
+import { gitHeadEvidencePath, readLatestGitHeadReceiptTaskId } from '../git-head-evidence.ts';
 
 interface ClaimLifecyclePhase {
   readonly phase: string;
@@ -317,7 +317,7 @@ export function resolveTaskWorkAdmissionFiles(taskDocument: Record<string, unkno
 
 function taskLifecycleArtifactPaths(taskId: string, cwd?: string): readonly string[] {
   return [
-    ...(cwd && readLatestGitHeadReceiptTaskId(cwd) === taskId ? ['.atm/history/evidence/git-head.jsonl'] : []),
+    ...(cwd && readLatestGitHeadReceiptTaskId(cwd) === taskId ? [gitHeadEvidencePath] : []),
     `.atm/history/evidence/${taskId}.*`,
     `.atm/history/task-events/${taskId}/**`,
     `.atm/history/tasks/${taskId}.json`
