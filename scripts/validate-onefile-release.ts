@@ -141,6 +141,7 @@ try {
     const nestedReleaseEntries = decodedPayload.files.filter((entry: { path: string }) => entry.path.startsWith('release/'));
     assert(nestedReleaseEntries.length === 0, `onefile payload must not embed release/** entries (nested launcher recursion); found: ${nestedReleaseEntries.map((entry: { path: string }) => entry.path).slice(0, 5).join(', ')}`);
     assert(decodedPayload.files.some((entry: { path: string }) => entry.path === 'packages/cli/dist/atm.js'), 'onefile payload must keep packages/cli/dist/atm.js so the extracted launcher has a runnable fallback entrypoint');
+    assert(decodedPayload.files.some((entry: { path: string }) => entry.path === 'docs/governance/docs-neutrality-policy.json'), 'onefile payload must include the neutrality policy required by self-host-alpha verification');
   }
 
   const externalBootstrapRepo = path.join(tempRoot, 'external-bootstrap-repo');
