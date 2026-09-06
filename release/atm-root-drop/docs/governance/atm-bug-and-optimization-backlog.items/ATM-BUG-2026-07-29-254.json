@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Fixed",
   "area": "Framework temp claim commit surface",
   "finding": "Framework temp claims can safely acquire scoped locks and produce runner-sync receipts, but the governed commit and hook evidence classifiers still assume a normal task ledger. This forces emergency native Git for framework-temp source or release-artifact bundles when no `.atm/history/tasks/<temp-id>.json` exists.",
   "expectedBehavior": "Framework temp work should have a governed commit surface and protected evidence context that can bind to the framework-temp claim or runner-sync steward record without inventing a task ledger. Hook bypass should not be required for exact scoped runner-sync receipts.",
-  "evidenceOrRepro": "The batch checkpoint repair used framework temp claim `ATM-FRAMEWORK-TEMP-codex-git-series-captain`. `node atm.mjs git commit --task ATM-FRAMEWORK-TEMP-...` had no task ledger route, and the pre-commit hook rejected the runner-sync receipt with `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT`, requiring emergency lease `EMG-ATM-FRAMEWORK-TEMP-codex-git-series-captain-1d7c8d5e8c` plus `git commit --no-verify`.",
-  "followUp": "Design a framework-temp commit candidate or claim-backed evidence context. Add tests for source-only temp claims, runner-sync release bundles, protected evidence classification, and no-verify-free governed commits."
+  "evidenceOrRepro": "The historical batch checkpoint repair required an emergency native commit because framework-temp claims had no governed commit context. Current `framework-temp-claim-attribution.test.ts`, `runner-sync-framework-temp-hotfix.test.ts`, `runner-publication-lifecycle.test.ts`, and `sealed-runner-publication-lifecycle.test.ts` pass, proving claim-backed attribution, runner-sync release handling, protected evidence context, and governed lifecycle coverage without requiring `--no-verify`.",
+  "followUp": "Keep framework-temp commit attribution and runner-sync lifecycle coverage aligned with future protected-evidence changes; emergency bypass remains reserved for separately evidenced anomalies."
 }

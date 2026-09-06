@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Closed — Fixed in 4766943ce109b382f3cb78d053cc883cccb2d7d6; frozen runner resealed in afd253454331120dd66f84d6a65ae944d865907d",
   "area": "CLI routing",
   "finding": "`atm next` readiness guidance can recommend `node atm.mjs taskflow diagnose --task <task-id> --json`, but the exposed `taskflow` command surface has only open, close, and pre-close; `diagnose` is not executable. Operators are routed to a nonexistent lifecycle recovery command.",
   "expectedBehavior": "Every `requiredCommand` or readiness command emitted by `next` must be accepted by the frozen CLI and covered by a command-spec integration test. Either implement `taskflow diagnose` as the canonical read-only lifecycle diagnostic or emit an existing supported command such as the appropriate tasks reconciliation/status route.",
-  "evidenceOrRepro": "During ATM-GOV-0266 recovery, `taskflow --help` exposed only open/close/pre-close while `next --json` emitted a `reconcile-required` state whose next action was `node atm.mjs taskflow diagnose --task <task-id> --json`.",
-  "followUp": "Add a CLI contract regression that enumerates all commands emitted by `next` and verifies they resolve in the frozen runner. Repair the lifecycle diagnostic route and add a read-only taskflow diagnose fixture if that is the intended public API."
+  "evidenceOrRepro": "Confirmed against the frozen runner that `node atm.mjs taskflow diagnose --task ATM-GOV-0266 --json` returned `ATM_CLI_USAGE` because `diagnose` is unsupported. Repaired both guidance and cross-authority closeback seams to emit the supported read-only command `node atm.mjs tasks status --task <task-id> --json`. Focused tests `first-layer-command-contracts.test.ts` and `taskflow-cross-authority-closeback-saga.test.ts` pass; `tasks status` executes successfully in the frozen runner. Source commit: `4766943ce109b382f3cb78d053cc883cccb2d7d6`; frozen runner reseal: `afd253454331120dd66f84d6a65ae944d865907d`.",
+  "followUp": "Keep the command-spec regression coverage and ensure future readiness commands are executable by the frozen runner."
 }

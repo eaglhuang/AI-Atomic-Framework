@@ -30,6 +30,8 @@ const takeoverEvidence = read('packages/cli/src/commands/tasks/takeover-evidence
 assert(orchestrator.includes('export async function runTasksClaimLifecycle'), 'claim lifecycle runner must live in claim-orchestrator');
 assert(ownership.includes('export function throwIfForeignSameTaskClaim'), 'lane-aware claim ownership helper must exist');
 assert(orchestrator.includes("from './claim-ownership.ts'"), 'claim-orchestrator must reuse claim-ownership helper');
+assert(orchestrator.includes("from '../next/foreign-dirty-wip-admission.ts'"), 'tasks claim must reuse the canonical dirty-WIP admission helper');
+assert(orchestrator.includes('assertClaimDirtyWipAdmission({'), 'tasks claim must execute the canonical dirty-WIP admission before claim completion');
 assert(legacy.includes("import { runTasksClaimLifecycle as delegatedRunTasksClaimLifecycle } from '../claim-orchestrator.ts';"), 'legacy tasks implementation must delegate lifecycle runner');
 assert(legacy.includes('delegatedRunTasksClaimLifecycle'), 'legacy tasks implementation must call delegated lifecycle runner');
 assert(facade.includes("runTasksClaimLifecycle"), 'tasks facade must re-export claim lifecycle runner');

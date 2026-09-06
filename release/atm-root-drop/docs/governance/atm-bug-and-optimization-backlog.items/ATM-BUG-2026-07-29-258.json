@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Fixed",
   "area": "Task import / planning mirror reconcile",
   "finding": "`tasks import --write --reconcile-mirror` can append a planning-mirror-reconcile transition to a done task without converging the planning mirror status, so the same task remains classified as `stale-import` immediately after the official recovery command succeeds.",
   "expectedBehavior": "A successful reconcile-mirror command should either update the authoritative planning mirror/frontmatter through the proper closeback surface, or fail closed with a recovery command that explains which repo/path must be mutated. It should not record a fresh reconcile transition while leaving the residue bucket unchanged.",
-  "evidenceOrRepro": "On 2026-07-29, `node atm.mjs tasks import --from ...TASK-GIT-0025... --write --reconcile-mirror --json` and the equivalent TASK-GIT-0026 command both returned `ATM_TASKS_IMPORT_WRITE_READY` and wrote new `planning-mirror-reconcile` events. A subsequent `tasks audit --series GIT --summary` still reported TASK-GIT-0025 and TASK-GIT-0026 as `status: done`, `claimState: released`, `residueBucket: stale-import`, `nextActionCode: tasks-import` because the 3KLife planning frontmatter remained `planned`.",
-  "followUp": "Unify planning-mirror reconcile with taskflow planning closeback. Add a regression where a done target-ledger task with planned external frontmatter runs reconcile-mirror; success must prove the residue bucket becomes no-residue, otherwise the command must not write a misleading reconcile event."
+  "evidenceOrRepro": "Current `preparePlanningMirrorReconcile` refuses unreadable or non-done ledgers, requires one matching planning card, and writes `status: done` to a planned mirror before recording the reconcile event. `packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts` passes the stale planned mirror scenario, verifies the mirror becomes done, and verifies the completed target ledger remains done with its close metadata intact.",
+  "followUp": "Keep the single-card and planned-to-done safety checks; any future cross-repository planning closeback change must retain the regression proving both mirror convergence and unchanged completed-ledger metadata."
 }

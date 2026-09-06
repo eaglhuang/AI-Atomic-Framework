@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Fixed",
   "area": "Emergency bridge / historical work admission",
   "finding": "Emergency bridge commits created through governed need can later fail pre-push historical work admission because attest requires provenance not present in the immutable bridge commit message, and `git:<commit>` provenance is rejected unless the historical commit already includes `ATM-Emergency-Reason`.",
   "expectedBehavior": "A governed emergency bridge path should create the required provenance at commit time or provide a first-class post-hoc attestation command that can bind an immutable commit to an external provenance receipt without hidden message-format coupling.",
-  "evidenceOrRepro": "Plan 3 bridge commits `ec63950aa`, `955afeb78`, and `822462f51` passed delivery validation but pre-push returned `ATM_WRITE_TICKET_HISTORICAL_ATTESTATION_REQUIRED`; `git attest --provenance-ref git:<commit>` failed until a separate `.atm/history/evidence/ATM-GOV-0242.emergency-bridge-provenance.json` file was authored and used for all three attestations.",
-  "followUp": "Add an emergency-bridge commit/attest contract and a regression that historical admission accepts external provenance receipts without requiring immutable commit-message fields."
+  "evidenceOrRepro": "Current source provides a first-class forward `git attest` path using an immutable external evidence file: `historical-work-admission-attestation.test.ts` proves dry-run and write succeed with file provenance, validate/status work, and duplicate attestation is rejected. `pre-push-historical-attestation-advisory.test.ts` confirms historical enforcement is advisory/disabled, so an emergency bridge is not coupled to an immutable commit-message field. Both focused tests exit 0.",
+  "followUp": "Keep external provenance files immutable, commit-bound, digest-checked, and append-only; retain fail-closed validation for missing, mismatched, duplicate, or non-ancestor attestations."
 }

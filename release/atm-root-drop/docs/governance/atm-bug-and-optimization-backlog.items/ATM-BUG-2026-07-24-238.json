@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Closed — Current integration-adapter validator passes; fixture hash and byte-size drift resolved in the current release line",
   "area": "Integration",
   "finding": "validate:integration-adapter fails because the Codex skill fixture hash and byte-size metadata do not match the current projected Codex skill file.",
   "expectedBehavior": "The generated or maintained Codex integration fixture must stay byte- and hash-consistent with its source projection, or the validator must report an explicitly governed stale-projection state.",
-  "evidenceOrRepro": "TASK-SKL-0018; npm run validate:integration-adapter; output: fixture hash must match current Codex skill file and fixture byte size must match current Codex skill file.",
-  "followUp": "Assign to integration/release hygiene owner; reconcile source-of-truth projection, fixture generation, and validator expectations before SKL close baseline requires this check again."
+  "evidenceOrRepro": "The original reproduction was `npm run validate:integration-adapter` reporting Codex fixture hash and byte-size drift. Re-run on the current HEAD returned `[integration-adapter:validate] ok (interface, manifest schema, Codex reference factory, and 6 installable adapters install/verify/uninstall)` with exit code 0.",
+  "followUp": "Keep the integration-adapter validator in the standard release validation profile so future source/projection drift remains detectable."
 }

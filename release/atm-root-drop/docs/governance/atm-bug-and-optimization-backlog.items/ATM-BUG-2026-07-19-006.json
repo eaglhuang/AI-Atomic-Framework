@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Documentation / AI routing",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Fixed in source; guidance and regression guard verified; formal backlog closure recorded",
   "area": "Captain workflow / Windows UTF-8 document IO",
   "finding": "Captain workflows can still use PowerShell content commands or PowerShell-wrapped one-liners for planning Markdown/JSON inspection even though atm-dispatch guidance says Windows planning documents must be read, compared, and authored through Node.js UTF-8 helpers. This causes repeated mojibake/range/quoting failures and can make valid Traditional Chinese UTF-8 look corrupted.",
   "expectedBehavior": "When a task touches CJK planning Markdown/JSON/text, the active captain and sidecars should treat Node.js UTF-8 document IO as a hard preflight rule. PowerShell may launch node, git, or ATM CLI commands, but must not be the basis for document content IO or comparison.",
-  "evidenceOrRepro": "Observed during 2026-07-19 governance-optimization planning work: the captain used PowerShell Get-Content/Select-Object for line-range inspection and then PowerShell-wrapped node -e commands that were mangled by shell interpolation, despite repo-local guidance in integrations/codex-skills/atm-dispatch/SKILL.md lines 119-121.",
-  "followUp": "Add a deterministic captain/document-IO preflight or skill guard that blocks PowerShell content IO for CJK planning files, provides a canonical Node.js UTF-8 helper command, and makes sidecar briefs inherit the same rule. Add a regression dogfood check that detects Get-Content/Set-Content/Out-File usage in captain-authored planning workflows."
+  "evidenceOrRepro": "Original 2026-07-19 reproduction is retained as historical evidence. Current guidance explicitly requires Node.js UTF-8 helpers or ATM CLI for Windows Markdown/JSON/text planning IO, forbids PowerShell content commands for authoring/comparison, and provides a copy-paste-safe stdin Node.js example. `tests/cli/atm-dispatch-windows-text-io.test.ts` passes and asserts the safe example, UTF-8 read path, and absence of node eval routes; the same rule is present in the dispatch, governance-router, and plan-authoring instruction/prompt surfaces.",
+  "followUp": "Keep the Windows text-IO rule covered by the existing instruction-surface regression test. Any future dogfood finding should open a new dated backlog item rather than reopen this resolved record."
 }
