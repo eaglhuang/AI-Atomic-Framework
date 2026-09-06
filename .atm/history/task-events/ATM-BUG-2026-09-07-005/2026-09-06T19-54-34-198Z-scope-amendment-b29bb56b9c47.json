@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T19-54-34-198Z-scope-amendment-b29bb56b9c47",
+  "taskId": "ATM-BUG-2026-09-07-005",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-BUG-2026-09-07-005.json",
+  "taskSha256": "sha256:c0119b20eab3d69be4f83ea6b4d953399b58a5f1fc3258fd0066a6b5304b7cbe",
+  "createdAt": "2026-09-06T19:54:34.198Z",
+  "command": "node atm.mjs tasks scope add --task ATM-BUG-2026-09-07-005 --actor codex-gpt-5.4-mini --add \".atm/history/evidence/ATM-BUG-2026-09-07-004.abandon-residue-disposition.json,.atm/history/evidence/ATM-BUG-2026-09-07-004.bundle-manifest.json,.atm/history/protected-override-audit/2026-09-06T19-48-46-982Z-POA-47a6fb679910.json,.atm/history/protected-override-audit/2026-09-06T19-49-13-405Z-POA-f31390d92c26.json\" --reason \"Successor task owns reconciliation of the terminal cleanup carrier evidence\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Successor task owns reconciliation of the terminal cleanup carrier evidence"
+  }
+}

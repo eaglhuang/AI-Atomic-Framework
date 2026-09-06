@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-BUG-2026-09-07-005",
   "title": "Reconcile terminal cleanup governance evidence",
-  "status": "open",
+  "status": "running",
   "owner": "codex-gpt-5.4-mini",
   "dependencies": [],
   "acceptance": [],
@@ -10,52 +10,54 @@
   "tags": [],
   "createdAt": "2026-09-06T19:51:37.537Z",
   "createdByActor": "codex-gpt-5.4-mini",
-  "lastTransitionId": "2026-09-06T19-52-59-833Z-release-a4f6b6716e26",
-  "lastTransitionAt": "2026-09-06T19:52:59.833Z",
+  "lastTransitionId": "2026-09-06T19-54-34-198Z-scope-amendment-b29bb56b9c47",
+  "lastTransitionAt": "2026-09-06T19:54:34.198Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "reservedAt": "2026-09-06T19:51:49.555Z",
-  "promotedAt": "2026-09-06T19:51:49.559Z",
+  "reservedAt": "2026-09-06T19:53:59.939Z",
+  "promotedAt": "2026-09-06T19:53:59.942Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-6f894d1b0bf9",
-    "claimedAt": "2026-09-06T19:52:14.706Z",
-    "heartbeatAt": "2026-09-06T19:52:58.801Z",
+    "leaseId": "lease-b19cc945494f",
+    "claimedAt": "2026-09-06T19:53:59.946Z",
+    "heartbeatAt": "2026-09-06T19:53:59.946Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/ATM-BUG-2026-09-07-005.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-004.abandon-residue-disposition.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-004.bundle-manifest.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-005.*",
       ".atm/history/protected-override-audit/2026-09-06T19-48-46-982Z-POA-47a6fb679910.json",
-      ".atm/history/protected-override-audit/2026-09-06T19-49-13-405Z-POA-f31390d92c26.json"
+      ".atm/history/protected-override-audit/2026-09-06T19-49-13-405Z-POA-f31390d92c26.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-005/**",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-005.json"
     ],
-    "state": "released",
+    "state": "active",
+    "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260906195214-codex-gpt-5.4-mini-67a641ec20",
+      "laneSessionId": "lane-20260906195359-codex-gpt-5.4-mini-0ab6194fa7",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906195214-codex-gpt-5.4-mini-67a641ec20\""
-    },
-    "reason": "Successor card metadata has no real deliverables; release without mutating or deleting cleanup evidence."
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906195359-codex-gpt-5.4-mini-0ab6194fa7\""
+    }
   },
   "startedAt": "2026-09-06T19:52:14.706Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-f5522d1be4d46261",
-    "ticketDigest": "sha256:f5522d1be4d46261443ac228d26599d3655b9372075d3d92e8037a493b801644",
+    "ticketId": "wat-94c579dbf6889c9e",
+    "ticketDigest": "sha256:94c579dbf6889c9ecb5b49c7d69943cb06042802fc65ba31c469b64d4938076b",
     "taskId": "ATM-BUG-2026-09-07-005",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260906195214-codex-gpt-5.4-mini-67a641ec20",
-    "claimGeneration": "lease-6f894d1b0bf9",
-    "issuedAt": "2026-09-06T19:52:14.706Z",
-    "expiresAt": "2026-09-06T20:22:14.706Z",
+    "laneSessionId": "lane-20260906195359-codex-gpt-5.4-mini-0ab6194fa7",
+    "claimGeneration": "lease-b19cc945494f",
+    "issuedAt": "2026-09-06T19:54:34.141Z",
+    "expiresAt": "2026-09-06T20:24:34.141Z",
     "scopeDigest": "sha256:dd92309a65b1359157524cbbb7b23933e03b8420b094080f7c41cbf00c6408d2",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-06T19:52:14.706Z"
+      "selectedAt": "2026-09-06T19:54:34.141Z"
     },
     "grants": [
       {
@@ -108,7 +110,7 @@
     "resolvedRecoveryMode": "disabled",
     "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
   },
-  "startedBySessionId": "session-20260906195214-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-005-28b68b9d55",
+  "startedBySessionId": "session-20260906195359-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-005-6e7641d47e",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -129,16 +131,25 @@
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
-    "promptHash": "85dae95ac5067ca74bbb6a9597a6287947093845a853c3352c1ce50efb642706",
+    "promptHash": "7f3548e353338c32acc7774acd5922294626450e62d887b6d3fddb215f857384",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260906195214-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-005-28b68b9d55",
+    "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20260906195214-codex-gpt-5.4-mini-67a641ec20",
+      "laneSessionId": "lane-20260906195359-codex-gpt-5.4-mini-0ab6194fa7",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906195214-codex-gpt-5.4-mini-67a641ec20\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906195359-codex-gpt-5.4-mini-0ab6194fa7\""
     },
-    "createdAt": "2026-09-06T19:52:15.813Z",
+    "createdAt": "2026-09-06T19:54:01.121Z",
     "status": "active"
-  }
+  },
+  "scopePaths": [
+    ".atm/history/evidence/ATM-BUG-2026-09-07-004.abandon-residue-disposition.json",
+    ".atm/history/evidence/ATM-BUG-2026-09-07-004.bundle-manifest.json",
+    ".atm/history/evidence/ATM-BUG-2026-09-07-005.*",
+    ".atm/history/protected-override-audit/2026-09-06T19-48-46-982Z-POA-47a6fb679910.json",
+    ".atm/history/protected-override-audit/2026-09-06T19-49-13-405Z-POA-f31390d92c26.json",
+    ".atm/history/task-events/ATM-BUG-2026-09-07-005/**",
+    ".atm/history/tasks/ATM-BUG-2026-09-07-005.json"
+  ]
 }
