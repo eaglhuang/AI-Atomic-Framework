@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0106",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "25d4dc6e4f6f8dfd097b2875667c686fc8ecc82a",
+  "governedTreeSha": "79ac40e18b3ab87bafaf0cdfdbea5a28b76d42a8",
+  "targetCommitDelta": {
+    "currentCommitSha": "25d4dc6e4f6f8dfd097b2875667c686fc8ecc82a",
+    "parentCommitShas": [
+      "25d4dc6e4f6f8dfd097b2875667c686fc8ecc82a"
+    ],
+    "governedTreeSha": "79ac40e18b3ab87bafaf0cdfdbea5a28b76d42a8",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/ledger-readers-atomization.ts",
+      "tests/cli/task-ledger-validator-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/task-ledger-suite-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:d3d5cebe92bd3e098dfb1d6c459329723ae9b3d0be64681a5b69f5e2ea8be097",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/task-ledger-suite-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:3ea78fc0eac9dae55bbb715f567ee27c0b537361ed9d8bfc09a0a0e86f466baa",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:7a87d908fb3b09bafde5e3d737e828b02be660935bb68ee1f323cd8608f0216c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T16:42:51.256Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0106.*",
+      ".atm/history/task-events/TASK-RFT-0106/**",
+      ".atm/history/tasks/TASK-RFT-0106.json",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/**/*.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "tests/cli/task-ledger-validator-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/**/*.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "tests/cli/task-ledger-validator-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0106.json",
+  "closedAt": "2026-09-06T16:42:51.256Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906162744-codex-gpt-5.4-mini-TASK-RFT-0106-470ad7adab",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "25d4dc6e4f6f8dfd097b2875667c686fc8ecc82a",
+    "taskMatchedFiles": [
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/ledger-readers-atomization.ts",
+      "tests/cli/task-ledger-validator-extraction.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0106.json",
+      ".atm/history/task-events/TASK-RFT-0106/2026-09-06T16-27-44-181Z-reserve-1c48a180fbdf.json",
+      ".atm/history/task-events/TASK-RFT-0106/2026-09-06T16-27-44-185Z-promote-406eccc5a720.json",
+      ".atm/history/task-events/TASK-RFT-0106/2026-09-06T16-27-50-528Z-claim-76fc5bc1f88d.json",
+      ".atm/history/tasks/TASK-RFT-0106.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

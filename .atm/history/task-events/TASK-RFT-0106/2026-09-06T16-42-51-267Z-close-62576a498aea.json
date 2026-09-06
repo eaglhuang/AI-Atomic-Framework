@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T16-42-51-267Z-close-62576a498aea",
+  "taskId": "TASK-RFT-0106",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906162744-codex-gpt-5.4-mini-TASK-RFT-0106-470ad7adab",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0106.json",
+  "taskSha256": "sha256:a49bc2198d65e160a0317d0264427732dc5d29e79e04375a5eb78257a53b708e",
+  "createdAt": "2026-09-06T16:42:51.267Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0106 --actor codex-gpt-5.4-mini --status done --historical-delivery 25d4dc6e4f6f8dfd097b2875667c686fc8ecc82a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906162744-codex-gpt-5.4-mini-TASK-RFT-0106-470ad7adab",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0106.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T16:42:51.256Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0106.*",
+        ".atm/history/task-events/TASK-RFT-0106/**",
+        ".atm/history/tasks/TASK-RFT-0106.json",
+        "scripts/validators/task-ledger/suite-impl.ts",
+        "scripts/validators/task-ledger/suite-impl/**/*.ts",
+        "scripts/validators/task-ledger/suite-impl/implementation.ts",
+        "tests/cli/task-ledger-validator-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validators/task-ledger/suite-impl.ts",
+        "scripts/validators/task-ledger/suite-impl/**/*.ts",
+        "scripts/validators/task-ledger/suite-impl/implementation.ts",
+        "tests/cli/task-ledger-validator-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+        "typecheck",
+        "validate:cli"
+      ]
+    }
+  }
+}
