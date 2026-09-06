@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T16-59-15-928Z-scope-amendment-8b88427d68e5",
+  "taskId": "TASK-RFT-0105",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0105.json",
+  "taskSha256": "sha256:3f6723ace46c4b9fe13504e32c4c77974c56b1acbbf13da291c7a1f3076d3159",
+  "createdAt": "2026-09-06T16:59:15.928Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0105 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/framework-development/closure-packet-schema/digest-normalization.ts --reason \"Register the newly extracted semantic module before governed delivery commit\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Register the newly extracted semantic module before governed delivery commit"
+  }
+}

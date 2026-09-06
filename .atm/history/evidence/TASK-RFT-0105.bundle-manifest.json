@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0105",
+  "updatedAt": "2026-09-06T16:51:01.100Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts"
+      ],
+      "generatedAt": "2026-09-06T16:49:49.607Z",
+      "startedAt": "2026-09-06T16:49:49.230Z",
+      "finishedAt": "2026-09-06T16:49:49.607Z",
+      "durationMs": 377,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7563c1efcfd5a1c7b6544f96acc5d7bee195e8c3",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-06T16:50:02.139Z",
+      "startedAt": "2026-09-06T16:49:52.491Z",
+      "finishedAt": "2026-09-06T16:50:02.139Z",
+      "durationMs": 9648,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7563c1efcfd5a1c7b6544f96acc5d7bee195e8c3",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:287062896bade468b2ce3d297b7ded6c1ec879c636468f110a4d7843ca10e4f7",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-09-06T16:51:01.099Z",
+      "startedAt": "2026-09-06T16:50:38.975Z",
+      "finishedAt": "2026-09-06T16:51:01.099Z",
+      "durationMs": 22124,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7563c1efcfd5a1c7b6544f96acc5d7bee195e8c3",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
