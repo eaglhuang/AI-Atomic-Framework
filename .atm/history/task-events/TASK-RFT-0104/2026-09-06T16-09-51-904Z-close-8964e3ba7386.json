@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T16-09-51-904Z-close-8964e3ba7386",
+  "taskId": "TASK-RFT-0104",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906155218-codex-gpt-5.4-mini-TASK-RFT-0104-173ed2da89",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0104.json",
+  "taskSha256": "sha256:f1cbd8b2bcc6db7ea2d8a5b7b3ac2bcfbef85d999ed63a6f151dba2c8adec17d",
+  "createdAt": "2026-09-06T16:09:51.904Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0104 --actor codex-gpt-5.4-mini --status done --historical-delivery 463745d226c950858fd07c42eb8fbce73e0cd366",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906155218-codex-gpt-5.4-mini-TASK-RFT-0104-173ed2da89",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0104.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T16:09:51.888Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0104.*",
+        ".atm/history/task-events/TASK-RFT-0104/**",
+        ".atm/history/tasks/TASK-RFT-0104.json",
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/cli/src/commands/tasks/legacy/**/*.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
+        "tests/cli/tasks-legacy-impl-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/cli/src/commands/tasks/legacy/**/*.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
+        "tests/cli/tasks-legacy-impl-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+        "typecheck",
+        "validate:cli"
+      ]
+    }
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0104",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "463745d226c950858fd07c42eb8fbce73e0cd366",
+  "governedTreeSha": "055e39c5e0ed89109e190710b11d446085323b6a",
+  "targetCommitDelta": {
+    "currentCommitSha": "463745d226c950858fd07c42eb8fbce73e0cd366",
+    "parentCommitShas": [
+      "463745d226c950858fd07c42eb8fbce73e0cd366"
+    ],
+    "governedTreeSha": "055e39c5e0ed89109e190710b11d446085323b6a",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      "packages/cli/dist/commands/tasks/legacy/implementation.js",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/tasks-legacy-impl-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:15f3a46075326c1f08b0ce8a7e388cba290b11580bdde1f8162f9a050ba30784",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T16:09:51.888Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0104.*",
+      ".atm/history/task-events/TASK-RFT-0104/**",
+      ".atm/history/tasks/TASK-RFT-0104.json",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/legacy/**/*.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
+      "tests/cli/tasks-legacy-impl-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/legacy/**/*.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
+      "tests/cli/tasks-legacy-impl-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0104.json",
+  "closedAt": "2026-09-06T16:09:51.888Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906155218-codex-gpt-5.4-mini-TASK-RFT-0104-173ed2da89",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "463745d226c950858fd07c42eb8fbce73e0cd366",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
+      "tests/cli/tasks-legacy-impl-extraction.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0104.json",
+      ".atm/history/task-events/TASK-RFT-0104/2026-09-06T15-52-07-733Z-import-4c0f6e5dee26.json",
+      ".atm/history/task-events/TASK-RFT-0104/2026-09-06T15-52-18-816Z-reserve-b3fe31cc7fc4.json",
+      ".atm/history/task-events/TASK-RFT-0104/2026-09-06T15-52-18-821Z-promote-a6cb87f2fe14.json",
+      ".atm/history/task-events/TASK-RFT-0104/2026-09-06T15-52-25-651Z-claim-d7cae8916e84.json",
+      ".atm/history/task-events/TASK-RFT-0104/2026-09-06T16-03-26-761Z-scope-amendment-80382362f1cb.json",
+      ".atm/history/tasks/TASK-RFT-0104.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

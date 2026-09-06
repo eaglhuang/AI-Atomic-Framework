@@ -2217,6 +2217,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy-impl.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/compat-command-map.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/implementation.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/parallel-advisor.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/repair-reconcile-lane.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/transition-compat.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/lifecycle-state.js",
@@ -3032,6 +3033,7 @@
     "release/atm-root-drop/packages/cli/src/commands/tasks/legacy-impl.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/compat-command-map.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/implementation.ts",
+    "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/repair-reconcile-lane.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/transition-compat.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/lifecycle-state.ts",
@@ -6041,8 +6043,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 3,
-    "unchanged": 1962,
+    "copied": 4,
+    "unchanged": 1963,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -25714,10 +25716,19 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/legacy/implementation.js",
-        "digest": "f6ed14ff52fa2e1755289d0017cad0b834ebc35e4fba50b1c87d306e89d518b4",
+        "digest": "e5d46d22b7f30d1a45b60558f31a5d050fa9d69594877e5c47f22b470c6dab8b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/legacy/implementation.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/tasks/legacy/parallel-advisor.js",
+        "digest": "8a4ac6405913d42b2466df590eaa4e51133d588fe9f1170f536d71c7339d5097",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/tasks/legacy/parallel-advisor.js"
         ],
         "replaceable": true
       },
@@ -33049,10 +33060,19 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/legacy/implementation.ts",
-        "digest": "848def410dbeb71547c2428cf46f358bcf32b48d4d57ebb27dcfe5f0e8789373",
+        "digest": "703d28572c86d41731cda520a20c8851b6c1a73529fdc6053543653ba087e154",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/legacy/implementation.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
+        "digest": "9fe2fd588f9ffae8d5b0e93c338f70413f7c79d86fcf80b154477ca2587e112b",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts"
         ],
         "replaceable": true
       },
@@ -60102,7 +60122,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:cfd8b62a41ebc7c8bb48cb90f6cdabcf61476a58945123efe6859a333fa74269"
+    "treeDigest": "sha256:ada7052917e445a9e5ab6cf0570ad4eb3aa21fae2f4fb42b0be36b71991a3895"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60797,6 +60817,7 @@
       "packages/cli/src/commands/tasks/legacy-impl.ts",
       "packages/cli/src/commands/tasks/legacy/compat-command-map.ts",
       "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
       "packages/cli/src/commands/tasks/legacy/repair-reconcile-lane.ts",
       "packages/cli/src/commands/tasks/legacy/transition-compat.ts",
       "packages/cli/src/commands/tasks/lifecycle-state.ts",
@@ -61641,7 +61662,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:40408a530da1499c17796a5f4bcfdbeff869a855624527a79a0ee33e98e250bb"
+    "digest": "sha256:822ec7b05b715f8d7d804c7823fb1ee80ec9c6a90e454b4b91fc767e5d6f3ab5"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63832,6 +63853,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy-impl.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/compat-command-map.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/parallel-advisor.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/repair-reconcile-lane.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/transition-compat.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/lifecycle-state.js",
@@ -64647,6 +64669,7 @@
       "release/atm-root-drop/packages/cli/src/commands/tasks/legacy-impl.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/compat-command-map.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/repair-reconcile-lane.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/transition-compat.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/lifecycle-state.ts",
@@ -67659,22 +67682,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:b2e981739e88b003ebbf3c90630b50330438d2c9f81d088de1fc4b61399b8bf4",
-  "sealedSourceCommit": "5481f8d7030559151ffc2886d0a8c73a129ef418",
+  "buildInputsTreeHash": "sha256:726e2d37c9a7136fbd4712ea6e1ebfc66029ee463f5e6ad95460c7f96d13ec11",
+  "sealedSourceCommit": "463745d226c950858fd07c42eb8fbce73e0cd366",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:813893fac0de9de02c4ad78bf0d9895379688d6e4fa24beef100371db8938846",
-  "tsBuildCacheDigest": "sha256:79770af950951c6ff650d3c4c2ff9e58725fa4726b1d68372508a45bd476b0c3",
+  "incrementalPlanDigest": "sha256:0fee42cbe8014be97e6483ccc23a71a51e3d005567995bc42cc943fe21035f89",
+  "tsBuildCacheDigest": "sha256:5ebc425094c0e02d8749e07dab40fabbb0a22036ea4bda3a9984b76f71c41509",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 49,
-    "skipDecision": 58,
-    "worktreeSetup": 22252,
-    "typescriptBuild": 18305,
-    "rootDropReleaseAssembly": 27413,
-    "onefileReleaseAssembly": 10069,
-    "artifactSync": 9694,
+    "inputHashCalculation": 50,
+    "skipDecision": 56,
+    "worktreeSetup": 14829,
+    "typescriptBuild": 19626,
+    "rootDropReleaseAssembly": 27324,
+    "onefileReleaseAssembly": 10379,
+    "artifactSync": 9833,
     "cleanup": 0,
-    "totalElapsed": 117682
+    "totalElapsed": 105645
   }
 }
