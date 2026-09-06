@@ -97,13 +97,10 @@ import {
 export { inspectProtectedAtmStateChanges, isUnconsumedCloseWindowDeferralSnapshot } from './support.ts';
 export { authorizeBlockLifecycleRecordBridge } from './cross-task-admission.ts';
 import { authorizeBlockLifecycleRecordBridge, raiseCrossTaskMutationBlock } from './cross-task-admission.ts';
+import { resolvePreCommitInvocationContext } from './invocation-context.ts';
 
 export function runPreCommitHook(cwd: string) {
-  const root = path.resolve(cwd);
-  const explicitCommittingTaskId = typeof process.env.ATM_COMMIT_TASK_ID === 'string' ? process.env.ATM_COMMIT_TASK_ID.trim() : null;
-  const stagedTaskIdsForContext = explicitCommittingTaskId ? [] : inferTaskIdsFromStagedFiles(readStagedFiles(root));
-  const committingTaskIdForHook = explicitCommittingTaskId || (stagedTaskIdsForContext.length === 1 ? stagedTaskIdsForContext[0] : null);
-  const scopedIndexActive = typeof process.env.GIT_INDEX_FILE === 'string' && process.env.GIT_INDEX_FILE.trim().length > 0;
+  const { root, committingTaskIdForHook, scopedIndexActive } = resolvePreCommitInvocationContext(cwd);
   const crossTaskBlock = detectCrossTaskMutation(root, committingTaskIdForHook, 'pre-commit', scopedIndexActive ? readStagedFiles(root) : undefined);
   const hasTaskHistoryCrossTaskBlock = crossTaskBlock?.conflicts.some((entry) => entry.surface === 'task-history') ?? false;
   if (crossTaskBlock && hasTaskHistoryCrossTaskBlock && !isResolutionAuthorizedCurrentTask(root, committingTaskIdForHook, crossTaskBlock.conflictTaskId) && !authorizeBlockLifecycleRecordBridge(root, crossTaskBlock).authorized) {

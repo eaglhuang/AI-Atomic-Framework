@@ -21,6 +21,7 @@ const checkedModules = [
   'packages/cli/src/commands/hook/pre-commit/failure-envelope.ts',
   'packages/cli/src/commands/hook/pre-commit/implementation.ts',
   'packages/cli/src/commands/hook/pre-commit/input-state.ts',
+  'packages/cli/src/commands/hook/pre-commit/invocation-context.ts',
   'packages/cli/src/commands/hook/pre-commit/scope-ownership.ts',
   'packages/cli/src/commands/hook/pre-commit/support.ts',
   'tests/cli/pre-commit-hook-extraction.test.ts'
