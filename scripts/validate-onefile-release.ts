@@ -334,7 +334,7 @@ async function validateExtractionLockWait(input: {
 
   const exitCode = await new Promise<number>((resolve, reject) => {
     child.once('error', reject);
-    child.once('close', (code) => resolve(code ?? 1));
+    child.once('exit', (code) => resolve(code ?? 1));
   });
   const payload = (Buffer.concat(stdoutChunks).toString('utf8') || Buffer.concat(stderrChunks).toString('utf8')).trim();
   assert(exitCode === 0, 'onefile runner must survive extraction-lock handoff');
