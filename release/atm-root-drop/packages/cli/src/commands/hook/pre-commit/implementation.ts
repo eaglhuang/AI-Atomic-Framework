@@ -100,7 +100,9 @@ import { authorizeBlockLifecycleRecordBridge, raiseCrossTaskMutationBlock } from
 
 export function runPreCommitHook(cwd: string) {
   const root = path.resolve(cwd);
-  const committingTaskIdForHook = typeof process.env.ATM_COMMIT_TASK_ID === 'string' ? process.env.ATM_COMMIT_TASK_ID.trim() : null;
+  const explicitCommittingTaskId = typeof process.env.ATM_COMMIT_TASK_ID === 'string' ? process.env.ATM_COMMIT_TASK_ID.trim() : null;
+  const stagedTaskIdsForContext = explicitCommittingTaskId ? [] : inferTaskIdsFromStagedFiles(readStagedFiles(root));
+  const committingTaskIdForHook = explicitCommittingTaskId || (stagedTaskIdsForContext.length === 1 ? stagedTaskIdsForContext[0] : null);
   const scopedIndexActive = typeof process.env.GIT_INDEX_FILE === 'string' && process.env.GIT_INDEX_FILE.trim().length > 0;
   const crossTaskBlock = detectCrossTaskMutation(root, committingTaskIdForHook, 'pre-commit', scopedIndexActive ? readStagedFiles(root) : undefined);
   const hasTaskHistoryCrossTaskBlock = crossTaskBlock?.conflicts.some((entry) => entry.surface === 'task-history') ?? false;
