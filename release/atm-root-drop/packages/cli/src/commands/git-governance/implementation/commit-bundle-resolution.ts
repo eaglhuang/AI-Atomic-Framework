@@ -391,6 +391,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     cwd: input.cwd,
     taskId: input.taskId,
     commitFiles: commitFilesWithGovernanceEvidence,
+    authorizedGeneratedResidueDeletions: autoCleanedResidue.map((entry: LegacyValue) => entry.path),
   });
   const closeoutOnlyMutationFiles =
     claimIntent === "closeout-only"
@@ -460,6 +461,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
           taskId: input.taskId,
           env,
           commitFiles: commitFilesWithGovernanceEvidence,
+          authorizedGeneratedResidueDeletions: autoCleanedResidue.map((entry: LegacyValue) => entry.path),
         });
         return mergeSealedCommitBundles(
           liveSealedBundle,

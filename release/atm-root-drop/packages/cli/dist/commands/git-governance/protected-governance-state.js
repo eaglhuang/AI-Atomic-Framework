@@ -36,6 +36,7 @@ export function inspectProtectedGovernanceStateDestructiveChanges(input) {
     const commitFileSet = input.commitFiles
         ? new Set(input.commitFiles.map(normalizeRelativePath))
         : null;
+    const authorizedGeneratedResidueDeletions = new Set((input.authorizedGeneratedResidueDeletions ?? []).map(normalizeRelativePath));
     const deleted = new Set([
         ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D'], input.env),
         ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D'], input.env)
@@ -47,7 +48,8 @@ export function inspectProtectedGovernanceStateDestructiveChanges(input) {
         const classification = classifyProtectedGovernanceStatePath(filePath);
         if (!classification)
             continue;
-        if (isEntitledGeneratedResidueDeletion(input.cwd, input.taskId, filePath))
+        if (authorizedGeneratedResidueDeletions.has(normalizeRelativePath(filePath)) ||
+            isEntitledGeneratedResidueDeletion(input.cwd, input.taskId, filePath))
             continue;
         violations.push({
             path: filePath,

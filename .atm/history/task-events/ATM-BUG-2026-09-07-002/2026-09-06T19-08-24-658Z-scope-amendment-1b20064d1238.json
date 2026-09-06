@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T19-08-24-658Z-scope-amendment-1b20064d1238",
+  "taskId": "ATM-BUG-2026-09-07-002",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-BUG-2026-09-07-002.json",
+  "taskSha256": "sha256:d6e7472fd49e93df3c93dde8c105e3ac280a119a5384065899afe3d178828011",
+  "createdAt": "2026-09-06T19:08:24.658Z",
+  "command": "node atm.mjs tasks scope add --task ATM-BUG-2026-09-07-002 --actor codex-gpt-5.4-mini --add \".atm/history/tasks/ATM-BUG-2026-09-07-001.json,.atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json,packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js,packages/cli/dist/commands/git-governance/protected-governance-state.js,packages/cli/dist/commands/hook/pre-commit/implementation.js,release/atm-onefile/atm.mjs,release/atm-onefile/release-manifest.json,release/atm-root-drop/**\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

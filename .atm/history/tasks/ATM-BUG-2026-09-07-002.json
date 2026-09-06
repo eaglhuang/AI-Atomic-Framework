@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-BUG-2026-09-07-002",
+  "title": "Reconcile sealed runner publication after terminal carrier",
+  "status": "running",
+  "owner": "codex-gpt-5.4-mini",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [],
+  "tags": [],
+  "createdAt": "2026-09-06T19:04:33.306Z",
+  "createdByActor": "codex-gpt-5.4-mini",
+  "lastTransitionId": "2026-09-06T19-09-37-199Z-scope-amendment-be116725a870",
+  "lastTransitionAt": "2026-09-06T19:09:37.199Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-09-06T19:07:56.821Z",
+  "promotedAt": "2026-09-06T19:07:56.825Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-efc5534d0a5d",
+    "claimedAt": "2026-09-06T19:07:56.830Z",
+    "heartbeatAt": "2026-09-06T19:07:56.830Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-002.*",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-001/2026-09-06T19-02-49-573Z-abandon-6bc40af9a931.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-002/**",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-001.json",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-002.json",
+      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906190756-codex-gpt-5.4-mini-eb97965bb7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906190756-codex-gpt-5.4-mini-eb97965bb7\""
+    }
+  },
+  "startedAt": "2026-09-06T19:07:56.830Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-f8de72210d1e4860",
+    "ticketDigest": "sha256:f8de72210d1e4860e6b527ec65af303312c0497f731792a98164b7a885e2cbe4",
+    "taskId": "ATM-BUG-2026-09-07-002",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260906190756-codex-gpt-5.4-mini-eb97965bb7",
+    "claimGeneration": "lease-efc5534d0a5d",
+    "issuedAt": "2026-09-06T19:09:37.103Z",
+    "expiresAt": "2026-09-06T19:39:37.103Z",
+    "scopeDigest": "sha256:802b6fe1464752dbb32aa9cb0c3d11d8d019cfd4b665292a6223e192bce0c4fa",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T19:09:37.103Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
+          ".atm/history/evidence/ATM-BUG-2026-09-07-002.*",
+          ".atm/history/task-events/ATM-BUG-2026-09-07-001/2026-09-06T19-02-49-573Z-abandon-6bc40af9a931.json",
+          ".atm/history/task-events/ATM-BUG-2026-09-07-002/**",
+          ".atm/history/tasks/ATM-BUG-2026-09-07-001.json",
+          ".atm/history/tasks/ATM-BUG-2026-09-07-002.json",
+          "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+          "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+          "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop/**"
+        ],
+        "digest": "sha256:c055ebbd328049bcc7abf28414f934af288f49f5b690001b5c95dfd9951e6292"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "startedBySessionId": "session-20260906190756-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-002-4f6d2c2848",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-BUG-2026-09-07-002",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-002.*",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-001/2026-09-06T19-02-49-573Z-abandon-6bc40af9a931.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-002/**",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-001.json",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-002.json",
+      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f97f1654c3985d02f6180096d8ca717d769d24f8e872dd3b2f9345922264cc6b",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260906190756-codex-gpt-5.4-mini-eb97965bb7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906190756-codex-gpt-5.4-mini-eb97965bb7\""
+    },
+    "createdAt": "2026-09-06T19:07:58.117Z",
+    "status": "active"
+  },
+  "scopePaths": [
+    ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
+    ".atm/history/evidence/ATM-BUG-2026-09-07-002.*",
+    ".atm/history/task-events/ATM-BUG-2026-09-07-002/**",
+    ".atm/history/tasks/ATM-BUG-2026-09-07-001.json",
+    ".atm/history/tasks/ATM-BUG-2026-09-07-002.json",
+    "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+    "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+    "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/**",
+    ".atm/history/task-events/ATM-BUG-2026-09-07-001/2026-09-06T19-02-49-573Z-abandon-6bc40af9a931.json"
+  ]
+}

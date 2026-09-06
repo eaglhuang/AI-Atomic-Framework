@@ -2006,6 +2006,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/framework-temp-claim-attribution.js",
     "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
     "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/input-state.js",
+    "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/invocation-context.js",
     "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/residue-candidates.js",
     "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/scope-ownership.js",
     "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/support.js",
@@ -2730,6 +2731,7 @@
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/framework-temp-claim-attribution.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/input-state.ts",
+    "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/invocation-context.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
     "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.test.ts",
@@ -6051,11 +6053,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 3,
-    "unchanged": 1970,
+    "copied": 1422,
+    "unchanged": 4596,
     "removed": 0
   },
-  "buildMode": "overlay",
+  "buildMode": "full",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -9308,7 +9310,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-197.json",
-        "digest": "cc6d1c9d61840d87c727253a355ef021e9c273ce2857716415ffa16b36d3d4d2",
+        "digest": "f126499a40afcf33be617208006c8a335e183a30cc8eaace1e469caaee4837fb",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-197.json"
@@ -9317,7 +9319,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json",
-        "digest": "b1843ab1fecb9c85e2f493466827383db627932ca43ec33f6885057067f82cab",
+        "digest": "1a1537f74043f0376d04b70fdc22dcf29f05da02a4b11e2ea8ab6ab8d3457082",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json"
@@ -9326,7 +9328,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-199.json",
-        "digest": "684c67d551c68ca5d5ee1491760c1f7b9afe274c58f6dc7ebe37cb1917a40c5d",
+        "digest": "ac3a1726db67e62602a025c7aef3247c73994ec9a9ae21d95215a505430ae624",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-199.json"
@@ -11774,7 +11776,7 @@
       },
       {
         "path": "docs/governance/atm-bug-and-optimization-backlog.md",
-        "digest": "348177e54362a5b3dc1e8b7e0a3b45bd73086ce378eaa5955547c996cc7722ef",
+        "digest": "d13472f8eb7b06d49bc53aba6bae1ffc9399263a0309e1bd9510a08e5c79bbd9",
         "origin": "source",
         "inputPaths": [
           "docs/governance/atm-bug-and-optimization-backlog.md"
@@ -23168,7 +23170,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
-        "digest": "b27653151ce3b102f4f695a513cf1093dbb840116e4959a88ae44274544003fa",
+        "digest": "a52a37546bf7cadd993f2e485b10700c0926279be7aa38912a7fbded2edb695f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js"
@@ -23492,7 +23494,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/protected-governance-state.js",
-        "digest": "96b32ad41a503969d2a8eb3653ab1e01bc1e9fb0eeed7e91adc62bf10a973319",
+        "digest": "8f2a00c6307a91d1e782f0d1bcfca95f7ebd13ac21322e54c1bb8717bea782ab",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/protected-governance-state.js"
@@ -23816,7 +23818,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/implementation.js",
-        "digest": "cbcb550270fac4fcb9802b9c74491a064f65ebe8666f5639aff816fb7eda6969",
+        "digest": "9349f7537cdd8f566172ca6315d681805fa059fdfedf6a577498a775f0a06417",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/implementation.js"
@@ -23829,6 +23831,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/input-state.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/hook/pre-commit/invocation-context.js",
+        "digest": "62289c53ba0e4b08f26055ffa58302797d9136a8ec3712eb5d759637e69d4095",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/hook/pre-commit/invocation-context.js"
         ],
         "replaceable": true
       },
@@ -29504,7 +29515,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
-        "digest": "01d295182f053fc2135e872f48c903543681fe765219d63a809814ac63acb119",
+        "digest": "ac5d744fc24e1aad18b1991d7308d936a3e9bedb284e4a1f160f28ef8c347384",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts"
@@ -29936,7 +29947,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/protected-governance-state.ts",
-        "digest": "56bbc4e49eaafc911bee64b01c5469bc4fe01c1aab18123df73a0aab4bc66ba6",
+        "digest": "60cb85933b2e18a41037c156f01bae356ef54e93f6fd5b2a5ee5b21e45cedcd0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/protected-governance-state.ts"
@@ -30332,7 +30343,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/implementation.ts",
-        "digest": "d3b66887b61fb339b53b534756c407a77dfc397fe33bd1c23f409753249cc880",
+        "digest": "cf1b41cb90bab74f90b482c9e6ecb18fac6fad86ee0bcde939ef6adee5787d33",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/implementation.ts"
@@ -30345,6 +30356,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/input-state.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/hook/pre-commit/invocation-context.ts",
+        "digest": "ea25ad6f82d7cec8379b5361dde8e8533d03637268ea1c7cc3b6a057cb9de44d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/hook/pre-commit/invocation-context.ts"
         ],
         "replaceable": true
       },
@@ -53201,7 +53221,7 @@
       },
       {
         "path": "tests/cli/evidence-bundle-io-extraction.test.ts",
-        "digest": "6dde22d0e4495cf241d8badef619e284283e33e7f895dd8cd39a2b75ee0939b0",
+        "digest": "4eefddf0ef6f1012356d8491f50b238bcd39d5df371828d174600f797c9703ae",
         "origin": "source",
         "inputPaths": [
           "tests/cli/evidence-bundle-io-extraction.test.ts"
@@ -55325,7 +55345,7 @@
       },
       {
         "path": "tests/cli/pre-commit-hook-extraction.test.ts",
-        "digest": "909cb9612745bac6671724882baa917e941c2827b7a721f4067b36befb2b3b62",
+        "digest": "249bc57bfd901dd9050c401ecc0336dc0da865a098a9d60497c138b5a59e65c1",
         "origin": "source",
         "inputPaths": [
           "tests/cli/pre-commit-hook-extraction.test.ts"
@@ -55397,7 +55417,7 @@
       },
       {
         "path": "tests/cli/protected-ledger-destructive-guard.test.ts",
-        "digest": "8afb6c80a81c5ba773b4ecf4523ae36f62c8dcc4c44a8fec67f925477bb9fc65",
+        "digest": "deb8e8759965018df2c565a4f65db19210fa3fde1e8ce93fe1c2f8fca938b1c8",
         "origin": "source",
         "inputPaths": [
           "tests/cli/protected-ledger-destructive-guard.test.ts"
@@ -56657,7 +56677,7 @@
       },
       {
         "path": "tests/cli/tasks-legacy-impl-extraction.test.ts",
-        "digest": "4dac592694ddd7571c14276efe008b77fdb2f54cf7ac8b05512c76b560d807c4",
+        "digest": "0c4e9bc4547a48a306e09a063777f896271a9c96552840697e51b1cdae8e301b",
         "origin": "source",
         "inputPaths": [
           "tests/cli/tasks-legacy-impl-extraction.test.ts"
@@ -60202,7 +60222,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:14a8af74271e8cef26ab5632b5071f87d97607c1cb35b21b026d8b942bea7135"
+    "treeDigest": "sha256:5699bef5a80945b602659e5b7e74a1c513f67405e61fd8f37b123b63097396e2"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60591,6 +60611,7 @@
       "packages/cli/src/commands/hook/pre-commit/framework-temp-claim-attribution.ts",
       "packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "packages/cli/src/commands/hook/pre-commit/input-state.ts",
+      "packages/cli/src/commands/hook/pre-commit/invocation-context.ts",
       "packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
       "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
       "packages/cli/src/commands/hook/pre-commit/support.test.ts",
@@ -61745,7 +61766,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:2c0c6969dbbfac002a5f43a7f9c537d2c757d8a967c2e0cae2461bcb5d4e7f9e"
+    "digest": "sha256:2c913ac33fe29afbe69aa3ee1aaf5b0cb85215454117944cb12aa25803ed47a3"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63725,6 +63746,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/framework-temp-claim-attribution.js",
       "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
       "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/input-state.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/invocation-context.js",
       "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/residue-candidates.js",
       "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/scope-ownership.js",
       "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/support.js",
@@ -64449,6 +64471,7 @@
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/framework-temp-claim-attribution.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/input-state.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/invocation-context.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/residue-candidates.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
       "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.test.ts",
@@ -67773,22 +67796,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:ca46124ffb7b168cc276c4644fbe8b655e826210fb7c4b1608390a5b3414b8da",
-  "sealedSourceCommit": "e75075c5d998ae4fc82343ea99b04b7ab877e703",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:6e960d9b0809476d685bfc4fe9ecb2c7278467ec900fccbae5190afe9c577d39",
-  "tsBuildCacheDigest": "sha256:355b3c73f6efabca51468acb3511fd7c5644cefaccc62516e4d61b58c585ad48",
+  "buildInputsTreeHash": "sha256:659968b60918267729e455f1312e016d1dba47e0cc303358a4c2f1397e2d72c4",
+  "sealedSourceCommit": "8dee52050b1efd36a437da2f4dca63fb645ebadc",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "missing-previous-sealed-source",
+  "incrementalPlanDigest": "sha256:7d50ab7561440ab438139eabc53bd56ca7c9842faf0ae2b242c7cecfdcc9dc21",
+  "tsBuildCacheDigest": "sha256:eb57728cff3c6cb93dec2e24b1175bdedd0fe3e113c4dbc72446314800f7c401",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 45,
-    "skipDecision": 55,
-    "worktreeSetup": 9715,
-    "typescriptBuild": 17557,
-    "rootDropReleaseAssembly": 24952,
-    "onefileReleaseAssembly": 8055,
-    "artifactSync": 8325,
+    "inputHashCalculation": 46,
+    "skipDecision": 17,
+    "worktreeSetup": 10293,
+    "typescriptBuild": 9633,
+    "rootDropReleaseAssembly": 30097,
+    "onefileReleaseAssembly": 8718,
+    "artifactSync": 8974,
     "cleanup": 0,
-    "totalElapsed": 84147
+    "totalElapsed": 79128
   }
 }

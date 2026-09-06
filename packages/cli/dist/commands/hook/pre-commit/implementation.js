@@ -18,16 +18,13 @@ import { buildCommitTaskFrameworkLockContext } from './framework-lock-context.js
 import { authorizesRunnerPublicationCloseCommit } from '../../framework-development/runner-publication-close-handoff.js';
 import { buildPreCommitBlockingFindings, buildPreCommitFailureEnvelope, selectActionableResidueFindings } from './failure-envelope.js';
 import { inspectTaskCardStatusChanges, readStagedChangedLineCount, readStagedFiles, scanEncoding, shouldWriteGitHeadEvidenceForStagedCommit, writeStagedGitHeadEvidence } from './input-state.js';
-import { collectCloseCommitWindowPlanningMirrorFiles, collectFrameworkTempClaimAllowedFiles, collectStagedBatchCheckpointScopeFiles, collectTaskGovernedCommitAllowedFiles, inferTaskIdsFromStagedFiles, inspectCommitAttribution, inspectEmergencyUseAudit, inspectProtectedAtmStateChanges, inspectSameFileClaimOwnership, inspectTaskOpenImportBundleStagedArtifacts, isActionableManualResidue, isPathAllowedByTaskDirection, isResolutionAuthorizedCurrentTask, isTaskDirectionPreCommitExempt, resolveResidueTaskId, selectRelevantDirectionLocksForCommit, uniqueSorted } from './support.js';
+import { collectCloseCommitWindowPlanningMirrorFiles, collectFrameworkTempClaimAllowedFiles, collectStagedBatchCheckpointScopeFiles, collectTaskGovernedCommitAllowedFiles, inspectCommitAttribution, inspectEmergencyUseAudit, inspectProtectedAtmStateChanges, inspectSameFileClaimOwnership, inspectTaskOpenImportBundleStagedArtifacts, isActionableManualResidue, isPathAllowedByTaskDirection, isResolutionAuthorizedCurrentTask, isTaskDirectionPreCommitExempt, resolveResidueTaskId, selectRelevantDirectionLocksForCommit, uniqueSorted } from './support.js';
 export { inspectProtectedAtmStateChanges, isUnconsumedCloseWindowDeferralSnapshot } from './support.js';
 export { authorizeBlockLifecycleRecordBridge } from './cross-task-admission.js';
 import { authorizeBlockLifecycleRecordBridge, raiseCrossTaskMutationBlock } from './cross-task-admission.js';
+import { resolvePreCommitInvocationContext } from './invocation-context.js';
 export function runPreCommitHook(cwd) {
-    const root = path.resolve(cwd);
-    const explicitCommittingTaskId = typeof process.env.ATM_COMMIT_TASK_ID === 'string' ? process.env.ATM_COMMIT_TASK_ID.trim() : null;
-    const stagedTaskIdsForContext = explicitCommittingTaskId ? [] : inferTaskIdsFromStagedFiles(readStagedFiles(root));
-    const committingTaskIdForHook = explicitCommittingTaskId || (stagedTaskIdsForContext.length === 1 ? stagedTaskIdsForContext[0] : null);
-    const scopedIndexActive = typeof process.env.GIT_INDEX_FILE === 'string' && process.env.GIT_INDEX_FILE.trim().length > 0;
+    const { root, committingTaskIdForHook, scopedIndexActive } = resolvePreCommitInvocationContext(cwd);
     const crossTaskBlock = detectCrossTaskMutation(root, committingTaskIdForHook, 'pre-commit', scopedIndexActive ? readStagedFiles(root) : undefined);
     const hasTaskHistoryCrossTaskBlock = crossTaskBlock?.conflicts.some((entry) => entry.surface === 'task-history') ?? false;
     if (crossTaskBlock && hasTaskHistoryCrossTaskBlock && !isResolutionAuthorizedCurrentTask(root, committingTaskIdForHook, crossTaskBlock.conflictTaskId) && !authorizeBlockLifecycleRecordBridge(root, crossTaskBlock).authorized) {

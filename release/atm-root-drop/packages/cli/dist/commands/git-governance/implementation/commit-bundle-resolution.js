@@ -249,6 +249,7 @@ export function resolveTaskScopedCommitBundle(input) {
         cwd: input.cwd,
         taskId: input.taskId,
         commitFiles: commitFilesWithGovernanceEvidence,
+        authorizedGeneratedResidueDeletions: autoCleanedResidue.map((entry) => entry.path),
     });
     const closeoutOnlyMutationFiles = claimIntent === "closeout-only"
         ? uniqueSorted([...commitFiles, ...unstagedDirtyFiles, ...inScopeStagedFiles].filter((filePath) => {
@@ -318,6 +319,7 @@ export function resolveTaskScopedCommitBundle(input) {
                     taskId: input.taskId,
                     env,
                     commitFiles: commitFilesWithGovernanceEvidence,
+                    authorizedGeneratedResidueDeletions: autoCleanedResidue.map((entry) => entry.path),
                 });
                 return mergeSealedCommitBundles(liveSealedBundle, sealCommitBundleFromCandidateIndex({ cwd: input.cwd, env, paths: stageCandidates }), { supersedingPaths: stageCandidates, surface: "auto-stage-worktree-overlay" });
             },
