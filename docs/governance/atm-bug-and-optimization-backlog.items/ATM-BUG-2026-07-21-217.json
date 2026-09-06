@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Task",
   "severity": "Medium",
-  "status": "Deferred",
+  "status": "Closed — skill projection requirement superseded and re-verified on 2026-09-06",
   "area": "Skills / Integration projection",
   "finding": "TASK-SKL-0014 delivered templates/skills/atm-framework-temp-claim.skill.md but did not add the skill to minimumAtmEntrySkillDefinitions in packages/integrations-core/src/compiler/skill-templates.ts nor update requiredTemplateIds in scripts/validate-skill-templates.ts, so no editor integration (claude-code / codex / cursor / gemini / copilot) projects the skill and it cannot be surfaced as a slash command. Deferred out of SKL-0014 because scripts/validate-skill-templates.ts was atom-held by concurrent TASK-SKL-0015; adding to only one of the two files makes npm run validate:skill-templates fail on count assertion.",
   "expectedBehavior": "A follow-up card (TASK-SKL-0014-FU-PROJECT) must (a) add id atm-framework-temp-claim to minimumAtmEntrySkillDefinitions in packages/integrations-core/src/compiler/skill-templates.ts, (b) add the same id to requiredTemplateIds in scripts/validate-skill-templates.ts, (c) run node atm.mjs integration add <adapter> --force for each of claude-code / codex / copilot / cursor / gemini, and (d) commit the resulting projections plus the four .atm/integrations/*.manifest.json updates. Verifies via npm run validate:skill-templates and npm run validate:cli.",
-  "evidenceOrRepro": "ATM-GOV-0232 reconciled this backlog row as a projected-skill follow-up rather than a task-import parser defect. The current claim scope intentionally does not include packages/integrations-core/src/compiler/skill-templates.ts, scripts/validate-skill-templates.ts, or generated editor projections, so this item remains delegated to the existing SKL follow-up lane.",
-  "followUp": "Terminal disposition for ATM-GOV-0232: deferred to TASK-SKL-0014-FU-PROJECT / SKL lane. Do not open a duplicate GOV task or edit integration projection files under ATM-GOV-0232."
+  "evidenceOrRepro": "The original missing-projection condition no longer reproduces. `npm run validate:skill-templates` exited 0 with 18 minimum entry templates and installed-copy parity sync=25; `node --strip-types scripts/validate-integration-adapter.ts` exited 0; and `node --strip-types tests/cli/plan4-adapter-parity.test.ts` exited 0 on 2026-09-06. The `atm-framework-temp-claim` template is present in the source corpus and current adapter projections, including claude-code, codex, copilot, and gemini paths.",
+  "followUp": "Keep the skill-template and adapter-parity validators green. Any future projection omission must be opened as a new, current reproduction; do not reopen this superseded finding."
 }
