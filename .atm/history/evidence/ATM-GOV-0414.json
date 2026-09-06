@@ -1,0 +1,184 @@
+{
+  "taskId": "ATM-GOV-0414",
+  "updatedAt": "2026-09-06T03:15:32.289Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260906030038-codex-captain-ATM-GOV-0414-2ce8098470",
+      "createdAt": "2026-09-06T03:15:17.880Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260906030038-codex-captain-ATM-GOV-0414-2ce8098470",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d5a0b0a68bb678a1696d1eeefdd77498b385a5773696cdded6be43c7e241f44a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-09-06T03:15:16.555Z",
+            "finishedAt": "2026-09-06T03:15:17.879Z",
+            "durationMs": 1324,
+            "cached": false,
+            "validators": [
+              "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "cf25bf3984176dfa57853dc9ee78c66f47d4007c",
+            "cacheKey": "sha256:dd9904a23a1376356a9bf81bd6547e64692f90f0fc5308425be7c636d3809208",
+            "generatedAt": "2026-09-06T03:15:17.879Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:dd9904a23a1376356a9bf81bd6547e64692f90f0fc5308425be7c636d3809208",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-06T03:15:17.879Z",
+              "observedAt": "2026-09-06T03:15:17.879Z",
+              "startedAt": "2026-09-06T03:15:16.555Z",
+              "finishedAt": "2026-09-06T03:15:17.879Z",
+              "durationMs": 1324,
+              "laneSessionId": null,
+              "taskId": "ATM-GOV-0414",
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:cf53bfc71bd87fbd291120f463936fd2ed655b9b6d1a815a5dd40217002b09f0",
+              "outputDigest": "sha256:0a215d2e1e0eeb26ad18a6caad0cc5d2c4db6bb7c0c3474715a9ae09141d5bc5",
+              "cache": {
+                "key": "sha256:dd9904a23a1376356a9bf81bd6547e64692f90f0fc5308425be7c636d3809208",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "cf25bf3984176dfa57853dc9ee78c66f47d4007c",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:8c396d28cddcd8f512c3b4d40ae37d2b86f3b0fd69c36210af0f96c07e229f17",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260906030038-codex-captain-ATM-GOV-0414-2ce8098470",
+      "createdAt": "2026-09-06T03:15:32.289Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260906030038-codex-captain-ATM-GOV-0414-2ce8098470",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "startedAt": "2026-09-06T03:15:21.480Z",
+            "finishedAt": "2026-09-06T03:15:32.288Z",
+            "durationMs": 10808,
+            "cached": false,
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "cf25bf3984176dfa57853dc9ee78c66f47d4007c",
+            "cacheKey": "sha256:a06956e586513eea590c7366e8e1a732ee2a10fa27bf6302eec94d499beec89e",
+            "generatedAt": "2026-09-06T03:15:32.288Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:a06956e586513eea590c7366e8e1a732ee2a10fa27bf6302eec94d499beec89e",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-06T03:15:32.288Z",
+              "observedAt": "2026-09-06T03:15:32.288Z",
+              "startedAt": "2026-09-06T03:15:21.480Z",
+              "finishedAt": "2026-09-06T03:15:32.288Z",
+              "durationMs": 10808,
+              "laneSessionId": null,
+              "taskId": "ATM-GOV-0414",
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:8d780bff62c50878fc35337ac95584a58a6254ad97cd3f8aeb7229513c43a700",
+              "outputDigest": "sha256:cb6206dcd66e4f4792c0bf9aa91e2996183c1e272e5c9c01f8b74d9e4162ac1d",
+              "cache": {
+                "key": "sha256:a06956e586513eea590c7366e8e1a732ee2a10fa27bf6302eec94d499beec89e",
+                "hit": false
+              },
+              "extensions": {
+                "command": "npm run typecheck",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "typecheck"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "cf25bf3984176dfa57853dc9ee78c66f47d4007c",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d8858b60a5f1efe7fb26b730bd948c41c7969612d2ccfa0f61c25a860c009498",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

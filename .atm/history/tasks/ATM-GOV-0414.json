@@ -1,0 +1,282 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0414",
+  "title": "Provide same-owner metadata-only planning import and seal repair",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0273"
+  ],
+  "acceptance": [
+    "`tasks import --metadata-only --preserve-active-claim` (or an equivalent governed command) is registered and returns a receipt naming the task, actor, lane/session, lease, before/after source digests, and changed keys.",
+    "Same-owner metadata-only import updates the planning source seal and validator metadata without changing status, claim state, lease, lane, scope, deliverables, or evidence references.",
+    "A different actor, lane, session, or non-metadata content change fails closed and leaves the task ledger and claim bytes unchanged.",
+    "Red/green regression reproduces `IMPORT_SKIPPED_ACTIVE_CLAIM`, then proves the narrow route succeeds only for the same-owner metadata case.",
+    "Existing default import behavior remains unchanged when the new flag is absent, including active-claim protection and force-overwrite gates.",
+    "The target repository imports the card through the governed planning source path before implementation; no direct `.atm/history/**` edits."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/legacy/implementation.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/legacy/implementation.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0414-provide-same-owner-metadata-only-planning-import-and-seal-repair.task.md",
+    "sectionTitle": "ATM-GOV-0414",
+    "headingLine": 55,
+    "hash": "6d96ac2df9865bc7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0414-provide-same-owner-metadata-only-planning-import-and-seal-repair.task.md",
+      "planningCommitSha": "a8e7d53215b0b2022e4bc534c444b3afc748c10c",
+      "contentDigest": "sha256:6d96ac2df9865bc7a84349816291e4c4084c00e314dc9c2323321a8032a79e6c",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T03:10:29.486Z"
+    }
+  },
+  "importedAt": "2026-09-06T03:00:28.793Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.tasks.import.metadata.only.preserve.claim.test.ts",
+      "command": "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "ATM-GOV-0273",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T03-10-29-613Z-metadata-only-import-e1642bba9505",
+  "lastTransitionAt": "2026-09-06T03:10:29.613Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-06T03:00:38.912Z",
+  "promotedAt": "2026-09-06T03:00:38.917Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-2b5fe40c0224",
+    "claimedAt": "2026-09-06T03:00:38.922Z",
+    "heartbeatAt": "2026-09-06T03:00:38.922Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0414.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906030039-codex-captain-d446eca299",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906030039-codex-captain-d446eca299\""
+    }
+  },
+  "startedAt": "2026-09-06T03:00:38.922Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-9d46490d973a8a0d",
+    "ticketDigest": "sha256:9d46490d973a8a0df66ea000ce3c321a7404132c1ece6b9e7d541beb073613bf",
+    "taskId": "ATM-GOV-0414",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260906030039-codex-captain-d446eca299",
+    "claimGeneration": "lease-2b5fe40c0224",
+    "issuedAt": "2026-09-06T03:00:38.922Z",
+    "expiresAt": "2026-09-06T03:30:38.922Z",
+    "scopeDigest": "sha256:3b375cd0c7602ade837f8fe2ef0e87d920c5d0094842be6739bcc234ea09cbae",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T03:00:38.922Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0414.*",
+          ".atm/history/task-events/ATM-GOV-0414/**",
+          ".atm/history/tasks/ATM-GOV-0414.json",
+          "packages/cli/src/commands/command-specs/tasks.spec.ts",
+          "packages/cli/src/commands/tasks/import-orchestrator.ts",
+          "packages/cli/src/commands/tasks/legacy/implementation.ts",
+          "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+        ],
+        "digest": "sha256:c16ba85eb548e57d0974bd386d0ff382e70030e776a7cbd75edc52866d31174c"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906030038-codex-captain-ATM-GOV-0414-2ce8098470",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0414",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0414.*",
+      ".atm/history/task-events/ATM-GOV-0414/**",
+      ".atm/history/tasks/ATM-GOV-0414.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "940ad627b49caa8bbc91186f749c23ec390a1fc334e23bccf9b87db9eaa97272",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260906030038-codex-captain-ATM-GOV-0414-2ce8098470",
+    "laneSession": {
+      "laneSessionId": "lane-20260906030039-codex-captain-d446eca299",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906030039-codex-captain-d446eca299\""
+    },
+    "createdAt": "2026-09-06T03:00:45.675Z",
+    "status": "active"
+  }
+}
