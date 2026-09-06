@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Partially fixed — quote contamination repaired; scope audit/status surface remains",
+  "status": "Closed — quote contamination repair and discoverable scope audit/status surface verified through ATM-GOV-0259",
   "area": "Task scope amendment / Windows CLI parsing",
   "finding": "On Windows/PowerShell, `tasks scope add --add \"path1,path2\"` normalized the live allowedFiles list but persisted quote-contaminated paths in amendmentHistory, leaving audit history with entries like `\"packages/...` and `...test.ts\"`.",
   "expectedBehavior": "Scope amendment parsing should canonicalize paths once and persist the same clean path list to allowedFiles and amendmentHistory. The CLI should reject or repair malformed quoted path fragments and expose a supported status/preflight command for scope audit.",
   "evidenceOrRepro": "The original quote-contamination reproduction is covered by the current parser and governance tests. `node --strip-types tests/cli/write-ticket-scope-amendment.test.ts` exited 0 and persisted quote-free paths/events; `node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts` exited 0 on 2026-09-06. The parser now canonicalizes the quoted CSV before both live scope and amendment history are written.",
-  "followUp": "The original quote-contamination defect is fixed and covered by focused tests. Remaining work is the separately bounded discoverable scope audit/status or preflight command; create a successor task card for that UX surface."
+  "followUp": "Closed after verifying ATM-GOV-0259 is done, tasks scope and tasks audit are discoverable, normalized allowed files and immutable amendment history are exposed, and the focused parser/admission tests pass. No successor task is required for this finding."
 }
