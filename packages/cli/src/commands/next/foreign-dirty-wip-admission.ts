@@ -7,6 +7,8 @@ import { pathMatchesTaskScope, uniqueSorted } from '../git-governance/commit-sco
 import { normalizeWorkPath } from './playbook-projection.ts';
 import type { ImportedTaskSummary } from './route-predicates.ts';
 
+type ClaimAdmissionTask = Pick<ImportedTaskSummary, 'workItemId'>;
+
 export interface ClaimDirtyWipAdmission {
   readonly schemaId: 'atm.claimDirtyWipAdmission.v1';
   readonly ok: boolean;
@@ -38,7 +40,7 @@ type DirtyPathOwner = {
 
 export function inspectClaimDirtyWipAdmission(input: {
   readonly cwd: string;
-  readonly task: ImportedTaskSummary;
+  readonly task: ClaimAdmissionTask;
   readonly actorId: string;
   readonly laneSessionId?: string | null;
   readonly claimFiles: readonly string[];
@@ -78,7 +80,7 @@ export function inspectClaimDirtyWipAdmission(input: {
 
 export function assertClaimDirtyWipAdmission(input: {
   readonly cwd: string;
-  readonly task: ImportedTaskSummary;
+  readonly task: ClaimAdmissionTask;
   readonly actorId: string;
   readonly laneSessionId?: string | null;
   readonly claimFiles: readonly string[];
@@ -108,7 +110,7 @@ export function assertClaimDirtyWipAdmission(input: {
   });
 }
 
-function clean(input: { readonly task: ImportedTaskSummary; readonly actorId: string; readonly laneSessionId?: string | null }, candidateFiles: readonly string[]): ClaimDirtyWipAdmission {
+function clean(input: { readonly task: ClaimAdmissionTask; readonly actorId: string; readonly laneSessionId?: string | null }, candidateFiles: readonly string[]): ClaimDirtyWipAdmission {
   return { schemaId: 'atm.claimDirtyWipAdmission.v1', ok: true, taskId: input.task.workItemId, currentActorId: input.actorId, currentLaneSessionId: input.laneSessionId ?? null, candidateFiles, intersectingFiles: [], blockers: [] };
 }
 

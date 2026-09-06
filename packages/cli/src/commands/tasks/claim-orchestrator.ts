@@ -23,8 +23,7 @@ import { resolveLaneSession } from '../lane-session/resolve.ts';
 import { laneSessionPathFor } from '../lane-session/store.ts';
 import { readClaimLaneSessionId, throwIfForeignSameTaskClaim, assertCurrentClaimOwnerForAction } from './claim-ownership.ts';
 import { prepareReleaseWip } from './release-wip-transaction.ts';
-import { withTakeoverAggregateRollback } from './takeover-aggregate-transaction.ts';
-
+import { withTakeoverAggregateRollback } from './takeover-aggregate-transaction.ts'; import { assertClaimDirtyWipAdmission } from '../next/foreign-dirty-wip-admission.ts';
 function normalizeTaskStatus(value: unknown): string {
   return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
 }
@@ -70,6 +69,7 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       taskId: options.taskId,
       command: `node atm.mjs tasks claim --task ${options.taskId} --actor ${actorId} --json`
     });
+    assertClaimDirtyWipAdmission({ cwd: options.cwd, task: taskRef, actorId, laneSessionId: laneSession.session.laneId, claimFiles: files });
     if (currentClaim && currentClaim.state === 'active') {
       throwIfForeignSameTaskClaim({
         taskId: options.taskId,

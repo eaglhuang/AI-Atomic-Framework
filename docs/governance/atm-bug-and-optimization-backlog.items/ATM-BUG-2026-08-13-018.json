@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Open",
+  "status": "Fixed",
   "area": "Claim entry points disagree about adoption of unowned dirty scope",
   "finding": "next --claim refuses a request whose declared scope intersects unowned dirty files with ATM_CLAIM_FOREIGN_UNSTAGED_WIP, while tasks claim can acquire the same task, actor, and file set. Two public spellings of the same lifecycle operation therefore produce opposite admission decisions.",
   "expectedBehavior": "All claim entry points must delegate to one admission policy and return the same decision for the same task, actor, scope, intent, and repository state. If dirty-work adoption is permitted, ownership lineage must be made explicit; if it is forbidden, every entry point must refuse it.",
-  "evidenceOrRepro": "On ATM-GOV-0364 at HEAD 88230861e with one unowned modified source file, next --claim --files returned ATM_CLAIM_FOREIGN_UNSTAGED_WIP, while tasks claim with the same file acquired the claim without an intervening worktree change.",
-  "followUp": "Choose the intended adoption rule, implement it once in the claim-admission deep module, and run the same fixture matrix through next --claim and tasks claim."
+  "evidenceOrRepro": "On ATM-GOV-0364 at HEAD 88230861e with one unowned modified source file, next --claim --files returned ATM_CLAIM_FOREIGN_UNSTAGED_WIP, while tasks claim with the same file acquired the claim without an intervening worktree change. The shared admission helper now runs before tasks claim completion, so both public entry points fail closed for the same foreign or unowned dirty scope.",
+  "followUp": "Focused regression coverage passes for the canonical dirty-WIP admission and the tasks claim wiring; any future change to allow adoption must remain an explicit, separately authorized recovery policy. Source repair is fixed; frozen publication and formal closeout remain separate governance states."
 }
