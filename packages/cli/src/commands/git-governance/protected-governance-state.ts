@@ -63,10 +63,20 @@ export function inspectProtectedGovernanceStateDestructiveChanges(input: {
    * reason to reject a path-bounded delivery.
    */
   readonly commitFiles?: readonly string[];
+  /**
+   * Generated residue already classified by the commit resolver as safe for
+   * this lifecycle transaction.  The resolver, not this policy, owns that
+   * classification; this list only carries the resulting bounded authority
+   * across the cleanup/check seam.
+   */
+  readonly authorizedGeneratedResidueDeletions?: readonly string[];
 }): ProtectedGovernanceStateReport {
   const commitFileSet = input.commitFiles
     ? new Set(input.commitFiles.map(normalizeRelativePath))
     : null;
+  const authorizedGeneratedResidueDeletions = new Set(
+    (input.authorizedGeneratedResidueDeletions ?? []).map(normalizeRelativePath),
+  );
   const deleted = new Set([
     ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D'], input.env),
     ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D'], input.env)
@@ -76,7 +86,10 @@ export function inspectProtectedGovernanceStateDestructiveChanges(input: {
     if (commitFileSet && !commitFileSet.has(normalizeRelativePath(filePath))) continue;
     const classification = classifyProtectedGovernanceStatePath(filePath);
     if (!classification) continue;
-    if (isEntitledGeneratedResidueDeletion(input.cwd, input.taskId, filePath)) continue;
+    if (
+      authorizedGeneratedResidueDeletions.has(normalizeRelativePath(filePath)) ||
+      isEntitledGeneratedResidueDeletion(input.cwd, input.taskId, filePath)
+    ) continue;
     violations.push({
       path: filePath,
       pathClass: classification.pathClass,
