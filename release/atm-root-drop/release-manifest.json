@@ -5362,6 +5362,7 @@
     "release/atm-root-drop/tests/cli/npm-clean-install.test.ts",
     "release/atm-root-drop/tests/cli/observed-evidence-production-callers.test.ts",
     "release/atm-root-drop/tests/cli/onefile-runtime-closure.test.ts",
+    "release/atm-root-drop/tests/cli/orient-compact-output.test.ts",
     "release/atm-root-drop/tests/cli/orphan-in-progress-adoption.test.ts",
     "release/atm-root-drop/tests/cli/out-of-scope-write-recorder.test.ts",
     "release/atm-root-drop/tests/cli/oversized-extraction-claim-pathway.test.ts",
@@ -6031,8 +6032,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 5,
-    "unchanged": 1959,
+    "copied": 8,
+    "unchanged": 2738,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -22194,7 +22195,7 @@
       },
       {
         "path": "packages/cli/dist/commands/command-specs/orient.spec.js",
-        "digest": "91397b651d72c5da2744b4398f672146c4bbd3d6f77fc1629b370bec86127a6a",
+        "digest": "52dff9dd565e4f8226487c326621c831a110e4b96c954d7da7fa133240ebd86a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/command-specs/orient.spec.js"
@@ -24642,7 +24643,7 @@
       },
       {
         "path": "packages/cli/dist/commands/orient.js",
-        "digest": "03460def16234fc327ab974b5d2b893501c030e8b0864c6802b0c3ca8e490bb6",
+        "digest": "294c7ee71b29f76aecec96f50707227202efbb44fcfdd46f4751607d6e1fa4a0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/orient.js"
@@ -24939,7 +24940,7 @@
       },
       {
         "path": "packages/cli/dist/commands/shared/option-and-file-tools.js",
-        "digest": "ffc10c4f5d3139ed9838a69d725823c19f2f02981b1d0527efd677b3041338d7",
+        "digest": "3aff8083a40e2155233ef8caa4302f3e8a2f691bc88372e3d88247838e5f00a6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/shared/option-and-file-tools.js"
@@ -28260,7 +28261,7 @@
       },
       {
         "path": "packages/cli/src/commands/command-specs/orient.spec.ts",
-        "digest": "2985de799884ab8db461b5d00f29d0a6ddf5f0ea1a5b6f75c2a8e52accb7edba",
+        "digest": "4417beead8453b3884aa853651020bf27bc5257c29be0550dd72b10491ddd15f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/command-specs/orient.spec.ts"
@@ -31320,7 +31321,7 @@
       },
       {
         "path": "packages/cli/src/commands/orient.ts",
-        "digest": "46cb07a18af2b28a305f325beb7ef95a9260fa10eae0c6f7097b50665a018904",
+        "digest": "52e56df2480e0ea0cfd5615a22f4a1bf5982a8750b97f2e416c8e70855116e1b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/orient.ts"
@@ -31617,7 +31618,7 @@
       },
       {
         "path": "packages/cli/src/commands/shared/option-and-file-tools.ts",
-        "digest": "2182b937810aff45270e82f655da31b1c297af00fef851e32898f3482ade5dd9",
+        "digest": "c7880928c61e93b909981f967c40ab1b920f69bd86d2b9871dfe880d9d2db984",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/shared/option-and-file-tools.ts"
@@ -39744,7 +39745,7 @@
       },
       {
         "path": "packages/core/src/guidance/guidance-packet.ts",
-        "digest": "eaaedef3fa45f0bfb5052e22fd8cdbc72c5d2f5bf9eab5b5bf0972d2592a8be6",
+        "digest": "6fd0926ea50f90cfceb2c7491dc77dd232ad4e53d075808541995c658d7cf247",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/guidance/guidance-packet.ts"
@@ -54008,6 +54009,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/orient-compact-output.test.ts",
+        "digest": "b64cfa736a851eb0d2388f77a1664145976ea16475d167178f4cb32c5063c379",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/orient-compact-output.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/orphan-in-progress-adoption.test.ts",
         "digest": "e04a597776e05d449f4a5d528ee19fb160cb89993b38eb4c1451c3a7b6f755b9",
         "origin": "source",
@@ -60002,7 +60012,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:c220363cff4a0ce3644c459a9ceea3907d72768468939a05b531f14e9efd8acc"
+    "treeDigest": "sha256:4631ff5ccfdb116d87b2f338e929c4186cb51cd8b0f1e439456be7f6a45e7b05"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61539,7 +61549,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:dc83daa917b4e3db16d8dd9dd9c8db52049d1343dbae31df208a47d4e61481cf"
+    "digest": "sha256:c13f2da1cd6f5b10912acb0edbf6a8015508447971e3588ce77931426c4df969"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66875,6 +66885,7 @@
       "release/atm-root-drop/tests/cli/npm-clean-install.test.ts",
       "release/atm-root-drop/tests/cli/observed-evidence-production-callers.test.ts",
       "release/atm-root-drop/tests/cli/onefile-runtime-closure.test.ts",
+      "release/atm-root-drop/tests/cli/orient-compact-output.test.ts",
       "release/atm-root-drop/tests/cli/orphan-in-progress-adoption.test.ts",
       "release/atm-root-drop/tests/cli/out-of-scope-write-recorder.test.ts",
       "release/atm-root-drop/tests/cli/oversized-extraction-claim-pathway.test.ts",
@@ -67547,22 +67558,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:d6d811949d6a94874d63ca3d63a18442891ef585de9e19a9a2136254697775ff",
-  "sealedSourceCommit": "eac5c402da07ea551e74f27c657f815455a87734",
+  "buildInputsTreeHash": "sha256:7c295aa1e243e1e075ac6f30c3ba2059fe25657597d62e50422fa17f16a89513",
+  "sealedSourceCommit": "f9f8468b3698a1013783dc67079b6bea80b472a2",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:8b4b6cb8f08fa27b550ab24dfd7e4048d1d52ed54fe0fb0d6de4b1c31d44f16b",
-  "tsBuildCacheDigest": "sha256:792b92c5c520205f72797e48450d45d6c17412e1eee62e7c15b10b20f2247893",
+  "buildDecisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlanDigest": "sha256:1f0de8619d83f6a83a999fb77e6a019b4197c5ab12c287bc4d4a664307cb7fdb",
+  "tsBuildCacheDigest": "sha256:1e25da9b4ecba2b1b2f2fde9b6bab2b7c43384f0c64007ec18f9c1ff54e0d1dd",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 76,
-    "skipDecision": 61,
-    "worktreeSetup": 11019,
-    "typescriptBuild": 17049,
-    "rootDropReleaseAssembly": 31576,
-    "onefileReleaseAssembly": 8072,
-    "artifactSync": 8064,
+    "inputHashCalculation": 51,
+    "skipDecision": 56,
+    "worktreeSetup": 11096,
+    "typescriptBuild": 23341,
+    "rootDropReleaseAssembly": 33792,
+    "onefileReleaseAssembly": 8504,
+    "artifactSync": 8510,
     "cleanup": 0,
-    "totalElapsed": 91543
+    "totalElapsed": 101087
   }
 }

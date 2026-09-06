@@ -11,13 +11,24 @@ export function runOrient(argv: string[] = []) {
   const parsed = parseArgsForCommand(spec, argv);
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
   const orientation = probeProject(cwd);
+  const full = parsed.options.full === true;
+  const compactLimit = 8;
+  const projectedOrientation = full || orientation.testEntrypoints.length <= compactLimit
+    ? orientation
+    : {
+        ...orientation,
+        testEntrypoints: orientation.testEntrypoints.slice(0, compactLimit),
+        testEntrypointsTruncated: true,
+        testEntrypointsTotalCount: orientation.testEntrypoints.length,
+        testEntrypointsInventoryMode: 'compact' as const
+      };
   return makeResult({
     ok: true,
     command: 'orient',
     cwd,
     messages: [message('info', 'ATM_GUIDANCE_ORIENTATION_READY', 'Project orientation report is ready.', { repositoryRoot: orientation.repositoryRoot })],
     evidence: {
-      orientation
+      orientation: projectedOrientation
     }
   });
 }

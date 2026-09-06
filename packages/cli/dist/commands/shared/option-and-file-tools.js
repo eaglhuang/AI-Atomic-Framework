@@ -15,7 +15,8 @@ const ALLOWED_FLAGS_MAP = {
     welcome: ['--dry-run'],
     status: [],
     validate: ['--spec'],
-    integration: ['--integration']
+    integration: ['--integration'],
+    orient: ['--full']
 };
 function getAllowedFlags(commandName) {
     const custom = ALLOWED_FLAGS_MAP[commandName] || [];
@@ -57,6 +58,7 @@ export function parseOptions(argv, commandName) {
         batch: undefined,
         scope: undefined,
         compact: false,
+        full: false,
         hold: false,
         atom: undefined,
         map: undefined,
@@ -234,6 +236,13 @@ export function parseOptions(argv, commandName) {
                 throw createUsageError(commandName, `${commandName} does not support option --compact`, { invalidFlags: ['--compact'] });
             }
             options.compact = true;
+            continue;
+        }
+        if (arg === '--full') {
+            if (commandName !== 'orient') {
+                throw createUsageError(commandName, `${commandName} does not support option --full`, { invalidFlags: ['--full'] });
+            }
+            options.full = true;
             continue;
         }
         if (arg === '--hold') {
