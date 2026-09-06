@@ -43,6 +43,15 @@ try {
   writeTask('TASK-A');
   writeTask('TASK-B');
   writeTask('TASK-C');
+  const incompleteUsage = runAtm([
+    'broker',
+    'runner-sync',
+    'release'
+  ], 2);
+  assert.match(incompleteUsage.messages[0].text, /--task <task-id>/);
+  assert.match(incompleteUsage.messages[0].text, /--steward-work-id <id>/);
+  assert.match(incompleteUsage.messages[0].text, /--receipt-ref <path> or --receipt-digest <sha256>/);
+  assert.match(String(incompleteUsage.messages[0].data.requiredCommand ?? ''), /broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json/);
   const first = runAtm([
     'broker',
     'runner-sync',

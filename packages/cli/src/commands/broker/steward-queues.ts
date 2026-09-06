@@ -145,12 +145,10 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
     }
 
     if (options.runnerSyncAction === 'release') {
-      if (!options.task) {
-        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync release requires --task <task-id>.', { exitCode: 2 });
-      }
-      if (!options.stewardWorkId) {
-        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync release requires --steward-work-id <id>.', { exitCode: 2 });
-      }
+      const missing = [!options.task ? '--task <task-id>' : null, !options.stewardWorkId ? '--steward-work-id <id>' : null, !options.receiptRef && !options.receiptDigest ? '--receipt-ref <path> or --receipt-digest <sha256>' : null].filter((entry): entry is string => Boolean(entry));
+      if (missing.length > 1) throw new CliError('ATM_CLI_USAGE', `broker runner-sync release is missing ${missing.join(', ')}.`, { exitCode: 2, details: { missing, requiredCommand: 'node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json' } });
+      if (!options.task) throw new CliError('ATM_CLI_USAGE', 'broker runner-sync release requires --task <task-id>.', { exitCode: 2 });
+      if (!options.stewardWorkId) throw new CliError('ATM_CLI_USAGE', 'broker runner-sync release requires --steward-work-id <id>.', { exitCode: 2 });
       try {
         const queue = readRunnerSyncStewardQueue(runnerSyncQueuePath);
         const receipt = validateRunnerSyncReleaseReceipt({
