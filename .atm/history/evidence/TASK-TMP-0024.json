@@ -1,0 +1,103 @@
+{
+  "taskId": "TASK-TMP-0024",
+  "updatedAt": "2026-09-06T13:20:32.972Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260906131831-codex-captain-TASK-TMP-0024-ca79aa4aeb",
+      "createdAt": "2026-09-06T13:20:32.972Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260906131831-codex-captain-TASK-TMP-0024-ca79aa4aeb",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.cli-taskflow-close-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:820a88b8f353cdba8f43005e7381a19b57401bdcbcaa4457cc221e51bb5673e5",
+            "stderrSha256": "sha256:57a58cd65f5982a5df50982fa8657589cee871d79a96a577571987c9f4164eb6",
+            "startedAt": "2026-09-06T13:20:32.310Z",
+            "finishedAt": "2026-09-06T13:20:32.971Z",
+            "durationMs": 661,
+            "cached": false,
+            "validators": [
+              "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "23e7b3239859c402bb4c48dfdfcfea35e6b5aefa",
+            "cacheKey": "sha256:0f6ab41b7f933f75c73a8196b94c1d522c86b6a4475da744eae628f06d296e5d",
+            "generatedAt": "2026-09-06T13:20:32.971Z",
+            "canonicalObservation": {
+              "schemaId": "atm.telemetryObservation.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "Canonical telemetry observation contract."
+              },
+              "observationId": "sha256:0f6ab41b7f933f75c73a8196b94c1d522c86b6a4475da744eae628f06d296e5d",
+              "producerId": "evidence.command-runs",
+              "producerVersion": "0.1.0",
+              "observationKind": "command-run",
+              "status": "canonical",
+              "source": "evidence-command-run-normalizer",
+              "sourceAvailability": "available",
+              "storagePolicy": "tracked-compact-digest",
+              "generatedAt": "2026-09-06T13:20:32.971Z",
+              "observedAt": "2026-09-06T13:20:32.971Z",
+              "startedAt": "2026-09-06T13:20:32.310Z",
+              "finishedAt": "2026-09-06T13:20:32.971Z",
+              "durationMs": 661,
+              "laneSessionId": null,
+              "taskId": "TASK-TMP-0024",
+              "batchId": null,
+              "waveId": null,
+              "inputDigest": "sha256:aa05d124cd6d1922b91d0250ff7251ecefc78f78a605d2fc6a14cc77c92aa276",
+              "outputDigest": "sha256:4e257c5d694bc02e22c2818dbf8eb4b1f945b3af550266829c478c82bb3c324e",
+              "cache": {
+                "key": "sha256:0f6ab41b7f933f75c73a8196b94c1d522c86b6a4475da744eae628f06d296e5d",
+                "hit": false
+              },
+              "extensions": {
+                "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+                "cwd": ".",
+                "exitCode": 0,
+                "validators": [
+                  "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts"
+                ],
+                "runnerKind": "dev-source",
+                "sourceCommit": "23e7b3239859c402bb4c48dfdfcfea35e6b5aefa",
+                "runnerVersion": null
+              }
+            }
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:17d3433f5a3f66dfc2a7be7a97f704b3addc1aea99c530088583c8e63a4f418a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
