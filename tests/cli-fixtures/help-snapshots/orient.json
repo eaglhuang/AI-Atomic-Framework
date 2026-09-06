@@ -9,6 +9,10 @@
       "summary": "Run the command against a specific repository root."
     },
     {
+      "flag": "--full",
+      "summary": "Include the complete test/validation entrypoint inventory; the default orientation keeps a compact summary."
+    },
+    {
       "flag": "--json",
       "summary": "Force machine-readable JSON output with the standard result contract (ok, severity, exitCode, blocking, diagnostics)."
     },
@@ -23,6 +27,7 @@
     }
   ],
   "examples": [
-    "node atm.mjs orient --cwd . --json"
+    "node atm.mjs orient --cwd . --json",
+    "node atm.mjs orient --cwd . --full --json"
   ]
 }

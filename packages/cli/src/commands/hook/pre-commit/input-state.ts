@@ -1,7 +1,8 @@
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { gitHeadEvidencePath, gitHeadEvidencePaths } from '../../git-head-evidence.ts';
+import { appendGitHeadEvidenceJsonl } from '../../git-governance/implementation/git-head-evidence-transaction.ts';
 import { readFrameworkVersion } from '../../shared.ts';
 import { hookProvider, hookContractVersion } from '../git-hooks-installer.ts';
 import { normalizeRelativePath, runGit, runGitLines } from '../git-index-diagnostics.ts';
@@ -212,7 +213,7 @@ export function writeStagedGitHeadEvidence(cwd: string, stagedFiles: readonly st
       }
     ]
   };
-  appendFileSync(evidenceAbsolute, `${JSON.stringify(payload)}\n`, 'utf8');
+  appendGitHeadEvidenceJsonl(evidenceAbsolute, payload);
   const addResult = runGit(cwd, ['add', '--', gitHeadEvidencePath]);
   return {
     evidencePath: gitHeadEvidencePath,

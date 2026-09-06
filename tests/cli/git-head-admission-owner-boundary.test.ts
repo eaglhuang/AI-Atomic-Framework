@@ -3,10 +3,11 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { resolveTaskWorkAdmissionFiles } from '../../packages/cli/src/commands/tasks/claim-work-admission.ts';
+import { gitHeadEvidencePath } from '../../packages/cli/src/commands/git-head-evidence.ts';
 
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-git-head-owner-'));
-const receiptPath = path.join(root, '.atm/history/evidence/git-head.jsonl');
-const gitHead = '.atm/history/evidence/git-head.jsonl';
+const receiptPath = path.join(root, gitHeadEvidencePath);
+const gitHead = gitHeadEvidencePath;
 const task = (id: string) => ({ workItemId: id, scopePaths: ['packages/example.ts'] });
 
 try {
