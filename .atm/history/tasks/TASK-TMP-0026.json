@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0026",
   "title": "Reconcile final records of terminal cleanup task",
-  "status": "running",
+  "status": "abandoned",
   "milestone": "temporary-governance",
   "dependencies": [],
   "acceptance": [
@@ -23,14 +23,9 @@
     ".atm/history/evidence/TASK-TMP-0025.live-index-reconciliation.json",
     ".atm/history/task-events/TASK-TMP-0025/2026-09-06T21-18-00-443Z-release-217926e8dc7d.json",
     ".atm/history/task-events/TASK-TMP-0025/2026-09-06T21-19-33-150Z-abandon-71f794288874.json",
-    ".atm/history/tasks/TASK-TMP-0025.json",
-    ".atm/history/evidence/TASK-TMP-0026.*",
-    ".atm/history/task-events/TASK-TMP-0026/**",
-    ".atm/history/tasks/TASK-TMP-0026.json"
+    ".atm/history/tasks/TASK-TMP-0025.json"
   ],
-  "validators": [
-    "tests/cli/terminal-governance-history-retention.test.ts"
-  ],
+  "validators": [],
   "planningRepo": "3KLife",
   "targetRepo": "AI-Atomic-Framework",
   "closureAuthority": "target_repo",
@@ -55,37 +50,28 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "importDiagnostics": [
-    {
-      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
-      "severity": "warning",
-      "field": "validators",
-      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
-    }
-  ],
+  "importDiagnostics": [],
   "tags": [],
   "notes": "Reconcile and retain only the final lifecycle/evidence records already generated for TASK-TMP-0025. This successor exists solely to authorize their governed reconciliation commit in AI-Atomic-Framework; it must not change source, releases, or foreign records.",
   "source": {
     "planPath": "temporary-governance/tasks/TASK-TMP-0026-reconcile-terminal-cleanup-records.task.md",
     "sectionTitle": "TASK-TMP-0026",
-    "headingLine": 47,
-    "hash": "b3bbee5637e2a774",
+    "headingLine": 46,
+    "hash": "0eb94c47e5707e15",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "temporary-governance/tasks/TASK-TMP-0026-reconcile-terminal-cleanup-records.task.md",
       "planningCommitSha": null,
-      "contentDigest": "sha256:b3bbee5637e2a774caf5489f7e79e52f0bf66039c37719307a5487ba471a5dbe",
-      "amendmentEpoch": 0,
-      "sealedAt": "2026-09-06T21:22:12.750Z"
+      "contentDigest": "sha256:0eb94c47e5707e15fb6b305644892b886ad16a7e14167b9c9e7492fd04c6f17e",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-06T21:37:40.015Z"
     }
   },
-  "importedAt": "2026-09-06T21:22:12.750Z",
+  "importedAt": "2026-09-06T21:37:40.015Z",
   "workAdmission": {
-    "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "recoveryMode": "auto"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -101,18 +87,6 @@
   "requiredTestCaseIds": [],
   "phaseTestCaseIds": [],
   "advisoryTestCaseIds": [],
-  "legacyValidatorProjection": [
-    {
-      "schemaId": "atm.validatorExecutionContract.v1",
-      "specVersion": "0.1.0",
-      "responsibility": "advisory",
-      "caseId": "legacy_cmd_tests.cli.terminal.governance.history.retention.test.ts",
-      "command": "tests/cli/terminal-governance-history-retention.test.ts",
-      "legacyProjection": true,
-      "acceptanceIds": [],
-      "impactEdges": []
-    }
-  ],
   "dependencyClassification": {
     "schemaId": "atm.taskDependencyClassification.v1",
     "semantics": "legacy",
@@ -128,17 +102,11 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-06T21-32-27-958Z-scope-amendment-e158936e3d81",
-  "lastTransitionAt": "2026-09-06T21:32:27.958Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-captain",
-  "reservedAt": "2026-09-06T21:25:58.356Z",
-  "promotedAt": "2026-09-06T21:25:58.359Z",
   "claim": {
     "actorId": "codex-captain",
     "leaseId": "lease-70e10bbc0454",
     "claimedAt": "2026-09-06T21:25:58.363Z",
-    "heartbeatAt": "2026-09-06T21:25:58.363Z",
+    "heartbeatAt": "2026-09-06T21:39:43.612Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/git-head.json",
@@ -151,83 +119,17 @@
       ".atm/history/tasks/TASK-TMP-0025.json",
       ".atm/history/tasks/TASK-TMP-0026.json"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260906212558-codex-captain-906d416e66",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906212558-codex-captain-906d416e66\""
-    }
-  },
-  "startedAt": "2026-09-06T21:22:23.083Z",
-  "startedByActor": "codex-captain",
-  "workAdmissionTicket": {
-    "schemaId": "atm.workAdmissionTicket.v1",
-    "specVersion": "0.1.0",
-    "ticketId": "wat-0c92c2e14f60d3f4",
-    "ticketDigest": "sha256:0c92c2e14f60d3f41a227f52b626b20b427588e95732b47572caf7137167796f",
-    "taskId": "TASK-TMP-0026",
-    "origin": "claim",
-    "actorId": "codex-captain",
-    "laneSessionId": "lane-20260906212558-codex-captain-906d416e66",
-    "claimGeneration": "lease-70e10bbc0454",
-    "issuedAt": "2026-09-06T21:32:27.908Z",
-    "expiresAt": "2026-09-06T22:02:27.908Z",
-    "scopeDigest": "sha256:9c4a7c94e26a4aefe42902091026608059d0275ca2aad11f7ec1bad46233577a",
-    "runnerSelection": {
-      "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-06T21:32:27.908Z"
     },
-    "grants": [
-      {
-        "kind": "file-write",
-        "values": [
-          ".atm/history/evidence/TASK-TMP-0025.abandon-residue-disposition.json",
-          ".atm/history/evidence/TASK-TMP-0025.live-index-reconciliation.json",
-          ".atm/history/evidence/TASK-TMP-0026.*",
-          ".atm/history/evidence/git-head.json",
-          ".atm/history/task-events/TASK-TMP-0025/2026-09-06T21-18-00-443Z-release-217926e8dc7d.json",
-          ".atm/history/task-events/TASK-TMP-0025/2026-09-06T21-19-33-150Z-abandon-71f794288874.json",
-          ".atm/history/task-events/TASK-TMP-0026/**",
-          ".atm/history/tasks/TASK-TMP-0025.json",
-          ".atm/history/tasks/TASK-TMP-0026.json"
-        ],
-        "digest": "sha256:9d75b0e7629fcf9045e7539b20eca6a3bc111fa6cfabaad8de3f6cc82c8b5635"
-      },
-      {
-        "kind": "lifecycle-operation",
-        "values": [
-          "close",
-          "commit",
-          "push",
-          "stage",
-          "write"
-        ],
-        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
-      },
-      {
-        "kind": "process-manifest",
-        "values": [],
-        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
-      }
-    ],
-    "deferredForeignResidue": [],
-    "recovery": {
-      "requestedMode": "auto",
-      "resolvedMode": "disabled",
-      "reasons": [
-        "low-risk-task"
-      ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
-      "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
-    }
+    "reason": "No non-ATM deliverable exists; terminal evidence was already retained in governed commits."
   },
+  "owner": "codex-captain",
+  "startedAt": "2026-09-06T21:22:23.083Z",
   "startedBySessionId": "session-20260906212558-codex-captain-TASK-TMP-0026-b2f4670d94",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
@@ -269,5 +171,13 @@
     },
     "createdAt": "2026-09-06T21:25:59.772Z",
     "status": "active"
-  }
+  },
+  "lastTransitionId": "2026-09-06T21-39-43-673Z-abandon-0964b8ee0814",
+  "lastTransitionAt": "2026-09-06T21:39:43.673Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-09-06T21:39:43.612Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260906212558-codex-captain-TASK-TMP-0026-b2f4670d94",
+  "closeReason": "No non-ATM deliverable exists; terminal evidence was already retained in governed commits.",
+  "abandonResidueDisposition": ".atm/history/evidence/TASK-TMP-0026.abandon-residue-disposition.json"
 }
