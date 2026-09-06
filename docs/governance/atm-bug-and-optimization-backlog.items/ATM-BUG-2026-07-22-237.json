@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — fixed in ATM-GOV-0263; formal backlog closeout reconciled 2026-09-07",
   "area": "Dispatch / autonomous task-card execution",
   "finding": "Captain dispatch had to repeatedly add detailed stop/report instructions because task cards and ATM recovery surfaces did not reliably contain all closeout, runner-sync, WIP recovery, and evidence expectations. This causes token-heavy back-and-forth and babysitting rather than autonomous task-card execution.",
   "expectedBehavior": "Durable task cards and ATM playbooks should carry the full executable acceptance/recovery contract; dispatch packets should stay concise and task-card-referenced while still self-contained for current state.",
   "evidenceOrRepro": "Plan 3.1 dogfood required repeated manual captain instructions for 0255 closeout, 0258 emergency WIP preservation, 0257 emergency WIP preservation, and 0260 claim/dependency recovery. The user explicitly corrected dispatch format and token balance rules.",
-  "followUp": "Continue enforcing the updated atm-dispatch token-economy/copy-paste packet rule and audit Plan3.1/Plan3.2 cards for missing recovery/report fields."
+  "followUp": "ATM-GOV-0263 delivered executable recovery and autonomous-continuation parity. Continue auditing future plan cards for missing recovery/report fields as ordinary maintenance."
 }
