@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Documentation / AI routing",
   "severity": "Medium",
-  "status": "Partially fixed — first-layer safe-shell/CLI guidance is covered; git-head raw-versus-digest policy remains open",
+  "status": "Closed — fixed in ATM-GOV-0416; runtime-only raw journal and tracked digest receipt verified",
   "area": "Governance instrumentation / agent skill routing",
   "finding": "ATM dogfood still exposes raw telemetry and shell-usage habits at the wrong layer: pre-push diagnostics expect .atm/history/evidence/git-head.jsonl even when the operator intentionally keeps raw JSONL out of Git, and first-layer skills do not reliably prevent Windows PowerShell text-IO/range examples that repeatedly trip agents.",
   "expectedBehavior": "Raw statistics, counters, logs, and detailed telemetry should remain on disk under gitignored runtime/log surfaces; Git should contain only compact digest or decision evidence. First-layer ATM skills should disclose the correct CLI surfaces and safe shell conventions early enough that agents do not need to rediscover them through trial-and-error.",
-  "evidenceOrRepro": "The safe-shell and first-layer CLI portion is now verified on 2026-09-06 by `first-layer-command-contracts.test.ts`, `first-layer-ux-routing.test.ts`, and `validate-guide.ts`; the contracts explicitly forbid PowerShell text/range parsing and expose the correct ATM surfaces. The git-head portion remains unresolved: current pre-push still retains a diagnostic path for missing `.atm/history/evidence/git-head.jsonl`, while the desired raw-journal versus compact-digest policy has not been implemented.",
-  "followUp": "Create a bounded follow-up task for runtime-only raw git-head journal plus tracked digest/receipt, then update pre-push acceptance and its regressions. Do not close this card until that policy is command-backed."
+  "evidenceOrRepro": "The safe-shell and first-layer CLI portion was verified by `first-layer-command-contracts.test.ts`, `first-layer-ux-routing.test.ts`, and `validate-guide.ts`. ATM-GOV-0416 then implemented the remaining policy: raw git-head JSONL is runtime-only, the tracked receipt contains compact digest/decision evidence, and the acceptance boundary remains strict. `git-head-runtime-only-receipt.test.ts`, `git-head-admission-owner-boundary.test.ts`, `npm run validate:git-head-evidence`, `npm run validate:cli:surface`, `npm run typecheck`, and the governed push all passed on 2026-09-06.",
+  "followUp": "Keep the runtime raw journal ignored and the tracked receipt compact and digest-verifiable. Future git-head changes must preserve the runtime-only storage policy and the focused owner-boundary regression."
 }
