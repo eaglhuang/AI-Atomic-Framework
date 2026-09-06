@@ -1875,6 +1875,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/evidence.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io/implementation.js",
+    "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io/manifest-reader.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/evidence-store.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/historical-batch-finalize.js",
@@ -2562,6 +2563,7 @@
     "release/atm-root-drop/packages/cli/src/commands/evidence/__tests__/verify.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+    "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/evidence-store.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/historical-batch-finalize.ts",
@@ -6049,8 +6051,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 4,
-    "unchanged": 1967,
+    "copied": 3,
+    "unchanged": 1970,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -22652,6 +22654,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/evidence/bundle-io/manifest-reader.js",
+        "digest": "7c6b4ddcf3ab78be099aa1f11a6a5d1d2747f70c2c0c3c07a8de08e5e16b9fb5",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/evidence/bundle-io/manifest-reader.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/evidence/command-runs.js",
         "digest": "f2069cb7ecf33d834e72b71f9f8f5156fa72bdb7c791e17afcc6f0c755c0fe8b",
         "origin": "source",
@@ -28827,10 +28838,19 @@
       },
       {
         "path": "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
-        "digest": "c7d9f4b67f6b0921c522bd83344c7db3a646c974a2e6f4664b8c61b3986eadbe",
+        "digest": "4cc7f65dd6b09ce705a3f4ec7feb3b2334fee590750bd0cf9cf5a45ed69de0ac",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/evidence/bundle-io/implementation.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+        "digest": "02eeb02bca6ae24b3c76a0a872c6a22da2f126a694a8a53da6355c427c1b4f09",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts"
         ],
         "replaceable": true
       },
@@ -60182,7 +60202,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:0876d361d5f391b480a57d612f873218b85b657834835fea23ffb9c3e20b1a8c"
+    "treeDigest": "sha256:14a8af74271e8cef26ab5632b5071f87d97607c1cb35b21b026d8b942bea7135"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60404,6 +60424,7 @@
       "packages/cli/src/commands/evidence/__tests__/verify.spec.ts",
       "packages/cli/src/commands/evidence/bundle-io.ts",
       "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
       "packages/cli/src/commands/evidence/command-runs.ts",
       "packages/cli/src/commands/evidence/evidence-store.ts",
       "packages/cli/src/commands/evidence/historical-batch-finalize.ts",
@@ -61724,7 +61745,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:c11ff0cab5bb5da61cf8be4fb206f12e1bff2aa50700777f24a69a0bca87f5b2"
+    "digest": "sha256:2c0c6969dbbfac002a5f43a7f9c537d2c757d8a967c2e0cae2461bcb5d4e7f9e"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63573,6 +63594,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/evidence.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io/manifest-reader.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/evidence-store.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/historical-batch-finalize.js",
@@ -64260,6 +64282,7 @@
       "release/atm-root-drop/packages/cli/src/commands/evidence/__tests__/verify.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/evidence-store.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/historical-batch-finalize.ts",
@@ -67750,22 +67773,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:971b17129dad4935420e21a039ed3feaa8b935650f46156b80802f8c56279ce4",
-  "sealedSourceCommit": "54fab0250dca5d12739ec8e5f43ad7f502c47cb7",
+  "buildInputsTreeHash": "sha256:ca46124ffb7b168cc276c4644fbe8b655e826210fb7c4b1608390a5b3414b8da",
+  "sealedSourceCommit": "e75075c5d998ae4fc82343ea99b04b7ab877e703",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:6a4340a2f8d11b4a6afa1705ba15ce502abb74fd0a24d0ffd96d93a464e4e61f",
-  "tsBuildCacheDigest": "sha256:b3dca033fc9618bb49d32933e6348d61d384a32f543541460b2a6f28e5b782e5",
+  "incrementalPlanDigest": "sha256:6e960d9b0809476d685bfc4fe9ecb2c7278467ec900fccbae5190afe9c577d39",
+  "tsBuildCacheDigest": "sha256:355b3c73f6efabca51468acb3511fd7c5644cefaccc62516e4d61b58c585ad48",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 44,
-    "skipDecision": 57,
-    "worktreeSetup": 10076,
-    "typescriptBuild": 13406,
-    "rootDropReleaseAssembly": 25130,
-    "onefileReleaseAssembly": 7862,
-    "artifactSync": 8421,
+    "inputHashCalculation": 45,
+    "skipDecision": 55,
+    "worktreeSetup": 9715,
+    "typescriptBuild": 17557,
+    "rootDropReleaseAssembly": 24952,
+    "onefileReleaseAssembly": 8055,
+    "artifactSync": 8325,
     "cleanup": 0,
-    "totalElapsed": 80822
+    "totalElapsed": 84147
   }
 }

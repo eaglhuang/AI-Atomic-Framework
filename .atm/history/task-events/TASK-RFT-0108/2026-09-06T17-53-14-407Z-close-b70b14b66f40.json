@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T17-53-14-407Z-close-b70b14b66f40",
+  "taskId": "TASK-RFT-0108",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906174457-codex-gpt-5.4-mini-TASK-RFT-0108-5a291d78a5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0108.json",
+  "taskSha256": "sha256:2d33f8cb80c790b6c9533ed51c0c8e4e0cb8e1583f5db3da17eac6f5310b612f",
+  "createdAt": "2026-09-06T17:53:14.407Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0108 --actor codex-gpt-5.4-mini --status done --historical-delivery e75075c5d998ae4fc82343ea99b04b7ab877e703",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906174457-codex-gpt-5.4-mini-TASK-RFT-0108-5a291d78a5",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0108.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T17:53:14.395Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0108.*",
+        ".atm/history/task-events/TASK-RFT-0108/**",
+        ".atm/history/tasks/TASK-RFT-0108.json",
+        "packages/cli/src/commands/evidence/bundle-io.ts",
+        "packages/cli/src/commands/evidence/bundle-io/**/*.ts",
+        "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+        "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+        "tests/cli/evidence-bundle-io-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence/bundle-io.ts",
+        "packages/cli/src/commands/evidence/bundle-io/**/*.ts",
+        "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+        "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+        "tests/cli/evidence-bundle-io-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+        "typecheck",
+        "validate:cli"
+      ]
+    }
+  }
+}

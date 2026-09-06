@@ -1,0 +1,133 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0108",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e75075c5d998ae4fc82343ea99b04b7ab877e703",
+  "governedTreeSha": "75ffd82f22ae5f29327167c5aea01a2f3b060844",
+  "targetCommitDelta": {
+    "currentCommitSha": "e75075c5d998ae4fc82343ea99b04b7ab877e703",
+    "parentCommitShas": [
+      "e75075c5d998ae4fc82343ea99b04b7ab877e703"
+    ],
+    "governedTreeSha": "75ffd82f22ae5f29327167c5aea01a2f3b060844",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/evidence-bundle-io-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:310144c294c08e7b4b3b0954a0d7b921da4ce3365112a6fd847f2aa8c8a2e741",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T17:53:14.395Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0108.*",
+      ".atm/history/task-events/TASK-RFT-0108/**",
+      ".atm/history/tasks/TASK-RFT-0108.json",
+      "packages/cli/src/commands/evidence/bundle-io.ts",
+      "packages/cli/src/commands/evidence/bundle-io/**/*.ts",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+      "tests/cli/evidence-bundle-io-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/evidence/bundle-io.ts",
+      "packages/cli/src/commands/evidence/bundle-io/**/*.ts",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+      "tests/cli/evidence-bundle-io-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0108.json",
+  "closedAt": "2026-09-06T17:53:14.395Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906174457-codex-gpt-5.4-mini-TASK-RFT-0108-5a291d78a5",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e75075c5d998ae4fc82343ea99b04b7ab877e703",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+      "tests/cli/evidence-bundle-io-extraction.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0108.json",
+      ".atm/history/task-events/TASK-RFT-0108/2026-09-06T17-44-48-332Z-import-7eae51cf37a0.json",
+      ".atm/history/task-events/TASK-RFT-0108/2026-09-06T17-44-57-570Z-reserve-e920cb0a382e.json",
+      ".atm/history/task-events/TASK-RFT-0108/2026-09-06T17-44-57-574Z-promote-a0b17d61bcf3.json",
+      ".atm/history/task-events/TASK-RFT-0108/2026-09-06T17-45-03-870Z-claim-379c3a4d6ea0.json",
+      ".atm/history/task-events/TASK-RFT-0108/2026-09-06T17-49-16-136Z-scope-amendment-36a8c21a6342.json",
+      ".atm/history/tasks/TASK-RFT-0108.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
