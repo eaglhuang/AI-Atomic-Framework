@@ -1,0 +1,288 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0105",
+  "title": "Extract bounded semantic modules from closure-packet schema implementation",
+  "status": "open",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Extract at least one complete semantic closure-packet schema family into readable modules, keeping every touched source and test module at or below 600 physical lines and no individual line above 1000 characters.",
+    "Preserve all existing facade exports and closure-packet behavior; add a deterministic red-to-green extraction-boundary receipt."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+    "tests/cli/closure-packet-schema-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+    "tests/cli/closure-packet-schema-extraction.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.closure-packet-schema",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.closure-packet-schema-validation",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.closure-packet-schema-evidence",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0105-closure-packet-semantic-modules.task.md",
+    "sectionTitle": "TASK-RFT-0105",
+    "headingLine": 82,
+    "hash": "df0fb86441d413c9",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "rft-hardening/tasks/TASK-RFT-0105-closure-packet-semantic-modules.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:df0fb86441d413c980ba5dbcc907de6b0819ea13323015db045dcafd0e219d6d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T16:17:22.762Z"
+    }
+  },
+  "importedAt": "2026-09-06T16:17:22.762Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-RFT-0034 is closed in the target ledger",
+      "closure-packet schema implementation is measured for physical lines and maximum line width before editing"
+    ],
+    "softRelations": [
+      "ATM-BUG-2026-07-15-197"
+    ],
+    "changedPublicSeams": [
+      "closure-packet schema facade exports remain behavior-compatible"
+    ],
+    "causalImpactEdges": [
+      "closure-packet-semantic-modules"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "closure-packet-schema-extraction"
+    ],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "closure_packet_schema_semantic_module_boundaries_0105",
+      "targetGroupId": "null",
+      "semanticKey": "closure_packet_schema_semantic_module_boundaries",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "closure-packet-semantic-modules"
+      ],
+      "expectedRedPredicate": "closure-packet schema implementation contains an oversized physical line and lacks bounded semantic module boundaries",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "closure-packet-schema-extraction",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "closure_packet_schema_semantic_module_boundaries_0105"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T16-20-10-286Z-release-83ea15856bb7",
+  "lastTransitionAt": "2026-09-06T16:20:10.286Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-06T16:18:10.115Z",
+  "promotedAt": "2026-09-06T16:18:10.119Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-67bc2919a54b",
+    "claimedAt": "2026-09-06T16:18:10.123Z",
+    "heartbeatAt": "2026-09-06T16:20:04.603Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0105.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "tests/cli/closure-packet-schema-extraction.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260906161810-codex-gpt-5.4-mini-d38ba6663f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906161810-codex-gpt-5.4-mini-d38ba6663f\""
+    },
+    "reason": "Focused contract is already green and partial semantic modules already exist; release claim without source mutation rather than manufacture a non-causal patch."
+  },
+  "startedAt": "2026-09-06T16:18:10.123Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-540cdd86f0823192",
+    "ticketDigest": "sha256:540cdd86f082319263c764885c65d245f2afc79bda8fca1d20a45d5134a60311",
+    "taskId": "TASK-RFT-0105",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260906161810-codex-gpt-5.4-mini-d38ba6663f",
+    "claimGeneration": "lease-67bc2919a54b",
+    "issuedAt": "2026-09-06T16:18:10.123Z",
+    "expiresAt": "2026-09-06T16:48:10.123Z",
+    "scopeDigest": "sha256:839a0519eebdfef268523d6bd09982beba8e1dee1a7fc8195cec7da767b7af4c",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T16:18:10.123Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-RFT-0105.*",
+          ".atm/history/task-events/TASK-RFT-0105/**",
+          ".atm/history/tasks/TASK-RFT-0105.json",
+          "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+          "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+          "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+          "tests/cli/closure-packet-schema-extraction.test.ts"
+        ],
+        "digest": "sha256:866d6b284b5d3f20c72dd71353ae2fa43502fe7f26f41da6491c362523375b40"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906161810-codex-gpt-5.4-mini-TASK-RFT-0105-74c2b190b0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0105",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0105.*",
+      ".atm/history/task-events/TASK-RFT-0105/**",
+      ".atm/history/tasks/TASK-RFT-0105.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "tests/cli/closure-packet-schema-extraction.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "69ffb29e570ef769b39f5669fb26eb0b3d5205d2cc4971b4ad44b1ef813f71bc",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260906161810-codex-gpt-5.4-mini-TASK-RFT-0105-74c2b190b0",
+    "laneSession": {
+      "laneSessionId": "lane-20260906161810-codex-gpt-5.4-mini-d38ba6663f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906161810-codex-gpt-5.4-mini-d38ba6663f\""
+    },
+    "createdAt": "2026-09-06T16:18:16.332Z",
+    "status": "active"
+  }
+}
