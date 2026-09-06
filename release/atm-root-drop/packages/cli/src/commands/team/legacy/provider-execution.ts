@@ -9,6 +9,7 @@ import { createDefaultTeamPermissionPolicy } from '../../../../../core/src/team-
 import { materializeTeamRoleHandoff, verifyTeamHandoffLedger } from '../../../../../core/src/team-runtime/handoff-ledger.ts';
 import { createTeamObservabilityEvent } from '../../../../../core/src/team-runtime/observability.ts';
 import { runProviderOrchestration } from '../../../../../core/src/team-runtime/execution-orchestrator.ts';
+import { runTeamPaidProviderPreflight, type TeamPaidProviderPreflightInput, type TeamPaidProviderPreflightReport } from '../provider-preflight.ts';
 import type {
   TeamRecipe,
   TeamRuntimeContract,
@@ -61,6 +62,8 @@ export async function runTeamProviderExecution(input: {
   }[];
   scopedPaths: readonly string[];
   executor?: TeamProviderHttpExecutor;
+  /** Optional, explicitly-authorized paid probe. Omitted means no paid request. */
+  paidProviderPreflight?: TeamPaidProviderPreflightInput;
 }) {
   if (input.runtimeContract.runtimeMode === 'broker-only') {
     return {
@@ -80,6 +83,20 @@ export async function runTeamProviderExecution(input: {
         runtimeMode: input.runtimeContract.runtimeMode
       }
     }));
+  let paidProviderPreflight: TeamPaidProviderPreflightReport | null = null;
+  if (input.paidProviderPreflight) {
+    paidProviderPreflight = await runTeamPaidProviderPreflight(input.paidProviderPreflight);
+    if (!paidProviderPreflight.ok && paidProviderPreflight.stoppedRoster && paidProviderPreflight.requiresExplicitContinuation) {
+      return {
+        requested: true,
+        blockedReason: paidProviderPreflight.requiresExplicitContinuation
+          ? 'paid-provider-preflight-requires-explicit-continuation'
+          : 'paid-provider-preflight-blocked',
+        paidProviderPreflight,
+        results: [] as DirectTeamProviderRoleResult[]
+      };
+    }
+  }
   const localSecrets = loadTeamVendorLocalSecrets(input.cwd);
   const results: DirectTeamProviderRoleResult[] = [];
   const priorRoleArtifacts: DirectTeamRoleHandoffArtifact[] = [];
@@ -146,6 +163,7 @@ export async function runTeamProviderExecution(input: {
   return {
     requested: true,
     blockedReason: null,
+    paidProviderPreflight,
     localSecrets: localSecrets.summary,
     results
   };

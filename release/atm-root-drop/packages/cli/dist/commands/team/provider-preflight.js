@@ -38,6 +38,48 @@ export function buildTeamProviderPreflight(input) {
         cheapestEligibleModelId: cheapestEligible?.modelId ?? null
     };
 }
+/**
+ * Run at most one explicitly-authorized, provider-neutral paid probe per provider.
+ * This function never creates authorization and never retries a provider.
+ */
+export async function runTeamPaidProviderPreflight(input) {
+    const requestCountByProvider = {};
+    const failures = [];
+    if (!input.enabled) {
+        return { schemaId: 'atm.teamPaidProviderPreflight.v1', ok: true, stoppedRoster: false, requiresExplicitContinuation: false, requestCountByProvider, totalRequestCount: 0, failures };
+    }
+    if (!input.authorized) {
+        return { schemaId: 'atm.teamPaidProviderPreflight.v1', ok: false, stoppedRoster: true, requiresExplicitContinuation: true, requestCountByProvider, totalRequestCount: 0, failures };
+    }
+    const providers = [...new Set(input.providerIds.filter((providerId) => providerId.length > 0))];
+    for (const providerId of providers) {
+        requestCountByProvider[providerId] = 1;
+        const result = await input.probe(providerId);
+        if (!result.ok) {
+            failures.push({ providerId, failureClass: result.failureClass });
+            if (result.failureClass === 'quota' || result.failureClass === 'billing') {
+                return {
+                    schemaId: 'atm.teamPaidProviderPreflight.v1',
+                    ok: false,
+                    stoppedRoster: true,
+                    requiresExplicitContinuation: !input.continuationAuthorized,
+                    requestCountByProvider,
+                    totalRequestCount: Object.values(requestCountByProvider).reduce((sum, count) => sum + count, 0),
+                    failures
+                };
+            }
+        }
+    }
+    return {
+        schemaId: 'atm.teamPaidProviderPreflight.v1',
+        ok: failures.length === 0,
+        stoppedRoster: false,
+        requiresExplicitContinuation: false,
+        requestCountByProvider,
+        totalRequestCount: Object.values(requestCountByProvider).reduce((sum, count) => sum + count, 0),
+        failures
+    };
+}
 export function selectCheapestEligibleProviderPlan(input) {
     const eligible = input.candidates
         .filter((candidate) => planSatisfiesRequirements(candidate, input.requiredCapabilities, input.risk, input.dataPolicy))

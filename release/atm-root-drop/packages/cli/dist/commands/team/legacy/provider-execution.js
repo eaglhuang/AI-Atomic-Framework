@@ -8,6 +8,7 @@ import { TEAM_PROVIDER_IDS } from '../../../_vendor/core/dist/team-runtime/provi
 import { createDefaultTeamPermissionPolicy } from '../../../_vendor/core/dist/team-runtime/permission-broker.js';
 import { materializeTeamRoleHandoff, verifyTeamHandoffLedger } from '../../../_vendor/core/dist/team-runtime/handoff-ledger.js';
 import { createTeamObservabilityEvent } from '../../../_vendor/core/dist/team-runtime/observability.js';
+import { runTeamPaidProviderPreflight } from '../provider-preflight.js';
 import { teamRunsDirectory } from './team-run-store.js';
 export const TEAM_HANDOFF_CONTEXT_PER_ARTIFACT_TOKENS = 256;
 export const TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS = 4;
@@ -31,6 +32,20 @@ export async function runTeamProviderExecution(input) {
                 runtimeMode: input.runtimeContract.runtimeMode
             }
         }));
+    let paidProviderPreflight = null;
+    if (input.paidProviderPreflight) {
+        paidProviderPreflight = await runTeamPaidProviderPreflight(input.paidProviderPreflight);
+        if (!paidProviderPreflight.ok && paidProviderPreflight.stoppedRoster && paidProviderPreflight.requiresExplicitContinuation) {
+            return {
+                requested: true,
+                blockedReason: paidProviderPreflight.requiresExplicitContinuation
+                    ? 'paid-provider-preflight-requires-explicit-continuation'
+                    : 'paid-provider-preflight-blocked',
+                paidProviderPreflight,
+                results: []
+            };
+        }
+    }
     const localSecrets = loadTeamVendorLocalSecrets(input.cwd);
     const results = [];
     const priorRoleArtifacts = [];
@@ -97,6 +112,7 @@ export async function runTeamProviderExecution(input) {
     return {
         requested: true,
         blockedReason: null,
+        paidProviderPreflight,
         localSecrets: localSecrets.summary,
         results
     };

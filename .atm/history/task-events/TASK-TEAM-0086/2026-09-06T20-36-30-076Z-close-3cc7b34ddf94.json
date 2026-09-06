@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T20-36-30-076Z-close-3cc7b34ddf94",
+  "taskId": "TASK-TEAM-0086",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260906202521-codex-captain-TASK-TEAM-0086-b06e6ff1b7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0086.json",
+  "taskSha256": "sha256:a4e4dace61aec577b8e3a2f8a1d62e84176897a002d3f5f8d36e4107aa2f6a4a",
+  "createdAt": "2026-09-06T20:36:30.076Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0086 --actor codex-captain --status done --historical-delivery a787c2347ecdb537666b703cd6d811e873da26e1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906202521-codex-captain-TASK-TEAM-0086-b06e6ff1b7",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0086.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+      "node --strip-types tests/cli/team-provider-preflight.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+      "node --strip-types tests/cli/team-provider-preflight.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T20:36:30.062Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0086.*",
+        ".atm/history/task-events/TASK-TEAM-0086/**",
+        ".atm/history/tasks/TASK-TEAM-0086.json",
+        "packages/cli/src/commands/team/legacy/command-runner.ts",
+        "packages/cli/src/commands/team/legacy/provider-execution.ts",
+        "packages/cli/src/commands/team/provider-preflight.ts",
+        "tests/cli/team-provider-preflight-probe.test.ts",
+        "tests/cli/team-provider-preflight.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team/legacy/command-runner.ts",
+        "packages/cli/src/commands/team/legacy/provider-execution.ts",
+        "packages/cli/src/commands/team/provider-preflight.ts",
+        "tests/cli/team-provider-preflight-probe.test.ts",
+        "tests/cli/team-provider-preflight.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+        "node --strip-types tests/cli/team-provider-preflight.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

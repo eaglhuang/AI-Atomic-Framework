@@ -5685,6 +5685,7 @@
     "release/atm-root-drop/tests/cli/team-plan-contract.test.ts",
     "release/atm-root-drop/tests/cli/team-proposal-first-recovery.test.ts",
     "release/atm-root-drop/tests/cli/team-proposal-workspace.test.ts",
+    "release/atm-root-drop/tests/cli/team-provider-preflight-probe.test.ts",
     "release/atm-root-drop/tests/cli/team-provider-preflight.test.ts",
     "release/atm-root-drop/tests/cli/team-role-provider-parser.test.ts",
     "release/atm-root-drop/tests/cli/team-runtime-cleanup.test.ts",
@@ -6053,11 +6054,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1422,
-    "unchanged": 4596,
+    "copied": 5,
+    "unchanged": 1971,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -26545,7 +26546,7 @@
       },
       {
         "path": "packages/cli/dist/commands/team/legacy/provider-execution.js",
-        "digest": "ba86d8ce816e28e76be166bcd5b09e564779ded5b74f4d488b4424f11b3b76b5",
+        "digest": "4c857ebaf5a1f61bd8661ac9b48f083ba7256ed62b9b49f49b0e7245218a0930",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/team/legacy/provider-execution.js"
@@ -26626,7 +26627,7 @@
       },
       {
         "path": "packages/cli/dist/commands/team/provider-preflight.js",
-        "digest": "5145dfedd9c32afadfe19b68f04cc692775f32c8e21d8ccde1278b592fc57f2b",
+        "digest": "bff2350ee554b9976910137424986a6f4892165f449e2727dd32f8403734db01",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/team/provider-preflight.js"
@@ -33970,7 +33971,7 @@
       },
       {
         "path": "packages/cli/src/commands/team/legacy/provider-execution.ts",
-        "digest": "6400c02cfe8b36092eb3fe3146cd484ee6fc8284dfce911b994d1f13e0cc0148",
+        "digest": "0a110a0c9694537d01c1ad142ec7b0e6bfa062a2e6574385b4373b2cb9b08fd5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/team/legacy/provider-execution.ts"
@@ -34051,7 +34052,7 @@
       },
       {
         "path": "packages/cli/src/commands/team/provider-preflight.ts",
-        "digest": "50eb73e72e6517b6ef8f4d9ff28aeb4bfda8ca7af98c7c5377541e7361ef9fd6",
+        "digest": "4221abfd5ef67885e194c2c8837835826ea4f5076a9cf5a3fa8243962e0ab1bd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/team/provider-preflight.ts"
@@ -56937,6 +56938,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/team-provider-preflight-probe.test.ts",
+        "digest": "1fb8b67fc6bbf2e1c63f881f005acde8c0b4b7bf567b287cf21a128fbeec59c1",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/team-provider-preflight-probe.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/team-provider-preflight.test.ts",
         "digest": "7eb79f28b24fe03b757ef62846c51e4fbbe2ee7d260c3d0addb922c8504e2950",
         "origin": "source",
@@ -60222,7 +60232,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:5699bef5a80945b602659e5b7e74a1c513f67405e61fd8f37b123b63097396e2"
+    "treeDigest": "sha256:adc3bd23cbc0079be522ec1f8760e6d328cadd5929f53c7a3290d8040473660a"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61766,7 +61776,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:2c913ac33fe29afbe69aa3ee1aaf5b0cb85215454117944cb12aa25803ed47a3"
+    "digest": "sha256:3ace64de423b9373bf6f9109f1314b3d960b084b600de5a566b743003ca42865"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -67425,6 +67435,7 @@
       "release/atm-root-drop/tests/cli/team-plan-contract.test.ts",
       "release/atm-root-drop/tests/cli/team-proposal-first-recovery.test.ts",
       "release/atm-root-drop/tests/cli/team-proposal-workspace.test.ts",
+      "release/atm-root-drop/tests/cli/team-provider-preflight-probe.test.ts",
       "release/atm-root-drop/tests/cli/team-provider-preflight.test.ts",
       "release/atm-root-drop/tests/cli/team-role-provider-parser.test.ts",
       "release/atm-root-drop/tests/cli/team-runtime-cleanup.test.ts",
@@ -67796,22 +67807,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:659968b60918267729e455f1312e016d1dba47e0cc303358a4c2f1397e2d72c4",
-  "sealedSourceCommit": "8dee52050b1efd36a437da2f4dca63fb645ebadc",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "missing-previous-sealed-source",
-  "incrementalPlanDigest": "sha256:7d50ab7561440ab438139eabc53bd56ca7c9842faf0ae2b242c7cecfdcc9dc21",
-  "tsBuildCacheDigest": "sha256:eb57728cff3c6cb93dec2e24b1175bdedd0fe3e113c4dbc72446314800f7c401",
+  "buildInputsTreeHash": "sha256:72ee87bed4d409953ed994becf283bf860c852a054f7f6e0b76c1b7c81186521",
+  "sealedSourceCommit": "a787c2347ecdb537666b703cd6d811e873da26e1",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:7151c54aafa801f6f3fb24169bd6989c5158c69e01994554e3eb58411dfa4ffd",
+  "tsBuildCacheDigest": "sha256:4ebff0de10317451b9bcfdb4fd2a456a90ca3dc8ebe3e72a597d74a067bdbdbe",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 46,
-    "skipDecision": 17,
-    "worktreeSetup": 10293,
-    "typescriptBuild": 9633,
-    "rootDropReleaseAssembly": 30097,
-    "onefileReleaseAssembly": 8718,
-    "artifactSync": 8974,
+    "inputHashCalculation": 48,
+    "skipDecision": 57,
+    "worktreeSetup": 10175,
+    "typescriptBuild": 16979,
+    "rootDropReleaseAssembly": 26478,
+    "onefileReleaseAssembly": 7853,
+    "artifactSync": 8764,
     "cleanup": 0,
-    "totalElapsed": 79128
+    "totalElapsed": 86550
   }
 }

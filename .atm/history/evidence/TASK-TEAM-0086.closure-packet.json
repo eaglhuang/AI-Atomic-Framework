@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0086",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a787c2347ecdb537666b703cd6d811e873da26e1",
+  "governedTreeSha": "deafd252321ba5531eeb64d33d31f99d27d5d9da",
+  "targetCommitDelta": {
+    "currentCommitSha": "a787c2347ecdb537666b703cd6d811e873da26e1",
+    "parentCommitShas": [
+      "a787c2347ecdb537666b703cd6d811e873da26e1"
+    ],
+    "governedTreeSha": "deafd252321ba5531eeb64d33d31f99d27d5d9da",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      "packages/cli/dist/commands/team/legacy/provider-execution.js",
+      "packages/cli/dist/commands/team/provider-preflight.js",
+      "packages/cli/src/commands/team/legacy/provider-execution.ts",
+      "packages/cli/src/commands/team/provider-preflight.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/team/legacy/provider-execution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team/provider-preflight.js",
+      "release/atm-root-drop/packages/cli/src/commands/team/legacy/provider-execution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team/provider-preflight.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/team-provider-preflight-probe.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:225ae747d1ec8a60dd03d4aecbcf26db63cf032d71fa6126851c031c35747483",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/team-provider-preflight.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a3b079c3d61ed737babaf16e4ba2a72a86e009bfa2d76b8032b7992ad9fcf1c4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+    "node --strip-types tests/cli/team-provider-preflight.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+    "node --strip-types tests/cli/team-provider-preflight.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T20:36:30.062Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0086.*",
+      ".atm/history/task-events/TASK-TEAM-0086/**",
+      ".atm/history/tasks/TASK-TEAM-0086.json",
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "packages/cli/src/commands/team/legacy/provider-execution.ts",
+      "packages/cli/src/commands/team/provider-preflight.ts",
+      "tests/cli/team-provider-preflight-probe.test.ts",
+      "tests/cli/team-provider-preflight.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "packages/cli/src/commands/team/legacy/provider-execution.ts",
+      "packages/cli/src/commands/team/provider-preflight.ts",
+      "tests/cli/team-provider-preflight-probe.test.ts",
+      "tests/cli/team-provider-preflight.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+      "node --strip-types tests/cli/team-provider-preflight.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0086.json",
+  "closedAt": "2026-09-06T20:36:30.063Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260906202521-codex-captain-TASK-TEAM-0086-b06e6ff1b7",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a787c2347ecdb537666b703cd6d811e873da26e1",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/team/legacy/provider-execution.ts",
+      "packages/cli/src/commands/team/provider-preflight.ts",
+      "tests/cli/team-provider-preflight-probe.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-TEAM-0086.json",
+      ".atm/history/task-events/TASK-TEAM-0086/2026-09-06T20-24-35-680Z-import-5c02f6468ed8.json",
+      ".atm/history/task-events/TASK-TEAM-0086/2026-09-06T20-25-12-544Z-import-18c05ddc7ff6.json",
+      ".atm/history/task-events/TASK-TEAM-0086/2026-09-06T20-25-21-860Z-reserve-1324dbe970e5.json",
+      ".atm/history/task-events/TASK-TEAM-0086/2026-09-06T20-25-21-863Z-promote-782c6446a588.json",
+      ".atm/history/task-events/TASK-TEAM-0086/2026-09-06T20-25-28-253Z-claim-17b96a6b849b.json",
+      ".atm/history/tasks/TASK-TEAM-0086.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

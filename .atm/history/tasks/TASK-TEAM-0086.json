@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TEAM-0086",
   "title": "Opt-in paid provider quota preflight probe",
-  "status": "running",
+  "status": "done",
   "milestone": "M10X",
   "dependencies": [
     "TASK-TEAM-0050",
@@ -196,8 +196,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-06T20-25-28-253Z-claim-17b96a6b849b",
-  "lastTransitionAt": "2026-09-06T20:25:28.253Z",
+  "lastTransitionId": "2026-09-06T20-36-30-076Z-close-3cc7b34ddf94",
+  "lastTransitionAt": "2026-09-06T20:36:30.076Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-06T20:25:21.860Z",
@@ -206,7 +206,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-98fa99eef8de",
     "claimedAt": "2026-09-06T20:25:21.868Z",
-    "heartbeatAt": "2026-09-06T20:25:21.868Z",
+    "heartbeatAt": "2026-09-06T20:36:30.072Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TEAM-0086.json",
@@ -216,14 +216,14 @@
       "tests/cli/team-provider-preflight-probe.test.ts",
       "tests/cli/team-provider-preflight.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260906202522-codex-captain-35bafd17d2",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906202522-codex-captain-35bafd17d2\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-06T20:25:21.868Z",
   "startedByActor": "codex-captain",
@@ -325,5 +325,9 @@
     },
     "createdAt": "2026-09-06T20:25:28.252Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-06T20:36:30.072Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260906202521-codex-captain-TASK-TEAM-0086-b06e6ff1b7",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0086.closure-packet.json"
 }
