@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0106",
+  "updatedAt": "2026-09-06T16:40:29.373Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/task-ledger-suite-extraction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-06T16:36:39.747Z",
+      "startedAt": "2026-09-06T16:36:38.449Z",
+      "finishedAt": "2026-09-06T16:36:39.747Z",
+      "durationMs": 1298,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7a9e6cc35b9e6d52e2f73c0d9dd8c0918ab8f044",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-06T16:36:52.489Z",
+      "startedAt": "2026-09-06T16:36:42.680Z",
+      "finishedAt": "2026-09-06T16:36:52.489Z",
+      "durationMs": 9809,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7a9e6cc35b9e6d52e2f73c0d9dd8c0918ab8f044",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:3ea78fc0eac9dae55bbb715f567ee27c0b537361ed9d8bfc09a0a0e86f466baa",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-09-06T16:37:17.901Z",
+      "startedAt": "2026-09-06T16:36:55.419Z",
+      "finishedAt": "2026-09-06T16:37:17.901Z",
+      "durationMs": 22482,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7a9e6cc35b9e6d52e2f73c0d9dd8c0918ab8f044",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:7a87d908fb3b09bafde5e3d737e828b02be660935bb68ee1f323cd8608f0216c",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-09-06T16:37:43.074Z",
+      "startedAt": "2026-09-06T16:37:20.565Z",
+      "finishedAt": "2026-09-06T16:37:43.074Z",
+      "durationMs": 22509,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7a9e6cc35b9e6d52e2f73c0d9dd8c0918ab8f044",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts"
+      ],
+      "generatedAt": "2026-09-06T16:40:29.372Z",
+      "startedAt": "2026-09-06T16:40:28.050Z",
+      "finishedAt": "2026-09-06T16:40:29.372Z",
+      "durationMs": 1322,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7a9e6cc35b9e6d52e2f73c0d9dd8c0918ab8f044",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

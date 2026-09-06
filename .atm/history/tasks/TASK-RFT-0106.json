@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0106",
   "title": "Extract bounded semantic modules from task-ledger validator implementation",
-  "status": "planned",
+  "status": "running",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -80,7 +80,9 @@
   },
   "importedAt": "2026-09-06T16:24:41.876Z",
   "workAdmission": {
-    "recoveryMode": "auto"
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -156,7 +158,131 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-06T16-24-42-018Z-import-dccd4628102e",
-  "lastTransitionAt": "2026-09-06T16:24:42.018Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-09-06T16-27-50-528Z-claim-76fc5bc1f88d",
+  "lastTransitionAt": "2026-09-06T16:27:50.528Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-06T16:27:44.181Z",
+  "promotedAt": "2026-09-06T16:27:44.185Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-e4fe521b9318",
+    "claimedAt": "2026-09-06T16:27:44.190Z",
+    "heartbeatAt": "2026-09-06T16:27:44.190Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0106.json",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/**/*.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "tests/cli/task-ledger-validator-extraction.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906162744-codex-gpt-5.4-mini-657d169bc5",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906162744-codex-gpt-5.4-mini-657d169bc5\""
+    }
+  },
+  "startedAt": "2026-09-06T16:27:44.190Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6443db7f7155e966",
+    "ticketDigest": "sha256:6443db7f7155e966edf419e669f85ada7816007feb3f8566cb30931a50dd0470",
+    "taskId": "TASK-RFT-0106",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260906162744-codex-gpt-5.4-mini-657d169bc5",
+    "claimGeneration": "lease-e4fe521b9318",
+    "issuedAt": "2026-09-06T16:27:44.190Z",
+    "expiresAt": "2026-09-06T16:57:44.190Z",
+    "scopeDigest": "sha256:7df10a50d2a459256b9f427ae5fc1f6d46bf48b17e514d89ae078b12d3fca233",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T16:27:44.190Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-RFT-0106.*",
+          ".atm/history/task-events/TASK-RFT-0106/**",
+          ".atm/history/tasks/TASK-RFT-0106.json",
+          "scripts/validators/task-ledger/suite-impl.ts",
+          "scripts/validators/task-ledger/suite-impl/**/*.ts",
+          "scripts/validators/task-ledger/suite-impl/implementation.ts",
+          "tests/cli/task-ledger-validator-extraction.test.ts"
+        ],
+        "digest": "sha256:8844e6ba502e5d6ccc08438d7732c8f7d9e7230382b35a628cc01cc758a0f11f"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906162744-codex-gpt-5.4-mini-TASK-RFT-0106-470ad7adab",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0106",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0106.*",
+      ".atm/history/task-events/TASK-RFT-0106/**",
+      ".atm/history/tasks/TASK-RFT-0106.json",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/**/*.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "tests/cli/task-ledger-validator-extraction.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b18529db1caa32610cc3260ee7eb58d0d9df79403e00704ca2ab52eb27e506b4",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260906162744-codex-gpt-5.4-mini-TASK-RFT-0106-470ad7adab",
+    "laneSession": {
+      "laneSessionId": "lane-20260906162744-codex-gpt-5.4-mini-657d169bc5",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906162744-codex-gpt-5.4-mini-657d169bc5\""
+    },
+    "createdAt": "2026-09-06T16:27:50.527Z",
+    "status": "active"
+  }
 }
