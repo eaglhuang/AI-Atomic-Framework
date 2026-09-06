@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T17-49-16-136Z-scope-amendment-36a8c21a6342",
+  "taskId": "TASK-RFT-0108",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0108.json",
+  "taskSha256": "sha256:864c890e18f20ba5daa2811aac8f52b32859bbdb6518cb68ecef01896cc4d191",
+  "createdAt": "2026-09-06T17:49:16.136Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0108 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts --reason \"Add extracted manifest reader required by the evidence bundle IO task\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Add extracted manifest reader required by the evidence bundle IO task"
+  }
+}

@@ -14,6 +14,7 @@ const maxLines = 600;
 const checkedModules = [
   'packages/cli/src/commands/evidence/bundle-io.ts',
   'packages/cli/src/commands/evidence/bundle-io/implementation.ts',
+  'packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts',
   'packages/cli/src/commands/evidence/command-runs.ts',
   'packages/cli/src/commands/evidence/evidence-store.ts',
   'packages/cli/src/commands/evidence/missing-report.ts',
@@ -29,6 +30,16 @@ for (const file of checkedModules) {
 const facade = readFileSync('packages/cli/src/commands/evidence/bundle-io.ts', 'utf8').trim();
 assert.equal(facade, "export * from './bundle-io/implementation.ts';");
 
+const implementationSource = readFileSync(
+  'packages/cli/src/commands/evidence/bundle-io/implementation.ts',
+  'utf8',
+);
+assert.match(
+  implementationSource,
+  /from ['"]\.\/manifest-reader\.ts['"];/,
+  'manifest reader semantics should live in a bounded module',
+);
+
 assert.equal(EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, 'atm.evidenceBundleManifest.v1');
 assert.equal(evidenceBundleManifestRelativePath('TASK-RFT-0036'), '.atm/history/evidence/TASK-RFT-0036.bundle-manifest.json');
 assert.deepEqual(buildTeamArtifactHandoffEvidence({ closeAllowed: true }), {
@@ -42,4 +53,3 @@ assert.deepEqual(buildTeamArtifactHandoffEvidence({ closeAllowed: true }), {
 assert.equal(typeof verifyTaskEvidence, 'function');
 assert.equal(typeof runEvidenceAdd, 'function');
 assert.equal(typeof runEvidenceVerify, 'function');
-

@@ -1,0 +1,305 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0108",
+  "title": "Extract bounded semantic modules from evidence bundle IO implementation",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Deliverables and validators are filled before import or implementation."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+    "packages/cli/src/commands/evidence/bundle-io/**/*.ts",
+    "tests/cli/evidence-bundle-io-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/evidence/bundle-io.ts",
+    "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+    "packages/cli/src/commands/evidence/bundle-io/**/*.ts",
+    "tests/cli/evidence-bundle-io-extraction.test.ts",
+    ".atm/history/evidence/TASK-RFT-0108.*",
+    ".atm/history/task-events/TASK-RFT-0108/**",
+    ".atm/history/tasks/TASK-RFT-0108.json",
+    "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the governed delivery commit and closeout bundle together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-evidence-bundle-io",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.cli-evidence-bundle-reader",
+        "pattern": "Reader",
+        "source": "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "atom": "atm.cli-evidence-bundle-writer",
+        "pattern": "Writer",
+        "source": "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0108-extract-bounded-semantic-modules-from-evidence-bundle-io-implementation.task.md",
+    "sectionTitle": "TASK-RFT-0108",
+    "headingLine": 58,
+    "hash": "52c1fdcb9653cd09",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "rft-hardening/tasks/TASK-RFT-0108-extract-bounded-semantic-modules-from-evidence-bundle-io-implementation.task.md",
+      "planningCommitSha": "a372d747fe8ca8fc38b80aa9f5ab2ce08108a5be",
+      "contentDigest": "sha256:52c1fdcb9653cd0900c4fe191320da80f33b2d5cd8f09a879eef776335f3fa89",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T17:44:48.218Z"
+    }
+  },
+  "importedAt": "2026-09-06T17:44:48.218Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.evidence.bundle.io.extraction.test.ts",
+      "command": "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T17-49-16-136Z-scope-amendment-36a8c21a6342",
+  "lastTransitionAt": "2026-09-06T17:49:16.136Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-06T17:44:57.570Z",
+  "promotedAt": "2026-09-06T17:44:57.574Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-301e15980247",
+    "claimedAt": "2026-09-06T17:44:57.578Z",
+    "heartbeatAt": "2026-09-06T17:44:57.578Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0108.*",
+      ".atm/history/task-events/TASK-RFT-0108/**",
+      ".atm/history/tasks/TASK-RFT-0108.json",
+      "packages/cli/src/commands/evidence/bundle-io.ts",
+      "packages/cli/src/commands/evidence/bundle-io/**/*.ts",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+      "tests/cli/evidence-bundle-io-extraction.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906174457-codex-gpt-5.4-mini-4d14f22952",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906174457-codex-gpt-5.4-mini-4d14f22952\""
+    }
+  },
+  "startedAt": "2026-09-06T17:44:57.578Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-19040cced0d3d237",
+    "ticketDigest": "sha256:19040cced0d3d23795f6ed0b82875bb87d94e195fcadeb010470f93b539f8498",
+    "taskId": "TASK-RFT-0108",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260906174457-codex-gpt-5.4-mini-4d14f22952",
+    "claimGeneration": "lease-301e15980247",
+    "issuedAt": "2026-09-06T17:49:16.077Z",
+    "expiresAt": "2026-09-06T18:19:16.077Z",
+    "scopeDigest": "sha256:0624368ab4cec3bd9a20783c23528f44ccae2e4b283d6ddd8b90b719af2ecfa8",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T17:49:16.077Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-RFT-0108.*",
+          ".atm/history/task-events/TASK-RFT-0108/**",
+          ".atm/history/tasks/TASK-RFT-0108.json",
+          "packages/cli/src/commands/evidence/bundle-io.ts",
+          "packages/cli/src/commands/evidence/bundle-io/**/*.ts",
+          "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+          "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+          "tests/cli/evidence-bundle-io-extraction.test.ts"
+        ],
+        "digest": "sha256:1e59766d8d1e3c0e6960bbeefbdef58f1430de215ccf8220a58c9df850fb7418"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906174457-codex-gpt-5.4-mini-TASK-RFT-0108-5a291d78a5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0108",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0108.*",
+      ".atm/history/task-events/TASK-RFT-0108/**",
+      ".atm/history/tasks/TASK-RFT-0108.json",
+      "packages/cli/src/commands/evidence/bundle-io.ts",
+      "packages/cli/src/commands/evidence/bundle-io/**/*.ts",
+      "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
+      "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+      "tests/cli/evidence-bundle-io-extraction.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/rft-hardening/tasks/TASK-RFT-0108-extract-bounded-semantic-modules-from-evidence-bundle-io-implementation.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/rft-hardening/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/TASK-RFT-0108-extract-bounded-semantic-modules-from-evidence-bundle-io-implementation.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "ade54cda359ab4995a46b0ae692e952bc3cea941dba9bf52d463e43e2fd61cbc",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260906174457-codex-gpt-5.4-mini-4d14f22952",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906174457-codex-gpt-5.4-mini-4d14f22952\""
+    },
+    "createdAt": "2026-09-06T17:45:03.955Z",
+    "status": "active"
+  }
+}
