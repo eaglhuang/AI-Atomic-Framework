@@ -6,6 +6,7 @@ const root = process.cwd();
 const files = [
   "packages/cli/src/commands/tasks/legacy-impl.ts",
   "packages/cli/src/commands/tasks/legacy/implementation.ts",
+  "packages/cli/src/commands/tasks/legacy/claim-state.ts",
   "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
 ];
 
@@ -37,6 +38,16 @@ const facade = readFileSync(
   "utf8",
 );
 assert.match(facade, /from '\.\/legacy\/implementation\.ts'/);
+
+const implementationSource = readFileSync(
+  path.join(root, "packages/cli/src/commands/tasks/legacy/implementation.ts"),
+  "utf8",
+);
+assert.match(
+  implementationSource,
+  /from '\.\/claim-state\.ts'/,
+  "claim-state semantics should be imported from its bounded module",
+);
 
 const implementation =
   (await import("../../packages/cli/src/commands/tasks/legacy-impl.ts")) as Record<

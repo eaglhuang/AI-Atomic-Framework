@@ -1,0 +1,290 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0107",
+  "title": "Extract bounded semantic modules from tasks legacy implementation",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Extract at least one complete semantic command family into readable modules, keeping every touched source and test module at or below 600 physical lines and no individual line above 1000 characters.",
+    "Preserve the public facade exports and task command behavior; add a deterministic red-to-green extraction-boundary receipt."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/legacy.ts",
+    "packages/cli/src/commands/tasks/legacy/implementation.ts",
+    "packages/cli/src/commands/tasks/legacy/**/*.ts",
+    "tests/cli/tasks-legacy-impl-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/legacy.ts",
+    "packages/cli/src/commands/tasks/legacy/implementation.ts",
+    "packages/cli/src/commands/tasks/legacy/**/*.ts",
+    "tests/cli/tasks-legacy-impl-extraction.test.ts",
+    ".atm/history/evidence/TASK-RFT-0107.*",
+    ".atm/history/task-events/TASK-RFT-0107/**",
+    ".atm/history/tasks/TASK-RFT-0107.json",
+    "packages/cli/src/commands/tasks/legacy/claim-state.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0107-extract-bounded-semantic-modules-from-tasks-legacy-implementation.task.md",
+    "sectionTitle": "TASK-RFT-0107",
+    "headingLine": 39,
+    "hash": "95287153dc4e60cf",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "rft-hardening/tasks/TASK-RFT-0107-extract-bounded-semantic-modules-from-tasks-legacy-implementation.task.md",
+      "planningCommitSha": "f0527236acf548ad5f9a661996126d2476dfcc63",
+      "contentDigest": "sha256:95287153dc4e60cfad3633109323b7c73627105edfa4abc68cd74f00bdb5e211",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T17:25:11.218Z"
+    }
+  },
+  "importedAt": "2026-09-06T17:25:11.218Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.tasks.legacy.impl.extraction.test.ts",
+      "command": "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.cli",
+      "command": "npm run validate:cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T17-31-39-965Z-scope-amendment-6d36fa4c0e3e",
+  "lastTransitionAt": "2026-09-06T17:31:39.965Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-06T17:25:34.321Z",
+  "promotedAt": "2026-09-06T17:25:34.326Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-cee20ed873cb",
+    "claimedAt": "2026-09-06T17:25:34.330Z",
+    "heartbeatAt": "2026-09-06T17:25:34.330Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0107.*",
+      ".atm/history/task-events/TASK-RFT-0107/**",
+      ".atm/history/tasks/TASK-RFT-0107.json",
+      "packages/cli/src/commands/tasks/legacy.ts",
+      "packages/cli/src/commands/tasks/legacy/**/*.ts",
+      "packages/cli/src/commands/tasks/legacy/claim-state.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "tests/cli/tasks-legacy-impl-extraction.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906172534-codex-gpt-5.4-mini-098d5cde4d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906172534-codex-gpt-5.4-mini-098d5cde4d\""
+    }
+  },
+  "startedAt": "2026-09-06T17:25:34.330Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-4afea31e14c68363",
+    "ticketDigest": "sha256:4afea31e14c68363d10f7dc4c9c503ea8c2515b45d14cc978641511d6f3b94b8",
+    "taskId": "TASK-RFT-0107",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260906172534-codex-gpt-5.4-mini-098d5cde4d",
+    "claimGeneration": "lease-cee20ed873cb",
+    "issuedAt": "2026-09-06T17:31:39.903Z",
+    "expiresAt": "2026-09-06T18:01:39.903Z",
+    "scopeDigest": "sha256:048fb407ed6a4b403ee576c4bfdb09070be9a8c10cc400c65e4d985a59581148",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T17:31:39.903Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-RFT-0107.*",
+          ".atm/history/task-events/TASK-RFT-0107/**",
+          ".atm/history/tasks/TASK-RFT-0107.json",
+          "packages/cli/src/commands/tasks/legacy.ts",
+          "packages/cli/src/commands/tasks/legacy/**/*.ts",
+          "packages/cli/src/commands/tasks/legacy/claim-state.ts",
+          "packages/cli/src/commands/tasks/legacy/implementation.ts",
+          "tests/cli/tasks-legacy-impl-extraction.test.ts"
+        ],
+        "digest": "sha256:fb5b062bf8ce91baede19ce4f95c42d0e63e99d9407f2a6a473a74b403b2327f"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906172534-codex-gpt-5.4-mini-TASK-RFT-0107-079c0898a9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0107",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0107.*",
+      ".atm/history/task-events/TASK-RFT-0107/**",
+      ".atm/history/tasks/TASK-RFT-0107.json",
+      "packages/cli/src/commands/tasks/legacy.ts",
+      "packages/cli/src/commands/tasks/legacy/**/*.ts",
+      "packages/cli/src/commands/tasks/legacy/claim-state.ts",
+      "packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "tests/cli/tasks-legacy-impl-extraction.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/rft-hardening/tasks/TASK-RFT-0107-extract-bounded-semantic-modules-from-tasks-legacy-implementation.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/rft-hardening/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/TASK-RFT-0107-extract-bounded-semantic-modules-from-tasks-legacy-implementation.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "6c7fb15776a998b1fd32345ba83a2c2882e70b38b82616063e4d18711d6235c3",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260906172534-codex-gpt-5.4-mini-098d5cde4d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906172534-codex-gpt-5.4-mini-098d5cde4d\""
+    },
+    "createdAt": "2026-09-06T17:25:37.730Z",
+    "status": "active"
+  }
+}
