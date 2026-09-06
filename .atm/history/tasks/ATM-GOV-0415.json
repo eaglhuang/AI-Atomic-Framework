@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0415",
   "title": "Runtime-only git-head journal with tracked digest acceptance",
-  "status": "open",
+  "status": "abandoned",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -152,20 +152,22 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-06T12-17-41-614Z-release-bb047c919709",
-  "lastTransitionAt": "2026-09-06T12:17:41.614Z",
+  "lastTransitionId": "2026-09-06T12-59-47-507Z-abandon-bba17d94e54e",
+  "lastTransitionAt": "2026-09-06T12:59:47.507Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
-  "reservedAt": "2026-09-06T12:15:23.401Z",
-  "promotedAt": "2026-09-06T12:15:23.405Z",
+  "reservedAt": "2026-09-06T12:25:23.447Z",
+  "promotedAt": "2026-09-06T12:25:23.452Z",
   "claim": {
     "actorId": "codex-captain",
-    "leaseId": "lease-27d481e8a0cb",
-    "claimedAt": "2026-09-06T12:15:23.411Z",
-    "heartbeatAt": "2026-09-06T12:17:35.611Z",
+    "leaseId": "lease-32c178e9e146",
+    "claimedAt": "2026-09-06T12:25:23.461Z",
+    "heartbeatAt": "2026-09-06T12:29:32.261Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0415.json",
+      ".atm/history/evidence/ATM-GOV-0415.*",
+      ".atm/history/task-events/ATM-GOV-0415/**",
       "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
       "packages/cli/src/commands/git-head-evidence.ts",
       "packages/cli/src/commands/hook/pre-push/**",
@@ -175,32 +177,32 @@
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260906121523-codex-captain-0de004613c",
+      "laneSessionId": "lane-20260906122523-codex-captain-a0b47803e8",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906121523-codex-captain-0de004613c\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906122523-codex-captain-a0b47803e8\""
     },
-    "reason": "Planning import ledger committed and pushed; no source implementation performed in this lane."
+    "reason": "Implementation contract is incomplete: runtime-only journal requires explicit ignore policy and tracked compact receipt scope; release claim before opening corrected bounded card."
   },
   "startedAt": "2026-09-06T12:15:23.411Z",
   "startedByActor": "codex-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-dfd2543de0dafb30",
-    "ticketDigest": "sha256:dfd2543de0dafb3065e37e87cc4c22b8557ab7ec0832624a9899674bc789ad1d",
+    "ticketId": "wat-c15f727bc91710f0",
+    "ticketDigest": "sha256:c15f727bc91710f0f4d13ddf348421a8329bef433760807651a34ac0c6b82f41",
     "taskId": "ATM-GOV-0415",
     "origin": "claim",
     "actorId": "codex-captain",
-    "laneSessionId": "lane-20260906121523-codex-captain-0de004613c",
-    "claimGeneration": "lease-27d481e8a0cb",
-    "issuedAt": "2026-09-06T12:15:23.411Z",
-    "expiresAt": "2026-09-06T12:45:23.411Z",
+    "laneSessionId": "lane-20260906122523-codex-captain-a0b47803e8",
+    "claimGeneration": "lease-32c178e9e146",
+    "issuedAt": "2026-09-06T12:25:23.461Z",
+    "expiresAt": "2026-09-06T12:55:23.461Z",
     "scopeDigest": "sha256:2e10340910b30459fb2eda130eed0a2ea29a0c04441abd515ad6e8d205501d83",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-06T12:15:23.411Z"
+      "selectedAt": "2026-09-06T12:25:23.461Z"
     },
     "grants": [
       {
@@ -250,7 +252,7 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260906121523-codex-captain-ATM-GOV-0415-a0fe0a073d",
+  "startedBySessionId": "session-20260906122523-codex-captain-ATM-GOV-0415-59af42a976",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -275,14 +277,19 @@
     "allowPlanningMirror": false,
     "promptHash": "08224ad236987e59cf70e31aa0c06a182f850e4a4ecda2302cc91d60aaa16579",
     "actorId": "codex-captain",
-    "sessionId": "session-20260906121523-codex-captain-ATM-GOV-0415-a0fe0a073d",
+    "sessionId": "session-20260906122523-codex-captain-ATM-GOV-0415-59af42a976",
     "laneSession": {
-      "laneSessionId": "lane-20260906121523-codex-captain-0de004613c",
+      "laneSessionId": "lane-20260906122523-codex-captain-a0b47803e8",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906121523-codex-captain-0de004613c\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906122523-codex-captain-a0b47803e8\""
     },
-    "createdAt": "2026-09-06T12:15:29.918Z",
+    "createdAt": "2026-09-06T12:25:30.219Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-06T12:59:47.455Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260906122523-codex-captain-ATM-GOV-0415-59af42a976",
+  "closeReason": "Superseded by corrected ATM-GOV-0416 runtime-only journal and tracked acceptance receipt contract; preserve all prior evidence.",
+  "abandonResidueDisposition": ".atm/history/evidence/ATM-GOV-0415.abandon-residue-disposition.json"
 }
