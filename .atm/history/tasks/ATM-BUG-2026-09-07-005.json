@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-BUG-2026-09-07-005",
+  "title": "Reconcile terminal cleanup governance evidence",
+  "status": "open",
+  "owner": "codex-gpt-5.4-mini",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [],
+  "tags": [],
+  "createdAt": "2026-09-06T19:51:37.537Z",
+  "createdByActor": "codex-gpt-5.4-mini",
+  "lastTransitionId": "2026-09-06T19-52-59-833Z-release-a4f6b6716e26",
+  "lastTransitionAt": "2026-09-06T19:52:59.833Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-09-06T19:51:49.555Z",
+  "promotedAt": "2026-09-06T19:51:49.559Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-6f894d1b0bf9",
+    "claimedAt": "2026-09-06T19:52:14.706Z",
+    "heartbeatAt": "2026-09-06T19:52:58.801Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-BUG-2026-09-07-005.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-004.abandon-residue-disposition.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-004.bundle-manifest.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-48-46-982Z-POA-47a6fb679910.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-49-13-405Z-POA-f31390d92c26.json"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260906195214-codex-gpt-5.4-mini-67a641ec20",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906195214-codex-gpt-5.4-mini-67a641ec20\""
+    },
+    "reason": "Successor card metadata has no real deliverables; release without mutating or deleting cleanup evidence."
+  },
+  "startedAt": "2026-09-06T19:52:14.706Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-f5522d1be4d46261",
+    "ticketDigest": "sha256:f5522d1be4d46261443ac228d26599d3655b9372075d3d92e8037a493b801644",
+    "taskId": "ATM-BUG-2026-09-07-005",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260906195214-codex-gpt-5.4-mini-67a641ec20",
+    "claimGeneration": "lease-6f894d1b0bf9",
+    "issuedAt": "2026-09-06T19:52:14.706Z",
+    "expiresAt": "2026-09-06T20:22:14.706Z",
+    "scopeDigest": "sha256:dd92309a65b1359157524cbbb7b23933e03b8420b094080f7c41cbf00c6408d2",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T19:52:14.706Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-BUG-2026-09-07-004.abandon-residue-disposition.json",
+          ".atm/history/evidence/ATM-BUG-2026-09-07-004.bundle-manifest.json",
+          ".atm/history/evidence/ATM-BUG-2026-09-07-005.*",
+          ".atm/history/protected-override-audit/2026-09-06T19-48-46-982Z-POA-47a6fb679910.json",
+          ".atm/history/protected-override-audit/2026-09-06T19-49-13-405Z-POA-f31390d92c26.json",
+          ".atm/history/task-events/ATM-BUG-2026-09-07-005/**",
+          ".atm/history/tasks/ATM-BUG-2026-09-07-005.json"
+        ],
+        "digest": "sha256:9d3ae54b772e0f343f13b99c21fddd7478632bef95fb4e836958bccab9a41cf5"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "startedBySessionId": "session-20260906195214-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-005-28b68b9d55",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-BUG-2026-09-07-005",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-BUG-2026-09-07-004.abandon-residue-disposition.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-004.bundle-manifest.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-005.*",
+      ".atm/history/protected-override-audit/2026-09-06T19-48-46-982Z-POA-47a6fb679910.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-49-13-405Z-POA-f31390d92c26.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-005/**",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-005.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "85dae95ac5067ca74bbb6a9597a6287947093845a853c3352c1ce50efb642706",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260906195214-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-005-28b68b9d55",
+    "laneSession": {
+      "laneSessionId": "lane-20260906195214-codex-gpt-5.4-mini-67a641ec20",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906195214-codex-gpt-5.4-mini-67a641ec20\""
+    },
+    "createdAt": "2026-09-06T19:52:15.813Z",
+    "status": "active"
+  }
+}
