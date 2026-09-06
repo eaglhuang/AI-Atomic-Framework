@@ -1,0 +1,41 @@
+{
+  "schemaId": "atm.brokerConflictResolution.v1",
+  "recordedAt": "2026-09-06T13:47:00.000Z",
+  "actorId": "codex-captain",
+  "primaryTaskId": "ATM-GOV-0417",
+  "conflictingTaskIds": ["ATM-GOV-0417"],
+  "conflictTaskId": "ATM-GOV-0417",
+  "conflictFiles": [
+    ".atm/history/evidence/ATM-GOV-0417.abandon-residue-disposition.json",
+    ".atm/history/evidence/ATM-GOV-0417.broker-conflict-resolution.json",
+    ".atm/history/evidence/ATM-GOV-0417.live-index-reconciliation.json",
+    ".atm/history/task-events/ATM-GOV-0417/2026-09-06T13-37-11-237Z-import-713b670c6864.json",
+    ".atm/history/task-events/ATM-GOV-0417/2026-09-06T13-37-34-867Z-reserve-8c8f7953fd6d.json",
+    ".atm/history/task-events/ATM-GOV-0417/2026-09-06T13-37-34-872Z-promote-d44e2cafda48.json",
+    ".atm/history/task-events/ATM-GOV-0417/2026-09-06T13-37-41-250Z-claim-2268c825c063.json"
+  ],
+  "decisionClass": "human-signoff-required",
+  "decisionReason": "The task was abandoned after focused regressions proved the source defect was absent. This one-time preservation commit is limited to the task's own lifecycle evidence; no source or foreign lane files are included.",
+  "violationStatus": "resolution-issued",
+  "resolutionClass": "abandoned-task-evidence-preservation",
+  "resolutionOrder": [
+    "Preserve only ATM-GOV-0417 lifecycle evidence and the generated git-head evidence.",
+    "Do not mutate or stage source files, foreign WIP, or another task's evidence.",
+    "Release the temporary framework claim after the exact-path commit succeeds."
+  ],
+  "validatorPlan": [
+    "node atm.mjs framework-mode status --json",
+    "node --strip-types tests/cli/runner-sync-clean-close-pathway.test.ts",
+    "node --strip-types tests/cli/runner-sync-receipt-closeout.test.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts"
+  ],
+  "indexConstraint": {
+    "allowedStagedFiles": [
+      ".atm/history/evidence/ATM-GOV-0417.abandon-residue-disposition.json",
+      ".atm/history/evidence/ATM-GOV-0417.live-index-reconciliation.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/task-events/ATM-GOV-0417/**"
+    ],
+    "foreignWorkHandling": "No source, release artifact, or unrelated WIP may be staged."
+  }
+}
