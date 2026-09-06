@@ -24,6 +24,7 @@ import { executeTaskScopedCommitTransaction } from '../git-governance/task-scope
 import { recordGitIndexRestoreFailure } from '../git-governance/implementation/git-index-transaction.js';
 import { issueCloseTransactionHookReceipt } from './close-transaction-hook-receipt.js';
 import { inspectTouchedPhysicalLineBudget } from '../git-governance/commit-scope-policy.js';
+import { listTaskDeclaredIgnoredWorktreeFiles } from '../git-governance/implementation/task-ignored-deliverable-discovery.js';
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
@@ -362,7 +363,8 @@ export function buildTaskflowCommitBundle(input) {
     const scopePaths = extractTaskStringList(taskDocument, 'scopePaths');
     const targetAllowedFiles = extractTaskStringList(taskDocument, 'targetAllowedFiles');
     const effectiveRuntimeDeliverables = [...resolveTaskflowEffectiveDeliverables(targetRepoRoot, input.taskId, taskDocument)];
-    const dirtyFiles = getDirtyFiles(targetRepoRoot);
+    const declaredIgnoredScope = uniqueSorted([...deliverables, ...scopePaths, ...targetAllowedFiles, ...effectiveRuntimeDeliverables]);
+    const dirtyFiles = uniqueSorted([...getDirtyFiles(targetRepoRoot), ...listTaskDeclaredIgnoredWorktreeFiles(targetRepoRoot, declaredIgnoredScope)]);
     const historicalCommitted = getHistoricalCommittedFiles(targetRepoRoot, input.historicalDeliveryRefs ?? []);
     const historicalCloseback = historicalCommitted.length > 0;
     const historyOnlyCloseback = historicalCloseback && isHistoricalEvidenceOnlyScope(scopePaths);

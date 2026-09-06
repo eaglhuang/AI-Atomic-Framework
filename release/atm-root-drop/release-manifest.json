@@ -2908,6 +2908,7 @@
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/dryrun/profile-fallback.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/framework-opener.spec.ts",
+    "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/ignored-artifact-close-bundle.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
@@ -6040,8 +6041,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 7,
-    "unchanged": 2030,
+    "copied": 3,
+    "unchanged": 1962,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -25173,7 +25174,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
-        "digest": "59f5be681ce05ccebf0a99ea6dc4b30bd604437a7021eeac33f6c05b174cfcd5",
+        "digest": "9451a6404f080e124f10fef5481ce7a3d95cc56a4048ff37c291fcd656f58f94",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js"
@@ -31940,6 +31941,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/taskflow/__tests__/ignored-artifact-close-bundle.spec.ts",
+        "digest": "4669e2138a98d477457b8b32e5d54e1fa1677f260faf675b3cbf71b3e8be9f33",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/taskflow/__tests__/ignored-artifact-close-bundle.spec.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
         "digest": "7090626eeb906feef13cbb415ea37d3a754f855a1a2008642de8d35170a27774",
         "origin": "source",
@@ -32139,7 +32149,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-        "digest": "60c85c5e4f4491b2c3ea627910988c13d8d678340ffe5864605e94607108d645",
+        "digest": "8f3a417e87f4dd30b777bc32c6fee3e451e0c5db24702c8796687a1f833e2ecc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
@@ -60092,7 +60102,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:4d6ca5bfe6f4d4912c2f2a5b3a17783cba1ab73b0412f31fd535ff8dac525b54"
+    "treeDigest": "sha256:cfd8b62a41ebc7c8bb48cb90f6cdabcf61476a58945123efe6859a333fa74269"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60663,6 +60673,7 @@
       "packages/cli/src/commands/taskflow/__tests__/dryrun/profile-fallback.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/framework-opener.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/ignored-artifact-close-bundle.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
       "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
@@ -61630,7 +61641,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:f7ab7c06b209c7c3980ce423fb7952ff2e86f1612920bcf3071ae5b805a1c0f8"
+    "digest": "sha256:40408a530da1499c17796a5f4bcfdbeff869a855624527a79a0ee33e98e250bb"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -64512,6 +64523,7 @@
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/dryrun/profile-fallback.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/dryrun/uncommitted-deliverables.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/framework-opener.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/ignored-artifact-close-bundle.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
@@ -67647,22 +67659,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:ff968671cda2aa3c48097f1b2a1c11b336f690b4960bf49e11eb28f04fbc1ba9",
-  "sealedSourceCommit": "7e9c5f784b6e7d07a95e9c7adbe514a708ef25b8",
+  "buildInputsTreeHash": "sha256:b2e981739e88b003ebbf3c90630b50330438d2c9f81d088de1fc4b61399b8bf4",
+  "sealedSourceCommit": "5481f8d7030559151ffc2886d0a8c73a129ef418",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:389b862ef53e2b455f72472bc893850ca28413e8ae8ec0496733392bfab5f3b5",
-  "tsBuildCacheDigest": "sha256:386ba4cf61482b85b80a31963fb2065d78fe8a62581927d1492d0575f29c8a1d",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:813893fac0de9de02c4ad78bf0d9895379688d6e4fa24beef100371db8938846",
+  "tsBuildCacheDigest": "sha256:79770af950951c6ff650d3c4c2ff9e58725fa4726b1d68372508a45bd476b0c3",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 50,
-    "skipDecision": 57,
-    "worktreeSetup": 13399,
-    "typescriptBuild": 14845,
-    "rootDropReleaseAssembly": 28371,
-    "onefileReleaseAssembly": 10068,
-    "artifactSync": 10346,
+    "inputHashCalculation": 49,
+    "skipDecision": 58,
+    "worktreeSetup": 22252,
+    "typescriptBuild": 18305,
+    "rootDropReleaseAssembly": 27413,
+    "onefileReleaseAssembly": 10069,
+    "artifactSync": 9694,
     "cleanup": 0,
-    "totalElapsed": 109024
+    "totalElapsed": 117682
   }
 }
