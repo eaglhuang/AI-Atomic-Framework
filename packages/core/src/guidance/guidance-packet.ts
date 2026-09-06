@@ -42,6 +42,9 @@ export interface ProjectOrientationReport {
   readonly detectedLanguages: readonly string[];
   readonly packageManager: string | null;
   readonly testEntrypoints: readonly string[];
+  readonly testEntrypointsTruncated?: boolean;
+  readonly testEntrypointsTotalCount?: number;
+  readonly testEntrypointsInventoryMode?: 'compact' | 'full';
   readonly governanceFiles: readonly string[];
   readonly adapterStatus: {
     readonly status: 'missing' | 'available' | 'unknown';
