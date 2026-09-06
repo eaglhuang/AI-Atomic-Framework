@@ -1,0 +1,266 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0418",
+  "title": "Deferred closeback must not leave stale derived manifests",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "A deferred close with a derived manifest leaves no stale dirty manifest; if proof is unavailable, it emits a governed recovery command.",
+    "Foreign staged and worktree files remain byte-identical and excluded.",
+    "Red and green runs exercise the same public closeback seam and receipt lineage, with no direct index mutation in the test harness."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/**",
+    "packages/cli/src/commands/git-governance/implementation/**",
+    "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/**",
+    "packages/cli/src/commands/git-governance/implementation/**",
+    "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli:surface",
+    "npm run validate:runner-reproducibility"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-closeback-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.taskflow-deferred-closeback",
+        "pattern": "Derived manifest closeback ownership",
+        "source": "packages/cli/src/commands/taskflow",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0418-deferred-closeback-must-not-leave-stale-derived-manifests.task.md",
+    "sectionTitle": "ATM-GOV-0418",
+    "headingLine": 60,
+    "hash": "9befaf0d6ca12eb6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0418-deferred-closeback-must-not-leave-stale-derived-manifests.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:9befaf0d6ca12eb66ca5ee3d7302ba2dfe2f322507c7eabef596fdec7851e1f6",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T13:53:02.887Z"
+    }
+  },
+  "importedAt": "2026-09-06T13:53:02.887Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_taskflow_deferred_closeback_no_stale_derived_manifest_0418",
+      "targetGroupId": "null",
+      "semanticKey": "taskflow_deferred_closeback_derived_manifest",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "deferred-closeback-derived-manifest"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "taskflow-deferred-closeback-contract",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_taskflow_deferred_closeback_no_stale_derived_manifest_0418"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T13-54-16-598Z-claim-63f1e5f20eaf",
+  "lastTransitionAt": "2026-09-06T13:54:16.598Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-06T13:54:10.265Z",
+  "promotedAt": "2026-09-06T13:54:10.269Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-cc0229ed6b7c",
+    "claimedAt": "2026-09-06T13:54:10.273Z",
+    "heartbeatAt": "2026-09-06T13:54:10.273Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0418.json",
+      "packages/cli/src/commands/git-governance/implementation/**",
+      "packages/cli/src/commands/taskflow/**",
+      "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906135410-codex-captain-bc3ec917d7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906135410-codex-captain-bc3ec917d7\""
+    }
+  },
+  "startedAt": "2026-09-06T13:54:10.273Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-bfea13cf847f6694",
+    "ticketDigest": "sha256:bfea13cf847f6694675e4e98d904e0122f020c6783de914e34b0c5097044c3f9",
+    "taskId": "ATM-GOV-0418",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260906135410-codex-captain-bc3ec917d7",
+    "claimGeneration": "lease-cc0229ed6b7c",
+    "issuedAt": "2026-09-06T13:54:10.273Z",
+    "expiresAt": "2026-09-06T14:24:10.273Z",
+    "scopeDigest": "sha256:0e221a465970acb8a9708202216e6a039ff494f012217e6675f0c804546da59d",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T13:54:10.273Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0418.*",
+          ".atm/history/task-events/ATM-GOV-0418/**",
+          ".atm/history/tasks/ATM-GOV-0418.json",
+          "packages/cli/src/commands/git-governance/implementation/**",
+          "packages/cli/src/commands/taskflow/**",
+          "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+        ],
+        "digest": "sha256:64f60331d3f17c1ddbc4e3e50795bd9badb027c5854d2c2bc3134ea2221ec031"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906135410-codex-captain-ATM-GOV-0418-e668a6545f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0418",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0418.*",
+      ".atm/history/task-events/ATM-GOV-0418/**",
+      ".atm/history/tasks/ATM-GOV-0418.json",
+      "packages/cli/src/commands/git-governance/implementation/**",
+      "packages/cli/src/commands/taskflow/**",
+      "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f6e25bd2c6ce24425375cfa9f7dbfe29868883c181dc72df68d48b9455c9be0e",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260906135410-codex-captain-ATM-GOV-0418-e668a6545f",
+    "laneSession": {
+      "laneSessionId": "lane-20260906135410-codex-captain-bc3ec917d7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906135410-codex-captain-bc3ec917d7\""
+    },
+    "createdAt": "2026-09-06T13:54:16.597Z",
+    "status": "active"
+  }
+}
