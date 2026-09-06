@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0104",
+  "updatedAt": "2026-09-06T16:02:01.827Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts"
+      ],
+      "generatedAt": "2026-09-06T16:01:21.962Z",
+      "startedAt": "2026-09-06T16:01:21.055Z",
+      "finishedAt": "2026-09-06T16:01:21.962Z",
+      "durationMs": 907,
+      "runnerKind": "dev-source",
+      "sourceCommit": "94cf4a31fce12c1b70ecff9a7af93334ae632f6f",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-06T16:01:36.013Z",
+      "startedAt": "2026-09-06T16:01:26.215Z",
+      "finishedAt": "2026-09-06T16:01:36.013Z",
+      "durationMs": 9798,
+      "runnerKind": "dev-source",
+      "sourceCommit": "94cf4a31fce12c1b70ecff9a7af93334ae632f6f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:15f3a46075326c1f08b0ce8a7e388cba290b11580bdde1f8162f9a050ba30784",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-09-06T16:02:01.826Z",
+      "startedAt": "2026-09-06T16:01:40.174Z",
+      "finishedAt": "2026-09-06T16:02:01.826Z",
+      "durationMs": 21652,
+      "runnerKind": "dev-source",
+      "sourceCommit": "94cf4a31fce12c1b70ecff9a7af93334ae632f6f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
