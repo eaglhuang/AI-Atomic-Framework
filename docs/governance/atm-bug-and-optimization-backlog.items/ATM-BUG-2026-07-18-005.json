@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — runner-sync receipt lifecycle and close handoff verified on 2026-09-06",
   "area": "Runner Sync / Taskflow Close",
   "finding": "Runner-sync cleanup is not fully task-scoped after close: broker runner-sync release can reference a receipt that is not generated or committed by a governed post-close pathway, and foreign receipts such as .atm/history/evidence/ATM-GOV-0168.runner-sync-receipt.json can remain as untracked residue.",
   "expectedBehavior": "Each task that runs runner-sync should end with a clean worktree: build should emit a governed receipt, broker release should require or write that receipt through task evidence/event context, and taskflow close should either include release artifacts or provide a safe post-close runner-sync commit path.",
-  "evidenceOrRepro": "During ATM-GOV-0169 close on 2026-07-18, npm run build updated release/** and broker runner-sync release cleared steward work runner-sync-b58f23d1, but no ATM-GOV-0169.runner-sync-receipt.json was generated. A manual receipt was rejected by pre-commit with ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT. Worktree also retained foreign untracked .atm/history/evidence/ATM-GOV-0168.runner-sync-receipt.json from cursor-gov-0168.",
-  "followUp": "Open a GOV task to make runner-sync receipt publication first-class: emit receipt during sealed build, append a lane/task event, include it in task evidence context, and add a residue check that fails close if the active task leaves release or runner-sync artifacts uncommitted."
+  "evidenceOrRepro": "The original receipt-lifecycle failure no longer reproduces. Current implementation requires task-attributed runner-sync receipts, validates publication handoff and runner input continuity at close, and exposes receipt-only reconciliation for verified orphan/stale receipts. `node --strip-types tests/cli/runner-sync-clean-close-pathway.test.ts`, `node --strip-types tests/cli/runner-publication-reconciliation.test.ts`, and `node --strip-types tests/cli/runner-publication-disposition-gate.test.ts` all exited 0 on 2026-09-06.",
+  "followUp": "Keep the clean-close, publication-reconciliation, and disposition-gate regressions green. Any new untracked runner receipt or missing task attribution requires a fresh incident card."
 }
