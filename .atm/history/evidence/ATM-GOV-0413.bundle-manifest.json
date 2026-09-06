@@ -1,0 +1,96 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0413",
+  "updatedAt": "2026-09-06T01:16:29.832Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts",
+    "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts"
+      ],
+      "generatedAt": "2026-09-06T01:11:09.406Z",
+      "startedAt": "2026-09-06T01:11:08.986Z",
+      "finishedAt": "2026-09-06T01:11:09.406Z",
+      "durationMs": 420,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b02dd8bf4b32297097cec9b8c7424aa0f9555e6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:140430092f1720f25b18e0e17aea8ed271b4dddbb1e93b167ca3a1133daf11e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts"
+      ],
+      "generatedAt": "2026-09-06T01:15:19.170Z",
+      "startedAt": "2026-09-06T01:15:17.008Z",
+      "finishedAt": "2026-09-06T01:15:19.170Z",
+      "durationMs": 2162,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b02dd8bf4b32297097cec9b8c7424aa0f9555e6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae3fb3d729be92f3d724e5c0a94061ace8eb5bf084e6634456f4c52b96051340",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts"
+      ],
+      "generatedAt": "2026-09-06T01:15:22.853Z",
+      "startedAt": "2026-09-06T01:15:22.531Z",
+      "finishedAt": "2026-09-06T01:15:22.853Z",
+      "durationMs": 322,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b02dd8bf4b32297097cec9b8c7424aa0f9555e6",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-06T01:15:36.168Z",
+      "startedAt": "2026-09-06T01:15:26.244Z",
+      "finishedAt": "2026-09-06T01:15:36.168Z",
+      "durationMs": 9924,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b02dd8bf4b32297097cec9b8c7424aa0f9555e6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae3fb3d729be92f3d724e5c0a94061ace8eb5bf084e6634456f4c52b96051340",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts"
+      ],
+      "generatedAt": "2026-09-06T01:16:29.831Z",
+      "startedAt": "2026-09-06T01:16:29.539Z",
+      "finishedAt": "2026-09-06T01:16:29.831Z",
+      "durationMs": 292,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b02dd8bf4b32297097cec9b8c7424aa0f9555e6",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
