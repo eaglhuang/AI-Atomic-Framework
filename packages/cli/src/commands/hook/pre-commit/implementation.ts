@@ -293,7 +293,11 @@ export function runPreCommitHook(cwd: string) {
   const explicitActorWarning = stagedFiles.length > 0 && !normalizeOptionalText(process.env.ATM_COMMIT_ACTOR_ID)
     ? message('warn', 'ATM_HOOK_COMMIT_ACTOR_NOT_EXPLICIT', 'No explicit commit actor was provided. Configure this editor/agent with its own actor identity instead of relying on repo default identity.', {
       clearStaleDefaultCommand: 'node atm.mjs identity clear --json',
-      requiredCommand: 'node atm.mjs identity clear --json && node atm.mjs identity set --actor <actor-id> --editor <editor-id> --git-name "<git user.name>" --git-email "<git user.email>" --json',
+      requiredCommand: 'node atm.mjs identity clear --json',
+      requiredCommands: [
+        'node atm.mjs identity clear --json',
+        'node atm.mjs identity set --actor <actor-id> --editor <editor-id> --git-name "<git user.name>" --git-email "<git user.email>" --json',
+      ],
       env: 'ATM_COMMIT_ACTOR_ID or ATM_ACTOR_ID'
     })
     : null;

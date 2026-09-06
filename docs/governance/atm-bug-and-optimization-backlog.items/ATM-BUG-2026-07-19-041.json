@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Low",
-  "status": "Open",
+  "status": "Fixed",
   "area": "CLI UX / Windows Command Examples",
   "finding": "ATM hook guidance emitted a `requiredCommand` containing `&&`, which fails in the current Windows PowerShell surface and repeats the exact shell-syntax class of dogfood failure the owner asked agents to avoid.",
   "expectedBehavior": "ATM guidance should emit Windows-safe command sequences or shell-specific variants instead of assuming POSIX/cmd-style command separators.",
-  "evidenceOrRepro": "During backlog commit, the hook warning `ATM_HOOK_COMMIT_ACTOR_NOT_EXPLICIT` returned `node atm.mjs identity clear --json && node atm.mjs identity set ...`; a previous attempt to use `&&` in this thread failed with PowerShell `The token '&&' is not a valid statement separator in this version`.",
-  "followUp": "Add shell-aware command rendering for guidance/hook messages, prefer separate commands in JSON arrays, and update first-layer skills to avoid PowerShell-hostile examples."
+  "evidenceOrRepro": "Reproduced on current HEAD: both the identity-check error details and pre-commit hook warning emitted a PowerShell-hostile `requiredCommand` containing `&&`. Added a focused regression that runs the hook on a staged file and asserts a single safe command plus an ordered `requiredCommands` array with no shell separator. `identity-command-windows-safe.test.ts`, the existing identity-check test, `npx tsc --noEmit`, `git diff --check`, and `npm run check:encoding:touched` all exit 0.",
+  "followUp": "Keep `requiredCommands` as the canonical multi-step representation; future guidance must not reintroduce shell-specific command chaining into a copyable single command field."
 }
