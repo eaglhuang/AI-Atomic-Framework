@@ -5638,6 +5638,7 @@
     "release/atm-root-drop/tests/cli/taskflow-status-migration-hint.test.ts",
     "release/atm-root-drop/tests/cli/tasks-audit-read-projection.test.ts",
     "release/atm-root-drop/tests/cli/tasks-claim-auto-intent.test.ts",
+    "release/atm-root-drop/tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
     "release/atm-root-drop/tests/cli/tasks-legacy-impl-extraction.test.ts",
     "release/atm-root-drop/tests/cli/tasks-new.test.ts",
     "release/atm-root-drop/tests/cli/tasks-repair-claim.test.ts",
@@ -6035,8 +6036,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 2,
-    "unchanged": 1961,
+    "copied": 5,
+    "unchanged": 1959,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -22369,7 +22370,7 @@
       },
       {
         "path": "packages/cli/dist/commands/command-specs/tasks.spec.js",
-        "digest": "115b1de9eca1afea84010ae5432b3452c2a6eb1961f5541a917fa0b84fca1b43",
+        "digest": "35eb38691d93c948ab0db568a5d4f3eb835a8953b02af131d92e28e9af2e87fc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/command-specs/tasks.spec.js"
@@ -25636,7 +25637,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/import-orchestrator.js",
-        "digest": "1918ebdae393c85d1a3b58f37858157f3a7beac0f0ba7cac94f3141251353d95",
+        "digest": "b90873ad5dc2aa4c778674ae0f35c14d7d0aa8a9988523cd9bdb54e0d193e789",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/import-orchestrator.js"
@@ -28435,7 +28436,7 @@
       },
       {
         "path": "packages/cli/src/commands/command-specs/tasks.spec.ts",
-        "digest": "d9b7c2f2cfed7f6f726c43b719c0000fd175d83e5f1c4e39f510533c61f432fc",
+        "digest": "27f2e2c8ee23033dd6628daee754d0abc0243299f7580db94622eb8749cb6049",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/command-specs/tasks.spec.ts"
@@ -32953,7 +32954,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/import-orchestrator.ts",
-        "digest": "34639b746a9170661439c132d090c87639506f9757e9248fe722ff89250709a0",
+        "digest": "e089d3fd60d34314c17d39c04dea2d4910c571e03225a3f4201ca68cfb7375be",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/import-orchestrator.ts"
@@ -56496,6 +56497,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
+        "digest": "dccff30826b2a4e032a1db238e4fa9c04181f5bcea744c7bf07bae54902fb562",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/tasks-legacy-impl-extraction.test.ts",
         "digest": "d724f82a9a7549094de025a0a92f7f7c8f1ad045c8a97af0f03e6881c0c44a89",
         "origin": "source",
@@ -60042,7 +60052,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:6184bffae2cdb59cca5ea9631bb8466211ecc816a740a481aaeebc1dd7a423e4"
+    "treeDigest": "sha256:e2370963d144719f37b8d30ab73439cdde5ec6db24f66a5b50593d87b9f24ac2"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61579,7 +61589,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:4b21c3800cf056d1a6e5629abfef2faa5549d0360102893d887e9802a4334426"
+    "digest": "sha256:f5ccdb253839706a9fce2b72887f978ead8e5dadaaf0273525cba0cdaa09b090"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -67191,6 +67201,7 @@
       "release/atm-root-drop/tests/cli/taskflow-status-migration-hint.test.ts",
       "release/atm-root-drop/tests/cli/tasks-audit-read-projection.test.ts",
       "release/atm-root-drop/tests/cli/tasks-claim-auto-intent.test.ts",
+      "release/atm-root-drop/tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
       "release/atm-root-drop/tests/cli/tasks-legacy-impl-extraction.test.ts",
       "release/atm-root-drop/tests/cli/tasks-new.test.ts",
       "release/atm-root-drop/tests/cli/tasks-repair-claim.test.ts",
@@ -67591,22 +67602,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:fefea617be319326ac34b0157eb0243799eb5f57f09cf34eb2f2d8b9d213f114",
-  "sealedSourceCommit": "d5e7e7a1a8cd7ed294b43a9a8a62fd52a46d69d9",
+  "buildInputsTreeHash": "sha256:4ab01f5dbae6f6beddaa5907c7bd72eb731beb0e6723d6eb7b43e23f54aeca2d",
+  "sealedSourceCommit": "e1a09c3ed5b1a9ff36aa0bbf78314c89d57c13b6",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:294de4a8be7fce17e4be5ca02720db6363822795fb6648a77cc7fbaedfbb6387",
-  "tsBuildCacheDigest": "sha256:120325e84e85a3584f36380916945539493e7ade84d9445c8af6b6307f5babf0",
+  "incrementalPlanDigest": "sha256:18110fdf84451fd3ed81facb7f6f7609fe1601daa8b6d952091fbeb83bd5c404",
+  "tsBuildCacheDigest": "sha256:3f3e1b84c128c932a434d507aad345df205314885f7360f313a09f5cbee703f4",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 50,
+    "inputHashCalculation": 54,
     "skipDecision": 59,
-    "worktreeSetup": 10920,
-    "typescriptBuild": 19493,
-    "rootDropReleaseAssembly": 34362,
-    "onefileReleaseAssembly": 27224,
-    "artifactSync": 32878,
+    "worktreeSetup": 11327,
+    "typescriptBuild": 18194,
+    "rootDropReleaseAssembly": 32652,
+    "onefileReleaseAssembly": 8258,
+    "artifactSync": 9744,
     "cleanup": 0,
-    "totalElapsed": 151063
+    "totalElapsed": 124911
   }
 }

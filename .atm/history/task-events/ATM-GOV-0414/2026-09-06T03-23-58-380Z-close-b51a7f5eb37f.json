@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T03-23-58-380Z-close-b51a7f5eb37f",
+  "taskId": "ATM-GOV-0414",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260906030038-codex-captain-ATM-GOV-0414-2ce8098470",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0414.json",
+  "taskSha256": "sha256:3cf5a82c35340ce877c754a09c3ff6b83584b4f64948ddece953ebc4a6c78479",
+  "createdAt": "2026-09-06T03:23:58.380Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0414 --actor codex-captain --status done --historical-delivery e1a09c3ed5b1a9ff36aa0bbf78314c89d57c13b6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906030038-codex-captain-ATM-GOV-0414-2ce8098470",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0414.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T03:23:58.365Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0414.*",
+        ".atm/history/task-events/ATM-GOV-0414/**",
+        ".atm/history/tasks/ATM-GOV-0414.json",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/legacy/implementation.ts",
+        "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/tasks-import-metadata-only-preserve-claim.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

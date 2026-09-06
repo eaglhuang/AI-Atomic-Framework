@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0414",
   "title": "Provide same-owner metadata-only planning import and seal repair",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "ATM-GOV-0273"
@@ -152,8 +152,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-06T03-10-29-613Z-metadata-only-import-e1642bba9505",
-  "lastTransitionAt": "2026-09-06T03:10:29.613Z",
+  "lastTransitionId": "2026-09-06T03-23-58-380Z-close-b51a7f5eb37f",
+  "lastTransitionAt": "2026-09-06T03:23:58.380Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-06T03:00:38.912Z",
@@ -162,7 +162,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-2b5fe40c0224",
     "claimedAt": "2026-09-06T03:00:38.922Z",
-    "heartbeatAt": "2026-09-06T03:00:38.922Z",
+    "heartbeatAt": "2026-09-06T03:23:58.377Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0414.json",
@@ -171,14 +171,14 @@
       "packages/cli/src/commands/tasks/legacy/implementation.ts",
       "tests/cli/tasks-import-metadata-only-preserve-claim.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260906030039-codex-captain-d446eca299",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906030039-codex-captain-d446eca299\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-06T03:00:38.922Z",
   "startedByActor": "codex-captain",
@@ -278,5 +278,9 @@
     },
     "createdAt": "2026-09-06T03:00:45.675Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-06T03:23:58.377Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260906030038-codex-captain-ATM-GOV-0414-2ce8098470",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0414.closure-packet.json"
 }

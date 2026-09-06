@@ -16,6 +16,8 @@ export default defineCommandSpec({
         { flag: '--planning-repo', value: 'path', summary: 'Optional planning repository root for tasks realign-plan-source path resolution (defaults to ATM_PLANNING_REPO_ROOT or cwd).' },
         { flag: '--force', summary: 'Overwrite existing task files even when the source hash differs. Active claims are still preserved unless --force-overwrite-claims is set.' },
         { flag: '--force-overwrite-claims', summary: 'Allow tasks import --write to overwrite tasks with active or handoff claims and emit claim-displaced-by-import transition events.', subcommands: ['import'] },
+        { flag: '--metadata-only', summary: 'For tasks import: update only validator metadata and planning-source seal; requires --preserve-active-claim and --write.', subcommands: ['import'] },
+        { flag: '--preserve-active-claim', summary: 'For tasks import: require the current active claim owner and preserve lifecycle/scope fields during metadata-only repair.', subcommands: ['import'] },
         { flag: '--waive-planning-root', summary: 'For framework-repo AAO/TEAM imports from .atm/task-plans: explicitly waive the canonical planning-root authorship preflight; requires --reason.', subcommands: ['import'] },
         { flag: '--reason', value: 'text', summary: 'Required rationale when --waive-planning-root is set.' },
         { flag: '--reset-open', summary: 'Rebuild matching imported tasks as open during tasks import --write.', subcommands: ['import'] },

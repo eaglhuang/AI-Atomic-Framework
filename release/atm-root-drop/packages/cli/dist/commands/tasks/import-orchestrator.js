@@ -11,13 +11,22 @@ import { buildExtractionFirstPatrolDiagnostics, buildAtomMapProjectionScopeDiagn
 import { applySingleCardContractValidation } from './import-card-contract-validation.js';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
 import { advancePlanningSourceSeal, attachPlanningSourceSeal, buildPlanningSourceSeal, readPlanningSourceSeal } from './import-task.js';
+import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.js';
 import { classifyForceImportAdmission } from './import-validation.js';
 import { normalizeImportedTasksForTargetLedger } from './task-import-status-normalization.js';
 import { issueTaskImportAdmissionTicket, validateWorkAdmissionImport } from './task-work-admission-import.js';
 import { preparePlanningMirrorReconcile } from './planning-mirror-reconcile.js';
 import { classifyResetOpenImportForOptions, collectActiveClaimImportSkips, detectPlanHeadings, enrichParsedTasksFromSiblingTaskCards, parseImportOptions, parseSingleCardFromPlugin, parsePlanMarkdown, writeImportEvidence, writeTaskFiles, taskPathFor, assertLocalTaskLedgerEnabled, recordStaleRunnerOverride } from '../tasks.js';
+const jsonEqual = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+export function applyMetadataOnlyImport(input) { const taskPath = taskPathFor(input.cwd, input.taskId); if (!existsSync(taskPath))
+    throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${input.taskId}.`, { exitCode: 2 }); const current = JSON.parse(readFileSync(taskPath, 'utf8')); const claim = current.claim && typeof current.claim === 'object' && !Array.isArray(current.claim) ? current.claim : null; const active = claim && (claim.state === 'active' || claim.state === 'handoff') ? claim : null; const actorId = input.actorId?.trim() || null; if (!active)
+    throw new CliError('ATM_TASK_METADATA_ONLY_IMPORT_CLAIM_REQUIRED', `Metadata-only import requires an active claim for ${input.taskId}.`, { exitCode: 1 }); if (!actorId || active.actorId !== actorId)
+    throw new CliError('ATM_TASK_METADATA_ONLY_IMPORT_OWNER_MISMATCH', `Metadata-only import requires the active claim owner for ${input.taskId}.`, { exitCode: 1, details: { activeActorId: active.actorId ?? null, actorId } }); const source = current.source && typeof current.source === 'object' && !Array.isArray(current.source) ? current.source : {}; const next = { ...current, validators: [...input.importedValidators], source: { ...source, planningSourceSeal: input.importedPlanningSourceSeal } }; const changedKeys = [...(jsonEqual(current.validators ?? [], next.validators) ? [] : ['validators']), ...(jsonEqual(source.planningSourceSeal ?? null, input.importedPlanningSourceSeal) ? [] : ['source.planningSourceSeal'])]; writeTaskDocumentWithTransition({ cwd: input.cwd, taskPath, taskId: input.taskId, taskDocument: next, action: 'metadata-only-import', actorId, previousStatus: typeof current.status === 'string' ? current.status : null, command: input.command }); const lane = active.laneSession && typeof active.laneSession === 'object' ? active.laneSession.laneSessionId : active.laneId; const seal = source.planningSourceSeal; const nextSeal = next.source.planningSourceSeal; return { taskId: input.taskId, taskPath: relativePathFrom(input.cwd, taskPath), actorId, laneId: typeof lane === 'string' ? lane : null, sessionId: typeof active.sessionId === 'string' ? active.sessionId : (typeof current.startedBySessionId === 'string' ? current.startedBySessionId : null), leaseId: typeof active.leaseId === 'string' ? active.leaseId : null, beforeSourceDigest: seal && typeof seal === 'object' ? JSON.stringify(seal) : null, afterSourceDigest: nextSeal && typeof nextSeal === 'object' ? JSON.stringify(nextSeal) : null, changedKeys, preservedKeys: ['status', 'claim', 'scopePaths', 'deliverables', 'dependencies', 'evidence', 'rollback', 'atomizationImpact'] }; }
 export async function runTasksImport(argv) {
-    const options = parseImportOptions(argv);
+    const metadataOnly = argv.includes('--metadata-only');
+    const preserveActiveClaim = argv.includes('--preserve-active-claim');
+    const actor = (() => { const index = argv.indexOf('--actor'); return index >= 0 ? String(argv[index + 1] ?? '').trim() || null : process.env.ATM_ACTOR_ID?.trim() ?? null; })();
+    const options = { ...parseImportOptions(argv.filter((arg) => arg !== '--metadata-only' && arg !== '--preserve-active-claim' && arg !== '--actor' && arg !== actor)), metadataOnly, preserveActiveClaim, actor };
     if (!options.from) {
         throw new CliError('ATM_CLI_USAGE', importPathUsageMessage(), {
             exitCode: 2,
@@ -32,6 +41,12 @@ export async function runTasksImport(argv) {
     }
     if (options.reconcileMirror && (options.force || options.forceOverwriteClaims || options.resetOpen || options.reopen)) {
         throw new CliError('ATM_CLI_USAGE', 'tasks import --reconcile-mirror cannot be combined with --force, --force-overwrite-claims, --reset-open, or --reopen.', { exitCode: 2 });
+    }
+    if (metadataOnly !== preserveActiveClaim) {
+        throw new CliError('ATM_CLI_USAGE', 'tasks import metadata-only mode requires both --metadata-only and --preserve-active-claim.', { exitCode: 2 });
+    }
+    if (metadataOnly && (!options.write || options.force || options.forceOverwriteClaims || options.resetOpen || options.reopen || options.reconcileMirror)) {
+        throw new CliError('ATM_CLI_USAGE', 'metadata-only import requires --write and cannot be combined with force, reset, reopen, or mirror reconciliation.', { exitCode: 2 });
     }
     // TASK-RFT-0011 — reset-open UX classification.
     // The historical behavior: any use of `--reset-open` on a `--write` import
@@ -303,6 +318,7 @@ export async function runTasksImport(argv) {
     }
     const writtenPaths = [];
     let evidencePath = null;
+    let metadataReceipt = null;
     // Deliverables participate in governed close bundles, so prose declarations
     // must be rejected at import rather than failing later during close.
     const strictPathViolations = [];
@@ -386,10 +402,25 @@ export async function runTasksImport(argv) {
     }
     if (options.write) {
         assertLocalTaskLedgerEnabled(options.cwd, 'import --write');
-        const planningMirrorReconcile = options.reconcileMirror
+        if (metadataOnly) {
+            if (parsed.tasks.length !== 1) {
+                throw new CliError('ATM_TASK_METADATA_ONLY_IMPORT_SINGLE_CARD_REQUIRED', 'Metadata-only import requires exactly one task card.', { exitCode: 1 });
+            }
+            const task = parsed.tasks[0];
+            metadataReceipt = applyMetadataOnlyImport({
+                cwd: options.cwd,
+                taskId: task.workItemId,
+                actorId: actor,
+                importedValidators: task.validators ?? [],
+                importedPlanningSourceSeal: task.source.planningSourceSeal ?? null,
+                command: `node atm.mjs tasks import --from ${options.from} --write --metadata-only --preserve-active-claim --actor ${actor ?? '<actor>'} --json`
+            });
+            writtenPaths.push(metadataReceipt.taskPath);
+        }
+        const planningMirrorReconcile = metadataOnly ? null : options.reconcileMirror
             ? preparePlanningMirrorReconcile({ cwd: options.cwd, planAbsolute, tasks: parsed.tasks })
             : null;
-        const result = writeTaskFiles({
+        const result = metadataOnly ? { writtenPaths: [], diagnostics: [] } : writeTaskFiles({
             cwd: options.cwd,
             tasks: parsed.tasks,
             force: options.force,
@@ -468,7 +499,8 @@ export async function runTasksImport(argv) {
             planPath: manifest.planPath,
             writtenPaths,
             evidencePath,
-            emergencyUse
+            emergencyUse,
+            ...(metadataReceipt ? { metadataOnly: metadataReceipt } : {})
         }
     });
 }
