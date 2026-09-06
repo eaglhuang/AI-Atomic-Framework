@@ -5321,6 +5321,7 @@
     "release/atm-root-drop/tests/cli/historical-residue-cleanup.test.ts",
     "release/atm-root-drop/tests/cli/historical-work-admission-attestation.test.ts",
     "release/atm-root-drop/tests/cli/hook-audit-scope-classification.test.ts",
+    "release/atm-root-drop/tests/cli/identity-command-windows-safe.test.ts",
     "release/atm-root-drop/tests/cli/identity-per-actor-routing.test.ts",
     "release/atm-root-drop/tests/cli/incident-learning-backlog-skill.test.ts",
     "release/atm-root-drop/tests/cli/integration-editor-detection.test.ts",
@@ -6030,8 +6031,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 3,
-    "unchanged": 1961,
+    "copied": 5,
+    "unchanged": 1959,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -23291,7 +23292,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/identity-check-command.js",
-        "digest": "8aa1e58736d7e349e204323fc8be06994ba0cc5aaa74d155abbf4f73b8d31a9a",
+        "digest": "2e113ad7aa7f187b014db23259730b50a1aef7b5f5fb583d4c43245e0134b504",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/identity-check-command.js"
@@ -23777,7 +23778,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/implementation.js",
-        "digest": "f258a756aee997e7b77530612d58d9971d9f96dd5290cdc5932ec28e059e027d",
+        "digest": "cbcb550270fac4fcb9802b9c74491a064f65ebe8666f5639aff816fb7eda6969",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/implementation.js"
@@ -29645,7 +29646,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts",
-        "digest": "9e6331efa422d1b2f4e4d427e5a44dbebff8214f6c856ebd08cfb5dac2893c28",
+        "digest": "7cb88b378b002521a48d405c0bcb76676bf496a099263ade7ed56319f261d607",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts"
@@ -30257,7 +30258,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/implementation.ts",
-        "digest": "3aaf0fd9145101b22b42af8c655c0a35ddc7b26bb3e6649d96e61f024ddee628",
+        "digest": "d3b66887b61fb339b53b534756c407a77dfc397fe33bd1c23f409753249cc880",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/implementation.ts"
@@ -53638,6 +53639,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/identity-command-windows-safe.test.ts",
+        "digest": "33d2cb4e796897f2d73f20b8e25371bebadde75f43668dfe5dd9541ab9b45346",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/identity-command-windows-safe.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/identity-per-actor-routing.test.ts",
         "digest": "112c54ff8d8611a0c1fa9960b71683e1475cea0c55bd78273812255b2e370954",
         "origin": "source",
@@ -59992,7 +60002,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:9a406d9ce7c39e39325b4ef343f3aed38ebd34957a5541f15e8af13cedcac044"
+    "treeDigest": "sha256:c220363cff4a0ce3644c459a9ceea3907d72768468939a05b531f14e9efd8acc"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61529,7 +61539,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:6047aa57cd2dbfdc9e0408bb29fdae21fb97d8012b228e36ff52f980712d6683"
+    "digest": "sha256:dc83daa917b4e3db16d8dd9dd9c8db52049d1343dbae31df208a47d4e61481cf"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66824,6 +66834,7 @@
       "release/atm-root-drop/tests/cli/historical-residue-cleanup.test.ts",
       "release/atm-root-drop/tests/cli/historical-work-admission-attestation.test.ts",
       "release/atm-root-drop/tests/cli/hook-audit-scope-classification.test.ts",
+      "release/atm-root-drop/tests/cli/identity-command-windows-safe.test.ts",
       "release/atm-root-drop/tests/cli/identity-per-actor-routing.test.ts",
       "release/atm-root-drop/tests/cli/incident-learning-backlog-skill.test.ts",
       "release/atm-root-drop/tests/cli/integration-editor-detection.test.ts",
@@ -67536,22 +67547,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:fa63695fbd0ea6e55031347d28f72cf6b3b00ae313f81b70fac815370b50cab3",
-  "sealedSourceCommit": "528c5b5cddbdb1fdf615ab720a804f92ee16b453",
+  "buildInputsTreeHash": "sha256:d6d811949d6a94874d63ca3d63a18442891ef585de9e19a9a2136254697775ff",
+  "sealedSourceCommit": "eac5c402da07ea551e74f27c657f815455a87734",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:e95a61cce485712eb6af9c9c2445e40f1ff797c7c1d0f5a3c31bd11a863ec9ea",
-  "tsBuildCacheDigest": "sha256:c90acaf372394c43258aa8791c6f5152f76e421e58ca6a5b91d6b95e3cfb9d61",
+  "incrementalPlanDigest": "sha256:8b4b6cb8f08fa27b550ab24dfd7e4048d1d52ed54fe0fb0d6de4b1c31d44f16b",
+  "tsBuildCacheDigest": "sha256:792b92c5c520205f72797e48450d45d6c17412e1eee62e7c15b10b20f2247893",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 51,
-    "skipDecision": 60,
-    "worktreeSetup": 10802,
-    "typescriptBuild": 17532,
-    "rootDropReleaseAssembly": 32678,
-    "onefileReleaseAssembly": 8502,
-    "artifactSync": 8327,
+    "inputHashCalculation": 76,
+    "skipDecision": 61,
+    "worktreeSetup": 11019,
+    "typescriptBuild": 17049,
+    "rootDropReleaseAssembly": 31576,
+    "onefileReleaseAssembly": 8072,
+    "artifactSync": 8064,
     "cleanup": 0,
-    "totalElapsed": 94158
+    "totalElapsed": 91543
   }
 }

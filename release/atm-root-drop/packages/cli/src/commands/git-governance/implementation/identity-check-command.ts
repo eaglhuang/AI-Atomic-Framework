@@ -427,7 +427,11 @@ export function requireExplicitGitActor(resolvedActor: LegacyValue, action: Lega
         resolvedFrom: resolvedActor.source,
         currentEditorHint: editorHint,
         clearStaleDefaultCommand: "node atm.mjs identity clear --json",
-        requiredCommand: `node atm.mjs identity clear --json && node atm.mjs identity set --actor <actor-id> --editor ${quoteCliValue(editorHint)} --git-name "<git user.name>" --git-email "<git user.email>" --json`,
+        requiredCommand: "node atm.mjs identity clear --json",
+        requiredCommands: [
+          "node atm.mjs identity clear --json",
+          `node atm.mjs identity set --actor <actor-id> --editor ${quoteCliValue(editorHint)} --git-name "<git user.name>" --git-email "<git user.email>" --json`,
+        ],
         usage: `node atm.mjs ${action} --actor <actor-id> ...`,
       },
     },
