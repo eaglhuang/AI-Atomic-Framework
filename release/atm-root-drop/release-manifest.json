@@ -5215,6 +5215,7 @@
     "release/atm-root-drop/tests/cli/causal-validator-selector.test.ts",
     "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
     "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
+    "release/atm-root-drop/tests/cli/claim-adopt-unowned-wip.test.ts",
     "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
     "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
     "release/atm-root-drop/tests/cli/claim-renew-expired-lane.test.ts",
@@ -6034,11 +6035,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1435,
-    "unchanged": 4564,
+    "copied": 5,
+    "unchanged": 1959,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -25365,7 +25366,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/claim-orchestrator.js",
-        "digest": "13ed70d684543ff95e593e54b43b350fd69bdbec53874486c2052a3730905bbe",
+        "digest": "ffcb0006e7dea1176abc0ee0f2a7a594fc852dbca4d08a3ad7aac28e340c6a54",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/claim-orchestrator.js"
@@ -26112,7 +26113,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/task-option-parsers/misc-claim-options.js",
-        "digest": "fb9527ec95fdff272255302eb384bf0b62a8484295afbb6c548436ad5b3b1d2f",
+        "digest": "03fd39d2f8a03e16fa40ba14c08d07d144005c3becf95ed296af33e919f53fff",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/task-option-parsers/misc-claim-options.js"
@@ -32682,7 +32683,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/claim-orchestrator.ts",
-        "digest": "308df9dfa6296c8d4e557e708d97190d0e2ab0b9dc513f8da7202ba7204e1241",
+        "digest": "0e174a8227bf0934c0608339558f4a1a453a7c9326aa2a7daf0fe14462cbca60",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/claim-orchestrator.ts"
@@ -33429,7 +33430,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
-        "digest": "6785ea8df6a9e0a2cf39c1f2b43479df1807cae69350db3e67b5013153d91050",
+        "digest": "b4cedd212d652a915ab684faffa21150e734744242da030f69bccb1bcbb2c3d9",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts"
@@ -52688,6 +52689,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/claim-adopt-unowned-wip.test.ts",
+        "digest": "4aa5f42b683946163051e7f1b0df5b876cafae859d8f075419e6541fbb25fb35",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/claim-adopt-unowned-wip.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/claim-foreign-unstaged-wip.test.ts",
         "digest": "c5d01d6c30c82d3d3786dbbc7f77e59cc0fa428328fc5eaa33b7734d361b69fe",
         "origin": "source",
@@ -60032,7 +60042,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:6fd4b0cef4b972ee412ed23d95fdb09ca8c34573b348429b7a985e4ee868b2ce"
+    "treeDigest": "sha256:9476162f991a0093b75a1005ff740633a31bb1203f921648282159a8df6c3b87"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61569,7 +61579,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:26d92b9a1a5976c6c9ae75aeddeda68e5271769925f7b63ca54572f69b1c3a12"
+    "digest": "sha256:b22e2b61ce85d344962c4ed40c244ec099bcdac432d116519db82f6eabd06f1b"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -66758,6 +66768,7 @@
       "release/atm-root-drop/tests/cli/causal-validator-selector.test.ts",
       "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
       "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
+      "release/atm-root-drop/tests/cli/claim-adopt-unowned-wip.test.ts",
       "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
       "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
       "release/atm-root-drop/tests/cli/claim-renew-expired-lane.test.ts",
@@ -67580,22 +67591,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:4aa4c9c0a8def958b032fdfe4846684387173df39c02543bbf47414c185e2614",
-  "sealedSourceCommit": "8fd81e8c113a6767b779a14d6f2b1b5a46c28eb4",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:ccc919911b21596df2aabc8c2ac41afc6ef9e2caeba1252d835bd1a4be4bed36",
-  "tsBuildCacheDigest": "sha256:a2147a418ff6d698a015714059a9a3109fa68900dbd8569677c2e8830caf7e3c",
+  "buildInputsTreeHash": "sha256:8e62e78acba3e7ce5004b4cae162401003405a716fa2672c53edb2792b0898f8",
+  "sealedSourceCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:83cb8a5da1179bbc3c2f4885ee6c35ab5d866833c74e7cd47cad416891913dc9",
+  "tsBuildCacheDigest": "sha256:7be7630a4b8cb7fbb2a792e1aa7b430c27646e1a7f48d0ff9ec908f6fdd5ab94",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 54,
-    "skipDecision": 67,
-    "worktreeSetup": 10866,
-    "typescriptBuild": 11306,
-    "rootDropReleaseAssembly": 31277,
-    "onefileReleaseAssembly": 7943,
-    "artifactSync": 8123,
+    "inputHashCalculation": 57,
+    "skipDecision": 61,
+    "worktreeSetup": 11296,
+    "typescriptBuild": 20271,
+    "rootDropReleaseAssembly": 32137,
+    "onefileReleaseAssembly": 8083,
+    "artifactSync": 8061,
     "cleanup": 0,
-    "totalElapsed": 75569
+    "totalElapsed": 90784
   }
 }

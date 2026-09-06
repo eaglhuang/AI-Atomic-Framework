@@ -1,0 +1,157 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0413",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+  "governedTreeSha": "bc8438d310e46bc380cd259f419d3e6c6a7f35da",
+  "targetCommitDelta": {
+    "currentCommitSha": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+    "parentCommitShas": [
+      "a50574095eb8694a5e0657d16349c0cc063d3c78"
+    ],
+    "governedTreeSha": "bc8438d310e46bc380cd259f419d3e6c6a7f35da",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0413.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0413.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-23-28-162Z-import-267694333720.json",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-23-39-790Z-renew-8cd3ec9ad532.json",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-27-38-198Z-renew-ba246e197d81.json",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-28-38-917Z-renew-e85865b43642.json",
+      ".atm/history/tasks/ATM-GOV-0413.json",
+      "packages/cli/dist/commands/tasks/claim-orchestrator.js",
+      "packages/cli/dist/commands/tasks/task-option-parsers/misc-claim-options.js",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers/misc-claim-options.js",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/claim-adopt-unowned-wip.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:140430092f1720f25b18e0e17aea8ed271b4dddbb1e93b167ca3a1133daf11e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae3fb3d729be92f3d724e5c0a94061ace8eb5bf084e6634456f4c52b96051340",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts",
+    "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts",
+    "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T01:29:17.405Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0413.*",
+      ".atm/history/task-events/ATM-GOV-0413/**",
+      ".atm/history/tasks/ATM-GOV-0413.json",
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "tests/cli/claim-adopt-unowned-wip.test.ts",
+      "tests/cli/claim-foreign-unstaged-wip.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "tests/cli/claim-adopt-unowned-wip.test.ts",
+      "tests/cli/claim-foreign-unstaged-wip.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts",
+      "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0413.json",
+  "closedAt": "2026-09-06T01:29:17.406Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260906010612-codex-captain-ATM-GOV-0413-8950f34991",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "tests/cli/claim-adopt-unowned-wip.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0413.json",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-05-19-343Z-import-71fcc0658259.json",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-06-12-832Z-reserve-78d0e203d7f7.json",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-06-12-835Z-promote-023288ee7339.json",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-06-19-801Z-claim-f4997187c911.json",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-14-49-862Z-import-fad6ce7ff85c.json",
+      ".atm/history/task-events/ATM-GOV-0413/2026-09-06T01-17-06-034Z-renew-4de887131e90.json",
+      ".atm/history/tasks/ATM-GOV-0413.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "ATM-GOV-0413",
-  "updatedAt": "2026-09-06T01:16:29.832Z",
+  "updatedAt": "2026-09-06T01:24:11.788Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
@@ -89,6 +89,134 @@
       "durationMs": 292,
       "runnerKind": "dev-source",
       "sourceCommit": "5b02dd8bf4b32297097cec9b8c7424aa0f9555e6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts"
+      ],
+      "generatedAt": "2026-09-06T01:22:45.159Z",
+      "startedAt": "2026-09-06T01:22:44.745Z",
+      "finishedAt": "2026-09-06T01:22:45.159Z",
+      "durationMs": 414,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:140430092f1720f25b18e0e17aea8ed271b4dddbb1e93b167ca3a1133daf11e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts"
+      ],
+      "generatedAt": "2026-09-06T01:22:51.024Z",
+      "startedAt": "2026-09-06T01:22:48.677Z",
+      "finishedAt": "2026-09-06T01:22:51.024Z",
+      "durationMs": 2347,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae3fb3d729be92f3d724e5c0a94061ace8eb5bf084e6634456f4c52b96051340",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts"
+      ],
+      "generatedAt": "2026-09-06T01:22:54.765Z",
+      "startedAt": "2026-09-06T01:22:54.473Z",
+      "finishedAt": "2026-09-06T01:22:54.765Z",
+      "durationMs": 292,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-06T01:23:08.277Z",
+      "startedAt": "2026-09-06T01:22:58.145Z",
+      "finishedAt": "2026-09-06T01:23:08.277Z",
+      "durationMs": 10132,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/claim-adopt-unowned-wip.test.ts"
+      ],
+      "generatedAt": "2026-09-06T01:23:49.781Z",
+      "startedAt": "2026-09-06T01:23:49.360Z",
+      "finishedAt": "2026-09-06T01:23:49.781Z",
+      "durationMs": 421,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:140430092f1720f25b18e0e17aea8ed271b4dddbb1e93b167ca3a1133daf11e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/claim-foreign-unstaged-wip.test.ts"
+      ],
+      "generatedAt": "2026-09-06T01:23:55.181Z",
+      "startedAt": "2026-09-06T01:23:52.935Z",
+      "finishedAt": "2026-09-06T01:23:55.181Z",
+      "durationMs": 2246,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae3fb3d729be92f3d724e5c0a94061ace8eb5bf084e6634456f4c52b96051340",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts"
+      ],
+      "generatedAt": "2026-09-06T01:23:58.617Z",
+      "startedAt": "2026-09-06T01:23:58.309Z",
+      "finishedAt": "2026-09-06T01:23:58.617Z",
+      "durationMs": 308,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-06T01:24:11.787Z",
+      "startedAt": "2026-09-06T01:24:01.715Z",
+      "finishedAt": "2026-09-06T01:24:11.787Z",
+      "durationMs": 10072,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "a50574095eb8694a5e0657d16349c0cc063d3c78",
       "cached": false
     }
   ],

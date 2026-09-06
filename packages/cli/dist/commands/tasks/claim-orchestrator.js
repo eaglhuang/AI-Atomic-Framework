@@ -67,7 +67,7 @@ export async function runTasksClaimLifecycle(action, argv) {
             taskId: options.taskId,
             command: `node atm.mjs tasks claim --task ${options.taskId} --actor ${actorId} --json`
         });
-        assertClaimDirtyWipAdmission({ cwd: options.cwd, task: taskRef, actorId, laneSessionId: laneSession.session.laneId, claimFiles: files });
+        const claimDirtyWipAdmission = assertClaimDirtyWipAdmission({ cwd: options.cwd, task: taskRef, actorId, laneSessionId: laneSession.session.laneId, claimFiles: files, allowUnownedTaskScopedRecovery: options.adoptUnownedWip === true });
         if (currentClaim && currentClaim.state === 'active') {
             throwIfForeignSameTaskClaim({
                 taskId: options.taskId,
@@ -175,6 +175,7 @@ export async function runTasksClaimLifecycle(action, argv) {
                 claimIntent: claimIntentResolution.resolvedClaimIntent,
                 planningSourceSealValidation,
                 claimIntentResolution,
+                claimDirtyWipAdmission, unownedWipAdoption: options.adoptUnownedWip === true,
                 claim: claimCompletion.claim,
                 workAdmissionTicket: claimCompletion.ticket,
                 taskPath: relativeTaskPath,

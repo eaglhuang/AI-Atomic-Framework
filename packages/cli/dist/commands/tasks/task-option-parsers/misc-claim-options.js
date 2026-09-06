@@ -237,6 +237,7 @@ export function parseClaimLifecycleOptions(action, argv) {
         claimIntent: 'write',
         autoIntent: false,
         claimIntentExplicit: false,
+        adoptUnownedWip: false,
         wipCommit: false,
         discardWip: false
     };
@@ -291,6 +292,13 @@ export function parseClaimLifecycleOptions(action, argv) {
                 throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option --auto-intent`, { exitCode: 2 });
             }
             options.autoIntent = true;
+            continue;
+        }
+        if (arg === '--adopt-unowned-wip') {
+            if (action !== 'claim') {
+                throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option --adopt-unowned-wip`, { exitCode: 2 });
+            }
+            options.adoptUnownedWip = true;
             continue;
         }
         if (arg === '--closeout-only' || arg === '--no-more-mutation') {
