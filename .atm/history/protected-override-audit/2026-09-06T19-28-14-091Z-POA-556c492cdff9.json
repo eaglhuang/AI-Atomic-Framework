@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-556c492cdff9",
+  "recordedAt": "2026-09-06T19:28:14.091Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-BUG-2026-09-07-004",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-BUG-2026-09-07-004 --message \"chore(governance): preserve final audit residue\n\nATM-Work-Admission: wat-29d6096625dd8b4c sha256:29d6096625dd8b4cc8a3eaca8e497872f91bb16823361686aa0d5eceb1c30ed7\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-BUG-2026-09-07-004-60425df2e7",
+  "reason": "Owner-approved final preservation of generated ATM audit and closure records only.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-06T19-28-14-090Z-EMG-ATM-BUG-2026-09-07-004-60425df2e7.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

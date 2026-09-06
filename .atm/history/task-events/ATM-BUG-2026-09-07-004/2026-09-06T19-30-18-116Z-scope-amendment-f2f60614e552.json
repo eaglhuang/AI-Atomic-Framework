@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T19-30-18-116Z-scope-amendment-f2f60614e552",
+  "taskId": "ATM-BUG-2026-09-07-004",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-BUG-2026-09-07-004.json",
+  "taskSha256": "sha256:1d173705db7fee1839ab126cc61c40792f8d69478b252f92bb401dc32a5463c4",
+  "createdAt": "2026-09-06T19:30:18.116Z",
+  "command": "node atm.mjs tasks scope remove --task ATM-BUG-2026-09-07-004 --actor codex-gpt-5.4-mini --remove .atm/history/evidence/ATM-BUG-2026-09-07-001.abandon-residue-disposition.json,.atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json,.atm/history/evidence/ATM-BUG-2026-09-07-002.live-index-reconciliation.json,.atm/history/evidence/ATM-BUG-2026-09-07-003.live-index-reconciliation.json,.atm/history/evidence/ATM-BUG-2026-09-07-004.*,.atm/history/evidence/git-head.json,.atm/history/evidence/TASK-RFT-0109.bundle-manifest.json,.atm/history/evidence/TASK-RFT-0109.closure-packet.json,.atm/history/evidence/TASK-RFT-0109.json,.atm/history/evidence/TASK-RFT-0109.live-index-reconciliation.json,.atm/history/evidence/TASK-RFT-0109.runner-sync-receipt.json,.atm/history/protected-override-audit/2026-09-06T19-22-12-919Z-POA-505d0e4794ff.json,.atm/history/protected-override-audit/2026-09-06T19-22-29-497Z-POA-10088de519b7.json,.atm/history/protected-override-audit/2026-09-06T19-26-09-376Z-POA-d597955047d9.json,.atm/history/protected-override-audit/2026-09-06T19-26-13-210Z-POA-5a82aeb04fec.json,.atm/history/protected-override-audit/2026-09-06T19-27-21-334Z-POA-0d4338adf22f.json,.atm/history/protected-override-audit/2026-09-06T19-27-24-407Z-POA-6193a64c9306.json,.atm/history/task-events/ATM-BUG-2026-09-07-004/** --json",
+  "amendmentMetadata": {
+    "amendmentClass": "scope-shrink",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "commit protected override audits separately through normal hook"
+  }
+}
