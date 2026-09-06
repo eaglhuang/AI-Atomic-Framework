@@ -2216,6 +2216,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/tasks/import-verify.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/is-frontmatter-scalar-helper.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy-impl.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/claim-state.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/compat-command-map.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/implementation.js",
     "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/parallel-advisor.js",
@@ -3033,6 +3034,7 @@
     "release/atm-root-drop/packages/cli/src/commands/tasks/import-verify.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/is-frontmatter-scalar-helper.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/legacy-impl.ts",
+    "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/claim-state.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/compat-command-map.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/implementation.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
@@ -6047,11 +6049,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1418,
-    "unchanged": 4594,
+    "copied": 4,
+    "unchanged": 1967,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -25719,6 +25721,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/tasks/legacy/claim-state.js",
+        "digest": "5946428fe274993ebef92e4195aaf4830e1bb3d4fa9bfccb79426f171b3ea900",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/tasks/legacy/claim-state.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/tasks/legacy/compat-command-map.js",
         "digest": "ba7963edfb096b2c788edcde75d8952370b637ac5d9f047255116bad00627099",
         "origin": "source",
@@ -25729,7 +25740,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/legacy/implementation.js",
-        "digest": "e5d46d22b7f30d1a45b60558f31a5d050fa9d69594877e5c47f22b470c6dab8b",
+        "digest": "67b6bd959421976c99726dca21e10a2a13defc4c2f8c1a2c14b813bf69fc9bb1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/legacy/implementation.js"
@@ -33072,6 +33083,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/tasks/legacy/claim-state.ts",
+        "digest": "e176aceec27e134c4f237de99faca17ae2089f6a14a14e0ae7ef9aa5d16917fe",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/tasks/legacy/claim-state.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/tasks/legacy/compat-command-map.ts",
         "digest": "e2363431a7cefffe0c5953b2ed29a0945a81d4fb78dc247c65e96f58b8aead60",
         "origin": "source",
@@ -33082,7 +33102,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/legacy/implementation.ts",
-        "digest": "703d28572c86d41731cda520a20c8851b6c1a73529fdc6053543653ba087e154",
+        "digest": "17a1879738ec20016b3fc0a151d71eb25fec845c6f572f73fb6b9861609bd94d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/legacy/implementation.ts"
@@ -60162,7 +60182,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:37130082b2baecd5a532676afbde03e7054fe68aadeef9493574ef481bf69636"
+    "treeDigest": "sha256:0876d361d5f391b480a57d612f873218b85b657834835fea23ffb9c3e20b1a8c"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60856,6 +60876,7 @@
       "packages/cli/src/commands/tasks/import-verify.ts",
       "packages/cli/src/commands/tasks/is-frontmatter-scalar-helper.ts",
       "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/legacy/claim-state.ts",
       "packages/cli/src/commands/tasks/legacy/compat-command-map.ts",
       "packages/cli/src/commands/tasks/legacy/implementation.ts",
       "packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
@@ -61703,7 +61724,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:6a2d8c956625d0059d190debc39be7016922fbb11fd2bc76b835c762619a05c6"
+    "digest": "sha256:c11ff0cab5bb5da61cf8be4fb206f12e1bff2aa50700777f24a69a0bca87f5b2"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63893,6 +63914,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/tasks/import-verify.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/is-frontmatter-scalar-helper.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy-impl.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/claim-state.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/compat-command-map.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/implementation.js",
       "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/parallel-advisor.js",
@@ -64710,6 +64732,7 @@
       "release/atm-root-drop/packages/cli/src/commands/tasks/import-verify.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/is-frontmatter-scalar-helper.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/claim-state.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/compat-command-map.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/implementation.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/parallel-advisor.ts",
@@ -67727,22 +67750,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:33c1efa0d16bda646f86c8793ff79f8d58f13256681dd5b411d6931e5870b3d1",
-  "sealedSourceCommit": "ba19a03c0eb8e44a5d03ac3d07fc344c81932b82",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "missing-previous-sealed-source",
-  "incrementalPlanDigest": "sha256:2c182edc98c9add8c10f7ec4dda2385e4de238b43fe3402b599dd437c44583df",
-  "tsBuildCacheDigest": "sha256:eb880ce010f4e376eca05ec301ea87ff56932dc4200ae9926af7b1e4804518e0",
+  "buildInputsTreeHash": "sha256:971b17129dad4935420e21a039ed3feaa8b935650f46156b80802f8c56279ce4",
+  "sealedSourceCommit": "54fab0250dca5d12739ec8e5f43ad7f502c47cb7",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:6a4340a2f8d11b4a6afa1705ba15ce502abb74fd0a24d0ffd96d93a464e4e61f",
+  "tsBuildCacheDigest": "sha256:b3dca033fc9618bb49d32933e6348d61d384a32f543541460b2a6f28e5b782e5",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 46,
-    "skipDecision": 19,
-    "worktreeSetup": 10456,
-    "typescriptBuild": 9363,
-    "rootDropReleaseAssembly": 29094,
-    "onefileReleaseAssembly": 8252,
-    "artifactSync": 8837,
+    "inputHashCalculation": 44,
+    "skipDecision": 57,
+    "worktreeSetup": 10076,
+    "typescriptBuild": 13406,
+    "rootDropReleaseAssembly": 25130,
+    "onefileReleaseAssembly": 7862,
+    "artifactSync": 8421,
     "cleanup": 0,
-    "totalElapsed": 74328
+    "totalElapsed": 80822
   }
 }

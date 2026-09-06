@@ -746,10 +746,7 @@ function hasProtectedActiveClaim(document) { if (!document)
  * someone's live hold on the task is a question about its state. Only the second
  * one may decide whether --force is allowed to discard it.
  */
-export function hasPreservableClaimState(document) { if (!document)
-    return false; if (hasProtectedActiveClaim(document))
-    return true; const claim = document.claim; if (!claim || typeof claim !== 'object' || Array.isArray(claim))
-    return false; const state = String(claim.state ?? '').trim(); return state.length > 0 && state !== 'released'; }
+export function hasPreservableClaimState(document) { return delegatedHasPreservableClaimState(document); }
 function isCreatePlaceholderLedger(document) { if (normalizeTaskStatus(document.status) !== 'planned')
     return false; const source = document.source; const sourceHash = source && typeof source === 'object' && !Array.isArray(source) ? String(source.hash ?? '').trim() : ''; const legacyHash = typeof document.hash === 'string' ? document.hash.trim() : ''; if (sourceHash.length > 0 || legacyHash.length > 0)
     return false; if (typeof document.importedAt === 'string' && document.importedAt.trim().length > 0)
@@ -1057,3 +1054,4 @@ async function runTasksNew(argv) { const spec = (await import('../../command-spe
 } assertTaskCardOutputPathIsNested(cwd, outPath); const resultCard = await generateTaskCard({ cwd, templateKey: template, taskId, title, outputPath: outPath, dependsOn: options.dependsOn, scopePath: options.scopePath, testPath: options.testPath, atomId: options.atomId, capability: options.capability, goal: options.goal }); const targetAbsolute = path.resolve(cwd, outPath); const targetDir = path.dirname(targetAbsolute); mkdirSync(targetDir, { recursive: true }); writeFileSync(targetAbsolute, resultCard.content, 'utf8'); return makeResult({ ok: true, command: 'tasks', cwd, messages: [message('info', 'ATM_TASKS_NEW_GENERATED', `Generated new task card template at ${outPath}`)], evidence: { ok: true, sourcePath: outPath, taskId: resultCard.taskId, templateUsed: template, generatorSurface: 'tasks-new' } }); }
 export { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseHistoricalDeliveryRefs, parseScopeAddOptions, parseScopeRepairOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from '../task-option-parsers.js';
 export { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline };
+import { hasPreservableClaimState as delegatedHasPreservableClaimState } from './claim-state.js';
