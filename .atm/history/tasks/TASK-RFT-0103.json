@@ -1,0 +1,261 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0103",
+  "title": "Align pre-commit hook parity test with unique staged task context",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Update only the parity test fixture so the raw commit case supplies an explicitly unrelated `ATM_COMMIT_TASK_ID`, proving that the hook blocks a cross-task mutation under the current unique-staged-task inference behavior.",
+    "Preserve the existing assertions for the governed bridge, tampered payload, and ineligible evidence; do not change the hook implementation, error code, or any foreign worktree/index state."
+  ],
+  "deliverables": [
+    "tests/cli/pre-commit-hook-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "tests/cli/pre-commit-hook-extraction.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.pre-commit-hook",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0103-pre-commit-hook-parity-contract.task.md",
+    "sectionTitle": "TASK-RFT-0103",
+    "headingLine": 66,
+    "hash": "4f51a1db17a5a3ed",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "rft-hardening/tasks/TASK-RFT-0103-pre-commit-hook-parity-contract.task.md",
+      "planningCommitSha": "8ef4e7253046c96b855761f99021d2637e3fb1d2",
+      "contentDigest": "sha256:4f51a1db17a5a3ed292b5204c21d04b2a2c5a77bcb73eb0f1b4a4e0e427d52d6",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T15:38:28.297Z"
+    }
+  },
+  "importedAt": "2026-09-06T15:38:28.297Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "current pre-commit implementation contains unique staged task context inference",
+      "parity test reproduces a cross-task commit with an explicit unrelated committing task"
+    ],
+    "softRelations": [
+      "ATM-BUG-2026-07-15-200"
+    ],
+    "changedPublicSeams": [
+      "pre-commit hook behavior remains unchanged"
+    ],
+    "causalImpactEdges": [
+      "pre-commit-hook-parity-contract"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "pre-commit-hook-extraction"
+    ],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "pre_commit_hook_parity_unique_task_context_0103",
+      "targetGroupId": "null",
+      "semanticKey": "pre_commit_hook_parity_unique_task_context",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "pre-commit-hook-parity-contract"
+      ],
+      "expectedRedPredicate": "parity test assumes missing task context means cross-task commit after unique staged task inference",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "pre-commit-hook-extraction",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "pre_commit_hook_parity_unique_task_context_0103"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T15-43-44-798Z-close-39fa135d6120",
+  "lastTransitionAt": "2026-09-06T15:43:44.798Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-06T15:38:40.570Z",
+  "promotedAt": "2026-09-06T15:38:40.577Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-a99bb8a12d89",
+    "claimedAt": "2026-09-06T15:38:40.585Z",
+    "heartbeatAt": "2026-09-06T15:43:44.795Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0103.json",
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260906153840-codex-gpt-5.4-mini-ad0b84f94e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906153840-codex-gpt-5.4-mini-ad0b84f94e\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-09-06T15:38:40.585Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-f02877c99b7b8044",
+    "ticketDigest": "sha256:f02877c99b7b8044dda12f8464d2b21c6d3132790839187e870f9df62a37c67e",
+    "taskId": "TASK-RFT-0103",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260906153840-codex-gpt-5.4-mini-ad0b84f94e",
+    "claimGeneration": "lease-a99bb8a12d89",
+    "issuedAt": "2026-09-06T15:38:40.585Z",
+    "expiresAt": "2026-09-06T16:08:40.585Z",
+    "scopeDigest": "sha256:bfac1dab7d6a6eac2b60369575bff6b12985ebf81e7b62bf379ebfeea7623d2e",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T15:38:40.585Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-RFT-0103.*",
+          ".atm/history/task-events/TASK-RFT-0103/**",
+          ".atm/history/tasks/TASK-RFT-0103.json",
+          "tests/cli/pre-commit-hook-extraction.test.ts"
+        ],
+        "digest": "sha256:0f74024b0d1a2f3841ba56b1a5e4d47dfc5171c59d58ac7e16f465531b588076"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906153840-codex-gpt-5.4-mini-TASK-RFT-0103-f155acaa33",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0103",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0103.*",
+      ".atm/history/task-events/TASK-RFT-0103/**",
+      ".atm/history/tasks/TASK-RFT-0103.json",
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ea4453034760801a441bacd5146c39ba203e93ef9ac1bb3657c6dee782485fb8",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260906153840-codex-gpt-5.4-mini-TASK-RFT-0103-f155acaa33",
+    "laneSession": {
+      "laneSessionId": "lane-20260906153840-codex-gpt-5.4-mini-ad0b84f94e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906153840-codex-gpt-5.4-mini-ad0b84f94e\""
+    },
+    "createdAt": "2026-09-06T15:38:48.211Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-06T15:43:44.795Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260906153840-codex-gpt-5.4-mini-TASK-RFT-0103-f155acaa33",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0103.closure-packet.json"
+}

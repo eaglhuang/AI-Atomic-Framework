@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0103",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "1ce30c9a5f552dddeba767a2bbf1ba254d7e4dd5",
+  "governedTreeSha": "3f8bf2e5cce75ddb6d9be4a9039246a12eca49cd",
+  "targetCommitDelta": {
+    "currentCommitSha": "1ce30c9a5f552dddeba767a2bbf1ba254d7e4dd5",
+    "parentCommitShas": [
+      "1ce30c9a5f552dddeba767a2bbf1ba254d7e4dd5"
+    ],
+    "governedTreeSha": "3f8bf2e5cce75ddb6d9be4a9039246a12eca49cd",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0103.json",
+      ".atm/history/task-events/TASK-RFT-0103/2026-09-06T15-38-28-433Z-import-0cba51857798.json",
+      ".atm/history/task-events/TASK-RFT-0103/2026-09-06T15-38-40-570Z-reserve-b36e9255c125.json",
+      ".atm/history/task-events/TASK-RFT-0103/2026-09-06T15-38-40-577Z-promote-e09707356ed4.json",
+      ".atm/history/task-events/TASK-RFT-0103/2026-09-06T15-38-48-212Z-claim-232edff98e67.json",
+      ".atm/history/tasks/TASK-RFT-0103.json",
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6422e0c18ac60252d5fe28251426604e49d715d442db353d3fe3b9cb6560db3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:52730e7971f446d84ac22c0632920336fe65fc91f958307cfe8eecb527becdff",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T15:43:44.781Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0103.*",
+      ".atm/history/task-events/TASK-RFT-0103/**",
+      ".atm/history/tasks/TASK-RFT-0103.json",
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0103.json",
+  "closedAt": "2026-09-06T15:43:44.781Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906153840-codex-gpt-5.4-mini-TASK-RFT-0103-f155acaa33",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "1ce30c9a5f552dddeba767a2bbf1ba254d7e4dd5",
+    "taskMatchedFiles": [
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

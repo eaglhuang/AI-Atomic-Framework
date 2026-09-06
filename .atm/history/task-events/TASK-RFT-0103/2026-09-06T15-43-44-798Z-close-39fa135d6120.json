@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T15-43-44-798Z-close-39fa135d6120",
+  "taskId": "TASK-RFT-0103",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906153840-codex-gpt-5.4-mini-TASK-RFT-0103-f155acaa33",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0103.json",
+  "taskSha256": "sha256:fe3e7435682bf19cbdbe61426e575cdfb6afb0b0e3b60b39c92dd6ac81942452",
+  "createdAt": "2026-09-06T15:43:44.798Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0103 --actor codex-gpt-5.4-mini --status done --historical-delivery 1ce30c9a5f552dddeba767a2bbf1ba254d7e4dd5",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906153840-codex-gpt-5.4-mini-TASK-RFT-0103-f155acaa33",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0103.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T15:43:44.781Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0103.*",
+        ".atm/history/task-events/TASK-RFT-0103/**",
+        ".atm/history/tasks/TASK-RFT-0103.json",
+        "tests/cli/pre-commit-hook-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "tests/cli/pre-commit-hook-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+        "typecheck",
+        "validate:cli"
+      ]
+    }
+  }
+}
