@@ -1,0 +1,23 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-10b25b2860a5",
+  "recordedAt": "2026-09-06T19:24:27.867Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-BUG-2026-09-07-004",
+  "surface": "tasks reset",
+  "command": "node atm.mjs tasks reset --task ATM-BUG-2026-09-07-004 --actor codex-gpt-5.4-mini --to ready --json",
+  "flags": [],
+  "permission": "backend.tasks.reset",
+  "leaseId": "EMG-ATM-BUG-2026-09-07-004-bc865ce0e3",
+  "reason": "reopen residue carrier after claim release and failed commit admission",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.reset"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-06T19-24-27-866Z-EMG-ATM-BUG-2026-09-07-004-bc865ce0e3.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
