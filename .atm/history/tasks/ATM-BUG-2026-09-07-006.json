@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-BUG-2026-09-07-006",
   "title": "Commit cleanup disposition evidence",
-  "status": "open",
+  "status": "running",
   "owner": "codex-gpt-5.4-mini",
   "dependencies": [],
   "acceptance": [],
@@ -10,59 +10,64 @@
   "tags": [],
   "createdAt": "2026-09-06T20:01:14.711Z",
   "createdByActor": "codex-gpt-5.4-mini",
-  "lastTransitionId": "2026-09-06T20-08-46-324Z-release-360587efe365",
-  "lastTransitionAt": "2026-09-06T20:08:46.324Z",
+  "lastTransitionId": "2026-09-06T20-09-34-970Z-scope-amendment-4f66088de9cd",
+  "lastTransitionAt": "2026-09-06T20:09:34.970Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "reservedAt": "2026-09-06T20:05:47.817Z",
-  "promotedAt": "2026-09-06T20:05:47.824Z",
+  "reservedAt": "2026-09-06T20:09:33.761Z",
+  "promotedAt": "2026-09-06T20:09:33.766Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-ff564c994d17",
-    "claimedAt": "2026-09-06T20:07:54.655Z",
-    "heartbeatAt": "2026-09-06T20:08:45.347Z",
+    "leaseId": "lease-4e038c56f584",
+    "claimedAt": "2026-09-06T20:09:33.773Z",
+    "heartbeatAt": "2026-09-06T20:09:33.773Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/protected-override-audit/2026-09-06T20-01-46-134Z-POA-4f91d33a021c.json"
+      ".atm/history/evidence/ATM-BUG-2026-09-07-006.*",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-006.live-index-reconciliation.json",
+      ".atm/history/protected-override-audit/2026-09-06T20-01-46-134Z-POA-4f91d33a021c.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-006/**",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-006.json"
     ],
-    "state": "released",
+    "state": "active",
+    "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260906200754-codex-gpt-5.4-mini-295a1db09b",
+      "laneSessionId": "lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906200754-codex-gpt-5.4-mini-295a1db09b\""
-    },
-    "reason": "Cleanup carrier audit committed; no source deliverables."
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f\""
+    }
   },
   "startedAt": "2026-09-06T20:07:54.655Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-334beb6f2024a8de",
-    "ticketDigest": "sha256:334beb6f2024a8de6fca4163df589f982f654d67e16f6134764c82cb7c529e0c",
+    "ticketId": "wat-5347b35343fff91e",
+    "ticketDigest": "sha256:5347b35343fff91eb2312865bfc8fe2387e898aca94e09566c79a041e1eb6241",
     "taskId": "ATM-BUG-2026-09-07-006",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260906200754-codex-gpt-5.4-mini-295a1db09b",
-    "claimGeneration": "lease-ff564c994d17",
-    "issuedAt": "2026-09-06T20:07:54.655Z",
-    "expiresAt": "2026-09-06T20:37:54.655Z",
-    "scopeDigest": "sha256:43755c5bdf6664a33e39a013b1ef932fb6ef71a53d6b5dc56ac4a0f1c843ddf6",
+    "laneSessionId": "lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f",
+    "claimGeneration": "lease-4e038c56f584",
+    "issuedAt": "2026-09-06T20:09:34.913Z",
+    "expiresAt": "2026-09-06T20:39:34.913Z",
+    "scopeDigest": "sha256:c25aad25afb2c6c6aad859f5d8a62d1c96766719048f0adfc788e1e945ab9cb9",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-06T20:07:54.655Z"
+      "selectedAt": "2026-09-06T20:09:34.913Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-BUG-2026-09-07-006.*",
+          ".atm/history/evidence/ATM-BUG-2026-09-07-006.live-index-reconciliation.json",
           ".atm/history/protected-override-audit/2026-09-06T20-01-46-134Z-POA-4f91d33a021c.json",
           ".atm/history/task-events/ATM-BUG-2026-09-07-006/**",
           ".atm/history/tasks/ATM-BUG-2026-09-07-006.json"
         ],
-        "digest": "sha256:3cd52ab1bd775b2fc6ee0b0d4793cead75f4361764c24c0ea58e2435449e384b"
+        "digest": "sha256:b10ecb882d2015efc64996e5e259aa1247f78a33bd7f64fcfb1501a8190569a7"
       },
       {
         "kind": "lifecycle-operation",
@@ -101,7 +106,7 @@
     "resolvedRecoveryMode": "disabled",
     "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
   },
-  "startedBySessionId": "session-20260906200754-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-006-b7c9723503",
+  "startedBySessionId": "session-20260906200933-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-006-d5508fa676",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -112,6 +117,7 @@
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/ATM-BUG-2026-09-07-006.*",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-006.live-index-reconciliation.json",
       ".atm/history/protected-override-audit/2026-09-06T20-01-46-134Z-POA-4f91d33a021c.json",
       ".atm/history/task-events/ATM-BUG-2026-09-07-006/**",
       ".atm/history/tasks/ATM-BUG-2026-09-07-006.json"
@@ -121,14 +127,21 @@
     "allowPlanningMirror": false,
     "promptHash": "f5cc1cb771b020a6dee8e640939d647c6da1c16f73947caca18e062f5af6d490",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260906200754-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-006-b7c9723503",
+    "sessionId": "session-20260906200933-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-006-d5508fa676",
     "laneSession": {
-      "laneSessionId": "lane-20260906200754-codex-gpt-5.4-mini-295a1db09b",
+      "laneSessionId": "lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906200754-codex-gpt-5.4-mini-295a1db09b\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f\""
     },
-    "createdAt": "2026-09-06T20:07:55.764Z",
+    "createdAt": "2026-09-06T20:09:34.905Z",
     "status": "active"
-  }
+  },
+  "scopePaths": [
+    ".atm/history/evidence/ATM-BUG-2026-09-07-006.*",
+    ".atm/history/evidence/ATM-BUG-2026-09-07-006.live-index-reconciliation.json",
+    ".atm/history/protected-override-audit/2026-09-06T20-01-46-134Z-POA-4f91d33a021c.json",
+    ".atm/history/task-events/ATM-BUG-2026-09-07-006/**",
+    ".atm/history/tasks/ATM-BUG-2026-09-07-006.json"
+  ]
 }
