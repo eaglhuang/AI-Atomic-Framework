@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0109",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2b87ba1101ea02eceff676f7da46046e06228e0e",
+  "governedTreeSha": "99219a4fcaa569d79fbdb27271138a20b258dec4",
+  "targetCommitDelta": {
+    "currentCommitSha": "2b87ba1101ea02eceff676f7da46046e06228e0e",
+    "parentCommitShas": [
+      "2b87ba1101ea02eceff676f7da46046e06228e0e"
+    ],
+    "governedTreeSha": "99219a4fcaa569d79fbdb27271138a20b258dec4",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-RFT-0109.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0109.closure-packet.json",
+      ".atm/history/evidence/TASK-RFT-0109.json",
+      ".atm/history/task-events/TASK-RFT-0109/2026-09-06T18-11-08-691Z-close-94633491fee5.json",
+      ".atm/history/task-events/TASK-RFT-0109/2026-09-06T18-11-58-680Z-planning-mirror-reconcile-352c8352ee5c.json",
+      ".atm/history/task-events/TASK-RFT-0109/2026-09-06T18-13-51-687Z-planning-mirror-reconcile-6d37443759ef.json",
+      ".atm/history/tasks/TASK-RFT-0109.json",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/invocation-context.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6422e0c18ac60252d5fe28251426604e49d715d442db353d3fe3b9cb6560db3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:94d96bf94c7b974b2e66023099c9da5b04cd7c21eeae534de4ec9f703226f988",
+      "stderrSha256": "sha256:a4876130339bb41d6d44b1f176f563a554d6ef888b0139a2767d4e0882308d12",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T18:24:58.717Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0109.*",
+      ".atm/history/task-events/TASK-RFT-0109/**",
+      ".atm/history/tasks/TASK-RFT-0109.json",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/hook/pre-commit/*.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/hook/pre-commit/*.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0109.json",
+  "closedAt": "2026-09-06T18:24:58.718Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "2b87ba1101ea02eceff676f7da46046e06228e0e",
+    "reconciledAt": "2026-09-06T18:24:55.542Z",
+    "reconciledByActor": "codex-gpt-5.4-mini",
+    "reconcileClassification": "local-closure-rewrite",
+    "reason": "Historical reconcile sync against commit 2b87ba1101ea02eceff676f7da46046e06228e0e"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "2b87ba1101ea02eceff676f7da46046e06228e0e",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/invocation-context.ts",
+      "tests/cli/pre-commit-hook-extraction.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0109.json",
+      ".atm/history/task-events/TASK-RFT-0109/2026-09-06T18-01-27-474Z-import-231dd7380d5b.json",
+      ".atm/history/task-events/TASK-RFT-0109/2026-09-06T18-01-32-413Z-reserve-b5858fe2ccb5.json",
+      ".atm/history/task-events/TASK-RFT-0109/2026-09-06T18-01-32-416Z-promote-e8e74432d3d8.json",
+      ".atm/history/task-events/TASK-RFT-0109/2026-09-06T18-01-36-822Z-claim-683837406ffb.json",
+      ".atm/history/tasks/TASK-RFT-0109.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
