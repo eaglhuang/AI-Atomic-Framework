@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-BUG-2026-09-07-002",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f14873362f885753f0980d38a9868f2e400f96fe",
+  "governedTreeSha": "2316eef2f7e5343158fd20544d6ee55b67a287e7",
+  "targetCommitDelta": {
+    "currentCommitSha": "f14873362f885753f0980d38a9868f2e400f96fe",
+    "parentCommitShas": [
+      "f14873362f885753f0980d38a9868f2e400f96fe"
+    ],
+    "governedTreeSha": "2316eef2f7e5343158fd20544d6ee55b67a287e7",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-002.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-RFT-0109.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0109.closure-packet.json",
+      ".atm/history/evidence/TASK-RFT-0109.json",
+      ".atm/history/task-events/TASK-RFT-0109/2026-09-06T18-11-08-691Z-close-94633491fee5.json",
+      ".atm/history/task-events/TASK-RFT-0109/2026-09-06T18-24-59-098Z-close-172aad792772.json",
+      ".atm/history/tasks/TASK-RFT-0109.json",
+      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-197.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-199.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/protected-governance-state.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/evidence-bundle-io-extraction.test.ts",
+      "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
+      "release/atm-root-drop/tests/cli/protected-ledger-destructive-guard.test.ts",
+      "release/atm-root-drop/tests/cli/tasks-legacy-impl-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:6a77561fd98615b8cf9777643b54dfceeaf71af1a1f7d65caa801ef1c9c0e8dd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b07ab83befbc96bb054a13eaa83ecddd7fa1a19d8affba5fc7c2e25a0d9679e0",
+      "stderrSha256": "sha256:f436681475a40b4426a6b1a3b6a1d6c001924a2a67bc4c17a3df2004e74c2d10",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T19:13:31.107Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-002.*",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-001/2026-09-06T19-02-49-573Z-abandon-6bc40af9a931.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-002/**",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-001.json",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-002.json",
+      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js"
+    ],
+    "requiredGates": []
+  },
+  "evidencePath": ".atm/history/evidence/ATM-BUG-2026-09-07-002.json",
+  "closedAt": "2026-09-06T19:13:31.108Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906190756-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-002-4f6d2c2848",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f14873362f885753f0980d38a9868f2e400f96fe",
+    "taskMatchedFiles": [
+      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/ATM-BUG-2026-09-07-002/2026-09-06T19-04-33-306Z-create-167a28d6163e.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-002/2026-09-06T19-07-56-821Z-reserve-eb5b4a39ceb2.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-002/2026-09-06T19-07-56-825Z-promote-37a368bdcf99.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-002/2026-09-06T19-07-58-035Z-claim-16244548d838.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-002/2026-09-06T19-08-24-658Z-scope-amendment-1b20064d1238.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-002/2026-09-06T19-09-37-199Z-scope-amendment-be116725a870.json",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-002.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-197.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-199.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/protected-governance-state.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/evidence-bundle-io-extraction.test.ts",
+      "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
+      "release/atm-root-drop/tests/cli/protected-ledger-destructive-guard.test.ts",
+      "release/atm-root-drop/tests/cli/tasks-legacy-impl-extraction.test.ts"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

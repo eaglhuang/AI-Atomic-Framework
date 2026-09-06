@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-BUG-2026-09-07-002",
   "title": "Reconcile sealed runner publication after terminal carrier",
-  "status": "running",
+  "status": "done",
   "owner": "codex-gpt-5.4-mini",
   "dependencies": [],
   "acceptance": [],
@@ -10,8 +10,8 @@
   "tags": [],
   "createdAt": "2026-09-06T19:04:33.306Z",
   "createdByActor": "codex-gpt-5.4-mini",
-  "lastTransitionId": "2026-09-06T19-09-37-199Z-scope-amendment-be116725a870",
-  "lastTransitionAt": "2026-09-06T19:09:37.199Z",
+  "lastTransitionId": "2026-09-06T19-13-31-123Z-close-bd36648175e1",
+  "lastTransitionAt": "2026-09-06T19:13:31.123Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-09-06T19:07:56.821Z",
   "promotedAt": "2026-09-06T19:07:56.825Z",
@@ -19,7 +19,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-efc5534d0a5d",
     "claimedAt": "2026-09-06T19:07:56.830Z",
-    "heartbeatAt": "2026-09-06T19:07:56.830Z",
+    "heartbeatAt": "2026-09-06T19:13:31.121Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
@@ -35,14 +35,14 @@
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/**"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260906190756-codex-gpt-5.4-mini-eb97965bb7",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906190756-codex-gpt-5.4-mini-eb97965bb7\""
-    }
+    },
+    "reason": "Close after command-backed typecheck and validate:cli evidence passed and delivery commit is present."
   },
   "startedAt": "2026-09-06T19:07:56.830Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -171,5 +171,10 @@
     "release/atm-onefile/release-manifest.json",
     "release/atm-root-drop/**",
     ".atm/history/task-events/ATM-BUG-2026-09-07-001/2026-09-06T19-02-49-573Z-abandon-6bc40af9a931.json"
-  ]
+  ],
+  "closedAt": "2026-09-06T19:13:31.121Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260906190756-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-002-4f6d2c2848",
+  "closeReason": "Close after command-backed typecheck and validate:cli evidence passed and delivery commit is present.",
+  "closurePacket": ".atm/history/evidence/ATM-BUG-2026-09-07-002.closure-packet.json"
 }

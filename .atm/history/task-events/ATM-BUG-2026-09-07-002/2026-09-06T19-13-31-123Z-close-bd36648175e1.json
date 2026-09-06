@@ -1,0 +1,55 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T19-13-31-123Z-close-bd36648175e1",
+  "taskId": "ATM-BUG-2026-09-07-002",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906190756-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-002-4f6d2c2848",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-BUG-2026-09-07-002.json",
+  "taskSha256": "sha256:d2eef9f857f70ebb79a72124c84e7a72b4c172845e2061788f37a1d465696764",
+  "createdAt": "2026-09-06T19:13:31.123Z",
+  "command": "node atm.mjs tasks close --task ATM-BUG-2026-09-07-002 --actor codex-gpt-5.4-mini --status done --historical-delivery f14873362f885753f0980d38a9868f2e400f96fe",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906190756-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-002-4f6d2c2848",
+    "closurePacketPath": ".atm/history/evidence/ATM-BUG-2026-09-07-002.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T19:13:31.107Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
+        ".atm/history/evidence/ATM-BUG-2026-09-07-002.*",
+        ".atm/history/task-events/ATM-BUG-2026-09-07-001/2026-09-06T19-02-49-573Z-abandon-6bc40af9a931.json",
+        ".atm/history/task-events/ATM-BUG-2026-09-07-002/**",
+        ".atm/history/tasks/ATM-BUG-2026-09-07-001.json",
+        ".atm/history/tasks/ATM-BUG-2026-09-07-002.json",
+        "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+        "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+        "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+        "packages/cli/dist/commands/git-governance/protected-governance-state.js",
+        "packages/cli/dist/commands/hook/pre-commit/implementation.js"
+      ],
+      "requiredGates": []
+    }
+  }
+}
