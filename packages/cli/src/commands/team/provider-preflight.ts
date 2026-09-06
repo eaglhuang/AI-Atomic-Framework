@@ -8,6 +8,28 @@ export type TeamProviderFailureClass =
   | 'currency'
   | 'plan';
 
+export type TeamPaidProviderProbeResult =
+  | { readonly ok: true }
+  | { readonly ok: false; readonly failureClass: Extract<TeamProviderFailureClass, 'auth' | 'model' | 'schema' | 'quota' | 'billing'> };
+
+export type TeamPaidProviderPreflightInput = {
+  readonly enabled: boolean;
+  readonly authorized: boolean;
+  readonly continuationAuthorized?: boolean;
+  readonly providerIds: readonly string[];
+  readonly probe: (providerId: string) => Promise<TeamPaidProviderProbeResult>;
+};
+
+export type TeamPaidProviderPreflightReport = {
+  readonly schemaId: 'atm.teamPaidProviderPreflight.v1';
+  readonly ok: boolean;
+  readonly stoppedRoster: boolean;
+  readonly requiresExplicitContinuation: boolean;
+  readonly requestCountByProvider: Readonly<Record<string, number>>;
+  readonly totalRequestCount: number;
+  readonly failures: readonly { readonly providerId: string; readonly failureClass: TeamProviderFailureClass }[];
+};
+
 export type TeamProviderPlan = {
   readonly providerId: string;
   readonly modelId: string;
@@ -92,6 +114,49 @@ export function buildTeamProviderPreflight(input: TeamProviderPreflightInput): T
     selected,
     failureClasses,
     cheapestEligibleModelId: cheapestEligible?.modelId ?? null
+  };
+}
+
+/**
+ * Run at most one explicitly-authorized, provider-neutral paid probe per provider.
+ * This function never creates authorization and never retries a provider.
+ */
+export async function runTeamPaidProviderPreflight(input: TeamPaidProviderPreflightInput): Promise<TeamPaidProviderPreflightReport> {
+  const requestCountByProvider: Record<string, number> = {};
+  const failures: { providerId: string; failureClass: TeamProviderFailureClass }[] = [];
+  if (!input.enabled) {
+    return { schemaId: 'atm.teamPaidProviderPreflight.v1', ok: true, stoppedRoster: false, requiresExplicitContinuation: false, requestCountByProvider, totalRequestCount: 0, failures };
+  }
+  if (!input.authorized) {
+    return { schemaId: 'atm.teamPaidProviderPreflight.v1', ok: false, stoppedRoster: true, requiresExplicitContinuation: true, requestCountByProvider, totalRequestCount: 0, failures };
+  }
+  const providers = [...new Set(input.providerIds.filter((providerId) => providerId.length > 0))];
+  for (const providerId of providers) {
+    requestCountByProvider[providerId] = 1;
+    const result = await input.probe(providerId);
+    if (!result.ok) {
+      failures.push({ providerId, failureClass: result.failureClass });
+      if (result.failureClass === 'quota' || result.failureClass === 'billing') {
+        return {
+          schemaId: 'atm.teamPaidProviderPreflight.v1',
+          ok: false,
+          stoppedRoster: true,
+          requiresExplicitContinuation: !input.continuationAuthorized,
+          requestCountByProvider,
+          totalRequestCount: Object.values(requestCountByProvider).reduce((sum, count) => sum + count, 0),
+          failures
+        };
+      }
+    }
+  }
+  return {
+    schemaId: 'atm.teamPaidProviderPreflight.v1',
+    ok: failures.length === 0,
+    stoppedRoster: false,
+    requiresExplicitContinuation: false,
+    requestCountByProvider,
+    totalRequestCount: Object.values(requestCountByProvider).reduce((sum, count) => sum + count, 0),
+    failures
   };
 }
 

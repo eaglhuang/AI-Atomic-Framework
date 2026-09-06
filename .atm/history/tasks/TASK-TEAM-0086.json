@@ -1,0 +1,329 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0086",
+  "title": "Opt-in paid provider quota preflight probe",
+  "status": "running",
+  "milestone": "M10X",
+  "dependencies": [
+    "TASK-TEAM-0050",
+    "TASK-TEAM-0051"
+  ],
+  "acceptance": [
+    "ACC-1: The probe is opt-in and never sends a paid request without explicit operator authorization.",
+    "ACC-2: At most one minimal probe request is sent per provider in one preflight, and evidence records the exact count without secrets.",
+    "ACC-3: The result distinguishes authentication, model access, request schema, quota, and billing failure classes; quota/billing failure stops the full roster.",
+    "ACC-4: Continuation after quota/billing failure requires a separate explicit operator action and is auditable; existing static preflight remains compatible."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team/provider-preflight.ts",
+    "packages/cli/src/commands/team/legacy/provider-execution.ts",
+    "packages/cli/src/commands/team/legacy/command-runner.ts",
+    "tests/cli/team-provider-preflight.test.ts",
+    "tests/cli/team-provider-preflight-probe.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team/provider-preflight.ts",
+    "packages/cli/src/commands/team/legacy/provider-execution.ts",
+    "packages/cli/src/commands/team/legacy/command-runner.ts",
+    "tests/cli/team-provider-preflight.test.ts",
+    "tests/cli/team-provider-preflight-probe.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-provider-preflight.test.ts",
+    "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove the opt-in probe route and focused tests; static preflight remains unchanged.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-provider-preflight-probe",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/team/provider-preflight.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0086-paid-provider-preflight-probe.task.md",
+    "sectionTitle": "TASK-TEAM-0086",
+    "headingLine": 112,
+    "hash": "1424a978bcca233f",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "team-agents/tasks/TASK-TEAM-0086-paid-provider-preflight-probe.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:1424a978bcca233f664c8bd730a08bf95c86a6aa998a600b6d7ea8db8d727be7",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T20:25:12.259Z"
+    }
+  },
+  "importedAt": "2026-09-06T20:25:12.259Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-TEAM-0050",
+      "TASK-TEAM-0051"
+    ],
+    "startConditions": [
+      "Existing static provider preflight remains green.",
+      "Operator explicitly enables the paid probe route.",
+      "Provider secrets use the existing secret boundary and never appear in evidence."
+    ],
+    "softRelations": [
+      "ATM-BUG-2026-07-11-100"
+    ],
+    "changedPublicSeams": [
+      "team-provider-preflight",
+      "team-execution-admission"
+    ],
+    "causalImpactEdges": [
+      "paid-provider-request-count",
+      "quota-billing-stop-before-roster"
+    ],
+    "parallelFrontierInputs": [
+      "provider-preflight"
+    ],
+    "validatorReferences": [
+      "team-provider-preflight.test.ts",
+      "team-provider-preflight-probe.test.ts"
+    ],
+    "phaseOwner": "atm-team"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_team_0086_paid_provider_probe_6b2a4c91",
+      "targetGroupId": "null",
+      "semanticKey": "paid_provider_probe",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "paid-provider-request-count",
+        "quota-billing-stop-before-roster"
+      ],
+      "expectedRedPredicate": "An enabled probe is absent and the full roster can start without a provider probe receipt.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "team-provider-preflight",
+      "resourceKey": "team-provider-preflight"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_team_0086_paid_provider_probe_6b2a4c91"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-TEAM-0050",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-TEAM-0051",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T20-25-28-253Z-claim-17b96a6b849b",
+  "lastTransitionAt": "2026-09-06T20:25:28.253Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-06T20:25:21.860Z",
+  "promotedAt": "2026-09-06T20:25:21.863Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-98fa99eef8de",
+    "claimedAt": "2026-09-06T20:25:21.868Z",
+    "heartbeatAt": "2026-09-06T20:25:21.868Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0086.json",
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "packages/cli/src/commands/team/legacy/provider-execution.ts",
+      "packages/cli/src/commands/team/provider-preflight.ts",
+      "tests/cli/team-provider-preflight-probe.test.ts",
+      "tests/cli/team-provider-preflight.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906202522-codex-captain-35bafd17d2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906202522-codex-captain-35bafd17d2\""
+    }
+  },
+  "startedAt": "2026-09-06T20:25:21.868Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-550248064c4b8bcc",
+    "ticketDigest": "sha256:550248064c4b8bcc714fb3878ac934cd875c71bb851da9e28ee1595589a37a08",
+    "taskId": "TASK-TEAM-0086",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260906202522-codex-captain-35bafd17d2",
+    "claimGeneration": "lease-98fa99eef8de",
+    "issuedAt": "2026-09-06T20:25:21.868Z",
+    "expiresAt": "2026-09-06T20:55:21.868Z",
+    "scopeDigest": "sha256:6dd8f3d6f56f0e3398b386348bb4a2372185abb5ff8a5adcfa867358522b316c",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T20:25:21.868Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-TEAM-0086.*",
+          ".atm/history/task-events/TASK-TEAM-0086/**",
+          ".atm/history/tasks/TASK-TEAM-0086.json",
+          "packages/cli/src/commands/team/legacy/command-runner.ts",
+          "packages/cli/src/commands/team/legacy/provider-execution.ts",
+          "packages/cli/src/commands/team/provider-preflight.ts",
+          "tests/cli/team-provider-preflight-probe.test.ts",
+          "tests/cli/team-provider-preflight.test.ts"
+        ],
+        "digest": "sha256:44e1e0a306fb55d16cfd9216db5caed02f0aecdbe739747c5cf0b895ccfb8b3d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906202521-codex-captain-TASK-TEAM-0086-b06e6ff1b7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0086",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0086.*",
+      ".atm/history/task-events/TASK-TEAM-0086/**",
+      ".atm/history/tasks/TASK-TEAM-0086.json",
+      "packages/cli/src/commands/team/legacy/command-runner.ts",
+      "packages/cli/src/commands/team/legacy/provider-execution.ts",
+      "packages/cli/src/commands/team/provider-preflight.ts",
+      "tests/cli/team-provider-preflight-probe.test.ts",
+      "tests/cli/team-provider-preflight.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "fc846f7d63be085083a9f1848a4cde91adc062f91e7c3b662832c86254a23663",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260906202521-codex-captain-TASK-TEAM-0086-b06e6ff1b7",
+    "laneSession": {
+      "laneSessionId": "lane-20260906202522-codex-captain-35bafd17d2",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906202522-codex-captain-35bafd17d2\""
+    },
+    "createdAt": "2026-09-06T20:25:28.252Z",
+    "status": "active"
+  }
+}

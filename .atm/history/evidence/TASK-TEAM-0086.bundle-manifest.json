@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TEAM-0086",
+  "updatedAt": "2026-09-06T20:31:02.824Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+    "node --strip-types tests/cli/team-provider-preflight.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-09-06T20:30:43.276Z",
+      "startedAt": "2026-09-06T20:30:43.006Z",
+      "finishedAt": "2026-09-06T20:30:43.276Z",
+      "durationMs": 270,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0a38648f73283a94c19c10b2c6a8c1c7da7e86f5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/team-provider-preflight-probe.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:225ae747d1ec8a60dd03d4aecbcf26db63cf032d71fa6126851c031c35747483",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-provider-preflight-probe.test.ts"
+      ],
+      "generatedAt": "2026-09-06T20:30:46.916Z",
+      "startedAt": "2026-09-06T20:30:46.634Z",
+      "finishedAt": "2026-09-06T20:30:46.916Z",
+      "durationMs": 282,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0a38648f73283a94c19c10b2c6a8c1c7da7e86f5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/team-provider-preflight.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a3b079c3d61ed737babaf16e4ba2a72a86e009bfa2d76b8032b7992ad9fcf1c4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-provider-preflight.test.ts"
+      ],
+      "generatedAt": "2026-09-06T20:30:50.612Z",
+      "startedAt": "2026-09-06T20:30:50.328Z",
+      "finishedAt": "2026-09-06T20:30:50.612Z",
+      "durationMs": 284,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0a38648f73283a94c19c10b2c6a8c1c7da7e86f5",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-06T20:31:02.823Z",
+      "startedAt": "2026-09-06T20:30:53.974Z",
+      "finishedAt": "2026-09-06T20:31:02.823Z",
+      "durationMs": 8849,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0a38648f73283a94c19c10b2c6a8c1c7da7e86f5",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
