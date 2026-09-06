@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T15-29-07-090Z-close-f4957ea7eee6",
+  "taskId": "TASK-RFT-0102",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906152602-codex-gpt-5.4-mini-TASK-RFT-0102-6f0246ecb4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0102.json",
+  "taskSha256": "sha256:5be1f8e2082e21593c04457e658ddc7764cc049b1d51b8f8bc10d9858c8967fe",
+  "createdAt": "2026-09-06T15:29:07.090Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0102 --actor codex-gpt-5.4-mini --status done --historical-delivery 65aa32730",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906152602-codex-gpt-5.4-mini-TASK-RFT-0102-6f0246ecb4",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0102.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T15:29:07.070Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0102.*",
+        ".atm/history/task-events/TASK-RFT-0102/**",
+        ".atm/history/tasks/TASK-RFT-0102.json",
+        "packages/cli/src/commands/git-governance/**/*.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "tests/cli/git-governance-command-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/**/*.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "tests/cli/git-governance-command-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+        "typecheck",
+        "validate:cli"
+      ]
+    }
+  }
+}

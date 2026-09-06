@@ -1,0 +1,182 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0102",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "b6384fa8f8708d8b0b9ef51992944bff61b024ef",
+  "governedTreeSha": "25f25ecc9fcd7b981b19457d226371380cfcaef9",
+  "targetCommitDelta": {
+    "currentCommitSha": "b6384fa8f8708d8b0b9ef51992944bff61b024ef",
+    "parentCommitShas": [
+      "b6384fa8f8708d8b0b9ef51992944bff61b024ef"
+    ],
+    "governedTreeSha": "25f25ecc9fcd7b981b19457d226371380cfcaef9",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0102.json",
+      ".atm/history/task-events/TASK-RFT-0102/2026-09-06T15-23-31-511Z-import-5b3baa1bd322.json",
+      ".atm/history/task-events/TASK-RFT-0102/2026-09-06T15-23-58-764Z-reserve-d3fae088a069.json",
+      ".atm/history/task-events/TASK-RFT-0102/2026-09-06T15-23-58-769Z-promote-88edb0aad944.json",
+      ".atm/history/task-events/TASK-RFT-0102/2026-09-06T15-24-05-527Z-claim-dbbbfd38a5d9.json",
+      ".atm/history/task-events/TASK-RFT-0102/2026-09-06T15-25-15-352Z-release-5f845d52cdfd.json",
+      ".atm/history/task-events/TASK-RFT-0102/2026-09-06T15-26-02-839Z-reserve-d52af33785e0.json",
+      ".atm/history/task-events/TASK-RFT-0102/2026-09-06T15-26-02-843Z-promote-5905ca1c1157.json",
+      ".atm/history/task-events/TASK-RFT-0102/2026-09-06T15-26-09-599Z-claim-1c517fab33d8.json",
+      ".atm/history/tasks/TASK-RFT-0102.json",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/admission-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/branch-commit-window.ts",
+      "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
+      "packages/cli/src/commands/git-governance/implementation/command-router.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-command-options.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+      "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/lease-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/push-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
+      "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
+      "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:b7eb02b524e840b3bb4545eb97c1a669009c441887657f9bf7d134d98746dd2b",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T15:29:07.070Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0102.*",
+      ".atm/history/task-events/TASK-RFT-0102/**",
+      ".atm/history/tasks/TASK-RFT-0102.json",
+      "packages/cli/src/commands/git-governance/**/*.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "tests/cli/git-governance-command-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance/**/*.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "tests/cli/git-governance-command-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0102.json",
+  "closedAt": "2026-09-06T15:29:07.071Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906152602-codex-gpt-5.4-mini-TASK-RFT-0102-6f0246ecb4",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "65aa32730ae8abcc1705e3f30feb015e3000fdff",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/admission-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/branch-commit-window.ts",
+      "packages/cli/src/commands/git-governance/implementation/broker-hook-bypass-preflight.ts",
+      "packages/cli/src/commands/git-governance/implementation/command-router.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-execution.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-command-options.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+      "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/lease-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/push-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
+      "packages/cli/src/commands/git-governance/implementation/record-commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
+      "packages/cli/src/commands/git-governance/task-scoped-commit-transaction.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/git-governance-transaction-atomic-map.md",
+      "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
+      "packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+      "tests/cli/git-commit-task-scoped-staging/index-lease-transaction-scenarios.ts",
+      "tests/cli/git-commit-task-scoped-staging/transaction-port-contract.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/git-governance-transaction-atomic-map.md",
+      "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
+      "packages/cli/src/commands/hook/pre-commit/framework-lock-context.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "tests/cli/git-commit-staged-line-budget-isolation.test.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-commit-task-scoped-staging/fixture.ts",
+      "tests/cli/git-commit-task-scoped-staging/index-lease-transaction-scenarios.ts",
+      "tests/cli/git-commit-task-scoped-staging/transaction-port-contract.ts"
+    ],
+    "waiverReason": "The requested typed git-governance module delivery is present in historical commit 65aa32730; sibling files are co-delivered TASK-RFT-0101 scope and are excluded from this task's acceptance."
+  },
+  "teamSummary": null
+}

@@ -1,0 +1,292 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0102",
+  "title": "Expand git-governance implementation carrier into typed bounded modules",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Replace the transitional compact implementation carrier with readable, semantically bounded modules for the existing commit and push guard seams; every touched or newly extracted source/test support module must stay at or below 600 physical lines.",
+    "Preserve the `TASK-RFT-0032` facade exports and protected-branch behavior, add the bound case `git_governance_typed_module_boundaries_0102` with a deterministic red-to-green receipt, and update the declared atom map only when the extracted ownership is proven."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/**/*.ts",
+    "tests/cli/git-governance-command-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/**/*.ts",
+    "tests/cli/git-governance-command-extraction.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-command-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.git-governance-transaction-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-governance/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.git-governance-command-results",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/git-governance/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0102-git-governance-typed-implementation-modules.task.md",
+    "sectionTitle": "TASK-RFT-0102",
+    "headingLine": 81,
+    "hash": "e6bf27645704c360",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "rft-hardening/tasks/TASK-RFT-0102-git-governance-typed-implementation-modules.task.md",
+      "planningCommitSha": "b93e877cc566ec75db8bcd6e554b7359e47bac71",
+      "contentDigest": "sha256:e6bf27645704c360aa665ddcd09cfe76090088bcfc43fafe20b147a2cfd0fce5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T15:23:31.395Z"
+    }
+  },
+  "importedAt": "2026-09-06T15:23:31.395Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-RFT-0032 is closed in the target ledger",
+      "current implementation and facade measurements are captured before editing"
+    ],
+    "softRelations": [
+      "ATM-BUG-2026-07-15-195"
+    ],
+    "changedPublicSeams": [
+      "git-governance facade exports remain behavior-compatible"
+    ],
+    "causalImpactEdges": [
+      "typed-implementation-modules"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "git-governance-command-extraction"
+    ],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "git_governance_typed_module_boundaries_0102",
+      "targetGroupId": "null",
+      "semanticKey": "git_governance_typed_module_boundaries",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "typed-implementation-modules"
+      ],
+      "expectedRedPredicate": "compact implementation carrier violates the bounded semantic-module contract",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "git-governance-command-extraction",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "git_governance_typed_module_boundaries_0102"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T15-29-07-090Z-close-f4957ea7eee6",
+  "lastTransitionAt": "2026-09-06T15:29:07.090Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-06T15:26:02.839Z",
+  "promotedAt": "2026-09-06T15:26:02.843Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-d5b3dac8e4c3",
+    "claimedAt": "2026-09-06T15:26:02.848Z",
+    "heartbeatAt": "2026-09-06T15:29:07.087Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0102.json",
+      ".atm/history/evidence/TASK-RFT-0102.*",
+      ".atm/history/task-events/TASK-RFT-0102/**",
+      "packages/cli/src/commands/git-governance/**/*.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "tests/cli/git-governance-command-extraction.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260906152358-codex-gpt-5.4-mini-da16abec3f",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906152358-codex-gpt-5.4-mini-da16abec3f\""
+    },
+    "reason": "The requested typed git-governance module delivery is present in historical commit 65aa32730; sibling files are co-delivered TASK-RFT-0101 scope and are excluded from this task's acceptance."
+  },
+  "startedAt": "2026-09-06T15:23:58.775Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-db30c477cb23bc4d",
+    "ticketDigest": "sha256:db30c477cb23bc4d53bac98d0e1d76d47dd621b5c120350e67c01d8b48ef2bbd",
+    "taskId": "TASK-RFT-0102",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260906152358-codex-gpt-5.4-mini-da16abec3f",
+    "claimGeneration": "lease-d5b3dac8e4c3",
+    "issuedAt": "2026-09-06T15:26:02.848Z",
+    "expiresAt": "2026-09-06T15:56:02.848Z",
+    "scopeDigest": "sha256:2f9fd04dd9ee22a010dfa2692356bcf2315bbd44cb7e72f964ce72ed2b63ff53",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T15:26:02.848Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-RFT-0102.*",
+          ".atm/history/task-events/TASK-RFT-0102/**",
+          ".atm/history/tasks/TASK-RFT-0102.json",
+          "packages/cli/src/commands/git-governance/**/*.ts",
+          "packages/cli/src/commands/git-governance/implementation.ts",
+          "tests/cli/git-governance-command-extraction.test.ts"
+        ],
+        "digest": "sha256:e0f4c2567d8b93b75c9848781557f99a0f85d828536af5d014da85ffa9416041"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906152602-codex-gpt-5.4-mini-TASK-RFT-0102-6f0246ecb4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0102",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0102.*",
+      ".atm/history/task-events/TASK-RFT-0102/**",
+      ".atm/history/tasks/TASK-RFT-0102.json",
+      "packages/cli/src/commands/git-governance/**/*.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "tests/cli/git-governance-command-extraction.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d3e6bdb70cb9a95f4588d9d978fa193b0be5ab6a31ff47bad3c5caacfafa65b3",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260906152602-codex-gpt-5.4-mini-TASK-RFT-0102-6f0246ecb4",
+    "laneSession": {
+      "laneSessionId": "lane-20260906152358-codex-gpt-5.4-mini-da16abec3f",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906152358-codex-gpt-5.4-mini-da16abec3f\""
+    },
+    "createdAt": "2026-09-06T15:26:09.598Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-06T15:29:07.087Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260906152602-codex-gpt-5.4-mini-TASK-RFT-0102-6f0246ecb4",
+  "closeReason": "The requested typed git-governance module delivery is present in historical commit 65aa32730; sibling files are co-delivered TASK-RFT-0101 scope and are excluded from this task's acceptance.",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0102.closure-packet.json"
+}
