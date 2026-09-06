@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0106",
+  "title": "Extract bounded semantic modules from task-ledger validator implementation",
+  "status": "planned",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Extract at least one complete task-ledger validator family into readable modules, keeping every touched source and test module at or below 600 physical lines and no individual line above 1000 characters.",
+    "Preserve the public suite exports and validator behavior; add a deterministic red-to-green extraction-boundary receipt."
+  ],
+  "deliverables": [
+    "scripts/validators/task-ledger/suite-impl.ts",
+    "scripts/validators/task-ledger/suite-impl/implementation.ts",
+    "scripts/validators/task-ledger/suite-impl/**/*.ts",
+    "tests/cli/task-ledger-validator-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/validators/task-ledger/suite-impl.ts",
+    "scripts/validators/task-ledger/suite-impl/implementation.ts",
+    "scripts/validators/task-ledger/suite-impl/**/*.ts",
+    "tests/cli/task-ledger-validator-extraction.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/task-ledger-validator-extraction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger-validator",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.task-ledger-validator-harness",
+        "pattern": "Validator Suite Map",
+        "source": "scripts/validators/task-ledger/suite-impl/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.task-ledger-validator-closeout",
+        "pattern": "Result Contract Object",
+        "source": "scripts/validators/task-ledger/suite-impl/implementation.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0106-task-ledger-validator-semantic-modules.task.md",
+    "sectionTitle": "TASK-RFT-0106",
+    "headingLine": 82,
+    "hash": "dee9d449208eda9c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "rft-hardening/tasks/TASK-RFT-0106-task-ledger-validator-semantic-modules.task.md",
+      "planningCommitSha": "5b027d7f6de93eb621911ba8c10d1b8125548304",
+      "contentDigest": "sha256:dee9d449208eda9c00f843a46727c9ed1c66e7a1d09e6a65fcc6d087c3891a43",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T16:24:41.876Z"
+    }
+  },
+  "importedAt": "2026-09-06T16:24:41.876Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-RFT-0035 is closed in the target ledger",
+      "task-ledger validator implementation is measured for physical lines and maximum line width before editing"
+    ],
+    "softRelations": [
+      "ATM-BUG-2026-07-15-198"
+    ],
+    "changedPublicSeams": [
+      "task-ledger validator suite exports remain behavior-compatible"
+    ],
+    "causalImpactEdges": [
+      "task-ledger-validator-semantic-modules"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "task-ledger-validator-extraction"
+    ],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "task_ledger_validator_semantic_module_boundaries_0106",
+      "targetGroupId": "null",
+      "semanticKey": "task_ledger_validator_semantic_module_boundaries",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "task-ledger-validator-semantic-modules"
+      ],
+      "expectedRedPredicate": "task-ledger validator implementation contains an oversized physical line and lacks bounded semantic module boundaries",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "task-ledger-validator-extraction",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "task_ledger_validator_semantic_module_boundaries_0106"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T16-24-42-018Z-import-dccd4628102e",
+  "lastTransitionAt": "2026-09-06T16:24:42.018Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
