@@ -180,6 +180,7 @@ const onefilePayloadPrefixes = [
 const onefilePayloadFrameworkMarkers = new Set([
   'packages/cli/src/atm.ts',
   'packages/cli/src/commands/self-host-alpha.ts',
+  'packages/core/seed.js',
   'scripts/validate-seed-registry.ts',
   'scripts/validate-seed-spec.ts'
 ]);

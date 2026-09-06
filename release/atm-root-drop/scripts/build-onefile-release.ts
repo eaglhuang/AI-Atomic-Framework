@@ -187,6 +187,7 @@ const onefilePayloadFrameworkMarkers = new Set([
 // These records are read by shipped CLI diagnostics. Governance projections
 // and backlog shards belong to the host repository, not the embedded runtime.
 const onefilePayloadGovernanceFiles = new Set([
+  'docs/governance/docs-neutrality-policy.json',
   'docs/governance/error-code-registry.json',
   'docs/governance/tasks-audit-warning-baseline.json'
 ]);

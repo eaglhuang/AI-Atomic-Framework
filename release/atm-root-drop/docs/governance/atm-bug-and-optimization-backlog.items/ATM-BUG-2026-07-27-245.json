@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Fixed",
+  "status": "Closed — source repair and focused validation verified; formal backlog closeout reconciled 2026-09-07",
   "area": "Task import fidelity",
   "finding": "A planning-side scope amendment for an already imported, actively claimed task can only replace the ledger via `tasks import --write --force`. ATM classifies that same-task, source-hash-verified re-import as protected emergency work requiring a human emergency approval lease, even when it only adds declared implementation and test paths.",
   "expectedBehavior": "Provide a normal governed amendment/re-import route that verifies the planning revision, preserves the existing actor, claim, lane, direction lock history, and audit trail, and applies an additive scope change without an emergency bypass. Destructive replacement or ownership-changing amendments should remain protected.",

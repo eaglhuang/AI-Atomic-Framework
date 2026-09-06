@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed",
+  "status": "Closed — source repair and focused validation verified; formal backlog closeout reconciled 2026-09-07",
   "area": "Task import / planning mirror reconcile",
   "finding": "`tasks import --write --reconcile-mirror` can append a planning-mirror-reconcile transition to a done task without converging the planning mirror status, so the same task remains classified as `stale-import` immediately after the official recovery command succeeds.",
   "expectedBehavior": "A successful reconcile-mirror command should either update the authoritative planning mirror/frontmatter through the proper closeback surface, or fail closed with a recovery command that explains which repo/path must be mutated. It should not record a fresh reconcile transition while leaving the residue bucket unchanged.",

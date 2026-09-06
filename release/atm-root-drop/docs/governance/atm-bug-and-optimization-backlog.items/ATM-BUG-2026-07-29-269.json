@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed",
+  "status": "Closed — source repair and focused validation verified; formal backlog closeout reconciled 2026-09-07",
   "area": "Emergency bridge / historical work admission",
   "finding": "Emergency bridge commits created through governed need can later fail pre-push historical work admission because attest requires provenance not present in the immutable bridge commit message, and `git:<commit>` provenance is rejected unless the historical commit already includes `ATM-Emergency-Reason`.",
   "expectedBehavior": "A governed emergency bridge path should create the required provenance at commit time or provide a first-class post-hoc attestation command that can bind an immutable commit to an external provenance receipt without hidden message-format coupling.",

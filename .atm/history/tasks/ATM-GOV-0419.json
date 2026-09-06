@@ -1,0 +1,273 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0419",
+  "title": "Publish onefile neutrality policy repair through the runner-sync steward",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "**ACC-1:** The runner-sync steward publishes the repaired source at a current sealed source SHA and records the exact release-surface receipt.",
+    "**ACC-2:** The published onefile passes clean extracted `self-host-alpha --verify`, including the neutrality scan, with no missing `docs/governance/docs-neutrality-policy.json` error."
+  ],
+  "deliverables": [
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/**"
+  ],
+  "scopePaths": [
+    "scripts/build-onefile-release.ts",
+    "scripts/validate-onefile-release.ts",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/**"
+  ],
+  "validators": [
+    "npm run validate:onefile-release",
+    "npm run validate:self-hosting-alpha",
+    "npm run validate:runner-reproducibility"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-build-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0419-publish-onefile-neutrality-policy-repair.task.md",
+    "sectionTitle": "ATM-GOV-0419",
+    "headingLine": 70,
+    "hash": "00956d7851bb1f22",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0419-publish-onefile-neutrality-policy-repair.task.md",
+      "planningCommitSha": "c4012457c08255c51a1f616b7aec56db56322c33",
+      "contentDigest": "sha256:00956d7851bb1f222839e4c8d1bb9e227da6fc64411df048114e058435201484",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T22:37:09.146Z"
+    }
+  },
+  "importedAt": "2026-09-06T22:37:09.146Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "frozen onefile runner publication"
+    ],
+    "causalImpactEdges": [
+      "onefile-self-host-alpha-clean-install"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "validate-onefile-release",
+      "validate-self-hosting-alpha"
+    ],
+    "phaseOwner": "atm-release"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_onefile_neutrality_policy_self_host_alpha_0419",
+      "targetGroupId": "null",
+      "semanticKey": "onefile_neutrality_policy_self_host_alpha",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "onefile-self-host-alpha-clean-install"
+      ],
+      "expectedRedPredicate": "clean extracted self-host-alpha verification fails with missing neutrality policy",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "onefile-neutrality-policy-closure",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_onefile_neutrality_policy_self_host_alpha_0419"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T22-39-03-156Z-claim-2e24b08df88c",
+  "lastTransitionAt": "2026-09-06T22:39:03.156Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-06T22:38:56.213Z",
+  "promotedAt": "2026-09-06T22:38:56.218Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-17689da45140",
+    "claimedAt": "2026-09-06T22:38:56.222Z",
+    "heartbeatAt": "2026-09-06T22:38:56.222Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0419.json",
+      ".atm/history/evidence/ATM-GOV-0419.*",
+      ".atm/history/task-events/ATM-GOV-0419/**",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "scripts/build-onefile-release.ts",
+      "scripts/validate-onefile-release.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906223856-codex-captain-4413dde437",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906223856-codex-captain-4413dde437\""
+    }
+  },
+  "startedAt": "2026-09-06T22:37:19.019Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-13d06569a3ac20ad",
+    "ticketDigest": "sha256:13d06569a3ac20ade8ddc8e0bc1d146ed3c6ff38bcdc92d7975868ca294a5e5d",
+    "taskId": "ATM-GOV-0419",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260906223856-codex-captain-4413dde437",
+    "claimGeneration": "lease-17689da45140",
+    "issuedAt": "2026-09-06T22:38:56.222Z",
+    "expiresAt": "2026-09-06T23:08:56.222Z",
+    "scopeDigest": "sha256:4eb17d5c94817383b27ea9fb3b0b74b4b41f7253c6370befad3e7289eb1b9a24",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T22:38:56.222Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0419.*",
+          ".atm/history/task-events/ATM-GOV-0419/**",
+          ".atm/history/tasks/ATM-GOV-0419.json",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop/**",
+          "scripts/build-onefile-release.ts",
+          "scripts/validate-onefile-release.ts"
+        ],
+        "digest": "sha256:514b73b80b0733c14a842b4db5dae4c12fef48e67490621b3f04472d189958b1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906223856-codex-captain-ATM-GOV-0419-374b6a9c69",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0419",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0419.*",
+      ".atm/history/task-events/ATM-GOV-0419/**",
+      ".atm/history/tasks/ATM-GOV-0419.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "scripts/build-onefile-release.ts",
+      "scripts/validate-onefile-release.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "c07afe52d346db2a4116eb6d93efeb40949c0e48119b371acec023f1945b96c6",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260906223856-codex-captain-ATM-GOV-0419-374b6a9c69",
+    "laneSession": {
+      "laneSessionId": "lane-20260906223856-codex-captain-4413dde437",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906223856-codex-captain-4413dde437\""
+    },
+    "createdAt": "2026-09-06T22:39:03.155Z",
+    "status": "active"
+  }
+}
