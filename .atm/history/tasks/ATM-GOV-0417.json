@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0417",
+  "title": "Runner-sync closeback must leave no dirty generated residue",
+  "status": "abandoned",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "A close with an accepted runner-sync receipt leaves no runner receipt or release-surface dirty residue.",
+    "A missing, stale, or out-of-scope receipt fails closed with one executable recovery command and does not silently widen the task ticket.",
+    "Foreign staged/dirty files remain byte-identical and outside the delivery.",
+    "Red and green evidence bind the same case id, public seam, and candidate lineage."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/taskflow/**",
+    "scripts/runner-sync-incremental-build.ts",
+    "scripts/runner-sync-receipt-continuation.ts",
+    "tests/cli/runner-sync-closeback-residue.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/taskflow/**",
+    "scripts/runner-sync-incremental-build.ts",
+    "scripts/runner-sync-receipt-continuation.ts",
+    "tests/cli/runner-sync-closeback-residue.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runner-sync-closeback-residue.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli:surface",
+    "npm run validate:runner-reproducibility"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync-closeback-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-sync-closeback",
+        "pattern": "Transactional closeback boundary",
+        "source": "packages/cli/src/commands/taskflow",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0417-runner-sync-closeback-must-leave-no-dirty-generated-residue.task.md",
+    "sectionTitle": "ATM-GOV-0417",
+    "headingLine": 66,
+    "hash": "cd3a741a77a786c6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0417-runner-sync-closeback-must-leave-no-dirty-generated-residue.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:cd3a741a77a786c6634f7612c7f5c4446dc7d5862f12755e1dd3e0903530fea2",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T13:37:10.937Z"
+    }
+  },
+  "importedAt": "2026-09-06T13:37:10.937Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_runner_sync_closeback_leaves_no_generated_residue_0417",
+      "targetGroupId": "null",
+      "semanticKey": "runner_sync_closeback_no_generated_residue",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "runner-sync-closeback-boundary"
+      ],
+      "expectedRedPredicate": null,
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "runner-sync-closeback-contract",
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_runner_sync_closeback_leaves_no_generated_residue_0417"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T13-39-04-741Z-abandon-9d990dd754a7",
+  "lastTransitionAt": "2026-09-06T13:39:04.741Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-06T13:37:34.867Z",
+  "promotedAt": "2026-09-06T13:37:34.872Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-904a9e4751d1",
+    "claimedAt": "2026-09-06T13:37:34.877Z",
+    "heartbeatAt": "2026-09-06T13:39:04.685Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0417.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "scripts/runner-sync-incremental-build.ts",
+      "scripts/runner-sync-receipt-continuation.ts",
+      "tests/cli/runner-sync-closeback-residue.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260906133735-codex-captain-4772a290fa",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906133735-codex-captain-4772a290fa\""
+    },
+    "reason": "Current source already satisfies runner-sync closeback bundle ownership; focused regressions pass and the backlog reproduction is no longer present, so no source change is justified."
+  },
+  "startedAt": "2026-09-06T13:37:34.877Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d0c95dff12993501",
+    "ticketDigest": "sha256:d0c95dff129935012d82c90cd17375aa5ef5f3d6ff521e01d081e722ea6caf83",
+    "taskId": "ATM-GOV-0417",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260906133735-codex-captain-4772a290fa",
+    "claimGeneration": "lease-904a9e4751d1",
+    "issuedAt": "2026-09-06T13:37:34.877Z",
+    "expiresAt": "2026-09-06T14:07:34.877Z",
+    "scopeDigest": "sha256:8dbc812e8fcfbff76c0419ffebc8c503e87ba3110ee7b12c16383daf5bf1e8ab",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T13:37:34.877Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0417.*",
+          ".atm/history/task-events/ATM-GOV-0417/**",
+          ".atm/history/tasks/ATM-GOV-0417.json",
+          "packages/cli/src/commands/broker/steward-queues.ts",
+          "packages/cli/src/commands/taskflow/**",
+          "scripts/runner-sync-incremental-build.ts",
+          "scripts/runner-sync-receipt-continuation.ts",
+          "tests/cli/runner-sync-closeback-residue.test.ts"
+        ],
+        "digest": "sha256:57af4f845b2d7a926daf7e97371391a65d003dedca245799cc264b57fcddf3b7"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906133734-codex-captain-ATM-GOV-0417-c689cccabf",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0417",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0417.*",
+      ".atm/history/task-events/ATM-GOV-0417/**",
+      ".atm/history/tasks/ATM-GOV-0417.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/taskflow/**",
+      "scripts/runner-sync-incremental-build.ts",
+      "scripts/runner-sync-receipt-continuation.ts",
+      "tests/cli/runner-sync-closeback-residue.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bdc3f8f66bacca4cc07146bf722460582020ba140e1fe5098a1a9f1112340ade",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260906133734-codex-captain-ATM-GOV-0417-c689cccabf",
+    "laneSession": {
+      "laneSessionId": "lane-20260906133735-codex-captain-4772a290fa",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906133735-codex-captain-4772a290fa\""
+    },
+    "createdAt": "2026-09-06T13:37:41.249Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-06T13:39:04.685Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260906133734-codex-captain-ATM-GOV-0417-c689cccabf",
+  "closeReason": "Current source already satisfies runner-sync closeback bundle ownership; focused regressions pass and the backlog reproduction is no longer present, so no source change is justified.",
+  "abandonResidueDisposition": ".atm/history/evidence/ATM-GOV-0417.abandon-residue-disposition.json"
+}
