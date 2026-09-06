@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed in 1017873b3 / 58cd0dfbc",
+  "status": "Closed — source repair verified in 1017873b3 / 58cd0dfbc; formal backlog closeout reconciled 2026-09-07",
   "area": "Next routing / batch claim readiness",
   "finding": "Prompt-scoped batch routing reported a dependency-blocked queue head as task-queue-ready, so the operator received a batch claim playbook that failed only after next --claim.",
   "expectedBehavior": "next --prompt must apply the same queue-head claim-readiness dependency check as next --claim and fail closed with ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED before suggesting implementation, checkpoint, or batch advancement.",
