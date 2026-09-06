@@ -2,60 +2,60 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-BUG-2026-09-07-006",
   "title": "Commit cleanup disposition evidence",
-  "status": "open",
-  "owner": "codex-gpt-5.4-mini",
+  "status": "abandoned",
+  "owner": "codex-captain",
   "dependencies": [],
   "acceptance": [],
   "deliverables": [],
   "tags": [],
   "createdAt": "2026-09-06T20:01:14.711Z",
   "createdByActor": "codex-gpt-5.4-mini",
-  "lastTransitionId": "2026-09-06T20-10-27-981Z-release-a253c2019732",
-  "lastTransitionAt": "2026-09-06T20:10:27.981Z",
+  "lastTransitionId": "2026-09-06T21-55-44-883Z-abandon-2da43ce9b6b3",
+  "lastTransitionAt": "2026-09-06T21:55:44.883Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "reservedAt": "2026-09-06T20:09:33.761Z",
-  "promotedAt": "2026-09-06T20:09:33.766Z",
+  "reservedAt": "2026-09-06T21:55:27.420Z",
+  "promotedAt": "2026-09-06T21:55:27.427Z",
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-4e038c56f584",
-    "claimedAt": "2026-09-06T20:09:33.773Z",
-    "heartbeatAt": "2026-09-06T20:10:26.982Z",
+    "actorId": "codex-captain",
+    "leaseId": "lease-24483fde7416",
+    "claimedAt": "2026-09-06T21:55:27.433Z",
+    "heartbeatAt": "2026-09-06T21:55:44.829Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/tasks/ATM-BUG-2026-09-07-006.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-006.*",
       ".atm/history/evidence/ATM-BUG-2026-09-07-006.live-index-reconciliation.json",
       ".atm/history/protected-override-audit/2026-09-06T20-01-46-134Z-POA-4f91d33a021c.json",
-      ".atm/history/task-events/ATM-BUG-2026-09-07-006/**",
-      ".atm/history/tasks/ATM-BUG-2026-09-07-006.json"
+      ".atm/history/task-events/ATM-BUG-2026-09-07-006/**"
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f",
+      "laneSessionId": "lane-20260906215527-codex-captain-062aa60b6d",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906215527-codex-captain-062aa60b6d\""
     },
-    "reason": "Push reconciliation receipt committed; no source deliverables."
+    "reason": "Queue-head contains no non-ATM deliverable or acceptance contract; no source change is justified."
   },
   "startedAt": "2026-09-06T20:07:54.655Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-5347b35343fff91e",
-    "ticketDigest": "sha256:5347b35343fff91eb2312865bfc8fe2387e898aca94e09566c79a041e1eb6241",
+    "ticketId": "wat-2b01e6637f51cfbf",
+    "ticketDigest": "sha256:2b01e6637f51cfbfd44eaaabbc087dc48565e342eaf4bb4f82186fd2ca271364",
     "taskId": "ATM-BUG-2026-09-07-006",
     "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f",
-    "claimGeneration": "lease-4e038c56f584",
-    "issuedAt": "2026-09-06T20:09:34.913Z",
-    "expiresAt": "2026-09-06T20:39:34.913Z",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260906215527-codex-captain-062aa60b6d",
+    "claimGeneration": "lease-24483fde7416",
+    "issuedAt": "2026-09-06T21:55:27.433Z",
+    "expiresAt": "2026-09-06T22:25:27.433Z",
     "scopeDigest": "sha256:c25aad25afb2c6c6aad859f5d8a62d1c96766719048f0adfc788e1e945ab9cb9",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-06T20:09:34.913Z"
+      "selectedAt": "2026-09-06T21:55:27.433Z"
     },
     "grants": [
       {
@@ -106,15 +106,15 @@
     "resolvedRecoveryMode": "disabled",
     "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
   },
-  "startedBySessionId": "session-20260906200933-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-006-d5508fa676",
+  "startedBySessionId": "session-20260906215527-codex-captain-ATM-BUG-2026-09-07-006-ea106bf96b",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "ATM-BUG-2026-09-07-006",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
+    "batchId": "batch-fc8fbb5f6857",
+    "scopeKey": "ATM-BUG",
+    "queueId": "queue-34094a72fe06d1fc",
+    "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/ATM-BUG-2026-09-07-006.*",
       ".atm/history/evidence/ATM-BUG-2026-09-07-006.live-index-reconciliation.json",
@@ -126,15 +126,15 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "f5cc1cb771b020a6dee8e640939d647c6da1c16f73947caca18e062f5af6d490",
-    "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260906200933-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-006-d5508fa676",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260906215527-codex-captain-ATM-BUG-2026-09-07-006-ea106bf96b",
     "laneSession": {
-      "laneSessionId": "lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f",
+      "laneSessionId": "lane-20260906215527-codex-captain-062aa60b6d",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906200933-codex-gpt-5.4-mini-3aa3c66a4f\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906215527-codex-captain-062aa60b6d\""
     },
-    "createdAt": "2026-09-06T20:09:34.905Z",
+    "createdAt": "2026-09-06T21:55:28.597Z",
     "status": "active"
   },
   "scopePaths": [
@@ -143,5 +143,10 @@
     ".atm/history/protected-override-audit/2026-09-06T20-01-46-134Z-POA-4f91d33a021c.json",
     ".atm/history/task-events/ATM-BUG-2026-09-07-006/**",
     ".atm/history/tasks/ATM-BUG-2026-09-07-006.json"
-  ]
+  ],
+  "closedAt": "2026-09-06T21:55:44.829Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260906215527-codex-captain-ATM-BUG-2026-09-07-006-ea106bf96b",
+  "closeReason": "Queue-head contains no non-ATM deliverable or acceptance contract; no source change is justified.",
+  "abandonResidueDisposition": ".atm/history/evidence/ATM-BUG-2026-09-07-006.abandon-residue-disposition.json"
 }
