@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T23-38-49-776Z-close-738be2b8d0a9",
+  "taskId": "ATM-GOV-0419",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260906231547-codex-captain-ATM-GOV-0419-85d853ac9b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0419.json",
+  "taskSha256": "sha256:3c4534feb4019c216c7b105570f36866a1d7e0ca56e0c58e18b7a7f527f993fa",
+  "createdAt": "2026-09-06T23:38:49.776Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0419 --actor codex-captain --status done --historical-delivery 41e88ba06a1c6e0611303d454d7496ef5508657f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906231547-codex-captain-ATM-GOV-0419-85d853ac9b",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0419.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "validate:onefile-release",
+      "validate:runner-reproducibility",
+      "validate:self-hosting-alpha"
+    ],
+    "requiredGates": [
+      "validate:onefile-release",
+      "validate:runner-reproducibility",
+      "validate:self-hosting-alpha"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T23:38:49.749Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0419.*",
+        ".atm/history/task-events/ATM-GOV-0419/**",
+        ".atm/history/tasks/ATM-GOV-0419.json",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**",
+        "scripts/build-onefile-release.ts",
+        "scripts/validate-onefile-release.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-onefile-release.ts",
+        "scripts/validate-onefile-release.ts"
+      ],
+      "requiredGates": [
+        "validate:onefile-release",
+        "validate:runner-reproducibility",
+        "validate:self-hosting-alpha"
+      ]
+    }
+  }
+}

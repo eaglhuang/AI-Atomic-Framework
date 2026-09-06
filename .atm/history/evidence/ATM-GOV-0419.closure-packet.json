@@ -1,0 +1,127 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0419",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "95f1d96b62f0d8d0e446b502580639cc2d7e09e6",
+  "governedTreeSha": "ec4e70758ed95becade0dd1f7b5cdcaa8af9a88c",
+  "targetCommitDelta": {
+    "currentCommitSha": "95f1d96b62f0d8d0e446b502580639cc2d7e09e6",
+    "parentCommitShas": [
+      "95f1d96b62f0d8d0e446b502580639cc2d7e09e6"
+    ],
+    "governedTreeSha": "ec4e70758ed95becade0dd1f7b5cdcaa8af9a88c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0419.live-index-reconciliation.json",
+      ".atm/history/evidence/ATM-GOV-0419.runner-sync-receipt.json",
+      ".atm/history/tasks/ATM-GOV-0419.json",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-onefile-release.ts",
+      "scripts/validate-onefile-release.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run validate:self-hosting-alpha",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:47a0a23d16353f0db63815fc299a49f2887cb91b3d53b24af908f865f0d902fe",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:runner-reproducibility",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ba22d75b5ef652e97c923752126d4717962df19ee373c9124ea242a2966ad3b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:15a4b8c60f18a7c214fd8dadd3a5c2bb7d9baf140a7ca0b1bdaa3bec946f299a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "validate:onefile-release",
+    "validate:runner-reproducibility",
+    "validate:self-hosting-alpha"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "validate:onefile-release",
+    "validate:runner-reproducibility",
+    "validate:self-hosting-alpha"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T23:38:49.749Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0419.*",
+      ".atm/history/task-events/ATM-GOV-0419/**",
+      ".atm/history/tasks/ATM-GOV-0419.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "scripts/build-onefile-release.ts",
+      "scripts/validate-onefile-release.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/build-onefile-release.ts",
+      "scripts/validate-onefile-release.ts"
+    ],
+    "requiredGates": [
+      "validate:onefile-release",
+      "validate:runner-reproducibility",
+      "validate:self-hosting-alpha"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0419.json",
+  "closedAt": "2026-09-06T23:38:49.749Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260906231547-codex-captain-ATM-GOV-0419-85d853ac9b",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "41e88ba06a1c6e0611303d454d7496ef5508657f",
+    "taskMatchedFiles": [
+      "scripts/validate-onefile-release.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0419.json",
+      ".atm/history/task-events/ATM-GOV-0419/2026-09-06T23-15-47-128Z-reserve-0220e364443d.json",
+      ".atm/history/task-events/ATM-GOV-0419/2026-09-06T23-15-47-132Z-promote-e287ae90461a.json",
+      ".atm/history/task-events/ATM-GOV-0419/2026-09-06T23-15-49-427Z-claim-2af8281f053e.json",
+      ".atm/history/tasks/ATM-GOV-0419.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-root-drop/scripts/validate-onefile-release.ts"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

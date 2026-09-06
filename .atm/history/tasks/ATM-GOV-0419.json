@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0419",
   "title": "Publish onefile neutrality policy repair through the runner-sync steward",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -138,8 +138,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-06T23-15-49-427Z-claim-2af8281f053e",
-  "lastTransitionAt": "2026-09-06T23:15:49.427Z",
+  "lastTransitionId": "2026-09-06T23-38-49-776Z-close-738be2b8d0a9",
+  "lastTransitionAt": "2026-09-06T23:38:49.776Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-06T23:15:47.128Z",
@@ -148,7 +148,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-cc709ea805f6",
     "claimedAt": "2026-09-06T23:15:47.136Z",
-    "heartbeatAt": "2026-09-06T23:15:47.136Z",
+    "heartbeatAt": "2026-09-06T23:38:49.770Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0419.json",
@@ -160,14 +160,14 @@
       "scripts/build-onefile-release.ts",
       "scripts/validate-onefile-release.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260906231547-codex-captain-1571525382",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906231547-codex-captain-1571525382\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-06T22:37:19.019Z",
   "startedByActor": "codex-captain",
@@ -269,5 +269,9 @@
     },
     "createdAt": "2026-09-06T23:15:49.426Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-06T23:38:49.770Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260906231547-codex-captain-ATM-GOV-0419-85d853ac9b",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0419.closure-packet.json"
 }
