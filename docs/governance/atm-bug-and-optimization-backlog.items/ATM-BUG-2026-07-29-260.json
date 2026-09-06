@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Low",
-  "status": "Needs task card",
+  "status": "Fixed",
   "area": "Validation / Generated projections",
   "finding": "`npm run generate:error-codes -- --check` is named like a read-only validation path but still rewrites generated files and reports `wrote docs\\ERROR_CODES.md and packages\\core\\src\\error-code-registry.generated.ts`.",
   "expectedBehavior": "A `--check` mode should be non-mutating and fail with a clear stale-projection diagnostic when generated files differ; the mutating path should remain an explicit `--write` or generator command.",
-  "evidenceOrRepro": "While preparing ATM-GOV-0268 claim admission, the command exited 0 and wrote generated error-code projections despite `--check`, leaving deliverable-like dirty files that blocked the next task claim with `ATM_TASK_SCOPE_EXPANSION_REQUIRED`.",
-  "followUp": "Split the generator into true check/write modes and add a regression test that asserts `--check` does not modify `docs/ERROR_CODES.md` or `packages/core/src/error-code-registry.generated.ts`."
+  "evidenceOrRepro": "The generator now recognizes `--check`, compares both generated projections without writing, and returns exit 0 when current or exit 1 with an explicit stale-file diagnostic. `tests/cli/error-code-index-check-mode.test.ts` passes against the current stale docs state and proves both bytes and mtimes remain unchanged.",
+  "followUp": "Regenerate the two projections in a separately scoped documentation update when the repository is ready to accept the full generated diff; `--check` now remains the safe read-only gate."
 }
