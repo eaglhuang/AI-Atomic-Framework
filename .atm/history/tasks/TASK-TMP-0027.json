@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0027",
   "title": "Disposition abandoned cleanup evidence",
-  "status": "running",
+  "status": "abandoned",
   "milestone": "temporary-governance",
   "dependencies": [],
   "acceptance": [
@@ -124,8 +124,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-06T21-48-00-265Z-scope-amendment-11a83f74304d",
-  "lastTransitionAt": "2026-09-06T21:48:00.265Z",
+  "lastTransitionId": "2026-09-06T21-50-19-103Z-abandon-2b7b0b718d27",
+  "lastTransitionAt": "2026-09-06T21:50:19.103Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-06T21:43:36.638Z",
@@ -134,7 +134,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-a4f3c363ffb6",
     "claimedAt": "2026-09-06T21:43:36.647Z",
-    "heartbeatAt": "2026-09-06T21:43:36.647Z",
+    "heartbeatAt": "2026-09-06T21:50:19.054Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/git-head.json",
@@ -149,14 +149,14 @@
       ".atm/history/tasks/TASK-TMP-0026.json",
       ".atm/history/tasks/TASK-TMP-0027.json"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260906214336-codex-captain-2712b030f5",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906214336-codex-captain-2712b030f5\""
-    }
+    },
+    "reason": "No non-ATM deliverable exists; cleanup evidence has been retained in governed commits."
   },
   "startedAt": "2026-09-06T21:43:36.647Z",
   "startedByActor": "codex-captain",
@@ -271,5 +271,10 @@
     },
     "createdAt": "2026-09-06T21:43:38.192Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-06T21:50:19.054Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260906214336-codex-captain-TASK-TMP-0027-c2f3dbc90f",
+  "closeReason": "No non-ATM deliverable exists; cleanup evidence has been retained in governed commits.",
+  "abandonResidueDisposition": ".atm/history/evidence/TASK-TMP-0027.abandon-residue-disposition.json"
 }
