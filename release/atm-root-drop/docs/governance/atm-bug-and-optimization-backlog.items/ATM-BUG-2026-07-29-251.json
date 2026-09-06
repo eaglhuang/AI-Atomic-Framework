@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — Fixed in 7e9c5f784; runner publication cecc61d1a verified 2026-09-06",
   "area": "Taskflow planning closeback",
   "finding": "`taskflow close` stages the whole planning task-card file when writing closure frontmatter. If the same physical card file also contains an unrelated in-flight planning edit, the close commit can forcibly include that edit because there is no partial-stage or field-scoped closeback path.",
   "expectedBehavior": "Planning closeback should stage only the closure mutation or provide a governed split/reconcile path when a physical planning card has unrelated dirty hunks. It should fail with a precise diagnostic rather than silently coupling close metadata with unrelated planning changes.",
-  "evidenceOrRepro": "TASK-AAO-0206 governed close produced planning commit `cca6b591ebdef1970f8110be0c6568f5eb9c2dfe`; the commit necessarily included both closure fields and a separate `TASK-AAO-0068` relationship edit from `depends_on` to `softRelations` in the same task-card file.",
-  "followUp": "Add closeback partial-stage support or a planning-card hunk isolation check. Include a regression where closure metadata and unrelated frontmatter/body edits coexist in one card."
+  "evidenceOrRepro": "Red reproduction in tests/cli/taskflow-close-planning-card-partial-stage.test.ts showed closeback had no partial staging snapshot while unrelated frontmatter/body WIP coexisted. Commit 7e9c5f784 adds a HEAD-based partial planning-card staging payload and stages it through the isolated temporary index; focused regression, closeback regression, typecheck, CLI surface, and encoding guard passed. Frozen runner publication cecc61d1a was rebuilt and pushed; node atm.mjs --version reports syncRequired=false.",
+  "followUp": "Formal task-card closeout remains separate from this backlog closure. Continue auditing other backlog items; do not treat this quickfix as completion of a broader plan."
 }

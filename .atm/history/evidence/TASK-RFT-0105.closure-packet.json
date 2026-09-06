@@ -1,0 +1,145 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0105",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "ba19a03c0eb8e44a5d03ac3d07fc344c81932b82",
+  "governedTreeSha": "3f005c8d019f0729e53da2e1398c8fd2a6049c39",
+  "targetCommitDelta": {
+    "currentCommitSha": "ba19a03c0eb8e44a5d03ac3d07fc344c81932b82",
+    "parentCommitShas": [
+      "ba19a03c0eb8e44a5d03ac3d07fc344c81932b82"
+    ],
+    "governedTreeSha": "3f005c8d019f0729e53da2e1398c8fd2a6049c39",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-RFT-0105.runner-sync-receipt.json",
+      "packages/cli/dist/commands/framework-development/closure-packet-schema.js",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/digest-normalization.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-195.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-197.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-29-251.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-279.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema.js",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl.ts",
+      "release/atm-root-drop/tests/cli/closure-packet-schema-extraction.test.ts",
+      "release/atm-root-drop/tests/cli/pre-commit-hook-extraction.test.ts",
+      "release/atm-root-drop/tests/cli/tasks-legacy-impl-extraction.test.ts",
+      "tests/cli/closure-packet-schema-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf507376b03d9d047d495f551d4cf2e37c02df60d29ba2c8afc0a15c1efd670",
+      "stderrSha256": "sha256:287062896bade468b2ce3d297b7ded6c1ec879c636468f110a4d7843ca10e4f7",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T17:11:33.578Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0105.*",
+      ".atm/history/task-events/TASK-RFT-0105/**",
+      ".atm/history/tasks/TASK-RFT-0105.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/digest-normalization.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "tests/cli/closure-packet-schema-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/digest-normalization.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "tests/cli/closure-packet-schema-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0105.json",
+  "closedAt": "2026-09-06T17:11:33.578Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906164737-codex-gpt-5.4-mini-TASK-RFT-0105-f9dc058304",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "ba19a03c0eb8e44a5d03ac3d07fc344c81932b82",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/digest-normalization.ts",
+      "tests/cli/closure-packet-schema-extraction.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0105.json",
+      ".atm/history/task-events/TASK-RFT-0105/2026-09-06T16-47-37-002Z-reserve-828c4adc0b6d.json",
+      ".atm/history/task-events/TASK-RFT-0105/2026-09-06T16-47-37-005Z-promote-df2ff5c4a6e8.json",
+      ".atm/history/task-events/TASK-RFT-0105/2026-09-06T16-47-43-107Z-claim-8304f7bf26b8.json",
+      ".atm/history/task-events/TASK-RFT-0105/2026-09-06T16-59-15-928Z-scope-amendment-8b88427d68e5.json",
+      ".atm/history/tasks/TASK-RFT-0105.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

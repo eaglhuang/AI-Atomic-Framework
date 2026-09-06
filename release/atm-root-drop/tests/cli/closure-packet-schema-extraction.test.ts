@@ -70,6 +70,11 @@ const invalid = validateClosurePacket({ ...packet, commandRuns: [{ ...packet.com
 assert.equal(invalid.ok, false);
 assert.equal(invalid.invalidFormat[0]?.path, 'commandRuns/0/stdoutSha256');
 
+const normalizeSha256DigestValue = implementation.normalizeSha256DigestValue as (value: string) => string;
+const normalizeSha256FieldsDeep = implementation.normalizeSha256FieldsDeep as <T>(value: T) => T;
+assert.equal(normalizeSha256DigestValue(` sha256:${'A'.repeat(64)} `), `sha256:${'a'.repeat(64)}`);
+assert.deepEqual(normalizeSha256FieldsDeep({ nested: [`sha256:${'B'.repeat(64)}`, 'keep'] }), { nested: [`sha256:${'b'.repeat(64)}`, 'keep'] });
+
 const atomMap = JSON.parse(readFileSync(path.join(root, 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json'), 'utf8'));
 const mappings = Array.isArray(atomMap.mappings) ? atomMap.mappings : [];
 const mappedPaths = new Set(mappings.map((entry: { path_pattern?: unknown }) => String(entry.path_pattern ?? '')));

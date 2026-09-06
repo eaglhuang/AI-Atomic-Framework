@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T17-11-33-590Z-close-94bc5a25e87a",
+  "taskId": "TASK-RFT-0105",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906164737-codex-gpt-5.4-mini-TASK-RFT-0105-f9dc058304",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0105.json",
+  "taskSha256": "sha256:6de1ab08dc0cc82a7834c0c13569aa3a3642a8f3da7d36306be06964ddf45134",
+  "createdAt": "2026-09-06T17:11:33.590Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0105 --actor codex-gpt-5.4-mini --status done --historical-delivery ba19a03c0eb8e44a5d03ac3d07fc344c81932b82",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906164737-codex-gpt-5.4-mini-TASK-RFT-0105-f9dc058304",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0105.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T17:11:33.578Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0105.*",
+        ".atm/history/task-events/TASK-RFT-0105/**",
+        ".atm/history/tasks/TASK-RFT-0105.json",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/digest-normalization.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "tests/cli/closure-packet-schema-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/digest-normalization.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "tests/cli/closure-packet-schema-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+        "typecheck",
+        "validate:cli"
+      ]
+    }
+  }
+}
