@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-BUG-2026-09-07-003",
   "title": "Commit governed closure and reconciliation residue",
-  "status": "running",
+  "status": "done",
   "owner": "codex-gpt-5.4-mini",
   "dependencies": [],
   "acceptance": [],
@@ -10,8 +10,8 @@
   "tags": [],
   "createdAt": "2026-09-06T19:15:18.575Z",
   "createdByActor": "codex-gpt-5.4-mini",
-  "lastTransitionId": "2026-09-06T19-15-36-682Z-scope-amendment-467d654b656a",
-  "lastTransitionAt": "2026-09-06T19:15:36.682Z",
+  "lastTransitionId": "2026-09-06T19-16-47-006Z-close-71ad9806ae5f",
+  "lastTransitionAt": "2026-09-06T19:16:47.006Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-09-06T19:15:22.734Z",
   "promotedAt": "2026-09-06T19:15:22.737Z",
@@ -19,7 +19,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-316558df499a",
     "claimedAt": "2026-09-06T19:15:22.742Z",
-    "heartbeatAt": "2026-09-06T19:15:22.742Z",
+    "heartbeatAt": "2026-09-06T19:16:47.004Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-BUG-2026-09-07-001.abandon-residue-disposition.json",
@@ -39,14 +39,14 @@
       ".atm/history/tasks/ATM-BUG-2026-09-07-003.json",
       ".atm/history/tasks/TASK-RFT-0109.json"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260906191522-codex-gpt-5.4-mini-78d75a67c9",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906191522-codex-gpt-5.4-mini-78d75a67c9\""
-    }
+    },
+    "reason": "Close residue carrier after verified governance evidence commit and typecheck pass."
   },
   "startedAt": "2026-09-06T19:15:22.742Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -187,5 +187,10 @@
     ".atm/history/tasks/ATM-BUG-2026-09-07-001.json",
     ".atm/history/tasks/ATM-BUG-2026-09-07-003.json",
     ".atm/history/tasks/TASK-RFT-0109.json"
-  ]
+  ],
+  "closedAt": "2026-09-06T19:16:47.004Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260906191522-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-003-4e0ed04c26",
+  "closeReason": "Close residue carrier after verified governance evidence commit and typecheck pass.",
+  "closurePacket": ".atm/history/evidence/ATM-BUG-2026-09-07-003.closure-packet.json"
 }

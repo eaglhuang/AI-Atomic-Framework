@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T19-16-47-006Z-close-71ad9806ae5f",
+  "taskId": "ATM-BUG-2026-09-07-003",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906191522-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-003-4e0ed04c26",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-BUG-2026-09-07-003.json",
+  "taskSha256": "sha256:32961e885c1262c5bb09c029ea10a1911ab68eac38633db1d8f102e2cc977b5b",
+  "createdAt": "2026-09-06T19:16:47.006Z",
+  "command": "node atm.mjs tasks close --task ATM-BUG-2026-09-07-003 --actor codex-gpt-5.4-mini --status done --historical-delivery 216ad31e98ea5e56351f2c395c564e92d96e6e58",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906191522-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-003-4e0ed04c26",
+    "closurePacketPath": ".atm/history/evidence/ATM-BUG-2026-09-07-003.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck"
+    ],
+    "requiredGates": [],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T19:16:46.991Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-BUG-2026-09-07-001.abandon-residue-disposition.json",
+        ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
+        ".atm/history/evidence/ATM-BUG-2026-09-07-003.*",
+        ".atm/history/evidence/git-head.json",
+        ".atm/history/evidence/TASK-RFT-0109.bundle-manifest.json",
+        ".atm/history/evidence/TASK-RFT-0109.closure-packet.json",
+        ".atm/history/evidence/TASK-RFT-0109.json",
+        ".atm/history/evidence/TASK-RFT-0109.live-index-reconciliation.json",
+        ".atm/history/evidence/TASK-RFT-0109.runner-sync-receipt.json",
+        ".atm/history/protected-override-audit/**",
+        ".atm/history/task-events/ATM-BUG-2026-09-07-001/**",
+        ".atm/history/task-events/ATM-BUG-2026-09-07-003/**",
+        ".atm/history/task-events/TASK-RFT-0109/**",
+        ".atm/history/tasks/ATM-BUG-2026-09-07-001.json",
+        ".atm/history/tasks/ATM-BUG-2026-09-07-003.json",
+        ".atm/history/tasks/TASK-RFT-0109.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": []
+    }
+  }
+}
