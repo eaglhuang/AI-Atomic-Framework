@@ -1,0 +1,288 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0415",
+  "title": "Runtime-only git-head journal with tracked digest acceptance",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Raw `.atm/history/evidence/git-head.jsonl` is never required to be tracked by the normal pre-push acceptance path.",
+    "A compact tracked digest/receipt contains owner, commit/candidate identity, source availability, and verifiable digest fields.",
+    "Missing, stale, or owner-mismatched compact evidence fails closed with an executable recovery command; valid runtime-only raw storage does not block.",
+    "Existing foreign staged work and historical raw evidence remain byte-preserved.",
+    "Focused red/green evidence binds `test_runtime_only_git_head_digest_acceptance_0415` to the changed public seam and candidate commit."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-head-evidence.ts",
+    "packages/cli/src/commands/hook/pre-push/**",
+    "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+    "scripts/validate-git-head-evidence.ts",
+    "tests/cli/git-head-admission-owner-boundary.test.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-head-evidence.ts",
+    "packages/cli/src/commands/hook/pre-push/**",
+    "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+    "scripts/validate-git-head-evidence.ts",
+    "tests/cli/git-head-admission-owner-boundary.test.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-head-admission-owner-boundary.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "npm run typecheck",
+    "npm run validate:git-head-evidence",
+    "npm run validate:cli:surface"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Restore the previous raw-journal acceptance path while retaining compatibility reads; do not delete existing runtime archives or tracked compact receipts.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-head-evidence-boundary",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.git-head-evidence-boundary",
+        "pattern": "Git-head evidence boundary",
+        "source": "packages/cli/src/commands/git-head-evidence.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0415-runtime-only-git-head-journal-with-tracked-digest-acceptance.task.md",
+    "sectionTitle": "ATM-GOV-0415",
+    "headingLine": 80,
+    "hash": "df17200e40af2b26",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0415-runtime-only-git-head-journal-with-tracked-digest-acceptance.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:df17200e40af2b26ae92c24ef48e062bcafec3df55a1d23cd9b33ffb2490df4f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T12:11:17.877Z"
+    }
+  },
+  "importedAt": "2026-09-06T12:11:17.877Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_runtime_only_git_head_digest_acceptance_0415",
+      "targetGroupId": "null",
+      "semanticKey": "runtime_only_git_head_digest_acceptance",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "git-head-evidence-boundary"
+      ],
+      "expectedRedPredicate": "pre-push accepts only a tracked digest/receipt and does not require the raw journal to be tracked",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "git-head-evidence-contract",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_runtime_only_git_head_digest_acceptance_0415"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T12-15-29-918Z-claim-27912d1f34a4",
+  "lastTransitionAt": "2026-09-06T12:15:29.918Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-06T12:15:23.401Z",
+  "promotedAt": "2026-09-06T12:15:23.405Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-27d481e8a0cb",
+    "claimedAt": "2026-09-06T12:15:23.411Z",
+    "heartbeatAt": "2026-09-06T12:15:23.411Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0415.json",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook/pre-push/**",
+      "scripts/validate-git-head-evidence.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-head-admission-owner-boundary.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906121523-codex-captain-0de004613c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906121523-codex-captain-0de004613c\""
+    }
+  },
+  "startedAt": "2026-09-06T12:15:23.411Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-dfd2543de0dafb30",
+    "ticketDigest": "sha256:dfd2543de0dafb3065e37e87cc4c22b8557ab7ec0832624a9899674bc789ad1d",
+    "taskId": "ATM-GOV-0415",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260906121523-codex-captain-0de004613c",
+    "claimGeneration": "lease-27d481e8a0cb",
+    "issuedAt": "2026-09-06T12:15:23.411Z",
+    "expiresAt": "2026-09-06T12:45:23.411Z",
+    "scopeDigest": "sha256:2e10340910b30459fb2eda130eed0a2ea29a0c04441abd515ad6e8d205501d83",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T12:15:23.411Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0415.*",
+          ".atm/history/task-events/ATM-GOV-0415/**",
+          ".atm/history/tasks/ATM-GOV-0415.json",
+          "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+          "packages/cli/src/commands/git-head-evidence.ts",
+          "packages/cli/src/commands/hook/pre-push/**",
+          "scripts/validate-git-head-evidence.ts",
+          "tests/cli/git-commit-task-scoped-staging.test.ts",
+          "tests/cli/git-head-admission-owner-boundary.test.ts"
+        ],
+        "digest": "sha256:e51cd95a2cf69e19ebd9e8ca29041aa8420b84e70f64bfce4c76558ce97791fb"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906121523-codex-captain-ATM-GOV-0415-a0fe0a073d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0415",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0415.*",
+      ".atm/history/task-events/ATM-GOV-0415/**",
+      ".atm/history/tasks/ATM-GOV-0415.json",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook/pre-push/**",
+      "scripts/validate-git-head-evidence.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-head-admission-owner-boundary.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "08224ad236987e59cf70e31aa0c06a182f850e4a4ecda2302cc91d60aaa16579",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260906121523-codex-captain-ATM-GOV-0415-a0fe0a073d",
+    "laneSession": {
+      "laneSessionId": "lane-20260906121523-codex-captain-0de004613c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906121523-codex-captain-0de004613c\""
+    },
+    "createdAt": "2026-09-06T12:15:29.918Z",
+    "status": "active"
+  }
+}
