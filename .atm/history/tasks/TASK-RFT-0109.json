@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0109",
   "title": "Extract bounded semantic modules from pre-commit hook implementation",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -74,19 +74,19 @@
     "planPath": "rft-hardening/tasks/TASK-RFT-0109-extract-bounded-semantic-modules-from-pre-commit-hook-implementation.task.md",
     "sectionTitle": "TASK-RFT-0109",
     "headingLine": 58,
-    "hash": "4fced7c18fba84a5",
+    "hash": "0d52523999571f78",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "rft-hardening/tasks/TASK-RFT-0109-extract-bounded-semantic-modules-from-pre-commit-hook-implementation.task.md",
-      "planningCommitSha": "b9bd962e4cf57d3370135565e5671fa08b79f55d",
-      "contentDigest": "sha256:4fced7c18fba84a5558932ff7ba5a15be38fa4731dd2ed4afad60cfb0d6209e9",
-      "amendmentEpoch": 0,
-      "sealedAt": "2026-09-06T18:01:27.357Z"
+      "planningCommitSha": "f0513e5422d679ef0d479f484e82bae3a42d6c77",
+      "contentDigest": "sha256:0d52523999571f787968b54e954093cf4107389456959ef33ae691173dba00d7",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-06T18:13:51.567Z"
     }
   },
-  "importedAt": "2026-09-06T18:01:27.357Z",
+  "importedAt": "2026-09-06T18:13:51.567Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "disabled",
@@ -162,8 +162,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-06T18-01-36-822Z-claim-683837406ffb",
-  "lastTransitionAt": "2026-09-06T18:01:36.822Z",
+  "lastTransitionId": "2026-09-06T18-24-59-098Z-close-172aad792772",
+  "lastTransitionAt": "2026-09-06T18:24:59.098Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-09-06T18:01:32.413Z",
@@ -172,7 +172,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-3812c4014cd4",
     "claimedAt": "2026-09-06T18:01:32.421Z",
-    "heartbeatAt": "2026-09-06T18:01:32.421Z",
+    "heartbeatAt": "2026-09-06T18:11:08.688Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-RFT-0109.json",
@@ -182,40 +182,44 @@
       "packages/cli/src/commands/hook/pre-commit/support.ts",
       "tests/cli/pre-commit-hook-extraction.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260906180132-codex-gpt-5.4-mini-3b4270e8e2",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906180132-codex-gpt-5.4-mini-3b4270e8e2\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-06T18:01:32.421Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-b5c1b2117e6fff63",
-    "ticketDigest": "sha256:b5c1b2117e6fff63ae11506667b6f79497f466b2b535b8f165c654f0c215ba4f",
+    "ticketId": "wat-0fbc5006b922363b",
+    "ticketDigest": "sha256:0fbc5006b922363b534501171ef5465b297fc47c96f2a02d93c4517a3aeeae90",
     "taskId": "TASK-RFT-0109",
-    "origin": "claim",
+    "origin": "repair-closure",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260906180132-codex-gpt-5.4-mini-3b4270e8e2",
-    "claimGeneration": "lease-3812c4014cd4",
-    "issuedAt": "2026-09-06T18:01:32.421Z",
-    "expiresAt": "2026-09-06T18:31:32.421Z",
-    "scopeDigest": "sha256:30ab01a73916b7fce26dc0c0d4a85b568bb656e4f06e8e0df0b2c58d5e0d5ef2",
+    "laneSessionId": null,
+    "claimGeneration": "repair-closure:2026-09-06T18:24:58.727Z",
+    "issuedAt": "2026-09-06T18:24:58.727Z",
+    "expiresAt": "2026-09-06T19:24:58.727Z",
+    "scopeDigest": "sha256:4ecd354af36af201932f8867db445bf4f05fbd92204a35a46814749f17bb589f",
     "runnerSelection": {
       "runnerKind": "frozen",
-      "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-06T18:01:32.421Z"
+      "runnerRef": "repair-closure",
+      "selectedAt": "2026-09-06T18:24:58.727Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-RFT-0109.*",
+          ".atm/history/evidence/git-head.jsonl",
+          ".atm/history/protected-override-audit/2026-09-06T18-19-53-635Z-POA-94f77b179264.json",
+          ".atm/history/protected-override-audit/2026-09-06T18-20-18-505Z-POA-ab593613cc2b.json",
+          ".atm/history/protected-override-audit/2026-09-06T18-24-49-802Z-POA-3ac1e194d2f0.json",
           ".atm/history/task-events/TASK-RFT-0109/**",
           ".atm/history/tasks/TASK-RFT-0109.json",
           "packages/cli/src/commands/hook/pre-commit.ts",
@@ -224,7 +228,7 @@
           "packages/cli/src/commands/hook/pre-commit/support.ts",
           "tests/cli/pre-commit-hook-extraction.test.ts"
         ],
-        "digest": "sha256:7f37e01d4968a663e58313937488fdbcb8afba42d92e63962a2d5637a80e9f77"
+        "digest": "sha256:169076c87f75729ad1f13b3c5e7bafa8ead7b4b5944eda97913ddb53b9cab65f"
       },
       {
         "kind": "lifecycle-operation",
@@ -291,5 +295,10 @@
     },
     "createdAt": "2026-09-06T18:01:36.821Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-06T18:24:58.727Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": null,
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0109.closure-packet.json",
+  "closeReason": "Historical reconcile sync against commit 2b87ba1101ea02eceff676f7da46046e06228e0e"
 }

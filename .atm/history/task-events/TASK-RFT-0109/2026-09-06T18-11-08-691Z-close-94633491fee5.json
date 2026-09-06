@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T18-11-08-691Z-close-94633491fee5",
+  "taskId": "TASK-RFT-0109",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260906180132-codex-gpt-5.4-mini-TASK-RFT-0109-a4b36ab62a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0109.json",
+  "taskSha256": "sha256:fc89f8d8f87f7265dd41098c1516ed4f05e5f66b1ed99653c4bad513eaeafe21",
+  "createdAt": "2026-09-06T18:11:08.691Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0109 --actor codex-gpt-5.4-mini --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906180132-codex-gpt-5.4-mini-TASK-RFT-0109-a4b36ab62a",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0109.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+      "typecheck",
+      "validate:cli"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T18:11:08.678Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0109.*",
+        ".atm/history/task-events/TASK-RFT-0109/**",
+        ".atm/history/tasks/TASK-RFT-0109.json",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/hook/pre-commit/*.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "tests/cli/pre-commit-hook-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/hook/pre-commit/*.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "tests/cli/pre-commit-hook-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+        "typecheck",
+        "validate:cli"
+      ]
+    }
+  }
+}

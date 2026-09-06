@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T18-57-23-317Z-metadata-repair-c3ae9acbb1b0",
+  "taskId": "ATM-BUG-2026-09-07-001",
+  "action": "metadata-repair",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-BUG-2026-09-07-001.json",
+  "taskSha256": "sha256:67d06349b1d433513d0e42f29d6d0c9421c8e3ff672841047147aaa25f79f23b",
+  "createdAt": "2026-09-06T18:57:23.317Z",
+  "command": "node atm.mjs tasks scope repair-deliverables --task ATM-BUG-2026-09-07-001 --actor codex-gpt-5.4-mini --set packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts,packages/cli/src/commands/git-governance/protected-governance-state.ts,tests/cli/protected-ledger-destructive-guard.test.ts --reason \"Repair malformed temporary quickfix task metadata so the already-delivered governance fix can close with explicit source deliverables.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "task-metadata",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Repair malformed temporary quickfix task metadata so the already-delivered governance fix can close with explicit source deliverables."
+  }
+}
