@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0024",
   "title": "Include declared ignored artifacts in taskflow close delivery",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -140,8 +140,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-06T13-18-38-207Z-claim-56aaa12b7370",
-  "lastTransitionAt": "2026-09-06T13:18:38.207Z",
+  "lastTransitionId": "2026-09-06T13-29-07-025Z-close-dc87a4053a48",
+  "lastTransitionAt": "2026-09-06T13:29:07.025Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-06T13:18:31.641Z",
@@ -150,21 +150,21 @@
     "actorId": "codex-captain",
     "leaseId": "lease-04df66dd682e",
     "claimedAt": "2026-09-06T13:18:31.652Z",
-    "heartbeatAt": "2026-09-06T13:18:31.652Z",
+    "heartbeatAt": "2026-09-06T13:29:07.023Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TMP-0024.json",
       "packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
       "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260906131831-codex-captain-9655285ce3",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906131831-codex-captain-9655285ce3\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-06T13:18:31.652Z",
   "startedByActor": "codex-captain",
@@ -260,5 +260,9 @@
     },
     "createdAt": "2026-09-06T13:18:38.207Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-06T13:29:07.023Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260906131831-codex-captain-TASK-TMP-0024-ca79aa4aeb",
+  "closurePacket": ".atm/history/evidence/TASK-TMP-0024.closure-packet.json"
 }

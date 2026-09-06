@@ -1,10 +1,12 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-TMP-0024",
-  "updatedAt": "2026-09-06T13:20:32.972Z",
+  "updatedAt": "2026-09-06T13:27:19.478Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
-    "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts"
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+    "typecheck"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -22,6 +24,38 @@
       "durationMs": 661,
       "runnerKind": "dev-source",
       "sourceCommit": "23e7b3239859c402bb4c48dfdfcfea35e6b5aefa",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-09-06T13:27:07.320Z",
+      "startedAt": "2026-09-06T13:27:06.947Z",
+      "finishedAt": "2026-09-06T13:27:07.320Z",
+      "durationMs": 373,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ffc94063f9e1a634c7594c24db76aab76315899e",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-06T13:27:19.478Z",
+      "startedAt": "2026-09-06T13:27:10.315Z",
+      "finishedAt": "2026-09-06T13:27:19.478Z",
+      "durationMs": 9163,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "ffc94063f9e1a634c7594c24db76aab76315899e",
       "cached": false
     }
   ],

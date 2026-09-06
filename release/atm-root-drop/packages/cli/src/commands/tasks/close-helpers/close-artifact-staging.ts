@@ -155,16 +155,21 @@ function listChangedFilesForDeliverableGate(cwd: string, claim: TaskClaimRecord 
   for (const args of [
     ['-C', cwd, 'diff', '--name-only', '--cached'],
     ['-C', cwd, 'diff', '--name-only'],
-    ['-C', cwd, 'ls-files', '-o', '--exclude-standard']
+    ['-C', cwd, 'ls-files', '-o', '--exclude-standard'],
+    ['-C', cwd, 'ls-files', '-o', '--ignored', '--exclude-standard']
   ]) {
     try {
       const output = execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
       gitAvailable = true;
       const isUntrackedCmd = args.includes('ls-files');
+      const isIgnoredUntrackedCmd = args.includes('--ignored');
       for (const line of output.split(/\r?\n/)) {
         const normalized = normalizeRelativePath(line);
         if (normalized) {
-          if (isUntrackedCmd && allowedSet) {
+          if (isIgnoredUntrackedCmd && allowedSet && !allowedSet.has(normalized)) {
+            continue;
+          }
+          if (isUntrackedCmd && !isIgnoredUntrackedCmd && allowedSet) {
             const isDeliverable = allowedSet.has(normalized)
               || isTaskCloseGovernanceCriticalPath(normalized, taskId || '');
             if (!isDeliverable) {

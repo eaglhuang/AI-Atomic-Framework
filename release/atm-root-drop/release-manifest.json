@@ -2965,6 +2965,7 @@
     "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/generated-residue-policy.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+    "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
@@ -6037,8 +6038,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 13,
-    "unchanged": 1951,
+    "copied": 3,
+    "unchanged": 1961,
     "removed": 0
   },
   "buildMode": "overlay",
@@ -25431,7 +25432,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-helpers/close-artifact-staging.js",
-        "digest": "2842a314aec298d4bdd1068feca087416dd166a7cc183d8d5c1309544d9d35eb",
+        "digest": "9d677b447e897f59d13008a0d928f97f09552b9b17703b1443dd007b98f18215",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-helpers/close-artifact-staging.js"
@@ -32450,6 +32451,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+        "digest": "8187139115e44f4472f4c9f0b7a2fb7c6245c8985f5dcae4693cda20273d25a1",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
         "digest": "42cb1c21bb2307f1274d199b7e02cf67ee418650569ffe3fc9ea01c45470d548",
         "origin": "source",
@@ -32748,7 +32758,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
-        "digest": "2f031d0757e07f9aa757ddc1e115e3185206f32863fc102ddb06096a8a725f33",
+        "digest": "1503b111348bb1bf87b1ba19ff177e8583c2f07ef2f951fff19262849890fa21",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts"
@@ -60062,7 +60072,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:6b74a504a4142ef98d91cb334a9799b4684c2f775260ab430844303cc2b7ee61"
+    "treeDigest": "sha256:0ffb084eecf9b1a2e3330f0e11bedc45155ba07818ac100c018208e3c4926b1b"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -60690,6 +60700,7 @@
       "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
       "packages/cli/src/commands/tasks/__tests__/generated-residue-policy.test.ts",
       "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+      "packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
       "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
       "packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
       "packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
@@ -61599,7 +61610,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:55c5fd1c3024e89ae9236a4826035a54dba046f742e1ee62fde2663fa74f7a25"
+    "digest": "sha256:cba1d08d81b98f2372de2aef3ba166116aa513c0c61dfca1939d0258eabc7a9d"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -64538,6 +64549,7 @@
       "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/generated-residue-policy.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
@@ -67613,22 +67625,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:40c4d5e0e3bff63a17c03deeac14419e78d8691c95d695b8c18b23cb349e33ac",
-  "sealedSourceCommit": "c7eff27dc2d1cfad9e70982c2bd5cedd1fb95f45",
+  "buildInputsTreeHash": "sha256:8a0e46ac14f3cf5b0732f3de136cfb179359da274051d7a5fa58fed238113cb4",
+  "sealedSourceCommit": "f31051e33c0f07d74e28de53da2528eff6784ded",
   "buildDecision": "incrementalBuild",
   "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:f60cc32f6ccd864739249d1cd77a4bda1c1ffb88ce6675c556088de57b052e72",
-  "tsBuildCacheDigest": "sha256:84e9d63b8e45284bc9aa90e03afe955ff160face31bdd6c853c817cbd0e5715f",
+  "incrementalPlanDigest": "sha256:4000347f4eddb27a82601635cd7bf933be107c7290cb061ebba76e608d4ad2fa",
+  "tsBuildCacheDigest": "sha256:62e3b581e82aa1c6f156c69ef1e4f196a02429cf9263f4b279b8ce2e591b9acd",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 51,
-    "skipDecision": 61,
-    "worktreeSetup": 15200,
-    "typescriptBuild": 19970,
-    "rootDropReleaseAssembly": 29526,
-    "onefileReleaseAssembly": 10215,
-    "artifactSync": 10908,
+    "inputHashCalculation": 49,
+    "skipDecision": 55,
+    "worktreeSetup": 12337,
+    "typescriptBuild": 17762,
+    "rootDropReleaseAssembly": 30709,
+    "onefileReleaseAssembly": 9640,
+    "artifactSync": 9936,
     "cleanup": 0,
-    "totalElapsed": 107361
+    "totalElapsed": 99544
   }
 }

@@ -1,0 +1,129 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TMP-0024",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "ffc94063f9e1a634c7594c24db76aab76315899e",
+  "governedTreeSha": "bdfd9d6954f6b07fb92602afa2ce150a95dcc205",
+  "targetCommitDelta": {
+    "currentCommitSha": "ffc94063f9e1a634c7594c24db76aab76315899e",
+    "parentCommitShas": [
+      "ffc94063f9e1a634c7594c24db76aab76315899e"
+    ],
+    "governedTreeSha": "bdfd9d6954f6b07fb92602afa2ce150a95dcc205",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TMP-0024.bundle-manifest.json",
+      ".atm/history/evidence/TASK-TMP-0024.json",
+      ".atm/history/tasks/TASK-TMP-0024.json",
+      "packages/cli/dist/commands/tasks/close-helpers/close-artifact-staging.js",
+      "packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/close-helpers/close-artifact-staging.js",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:820a88b8f353cdba8f43005e7381a19b57401bdcbcaa4457cc221e51bb5673e5",
+      "stderrSha256": "sha256:57a58cd65f5982a5df50982fa8657589cee871d79a96a577571987c9f4164eb6",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T13:29:07.017Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TMP-0024.*",
+      ".atm/history/task-events/TASK-TMP-0024/**",
+      ".atm/history/tasks/TASK-TMP-0024.json",
+      "packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TMP-0024.json",
+  "closedAt": "2026-09-06T13:29:07.018Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260906131831-codex-captain-TASK-TMP-0024-ca79aa4aeb",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f31051e33c0f07d74e28de53da2528eff6784ded",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/tasks/__tests__/ignored-deliverable-close-gate.test.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-TMP-0024.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/task-events/TASK-TMP-0024/2026-09-06T13-18-21-282Z-import-f3984470d400.json",
+      ".atm/history/task-events/TASK-TMP-0024/2026-09-06T13-18-31-641Z-reserve-a08b53b9d4f3.json",
+      ".atm/history/task-events/TASK-TMP-0024/2026-09-06T13-18-31-646Z-promote-7254b821eebc.json",
+      ".atm/history/task-events/TASK-TMP-0024/2026-09-06T13-18-38-207Z-claim-56aaa12b7370.json",
+      ".atm/history/tasks/TASK-TMP-0024.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
