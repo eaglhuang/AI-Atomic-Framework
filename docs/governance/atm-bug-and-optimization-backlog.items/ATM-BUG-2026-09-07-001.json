@@ -5,11 +5,11 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P1",
-  "status": "Open",
+  "status": "Fixed in f4a0abd7b8bd5a9dd7bc09fb3ed5738dc20c6bb6; frozen runner publication pending",
   "area": "Onefile release packaging / self-host verification",
   "finding": "The onefile payload allowlist omits docs/governance/docs-neutrality-policy.json even though the bundled rule-guard neutrality scanner reads that path during self-host-alpha verification. A clean extracted onefile therefore fails with ENOENT before it can report verification evidence.",
   "expectedBehavior": "Every governance data file required by a shipped onefile command must be included in the payload and covered by a clean extracted-run regression assertion.",
-  "evidenceOrRepro": "node release/atm-onefile/atm.mjs self-host-alpha --verify --json on the current frozen runner fails with ATM_CLI_UNHANDLED and ENOENT for docs/governance/docs-neutrality-policy.json. The source file and root-drop copy both exist, while the onefile governance allowlist contains only error-code-registry.json and tasks-audit-warning-baseline.json.",
+  "evidenceOrRepro": "node release/atm-onefile/atm.mjs self-host-alpha --verify --json on the current frozen runner fails with ATM_CLI_UNHANDLED and ENOENT for docs/governance/docs-neutrality-policy.json. The source file and root-drop copy both exist, while the onefile governance allowlist contains only error-code-registry.json and tasks-audit-warning-baseline.json. Source repair is committed as f4a0abd7b8bd5a9dd7bc09fb3ed5738dc20c6bb6; typecheck, encoding guard, and governance projection validation pass.",
   "containment": "Do not publish a onefile candidate as self-host-alpha compliant while the clean extracted verification fails. Do not weaken neutrality verification or silently treat the missing policy as optional.",
   "followUp": "Add the missing governance data asset to the data-driven onefile payload contract, add a regression assertion for the extracted self-host-alpha path, run the focused onefile/self-host validators, then publish the sealed runner through the governed runner-sync path. Keep unrelated dirty files and foreign release residue untouched."
 }
