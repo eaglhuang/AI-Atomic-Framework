@@ -319,6 +319,16 @@ export function restoreDeferredGovernanceDirtyFiles(repoRoot, report) {
         const file = typeof snapshot.file === 'string' ? snapshot.file : entry.file;
         const content = typeof snapshot.content === 'string' ? snapshot.content : '';
         const absolutePath = path.join(repoRoot, file);
+        const currentContent = existsSync(absolutePath) ? readFileSync(absolutePath, 'utf8') : null;
+        let headContent = null;
+        try {
+            headContent = execFileSync('git', ['show', `HEAD:${file}`], { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+        }
+        catch { }
+        if (currentContent !== null && headContent !== null && currentContent !== headContent) {
+            writeFileSync(snapshotPath, `${JSON.stringify({ ...snapshot, restoredAt: null, skipReason: 'newer-content-preserved' }, null, 2)}\n`, 'utf8');
+            return { ...entry, restoredAt: null, skipReason: 'newer-content-preserved' };
+        }
         mkdirSync(path.dirname(absolutePath), { recursive: true });
         writeFileSync(absolutePath, content, 'utf8');
         writeFileSync(snapshotPath, `${JSON.stringify({ ...snapshot, restoredAt }, null, 2)}\n`, 'utf8');

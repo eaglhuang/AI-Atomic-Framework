@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — quote contamination repair and discoverable scope audit/status surface verified through ATM-GOV-0259",
   "area": "Task scope amendment / Windows CLI parsing",
   "finding": "On Windows/PowerShell, `tasks scope add --add \"path1,path2\"` normalized the live allowedFiles list but persisted quote-contaminated paths in amendmentHistory, leaving audit history with entries like `\"packages/...` and `...test.ts\"`.",
   "expectedBehavior": "Scope amendment parsing should canonicalize paths once and persist the same clean path list to allowedFiles and amendmentHistory. The CLI should reject or repair malformed quoted path fragments and expose a supported status/preflight command for scope audit.",
-  "evidenceOrRepro": "Plan 3.1 ATM-GOV-0258 scope amendment report: allowedFiles was clean, but amendmentHistory transition 2026-07-22T15-11-19-606Z contained quote-contaminated first/last addedPaths; `tasks scope status/preflight` returned ATM_CLI_USAGE and only listed add/remove/repair/repair-deliverables.",
-  "followUp": "Implement malformed scope-amendment path regression coverage in ATM-GOV-0259; add parser-level quote-fragment rejection/repair and a discoverable scope audit/status command."
+  "evidenceOrRepro": "The original quote-contamination reproduction is covered by the current parser and governance tests. `node --strip-types tests/cli/write-ticket-scope-amendment.test.ts` exited 0 and persisted quote-free paths/events; `node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts` exited 0 on 2026-09-06. The parser now canonicalizes the quoted CSV before both live scope and amendment history are written.",
+  "followUp": "Closed after verifying ATM-GOV-0259 is done, tasks scope and tasks audit are discoverable, normalized allowed files and immutable amendment history are exposed, and the focused parser/admission tests pass. No successor task is required for this finding."
 }

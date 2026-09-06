@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — broker-managed transactional commit and staged-residue isolation verified through ATM-GOV-0258/0261",
   "area": "Git index / backlog maintenance under parallel WIP",
   "finding": "When another lane has files staged in the shared index, a separate low-risk backlog/projection update cannot use the normal ATM commit flow without risk of mixing staged payloads. The captain must resort to pathspec-only/native commit strategies or wait, even though the backlog item is unrelated.",
   "expectedBehavior": "ATM should provide a broker-managed transactional commit/staging lane for unrelated low-risk maintenance that can submit a path-bounded commit request without disturbing or consuming another actor?s staged WIP.",
-  "evidenceOrRepro": "During Plan 3.1 backlog writeback, `atm next` reported 9 staged files from Cursor 0257 WIP while the requested scope was only docs/governance backlog files; framework temp claim warned ATM_FRAMEWORK_STAGED_RESIDUE_DETECTED.",
-  "followUp": "Fold this concrete staged-index example into ATM-BUG-228 / transactional commit queue acceptance: path-bounded commit submission, queue ticket, and staged-residue isolation evidence."
+  "evidenceOrRepro": "The original Plan 3.1 staged-index reproduction is covered by the completed ATM-GOV-0258 and ATM-GOV-0261 ledgers (`done`, `claimState=released`, no residue). On 2026-09-06, `node --strip-types tests/cli/commit-admission-ticket-scoped-selection.test.ts` exited 0, and `node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts` completed without leaving worktree changes. The governed commit path now resolves path-bounded candidates and preserves unrelated staged work instead of consuming it.",
+  "followUp": "Keep the transactional broker and staged-scope isolation regressions in the frozen runner; future changes to shared-index admission must preserve unrelated staged-byte isolation."
 }

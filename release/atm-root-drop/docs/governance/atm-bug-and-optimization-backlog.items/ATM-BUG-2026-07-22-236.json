@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — emergency author/committer continuity and recovery guidance verified on 2026-09-06",
   "area": "Actor identity / git author continuity",
   "finding": "Native emergency commits can easily preserve ATM-Actor trailers while still using a stale Git author/committer from the host repo. ATM diagnostics also surfaced safeModeActor/ambient identity values that did not match the active captain actor.",
   "expectedBehavior": "Emergency commit guidance should set and verify Git author/committer identity atomically from the actor identity, and ATM post-commit/pre-push diagnostics should elevate mismatches into an actionable recoveryCommand rather than advisory-only drift.",
-  "evidenceOrRepro": "Codex emergency commit for ATM-GOV-0260 initially landed with Author/Committer `codex-gpt-5.4-mini` while trailers said `ATM-Actor: codex-plan31-captain`; it required an amend to repair actor continuity. Pre-push later reported safeModeActor `codex-gpt-5.4-mini`.",
-  "followUp": "Add identity continuity checks for emergency/native fallback paths and a generated copyable command that sets GIT_AUTHOR_NAME/GIT_AUTHOR_EMAIL/GIT_COMMITTER_* before commit."
+  "evidenceOrRepro": "The original mismatch is covered by `node --strip-types tests/cli/emergency-git-author-continuity.test.ts` (passed on 2026-09-06), which verifies actor-derived `GIT_AUTHOR_*`/`GIT_COMMITTER_*` remediation and rejects stale host identity. `node --strip-types tests/cli/git-pathspec-emergency-skill-contract.test.ts` also passed, confirming the installed emergency guidance retains the copyable identity setup contract.",
+  "followUp": "Keep both identity-continuity regressions in emergency fallback validation. Any future mismatch in a new native path should be recorded separately with its observed author, committer, actor trailer, and recovery command."
 }

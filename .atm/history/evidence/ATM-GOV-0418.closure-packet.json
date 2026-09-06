@@ -1,0 +1,162 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0418",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "be667fd0f1a2da189ba434d7822ff0c0056bd757",
+  "governedTreeSha": "0c555745ededb33e4963048ecb991fd2d824a74c",
+  "targetCommitDelta": {
+    "currentCommitSha": "be667fd0f1a2da189ba434d7822ff0c0056bd757",
+    "parentCommitShas": [
+      "be667fd0f1a2da189ba434d7822ff0c0056bd757"
+    ],
+    "governedTreeSha": "0c555745ededb33e4963048ecb991fd2d824a74c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0418.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/task-events/ATM-GOV-0418/2026-09-06T14-24-57-515Z-renew-383ee3e9b4fe.json",
+      ".atm/history/tasks/ATM-GOV-0418.json",
+      "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/integrations-core/templates/skills/atm-dispatch.skill.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-11-100.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-001.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-18-005.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-003.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-010.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-025.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-19-026.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-217.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-21-221.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-231.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-235.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-22-236.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-29-259.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-29-271.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-29-272.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-277.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-30-278.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli-fixtures/help-snapshots/orient.json",
+      "release/atm-root-drop/tests/cli/runner-sync-steward-release.test.ts",
+      "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2f0bff609b8a76cf10f7f13c99402b0382bea3556b0aa5a9f30990b3c35ab94f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli:surface",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b2b32b84ace0d3192241adab3b31e9e395a4126d8777aca74f0c43e584a03c7b",
+      "stderrSha256": "sha256:f43341252d69045fe2082863a7e6a442b715bbc8cfd9ad3d24fe8075e735ce44",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:runner-reproducibility",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ba22d75b5ef652e97c923752126d4717962df19ee373c9124ea242a2966ad3b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
+    "typecheck",
+    "validate:cli:surface",
+    "validate:runner-reproducibility"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
+    "typecheck",
+    "validate:cli:surface",
+    "validate:runner-reproducibility"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-06T14:25:41.030Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0418.*",
+      ".atm/history/task-events/ATM-GOV-0418/**",
+      ".atm/history/tasks/ATM-GOV-0418.json",
+      "packages/cli/src/commands/git-governance/implementation/**",
+      "packages/cli/src/commands/taskflow/**",
+      "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance/implementation/**",
+      "packages/cli/src/commands/taskflow/**",
+      "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
+      "typecheck",
+      "validate:cli:surface",
+      "validate:runner-reproducibility"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0418.json",
+  "closedAt": "2026-09-06T14:25:41.030Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260906135410-codex-captain-ATM-GOV-0418-e668a6545f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "be667fd0f1a2da189ba434d7822ff0c0056bd757",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/ATM-GOV-0418/2026-09-06T13-53-03-207Z-import-570a51ef1a5a.json",
+      ".atm/history/task-events/ATM-GOV-0418/2026-09-06T13-54-10-265Z-reserve-6fd26fe4dfb0.json",
+      ".atm/history/task-events/ATM-GOV-0418/2026-09-06T13-54-10-269Z-promote-50703d24dc9b.json",
+      ".atm/history/task-events/ATM-GOV-0418/2026-09-06T13-54-16-598Z-claim-63f1e5f20eaf.json",
+      ".atm/history/tasks/ATM-GOV-0418.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

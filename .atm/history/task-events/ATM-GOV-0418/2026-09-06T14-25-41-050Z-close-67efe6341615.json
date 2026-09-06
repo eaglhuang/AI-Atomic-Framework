@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-06T14-25-41-050Z-close-67efe6341615",
+  "taskId": "ATM-GOV-0418",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260906135410-codex-captain-ATM-GOV-0418-e668a6545f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0418.json",
+  "taskSha256": "sha256:14bc52b75131881cc92deeae24f09fd878b47c6393fa5d64f52c146b1a488039",
+  "createdAt": "2026-09-06T14:25:41.050Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0418 --actor codex-captain --status done --historical-delivery be667fd0f1a2da189ba434d7822ff0c0056bd757",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260906135410-codex-captain-ATM-GOV-0418-e668a6545f",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0418.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
+      "typecheck",
+      "validate:cli:surface",
+      "validate:runner-reproducibility"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
+      "typecheck",
+      "validate:cli:surface",
+      "validate:runner-reproducibility"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-06T14:25:41.030Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0418.*",
+        ".atm/history/task-events/ATM-GOV-0418/**",
+        ".atm/history/tasks/ATM-GOV-0418.json",
+        "packages/cli/src/commands/git-governance/implementation/**",
+        "packages/cli/src/commands/taskflow/**",
+        "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/implementation/**",
+        "packages/cli/src/commands/taskflow/**",
+        "tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
+        "typecheck",
+        "validate:cli:surface",
+        "validate:runner-reproducibility"
+      ]
+    }
+  }
+}

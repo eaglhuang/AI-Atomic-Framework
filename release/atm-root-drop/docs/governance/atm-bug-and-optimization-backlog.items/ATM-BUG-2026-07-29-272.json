@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Optimization",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — governed commit status and resumable progress evidence verified on 2026-09-06",
   "area": "Governed git commit / operator feedback",
   "finding": "Governed `atm git commit` can spend more than two minutes inside pre-commit without progress output, leaving the operator unable to tell whether it is hung or still validating after auto-stage succeeded.",
   "expectedBehavior": "Long-running governed commit hooks should emit phase heartbeats or a resumable receipt showing stage succeeded, hook is running, and the active branch-queue lock owner/pid.",
-  "evidenceOrRepro": "During ATM-GOV-0243 delivery commit, `node atm.mjs git commit --actor codex-git-series-captain --task ATM-GOV-0243 --message ... --auto-stage --json` timed out at 124s in the caller while node pid 92480 continued `atm.mjs git commit` and pid 92620 ran `atm.dev.mjs hook pre-commit --json`; the commit later completed as ecf573c44.",
-  "followUp": "Add governed-commit progress receipts and a safe resume/status command for staged-but-hook-running commit lanes."
+  "evidenceOrRepro": "The original timeout scenario is now covered by `node --strip-types tests/cli/git-commit-timeout-and-status.test.ts` (passed on 2026-09-06). The governed status route distinguishes no attempt, a live branch-queue owner with owner PID/aliveness, an in-flight or timed-out attempt, and a completed attempt with the actual commit SHA and post-attempt HEAD. This provides a safe resumable/status path without rerunning the commit blindly.",
+  "followUp": "Keep `git-commit-timeout-and-status.test.ts` in the focused git-governance regression set. If a future report needs phase-level heartbeats beyond the existing status receipt, open a separate card with a fresh timing reproduction."
 }

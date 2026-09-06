@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — ATM-GOV-0414 source repair, runner publication, and formal closeout verified 2026-09-06",
   "area": "Task Import / Planning Source Seal",
   "finding": "When a planning card needs a metadata-only validator correction under an active same-lane claim, `tasks import --dry-run` computes the new planning source seal but `tasks import --write` would skip the active claim unless a broad force-overwrite route is used.",
   "expectedBehavior": "ATM should provide a governed same-owner metadata repair/import lane that updates validators and planning source seal while preserving the active claim, lease, lane session, and evidence continuity.",
-  "evidenceOrRepro": "ATM-GOV-0245 replaced `validate:standard` with `node atm.mjs broker replay final-verdict --json`; dry-run produced content digest `sha256:da08e676...` but warned `IMPORT_SKIPPED_ACTIVE_CLAIM`, requiring a minimal emergency seal metadata repair to avoid claim displacement.",
-  "followUp": "Add `tasks import --metadata-only --preserve-active-claim` or equivalent, with diff-limited validation and source-seal update receipts."
+  "evidenceOrRepro": "ATM-GOV-0414 delivered the governed same-owner metadata-only route. The focused preservation regression passed, including wrong-owner fail-closed behavior; typecheck, encoding guard, physical line budget, runner publication, taskflow close, and protected-branch push all passed. Delivery commit `e1a09c3e...`; close bundle commit `1d8d27bf...`; runner/evidence commit `57e332b7...`.",
+  "followUp": "No remaining source repair is required for this finding. Future work is limited to broader import policy coverage and ordinary backlog stewardship; do not reopen unless the preservation contract regresses."
 }
