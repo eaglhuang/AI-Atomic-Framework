@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-5a82aeb04fec",
+  "recordedAt": "2026-09-06T19:26:13.210Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "ATM-BUG-2026-09-07-004",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --task ATM-BUG-2026-09-07-004 --message \"chore(governance): preserve cross-task evidence residue\n\nATM-Work-Admission: wat-baa5f0b743a3b30c sha256:baa5f0b743a3b30c3e983286e211abd5b88fb9f985eba271e1dc898b018144ef\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-BUG-2026-09-07-004-db9b843525",
+  "reason": "Owner-approved one-time preservation of explicitly inventoried governance records after semantic cross-task admission blocked normal commit.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-06T19-26-09-375Z-EMG-ATM-BUG-2026-09-07-004-db9b843525.json",
+  "parentEventId": "POA-d597955047d9",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

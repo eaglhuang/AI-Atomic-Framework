@@ -10,8 +10,8 @@
   "tags": [],
   "createdAt": "2026-09-06T19:18:13.982Z",
   "createdByActor": "codex-gpt-5.4-mini",
-  "lastTransitionId": "2026-09-06T19-25-08-691Z-claim-e30404de9e53",
-  "lastTransitionAt": "2026-09-06T19:25:08.691Z",
+  "lastTransitionId": "2026-09-06T19-26-53-671Z-scope-amendment-3b8eb1da4799",
+  "lastTransitionAt": "2026-09-06T19:26:53.671Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-09-06T19:25:07.512Z",
   "promotedAt": "2026-09-06T19:25:07.516Z",
@@ -22,18 +22,24 @@
     "heartbeatAt": "2026-09-06T19:25:07.520Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/ATM-BUG-2026-09-07-004.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-001.abandon-residue-disposition.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-001.runner-sync-receipt.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-002.live-index-reconciliation.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-003.live-index-reconciliation.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-004.*",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-004.live-index-reconciliation.json",
+      ".atm/history/evidence/git-head.json",
       ".atm/history/evidence/TASK-RFT-0109.bundle-manifest.json",
       ".atm/history/evidence/TASK-RFT-0109.closure-packet.json",
       ".atm/history/evidence/TASK-RFT-0109.json",
       ".atm/history/evidence/TASK-RFT-0109.live-index-reconciliation.json",
       ".atm/history/evidence/TASK-RFT-0109.runner-sync-receipt.json",
-      ".atm/history/task-events/ATM-BUG-2026-09-07-004/**"
+      ".atm/history/protected-override-audit/2026-09-06T19-22-12-919Z-POA-505d0e4794ff.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-22-29-497Z-POA-10088de519b7.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-26-09-376Z-POA-d597955047d9.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-26-13-210Z-POA-5a82aeb04fec.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-004/**",
+      ".atm/history/tasks/ATM-BUG-2026-09-07-004.json"
     ],
     "state": "active",
     "intent": "write",
@@ -49,20 +55,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-baa5f0b743a3b30c",
-    "ticketDigest": "sha256:baa5f0b743a3b30c3e983286e211abd5b88fb9f985eba271e1dc898b018144ef",
+    "ticketId": "wat-d4706a0757c6cc95",
+    "ticketDigest": "sha256:d4706a0757c6cc950a6782de97dd1b803cc19015b35065ece32c9581a014f505",
     "taskId": "ATM-BUG-2026-09-07-004",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260906192507-codex-gpt-5.4-mini-d7dcbefda3",
     "claimGeneration": "lease-f589519f1b32",
-    "issuedAt": "2026-09-06T19:25:07.520Z",
-    "expiresAt": "2026-09-06T19:55:07.520Z",
-    "scopeDigest": "sha256:7cee39e13fba9a584fd6fbbbb3497cee566747f5ce8116e15864dc836c83d9fa",
+    "issuedAt": "2026-09-06T19:26:53.613Z",
+    "expiresAt": "2026-09-06T19:56:53.613Z",
+    "scopeDigest": "sha256:c6d4630965410ef3badc812b780c7da4175a457b96ec63ad414fd3a60ea35e0e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-06T19:25:07.520Z"
+      "selectedAt": "2026-09-06T19:26:53.613Z"
     },
     "grants": [
       {
@@ -73,15 +79,21 @@
           ".atm/history/evidence/ATM-BUG-2026-09-07-002.live-index-reconciliation.json",
           ".atm/history/evidence/ATM-BUG-2026-09-07-003.live-index-reconciliation.json",
           ".atm/history/evidence/ATM-BUG-2026-09-07-004.*",
+          ".atm/history/evidence/ATM-BUG-2026-09-07-004.live-index-reconciliation.json",
           ".atm/history/evidence/TASK-RFT-0109.bundle-manifest.json",
           ".atm/history/evidence/TASK-RFT-0109.closure-packet.json",
           ".atm/history/evidence/TASK-RFT-0109.json",
           ".atm/history/evidence/TASK-RFT-0109.live-index-reconciliation.json",
           ".atm/history/evidence/TASK-RFT-0109.runner-sync-receipt.json",
+          ".atm/history/evidence/git-head.json",
+          ".atm/history/protected-override-audit/2026-09-06T19-22-12-919Z-POA-505d0e4794ff.json",
+          ".atm/history/protected-override-audit/2026-09-06T19-22-29-497Z-POA-10088de519b7.json",
+          ".atm/history/protected-override-audit/2026-09-06T19-26-09-376Z-POA-d597955047d9.json",
+          ".atm/history/protected-override-audit/2026-09-06T19-26-13-210Z-POA-5a82aeb04fec.json",
           ".atm/history/task-events/ATM-BUG-2026-09-07-004/**",
           ".atm/history/tasks/ATM-BUG-2026-09-07-004.json"
         ],
-        "digest": "sha256:fc1e06b70f31c29d8e0f974de9f1a210c9e0ac5ecad8835d40cca1fa56fec6e3"
+        "digest": "sha256:c3deb9dfa5f1a6f399afe5145c22fa9a97f7b2116dd46145e0d8c240843bf89e"
       },
       {
         "kind": "lifecycle-operation",
@@ -103,22 +115,22 @@
     "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
-      "resolvedMode": "disabled",
+      "resolvedMode": "enabled",
       "reasons": [
-        "low-risk-task"
+        "complex-task"
       ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
   },
   "workAdmission": {
     "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
   },
   "startedBySessionId": "session-20260906192507-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-004-3dbd693356",
   "taskDirectionLock": {
@@ -135,27 +147,33 @@
       ".atm/history/evidence/ATM-BUG-2026-09-07-002.live-index-reconciliation.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-003.live-index-reconciliation.json",
       ".atm/history/evidence/ATM-BUG-2026-09-07-004.*",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-004.live-index-reconciliation.json",
+      ".atm/history/evidence/git-head.json",
       ".atm/history/evidence/TASK-RFT-0109.bundle-manifest.json",
       ".atm/history/evidence/TASK-RFT-0109.closure-packet.json",
       ".atm/history/evidence/TASK-RFT-0109.json",
       ".atm/history/evidence/TASK-RFT-0109.live-index-reconciliation.json",
       ".atm/history/evidence/TASK-RFT-0109.runner-sync-receipt.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-22-12-919Z-POA-505d0e4794ff.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-22-29-497Z-POA-10088de519b7.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-26-09-376Z-POA-d597955047d9.json",
+      ".atm/history/protected-override-audit/2026-09-06T19-26-13-210Z-POA-5a82aeb04fec.json",
       ".atm/history/task-events/ATM-BUG-2026-09-07-004/**",
       ".atm/history/tasks/ATM-BUG-2026-09-07-004.json"
     ],
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
-    "promptHash": "c48feaa22cd2af1b349251dd3bc59e2d03d19075d6a3c0a0a4d27de558ee604d",
+    "promptHash": "f0fdcfacc3bf8be9c4732661be5f037e611ac9d617626f12cbdaea74e61cb859",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260906192507-codex-gpt-5.4-mini-ATM-BUG-2026-09-07-004-3dbd693356",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260906192507-codex-gpt-5.4-mini-d7dcbefda3",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906192507-codex-gpt-5.4-mini-d7dcbefda3\""
     },
-    "createdAt": "2026-09-06T19:25:08.690Z",
+    "createdAt": "2026-09-06T19:25:08.756Z",
     "status": "active"
   },
   "scopePaths": [
@@ -170,7 +188,13 @@
     ".atm/history/evidence/TASK-RFT-0109.live-index-reconciliation.json",
     ".atm/history/evidence/TASK-RFT-0109.runner-sync-receipt.json",
     ".atm/history/task-events/ATM-BUG-2026-09-07-004/**",
-    ".atm/history/tasks/ATM-BUG-2026-09-07-004.json"
+    ".atm/history/tasks/ATM-BUG-2026-09-07-004.json",
+    ".atm/history/evidence/ATM-BUG-2026-09-07-004.live-index-reconciliation.json",
+    ".atm/history/evidence/git-head.json",
+    ".atm/history/protected-override-audit/2026-09-06T19-22-12-919Z-POA-505d0e4794ff.json",
+    ".atm/history/protected-override-audit/2026-09-06T19-22-29-497Z-POA-10088de519b7.json",
+    ".atm/history/protected-override-audit/2026-09-06T19-26-09-376Z-POA-d597955047d9.json",
+    ".atm/history/protected-override-audit/2026-09-06T19-26-13-210Z-POA-5a82aeb04fec.json"
   ],
   "resetReason": "reopen residue carrier after claim release and failed commit admission"
 }
