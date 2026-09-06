@@ -1,0 +1,30 @@
+{
+  "schemaId": "atm.abandonResidueDisposition.v1",
+  "taskId": "ATM-BUG-2026-09-07-004",
+  "actorId": "codex-gpt-5.4-mini",
+  "reason": "Cleanup evidence was already committed and pushed; task has no deliverables and cannot be closed as done. Retain runtime diagnostics under explicit ignore rules.",
+  "disposition": "remove-evidence",
+  "classes": {
+    "keep-diagnostic": [
+      ".atm/history/tasks/ATM-BUG-2026-09-07-004.json",
+      ".atm/history/evidence/ATM-BUG-2026-09-07-004.json",
+      ".atm/history/task-events/ATM-BUG-2026-09-07-004/"
+    ],
+    "abandon": [],
+    "remove-evidence": [
+      ".atm/history/evidence/ATM-BUG-2026-09-07-004.bundle-manifest.json"
+    ]
+  },
+  "removed": [
+    ".atm/history/evidence/ATM-BUG-2026-09-07-004.bundle-manifest.json"
+  ],
+  "unstaged": [
+    ".atm/history/evidence/ATM-BUG-2026-09-07-004.bundle-manifest.json"
+  ],
+  "keptAuditTrail": [
+    ".atm/history/tasks/ATM-BUG-2026-09-07-004.json",
+    ".atm/history/evidence/ATM-BUG-2026-09-07-004.json",
+    ".atm/history/task-events/ATM-BUG-2026-09-07-004/"
+  ],
+  "recordedAt": "2026-09-06T19:47:28.564Z"
+}
