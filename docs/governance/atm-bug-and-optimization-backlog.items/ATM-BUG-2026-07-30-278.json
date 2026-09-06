@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Task card created — ATM-GOV-0414; source repair not started",
   "area": "Task Import / Planning Source Seal",
   "finding": "When a planning card needs a metadata-only validator correction under an active same-lane claim, `tasks import --dry-run` computes the new planning source seal but `tasks import --write` would skip the active claim unless a broad force-overwrite route is used.",
   "expectedBehavior": "ATM should provide a governed same-owner metadata repair/import lane that updates validators and planning source seal while preserving the active claim, lease, lane session, and evidence continuity.",
   "evidenceOrRepro": "ATM-GOV-0245 replaced `validate:standard` with `node atm.mjs broker replay final-verdict --json`; dry-run produced content digest `sha256:da08e676...` but warned `IMPORT_SKIPPED_ACTIVE_CLAIM`, requiring a minimal emergency seal metadata repair to avoid claim displacement.",
-  "followUp": "Add `tasks import --metadata-only --preserve-active-claim` or equivalent, with diff-limited validation and source-seal update receipts."
+  "followUp": "Successor card ATM-GOV-0414 was created and pushed in 3KLife on 2026-09-06. Import it into the target ledger, then implement and verify the narrow same-owner metadata-only route; do not mark this finding fixed until the red/green preservation regression passes."
 }
