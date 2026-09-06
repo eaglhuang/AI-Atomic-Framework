@@ -1,0 +1,275 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0025",
+  "title": "Retain and settle terminal governance history records",
+  "status": "running",
+  "milestone": "temporary-governance",
+  "dependencies": [],
+  "acceptance": [
+    "Deliver the scoped change described by this task.",
+    "Keep edits inside the declared scope unless the task is explicitly amended.",
+    "Run the declared validator and record command-backed evidence before closeout."
+  ],
+  "deliverables": [
+    ".atm/history/task-events/TASK-TEAM-0087/**",
+    ".atm/history/tasks/TASK-TEAM-0087.json"
+  ],
+  "scopePaths": [
+    ".atm/history/protected-override-audit/2026-09-06T20-46-09-210Z-POA-cdce2797fd77.json",
+    ".atm/history/protected-override-audit/2026-09-06T20-46-57-494Z-POA-322333c58042.json",
+    ".atm/history/protected-override-audit/2026-09-06T21-02-32-563Z-POA-74127bee3ed9.json",
+    ".atm/history/task-events/TASK-TEAM-0087/**",
+    ".atm/history/tasks/TASK-TEAM-0087.json"
+  ],
+  "validators": [
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "source code",
+    "release artifacts",
+    "foreign incident evidence"
+  ],
+  "nonGoals": [
+    "deleting audit history",
+    "changing TASK-TEAM-0087 lifecycle semantics"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the terminal governance history retention commit.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.governance-history-retention",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": "Retain the already-generated terminal governance records through the governed ATM commit route.",
+  "source": {
+    "planPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0025-retain-and-settle-terminal-governance-history.task.md",
+    "sectionTitle": "TASK-TMP-0025",
+    "headingLine": 61,
+    "hash": "06774b060ea0fdda",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/temporary-governance/tasks/TASK-TMP-0025-retain-and-settle-terminal-governance-history.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:06774b060ea0fdda205d1a7220ba7cad99e408fe2c8f79d8f2e4139eab0a52af",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T21:12:54.077Z"
+    }
+  },
+  "importedAt": "2026-09-06T21:12:54.077Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-TEAM-0087 is terminal and its planning mirror is done.",
+      "Only already-generated governance records are in scope."
+    ],
+    "softRelations": [
+      "TASK-TEAM-0087"
+    ],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [
+      "governance-record-retention"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "git-diff-check"
+    ],
+    "phaseOwner": "atm-governance"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T21-16-25-874Z-renew-9af10cea62af",
+  "lastTransitionAt": "2026-09-06T21:16:25.874Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-06T21:12:58.715Z",
+  "promotedAt": "2026-09-06T21:12:58.720Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-7cbb4a855656",
+    "claimedAt": "2026-09-06T21:12:58.724Z",
+    "heartbeatAt": "2026-09-06T21:16:25.109Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TMP-0025.json",
+      ".atm/history/protected-override-audit/2026-09-06T20-46-09-210Z-POA-cdce2797fd77.json",
+      ".atm/history/protected-override-audit/2026-09-06T20-46-57-494Z-POA-322333c58042.json",
+      ".atm/history/protected-override-audit/2026-09-06T21-02-32-563Z-POA-74127bee3ed9.json",
+      ".atm/history/task-events/TASK-TEAM-0087/**",
+      ".atm/history/tasks/TASK-TEAM-0087.json"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260906211258-codex-captain-c8fbfcd7ba",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906211258-codex-captain-c8fbfcd7ba\""
+    }
+  },
+  "startedAt": "2026-09-06T21:12:58.724Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-62ad719bdc558aa9",
+    "ticketDigest": "sha256:62ad719bdc558aa9f1b32c7fa26998c7ac7bcb835335d2d00cb8b3d1db86a989",
+    "taskId": "TASK-TMP-0025",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260906211258-codex-captain-c8fbfcd7ba",
+    "claimGeneration": "lease-7cbb4a855656",
+    "issuedAt": "2026-09-06T21:16:25.109Z",
+    "expiresAt": "2026-09-06T21:46:25.109Z",
+    "scopeDigest": "sha256:e76870c6ac822fe771e6173ee4bfe587a4ca148d591ea9d95c2cf125b3001fe5",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T21:16:25.109Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-TMP-0025.*",
+          ".atm/history/protected-override-audit/2026-09-06T20-46-09-210Z-POA-cdce2797fd77.json",
+          ".atm/history/protected-override-audit/2026-09-06T20-46-57-494Z-POA-322333c58042.json",
+          ".atm/history/protected-override-audit/2026-09-06T21-02-32-563Z-POA-74127bee3ed9.json",
+          ".atm/history/task-events/TASK-TEAM-0087/**",
+          ".atm/history/task-events/TASK-TMP-0025/**",
+          ".atm/history/tasks/TASK-TEAM-0087.json",
+          ".atm/history/tasks/TASK-TMP-0025.json"
+        ],
+        "digest": "sha256:641428ee51bda5ea9412227a21fbf8a0751630017d8bb1e708f29cc3a4f55cb6"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906211258-codex-captain-TASK-TMP-0025-640fc728fd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0025",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TMP-0025.*",
+      ".atm/history/protected-override-audit/2026-09-06T20-46-09-210Z-POA-cdce2797fd77.json",
+      ".atm/history/protected-override-audit/2026-09-06T20-46-57-494Z-POA-322333c58042.json",
+      ".atm/history/protected-override-audit/2026-09-06T21-02-32-563Z-POA-74127bee3ed9.json",
+      ".atm/history/task-events/TASK-TEAM-0087/**",
+      ".atm/history/task-events/TASK-TMP-0025/**",
+      ".atm/history/tasks/TASK-TEAM-0087.json",
+      ".atm/history/tasks/TASK-TMP-0025.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d106ce645b270adb350da7fc8569e279ae3e6f5f2e7865b4b7d2614539517526",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260906211258-codex-captain-TASK-TMP-0025-640fc728fd",
+    "laneSession": {
+      "laneSessionId": "lane-20260906211258-codex-captain-c8fbfcd7ba",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906211258-codex-captain-c8fbfcd7ba\""
+    },
+    "createdAt": "2026-09-06T21:13:00.098Z",
+    "status": "active"
+  }
+}

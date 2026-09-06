@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0087",
+  "title": "Sync completed TASK-TEAM-0086 planning projections",
+  "status": "done",
+  "milestone": "Team Broker Maintainability",
+  "dependencies": [],
+  "acceptance": [
+    "The task index row identifies TASK-TEAM-0086 as `done`.",
+    "The plan section records the existing 2026-09-06 completion without changing the completed task's scope or evidence.",
+    "Only the two declared projection files are delivered; the planning card is handled by the planning bundle.",
+    "The delivery uses governed ATM commit and passes `git diff --check`."
+  ],
+  "deliverables": [
+    "docs/ai_atomic_framework/team-agents/tasks/README.md",
+    "docs/ai_atomic_framework/team-agents/團隊自動化代理分工計畫.md"
+  ],
+  "scopePaths": [
+    "docs/ai_atomic_framework/team-agents/tasks/README.md",
+    "docs/ai_atomic_framework/team-agents/團隊自動化代理分工計畫.md"
+  ],
+  "validators": [
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "3KLife",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the projection sync if the completed status mirror is incorrect.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0087-sync-0086-planning-projections.task.md",
+    "sectionTitle": "TASK-TEAM-0087",
+    "headingLine": 64,
+    "hash": "7786ed0f24dbe3d1",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0087-sync-0086-planning-projections.task.md",
+      "planningCommitSha": "213ab417b8ee870cc6e27ee9a7decce3cd97d8fa",
+      "contentDigest": "sha256:7786ed0f24dbe3d1f5d91d3e0ace961845defc69ed5230c43cf75000040c298e",
+      "amendmentEpoch": 2,
+      "sealedAt": "2026-09-06T21:08:25.011Z"
+    }
+  },
+  "importedAt": "2026-09-06T21:08:25.011Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The projection changes are limited to the completed task row and section."
+    ],
+    "softRelations": [
+      "TASK-TEAM-0086"
+    ],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [
+      "planning-projection-status"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [
+      "git-diff-check"
+    ],
+    "phaseOwner": "atm-team"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T21-08-25-142Z-import-e8ee1684d787",
+  "lastTransitionAt": "2026-09-06T21:08:25.142Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
