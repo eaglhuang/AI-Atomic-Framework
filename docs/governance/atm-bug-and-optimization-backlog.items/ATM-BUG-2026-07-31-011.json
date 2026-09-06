@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Needs task card",
+  "status": "Closed — Fixed in ATM-GOV-0418 (a0e5b2941), formal closeout 2026-09-06",
   "area": "Taskflow close / deferred governance state",
   "finding": "When taskflow close uses `--defer-foreign-state`, derived evidence indexes such as `TASK-*.bundle-manifest.json` can be snapshotted into the close bundle at an older HEAD version and then reapplied to the worktree at a newer derived version. The task closes successfully, but the derived manifest remains dirty afterward and blocks push-readiness.",
   "expectedBehavior": "Taskflow close should either include the latest derived evidence manifest in the close bundle, regenerate it deterministically after close, or classify it as safe derived residue with an explicit recovery instruction. A successful close should not leave an in-scope derived evidence file dirty with no ATM-authorized cleanup route.",
-  "evidenceOrRepro": "TASK-GIT-0031 closeout on 2026-07-31 used `--defer-foreign-state` because of foreign staged git-head state. `validate:git-head-evidence` updated `.atm/history/evidence/TASK-GIT-0031.json` and derived `.atm/history/evidence/TASK-GIT-0031.bundle-manifest.json`; the close commit sealed the older manifest while reapplying the newer derived manifest after close. ATM residue/finalize diagnostics reported no actionable residue, leaving `.atm/history/evidence/TASK-GIT-0031.bundle-manifest.json` as a push blocker until the captain explicitly authorized restoring that exact derived file.",
-  "followUp": "Open a GIT/taskflow follow-up to fix defer-foreign-state close ordering or derived-manifest recovery semantics. Acceptance should prove close with deferred governance state does not leave dirty derived evidence manifests, or emits an explicit safe cleanup/rebuild route."
+  "evidenceOrRepro": "Original TASK-GIT-0031 reproduction is preserved above. Fixed by ATM-GOV-0418: `taskflow close --write` now preserves newer deferred derived-manifest content instead of blindly restoring the older snapshot; focused regression `taskflow-deferred-derived-manifest-closeback.test.ts` passed red→green, along with closeback/index-isolation regressions, typecheck, CLI surface, and runner reproducibility. Formal target close committed as `a0e5b294129f8118fa15a7d03b0c2ed57731c627`; planning closeback committed as `60e48b0cdd0b29380fd2627bf859060f3d6c30d3`.",
+  "followUp": "Keep the regression in the taskflow closeback family; reopen only with a new reproducer showing newer derived content is lost or stale residue remains after a governed close."
 }
