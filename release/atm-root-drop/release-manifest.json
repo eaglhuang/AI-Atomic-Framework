@@ -5622,6 +5622,7 @@
     "release/atm-root-drop/tests/cli/taskflow-close-exactly-once-result.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-close-index-isolation.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-close-orchestration.test.ts",
+    "release/atm-root-drop/tests/cli/taskflow-close-planning-card-partial-stage.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-close-publication-auto-handoff.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-close-readiness-parity.test.ts",
@@ -6039,11 +6040,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1422,
-    "unchanged": 4582,
+    "copied": 7,
+    "unchanged": 2030,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -25163,7 +25164,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/closeback-orchestration.js",
-        "digest": "3ff19f91c8ff32fa9373c06842503d2ce3d19a874923650c318b58c57d246b34",
+        "digest": "46d9e96c2579e8cb1f7540596957dc0bdc0275e823f375df3ece04fb74da8fee",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/closeback-orchestration.js"
@@ -25172,7 +25173,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
-        "digest": "b643c151fb6b4bc38d625b51b92f57c62278bc31d8b79f63e2b717982165a82b",
+        "digest": "59f5be681ce05ccebf0a99ea6dc4b30bd604437a7021eeac33f6c05b174cfcd5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js"
@@ -25244,7 +25245,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/implementation.js",
-        "digest": "9d7211d062f1ef7f7963fa7d4aff603a29320caa555c2cab69cf34066657df90",
+        "digest": "efa62528e0352023e8d7a9520dbe10fb1e8f482715b13c0533f620e0a61a7d5d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/implementation.js"
@@ -32129,7 +32130,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
-        "digest": "37836ea0cc96ad56a0dc0e70cdbe2fe18d84e8d0e6b1f82078de3b4c0ba9d496",
+        "digest": "65899611692f8616b9e2c210e69f685b67e5a88da30130ea36777f94761c73b6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/closeback-orchestration.ts"
@@ -32138,7 +32139,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-        "digest": "0bb91b9eaec4e5946fa02a3d75aa60baaf9b3e50cef47128922e91edf53dd4bb",
+        "digest": "60c85c5e4f4491b2c3ea627910988c13d8d678340ffe5864605e94607108d645",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
@@ -32210,7 +32211,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/implementation.ts",
-        "digest": "7966c8807f1e8f4778d04164d22151cec2eaa322f342bdadec326c76723f3ede",
+        "digest": "e45afe6e5186d29687e468909a75cb77fc8c5991f70dd6cd1d8f4b5eb5d020e0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/implementation.ts"
@@ -56356,6 +56357,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/taskflow-close-planning-card-partial-stage.test.ts",
+        "digest": "ef1d0efd19b1925eda11af3e895fc5443df838906a0dad33e7d3f5f8503ce162",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/taskflow-close-planning-card-partial-stage.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
         "digest": "342f1e7fd62b18678e3196396727d0018bebd6a64bfd1055ae15fd438334157f",
         "origin": "source",
@@ -60082,7 +60092,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:2100e0bd2310b5bb9011e6bc1c02a9134541b8443f3b6255c633a48a50935cde"
+    "treeDigest": "sha256:4d6ca5bfe6f4d4912c2f2a5b3a17783cba1ab73b0412f31fd535ff8dac525b54"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61620,7 +61630,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:5d50761256cf838e113ffea8aa55625d975d8bd4df0418a32bc3d8130baa687f"
+    "digest": "sha256:f7ab7c06b209c7c3980ce423fb7952ff2e86f1612920bcf3071ae5b805a1c0f8"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -67216,6 +67226,7 @@
       "release/atm-root-drop/tests/cli/taskflow-close-exactly-once-result.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-close-index-isolation.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-close-orchestration.test.ts",
+      "release/atm-root-drop/tests/cli/taskflow-close-planning-card-partial-stage.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-close-post-side-effect-idempotency.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-close-publication-auto-handoff.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-close-readiness-parity.test.ts",
@@ -67636,22 +67647,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:b5043f0b50aa863c2c80dc5fadc856da5bd3e00c310598e675e86ec9f3478fbc",
-  "sealedSourceCommit": "be667fd0f1a2da189ba434d7822ff0c0056bd757",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "missing-previous-sealed-source",
-  "incrementalPlanDigest": "sha256:7ba3019b62bb91c3ffd538f0d38a50725e5eecc19f2c2880fa6271db4ea8b101",
-  "tsBuildCacheDigest": "sha256:8091543cad88e95fdc8deca50c97b71d99a46397ef1470c1007989ab0f7e9dd3",
+  "buildInputsTreeHash": "sha256:ff968671cda2aa3c48097f1b2a1c11b336f690b4960bf49e11eb28f04fbc1ba9",
+  "sealedSourceCommit": "7e9c5f784b6e7d07a95e9c7adbe514a708ef25b8",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlanDigest": "sha256:389b862ef53e2b455f72472bc893850ca28413e8ae8ec0496733392bfab5f3b5",
+  "tsBuildCacheDigest": "sha256:386ba4cf61482b85b80a31963fb2065d78fe8a62581927d1492d0575f29c8a1d",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 48,
-    "skipDecision": 16,
-    "worktreeSetup": 14045,
-    "typescriptBuild": 11617,
-    "rootDropReleaseAssembly": 34414,
-    "onefileReleaseAssembly": 10077,
-    "artifactSync": 9572,
+    "inputHashCalculation": 50,
+    "skipDecision": 57,
+    "worktreeSetup": 13399,
+    "typescriptBuild": 14845,
+    "rootDropReleaseAssembly": 28371,
+    "onefileReleaseAssembly": 10068,
+    "artifactSync": 10346,
     "cleanup": 0,
-    "totalElapsed": 123135
+    "totalElapsed": 109024
   }
 }

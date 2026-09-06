@@ -27,6 +27,7 @@ export interface PlanningCardCloseback {
   relativePath: string;
   transitionPath: string | null;
   updatedFields: string[];
+  stagedContent: string | null;
 }
 
 function tryGitScalar(cwd: string, args: readonly string[]): string | null {
@@ -83,6 +84,21 @@ function parseTaskMarkdownFrontmatter(text: string): Record<string, unknown> {
   return result;
 }
 
+function buildPartialPlanningCardContent(baseline: string, updated: string, fields: readonly string[]): string | null {
+  const baselineMatch = baseline.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n)?/);
+  const updatedMatch = updated.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n)?/);
+  if (!baselineMatch || !updatedMatch) return null;
+  const lineEnding = baseline.includes('\r\n') ? '\r\n' : '\n';
+  let frontmatter = baselineMatch[1].replace(/\r\n/g, '\n');
+  const updatedLines = updatedMatch[1].replace(/\r\n/g, '\n').split('\n');
+  for (const field of fields) {
+    const line = updatedLines.find((candidate) => candidate.startsWith(`${field}:`));
+    if (line) frontmatter = upsertFrontmatterField(frontmatter, field, line.slice(field.length + 1).trim());
+  }
+  const baselineRest = baseline.slice(baselineMatch[0].length);
+  return `---${lineEnding}${frontmatter.split('\n').join(lineEnding)}${lineEnding}---${lineEnding}${baselineRest}`;
+}
+
 export function capturePlanningCardSnapshot(input: {
   cwd: string;
   planningMirrorPath: string | null;
@@ -119,6 +135,7 @@ export function applyPlanningCardCloseback(input: {
     });
   }
   const content = readFileSync(absolutePath, 'utf8');
+  const baselineContent = tryGitScalar(planning.repoRoot, ['show', `HEAD:${planning.relativePath}`]);
   const expectation = buildPlanningMirrorClosebackExpectation(
     input.actorId,
     input.historicalDeliveryRefs[0] ?? null
@@ -134,7 +151,8 @@ export function applyPlanningCardCloseback(input: {
       repoRoot: planning.repoRoot,
       relativePath: planning.relativePath,
       transitionPath: null,
-      updatedFields: ['status', 'completed_at', 'completed_by_agent', ...(expectation.deliveryCommit ? ['delivery_commit'] : [])]
+      updatedFields: ['status', 'completed_at', 'completed_by_agent', ...(expectation.deliveryCommit ? ['delivery_commit'] : [])],
+      stagedContent: baselineContent ? buildPartialPlanningCardContent(baselineContent, content, ['status', 'completed_at', 'completed_by_agent', ...(expectation.deliveryCommit ? ['delivery_commit'] : [])]) : null
     };
   }
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n)?/);
@@ -198,7 +216,8 @@ export function applyPlanningCardCloseback(input: {
   }
   const rest = content.slice(match[0].length);
   const normalizedFrontmatter = frontmatter.split('\n').join(lineEnding);
-  writeFileSync(absolutePath, `---${lineEnding}${normalizedFrontmatter}${lineEnding}---${lineEnding}${rest}`, 'utf8');
+  const updatedContent = `---${lineEnding}${normalizedFrontmatter}${lineEnding}---${lineEnding}${rest}`;
+  writeFileSync(absolutePath, updatedContent, 'utf8');
   const transition = appendTaskTransitionEvent({
     cwd: planning.repoRoot,
     taskId,
@@ -217,7 +236,8 @@ export function applyPlanningCardCloseback(input: {
     repoRoot: planning.repoRoot,
     relativePath: planning.relativePath,
     transitionPath: transition.eventPath,
-    updatedFields
+    updatedFields,
+    stagedContent: baselineContent ? buildPartialPlanningCardContent(baselineContent, updatedContent, updatedFields) : null
   };
 }
 
