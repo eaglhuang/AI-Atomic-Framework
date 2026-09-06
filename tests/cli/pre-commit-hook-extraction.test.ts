@@ -159,7 +159,7 @@ assert.equal(typeof isPreCommitEnvironmentFinding, 'function');
 
     // 4. The actual pre-commit hook blocks a raw commit of the pair (no authorization).
     stagePair(repo);
-    withEnv({ [RECORD_COMMIT_BLOCK_BRIDGE_AUTH_ENV]: undefined, ATM_COMMIT_ACTOR_ID: undefined, ATM_COMMIT_TASK_ID: undefined }, () => {
+    withEnv({ [RECORD_COMMIT_BLOCK_BRIDGE_AUTH_ENV]: undefined, ATM_COMMIT_ACTOR_ID: undefined, ATM_COMMIT_TASK_ID: 'TASK-UNRELATED-COMMIT' }, () => {
       let caught: unknown = null;
       try { runPreCommitHook(repo); } catch (error) { caught = error; }
       assert.ok(caught instanceof CliError, `expected the hook to block raw git, got ${String(caught)}`);
