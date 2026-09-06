@@ -1,0 +1,239 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TMP-0027",
+  "title": "Disposition abandoned cleanup evidence",
+  "status": "running",
+  "milestone": "temporary-governance",
+  "dependencies": [],
+  "acceptance": [
+    "The two exact evidence paths are either retained by a governed record commit or dispositioned by an explicit cleanup result.",
+    "No source, release artifact, foreign incident, or unrelated runtime path is changed.",
+    "The task is not marked done solely because ledger records were written."
+  ],
+  "deliverables": [],
+  "scopePaths": [
+    ".atm/history/evidence/TASK-TMP-0025.abandon-residue-disposition.json",
+    ".atm/history/evidence/TASK-TMP-0025.live-index-reconciliation.json"
+  ],
+  "validators": [],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "source code",
+    "release artifacts",
+    "foreign incident evidence"
+  ],
+  "nonGoals": [
+    "marking a ledger-only record-retention task done",
+    "deleting unrelated runtime incidents"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the record-retention commit if the evidence-retention policy changes.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.governance-history-retention",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "temporary-governance/tasks/TASK-TMP-0027-disposition-abandoned-evidence.task.md",
+    "sectionTitle": "TASK-TMP-0027",
+    "headingLine": 55,
+    "hash": "61d3c98f47fdf9bf",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "temporary-governance/tasks/TASK-TMP-0027-disposition-abandoned-evidence.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:61d3c98f47fdf9bffc6b46c49f0f2b60bda966d28fca201501013c36dc086499",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-06T21:42:44.915Z"
+    }
+  },
+  "importedAt": "2026-09-06T21:42:44.915Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-TMP-0025 and TASK-TMP-0026 are terminal and have no active claim.",
+      "The two evidence files are already present and untracked in the target repository."
+    ],
+    "softRelations": [
+      "TASK-TMP-0025",
+      "TASK-TMP-0026"
+    ],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [
+      "governance-record-retention"
+    ],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "atm-governance"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-06T21-43-38-102Z-claim-0e320ba65447",
+  "lastTransitionAt": "2026-09-06T21:43:38.102Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-06T21:43:36.638Z",
+  "promotedAt": "2026-09-06T21:43:36.643Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-a4f3c363ffb6",
+    "claimedAt": "2026-09-06T21:43:36.647Z",
+    "heartbeatAt": "2026-09-06T21:43:36.647Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TMP-0027.json",
+      ".atm/history/evidence/TASK-TMP-0025.abandon-residue-disposition.json",
+      ".atm/history/evidence/TASK-TMP-0025.live-index-reconciliation.json"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260906214336-codex-captain-2712b030f5",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906214336-codex-captain-2712b030f5\""
+    }
+  },
+  "startedAt": "2026-09-06T21:43:36.647Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-5e6c69d496876f1b",
+    "ticketDigest": "sha256:5e6c69d496876f1b03980509e1affb0711d6f441068b611f988fa9ef909d66ad",
+    "taskId": "TASK-TMP-0027",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260906214336-codex-captain-2712b030f5",
+    "claimGeneration": "lease-a4f3c363ffb6",
+    "issuedAt": "2026-09-06T21:43:36.647Z",
+    "expiresAt": "2026-09-06T22:13:36.647Z",
+    "scopeDigest": "sha256:ae8a09a16d1cb7fd25181f6389fb62885983352e3358482fdcde3bf25f2a237e",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-06T21:43:36.647Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-TMP-0025.abandon-residue-disposition.json",
+          ".atm/history/evidence/TASK-TMP-0025.live-index-reconciliation.json",
+          ".atm/history/evidence/TASK-TMP-0027.*",
+          ".atm/history/task-events/TASK-TMP-0027/**",
+          ".atm/history/tasks/TASK-TMP-0027.json"
+        ],
+        "digest": "sha256:81884d02c47d33aaac61796a90f3d649092801c3c8b1d09872579b9cc64409be"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260906214336-codex-captain-TASK-TMP-0027-c2f3dbc90f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TMP-0027",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TMP-0025.abandon-residue-disposition.json",
+      ".atm/history/evidence/TASK-TMP-0025.live-index-reconciliation.json",
+      ".atm/history/evidence/TASK-TMP-0027.*",
+      ".atm/history/task-events/TASK-TMP-0027/**",
+      ".atm/history/tasks/TASK-TMP-0027.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9529dc8b553a8a39925f21b062fda477fa6bd5fb17ed427c15a450b1cdfa258b",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260906214336-codex-captain-TASK-TMP-0027-c2f3dbc90f",
+    "laneSession": {
+      "laneSessionId": "lane-20260906214336-codex-captain-2712b030f5",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260906214336-codex-captain-2712b030f5\""
+    },
+    "createdAt": "2026-09-06T21:43:38.101Z",
+    "status": "active"
+  }
+}
