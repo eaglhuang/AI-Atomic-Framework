@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Product gap",
   "severity": "Medium",
-  "status": "Fixed",
+  "status": "Closed — source repair and focused validation verified; formal backlog closeout reconciled 2026-09-07",
   "area": "Framework temp claim commit surface",
   "finding": "Framework temp claims can safely acquire scoped locks and produce runner-sync receipts, but the governed commit and hook evidence classifiers still assume a normal task ledger. This forces emergency native Git for framework-temp source or release-artifact bundles when no `.atm/history/tasks/<temp-id>.json` exists.",
   "expectedBehavior": "Framework temp work should have a governed commit surface and protected evidence context that can bind to the framework-temp claim or runner-sync steward record without inventing a task ledger. Hook bypass should not be required for exact scoped runner-sync receipts.",

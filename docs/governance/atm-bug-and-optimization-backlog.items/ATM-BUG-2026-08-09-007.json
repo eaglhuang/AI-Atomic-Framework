@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed",
+  "status": "Closed — source repair and focused validation verified; formal backlog closeout reconciled 2026-09-07",
   "area": "Batch routing and recovery",
   "finding": "A whole-plan next route returned a mandatory batch playbook with state repair-required and command node atm.mjs batch repair --actor <id> --json. The commanded repair then failed with ATM_BATCH_RUN_MISSING, while node atm.mjs batch status --json reported no active batch and internally consistent state.",
   "expectedBehavior": "A returned recovery command must be executable against the state that produced it. If no active batch exists, next must either create or name a batch run before prescribing repair, or return a non-batch wait/claim route with the actual dependency blocker.",

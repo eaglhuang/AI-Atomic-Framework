@@ -5,7 +5,7 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "Medium",
-  "status": "Fixed",
+  "status": "Closed — source repair and focused validation verified; formal backlog closeout reconciled 2026-09-07",
   "area": "Git governance / hook context",
   "finding": "A native git commit over an ATM task-scoped staged bundle can be blocked as ATM_CROSS_TASK_MUTATION_BLOCKED because the pre-commit hook sees taskId=null and treats the current task's own active files as foreign cross-task mutations.",
   "expectedBehavior": "When the staged set is already task-scoped and trailers or environment provide actor/task context, the hook should classify same-task mutations as owned, or return a precise missing-context error with the ATM commit command that preserves the staged bundle.",
