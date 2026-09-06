@@ -196,6 +196,23 @@ On Windows, read, write, and compare Markdown, JSON, and text planning documents
 
 PowerShell may still launch `node`, `git`, and ATM CLI commands; the restriction is on document content IO and document content comparison.
 
+Copy-paste-safe read example (PowerShell; the file path is passed as data, not
+embedded in an evaluated JavaScript string):
+
+```powershell
+@'
+import { readFileSync } from 'node:fs';
+const file = process.argv[2];
+if (!file) throw new Error('usage: read a file path');
+process.stdout.write(readFileSync(file, 'utf8'));
+'@ | node --input-type=module - -- 'path/to/document.md'
+```
+
+For a byte-stable comparison, pass two paths to the same pattern and compare
+`readFileSync(left, 'utf8') === readFileSync(right, 'utf8')`. Do not replace
+this with `node -e`, `node --eval`, or PowerShell content cmdlets; those routes
+are prohibited by the execution policy below.
+
 ## Copy-paste Dispatch Packet Rule
 
 When preparing an external handoff for a human to paste into Claude, Cursor,
