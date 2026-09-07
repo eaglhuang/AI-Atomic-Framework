@@ -6055,11 +6055,11 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1409,
-    "unchanged": 4611,
+    "copied": 2,
+    "unchanged": 1973,
     "removed": 0
   },
-  "buildMode": "full",
+  "buildMode": "overlay",
   "overlayFallbackReason": null,
   "baseCompatibilityKey": "sha256:5d03f383b6fddac1cd1e9bd6b10ae3ea46ca4a305abd9c598d9cbd74b9c80f8b",
   "artifactInventory": {
@@ -25593,7 +25593,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-window-staged-index-admission.js",
-        "digest": "aa7c886f8d1e2320ad4c797f4c9336be61b16cfcf509e920625183214cd63a74",
+        "digest": "2d5aaa963d596d67d8a0af3a897319149c5e161fe3963dd735cbdf31a254efe9",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-window-staged-index-admission.js"
@@ -32973,7 +32973,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts",
-        "digest": "1ceae22cab5056750489d373792602b3713f45d2276338e00d9e8ce81cd39fde",
+        "digest": "00737d3794e81425b9c0d642411ee287438ceee5ad9fa3713190e83f715c40a4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-window-staged-index-admission.ts"
@@ -60242,7 +60242,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:8c28b888d18db7f982423411d8ded949d62ada3666c1b7434c7e05d62952be8e"
+    "treeDigest": "sha256:8fa6e97dd33393a660bfe5b2a98faec604c5e2f85c69a4f5b5eccfddd792cdda"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61786,7 +61786,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:99dece2c4579bc8250f65de281c7ec26eeebbb593b27153f47f4d6e35ca3ef6b"
+    "digest": "sha256:dad3e16f87733c9ed7f77843b8adb40238c681f832785ae2a7ebf5104e8ed7e3"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -67818,22 +67818,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:bbf078e81816674da3e04300d40d9b2ee9b3a7362bd707879ad5cd20fed4ce2f",
-  "sealedSourceCommit": "59274f0306542378c6bca65a03915afd28824572",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:933cb040e5729079423d9a6e1aebbbdaa5a8b4eb257678ce22b7289613a48cd3",
-  "tsBuildCacheDigest": "sha256:7aad41c687990d6f482fc62f8e5340bacb7eec18da901f1606545b5d9c99fb33",
+  "buildInputsTreeHash": "sha256:cb0f95c62da4103ff567f85ff3002ee7acbdb197af6b537f0d4a36347df22a09",
+  "sealedSourceCommit": "cb0a7787a67d237f9e5c03c4b9b7f2eb7d31fa8d",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:2a1fb5a05d6f5aa98ed62f703db8a67982829a42723af202694b9581566a4afe",
+  "tsBuildCacheDigest": "sha256:35d67fad2e87575d07ef27e0e60c1db61e16ede5bb2419cf67fe225576ad278f",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 46,
-    "skipDecision": 56,
-    "worktreeSetup": 13392,
-    "typescriptBuild": 9944,
-    "rootDropReleaseAssembly": 32251,
-    "onefileReleaseAssembly": 8748,
-    "artifactSync": 7820,
+    "inputHashCalculation": 47,
+    "skipDecision": 54,
+    "worktreeSetup": 13399,
+    "typescriptBuild": 11785,
+    "rootDropReleaseAssembly": 27765,
+    "onefileReleaseAssembly": 9778,
+    "artifactSync": 9073,
     "cleanup": 0,
-    "totalElapsed": 84226
+    "totalElapsed": 127462
   }
 }
