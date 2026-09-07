@@ -158,20 +158,32 @@ function drainStub(drainedPaths: readonly string[]) {
   assert.ok(admission.blockedSummary?.includes('own unreconciled commits'));
 }
 
-// Deferral itself is untouched: an explicit defer still admits, residue or not.
+// Explicit defer remains valid for genuine foreign work, but must not snapshot
+// and restore proven reconciliation residue.
 {
-  for (const provenResidueFiles of [[], ['src/mine.ts']]) {
-    const admission = evaluateCloseWindowStagedIndexAdmission({
-      taskId: 'TASK-CLOSING-0002',
-      activeLockTaskId: null,
-      unexpectedStagedFiles: ['src/mine.ts'],
-      unexpectedStagedTaskIds: [],
-      deferForeignStaged: true,
-      provenResidueFiles
-    });
-    assert.equal(admission.ok, true);
-    assert.equal(admission.blockedCode, null);
-  }
+  const foreign = evaluateCloseWindowStagedIndexAdmission({
+    taskId: 'TASK-CLOSING-0002',
+    activeLockTaskId: null,
+    unexpectedStagedFiles: ['src/theirs.ts'],
+    unexpectedStagedTaskIds: ['TASK-OTHER-0003'],
+    deferForeignStaged: true,
+    provenResidueFiles: []
+  });
+  assert.equal(foreign.ok, true);
+
+  const residue = evaluateCloseWindowStagedIndexAdmission({
+    taskId: 'TASK-CLOSING-0002',
+    activeLockTaskId: null,
+    unexpectedStagedFiles: ['src/mine.ts'],
+    unexpectedStagedTaskIds: [],
+    deferForeignStaged: true,
+    provenResidueFiles: ['src/mine.ts'],
+    residueDrainCommand: DRAIN_COMMAND
+  });
+  assert.equal(residue.ok, false);
+  assert.equal(residue.blockedCode, 'ATM_CLOSE_WINDOW_UNRECONCILED_RESIDUE');
+  assert.ok(residue.blockedSummary?.includes('cannot defer'));
+  assert.ok(residue.blockedSummary?.includes(DRAIN_COMMAND));
 }
 
 // The staged-index lock verdict still wins over any staged-entry diagnosis.

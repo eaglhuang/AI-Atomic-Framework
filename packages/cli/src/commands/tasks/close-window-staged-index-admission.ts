@@ -21,8 +21,15 @@ export function evaluateCloseWindowStagedIndexAdmission(input: {
   if (input.activeLockTaskId && input.activeLockTaskId !== input.taskId) {
     return { ok: false, blockedCode: 'ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED', blockedSummary: `Close window staged-index lock is already held by ${input.activeLockTaskId}; wait for release or inspect tasks status before staging.` };
   }
+  const residue = new Set(input.provenResidueFiles ?? []);
+  const provenResidueFiles = input.unexpectedStagedFiles.filter((filePath) => residue.has(filePath));
+  // A defer snapshot is restored on release. Applying it to proven residue
+  // would silently recreate another task's reconciliation debt.
+  if (input.deferForeignStaged && provenResidueFiles.length > 0) {
+    return { ok: false, blockedCode: 'ATM_CLOSE_WINDOW_UNRECONCILED_RESIDUE', blockedSummary:
+      `Close window cannot defer ${provenResidueFiles.length} staged path(s) that are this repository's own unreconciled commits; draining the recorded reconciliation debt is required${input.residueDrainCommand ? ` (${input.residueDrainCommand})` : ''} before close.` };
+  }
   if (input.unexpectedStagedFiles.length > 0 && !input.deferForeignStaged) {
-    const residue = new Set(input.provenResidueFiles ?? []);
     const foreignStagedFiles = input.unexpectedStagedFiles.filter((filePath) => !residue.has(filePath));
     // Deferring proven residue parks a snapshot and restores it byte-identically
     // on release, so it recreates the debt instead of clearing it. When nothing
