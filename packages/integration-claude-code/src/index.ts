@@ -1,11 +1,10 @@
 import {
   compileSkillTemplatesForAdapter,
-  loadSkillCorpusSourceSnapshot,
   createStaticIntegrationAdapter,
+  resolveDefaultSkillSourceCoverage,
   type IntegrationAdapter,
   type IntegrationSourceFile
 } from '../../integrations-core/src/index.ts';
-import path from 'node:path';
 
 export const integrationClaudeCodePackage = {
   packageName: '@ai-atomic-framework/integration-claude-code',
@@ -27,7 +26,7 @@ export function createClaudeCodeIntegrationAdapter(options: ClaudeCodeIntegratio
     fileFormat: 'skill',
     placeholderStyle: '$ARGUMENTS',
     sourceFiles: (context) => createClaudeCodeSourceFiles(context.repositoryRoot),
-    sourceCoverage: (context) => ({ sourceFileCount: loadSkillCorpusSourceSnapshot(path.join(context.repositoryRoot, 'templates', 'skills')).templateCount })
+    sourceCoverage: (context) => resolveDefaultSkillSourceCoverage(context.repositoryRoot)
   });
 }
 

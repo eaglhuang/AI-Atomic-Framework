@@ -1,13 +1,12 @@
 import {
   atmFirstCommand,
   compileSkillTemplatesForAdapter,
-  loadSkillCorpusSourceSnapshot,
   createStaticIntegrationAdapter,
+  resolveDefaultSkillSourceCoverage,
   renderCharterInvariantsBlock,
   type IntegrationAdapter,
   type IntegrationSourceFile
 } from '../../integrations-core/src/index.ts';
-import path from 'node:path';
 
 export const integrationGeminiPackage = {
   packageName: '@ai-atomic-framework/integration-gemini',
@@ -33,7 +32,7 @@ export function createGeminiIntegrationAdapter(options: GeminiIntegrationAdapter
     fileFormat: 'toml',
     placeholderStyle: 'toml-fields',
     sourceFiles: (context) => createGeminiSourceFiles(context.repositoryRoot),
-    sourceCoverage: (context) => ({ sourceFileCount: loadSkillCorpusSourceSnapshot(path.join(context.repositoryRoot, 'templates', 'skills')).templateCount })
+    sourceCoverage: (context) => resolveDefaultSkillSourceCoverage(context.repositoryRoot)
   });
 }
 
@@ -46,7 +45,7 @@ export function createAntigravityIntegrationAdapter(options: AntigravityIntegrat
     fileFormat: 'markdown',
     placeholderStyle: '$ARGUMENTS',
     sourceFiles: (context) => createAntigravitySourceFiles(context.repositoryRoot),
-    sourceCoverage: (context) => ({ sourceFileCount: loadSkillCorpusSourceSnapshot(path.join(context.repositoryRoot, 'templates', 'skills')).templateCount })
+    sourceCoverage: (context) => resolveDefaultSkillSourceCoverage(context.repositoryRoot)
   });
 }
 

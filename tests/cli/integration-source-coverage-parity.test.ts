@@ -3,11 +3,26 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { createStaticIntegrationAdapter } from '../../packages/integrations-core/src/index.ts';
+import { createStaticIntegrationAdapter, resolveDefaultSkillSourceCoverage } from '../../packages/integrations-core/src/index.ts';
+import { createCodexIntegrationAdapter } from '../../packages/integration-codex/src/index.ts';
 import { verifyInstalledManifest } from '../../packages/cli/src/commands/integration/health.ts';
 
 const repositoryRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-integration-source-coverage-'));
 try {
+  const bundledCoverage = resolveDefaultSkillSourceCoverage(repositoryRoot);
+  assert(bundledCoverage.sourceFileCount > 0, 'clean adopter coverage must resolve the bundled template corpus');
+  assert.match(bundledCoverage.sourceCatalogDigest, /^sha256:[a-f0-9]{64}$/);
+
+  const codex = createCodexIntegrationAdapter();
+  const codexInstall = await codex.install({ repositoryRoot, dryRun: false });
+  const codexReport = await verifyInstalledManifest(
+    repositoryRoot,
+    '.atm/integrations/codex.manifest.json',
+    codex,
+    codexInstall.manifest
+  );
+  assert.equal(codexReport.ok, true, 'clean adopter install must verify against the same bundled profile corpus');
+
   const sourceFiles = [
     {
       relativePath: 'one.md',
