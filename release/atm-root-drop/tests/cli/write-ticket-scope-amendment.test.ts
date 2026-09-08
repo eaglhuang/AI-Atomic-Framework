@@ -2,8 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { parseScopeAddCommandPaths } from '../../packages/cli/src/commands/tasks/status-triangulation.ts';
-import { readScopeAmendmentEvents } from '../../packages/cli/src/commands/tasks/status-triangulation.ts';
+import { parseScopeAddCommandPaths, readScopeAmendmentEvents } from '../../packages/cli/src/commands/tasks/status-triangulation.ts';
 import { parseScopeAddOptions } from '../../packages/cli/src/commands/tasks/task-option-parsers.ts';
 import { acquireWriteTicket, checkWriteTicket } from '../../packages/core/src/broker/write-ticket.ts';
 

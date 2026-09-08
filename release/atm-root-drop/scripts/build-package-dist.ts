@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { writeTextWithRetry } from './lib/windows-write-retry.ts';
+import { buildCliNpmRuntime } from './build-cli-npm-runtime.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_PACKAGE_DIR = 'packages/cli';
@@ -196,7 +197,10 @@ const packageDirs = readdirSync(path.join(root, 'packages'), { withFileTypes: tr
 
 const mode = onlyPackage || onlyPackages ? 'incremental' : 'full';
 for (const packageDir of packageDirs) buildPackage(packageDir, mode);
-if (packageDirs.includes(CLI_PACKAGE_DIR)) buildCliRuntimeClosure();
+if (packageDirs.includes(CLI_PACKAGE_DIR)) {
+  buildCliRuntimeClosure();
+  await buildCliNpmRuntime({ repositoryRoot: root });
+}
 console.log(`[build-package-dist] built ${packageDirs.length} packages (${mode})`);
 
 function writeTextIfChanged(filePath: string, content: string): void {

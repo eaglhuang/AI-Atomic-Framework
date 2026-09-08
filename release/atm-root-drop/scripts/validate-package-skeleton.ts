@@ -68,6 +68,8 @@ for (const packageSpec of fixture.packages) {
   const expectedPublishFiles = Array.isArray(packageSpec.publishFiles)
     ? packageSpec.publishFiles
     : ['dist'];
+  const expectedExportImport = packageSpec.exportImport ?? './dist/index.js';
+  const expectedExportTypes = packageSpec.exportTypes ?? './dist/index.d.ts';
   const allowedExternalDependencies = typeof packageSpec.externalDependencies === 'object' && packageSpec.externalDependencies !== null
     ? packageSpec.externalDependencies as Record<string, unknown>
     : {};
@@ -84,14 +86,14 @@ for (const packageSpec of fixture.packages) {
     fail(`${manifestPath} must use type=module`);
   }
   const exportTarget = manifest.exports?.['.'] ?? manifest.exports;
-  if (exportTarget?.import !== './dist/index.js' || exportTarget?.types !== './dist/index.d.ts') {
-    fail(`${manifestPath} must export ./dist/index.js with ./dist/index.d.ts types`);
+  if (exportTarget?.import !== expectedExportImport || exportTarget?.types !== expectedExportTypes) {
+    fail(`${manifestPath} must export ${expectedExportImport} with ${expectedExportTypes} types`);
   }
   if (JSON.stringify(manifest.files) !== JSON.stringify(expectedPublishFiles)) {
     fail(`${manifestPath} files must exactly match the runtime allowlist ${JSON.stringify(expectedPublishFiles)}`);
   }
-  if (manifest.types !== './dist/index.d.ts') {
-    fail(`${manifestPath} must set types=./dist/index.d.ts`);
+  if (manifest.types !== expectedExportTypes) {
+    fail(`${manifestPath} must set types=${expectedExportTypes}`);
   }
   for (const scriptName of ['build', 'test', 'typecheck', 'lint']) {
     if (!manifest.scripts?.[scriptName]) {

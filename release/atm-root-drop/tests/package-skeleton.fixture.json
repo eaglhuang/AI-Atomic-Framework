@@ -21,6 +21,9 @@
       "directory": "packages/cli",
       "role": "Command entrypoints and run envelopes",
       "exportSymbol": "cliPackage",
+      "publishFiles": ["dist/npm-runtime"],
+      "exportImport": "./dist/npm-runtime/index.js",
+      "exportTypes": "./dist/npm-runtime/index.d.ts",
       "externalDependencies": {
         "ajv": "^8.17.1",
         "ajv-formats": "^3.0.1"
