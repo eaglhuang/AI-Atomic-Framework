@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -37,6 +37,17 @@ function run(command: string, args: string[], cwd: string): string {
   return result.stdout;
 }
 
+function parseNpmJson(output: string): any {
+  const trimmed = output.trimStart();
+  const jsonStart = trimmed.startsWith('[') && !trimmed.startsWith('[build-')
+    ? output.indexOf('[')
+    : output.lastIndexOf('\n[') + 1;
+  if (jsonStart < 0 || !output.slice(jsonStart).trimStart().startsWith('[')) {
+    fail(`npm command did not emit a JSON array: ${output}`);
+  }
+  return JSON.parse(output.slice(jsonStart));
+}
+
 function expectedPublishFiles(packageSpec: PackageSpec): readonly string[] {
   return packageSpec.publishFiles ?? ['dist'];
 }
@@ -53,6 +64,10 @@ function assertAllowedFiles(entry: any, packageSpec: PackageSpec): void {
 
 function listFiles(directory: string, results: string[] = []): string[] {
   if (!existsSync(directory)) return results;
+  if (statSync(directory).isFile()) {
+    results.push(directory);
+    return results;
+  }
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const fullPath = path.join(directory, entry.name);
     if (entry.isDirectory()) listFiles(fullPath, results);
@@ -192,7 +207,7 @@ try {
   }
 
   const workspaceArgs = publishedPackages.flatMap((packageSpec) => ['--workspace', packageSpec.name]);
-  const packed = JSON.parse(run('npm', ['pack', ...workspaceArgs, '--pack-destination', tempRoot, '--json'], root));
+  const packed = parseNpmJson(run('npm', ['pack', ...workspaceArgs, '--pack-destination', tempRoot, '--json'], root));
   if (!Array.isArray(packed) || packed.length !== publishedPackages.length) {
     fail(`npm pack must return exactly ${publishedPackages.length} published workspace artifact(s)`);
   }

@@ -10,9 +10,10 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
-assert(JSON.stringify(cliPackage.files) === JSON.stringify(['dist']), 'CLI npm package must not publish src.');
+assert(JSON.stringify(cliPackage.files) === JSON.stringify(['dist/npm-runtime']), 'CLI npm package must publish only its compact runtime.');
 assert(cliPackage.atmArtifactBudget?.schemaId === 'atm.cliArtifactBudget.v1', 'CLI must seal an artifact budget.');
-assert(cliPackage.atmArtifactBudget?.ownerApprovedDependencyRevision?.revisedBudget, 'Budget revision must be explicit and reviewable.');
+assert(cliPackage.atmArtifactBudget?.budget?.maxPackedBytes === 3365772, 'CLI must enforce the original 70% byte-reduction target.');
+assert(cliPackage.atmArtifactBudget?.budget?.maxPackedEntries === 308, 'CLI must enforce the original 80% entry-reduction target.');
 assert(validator.includes('forbidden adopter files'), 'Validator must reject tests, fixtures, and evidence from the runtime artifact.');
-assert(validator.includes('exceeds approved budget'), 'Validator must enforce the revised caps.');
+assert(validator.includes('exceeds original budget'), 'Validator must enforce the original caps.');
 console.log('[adopter-artifact-budget] ok');
