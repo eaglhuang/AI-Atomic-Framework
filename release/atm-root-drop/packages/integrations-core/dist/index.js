@@ -25,6 +25,6 @@ export { buildCanonicalSkillCatalog, inferCompanionFiles } from './distribution/
 export { resolveSkillInstallationPlan, digestSkillInstallationPlan } from './distribution/skill-distribution-manager.js';
 export { loadExternalSkillCatalog, federateExternalSkillCatalog } from './distribution/external-skill-catalog.js';
 export { getEditorGlobalOverlayAdapter, createEditorGlobalOverlayPlan, applyEditorGlobalOverlayPlan, formatEditorGlobalSkillManifest } from './distribution/editor-global-overlay.js';
-export { renderCharterInvariantsBlock, compileSkillTemplatesForAdapter, compileSkillTemplate } from './compiler/compile.js';
+export { renderCharterInvariantsBlock, compileSkillTemplatesForAdapter, compileSkillTemplate, resolveDefaultSkillSourceCoverage } from './compiler/compile.js';
 export { installManifestSchemaVersion, sha256Bytes, sha256File, normalizeManifestPath, formatInstallManifest } from './manifest/schema.js';
 export { createInstallManifest, createManifestFileRecord, createCodexSkillsAdapter, createStaticIntegrationAdapter } from './manifest/construct.js';

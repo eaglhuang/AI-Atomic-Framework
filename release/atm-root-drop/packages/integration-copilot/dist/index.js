@@ -1,5 +1,4 @@
-import { compileSkillTemplatesForAdapter, loadSkillCorpusSourceSnapshot, createStaticIntegrationAdapter } from '../../integrations-core/dist/index.js';
-import path from 'node:path';
+import { compileSkillTemplatesForAdapter, createStaticIntegrationAdapter, resolveDefaultSkillSourceCoverage } from '../../integrations-core/dist/index.js';
 export const integrationCopilotPackage = {
     packageName: '@ai-atomic-framework/integration-copilot',
     packageRole: 'copilot-integration-adapter',
@@ -14,7 +13,7 @@ export function createCopilotIntegrationAdapter(options = {}) {
         fileFormat: 'instructions-md',
         placeholderStyle: '{{vars}}',
         sourceFiles: (context) => createCopilotSourceFiles(context.repositoryRoot),
-        sourceCoverage: (context) => ({ sourceFileCount: loadSkillCorpusSourceSnapshot(path.join(context.repositoryRoot, 'templates', 'skills')).templateCount })
+        sourceCoverage: (context) => resolveDefaultSkillSourceCoverage(context.repositoryRoot)
     });
 }
 export function createCopilotSourceFiles(repositoryRoot = process.cwd()) {

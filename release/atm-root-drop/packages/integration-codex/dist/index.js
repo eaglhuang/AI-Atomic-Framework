@@ -1,5 +1,4 @@
-import { compileSkillTemplatesForAdapter, loadSkillCorpusSourceSnapshot, createStaticIntegrationAdapter } from '../../integrations-core/dist/index.js';
-import path from 'node:path';
+import { compileSkillTemplatesForAdapter, createStaticIntegrationAdapter, resolveDefaultSkillSourceCoverage } from '../../integrations-core/dist/index.js';
 export const integrationCodexPackage = {
     packageName: '@ai-atomic-framework/integration-codex',
     packageRole: 'codex-integration-adapter',
@@ -14,7 +13,7 @@ export function createCodexIntegrationAdapter(options = {}) {
         fileFormat: 'skill',
         placeholderStyle: '$ARGUMENTS',
         sourceFiles: (context) => createCodexSourceFiles(context.repositoryRoot),
-        sourceCoverage: (context) => ({ sourceFileCount: loadSkillCorpusSourceSnapshot(path.join(context.repositoryRoot, 'templates', 'skills')).templateCount })
+        sourceCoverage: (context) => resolveDefaultSkillSourceCoverage(context.repositoryRoot)
     });
 }
 export function createCodexSourceFiles(repositoryRoot = process.cwd()) {

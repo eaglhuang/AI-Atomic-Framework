@@ -2,9 +2,14 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { probeProject } from '../_vendor/core/dist/guidance/index.js';
-import { createJavaScriptLanguageAdapter, detectProjectProfile as detectJavaScriptProjectProfile } from '../_vendor/language-js/dist/index.js';
-import { createPythonLanguageAdapter, detectPythonProjectProfile } from '../_vendor/language-python/dist/index.js';
-import { createCSharpLanguageAdapter, detectCSharpProjectProfile } from '../_vendor/language-csharp/dist/index.js';
+import { createJavaScriptLanguageAdapter, detectProjectProfile as detectJavaScriptProjectProfile, languageJsPackage } from '../_vendor/language-js/dist/index.js';
+import { createPythonLanguageAdapter, detectPythonProjectProfile, pythonLanguageAdapterPackage } from '../_vendor/language-python/dist/index.js';
+import { createCSharpLanguageAdapter, detectCSharpProjectProfile, csharpLanguageAdapterPackage } from '../_vendor/language-csharp/dist/index.js';
+const bundledLanguageAdapterPackages = [
+    languageJsPackage.packageName,
+    pythonLanguageAdapterPackage.packageName,
+    csharpLanguageAdapterPackage.packageName
+].sort((left, right) => left.localeCompare(right));
 export function inspectRuntimeAdapterReadiness(repositoryRoot) {
     const orientation = probeProject(repositoryRoot);
     const pythonOnlyHost = orientation.detectedLanguages.includes('Python')
@@ -13,10 +18,12 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot) {
     const languageOnlyHost = orientation.detectedLanguages.length > 0
         && !orientation.detectedLanguages.includes('JavaScript')
         && !orientation.detectedLanguages.includes('TypeScript');
-    const bundledLanguageAdapters = listBundledPackageNames((packageDirName) => packageDirName.startsWith('language-'));
+    // These adapters are statically imported into both source and packaged CLI
+    // runners. Filesystem discovery is not authoritative after bundling because
+    // the package source directories no longer exist beside the entrypoint.
+    const bundledLanguageAdapters = bundledLanguageAdapterPackages;
     const bundledProjectAdapters = listBundledPackageNames((packageDirName) => packageDirName.startsWith('adapter-') || packageDirName === 'plugin-governance-local');
-    const pythonLanguageAdapterAvailable = bundledLanguageAdapters.some((packageName) => /python/i.test(packageName))
-        || hasLocalLanguagePythonPackage();
+    const pythonLanguageAdapterAvailable = bundledLanguageAdapters.some((packageName) => /python/i.test(packageName));
     const csharpLanguageAdapterAvailable = bundledLanguageAdapters.some((packageName) => /csharp/i.test(packageName));
     const missingLanguageAdapters = orientation.detectedLanguages.filter((language) => !hasBundledLanguageAdapter(language, bundledLanguageAdapters));
     const staticCheckHints = collectStaticCheckHints(repositoryRoot, orientation.detectedLanguages, {
@@ -61,19 +68,6 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot) {
             : 'A non-JavaScript host language was detected and a matching bundled language adapter is available. Candidate ranking, dry-run atomize/infect, and source inventory are supported; apply still flows through review and police gates.',
         staticCheckHints
     };
-}
-function hasLocalLanguagePythonPackage() {
-    const packagesRoot = resolveFrameworkPackagesRoot();
-    if (!existsSync(packagesRoot))
-        return false;
-    const candidateDir = path.join(packagesRoot, 'language-python');
-    if (!existsSync(candidateDir))
-        return false;
-    const packageJsonPath = path.join(candidateDir, 'package.json');
-    if (!existsSync(packageJsonPath))
-        return false;
-    const packageName = readPackageName(packageJsonPath);
-    return packageName === '@ai-atomic-framework/language-python';
 }
 function listBundledPackageNames(includePackageDir) {
     const packagesRoot = resolveFrameworkPackagesRoot();

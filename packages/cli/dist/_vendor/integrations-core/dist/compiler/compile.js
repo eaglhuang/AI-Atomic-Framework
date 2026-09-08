@@ -117,6 +117,20 @@ export function compileSkillTemplatesForAdapter(adapterTarget, templates = undef
         }
     ]);
 }
+/**
+ * Report the same default source corpus that compilation selects for a target
+ * repository. The templates are bundled with integrations-core; the target
+ * repository only selects the install profile and is never treated as the
+ * template source.
+ */
+export function resolveDefaultSkillSourceCoverage(repositoryRoot = integrationsCoreRepoRoot) {
+    const profileId = selectDefaultSkillInstallProfile({ repositoryRoot });
+    const templates = loadSkillTemplatesForProfile(profileId);
+    return {
+        sourceFileCount: templates.length,
+        sourceCatalogDigest: digestSkillTemplates(templates)
+    };
+}
 export function compileSkillTemplate(template, adapterTarget, options = {}) {
     const frontmatter = template.frontmatter;
     const body = renderSkillTemplateBody(template, options);

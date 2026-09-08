@@ -1,5 +1,4 @@
-import { atmFirstCommand, compileSkillTemplatesForAdapter, loadSkillCorpusSourceSnapshot, createStaticIntegrationAdapter, renderCharterInvariantsBlock } from '../../integrations-core/dist/index.js';
-import path from 'node:path';
+import { atmFirstCommand, compileSkillTemplatesForAdapter, createStaticIntegrationAdapter, resolveDefaultSkillSourceCoverage, renderCharterInvariantsBlock } from '../../integrations-core/dist/index.js';
 export const integrationGeminiPackage = {
     packageName: '@ai-atomic-framework/integration-gemini',
     packageRole: 'gemini-integration-adapter',
@@ -14,7 +13,7 @@ export function createGeminiIntegrationAdapter(options = {}) {
         fileFormat: 'toml',
         placeholderStyle: 'toml-fields',
         sourceFiles: (context) => createGeminiSourceFiles(context.repositoryRoot),
-        sourceCoverage: (context) => ({ sourceFileCount: loadSkillCorpusSourceSnapshot(path.join(context.repositoryRoot, 'templates', 'skills')).templateCount })
+        sourceCoverage: (context) => resolveDefaultSkillSourceCoverage(context.repositoryRoot)
     });
 }
 export function createAntigravityIntegrationAdapter(options = {}) {
@@ -26,7 +25,7 @@ export function createAntigravityIntegrationAdapter(options = {}) {
         fileFormat: 'markdown',
         placeholderStyle: '$ARGUMENTS',
         sourceFiles: (context) => createAntigravitySourceFiles(context.repositoryRoot),
-        sourceCoverage: (context) => ({ sourceFileCount: loadSkillCorpusSourceSnapshot(path.join(context.repositoryRoot, 'templates', 'skills')).templateCount })
+        sourceCoverage: (context) => resolveDefaultSkillSourceCoverage(context.repositoryRoot)
     });
 }
 export function createGeminiSourceFiles(repositoryRoot = process.cwd()) {

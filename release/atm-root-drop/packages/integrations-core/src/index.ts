@@ -142,7 +142,8 @@ export type { RenderedCharterInvariants } from './compiler/compile.ts';
 export {
   renderCharterInvariantsBlock,
   compileSkillTemplatesForAdapter,
-  compileSkillTemplate
+  compileSkillTemplate,
+  resolveDefaultSkillSourceCoverage
 } from './compiler/compile.ts';
 
 // ─── Manifest submodule ────────────────────────────────────────────────────
