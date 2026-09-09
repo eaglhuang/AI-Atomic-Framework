@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-09T23-46-53-714Z-close-73bd297472d0",
+  "taskId": "TASK-PRF-0011",
+  "action": "close",
+  "actorId": "codex-product-proof",
+  "sessionId": "session-20260909232050-codex-product-proof-TASK-PRF-0011-4059f1687e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0011.json",
+  "taskSha256": "sha256:68c4feb7da797e9a56c0c7658c69944eef33324a5e190a51d89b4c041d1beedb",
+  "createdAt": "2026-09-09T23:46:53.714Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0011 --actor codex-product-proof --status done --historical-delivery b5d707452e8dd219e0e15a20fa49bd408bc09186",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260909232050-codex-product-proof-TASK-PRF-0011-4059f1687e",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0011.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "validate:adopter-artifact-manifest",
+      "validate:npm-clean-install",
+      "validate:onefile-release"
+    ],
+    "requiredGates": [
+      "build",
+      "validate:adopter-artifact-manifest",
+      "validate:npm-clean-install",
+      "validate:onefile-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-09T23:46:53.703Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0011.*",
+        ".atm/history/task-events/TASK-PRF-0011/**",
+        ".atm/history/tasks/TASK-PRF-0011.json",
+        "packages/cli/dist",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop",
+        "release/atm-root-drop/release-manifest.json",
+        "release/atm-root-drop/scripts/build-package-dist.ts",
+        "release/atm-root-drop/scripts/validate-onefile-release.ts",
+        "schemas/atomic-spec.schema.json",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/validate-adopter-artifact-manifest.ts",
+        "scripts/validate-npm-clean-install.ts",
+        "scripts/validate-onefile-release.ts",
+        "templates/atom.spec.template.json",
+        "templates/atom.test.template.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "schemas/atomic-spec.schema.json",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/validate-adopter-artifact-manifest.ts",
+        "scripts/validate-npm-clean-install.ts",
+        "scripts/validate-onefile-release.ts",
+        "templates/atom.spec.template.json",
+        "templates/atom.test.template.ts"
+      ],
+      "requiredGates": [
+        "build",
+        "validate:adopter-artifact-manifest",
+        "validate:npm-clean-install",
+        "validate:onefile-release"
+      ]
+    }
+  }
+}

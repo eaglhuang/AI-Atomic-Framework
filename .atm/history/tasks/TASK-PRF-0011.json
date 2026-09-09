@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0011",
   "title": "Restore atom templates in compact npm runtime",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0004"
@@ -28,7 +28,14 @@
     ".atm/history/task-events/TASK-PRF-0011/**",
     ".atm/history/tasks/TASK-PRF-0011.json",
     "scripts/validate-onefile-release.ts",
-    "schemas/atomic-spec.schema.json"
+    "schemas/atomic-spec.schema.json",
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/release-manifest.json",
+    "release/atm-root-drop/scripts/build-package-dist.ts",
+    "release/atm-root-drop/scripts/validate-onefile-release.ts"
   ],
   "validators": [
     "npm run build",
@@ -76,7 +83,7 @@
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "enabled",
-    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
   },
   "causalGraph": {
     "causalDependencies": [
@@ -192,8 +199,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-09T23-37-07-640Z-metadata-only-import-fff3cae9513f",
-  "lastTransitionAt": "2026-09-09T23:37:07.640Z",
+  "lastTransitionId": "2026-09-09T23-46-53-714Z-close-73bd297472d0",
+  "lastTransitionAt": "2026-09-09T23:46:53.714Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-product-proof",
   "reservedAt": "2026-09-09T23:20:50.652Z",
@@ -202,12 +209,19 @@
     "actorId": "codex-product-proof",
     "leaseId": "lease-1fff46f3afb9",
     "claimedAt": "2026-09-09T23:20:50.660Z",
-    "heartbeatAt": "2026-09-09T23:20:50.660Z",
+    "heartbeatAt": "2026-09-09T23:46:53.711Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0011.*",
       ".atm/history/task-events/TASK-PRF-0011/**",
       ".atm/history/tasks/TASK-PRF-0011.json",
+      "packages/cli/dist",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/build-package-dist.ts",
+      "release/atm-root-drop/scripts/validate-onefile-release.ts",
       "schemas/atomic-spec.schema.json",
       "scripts/build-cli-npm-runtime.ts",
       "scripts/build-package-dist.ts",
@@ -217,42 +231,50 @@
       "templates/atom.spec.template.json",
       "templates/atom.test.template.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260909232050-codex-product-proof-6e4eb9dc07",
       "status": "active",
-      "source": "minted",
+      "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260909232050-codex-product-proof-6e4eb9dc07\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-09T23:20:50.660Z",
   "startedByActor": "codex-product-proof",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-a937398eb50d97f9",
-    "ticketDigest": "sha256:a937398eb50d97f958ba1082dbe1cc79e5011e85bb7d22a5086197d718dfb9a7",
+    "ticketId": "wat-c5eab2754f8fe041",
+    "ticketDigest": "sha256:c5eab2754f8fe04197631bae33ef5d7b2755c3de51f4cbbe7db703f30ca1643c",
     "taskId": "TASK-PRF-0011",
     "origin": "claim",
     "actorId": "codex-product-proof",
     "laneSessionId": "lane-20260909232050-codex-product-proof-6e4eb9dc07",
     "claimGeneration": "lease-1fff46f3afb9",
-    "issuedAt": "2026-09-09T23:28:46.281Z",
-    "expiresAt": "2026-09-09T23:58:46.281Z",
-    "scopeDigest": "sha256:e6988c21e53d9d20ba383d00786cdb7e7d72ff84f980595d1bf80bdd1c5a291c",
+    "issuedAt": "2026-09-09T23:45:50.792Z",
+    "expiresAt": "2026-09-10T00:15:50.792Z",
+    "scopeDigest": "sha256:56ca601a590f69b5c97d2333667f2192609f30612526e324ac6751e0db754447",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-09T23:28:46.281Z"
+      "selectedAt": "2026-09-09T23:45:50.792Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0011.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0011/**",
           ".atm/history/tasks/TASK-PRF-0011.json",
+          "packages/cli/dist",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop",
+          "release/atm-root-drop/release-manifest.json",
+          "release/atm-root-drop/scripts/build-package-dist.ts",
+          "release/atm-root-drop/scripts/validate-onefile-release.ts",
           "schemas/atomic-spec.schema.json",
           "scripts/build-cli-npm-runtime.ts",
           "scripts/build-package-dist.ts",
@@ -262,7 +284,7 @@
           "templates/atom.spec.template.json",
           "templates/atom.test.template.ts"
         ],
-        "digest": "sha256:bf6248ba3989665732532d423f96cbbd8bdcf398a83689afb1516245fbf5e1ff"
+        "digest": "sha256:3180eaea27f38dd0cefdbc02ac8bbc9baeadc2a8ce258a614e9228033e7e94c2"
       },
       {
         "kind": "lifecycle-operation",
@@ -286,6 +308,7 @@
       "requestedMode": "auto",
       "resolvedMode": "enabled",
       "reasons": [
+        "complex-task",
         "shared-surface"
       ],
       "maxSavePoints": 2,
@@ -293,7 +316,7 @@
       "repositoryByteBudget": 268435456,
       "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
     }
   },
   "startedBySessionId": "session-20260909232050-codex-product-proof-TASK-PRF-0011-4059f1687e",
@@ -309,6 +332,13 @@
       ".atm/history/evidence/TASK-PRF-0011.*",
       ".atm/history/task-events/TASK-PRF-0011/**",
       ".atm/history/tasks/TASK-PRF-0011.json",
+      "packages/cli/dist",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/build-package-dist.ts",
+      "release/atm-root-drop/scripts/validate-onefile-release.ts",
       "schemas/atomic-spec.schema.json",
       "scripts/build-cli-npm-runtime.ts",
       "scripts/build-package-dist.ts",
@@ -339,5 +369,9 @@
     },
     "createdAt": "2026-09-09T23:20:56.475Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-09T23:46:53.711Z",
+  "closedByActor": "codex-product-proof",
+  "closedBySessionId": "session-20260909232050-codex-product-proof-TASK-PRF-0011-4059f1687e",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0011.closure-packet.json"
 }
