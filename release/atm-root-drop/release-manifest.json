@@ -2406,6 +2406,9 @@
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/plugin-experience-loop/schemas/skill-amendment.schema.json",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/plugin-experience-loop/schemas/skill-candidate.schema.json",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/migration/migration-index.json",
+    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/schemas/atomic-spec.schema.json",
+    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/atom.spec.template.json",
+    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/atom.test.template.ts",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/root-drop/.atm/charter/atm-first-principles.template.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/root-drop/.atm/charter/atomic-charter.template.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/root-drop/.atm/charter/charter-invariants.template.json",
@@ -2431,10 +2434,13 @@
     "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
     "release/atm-root-drop/packages/cli/dist/plugin-registry.js",
+    "release/atm-root-drop/packages/cli/dist/schemas/atomic-spec.schema.json",
     "release/atm-root-drop/packages/cli/dist/startup-integrity.js",
     "release/atm-root-drop/packages/cli/dist/startup-known-bad.js",
     "release/atm-root-drop/packages/cli/dist/telemetry/index.js",
     "release/atm-root-drop/packages/cli/dist/temp-workspace.js",
+    "release/atm-root-drop/packages/cli/dist/templates/atom.spec.template.json",
+    "release/atm-root-drop/packages/cli/dist/templates/atom.test.template.ts",
     "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/atm-first-principles.template.md",
     "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/atomic-charter.template.md",
     "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/charter-invariants.template.json",
@@ -6129,8 +6135,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1486,
-    "unchanged": 4608,
+    "copied": 1491,
+    "unchanged": 4609,
     "removed": 0
   },
   "buildMode": "full",
@@ -27511,6 +27517,33 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/npm-runtime/layout/schemas/atomic-spec.schema.json",
+        "digest": "68157a3b8078ba1a88dceb89e6b2ff2c276beab5577af76625143e58415dc6a2",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/npm-runtime/layout/schemas/atomic-spec.schema.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/npm-runtime/layout/templates/atom.spec.template.json",
+        "digest": "7c0ee1dfac4c23a99009551b86aa5e7f3375abcaafe9f86be44554f55f51e1f3",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/npm-runtime/layout/templates/atom.spec.template.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/npm-runtime/layout/templates/atom.test.template.ts",
+        "digest": "d940cf19563d5b2eb73caf39dafca965d76b86d62efd269e1e1365b483a2d5e1",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/npm-runtime/layout/templates/atom.test.template.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/npm-runtime/layout/templates/root-drop/.atm/charter/atm-first-principles.template.md",
         "digest": "03c82a6f51f80b2cc7cbfd3858c9b6847e5f208c22b565aab06b598be06063ab",
         "origin": "source",
@@ -27710,7 +27743,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "f9e7b691225ad3988f8822589a8bfd250dfb7fe6870d64517aa97e8fb460de43",
+        "digest": "927de5985dbc7fc00e821b5218e86c4b2b50112f6ce50aaf0ab079c0a0d0c835",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -27732,6 +27765,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/plugin-registry.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/schemas/atomic-spec.schema.json",
+        "digest": "68157a3b8078ba1a88dceb89e6b2ff2c276beab5577af76625143e58415dc6a2",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/schemas/atomic-spec.schema.json"
         ],
         "replaceable": true
       },
@@ -27768,6 +27810,24 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/temp-workspace.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/atom.spec.template.json",
+        "digest": "7c0ee1dfac4c23a99009551b86aa5e7f3375abcaafe9f86be44554f55f51e1f3",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/atom.spec.template.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/templates/atom.test.template.ts",
+        "digest": "d940cf19563d5b2eb73caf39dafca965d76b86d62efd269e1e1365b483a2d5e1",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/templates/atom.test.template.ts"
         ],
         "replaceable": true
       },
@@ -46547,7 +46607,7 @@
       },
       {
         "path": "scripts/build-package-dist.ts",
-        "digest": "9bd60c7b0ee4fbd02fdc3b00f96e3a71644487bf5077b785b5bc53ce6f2b057f",
+        "digest": "3d2838bf338fe55a8e562f3ef94d5652ed14acf85935ef33c091161aa6225c42",
         "origin": "source",
         "inputPaths": [
           "scripts/build-package-dist.ts"
@@ -48527,7 +48587,7 @@
       },
       {
         "path": "scripts/validate-adopter-artifact-manifest.ts",
-        "digest": "2ad9f4e1f6637a0f1c236a6b3576a87d2142bb89f805aeed411991bbb0bdce38",
+        "digest": "e07180274a033e476ede50a385dd34edaddd9ab36c3b2f4ac16c12e1b0b443f3",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-adopter-artifact-manifest.ts"
@@ -49571,7 +49631,7 @@
       },
       {
         "path": "scripts/validate-npm-clean-install.ts",
-        "digest": "c24d203926a14aafa0643d88053b0403927a2913f6668499986722cec7259f30",
+        "digest": "65137841753c48f1c5b43a464436df912a628f27641c439f0393d996f0c0ff52",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-npm-clean-install.ts"
@@ -49589,7 +49649,7 @@
       },
       {
         "path": "scripts/validate-onefile-release.ts",
-        "digest": "3dc34dc3b0c4fdb58a55ae56c1128568f80a39851962932aa66214e3a68eafa7",
+        "digest": "d7b964ec22a6056ae9c435fd34e69be07d5940fd6c8bff8912a852e8cb84242f",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-onefile-release.ts"
@@ -60982,7 +61042,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:15429595e4fdee6914963a754f582d574db524c408ba7d48174a6134ba38b235"
+    "treeDigest": "sha256:36bea0d204f9a41c81d5f62abf3c72f00742dc4dd8fd55a02464748ef2d28ad6"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62526,7 +62586,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:117b9995badb695e7293c3b6aa27ff920de255b0e818c68dafcbb8944b013ff2"
+    "digest": "sha256:1ba49d7ac32931812cd81c58fd74765a74cd796f9a292e1adaa22478b8886102"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -64906,6 +64966,9 @@
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/plugin-experience-loop/schemas/skill-amendment.schema.json",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/plugin-experience-loop/schemas/skill-candidate.schema.json",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/migration/migration-index.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/schemas/atomic-spec.schema.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/atom.spec.template.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/atom.test.template.ts",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/root-drop/.atm/charter/atm-first-principles.template.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/root-drop/.atm/charter/atomic-charter.template.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/templates/root-drop/.atm/charter/charter-invariants.template.json",
@@ -64931,10 +64994,13 @@
       "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
       "release/atm-root-drop/packages/cli/dist/plugin-registry.js",
+      "release/atm-root-drop/packages/cli/dist/schemas/atomic-spec.schema.json",
       "release/atm-root-drop/packages/cli/dist/startup-integrity.js",
       "release/atm-root-drop/packages/cli/dist/startup-known-bad.js",
       "release/atm-root-drop/packages/cli/dist/telemetry/index.js",
       "release/atm-root-drop/packages/cli/dist/temp-workspace.js",
+      "release/atm-root-drop/packages/cli/dist/templates/atom.spec.template.json",
+      "release/atm-root-drop/packages/cli/dist/templates/atom.test.template.ts",
       "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/atm-first-principles.template.md",
       "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/atomic-charter.template.md",
       "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/charter/charter-invariants.template.json",
@@ -68632,22 +68698,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:1c5e547b6318eac061497aac7417dc89051e544d38bbe4914eec9a23d7d19e20",
-  "sealedSourceCommit": "28abd508f42e94c05452afa1644236b6feb0e4bd",
+  "buildInputsTreeHash": "sha256:ce3734c44dce4cc0e6168d13c788721221633b696bdd55ab9c6c6de0522f87b9",
+  "sealedSourceCommit": "1853d042f83e6c3a78902918bfb04f5bb061dd2a",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:8a2f679d542975d4dbead6a58e3eab3e7a62dfb37653eed59400a141d225de5c",
+  "incrementalPlanDigest": "sha256:ae2579dedc065002a2c3968d53021816569ed1f9a03c72071425fbe31d20d520",
   "tsBuildCacheDigest": "sha256:7530b7d506ea8817feee130ab409d2ed1e6e027994d5495f01d85befb5e5f61d",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 43,
+    "inputHashCalculation": 44,
     "skipDecision": 54,
-    "worktreeSetup": 8669,
-    "typescriptBuild": 11695,
-    "rootDropReleaseAssembly": 28156,
-    "onefileReleaseAssembly": 9798,
-    "artifactSync": 5167,
+    "worktreeSetup": 8760,
+    "typescriptBuild": 11472,
+    "rootDropReleaseAssembly": 28206,
+    "onefileReleaseAssembly": 9924,
+    "artifactSync": 5590,
     "cleanup": 0,
-    "totalElapsed": 86214
+    "totalElapsed": 71262
   }
 }

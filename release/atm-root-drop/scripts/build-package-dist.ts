@@ -9,6 +9,11 @@ import { buildCliNpmRuntime } from './build-cli-npm-runtime.ts';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_PACKAGE_DIR = 'packages/cli';
 const VENDOR_DIRNAME = '_vendor';
+const CLI_SCAFFOLD_RUNTIME_ASSETS = [
+  'schemas/atomic-spec.schema.json',
+  'templates/atom.spec.template.json',
+  'templates/atom.test.template.ts'
+] as const;
 const onlyPackage = process.argv.includes('--package')
   ? process.argv[process.argv.indexOf('--package') + 1]
   : null;
@@ -375,5 +380,21 @@ function buildCliRuntimeClosure(): void {
     adoptionTemplateFiles = copyRuntimeTree(adoptionTemplateSource, adoptionTemplateTarget).length;
   }
 
-  console.log(`[build-package-dist] cli runtime closure: vendored ${vendored.size} workspaces, rewrote ${rewrittenFiles} cli modules and ${rewrittenVendorFiles} vendored modules, bundled ${adoptionTemplateFiles} adoption template files`);
+  // Atom creation is a public CLI capability, so its data templates belong to
+  // the runtime closure even though they are not JavaScript module imports.
+  // Keep this allowlist exact: copying the repository-wide templates tree would
+  // silently turn the compact product back into a development snapshot.
+  let scaffoldRuntimeAssets = 0;
+  for (const assetPath of CLI_SCAFFOLD_RUNTIME_ASSETS) {
+    const source = path.join(root, assetPath);
+    const target = path.join(cliDist, assetPath);
+    if (!existsSync(source)) {
+      throw new Error(`Required CLI scaffold runtime asset is missing: ${assetPath}`);
+    }
+    ensureDir(target);
+    copyFileIfChanged(source, target);
+    scaffoldRuntimeAssets += 1;
+  }
+
+  console.log(`[build-package-dist] cli runtime closure: vendored ${vendored.size} workspaces, rewrote ${rewrittenFiles} cli modules and ${rewrittenVendorFiles} vendored modules, bundled ${adoptionTemplateFiles} adoption template files and ${scaffoldRuntimeAssets} scaffold runtime assets`);
 }
