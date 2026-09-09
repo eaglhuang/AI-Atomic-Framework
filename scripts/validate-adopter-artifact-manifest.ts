@@ -1,4 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -65,6 +66,21 @@ const unlisted = relative.filter((file) => file !== 'manifest.json' && !listedPa
 if (unlisted.length > 0) fail(`CLI npm runtime contains unlisted files: ${unlisted.slice(0, 8).join(', ')}`);
 const unexplained = (manifest.files ?? []).filter((entry: any) => !['runtime-entrypoint', 'immutable-runtime-asset'].includes(entry.kind));
 if (unexplained.length > 0) fail(`CLI npm runtime contains files without a runtime reason: ${unexplained.slice(0, 8).map((entry: any) => entry.path).join(', ')}`);
+for (const assetPath of [
+  'layout/templates/atom.spec.template.json',
+  'layout/templates/atom.test.template.ts',
+  'layout/schemas/atomic-spec.schema.json'
+]) {
+  const entry = (manifest.files ?? []).find((candidate: any) => candidate.path === assetPath);
+  if (!entry || entry.kind !== 'immutable-runtime-asset') {
+    fail(`CLI npm runtime manifest must classify ${assetPath} as an immutable runtime asset.`);
+  }
+  const bytes = readFileSync(path.join(runtimeRoot, assetPath));
+  const digest = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+  if (entry.bytes !== bytes.length || entry.sha256 !== digest) {
+    fail(`CLI npm runtime manifest hash or byte count does not match ${assetPath}.`);
+  }
+}
 
 const packed = spawnSync('npm', ['pack', '.', '--dry-run', '--json'], {
   cwd: cliRoot,

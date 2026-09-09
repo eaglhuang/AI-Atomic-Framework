@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -74,6 +75,16 @@ function listFiles(directory: string, results: string[] = []): string[] {
     else results.push(fullPath);
   }
   return results;
+}
+
+function snapshotTree(directory: string): string {
+  const entries = listFiles(directory)
+    .map((filePath) => ({
+      path: path.relative(directory, filePath).replace(/\\/g, '/'),
+      digest: createHash('sha256').update(readFileSync(filePath)).digest('hex')
+    }))
+    .sort((left, right) => left.path.localeCompare(right.path));
+  return JSON.stringify(entries);
 }
 
 // A published tarball carries only its own package directory. A relative
@@ -256,6 +267,30 @@ try {
       const versionText = `${version.stdout ?? ''}${version.stderr ?? ''}`;
       if (version.status !== 0 || !versionText.includes(`\"frameworkVersion\": \"${installedManifest.version}\"`)) {
         fail(`atm --version must report the installed tarball version ${installedManifest.version}: ${versionText.split('\n').slice(0, 8).join(' ')}`);
+      }
+      const beforeCreate = snapshotTree(installRoot);
+      const installedCliEntrypoint = path.join(installRoot, 'node_modules', ...packageSpec.name.split('/'), 'dist', 'npm-runtime', 'atm.mjs');
+      const create = spawnSync(process.execPath, [installedCliEntrypoint,
+        'create', '--bucket', 'CORE', '--title', 'SmokeAtom',
+        '--description', 'Installed runtime smoke',
+        '--logical-name', 'atom.smoke.installed', '--dry-run', '--json'
+      ], { cwd: installRoot, encoding: 'utf8' });
+      const createText = `${create.stdout ?? ''}${create.stderr ?? ''}`;
+      if (create.status !== 0) {
+        fail(`installed atm create --dry-run failed: ${createText}`);
+      }
+      const installedLayout = path.join(installRoot, 'node_modules', ...packageSpec.name.split('/'), 'dist', 'npm-runtime', 'layout');
+      for (const assetPath of [
+        'templates/atom.spec.template.json',
+        'templates/atom.test.template.ts',
+        'schemas/atomic-spec.schema.json'
+      ]) {
+        if (!existsSync(path.join(installedLayout, assetPath))) {
+          fail(`installed atm runtime is missing scaffold asset ${assetPath}`);
+        }
+      }
+      if (snapshotTree(installRoot) !== beforeCreate) {
+        fail('installed atm create --dry-run mutated the fixture repository');
       }
       assertAdoptionSucceeds(binPath, tempRoot, installedManifest.version);
     }

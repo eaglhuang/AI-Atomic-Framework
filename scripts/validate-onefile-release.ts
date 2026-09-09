@@ -178,6 +178,18 @@ try {
   assert(orient.parsed.ok === true, 'onefile orient must report ok=true');
   assert(orient.parsed.evidence?.orientation?.schemaId === 'atm.projectOrientationReport', 'onefile orient must emit orientation report');
 
+  const statusBeforeCreate = runGit(blankRepo, ['status', '--porcelain']);
+  const create = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, [
+    'create', '--bucket', 'CORE', '--title', 'SmokeAtom',
+    '--description', 'Onefile runtime smoke',
+    '--logical-name', 'atom.smoke.onefile', '--dry-run', '--json'
+  ]);
+  assert(create.exitCode === 0, 'onefile create --dry-run must exit 0');
+  assert(create.parsed.ok === true, 'onefile create --dry-run must report ok=true');
+  assert(create.parsed.evidence?.specPath?.endsWith('atom.spec.json'), 'onefile create --dry-run must resolve the atom spec template');
+  assert(create.parsed.evidence?.testPath?.endsWith('atom.test.ts'), 'onefile create --dry-run must resolve the atom test template');
+  assert(runGit(blankRepo, ['status', '--porcelain']) === statusBeforeCreate, 'onefile create --dry-run must not mutate the host repository');
+
   const start = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['start', '--cwd', '.', '--goal', 'Bootstrap onefile repo', '--json']);
   assert(start.exitCode === 0, 'onefile start must exit 0');
   assert(start.parsed.ok === true, 'onefile start must report ok=true');
@@ -348,5 +360,5 @@ function delay(ms: number) {
 }
 
 if (!process.exitCode) {
-  console.log('[onefile-release:' + mode + '] ok (single-file bootstrap, doctor, self-host-alpha, and extraction-lock wait verified)');
+  console.log('[onefile-release:' + mode + '] ok (single-file create dry-run, bootstrap, doctor, self-host-alpha, and extraction-lock wait verified)');
 }

@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0011",
+  "updatedAt": "2026-09-09T23:36:41.825Z",
+  "updatedBy": "codex-product-proof",
+  "freshValidationPasses": [
+    "validate:adopter-artifact-manifest",
+    "validate:npm-clean-install",
+    "validate:onefile-release"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-adopter-artifact-manifest.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c6e8bc10e1b0d0d546a4b035e297c8f657847215b19c5635a635993c059471ae",
+      "stderrSha256": "sha256:c6fa6cd5647936ae06b7cb7cb5b4fdc2478a592df0d04fca0f5b585c96fb478b",
+      "validators": [
+        "validate:adopter-artifact-manifest"
+      ],
+      "generatedAt": "2026-09-09T23:34:51.783Z",
+      "startedAt": "2026-09-09T23:34:44.499Z",
+      "finishedAt": "2026-09-09T23:34:51.783Z",
+      "durationMs": 7284,
+      "runnerKind": "dev-source",
+      "sourceCommit": "eb307111959f73b6ee971e2aff3499d9335ba3a2",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed127c39b81cb29336c6b6c0a1155d491b4e1bc37b650b991e41444ea41fd8fd",
+      "stderrSha256": "sha256:565a5c2b83f18f33190174470196bd3283e02ec6796078ddca68d44b6cf31fe9",
+      "validators": [
+        "validate:npm-clean-install"
+      ],
+      "generatedAt": "2026-09-09T23:35:18.735Z",
+      "startedAt": "2026-09-09T23:35:00.835Z",
+      "finishedAt": "2026-09-09T23:35:18.735Z",
+      "durationMs": 17900,
+      "runnerKind": "dev-source",
+      "sourceCommit": "eb307111959f73b6ee971e2aff3499d9335ba3a2",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-onefile-release.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ec37bad4b6016824a09b8d825ad7937b293a0e1d7ef299ab68144fd4f8f7740a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-09-09T23:36:41.824Z",
+      "startedAt": "2026-09-09T23:35:28.944Z",
+      "finishedAt": "2026-09-09T23:36:41.824Z",
+      "durationMs": 72880,
+      "runnerKind": "dev-source",
+      "sourceCommit": "eb307111959f73b6ee971e2aff3499d9335ba3a2",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -1,0 +1,343 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0011",
+  "title": "Restore atom templates in compact npm runtime",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0004"
+  ],
+  "acceptance": [
+    "ACC-1: An isolated `npm pack` installation runs `atm create --bucket CORE --title SmokeAtom --description \"Installed runtime smoke\" --logical-name atom.smoke.installed --dry-run --json` successfully.",
+    "ACC-2: Both atom scaffold templates resolve from the installed runtime and the dry-run performs no repository mutation.",
+    "ACC-3: The two assets are individually hashed in the runtime manifest; the tarball remains below 3,365,772 unpacked bytes and 308 entries and contains no source, test, cache or evidence tree.",
+    "ACC-4: The frozen onefile runner executes the same create dry-run successfully so source, onefile and npm-installed behavior cannot drift silently."
+  ],
+  "deliverables": [
+    "scripts/build-package-dist.ts",
+    "scripts/validate-npm-clean-install.ts"
+  ],
+  "scopePaths": [
+    "scripts/build-package-dist.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/validate-npm-clean-install.ts",
+    "scripts/validate-adopter-artifact-manifest.ts",
+    "templates/atom.spec.template.json",
+    "templates/atom.test.template.ts",
+    ".atm/history/evidence/TASK-PRF-0011.*",
+    ".atm/history/task-events/TASK-PRF-0011/**",
+    ".atm/history/tasks/TASK-PRF-0011.json",
+    "scripts/validate-onefile-release.ts",
+    "schemas/atomic-spec.schema.json"
+  ],
+  "validators": [
+    "npm run build",
+    "node --strip-types scripts/validate-adopter-artifact-manifest.ts",
+    "node --strip-types scripts/validate-npm-clean-install.ts",
+    "node --strip-types scripts/validate-onefile-release.ts"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the runtime-asset copy and smoke assertion together; do not retain a package that advertises atm create while omitting its templates.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-npm-runtime-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0011-restore-atom-templates-in-compact-npm-runtime.task.md",
+    "sectionTitle": "TASK-PRF-0011",
+    "headingLine": 86,
+    "hash": "0041a9f22a978b46",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0011-restore-atom-templates-in-compact-npm-runtime.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4ddcfffee1c78d27870d34ba8fff1c97badf9583f42f0940601c184b1f5d3707",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-09T23:37:07.393Z"
+    }
+  },
+  "importedAt": "2026-09-09T23:20:37.396Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0004"
+    ],
+    "startConditions": [
+      "The compact npm runtime remains within the original Phase-2 byte and entry caps.",
+      "The frozen-runner ENOENT reproduction is retained as the red baseline."
+    ],
+    "softRelations": [
+      "TASK-PRF-0010"
+    ],
+    "changedPublicSeams": [
+      "npm-runtime-asset-closure",
+      "atm-create"
+    ],
+    "causalImpactEdges": [
+      "installed-cli-can-scaffold-an-atom",
+      "runtime-assets-remain-minimal-and-hash-sealed"
+    ],
+    "parallelFrontierInputs": [
+      "packed-file-inventory",
+      "atom-template-runtime-read"
+    ],
+    "validatorReferences": [
+      "test_prf_installed_atm_create_smoke_61c02eab",
+      "test_prf_compact_runtime_budget_48f7a0cd"
+    ],
+    "phaseOwner": "phase-2-installable-package-correction"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_installed_atm_create_smoke_61c02eab",
+      "targetGroupId": "null",
+      "semanticKey": "installed_atm_create_smoke",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "installed-cli-can-scaffold-an-atom"
+      ],
+      "expectedRedPredicate": "An isolated install of the CLI tarball exits non-zero on atm create --dry-run because a required scaffold template is absent.",
+      "contributionResourceKey": "npm-runtime-template-assets",
+      "responsibility": "task-required",
+      "dependencyEdge": "installed-cli-to-scaffold-template",
+      "contractEdge": "atm-create",
+      "resourceKey": "cli-tarball"
+    },
+    {
+      "caseId": "test_prf_compact_runtime_budget_48f7a0cd",
+      "targetGroupId": "null",
+      "semanticKey": "compact_runtime_budget",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "runtime-assets-remain-minimal-and-hash-sealed"
+      ],
+      "expectedRedPredicate": "The restored assets are absent from the manifest, unhashed, or push the tarball beyond the original Phase-2 caps.",
+      "contributionResourceKey": "npm-runtime-manifest",
+      "responsibility": "task-required",
+      "dependencyEdge": "runtime-assets-to-pack-manifest",
+      "contractEdge": "npm-runtime-asset-closure",
+      "resourceKey": "cli-artifact-budget"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_installed_atm_create_smoke_61c02eab",
+    "test_prf_compact_runtime_budget_48f7a0cd"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0004",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-09T23-37-07-640Z-metadata-only-import-fff3cae9513f",
+  "lastTransitionAt": "2026-09-09T23:37:07.640Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-product-proof",
+  "reservedAt": "2026-09-09T23:20:50.652Z",
+  "promotedAt": "2026-09-09T23:20:50.656Z",
+  "claim": {
+    "actorId": "codex-product-proof",
+    "leaseId": "lease-1fff46f3afb9",
+    "claimedAt": "2026-09-09T23:20:50.660Z",
+    "heartbeatAt": "2026-09-09T23:20:50.660Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0011.*",
+      ".atm/history/task-events/TASK-PRF-0011/**",
+      ".atm/history/tasks/TASK-PRF-0011.json",
+      "schemas/atomic-spec.schema.json",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/validate-adopter-artifact-manifest.ts",
+      "scripts/validate-npm-clean-install.ts",
+      "scripts/validate-onefile-release.ts",
+      "templates/atom.spec.template.json",
+      "templates/atom.test.template.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260909232050-codex-product-proof-6e4eb9dc07",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260909232050-codex-product-proof-6e4eb9dc07\""
+    }
+  },
+  "startedAt": "2026-09-09T23:20:50.660Z",
+  "startedByActor": "codex-product-proof",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-a937398eb50d97f9",
+    "ticketDigest": "sha256:a937398eb50d97f958ba1082dbe1cc79e5011e85bb7d22a5086197d718dfb9a7",
+    "taskId": "TASK-PRF-0011",
+    "origin": "claim",
+    "actorId": "codex-product-proof",
+    "laneSessionId": "lane-20260909232050-codex-product-proof-6e4eb9dc07",
+    "claimGeneration": "lease-1fff46f3afb9",
+    "issuedAt": "2026-09-09T23:28:46.281Z",
+    "expiresAt": "2026-09-09T23:58:46.281Z",
+    "scopeDigest": "sha256:e6988c21e53d9d20ba383d00786cdb7e7d72ff84f980595d1bf80bdd1c5a291c",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-09T23:28:46.281Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0011.*",
+          ".atm/history/task-events/TASK-PRF-0011/**",
+          ".atm/history/tasks/TASK-PRF-0011.json",
+          "schemas/atomic-spec.schema.json",
+          "scripts/build-cli-npm-runtime.ts",
+          "scripts/build-package-dist.ts",
+          "scripts/validate-adopter-artifact-manifest.ts",
+          "scripts/validate-npm-clean-install.ts",
+          "scripts/validate-onefile-release.ts",
+          "templates/atom.spec.template.json",
+          "templates/atom.test.template.ts"
+        ],
+        "digest": "sha256:bf6248ba3989665732532d423f96cbbd8bdcf398a83689afb1516245fbf5e1ff"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260909232050-codex-product-proof-TASK-PRF-0011-4059f1687e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0011",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0011.*",
+      ".atm/history/task-events/TASK-PRF-0011/**",
+      ".atm/history/tasks/TASK-PRF-0011.json",
+      "schemas/atomic-spec.schema.json",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/validate-adopter-artifact-manifest.ts",
+      "scripts/validate-npm-clean-install.ts",
+      "scripts/validate-onefile-release.ts",
+      "templates/atom.spec.template.json",
+      "templates/atom.test.template.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0011-restore-atom-templates-in-compact-npm-runtime.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0011-restore-atom-templates-in-compact-npm-runtime.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "2937aa18eabdab6a1a1e0af4de2ee5bf96bc83ec901c114d615303cdaf7c1781",
+    "actorId": "codex-product-proof",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260909232050-codex-product-proof-6e4eb9dc07",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260909232050-codex-product-proof-6e4eb9dc07\""
+    },
+    "createdAt": "2026-09-09T23:20:56.475Z",
+    "status": "active"
+  }
+}
