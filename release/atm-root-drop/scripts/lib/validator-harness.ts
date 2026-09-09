@@ -23,6 +23,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
 export type ValidatorMode = 'test' | 'validate' | 'lint' | 'typecheck' | string;
+export type PortableCliExecution = 'frozen-first' | 'source-in-process';
 
 export interface ValidatorHarness {
   readonly name: string;
@@ -63,7 +64,11 @@ export function parseValidatorMode(argv: string[] = process.argv.slice(2), fallb
   return value && !value.startsWith('--') ? value : fallback;
 }
 
-export function createValidator(name: string, options: { argv?: string[]; defaultMode?: ValidatorMode } = {}): ValidatorHarness {
+export function createValidator(name: string, options: {
+  argv?: string[];
+  defaultMode?: ValidatorMode;
+  portableCliExecution?: PortableCliExecution;
+} = {}): ValidatorHarness {
   const root = resolveRoot();
   const mode = parseValidatorMode(options.argv ?? process.argv.slice(2), options.defaultMode ?? 'validate');
 
@@ -117,6 +122,9 @@ export function createValidator(name: string, options: { argv?: string[]; defaul
   }
 
   async function runAtmJsonPortable(args: string[], cwd = root): Promise<AtmJsonExecutionResult> {
+    if (options.portableCliExecution === 'source-in-process') {
+      return await runAtmJsonInProcess(args, cwd);
+    }
     const primary = runAtmJsonAttempt(args, cwd, 'atm.mjs');
     if (!shouldFallbackToPortableSourceCli(primary.exitCode, primary.payload)) {
       return finalizeAtmJsonResult(primary, args);
