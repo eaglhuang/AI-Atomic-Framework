@@ -15,7 +15,7 @@ import {
 import { inspectRuntimeAdapterReadiness } from '../packages/cli/src/commands/runtime-adapter-readiness.ts';
 import { runHostLocalShadowEvidenceAssertions } from './lib/validate-guidance/host-local-shadow.ts';
 
-const validator = createValidator('guidance');
+const validator = createValidator('guidance', { portableCliExecution: 'source-in-process' });
 const { assert, requireFile, runAtmJsonPortable, ok, root } = validator;
 
 for (const relativePath of [

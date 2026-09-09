@@ -5,7 +5,7 @@ import { createTempWorkspace } from './temp-root.ts';
 import { buildFirstLayerCommandContract, classifyFirstLayerIntent, classifyGuidanceIntent } from '../packages/core/src/guidance/index.ts';
 
 
-const validator = createValidator('guide');
+const validator = createValidator('guide', { portableCliExecution: 'source-in-process' });
 const { assert, requireFile, runAtmJsonPortable, ok, readText, root } = validator;
 
 for (const relativePath of [
