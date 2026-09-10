@@ -23,6 +23,7 @@ import { issueRepairClosureAdmissionTicket } from '../git-governance/work-admiss
 import { parseReconcileOptions } from './task-option-parsers.ts';
 import { readGitScalar } from './task-git-helpers.ts';
 import { evidencePathForTask } from '../evidence/evidence-store.ts';
+import { closureEvidenceContextForTask } from '../evidence/closure-evidence-context.ts';
 import { parseClaimRecord } from './task-ledger-readers.ts';
 import { readJsonRecord, taskPathFor } from './task-file-io-helpers.ts';
 import { buildHistoricalDeliveryProvenance, pathMatchesTaskScope } from './historical-delivery.ts';
@@ -243,7 +244,8 @@ export async function runTasksReconcile(argv: string[]): Promise<CommandResult> 
   let createdClosurePacketAbsolute: string | null = null;
   const reconcileReason = `Historical reconcile sync against commit ${commitSha}`;
   if (frameworkStatus?.repoRole === 'framework') {
-    pendingReconcilePacket = createClosurePacket({
+    pendingReconcilePacket = {
+      ...createClosurePacket({
       cwd: options.cwd,
       taskId: options.taskId,
       actorId,
@@ -265,7 +267,9 @@ export async function runTasksReconcile(argv: string[]): Promise<CommandResult> 
         deliverableGate.historicalDeliveries[0] ?? null,
         options.waiverReason
       )
-    });
+      }),
+      ...closureEvidenceContextForTask(options.cwd, options.taskId)
+    };
     const validation = validateClosurePacket(pendingReconcilePacket);
     if (!validation.ok) {
       const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);

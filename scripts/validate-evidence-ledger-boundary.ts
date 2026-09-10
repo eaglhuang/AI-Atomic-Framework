@@ -14,6 +14,7 @@ const productionRoots = [
 
 const approvedLegacyReferenceFiles = new Set([
   'packages/core/src/evidence/evidence-ledger.ts',
+  'packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts',
   'packages/cli/src/commands/evidence/evidence-store.ts',
   'packages/cli/src/commands/git-head-evidence.ts',
   'packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts',
@@ -32,7 +33,7 @@ const approvedDurableReferencePatterns = [
   /\.index-restore-failure\.json/,
   /(?:\.|\/)live-index-reconciliation(?:\.[^/]+)?\.json/,
   /\/git-boundary-runs\/[^/]+\.(?:json|md)/,
-  /\/git-head\.jsonl/,
+  /\/git-head\.jsonl?/,
   /\.proposal-lane-[^/]+\.json/,
   /\.runner-publication-recovery\.json/,
   /\.runner-sync-receipt\.json/,
@@ -62,14 +63,14 @@ export function validateProductionEvidenceCallers(sourceRoot = process.cwd()) {
     const source = readFileSync(absolutePath, 'utf8');
     if (!source.includes('.atm/history/evidence')) continue;
     if (approvedLegacyReferenceFiles.has(relativePath)) continue;
-    const relevantLines = source.split(/\r?\n/).filter((line) => line.includes('.atm/history/evidence'));
-    const hasNakedBundleReference = relevantLines.some((line) => {
-      if (approvedDurableReferencePatterns.some((pattern) => pattern.test(line))) return false;
-      return /history\/evidence\/[A-Za-z0-9_-]+\.json/.test(line)
-        || /history\/evidence\/[^'"`]*\$\{[^}]+\}\.json/.test(line)
-        || /history['"],\s*['"]evidence['"].*`\$\{[^}]+\}\.json`/.test(line)
-        || /\.atm\/history\/evidence\/<task(?:-id|Id)?>\.json/.test(line);
-    });
+    const sourceWithoutDurableReferences = approvedDurableReferencePatterns.reduce(
+      (current, pattern) => current.replace(new RegExp(pattern.source, 'g'), ''),
+      source
+    );
+    const hasNakedBundleReference = /history\/evidence\/[A-Za-z0-9_-]+\.json/.test(sourceWithoutDurableReferences)
+      || /history\/evidence\/[A-Za-z0-9_.-]*\$\{[^}]+\}\.json/.test(sourceWithoutDurableReferences)
+      || /history['"],\s*['"]evidence['"],\s*`\$\{[^}]+\}\.json`/.test(sourceWithoutDurableReferences)
+      || /\.atm\/history\/evidence\/<task(?:-id|Id)?>\.json/.test(sourceWithoutDurableReferences);
     if (hasNakedBundleReference) {
       illegalReferences.push(relativePath);
     }

@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0010",
-  "updatedAt": "2026-09-10T14:05:40.150Z",
+  "updatedAt": "2026-09-10T14:17:14.672Z",
   "updatedBy": "codex-product-proof",
   "freshValidationPasses": [
     "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
@@ -105,6 +105,54 @@
       "runnerKind": "dev-source",
       "sourceCommit": "064480d92ce22cf27cee24af06e38e29c923dc26",
       "cached": true
+    },
+    {
+      "command": "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0f09efc248cd2df6a713e748c402d0d07fb72a7f93c26a7ab4ce56dedd7f06a0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/evidence-ledger-migration.test.ts"
+      ],
+      "generatedAt": "2026-09-10T14:17:02.732Z",
+      "startedAt": "2026-09-10T14:17:02.320Z",
+      "finishedAt": "2026-09-10T14:17:02.732Z",
+      "durationMs": 412,
+      "runnerKind": "dev-source",
+      "sourceCommit": "75b884957c41a914d98ebcb4818e8999d9fac69e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b76f4a00e58e78ec00f9d6ce5bb8d537ecf07130f779d2c8a1a252db31d63837",
+      "stderrSha256": "sha256:226bb7ae7dde4751608648ffd12b0814d3e1c010833dd8c9a9ed78e861bcb887",
+      "validators": [
+        "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts"
+      ],
+      "generatedAt": "2026-09-10T14:17:07.491Z",
+      "startedAt": "2026-09-10T14:17:06.984Z",
+      "finishedAt": "2026-09-10T14:17:07.491Z",
+      "durationMs": 507,
+      "runnerKind": "dev-source",
+      "sourceCommit": "75b884957c41a914d98ebcb4818e8999d9fac69e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-evidence-ledger-boundary.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:051af8b845fa8c171064ba56e2538d39b6b4ad6e0c3437b9f1fc87e8276f5272",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:evidence-ledger-boundary"
+      ],
+      "generatedAt": "2026-09-10T14:17:14.671Z",
+      "startedAt": "2026-09-10T14:17:11.788Z",
+      "finishedAt": "2026-09-10T14:17:14.671Z",
+      "durationMs": 2883,
+      "runnerKind": "dev-source",
+      "sourceCommit": "75b884957c41a914d98ebcb4818e8999d9fac69e",
+      "cached": false
     }
   ],
   "artifactPaths": []
