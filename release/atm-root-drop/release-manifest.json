@@ -142,6 +142,7 @@
     "release/atm-root-drop/docs/DIST_TAGS.md",
     "release/atm-root-drop/docs/ECOSYSTEM_POSITIONING.md",
     "release/atm-root-drop/docs/ERROR_CODES.md",
+    "release/atm-root-drop/docs/EVIDENCE_LEDGER.md",
     "release/atm-root-drop/docs/EXPERIENCE_LOOP.md",
     "release/atm-root-drop/docs/EXPERIMENTAL_API.md",
     "release/atm-root-drop/docs/HOST_GOVERNANCE_INTEGRATION.md",
@@ -5669,6 +5670,7 @@
     "release/atm-root-drop/tests/cli/runner-sync-terminal-task-parity.test.ts",
     "release/atm-root-drop/tests/cli/runner-version-lease.test.ts",
     "release/atm-root-drop/tests/cli/runner-version-selection.test.ts",
+    "release/atm-root-drop/tests/cli/runtime-evidence-git-boundary.test.ts",
     "release/atm-root-drop/tests/cli/runtime-telemetry-boundary.test.ts",
     "release/atm-root-drop/tests/cli/scope-amendment-rearbitration.test.ts",
     "release/atm-root-drop/tests/cli/scope-amendment-work-admission-ticket.test.ts",
@@ -6135,8 +6137,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1491,
-    "unchanged": 4609,
+    "copied": 1543,
+    "unchanged": 4559,
     "removed": 0
   },
   "buildMode": "full",
@@ -7137,6 +7139,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/ERROR_CODES.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/EVIDENCE_LEDGER.md",
+        "digest": "f2839238c92597ad9facdaf339a7dbe134ded501bcfbded55a147b81e4c71646",
+        "origin": "source",
+        "inputPaths": [
+          "docs/EVIDENCE_LEDGER.md"
         ],
         "replaceable": true
       },
@@ -18014,7 +18025,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/broker/work-admission-ticket.js",
-        "digest": "eda9b326570ea1740ede179ad49f6e3d70143b81292c48b7eb18e8eb4cd34b8e",
+        "digest": "ca4ae31207df3b983d1af85ab18411d6514742aefe48c6865f7ffb3a3aedb9ad",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/work-admission-ticket.js"
@@ -18284,7 +18295,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/evidence/evidence-ledger.js",
-        "digest": "6cca7355bcdf48d72d49f613916579d5303a6ebf9bc7b2f18c2ccbbabf3461b5",
+        "digest": "dd9a1ff8d7bf061c41ccf5aa0d52211bfbb7aa4ee34a9b612b5ca14cb7415d4f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/evidence/evidence-ledger.js"
@@ -20903,7 +20914,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/implementation.js",
-        "digest": "840b058ca5add59c5e050c49446c218876a03193ab51ecb58fd4f6c65d5a980c",
+        "digest": "54c509f090a33308ac951410e12a731c12c15e9857047d38af59d1540c0ac56f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/implementation.js"
@@ -20966,7 +20977,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/layout.js",
-        "digest": "d4a9f8eaa7af223278943c1787168f627abb445e5ad1f17bbcfba00915754d11",
+        "digest": "75899612c33b51557b88ace1b67f8fe43a13546ea10f27717e1e27cc4d34ac39",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-governance-local/dist/layout.js"
@@ -20975,7 +20986,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/stores.js",
-        "digest": "3cb7a4acd318e46392aa14a9db698eaf3bd26d0d93e0bb56db2ef5938dca9623",
+        "digest": "2ecd363dff92373884585ce76cff1352a3ea13f671a7ccf62dfc4379db2da240",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-governance-local/dist/stores.js"
@@ -21245,7 +21256,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-sdk/dist/governance/layout.js",
-        "digest": "177d40e82f34bc2be983a600ff5e54e6ee02ec3014a7e6e225d819abe6a9389f",
+        "digest": "b353b9e9d3fadf58dcc2a5216a9151b0e6870af54c356810488c26aac599182a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-sdk/dist/governance/layout.js"
@@ -21371,7 +21382,7 @@
       },
       {
         "path": "packages/cli/dist/commands/agent-confidence.js",
-        "digest": "65efb48ab5b8993ccd4c2e16fb5ac771d5f408490ce2a9f0c393950bc8a7c001",
+        "digest": "3fc18c36fa9d6064d3a6c4760244670aeb287d5f96bc85a8caf38c414c875faf",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/agent-confidence.js"
@@ -21506,7 +21517,7 @@
       },
       {
         "path": "packages/cli/dist/commands/batch/implementation.js",
-        "digest": "a4744f296e14c1e282a329bd35e2d95bb9b306ae66c2e26febef9334dedfccbc",
+        "digest": "69b85ebf2c0740ae4176f0b24786a4f48323210b4cd29f9be4cdd08fc7d70963",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/batch/implementation.js"
@@ -21731,7 +21742,7 @@
       },
       {
         "path": "packages/cli/dist/commands/broker/replay/closure-policy.js",
-        "digest": "5bc0dd74b9f43332640f9daf392f75aed16b8e9e668af701b1e27e170b8360cd",
+        "digest": "f721129fbf31b2017f8980ceb3d3bae82e9278a7b9739f15d312518140a8ed15",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/broker/replay/closure-policy.js"
@@ -22766,7 +22777,7 @@
       },
       {
         "path": "packages/cli/dist/commands/evidence/evidence-store.js",
-        "digest": "de1237cad0cfc97b109b4d9511a176ca01bcb5567d65e1dce1407f394a59ad1c",
+        "digest": "5374cdea7f5ee99bbf7af1c00d3d1017ed50de134b7cfa4a7c56047ac57a431c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/evidence/evidence-store.js"
@@ -23387,7 +23398,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js",
-        "digest": "775b578005528bbb8f04b8be89a4dc2d2092a801c13bb3cfe89b01c426e67a18",
+        "digest": "0d841c9f1f19108fe3eaba6944649112f279eba17ab386bba5b6ae167f3a4708",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/git-index-transaction.js"
@@ -23423,7 +23434,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/identity-check-command.js",
-        "digest": "2e113ad7aa7f187b014db23259730b50a1aef7b5f5fb583d4c43245e0134b504",
+        "digest": "a636b7bef702d29e4adf716d90fa99188152adbd076ac12142daf4df8e7eb0ff",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/identity-check-command.js"
@@ -23576,7 +23587,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js",
-        "digest": "24fbb3b83e469a3df5a40196691d39c2fb6369a00ed789cbfbe0720cb3740634",
+        "digest": "60ee2db1bfca33faef63836685bd3f226d061038e1477b7a8edfb07ea4028c06",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/terminal-history-cleanup.js"
@@ -23630,7 +23641,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/work-admission-check.js",
-        "digest": "9840f1e682148acc8ce2629fc723015b327016f63144e2f0ac32a92a4eb61fa4",
+        "digest": "cdf8b8812643fa0546d7d5b687f18bf242b32f87faf03da5ae797df0dfc8ef4e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/work-admission-check.js"
@@ -23693,7 +23704,7 @@
       },
       {
         "path": "packages/cli/dist/commands/governance-runtime.js",
-        "digest": "a278b82bdd0d9575a45bcda0042f3e12ad17e2994c1eb96a0fbe3b69d578abf8",
+        "digest": "ddd7fd613b423b0ab2520a7b89e2eb84ccd3b13a4be4ef6fb29deb1cce9862a4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/governance-runtime.js"
@@ -23909,7 +23920,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/implementation.js",
-        "digest": "9349f7537cdd8f566172ca6315d681805fa059fdfedf6a577498a775f0a06417",
+        "digest": "c827e33843fb6a4fdae2fe591a77ba51f952720dacf91da1f1b756fa0b6af46b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/implementation.js"
@@ -23945,7 +23956,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/scope-ownership.js",
-        "digest": "b752e078310e0c5c5bcc7a4bcb63183eb4814410104597483cb3b49b87c76e9d",
+        "digest": "e7ca6ef0e4992961ba047a797ae6c919c015e96a9864ec2497c0d3851af2b29c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/scope-ownership.js"
@@ -23990,7 +24001,7 @@
       },
       {
         "path": "packages/cli/dist/commands/init.js",
-        "digest": "4593927e194d6d67aa1d445eaaa906992caccd0e71ff5383da5c7831aea13da6",
+        "digest": "5fef043440b33500312aa9d598e373ac41d7b201cc902832f1d8701168dd7d47",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/init.js"
@@ -24539,7 +24550,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/playbook-projection/channel-playbook.js",
-        "digest": "d0df4cfcd8520fbcfd5a29e5a6810df07a5bfbf324f735ccbbbae5dbdacd07c1",
+        "digest": "61096ebb482620c0433c6fe2582c08afd5e435eeea63d04c478c1629f6338b20",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/playbook-projection/channel-playbook.js"
@@ -25034,7 +25045,7 @@
       },
       {
         "path": "packages/cli/dist/commands/self-host-alpha.js",
-        "digest": "01b7f180f8b6aeeedc7a4e7ea240cfb97ba8ce37c5240cb4f31038ac38cf9b17",
+        "digest": "6f65094fb369dd8a47c577ae684d8ba7fecdc374bf40b291a4696fd7241962fd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/self-host-alpha.js"
@@ -25232,7 +25243,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/close-orchestration.js",
-        "digest": "147b6826542072742e1063af733c70a32b3174c64020b497f77637353b4fad34",
+        "digest": "2878e7e956f1f144fa38be36b2bf685d712c1e631365d44e2461726ca3ebb009",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/close-orchestration.js"
@@ -25304,7 +25315,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
-        "digest": "9451a6404f080e124f10fef5481ce7a3d95cc56a4048ff37c291fcd656f58f94",
+        "digest": "a1f017ef1bacd762f7a112108513e31bf23710a2ff7c23281498d04153e58f02",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js"
@@ -25358,7 +25369,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/historical-close-preflight.js",
-        "digest": "dc9e083eef221498bf2b64ae43897fc2bab4556d1ec57c90f4a66123a39bcbae",
+        "digest": "7e3a7885ff7a0aede40ada878a87e305c8a57b4595e7d50623c7e1a1216c74d4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/historical-close-preflight.js"
@@ -25502,7 +25513,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/claim-orchestrator.js",
-        "digest": "ffcb0006e7dea1176abc0ee0f2a7a594fc852dbca4d08a3ad7aac28e340c6a54",
+        "digest": "f7a958b6eb48f892531b8f47eade7333d039d972456907b979b5a098bfcf123b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/claim-orchestrator.js"
@@ -25592,7 +25603,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-orchestrator.js",
-        "digest": "3997783024e23c9bb921b2398608dece5997c0bc4e1dc3e231e62e792f7d0ca1",
+        "digest": "6277a862ae3eb95e5748a9dfd2042000b275e532084659e8682c2bbb01cbd535",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-orchestrator.js"
@@ -25619,7 +25630,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-orchestrator/close-write.js",
-        "digest": "4507015004b7093294ec359c568241eb90c133ea84d438b4f7976d5296574f04",
+        "digest": "eb97fc3efbc184d930b7e940cdc65befa4899d9d6b0073ff61b4b6fcb3af7fc8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-orchestrator/close-write.js"
@@ -25628,7 +25639,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js",
-        "digest": "1aa0cd1eb24efda6e2919ecb5b1956d5c65420516d0c2ec02c1d906c81079870",
+        "digest": "f787de4eac0da30cde423a501493065e8b695ce35b7929a226af2cc288de14d8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js"
@@ -25718,7 +25729,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/deliver-close-orchestrator.js",
-        "digest": "e40ae2cae5b6c9a778011b3da4017481822f07cb2c8d5af5b9b7481d6c5f5396",
+        "digest": "dbf87a2e62923e608f35cd3f9001c7488203275daff89e028251b7f9ae926d0d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/deliver-close-orchestrator.js"
@@ -25988,7 +25999,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/reconcile-orchestrator.js",
-        "digest": "5e50e78bc21d8c4ae82cec3b5b71d5f4abf2ad30b11d95101b923ac413c94cf4",
+        "digest": "0d2c1971d9d5e130213a5d14e1da72fcc7e4ab9f7dab15452cb151f73941948e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/reconcile-orchestrator.js"
@@ -26924,7 +26935,7 @@
       },
       {
         "path": "packages/cli/dist/commands/upgrade/proposal/context-budget.js",
-        "digest": "b211c7f9e42ecf2b1c57e00d95a54ff4822d5a91da2ea9c90a6991bbcaeba5e1",
+        "digest": "5a9d41336fbf04d3bcf20006122511bc1dc192e3fe96bcf552e628b1a65657f8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/upgrade/proposal/context-budget.js"
@@ -27743,7 +27754,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "927de5985dbc7fc00e821b5218e86c4b2b50112f6ce50aaf0ab079c0a0d0c835",
+        "digest": "379e7170be2149df76ef329b883a1aa619c59a4eccfc8e6184eb7ca9d781939b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -27752,7 +27763,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "39372b429caa5a8c782660e61ea943f0d3c03ce5cb17f0cb9166192bfb0bcd3f",
+        "digest": "a523b97386be2d66d33f4f3d8d9827f7de6ab925e01574addaa0d4e4f332aa2d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -28175,7 +28186,7 @@
       },
       {
         "path": "packages/cli/src/commands/agent-confidence.ts",
-        "digest": "68cda23049829fef4d52b2d3308f40bc57c33939224ed37126e082aea79c26fa",
+        "digest": "5b602e3527f17a055997d6caf88bcaa37ebea86a898a8d5c9ae01456cfe72d17",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/agent-confidence.ts"
@@ -28319,7 +28330,7 @@
       },
       {
         "path": "packages/cli/src/commands/batch/implementation.ts",
-        "digest": "753491e6e71e184d0592d6f72d23913b4382bcccfd9b482d6c7d8e0a790d7037",
+        "digest": "a72ad9b6e262f85d55e2f053f4b2188473b7ef51dc902df5ec924867894ce56b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/batch/implementation.ts"
@@ -28544,7 +28555,7 @@
       },
       {
         "path": "packages/cli/src/commands/broker/replay/closure-policy.ts",
-        "digest": "79531c62562b73948a27baeea46525f3843cfadadcbffa0122bca630874d39ef",
+        "digest": "9b855c46623f5225d24fe9ac1d79cbd01d2d46e361d45c888827076cd30beb55",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/broker/replay/closure-policy.ts"
@@ -29678,7 +29689,7 @@
       },
       {
         "path": "packages/cli/src/commands/evidence/evidence-store.ts",
-        "digest": "d4234ebbcc36e7683e6d67f5668812f2aa2d93550a21fb3fe1d1eed6fa48ff64",
+        "digest": "e8fa58ad6944178ecdc553a5f6fba0aa4086da5b61dafe0ba0dccf86b87c5c26",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/evidence/evidence-store.ts"
@@ -30488,7 +30499,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
-        "digest": "fa87c45192150385ef25b2acad17bac4cbbba823e6e75633b3cdd70c169a239d",
+        "digest": "dab9d52c84dda8e01e7e96908ab0992c299bd7296fe2aead2784c8c8c5bea01e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts"
@@ -30533,7 +30544,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts",
-        "digest": "7cb88b378b002521a48d405c0bcb76676bf496a099263ade7ed56319f261d607",
+        "digest": "ed70e99284fbc42e6ac135aab6b7cff94550b3b56df07f8a2e3933481d909bad",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts"
@@ -30740,7 +30751,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
-        "digest": "3679607cd95ec3d3c7b1fc918f64cb956f8feadc0428bcab8628ece9852ec936",
+        "digest": "d41d390bc6038f5427956d063778d5967eeed109612f7fdc762c4f03dd497b2c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts"
@@ -30803,7 +30814,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/work-admission-check.ts",
-        "digest": "5a5a98107a52bc2400597b4615dc939e28edf226e2b3b48f9fb22d0103371293",
+        "digest": "77ff20c849298f108c9361ab67297f64b9564b1d77c91e18a1c0740a5c0db3b8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/work-admission-check.ts"
@@ -30866,7 +30877,7 @@
       },
       {
         "path": "packages/cli/src/commands/governance-runtime.ts",
-        "digest": "7369714cd27eec9df52edcfd18742a2d2331fdf12e30ebdeca847d58429cfd55",
+        "digest": "9e4f33c9ca001653357601497c9fad66c58c0fa9044319aaa5a3280a4a95df82",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/governance-runtime.ts"
@@ -31145,7 +31156,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/implementation.ts",
-        "digest": "cf1b41cb90bab74f90b482c9e6ecb18fac6fad86ee0bcde939ef6adee5787d33",
+        "digest": "a59c77c235691ce4d65b2203af98a53653de4442bc3929a3f43882d97b7f2d5b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/implementation.ts"
@@ -31181,7 +31192,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
-        "digest": "0fcb3e0e098ab99a9001b15fee931b3238d2135b37853ba0c2393f1f41e7a916",
+        "digest": "f47eaf1d702d1e216d07c2293107b4ba6faa1f7b0ab2f61eb722667d1b4862b4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts"
@@ -31235,7 +31246,7 @@
       },
       {
         "path": "packages/cli/src/commands/init.ts",
-        "digest": "4919ac7d3c532136b20c8b839c504c4c5768795a1e4478b0269853fc344e0233",
+        "digest": "a160b2073ce5fd8016cabd34d849e0f3e7e097c1136a0741a85d063fd9be336f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/init.ts"
@@ -31973,7 +31984,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
-        "digest": "d312436224c47236e7420acb281f0b86c17171376ce0aa7a4d2aabd33f13bf66",
+        "digest": "6ebf9b469958f01812f47efa2eacc1c579d1012ff46563db3df545295ed7c19c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts"
@@ -32468,7 +32479,7 @@
       },
       {
         "path": "packages/cli/src/commands/self-host-alpha.ts",
-        "digest": "a453d1f1948300997c22d6ac0921116864a25644da3f83fcced778a4f50306b3",
+        "digest": "d8f4e48f75a39801b624444dafa947a5f2deb2690c38305a6147db495aee5913",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/self-host-alpha.ts"
@@ -32954,7 +32965,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/close-orchestration.ts",
-        "digest": "04be3d9ba63ae7f16209cde420c6f75f440b5e43f92adbd5b01c51081abde373",
+        "digest": "1a283459293b4fe3e93a6562a7be5d1bc26a0ad24f06f752960fc4ca5fbd3896",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/close-orchestration.ts"
@@ -33035,7 +33046,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-        "digest": "8f3a417e87f4dd30b777bc32c6fee3e451e0c5db24702c8796687a1f833e2ecc",
+        "digest": "2e29ecbb99f5ea76c16d02bdf67455f72f2a2993a6bf2a8a02bdc64255421e08",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
@@ -33089,7 +33100,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
-        "digest": "83ef45b3d0260d573e37e1b7b226192e813712cb5fd5ca50db6829d6fbdd77a7",
+        "digest": "c5bd2163474c71ee4cb7cf0088226d43b5344674b351aaeeacc7c7d5a8cb74ea",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/historical-close-preflight.ts"
@@ -33593,7 +33604,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/claim-orchestrator.ts",
-        "digest": "0e174a8227bf0934c0608339558f4a1a453a7c9326aa2a7daf0fe14462cbca60",
+        "digest": "767c1e987cf03a887eee40a1215a428a207086002f9946bc1b1d10999e6ccecb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/claim-orchestrator.ts"
@@ -33683,7 +33694,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-orchestrator.ts",
-        "digest": "a9b772273257f2108c7d027b9d401be32e712818b30cd37762b72323b99b6248",
+        "digest": "5259c35ba8cc6f62c00fab52f3d385ca062e691e302c86db663cabc40774f02f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-orchestrator.ts"
@@ -33710,7 +33721,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
-        "digest": "f98c0a1fe67a03785749b226c6d4e386808ee4190d0d89b635516e2c044e842b",
+        "digest": "36dc4a1229c0fe4aa71cea2bee20ab0d592e468eb856313c9008872e7152e148",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts"
@@ -33719,7 +33730,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
-        "digest": "cd799b841425f3c4e43155723a7a7ed2ccfe3407ae889b208046380724e79f90",
+        "digest": "fade3f940d55257424a78e27b9a5a0e244b09f706eecaf036676d9bcef02b3cf",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts"
@@ -33809,7 +33820,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts",
-        "digest": "666015c8f3f1c346b606b384fd09d7e940a5ff1bc6427608ad61c3199eee1fad",
+        "digest": "369293802434697f9c40771e2d1939ce3656c41652a8a5c19f20616bd65b690a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts"
@@ -34079,7 +34090,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/reconcile-orchestrator.ts",
-        "digest": "03e8615a1f1fa7085b4a16fcf387133518c244c034c321353a9c435ddb8594ea",
+        "digest": "b5e44bf6d6fdaa98cd81c381ee44b7e919036d29d106994b6f4307a52e2f34c1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/reconcile-orchestrator.ts"
@@ -35069,7 +35080,7 @@
       },
       {
         "path": "packages/cli/src/commands/upgrade/proposal/context-budget.ts",
-        "digest": "23e4af650016e38aaa7ff4cc4af5ba3f6e1ebb7ba925ad65b15e3c4390a46f5e",
+        "digest": "f04a10cb6d1ba1ccb07033c292ab6d32eba77397a33687c8facf05ec710cdac1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/upgrade/proposal/context-budget.ts"
@@ -36320,7 +36331,7 @@
       },
       {
         "path": "packages/core/dist/broker/work-admission-ticket.js",
-        "digest": "eda9b326570ea1740ede179ad49f6e3d70143b81292c48b7eb18e8eb4cd34b8e",
+        "digest": "ca4ae31207df3b983d1af85ab18411d6514742aefe48c6865f7ffb3a3aedb9ad",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/work-admission-ticket.js"
@@ -36590,7 +36601,7 @@
       },
       {
         "path": "packages/core/dist/evidence/evidence-ledger.js",
-        "digest": "6cca7355bcdf48d72d49f613916579d5303a6ebf9bc7b2f18c2ccbbabf3461b5",
+        "digest": "dd9a1ff8d7bf061c41ccf5aa0d52211bfbb7aa4ee34a9b612b5ca14cb7415d4f",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/evidence/evidence-ledger.js"
@@ -39983,7 +39994,7 @@
       },
       {
         "path": "packages/core/src/broker/work-admission-ticket.ts",
-        "digest": "92f4de180ebe1c3d8b803f7490d919d066d447caacb8778e7a8efd357344526a",
+        "digest": "1526f22d5e7fd0a10cfd752ada812d83572238a3cf5d2e527a149302e3b2d8a3",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/broker/work-admission-ticket.ts"
@@ -40253,7 +40264,7 @@
       },
       {
         "path": "packages/core/src/evidence/evidence-ledger.ts",
-        "digest": "d9ce2ff6ce5c49da0656809167ed8122b17b4fcbb1a68936608cb84fec8607a3",
+        "digest": "9964a09183816fe0f683f4c9cfb0941470bf89cbe97b45f44604c312c5df276b",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/evidence/evidence-ledger.ts"
@@ -43862,7 +43873,7 @@
       },
       {
         "path": "packages/plugin-governance-local/dist/bootstrap/bootstrap/implementation.js",
-        "digest": "840b058ca5add59c5e050c49446c218876a03193ab51ecb58fd4f6c65d5a980c",
+        "digest": "54c509f090a33308ac951410e12a731c12c15e9857047d38af59d1540c0ac56f",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/dist/bootstrap/bootstrap/implementation.js"
@@ -43925,7 +43936,7 @@
       },
       {
         "path": "packages/plugin-governance-local/dist/layout.js",
-        "digest": "d4a9f8eaa7af223278943c1787168f627abb445e5ad1f17bbcfba00915754d11",
+        "digest": "75899612c33b51557b88ace1b67f8fe43a13546ea10f27717e1e27cc4d34ac39",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/dist/layout.js"
@@ -43934,7 +43945,7 @@
       },
       {
         "path": "packages/plugin-governance-local/dist/stores.js",
-        "digest": "3cb7a4acd318e46392aa14a9db698eaf3bd26d0d93e0bb56db2ef5938dca9623",
+        "digest": "2ecd363dff92373884585ce76cff1352a3ea13f671a7ccf62dfc4379db2da240",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/dist/stores.js"
@@ -43988,7 +43999,7 @@
       },
       {
         "path": "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
-        "digest": "daed6361fb05a246ee48908edaa345ccf5a9c4ac4aad38ef6e6fcf81aab56004",
+        "digest": "196affc574c17ca553dcf65b100fe471aa0f5a264e2f728c111d47bbeb59a958",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts"
@@ -44051,7 +44062,7 @@
       },
       {
         "path": "packages/plugin-governance-local/src/layout.ts",
-        "digest": "fcd833c04a497bcb42d89ff2183e2f3072a5dd2f80c67fb60afdfa9c88cee408",
+        "digest": "96f6008022426c135eda09214393073ca4c342b5ef9082a0a8310e6a0b91f7fb",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/src/layout.ts"
@@ -44060,7 +44071,7 @@
       },
       {
         "path": "packages/plugin-governance-local/src/stores.ts",
-        "digest": "1353af192db520b1f7bc4800da9a92a41b77fd21dda541a392b3d30b462d9804",
+        "digest": "d35ad69c7fc9c31d65ed54b1a723a9cccda7dbaf318b4ae70dbc1e7081d7aa82",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/src/stores.ts"
@@ -44501,7 +44512,7 @@
       },
       {
         "path": "packages/plugin-sdk/dist/governance/layout.js",
-        "digest": "177d40e82f34bc2be983a600ff5e54e6ee02ec3014a7e6e225d819abe6a9389f",
+        "digest": "b353b9e9d3fadf58dcc2a5216a9151b0e6870af54c356810488c26aac599182a",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-sdk/dist/governance/layout.js"
@@ -44726,7 +44737,7 @@
       },
       {
         "path": "packages/plugin-sdk/src/governance/layout.ts",
-        "digest": "5b6ee83e34d7a9aaccfeb4f9ab0575beee7904f74eca31bd7ce22f6e9fbac12d",
+        "digest": "d90e582c41735cdc135baa2e4a0d5000646f033fcc337dba7f48e38ddbf5632e",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-sdk/src/governance/layout.ts"
@@ -48137,7 +48148,7 @@
       },
       {
         "path": "scripts/migrate-evidence-ledger.ts",
-        "digest": "84dce10089ed7254e40cfbae3a5d470c429e287263c882a568ccf362cbfc3d92",
+        "digest": "f19a2b128959d2e558ba29ca576793cef99b4be70fcb456e41ccb272965cdee2",
         "origin": "source",
         "inputPaths": [
           "scripts/migrate-evidence-ledger.ts"
@@ -48731,7 +48742,7 @@
       },
       {
         "path": "scripts/validate-bootstrap.ts",
-        "digest": "7da79441de95a004c479ddad6fe36d65ebd125a260ffc52c801d40fe45191db3",
+        "digest": "ab28049b1aa609b5b2079e844855116803b1708ab2c94dfcf03495b4072b0d1b",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-bootstrap.ts"
@@ -49064,7 +49075,7 @@
       },
       {
         "path": "scripts/validate-evidence-ledger-boundary.ts",
-        "digest": "4648c6f957ea68ba741489b4c147c32738e58ee174e322dacaf4465ff72a2d42",
+        "digest": "57b6d505506054910b9542f360dd39849aab6cd14d5d6d1e3a436e5277405b34",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-evidence-ledger-boundary.ts"
@@ -50441,7 +50452,7 @@
       },
       {
         "path": "scripts/validate-self-hosting-alpha.ts",
-        "digest": "0951f6dbbcb81624fbe9b7fcef745968b64f0dc8e36655d105807fe83fbe34e7",
+        "digest": "427c847c9de990819cacfb722e8fa9cf8bd1c09626b52b280bc7f0c2514f8254",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-self-hosting-alpha.ts"
@@ -54050,7 +54061,7 @@
       },
       {
         "path": "tests/cli/evidence-ledger-migration.test.ts",
-        "digest": "2b8c1e03bb89cd64cc005a607512f0203b3fac7d010e0c172bfc5bd3f7b65699",
+        "digest": "fda970835102af837e9eb4393f7a93eb61d3ab92af358d8dddbe5984396817f8",
         "origin": "source",
         "inputPaths": [
           "tests/cli/evidence-ledger-migration.test.ts"
@@ -56875,6 +56886,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/runtime-evidence-git-boundary.test.ts",
+        "digest": "fa4f8f9d5e450bd48b337ab560b17cdfe5c5e1990b393caef03d6812458fc034",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/runtime-evidence-git-boundary.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/runtime-telemetry-boundary.test.ts",
         "digest": "3800d27430dd0e969881294cf9f46f1d06a952d1e659c499171d650e450a05a8",
         "origin": "source",
@@ -59108,7 +59128,7 @@
       },
       {
         "path": "tests/governance-local.fixture.json",
-        "digest": "78bf9d75bcac7eba762cb4ae91805bdd6971824e75b164316ad10178cd556148",
+        "digest": "b50fbe54c047e267200a74097e08d6f334677d46b2232ce3f343274c49fc4521",
         "origin": "source",
         "inputPaths": [
           "tests/governance-local.fixture.json"
@@ -59720,7 +59740,7 @@
       },
       {
         "path": "tests/sandbox/sandbox-fixture.ts",
-        "digest": "c6e4c93dbffd26f33674d7c0f7b75d2f37d8bf50f8caae5edc9c26d8221e9735",
+        "digest": "d631c7763477a782343b54efee7a9f691971298a9ad041fe0febc882097ae111",
         "origin": "source",
         "inputPaths": [
           "tests/sandbox/sandbox-fixture.ts"
@@ -61042,7 +61062,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:36bea0d204f9a41c81d5f62abf3c72f00742dc4dd8fd55a02464748ef2d28ad6"
+    "treeDigest": "sha256:fb1f858989f7c93079daf8cea3e3fb40ba07e6a1eaea9ea21f9389006a672172"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62586,7 +62606,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:1ba49d7ac32931812cd81c58fd74765a74cd796f9a292e1adaa22478b8886102"
+    "digest": "sha256:fabb8018a8bc1ce119a6d9dc479c78146feef60f80c9f78260c31f55cb054de2"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -62702,6 +62722,7 @@
       "release/atm-root-drop/docs/DIST_TAGS.md",
       "release/atm-root-drop/docs/ECOSYSTEM_POSITIONING.md",
       "release/atm-root-drop/docs/ERROR_CODES.md",
+      "release/atm-root-drop/docs/EVIDENCE_LEDGER.md",
       "release/atm-root-drop/docs/EXPERIENCE_LOOP.md",
       "release/atm-root-drop/docs/EXPERIMENTAL_API.md",
       "release/atm-root-drop/docs/HOST_GOVERNANCE_INTEGRATION.md",
@@ -68229,6 +68250,7 @@
       "release/atm-root-drop/tests/cli/runner-sync-terminal-task-parity.test.ts",
       "release/atm-root-drop/tests/cli/runner-version-lease.test.ts",
       "release/atm-root-drop/tests/cli/runner-version-selection.test.ts",
+      "release/atm-root-drop/tests/cli/runtime-evidence-git-boundary.test.ts",
       "release/atm-root-drop/tests/cli/runtime-telemetry-boundary.test.ts",
       "release/atm-root-drop/tests/cli/scope-amendment-rearbitration.test.ts",
       "release/atm-root-drop/tests/cli/scope-amendment-work-admission-ticket.test.ts",
@@ -68698,34 +68720,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:ce3734c44dce4cc0e6168d13c788721221633b696bdd55ab9c6c6de0522f87b9",
-  "sealedSourceCommit": "064480d92ce22cf27cee24af06e38e29c923dc26",
-  "buildDecision": "cacheHitSkip",
-  "buildDecisionReason": "build input tree hash matches release manifests",
-  "incrementalPlanDigest": null,
-  "tsBuildCacheDigest": null,
+  "buildInputsTreeHash": "sha256:297e28978b792811d44c39518a2e5b71d6fc3bf3bd42c037b1dfd89e59907b2a",
+  "sealedSourceCommit": "6ac164fe8a1cf2a3522fb320ce8523f72f5987f8",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:7f7b4948736c98d5c4c9a9d4ac8bf6faa5f0815c0e810be77c4aafc7f57469e2",
+  "tsBuildCacheDigest": "sha256:75d5ca95dfe8b2723aa833bd8a9d047d2219760ece2cfe69e898b373cc3ef1e8",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 48,
-    "skipDecision": 56,
-    "worktreeSetup": 0,
-    "typescriptBuild": 0,
-    "rootDropReleaseAssembly": 0,
-    "onefileReleaseAssembly": 0,
-    "artifactSync": 0,
+    "inputHashCalculation": 44,
+    "skipDecision": 59,
+    "worktreeSetup": 9497,
+    "typescriptBuild": 15043,
+    "rootDropReleaseAssembly": 31233,
+    "onefileReleaseAssembly": 10564,
+    "artifactSync": 5782,
     "cleanup": 0,
-    "totalElapsed": 27880
-  },
-  "dominantPhaseSummary": {
-    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "skipDecision",
-    "dominantPhaseMs": 56,
-    "totalElapsedMs": 27880,
-    "dominanceRatio": 0.002,
-    "phaseMedianMs": 0,
-    "phaseP95Ms": 56,
-    "measuredPhaseCount": 8,
-    "optimizationVerdict": "inconclusive",
-    "basis": "single-run"
+    "totalElapsed": 84831
   }
 }

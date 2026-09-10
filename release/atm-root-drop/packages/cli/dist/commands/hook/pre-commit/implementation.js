@@ -117,7 +117,6 @@ export function runPreCommitHook(cwd) {
     const closeCommitWindowAllowedFiles = uniqueSorted(activeCloseCommitWindows.flatMap((win) => [
         ...win.allowedFiles,
         `.atm/history/tasks/${win.taskId}.json`,
-        `.atm/history/evidence/${win.taskId}.json`,
         `.atm/history/evidence/${win.taskId}.bundle-manifest.json`,
         `.atm/history/evidence/${win.taskId}.closure-packet.json`,
         `.atm/history/task-events/${win.taskId}/**`

@@ -23,6 +23,7 @@ import { resolveLaneSession } from '../lane-session/resolve.ts';
 import { laneSessionPathFor } from '../lane-session/store.ts';
 import { readClaimLaneSessionId, throwIfForeignSameTaskClaim, assertCurrentClaimOwnerForAction } from './claim-ownership.ts';
 import { prepareReleaseWip } from './release-wip-transaction.ts';
+import { evidencePathForTask } from '../evidence/evidence-store.ts';
 import { withTakeoverAggregateRollback } from './takeover-aggregate-transaction.ts'; import { assertClaimDirtyWipAdmission } from '../next/foreign-dirty-wip-admission.ts';
 function normalizeTaskStatus(value: unknown): string {
   return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
@@ -506,7 +507,7 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
   const originalTaskDocument = structuredClone(taskDocument);
   const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
   const directionSidecarPath = path.join(options.cwd, '.atm', 'runtime', 'task-direction-locks', `${options.taskId}.json`);
-  const evidencePath = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.json`);
+  const evidencePath = evidencePathForTask(options.cwd, options.taskId);
   const priorSessionIds = new Set(listActorWorkSessions(options.cwd).map((session) => session.sessionId));
   let laneSession: ReturnType<typeof resolveLaneSession> | null = null;
   let transitionPath: string | null = null;
@@ -573,7 +574,7 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
           actorId,
           previousClaim: currentClaim,
           claim: takeoverClaim,
-          evidencePath: `.atm/history/evidence/${options.taskId}.json`,
+          evidencePath: relativePathFrom(options.cwd, evidencePath),
           transitionPath: transitionPath ?? '',
           sessionId: claimCompletion.session.sessionId,
           session: claimCompletion.session,

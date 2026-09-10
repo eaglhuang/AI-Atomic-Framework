@@ -141,9 +141,9 @@ export async function runBatch(argv) {
         return makeResult({ ok: true, command: 'batch', cwd: options.cwd,
             messages: [message('info', primaryCode, primaryText, { batchId: updated.batchId, closedTaskId: currentTaskId, nextTaskId: updated.currentTaskId, held: Boolean(nextTaskId), category: isBatchComplete ? 'batch-complete' : 'pending-commit', remainingTasks, totalTasks, batchComplete: isBatchComplete,
                     deliveryPrinciple: 'Batch speed comes from automated queue bookkeeping, not relaxed delivery. Each task still needs real non-.atm deliverables before checkpoint can close it.',
-                    commitInstruction: `Checkpoint succeeded. Stage .atm/history/tasks/${currentTaskId}.json and .atm/history/task-events/${currentTaskId}/, then create one commit that contains the already staged deliverables, evidence, task file, and task events.`, continueInstruction: isBatchComplete ? 'Batch is complete after this checkpoint commit.' : `Commit the closed task first, then resume with node atm.mjs batch resume --actor <id> --batch ${updated.batchId} --json.`, requiredCommand: null })],
+                    commitInstruction: `Checkpoint succeeded. Stage .atm/history/tasks/${currentTaskId}.json, the durable evidence manifest and .atm/history/task-events/${currentTaskId}/, then create one commit that contains the already staged deliverables and governance receipts.`, continueInstruction: isBatchComplete ? 'Batch is complete after this checkpoint commit.' : `Commit the closed task first, then resume with node atm.mjs batch resume --actor <id> --batch ${updated.batchId} --json.`, requiredCommand: null })],
             evidence: { action: 'checkpoint', actorId: resolvedActor.actorId, closedTaskId: currentTaskId, held: Boolean(nextTaskId), continuation, historicalDeliveryRefs: batchHistoricalDeliveryRefs, historicalBatchRefs: batchHistoricalBatchRefs, closeHeadCapture: { schemaId: 'atm.batchCheckpointHeadCapture.v1', taskId: currentTaskId, batchId: active.batchId, headBeforeClose: capturedHeadBeforeClose, headAfterClose: readGitHead(options.cwd) },
-                commitInstruction: { timing: 'single-commit-after-checkpoint', beforeCheckpoint: ['<stage deliverables>', `.atm/history/evidence/${currentTaskId}.json`], files: ['<deliverables>', `.atm/history/tasks/${currentTaskId}.json`, `.atm/history/evidence/${currentTaskId}.json`, `.atm/history/task-events/${currentTaskId}/`] }, closeResult: closeResult.evidence,
+                commitInstruction: { timing: 'single-commit-after-checkpoint', beforeCheckpoint: ['<stage deliverables>', `.atm/history/evidence/${currentTaskId}.bundle-manifest.json`], files: ['<deliverables>', `.atm/history/tasks/${currentTaskId}.json`, `.atm/history/evidence/${currentTaskId}.bundle-manifest.json`, `.atm/history/task-events/${currentTaskId}/`] }, closeResult: closeResult.evidence,
                 cleanupResult: cleanupResult?.evidence ?? null, batchRun: updated, nextClaim: null }
         });
     }
@@ -569,7 +569,7 @@ function buildCompactBatchStatus(cwd, batchRun, taskQueue, consistency, activeBa
             title: queueHead.title, taskPath: queueHead.taskPath, sourcePlanPath: queueHead.sourcePlanPath, targetRepo: queueHead.targetRepo }
             : null, allowedFiles: scope?.targetWork.allowedFiles ?? [], planningReadOnlyPaths: scope?.planningContext.readOnlyPaths ?? [], validators, currentWave, deferredReasons: currentWave.deferredReasons, dispatchCommand: currentWave.dispatchCommand, pendingCommitWindow, checkpointCommand: batchId ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json` : null, commands: { checkpoint: batchId ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json` : null, checkpointHold: batchId
                 ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --hold --json` : null, resume: batchId ? `node atm.mjs batch resume --actor <id> --batch ${batchId} --json` : null, repair: batchId ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json` : 'node atm.mjs batch repair --actor <id> --json', status: batchId ? `node atm.mjs batch current --batch ${batchId} --compact --json`
-                : 'node atm.mjs batch current --compact --json', dispatchWave: currentWave.dispatchCommand }, commitInstruction: commitInstructionTaskId ? { timing: 'after-checkpoint', files: pendingCommitWindow?.commitFiles ?? ['<deliverables>', `.atm/history/tasks/${commitInstructionTaskId}.json`, `.atm/history/evidence/${commitInstructionTaskId}.json`, `.atm/history/task-events/${commitInstructionTaskId}/`] }
+                : 'node atm.mjs batch current --compact --json', dispatchWave: currentWave.dispatchCommand }, commitInstruction: commitInstructionTaskId ? { timing: 'after-checkpoint', files: pendingCommitWindow?.commitFiles ?? ['<deliverables>', `.atm/history/tasks/${commitInstructionTaskId}.json`, `.atm/history/evidence/${commitInstructionTaskId}.bundle-manifest.json`, `.atm/history/task-events/${commitInstructionTaskId}/`] }
             : null, nextCommand: batchRun?.sourcePrompt ? `node atm.mjs next --claim --actor <id> --prompt "${batchRun.sourcePrompt}" --json` : null, resumeCommand, repairCommand: batchId ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json` : 'node atm.mjs batch repair --actor <id> --json', omitted: { taskIds: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0, fullTaskQueue: true, fullBatchRun: true,
             useVerboseCommand: batchId ? `node atm.mjs batch status --batch ${batchId} --json` : 'node atm.mjs batch status --json' }, consistency };
 }
@@ -702,9 +702,9 @@ export function buildPendingCheckpointCommitWindow(cwd, batchRun, taskQueue) {
             continue;
         const scope = extractTaskScopeFiles(task);
         const deliverableFiles = changedFiles.filter((file) => scope.some((allowed) => isPathAllowedByScope(file, [allowed])));
-        const evidenceFile = `.atm/history/evidence/${taskId}.json`;
-        const checkpointFiles = relatedFiles.length > 0 ? relatedFiles : uniqueStrings([taskFile, existsSync(path.join(cwd, normalizeRelativePath(evidenceFile))) ? evidenceFile : '', eventFile].filter(Boolean));
-        const commitFiles = uniqueStrings([...deliverableFiles, taskFile, evidenceFile, `.atm/history/task-events/${taskId}/`]);
+        const evidenceManifest = `.atm/history/evidence/${taskId}.bundle-manifest.json`;
+        const checkpointFiles = relatedFiles.length > 0 ? relatedFiles : uniqueStrings([taskFile, existsSync(path.join(cwd, normalizeRelativePath(evidenceManifest))) ? evidenceManifest : '', eventFile].filter(Boolean));
+        const commitFiles = uniqueStrings([...deliverableFiles, taskFile, evidenceManifest, `.atm/history/task-events/${taskId}/`]);
         return { schemaId: 'atm.batchCheckpointCommitWindow.v1', batchId: batchRun.batchId, taskId, currentBatchTaskId: batchRun.currentTaskId ?? taskQueue?.taskIds?.[taskQueue?.currentIndex ?? 0] ?? null, changedFiles: checkpointFiles, deliverableFiles, commitFiles,
             commitCommand: `git add ${commitFiles.map(quoteShellArg).join(' ')} && git commit -m "complete ${taskId}"`, statusCommand: `node atm.mjs batch current --batch ${batchRun.batchId} --compact --json`, note: 'Checkpoint has closed this task. Commit these files before continuing with the next queue head.' };
     }
@@ -714,7 +714,7 @@ function isTaskCheckpointRelatedFile(filePath, taskId) {
     const normalized = normalizeRelativePath(filePath);
     const lower = normalized.toLowerCase();
     const taskLower = taskId.toLowerCase();
-    return lower === `.atm/history/tasks/${taskLower}.json` || lower === `.atm/history/evidence/${taskLower}.json` || lower === `.atm/history/evidence/${taskLower}.closure-packet.json` || lower.startsWith(`.atm/history/task-events/${taskLower}/`);
+    return lower === `.atm/history/tasks/${taskLower}.json` || lower === `.atm/history/evidence/${taskLower}.bundle-manifest.json` || lower === `.atm/history/evidence/${taskLower}.closure-packet.json` || lower.startsWith(`.atm/history/task-events/${taskLower}/`);
 }
 function extractTaskScopeFiles(task) {
     const output = [];

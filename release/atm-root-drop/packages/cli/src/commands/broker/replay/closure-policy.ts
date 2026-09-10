@@ -3,6 +3,7 @@ import path from 'node:path';
 import { inspectCommandBackedMatrix, hasCommandBackedCellEvidence } from './command-backed-matrix.ts';
 import { buildPlan3DogfoodOrchestratorEvidence } from './dogfood-orchestrator.ts';
 import { selectRuntimeDogfoodTasks } from './implementation.ts';
+import { readEvidenceBundle } from '../../evidence/evidence-store.ts';
 
 export type Plan3ClosureVerdict = 'ready-to-close' | 'remain-open';
 
@@ -403,9 +404,12 @@ function detectFormulaHardcodedSignals(cwd: string): readonly string[] {
 }
 
 function hasPassingCallSiteParityEvidence(cwd: string): boolean {
-  const evidencePath = path.join(cwd, '.atm/history/evidence/ATM-GOV-0262.json');
-  if (!existsSync(evidencePath)) return false;
-  const raw = readFileSync(evidencePath, 'utf8');
+  let raw: string;
+  try {
+    raw = JSON.stringify(readEvidenceBundle(cwd, 'ATM-GOV-0262'));
+  } catch {
+    return false;
+  }
   return raw.includes('broker-overlap-callsite-parity.test.ts');
 }
 

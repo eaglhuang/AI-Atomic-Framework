@@ -206,7 +206,7 @@ try {
     nextActions: ['Review the phase-B gate report.', 'Inspect the recorded evidence entry.', 'Decide whether alpha0 can advance.'],
     generatedAt: '2026-01-01T00:00:00.000Z',
     artifactPaths: ['.atm/history/artifacts/BOOTSTRAP-0001/hello-world-smoke.json', '.atm/history/logs/BOOTSTRAP-0001.log'],
-    evidencePaths: ['.atm/history/evidence/BOOTSTRAP-0001.json'],
+    evidencePaths: ['.atm/runtime/evidence-ledger/bundles/BOOTSTRAP-0001.json'],
     reportPaths: ['.atm/history/reports/self-host-alpha/BOOTSTRAP-0001.json', '.atm/history/reports/context-budget/self-host-alpha-BOOTSTRAP-0001.json'],
     authoredBy: 'ATM CLI',
     handoffKind: 'self-host-alpha',

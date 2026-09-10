@@ -191,7 +191,7 @@ export function runGitPrepare(options) {
         ...(claim?.leaseId ? [`ATM-Claim: ${claim.leaseId}`] : []),
         ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : []),
         ...(options.taskId
-            ? [`ATM-Evidence: .atm/history/evidence/${options.taskId}.json`]
+            ? [`ATM-Evidence: .atm/history/evidence/${options.taskId}.bundle-manifest.json`]
             : []),
     ];
     return makeResult({

@@ -190,7 +190,9 @@ function resolveLegacyTaskAdmissionFiles(cwd, task, taskId) {
             ...declaredFiles.map((entry) => entry.trim()).filter(Boolean),
             ...resolveTaskOwnedProtectedOverrideAuditPaths(cwd, taskId),
             '.atm/history/evidence/git-head.jsonl',
-            `.atm/history/evidence/${taskId}.*`,
+            `.atm/history/evidence/${taskId}.bundle-manifest.json`,
+            `.atm/history/evidence/${taskId}.closure-packet.json`,
+            `.atm/history/evidence/${taskId}.seal-and-commit.json`,
             `.atm/history/task-events/${taskId}/**`,
             `.atm/history/tasks/${taskId}.json`
         ])];

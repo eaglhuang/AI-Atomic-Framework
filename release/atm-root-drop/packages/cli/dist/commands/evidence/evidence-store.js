@@ -1,16 +1,17 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { EVIDENCE_STORAGE_POLICY, legacyEvidenceBundleRelativePath, runtimeEvidenceBundleRelativePath } from '../../_vendor/core/dist/evidence/evidence-ledger.js';
 import { canonicalizeValidatorIdentity, detectAutoLinkedValidator } from './validator-classification.js';
 import { quoteForShell, isRecord } from './shared-utils.js';
 export function evidencePathForTask(cwd, taskId) {
-    return path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
+    return path.join(cwd, runtimeEvidenceBundleRelativePath(taskId));
 }
 /**
  * The only adapter-owned legacy evidence root. Runtime callers must use the
  * ledger for new evidence and keep this path solely for historical reads.
  */
 export function legacyEvidenceDirectory(cwd) {
-    return path.join(cwd, '.atm', 'history', 'evidence');
+    return path.join(cwd, EVIDENCE_STORAGE_POLICY.legacyRoot);
 }
 export function evidenceBundleManifestRelativePath(taskId) {
     return `.atm/history/evidence/${taskId}.bundle-manifest.json`;
@@ -75,7 +76,9 @@ export function readTaskDocument(cwd, taskId) {
     return isRecord(parsed) ? parsed : null;
 }
 export function readEvidenceBundle(cwd, taskId) {
-    const evidencePath = evidencePathForTask(cwd, taskId);
+    const runtimePath = evidencePathForTask(cwd, taskId);
+    const legacyPath = path.join(cwd, legacyEvidenceBundleRelativePath(taskId));
+    const evidencePath = existsSync(runtimePath) ? runtimePath : legacyPath;
     if (!existsSync(evidencePath))
         return { evidence: [] };
     const parsed = JSON.parse(readFileSync(evidencePath, 'utf8'));

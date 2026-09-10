@@ -3,6 +3,7 @@ import path from 'node:path';
 import { inspectCommandBackedMatrix, hasCommandBackedCellEvidence } from './command-backed-matrix.js';
 import { buildPlan3DogfoodOrchestratorEvidence } from './dogfood-orchestrator.js';
 import { selectRuntimeDogfoodTasks } from './implementation.js';
+import { readEvidenceBundle } from '../../evidence/evidence-store.js';
 const REQUIRED_LIFECYCLE_CLASSES = [
     'executed-dogfood-lifecycle',
     'compose-batch-membership',
@@ -313,10 +314,13 @@ function detectFormulaHardcodedSignals(cwd) {
     ].filter((signal) => source.includes(signal));
 }
 function hasPassingCallSiteParityEvidence(cwd) {
-    const evidencePath = path.join(cwd, '.atm/history/evidence/ATM-GOV-0262.json');
-    if (!existsSync(evidencePath))
+    let raw;
+    try {
+        raw = JSON.stringify(readEvidenceBundle(cwd, 'ATM-GOV-0262'));
+    }
+    catch {
         return false;
-    const raw = readFileSync(evidencePath, 'utf8');
+    }
     return raw.includes('broker-overlap-callsite-parity.test.ts');
 }
 function uniqueLifecycle(values) {

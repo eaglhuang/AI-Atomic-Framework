@@ -100,7 +100,7 @@ export function buildChannelPlaybook(input: {
         batchClaimCommand,
         '<implement queue-head deliverables>',
         'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
-        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.json',
+        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.bundle-manifest.json',
         `node atm.mjs batch checkpoint --actor ${actor} --json`,
         'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
         `node atm.mjs git commit --actor ${actor} --task <queue-head-task-id> --message "<scope>: complete <queue-head-task-id>" --json`
@@ -109,7 +109,7 @@ export function buildChannelPlaybook(input: {
         batchClaimCommand,
         '<implement queue-head deliverables>',
         'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
-        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.json',
+        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.bundle-manifest.json',
         `node atm.mjs batch checkpoint --actor ${actor} --json`,
         'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
         `node atm.mjs git commit --actor ${actor} --task <queue-head-task-id> --message "<scope>: complete <queue-head-task-id>" --json`
@@ -193,7 +193,7 @@ export function buildChannelPlaybook(input: {
       closeOps.preClose,
       closeOps.dryRun,
       closeOps.write,
-      'git add <deliverables> .atm/history/tasks/<task-id>.json .atm/history/evidence/<task-id>.json .atm/history/task-events/<task-id>/',
+      'git add <deliverables> .atm/history/tasks/<task-id>.json .atm/history/evidence/<task-id>.bundle-manifest.json .atm/history/task-events/<task-id>/',
       `node atm.mjs git commit --actor ${actor} --task <task-id> --message "<scope>: complete <task-id>" --json`
     ],
     closePreview: {

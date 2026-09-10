@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runtimeEvidenceBundleRelativePath } from '../../../../core/dist/evidence/evidence-ledger.js';
 import { createDefaultGuards } from '../../default-guards.js';
 import { createLocalGovernanceStores } from '../../stores.js';
 import { createContextBudgetSummary, createDefaultContextBudgetPolicy, evaluateContextBudget, estimateContextBudgetTokens, sanitizeBudgetFileId } from '../budget.js';
@@ -267,7 +268,7 @@ export function createOfficialBootstrapCommand(commandCwd = '.') {
     return `node atm.mjs bootstrap --cwd ${commandCwd} --task "${defaultBootstrapTaskTitle}"`;
 }
 export function createRecommendedPrompt(taskId = defaultBootstrapTaskId) {
-    return `Read README.md if present, then run \`node atm.mjs next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`node atm.mjs next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and .atm/history/evidence/${taskId}.json only as supporting runtime state.`;
+    return `Read README.md if present, then run \`node atm.mjs next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`node atm.mjs next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and ${runtimeEvidenceBundleRelativePath(taskId)} only as supporting runtime state.`;
 }
 export function createSelfHostingAlphaPrompt() {
     return 'Read README.md if present, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, `node atm.mjs next --json` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action.';
@@ -315,7 +316,7 @@ function createBootstrapConfig(taskId) {
             lockPath: `.atm/runtime/locks/${taskId}.lock.json`,
             projectProbePath: '.atm/runtime/project-probe.json',
             defaultGuardsPath: '.atm/runtime/default-guards.json',
-            evidencePath: `.atm/history/evidence/${taskId}.json`,
+            evidencePath: runtimeEvidenceBundleRelativePath(taskId),
             currentTaskPath: '.atm/runtime/current-task.json'
         }
     };
@@ -387,7 +388,7 @@ function createBootstrapPaths(cwd, taskId) {
         contextBudgetSummaryPath: path.join(atmRoot, 'runtime', 'budget', `bootstrap-${sanitizeBudgetFileId(`bootstrap/${taskId}`)}.md`),
         taskPath: path.join(atmRoot, 'history', 'tasks', `${taskId}.json`),
         lockPath: path.join(atmRoot, 'runtime', 'locks', `${taskId}.lock.json`),
-        evidencePath: path.join(atmRoot, 'history', 'evidence', `${taskId}.json`),
+        evidencePath: path.join(cwd, runtimeEvidenceBundleRelativePath(taskId)),
         contextSummaryPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.json`),
         contextSummaryMarkdownPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.md`),
         contextPath: path.join(atmRoot, 'history', 'handoff', 'INITIAL_SUMMARY.md'),
@@ -400,7 +401,7 @@ function createBootstrapPaths(cwd, taskId) {
             contextBudget: path.join(atmRoot, 'runtime', 'budget'),
             history: path.join(atmRoot, 'history'),
             tasks: path.join(atmRoot, 'history', 'tasks'),
-            evidence: path.join(atmRoot, 'history', 'evidence'),
+            evidence: path.join(atmRoot, 'runtime', 'evidence-ledger'),
             artifacts: path.join(atmRoot, 'history', 'artifacts'),
             logs: path.join(atmRoot, 'history', 'logs'),
             reports: path.join(atmRoot, 'history', 'reports'),

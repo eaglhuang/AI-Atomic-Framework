@@ -10,7 +10,8 @@ export const defaultGovernanceLayout = {
     logStorePath: '.atm/history/logs',
     runReportStorePath: '.atm/history/reports',
     ruleGuardPath: '.atm/runtime/rules',
-    evidenceStorePath: '.atm/history/evidence',
+    evidenceStorePath: '.atm/runtime/evidence-ledger',
+    legacyEvidenceStorePath: '.atm/history/evidence',
     registryStorePath: '.atm/catalog/registry',
     contextBudgetStorePath: '.atm/runtime/budget',
     contextSummaryStorePath: '.atm/history/handoff'

@@ -12,6 +12,7 @@ import { CliError, readJsonFile, resolveValue } from '../../shared.ts';
 import type { ParsedUpgradeCommandOptions } from './types.ts';
 import { inferInputKind } from './inputs.ts';
 import { sanitizeUpgradeBudgetId } from './guided-legacy.ts';
+import { evidencePathForTask } from '../../evidence/evidence-store.ts';
 
 export async function evaluateUpgradeContextBudget(
   options: ParsedUpgradeCommandOptions,
@@ -103,7 +104,7 @@ async function materializeUpgradeHardStop(
   }
   const continuationReportId = `continuation/upgrade/${atomId}`;
   const continuationReportPath = `.atm/history/reports/continuation/upgrade/${atomId}.json`;
-  const evidencePath = `.atm/history/evidence/${atomId}.json`;
+  const evidencePath = path.relative(cwd, evidencePathForTask(cwd, atomId)).replace(/\\/g, '/');
   const contextSummaryPath = `.atm/history/handoff/${atomId}.json`;
   const contextSummaryMarkdownPath = `.atm/history/handoff/${atomId}.md`;
 
@@ -156,7 +157,7 @@ async function materializeUpgradeHardStop(
 }
 
 function persistUpgradeHandoffEvidence(cwd: string, atomId: string, handoffEvidence: Record<string, unknown>): void {
-  const absolutePath = path.join(cwd, '.atm', 'history', 'evidence', `${atomId}.json`);
+  const absolutePath = evidencePathForTask(cwd, atomId);
   const existing = existsSync(absolutePath) ? JSON.parse(readFileSync(absolutePath, 'utf8')) as unknown : null;
   const existingEvidence = Array.isArray(existing)
     ? existing

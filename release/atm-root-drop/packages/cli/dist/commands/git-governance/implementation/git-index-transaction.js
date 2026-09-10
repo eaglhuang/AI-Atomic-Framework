@@ -130,8 +130,6 @@ export function isAllowedGovernanceArtifactPath(cwd, filePath, taskId) {
     const lower = normalized.toLowerCase();
     if (lower === `.atm/history/tasks/${normalizedTaskId}.json`)
         return true;
-    if (lower === `.atm/history/evidence/${normalizedTaskId}.json`)
-        return true;
     if (lower === `.atm/history/evidence/${normalizedTaskId}.bundle-manifest.json`)
         return true;
     if (lower === `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`)

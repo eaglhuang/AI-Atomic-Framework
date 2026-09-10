@@ -3,6 +3,7 @@ import { deflateSync } from 'node:zlib';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { computeWriteScopeDigest, normalizeWritePathList, pathMatchesWriteScope } from './write-scope-policy.js';
+import { isDurableEvidencePath } from '../evidence/evidence-ledger.js';
 export const WORK_ADMISSION_TICKET_SCHEMA_ID = 'atm.workAdmissionTicket.v1';
 export const WORK_ADMISSION_COVERAGE_RECEIPT_SCHEMA_ID = 'atm.workAdmissionCoverageReceipt.v1';
 export function issueWorkAdmissionTicket(input) {
@@ -105,7 +106,7 @@ function isTaskManagedLifecyclePath(taskId, file) {
     const normalized = normalizeWritePathList([file])[0] ?? '';
     return normalized === '.atm/history/evidence/git-head.jsonl'
         || normalized === `.atm/history/tasks/${taskId}.json`
-        || normalized.startsWith(`.atm/history/evidence/${taskId}.`)
+        || (normalized.includes(`/${taskId}.`) && isDurableEvidencePath(normalized))
         || normalized.startsWith(`.atm/history/task-events/${taskId}/`);
 }
 export function createWorkAdmissionCoverageReceipt(input) {

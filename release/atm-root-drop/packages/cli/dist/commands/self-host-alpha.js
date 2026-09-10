@@ -1,5 +1,6 @@
 import { cpSync, existsSync, mkdirSync, rmSync, statSync, utimesSync } from 'node:fs';
 import path from 'node:path';
+import { runtimeEvidenceBundleRelativePath } from '../_vendor/core/dist/evidence/evidence-ledger.js';
 import { createContinuationSummaryRecord, createLocalGovernanceAdapter, estimateContextBudgetTokens } from '../_vendor/plugin-governance-local/dist/index.js';
 import { createTempWorkspace } from '../temp-workspace.js';
 import { runBootstrap } from './bootstrap-entry.js';
@@ -178,7 +179,7 @@ async function materializeSelfHostingArtifacts(cwd, bootstrapEvidence, helloWorl
     const logPath = `.atm/history/logs/${bootstrapTaskId}.log`;
     const phaseBReportId = `self-host-alpha/${bootstrapTaskId}`;
     const phaseBReportPath = `.atm/history/reports/self-host-alpha/${bootstrapTaskId}.json`;
-    const evidencePath = `.atm/history/evidence/${bootstrapTaskId}.json`;
+    const evidencePath = runtimeEvidenceBundleRelativePath(bootstrapTaskId);
     const estimatedTokens = estimateContextBudgetTokens(bootstrapEvidence, helloWorld, criteria, neutrality?.evidence ?? null);
     const contextBudgetGuard = adapter.stores.contextBudgetGuard;
     const runReportStore = adapter.stores.runReportStore;

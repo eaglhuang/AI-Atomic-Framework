@@ -21,6 +21,7 @@ import { resolveLaneSession } from '../lane-session/resolve.js';
 import { laneSessionPathFor } from '../lane-session/store.js';
 import { readClaimLaneSessionId, throwIfForeignSameTaskClaim, assertCurrentClaimOwnerForAction } from './claim-ownership.js';
 import { prepareReleaseWip } from './release-wip-transaction.js';
+import { evidencePathForTask } from '../evidence/evidence-store.js';
 import { withTakeoverAggregateRollback } from './takeover-aggregate-transaction.js';
 import { assertClaimDirtyWipAdmission } from '../next/foreign-dirty-wip-admission.js';
 function normalizeTaskStatus(value) {
@@ -499,7 +500,7 @@ export async function runTasksClaimLifecycle(action, argv) {
     const originalTaskDocument = structuredClone(taskDocument);
     const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
     const directionSidecarPath = path.join(options.cwd, '.atm', 'runtime', 'task-direction-locks', `${options.taskId}.json`);
-    const evidencePath = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.json`);
+    const evidencePath = evidencePathForTask(options.cwd, options.taskId);
     const priorSessionIds = new Set(listActorWorkSessions(options.cwd).map((session) => session.sessionId));
     let laneSession = null;
     let transitionPath = null;
@@ -566,7 +567,7 @@ export async function runTasksClaimLifecycle(action, argv) {
                     actorId,
                     previousClaim: currentClaim,
                     claim: takeoverClaim,
-                    evidencePath: `.atm/history/evidence/${options.taskId}.json`,
+                    evidencePath: relativePathFrom(options.cwd, evidencePath),
                     transitionPath: transitionPath ?? '',
                     sessionId: claimCompletion.session.sessionId,
                     session: claimCompletion.session,

@@ -9,6 +9,7 @@ import type {
   WorkItemRef
 } from '@ai-atomic-framework/core';
 import type { CapabilityResult } from '@ai-atomic-framework/plugin-sdk';
+import { runtimeEvidenceBundleRelativePath } from '../../../../core/src/evidence/evidence-ledger.ts';
 import { createDefaultGuards } from '../../default-guards.ts';
 import { createLocalGovernanceStores } from '../../stores.ts';
 import {
@@ -362,7 +363,7 @@ export function createOfficialBootstrapCommand(commandCwd = '.'): string {
 }
 
 export function createRecommendedPrompt(taskId = defaultBootstrapTaskId): string {
-  return `Read README.md if present, then run \`node atm.mjs next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`node atm.mjs next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and .atm/history/evidence/${taskId}.json only as supporting runtime state.`;
+  return `Read README.md if present, then run \`node atm.mjs next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`node atm.mjs next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and ${runtimeEvidenceBundleRelativePath(taskId)} only as supporting runtime state.`;
 }
 
 export function createSelfHostingAlphaPrompt(): string {
@@ -412,7 +413,7 @@ function createBootstrapConfig(taskId: string) {
       lockPath: `.atm/runtime/locks/${taskId}.lock.json`,
       projectProbePath: '.atm/runtime/project-probe.json',
       defaultGuardsPath: '.atm/runtime/default-guards.json',
-      evidencePath: `.atm/history/evidence/${taskId}.json`,
+      evidencePath: runtimeEvidenceBundleRelativePath(taskId),
       currentTaskPath: '.atm/runtime/current-task.json'
     }
   };
@@ -497,7 +498,7 @@ function createBootstrapPaths(cwd: string, taskId: string) {
     contextBudgetSummaryPath: path.join(atmRoot, 'runtime', 'budget', `bootstrap-${sanitizeBudgetFileId(`bootstrap/${taskId}`)}.md`),
     taskPath: path.join(atmRoot, 'history', 'tasks', `${taskId}.json`),
     lockPath: path.join(atmRoot, 'runtime', 'locks', `${taskId}.lock.json`),
-    evidencePath: path.join(atmRoot, 'history', 'evidence', `${taskId}.json`),
+    evidencePath: path.join(cwd, runtimeEvidenceBundleRelativePath(taskId)),
     contextSummaryPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.json`),
     contextSummaryMarkdownPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.md`),
     contextPath: path.join(atmRoot, 'history', 'handoff', 'INITIAL_SUMMARY.md'),
@@ -510,7 +511,7 @@ function createBootstrapPaths(cwd: string, taskId: string) {
       contextBudget: path.join(atmRoot, 'runtime', 'budget'),
       history: path.join(atmRoot, 'history'),
       tasks: path.join(atmRoot, 'history', 'tasks'),
-      evidence: path.join(atmRoot, 'history', 'evidence'),
+      evidence: path.join(atmRoot, 'runtime', 'evidence-ledger'),
       artifacts: path.join(atmRoot, 'history', 'artifacts'),
       logs: path.join(atmRoot, 'history', 'logs'),
       reports: path.join(atmRoot, 'history', 'reports'),

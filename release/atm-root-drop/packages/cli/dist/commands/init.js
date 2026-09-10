@@ -193,7 +193,7 @@ function createDefaultConfig(options) {
             lockPath: '.atm/runtime/locks/BOOTSTRAP-0001.lock.json',
             projectProbePath: '.atm/runtime/project-probe.json',
             defaultGuardsPath: '.atm/runtime/default-guards.json',
-            evidencePath: '.atm/history/evidence/BOOTSTRAP-0001.json',
+            evidencePath: '.atm/runtime/evidence-ledger/bundles/BOOTSTRAP-0001.json',
             currentTaskPath: '.atm/runtime/current-task.json'
         };
     }
