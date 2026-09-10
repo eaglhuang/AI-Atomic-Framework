@@ -1878,6 +1878,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io/implementation.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io/manifest-reader.js",
+    "release/atm-root-drop/packages/cli/dist/commands/evidence/closure-evidence-context.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/evidence-store.js",
     "release/atm-root-drop/packages/cli/dist/commands/evidence/historical-batch-finalize.js",
@@ -2646,6 +2647,7 @@
     "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io/implementation.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+    "release/atm-root-drop/packages/cli/src/commands/evidence/closure-evidence-context.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/evidence-store.ts",
     "release/atm-root-drop/packages/cli/src/commands/evidence/historical-batch-finalize.ts",
@@ -6137,8 +6139,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1543,
-    "unchanged": 4559,
+    "copied": 1489,
+    "unchanged": 4615,
     "removed": 0
   },
   "buildMode": "full",
@@ -22767,6 +22769,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/evidence/closure-evidence-context.js",
+        "digest": "6f99270732b07cdf6f5f31ebca8df25878174fea371230719c96d265d752ed24",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/evidence/closure-evidence-context.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/evidence/command-runs.js",
         "digest": "f2069cb7ecf33d834e72b71f9f8f5156fa72bdb7c791e17afcc6f0c755c0fe8b",
         "origin": "source",
@@ -25639,7 +25650,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js",
-        "digest": "f787de4eac0da30cde423a501493065e8b695ce35b7929a226af2cc288de14d8",
+        "digest": "e47f3d54f558a2a25f324ba11664065f4787df63024d4c50067ec31cc61d4228",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/close-orchestrator/closure-packet.js"
@@ -25999,7 +26010,7 @@
       },
       {
         "path": "packages/cli/dist/commands/tasks/reconcile-orchestrator.js",
-        "digest": "0d2c1971d9d5e130213a5d14e1da72fcc7e4ab9f7dab15452cb151f73941948e",
+        "digest": "3866200bf8f580907482dcc6897615ce5bf170637a671e9a0f6fffca47df8947",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/tasks/reconcile-orchestrator.js"
@@ -27754,7 +27765,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "379e7170be2149df76ef329b883a1aa619c59a4eccfc8e6184eb7ca9d781939b",
+        "digest": "362fc4b2cf7b7f64c8ef009d1a1c72016330aea7903188c4b2b05dc1c6e4995e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -27763,7 +27774,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "a523b97386be2d66d33f4f3d8d9827f7de6ab925e01574addaa0d4e4f332aa2d",
+        "digest": "f31af5ed8f131d0f7b90471b3b52e5a18b1990286fb91830b8718b27b6de3f1d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -29675,6 +29686,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/evidence/closure-evidence-context.ts",
+        "digest": "ae993954649a1abe34baf5532762d74325b14dd1ad1f5e5d3378411ac278d0ab",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/evidence/closure-evidence-context.ts"
         ],
         "replaceable": true
       },
@@ -33730,7 +33750,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
-        "digest": "fade3f940d55257424a78e27b9a5a0e244b09f706eecaf036676d9bcef02b3cf",
+        "digest": "b70d99e633f522aef9e82d967bc3261e708fdc1acc69851adeddc52eaebce641",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts"
@@ -34090,7 +34110,7 @@
       },
       {
         "path": "packages/cli/src/commands/tasks/reconcile-orchestrator.ts",
-        "digest": "b5e44bf6d6fdaa98cd81c381ee44b7e919036d29d106994b6f4307a52e2f34c1",
+        "digest": "86abbac4ebd0451e2aac63ae66f3b860ec4b3fd9facf9592d8abeb3f21074c21",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/tasks/reconcile-orchestrator.ts"
@@ -49075,7 +49095,7 @@
       },
       {
         "path": "scripts/validate-evidence-ledger-boundary.ts",
-        "digest": "57b6d505506054910b9542f360dd39849aab6cd14d5d6d1e3a436e5277405b34",
+        "digest": "b299e925b9df9defa0d553d4933a1f632ecd75827c4f4f0c0246cc255d0ac97e",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-evidence-ledger-boundary.ts"
@@ -61062,7 +61082,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:fb1f858989f7c93079daf8cea3e3fb40ba07e6a1eaea9ea21f9389006a672172"
+    "treeDigest": "sha256:5583b934453983572cae26b11995c10785ede31cffdfe6968d8669d88a9dd440"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61285,6 +61305,7 @@
       "packages/cli/src/commands/evidence/bundle-io.ts",
       "packages/cli/src/commands/evidence/bundle-io/implementation.ts",
       "packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+      "packages/cli/src/commands/evidence/closure-evidence-context.ts",
       "packages/cli/src/commands/evidence/command-runs.ts",
       "packages/cli/src/commands/evidence/evidence-store.ts",
       "packages/cli/src/commands/evidence/historical-batch-finalize.ts",
@@ -62606,7 +62627,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:fabb8018a8bc1ce119a6d9dc479c78146feef60f80c9f78260c31f55cb054de2"
+    "digest": "sha256:cd792a0d4440965fc54bd5e1f8f49564b6e89ae5adb8e0bb417f1ca30019099f"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -64458,6 +64479,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io/implementation.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/bundle-io/manifest-reader.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/closure-evidence-context.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/command-runs.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/evidence-store.js",
       "release/atm-root-drop/packages/cli/dist/commands/evidence/historical-batch-finalize.js",
@@ -65226,6 +65248,7 @@
       "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io/implementation.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/bundle-io/manifest-reader.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/closure-evidence-context.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/command-runs.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/evidence-store.ts",
       "release/atm-root-drop/packages/cli/src/commands/evidence/historical-batch-finalize.ts",
@@ -68720,22 +68743,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:297e28978b792811d44c39518a2e5b71d6fc3bf3bd42c037b1dfd89e59907b2a",
-  "sealedSourceCommit": "6ac164fe8a1cf2a3522fb320ce8523f72f5987f8",
+  "buildInputsTreeHash": "sha256:d08339db18dfa1f287a332e4c0f3a8e93052189c0ab8a5e684ffef39c1b1b61e",
+  "sealedSourceCommit": "0106098329eeeafe24dbaa13902893216f7a6d79",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:7f7b4948736c98d5c4c9a9d4ac8bf6faa5f0815c0e810be77c4aafc7f57469e2",
-  "tsBuildCacheDigest": "sha256:75d5ca95dfe8b2723aa833bd8a9d047d2219760ece2cfe69e898b373cc3ef1e8",
+  "incrementalPlanDigest": "sha256:d047e1a8763a50223e32af6577375027a4e8e271ec22c89f2f40407d1c081bfe",
+  "tsBuildCacheDigest": "sha256:a63fd693174173b503651a71c0b8d838561dc0d4e99c18d5010849fb731284e6",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 44,
-    "skipDecision": 59,
-    "worktreeSetup": 9497,
-    "typescriptBuild": 15043,
-    "rootDropReleaseAssembly": 31233,
-    "onefileReleaseAssembly": 10564,
-    "artifactSync": 5782,
+    "skipDecision": 53,
+    "worktreeSetup": 9754,
+    "typescriptBuild": 13421,
+    "rootDropReleaseAssembly": 30266,
+    "onefileReleaseAssembly": 11046,
+    "artifactSync": 5628,
     "cleanup": 0,
-    "totalElapsed": 84831
+    "totalElapsed": 82742
   }
 }

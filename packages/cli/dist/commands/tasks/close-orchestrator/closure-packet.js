@@ -8,6 +8,7 @@ import { buildHistoricalDeliveryProvenance } from '../historical-delivery.js';
 import { uniqueStrings } from '../../tasks.js';
 import { assertAcceptanceEvidenceClosureGate } from './acceptance-evidence-gate.js';
 import { evidencePathForTask } from '../../evidence/evidence-store.js';
+import { closureEvidenceContextForTask } from '../../evidence/closure-evidence-context.js';
 export function prepareClosurePacket(input) {
     const { options, taskDocument, actorId, activeSession, frameworkStatus, deliverableGate, taskDeclaredFiles, historicalBatchSlice } = input;
     const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
@@ -62,30 +63,33 @@ export function prepareClosurePacket(input) {
             .map((entry) => canonicalizeValidatorIdentity(entry)))
         : [];
     assertAcceptanceEvidenceClosureGate({ taskId: options.taskId, taskDocument });
-    const pendingClosurePacket = createClosurePacket({
-        cwd: options.cwd,
-        taskId: options.taskId,
-        actorId,
-        sessionId: activeSession?.sessionId ?? null,
-        evidencePath: path.relative(options.cwd, evidencePathForTask(options.cwd, options.taskId)).replace(/\\/g, '/'),
-        requiredGates: historicalBatchSlice?.okToCloseTask === true
-            ? uniqueStrings([
-                ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),
-                ...(historicalBatchSlice.batchWideValidationPasses ?? [])
-            ])
-            : taskRequiredGates,
-        changedFiles: closePacketChangedFiles,
-        frameworkStatus,
-        validationPasses: historicalBatchSlice?.okToCloseTask === true
-            ? uniqueStrings([
-                ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),
-                ...(historicalBatchSlice.batchWideValidationPasses ?? []),
-                ...(historicalBatchSlice.advisoryValidationPasses ?? [])
-            ])
-            : undefined,
-        evidenceFreshness: historicalBatchSlice?.okToCloseTask === true ? 'fresh' : undefined,
-        historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate?.historicalDeliveries?.[0] ?? null, options.reason)
-    });
+    const pendingClosurePacket = {
+        ...createClosurePacket({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            actorId,
+            sessionId: activeSession?.sessionId ?? null,
+            evidencePath: path.relative(options.cwd, evidencePathForTask(options.cwd, options.taskId)).replace(/\\/g, '/'),
+            requiredGates: historicalBatchSlice?.okToCloseTask === true
+                ? uniqueStrings([
+                    ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),
+                    ...(historicalBatchSlice.batchWideValidationPasses ?? [])
+                ])
+                : taskRequiredGates,
+            changedFiles: closePacketChangedFiles,
+            frameworkStatus,
+            validationPasses: historicalBatchSlice?.okToCloseTask === true
+                ? uniqueStrings([
+                    ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),
+                    ...(historicalBatchSlice.batchWideValidationPasses ?? []),
+                    ...(historicalBatchSlice.advisoryValidationPasses ?? [])
+                ])
+                : undefined,
+            evidenceFreshness: historicalBatchSlice?.okToCloseTask === true ? 'fresh' : undefined,
+            historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate?.historicalDeliveries?.[0] ?? null, options.reason)
+        }),
+        ...closureEvidenceContextForTask(options.cwd, options.taskId)
+    };
     const validation = validateClosurePacket(pendingClosurePacket);
     if (!validation.ok) {
         const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);

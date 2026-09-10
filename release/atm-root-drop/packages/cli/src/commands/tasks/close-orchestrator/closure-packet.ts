@@ -12,6 +12,7 @@ import { buildHistoricalDeliveryProvenance, type TaskHistoricalDeliveryReport } 
 import { uniqueStrings } from '../../tasks.ts';
 import { assertAcceptanceEvidenceClosureGate } from './acceptance-evidence-gate.ts';
 import { evidencePathForTask } from '../../evidence/evidence-store.ts';
+import { closureEvidenceContextForTask } from '../../evidence/closure-evidence-context.ts';
 
 type ClosurePacketOptions = {
   readonly cwd: string;
@@ -105,7 +106,8 @@ export function prepareClosurePacket(input: {
       .map((entry) => canonicalizeValidatorIdentity(entry)))
     : [];
   assertAcceptanceEvidenceClosureGate({ taskId: options.taskId, taskDocument });
-  const pendingClosurePacket = createClosurePacket({
+  const pendingClosurePacket = {
+    ...createClosurePacket({
     cwd: options.cwd,
     taskId: options.taskId,
     actorId,
@@ -131,7 +133,9 @@ export function prepareClosurePacket(input: {
       deliverableGate?.historicalDeliveries?.[0] ?? null,
       options.reason
     )
-  });
+    }),
+    ...closureEvidenceContextForTask(options.cwd, options.taskId)
+  };
   const validation = validateClosurePacket(pendingClosurePacket);
   if (!validation.ok) {
     const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);

@@ -12,6 +12,7 @@ import { issueRepairClosureAdmissionTicket } from '../git-governance/work-admiss
 import { parseReconcileOptions } from './task-option-parsers.js';
 import { readGitScalar } from './task-git-helpers.js';
 import { evidencePathForTask } from '../evidence/evidence-store.js';
+import { closureEvidenceContextForTask } from '../evidence/closure-evidence-context.js';
 import { parseClaimRecord } from './task-ledger-readers.js';
 import { taskPathFor } from './task-file-io-helpers.js';
 import { buildHistoricalDeliveryProvenance } from './historical-delivery.js';
@@ -205,26 +206,29 @@ export async function runTasksReconcile(argv) {
     let createdClosurePacketAbsolute = null;
     const reconcileReason = `Historical reconcile sync against commit ${commitSha}`;
     if (frameworkStatus?.repoRole === 'framework') {
-        pendingReconcilePacket = createClosurePacket({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            actorId,
-            sessionId: null,
-            evidencePath: relativePathFrom(options.cwd, evidencePath),
-            requiredGates: frameworkStatus?.requiredGates ?? [],
-            changedFiles: deliverableGate.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
-            frameworkStatus: frameworkStatus ?? undefined,
-            attestation: {
-                schemaId: 'atm.reconcileAttestation.v1',
-                deliveryCommit: commitSha,
-                ...(options.historicalDeliveryRepo ? { deliveryRepoRoot } : {}),
-                reconciledAt: new Date().toISOString(),
-                reconciledByActor: actorId,
-                reconcileClassification: reconcileClassification.classification,
-                reason: reconcileReason
-            },
-            historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate.historicalDeliveries[0] ?? null, options.waiverReason)
-        });
+        pendingReconcilePacket = {
+            ...createClosurePacket({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                actorId,
+                sessionId: null,
+                evidencePath: relativePathFrom(options.cwd, evidencePath),
+                requiredGates: frameworkStatus?.requiredGates ?? [],
+                changedFiles: deliverableGate.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
+                frameworkStatus: frameworkStatus ?? undefined,
+                attestation: {
+                    schemaId: 'atm.reconcileAttestation.v1',
+                    deliveryCommit: commitSha,
+                    ...(options.historicalDeliveryRepo ? { deliveryRepoRoot } : {}),
+                    reconciledAt: new Date().toISOString(),
+                    reconciledByActor: actorId,
+                    reconcileClassification: reconcileClassification.classification,
+                    reason: reconcileReason
+                },
+                historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate.historicalDeliveries[0] ?? null, options.waiverReason)
+            }),
+            ...closureEvidenceContextForTask(options.cwd, options.taskId)
+        };
         const validation = validateClosurePacket(pendingReconcilePacket);
         if (!validation.ok) {
             const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
