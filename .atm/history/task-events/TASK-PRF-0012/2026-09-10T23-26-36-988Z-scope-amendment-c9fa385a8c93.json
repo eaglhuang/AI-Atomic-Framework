@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-10T23-26-36-988Z-scope-amendment-c9fa385a8c93",
+  "taskId": "TASK-PRF-0012",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0012.json",
+  "taskSha256": "sha256:fea9db0d5c2d02961093943db62f51e9acbe25e68efd68b457f5856a54433de4",
+  "createdAt": "2026-09-10T23:26:36.988Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0012 --actor codex-captain --add \"release/atm-root-drop/**,packages/cli/dist/**\" --reason \"Close target delivery expands directory outputs; grant recursive release and npm dist paths for governed close admission\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Close target delivery expands directory outputs; grant recursive release and npm dist paths for governed close admission"
+  }
+}

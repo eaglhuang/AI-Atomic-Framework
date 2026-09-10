@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0012",
   "title": "Make npm and onefile release payloads disjoint and budget-verifiable",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -34,7 +34,15 @@
     "tests/cli/onefile-runtime-closure.test.ts",
     "tests/cli/build-release-hygiene.test.ts",
     "tests/cli/release-prepublish-gate.test.ts",
-    "docs/reports/atm-release-surface-budget.md"
+    "docs/reports/atm-release-surface-budget.md",
+    ".atm/history/evidence/TASK-PRF-0012.*",
+    ".atm/history/task-events/TASK-PRF-0012/**",
+    ".atm/history/tasks/TASK-PRF-0012.json",
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop",
+    "packages/cli/dist/**",
+    "release/atm-root-drop/**"
   ],
   "validators": [
     "npm run typecheck",
@@ -236,8 +244,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-10T22-56-02-060Z-claim-a18942f69b86",
-  "lastTransitionAt": "2026-09-10T22:56:02.060Z",
+  "lastTransitionId": "2026-09-10T23-29-51-633Z-close-71e0c32cac46",
+  "lastTransitionAt": "2026-09-10T23:29:51.633Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-10T22:55:57.164Z",
@@ -246,13 +254,20 @@
     "actorId": "codex-captain",
     "leaseId": "lease-a8908bd90baf",
     "claimedAt": "2026-09-10T22:55:57.172Z",
-    "heartbeatAt": "2026-09-10T22:55:57.172Z",
+    "heartbeatAt": "2026-09-10T23:29:51.631Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-PRF-0012.*",
+      ".atm/history/task-events/TASK-PRF-0012/**",
       ".atm/history/tasks/TASK-PRF-0012.json",
       "docs/reports/atm-release-surface-budget.md",
       "package.json",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
       "packages/cli/package.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop",
+      "release/atm-root-drop/**",
       "scripts/build-cli-npm-runtime.ts",
       "scripts/build-onefile-release.ts",
       "scripts/build-package-dist.ts",
@@ -265,45 +280,51 @@
       "tests/cli/onefile-runtime-closure.test.ts",
       "tests/cli/release-prepublish-gate.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260910225557-codex-captain-ea6e379bc7",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910225557-codex-captain-ea6e379bc7\""
-    }
+      "laneSessionId": "lane-20260910232643-codex-captain-9199646bbd",
+      "status": "adopted",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910232643-codex-captain-9199646bbd\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-10T22:55:57.172Z",
   "startedByActor": "codex-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-bb1b6995929aa5b5",
-    "ticketDigest": "sha256:bb1b6995929aa5b5baa70f87667944ff66c82dc9c0dd9033d4f0e5d1d430802a",
+    "ticketId": "wat-867bd5add9c74059",
+    "ticketDigest": "sha256:867bd5add9c74059c9f2040156d0ae0b605b60b0821290244cdc3e2024bc4f6a",
     "taskId": "TASK-PRF-0012",
     "origin": "claim",
     "actorId": "codex-captain",
-    "laneSessionId": "lane-20260910225557-codex-captain-ea6e379bc7",
+    "laneSessionId": "lane-20260910232643-codex-captain-9199646bbd",
     "claimGeneration": "lease-a8908bd90baf",
-    "issuedAt": "2026-09-10T22:55:57.172Z",
-    "expiresAt": "2026-09-10T23:25:57.172Z",
-    "scopeDigest": "sha256:cf5cd2e5b85fc79237edb2395b4d778fbf5a56b3343f44cf8ab5ac7d3a2fdb21",
+    "issuedAt": "2026-09-10T23:29:09.877Z",
+    "expiresAt": "2026-09-10T23:59:09.877Z",
+    "scopeDigest": "sha256:dbe1198d0e79d1800f2d5feddbea1bf55ab8b4b91f129d8001ca48c197bf018d",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-10T22:55:57.172Z"
+      "selectedAt": "2026-09-10T23:29:09.877Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0012.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0012/**",
           ".atm/history/tasks/TASK-PRF-0012.json",
           "docs/reports/atm-release-surface-budget.md",
           "package.json",
+          "packages/cli/dist",
+          "packages/cli/dist/**",
           "packages/cli/package.json",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop",
+          "release/atm-root-drop/**",
           "scripts/build-cli-npm-runtime.ts",
           "scripts/build-onefile-release.ts",
           "scripts/build-package-dist.ts",
@@ -316,7 +337,7 @@
           "tests/cli/onefile-runtime-closure.test.ts",
           "tests/cli/release-prepublish-gate.test.ts"
         ],
-        "digest": "sha256:0c23dc8629f98da399e49dd8efbf1bfbebc69c43e37fc3558087a3c5bbaf345e"
+        "digest": "sha256:2997b2716a0461c1bbd41bdb6158d0fd077a57644f3f595bbfd0bea1772fe17e"
       },
       {
         "kind": "lifecycle-operation",
@@ -365,7 +386,12 @@
       ".atm/history/tasks/TASK-PRF-0012.json",
       "docs/reports/atm-release-surface-budget.md",
       "package.json",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
       "packages/cli/package.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop",
+      "release/atm-root-drop/**",
       "scripts/build-cli-npm-runtime.ts",
       "scripts/build-onefile-release.ts",
       "scripts/build-package-dist.ts",
@@ -378,19 +404,30 @@
       "tests/cli/onefile-runtime-closure.test.ts",
       "tests/cli/release-prepublish-gate.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0012-make-npm-and-onefile-release-payloads-disjoint-and-budget-verifiable.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0012-make-npm-and-onefile-release-payloads-disjoint-and-budget-verifiable.task.md"
+    ],
     "allowPlanningMirror": false,
-    "promptHash": "061131f1e1c43187d5a4127dde416b092cf633ee77f7379ff729247ad8fa3a99",
+    "promptHash": "d5fcb699193a3b71ed4e4c6c7c0f4e0e66bba8aeb5b6fbf0b48eb588d6ca44cf",
     "actorId": "codex-captain",
-    "sessionId": "session-20260910225557-codex-captain-TASK-PRF-0012-1435da33d3",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260910225557-codex-captain-ea6e379bc7",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910225557-codex-captain-ea6e379bc7\""
     },
-    "createdAt": "2026-09-10T22:56:02.060Z",
+    "createdAt": "2026-09-10T22:56:02.130Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-10T23:29:51.631Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260910225557-codex-captain-TASK-PRF-0012-1435da33d3",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0012.closure-packet.json"
 }

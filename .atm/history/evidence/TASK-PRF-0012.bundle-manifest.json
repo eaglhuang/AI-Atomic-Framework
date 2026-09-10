@@ -1,13 +1,17 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0012",
-  "updatedAt": "2026-09-10T23:07:59.246Z",
+  "updatedAt": "2026-09-10T23:20:21.167Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "lint",
     "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
     "node --strip-types tests/cli/onefile-runtime-closure.test.ts",
     "typecheck",
+    "validate:onefile-budget",
+    "validate:onefile-release",
+    "validate:release-prepublish -- --prior-evidence .atm/history/evidence/TASK-PRF-0012.release-prepublish-prior.json",
+    "validate:release-prepublish -- --prior-evidence <sealed-prior-evidence>",
     "validate:runner-reproducibility"
   ],
   "staleValidationPasses": [],
@@ -90,6 +94,70 @@
       "durationMs": 78187,
       "runnerKind": "dev-source",
       "sourceCommit": "0374416b27b6835b191144487060eb0d3264b8c9",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-budget",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:77231406b16ae7c6fc3bf31448df6474d1549547ed617725113c431422525a4b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-budget"
+      ],
+      "generatedAt": "2026-09-10T23:16:43.039Z",
+      "startedAt": "2026-09-10T23:15:51.768Z",
+      "finishedAt": "2026-09-10T23:16:43.039Z",
+      "durationMs": 51271,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3c59eda46c7dea444a72ad0353effb17f703df4b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19ad5859c72fb0b66e8cac63671df0882c74aa04d5d7fb3d9039cd358f67066d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-09-10T23:17:57.662Z",
+      "startedAt": "2026-09-10T23:16:46.459Z",
+      "finishedAt": "2026-09-10T23:17:57.662Z",
+      "durationMs": 71203,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3c59eda46c7dea444a72ad0353effb17f703df4b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:release-prepublish -- --prior-evidence .atm/history/evidence/TASK-PRF-0012.release-prepublish-prior.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bd5d6e75c231c83929ff5c9ca8b9162bc600661d8ccd3e06cc1e911654ef6444",
+      "stderrSha256": "sha256:69bdd1593a0f5a0f0af65a989c58c77aad25ec89cb1d7ef3a79a48ab0a99796f",
+      "validators": [
+        "validate:release-prepublish -- --prior-evidence .atm/history/evidence/TASK-PRF-0012.release-prepublish-prior.json"
+      ],
+      "generatedAt": "2026-09-10T23:19:12.097Z",
+      "startedAt": "2026-09-10T23:18:27.104Z",
+      "finishedAt": "2026-09-10T23:19:12.097Z",
+      "durationMs": 44993,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3c59eda46c7dea444a72ad0353effb17f703df4b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:release-prepublish -- --prior-evidence .atm/history/evidence/TASK-PRF-0012.release-prepublish-prior.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e1630584df7395bfd1942ad0b5f4a04840b24202a0f64ece6c3b9f424c548d82",
+      "stderrSha256": "sha256:2550e66fdd97fce78798bc3d968f5331df11f0ccc7619eddf3f4b91330991f1a",
+      "validators": [
+        "validate:release-prepublish -- --prior-evidence <sealed-prior-evidence>"
+      ],
+      "generatedAt": "2026-09-10T23:20:21.166Z",
+      "startedAt": "2026-09-10T23:19:47.137Z",
+      "finishedAt": "2026-09-10T23:20:21.166Z",
+      "durationMs": 34029,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3c59eda46c7dea444a72ad0353effb17f703df4b",
       "cached": false
     }
   ],

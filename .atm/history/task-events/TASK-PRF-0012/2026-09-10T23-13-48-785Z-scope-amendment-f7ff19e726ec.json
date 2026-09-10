@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-10T23-13-48-785Z-scope-amendment-f7ff19e726ec",
+  "taskId": "TASK-PRF-0012",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0012.json",
+  "taskSha256": "sha256:2916bdafa403eac1dfebea8ecb63c3c800d10bfe0713e3e469e0695ecb7829c4",
+  "createdAt": "2026-09-10T23:13:48.785Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0012 --actor codex-captain --add \"release/atm-onefile/atm.mjs,release/atm-root-drop,packages/cli/dist\" --reason \"Sealed runner publication surfaces are required to validate TASK-PRF-0012 release contracts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Sealed runner publication surfaces are required to validate TASK-PRF-0012 release contracts"
+  }
+}
