@@ -741,6 +741,7 @@
     "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
     "release/atm-root-drop/docs/reports/atm-plan-4-1-dependency-census.json",
     "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
+    "release/atm-root-drop/docs/reports/atm-release-surface-budget.md",
     "release/atm-root-drop/docs/reports/atomization-dogfood-adoption-report.md",
     "release/atm-root-drop/docs/reports/broker-format-adapter-dogfood-report.md",
     "release/atm-root-drop/docs/reports/captain-dispatch-mailbox-atomic-map.md",
@@ -6139,8 +6140,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1489,
-    "unchanged": 4615,
+    "copied": 1483,
+    "unchanged": 4622,
     "removed": 0
   },
   "buildMode": "full",
@@ -12532,6 +12533,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-ci-burn-in.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/atm-release-surface-budget.md",
+        "digest": "6d138e66116b655d66165ca5bd08ba00e78a673fb37a8f8561bccac4d94339c9",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-release-surface-budget.md"
         ],
         "replaceable": true
       },
@@ -46629,7 +46639,7 @@
       },
       {
         "path": "scripts/build-onefile-release.ts",
-        "digest": "730b2ca886f628eb8eb03b9944096b1b9b54bbed641730fac913eeda5f072aeb",
+        "digest": "5024bb347dac30edf6ccf6ff699743da06d0171c6cba03db32bdc0d646a847aa",
         "origin": "source",
         "inputPaths": [
           "scripts/build-onefile-release.ts"
@@ -49671,7 +49681,7 @@
       },
       {
         "path": "scripts/validate-onefile-budget.ts",
-        "digest": "787cfdbf3f0bd8ee75abf48bb5ec62aa486e06e5f33d267f065a7f170bce9a02",
+        "digest": "7c0cd7f558e6fec13d6a8eb7dbab08636e9618a7dda13370024cb9c89fcbb9d7",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-onefile-budget.ts"
@@ -55017,7 +55027,7 @@
       },
       {
         "path": "tests/cli/onefile-runtime-closure.test.ts",
-        "digest": "9f1cc65cecdb41c987d591eed94aaf5bdfa36761bafe99a960596038fe0f2069",
+        "digest": "69feb60bf9aa18c5b569cc270a7b9a8dd9eb8f368ec06ff3cd2b8186638fb0af",
         "origin": "source",
         "inputPaths": [
           "tests/cli/onefile-runtime-closure.test.ts"
@@ -61082,7 +61092,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:5583b934453983572cae26b11995c10785ede31cffdfe6968d8669d88a9dd440"
+    "treeDigest": "sha256:908009f1d0a0b65a4e8d7fec2f526f1f3cbefb3643b0bcb7870f1d29da2d014d"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62627,7 +62637,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:cd792a0d4440965fc54bd5e1f8f49564b6e89ae5adb8e0bb417f1ca30019099f"
+    "digest": "sha256:e0e00b8933c4d95c6ec057f7dc72cec756b99b6ff17feaa13ed49237a436d43d"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63342,6 +63352,7 @@
       "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
       "release/atm-root-drop/docs/reports/atm-plan-4-1-dependency-census.json",
       "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
+      "release/atm-root-drop/docs/reports/atm-release-surface-budget.md",
       "release/atm-root-drop/docs/reports/atomization-dogfood-adoption-report.md",
       "release/atm-root-drop/docs/reports/broker-format-adapter-dogfood-report.md",
       "release/atm-root-drop/docs/reports/captain-dispatch-mailbox-atomic-map.md",
@@ -68743,22 +68754,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:d08339db18dfa1f287a332e4c0f3a8e93052189c0ab8a5e684ffef39c1b1b61e",
-  "sealedSourceCommit": "0106098329eeeafe24dbaa13902893216f7a6d79",
+  "buildInputsTreeHash": "sha256:70b856368758cf682303a44fb62d51bfe2c1395e0662df8ef77c64a08089c0a3",
+  "sealedSourceCommit": "3c59eda46c7dea444a72ad0353effb17f703df4b",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:d047e1a8763a50223e32af6577375027a4e8e271ec22c89f2f40407d1c081bfe",
-  "tsBuildCacheDigest": "sha256:a63fd693174173b503651a71c0b8d838561dc0d4e99c18d5010849fb731284e6",
+  "incrementalPlanDigest": "sha256:79b079072c5cd4ba83459af484afc20d0270fd51f3cb7721228ff18b9d5f7000",
+  "tsBuildCacheDigest": "sha256:e7b22df5aca0c698eb037cae6f76fe2e36e8ec5f8b5ab54d24b65143d8b69057",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 44,
-    "skipDecision": 53,
-    "worktreeSetup": 9754,
-    "typescriptBuild": 13421,
-    "rootDropReleaseAssembly": 30266,
-    "onefileReleaseAssembly": 11046,
-    "artifactSync": 5628,
+    "inputHashCalculation": 37,
+    "skipDecision": 45,
+    "worktreeSetup": 9133,
+    "typescriptBuild": 11288,
+    "rootDropReleaseAssembly": 28656,
+    "onefileReleaseAssembly": 9423,
+    "artifactSync": 5541,
     "cleanup": 0,
-    "totalElapsed": 82742
+    "totalElapsed": 84417
   }
 }

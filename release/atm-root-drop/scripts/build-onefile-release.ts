@@ -232,6 +232,13 @@ export function isOnefilePayloadPath(relativePath: string) {
     if (!normalized.startsWith('packages/cli/')) {
       return false;
     }
+    // The npm package has its own compact, bundled runtime surface. It is an
+    // adopter artifact, not part of the portable onefile runtime closure.
+    // Keeping it out here prevents the onefile release from embedding the
+    // same CLI graph a second time under packages/cli/dist/npm-runtime.
+    if (normalized.startsWith('packages/cli/dist/npm-runtime/')) {
+      return false;
+    }
     if (normalized.includes('/dist/') && normalized.includes('/__tests__/')) {
       return false;
     }
