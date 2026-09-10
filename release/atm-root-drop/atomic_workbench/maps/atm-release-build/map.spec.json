@@ -16,14 +16,16 @@
     { "atomId": "atom-build-onefile-release", "version": "0.1.0", "status": "generatedDraft" },
     { "atomId": "atom-build-package-dist", "version": "0.1.0", "status": "generatedDraft" },
     { "atomId": "atom-validator-root-drop-release", "version": "0.1.0", "status": "generatedDraft" },
-    { "atomId": "atom-validator-onefile-release", "version": "0.1.0", "status": "generatedDraft" }
+    { "atomId": "atom-validator-onefile-release", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-validator-package-install", "version": "0.1.0", "status": "generatedDraft" }
   ],
   "edges": [
     { "from": "atom-build-release", "to": "atom-build-package-dist", "binding": "invokes" },
     { "from": "atom-build-release", "to": "atom-build-root-drop-release", "binding": "invokes" },
     { "from": "atom-build-release", "to": "atom-build-onefile-release", "binding": "invokes" },
     { "from": "atom-build-root-drop-release", "to": "atom-validator-root-drop-release", "binding": "verified-by" },
-    { "from": "atom-build-onefile-release", "to": "atom-validator-onefile-release", "binding": "verified-by" }
+    { "from": "atom-build-onefile-release", "to": "atom-validator-onefile-release", "binding": "verified-by" },
+    { "from": "atom-build-package-dist", "to": "atom-validator-package-install", "binding": "verified-by" }
   ],
   "entrypoints": ["atom-build-release"],
   "qualityTargets": {

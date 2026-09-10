@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0013",
   "title": "Prove clean-installable npm tarball and enforce it in Product CI",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -179,8 +179,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-10T23-40-10-538Z-renew-3439b6f49762",
-  "lastTransitionAt": "2026-09-10T23:40:10.538Z",
+  "lastTransitionId": "2026-09-10T23-48-55-743Z-close-e1a10f3c84eb",
+  "lastTransitionAt": "2026-09-10T23:48:55.743Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-10T23:34:29.697Z",
@@ -189,7 +189,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-e2ff8db672d8",
     "claimedAt": "2026-09-10T23:34:29.705Z",
-    "heartbeatAt": "2026-09-10T23:40:09.666Z",
+    "heartbeatAt": "2026-09-10T23:48:55.740Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0013.json",
@@ -201,39 +201,41 @@
       "scripts/validate-package-skeleton.ts",
       "tests/cli/ci-product-lane-contract.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260910233429-codex-captain-a1223bf1c4",
-      "status": "active",
+      "status": "adopted",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910233429-codex-captain-a1223bf1c4\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-10T23:34:29.705Z",
   "startedByActor": "codex-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-c4e290e0c951d63f",
-    "ticketDigest": "sha256:c4e290e0c951d63f052ca090d0b335ff07f8f3c76aa46bd7bc6bf9e2d7124bff",
+    "ticketId": "wat-8ae74459c6540fc6",
+    "ticketDigest": "sha256:8ae74459c6540fc63ab9202952a44c21f09e8262b559bb860ecbf52caba52187",
     "taskId": "TASK-PRF-0013",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260910233429-codex-captain-a1223bf1c4",
     "claimGeneration": "lease-e2ff8db672d8",
-    "issuedAt": "2026-09-10T23:40:09.666Z",
-    "expiresAt": "2026-09-11T00:10:09.666Z",
-    "scopeDigest": "sha256:b2341a422d37c041f6b29466f06f2070604735f3c76fcade3cd9728786dfe212",
+    "issuedAt": "2026-09-10T23:47:06.708Z",
+    "expiresAt": "2026-09-11T00:17:06.708Z",
+    "scopeDigest": "sha256:d3ee608d94ea0e9cd94243afaab7939f8e4e51f7f4c7a0ca02e83aa22edea207",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-10T23:40:09.666Z"
+      "selectedAt": "2026-09-10T23:47:06.708Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0013.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0013/**",
           ".atm/history/tasks/TASK-PRF-0013.json",
           ".github/workflows/ci.yml",
@@ -244,7 +246,7 @@
           "scripts/validate-package-skeleton.ts",
           "tests/cli/ci-product-lane-contract.test.ts"
         ],
-        "digest": "sha256:f984ebe7af15510d74c65bf09ca930452659a3d52f61bb4283ae0c6c839850af"
+        "digest": "sha256:c35b1cc435f2c492064252264e5f0bc316278a1d16f063f362abfcf4c3b48dd1"
       },
       {
         "kind": "lifecycle-operation",
@@ -313,5 +315,9 @@
     },
     "createdAt": "2026-09-10T23:34:34.581Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-10T23:48:55.741Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260910233429-codex-captain-TASK-PRF-0013-e0d8107963",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0013.closure-packet.json"
 }

@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0013",
-  "updatedAt": "2026-09-10T23:41:03.896Z",
+  "updatedAt": "2026-09-10T23:45:37.011Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
@@ -106,6 +106,70 @@
       "durationMs": 9453,
       "runnerKind": "dev-source",
       "sourceCommit": "5d60260a11cfb77fae2ddcdc5b933a760bbb539d",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-10T23:45:04.272Z",
+      "startedAt": "2026-09-10T23:44:55.316Z",
+      "finishedAt": "2026-09-10T23:45:04.272Z",
+      "durationMs": 8956,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a21da8068291c0218f13adc211bb8bf1ea37feae",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b41cd8e11144bfb101335f1339066c7e6c9da2dc1de5433c2fa88f793e137149",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-10T23:45:13.266Z",
+      "startedAt": "2026-09-10T23:45:12.840Z",
+      "finishedAt": "2026-09-10T23:45:13.266Z",
+      "durationMs": 426,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a21da8068291c0218f13adc211bb8bf1ea37feae",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-package-skeleton.ts --mode install-smoke",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c68ae45ef9822523ce03fd33c24bcd1b882c898747f535d4faa05dea38a19887",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:package-skeleton"
+      ],
+      "generatedAt": "2026-09-10T23:45:29.515Z",
+      "startedAt": "2026-09-10T23:45:20.287Z",
+      "finishedAt": "2026-09-10T23:45:29.515Z",
+      "durationMs": 9228,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a21da8068291c0218f13adc211bb8bf1ea37feae",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:ci-product-lane",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d38b7988d96c85feb88c6d085a1289eee305863ee39197ca09baa72659189e18",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-09-10T23:45:37.010Z",
+      "startedAt": "2026-09-10T23:45:36.381Z",
+      "finishedAt": "2026-09-10T23:45:37.010Z",
+      "durationMs": 629,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a21da8068291c0218f13adc211bb8bf1ea37feae",
       "cached": false
     }
   ],

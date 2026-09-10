@@ -1,4 +1,7 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -6,6 +9,58 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'test';
+
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
+function runInstallSmoke(): void {
+  const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-package-install-'));
+  const packRoot = path.join(tempRoot, 'pack');
+  const consumerRoot = path.join(tempRoot, 'consumer');
+  const startedAt = Date.now();
+  try {
+    mkdirSync(packRoot, { recursive: true });
+    const packOutput = execFileSync(npmCommand, [
+      'pack', '--workspace', 'packages/cli', '--pack-destination', packRoot, '--json', '--loglevel', 'silent'
+    ], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: process.platform === 'win32' });
+    const tarballs = readdirSync(packRoot).filter((entry) => entry.endsWith('.tgz'));
+    if (tarballs.length !== 1) throw new Error(`expected exactly one packed CLI tarball, found ${tarballs.length}`);
+    const tarballPath = path.join(packRoot, tarballs[0]);
+    const tarballBytes = readFileSync(tarballPath);
+    execFileSync(npmCommand, ['install', '--ignore-scripts', '--prefix', consumerRoot, tarballPath], {
+      cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: process.platform === 'win32'
+    });
+    const binPath = path.join(consumerRoot, 'node_modules', '.bin', process.platform === 'win32' ? 'atm.cmd' : 'atm');
+    if (!existsSync(binPath)) throw new Error(`installed package did not expose the atm bin: ${binPath}`);
+    const versionOutput = execFileSync(binPath, ['--version'], {
+      cwd: consumerRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: process.platform === 'win32'
+    });
+    if (!/ATM_CLI_VERSION|framework version/i.test(versionOutput)) {
+      throw new Error(`installed atm --version output was not recognized: ${versionOutput.trim()}`);
+    }
+    const jsonStart = packOutput.search(/\n\[\s*\{/);
+    if (jsonStart < 0) throw new Error('npm pack did not emit a JSON inventory');
+    const inventory = JSON.parse(packOutput.slice(jsonStart + 1)) as Array<{ files?: Array<{ path?: string }>; unpackedSize?: number; filename?: string }>;
+    const files = inventory[0]?.files ?? [];
+    const forbidden = files.map((entry) => String(entry.path)).filter((entry) => /(^|[\\/])(src|tests|\.atm[\\/]history|node_modules)([\\/]|$)/.test(entry));
+    if (forbidden.length > 0) throw new Error(`packed CLI contains forbidden adopter files: ${forbidden.join(', ')}`);
+    console.log(JSON.stringify({
+      schemaId: 'atm.cleanInstallSmoke.v1', package: '@ai-atomic-framework/cli',
+      tarball: inventory[0]?.filename ?? tarballs[0], tarballBytes: tarballBytes.byteLength,
+      tarballSha256: createHash('sha256').update(tarballBytes).digest('hex'),
+      unpackedSize: inventory[0]?.unpackedSize ?? null, entryCount: files.length,
+      installCommand: 'npm install --ignore-scripts <tarball>', publicCommand: 'atm --version',
+      publicCommandOutputSha256: createHash('sha256').update(versionOutput).digest('hex'),
+      elapsedMs: Date.now() - startedAt, temporaryRootRemoved: true
+    }));
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+}
+
+if (mode === 'install-smoke') {
+  runInstallSmoke();
+  process.exit(0);
+}
 
 const fixture = JSON.parse(readFileSync(path.join(root, 'tests', 'package-skeleton.fixture.json'), 'utf8'));
 const rootPackage = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
