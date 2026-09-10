@@ -46,6 +46,9 @@ jobs:
       - name: Package skeleton smoke
         run: node --strip-types scripts/validate-package-skeleton.ts
 
+      - name: Clean-install packed CLI smoke
+        run: npm run validate:package-install
+
       - name: Workspace package smoke
         run: npm pack --workspaces --dry-run
 

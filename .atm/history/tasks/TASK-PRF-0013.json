@@ -1,0 +1,317 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0013",
+  "title": "Prove clean-installable npm tarball and enforce it in Product CI",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: `npm pack --workspace packages/cli` produces a tarball whose inventory is limited to the declared runtime closure and package metadata.",
+    "ACC-2: A fresh temporary consumer can install that exact tarball with `npm install --ignore-scripts` and execute `npx --no-install atm --version` (or the equivalent installed bin) successfully.",
+    "ACC-3: Product CI runs the same isolated clean-install smoke independently of ATM Dogfood, and the workflow contract test fails if the step disappears.",
+    "ACC-4: Evidence records tarball bytes, entries, install command, public command output digest, and rollback/reproduction instructions without committing temporary consumer files."
+  ],
+  "deliverables": [
+    ".github/workflows/ci.yml",
+    "package.json",
+    "scripts/validate-ci-product-lane.ts",
+    "scripts/validate-package-skeleton.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "docs/reports/atm-product-ci-burn-in.md",
+    "atomic_workbench/maps/atm-release-build/map.spec.json"
+  ],
+  "scopePaths": [
+    ".github/workflows/ci.yml",
+    "package.json",
+    "scripts/validate-ci-product-lane.ts",
+    "scripts/validate-package-skeleton.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "docs/reports/atm-product-ci-burn-in.md",
+    "atomic_workbench/maps/atm-release-build/map.spec.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "node --strip-types scripts/validate-package-skeleton.ts --mode install-smoke",
+    "npm run validate:ci-product-lane"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the workflow, validator, package-script, report, and map changes together; no registry or npm publication is performed.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-build-map",
+    "atomCid": "null",
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-release-build/map.spec.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0013-prove-clean-installable-npm-tarball-and-enforce-it-in-product-ci.task.md",
+    "sectionTitle": "TASK-PRF-0013",
+    "headingLine": 102,
+    "hash": "6055a6e1601d9cf0",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0013-prove-clean-installable-npm-tarball-and-enforce-it-in-product-ci.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:6055a6e1601d9cf0e65d8cb3f1d89cc00d4b98c136272e1a60c883706898c540",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-10T23:34:18.976Z"
+    }
+  },
+  "importedAt": "2026-09-10T23:34:18.976Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_ci_clean_install_tarball_9b7e2a1c",
+      "targetGroupId": "null",
+      "semanticKey": "clean_install_tarball",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "public-npm-install-seam",
+        "protected-product-ci-seam"
+      ],
+      "expectedRedPredicate": "an isolated consumer install must fail when the packed bin or runtime closure is unusable",
+      "contributionResourceKey": "npm-tarball-smoke",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "npm-install-contract",
+      "resourceKey": "npm-tarball-smoke"
+    },
+    {
+      "caseId": "test_ci_workflow_contract_4d2a8f77",
+      "targetGroupId": "null",
+      "semanticKey": "product_ci_clean_install_step",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "protected-product-ci-seam"
+      ],
+      "expectedRedPredicate": "the workflow contract must fail when Product CI no longer runs the isolated tarball smoke",
+      "contributionResourceKey": "product-ci-workflow",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "product-ci-contract",
+      "resourceKey": "product-ci-workflow"
+    },
+    {
+      "caseId": "test_ci_install_evidence_71c04e2e",
+      "targetGroupId": "null",
+      "semanticKey": "install_evidence_digest",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "npm-install-evidence-seam"
+      ],
+      "expectedRedPredicate": "the smoke must emit measured inventory and command-backed evidence without retaining temp files",
+      "contributionResourceKey": "npm-tarball-evidence",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "npm-evidence-contract",
+      "resourceKey": "npm-tarball-evidence"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_ci_clean_install_tarball_9b7e2a1c",
+    "test_ci_workflow_contract_4d2a8f77",
+    "test_ci_install_evidence_71c04e2e"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-10T23-40-10-538Z-renew-3439b6f49762",
+  "lastTransitionAt": "2026-09-10T23:40:10.538Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-10T23:34:29.697Z",
+  "promotedAt": "2026-09-10T23:34:29.701Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-e2ff8db672d8",
+    "claimedAt": "2026-09-10T23:34:29.705Z",
+    "heartbeatAt": "2026-09-10T23:40:09.666Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0013.json",
+      ".github/workflows/ci.yml",
+      "atomic_workbench/maps/atm-release-build/map.spec.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "package.json",
+      "scripts/validate-ci-product-lane.ts",
+      "scripts/validate-package-skeleton.ts",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260910233429-codex-captain-a1223bf1c4",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910233429-codex-captain-a1223bf1c4\""
+    }
+  },
+  "startedAt": "2026-09-10T23:34:29.705Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-c4e290e0c951d63f",
+    "ticketDigest": "sha256:c4e290e0c951d63f052ca090d0b335ff07f8f3c76aa46bd7bc6bf9e2d7124bff",
+    "taskId": "TASK-PRF-0013",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260910233429-codex-captain-a1223bf1c4",
+    "claimGeneration": "lease-e2ff8db672d8",
+    "issuedAt": "2026-09-10T23:40:09.666Z",
+    "expiresAt": "2026-09-11T00:10:09.666Z",
+    "scopeDigest": "sha256:b2341a422d37c041f6b29466f06f2070604735f3c76fcade3cd9728786dfe212",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-10T23:40:09.666Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0013.*",
+          ".atm/history/task-events/TASK-PRF-0013/**",
+          ".atm/history/tasks/TASK-PRF-0013.json",
+          ".github/workflows/ci.yml",
+          "atomic_workbench/maps/atm-release-build/map.spec.json",
+          "docs/reports/atm-product-ci-burn-in.md",
+          "package.json",
+          "scripts/validate-ci-product-lane.ts",
+          "scripts/validate-package-skeleton.ts",
+          "tests/cli/ci-product-lane-contract.test.ts"
+        ],
+        "digest": "sha256:f984ebe7af15510d74c65bf09ca930452659a3d52f61bb4283ae0c6c839850af"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260910233429-codex-captain-TASK-PRF-0013-e0d8107963",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0013",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0013.*",
+      ".atm/history/task-events/TASK-PRF-0013/**",
+      ".atm/history/tasks/TASK-PRF-0013.json",
+      ".github/workflows/ci.yml",
+      "atomic_workbench/maps/atm-release-build/map.spec.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "package.json",
+      "scripts/validate-ci-product-lane.ts",
+      "scripts/validate-package-skeleton.ts",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e2e2e7b97581540d1fe6c246673dc3e7c9f3ba4ac08e262ac1f59ffd5b73d5c5",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260910233429-codex-captain-TASK-PRF-0013-e0d8107963",
+    "laneSession": {
+      "laneSessionId": "lane-20260910233429-codex-captain-a1223bf1c4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910233429-codex-captain-a1223bf1c4\""
+    },
+    "createdAt": "2026-09-10T23:34:34.581Z",
+    "status": "active"
+  }
+}
