@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0014",
+  "updatedAt": "2026-09-10T23:56:08.680Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "validate:ci-product-lane"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b41cd8e11144bfb101335f1339066c7e6c9da2dc1de5433c2fa88f793e137149",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-10T23:55:28.244Z",
+      "startedAt": "2026-09-10T23:55:27.866Z",
+      "finishedAt": "2026-09-10T23:55:28.244Z",
+      "durationMs": 378,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "cf32c72a175f0099b9f9e34cd4f2014d070deafd",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:ci-product-lane",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d38b7988d96c85feb88c6d085a1289eee305863ee39197ca09baa72659189e18",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-09-10T23:55:31.347Z",
+      "startedAt": "2026-09-10T23:55:30.736Z",
+      "finishedAt": "2026-09-10T23:55:31.347Z",
+      "durationMs": 611,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "cf32c72a175f0099b9f9e34cd4f2014d070deafd",
+      "cached": false
+    },
+    {
+      "command": "gh run view 34136912919 --repo eaglhuang/AI-Atomic-Framework --log-failed",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9da8e82b0ad9bac053e78c1c6df540a477cf2f732c8fa9a09d2d1820be691b04",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-10T23:55:58.573Z",
+      "startedAt": "2026-09-10T23:55:57.031Z",
+      "finishedAt": "2026-09-10T23:55:58.573Z",
+      "durationMs": 1542,
+      "runnerKind": "external",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "gh api repos/eaglhuang/AI-Atomic-Framework/branches/main/protection",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8e88c82e5aabfcf74c32dc1155c793ccc09020c66a3974f0d98ff5e8b4405d14",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-10T23:56:01.797Z",
+      "startedAt": "2026-09-10T23:56:01.065Z",
+      "finishedAt": "2026-09-10T23:56:01.797Z",
+      "durationMs": 732,
+      "runnerKind": "external",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": [
+    "docs/reports/atm-product-ci-burn-in.md"
+  ]
+}

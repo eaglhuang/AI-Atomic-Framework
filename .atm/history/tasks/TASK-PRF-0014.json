@@ -1,0 +1,322 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0014",
+  "title": "Reverify protected-main Product CI after clean-install delivery",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0009",
+    "TASK-PRF-0013"
+  ],
+  "acceptance": [
+    "ACC-1: The delivered SHA and complete GitHub Actions run IDs are recorded.",
+    "ACC-2: The required Product CI lane is green and its logs show the clean-install smoke executed against the delivered SHA.",
+    "ACC-3: The report proves the declared consecutive-green count from distinct protected-main runs, or remains explicitly red/inconclusive with the first failing command.",
+    "ACC-4: Branch protection/ruleset evidence binds the Product CI check as required; a sandbox or advisory workflow cannot satisfy this criterion."
+  ],
+  "deliverables": [
+    "docs/reports/atm-product-ci-burn-in.md"
+  ],
+  "scopePaths": [
+    "docs/reports/atm-product-ci-burn-in.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "npm run validate:ci-product-lane",
+    "node --strip-types scripts/validate-ci-product-lane.ts --remote"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the burn-in report update; never rewrite or delete remote run history.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-build-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0014-reverify-protected-main-product-ci-after-clean-install-delivery.task.md",
+    "sectionTitle": "TASK-PRF-0014",
+    "headingLine": 84,
+    "hash": "83fe1878583c765b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0014-reverify-protected-main-product-ci-after-clean-install-delivery.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:83fe1878583c765b81fc6592e57ef4c443fc23496b04aae6af3c15d641f1bf34",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-10T23:54:16.056Z"
+    }
+  },
+  "importedAt": "2026-09-10T23:54:16.056Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0009",
+      "TASK-PRF-0013"
+    ],
+    "startConditions": [
+      "Owner-authorized delivery of the reviewed local commits to protected main is available.",
+      "The Product CI workflow and clean-install smoke are present at the delivered SHA.",
+      "GitHub Actions read access can retrieve complete logs and conclusions."
+    ],
+    "softRelations": [
+      "TASK-PRF-0008"
+    ],
+    "changedPublicSeams": [
+      "protected-main-product-ci-evidence"
+    ],
+    "causalImpactEdges": [
+      "required-product-lane-is-green",
+      "clean-install-smoke-runs-remotely",
+      "consecutive-green-run-count-is-real"
+    ],
+    "parallelFrontierInputs": [
+      "delivered-sha",
+      "github-run-identifiers",
+      "branch-protection-or-ruleset-evidence"
+    ],
+    "validatorReferences": [
+      "test_prf_remote_product_ci_observation_2f8a1d4c",
+      "test_prf_consecutive_green_run_gate_7c2e9b41"
+    ],
+    "phaseOwner": "phase-1-remote-ci-verification"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_remote_product_ci_observation_2f8a1d4c",
+      "targetGroupId": "null",
+      "semanticKey": "remote_product_ci_observation",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "required-product-lane-is-green",
+        "clean-install-smoke-runs-remotely"
+      ],
+      "expectedRedPredicate": "A protected-main Product CI run is absent, red, stale, or does not execute the required clean-install smoke.",
+      "contributionResourceKey": "github-product-ci-runs",
+      "responsibility": "task-required",
+      "dependencyEdge": "delivered-sha-to-remote-run",
+      "contractEdge": "protected-main-product-ci-evidence",
+      "resourceKey": "github-actions"
+    },
+    {
+      "caseId": "test_prf_consecutive_green_run_gate_7c2e9b41",
+      "targetGroupId": "null",
+      "semanticKey": "consecutive_green_run_gate",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "consecutive-green-run-count-is-real"
+      ],
+      "expectedRedPredicate": "The burn-in report claims green or protected enforcement without the required consecutive run IDs and branch-rule evidence.",
+      "contributionResourceKey": "ci-burn-in-report",
+      "responsibility": "task-required",
+      "dependencyEdge": "remote-run-to-burn-in-report",
+      "contractEdge": "protected-main-product-ci-evidence",
+      "resourceKey": "release-gate"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_remote_product_ci_observation_2f8a1d4c",
+    "test_prf_consecutive_green_run_gate_7c2e9b41"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0009",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-PRF-0013",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-10T23-57-23-613Z-close-052b22f29c24",
+  "lastTransitionAt": "2026-09-10T23:57:23.613Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-10T23:54:36.643Z",
+  "promotedAt": "2026-09-10T23:54:36.649Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-3bfc5f771718",
+    "claimedAt": "2026-09-10T23:54:36.654Z",
+    "heartbeatAt": "2026-09-10T23:57:23.611Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0014.json",
+      "docs/reports/atm-product-ci-burn-in.md"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260910235436-codex-captain-b0ad1eba96",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910235436-codex-captain-b0ad1eba96\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-09-10T23:54:36.654Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-9dc116dc7f5b2acb",
+    "ticketDigest": "sha256:9dc116dc7f5b2acb284ccdedaf63947c94549e11f51661b570bc0d3dc8be1812",
+    "taskId": "TASK-PRF-0014",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260910235436-codex-captain-b0ad1eba96",
+    "claimGeneration": "lease-3bfc5f771718",
+    "issuedAt": "2026-09-10T23:54:36.654Z",
+    "expiresAt": "2026-09-11T00:24:36.654Z",
+    "scopeDigest": "sha256:fb77816c2ab3ecfde6a4a262f97264ad140ad6af761538852d04e34b891d6a2a",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-10T23:54:36.654Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0014.*",
+          ".atm/history/task-events/TASK-PRF-0014/**",
+          ".atm/history/tasks/TASK-PRF-0014.json",
+          "docs/reports/atm-product-ci-burn-in.md"
+        ],
+        "digest": "sha256:4fa197e7cbb84cfe65406c4c7672f57f47f85184cbfabf68f187d7e8fb38979a"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260910235436-codex-captain-TASK-PRF-0014-aa7b9f676b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0014",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0014.*",
+      ".atm/history/task-events/TASK-PRF-0014/**",
+      ".atm/history/tasks/TASK-PRF-0014.json",
+      "docs/reports/atm-product-ci-burn-in.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "cd826b5b3cd7a436c36f4999e263d3a231bffa488cc20ce1ec6da0b4f39f8fe2",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260910235436-codex-captain-TASK-PRF-0014-aa7b9f676b",
+    "laneSession": {
+      "laneSessionId": "lane-20260910235436-codex-captain-b0ad1eba96",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910235436-codex-captain-b0ad1eba96\""
+    },
+    "createdAt": "2026-09-10T23:54:41.153Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-10T23:57:23.611Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260910235436-codex-captain-TASK-PRF-0014-aa7b9f676b",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0014.closure-packet.json"
+}

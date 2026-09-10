@@ -1,0 +1,118 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0014",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e3442d498218f377685d833761e7e10a156d4b3c",
+  "governedTreeSha": "039102a94c7323461e0cbd500bbbc044d79821aa",
+  "targetCommitDelta": {
+    "currentCommitSha": "e3442d498218f377685d833761e7e10a156d4b3c",
+    "parentCommitShas": [
+      "e3442d498218f377685d833761e7e10a156d4b3c"
+    ],
+    "governedTreeSha": "039102a94c7323461e0cbd500bbbc044d79821aa",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/task-events/TASK-PRF-0014/2026-09-10T23-54-16-281Z-import-8d22ad03f17b.json",
+      ".atm/history/task-events/TASK-PRF-0014/2026-09-10T23-54-36-643Z-reserve-964d9f36d518.json",
+      ".atm/history/task-events/TASK-PRF-0014/2026-09-10T23-54-36-649Z-promote-78e60b4bfb20.json",
+      ".atm/history/task-events/TASK-PRF-0014/2026-09-10T23-54-41-154Z-claim-99c3bf0b91e9.json",
+      ".atm/history/tasks/TASK-PRF-0014.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-product-ci-burn-in.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b41cd8e11144bfb101335f1339066c7e6c9da2dc1de5433c2fa88f793e137149",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:ci-product-lane",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d38b7988d96c85feb88c6d085a1289eee305863ee39197ca09baa72659189e18",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "gh run view 34136912919 --repo eaglhuang/AI-Atomic-Framework --log-failed",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9da8e82b0ad9bac053e78c1c6df540a477cf2f732c8fa9a09d2d1820be691b04",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "gh api repos/eaglhuang/AI-Atomic-Framework/branches/main/protection",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8e88c82e5aabfcf74c32dc1155c793ccc09020c66a3974f0d98ff5e8b4405d14",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "validate:ci-product-lane"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "validate:ci-product-lane"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-10T23:57:23.601Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0014.*",
+      ".atm/history/task-events/TASK-PRF-0014/**",
+      ".atm/history/tasks/TASK-PRF-0014.json",
+      "docs/reports/atm-product-ci-burn-in.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "validate:ci-product-lane"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0014.json",
+  "closedAt": "2026-09-10T23:57:23.601Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260910235436-codex-captain-TASK-PRF-0014-aa7b9f676b",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e3442d498218f377685d833761e7e10a156d4b3c",
+    "taskMatchedFiles": [
+      "docs/reports/atm-product-ci-burn-in.md"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
