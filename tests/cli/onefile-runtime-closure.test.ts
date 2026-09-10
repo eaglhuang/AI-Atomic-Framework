@@ -32,6 +32,7 @@ for (const path of [
 }
 
 for (const path of [
+  'docs/governance/docs-neutrality-policy.json',
   'docs/governance/error-code-registry.json',
   'docs/governance/tasks-audit-warning-baseline.json'
 ]) {
@@ -51,8 +52,7 @@ for (const path of [
 assert.equal(isOnefilePayloadPath('packages/cli/dist/npm-runtime/runtime.mjs'), false, 'npm-only compact runtime must stay outside onefile payload');
 
 for (const path of [
-  'docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json',
-  'docs/governance/docs-neutrality-policy.json'
+  'docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json'
 ]) {
   assert.equal(isOnefilePayloadPath(path), false, `host governance projection must stay outside onefile payload: ${path}`);
 }
