@@ -291,11 +291,13 @@ function validateRunnerBoundary(scripts: Record<string, string>) {
   const buildOnefileScript = scripts['build:onefile-release'] ?? '';
   const validateBudgetScript = scripts['validate:onefile-budget'] ?? '';
 
-  if (buildOnefileScript !== 'node --strip-types scripts/build-onefile-release.ts') {
+  const directBuilder = 'node --strip-types scripts/build-onefile-release.ts';
+  const sealedBuilder = 'node --strip-types scripts/run-sealed-runner-build.ts onefile';
+  if (buildOnefileScript !== directBuilder && buildOnefileScript !== sealedBuilder) {
     findings.push({
       code: 'ONEFILE_BUILD_SCRIPT_BOUNDARY_DRIFT',
-      message: 'build:onefile-release must point at scripts/build-onefile-release.ts.',
-      remediation: 'Keep release runner construction in scripts/build-onefile-release.ts; do not route it through atm.dev.mjs.'
+      message: 'build:onefile-release must use the direct onefile builder or its sealed runner wrapper.',
+      remediation: 'Keep the sealed release boundary on scripts/build-onefile-release.ts; the wrapper may only dispatch the canonical builder and must not route through atm.dev.mjs.'
     });
   }
 
@@ -322,6 +324,8 @@ function validateRunnerBoundary(scripts: Record<string, string>) {
     summary: {
       buildOnefileScript,
       validateBudgetScript,
+      canonicalBuilder: directBuilder,
+      sealedBuilder,
       budgetTarget: 'release runner only',
       devRunnerExcluded: true
     }

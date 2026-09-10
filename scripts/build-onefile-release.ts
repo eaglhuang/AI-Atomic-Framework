@@ -188,7 +188,6 @@ const onefilePayloadFrameworkMarkers = new Set([
 // These records are read by shipped CLI diagnostics. Governance projections
 // and backlog shards belong to the host repository, not the embedded runtime.
 const onefilePayloadGovernanceFiles = new Set([
-  'docs/governance/docs-neutrality-policy.json',
   'docs/governance/error-code-registry.json',
   'docs/governance/tasks-audit-warning-baseline.json'
 ]);
@@ -230,6 +229,13 @@ export function isOnefilePayloadPath(relativePath: string) {
     // duplicates those modules and turns the onefile launcher into a source
     // archive instead of a portable runtime.
     if (!normalized.startsWith('packages/cli/')) {
+      return false;
+    }
+    // The npm package has its own compact, bundled runtime surface. It is an
+    // adopter artifact, not part of the portable onefile runtime closure.
+    // Keeping it out here prevents the onefile release from embedding the
+    // same CLI graph a second time under packages/cli/dist/npm-runtime.
+    if (normalized.startsWith('packages/cli/dist/npm-runtime/')) {
       return false;
     }
     if (normalized.includes('/dist/') && normalized.includes('/__tests__/')) {

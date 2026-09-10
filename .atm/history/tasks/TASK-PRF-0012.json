@@ -1,0 +1,396 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0012",
+  "title": "Make npm and onefile release payloads disjoint and budget-verifiable",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "**ACC-1 — Disjoint payloads:** the npm tarball and portable onefile have separate manifests; onefile excludes npm-only runtime payloads and its packed surface remains at or below 4,500,000 bytes without forbidden development files.",
+    "**ACC-2 — Single builder contract:** package scripts, sealed runner publication, release manifest, and `validate-onefile-budget` resolve the same canonical builder entrypoint; boundary drift is detected by a focused test.",
+    "**ACC-3 — Reproducible release proof:** clean rebuilds pass onefile size, cold/warm startup, clean-install, and runner-reproducibility gates; release prepublish consumes sealed prior evidence and does not treat missing evidence as green.",
+    "**ACC-4 — No scope laundering:** no npm publish, protected push, or external benchmark verdict is part of this card's closure."
+  ],
+  "deliverables": [
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/validate-onefile-budget.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "tests/cli/onefile-runtime-closure.test.ts",
+    "tests/cli/release-prepublish-gate.test.ts",
+    "docs/reports/atm-release-surface-budget.md"
+  ],
+  "scopePaths": [
+    "package.json",
+    "packages/cli/package.json",
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/build-package-dist.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/validate-onefile-budget.ts",
+    "scripts/validate-onefile-release.ts",
+    "scripts/validate-runner-reproducibility.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "tests/cli/onefile-runtime-closure.test.ts",
+    "tests/cli/build-release-hygiene.test.ts",
+    "tests/cli/release-prepublish-gate.test.ts",
+    "docs/reports/atm-release-surface-budget.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run lint",
+    "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+    "node --strip-types tests/cli/onefile-runtime-closure.test.ts",
+    "npm run validate:onefile-budget",
+    "npm run validate:onefile-release",
+    "npm run validate:runner-reproducibility",
+    "npm run validate:release-prepublish -- --prior-evidence <sealed-prior-evidence>"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the packaging-contract change and restore the last sealed runner; never raise the byte budget or remove the failing validator to obtain green output.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-surface-budget-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-release-surface-budget-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.release-payload-inventory",
+        "pattern": "Policy Object",
+        "source": "scripts/build-cli-npm-runtime.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0012-make-npm-and-onefile-release-payloads-disjoint-and-budget-verifiable.task.md",
+    "sectionTitle": "TASK-PRF-0012",
+    "headingLine": 146,
+    "hash": "4e9c065d11d02f8a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0012-make-npm-and-onefile-release-payloads-disjoint-and-budget-verifiable.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4e9c065d11d02f8af902e5f20352e70bee9ba22fb32661c7b4564c86632af93c",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-10T22:55:34.259Z"
+    }
+  },
+  "importedAt": "2026-09-10T22:55:34.259Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-PRF-0011 compact npm runtime remains installable and its scaffold smoke stays green.",
+      "No external benchmark verdict is inferred from this packaging task."
+    ],
+    "softRelations": [
+      "TASK-PRF-0008 remains independently blocked until external evidence is supplied."
+    ],
+    "changedPublicSeams": [
+      "npm-cli-package-payload",
+      "onefile-release-payload",
+      "sealed-release-builder-entrypoint",
+      "onefile-budget-validator"
+    ],
+    "causalImpactEdges": [
+      "npm-and-onefile-inventories-are-disjoint",
+      "onefile-budget-is-measured-on-the-shipped-surface",
+      "builder-and-validator-share-one-contract"
+    ],
+    "parallelFrontierInputs": [
+      "compact-npm-runtime-manifest",
+      "onefile-payload-manifest",
+      "release-prepublish-evidence"
+    ],
+    "validatorReferences": [
+      "test_prf_payload_disjointness_4b0b3d1a",
+      "test_prf_builder_boundary_coherence_2f8c91e0",
+      "test_prf_release_surface_budget_9a12f3ce",
+      "test_prf_scope_boundary_no_publish_6d91a2e4"
+    ],
+    "phaseOwner": "phase-3-installable-artifact-and-ci"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_payload_disjointness_4b0b3d1a",
+      "targetGroupId": "null",
+      "semanticKey": "npm_and_onefile_payload_disjointness",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "npm-and-onefile-inventories-are-disjoint"
+      ],
+      "expectedRedPredicate": "Onefile payload includes npm-only runtime files or package budget is not enforced on the packed surface.",
+      "contributionResourceKey": "release-surface-inventory",
+      "responsibility": "task-required",
+      "dependencyEdge": "compact-npm-runtime-to-onefile-payload",
+      "contractEdge": "npm-cli-package-payload",
+      "resourceKey": "payload-manifests"
+    },
+    {
+      "caseId": "test_prf_builder_boundary_coherence_2f8c91e0",
+      "targetGroupId": "null",
+      "semanticKey": "sealed_builder_boundary_coherence",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "builder-and-validator-share-one-contract"
+      ],
+      "expectedRedPredicate": "package.json, sealed runner wrapper, and onefile validator disagree about the canonical builder entrypoint.",
+      "contributionResourceKey": "sealed-builder-contract",
+      "responsibility": "task-required",
+      "dependencyEdge": "builder-to-validator-boundary",
+      "contractEdge": "sealed-release-builder-entrypoint",
+      "resourceKey": "builder-boundary"
+    },
+    {
+      "caseId": "test_prf_release_surface_budget_9a12f3ce",
+      "targetGroupId": "null",
+      "semanticKey": "release_surface_budget_and_reproducibility",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "onefile-budget-is-measured-on-the-shipped-surface"
+      ],
+      "expectedRedPredicate": "A rebuilt onefile exceeds 4,500,000 bytes or fails cold/warm startup or reproducibility gates.",
+      "contributionResourceKey": "onefile-budget",
+      "responsibility": "task-required",
+      "dependencyEdge": "payload-inventory-to-budget-verdict",
+      "contractEdge": "onefile-budget-validator",
+      "resourceKey": "onefile-budget"
+    },
+    {
+      "caseId": "test_prf_scope_boundary_no_publish_6d91a2e4",
+      "targetGroupId": "null",
+      "semanticKey": "packaging_task_scope_boundary",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [],
+      "expectedRedPredicate": "Packaging work emits a publish, protected push, or synthetic external benchmark verdict as completion evidence.",
+      "contributionResourceKey": "task-scope-boundary",
+      "responsibility": "task-required",
+      "dependencyEdge": "packaging-to-external-proof-boundary",
+      "contractEdge": "release-surface-budget",
+      "resourceKey": "scope-boundary"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_payload_disjointness_4b0b3d1a",
+    "test_prf_builder_boundary_coherence_2f8c91e0",
+    "test_prf_release_surface_budget_9a12f3ce",
+    "test_prf_scope_boundary_no_publish_6d91a2e4"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-10T22-56-02-060Z-claim-a18942f69b86",
+  "lastTransitionAt": "2026-09-10T22:56:02.060Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-10T22:55:57.164Z",
+  "promotedAt": "2026-09-10T22:55:57.168Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-a8908bd90baf",
+    "claimedAt": "2026-09-10T22:55:57.172Z",
+    "heartbeatAt": "2026-09-10T22:55:57.172Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0012.json",
+      "docs/reports/atm-release-surface-budget.md",
+      "package.json",
+      "packages/cli/package.json",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/validate-onefile-budget.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-runner-reproducibility.ts",
+      "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/build-release-hygiene.test.ts",
+      "tests/cli/onefile-runtime-closure.test.ts",
+      "tests/cli/release-prepublish-gate.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260910225557-codex-captain-ea6e379bc7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910225557-codex-captain-ea6e379bc7\""
+    }
+  },
+  "startedAt": "2026-09-10T22:55:57.172Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-bb1b6995929aa5b5",
+    "ticketDigest": "sha256:bb1b6995929aa5b5baa70f87667944ff66c82dc9c0dd9033d4f0e5d1d430802a",
+    "taskId": "TASK-PRF-0012",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260910225557-codex-captain-ea6e379bc7",
+    "claimGeneration": "lease-a8908bd90baf",
+    "issuedAt": "2026-09-10T22:55:57.172Z",
+    "expiresAt": "2026-09-10T23:25:57.172Z",
+    "scopeDigest": "sha256:cf5cd2e5b85fc79237edb2395b4d778fbf5a56b3343f44cf8ab5ac7d3a2fdb21",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-10T22:55:57.172Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0012.*",
+          ".atm/history/task-events/TASK-PRF-0012/**",
+          ".atm/history/tasks/TASK-PRF-0012.json",
+          "docs/reports/atm-release-surface-budget.md",
+          "package.json",
+          "packages/cli/package.json",
+          "scripts/build-cli-npm-runtime.ts",
+          "scripts/build-onefile-release.ts",
+          "scripts/build-package-dist.ts",
+          "scripts/run-sealed-runner-build.ts",
+          "scripts/validate-onefile-budget.ts",
+          "scripts/validate-onefile-release.ts",
+          "scripts/validate-runner-reproducibility.ts",
+          "tests/cli/adopter-artifact-budget.test.ts",
+          "tests/cli/build-release-hygiene.test.ts",
+          "tests/cli/onefile-runtime-closure.test.ts",
+          "tests/cli/release-prepublish-gate.test.ts"
+        ],
+        "digest": "sha256:0c23dc8629f98da399e49dd8efbf1bfbebc69c43e37fc3558087a3c5bbaf345e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260910225557-codex-captain-TASK-PRF-0012-1435da33d3",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0012",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0012.*",
+      ".atm/history/task-events/TASK-PRF-0012/**",
+      ".atm/history/tasks/TASK-PRF-0012.json",
+      "docs/reports/atm-release-surface-budget.md",
+      "package.json",
+      "packages/cli/package.json",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/validate-onefile-budget.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-runner-reproducibility.ts",
+      "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/build-release-hygiene.test.ts",
+      "tests/cli/onefile-runtime-closure.test.ts",
+      "tests/cli/release-prepublish-gate.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "061131f1e1c43187d5a4127dde416b092cf633ee77f7379ff729247ad8fa3a99",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260910225557-codex-captain-TASK-PRF-0012-1435da33d3",
+    "laneSession": {
+      "laneSessionId": "lane-20260910225557-codex-captain-ea6e379bc7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260910225557-codex-captain-ea6e379bc7\""
+    },
+    "createdAt": "2026-09-10T22:56:02.060Z",
+    "status": "active"
+  }
+}

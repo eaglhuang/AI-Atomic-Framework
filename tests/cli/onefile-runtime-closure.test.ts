@@ -7,11 +7,16 @@ import { isOnefilePayloadPath } from '../../scripts/build-onefile-release.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const builder = readFileSync(path.join(root, 'scripts', 'build-onefile-release.ts'), 'utf8');
+const packageJson = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
 const fastVersionRuntime = readFileSync(path.join(root, 'scripts', 'onefile-fast-version-runtime.ts'), 'utf8');
 
 assert.match(builder, /renderOnefileFastVersionRuntime/, 'onefile builder must inject the dedicated fast-version runtime fragment');
 assert.match(fastVersionRuntime, /function isVersionRequest\(args\)/, 'onefile launcher must recognize a direct version request before extraction');
 assert.match(fastVersionRuntime, /function writeFastVersionResult\(\)/, 'onefile launcher must expose a sealed version envelope without importing every CLI command');
+assert.ok([
+  'node --strip-types scripts/build-onefile-release.ts',
+  'node --strip-types scripts/run-sealed-runner-build.ts onefile'
+].includes(packageJson.scripts['build:onefile-release']), 'onefile package script must use the canonical builder or sealed wrapper');
 
 // A onefile launcher must carry one executable closure: the CLI and its
 // vendored runtime dependencies. Root workspace copies are development-tree
@@ -42,6 +47,8 @@ for (const path of [
 ]) {
   assert.equal(isOnefilePayloadPath(path), false, `duplicate root workspace must stay outside onefile payload: ${path}`);
 }
+
+assert.equal(isOnefilePayloadPath('packages/cli/dist/npm-runtime/runtime.mjs'), false, 'npm-only compact runtime must stay outside onefile payload');
 
 for (const path of [
   'docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-08-12-001.json',
