@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import path from 'node:path';
 import { computeWriteScopeDigest, normalizeWritePathList, pathMatchesWriteScope } from './write-scope-policy.ts';
 import type { ForeignGeneratedResidueProvenance } from './foreign-generated-residue-disposition.ts';
+import { isDurableEvidencePath } from '../evidence/evidence-ledger.ts';
 
 export const WORK_ADMISSION_TICKET_SCHEMA_ID = 'atm.workAdmissionTicket.v1';
 export const WORK_ADMISSION_COVERAGE_RECEIPT_SCHEMA_ID = 'atm.workAdmissionCoverageReceipt.v1';
@@ -262,7 +263,7 @@ function isTaskManagedLifecyclePath(taskId: string, file: string): boolean {
   const normalized = normalizeWritePathList([file])[0] ?? '';
   return normalized === '.atm/history/evidence/git-head.jsonl'
     || normalized === `.atm/history/tasks/${taskId}.json`
-    || normalized.startsWith(`.atm/history/evidence/${taskId}.`)
+    || (normalized.includes(`/${taskId}.`) && isDurableEvidencePath(normalized))
     || normalized.startsWith(`.atm/history/task-events/${taskId}/`);
 }
 

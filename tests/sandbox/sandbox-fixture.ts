@@ -35,7 +35,7 @@ const agentsMarkdownTokens = {
   BOOTSTRAP_PROFILE_PATH: '.atm/runtime/profile/default.md',
   PROJECT_PROBE_PATH: '.atm/runtime/project-probe.json',
   DEFAULT_GUARDS_PATH: '.atm/runtime/default-guards.json',
-  BOOTSTRAP_EVIDENCE_PATH: '.atm/history/evidence/BOOTSTRAP-0001.json',
+  BOOTSTRAP_EVIDENCE_PATH: '.atm/runtime/evidence-ledger/bundles/BOOTSTRAP-0001.json',
   HOST_WORKFLOW: 'npm-workspace',
   REPOSITORY_KIND: 'workspace',
   PACKAGE_MANAGER: 'npm'

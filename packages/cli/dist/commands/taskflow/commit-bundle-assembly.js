@@ -325,12 +325,13 @@ export function restoreDeferredGovernanceDirtyFiles(repoRoot, report) {
         const content = typeof snapshot.content === 'string' ? snapshot.content : '';
         const absolutePath = path.join(repoRoot, file);
         const currentContent = existsSync(absolutePath) ? readFileSync(absolutePath, 'utf8') : null;
-        let headContent = null;
+        let matchesHead = false;
         try {
-            headContent = execFileSync('git', ['show', `HEAD:${file}`], { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+            execFileSync('git', ['diff', '--quiet', '--', file], { cwd: repoRoot, stdio: 'ignore' });
+            matchesHead = true;
         }
         catch { }
-        if (currentContent !== null && headContent !== null && currentContent !== headContent) {
+        if (currentContent !== null && !matchesHead) {
             writeFileSync(snapshotPath, `${JSON.stringify({ ...snapshot, restoredAt: null, skipReason: 'newer-content-preserved' }, null, 2)}\n`, 'utf8');
             return { ...entry, restoredAt: null, skipReason: 'newer-content-preserved' };
         }
@@ -550,7 +551,7 @@ function commitRepoWithTemporaryIndex(input) {
         if (input.stageFileContents)
             stageGitFileContents(input.repoRoot, input.stageFileContents, env);
         const closeWindowLock = input.taskId ? readCloseWindowStagedIndexLockReport(input.repoRoot) : null;
-        const isGovernanceFollowUp = Boolean(input.taskId && closeWindowLock?.status === 'active' && closeWindowLock.taskId === input.taskId && isImmediateTaskflowDeliveryParent(input.repoRoot, input.taskId) && input.stageFiles.some((filePath) => filePath === `.atm/history/tasks/${input.taskId}.json` || filePath === `.atm/history/evidence/${input.taskId}.json`));
+        const isGovernanceFollowUp = Boolean(input.taskId && closeWindowLock?.status === 'active' && closeWindowLock.taskId === input.taskId && isImmediateTaskflowDeliveryParent(input.repoRoot, input.taskId) && input.stageFiles.some((filePath) => filePath === `.atm/history/tasks/${input.taskId}.json` || filePath === `.atm/history/evidence/${input.taskId}.bundle-manifest.json`));
         if (isGovernanceFollowUp && input.taskId && input.actorId && closeWindowLock) {
             const invocationNonce = randomUUID();
             env.ATM_CLOSE_TRANSACTION_RECEIPT_NONCE = invocationNonce;

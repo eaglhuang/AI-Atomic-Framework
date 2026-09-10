@@ -5,6 +5,45 @@ import type { EvidenceRecord } from '../index.ts';
 export const EVIDENCE_LEDGER_ENTRY_SCHEMA_ID = 'atm.evidenceLedgerEntry.v1' as const;
 export const EVIDENCE_LEDGER_CHECKPOINT_SCHEMA_ID = 'atm.evidenceLedgerCheckpoint.v1' as const;
 
+export const EVIDENCE_STORAGE_POLICY = {
+  runtimeRoot: '.atm/runtime/evidence-ledger',
+  legacyRoot: '.atm/history/evidence',
+  durableKinds: [
+    'abandon-residue-disposition',
+    'bundle-manifest',
+    'checkpoint',
+    'closure-packet',
+    'index-restore-failure',
+    'live-index-reconciliation',
+    'proposal-lane',
+    'runner-publication-recovery',
+    'runner-sync-receipt',
+    'seal-and-commit'
+  ]
+} as const;
+
+export type DurableEvidenceKind = typeof EVIDENCE_STORAGE_POLICY.durableKinds[number];
+
+export function runtimeEvidenceBundleRelativePath(workItemId: string): string {
+  return `${EVIDENCE_STORAGE_POLICY.runtimeRoot}/bundles/${workItemId}.json`;
+}
+
+export function durableEvidenceRelativePath(workItemId: string, kind: DurableEvidenceKind): string {
+  return `${EVIDENCE_STORAGE_POLICY.legacyRoot}/${workItemId}.${kind}.json`;
+}
+
+export function legacyEvidenceBundleRelativePath(workItemId: string): string {
+  return `${EVIDENCE_STORAGE_POLICY.legacyRoot}/${workItemId}.json`;
+}
+
+export function isDurableEvidencePath(relativePath: string): boolean {
+  const normalized = relativePath.replace(/\\/g, '/');
+  return EVIDENCE_STORAGE_POLICY.durableKinds.some((kind) =>
+    normalized.startsWith(`${EVIDENCE_STORAGE_POLICY.legacyRoot}/`)
+      && normalized.endsWith(`.${kind}.json`)
+  );
+}
+
 export interface EvidenceLedgerEntry {
   readonly schemaId: typeof EVIDENCE_LEDGER_ENTRY_SCHEMA_ID;
   readonly digest: string;

@@ -195,7 +195,7 @@ export async function runTasksDeliverAndClose(argv: string[], dependencies: Deli
   const governanceFiles: string[] = [];
   const relTaskPath = typeof closeEvidence.taskPath === 'string' ? closeEvidence.taskPath : relativePathFrom(options.cwd, taskPath);
   if (relTaskPath) governanceFiles.push(relTaskPath);
-  const evidencePath = `.atm/history/evidence/${options.taskId}.json`;
+  const evidencePath = `.atm/history/evidence/${options.taskId}.bundle-manifest.json`;
   if (existsSync(path.resolve(options.cwd, evidencePath))) governanceFiles.push(evidencePath);
   if (typeof closeEvidence.closurePacketPath === 'string' && closeEvidence.closurePacketPath) {
     governanceFiles.push(closeEvidence.closurePacketPath);

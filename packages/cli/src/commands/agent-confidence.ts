@@ -72,7 +72,7 @@ const renderedRequiredMarkers = [
   'node atm.mjs next --json',
   '.atm/runtime/profile/default.md',
   '.atm/history/tasks/BOOTSTRAP-0001.json',
-  '.atm/history/evidence/BOOTSTRAP-0001.json'
+  '.atm/runtime/evidence-ledger/bundles/BOOTSTRAP-0001.json'
 ];
 
 export interface AgentProfile {

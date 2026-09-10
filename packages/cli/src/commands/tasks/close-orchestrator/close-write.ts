@@ -49,8 +49,14 @@ function listStagedPaths(cwd: string): string[] {
 function isAbandonedTaskOwnedPath(taskId: string, filePath: string): boolean {
   const lower = normalizeRel(filePath).toLowerCase();
   const id = taskId.toLowerCase();
+  const evidencePrefix = `.atm/history/evidence/${id}`;
+  const durableEvidenceSuffixes = [
+    '.bundle-manifest.json',
+    '.closure-packet.json',
+    '.abandon-residue-disposition.json'
+  ];
   return lower === `.atm/history/tasks/${id}.json`
-    || lower.startsWith(`.atm/history/evidence/${id}.`)
+    || durableEvidenceSuffixes.some((suffix) => lower === `${evidencePrefix}${suffix}`)
     || lower.startsWith(`.atm/history/task-events/${id}/`);
 }
 
@@ -98,7 +104,7 @@ export function applyAbandonedResidueDisposition(input: {
 
   for (const rel of [
     `.atm/history/tasks/${taskId}.json`,
-    `.atm/history/evidence/${taskId}.json`,
+    `.atm/history/evidence/${taskId}.bundle-manifest.json`,
     `.atm/history/evidence/${taskId}.closure-packet.json`
   ]) {
     if (existsSync(path.join(input.cwd, rel))) keptAuditTrail.push(rel);
@@ -224,7 +230,7 @@ export async function executeCloseWrites(input: {
       });
       const closeArtifactFiles = existingTaskCloseArtifacts(options.cwd, [
         relativePathFrom(options.cwd, input.taskPath),
-        `.atm/history/evidence/${options.taskId}.json`,
+        `.atm/history/evidence/${options.taskId}.bundle-manifest.json`,
         transitionPath,
         closurePacketPath
       ]);

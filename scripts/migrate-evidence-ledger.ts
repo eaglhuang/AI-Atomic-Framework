@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { sha256 } from '../packages/core/src/evidence/evidence-ledger.ts';
@@ -21,6 +22,14 @@ export interface EvidenceLedgerMigrationManifest {
   readonly ledgerRoot: string;
   readonly records: readonly EvidenceLedgerMigrationRecord[];
   readonly checkpointDigest: string;
+  readonly trackedLegacyBaseline: {
+    readonly fileCount: number;
+    readonly bytes: number;
+  };
+  readonly futureGitGrowthAvoided: {
+    readonly migratedRecordCount: number;
+    readonly migratedPayloadBytes: number;
+  };
 }
 
 export function migrateEvidenceLedger(input: {
@@ -33,6 +42,8 @@ export function migrateEvidenceLedger(input: {
   const legacyRoot = path.resolve(input.legacyEvidenceRoot ?? path.join(repositoryRoot, '.atm', 'history', 'evidence'));
   const stores = createLocalGovernanceStores({ repositoryRoot });
   const records: EvidenceLedgerMigrationRecord[] = [];
+  const trackedLegacyPaths = readTrackedLegacyPaths(repositoryRoot, legacyRoot);
+  let migratedPayloadBytes = 0;
 
   if (existsSync(legacyRoot)) {
     for (const name of readdirSync(legacyRoot).filter((entry) => entry.endsWith('.json')).sort()) {
@@ -45,6 +56,7 @@ export function migrateEvidenceLedger(input: {
         for (const candidate of parsed.evidence) {
           if (!isEvidenceRecord(candidate)) continue;
           const record = candidate as EvidenceRecord;
+          migratedPayloadBytes += Buffer.byteLength(JSON.stringify(record), 'utf8');
           const legacyRecordDigest = sha256({ workItemId, record });
           const entry = stores.evidenceStore.appendEvidence(workItemId, record) as { digest: string };
           records.push({
@@ -59,13 +71,22 @@ export function migrateEvidenceLedger(input: {
     }
   }
 
-  const checkpoint = stores.evidenceStore.checkpointEvidence() as { digest: string };
+  const migratedEntryDigests = [...new Set(records.map((record) => record.ledgerDigest))].sort();
+  const checkpointDigest = sha256({ entryDigests: migratedEntryDigests });
   const manifest: EvidenceLedgerMigrationManifest = {
     schemaId: EVIDENCE_LEDGER_MIGRATION_MANIFEST_SCHEMA_ID,
     legacyEvidenceRoot: path.relative(repositoryRoot, legacyRoot).replace(/\\/g, '/'),
     ledgerRoot: '.atm/runtime/evidence-ledger',
     records,
-    checkpointDigest: checkpoint.digest
+    checkpointDigest,
+    trackedLegacyBaseline: {
+      fileCount: trackedLegacyPaths.length,
+      bytes: trackedLegacyPaths.reduce((sum, filePath) => sum + statSync(filePath).size, 0)
+    },
+    futureGitGrowthAvoided: {
+      migratedRecordCount: records.length,
+      migratedPayloadBytes
+    }
   };
   if (input.writeManifest) {
     const manifestPath = path.resolve(repositoryRoot, input.manifestPath ?? 'docs/reports/evidence-ledger-migration-manifest.json');
@@ -73,6 +94,43 @@ export function migrateEvidenceLedger(input: {
     writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   }
   return manifest;
+}
+
+export function restoreEvidenceLedger(input: {
+  readonly sourceRepositoryRoot: string;
+  readonly targetRepositoryRoot: string;
+  readonly manifest: EvidenceLedgerMigrationManifest;
+}) {
+  const sourceRoot = path.resolve(input.sourceRepositoryRoot);
+  const targetStores = createLocalGovernanceStores({ repositoryRoot: path.resolve(input.targetRepositoryRoot) });
+  for (const record of input.manifest.records) {
+    const objectPath = path.join(sourceRoot, '.atm', 'runtime', 'evidence-ledger', 'records', `${record.ledgerDigest.replace(/^sha256:/, '')}.json`);
+    if (!existsSync(objectPath)) throw new Error(`Evidence Ledger restore object is missing: ${record.ledgerDigest}`);
+    const entry = JSON.parse(readFileSync(objectPath, 'utf8')) as { workItemId?: unknown; record?: unknown; digest?: unknown };
+    if (entry.digest !== record.ledgerDigest || entry.workItemId !== record.workItemId || !isEvidenceRecord(entry.record)) {
+      throw new Error(`Evidence Ledger restore object is corrupt: ${record.ledgerDigest}`);
+    }
+    const restored = targetStores.evidenceStore.appendEvidence(record.workItemId, entry.record) as { digest: string };
+    if (restored.digest !== record.ledgerDigest || targetStores.evidenceStore.verifyEvidence(restored.digest) !== true) {
+      throw new Error(`Evidence Ledger restore digest changed: ${record.ledgerDigest}`);
+    }
+  }
+  const checkpoint = targetStores.evidenceStore.checkpointEvidence() as { digest: string };
+  if (checkpoint.digest !== input.manifest.checkpointDigest) throw new Error('Evidence Ledger restored checkpoint does not match export.');
+  return { restoredRecords: input.manifest.records.length, checkpointDigest: checkpoint.digest };
+}
+
+function readTrackedLegacyPaths(repositoryRoot: string, legacyRoot: string): string[] {
+  try {
+    const relativeRoot = path.relative(repositoryRoot, legacyRoot).replace(/\\/g, '/');
+    const output = execFileSync('git', ['ls-files', '-z', '--', relativeRoot], {
+      cwd: repositoryRoot,
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    return output.toString('utf8').split('\0').filter(Boolean).map((entry) => path.join(repositoryRoot, entry));
+  } catch {
+    return [];
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

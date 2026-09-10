@@ -1,5 +1,6 @@
 import { cpSync, existsSync, mkdirSync, rmSync, statSync, utimesSync } from 'node:fs';
 import path from 'node:path';
+import { runtimeEvidenceBundleRelativePath } from '../../../core/src/evidence/evidence-ledger.ts';
 import {
   createContinuationRunReport,
   createContinuationSummaryRecord,
@@ -230,7 +231,7 @@ async function materializeSelfHostingArtifacts(
   const logPath = `.atm/history/logs/${bootstrapTaskId}.log`;
   const phaseBReportId = `self-host-alpha/${bootstrapTaskId}`;
   const phaseBReportPath = `.atm/history/reports/self-host-alpha/${bootstrapTaskId}.json`;
-  const evidencePath = `.atm/history/evidence/${bootstrapTaskId}.json`;
+  const evidencePath = runtimeEvidenceBundleRelativePath(bootstrapTaskId);
   const estimatedTokens = estimateContextBudgetTokens(bootstrapEvidence, helloWorld, criteria, neutrality?.evidence ?? null);
   const contextBudgetGuard = adapter.stores.contextBudgetGuard;
   const runReportStore = adapter.stores.runReportStore;

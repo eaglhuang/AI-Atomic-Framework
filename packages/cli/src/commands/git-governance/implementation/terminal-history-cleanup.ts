@@ -5,13 +5,13 @@ import {
   readTaskWriteAuthority,
   resolveTaskHistoryOwnerTaskId,
 } from '../../../../../core/src/broker/cross-task-mutation-guard.ts';
+import { isDurableEvidencePath } from '../../../../../core/src/evidence/evidence-ledger.ts';
 
 function isCurrentTaskIntrinsicHistoryScope(scope: string, taskId: string) {
   const normalized = normalizeRelativePath(scope).toLowerCase();
   const task = taskId.toLowerCase();
   return normalized === `.atm/history/tasks/${task}.json`
-    || normalized === `.atm/history/evidence/${task}.json`
-    || normalized.startsWith(`.atm/history/evidence/${task}.`)
+    || (normalized.startsWith(`.atm/history/evidence/${task}.`) && isDurableEvidencePath(normalized))
     || normalized.startsWith(`.atm/history/task-events/${task}/`);
 }
 

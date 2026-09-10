@@ -462,7 +462,7 @@ export function buildHistoricalClosePreflight(input: {
     allowedAdvisoryGovernanceFiles: uniqueStrings([
       ...expectedCloseBundleFiles.filter((filePath) => filePath.startsWith('.atm/')),
       ...(input.historicalDeliveryRefs.length > 0
-        ? [`.atm/history/evidence/${input.taskId}.json`]
+        ? [`.atm/history/evidence/${input.taskId}.bundle-manifest.json`]
         : [])
     ]),
     allowedAdvisoryDirtyFiles: foreignActiveDirtyFiles,

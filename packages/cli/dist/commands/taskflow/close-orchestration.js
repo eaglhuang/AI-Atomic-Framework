@@ -349,7 +349,7 @@ export function buildCloseWriteRollbackSnapshot(input) {
     const liveTransitionPath = typeof currentTask?.lastTransitionId === 'string' && currentTask.lastTransitionId.trim() ? `.atm/history/task-events/${input.taskId}/${currentTask.lastTransitionId.trim()}.json` : null;
     const transitionPath = typeof evidence.transitionPath === 'string' ? evidence.transitionPath : liveTransitionPath;
     const stagedArtifacts = uniqueRelativePaths([typeof evidence.taskPath === 'string' ? evidence.taskPath : taskPath,
-        transitionPath, typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null, `.atm/history/evidence/${input.taskId}.json`, ...(input.extraStagedArtifacts ?? [])]);
+        transitionPath, typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null, `.atm/history/evidence/${input.taskId}.bundle-manifest.json`, ...(input.extraStagedArtifacts ?? [])]);
     return { taskPath, previousTaskContent: input.previousTaskContent,
         transitionPath, closurePacketPath: typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null, closeCommitWindowPath: typeof evidence.closeCommitWindowPath === 'string' ? evidence.closeCommitWindowPath : null, closeWindowStagedIndexLockActive: input.closeWindowStagedIndexLockActive === true,
         planningCard: input.planningCard, stagedArtifacts, preCloseStagedFiles: uniqueRelativePaths(input.preCloseStagedFiles ?? []) };

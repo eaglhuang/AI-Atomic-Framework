@@ -11,6 +11,7 @@ import { recordStaleRunnerOverride } from './close-governance.js';
 import { issueRepairClosureAdmissionTicket } from '../git-governance/work-admission-check.js';
 import { parseReconcileOptions } from './task-option-parsers.js';
 import { readGitScalar } from './task-git-helpers.js';
+import { evidencePathForTask } from '../evidence/evidence-store.js';
 import { parseClaimRecord } from './task-ledger-readers.js';
 import { taskPathFor } from './task-file-io-helpers.js';
 import { buildHistoricalDeliveryProvenance } from './historical-delivery.js';
@@ -160,7 +161,7 @@ export async function runTasksReconcile(argv) {
             });
         }
     }
-    const evidencePath = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.json`);
+    const evidencePath = evidencePathForTask(options.cwd, options.taskId);
     if (!existsSync(evidencePath)) {
         mkdirSync(path.dirname(evidencePath), { recursive: true });
         const requiredPasses = uniqueStrings((frameworkStatus?.requiredGates ?? [
@@ -209,7 +210,7 @@ export async function runTasksReconcile(argv) {
             taskId: options.taskId,
             actorId,
             sessionId: null,
-            evidencePath: `.atm/history/evidence/${options.taskId}.json`,
+            evidencePath: relativePathFrom(options.cwd, evidencePath),
             requiredGates: frameworkStatus?.requiredGates ?? [],
             changedFiles: deliverableGate.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
             frameworkStatus: frameworkStatus ?? undefined,

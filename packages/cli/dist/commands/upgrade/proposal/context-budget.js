@@ -5,6 +5,7 @@ import { renderQualityReportMarkdown } from '../../../_vendor/core/dist/police/r
 import { CliError, readJsonFile, resolveValue } from '../../shared.js';
 import { inferInputKind } from './inputs.js';
 import { sanitizeUpgradeBudgetId } from './guided-legacy.js';
+import { evidencePathForTask } from '../../evidence/evidence-store.js';
 export async function evaluateUpgradeContextBudget(options, inputDocuments) {
     const hashDiffInput = inputDocuments.find((entry) => inferInputKind(entry.document.schemaId) === 'hash-diff');
     const qualityComparisonInput = inputDocuments.find((entry) => inferInputKind(entry.document.schemaId) === 'quality-comparison');
@@ -74,7 +75,7 @@ async function materializeUpgradeHardStop(cwd, atomId, qualityReportPath, evalua
     }
     const continuationReportId = `continuation/upgrade/${atomId}`;
     const continuationReportPath = `.atm/history/reports/continuation/upgrade/${atomId}.json`;
-    const evidencePath = `.atm/history/evidence/${atomId}.json`;
+    const evidencePath = path.relative(cwd, evidencePathForTask(cwd, atomId)).replace(/\\/g, '/');
     const contextSummaryPath = `.atm/history/handoff/${atomId}.json`;
     const contextSummaryMarkdownPath = `.atm/history/handoff/${atomId}.md`;
     const continuationInput = {
@@ -123,7 +124,7 @@ async function materializeUpgradeHardStop(cwd, atomId, qualityReportPath, evalua
     };
 }
 function persistUpgradeHandoffEvidence(cwd, atomId, handoffEvidence) {
-    const absolutePath = path.join(cwd, '.atm', 'history', 'evidence', `${atomId}.json`);
+    const absolutePath = evidencePathForTask(cwd, atomId);
     const existing = existsSync(absolutePath) ? JSON.parse(readFileSync(absolutePath, 'utf8')) : null;
     const existingEvidence = Array.isArray(existing)
         ? existing

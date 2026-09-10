@@ -342,7 +342,6 @@ export function collectTaskGovernedCommitAllowedFiles(cwd: string, taskId: strin
   if (!taskId) return [];
   const files = [
     `.atm/history/tasks/${taskId}.json`,
-    `.atm/history/evidence/${taskId}.json`,
     `.atm/history/evidence/${taskId}.bundle-manifest.json`,
     `.atm/history/evidence/${taskId}.closure-packet.json`,
     `.atm/history/task-events/${taskId}/**`

@@ -7,6 +7,7 @@ import { createClosurePacket, validateClosurePacket } from '../../framework-deve
 import { buildHistoricalDeliveryProvenance } from '../historical-delivery.js';
 import { uniqueStrings } from '../../tasks.js';
 import { assertAcceptanceEvidenceClosureGate } from './acceptance-evidence-gate.js';
+import { evidencePathForTask } from '../../evidence/evidence-store.js';
 export function prepareClosurePacket(input) {
     const { options, taskDocument, actorId, activeSession, frameworkStatus, deliverableGate, taskDeclaredFiles, historicalBatchSlice } = input;
     const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
@@ -66,7 +67,7 @@ export function prepareClosurePacket(input) {
         taskId: options.taskId,
         actorId,
         sessionId: activeSession?.sessionId ?? null,
-        evidencePath: `.atm/history/evidence/${options.taskId}.json`,
+        evidencePath: path.relative(options.cwd, evidencePathForTask(options.cwd, options.taskId)).replace(/\\/g, '/'),
         requiredGates: historicalBatchSlice?.okToCloseTask === true
             ? uniqueStrings([
                 ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),

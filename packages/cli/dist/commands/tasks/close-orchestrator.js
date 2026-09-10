@@ -210,7 +210,7 @@ export async function runTasksClose(argv) {
                 ? closeWorktree.trackedDirtyFiles.filter((entry) => {
                     const normalized = normalizeRelativePath(entry).toLowerCase();
                     const taskIdLower = options.taskId.toLowerCase();
-                    return normalized === `.atm/history/evidence/${taskIdLower}.json`
+                    return normalized === `.atm/history/evidence/${taskIdLower}.bundle-manifest.json`
                         || normalized === `.atm/history/tasks/${taskIdLower}.json`
                         || normalized.startsWith(`.atm/history/task-events/${taskIdLower}/`);
                 })
@@ -220,7 +220,7 @@ export async function runTasksClose(argv) {
                 : [];
             const allowedAdvisoryGovernanceFiles = options.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0
                 ? [
-                    `.atm/history/evidence/${options.taskId}.json`,
+                    `.atm/history/evidence/${options.taskId}.bundle-manifest.json`,
                     `.atm/history/tasks/${options.taskId}.json`,
                     ...readDeferredForeignStagedFilesForActiveCloseWindow(options.cwd, options.taskId)
                 ]
@@ -438,7 +438,7 @@ export async function runTasksClose(argv) {
         });
         const transitionPath = closeWriteResult.transitionPath;
         closurePacketPath = closeWriteResult.closurePacketPath;
-        const closeEvidencePath = `.atm/history/evidence/${options.taskId}.json`;
+        const closeEvidencePath = `.atm/history/evidence/${options.taskId}.bundle-manifest.json`;
         const closeArtifactFiles = existingTaskCloseArtifacts(options.cwd, [
             relativePathFrom(options.cwd, taskPath),
             closeEvidencePath,

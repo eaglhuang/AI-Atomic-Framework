@@ -11,6 +11,7 @@ import {
 import { buildHistoricalDeliveryProvenance, type TaskHistoricalDeliveryReport } from '../historical-delivery.ts';
 import { uniqueStrings } from '../../tasks.ts';
 import { assertAcceptanceEvidenceClosureGate } from './acceptance-evidence-gate.ts';
+import { evidencePathForTask } from '../../evidence/evidence-store.ts';
 
 type ClosurePacketOptions = {
   readonly cwd: string;
@@ -109,7 +110,7 @@ export function prepareClosurePacket(input: {
     taskId: options.taskId,
     actorId,
     sessionId: activeSession?.sessionId ?? null,
-    evidencePath: `.atm/history/evidence/${options.taskId}.json`,
+    evidencePath: path.relative(options.cwd, evidencePathForTask(options.cwd, options.taskId)).replace(/\\/g, '/'),
     requiredGates: historicalBatchSlice?.okToCloseTask === true
       ? uniqueStrings([
         ...(historicalBatchSlice.taskSpecificValidationPasses ?? []),

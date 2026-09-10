@@ -82,6 +82,10 @@ import {
 export function createLocalGovernanceStores(config: LocalGovernanceConfig): GovernanceStores {
   const repositoryRoot = path.resolve(config.repositoryRoot);
   const layout = resolveLocalGovernanceLayout(config.layout);
+  const legacyEvidenceStorePath = path.join(
+    repositoryRoot,
+    layout.legacyEvidenceStorePath ?? '.atm/history/evidence'
+  );
   const now = config.now ?? (() => new Date().toISOString());
   const absoluteLayout = createAbsoluteLayout(repositoryRoot, layout);
 
@@ -448,7 +452,7 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
         const entries = Array.isArray(index.digests) ? index.digests.map((digest) => typeof digest === 'string' ? resolveLedgerEvidence(digest) : null).filter((entry): entry is EvidenceLedgerEntry => entry !== null) : [];
         return entries.map((entry) => entry.record);
       }
-      return readEvidenceDocument(path.join(absoluteLayout.evidenceStorePath, `${workItemId}.json`)).evidence;
+      return readEvidenceDocument(path.join(legacyEvidenceStorePath, `${workItemId}.json`)).evidence;
     }
   };
 

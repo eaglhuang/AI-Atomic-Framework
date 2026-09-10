@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { runtimeEvidenceBundleRelativePath } from '../_vendor/core/dist/evidence/evidence-ledger.js';
 export const bootstrapTaskId = 'BOOTSTRAP-0001';
 export const atmLayoutVersion = 2;
 export function createV2AtmPaths(taskId = bootstrapTaskId) {
@@ -19,7 +20,7 @@ export function createV2AtmPaths(taskId = bootstrapTaskId) {
         contextBudgetSummaryPath: path.join(atmRoot, 'runtime', 'budget', `bootstrap-${sanitizeBudgetFileId(`bootstrap/${taskId}`)}.md`),
         taskPath: path.join(atmRoot, 'history', 'tasks', `${taskId}.json`),
         lockPath: path.join(atmRoot, 'runtime', 'locks', `${taskId}.lock.json`),
-        evidencePath: path.join(atmRoot, 'history', 'evidence', `${taskId}.json`),
+        evidencePath: runtimeEvidenceBundleRelativePath(taskId),
         contextSummaryPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.json`),
         contextSummaryMarkdownPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.md`),
         continuationReportPath: path.join(atmRoot, 'history', 'reports', 'continuation', `${taskId}.json`),
@@ -33,6 +34,7 @@ export function createV2AtmPaths(taskId = bootstrapTaskId) {
             runtimeState: path.join(atmRoot, 'runtime', 'state'),
             history: path.join(atmRoot, 'history'),
             historyTasks: path.join(atmRoot, 'history', 'tasks'),
+            runtimeEvidence: path.join(atmRoot, 'runtime', 'evidence-ledger'),
             historyEvidence: path.join(atmRoot, 'history', 'evidence'),
             historyArtifacts: path.join(atmRoot, 'history', 'artifacts'),
             historyLogs: path.join(atmRoot, 'history', 'logs'),
@@ -92,7 +94,7 @@ export function detectGovernanceRuntime(cwd, taskId = bootstrapTaskId) {
     const currentTask = readJsonIfExists(path.join(cwd, paths.currentTaskPath ?? ''));
     const currentTaskId = currentTask?.workItemId ?? currentTask?.taskId ?? inferCurrentTaskId(cwd, layoutVersion);
     const activeLock = readActiveLock(cwd, layoutVersion, currentTaskId);
-    const lastEvidenceAt = findLatestTimestamp(path.join(cwd, layoutVersion === atmLayoutVersion ? '.atm/history/evidence' : '.atm/evidence'));
+    const lastEvidenceAt = findLatestTimestamp(path.join(cwd, layoutVersion === atmLayoutVersion ? '.atm/runtime/evidence-ledger/bundles' : '.atm/evidence'));
     const lastHandoffAt = findLatestTimestamp(path.join(cwd, layoutVersion === atmLayoutVersion ? '.atm/history/handoff' : '.atm/state/context-summary'));
     const missingPaths = [];
     for (const relativePath of [paths.profilePath, paths.projectProbePath, paths.defaultGuardsPath, paths.contextBudgetPolicyPath]) {

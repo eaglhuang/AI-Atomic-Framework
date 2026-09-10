@@ -1,14 +1,81 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 import { createLocalGovernanceStores } from '../packages/plugin-governance-local/src/stores.ts';
+import { sha256 } from '../packages/core/src/evidence/evidence-ledger.ts';
 import { EVIDENCE_LEDGER_MIGRATION_MANIFEST_SCHEMA_ID, type EvidenceLedgerMigrationManifest } from './migrate-evidence-ledger.ts';
 
-const runtimeCallers = [
-  'packages/plugin-governance-local/src/stores.ts',
-  'packages/plugin-sdk/src/governance/stores.ts',
-  'packages/core/src/evidence/evidence-ledger.ts'
+const productionRoots = [
+  'packages/cli/src',
+  'packages/core/src',
+  'packages/plugin-governance-local/src',
+  'packages/plugin-sdk/src'
 ] as const;
+
+const approvedLegacyReferenceFiles = new Set([
+  'packages/core/src/evidence/evidence-ledger.ts',
+  'packages/cli/src/commands/evidence/evidence-store.ts',
+  'packages/cli/src/commands/git-head-evidence.ts',
+  'packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts',
+  'packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts',
+  'packages/cli/src/commands/hook/pre-commit/support.ts',
+  'packages/plugin-governance-local/src/layout.ts',
+  'packages/plugin-governance-local/src/stores.ts',
+  'packages/plugin-sdk/src/governance/layout.ts'
+]);
+
+const approvedDurableReferencePatterns = [
+  /\.abandon-residue-disposition\.json/,
+  /\.bundle-manifest\.json/,
+  /\.checkpoint\.json/,
+  /\.closure-packet\.json/,
+  /\.index-restore-failure\.json/,
+  /(?:\.|\/)live-index-reconciliation(?:\.[^/]+)?\.json/,
+  /\/git-boundary-runs\/[^/]+\.(?:json|md)/,
+  /\/git-head\.jsonl/,
+  /\.proposal-lane-[^/]+\.json/,
+  /\.runner-publication-recovery\.json/,
+  /\.runner-sync-receipt\.json/,
+  /\.seal-and-commit\.json/
+] as const;
+
+function listTypeScriptFiles(root: string): string[] {
+  if (!existsSync(root)) return [];
+  const output: string[] = [];
+  for (const entry of readdirSync(root)) {
+    const candidate = path.join(root, entry);
+    if (statSync(candidate).isDirectory()) output.push(...listTypeScriptFiles(candidate));
+    else if (candidate.endsWith('.ts')
+      && !candidate.endsWith('.test.ts')
+      && !candidate.endsWith('.spec.ts')
+      && !candidate.includes(`${path.sep}__tests__${path.sep}`)) output.push(candidate);
+  }
+  return output;
+}
+
+export function validateProductionEvidenceCallers(sourceRoot = process.cwd()) {
+  const absoluteRoot = path.resolve(sourceRoot);
+  const files = productionRoots.flatMap((root) => listTypeScriptFiles(path.join(absoluteRoot, root)));
+  const illegalReferences: string[] = [];
+  for (const absolutePath of files) {
+    const relativePath = path.relative(absoluteRoot, absolutePath).replace(/\\/g, '/');
+    const source = readFileSync(absolutePath, 'utf8');
+    if (!source.includes('.atm/history/evidence')) continue;
+    if (approvedLegacyReferenceFiles.has(relativePath)) continue;
+    const relevantLines = source.split(/\r?\n/).filter((line) => line.includes('.atm/history/evidence'));
+    const hasNakedBundleReference = relevantLines.some((line) => {
+      if (approvedDurableReferencePatterns.some((pattern) => pattern.test(line))) return false;
+      return /history\/evidence\/[A-Za-z0-9_-]+\.json/.test(line)
+        || /history\/evidence\/[^'"`]*\$\{[^}]+\}\.json/.test(line)
+        || /history['"],\s*['"]evidence['"].*`\$\{[^}]+\}\.json`/.test(line)
+        || /\.atm\/history\/evidence\/<task(?:-id|Id)?>\.json/.test(line);
+    });
+    if (hasNakedBundleReference) {
+      illegalReferences.push(relativePath);
+    }
+  }
+  return { scannedFiles: files.length, illegalReferences: illegalReferences.sort() };
+}
 
 export function validateEvidenceLedgerBoundary(
   cwd = process.cwd(),
@@ -17,9 +84,8 @@ export function validateEvidenceLedgerBoundary(
 ) {
   const repositoryRoot = path.resolve(cwd);
   const resolvedSourceRoot = path.resolve(sourceRoot);
-  const illegalLegacyReferences = runtimeCallers.filter((relativePath) =>
-    readFileSync(path.join(resolvedSourceRoot, relativePath), 'utf8').includes('.atm/history/evidence')
-  );
+  const callerReport = validateProductionEvidenceCallers(resolvedSourceRoot);
+  const illegalLegacyReferences = callerReport.illegalReferences;
   if (illegalLegacyReferences.length > 0) {
     throw new Error(`Runtime callers retain direct legacy evidence paths: ${illegalLegacyReferences.join(', ')}`);
   }
@@ -33,9 +99,9 @@ export function validateEvidenceLedgerBoundary(
       throw new Error(`Evidence Ledger restore verification failed for ${record.legacyPath}.`);
     }
   }
-  const checkpoint = stores.evidenceStore.checkpointEvidence() as { digest: string };
-  if (checkpoint.digest !== manifest.checkpointDigest) throw new Error('Evidence Ledger checkpoint drifted after migration.');
-  return { ok: true, records: manifest.records.length, checkpointDigest: checkpoint.digest };
+  const checkpointDigest = sha256({ entryDigests: [...new Set(manifest.records.map((record) => record.ledgerDigest))].sort() });
+  if (checkpointDigest !== manifest.checkpointDigest) throw new Error('Evidence Ledger checkpoint drifted after migration.');
+  return { ok: true, records: manifest.records.length, checkpointDigest, scannedFiles: callerReport.scannedFiles };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(import.meta.filename)) {

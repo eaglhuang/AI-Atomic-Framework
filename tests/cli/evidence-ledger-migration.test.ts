@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
 import { createLocalGovernanceStores } from '../../packages/plugin-governance-local/src/stores.ts';
-import { migrateEvidenceLedger } from '../../scripts/migrate-evidence-ledger.ts';
+import { migrateEvidenceLedger, restoreEvidenceLedger } from '../../scripts/migrate-evidence-ledger.ts';
 import { validateEvidenceLedgerBoundary } from '../../scripts/validate-evidence-ledger-boundary.ts';
 
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-ledger-'));
@@ -27,10 +27,33 @@ try {
   const manifest = migrateEvidenceLedger({ repositoryRoot: root, writeManifest: true });
   assert.equal(manifest.records.length, 1);
   assert.equal(manifest.records[0].legacyRecordDigest, manifest.records[0].ledgerDigest);
-  assert.deepEqual(
-    validateEvidenceLedgerBoundary(root, 'docs/reports/evidence-ledger-migration-manifest.json', process.cwd()),
-    { ok: true, records: 1, checkpointDigest: manifest.checkpointDigest }
-  );
+  assert.equal(manifest.futureGitGrowthAvoided.migratedRecordCount, 1);
+  assert.ok(manifest.futureGitGrowthAvoided.migratedPayloadBytes > 0);
+  const restoredRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-ledger-restored-'));
+  try {
+    assert.deepEqual(restoreEvidenceLedger({ sourceRepositoryRoot: root, targetRepositoryRoot: restoredRoot, manifest }), {
+      restoredRecords: 1,
+      checkpointDigest: manifest.checkpointDigest
+    });
+  } finally {
+    rmSync(restoredRoot, { recursive: true, force: true });
+  }
+  const boundary = validateEvidenceLedgerBoundary(root, 'docs/reports/evidence-ledger-migration-manifest.json', process.cwd());
+  assert.equal(boundary.ok, true);
+  assert.equal(boundary.records, 1);
+  assert.equal(boundary.checkpointDigest, manifest.checkpointDigest);
+  assert.ok(boundary.scannedFiles > 3);
+  const objectPath = path.join(root, '.atm', 'runtime', 'evidence-ledger', 'records', `${manifest.records[0].ledgerDigest.replace(/^sha256:/, '')}.json`);
+  const missingRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-ledger-missing-'));
+  unlinkSync(objectPath);
+  try {
+    assert.throws(
+      () => restoreEvidenceLedger({ sourceRepositoryRoot: root, targetRepositoryRoot: missingRoot, manifest }),
+      /restore object is missing/
+    );
+  } finally {
+    rmSync(missingRoot, { recursive: true, force: true });
+  }
   console.log('[evidence-ledger-migration] ok');
 } finally {
   rmSync(root, { recursive: true, force: true });
