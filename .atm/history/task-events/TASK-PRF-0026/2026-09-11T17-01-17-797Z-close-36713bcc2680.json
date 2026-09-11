@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T17-01-17-797Z-close-36713bcc2680",
+  "taskId": "TASK-PRF-0026",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911165311-codex-captain-TASK-PRF-0026-d5c0ff3eec",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0026.json",
+  "taskSha256": "sha256:5eb84c87ca63ac472393eec7ef4f2cb32f2ee84c8a087f032f3831998059fec1",
+  "createdAt": "2026-09-11T17:01:17.797Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0026 --actor codex-captain --status done --historical-delivery b42e8d1ea02cd48ac966c8688ce25c014a765d29",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260911165311-codex-captain-TASK-PRF-0026-d5c0ff3eec",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0026.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "npm audit --omit=dev --audit-level=high",
+      "typecheck",
+      "validate:package-install"
+    ],
+    "requiredGates": [
+      "lint",
+      "npm audit --omit=dev --audit-level=high",
+      "typecheck",
+      "validate:package-install"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-11T17:01:17.783Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0026.*",
+        ".atm/history/task-events/TASK-PRF-0026/**",
+        ".atm/history/tasks/TASK-PRF-0026.json",
+        ".github/workflows/dependency-scan.yml",
+        "package-lock.json",
+        "package.json",
+        "scripts/validate-dependencies.ts"
+      ],
+      "criticalChangedFiles": [
+        "package-lock.json",
+        "package.json",
+        "scripts/validate-dependencies.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "npm audit --omit=dev --audit-level=high",
+        "typecheck",
+        "validate:package-install"
+      ]
+    }
+  }
+}

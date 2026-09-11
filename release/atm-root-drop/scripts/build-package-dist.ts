@@ -205,8 +205,29 @@ for (const packageDir of packageDirs) buildPackage(packageDir, mode);
 if (packageDirs.includes(CLI_PACKAGE_DIR)) {
   buildCliRuntimeClosure();
   await buildCliNpmRuntime({ repositoryRoot: root });
+  assertCliArtifactBudget();
 }
 console.log(`[build-package-dist] built ${packageDirs.length} packages (${mode})`);
+
+function assertCliArtifactBudget(): void {
+  const packageJsonPath = path.join(root, CLI_PACKAGE_DIR, 'package.json');
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as {
+    atmArtifactBudget?: { budget?: { maxPackedBytes?: number; maxPackedEntries?: number } }
+  };
+  const budget = packageJson.atmArtifactBudget?.budget;
+  const runtimeRoot = path.join(root, CLI_PACKAGE_DIR, 'dist', 'npm-runtime');
+  const files = listFiles(runtimeRoot);
+  const bytes = files.reduce((total, filePath) => total + statSync(filePath).size, 0);
+  if (!budget || !Number.isInteger(budget.maxPackedBytes) || !Number.isInteger(budget.maxPackedEntries)) {
+    throw new Error('CLI artifact budget is missing or invalid; refusing to produce a publishable runtime');
+  }
+  const maxPackedBytes = budget.maxPackedBytes as number;
+  const maxPackedEntries = budget.maxPackedEntries as number;
+  if (bytes > maxPackedBytes || files.length > maxPackedEntries) {
+    throw new Error(`CLI npm-runtime exceeds artifact budget: ${bytes}/${maxPackedBytes} bytes, ${files.length}/${maxPackedEntries} files`);
+  }
+  console.log(`[build-package-dist] cli artifact budget ok: ${bytes} bytes / ${files.length} files`);
+}
 
 function writeTextIfChanged(filePath: string, content: string): void {
   if (existsSync(filePath) && readFileSync(filePath, 'utf8') === content) return;
@@ -316,15 +337,22 @@ function buildCliRuntimeClosure(): void {
 
   while (pending.length > 0) {
     const packageName = pending.shift()!;
+    let copiedForPackage = 0;
     for (const publishRoot of publishRootsOf(packageName)) {
       const sourceRoot = path.join(root, 'packages', packageName, publishRoot);
-      if (!existsSync(sourceRoot)) continue;
+      if (!existsSync(sourceRoot)) {
+        throw new Error(`CLI runtime closure requires built workspace output: packages/${packageName}/${publishRoot}`);
+      }
       for (const originalFile of copyRuntimeTree(sourceRoot, path.join(vendorRoot, packageName, publishRoot))) {
+        copiedForPackage += 1;
         if (!/\.[cm]?js$/.test(originalFile)) continue;
         // Resolve against the authored location so an escaping specifier names
         // the workspace it was written against, not the vendored copy.
         for (const reference of escapingPackageReferences(originalFile, originalFile)) enqueue(reference.packageName);
       }
+    }
+    if (copiedForPackage === 0) {
+      throw new Error(`CLI runtime closure found no publishable files for workspace: packages/${packageName}`);
     }
   }
 

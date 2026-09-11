@@ -139,6 +139,15 @@ try {
   assert(agentsMdTemplate.exitCode === 0, 'verify --agents-md must exit 0 against the repository template copy');
   assert(agentsMdTemplate.parsed.ok === true, 'verify --agents-md must report ok=true against the repository template copy');
 
+  // A clean self-hosting copy intentionally excludes runtime state. Bootstrap
+  // it before verification so the verifier consumes the fixture's own evidence
+  // ledger instead of assuming history was copied from the source checkout.
+  if (!existsSync(path.join(repoCopy, '.atm', 'config.json'))) {
+    const bootstrap = runAtm(['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM self-hosting alpha'], repoCopy);
+    assert(bootstrap.exitCode === 0, 'bootstrap must exit 0 in self-hosting repo copy');
+    assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true in self-hosting repo copy');
+  }
+
   const selfHostAlphaGate = runAtm(['self-host-alpha', '--verify', '--json'], repoCopy);
   assert(selfHostAlphaGate.exitCode === 0, 'self-host-alpha --verify --json must exit 0 in self-hosting repo copy');
   assert(selfHostAlphaGate.parsed.ok === true, 'self-host-alpha --verify --json must report ok=true');
@@ -153,12 +162,6 @@ try {
   assert(selfHostAlphaGate.parsed.evidence.selfHostingArtifacts.contextSummaryPath === '.atm/history/handoff/BOOTSTRAP-0001.json', 'self-host-alpha must report the context summary json path');
   assert(selfHostAlphaGate.parsed.evidence.selfHostingArtifacts.contextSummaryMarkdownPath === '.atm/history/handoff/BOOTSTRAP-0001.md', 'self-host-alpha must report the context summary markdown path');
   assert(selfHostAlphaGate.parsed.evidence.selfHostingArtifacts.budgetReportPath === '.atm/history/reports/context-budget/self-host-alpha-BOOTSTRAP-0001.json', 'self-host-alpha must report the self-hosting budget report path');
-
-  if (!existsSync(path.join(repoCopy, '.atm', 'config.json'))) {
-    const bootstrap = runAtm(['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM self-hosting alpha'], repoCopy);
-    assert(bootstrap.exitCode === 0, 'bootstrap must exit 0 in self-hosting repo copy');
-    assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true in self-hosting repo copy');
-  }
 
   const status = runAtm(['status', '--cwd', '.'], repoCopy);
   assert(status.exitCode === 0, 'status must exit 0 after self-hosting bootstrap');
@@ -242,7 +245,7 @@ try {
 
   const taskPath = path.join(repoCopy, '.atm', 'history', 'tasks', 'BOOTSTRAP-0001.json');
   const lockPath = path.join(repoCopy, '.atm', 'runtime', 'locks', 'BOOTSTRAP-0001.lock.json');
-  const evidencePath = path.join(repoCopy, '.atm', 'history', 'evidence', 'BOOTSTRAP-0001.json');
+  const evidencePath = path.join(repoCopy, '.atm', 'runtime', 'evidence-ledger', 'bundles', 'BOOTSTRAP-0001.json');
   const task = readJson(taskPath);
   task.status = 'done';
   task.smoke = {

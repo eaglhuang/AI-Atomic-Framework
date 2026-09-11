@@ -120,7 +120,9 @@ async function assertEvidenceCommandQuotingAndAutoLink(tempRoot: string, ctx: Va
       '--stderr-sha256', 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
     ], workspace);
     assert(addRes.parsed.ok === true, 'evidence add without --validators must succeed');
-    const evidence = JSON.parse(readFileSync(path.join(workspace, '.atm/history/evidence/TASK-AAO-0063.json'), 'utf8'));
+    // Runtime evidence intentionally lives outside Git history. Read the
+    // content-addressed ledger bundle rather than the removed legacy path.
+    const evidence = JSON.parse(readFileSync(path.join(workspace, '.atm/runtime/evidence-ledger/bundles/TASK-AAO-0063.json'), 'utf8'));
     assert(evidence.evidence[0].details.validationPasses.includes('validate:cli'), 'auto-link must automatically link validate:cli');
 
     const taskAPath = path.join(workspace, '.atm/history/tasks/TASK-REGRESS-DEP-A.json');

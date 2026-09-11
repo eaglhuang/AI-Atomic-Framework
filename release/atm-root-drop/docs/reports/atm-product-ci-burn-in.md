@@ -66,11 +66,12 @@ live GitHub API before making a release or product claim.
 
 ## TASK-PRF-0014 current remote observation
 
-Read-only GitHub inspection on 2026-09-10 disproves a current green claim for
-the delivered local clean-install change. The newest visible `ci` run on
-`main` was `34136912919` at SHA `a85ed1203a3ddb279c9dc659d24373706bb2172e`.
-Its `Product CI` workflow failed because the separate `ATM Dogfood` lint step
-reported:
+Read-only GitHub inspection on 2026-09-10 disproves a current green burn-in
+claim for the delivered local clean-install change. The newest visible `ci` run
+on `main` was `34136912919` at SHA
+`a85ed1203a3ddb279c9dc659d24373706bb2172e`. Its required `Product CI` job
+concluded `success`; the overall workflow was red because the separate,
+non-required `ATM Dogfood` lint step reported:
 
 ```text
 tests/cli/write-ticket-scope-amendment.test.ts:6:1
@@ -78,9 +79,12 @@ tests/cli/write-ticket-scope-amendment.test.ts:6:1
 no-duplicate-imports
 ```
 
-The same run's Product CI job therefore cannot count toward the protected-main
-burn-in. The local checkout now passes `npm run lint`, but that result is not a
-remote run and does not repair the unpushed remote SHA.
+The run cannot count toward the ten-run burn-in because it is not a
+release-candidate observation and the current ten-run window has no qualifying
+pair of release-candidate runs. The local checkout now passes `npm run lint`,
+but that result is not a remote run and does not repair the unpushed remote SHA.
+The advisory Dogfood failure remains visible and must not be relabeled as a
+Product CI failure.
 
 The branch-protection API was also checked read-only and currently requires
 the `Product CI` context with strict status checks. The remote burn-in
