@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0027",
+  "updatedAt": "2026-09-11T19:52:20.687Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "validate:git-hooks-enforcement",
+    "validate:governance-commands",
+    "validate:upgrade-proposal"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-git-hooks-enforcement.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a1d71cd3288a083802abb7c18ce15b6b295337b603945e093c5f7ee0d88654d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-hooks-enforcement"
+      ],
+      "generatedAt": "2026-09-11T19:51:16.048Z",
+      "startedAt": "2026-09-11T19:46:01.071Z",
+      "finishedAt": "2026-09-11T19:51:16.048Z",
+      "durationMs": 314977,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d3e82f09999fd4f63ab493b449e0fcc4f5637f80",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:75a57b566263de48753fb22c99048185a8116e74b374b7b697f13bc1ba6a2b2e",
+      "stderrSha256": "sha256:c8cb3117a528ac19c21ae118b2fd13709369d29208b2b8a56fd9c279f025ac91",
+      "validators": [
+        "validate:governance-commands"
+      ],
+      "generatedAt": "2026-09-11T19:52:07.213Z",
+      "startedAt": "2026-09-11T19:51:19.274Z",
+      "finishedAt": "2026-09-11T19:52:07.213Z",
+      "durationMs": 47939,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d3e82f09999fd4f63ab493b449e0fcc4f5637f80",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-upgrade-proposal.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d4d779a5381356bb287366031c092d013c2311d2657f1c38f318cd97931088d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:upgrade-proposal"
+      ],
+      "generatedAt": "2026-09-11T19:52:20.686Z",
+      "startedAt": "2026-09-11T19:52:10.441Z",
+      "finishedAt": "2026-09-11T19:52:20.686Z",
+      "durationMs": 10245,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d3e82f09999fd4f63ab493b449e0fcc4f5637f80",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

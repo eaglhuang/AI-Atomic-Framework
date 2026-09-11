@@ -1,0 +1,332 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0027",
+  "title": "Repair release full-validation regressions before npm publish",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0025"
+  ],
+  "acceptance": [
+    "`validate-upgrade-proposal`, `validate-governance-commands`, and `validate-git-hooks-enforcement` pass on clean isolated fixtures.",
+    "No production validator is weakened, disabled, or changed from blocking to advisory to obtain a pass.",
+    "Release dry-run passes the full validation gate and its artifact checks.",
+    "Runtime evidence remains outside Git history; fixtures do not recreate or require the retired `git-head.jsonl` path.",
+    "Rollback is a governed revert of only the scoped fixture/contract edits, followed by the same three validators."
+  ],
+  "deliverables": [
+    "scripts/validate-upgrade-proposal.ts",
+    "scripts/validate-governance-commands.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+    "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+    "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+    ".github/workflows/release-npm.yml"
+  ],
+  "scopePaths": [
+    "scripts/validate-upgrade-proposal.ts",
+    "scripts/validate-governance-commands.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+    "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+    "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+    "tests",
+    ".github/workflows/release-npm.yml"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-upgrade-proposal.ts --mode validate",
+    "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+    "node --strip-types scripts/validate-git-hooks-enforcement.ts --mode validate",
+    "npm run validate:release-prepublish -- --parallel",
+    "npm run validate:full -- --parallel"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0027-repair-release-full-validation-regressions.task.md",
+    "sectionTitle": "TASK-PRF-0027",
+    "headingLine": 44,
+    "hash": "450ba817b02777c0",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0027-repair-release-full-validation-regressions.task.md",
+      "planningCommitSha": "b65a44b6046733a26bd24d11b8edb66ec96965a5",
+      "contentDigest": "sha256:450ba817b02777c03bb19a07a775e2fa4ac02be10d27ae6c35478fd122cf45b4",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-11T18:36:53.789Z"
+    }
+  },
+  "importedAt": "2026-09-11T18:36:53.789Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.upgrade.proposal.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-upgrade-proposal.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.governance.commands.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.git.hooks.enforcement.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-git-hooks-enforcement.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.release.prepublish.parallel",
+      "command": "npm run validate:release-prepublish -- --parallel",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.full.parallel",
+      "command": "npm run validate:full -- --parallel",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0025",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-11T19-45-50-357Z-renew-8c611979a51e",
+  "lastTransitionAt": "2026-09-11T19:45:50.357Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-11T18:37:03.317Z",
+  "promotedAt": "2026-09-11T18:37:03.321Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-fd4f2ba01e9f",
+    "claimedAt": "2026-09-11T18:37:03.325Z",
+    "heartbeatAt": "2026-09-11T19:45:49.399Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0027.json",
+      ".github/workflows/release-npm.yml",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+      "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-upgrade-proposal.ts",
+      "tests"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260911194549-codex-captain-5caa7f58b9",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911194549-codex-captain-5caa7f58b9\""
+    }
+  },
+  "startedAt": "2026-09-11T18:37:03.325Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-71a5e34a4a36360a",
+    "ticketDigest": "sha256:71a5e34a4a36360a7045e3bdc9693b28978f2e554052d4683a2da154d1ddf0ab",
+    "taskId": "TASK-PRF-0027",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260911194549-codex-captain-5caa7f58b9",
+    "claimGeneration": "lease-fd4f2ba01e9f",
+    "issuedAt": "2026-09-11T19:45:49.399Z",
+    "expiresAt": "2026-09-11T20:15:49.399Z",
+    "scopeDigest": "sha256:51079841ee9f1fbb0b08669f92208ba0893b69990fba8a61beea0d4bba7aad4a",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-11T19:45:49.399Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0027.*",
+          ".atm/history/task-events/TASK-PRF-0027/**",
+          ".atm/history/tasks/TASK-PRF-0027.json",
+          ".github/workflows/release-npm.yml",
+          "scripts/validate-git-hooks-enforcement.ts",
+          "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+          "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+          "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+          "scripts/validate-governance-commands.ts",
+          "scripts/validate-upgrade-proposal.ts",
+          "tests"
+        ],
+        "digest": "sha256:be5c04d2d64b36a917dcf250f6df2ede4c90542ea77a54111d4f3ed9145dce42"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260911183703-codex-captain-TASK-PRF-0027-3bf9ac4cff",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0027",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0027.*",
+      ".atm/history/task-events/TASK-PRF-0027/**",
+      ".atm/history/tasks/TASK-PRF-0027.json",
+      ".github/workflows/release-npm.yml",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+      "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-upgrade-proposal.ts",
+      "tests"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "c532e2152609c59d510bae8d9f882dfb14ecbf2e1358d96fafe1fab37dbf03ca",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260911183703-codex-captain-TASK-PRF-0027-3bf9ac4cff",
+    "laneSession": {
+      "laneSessionId": "lane-20260911183703-codex-captain-0e17882843",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911183703-codex-captain-0e17882843\""
+    },
+    "createdAt": "2026-09-11T18:37:08.304Z",
+    "status": "active"
+  }
+}
