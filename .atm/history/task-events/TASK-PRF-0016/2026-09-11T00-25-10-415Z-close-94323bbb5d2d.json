@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T00-25-10-415Z-close-94323bbb5d2d",
+  "taskId": "TASK-PRF-0016",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911001642-codex-captain-TASK-PRF-0016-db56ade040",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0016.json",
+  "taskSha256": "sha256:44e3968c20258be60c24d8b3e033ec06a94bb60610d10dc1e49132d6c08c08b6",
+  "createdAt": "2026-09-11T00:25:10.415Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0016 --actor codex-captain --status done --historical-delivery d281955bf6037f335270eea510569cd64564eef9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260911001642-codex-captain-TASK-PRF-0016-db56ade040",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0016.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "typecheck",
+      "validate:npm-clean-install",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.1 --output docs/reports/atm-public-npm-install-proof-beta.md --record-blocked",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.2 --output docs/reports/atm-public-npm-install-proof-beta.md"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "validate:npm-clean-install",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.2 --output docs/reports/atm-public-npm-install-proof-beta.md"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-11T00:25:10.402Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0016.*",
+        ".atm/history/task-events/TASK-PRF-0016/**",
+        ".atm/history/tasks/TASK-PRF-0016.json",
+        ".github/workflows/release-npm.yml",
+        "docs/reports/atm-public-npm-install-proof-beta.md",
+        "scripts/build-package-dist.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-package-dist.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+        "validate:npm-clean-install",
+        "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.2 --output docs/reports/atm-public-npm-install-proof-beta.md"
+      ]
+    }
+  }
+}

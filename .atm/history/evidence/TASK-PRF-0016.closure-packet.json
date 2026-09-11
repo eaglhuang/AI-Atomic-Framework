@@ -1,0 +1,144 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0016",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d281955bf6037f335270eea510569cd64564eef9",
+  "governedTreeSha": "18ea507deeca3b870d80c9869cb8c554e9e8d5e7",
+  "targetCommitDelta": {
+    "currentCommitSha": "d281955bf6037f335270eea510569cd64564eef9",
+    "parentCommitShas": [
+      "d281955bf6037f335270eea510569cd64564eef9"
+    ],
+    "governedTreeSha": "18ea507deeca3b870d80c9869cb8c554e9e8d5e7",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3cd67742294542997602b2b7541cae04cc80a43b5b64416c1ce30226b3093c91",
+      "stderrSha256": "sha256:089ef2aec6d3a14bcea3bd390bc077d5d2bf0dd2ef31cdec5ffba7aa42c24a22",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed127c39b81cb29336c6b6c0a1155d491b4e1bc37b650b991e41444ea41fd8fd",
+      "stderrSha256": "sha256:cc76f91e0b3a252d004e46eb6b6710a4c39a4a56ffba01e2b230f13c9b90607f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.1 --output docs/reports/atm-public-npm-install-proof-beta.md --record-blocked",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d843786b8825a7731805f302f75c9c8e424be4e39064f33f492923f47a9ac1cd",
+      "stderrSha256": "sha256:a6ac1ddf9e740b6f834bed17b3f008e2f62ae278f37f6a034f85503aa261a586",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.2 --output docs/reports/atm-public-npm-install-proof-beta.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e378bb02976bd03d2c6c85594a10866f22d89b9f5ddc830f0e0249b99a732d19",
+      "stderrSha256": "sha256:9f584c8454c5538193ad2ea63f09e15e995ae3110e98597076fd93df8ea4149a",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "typecheck",
+    "validate:npm-clean-install",
+    "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.1 --output docs/reports/atm-public-npm-install-proof-beta.md --record-blocked",
+    "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.2 --output docs/reports/atm-public-npm-install-proof-beta.md"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "validate:npm-clean-install",
+    "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.2 --output docs/reports/atm-public-npm-install-proof-beta.md"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-11T00:25:10.402Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0016.*",
+      ".atm/history/task-events/TASK-PRF-0016/**",
+      ".atm/history/tasks/TASK-PRF-0016.json",
+      ".github/workflows/release-npm.yml",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "scripts/build-package-dist.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/build-package-dist.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "validate:npm-clean-install",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.2 --output docs/reports/atm-public-npm-install-proof-beta.md"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0016.json",
+  "closedAt": "2026-09-11T00:25:10.403Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260911001642-codex-captain-TASK-PRF-0016-db56ade040",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d281955bf6037f335270eea510569cd64564eef9",
+    "taskMatchedFiles": [
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0016/2026-09-11T00-15-31-358Z-import-64ebbf5d3c79.json",
+      ".atm/history/task-events/TASK-PRF-0016/2026-09-11T00-16-42-530Z-reserve-32fa26425b11.json",
+      ".atm/history/task-events/TASK-PRF-0016/2026-09-11T00-16-42-534Z-promote-b8090fbf1f16.json",
+      ".atm/history/task-events/TASK-PRF-0016/2026-09-11T00-16-47-397Z-claim-8e06aa05561a.json",
+      ".atm/history/tasks/TASK-PRF-0016.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
