@@ -1,11 +1,12 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0027",
-  "updatedAt": "2026-09-11T19:52:20.687Z",
+  "updatedAt": "2026-09-11T22:56:46.260Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "validate:git-hooks-enforcement",
     "validate:governance-commands",
+    "validate:release-prepublish -- --run-id release-prepublish-local-0027c --prior-evidence .atm/runtime/release-prepublish-prior-evidence.json --parallel",
     "validate:upgrade-proposal"
   ],
   "staleValidationPasses": [],
@@ -56,6 +57,38 @@
       "durationMs": 10245,
       "runnerKind": "dev-source",
       "sourceCommit": "d3e82f09999fd4f63ab493b449e0fcc4f5637f80",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:release-prepublish -- --run-id release-prepublish-local-0027c --prior-evidence .atm/runtime/release-prepublish-prior-evidence.json --parallel",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ad5cdcb5e9eac37c6131f658fdc22b2db7d735b5b8adb9967b2f4d6327dd21cf",
+      "stderrSha256": "sha256:444ae703603bd2cee76ff3990d20255cfcb9a0c4e8620a80daae5f8b58351da6",
+      "validators": [
+        "validate:release-prepublish -- --run-id release-prepublish-local-0027c --prior-evidence .atm/runtime/release-prepublish-prior-evidence.json --parallel"
+      ],
+      "generatedAt": "2026-09-11T20:41:43.614Z",
+      "startedAt": "2026-09-11T20:41:05.696Z",
+      "finishedAt": "2026-09-11T20:41:43.614Z",
+      "durationMs": 37918,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c86f0e297dc18744eb41b7c746f22b8a9856da25",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:75a57b566263de48753fb22c99048185a8116e74b374b7b697f13bc1ba6a2b2e",
+      "stderrSha256": "sha256:713f0d1d47ef7efca8bd83465d65d7b844ad80eb7a2b8972368af1bfb37268ed",
+      "validators": [
+        "validate:governance-commands"
+      ],
+      "generatedAt": "2026-09-11T22:56:46.259Z",
+      "startedAt": "2026-09-11T22:55:59.976Z",
+      "finishedAt": "2026-09-11T22:56:46.259Z",
+      "durationMs": 46283,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "00cea9a5c57a8c6eae9ab8c00adbbebeab181ed3",
       "cached": false
     }
   ],

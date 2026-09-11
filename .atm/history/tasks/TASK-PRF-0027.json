@@ -31,7 +31,11 @@
     "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
     "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
     "tests",
-    ".github/workflows/release-npm.yml"
+    ".github/workflows/release-npm.yml",
+    ".atm/history/evidence/TASK-PRF-0027.*",
+    ".atm/history/task-events/TASK-PRF-0027/**",
+    ".atm/history/tasks/TASK-PRF-0027.json",
+    "scripts/validate-governance-commands/implementation.ts"
   ],
   "validators": [
     "node --strip-types scripts/validate-upgrade-proposal.ts --mode validate",
@@ -191,8 +195,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-11T20-05-30-684Z-renew-ed32f3ff25a2",
-  "lastTransitionAt": "2026-09-11T20:05:30.684Z",
+  "lastTransitionId": "2026-09-11T22-55-48-449Z-renew-251bb054c98f",
+  "lastTransitionAt": "2026-09-11T22:55:48.449Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-11T18:37:03.317Z",
@@ -201,9 +205,11 @@
     "actorId": "codex-captain",
     "leaseId": "lease-fd4f2ba01e9f",
     "claimedAt": "2026-09-11T18:37:03.325Z",
-    "heartbeatAt": "2026-09-11T20:05:29.784Z",
+    "heartbeatAt": "2026-09-11T22:55:47.923Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-PRF-0027.*",
+      ".atm/history/task-events/TASK-PRF-0027/**",
       ".atm/history/tasks/TASK-PRF-0027.json",
       ".github/workflows/release-npm.yml",
       "scripts/validate-git-hooks-enforcement.ts",
@@ -211,15 +217,16 @@
       "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
       "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
       "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/implementation.ts",
       "scripts/validate-upgrade-proposal.ts",
       "tests"
     ],
     "state": "active",
     "laneSession": {
-      "laneSessionId": "lane-20260911194549-codex-captain-5caa7f58b9",
+      "laneSessionId": "lane-20260911225547-codex-captain-fe995dff7a",
       "status": "active",
-      "source": "option",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911194549-codex-captain-5caa7f58b9\""
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911225547-codex-captain-fe995dff7a\""
     }
   },
   "startedAt": "2026-09-11T18:37:03.325Z",
@@ -227,27 +234,26 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-3c92791931adf956",
-    "ticketDigest": "sha256:3c92791931adf956def55496d77543e71daa405ed9db7000ac4c2ffdd3851c71",
+    "ticketId": "wat-269d91960d062dd4",
+    "ticketDigest": "sha256:269d91960d062dd4f92345193061a8a59c3f5cc5ee4099a6a6753cad4ffc172b",
     "taskId": "TASK-PRF-0027",
     "origin": "claim",
     "actorId": "codex-captain",
-    "laneSessionId": "lane-20260911194549-codex-captain-5caa7f58b9",
+    "laneSessionId": "lane-20260911225547-codex-captain-fe995dff7a",
     "claimGeneration": "lease-fd4f2ba01e9f",
-    "issuedAt": "2026-09-11T20:05:29.784Z",
-    "expiresAt": "2026-09-11T20:35:29.784Z",
-    "scopeDigest": "sha256:90051c6e202561bb7292c049f1bb0294c4abedb1c466fbfbdda67632b12f8cf4",
+    "issuedAt": "2026-09-11T22:55:47.923Z",
+    "expiresAt": "2026-09-11T23:25:47.923Z",
+    "scopeDigest": "sha256:6a661e7db6dd260fc0befa5a87402bac38a40905154cbd2264a611b3cb2bb052",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-11T20:05:29.784Z"
+      "selectedAt": "2026-09-11T22:55:47.923Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0027.*",
-          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0027/**",
           ".atm/history/tasks/TASK-PRF-0027.json",
           ".github/workflows/release-npm.yml",
@@ -256,10 +262,11 @@
           "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
           "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
           "scripts/validate-governance-commands.ts",
+          "scripts/validate-governance-commands/implementation.ts",
           "scripts/validate-upgrade-proposal.ts",
           "tests"
         ],
-        "digest": "sha256:24ebff8ba4bde992a79c2a71a0ec0a88bd435a87bb61607d6e45c3f630c49d1b"
+        "digest": "sha256:28e1bd5d8463b3e86f4afd2c8fff225697768489bda6551546866a5f8d48d76b"
       },
       {
         "kind": "lifecycle-operation",
@@ -312,22 +319,30 @@
       "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
       "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
       "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/implementation.ts",
       "scripts/validate-upgrade-proposal.ts",
       "tests"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0027-repair-release-full-validation-regressions.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0027-repair-release-full-validation-regressions.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "c532e2152609c59d510bae8d9f882dfb14ecbf2e1358d96fafe1fab37dbf03ca",
     "actorId": "codex-captain",
-    "sessionId": "session-20260911183703-codex-captain-TASK-PRF-0027-3bf9ac4cff",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260911183703-codex-captain-0e17882843",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911183703-codex-captain-0e17882843\""
     },
-    "createdAt": "2026-09-11T18:37:08.304Z",
+    "createdAt": "2026-09-11T18:37:08.378Z",
     "status": "active"
   }
 }

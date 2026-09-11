@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T22-55-42-860Z-scope-amendment-628bab43f4ea",
+  "taskId": "TASK-PRF-0027",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0027.json",
+  "taskSha256": "sha256:d8ed4f03939107a0d80d938f2188b1b9c90b8803859164c1270de2ec62aee46b",
+  "createdAt": "2026-09-11T22:55:42.860Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0027 --actor codex-captain --add scripts/validate-governance-commands/implementation.ts --reason \"Include the validator implementation fixture contract updated from retired git-head.jsonl to runtime git-head.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Include the validator implementation fixture contract updated from retired git-head.jsonl to runtime git-head.json"
+  }
+}
