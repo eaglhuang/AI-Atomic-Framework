@@ -398,6 +398,27 @@ function releaseExtractionLock(lockRoot) {
   rmSync(lockRoot, { recursive: true, force: true });
 }
 
+function renameStagingRoot(stagingRoot, cacheRoot) {
+  const retryableCodes = new Set(['EPERM', 'EACCES', 'EBUSY']);
+  const attempts = readPositiveIntEnv('ATM_ONEFILE_RENAME_RETRY_ATTEMPTS', 8);
+  const delayMs = readPositiveIntEnv('ATM_ONEFILE_RENAME_RETRY_DELAY_MS', 100);
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      renameSync(stagingRoot, cacheRoot);
+      return;
+    } catch (error) {
+      lastError = error;
+      const code = error && typeof error === 'object' ? error.code : undefined;
+      if (process.platform !== 'win32' || !retryableCodes.has(code) || attempt === attempts) {
+        throw error;
+      }
+      sleepMs(delayMs * attempt);
+    }
+  }
+  throw lastError;
+}
+
 function extractPayload(cacheRoot) {
   const payload = decodePayload();
   const stagingRoot = \`\${cacheRoot}.staging-\${process.pid}-\${Date.now()}\`;
@@ -428,7 +449,7 @@ function extractPayload(cacheRoot) {
     mkdirSync(path.dirname(cacheRoot), { recursive: true });
     // Use rename semantics through copy-less move by relying on same root.
     // On Windows, rename over existing path fails, so cacheRoot is removed above.
-    renameSync(stagingRoot, cacheRoot);
+    renameStagingRoot(stagingRoot, cacheRoot);
   } finally {
     rmSync(stagingRoot, { recursive: true, force: true });
   }
