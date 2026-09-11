@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0023",
+  "title": "Repair Dogfood clean-fixture evidence isolation",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "A clean temporary fixture contains every evidence file required by the validator.",
+    "`validate-cli` and `validate-self-hosting-alpha` pass from an isolated checkout.",
+    "The path construction rejects duplicated repository-root segments.",
+    "`npm test` passes without weakening or skipping the affected suites.",
+    "Evidence records the failed run `34619400251` and the repaired run SHA.",
+    "Rollback is limited to reverting the validator/fixture changes and rerunning the same gates."
+  ],
+  "deliverables": [
+    "scripts/validate-cli/full-suite.ts",
+    "scripts/validate-self-hosting-alpha.ts",
+    "scripts/validate-cli.ts",
+    "tests/fixtures"
+  ],
+  "scopePaths": [
+    "scripts/validate-cli/full-suite.ts",
+    "scripts/validate-self-hosting-alpha.ts",
+    "scripts/validate-cli.ts",
+    "tests/fixtures",
+    ".atm/history/evidence/TASK-PRF-0023.*",
+    ".atm/history/task-events/TASK-PRF-0023/**",
+    ".atm/history/tasks/TASK-PRF-0023.json",
+    "AGENTS.md"
+  ],
+  "validators": [
+    "npm test",
+    "node --strip-types scripts/validate-cli.ts --mode test",
+    "node --strip-types scripts/validate-self-hosting-alpha.ts --mode test"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0023-repair-dogfood-clean-fixture-evidence-isolation.task.md",
+    "sectionTitle": "TASK-PRF-0023",
+    "headingLine": 38,
+    "hash": "094d1ce14d224a22",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0023-repair-dogfood-clean-fixture-evidence-isolation.task.md",
+      "planningCommitSha": "46c35e8066b1c7a7f1e4d2e8b36ca5daab0c2d2c",
+      "contentDigest": "sha256:094d1ce14d224a22db119bc4b09df001a5d0c85f2644b9c32988ca7ff2f1ee49",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-11T16:04:05.432Z"
+    }
+  },
+  "importedAt": "2026-09-11T16:04:05.432Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.test",
+      "command": "npm test",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.cli.ts.mode.test",
+      "command": "node --strip-types scripts/validate-cli.ts --mode test",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.self.hosting.alpha.ts.mode.test",
+      "command": "node --strip-types scripts/validate-self-hosting-alpha.ts --mode test",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-11T16-11-28-548Z-scope-amendment-da8f39ee11a8",
+  "lastTransitionAt": "2026-09-11T16:11:28.548Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-11T16:04:24.609Z",
+  "promotedAt": "2026-09-11T16:04:24.613Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-99d150e765ca",
+    "claimedAt": "2026-09-11T16:04:24.618Z",
+    "heartbeatAt": "2026-09-11T16:04:24.618Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0023.*",
+      ".atm/history/task-events/TASK-PRF-0023/**",
+      ".atm/history/tasks/TASK-PRF-0023.json",
+      "AGENTS.md",
+      "scripts/validate-cli.ts",
+      "scripts/validate-cli/full-suite.ts",
+      "scripts/validate-self-hosting-alpha.ts",
+      "tests/fixtures"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260911160424-codex-captain-6c778f5119",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911160424-codex-captain-6c778f5119\""
+    }
+  },
+  "startedAt": "2026-09-11T16:04:24.618Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-ecc915158a7233c4",
+    "ticketDigest": "sha256:ecc915158a7233c4078cb354a478f103040c922fdaa945dd013a9e5eeb1b2260",
+    "taskId": "TASK-PRF-0023",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260911160424-codex-captain-6c778f5119",
+    "claimGeneration": "lease-99d150e765ca",
+    "issuedAt": "2026-09-11T16:11:28.377Z",
+    "expiresAt": "2026-09-11T16:41:28.377Z",
+    "scopeDigest": "sha256:0e0b77b92d90164200f7416c7f218724b2418f149d596061670bc0fcc5284fdb",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-11T16:11:28.377Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0023.*",
+          ".atm/history/task-events/TASK-PRF-0023/**",
+          ".atm/history/tasks/TASK-PRF-0023.json",
+          "AGENTS.md",
+          "scripts/validate-cli.ts",
+          "scripts/validate-cli/full-suite.ts",
+          "scripts/validate-self-hosting-alpha.ts",
+          "tests/fixtures"
+        ],
+        "digest": "sha256:53bf864f30127874bc2260bf1ff524f25dbfcea03756eec290076fef8a7ef1ef"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260911160424-codex-captain-TASK-PRF-0023-e50dc869fd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0023",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0023.*",
+      ".atm/history/task-events/TASK-PRF-0023/**",
+      ".atm/history/tasks/TASK-PRF-0023.json",
+      "AGENTS.md",
+      "scripts/validate-cli.ts",
+      "scripts/validate-cli/full-suite.ts",
+      "scripts/validate-self-hosting-alpha.ts",
+      "tests/fixtures"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0023-repair-dogfood-clean-fixture-evidence-isolation.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0023-repair-dogfood-clean-fixture-evidence-isolation.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4d4307ef9f2642773a4df2123a8c714f5ae8ae61493da13a2cd27b24ba6a1a89",
+    "actorId": "codex-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260911160424-codex-captain-6c778f5119",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911160424-codex-captain-6c778f5119\""
+    },
+    "createdAt": "2026-09-11T16:04:29.612Z",
+    "status": "active"
+  }
+}

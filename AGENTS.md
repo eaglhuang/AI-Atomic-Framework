@@ -8,7 +8,7 @@ Captain/dispatch entry gate: if the user asks for Captain, Coordinator, dispatch
 
 Start with this line when a user has given you a concrete request:
 
-Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, "node atm.mjs next --json" is read-only status. In this framework repository, `node atm.mjs` is the stable frozen runner entrypoint; use `node atm.dev.mjs` only when explicitly validating unbuilt source changes to ATM itself. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
+Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, "node atm.mjs next --json" is read-only status. In this framework repository, `node atm.mjs` is the stable frozen runner entrypoint; use `node atm.dev.mjs` only when explicitly validating unbuilt source changes to ATM itself. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/runtime/evidence-ledger/bundles/BOOTSTRAP-0001.json only as supporting runtime state.
 
 After every `next --prompt` or `next --claim` response, read `evidence.nextAction.playbook` before editing, closing, or committing. The playbook is the short channel-specific work order; do not invent your own lifecycle.
 
@@ -17,7 +17,7 @@ Batch task rule:
 - If the request says to finish all task cards, a whole plan, a task family, or multiple tasks, let `next --prompt` route it as `recommendedChannel: "batch"`.
 - After claiming a batch route, work only on the queue head and run `node atm.mjs batch checkpoint --actor <id> --json` after delivering that task.
 - Do not commit queue-head deliverables before `batch checkpoint` succeeds.
-- After checkpoint succeeds, commit the deliverables together with the matching `.atm/history/tasks/<task>.json`, `.atm/history/evidence/<task>.json`, and `.atm/history/task-events/<task>/`.
+- After checkpoint succeeds, commit the deliverables together with the matching `.atm/history/tasks/<task>.json`, `.atm/history/evidence/<task>.bundle-manifest.json`, and `.atm/history/task-events/<task>/`.
 - Do not manually loop over `tasks reserve/promote/claim/close`; the batch checkpoint is the governed completion entry.
 
 Framework-repository exception:
@@ -35,7 +35,7 @@ Bootstrap files:
 - Profile: .atm/runtime/profile/default.md
 - Project probe: .atm/runtime/project-probe.json
 - Default guards: .atm/runtime/default-guards.json
-- Evidence: .atm/history/evidence/BOOTSTRAP-0001.json
+- Evidence: .atm/runtime/evidence-ledger/bundles/BOOTSTRAP-0001.json
 
 Operating rules:
 
