@@ -37,6 +37,7 @@ jobs:
   publish:
     name: Publish npm packages
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
     env:
       RELEASE_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
