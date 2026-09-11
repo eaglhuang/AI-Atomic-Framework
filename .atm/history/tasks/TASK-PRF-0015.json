@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0015",
   "title": "Prove public npm registry installability and provenance",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0013",
@@ -28,7 +28,7 @@
   ],
   "validators": [
     "node --strip-types tests/cli/public-npm-install-contract.test.ts",
-    "npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0"
+    "npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --output docs/reports/atm-public-npm-install-proof.md"
   ],
   "planningRepo": "C:/Users/User/3KLife",
   "targetRepo": "C:/Users/User/AI-Atomic-Framework",
@@ -63,9 +63,9 @@
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0015-prove-public-npm-registry-installability-and-provenance.task.md",
       "planningCommitSha": null,
-      "contentDigest": "sha256:0fa2e760e47e3e7df0d406ac5b73fe5c620180845779df1a4a2c0fa84aef4970",
-      "amendmentEpoch": 0,
-      "sealedAt": "2026-09-10T23:59:48.372Z"
+      "contentDigest": "sha256:f07f12e1c48add7ccb082cf0de2e0e4e0812e7411812e6780e8c0adc9b1c20d9",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-11T00:06:00.307Z"
     }
   },
   "importedAt": "2026-09-10T23:59:48.372Z",
@@ -221,8 +221,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-11T00-04-05-470Z-renew-c8b35e00d35f",
-  "lastTransitionAt": "2026-09-11T00:04:05.470Z",
+  "lastTransitionId": "2026-09-11T00-09-11-303Z-close-9961a06f8376",
+  "lastTransitionAt": "2026-09-11T00:09:11.303Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-11T00:00:09.012Z",
@@ -231,7 +231,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-b4dbdadd7335",
     "claimedAt": "2026-09-11T00:00:09.022Z",
-    "heartbeatAt": "2026-09-11T00:04:04.623Z",
+    "heartbeatAt": "2026-09-11T00:09:11.301Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0015.json",
@@ -240,13 +240,14 @@
       "scripts/validate-public-npm-install.ts",
       "tests/cli/public-npm-install-contract.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260911000009-codex-captain-826497051e",
       "status": "active",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911000009-codex-captain-826497051e\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-11T00:00:09.022Z",
   "startedByActor": "codex-captain",
@@ -346,5 +347,9 @@
     },
     "createdAt": "2026-09-11T00:00:13.897Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-11T00:09:11.301Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260911000009-codex-captain-TASK-PRF-0015-bc3f37838b",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0015.closure-packet.json"
 }

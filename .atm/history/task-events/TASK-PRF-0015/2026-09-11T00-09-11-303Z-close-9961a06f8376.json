@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T00-09-11-303Z-close-9961a06f8376",
+  "taskId": "TASK-PRF-0015",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911000009-codex-captain-TASK-PRF-0015-bc3f37838b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0015.json",
+  "taskSha256": "sha256:248ad1cf55c424dee4ee0c82313d7a4747420a811da254cf299d64ccdd6211fa",
+  "createdAt": "2026-09-11T00:09:11.303Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0015 --actor codex-captain --status done --historical-delivery 002823e79d2cf728eeb8d41771bbd5aae6c4d7e0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260911000009-codex-captain-TASK-PRF-0015-bc3f37838b",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0015.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "typecheck",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --output docs/reports/atm-public-npm-install-proof.md"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --output docs/reports/atm-public-npm-install-proof.md"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-11T00:09:11.290Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0015.*",
+        ".atm/history/task-events/TASK-PRF-0015/**",
+        ".atm/history/tasks/TASK-PRF-0015.json",
+        "docs/reports/atm-public-npm-install-proof.md",
+        "package.json",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+        "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --output docs/reports/atm-public-npm-install-proof.md"
+      ]
+    }
+  }
+}

@@ -1,0 +1,245 @@
+{
+  "schemaId": "atm.runnerSyncReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0015",
+  "publicationDisposition": "published",
+  "recoveryRetainedPaths": [],
+  "actorId": "codex-captain",
+  "actorIdentity": {
+    "actorId": "codex-captain",
+    "source": "AGENT_IDENTITY"
+  },
+  "stewardWorkId": "runner-sync-19c73cd5",
+  "sealedSourceSha": "002823e79d2cf728eeb8d41771bbd5aae6c4d7e0",
+  "outputInventory": {
+    "schemaId": "atm.runnerBuildOutputInventory.v1",
+    "sealedSourceSha": "002823e79d2cf728eeb8d41771bbd5aae6c4d7e0",
+    "entries": [
+      {
+        "path": ".atm/history/evidence/TASK-PRF-0015.runner-sync-receipt.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0015",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-onefile/atm.mjs",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0015",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-onefile/release-manifest.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0015",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0015",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/docs/reports/atm-public-npm-install-proof.md",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0015",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/package.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0015",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/release-manifest.json",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0015",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/scripts/validate-public-npm-install.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0015",
+        "ownerActorId": null
+      },
+      {
+        "path": "release/atm-root-drop/tests/cli/public-npm-install-contract.test.ts",
+        "disposition": "owned-current",
+        "ownerTaskId": "TASK-PRF-0015",
+        "ownerActorId": null
+      }
+    ],
+    "digest": "sha256:439705fbebd74fe03683e03f5e242e25df4fe456be88eda67f2060c444c70d13"
+  },
+  "memberTaskIds": [
+    "TASK-PRF-0015"
+  ],
+  "linkedTaskIds": [],
+  "groupManifest": {
+    "schemaId": "atm.runnerSyncCoalescedGroupManifest.v1",
+    "stewardWorkId": "runner-sync-19c73cd5",
+    "sealedSourceSha": "002823e79d2cf728eeb8d41771bbd5aae6c4d7e0",
+    "members": [
+      {
+        "taskId": "TASK-PRF-0015",
+        "actorId": "codex-captain",
+        "laneFingerprint": null,
+        "requestedSurfaces": [
+          "packages/cli/dist",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop"
+        ],
+        "requestDigest": "sha256:666c5aaaef14b49073b6a972644bb69a24918abdd6ee718e17ee72f2233798aa"
+      }
+    ],
+    "memberTaskIds": [
+      "TASK-PRF-0015"
+    ],
+    "sharedSealedInputDigest": "sha256:c73def41920cae5502cdde1cf4f23790db73d39018ef0edf03a71cdfc29ddda5",
+    "sharedOutputDigest": "sha256:d3796d7f7b3a51fd1127f9467bc7c9add05021fe8afd12b1cb93d039d8976eef",
+    "manifestDigest": "sha256:a7de112e1524bc6c28e1fac54d38846885ce44457cfe3264abbb63c1e4955faf",
+    "createdAt": "2026-09-11T00:08:26.081Z"
+  },
+  "childReceipts": [
+    {
+      "schemaId": "atm.runnerSyncChildReceipt.v1",
+      "taskId": "TASK-PRF-0015",
+      "parentStewardWorkId": "runner-sync-19c73cd5",
+      "groupManifestDigest": "sha256:a7de112e1524bc6c28e1fac54d38846885ce44457cfe3264abbb63c1e4955faf",
+      "memberRequestDigest": "sha256:666c5aaaef14b49073b6a972644bb69a24918abdd6ee718e17ee72f2233798aa",
+      "sealedSourceSha": "002823e79d2cf728eeb8d41771bbd5aae6c4d7e0",
+      "sharedSealedInputDigest": "sha256:c73def41920cae5502cdde1cf4f23790db73d39018ef0edf03a71cdfc29ddda5",
+      "sharedOutputDigest": "sha256:d3796d7f7b3a51fd1127f9467bc7c9add05021fe8afd12b1cb93d039d8976eef",
+      "receiptDigest": "sha256:0d254ad9de569fa2358eb87d4cb96e3d95ec0a2e56f48e7de1c3d08343e5f1bb",
+      "issuedAt": "2026-09-11T00:08:26.081Z"
+    }
+  ],
+  "childAttribution": {
+    "schemaId": "atm.runnerSyncChildAttribution.v1",
+    "complete": true,
+    "members": [
+      {
+        "taskId": "TASK-PRF-0015",
+        "actorId": "codex-captain",
+        "laneFingerprint": null,
+        "childReceiptDigest": "sha256:0d254ad9de569fa2358eb87d4cb96e3d95ec0a2e56f48e7de1c3d08343e5f1bb"
+      }
+    ],
+    "missingTaskIds": []
+  },
+  "lifecycle": {
+    "schemaId": "atm.runnerSyncReceiptLifecycle.v1",
+    "durableStates": [
+      "building",
+      "built-provisional",
+      "publication-ready",
+      "published",
+      "reconciled"
+    ],
+    "provisionalState": "built-provisional",
+    "publicationReadyState": "publication-ready",
+    "terminalState": "reconciled",
+    "releasePhase": "published",
+    "reconcilePhase": "reconciled",
+    "finalizable": true,
+    "recoveryCommand": null
+  },
+  "runnerInputTreeHash": "sha256:c73def41920cae5502cdde1cf4f23790db73d39018ef0edf03a71cdfc29ddda5",
+  "runnerInputGraph": {
+    "schemaId": "atm.runnerInputGraph.v1",
+    "sealedSourceSha": "002823e79d2cf728eeb8d41771bbd5aae6c4d7e0",
+    "aggregateInputTreeHash": "sha256:c73def41920cae5502cdde1cf4f23790db73d39018ef0edf03a71cdfc29ddda5",
+    "nodes": [
+      {
+        "segment": "packages",
+        "inputPaths": [
+          "atomic_workbench",
+          "package-lock.json",
+          "package.json",
+          "packages",
+          "schemas",
+          "scripts",
+          "templates",
+          "tsconfig.build.json",
+          "tsconfig.json"
+        ],
+        "inputDigest": "sha256:c73def41920cae5502cdde1cf4f23790db73d39018ef0edf03a71cdfc29ddda5",
+        "outputEntries": [
+          "packages/cli/dist",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop"
+        ],
+        "outputDigest": "sha256:6e3063b6d8bfebf1846dcb913ed22481ae3d27895c318379dd8297493a8e7563"
+      }
+    ]
+  },
+  "requestedSurfaces": [
+    "packages/cli/dist",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "buildTarget": "full",
+  "buildInputsTreeHash": "sha256:c73def41920cae5502cdde1cf4f23790db73d39018ef0edf03a71cdfc29ddda5",
+  "buildDecision": "fullRebuild",
+  "decisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:2d6a533ba38109b8907745280569b1370704abaf71b5ace438202038b650a8c4",
+  "runtimeTelemetryRef": ".atm/runtime/telemetry/runner-sync-build/2026-09-11T00-08-23-813Z-runner-sync.jsonl",
+  "tsBuildCacheDigest": "sha256:e7b22df5aca0c698eb037cae6f76fe2e36e8ec5f8b5ab54d24b65143d8b69057",
+  "telemetryDigest": "sha256:22a4e48a7982d7e1a536a77bf1a9d6a30b8dc80de6faab0bdc0ab8c275d61920",
+  "brokerTicket": {
+    "ticketId": "runner-sync-19c73cd5:002823e79d2cf728eeb8d41771bbd5aae6c4d7e0",
+    "waitedMs": 0,
+    "position": 1,
+    "headOwner": "TASK-PRF-0015"
+  },
+  "dominantPhaseSummary": {
+    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+    "dominantPhase": "rootDropReleaseAssembly",
+    "dominantPhaseMs": 32656,
+    "totalElapsedMs": 78920,
+    "dominanceRatio": 0.4138,
+    "phaseMedianMs": 5284,
+    "phaseP95Ms": 32656,
+    "measuredPhaseCount": 8,
+    "optimizationVerdict": "inconclusive",
+    "basis": "single-run"
+  },
+  "buildObservation": {
+    "schemaId": "atm.runnerSyncBuildObservation.v1",
+    "buildDecision": "fullRebuild",
+    "decisionReason": "build-script-change",
+    "brokerTicket": {
+      "ticketId": "runner-sync-19c73cd5:002823e79d2cf728eeb8d41771bbd5aae6c4d7e0",
+      "waitedMs": 0,
+      "position": 1,
+      "headOwner": "TASK-PRF-0015"
+    },
+    "changedPathCount": 2,
+    "affectedPackageCount": 0,
+    "unsafeReasons": [
+      "build-script-change",
+      "root-config-change"
+    ],
+    "dominantPhaseSummary": {
+      "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+      "dominantPhase": "rootDropReleaseAssembly",
+      "dominantPhaseMs": 32656,
+      "totalElapsedMs": 78920,
+      "dominanceRatio": 0.4138,
+      "phaseMedianMs": 5284,
+      "phaseP95Ms": 32656,
+      "measuredPhaseCount": 8,
+      "optimizationVerdict": "inconclusive",
+      "basis": "single-run"
+    }
+  },
+  "atomicWrite": {
+    "schemaId": "atm.runnerSyncAtomicWrite.v1",
+    "strategy": "temp-file-rename-with-retry",
+    "platform": "win32",
+    "maxAttempts": 4
+  },
+  "autoReleaseCommand": "node atm.mjs broker runner-sync release --task \"TASK-PRF-0015\" --steward-work-id \"runner-sync-19c73cd5\" --receipt-ref \".atm/history/evidence/TASK-PRF-0015.runner-sync-receipt.json\" --json",
+  "publishedAt": "2026-09-11T00:08:26.082Z"
+}

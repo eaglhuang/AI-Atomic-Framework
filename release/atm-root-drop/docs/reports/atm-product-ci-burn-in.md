@@ -63,3 +63,33 @@ live GitHub API before making a release or product claim.
 | 33024567885 | standard | `b8cdf3c727e6` | success |
 | 33024565507 | standard | `b8cdf3c727e6` | success |
 | 33024563526 | standard | `b8cdf3c727e6` | success |
+
+## TASK-PRF-0014 current remote observation
+
+Read-only GitHub inspection on 2026-09-10 disproves a current green claim for
+the delivered local clean-install change. The newest visible `ci` run on
+`main` was `34136912919` at SHA `a85ed1203a3ddb279c9dc659d24373706bb2172e`.
+Its `Product CI` workflow failed because the separate `ATM Dogfood` lint step
+reported:
+
+```text
+tests/cli/write-ticket-scope-amendment.test.ts:6:1
+../../packages/cli/src/commands/tasks/status-triangulation.ts import is duplicated
+no-duplicate-imports
+```
+
+The same run's Product CI job therefore cannot count toward the protected-main
+burn-in. The local checkout now passes `npm run lint`, but that result is not a
+remote run and does not repair the unpushed remote SHA.
+
+The branch-protection API was also checked read-only and currently requires
+the `Product CI` context with strict status checks. The remote burn-in
+validator was executed against the live API and failed closed with:
+
+```text
+protected-main burn-in requires at least two release-candidate ci runs
+```
+
+This section is an explicit red/inconclusive evidence result for
+`TASK-PRF-0014`, not a release claim. No push, branch-rule mutation, or npm
+publication was performed.
