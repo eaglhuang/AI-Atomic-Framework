@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0026",
+  "updatedAt": "2026-09-11T16:55:02.856Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "lint",
+    "npm audit --omit=dev --audit-level=high",
+    "typecheck",
+    "validate:package-install"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm audit --omit=dev --audit-level=high",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "npm audit --omit=dev --audit-level=high"
+      ],
+      "generatedAt": "2026-09-11T16:54:20.745Z",
+      "startedAt": "2026-09-11T16:54:19.512Z",
+      "finishedAt": "2026-09-11T16:54:20.745Z",
+      "durationMs": 1233,
+      "runnerKind": "dev-source",
+      "sourceCommit": "73810d2754410fd044f572a4899bb357e1db9a5d",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-11T16:54:33.318Z",
+      "startedAt": "2026-09-11T16:54:24.405Z",
+      "finishedAt": "2026-09-11T16:54:33.318Z",
+      "durationMs": 8913,
+      "runnerKind": "dev-source",
+      "sourceCommit": "73810d2754410fd044f572a4899bb357e1db9a5d",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-11T16:54:47.092Z",
+      "startedAt": "2026-09-11T16:54:36.920Z",
+      "finishedAt": "2026-09-11T16:54:47.092Z",
+      "durationMs": 10172,
+      "runnerKind": "dev-source",
+      "sourceCommit": "73810d2754410fd044f572a4899bb357e1db9a5d",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:package-install",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1519e154c754ae2c03d93381958ec4a7ad2f87c88fa09939564639648ca03089",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:package-install"
+      ],
+      "generatedAt": "2026-09-11T16:55:02.855Z",
+      "startedAt": "2026-09-11T16:54:50.717Z",
+      "finishedAt": "2026-09-11T16:55:02.855Z",
+      "durationMs": 12138,
+      "runnerKind": "dev-source",
+      "sourceCommit": "73810d2754410fd044f572a4899bb357e1db9a5d",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
