@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T16-43-56-260Z-close-d17335f9bd9a",
+  "taskId": "TASK-PRF-0024",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911162924-codex-captain-TASK-PRF-0024-2408563f7f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0024.json",
+  "taskSha256": "sha256:790f8f3f1cbf253a4bfeb5e3beb78629fbdc568acbf113593c03b9681efb4c10",
+  "createdAt": "2026-09-11T16:43:56.260Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0024 --actor codex-captain --status done --historical-delivery 44bc8d926c6bf5105de510e26053f2250abd66d8",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260911162924-codex-captain-TASK-PRF-0024-2408563f7f",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0024.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "npm audit --omit=dev --audit-level=high",
+      "typecheck",
+      "validate:npm-clean-install",
+      "validate:package-install",
+      "validate:package-skeleton"
+    ],
+    "requiredGates": [
+      "lint",
+      "npm audit --omit=dev --audit-level=high",
+      "typecheck",
+      "validate:npm-clean-install",
+      "validate:package-skeleton"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-11T16:43:56.247Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0024.*",
+        ".atm/history/task-events/TASK-PRF-0024/**",
+        ".atm/history/tasks/TASK-PRF-0024.json",
+        "package-lock.json",
+        "package.json",
+        "packages/*/package.json",
+        "scripts/validate-dependencies.ts"
+      ],
+      "criticalChangedFiles": [
+        "package-lock.json",
+        "package.json",
+        "packages/*/package.json",
+        "scripts/validate-dependencies.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "npm audit --omit=dev --audit-level=high",
+        "typecheck",
+        "validate:npm-clean-install",
+        "validate:package-skeleton"
+      ]
+    }
+  }
+}

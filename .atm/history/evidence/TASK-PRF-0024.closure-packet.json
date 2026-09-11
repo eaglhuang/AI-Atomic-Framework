@@ -1,0 +1,178 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0024",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "44bc8d926c6bf5105de510e26053f2250abd66d8",
+  "governedTreeSha": "94491b19050561179814f9282a57b7a923a134bd",
+  "targetCommitDelta": {
+    "currentCommitSha": "44bc8d926c6bf5105de510e26053f2250abd66d8",
+    "parentCommitShas": [
+      "44bc8d926c6bf5105de510e26053f2250abd66d8"
+    ],
+    "governedTreeSha": "94491b19050561179814f9282a57b7a923a134bd",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/tasks/TASK-PRF-0018.json",
+      ".atm/history/tasks/TASK-PRF-0024.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "package-lock.json",
+      "package.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
+      "release/atm-root-drop/package-lock.json",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/package.json",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/build-package-dist.ts",
+      "release/atm-root-drop/scripts/validate-cli/full-suite.ts",
+      "release/atm-root-drop/scripts/validate-public-npm-install.ts",
+      "release/atm-root-drop/scripts/validate-self-hosting-alpha.ts",
+      "release/atm-root-drop/tests/cli/public-npm-install-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm audit --omit=dev --audit-level=high --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2637bd1cc5683bb078aa17ed58a2b5034d8c4f0feaee717507a57fdb3ccbf725",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:package-install",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a7e7db185af8f46926cfee387d7894912f34d4f29eac1f5777b8ad51eb0e1d32",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm audit --omit=dev --audit-level=high",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed127c39b81cb29336c6b6c0a1155d491b4e1bc37b650b991e41444ea41fd8fd",
+      "stderrSha256": "sha256:d1ee86c583c92e0a6802e47ac623d66f5eccbb75aa8b70aecaa2c49ba7fec093",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-package-skeleton.ts --mode install-smoke",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7cc9868f315524f14fd91809d9112ec18096868c48b4947a53516f08d315e144",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "lint",
+    "npm audit --omit=dev --audit-level=high",
+    "typecheck",
+    "validate:npm-clean-install",
+    "validate:package-install",
+    "validate:package-skeleton"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "lint",
+    "npm audit --omit=dev --audit-level=high",
+    "typecheck",
+    "validate:npm-clean-install",
+    "validate:package-skeleton"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-11T16:43:56.247Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0024.*",
+      ".atm/history/task-events/TASK-PRF-0024/**",
+      ".atm/history/tasks/TASK-PRF-0024.json",
+      "package-lock.json",
+      "package.json",
+      "packages/*/package.json",
+      "scripts/validate-dependencies.ts"
+    ],
+    "criticalChangedFiles": [
+      "package-lock.json",
+      "package.json",
+      "packages/*/package.json",
+      "scripts/validate-dependencies.ts"
+    ],
+    "requiredGates": [
+      "lint",
+      "npm audit --omit=dev --audit-level=high",
+      "typecheck",
+      "validate:npm-clean-install",
+      "validate:package-skeleton"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0024.json",
+  "closedAt": "2026-09-11T16:43:56.247Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260911162924-codex-captain-TASK-PRF-0024-2408563f7f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "44bc8d926c6bf5105de510e26053f2250abd66d8",
+    "taskMatchedFiles": [
+      "package-lock.json",
+      "package.json"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0024/2026-09-11T16-04-08-063Z-import-8cacf139623e.json",
+      ".atm/history/task-events/TASK-PRF-0024/2026-09-11T16-29-24-740Z-reserve-7f658ee915dc.json",
+      ".atm/history/task-events/TASK-PRF-0024/2026-09-11T16-29-24-744Z-promote-12145cd0b9bb.json",
+      ".atm/history/task-events/TASK-PRF-0024/2026-09-11T16-29-29-528Z-claim-bafac5dc41ee.json",
+      ".atm/history/tasks/TASK-PRF-0024.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

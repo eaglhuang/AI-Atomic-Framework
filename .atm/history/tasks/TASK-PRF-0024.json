@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0024",
   "title": "Remediate production dependency vulnerabilities",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -179,8 +179,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-11T16-29-29-528Z-claim-bafac5dc41ee",
-  "lastTransitionAt": "2026-09-11T16:29:29.528Z",
+  "lastTransitionId": "2026-09-11T16-43-56-260Z-close-d17335f9bd9a",
+  "lastTransitionAt": "2026-09-11T16:43:56.260Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-11T16:29:24.740Z",
@@ -189,7 +189,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-c58edfd49754",
     "claimedAt": "2026-09-11T16:29:24.748Z",
-    "heartbeatAt": "2026-09-11T16:29:24.748Z",
+    "heartbeatAt": "2026-09-11T16:43:56.257Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0024.json",
@@ -198,14 +198,14 @@
       "packages/*/package.json",
       "scripts/validate-dependencies.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260911162924-codex-captain-6a13c7f628",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911162924-codex-captain-6a13c7f628\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-11T16:29:24.748Z",
   "startedByActor": "codex-captain",
@@ -305,5 +305,9 @@
     },
     "createdAt": "2026-09-11T16:29:29.527Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-11T16:43:56.257Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260911162924-codex-captain-TASK-PRF-0024-2408563f7f",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0024.closure-packet.json"
 }
