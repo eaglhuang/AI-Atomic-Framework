@@ -1,0 +1,128 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0024",
+  "updatedAt": "2026-09-11T16:33:43.329Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "lint",
+    "npm audit --omit=dev --audit-level=high",
+    "typecheck",
+    "validate:npm-clean-install",
+    "validate:package-install",
+    "validate:package-skeleton"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm audit --omit=dev --audit-level=high --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2637bd1cc5683bb078aa17ed58a2b5034d8c4f0feaee717507a57fdb3ccbf725",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-11T16:31:25.622Z",
+      "startedAt": "2026-09-11T16:31:24.457Z",
+      "finishedAt": "2026-09-11T16:31:25.622Z",
+      "durationMs": 1165,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9c79fec0bc5e70e105bfc93d9caee6291db27b9c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-11T16:31:38.145Z",
+      "startedAt": "2026-09-11T16:31:29.277Z",
+      "finishedAt": "2026-09-11T16:31:38.145Z",
+      "durationMs": 8868,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9c79fec0bc5e70e105bfc93d9caee6291db27b9c",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-11T16:31:51.909Z",
+      "startedAt": "2026-09-11T16:31:41.778Z",
+      "finishedAt": "2026-09-11T16:31:51.909Z",
+      "durationMs": 10131,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9c79fec0bc5e70e105bfc93d9caee6291db27b9c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:package-install",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a7e7db185af8f46926cfee387d7894912f34d4f29eac1f5777b8ad51eb0e1d32",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:package-install"
+      ],
+      "generatedAt": "2026-09-11T16:32:07.672Z",
+      "startedAt": "2026-09-11T16:31:55.574Z",
+      "finishedAt": "2026-09-11T16:32:07.672Z",
+      "durationMs": 12098,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9c79fec0bc5e70e105bfc93d9caee6291db27b9c",
+      "cached": false
+    },
+    {
+      "command": "npm audit --omit=dev --audit-level=high",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "npm audit --omit=dev --audit-level=high"
+      ],
+      "generatedAt": "2026-09-11T16:33:02.949Z",
+      "startedAt": "2026-09-11T16:33:01.793Z",
+      "finishedAt": "2026-09-11T16:33:02.949Z",
+      "durationMs": 1156,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9c79fec0bc5e70e105bfc93d9caee6291db27b9c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed127c39b81cb29336c6b6c0a1155d491b4e1bc37b650b991e41444ea41fd8fd",
+      "stderrSha256": "sha256:d1ee86c583c92e0a6802e47ac623d66f5eccbb75aa8b70aecaa2c49ba7fec093",
+      "validators": [
+        "validate:npm-clean-install"
+      ],
+      "generatedAt": "2026-09-11T16:33:27.613Z",
+      "startedAt": "2026-09-11T16:33:06.554Z",
+      "finishedAt": "2026-09-11T16:33:27.613Z",
+      "durationMs": 21059,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9c79fec0bc5e70e105bfc93d9caee6291db27b9c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-package-skeleton.ts --mode install-smoke",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7cc9868f315524f14fd91809d9112ec18096868c48b4947a53516f08d315e144",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:package-skeleton"
+      ],
+      "generatedAt": "2026-09-11T16:33:43.328Z",
+      "startedAt": "2026-09-11T16:33:31.508Z",
+      "finishedAt": "2026-09-11T16:33:43.328Z",
+      "durationMs": 11820,
+      "runnerKind": "dev-source",
+      "sourceCommit": "9c79fec0bc5e70e105bfc93d9caee6291db27b9c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

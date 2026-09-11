@@ -1,0 +1,309 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0024",
+  "title": "Remediate production dependency vulnerabilities",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`npm audit --omit=dev --audit-level=high` exits 0 with no high/critical findings.",
+    "The lockfile and package manifests resolve deterministically on a clean install.",
+    "Packed CLI size/entry budgets and isolated install remain within existing caps.",
+    "No runtime dependency is replaced by a dev-only package or hidden override.",
+    "Evidence records advisory IDs, resolved versions, and the repaired CI run.",
+    "Rollback restores the prior lockfile/manifests and reruns the package gates."
+  ],
+  "deliverables": [
+    "package.json",
+    "package-lock.json",
+    "packages/*/package.json",
+    "scripts/validate-dependencies.ts"
+  ],
+  "scopePaths": [
+    "package.json",
+    "package-lock.json",
+    "packages/*/package.json",
+    "scripts/validate-dependencies.ts"
+  ],
+  "validators": [
+    "npm audit --omit=dev --audit-level=high",
+    "npm run typecheck",
+    "npm run lint",
+    "node --strip-types scripts/validate-package-skeleton.ts --mode install-smoke",
+    "node --strip-types scripts/validate-npm-clean-install.ts"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    },
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "package-lock.json (2470 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0024-remediate-production-dependency-vulnerabilities.task.md",
+    "sectionTitle": "TASK-PRF-0024",
+    "headingLine": 40,
+    "hash": "ae6bb880350662ad",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0024-remediate-production-dependency-vulnerabilities.task.md",
+      "planningCommitSha": "46c35e8066b1c7a7f1e4d2e8b36ca5daab0c2d2c",
+      "contentDigest": "sha256:ae6bb880350662ad29d3fb0554bffff5d57564436407c0b97f6dcdac7e66f2c3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-11T16:04:07.974Z"
+    }
+  },
+  "importedAt": "2026-09-11T16:04:07.974Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.audit.omit.dev.audit.level.high",
+      "command": "npm audit --omit=dev --audit-level=high",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.lint",
+      "command": "npm run lint",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.package.skeleton.ts.mode.install.smoke",
+      "command": "node --strip-types scripts/validate-package-skeleton.ts --mode install-smoke",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.npm.clean.install.ts",
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-11T16-29-29-528Z-claim-bafac5dc41ee",
+  "lastTransitionAt": "2026-09-11T16:29:29.528Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-11T16:29:24.740Z",
+  "promotedAt": "2026-09-11T16:29:24.744Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-c58edfd49754",
+    "claimedAt": "2026-09-11T16:29:24.748Z",
+    "heartbeatAt": "2026-09-11T16:29:24.748Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0024.json",
+      "package-lock.json",
+      "package.json",
+      "packages/*/package.json",
+      "scripts/validate-dependencies.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260911162924-codex-captain-6a13c7f628",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911162924-codex-captain-6a13c7f628\""
+    }
+  },
+  "startedAt": "2026-09-11T16:29:24.748Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-85ceb8229852789c",
+    "ticketDigest": "sha256:85ceb8229852789cd9c548eac30b6bd413480958e70a136f33bb1f116ba96785",
+    "taskId": "TASK-PRF-0024",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260911162924-codex-captain-6a13c7f628",
+    "claimGeneration": "lease-c58edfd49754",
+    "issuedAt": "2026-09-11T16:29:24.748Z",
+    "expiresAt": "2026-09-11T16:59:24.748Z",
+    "scopeDigest": "sha256:2a52e79ee9efac685ec27d61a4956353a0558f96c5ef6ed68b50fb7c06c6fe22",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-11T16:29:24.748Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0024.*",
+          ".atm/history/task-events/TASK-PRF-0024/**",
+          ".atm/history/tasks/TASK-PRF-0024.json",
+          "package-lock.json",
+          "package.json",
+          "packages/*/package.json",
+          "scripts/validate-dependencies.ts"
+        ],
+        "digest": "sha256:dec0d31a399dfbe3e8686da31c03c0868a887f5d95d5977bd97ec3284be521f1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260911162924-codex-captain-TASK-PRF-0024-2408563f7f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0024",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0024.*",
+      ".atm/history/task-events/TASK-PRF-0024/**",
+      ".atm/history/tasks/TASK-PRF-0024.json",
+      "package-lock.json",
+      "package.json",
+      "packages/*/package.json",
+      "scripts/validate-dependencies.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0099eddb8b010d7f18ec8a95f70928213315434b370179371117a412388f2ac1",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260911162924-codex-captain-TASK-PRF-0024-2408563f7f",
+    "laneSession": {
+      "laneSessionId": "lane-20260911162924-codex-captain-6a13c7f628",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911162924-codex-captain-6a13c7f628\""
+    },
+    "createdAt": "2026-09-11T16:29:29.527Z",
+    "status": "active"
+  }
+}
