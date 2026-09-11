@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T23-41-04-859Z-close-da8c88299a89",
+  "taskId": "TASK-PRF-0027",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911183703-codex-captain-TASK-PRF-0027-3bf9ac4cff",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0027.json",
+  "taskSha256": "sha256:cea8a44b59268812b505778ea9127d00c484020c7adcccf9c1ec955ac13d5614",
+  "createdAt": "2026-09-11T23:41:04.859Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0027 --actor codex-captain --status done --historical-delivery 51c5058014303a44da07267792e9189accf37b09",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260911183703-codex-captain-TASK-PRF-0027-3bf9ac4cff",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0027.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "validate:full -- --parallel",
+      "validate:full -- --parallel --validator-timeout-ms 300000",
+      "validate:git-hooks-enforcement",
+      "validate:governance-commands",
+      "validate:release-prepublish -- --parallel",
+      "validate:release-prepublish -- --run-id release-prepublish-local-0027c --prior-evidence .atm/runtime/release-prepublish-prior-evidence.json --parallel",
+      "validate:upgrade-proposal"
+    ],
+    "requiredGates": [
+      "validate:full -- --parallel",
+      "validate:git-hooks-enforcement",
+      "validate:governance-commands",
+      "validate:release-prepublish -- --parallel",
+      "validate:upgrade-proposal"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-11T23:41:04.848Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0027.*",
+        ".atm/history/task-events/TASK-PRF-0027/**",
+        ".atm/history/tasks/TASK-PRF-0027.json",
+        ".github/workflows/release-npm.yml",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+        "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+        "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-governance-commands/implementation.ts",
+        "scripts/validate-upgrade-proposal.ts",
+        "tests"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+        "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+        "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-governance-commands/implementation.ts",
+        "scripts/validate-upgrade-proposal.ts"
+      ],
+      "requiredGates": [
+        "validate:full -- --parallel",
+        "validate:git-hooks-enforcement",
+        "validate:governance-commands",
+        "validate:release-prepublish -- --parallel",
+        "validate:upgrade-proposal"
+      ]
+    }
+  }
+}

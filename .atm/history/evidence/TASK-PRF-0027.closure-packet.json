@@ -1,0 +1,189 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0027",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "51c5058014303a44da07267792e9189accf37b09",
+  "governedTreeSha": "6420cc67982da815128499fadfbb54094cd5a09b",
+  "targetCommitDelta": {
+    "currentCommitSha": "51c5058014303a44da07267792e9189accf37b09",
+    "parentCommitShas": [
+      "51c5058014303a44da07267792e9189accf37b09"
+    ],
+    "governedTreeSha": "6420cc67982da815128499fadfbb54094cd5a09b",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0027.bundle-manifest.json",
+      ".atm/history/task-events/TASK-PRF-0027/2026-09-11T23-39-04-919Z-renew-7fc3ac9bb549.json",
+      ".atm/history/task-events/TASK-PRF-0027/2026-09-11T23-40-02-176Z-renew-0c2e29446e85.json",
+      ".atm/history/tasks/TASK-PRF-0018.json",
+      ".atm/history/tasks/TASK-PRF-0027.json",
+      ".github/workflows/release-npm.yml",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+      "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+      "scripts/validate-governance-commands/implementation.ts",
+      "scripts/validate-upgrade-proposal.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-git-hooks-enforcement.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a1d71cd3288a083802abb7c18ce15b6b295337b603945e093c5f7ee0d88654d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:75a57b566263de48753fb22c99048185a8116e74b374b7b697f13bc1ba6a2b2e",
+      "stderrSha256": "sha256:c8cb3117a528ac19c21ae118b2fd13709369d29208b2b8a56fd9c279f025ac91",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-upgrade-proposal.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d4d779a5381356bb287366031c092d013c2311d2657f1c38f318cd97931088d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:release-prepublish -- --run-id release-prepublish-local-0027c --prior-evidence .atm/runtime/release-prepublish-prior-evidence.json --parallel",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ad5cdcb5e9eac37c6131f658fdc22b2db7d735b5b8adb9967b2f4d6327dd21cf",
+      "stderrSha256": "sha256:444ae703603bd2cee76ff3990d20255cfcb9a0c4e8620a80daae5f8b58351da6",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:75a57b566263de48753fb22c99048185a8116e74b374b7b697f13bc1ba6a2b2e",
+      "stderrSha256": "sha256:713f0d1d47ef7efca8bd83465d65d7b844ad80eb7a2b8972368af1bfb37268ed",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:full -- --parallel --validator-timeout-ms 300000",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5a44e660f01adbbcce04d2a060aac558cbaae3111b15efdc83ebc864ad07ea84",
+      "stderrSha256": "sha256:1cb8b26883a6c0961218d386e8e9e07f25a37f82ed4b6af496bc65fa43afb9c5",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:full -- --parallel",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5a44e660f01adbbcce04d2a060aac558cbaae3111b15efdc83ebc864ad07ea84",
+      "stderrSha256": "sha256:1cb8b26883a6c0961218d386e8e9e07f25a37f82ed4b6af496bc65fa43afb9c5",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:release-prepublish -- --parallel",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ad5cdcb5e9eac37c6131f658fdc22b2db7d735b5b8adb9967b2f4d6327dd21cf",
+      "stderrSha256": "sha256:444ae703603bd2cee76ff3990d20255cfcb9a0c4e8620a80daae5f8b58351da6",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "validate:full -- --parallel",
+    "validate:full -- --parallel --validator-timeout-ms 300000",
+    "validate:git-hooks-enforcement",
+    "validate:governance-commands",
+    "validate:release-prepublish -- --parallel",
+    "validate:release-prepublish -- --run-id release-prepublish-local-0027c --prior-evidence .atm/runtime/release-prepublish-prior-evidence.json --parallel",
+    "validate:upgrade-proposal"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "validate:full -- --parallel",
+    "validate:git-hooks-enforcement",
+    "validate:governance-commands",
+    "validate:release-prepublish -- --parallel",
+    "validate:upgrade-proposal"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-11T23:41:04.848Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0027.*",
+      ".atm/history/task-events/TASK-PRF-0027/**",
+      ".atm/history/tasks/TASK-PRF-0027.json",
+      ".github/workflows/release-npm.yml",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+      "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/implementation.ts",
+      "scripts/validate-upgrade-proposal.ts",
+      "tests"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+      "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/implementation.ts",
+      "scripts/validate-upgrade-proposal.ts"
+    ],
+    "requiredGates": [
+      "validate:full -- --parallel",
+      "validate:git-hooks-enforcement",
+      "validate:governance-commands",
+      "validate:release-prepublish -- --parallel",
+      "validate:upgrade-proposal"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0027.json",
+  "closedAt": "2026-09-11T23:41:04.848Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260911183703-codex-captain-TASK-PRF-0027-3bf9ac4cff",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "51c5058014303a44da07267792e9189accf37b09",
+    "taskMatchedFiles": [
+      "scripts/validate-governance-commands/implementation.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0027/2026-09-11T20-40-10-826Z-renew-6f77f1a1267c.json",
+      ".atm/history/task-events/TASK-PRF-0027/2026-09-11T22-00-14-713Z-renew-23ea72e90916.json",
+      ".atm/history/task-events/TASK-PRF-0027/2026-09-11T22-55-42-860Z-scope-amendment-628bab43f4ea.json",
+      ".atm/history/task-events/TASK-PRF-0027/2026-09-11T22-55-48-449Z-renew-251bb054c98f.json",
+      ".atm/history/tasks/TASK-PRF-0027.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

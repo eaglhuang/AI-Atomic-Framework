@@ -1,11 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0027",
-  "updatedAt": "2026-09-11T22:56:46.260Z",
+  "updatedAt": "2026-09-11T23:38:31.737Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
+    "validate:full -- --parallel",
+    "validate:full -- --parallel --validator-timeout-ms 300000",
     "validate:git-hooks-enforcement",
     "validate:governance-commands",
+    "validate:release-prepublish -- --parallel",
     "validate:release-prepublish -- --run-id release-prepublish-local-0027c --prior-evidence .atm/runtime/release-prepublish-prior-evidence.json --parallel",
     "validate:upgrade-proposal"
   ],
@@ -89,6 +92,54 @@
       "durationMs": 46283,
       "runnerKind": "frozen-runner",
       "sourceCommit": "00cea9a5c57a8c6eae9ab8c00adbbebeab181ed3",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:full -- --parallel --validator-timeout-ms 300000",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5a44e660f01adbbcce04d2a060aac558cbaae3111b15efdc83ebc864ad07ea84",
+      "stderrSha256": "sha256:1cb8b26883a6c0961218d386e8e9e07f25a37f82ed4b6af496bc65fa43afb9c5",
+      "validators": [
+        "validate:full -- --parallel --validator-timeout-ms 300000"
+      ],
+      "generatedAt": "2026-09-11T23:37:09.402Z",
+      "startedAt": "2026-09-11T23:10:42.357Z",
+      "finishedAt": "2026-09-11T23:37:09.402Z",
+      "durationMs": 1587045,
+      "runnerKind": "dev-source",
+      "sourceCommit": "51c5058014303a44da07267792e9189accf37b09",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:full -- --parallel",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5a44e660f01adbbcce04d2a060aac558cbaae3111b15efdc83ebc864ad07ea84",
+      "stderrSha256": "sha256:1cb8b26883a6c0961218d386e8e9e07f25a37f82ed4b6af496bc65fa43afb9c5",
+      "validators": [
+        "validate:full -- --parallel"
+      ],
+      "generatedAt": "2026-09-11T23:37:57.817Z",
+      "startedAt": null,
+      "finishedAt": null,
+      "durationMs": null,
+      "runnerKind": "dev-source",
+      "sourceCommit": "51c5058014303a44da07267792e9189accf37b09",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:release-prepublish -- --parallel",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ad5cdcb5e9eac37c6131f658fdc22b2db7d735b5b8adb9967b2f4d6327dd21cf",
+      "stderrSha256": "sha256:444ae703603bd2cee76ff3990d20255cfcb9a0c4e8620a80daae5f8b58351da6",
+      "validators": [
+        "validate:release-prepublish -- --parallel"
+      ],
+      "generatedAt": "2026-09-11T23:38:32.093Z",
+      "startedAt": null,
+      "finishedAt": null,
+      "durationMs": null,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "51c5058014303a44da07267792e9189accf37b09",
       "cached": false
     }
   ],

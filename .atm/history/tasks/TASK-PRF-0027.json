@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0027",
   "title": "Repair release full-validation regressions before npm publish",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0025"
@@ -195,8 +195,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-11T22-55-48-449Z-renew-251bb054c98f",
-  "lastTransitionAt": "2026-09-11T22:55:48.449Z",
+  "lastTransitionId": "2026-09-11T23-41-04-859Z-close-da8c88299a89",
+  "lastTransitionAt": "2026-09-11T23:41:04.859Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-11T18:37:03.317Z",
@@ -205,7 +205,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-fd4f2ba01e9f",
     "claimedAt": "2026-09-11T18:37:03.325Z",
-    "heartbeatAt": "2026-09-11T22:55:47.923Z",
+    "heartbeatAt": "2026-09-11T23:41:04.856Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0027.*",
@@ -221,39 +221,41 @@
       "scripts/validate-upgrade-proposal.ts",
       "tests"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260911225547-codex-captain-fe995dff7a",
+      "laneSessionId": "lane-20260911233904-codex-captain-faa8e505d1",
       "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911225547-codex-captain-fe995dff7a\""
-    }
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911233904-codex-captain-faa8e505d1\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-11T18:37:03.325Z",
   "startedByActor": "codex-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-269d91960d062dd4",
-    "ticketDigest": "sha256:269d91960d062dd4f92345193061a8a59c3f5cc5ee4099a6a6753cad4ffc172b",
+    "ticketId": "wat-8b648f9edc6b75f0",
+    "ticketDigest": "sha256:8b648f9edc6b75f04d862567b6bf3f2c7669de0381d18d70ad70ed22d3507d88",
     "taskId": "TASK-PRF-0027",
     "origin": "claim",
     "actorId": "codex-captain",
-    "laneSessionId": "lane-20260911225547-codex-captain-fe995dff7a",
+    "laneSessionId": "lane-20260911233904-codex-captain-faa8e505d1",
     "claimGeneration": "lease-fd4f2ba01e9f",
-    "issuedAt": "2026-09-11T22:55:47.923Z",
-    "expiresAt": "2026-09-11T23:25:47.923Z",
-    "scopeDigest": "sha256:6a661e7db6dd260fc0befa5a87402bac38a40905154cbd2264a611b3cb2bb052",
+    "issuedAt": "2026-09-11T23:40:01.696Z",
+    "expiresAt": "2026-09-12T00:10:01.696Z",
+    "scopeDigest": "sha256:469ce5bba542c2cc3db1b77eb81dd6925dd1abbc2598aa0b37727bb0c4960a74",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-11T22:55:47.923Z"
+      "selectedAt": "2026-09-11T23:40:01.696Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0027.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0027/**",
           ".atm/history/tasks/TASK-PRF-0027.json",
           ".github/workflows/release-npm.yml",
@@ -266,7 +268,7 @@
           "scripts/validate-upgrade-proposal.ts",
           "tests"
         ],
-        "digest": "sha256:28e1bd5d8463b3e86f4afd2c8fff225697768489bda6551546866a5f8d48d76b"
+        "digest": "sha256:f9c0d69f473ef156124758717ccbf25930728e495183aa4aa9d250066d17ef34"
       },
       {
         "kind": "lifecycle-operation",
@@ -344,5 +346,9 @@
     },
     "createdAt": "2026-09-11T18:37:08.378Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-11T23:41:04.856Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260911183703-codex-captain-TASK-PRF-0027-3bf9ac4cff",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0027.closure-packet.json"
 }
