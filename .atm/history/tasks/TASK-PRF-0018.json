@@ -27,11 +27,7 @@
     "scripts/validate-package-skeleton.ts",
     "scripts/fixtures/atm-external-benchmark/manifest.json",
     "docs/reports/atm-public-npm-install-proof-beta.md",
-    "docs/reports/atm-external-benchmark-decision.md",
-    ".atm/history/evidence/TASK-PRF-0018.*",
-    ".atm/history/task-events/TASK-PRF-0018/**",
-    ".atm/history/tasks/TASK-PRF-0018.json",
-    "tests/cli/public-npm-install-contract.test.ts"
+    "docs/reports/atm-external-benchmark-decision.md"
   ],
   "validators": [
     "node --strip-types scripts/validate-package-skeleton.ts --mode install-smoke",
@@ -69,13 +65,13 @@
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
       "repoRoot": "C:/Users/User/3KLife",
       "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0018-republish-slim-npm-runtime-and-rebind-benchmark-package.task.md",
-      "planningCommitSha": null,
+      "planningCommitSha": "fa38891226cd21e1cd37a3c5b41f09115339474e",
       "contentDigest": "sha256:5e3e904b417dbf96d5a7485fdf858eab584984dbd3e0b5cfe1d2c1cc25990395",
       "amendmentEpoch": 0,
-      "sealedAt": "2026-09-11T00:34:50.658Z"
+      "sealedAt": "2026-09-11T18:22:23.101Z"
     }
   },
-  "importedAt": "2026-09-11T00:34:50.658Z",
+  "importedAt": "2026-09-11T18:22:23.101Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "disabled",
@@ -208,19 +204,49 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-11T01-10-50-125Z-renew-ba16b8d0dabf",
-  "lastTransitionAt": "2026-09-11T01:10:50.125Z",
+  "lastTransitionId": "2026-09-11T23-54-59-664Z-renew-015fb6afb1f0",
+  "lastTransitionAt": "2026-09-11T23:54:59.664Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
-  "reservedAt": "2026-09-11T00:36:20.737Z",
-  "promotedAt": "2026-09-11T00:36:20.740Z",
+  "reservedAt": "2026-09-11T22:30:38.441Z",
+  "promotedAt": "2026-09-11T22:30:38.446Z",
   "claim": {
     "actorId": "codex-captain",
-    "leaseId": "lease-f29f7604cec1",
-    "claimedAt": "2026-09-11T00:36:20.746Z",
-    "heartbeatAt": "2026-09-11T01:10:49.256Z",
+    "leaseId": "lease-b298df8d5b53",
+    "claimedAt": "2026-09-11T22:30:38.451Z",
+    "heartbeatAt": "2026-09-11T23:54:59.169Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/tasks/TASK-PRF-0018.json",
+      ".atm/history/evidence/TASK-PRF-0018.*",
+      ".atm/history/task-events/TASK-PRF-0018/**",
+      "docs/reports/atm-external-benchmark-decision.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "scripts/build-package-dist.ts",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
+      "scripts/validate-package-skeleton.ts",
+      "scripts/validate-public-npm-install.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260911235459-codex-captain-22ceac35a7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911235459-codex-captain-22ceac35a7\""
+    }
+  },
+  "startedAt": "2026-09-11T18:23:26.069Z",
+  "startedByActor": "codex-captain",
+  "startedBySessionId": "session-20260911223038-codex-captain-TASK-PRF-0018-f9145264dc",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0018",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
       ".atm/history/evidence/TASK-PRF-0018.*",
       ".atm/history/task-events/TASK-PRF-0018/**",
       ".atm/history/tasks/TASK-PRF-0018.json",
@@ -229,36 +255,40 @@
       "scripts/build-package-dist.ts",
       "scripts/fixtures/atm-external-benchmark/manifest.json",
       "scripts/validate-package-skeleton.ts",
-      "scripts/validate-public-npm-install.ts",
-      "tests/cli/public-npm-install-contract.test.ts"
+      "scripts/validate-public-npm-install.ts"
     ],
-    "state": "active",
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "2fe957e97ccafee79ba7cfa02bfe52651bbe781246fa9ead298a8ffb0834aac9",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260911223038-codex-captain-TASK-PRF-0018-f9145264dc",
     "laneSession": {
-      "laneSessionId": "lane-20260911011049-codex-captain-d16fa77dca",
+      "laneSessionId": "lane-20260911223038-codex-captain-bbc459372f",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911011049-codex-captain-d16fa77dca\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911223038-codex-captain-bbc459372f\""
+    },
+    "createdAt": "2026-09-11T22:30:39.757Z",
+    "status": "active"
   },
-  "startedAt": "2026-09-11T00:36:20.746Z",
-  "startedByActor": "codex-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-c23f3d5b63658720",
-    "ticketDigest": "sha256:c23f3d5b636587202421e445159ea6c2c99880d979a01ecc28e758a88a60e8c8",
+    "ticketId": "wat-5c1b22bb3967e383",
+    "ticketDigest": "sha256:5c1b22bb3967e3837dff408ac54b29228c713482f9406a06683a7018c3662d37",
     "taskId": "TASK-PRF-0018",
     "origin": "claim",
     "actorId": "codex-captain",
-    "laneSessionId": "lane-20260911011049-codex-captain-d16fa77dca",
-    "claimGeneration": "lease-f29f7604cec1",
-    "issuedAt": "2026-09-11T01:10:49.256Z",
-    "expiresAt": "2026-09-11T01:40:49.256Z",
-    "scopeDigest": "sha256:7fa3e9b166485d25d23a6377dd9990410a830441924095fb0b5c25fd691b5526",
+    "laneSessionId": "lane-20260911235459-codex-captain-22ceac35a7",
+    "claimGeneration": "lease-b298df8d5b53",
+    "issuedAt": "2026-09-11T23:54:59.169Z",
+    "expiresAt": "2026-09-12T00:24:59.169Z",
+    "scopeDigest": "sha256:454ebdc9e4c91a6921535fcfe4b2af5f3c0f08aa73260c15ecbcea36fde469c0",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-11T01:10:49.256Z"
+      "selectedAt": "2026-09-11T23:54:59.169Z"
     },
     "grants": [
       {
@@ -272,10 +302,9 @@
           "scripts/build-package-dist.ts",
           "scripts/fixtures/atm-external-benchmark/manifest.json",
           "scripts/validate-package-skeleton.ts",
-          "scripts/validate-public-npm-install.ts",
-          "tests/cli/public-npm-install-contract.test.ts"
+          "scripts/validate-public-npm-install.ts"
         ],
-        "digest": "sha256:a6f34c62a0ffd89a01036ab044d525afc3c1da63767b7a236f1a5c63b78bc0be"
+        "digest": "sha256:f70c39b5774c56e2194401884571abdac81f8f9d7dbad1050df22163fa744361"
       },
       {
         "kind": "lifecycle-operation",
@@ -308,48 +337,5 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  },
-  "startedBySessionId": "session-20260911003620-codex-captain-TASK-PRF-0018-19c92cfc17",
-  "taskDirectionLock": {
-    "schemaId": "atm.taskDirectionLock.v1",
-    "specVersion": "0.1.0",
-    "taskId": "TASK-PRF-0018",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
-    "allowedFiles": [
-      ".atm/history/evidence/TASK-PRF-0018.*",
-      ".atm/history/task-events/TASK-PRF-0018/**",
-      ".atm/history/tasks/TASK-PRF-0018.json",
-      "docs/reports/atm-external-benchmark-decision.md",
-      "docs/reports/atm-public-npm-install-proof-beta.md",
-      "scripts/build-package-dist.ts",
-      "scripts/fixtures/atm-external-benchmark/manifest.json",
-      "scripts/validate-package-skeleton.ts",
-      "scripts/validate-public-npm-install.ts",
-      "tests/cli/public-npm-install-contract.test.ts"
-    ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0018-republish-slim-npm-runtime-and-rebind-benchmark-package.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/atm-product-proof/",
-      "docs/ai_atomic_framework/atm-product-proof/tasks/",
-      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0018-republish-slim-npm-runtime-and-rebind-benchmark-package.task.md"
-    ],
-    "allowPlanningMirror": false,
-    "promptHash": "4f8f2bc5ae90c5d9a31af120d77d9685e1ab6950848afe0429e4ff3ca1ec249c",
-    "actorId": "codex-captain",
-    "sessionId": null,
-    "laneSession": {
-      "laneSessionId": "lane-20260911003620-codex-captain-a11b66f3e6",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911003620-codex-captain-a11b66f3e6\""
-    },
-    "createdAt": "2026-09-11T00:36:25.822Z",
-    "status": "active"
   }
 }

@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T16-38-25-607Z-repair-claim-d6ca7b278580",
+  "taskId": "TASK-PRF-0018",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911003620-codex-captain-TASK-PRF-0018-19c92cfc17",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0018.json",
+  "taskSha256": "sha256:94ed0927c05291d41ec21479e61b3599a60e753fbfbea3f902caaeafb3384652",
+  "createdAt": "2026-09-11T16:38:25.607Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0018 --actor codex-captain --write --reason \"Recover expired TASK-PRF-0018 claim so shared release surfaces can be governed without overwriting its WIP\" --json"
+}
