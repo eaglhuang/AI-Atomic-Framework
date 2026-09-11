@@ -424,13 +424,13 @@ try {
   check(hardStopResult.evidence.contextBudget.continuationReportPath === '.atm/history/reports/continuation/upgrade/ATM-CORE-0001.json', 'hard-stop run must surface continuation report path');
   check(hardStopResult.evidence.contextBudget.contextSummaryPath === '.atm/history/handoff/ATM-CORE-0001.json', 'hard-stop run must surface context summary path');
   check(hardStopResult.evidence.contextBudget.contextSummaryMarkdownPath === '.atm/history/handoff/ATM-CORE-0001.md', 'hard-stop run must surface context summary markdown path');
-  check(hardStopResult.evidence.contextBudget.evidencePath === '.atm/history/evidence/ATM-CORE-0001.json', 'hard-stop run must surface handoff evidence path');
+  check(hardStopResult.evidence.contextBudget.evidencePath === '.atm/runtime/evidence-ledger/bundles/ATM-CORE-0001.json', 'hard-stop run must surface runtime handoff evidence path');
   check(existsSync(path.join(governedRepo, '.atm', 'history', 'reports', 'context-budget', 'upgrade-ATM-CORE-0001-1.1.0.json')), 'hard-stop run must persist the context budget report');
   check(existsSync(path.join(governedRepo, '.atm', 'history', 'reports', 'continuation', 'upgrade', 'ATM-CORE-0001.json')), 'hard-stop run must persist the continuation report');
   check(existsSync(path.join(governedRepo, '.atm', 'history', 'handoff', 'ATM-CORE-0001.json')), 'hard-stop run must persist the continuation summary json');
   check(existsSync(path.join(governedRepo, '.atm', 'history', 'handoff', 'ATM-CORE-0001.md')), 'hard-stop run must persist the continuation summary markdown');
-  check(existsSync(path.join(governedRepo, '.atm', 'history', 'evidence', 'ATM-CORE-0001.json')), 'hard-stop run must persist the handoff evidence');
-  const handoffEvidence = JSON.parse(readFileSync(path.join(governedRepo, '.atm', 'history', 'evidence', 'ATM-CORE-0001.json'), 'utf8'));
+  check(existsSync(path.join(governedRepo, '.atm', 'runtime', 'evidence-ledger', 'bundles', 'ATM-CORE-0001.json')), 'hard-stop run must persist the runtime handoff evidence');
+  const handoffEvidence = JSON.parse(readFileSync(path.join(governedRepo, '.atm', 'runtime', 'evidence-ledger', 'bundles', 'ATM-CORE-0001.json'), 'utf8'));
   const handoffRecords = Array.isArray(handoffEvidence) ? handoffEvidence : handoffEvidence.evidence;
   check(Array.isArray(handoffRecords) && handoffRecords.some((entry: any) => entry.evidenceKind === 'handoff' && entry.workItemId === 'ATM-CORE-0001'), 'hard-stop history evidence must contain the durable handoff record');
 } finally {

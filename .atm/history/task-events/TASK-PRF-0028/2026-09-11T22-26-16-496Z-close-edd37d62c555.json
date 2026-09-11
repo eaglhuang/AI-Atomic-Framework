@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T22-26-16-496Z-close-edd37d62c555",
+  "taskId": "TASK-PRF-0028",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911211859-codex-captain-TASK-PRF-0028-f5cad66233",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0028.json",
+  "taskSha256": "sha256:7ffec9cbf3a27ddbf7289ae9a41bf737076a4df19ab755296a6045656296d464",
+  "createdAt": "2026-09-11T22:26:16.496Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0028 --actor codex-captain --status done --historical-delivery a3de11e68ac13de97c1032985b3497748d8fad81",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260911211859-codex-captain-TASK-PRF-0028-f5cad66233",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0028.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "validate:bootstrap",
+      "validate:full -- --filter validate-bootstrap,validate-git-hooks-enforcement-full --serial --validator-timeout-ms 300000",
+      "validate:full -- --parallel --validator-timeout-ms 300000",
+      "validate:full -- --status --run-id run-2026-09-11T21-22-48-942Z-46436",
+      "validate:full -- --status --run-id run-2026-09-11T21-29-39-002Z-41328"
+    ],
+    "requiredGates": [
+      "validate:bootstrap",
+      "validate:full -- --filter validate-bootstrap,validate-git-hooks-enforcement-full --serial --validator-timeout-ms 300000",
+      "validate:full -- --parallel --validator-timeout-ms 300000"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-11T22:26:16.487Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0028.*",
+        ".atm/history/task-events/TASK-PRF-0028/**",
+        ".atm/history/tasks/TASK-PRF-0028.json",
+        ".github/workflows/release-npm.yml",
+        "scripts/build-onefile-release.ts",
+        "scripts/validate-bootstrap.ts",
+        "tests"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-onefile-release.ts",
+        "scripts/validate-bootstrap.ts"
+      ],
+      "requiredGates": [
+        "validate:bootstrap",
+        "validate:full -- --filter validate-bootstrap,validate-git-hooks-enforcement-full --serial --validator-timeout-ms 300000",
+        "validate:full -- --parallel --validator-timeout-ms 300000"
+      ]
+    }
+  }
+}

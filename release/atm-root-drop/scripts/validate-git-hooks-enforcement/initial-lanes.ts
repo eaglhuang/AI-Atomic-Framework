@@ -57,7 +57,7 @@ runGit(repo, ['add', 'docs-only.txt']);
 const explicitPreCommit = parsePayload(runCli(repo, ['hook', 'pre-commit', '--json']));
 assert(explicitPreCommit.ok === true, 'explicit pre-commit hook command must succeed for governed docs change');
 assert(explicitPreCommit.evidence?.gitHeadEvidenceRequired === false, 'docs-only pre-commit must not require git-head evidence');
-assert(!existsSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl')), 'docs-only pre-commit must not write git-head evidence');
+assert(!existsSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.json')), 'docs-only pre-commit must not write git-head evidence');
 const governedCommit = runGit(repo, ['commit', '--no-verify', '-m', 'governed docs change']);
 assert(governedCommit.status === 0, 'governed commit must succeed after explicit hook validation');
 

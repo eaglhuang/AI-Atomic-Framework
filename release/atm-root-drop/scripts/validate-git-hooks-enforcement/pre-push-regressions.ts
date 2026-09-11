@@ -203,7 +203,7 @@ const wrapperCommitSha = String(wrapperCommit.evidence?.commitSha ?? '');
 assert(Boolean(wrapperCommitSha), 'governed git wrapper critical commit must return commitSha');
 const wrapperTouchedPaths = String(runGit(governedWrapperRepo, ['show', '--pretty=', '--name-only', wrapperCommitSha]).stdout || '').trim().split(/\r?\n/).filter(Boolean);
 assert(wrapperTouchedPaths.includes('packages/core/src/index.ts'), 'governed git wrapper critical commit must include the critical file');
-assert(wrapperTouchedPaths.includes('.atm/history/evidence/git-head.jsonl'), 'governed git wrapper critical commit must include git-head evidence in the same commit');
+assert(wrapperTouchedPaths.includes('.atm/history/evidence/git-head.json'), 'governed git wrapper critical commit must include git-head evidence in the same commit');
 const wrapperCommitRelease = parsePayload(runCli(governedWrapperRepo, ['framework-mode', 'release', '--actor', 'hook-validator', '--json']));
 assert(wrapperCommitRelease.ok === true, 'critical governed wrapper commit must release fixture-local framework authority');
 const governedPrePush = parsePayload(runCli(governedWrapperRepo, ['hook', 'pre-push', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true }));

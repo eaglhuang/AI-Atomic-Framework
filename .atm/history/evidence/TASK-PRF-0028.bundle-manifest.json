@@ -1,9 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0028",
-  "updatedAt": "2026-09-11T21:57:45.856Z",
+  "updatedAt": "2026-09-11T22:16:42.702Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
+    "validate:bootstrap",
+    "validate:full -- --filter validate-bootstrap,validate-git-hooks-enforcement-full --serial --validator-timeout-ms 300000",
+    "validate:full -- --parallel --validator-timeout-ms 300000",
+    "validate:full -- --status --run-id run-2026-09-11T21-22-48-942Z-46436",
     "validate:full -- --status --run-id run-2026-09-11T21-29-39-002Z-41328"
   ],
   "staleValidationPasses": [],
@@ -22,6 +26,86 @@
       "durationMs": 717,
       "runnerKind": "frozen-runner",
       "sourceCommit": "c86f0e297dc18744eb41b7c746f22b8a9856da25",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-bootstrap.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d0fd6fe2e4efcaf97e175e0f090ed578ba89d599b97a80141219b1f6db8708ef",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:bootstrap"
+      ],
+      "generatedAt": "2026-09-11T22:05:09.821Z",
+      "startedAt": "2026-09-11T22:02:29.192Z",
+      "finishedAt": "2026-09-11T22:05:09.821Z",
+      "durationMs": 160629,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a3de11e68ac13de97c1032985b3497748d8fad81",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:full -- --status --run-id run-2026-09-11T21-22-48-942Z-46436",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d0eaea84dc7d6a1b74f4f726112a87ccc9c14b9cb7be68548746748966c969da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:full -- --status --run-id run-2026-09-11T21-22-48-942Z-46436"
+      ],
+      "generatedAt": "2026-09-11T22:05:20.078Z",
+      "startedAt": "2026-09-11T22:05:19.338Z",
+      "finishedAt": "2026-09-11T22:05:20.078Z",
+      "durationMs": 740,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a3de11e68ac13de97c1032985b3497748d8fad81",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:full -- --filter validate-bootstrap,validate-git-hooks-enforcement-full --serial --validator-timeout-ms 300000",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:68480ee66b6c049b91d607ee1ac09878a5378f8a6f65af7a4ade7735bc675acb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:full -- --filter validate-bootstrap,validate-git-hooks-enforcement-full --serial --validator-timeout-ms 300000"
+      ],
+      "generatedAt": "2026-09-11T21:29:34.478Z",
+      "startedAt": "2026-09-11T21:22:49.001Z",
+      "finishedAt": "2026-09-11T21:29:34.478Z",
+      "durationMs": 405477,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a3de11e68ac13de97c1032985b3497748d8fad81",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:full -- --filter validate-bootstrap,validate-git-hooks-enforcement-full --serial --validator-timeout-ms 300000",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:68480ee66b6c049b91d607ee1ac09878a5378f8a6f65af7a4ade7735bc675acb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:full -- --filter validate-bootstrap,validate-git-hooks-enforcement-full --serial --validator-timeout-ms 300000"
+      ],
+      "generatedAt": "2026-09-11T21:29:34.478Z",
+      "startedAt": "2026-09-11T21:22:49.001Z",
+      "finishedAt": "2026-09-11T21:29:34.478Z",
+      "durationMs": 405477,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a3de11e68ac13de97c1032985b3497748d8fad81",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:full -- --parallel --validator-timeout-ms 300000",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:082d586089373c0d83977ac1dcdeee7f09300bd96333cc9466a173c5572f7f19",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:full -- --parallel --validator-timeout-ms 300000"
+      ],
+      "generatedAt": "2026-09-11T21:57:45.855Z",
+      "startedAt": "2026-09-11T21:29:39.037Z",
+      "finishedAt": "2026-09-11T21:56:26.837Z",
+      "durationMs": 1607800,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a3de11e68ac13de97c1032985b3497748d8fad81",
       "cached": false
     }
   ],
