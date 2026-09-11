@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0022",
   "title": "Repair clean-install packed CLI vendor boundary",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -31,7 +31,8 @@
     ".atm/history/task-events/TASK-PRF-0022/**",
     ".atm/history/tasks/TASK-PRF-0022.json",
     "scripts/build-package-dist.ts",
-    "packages/cli/dist/npm-runtime/runtime.mjs"
+    "packages/cli/dist/npm-runtime/runtime.mjs",
+    "packages/cli/dist/npm-runtime/**"
   ],
   "validators": [
     "npm run build --workspace packages/cli",
@@ -215,8 +216,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-11T15-50-18-751Z-scope-amendment-baf8cfec4cbe",
-  "lastTransitionAt": "2026-09-11T15:50:18.751Z",
+  "lastTransitionId": "2026-09-11T15-58-11-522Z-close-9ca926e78d55",
+  "lastTransitionAt": "2026-09-11T15:58:11.522Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-11T15:40:33.701Z",
@@ -225,7 +226,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-74c497631180",
     "claimedAt": "2026-09-11T15:40:33.711Z",
-    "heartbeatAt": "2026-09-11T15:40:33.711Z",
+    "heartbeatAt": "2026-09-11T15:58:11.520Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0022.*",
@@ -233,57 +234,60 @@
       ".atm/history/tasks/TASK-PRF-0022.json",
       "docs/reports/atm-product-ci-burn-in.md",
       "docs/reports/atm-public-npm-install-proof-beta.md",
+      "packages/cli/dist/npm-runtime/**",
       "packages/cli/dist/npm-runtime/runtime.mjs",
       "packages/cli/package.json",
       "scripts/build-cli-npm-runtime.ts",
       "scripts/build-package-dist.ts",
       "tests/cli/public-npm-install-contract.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260911154033-codex-captain-c6468092b1",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911154033-codex-captain-c6468092b1\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-11T15:40:33.711Z",
   "startedByActor": "codex-captain",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-ee61c397eeb4f23d",
-    "ticketDigest": "sha256:ee61c397eeb4f23d4076fe22f7ff290ce1c6dd35b72dbb8317a1a3915cd620ba",
+    "ticketId": "wat-f6e6ad87704ab97b",
+    "ticketDigest": "sha256:f6e6ad87704ab97b1b53a7986c6aecdd0c744e26b001e731f282cc3b848c07a3",
     "taskId": "TASK-PRF-0022",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260911154033-codex-captain-c6468092b1",
     "claimGeneration": "lease-74c497631180",
-    "issuedAt": "2026-09-11T15:50:18.686Z",
-    "expiresAt": "2026-09-11T16:20:18.686Z",
-    "scopeDigest": "sha256:498231012f2843b3ecc3bebd6e97ac47fff514f57fdfb24ff54a166a56b86e25",
+    "issuedAt": "2026-09-11T15:51:49.260Z",
+    "expiresAt": "2026-09-11T16:21:49.260Z",
+    "scopeDigest": "sha256:ad0e19d464ffe21467426e7b0bdd5f7ae83b8b2f5294dfe8ba424dba2a699bc0",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-11T15:50:18.686Z"
+      "selectedAt": "2026-09-11T15:51:49.260Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0022.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0022/**",
           ".atm/history/tasks/TASK-PRF-0022.json",
           "docs/reports/atm-product-ci-burn-in.md",
           "docs/reports/atm-public-npm-install-proof-beta.md",
+          "packages/cli/dist/npm-runtime/**",
           "packages/cli/dist/npm-runtime/runtime.mjs",
           "packages/cli/package.json",
           "scripts/build-cli-npm-runtime.ts",
           "scripts/build-package-dist.ts",
           "tests/cli/public-npm-install-contract.test.ts"
         ],
-        "digest": "sha256:e06b2bb30ee93838840d9708ea2a60b29ef297b5643545f256d926a8645c24f2"
+        "digest": "sha256:d0b6509549b353f951f429d9e27b9e7d0f29217932cef1c37509a1293ea8405e"
       },
       {
         "kind": "lifecycle-operation",
@@ -332,6 +336,7 @@
       ".atm/history/tasks/TASK-PRF-0022.json",
       "docs/reports/atm-product-ci-burn-in.md",
       "docs/reports/atm-public-npm-install-proof-beta.md",
+      "packages/cli/dist/npm-runtime/**",
       "packages/cli/dist/npm-runtime/runtime.mjs",
       "packages/cli/package.json",
       "scripts/build-cli-npm-runtime.ts",
@@ -359,5 +364,9 @@
     },
     "createdAt": "2026-09-11T15:40:36.278Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-11T15:58:11.520Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260911154033-codex-captain-TASK-PRF-0022-8ef29b3c90",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0022.closure-packet.json"
 }

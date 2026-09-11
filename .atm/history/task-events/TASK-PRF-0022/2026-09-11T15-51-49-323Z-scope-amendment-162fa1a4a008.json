@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T15-51-49-323Z-scope-amendment-162fa1a4a008",
+  "taskId": "TASK-PRF-0022",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0022.json",
+  "taskSha256": "sha256:127f05fcdea682cba7bf73814975900cf5d29342b5af8ef3d295a76a5c433e2a",
+  "createdAt": "2026-09-11T15:51:49.323Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0022 --actor codex-captain --add \"packages/cli/dist/npm-runtime/**\" --reason \"Include generated CLI npm runtime closure emitted by package build\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Include generated CLI npm runtime closure emitted by package build"
+  }
+}
