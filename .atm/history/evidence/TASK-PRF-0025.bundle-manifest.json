@@ -1,0 +1,130 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0025",
+  "updatedAt": "2026-09-11T18:12:14.228Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "lint",
+    "typecheck",
+    "validate:module-boundaries",
+    "validate:multi-agent-confidence",
+    "validate:standard",
+    "validate:task-ledger-governance"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-module-boundaries.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8a8575f386569f024588ea09e3ba0bc84b53240e0f9304848142714a050864ee",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:module-boundaries"
+      ],
+      "generatedAt": "2026-09-11T17:36:25.777Z",
+      "startedAt": "2026-09-11T17:36:25.240Z",
+      "finishedAt": "2026-09-11T17:36:25.777Z",
+      "durationMs": 537,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-11T17:37:47.673Z",
+      "startedAt": "2026-09-11T17:37:36.882Z",
+      "finishedAt": "2026-09-11T17:37:47.673Z",
+      "durationMs": 10791,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-multi-agent-confidence.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2201af6cbfa3250997740c20e90948a5c2e4261d3b087f1dc5627e64e725f88e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:multi-agent-confidence"
+      ],
+      "generatedAt": "2026-09-11T17:38:02.010Z",
+      "startedAt": "2026-09-11T17:36:35.685Z",
+      "finishedAt": "2026-09-11T17:38:02.010Z",
+      "durationMs": 86325,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-11T17:38:03.672Z",
+      "startedAt": "2026-09-11T17:37:51.191Z",
+      "finishedAt": "2026-09-11T17:38:03.672Z",
+      "durationMs": 12481,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8164d2d203d065c34a2019262a39ca124d9e85d2e8086a12b90dd2e47ba8e1ff",
+      "stderrSha256": "sha256:4a5eaa6aeb350e1e29635437a1c6710aa366b85cb6827a44c95dd7b65fd6d4d0",
+      "validators": [
+        "validate:task-ledger-governance"
+      ],
+      "generatedAt": "2026-09-11T17:38:11.229Z",
+      "startedAt": "2026-09-11T17:37:06.149Z",
+      "finishedAt": "2026-09-11T17:38:11.229Z",
+      "durationMs": 65080,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:standard -- --cache",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5c273c281a555db0b8a98b089115f184bee598f666b82cb5644d460ddb86098a",
+      "stderrSha256": "sha256:1b26455faffeac3cf33b86c494aa19f03f5fb48677f867f18aa4a0a7e84b0e41",
+      "validators": [
+        "validate:standard"
+      ],
+      "generatedAt": "2026-09-11T18:10:33.060Z",
+      "startedAt": "2026-09-11T18:10:24.272Z",
+      "finishedAt": "2026-09-11T18:10:33.060Z",
+      "durationMs": 8788,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:standard -- --cache",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:080cccf8a68d9aeab8597a0a1b953860114f7692b75a0af5c08ba02506e6b6e7",
+      "stderrSha256": "sha256:1b26455faffeac3cf33b86c494aa19f03f5fb48677f867f18aa4a0a7e84b0e41",
+      "validators": [
+        "validate:standard"
+      ],
+      "generatedAt": "2026-09-11T18:12:14.227Z",
+      "startedAt": "2026-09-11T18:12:05.926Z",
+      "finishedAt": "2026-09-11T18:12:14.227Z",
+      "durationMs": 8301,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

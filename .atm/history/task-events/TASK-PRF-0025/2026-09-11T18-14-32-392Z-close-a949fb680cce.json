@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T18-14-32-392Z-close-a949fb680cce",
+  "taskId": "TASK-PRF-0025",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911173218-codex-captain-TASK-PRF-0025-19195c7bb5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0025.json",
+  "taskSha256": "sha256:9ed29d30819b59038e839be40629c7e8385541858fea4fe1d3abc805f43cb67b",
+  "createdAt": "2026-09-11T18:14:32.392Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0025 --actor codex-captain --status done --historical-delivery e3442d498218f377685d833761e7e10a156d4b3c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260911173218-codex-captain-TASK-PRF-0025-19195c7bb5",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0025.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "typecheck",
+      "validate:module-boundaries",
+      "validate:multi-agent-confidence",
+      "validate:standard",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "lint",
+      "typecheck",
+      "validate:module-boundaries",
+      "validate:multi-agent-confidence",
+      "validate:standard",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-11T18:14:32.379Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0025.*",
+        ".atm/history/task-events/TASK-PRF-0025/**",
+        ".atm/history/tasks/TASK-PRF-0025.json",
+        "docs/multi-agent-compatibility-matrix.md",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/render-agent-matrix.ts",
+        "scripts/validate-module-boundaries.ts",
+        "scripts/validate-multi-agent-confidence.ts",
+        "scripts/validate-task-ledger-governance.ts",
+        "scripts/validators/task-ledger/suite-impl/implementation.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/render-agent-matrix.ts",
+        "scripts/validate-module-boundaries.ts",
+        "scripts/validate-multi-agent-confidence.ts",
+        "scripts/validate-task-ledger-governance.ts",
+        "scripts/validators/task-ledger/suite-impl/implementation.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "typecheck",
+        "validate:module-boundaries",
+        "validate:multi-agent-confidence",
+        "validate:standard",
+        "validate:task-ledger-governance"
+      ]
+    }
+  }
+}

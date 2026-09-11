@@ -1,0 +1,198 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0025",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff",
+  "governedTreeSha": "51dd4f46f2394e8e84b29b394d8d72fbd16075d4",
+  "targetCommitDelta": {
+    "currentCommitSha": "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff",
+    "parentCommitShas": [
+      "0d739dc5ada9a803aa4eb7d39be8a15671daa8ff"
+    ],
+    "governedTreeSha": "51dd4f46f2394e8e84b29b394d8d72fbd16075d4",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T16-48-16-147Z-import-d45cd5e69013.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T16-51-30-160Z-reserve-e7dbb20c8e87.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T16-51-30-164Z-promote-209c1132eec2.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T16-51-33-151Z-claim-253e0f227f66.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T16-51-33-159Z-scope-amendment.claim-first-resolved-ffc0a73f8edb.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T16-51-33-260Z-scope-amendment-fd73cb96191e.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T17-22-28-538Z-renew-8e7c52233eaf.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T17-26-38-072Z-scope-amendment-255e0db86fdb.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T17-28-23-683Z-import-be0c3c252531.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T17-28-23-687Z-claim-displaced-by-import-91271d3033be.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T17-31-21-667Z-repair-claim-36f72f95d6b3.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T17-32-18-009Z-reserve-e0224ecda00a.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T17-32-18-012Z-promote-1f5636c95d52.json",
+      ".atm/history/task-events/TASK-PRF-0025/2026-09-11T17-32-21-164Z-claim-4960eeb44646.json",
+      ".atm/history/tasks/TASK-PRF-0018.json",
+      ".atm/history/tasks/TASK-PRF-0025.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "packages/cli/dist/commands/tasks/close-orchestrator.js",
+      "packages/cli/dist/commands/tasks/close-orchestrator/close-write.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/multi-agent-compatibility-matrix.md",
+      "release/atm-root-drop/package-lock.json",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator/close-write.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-module-boundaries.ts",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl/implementation.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-module-boundaries.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8a8575f386569f024588ea09e3ba0bc84b53240e0f9304848142714a050864ee",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-multi-agent-confidence.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2201af6cbfa3250997740c20e90948a5c2e4261d3b087f1dc5627e64e725f88e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8164d2d203d065c34a2019262a39ca124d9e85d2e8086a12b90dd2e47ba8e1ff",
+      "stderrSha256": "sha256:4a5eaa6aeb350e1e29635437a1c6710aa366b85cb6827a44c95dd7b65fd6d4d0",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:standard -- --cache",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5c273c281a555db0b8a98b089115f184bee598f666b82cb5644d460ddb86098a",
+      "stderrSha256": "sha256:1b26455faffeac3cf33b86c494aa19f03f5fb48677f867f18aa4a0a7e84b0e41",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:standard -- --cache",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:080cccf8a68d9aeab8597a0a1b953860114f7692b75a0af5c08ba02506e6b6e7",
+      "stderrSha256": "sha256:1b26455faffeac3cf33b86c494aa19f03f5fb48677f867f18aa4a0a7e84b0e41",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "lint",
+    "typecheck",
+    "validate:module-boundaries",
+    "validate:multi-agent-confidence",
+    "validate:standard",
+    "validate:task-ledger-governance"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "lint",
+    "typecheck",
+    "validate:module-boundaries",
+    "validate:multi-agent-confidence",
+    "validate:standard",
+    "validate:task-ledger-governance"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-11T18:14:32.379Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0025.*",
+      ".atm/history/task-events/TASK-PRF-0025/**",
+      ".atm/history/tasks/TASK-PRF-0025.json",
+      "docs/multi-agent-compatibility-matrix.md",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/render-agent-matrix.ts",
+      "scripts/validate-module-boundaries.ts",
+      "scripts/validate-multi-agent-confidence.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/render-agent-matrix.ts",
+      "scripts/validate-module-boundaries.ts",
+      "scripts/validate-multi-agent-confidence.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts"
+    ],
+    "requiredGates": [
+      "lint",
+      "typecheck",
+      "validate:module-boundaries",
+      "validate:multi-agent-confidence",
+      "validate:standard",
+      "validate:task-ledger-governance"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0025.json",
+  "closedAt": "2026-09-11T18:14:32.379Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260911173218-codex-captain-TASK-PRF-0025-19195c7bb5",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e3442d498218f377685d833761e7e10a156d4b3c",
+    "taskMatchedFiles": [
+      "docs/reports/atm-product-ci-burn-in.md"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

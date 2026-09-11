@@ -221,6 +221,7 @@ export async function runTasksClose(argv) {
             const allowedAdvisoryGovernanceFiles = options.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0
                 ? [
                     `.atm/history/evidence/${options.taskId}.bundle-manifest.json`,
+                    `.atm/history/evidence/${options.taskId}.json`,
                     `.atm/history/tasks/${options.taskId}.json`,
                     ...readDeferredForeignStagedFilesForActiveCloseWindow(options.cwd, options.taskId)
                 ]
@@ -441,6 +442,7 @@ export async function runTasksClose(argv) {
         const closeEvidencePath = `.atm/history/evidence/${options.taskId}.bundle-manifest.json`;
         const closeArtifactFiles = existingTaskCloseArtifacts(options.cwd, [
             relativePathFrom(options.cwd, taskPath),
+            `.atm/history/evidence/${options.taskId}.json`,
             closeEvidencePath,
             transitionPath,
             closurePacketPath

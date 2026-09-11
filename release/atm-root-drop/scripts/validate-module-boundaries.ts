@@ -11,6 +11,9 @@ const allowedSourceMjsFiles = new Set([
   'scripts/repro/bug-atm-0045-planning-root-preference.mjs',
   'scripts/templates/atm-stable-launcher.mjs'
 ]);
+const allowedGeneratedMjsImports = new Map([
+  ['scripts/build-cli-npm-runtime.ts', new Set(['./runtime.mjs'])]
+]);
 const importPatterns = [
   /(from\s+['"])([^'"]+)(['"])/g,
   /(import\s+['"])([^'"]+)(['"])/g,
@@ -59,7 +62,9 @@ for (const filePath of sourceFiles.filter((candidate) => candidate.endsWith('.ts
     while ((match = pattern.exec(content)) !== null) {
       const specifier = match[2];
       if (!specifier.startsWith('.')) continue;
-      assert(!specifier.endsWith('.mjs'), `${relPath} imports a .mjs source module: ${specifier}`);
+      const generatedMjsImport = allowedGeneratedMjsImports.get(relPath);
+      const isBoundedGeneratedImport = generatedMjsImport?.has(specifier) === true;
+      assert(!specifier.endsWith('.mjs') || isBoundedGeneratedImport, `${relPath} imports a .mjs source module: ${specifier}`);
       if (isPackageRuntime) {
         assert(!resolvesIntoScripts(filePath, specifier), `package runtime must not import from scripts/: ${relPath} imports ${specifier}`);
       }

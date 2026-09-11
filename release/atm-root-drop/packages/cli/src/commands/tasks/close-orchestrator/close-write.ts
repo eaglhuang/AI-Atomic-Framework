@@ -230,6 +230,7 @@ export async function executeCloseWrites(input: {
       });
       const closeArtifactFiles = existingTaskCloseArtifacts(options.cwd, [
         relativePathFrom(options.cwd, input.taskPath),
+        `.atm/history/evidence/${options.taskId}.json`,
         `.atm/history/evidence/${options.taskId}.bundle-manifest.json`,
         transitionPath,
         closurePacketPath

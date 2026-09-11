@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0025",
+  "title": "Repair remaining green CI governance blockers",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "The `.mjs` runtime build seam is accepted only through a documented, bounded rule and unrelated `.mjs` imports still fail closed.",
+    "Rendered multi-agent matrix and validator output have matching digests.",
+    "Task-ledger governance validator passes on clean and negative fixtures.",
+    "`npm run validate:standard`, typecheck, and lint pass locally and in CI.",
+    "No validator is disabled or converted from blocking to advisory merely to obtain green CI.",
+    "Rollback is a governed revert of the scoped source/fixture changes, followed by the same validator suite."
+  ],
+  "deliverables": [
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/validate-module-boundaries.ts",
+    "scripts/render-agent-matrix.ts",
+    "scripts/validate-multi-agent-confidence.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "scripts/validators/task-ledger/suite-impl/implementation.ts",
+    "docs/reports/atm-product-ci-burn-in.md",
+    "docs/multi-agent-compatibility-matrix.md"
+  ],
+  "scopePaths": [
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/validate-module-boundaries.ts",
+    "scripts/render-agent-matrix.ts",
+    "scripts/validate-multi-agent-confidence.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "scripts/validators/task-ledger/suite-impl/implementation.ts",
+    "docs/reports/atm-product-ci-burn-in.md",
+    "docs/multi-agent-compatibility-matrix.md"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-module-boundaries.ts --mode validate",
+    "node --strip-types scripts/validate-multi-agent-confidence.ts --mode validate",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "npm run validate:standard",
+    "npm run typecheck",
+    "npm run lint"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/validate-module-boundaries.ts",
+        "scripts/render-agent-matrix.ts",
+        "scripts/validate-multi-agent-confidence.ts",
+        "scripts/validate-task-ledger-governance.ts",
+        "scripts/validators/task-ledger/suite-impl/implementation.ts",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "docs/multi-agent-compatibility-matrix.md",
+        "generalized module-boundary contract that accepts the runtime build seam without weakening unrelated checks",
+        "regenerated and validated multi-agent compatibility matrix with one canonical source",
+        "repaired task-ledger governance fixtures/logic with command-backed regression evidence",
+        "CI evidence showing Validate Standard passes with no new performance regressions"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 6 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0025-repair-green-ci-governance-blockers.task.md",
+    "sectionTitle": "TASK-PRF-0025",
+    "headingLine": 46,
+    "hash": "26b975d183a6996d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0025-repair-green-ci-governance-blockers.task.md",
+      "planningCommitSha": "bf6559d93833f71e37ada84dfafd57d726e4a33f",
+      "contentDigest": "sha256:26b975d183a6996d8015a8ec5e91dd24792fd2927b20d26fdd88f8bdc0700b3a",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-11T17:28:23.584Z"
+    }
+  },
+  "importedAt": "2026-09-11T17:28:23.584Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.module.boundaries.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-module-boundaries.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.multi.agent.confidence.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-multi-agent-confidence.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.task.ledger.governance.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.standard",
+      "command": "npm run validate:standard",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.lint",
+      "command": "npm run lint",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-11T18-14-32-392Z-close-a949fb680cce",
+  "lastTransitionAt": "2026-09-11T18:14:32.392Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-11T17:32:18.009Z",
+  "promotedAt": "2026-09-11T17:32:18.012Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-50ae8a91f0b2",
+    "claimedAt": "2026-09-11T17:32:18.016Z",
+    "heartbeatAt": "2026-09-11T18:14:32.390Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0025.json",
+      "docs/multi-agent-compatibility-matrix.md",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/render-agent-matrix.ts",
+      "scripts/validate-module-boundaries.ts",
+      "scripts/validate-multi-agent-confidence.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260911173218-codex-captain-2f732eb6db",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911173218-codex-captain-2f732eb6db\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-09-11T17:32:18.016Z",
+  "startedByActor": "codex-captain",
+  "startedBySessionId": "session-20260911173218-codex-captain-TASK-PRF-0025-19195c7bb5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0025",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0025.*",
+      ".atm/history/task-events/TASK-PRF-0025/**",
+      ".atm/history/tasks/TASK-PRF-0025.json",
+      "docs/multi-agent-compatibility-matrix.md",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/render-agent-matrix.ts",
+      "scripts/validate-module-boundaries.ts",
+      "scripts/validate-multi-agent-confidence.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b77d90670b6c60be42b913d565eb10cdd4d3cc84abd9f53e296f71b1900c220f",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260911173218-codex-captain-TASK-PRF-0025-19195c7bb5",
+    "laneSession": {
+      "laneSessionId": "lane-20260911173218-codex-captain-2f732eb6db",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911173218-codex-captain-2f732eb6db\""
+    },
+    "createdAt": "2026-09-11T17:32:21.163Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-11T18:14:32.390Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260911173218-codex-captain-TASK-PRF-0025-19195c7bb5",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0025.closure-packet.json"
+}

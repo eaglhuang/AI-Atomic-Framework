@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T17-26-38-072Z-scope-amendment-255e0db86fdb",
+  "taskId": "TASK-PRF-0025",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0025.json",
+  "taskSha256": "sha256:d91786afc1b4f0317288d7a4e928b50c99fd433b67eba2b697958d214e3e53e2",
+  "createdAt": "2026-09-11T17:26:38.072Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0025 --actor codex-captain --add \"package.json,package-lock.json\" --reason \"CI evidence shows transitive production dependency baseline is required for the green dependency gate\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "CI evidence shows transitive production dependency baseline is required for the green dependency gate"
+  }
+}
