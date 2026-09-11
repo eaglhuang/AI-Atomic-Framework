@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T16-21-15-642Z-close-4c7bffe52590",
+  "taskId": "TASK-PRF-0023",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911160424-codex-captain-TASK-PRF-0023-e50dc869fd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0023.json",
+  "taskSha256": "sha256:7bd7f4ac1163a258b40f951d742cbcd80b94e3e457826758d1963769a072e1ca",
+  "createdAt": "2026-09-11T16:21:15.642Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0023 --actor codex-captain --status done --historical-delivery 2effeea4fc118c8929f08097977514ea7b11e901",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260911160424-codex-captain-TASK-PRF-0023-e50dc869fd",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0023.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "test",
+      "validate:cli",
+      "validate:self-hosting-alpha"
+    ],
+    "requiredGates": [
+      "test",
+      "validate:cli",
+      "validate:self-hosting-alpha"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-11T16:21:15.628Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0023.*",
+        ".atm/history/task-events/TASK-PRF-0023/**",
+        ".atm/history/tasks/TASK-PRF-0023.json",
+        "AGENTS.md",
+        "scripts/validate-cli.ts",
+        "scripts/validate-cli/full-suite.ts",
+        "scripts/validate-self-hosting-alpha.ts",
+        "tests/fixtures"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-cli.ts",
+        "scripts/validate-cli/full-suite.ts",
+        "scripts/validate-self-hosting-alpha.ts",
+        "tests/fixtures"
+      ],
+      "requiredGates": [
+        "test",
+        "validate:cli",
+        "validate:self-hosting-alpha"
+      ]
+    }
+  }
+}
