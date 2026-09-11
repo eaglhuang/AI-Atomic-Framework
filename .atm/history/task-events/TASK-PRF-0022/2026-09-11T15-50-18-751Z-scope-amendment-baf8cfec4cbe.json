@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T15-50-18-751Z-scope-amendment-baf8cfec4cbe",
+  "taskId": "TASK-PRF-0022",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0022.json",
+  "taskSha256": "sha256:6e21c773ac44adbbe83e76313f0c578598b75ea282c519b5f5dda2ec3e263b03",
+  "createdAt": "2026-09-11T15:50:18.751Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0022 --actor codex-captain --add packages/cli/dist/npm-runtime/runtime.mjs --reason \"Include generated npm runtime artifact declared by TASK-PRF-0022 after deterministic full prepack build\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Include generated npm runtime artifact declared by TASK-PRF-0022 after deterministic full prepack build"
+  }
+}

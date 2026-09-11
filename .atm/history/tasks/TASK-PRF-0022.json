@@ -1,0 +1,363 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0022",
+  "title": "Repair clean-install packed CLI vendor boundary",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "A clean checkout can run `npm pack --workspace packages/cli` with zero unresolved `_vendor` imports.",
+    "The prepack path deterministically builds or validates every referenced workspace runtime; it fails closed rather than silently skipping absent vendor roots.",
+    "The packed tarball installs in an isolated directory and `atm --help` (or the declared smoke command) succeeds.",
+    "Artifact remains within the declared 3,365,772-byte / 308-entry cap and contains no forbidden source, test, or evidence artifacts.",
+    "Lint, typecheck, and focused package contract pass.",
+    "Report records run `34607184874`, the root cause, and the successful remediation run; historical failure evidence is retained.",
+    "No npm publish or protected-main push occurs without separate owner authorization."
+  ],
+  "deliverables": [
+    "packages/cli/dist/npm-runtime/runtime.mjs",
+    "packages/cli/dist/npm-runtime/manifest.json",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-product-ci-burn-in.md"
+  ],
+  "scopePaths": [
+    "scripts/build-cli-npm-runtime.ts",
+    "packages/cli/package.json",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-product-ci-burn-in.md",
+    ".atm/history/evidence/TASK-PRF-0022.*",
+    ".atm/history/task-events/TASK-PRF-0022/**",
+    ".atm/history/tasks/TASK-PRF-0022.json",
+    "scripts/build-package-dist.ts",
+    "packages/cli/dist/npm-runtime/runtime.mjs"
+  ],
+  "validators": [
+    "npm run build --workspace packages/cli",
+    "npm pack --workspace packages/cli --dry-run --json",
+    "node --strip-types scripts/validate-adopter-artifact-manifest.ts --mode validate",
+    "node --strip-types scripts/validate-npm-clean-install.ts",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "npm run lint",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "owner",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/build-cli-npm-runtime.ts",
+        "packages/cli/package.json",
+        "tests/cli/public-npm-install-contract.test.ts",
+        "docs/reports/atm-public-npm-install-proof-beta.md",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "packages/cli/dist/npm-runtime/runtime.mjs",
+        "packages/cli/dist/npm-runtime/manifest.json"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 7 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0022-repair-clean-install-packed-cli-vendor-boundary.task.md",
+    "sectionTitle": "TASK-PRF-0022",
+    "headingLine": 45,
+    "hash": "c5f13ca6043eb2da",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0022-repair-clean-install-packed-cli-vendor-boundary.task.md",
+      "planningCommitSha": "87a9af9a968f560bbee5a5740719a992d84dd670",
+      "contentDigest": "sha256:c5f13ca6043eb2daa246390bdd0c7ec4ffb9968522a11501f5486a5ed9f0f36a",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-11T14:00:33.676Z"
+    }
+  },
+  "importedAt": "2026-09-11T14:00:33.676Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.build.workspace.packages.cli",
+      "command": "npm run build --workspace packages/cli",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.pack.workspace.packages.cli.dry.run.json",
+      "command": "npm pack --workspace packages/cli --dry-run --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.adopter.artifact.manifest.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-adopter-artifact-manifest.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.npm.clean.install.ts",
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.public.npm.install.contract.test.ts",
+      "command": "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.lint",
+      "command": "npm run lint",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-11T15-50-18-751Z-scope-amendment-baf8cfec4cbe",
+  "lastTransitionAt": "2026-09-11T15:50:18.751Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-11T15:40:33.701Z",
+  "promotedAt": "2026-09-11T15:40:33.706Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-74c497631180",
+    "claimedAt": "2026-09-11T15:40:33.711Z",
+    "heartbeatAt": "2026-09-11T15:40:33.711Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0022.*",
+      ".atm/history/task-events/TASK-PRF-0022/**",
+      ".atm/history/tasks/TASK-PRF-0022.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/package.json",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260911154033-codex-captain-c6468092b1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911154033-codex-captain-c6468092b1\""
+    }
+  },
+  "startedAt": "2026-09-11T15:40:33.711Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-ee61c397eeb4f23d",
+    "ticketDigest": "sha256:ee61c397eeb4f23d4076fe22f7ff290ce1c6dd35b72dbb8317a1a3915cd620ba",
+    "taskId": "TASK-PRF-0022",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260911154033-codex-captain-c6468092b1",
+    "claimGeneration": "lease-74c497631180",
+    "issuedAt": "2026-09-11T15:50:18.686Z",
+    "expiresAt": "2026-09-11T16:20:18.686Z",
+    "scopeDigest": "sha256:498231012f2843b3ecc3bebd6e97ac47fff514f57fdfb24ff54a166a56b86e25",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-11T15:50:18.686Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0022.*",
+          ".atm/history/task-events/TASK-PRF-0022/**",
+          ".atm/history/tasks/TASK-PRF-0022.json",
+          "docs/reports/atm-product-ci-burn-in.md",
+          "docs/reports/atm-public-npm-install-proof-beta.md",
+          "packages/cli/dist/npm-runtime/runtime.mjs",
+          "packages/cli/package.json",
+          "scripts/build-cli-npm-runtime.ts",
+          "scripts/build-package-dist.ts",
+          "tests/cli/public-npm-install-contract.test.ts"
+        ],
+        "digest": "sha256:e06b2bb30ee93838840d9708ea2a60b29ef297b5643545f256d926a8645c24f2"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260911154033-codex-captain-TASK-PRF-0022-8ef29b3c90",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0022",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0022.*",
+      ".atm/history/task-events/TASK-PRF-0022/**",
+      ".atm/history/tasks/TASK-PRF-0022.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/package.json",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0022-repair-clean-install-packed-cli-vendor-boundary.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0022-repair-clean-install-packed-cli-vendor-boundary.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "e1d9d23961ea101aa223940810d2f4991ff3b07467a4d7042bfe8ef4f5849e28",
+    "actorId": "codex-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260911154033-codex-captain-c6468092b1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911154033-codex-captain-c6468092b1\""
+    },
+    "createdAt": "2026-09-11T15:40:36.278Z",
+    "status": "active"
+  }
+}

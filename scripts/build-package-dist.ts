@@ -337,15 +337,22 @@ function buildCliRuntimeClosure(): void {
 
   while (pending.length > 0) {
     const packageName = pending.shift()!;
+    let copiedForPackage = 0;
     for (const publishRoot of publishRootsOf(packageName)) {
       const sourceRoot = path.join(root, 'packages', packageName, publishRoot);
-      if (!existsSync(sourceRoot)) continue;
+      if (!existsSync(sourceRoot)) {
+        throw new Error(`CLI runtime closure requires built workspace output: packages/${packageName}/${publishRoot}`);
+      }
       for (const originalFile of copyRuntimeTree(sourceRoot, path.join(vendorRoot, packageName, publishRoot))) {
+        copiedForPackage += 1;
         if (!/\.[cm]?js$/.test(originalFile)) continue;
         // Resolve against the authored location so an escaping specifier names
         // the workspace it was written against, not the vendored copy.
         for (const reference of escapingPackageReferences(originalFile, originalFile)) enqueue(reference.packageName);
       }
+    }
+    if (copiedForPackage === 0) {
+      throw new Error(`CLI runtime closure found no publishable files for workspace: packages/${packageName}`);
     }
   }
 

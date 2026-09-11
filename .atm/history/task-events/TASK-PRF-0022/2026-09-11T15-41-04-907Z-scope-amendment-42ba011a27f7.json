@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-11T15-41-04-907Z-scope-amendment-42ba011a27f7",
+  "taskId": "TASK-PRF-0022",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0022.json",
+  "taskSha256": "sha256:81f960a6d3a52580fe2e3053a52177f560ec3d53b8e2ada56a84dd909bc4b189",
+  "createdAt": "2026-09-11T15:41:04.907Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0022 --actor codex-captain --add scripts/build-package-dist.ts --reason \"Prepack must build or fail-closed validate referenced workspace vendor roots\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Prepack must build or fail-closed validate referenced workspace vendor roots"
+  }
+}
