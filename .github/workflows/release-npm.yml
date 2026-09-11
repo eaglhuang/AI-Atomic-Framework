@@ -246,6 +246,7 @@ jobs:
 
       - name: Post-publish full validation
         if: ${{ always() && !cancelled() }}
+        timeout-minutes: 45
         shell: bash
         run: |
           release_version="${GITHUB_REF_NAME#v}"
