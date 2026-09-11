@@ -1,0 +1,355 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0018",
+  "title": "Republish slim npm runtime and rebind benchmark package",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0016",
+    "TASK-PRF-0006"
+  ],
+  "acceptance": [
+    "ACC-1: The new public beta resolves from npm and passes isolated install plus `atm --version` with no workspace link.",
+    "ACC-2: The public tarball's compressed/unpacked bytes and file inventory meet the declared adopter-runtime budget and exclude source, tests, fixtures and runtime evidence.",
+    "ACC-3: The external benchmark manifest is resealed to the exact published version and SHA-256 before execution; a mismatch fails closed."
+  ],
+  "deliverables": [
+    "scripts/build-package-dist.ts",
+    "scripts/validate-public-npm-install.ts",
+    "scripts/validate-package-skeleton.ts",
+    "scripts/fixtures/atm-external-benchmark/manifest.json",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-external-benchmark-decision.md"
+  ],
+  "scopePaths": [
+    "scripts/build-package-dist.ts",
+    "scripts/validate-public-npm-install.ts",
+    "scripts/validate-package-skeleton.ts",
+    "scripts/fixtures/atm-external-benchmark/manifest.json",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-external-benchmark-decision.md",
+    ".atm/history/evidence/TASK-PRF-0018.*",
+    ".atm/history/task-events/TASK-PRF-0018/**",
+    ".atm/history/tasks/TASK-PRF-0018.json",
+    "tests/cli/public-npm-install-contract.test.ts"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-package-skeleton.ts --mode install-smoke",
+    "node --strip-types scripts/validate-public-npm-install.ts --package @ai-atomic-framework/cli --version <new-version> --output docs/reports/atm-public-npm-install-proof-beta.md",
+    "node --strip-types scripts/validate-external-benchmark-protocol.ts --mode validate",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "retain-old-tag-and-invalidate-unbound-benchmark-protocol",
+  "rollbackNotes": "Never overwrite an npm version or mutate a sealed benchmark after runs. If the size or dependency closure is wrong, publish nothing and reseal a new protocol only after a corrected immutable beta exists.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-build-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0018-republish-slim-npm-runtime-and-rebind-benchmark-package.task.md",
+    "sectionTitle": "TASK-PRF-0018",
+    "headingLine": 83,
+    "hash": "5e3e904b417dbf96",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0018-republish-slim-npm-runtime-and-rebind-benchmark-package.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:5e3e904b417dbf96d5a7485fdf858eab584984dbd3e0b5cfe1d2c1cc25990395",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-11T00:34:50.658Z"
+    }
+  },
+  "importedAt": "2026-09-11T00:34:50.658Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0016",
+      "TASK-PRF-0006"
+    ],
+    "startConditions": [
+      "The release owner authorizes publication of a new immutable beta version.",
+      "The current source build produces the declared npm-runtime boundary without workspace links.",
+      "The benchmark protocol is amended and resealed to the exact new public tarball digest before any run."
+    ],
+    "softRelations": [
+      "TASK-PRF-0008"
+    ],
+    "changedPublicSeams": [
+      "public-npm-runtime-size"
+    ],
+    "causalImpactEdges": [
+      "public-tarball-is-installable",
+      "adopter-runtime-stays-within-size-budget",
+      "benchmark-arm-binds-to-current-tarball"
+    ],
+    "parallelFrontierInputs": [
+      "npm-runtime-output-inventory",
+      "immutable-public-beta-version",
+      "benchmark-protocol-preregistration"
+    ],
+    "validatorReferences": [
+      "test_prf_public_runtime_budget_7f2c4a11",
+      "test_prf_benchmark_tarball_binding_9a61d2e0"
+    ],
+    "phaseOwner": "phase-2-public-npm-delivery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_public_runtime_budget_7f2c4a11",
+      "targetGroupId": null,
+      "semanticKey": "public_runtime_matches_declared_size_and_file_budget",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "public-tarball-is-installable",
+        "adopter-runtime-stays-within-size-budget"
+      ],
+      "expectedRedPredicate": "The published tarball is installable but exceeds the declared runtime file or byte budget, or includes forbidden source/evidence surfaces.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    },
+    {
+      "caseId": "test_prf_benchmark_tarball_binding_9a61d2e0",
+      "targetGroupId": null,
+      "semanticKey": "benchmark_protocol_binds_exact_public_tarball",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "benchmark-arm-binds-to-current-tarball"
+      ],
+      "expectedRedPredicate": "The benchmark manifest names a version or SHA-256 that differs from the independently verified public tarball.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_public_runtime_budget_7f2c4a11",
+    "test_prf_benchmark_tarball_binding_9a61d2e0"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0016",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-PRF-0006",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-11T01-10-50-125Z-renew-ba16b8d0dabf",
+  "lastTransitionAt": "2026-09-11T01:10:50.125Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-11T00:36:20.737Z",
+  "promotedAt": "2026-09-11T00:36:20.740Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-f29f7604cec1",
+    "claimedAt": "2026-09-11T00:36:20.746Z",
+    "heartbeatAt": "2026-09-11T01:10:49.256Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0018.*",
+      ".atm/history/task-events/TASK-PRF-0018/**",
+      ".atm/history/tasks/TASK-PRF-0018.json",
+      "docs/reports/atm-external-benchmark-decision.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "scripts/build-package-dist.ts",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
+      "scripts/validate-package-skeleton.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260911011049-codex-captain-d16fa77dca",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911011049-codex-captain-d16fa77dca\""
+    }
+  },
+  "startedAt": "2026-09-11T00:36:20.746Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-c23f3d5b63658720",
+    "ticketDigest": "sha256:c23f3d5b636587202421e445159ea6c2c99880d979a01ecc28e758a88a60e8c8",
+    "taskId": "TASK-PRF-0018",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260911011049-codex-captain-d16fa77dca",
+    "claimGeneration": "lease-f29f7604cec1",
+    "issuedAt": "2026-09-11T01:10:49.256Z",
+    "expiresAt": "2026-09-11T01:40:49.256Z",
+    "scopeDigest": "sha256:7fa3e9b166485d25d23a6377dd9990410a830441924095fb0b5c25fd691b5526",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-11T01:10:49.256Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0018.*",
+          ".atm/history/task-events/TASK-PRF-0018/**",
+          ".atm/history/tasks/TASK-PRF-0018.json",
+          "docs/reports/atm-external-benchmark-decision.md",
+          "docs/reports/atm-public-npm-install-proof-beta.md",
+          "scripts/build-package-dist.ts",
+          "scripts/fixtures/atm-external-benchmark/manifest.json",
+          "scripts/validate-package-skeleton.ts",
+          "scripts/validate-public-npm-install.ts",
+          "tests/cli/public-npm-install-contract.test.ts"
+        ],
+        "digest": "sha256:a6f34c62a0ffd89a01036ab044d525afc3c1da63767b7a236f1a5c63b78bc0be"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260911003620-codex-captain-TASK-PRF-0018-19c92cfc17",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0018",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0018.*",
+      ".atm/history/task-events/TASK-PRF-0018/**",
+      ".atm/history/tasks/TASK-PRF-0018.json",
+      "docs/reports/atm-external-benchmark-decision.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "scripts/build-package-dist.ts",
+      "scripts/fixtures/atm-external-benchmark/manifest.json",
+      "scripts/validate-package-skeleton.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0018-republish-slim-npm-runtime-and-rebind-benchmark-package.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0018-republish-slim-npm-runtime-and-rebind-benchmark-package.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4f8f2bc5ae90c5d9a31af120d77d9685e1ab6950848afe0429e4ff3ca1ec249c",
+    "actorId": "codex-captain",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260911003620-codex-captain-a11b66f3e6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260911003620-codex-captain-a11b66f3e6\""
+    },
+    "createdAt": "2026-09-11T00:36:25.822Z",
+    "status": "active"
+  }
+}
