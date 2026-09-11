@@ -91,9 +91,10 @@ raw billed-cost improvement. Missing or non-original cost data remains
 `inconclusive`; adverse safety is `stop` and must name the smallest optional
 capability before any narrow retest.
 
-The signed hidden-corpus acceptance is now sealed for the pre-run phase. The
-baseline operator still needs an owner-approved fork destination before opening
-the required pull requests. `runEligibility` never substitutes for final evidence:
+The signed hidden-corpus acceptance is **not yet sealed** in the current protocol
+fixture, so the pre-run packet is not eligible to execute. The baseline operator
+also needs an owner-approved fork destination before opening the required pull
+requests. `runEligibility` never substitutes for final evidence:
 the verifier still requires
 sealed independent adjudication, provider telemetry, and its original export before
 it can issue any product decision.
