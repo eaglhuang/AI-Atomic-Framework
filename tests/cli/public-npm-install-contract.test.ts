@@ -10,6 +10,10 @@ assert.equal(proof.status, 'blocked');
 assert.equal(proof.publicRegistry, false);
 assert.equal(proof.usedWorkspaceLink, undefined);
 
+const validatorSource = await import('node:fs').then(({ readFileSync }) => readFileSync(new URL('../../scripts/validate-public-npm-install.ts', import.meta.url), 'utf8'));
+assert.match(validatorSource, /\['dist\.tarball'\]/, 'validator must accept npm view flat dist.tarball metadata');
+assert.match(validatorSource, /shell: process\.platform === 'win32'/, 'validator must execute Windows .cmd bins through the shell');
+
 let failedClosed = false;
 try { execFileSync(npm, args.slice(0, -1), { encoding: 'utf8', windowsHide: true, stdio: 'pipe', shell: process.platform === 'win32' }); } catch { failedClosed = true; }
 assert.equal(failedClosed, true, 'unpublished package must fail closed without --record-blocked');

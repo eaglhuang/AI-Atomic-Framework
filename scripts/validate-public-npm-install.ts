@@ -44,7 +44,9 @@ try {
     if (!args.recordBlocked) process.exitCode = 1;
     process.exit();
   }
-  if (!metadata?.version || !metadata?.dist?.tarball) throw new Error('registry metadata is incomplete');
+  const registryTarball = metadata?.dist?.tarball ?? metadata?.['dist.tarball'];
+  const registryIntegrity = metadata?.dist?.integrity ?? metadata?.['dist.integrity'] ?? null;
+  if (!metadata?.version || !registryTarball) throw new Error('registry metadata is incomplete');
   root = mkdtempSync(join(tmpdir(), 'atm-public-npm-'));
   const packed = JSON.parse(runNpm(['pack', `${args.packageName}@${args.version}`, '--pack-destination', root, '--json', '--loglevel', 'silent'], root).trim());
   const filename = Array.isArray(packed) ? packed[0]?.filename : packed?.filename;
@@ -53,13 +55,13 @@ try {
   const consumer = join(root, 'consumer');
   runNpm(['install', '--ignore-scripts', '--prefix', consumer, `${args.packageName}@${args.version}`], root);
   const bin = process.platform === 'win32' ? join(consumer, 'node_modules', '.bin', 'atm.cmd') : join(consumer, 'node_modules', '.bin', 'atm');
-  const cliVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', windowsHide: true }).trim();
-  const payload = report(args, { status: 'verified', publicRegistry: true, registryVersion: metadata.version, distTarball: metadata.dist.tarball, distIntegrity: metadata.dist.integrity ?? null, tarballSha256: sha256(tarball), cliVersion, cleanConsumer: true, usedWorkspaceLink: false, temporaryRootRemoved: true });
+  const cliVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' }).trim();
+  const payload = report(args, { status: 'verified', publicRegistry: true, registryVersion: metadata.version, distTarball: registryTarball, distIntegrity: registryIntegrity, tarballSha256: sha256(tarball), cliVersion, cleanConsumer: true, usedWorkspaceLink: false, temporaryRootRemoved: true });
   console.log(JSON.stringify(payload));
 } catch (error) {
   const payload = report(args, { status: 'blocked', publicRegistry: false, temporaryRootRemoved: true, blockedReason: 'public clean-consumer install proof failed', error: String(error) });
   console.log(JSON.stringify(payload));
-  process.exitCode = 1;
+  process.exitCode = args.recordBlocked ? 0 : 1;
 } finally {
   if (root) rmSync(root, { recursive: true, force: true });
 }
