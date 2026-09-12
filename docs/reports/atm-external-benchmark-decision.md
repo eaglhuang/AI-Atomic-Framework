@@ -2,8 +2,8 @@
 
 - Verdict: **inconclusive**
 - Product Proof status: **not established — execution packet prepared**
-- Public ATM arm: `@ai-atomic-framework/cli@0.1.0-beta.4`
-- Public tarball SHA-256: `sha256:6b1affb435479a7bf62e0d69d504f979b2f490680273692ad747ec766f460424`
+- Public ATM arm: `@ai-atomic-framework/cli@0.1.0-beta.5`
+- Public tarball SHA-256: `sha256:d08dfbbe772d4cb71b6849f270949321481072224dc7e0f84a1892bf0ba5e67f`
 - Verifier source commit: `253cfc907ee86438f0a3c7b85e0518bc0e52382c`
 
 No benchmark result is recorded in this report. No synthetic timing, workspace-linked
