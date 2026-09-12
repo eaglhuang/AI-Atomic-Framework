@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T15-43-24-706Z-scope-amendment-00ec50b9d8ec",
+  "taskId": "TASK-PRF-0029",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0029.json",
+  "taskSha256": "sha256:88dcb1827c1937813e67ab3d4555b6c1c2d9743b7f8804740086822f3e98913d",
+  "createdAt": "2026-09-12T15:43:24.706Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0029 --actor codex-captain --add \"package.json,scripts/validate-public-npm-install.ts,tests/cli/npm-clean-install.test.ts\" --reason \"Authorize the validator contract repair delivered by this task.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Authorize the validator contract repair delivered by this task."
+  }
+}

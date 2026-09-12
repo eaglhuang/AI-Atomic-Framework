@@ -34,7 +34,10 @@
     "docs/reports/atm-product-ci-burn-in.md",
     ".atm/history/evidence/TASK-PRF-0029.*",
     ".atm/history/task-events/TASK-PRF-0029/**",
-    ".atm/history/tasks/TASK-PRF-0029.json"
+    ".atm/history/tasks/TASK-PRF-0029.json",
+    "package.json",
+    "scripts/validate-public-npm-install.ts",
+    "tests/cli/npm-clean-install.test.ts"
   ],
   "validators": [
     "node --strip-types tests/cli/public-npm-install-contract.test.ts",
@@ -115,8 +118,8 @@
   "importedAt": "2026-09-12T15:21:40.073Z",
   "workAdmission": {
     "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -228,8 +231,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-12T15-36-20-010Z-renew-6ee10298adb1",
-  "lastTransitionAt": "2026-09-12T15:36:20.010Z",
+  "lastTransitionId": "2026-09-12T15-43-24-706Z-scope-amendment-00ec50b9d8ec",
+  "lastTransitionAt": "2026-09-12T15:43:24.706Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-12T15:32:41.130Z",
@@ -241,17 +244,20 @@
     "heartbeatAt": "2026-09-12T15:36:19.481Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/TASK-PRF-0029.json",
       ".atm/history/evidence/TASK-PRF-0029.*",
       ".atm/history/task-events/TASK-PRF-0029/**",
+      ".atm/history/tasks/TASK-PRF-0029.json",
       "docs/reports/atm-product-ci-burn-in.md",
       "docs/reports/atm-public-npm-install-proof-beta.md",
+      "package.json",
       "packages/cli/src/atm.ts",
       "packages/cli/src/commands/command-specs.ts",
       "scripts/build-cli-npm-runtime.ts",
       "scripts/build-package-dist.ts",
       "scripts/validate-adopter-artifact-manifest.ts",
+      "scripts/validate-public-npm-install.ts",
       "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/npm-clean-install.test.ts",
       "tests/cli/public-npm-install-contract.test.ts"
     ],
     "state": "active",
@@ -267,20 +273,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-9fa80873a9479077",
-    "ticketDigest": "sha256:9fa80873a9479077927bbc28a65fe922181339c5c4f22f94114b63da624c9e00",
+    "ticketId": "wat-43cb519b6eeba2c1",
+    "ticketDigest": "sha256:43cb519b6eeba2c1ca1bb7b0707d4d336204434730d335988d9d9e026c201309",
     "taskId": "TASK-PRF-0029",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260912152153-codex-captain-f1e8250eac",
     "claimGeneration": "lease-183f88fefebd",
-    "issuedAt": "2026-09-12T15:36:19.481Z",
-    "expiresAt": "2026-09-12T16:06:19.481Z",
-    "scopeDigest": "sha256:ba48cff290d26a2e71d4b66e3c3cb9b514f0aa1c9cc40641b7db590d6f45ca20",
+    "issuedAt": "2026-09-12T15:43:24.646Z",
+    "expiresAt": "2026-09-12T16:13:24.646Z",
+    "scopeDigest": "sha256:cd2fea827bae59ca9c85ecd85476e33004445c2ec3014f3c3a013ced87adf2bc",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-12T15:36:19.481Z"
+      "selectedAt": "2026-09-12T15:43:24.646Z"
     },
     "grants": [
       {
@@ -292,15 +298,18 @@
           ".atm/history/tasks/TASK-PRF-0029.json",
           "docs/reports/atm-product-ci-burn-in.md",
           "docs/reports/atm-public-npm-install-proof-beta.md",
+          "package.json",
           "packages/cli/src/atm.ts",
           "packages/cli/src/commands/command-specs.ts",
           "scripts/build-cli-npm-runtime.ts",
           "scripts/build-package-dist.ts",
           "scripts/validate-adopter-artifact-manifest.ts",
+          "scripts/validate-public-npm-install.ts",
           "tests/cli/adopter-artifact-budget.test.ts",
+          "tests/cli/npm-clean-install.test.ts",
           "tests/cli/public-npm-install-contract.test.ts"
         ],
-        "digest": "sha256:d2f2299ec86b9e68b952f7421c521d30d1d288d20e53cd5b7598e1a56346ed4f"
+        "digest": "sha256:b2ab2c8156fe035eb036df5c5d5b6b99508e6f890aaf1008723cc77fbe7af4a3"
       },
       {
         "kind": "lifecycle-operation",
@@ -322,16 +331,16 @@
     "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
-      "resolvedMode": "disabled",
+      "resolvedMode": "enabled",
       "reasons": [
-        "low-risk-task"
+        "complex-task"
       ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
   },
   "startedBySessionId": "session-20260912153241-codex-captain-TASK-PRF-0029-c781f5d3bf",
@@ -349,27 +358,37 @@
       ".atm/history/tasks/TASK-PRF-0029.json",
       "docs/reports/atm-product-ci-burn-in.md",
       "docs/reports/atm-public-npm-install-proof-beta.md",
+      "package.json",
       "packages/cli/src/atm.ts",
       "packages/cli/src/commands/command-specs.ts",
       "scripts/build-cli-npm-runtime.ts",
       "scripts/build-package-dist.ts",
       "scripts/validate-adopter-artifact-manifest.ts",
+      "scripts/validate-public-npm-install.ts",
       "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/npm-clean-install.test.ts",
       "tests/cli/public-npm-install-contract.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0029-deepen-cli-runtime-boundary-and-reduce-adopter-bundle.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0029-deepen-cli-runtime-boundary-and-reduce-adopter-bundle.task.md"
+    ],
     "allowPlanningMirror": false,
-    "promptHash": "080c1b04148172ac64a7e5d4f316a409813f8e935567ada3889985711d5a59c9",
+    "promptHash": "dc72c33a9eb07cd3e45a4193232d1c3b65e3d8ee5a2c5fbab8d066f1c4c03d0b",
     "actorId": "codex-captain",
-    "sessionId": "session-20260912153241-codex-captain-TASK-PRF-0029-c781f5d3bf",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260912152153-codex-captain-f1e8250eac",
       "status": "adopted",
       "source": "env",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912152153-codex-captain-f1e8250eac\""
     },
-    "createdAt": "2026-09-12T15:32:43.484Z",
+    "createdAt": "2026-09-12T15:32:43.567Z",
     "status": "active"
   }
 }

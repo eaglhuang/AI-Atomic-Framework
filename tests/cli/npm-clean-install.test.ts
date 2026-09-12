@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const validator = path.join(root, 'scripts', 'validate-npm-clean-install.ts');
+const rootManifest = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8')) as { scripts?: Record<string, string> };
 const releaseWorkflow = path.join(root, '.github', 'workflows', 'release-npm.yml');
 const fixture = JSON.parse(readFileSync(path.join(root, 'tests', 'package-skeleton.fixture.json'), 'utf8')) as {
   packages: { name: string; directory: string; publishFiles?: string[] }[];
@@ -13,6 +14,7 @@ const fixture = JSON.parse(readFileSync(path.join(root, 'tests', 'package-skelet
 const publishedPackages = fixture.publishClosure?.publishedPackages ?? [];
 
 assert.ok(existsSync(validator), 'clean-install validator must exist');
+assert.equal(rootManifest.scripts?.['validate:npm-clean-install'], 'node --strip-types scripts/validate-npm-clean-install.ts', 'root package must expose the clean-install validator contract');
 for (const packageSpec of fixture.packages) {
   const expectedFiles = packageSpec.publishFiles ?? ['dist'];
   const directory = packageSpec.directory;
