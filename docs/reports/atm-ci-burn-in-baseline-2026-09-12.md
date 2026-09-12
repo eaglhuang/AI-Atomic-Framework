@@ -40,9 +40,26 @@ not **long-term green**.
 ## Reproduction
 
 ```text
-gh run list --repo eaglhuang/AI-Atomic-Framework --workflow ci.yml --limit 30 \\
-  --json databaseId,status,conclusion,headSha,createdAt,event,url
+gh run list --repo eaglhuang/AI-Atomic-Framework --workflow ci.yml --limit 100 \\
+  --json databaseId,status,conclusion,headSha,headBranch,createdAt,event,displayTitle \\
+  | node --strip-types scripts/measure-product-ci-burn-in.ts --stdin
 ```
 
 Re-run this command at each burn-in checkpoint and append the raw result digest;
 do not overwrite earlier observations.
+
+## Machine-evaluated checkpoint — 2026-09-12T15:58Z
+
+The new offline evaluator is available as `npm run validate:ci-burn-in --
+--input <gh-run-list.json>`. It validates newest-first ordering, unique run IDs,
+completed status, protected `main` branch, supported events, and explicit
+conclusions before evaluating the claim. A short or failed history exits
+non-zero and can never be labelled `long-term-green`.
+
+The current GitHub export contains 100 completed Product CI runs. The newest 21
+are successful (including 2 release-candidate observations), followed by 79
+historical failures; the observed range is 6.115150 days. Therefore the machine
+claim is `unexplained-failure`, not `long-term-green`. This is a measurement
+improvement, not long-term-green proof. The raw export digest is
+`sha256:1577c58723c4533c28bc250117f97a590583c9856ce335ed1efb809eb4f9b1a2` and
+must be retained at each checkpoint rather than replacing this observation.
