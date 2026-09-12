@@ -4705,6 +4705,7 @@
     "release/atm-root-drop/scripts/lib/validator-harness.ts",
     "release/atm-root-drop/scripts/lib/windows-write-retry.ts",
     "release/atm-root-drop/scripts/list-packages.ts",
+    "release/atm-root-drop/scripts/measure-product-ci-burn-in.ts",
     "release/atm-root-drop/scripts/migrate-evidence-ledger.ts",
     "release/atm-root-drop/scripts/module-boundaries.config.json",
     "release/atm-root-drop/scripts/onefile-fast-version-runtime.ts",
@@ -5606,6 +5607,7 @@
     "release/atm-root-drop/tests/cli/pre-push-provisional-closure-packet.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+    "release/atm-root-drop/tests/cli/product-ci-burn-in.test.ts",
     "release/atm-root-drop/tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
     "release/atm-root-drop/tests/cli/protected-ledger-destructive-guard.test.ts",
     "release/atm-root-drop/tests/cli/protected-override-audit-direction-lock.test.ts",
@@ -5928,6 +5930,7 @@
     "release/atm-root-drop/tests/fixtures/plan3-fake-green/stale-evidence-nonterminal.json",
     "release/atm-root-drop/tests/fixtures/plan3-fake-green/timeout-nonterminal.json",
     "release/atm-root-drop/tests/fixtures/plan3-fake-green/unknown-evidence-nonterminal.json",
+    "release/atm-root-drop/tests/fixtures/product-ci-burn-in/known-failure.json",
     "release/atm-root-drop/tests/fixtures/validator-governance-replay/historical-ab-candidates.json",
     "release/atm-root-drop/tests/governance-local.fixture.json",
     "release/atm-root-drop/tests/governance/map-equivalence-report.test.ts",
@@ -6147,8 +6150,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1486,
-    "unchanged": 4626,
+    "copied": 1483,
+    "unchanged": 4632,
     "removed": 0
   },
   "buildMode": "full",
@@ -12500,7 +12503,7 @@
       },
       {
         "path": "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
-        "digest": "3db93f644b87425828913133dc544b23ae491ba2b87fc7b6c6578e048e969e13",
+        "digest": "a576585466bb42388d233ecd07a53c3023ca8a24a26e8b0d238bb3476bbeb255",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
@@ -16406,7 +16409,7 @@
       },
       {
         "path": "package.json",
-        "digest": "d7a5ef8c454821212c2904edac6b253f7c1ad0a2417c2ed791a32ec0e7c2940b",
+        "digest": "76a2e569b059d4aade78f5cf5ccc1f33db26e6934e1448022a609cde318179cd",
         "origin": "source",
         "inputPaths": [
           "package.json"
@@ -48211,6 +48214,15 @@
         "replaceable": true
       },
       {
+        "path": "scripts/measure-product-ci-burn-in.ts",
+        "digest": "a6258bacffb05b91e4df3a56ef594ac8449582142342ad65158ef37f9716431b",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/measure-product-ci-burn-in.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/migrate-evidence-ledger.ts",
         "digest": "f19a2b128959d2e558ba29ca576793cef99b4be70fcb456e41ccb272965cdee2",
         "origin": "source",
@@ -56320,6 +56332,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/product-ci-burn-in.test.ts",
+        "digest": "8f73d4d744a4e2abb62ddaa1fa8416e45ac31a9a29ef0829060730c2537311fe",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/product-ci-burn-in.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
         "digest": "763e7cba443024d4f7e8977f8cf6127c8851e252377acbd9e8bc8375ab556dfc",
         "origin": "source",
@@ -59218,6 +59239,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/fixtures/product-ci-burn-in/known-failure.json",
+        "digest": "53ff1754b2674e730947a07184356d0c3db64010b1fab11968c7ac31e798b4cf",
+        "origin": "source",
+        "inputPaths": [
+          "tests/fixtures/product-ci-burn-in/known-failure.json"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/fixtures/validator-governance-replay/historical-ab-candidates.json",
         "digest": "dd8a235097c567930eb9b6099272bdfbb2c1a29fff86a9cc527a122e3783840d",
         "origin": "source",
@@ -61162,7 +61192,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:008a09df579bda080834ea49569400489f8f8c439579120be9093b58502c9783"
+    "treeDigest": "sha256:8e185bd9a828503a477b70817c3a7d51b75c1a3e312d29a336d59250dc1f7797"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62707,7 +62737,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:bb44b21b201443e32b4060ef2887402e76cb7ed436b170ddc25d0e414990361b"
+    "digest": "sha256:c3f2a64e4412f05690023c03ec24f07830353f14a0434cb43694b9e5184f681e"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -67386,6 +67416,7 @@
       "release/atm-root-drop/scripts/lib/validator-harness.ts",
       "release/atm-root-drop/scripts/lib/windows-write-retry.ts",
       "release/atm-root-drop/scripts/list-packages.ts",
+      "release/atm-root-drop/scripts/measure-product-ci-burn-in.ts",
       "release/atm-root-drop/scripts/migrate-evidence-ledger.ts",
       "release/atm-root-drop/scripts/module-boundaries.config.json",
       "release/atm-root-drop/scripts/onefile-fast-version-runtime.ts",
@@ -68287,6 +68318,7 @@
       "release/atm-root-drop/tests/cli/pre-push-provisional-closure-packet.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+      "release/atm-root-drop/tests/cli/product-ci-burn-in.test.ts",
       "release/atm-root-drop/tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
       "release/atm-root-drop/tests/cli/protected-ledger-destructive-guard.test.ts",
       "release/atm-root-drop/tests/cli/protected-override-audit-direction-lock.test.ts",
@@ -68609,6 +68641,7 @@
       "release/atm-root-drop/tests/fixtures/plan3-fake-green/stale-evidence-nonterminal.json",
       "release/atm-root-drop/tests/fixtures/plan3-fake-green/timeout-nonterminal.json",
       "release/atm-root-drop/tests/fixtures/plan3-fake-green/unknown-evidence-nonterminal.json",
+      "release/atm-root-drop/tests/fixtures/product-ci-burn-in/known-failure.json",
       "release/atm-root-drop/tests/fixtures/validator-governance-replay/historical-ab-candidates.json",
       "release/atm-root-drop/tests/governance-local.fixture.json",
       "release/atm-root-drop/tests/governance/map-equivalence-report.test.ts",
@@ -68831,22 +68864,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:81447408b1195536936789beba429a3299d84646f6f6e22493d4b4062a18cd46",
-  "sealedSourceCommit": "19d893ffdb17a63b31a02b861585356308f1e5bd",
+  "buildInputsTreeHash": "sha256:d9cb1793d9e1782001b0e41db5a4393a87b0193bfb57096a3724ee3847bcfaf7",
+  "sealedSourceCommit": "2f0f7d8ccc19600b2fe0586335504cfbce97d432",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:cfd6f058b3c07e3009345068338cf79c4f481549ee1b308c1a4c04a9a6abd8b8",
+  "incrementalPlanDigest": "sha256:ce6020b326b9c3be7e8923f71df657e1b7fbc3d1a48a2c6969083f0da90d99f8",
   "tsBuildCacheDigest": "sha256:1c4a05cbc91185aa531a574d51cc7c4fc0e69121f9874affd3c8a51ad76bcc71",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 35,
-    "skipDecision": 48,
-    "worktreeSetup": 11427,
-    "typescriptBuild": 12832,
-    "rootDropReleaseAssembly": 34810,
-    "onefileReleaseAssembly": 13848,
-    "artifactSync": 8287,
+    "skipDecision": 43,
+    "worktreeSetup": 10120,
+    "typescriptBuild": 11568,
+    "rootDropReleaseAssembly": 29390,
+    "onefileReleaseAssembly": 10254,
+    "artifactSync": 6388,
     "cleanup": 0,
-    "totalElapsed": 95876
+    "totalElapsed": 80679
   }
 }

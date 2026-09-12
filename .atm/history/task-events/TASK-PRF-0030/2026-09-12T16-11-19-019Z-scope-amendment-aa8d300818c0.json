@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T16-11-19-019Z-scope-amendment-aa8d300818c0",
+  "taskId": "TASK-PRF-0030",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0030.json",
+  "taskSha256": "sha256:cfbb49449bda1bc474185ce436b7f261037479b7853cd2a7becc8481adf7dfcd",
+  "createdAt": "2026-09-12T16:11:19.019Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0030 --actor codex-captain --add tests/fixtures/product-ci-burn-in/known-failure.json --reason \"Add the deterministic offline fixture required by the task's fail-closed CI burn-in validator.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Add the deterministic offline fixture required by the task's fail-closed CI burn-in validator."
+  }
+}

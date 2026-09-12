@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T16-19-14-330Z-close-277d8cf0f16e",
+  "taskId": "TASK-PRF-0030",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260912155628-codex-captain-TASK-PRF-0030-a055ca041e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0030.json",
+  "taskSha256": "sha256:a1b963974f8a1f4f2bed9049bc2087baf7a64476b1a1aeba91e306a38279c588",
+  "createdAt": "2026-09-12T16:19:14.330Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0030 --actor codex-captain --status done --historical-delivery 2f0f7d8ccc19600b2fe0586335504cfbce97d432",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260912155628-codex-captain-TASK-PRF-0030-a055ca041e",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0030.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "typecheck",
+      "validate:ci-burn-in -- --input tests/fixtures/product-ci-burn-in/known-failure.json --report-only",
+      "validate:cli"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "typecheck",
+      "validate:ci-burn-in -- --input tests/fixtures/product-ci-burn-in/known-failure.json --report-only"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-12T16:19:14.321Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0030.*",
+        ".atm/history/task-events/TASK-PRF-0030/**",
+        ".atm/history/tasks/TASK-PRF-0030.json",
+        "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+        "package.json",
+        "scripts/measure-product-ci-burn-in.ts",
+        "tests/cli/product-ci-burn-in.test.ts",
+        "tests/fixtures/product-ci-burn-in/known-failure.json"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/measure-product-ci-burn-in.ts",
+        "tests/cli/product-ci-burn-in.test.ts",
+        "tests/fixtures/product-ci-burn-in/known-failure.json"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+        "typecheck",
+        "validate:ci-burn-in -- --input tests/fixtures/product-ci-burn-in/known-failure.json --report-only"
+      ]
+    }
+  }
+}

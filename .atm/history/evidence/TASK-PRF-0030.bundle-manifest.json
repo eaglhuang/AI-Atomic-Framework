@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0030",
+  "updatedAt": "2026-09-12T16:15:10.440Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "lint",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+    "typecheck",
+    "validate:ci-burn-in -- --input tests/fixtures/product-ci-burn-in/known-failure.json --report-only",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f7e4d5a7e8575507bce2c452ddb812b2e9a09a0f1741b0bef7bc66ffa6ccca8c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/product-ci-burn-in.test.ts"
+      ],
+      "generatedAt": "2026-09-12T16:01:54.464Z",
+      "startedAt": "2026-09-12T16:01:54.145Z",
+      "finishedAt": "2026-09-12T16:01:54.464Z",
+      "durationMs": 319,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4a5941d0bfaa366e4f4d33ef10e1698de4c5d0e3",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-12T16:02:12.987Z",
+      "startedAt": "2026-09-12T16:02:03.038Z",
+      "finishedAt": "2026-09-12T16:02:12.987Z",
+      "durationMs": 9949,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4a5941d0bfaa366e4f4d33ef10e1698de4c5d0e3",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-12T16:02:27.827Z",
+      "startedAt": "2026-09-12T16:02:16.685Z",
+      "finishedAt": "2026-09-12T16:02:27.827Z",
+      "durationMs": 11142,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4a5941d0bfaa366e4f4d33ef10e1698de4c5d0e3",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:60e5b9bf26d0aa9526f712b0e419bf04168c9dd8fd862f3203e1b2f5ffc054ac",
+      "stderrSha256": "sha256:7925ffaa3ea4056f8a421b26571c1897fe4dc1b2392d3324ac7d4abc6ce81b34",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-09-12T16:02:53.805Z",
+      "startedAt": "2026-09-12T16:02:31.635Z",
+      "finishedAt": "2026-09-12T16:02:53.805Z",
+      "durationMs": 22170,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4a5941d0bfaa366e4f4d33ef10e1698de4c5d0e3",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:ci-burn-in -- --input tests/fixtures/product-ci-burn-in/known-failure.json --report-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:80c8b34da2fbbdf1f5dd0e72be5623f736cf4d346c2e58afecc09ccfcfb03741",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:ci-burn-in -- --input tests/fixtures/product-ci-burn-in/known-failure.json --report-only"
+      ],
+      "generatedAt": "2026-09-12T16:15:10.439Z",
+      "startedAt": "2026-09-12T16:15:09.771Z",
+      "finishedAt": "2026-09-12T16:15:10.439Z",
+      "durationMs": 668,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "2f0f7d8ccc19600b2fe0586335504cfbce97d432",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
