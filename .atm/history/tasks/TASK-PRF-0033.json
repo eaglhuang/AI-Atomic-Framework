@@ -1,0 +1,301 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0033",
+  "title": "Fail-closed timeout and diagnostics for Standard Dogfood CI",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0031"
+  ],
+  "acceptance": [
+    "ACC-1: ATM Dogfood has a bounded job-level timeout; timeout is a non-green observation and is never silently excluded from burn-in.",
+    "ACC-2: Validate Standard timeout output includes the validator progress snapshot, active validator, timeout budget, and stable `ATM_VALIDATOR_TIMEOUT` diagnostic.",
+    "ACC-3: Focused regression test proves timeout classification is distinct from ordinary validator failure; Product CI behavior and burn-in thresholds remain unchanged."
+  ],
+  "deliverables": [
+    ".github/workflows/ci.yml",
+    "scripts/run-validators/implementation.ts",
+    "tests/cli/standard-validator-timeout.test.ts",
+    "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
+  ],
+  "scopePaths": [
+    ".github/workflows/ci.yml",
+    "scripts/run-validators/implementation.ts",
+    "tests/cli/standard-validator-timeout.test.ts",
+    "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/standard-validator-timeout.test.ts",
+    "npm run typecheck",
+    "npm run lint",
+    "npm run validate:standard"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-runner-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-validator-runner-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validator-timeout-policy",
+        "pattern": "Policy Object",
+        "source": "scripts/run-validators/implementation.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0033-fail-closed-timeout-and-diagnostics-for-standard-dogfood-ci.task.md",
+    "sectionTitle": "TASK-PRF-0033",
+    "headingLine": 82,
+    "hash": "ae52ea1de849c44a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0033-fail-closed-timeout-and-diagnostics-for-standard-dogfood-ci.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:b93b68382ca44744cacf0abd07eb4ca6c6e839dd0411fe3f81653b540f93477d",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-12T17:43:14.948Z"
+    }
+  },
+  "importedAt": "2026-09-12T17:40:03.475Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-PRF-0031 is released and daily Product CI retention remains enabled"
+    ],
+    "softRelations": [
+      "TASK-PRF-0032 baseline boundary"
+    ],
+    "changedPublicSeams": [
+      "product-ci-dogfood-timeout-contract"
+    ],
+    "causalImpactEdges": [
+      "dogfood-timeout-to-burn-in-observation"
+    ],
+    "parallelFrontierInputs": [
+      "protected-main-ci-workflow"
+    ],
+    "validatorReferences": [
+      "tests/cli/standard-validator-timeout.test.ts"
+    ],
+    "phaseOwner": "atm-release"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_standard_validator_timeout_diagnostic_2c9e7f1a",
+      "targetGroupId": "null",
+      "semanticKey": "standard_validator_timeout_diagnostic",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "dogfood-timeout-to-burn-in-observation"
+      ],
+      "expectedRedPredicate": "timeout emits active validator and progress diagnostics and exits non-zero",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "product-ci-dogfood-timeout-contract",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_standard_validator_timeout_diagnostic_2c9e7f1a"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0031",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-12T18-19-58-056Z-renew-264891d97426",
+  "lastTransitionAt": "2026-09-12T18:19:58.056Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-12T17:41:30.157Z",
+  "promotedAt": "2026-09-12T17:41:30.162Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-4b834bea2c48",
+    "claimedAt": "2026-09-12T17:41:30.167Z",
+    "heartbeatAt": "2026-09-12T18:19:57.538Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0033.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/standard-validator-timeout.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260912181957-codex-captain-2199949d2f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912181957-codex-captain-2199949d2f\""
+    }
+  },
+  "startedAt": "2026-09-12T17:41:30.167Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-5fe7225ef647ddf5",
+    "ticketDigest": "sha256:5fe7225ef647ddf5a73664334392387d2de087a91ad70389b5b7a43aaa683075",
+    "taskId": "TASK-PRF-0033",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260912181957-codex-captain-2199949d2f",
+    "claimGeneration": "lease-4b834bea2c48",
+    "issuedAt": "2026-09-12T18:19:57.538Z",
+    "expiresAt": "2026-09-12T18:49:57.538Z",
+    "scopeDigest": "sha256:301486e4bd068631998ac88d3d8d4c33493ca7a789ba1cc5517bec232decce77",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-12T18:19:57.538Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0033.*",
+          ".atm/history/task-events/TASK-PRF-0033/**",
+          ".atm/history/tasks/TASK-PRF-0033.json",
+          ".github/workflows/ci.yml",
+          "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+          "scripts/run-validators/implementation.ts",
+          "tests/cli/standard-validator-timeout.test.ts"
+        ],
+        "digest": "sha256:e98bd98a8da31d3ae463bcd7ab57aac1ab32d91ed99302ad4e12a7e90bb53edc"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260912174130-codex-captain-TASK-PRF-0033-cb46f92de6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0033",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0033.*",
+      ".atm/history/task-events/TASK-PRF-0033/**",
+      ".atm/history/tasks/TASK-PRF-0033.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/standard-validator-timeout.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1684b529e50d7a941844dc24fa15ce8fd0b003b09358c6f519efff2e6b22d4dc",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260912174130-codex-captain-TASK-PRF-0033-cb46f92de6",
+    "laneSession": {
+      "laneSessionId": "lane-20260912174130-codex-captain-a57f160fda",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912174130-codex-captain-a57f160fda\""
+    },
+    "createdAt": "2026-09-12T17:41:34.366Z",
+    "status": "active"
+  }
+}

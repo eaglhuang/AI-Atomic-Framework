@@ -17,6 +17,24 @@ killAllRunningValidatorChildren("SIGTERM"); process.exit(130); }); process.on("S
 // the shared safety margin then turns that measurement into a timeout.
 export const VALIDATOR_TIMEOUT_POLICY_SCHEMA_ID = "atm.validatorTimeoutPolicy.v1";
 export const VALIDATOR_TIMEOUT_EXIT_CODE = 124;
+export function createValidatorTimeoutDiagnostic(input: {
+  validatorName: string;
+  timeoutMs: number;
+  timeoutSource: string;
+  observedDurationMs: number;
+  requiredCommand: string | null;
+}) {
+  return {
+    schemaId: "atm.validatorTimeoutDiagnostic.v1",
+    code: "ATM_VALIDATOR_TIMEOUT",
+    validatorName: input.validatorName,
+    detail: `Validator exceeded timeout budget of ${input.timeoutMs}ms and was killed.`,
+    timeoutMs: input.timeoutMs,
+    timeoutSource: input.timeoutSource,
+    observedDurationMs: input.observedDurationMs,
+    requiredCommand: input.requiredCommand,
+  };
+}
 export function resolveDeclaredEvidenceCounters(validator: any, exitCode: number): { caseCount: number; assertionCount: number } {
   const contract = validator?.evidenceContract;
   const caseCount = Number(contract?.caseCount);

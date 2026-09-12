@@ -78,3 +78,13 @@ node --strip-types scripts/validate-product-ci-burn-in-schedule.ts --mode valida
 
 This schedule increases the future observation rate; it does not itself prove
 the 30-day/90-run claim or substitute for the independent A/B benchmark.
+
+## Dogfood timeout contract (TASK-PRF-0033)
+
+The protected-main run `34708532902` completed Product CI successfully but
+stalled in `ATM Dogfood` at `Validate Standard` without a terminal status or
+live log. The Dogfood job now has a 20-minute outer timeout and the Standard
+validator step has a 15-minute timeout. Timeout remains a non-green observation;
+it is not excluded from burn-in. Validator-level progress heartbeats and the
+stable `ATM_VALIDATOR_TIMEOUT` diagnostic remain available for post-timeout
+triage. This bounds runner consumption without changing burn-in thresholds.
