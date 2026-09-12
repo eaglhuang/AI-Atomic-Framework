@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0018",
-  "updatedAt": "2026-09-12T00:04:29.883Z",
+  "updatedAt": "2026-09-12T14:27:01.100Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "node --strip-types tests/cli/public-npm-install-contract.test.ts",
@@ -10,6 +10,7 @@
     "validate:external-benchmark-protocol",
     "validate:npm-clean-install",
     "validate:package-skeleton",
+    "validate:public-npm-install",
     "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.4 --record-blocked"
   ],
   "staleValidationPasses": [],
@@ -232,6 +233,22 @@
       "durationMs": 11856,
       "runnerKind": "frozen-runner",
       "sourceCommit": "853ef120084ed076496836517925224ae4bb2fd4",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-public-npm-install.ts --package @ai-atomic-framework/cli --version 0.1.0-beta.5 --output docs/reports/atm-public-npm-install-proof-beta.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fb8b615457ce79268a0328800ccf819706a81e5d4fcbf3eb21e92e8b5721cc1c",
+      "stderrSha256": "sha256:a2b21ff37d439028a752f8b30ed86218b2b9766f6cf2464c2009f7b31aef88d0",
+      "validators": [
+        "validate:public-npm-install"
+      ],
+      "generatedAt": "2026-09-12T14:27:01.099Z",
+      "startedAt": "2026-09-12T14:26:54.330Z",
+      "finishedAt": "2026-09-12T14:27:01.099Z",
+      "durationMs": 6769,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "d76d866b3d78917fc9ac53637316720e688aa0b9",
       "cached": false
     }
   ],

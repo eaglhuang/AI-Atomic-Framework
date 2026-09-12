@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T14-29-26-806Z-close-4de53528fde1",
+  "taskId": "TASK-PRF-0018",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260911223038-codex-captain-TASK-PRF-0018-f9145264dc",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0018.json",
+  "taskSha256": "sha256:78ba30fd24c30430d31727cac6efbfa4439020302c95a9df40278a95bbfb61bc",
+  "createdAt": "2026-09-12T14:29:26.806Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0018 --actor codex-captain --status done --historical-delivery f16e22f6ebd954f482ed2e2c094c8ad9f24ad466",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260911223038-codex-captain-TASK-PRF-0018-f9145264dc",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0018.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "typecheck",
+      "validate:adopter-artifact-manifest",
+      "validate:external-benchmark-protocol",
+      "validate:npm-clean-install",
+      "validate:package-skeleton",
+      "validate:public-npm-install",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0-beta.4 --record-blocked"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "validate:external-benchmark-protocol",
+      "validate:package-skeleton",
+      "validate:public-npm-install"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-12T14:29:26.791Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0018.*",
+        ".atm/history/task-events/TASK-PRF-0018/**",
+        ".atm/history/tasks/TASK-PRF-0018.json",
+        "docs/reports/atm-external-benchmark-decision.md",
+        "docs/reports/atm-public-npm-install-proof-beta.md",
+        "scripts/build-package-dist.ts",
+        "scripts/fixtures/atm-external-benchmark/manifest.json",
+        "scripts/validate-package-skeleton.ts",
+        "scripts/validate-public-npm-install.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-package-dist.ts",
+        "scripts/fixtures/atm-external-benchmark/manifest.json",
+        "scripts/validate-package-skeleton.ts",
+        "scripts/validate-public-npm-install.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+        "validate:external-benchmark-protocol",
+        "validate:package-skeleton",
+        "validate:public-npm-install"
+      ]
+    }
+  }
+}
