@@ -148,7 +148,9 @@ async function main() {
     protectedBranch: option(args, '--branch') ?? DEFAULT_POLICY.protectedBranch,
   });
   process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-  if (report.claimStatus !== 'long-term-green') process.exitCode = 1;
+  // Report-only mode is for collecting a durable negative observation. The
+  // default remains a fail-closed gate for CI callers.
+  if (report.claimStatus !== 'long-term-green' && !args.includes('--report-only')) process.exitCode = 1;
 }
 
 if (process.argv[1]?.endsWith('measure-product-ci-burn-in.ts')) {
