@@ -74,6 +74,7 @@ observations on the same candidate SHA. This is command-backed by
 
 | Run | Classification | SHA | Product CI |
 | --- | --- | --- | --- |
+| 34701051186 | standard | `1bf079072a64` | success |
 | 34700199205 | release-candidate | `6193fd5e9733` | success |
 | 34700197148 | release-candidate | `6193fd5e9733` | success |
 | 34700101071 | standard | `6193fd5e9733` | success |
@@ -83,7 +84,6 @@ observations on the same candidate SHA. This is command-backed by
 | 34697745745 | standard | `d76d866b3d78` | success |
 | 34660413501 | standard | `bb5534aff793` | success |
 | 34660319435 | standard | `853ef120084e` | success |
-| 34660154388 | standard | `e25f07e58d3e` | success |
 
 The validator also confirmed that protected `main` requires the `Product CI`
 status. This section is the current observation; earlier sections remain
