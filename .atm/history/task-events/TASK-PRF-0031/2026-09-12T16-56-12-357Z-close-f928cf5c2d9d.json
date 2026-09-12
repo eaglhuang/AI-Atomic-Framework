@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T16-56-12-357Z-close-f928cf5c2d9d",
+  "taskId": "TASK-PRF-0031",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260912165303-codex-captain-TASK-PRF-0031-158b1d95ac",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0031.json",
+  "taskSha256": "sha256:002fda9ff025075a8fea4b86a845b2871f0372a43801f0f39109059c7e58013a",
+  "createdAt": "2026-09-12T16:56:12.357Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0031 --actor codex-captain --status done --historical-delivery 08627995ca1b4047171b1613cfa84e2e23aa3ccc",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260912165303-codex-captain-TASK-PRF-0031-158b1d95ac",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0031.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types tests/cli/product-ci-burn-in-schedule.test.ts",
+      "typecheck",
+      "validate:product-ci-burn-in-schedule"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/product-ci-burn-in-schedule.test.ts",
+      "typecheck",
+      "validate:product-ci-burn-in-schedule"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-12T16:56:12.346Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0031.*",
+        ".atm/history/task-events/TASK-PRF-0031/**",
+        ".atm/history/tasks/TASK-PRF-0031.json",
+        ".github/workflows/ci.yml",
+        "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+        "scripts/validate-product-ci-burn-in-schedule.ts",
+        "tests/cli/product-ci-burn-in-schedule.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-product-ci-burn-in-schedule.ts",
+        "tests/cli/product-ci-burn-in-schedule.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types tests/cli/product-ci-burn-in-schedule.test.ts",
+        "typecheck",
+        "validate:product-ci-burn-in-schedule"
+      ]
+    }
+  }
+}

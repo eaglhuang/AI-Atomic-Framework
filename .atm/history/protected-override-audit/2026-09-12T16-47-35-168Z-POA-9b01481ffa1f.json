@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-9b01481ffa1f",
+  "recordedAt": "2026-09-12T16:47:35.168Z",
+  "actorId": null,
+  "taskId": "TASK-PRF-0031",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\atm-product-proof\\tasks\\TASK-PRF-0031-product-ci-burn-in-retention-gate.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-TASK-PRF-0031-ed5b9a21cd",
+  "reason": "Force import would overwrite closed target-authority task history.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-12T16-47-35-167Z-EMG-TASK-PRF-0031-ed5b9a21cd.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
