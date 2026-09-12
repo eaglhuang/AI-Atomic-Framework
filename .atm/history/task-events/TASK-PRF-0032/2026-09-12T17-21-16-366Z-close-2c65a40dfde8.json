@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T17-21-16-366Z-close-2c65a40dfde8",
+  "taskId": "TASK-PRF-0032",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260912171447-codex-captain-TASK-PRF-0032-be8c99e51a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0032.json",
+  "taskSha256": "sha256:a17a670d5ebdb109f3f85aa6b2bbdd77bb84f4ba6c369d00efaa0cd8b29b6260",
+  "createdAt": "2026-09-12T17:21:16.366Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0032 --actor codex-captain --status done --historical-delivery e746248573972c994f271a737f5039e31ab43f8c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260912171447-codex-captain-TASK-PRF-0032-be8c99e51a",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0032.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-12T17:21:16.355Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0032.*",
+        ".atm/history/task-events/TASK-PRF-0032/**",
+        ".atm/history/tasks/TASK-PRF-0032.json",
+        "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+        "scripts/measure-product-ci-burn-in.ts",
+        "tests/cli/product-ci-burn-in.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/measure-product-ci-burn-in.ts",
+        "tests/cli/product-ci-burn-in.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
