@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0019",
+  "updatedAt": "2026-09-12T14:33:47.632Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/external-benchmark-decision.test.ts",
+    "node --strip-types tests/cli/external-benchmark-metrics.test.ts",
+    "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "validate:external-benchmark-decision",
+    "validate:external-benchmark-metrics",
+    "validate:external-benchmark-protocol"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-decision.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19cf1f8c3401c3d82d6a915ed31c73884ecceb25555f9f8f35bfb3e28309868b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-decision.test.ts"
+      ],
+      "generatedAt": "2026-09-12T14:31:39.057Z",
+      "startedAt": "2026-09-12T14:31:38.730Z",
+      "finishedAt": "2026-09-12T14:31:39.057Z",
+      "durationMs": 327,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5d70f7a789ca6776f11a957b9ce51487f268b24f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-metrics.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f27ab6c327030e234a09ace1f2d492045ebbdcc51c574dfe66f78b1e4956be9e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-metrics.test.ts"
+      ],
+      "generatedAt": "2026-09-12T14:31:42.571Z",
+      "startedAt": "2026-09-12T14:31:42.293Z",
+      "finishedAt": "2026-09-12T14:31:42.571Z",
+      "durationMs": 278,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5d70f7a789ca6776f11a957b9ce51487f268b24f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e6592d186ba2506be78325cc4da10c134c4c7fde219d2bcef36ed7ba9436b716",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-protocol.test.ts"
+      ],
+      "generatedAt": "2026-09-12T14:31:48.181Z",
+      "startedAt": "2026-09-12T14:31:45.767Z",
+      "finishedAt": "2026-09-12T14:31:48.181Z",
+      "durationMs": 2414,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5d70f7a789ca6776f11a957b9ce51487f268b24f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-external-benchmark-protocol.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4a8a35c0d7641b524cf2086602b386efa4062d35753f1001bcbc8b12c0b2e55d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:external-benchmark-protocol"
+      ],
+      "generatedAt": "2026-09-12T14:31:58.331Z",
+      "startedAt": "2026-09-12T14:31:57.922Z",
+      "finishedAt": "2026-09-12T14:31:58.331Z",
+      "durationMs": 409,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5d70f7a789ca6776f11a957b9ce51487f268b24f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-external-benchmark-metrics.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a860994f5127dfca51b8ebbc372d47fbd0fd27d152dd12c754e1e56c1b3edc53",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:external-benchmark-metrics"
+      ],
+      "generatedAt": "2026-09-12T14:33:44.419Z",
+      "startedAt": "2026-09-12T14:33:44.074Z",
+      "finishedAt": "2026-09-12T14:33:44.419Z",
+      "durationMs": 345,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5d70f7a789ca6776f11a957b9ce51487f268b24f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-external-benchmark-decision.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df7180d841176e1ab5a81215fb56ff30da94c5123ecd43df836bd4adf7bc265d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:external-benchmark-decision"
+      ],
+      "generatedAt": "2026-09-12T14:33:47.631Z",
+      "startedAt": "2026-09-12T14:33:47.297Z",
+      "finishedAt": "2026-09-12T14:33:47.631Z",
+      "durationMs": 334,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5d70f7a789ca6776f11a957b9ce51487f268b24f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
