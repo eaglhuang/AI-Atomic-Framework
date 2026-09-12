@@ -1,0 +1,245 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0021",
+  "title": "Restore advisory Dogfood lint health after duplicate import regression",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`status-triangulation.ts` has one import declaration per source module.",
+    "Lint and typecheck pass locally.",
+    "Product CI contract and local validator pass.",
+    "A post-remediation remote run shows advisory Dogfood lint success (or a separately documented, non-lint infrastructure failure).",
+    "TASK-PRF-0017's release-candidate burn-in count remains independently measured; this card cannot close that gate.",
+    "Diff is limited to the declared paths and governed evidence."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/status-triangulation.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "docs/reports/atm-product-ci-burn-in.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/status-triangulation.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "docs/reports/atm-product-ci-burn-in.md"
+  ],
+  "validators": [
+    "npm run lint",
+    "npm run typecheck",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "node --strip-types scripts/validate-ci-product-lane.ts --mode validate",
+    "node --strip-types scripts/validate-ci-product-lane.ts --remote"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "owner",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/status-triangulation.ts",
+        "tests/cli/ci-product-lane-contract.test.ts",
+        "docs/reports/atm-product-ci-burn-in.md"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0021-restore-advisory-dogfood-lint-health-after-duplicate-import-regression.task.md",
+    "sectionTitle": "TASK-PRF-0021",
+    "headingLine": 39,
+    "hash": "10f9df352ae52fa8",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0021-restore-advisory-dogfood-lint-health-after-duplicate-import-regression.task.md",
+      "planningCommitSha": "55d9a54e7df96283303e5f1f01bc4ed11c63e7ec",
+      "contentDigest": "sha256:10f9df352ae52fa85d03d3a0bb8d64886b936b5cfe281626e0e663e4a39e8860",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-12T16:25:28.131Z"
+    }
+  },
+  "importedAt": "2026-09-12T16:25:28.131Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.lint",
+      "command": "npm run lint",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.ci.product.lane.contract.test.ts",
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.ci.product.lane.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-ci-product-lane.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.ci.product.lane.ts.remote",
+      "command": "node --strip-types scripts/validate-ci-product-lane.ts --remote",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-12T16-27-53-720Z-close-3b389d1a1f13",
+  "lastTransitionAt": "2026-09-12T16:27:53.720Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-12T16:25:39.991Z",
+  "promotedAt": "2026-09-12T16:25:39.995Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-77aaf7395a2a",
+    "claimedAt": "2026-09-12T16:25:40.001Z",
+    "heartbeatAt": "2026-09-12T16:27:53.718Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0021.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "packages/cli/src/commands/tasks/status-triangulation.ts",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260912162540-codex-captain-ace18f534c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912162540-codex-captain-ace18f534c\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-09-12T16:25:40.001Z",
+  "startedByActor": "codex-captain",
+  "startedBySessionId": "session-20260912162540-codex-captain-TASK-PRF-0021-47bf209f3a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0021",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0021.*",
+      ".atm/history/task-events/TASK-PRF-0021/**",
+      ".atm/history/tasks/TASK-PRF-0021.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "packages/cli/src/commands/tasks/status-triangulation.ts",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7111d334724b8ed3f176cc53de8689c8a965defbd709534efb27b646c966c959",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260912162540-codex-captain-TASK-PRF-0021-47bf209f3a",
+    "laneSession": {
+      "laneSessionId": "lane-20260912162540-codex-captain-ace18f534c",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912162540-codex-captain-ace18f534c\""
+    },
+    "createdAt": "2026-09-12T16:25:41.946Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-12T16:27:53.718Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260912162540-codex-captain-TASK-PRF-0021-47bf209f3a",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0021.closure-packet.json"
+}

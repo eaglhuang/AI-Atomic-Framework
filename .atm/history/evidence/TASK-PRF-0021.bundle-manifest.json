@@ -1,0 +1,112 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0021",
+  "updatedAt": "2026-09-12T16:26:42.141Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "lint",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "typecheck",
+    "validate:ci-product-lane"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-12T16:26:03.192Z",
+      "startedAt": "2026-09-12T16:25:52.836Z",
+      "finishedAt": "2026-09-12T16:26:03.192Z",
+      "durationMs": 10356,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3da15140d10fb724f0591bf33a3cd8917b06a7ba",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-12T16:26:15.298Z",
+      "startedAt": "2026-09-12T16:26:06.281Z",
+      "finishedAt": "2026-09-12T16:26:15.298Z",
+      "durationMs": 9017,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3da15140d10fb724f0591bf33a3cd8917b06a7ba",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b41cd8e11144bfb101335f1339066c7e6c9da2dc1de5433c2fa88f793e137149",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-12T16:26:18.826Z",
+      "startedAt": "2026-09-12T16:26:18.438Z",
+      "finishedAt": "2026-09-12T16:26:18.826Z",
+      "durationMs": 388,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3da15140d10fb724f0591bf33a3cd8917b06a7ba",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-ci-product-lane.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:620fbd4f357afe6097f9913d42f6690b6840db31addca02d563f9976334fb01f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-09-12T16:26:22.208Z",
+      "startedAt": "2026-09-12T16:26:21.920Z",
+      "finishedAt": "2026-09-12T16:26:22.208Z",
+      "durationMs": 288,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3da15140d10fb724f0591bf33a3cd8917b06a7ba",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-ci-product-lane.ts --remote",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d1b7b48e620c65885e6d20f871d73a59622ef2ef8a01c9e37aded6e090b4ee1b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-09-12T16:26:33.335Z",
+      "startedAt": "2026-09-12T16:26:25.239Z",
+      "finishedAt": "2026-09-12T16:26:33.335Z",
+      "durationMs": 8096,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3da15140d10fb724f0591bf33a3cd8917b06a7ba",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-ci-product-lane.ts --remote",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d1b7b48e620c65885e6d20f871d73a59622ef2ef8a01c9e37aded6e090b4ee1b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-09-12T16:26:42.140Z",
+      "startedAt": "2026-09-12T16:26:34.438Z",
+      "finishedAt": "2026-09-12T16:26:42.140Z",
+      "durationMs": 7702,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "3da15140d10fb724f0591bf33a3cd8917b06a7ba",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

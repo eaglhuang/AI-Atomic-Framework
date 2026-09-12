@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T16-27-53-720Z-close-3b389d1a1f13",
+  "taskId": "TASK-PRF-0021",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260912162540-codex-captain-TASK-PRF-0021-47bf209f3a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0021.json",
+  "taskSha256": "sha256:71402983bdbf5db88c6cdb67df3ebf2f86ce20080edca6bc86b908d824992499",
+  "createdAt": "2026-09-12T16:27:53.720Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0021 --actor codex-captain --status done --historical-delivery ecb902f4c16f63b448d7396532e931435996e6ea",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260912162540-codex-captain-TASK-PRF-0021-47bf209f3a",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0021.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "typecheck",
+      "validate:ci-product-lane"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "typecheck",
+      "validate:ci-product-lane"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-12T16:27:53.711Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0021.*",
+        ".atm/history/task-events/TASK-PRF-0021/**",
+        ".atm/history/tasks/TASK-PRF-0021.json",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "packages/cli/src/commands/tasks/status-triangulation.ts",
+        "tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/status-triangulation.ts",
+        "tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+        "typecheck",
+        "validate:ci-product-lane"
+      ]
+    }
+  }
+}
