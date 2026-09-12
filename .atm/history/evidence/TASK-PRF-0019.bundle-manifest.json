@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0019",
-  "updatedAt": "2026-09-12T14:33:47.632Z",
+  "updatedAt": "2026-09-12T14:40:24.640Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "node --strip-types tests/cli/external-benchmark-decision.test.ts",
@@ -107,6 +107,22 @@
       "durationMs": 334,
       "runnerKind": "frozen-runner",
       "sourceCommit": "5d70f7a789ca6776f11a957b9ce51487f268b24f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-external-benchmark-protocol.ts --manifest scripts/fixtures/atm-external-benchmark/manifest.json --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4a8a35c0d7641b524cf2086602b386efa4062d35753f1001bcbc8b12c0b2e55d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:external-benchmark-protocol"
+      ],
+      "generatedAt": "2026-09-12T14:40:24.639Z",
+      "startedAt": "2026-09-12T14:40:24.091Z",
+      "finishedAt": "2026-09-12T14:40:24.639Z",
+      "durationMs": 548,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "aa7263c500b788045c65cc582f5a75a682ffd293",
       "cached": false
     }
   ],
