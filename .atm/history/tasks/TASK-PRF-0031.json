@@ -1,0 +1,305 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0031",
+  "title": "建立 Product CI 持續 burn-in 排程與 retention gate",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0030"
+  ],
+  "acceptance": [
+    "ACC-1: `ci.yml` schedules a daily protected-main burn-in and preserves the existing Product CI job.",
+    "ACC-2: The schedule has no npm publish, id-token, or contents-write permission and remains independent of ATM Dogfood diagnostics.",
+    "ACC-3: A deterministic validator/test proves the schedule, retention inputs, and fail-closed evaluator wiring; the burn-in report records the exact command to reproduce it."
+  ],
+  "deliverables": [
+    ".github/workflows/ci.yml",
+    "scripts/validate-product-ci-burn-in-schedule.ts",
+    "tests/cli/product-ci-burn-in-schedule.test.ts",
+    "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
+  ],
+  "scopePaths": [
+    ".github/workflows/ci.yml",
+    "scripts/validate-product-ci-burn-in-schedule.ts",
+    "tests/cli/product-ci-burn-in-schedule.test.ts",
+    "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/product-ci-burn-in-schedule.test.ts",
+    "node --strip-types scripts/validate-product-ci-burn-in-schedule.ts --mode validate",
+    "npm run typecheck",
+    "npm run lint"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove only the schedule/retention gate and preserve all prior burn-in reports.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release.product-ci-burn-in-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.release.product-ci-burn-in-schedule-policy",
+        "pattern": "Policy Object",
+        "source": "scripts/validate-product-ci-burn-in-schedule.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0031-product-ci-burn-in-retention-gate.task.md",
+    "sectionTitle": "TASK-PRF-0031",
+    "headingLine": 71,
+    "hash": "2d5d785050e2b033",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0031-product-ci-burn-in-retention-gate.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:2d5d785050e2b033d317ff14fa722c640dc11256c370d19b9e81786b01d22384",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-12T16:40:04.875Z"
+    }
+  },
+  "importedAt": "2026-09-12T16:40:04.875Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0030"
+    ],
+    "startConditions": [
+      "Product CI burn-in evaluator and fail-closed policy are already available.",
+      "The scheduled workflow must run on protected main without npm publish permissions."
+    ],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "product-ci-burn-in-schedule"
+    ],
+    "causalImpactEdges": [
+      "long-term-green-window-is-observable",
+      "burn-in-evidence-is-retained"
+    ],
+    "parallelFrontierInputs": [
+      "github-actions-scheduler"
+    ],
+    "validatorReferences": [
+      "test_prf_burn_in_schedule_contract_31a7f2c9"
+    ],
+    "phaseOwner": "phase-3-product-ci-burn-in"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_burn_in_schedule_contract_31a7f2c9",
+      "targetGroupId": null,
+      "semanticKey": "protected_main_burn_in_schedule_is_retained",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "long-term-green-window-is-observable",
+        "burn-in-evidence-is-retained"
+      ],
+      "expectedRedPredicate": "The workflow has no protected-main schedule, can publish packages, or omits the burn-in evaluator contract.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": null,
+      "resourceKey": null
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_burn_in_schedule_contract_31a7f2c9"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0030",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-12T16-46-05-537Z-close-bed398660e03",
+  "lastTransitionAt": "2026-09-12T16:46:05.537Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-12T16:40:21.083Z",
+  "promotedAt": "2026-09-12T16:40:21.087Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-b6c957bf2576",
+    "claimedAt": "2026-09-12T16:40:21.092Z",
+    "heartbeatAt": "2026-09-12T16:46:05.535Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0031.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/validate-product-ci-burn-in-schedule.ts",
+      "tests/cli/product-ci-burn-in-schedule.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260912164021-codex-captain-6b8f12ab37",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912164021-codex-captain-6b8f12ab37\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-09-12T16:40:21.092Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-130521e6966136ac",
+    "ticketDigest": "sha256:130521e6966136acb6199758d2a2e0066e35a7556990bb367b353719e320405b",
+    "taskId": "TASK-PRF-0031",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260912164021-codex-captain-6b8f12ab37",
+    "claimGeneration": "lease-b6c957bf2576",
+    "issuedAt": "2026-09-12T16:40:21.092Z",
+    "expiresAt": "2026-09-12T17:10:21.092Z",
+    "scopeDigest": "sha256:aa2062f8e1604472364d9326384e55f075912d6635ef7bba12d09a27435202f2",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-12T16:40:21.092Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0031.*",
+          ".atm/history/task-events/TASK-PRF-0031/**",
+          ".atm/history/tasks/TASK-PRF-0031.json",
+          ".github/workflows/ci.yml",
+          "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+          "scripts/validate-product-ci-burn-in-schedule.ts",
+          "tests/cli/product-ci-burn-in-schedule.test.ts"
+        ],
+        "digest": "sha256:9fa9b4e193dc2b216d80f035e7cefed0b844aa04b0a87c67fdb4df59fa1c398f"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260912164021-codex-captain-TASK-PRF-0031-b0276e1252",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0031",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0031.*",
+      ".atm/history/task-events/TASK-PRF-0031/**",
+      ".atm/history/tasks/TASK-PRF-0031.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/validate-product-ci-burn-in-schedule.ts",
+      "tests/cli/product-ci-burn-in-schedule.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a435a9598a8aff8354ed04e207b6d7aa5a49a0934360e2992872456dede765da",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260912164021-codex-captain-TASK-PRF-0031-b0276e1252",
+    "laneSession": {
+      "laneSessionId": "lane-20260912164021-codex-captain-6b8f12ab37",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912164021-codex-captain-6b8f12ab37\""
+    },
+    "createdAt": "2026-09-12T16:40:24.259Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-12T16:46:05.535Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260912164021-codex-captain-TASK-PRF-0031-b0276e1252",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0031.closure-packet.json"
+}

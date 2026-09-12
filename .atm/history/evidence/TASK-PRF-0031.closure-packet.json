@@ -1,0 +1,140 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0031",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "08627995ca1b4047171b1613cfa84e2e23aa3ccc",
+  "governedTreeSha": "29c8a0cb3ad28417661120865ee12fb48c6cd82f",
+  "targetCommitDelta": {
+    "currentCommitSha": "08627995ca1b4047171b1613cfa84e2e23aa3ccc",
+    "parentCommitShas": [
+      "08627995ca1b4047171b1613cfa84e2e23aa3ccc"
+    ],
+    "governedTreeSha": "29c8a0cb3ad28417661120865ee12fb48c6cd82f",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/task-events/TASK-PRF-0031/2026-09-12T16-40-05-118Z-import-a242c138bda4.json",
+      ".atm/history/task-events/TASK-PRF-0031/2026-09-12T16-40-21-083Z-reserve-1506053dc774.json",
+      ".atm/history/task-events/TASK-PRF-0031/2026-09-12T16-40-21-087Z-promote-b5b242845dab.json",
+      ".atm/history/task-events/TASK-PRF-0031/2026-09-12T16-40-24-260Z-claim-7a2399fec527.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0031.json",
+      ".github/workflows/ci.yml",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/validate-product-ci-burn-in-schedule.ts",
+      "tests/cli/product-ci-burn-in-schedule.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/product-ci-burn-in-schedule.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a741ad4305440ec14f24c081e28162759fff3595daa60f600c7bc2ad9d96a775",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-product-ci-burn-in-schedule.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0f5ca14af0b92f6b73a35f833ee5836d2659adef9a13832f50f680180447e0f7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "lint",
+    "node --strip-types tests/cli/product-ci-burn-in-schedule.test.ts",
+    "typecheck",
+    "validate:product-ci-burn-in-schedule"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "lint",
+    "node --strip-types tests/cli/product-ci-burn-in-schedule.test.ts",
+    "typecheck",
+    "validate:product-ci-burn-in-schedule"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-12T16:46:05.528Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0031.*",
+      ".atm/history/task-events/TASK-PRF-0031/**",
+      ".atm/history/tasks/TASK-PRF-0031.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/validate-product-ci-burn-in-schedule.ts",
+      "tests/cli/product-ci-burn-in-schedule.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validate-product-ci-burn-in-schedule.ts",
+      "tests/cli/product-ci-burn-in-schedule.test.ts"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/product-ci-burn-in-schedule.test.ts",
+      "typecheck",
+      "validate:product-ci-burn-in-schedule"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0031.json",
+  "closedAt": "2026-09-12T16:46:05.528Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260912164021-codex-captain-TASK-PRF-0031-b0276e1252",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "08627995ca1b4047171b1613cfa84e2e23aa3ccc",
+    "taskMatchedFiles": [
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/validate-product-ci-burn-in-schedule.ts",
+      "tests/cli/product-ci-burn-in-schedule.test.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
