@@ -1,0 +1,367 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0029",
+  "title": "Deepen CLI runtime boundary and reduce adopter bundle",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A provider-neutral runtime capability interface and deep-module review receipt exist before implementation; the deletion test shows that removing the boundary would redistribute policy across callers.",
+    "ACC-2: The core `atm` bin, library export, and declared command surface remain behaviorally equivalent in an isolated clean install with no workspace links.",
+    "ACC-3: The candidate reduces unpacked bytes and/or entry count against the beta5 baseline by a measured amount recorded in the manifest; no reduction is accepted if it weakens required behavior.",
+    "ACC-4: At least two concrete adapters (bundled core and optional capability provider) are exercised through the public interface; tests do not assert private internals.",
+    "ACC-5: The artifact manifest still rejects tests, CI fixtures, evidence ledgers, duplicate development source, and unresolved vendor imports.",
+    "ACC-6: Typecheck, lint, module-boundary, CLI-surface, clean-install, and focused artifact validators pass, with rollback evidence retained."
+  ],
+  "deliverables": [
+    "packages/cli/src/atm.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/build-package-dist.ts",
+    "scripts/validate-adopter-artifact-manifest.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "docs/reports/atm-public-npm-install-proof-beta.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/atm.ts",
+    "packages/cli/src/commands/command-specs.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/build-package-dist.ts",
+    "scripts/validate-adopter-artifact-manifest.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-product-ci-burn-in.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+    "node --strip-types scripts/validate-adopter-artifact-manifest.ts --mode validate",
+    "node --strip-types scripts/validate-npm-clean-install.ts",
+    "node --strip-types scripts/validate-cli.ts --mode surface",
+    "npm run validate:module-boundaries",
+    "npm run typecheck",
+    "npm run lint"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Restore the beta5 runtime boundary and generated manifest; retain baseline and failed-candidate evidence. Never relax the clean-install or forbidden-artifact gates to make a split pass.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-command-router-map",
+    "atomCid": "cid:atom.cli-command-router-map",
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-cli-command-router-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.cli.runtime-capability-boundary",
+        "pattern": "Provider-neutral deep module",
+        "source": "packages/cli/src/atm.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/command-specs.ts",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/validate-adopter-artifact-manifest.ts",
+        "tests/cli/public-npm-install-contract.test.ts",
+        "tests/cli/adopter-artifact-budget.test.ts",
+        "docs/reports/atm-public-npm-install-proof-beta.md",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "atomic_workbench/maps/atm-cli-command-router-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0029-deepen-cli-runtime-boundary-and-reduce-adopter-bundle.task.md",
+    "sectionTitle": "TASK-PRF-0029",
+    "headingLine": 111,
+    "hash": "f3f8f2f0fc9c778b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0029-deepen-cli-runtime-boundary-and-reduce-adopter-bundle.task.md",
+      "planningCommitSha": "6d568da1b68d0dfca296443990eee2b391f58a95",
+      "contentDigest": "sha256:f3f8f2f0fc9c778b53a308ba926f989441d1a7d9553211847a0bc060bf78ccb2",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-12T15:21:40.073Z"
+    }
+  },
+  "importedAt": "2026-09-12T15:21:40.073Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Published beta5 clean-install proof remains green.",
+      "Current npm runtime inventory and command surface are captured as the sealed baseline.",
+      "Deep-module review receipt passes before production implementation."
+    ],
+    "softRelations": [
+      "TASK-PRF-0006",
+      "TASK-PRF-0018"
+    ],
+    "changedPublicSeams": [
+      "cli-command-router",
+      "npm-runtime-boundary",
+      "adopter-artifact-manifest"
+    ],
+    "causalImpactEdges": [
+      "core-command-behavior-preserved",
+      "optional-capabilities-are-replaceable",
+      "adopter-bytes-decrease-without-forbidden-artifacts",
+      "clean-install-remains-independent-of-workspace-links"
+    ],
+    "parallelFrontierInputs": [
+      "beta5-public-npm-digest",
+      "beta5-artifact-inventory",
+      "cli-surface-baseline"
+    ],
+    "validatorReferences": [
+      "test_prf_runtime_boundary_equivalence_7e4a1c2b",
+      "test_prf_bundle_reduction_budget_3f9d2a81"
+    ],
+    "phaseOwner": "phase-4-adopter-bundle-minimisation"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_runtime_boundary_equivalence_7e4a1c2b",
+      "targetGroupId": "null",
+      "semanticKey": "runtime_boundary_equivalence",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "core-command-behavior-preserved",
+        "optional-capabilities-are-replaceable",
+        "clean-install-remains-independent-of-workspace-links"
+      ],
+      "expectedRedPredicate": "A command, library export, or clean-install smoke path changes behavior after the runtime boundary is split.",
+      "contributionResourceKey": "cli-runtime-equivalence",
+      "responsibility": "task-required",
+      "dependencyEdge": "runtime-boundary-to-cli-surface",
+      "contractEdge": "cli-command-router",
+      "resourceKey": "clean-install-environment"
+    },
+    {
+      "caseId": "test_prf_bundle_reduction_budget_3f9d2a81",
+      "targetGroupId": "null",
+      "semanticKey": "bundle_reduction_budget",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "adopter-bytes-decrease-without-forbidden-artifacts"
+      ],
+      "expectedRedPredicate": "The candidate does not improve the sealed baseline on unpacked bytes or ships a forbidden artifact class.",
+      "contributionResourceKey": "npm-runtime-budget",
+      "responsibility": "task-required",
+      "dependencyEdge": "runtime-closure-to-artifact-budget",
+      "contractEdge": "adopter-artifact-manifest",
+      "resourceKey": "beta5-baseline-inventory"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_runtime_boundary_equivalence_7e4a1c2b",
+    "test_prf_bundle_reduction_budget_3f9d2a81"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-12T15-21-55-952Z-claim-c920ae8c52f8",
+  "lastTransitionAt": "2026-09-12T15:21:55.952Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-12T15:21:53.863Z",
+  "promotedAt": "2026-09-12T15:21:53.867Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-10e4dd0da12b",
+    "claimedAt": "2026-09-12T15:21:53.878Z",
+    "heartbeatAt": "2026-09-12T15:21:53.878Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0029.json",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "packages/cli/src/atm.ts",
+      "packages/cli/src/commands/command-specs.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/validate-adopter-artifact-manifest.ts",
+      "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260912152153-codex-captain-f1e8250eac",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912152153-codex-captain-f1e8250eac\""
+    }
+  },
+  "startedAt": "2026-09-12T15:21:53.878Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-8c943dd9e762f24a",
+    "ticketDigest": "sha256:8c943dd9e762f24a4f0e69c1a08bb799f3e0c8aec8b139e36c0d573441755d95",
+    "taskId": "TASK-PRF-0029",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260912152153-codex-captain-f1e8250eac",
+    "claimGeneration": "lease-10e4dd0da12b",
+    "issuedAt": "2026-09-12T15:21:53.878Z",
+    "expiresAt": "2026-09-12T15:51:53.878Z",
+    "scopeDigest": "sha256:13046c203dd59acac4ccecaae3ac067f53159970d793bc244be7ba623950107a",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-12T15:21:53.878Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0029.*",
+          ".atm/history/task-events/TASK-PRF-0029/**",
+          ".atm/history/tasks/TASK-PRF-0029.json",
+          "docs/reports/atm-public-npm-install-proof-beta.md",
+          "packages/cli/src/atm.ts",
+          "packages/cli/src/commands/command-specs.ts",
+          "scripts/build-cli-npm-runtime.ts",
+          "scripts/build-package-dist.ts",
+          "scripts/validate-adopter-artifact-manifest.ts",
+          "tests/cli/adopter-artifact-budget.test.ts",
+          "tests/cli/public-npm-install-contract.test.ts"
+        ],
+        "digest": "sha256:7636f73868a2c6faa2acc271519b452c43fd782731575e1bd61ca805503d3f3c"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260912152153-codex-captain-TASK-PRF-0029-cca922846b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0029",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0029.*",
+      ".atm/history/task-events/TASK-PRF-0029/**",
+      ".atm/history/tasks/TASK-PRF-0029.json",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "packages/cli/src/atm.ts",
+      "packages/cli/src/commands/command-specs.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/validate-adopter-artifact-manifest.ts",
+      "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "080c1b04148172ac64a7e5d4f316a409813f8e935567ada3889985711d5a59c9",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260912152153-codex-captain-TASK-PRF-0029-cca922846b",
+    "laneSession": {
+      "laneSessionId": "lane-20260912152153-codex-captain-f1e8250eac",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912152153-codex-captain-f1e8250eac\""
+    },
+    "createdAt": "2026-09-12T15:21:55.951Z",
+    "status": "active"
+  }
+}
