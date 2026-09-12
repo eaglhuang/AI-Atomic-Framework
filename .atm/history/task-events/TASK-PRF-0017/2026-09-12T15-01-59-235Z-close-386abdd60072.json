@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T15-01-59-235Z-close-386abdd60072",
+  "taskId": "TASK-PRF-0017",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260912144443-codex-captain-TASK-PRF-0017-ddbddf400b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0017.json",
+  "taskSha256": "sha256:f126f2b7caa968ba0e6af48aa75c3c987d38b379108cd5e9cd7e18328525f49e",
+  "createdAt": "2026-09-12T15:01:59.235Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0017 --actor codex-captain --status done --historical-delivery 29635d942a261775395a69d564f4a976f15cece0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260912144443-codex-captain-TASK-PRF-0017-ddbddf400b",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0017.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "typecheck",
+      "validate:ci-product-lane"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "typecheck",
+      "validate:ci-product-lane"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-12T15:01:59.219Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0017.*",
+        ".atm/history/task-events/TASK-PRF-0017/**",
+        ".atm/history/tasks/TASK-PRF-0017.json",
+        ".github/workflows/ci.yml",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "scripts/validate-ci-product-lane.ts",
+        "tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-ci-product-lane.ts",
+        "tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+        "typecheck",
+        "validate:ci-product-lane"
+      ]
+    }
+  }
+}

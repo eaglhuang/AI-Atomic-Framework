@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0017",
   "title": "Restore protected-main Product CI burn-in after remote failure",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0014",
@@ -201,8 +201,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-12T14-59-51-544Z-renew-9bf354d55f86",
-  "lastTransitionAt": "2026-09-12T14:59:51.544Z",
+  "lastTransitionId": "2026-09-12T15-01-59-235Z-close-386abdd60072",
+  "lastTransitionAt": "2026-09-12T15:01:59.235Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-12T14:44:43.089Z",
@@ -211,7 +211,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-59947c0146d0",
     "claimedAt": "2026-09-12T14:44:43.100Z",
-    "heartbeatAt": "2026-09-12T14:59:51.055Z",
+    "heartbeatAt": "2026-09-12T15:01:59.233Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0017.json",
@@ -220,13 +220,14 @@
       "scripts/validate-ci-product-lane.ts",
       "tests/cli/ci-product-lane-contract.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260912144443-codex-captain-4070f96a99",
       "status": "adopted",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912144443-codex-captain-4070f96a99\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-12T14:44:43.100Z",
   "startedByActor": "codex-captain",
@@ -326,5 +327,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  }
+  },
+  "closedAt": "2026-09-12T15:01:59.233Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260912144443-codex-captain-TASK-PRF-0017-ddbddf400b",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0017.closure-packet.json"
 }
