@@ -1,0 +1,296 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0032",
+  "title": "建立 Product CI burn-in baseline boundary 與歷史失敗分層",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0031"
+  ],
+  "acceptance": [
+    "ACC-1: The evaluator accepts a declared baseline boundary bound to protected-main SHA and timestamp.",
+    "ACC-2: Pre-baseline failures remain reported as historical, while post-baseline failures still fail the green claim.",
+    "ACC-3: Tests prove missing, malformed, and valid-boundary behavior without weakening the 90-run/30-day thresholds."
+  ],
+  "deliverables": [
+    "scripts/measure-product-ci-burn-in.ts",
+    "tests/cli/product-ci-burn-in.test.ts",
+    "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
+  ],
+  "scopePaths": [
+    "scripts/measure-product-ci-burn-in.ts",
+    "tests/cli/product-ci-burn-in.test.ts",
+    "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+    "npm run typecheck",
+    "npm run lint"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert baseline-boundary option and preserve raw historical run records.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release.product-ci-burn-in-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.release.product-ci-burn-in-baseline-policy",
+        "pattern": "Policy Object",
+        "source": "scripts/measure-product-ci-burn-in.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0032-product-ci-burn-in-baseline-boundary.task.md",
+    "sectionTitle": "TASK-PRF-0032",
+    "headingLine": 73,
+    "hash": "9956c69979116bd1",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0032-product-ci-burn-in-baseline-boundary.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:9956c69979116bd195916eed7666fae3aed0649e885322ce40a0ca2ba7253ef0",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-12T17:14:35.371Z"
+    }
+  },
+  "importedAt": "2026-09-12T17:14:35.371Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0031"
+    ],
+    "startConditions": [
+      "Product CI daily schedule is deployed on protected main.",
+      "Existing burn-in history contains pre-remediation failures that must remain visible."
+    ],
+    "softRelations": [],
+    "changedPublicSeams": [
+      "product-ci-burn-in-baseline-boundary"
+    ],
+    "causalImpactEdges": [
+      "post-remediation-green-window-is-measurable",
+      "historical-failures-remain-auditable"
+    ],
+    "parallelFrontierInputs": [
+      "github-actions-history"
+    ],
+    "validatorReferences": [
+      "test_prf_burn_in_baseline_boundary_5d9c1f0a"
+    ],
+    "phaseOwner": "phase-3-product-ci-burn-in"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_burn_in_baseline_boundary_5d9c1f0a",
+      "targetGroupId": "null",
+      "semanticKey": "post_remediation_failures_are_separated_from_historical_failures",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "post-remediation-green-window-is-measurable",
+        "historical-failures-remain-auditable"
+      ],
+      "expectedRedPredicate": "Historical failures before the declared baseline are counted as post-remediation failures or the baseline is accepted without evidence.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "burn-in-baseline-boundary",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_burn_in_baseline_boundary_5d9c1f0a"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0031",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-12T17-19-36-858Z-renew-462c31f1aaa8",
+  "lastTransitionAt": "2026-09-12T17:19:36.858Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-12T17:14:47.058Z",
+  "promotedAt": "2026-09-12T17:14:47.064Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-5ea104ec3166",
+    "claimedAt": "2026-09-12T17:14:47.068Z",
+    "heartbeatAt": "2026-09-12T17:19:36.352Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0032.json",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/product-ci-burn-in.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260912171447-codex-captain-1264860802",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912171447-codex-captain-1264860802\""
+    }
+  },
+  "startedAt": "2026-09-12T17:14:47.068Z",
+  "startedByActor": "codex-captain",
+  "startedBySessionId": "session-20260912171447-codex-captain-TASK-PRF-0032-be8c99e51a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0032",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0032.*",
+      ".atm/history/task-events/TASK-PRF-0032/**",
+      ".atm/history/tasks/TASK-PRF-0032.json",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/product-ci-burn-in.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3466e0665e68581449b4c41ac3ba892310667681afda223f3014c4571738a9e0",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260912171447-codex-captain-TASK-PRF-0032-be8c99e51a",
+    "laneSession": {
+      "laneSessionId": "lane-20260912171447-codex-captain-1264860802",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912171447-codex-captain-1264860802\""
+    },
+    "createdAt": "2026-09-12T17:14:50.468Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-a3904936745d2aa4",
+    "ticketDigest": "sha256:a3904936745d2aa4dd1617de3ca64b70bf07d6df955bc9420dcb5c5b43593cba",
+    "taskId": "TASK-PRF-0032",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260912171447-codex-captain-1264860802",
+    "claimGeneration": "lease-5ea104ec3166",
+    "issuedAt": "2026-09-12T17:19:36.352Z",
+    "expiresAt": "2026-09-12T17:49:36.352Z",
+    "scopeDigest": "sha256:c7792bf0cd11a6183ac64370a44fac12a64fa9c940b458d4ccc15f60623ef7a9",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-12T17:19:36.352Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0032.*",
+          ".atm/history/task-events/TASK-PRF-0032/**",
+          ".atm/history/tasks/TASK-PRF-0032.json",
+          "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+          "scripts/measure-product-ci-burn-in.ts",
+          "tests/cli/product-ci-burn-in.test.ts"
+        ],
+        "digest": "sha256:b15d9d715608fb250a8026c74c7aea2c8efa5aa713fc63f2cc63b938edd0b17f"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

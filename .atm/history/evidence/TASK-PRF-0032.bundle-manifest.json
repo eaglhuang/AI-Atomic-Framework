@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0032",
+  "updatedAt": "2026-09-12T17:16:36.812Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "lint",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:55c8c5d3886f01b7a71c93ceb8a97df34b5bfa425a4b1d615dda79481fd44ec7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/product-ci-burn-in.test.ts"
+      ],
+      "generatedAt": "2026-09-12T17:16:11.194Z",
+      "startedAt": "2026-09-12T17:16:10.881Z",
+      "finishedAt": "2026-09-12T17:16:11.194Z",
+      "durationMs": 313,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "558f11cca4dd034305ab4ea6a36209861634e924",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-12T17:16:23.246Z",
+      "startedAt": "2026-09-12T17:16:14.207Z",
+      "finishedAt": "2026-09-12T17:16:23.246Z",
+      "durationMs": 9039,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "558f11cca4dd034305ab4ea6a36209861634e924",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-12T17:16:36.811Z",
+      "startedAt": "2026-09-12T17:16:26.447Z",
+      "finishedAt": "2026-09-12T17:16:36.811Z",
+      "durationMs": 10364,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "558f11cca4dd034305ab4ea6a36209861634e924",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

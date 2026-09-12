@@ -17,6 +17,10 @@ export type BurnInPolicy = {
   minCompletedRuns: number;
   minCalendarDays: number;
   protectedBranch: string;
+  /** Optional immutable remediation boundary. Runs before it remain historical evidence. */
+  baselineAt?: string;
+  /** Protected-main commit that establishes the remediation boundary. */
+  baselineSha?: string;
 };
 
 const DEFAULT_POLICY: BurnInPolicy = {
@@ -78,7 +82,14 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
   const policy = { ...DEFAULT_POLICY, ...suppliedPolicy };
   const sourceDigest = digest(input);
   try {
-    const runs = validateRuns(input, policy);
+    const allRuns = validateRuns(input, policy);
+    const baselineTimestamp = policy.baselineAt ? parseDate(policy.baselineAt, 'baselineAt') : null;
+    if (policy.baselineSha && !/^[0-9a-f]{7,64}$/i.test(policy.baselineSha)) throw new Error('invalid-baselineSha');
+    if (baselineTimestamp !== null && !policy.baselineSha) throw new Error('baselineSha-required-with-baselineAt');
+    if (policy.baselineSha && baselineTimestamp === null) throw new Error('baselineAt-required-with-baselineSha');
+    const runs = baselineTimestamp === null ? allRuns : allRuns.filter((run) => parseDate(run.createdAt, `createdAt-${run.databaseId}`) >= baselineTimestamp);
+    if (baselineTimestamp !== null && runs.length === 0) throw new Error('baseline-no-post-boundary-runs');
+    if (baselineTimestamp !== null && !runs.some((run) => run.headSha.toLowerCase() === policy.baselineSha!.toLowerCase())) throw new Error('baselineSha-not-observed-on-protected-main');
     const newest = parseDate(runs[0].createdAt, 'newest-createdAt');
     const oldest = parseDate(runs[runs.length - 1].createdAt, 'oldest-createdAt');
     const calendarDays = (newest - oldest) / 86_400_000;
@@ -108,6 +119,10 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
         failedRuns,
         currentConsecutiveSuccessStreak: streak,
         releaseCandidateRuns,
+        historicalRunCount: allRuns.length - runs.length,
+        postBaselineRunCount: runs.length,
+        baselineAt: policy.baselineAt ?? null,
+        baselineSha: policy.baselineSha ?? null,
       },
       claimStatus,
       reasons,
@@ -146,6 +161,8 @@ async function main() {
     minCompletedRuns: Number(option(args, '--min-runs') ?? DEFAULT_POLICY.minCompletedRuns),
     minCalendarDays: Number(option(args, '--min-days') ?? DEFAULT_POLICY.minCalendarDays),
     protectedBranch: option(args, '--branch') ?? DEFAULT_POLICY.protectedBranch,
+    baselineAt: option(args, '--baseline-at'),
+    baselineSha: option(args, '--baseline-sha'),
   });
   process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   // Report-only mode is for collecting a durable negative observation. The

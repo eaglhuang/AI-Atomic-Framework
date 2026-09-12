@@ -42,4 +42,21 @@ const nonProtected = evaluateBurnIn([run(4, '2026-02-01T00:00:00Z', 'success', {
 assert.equal(nonProtected.claimStatus, 'invalid-input');
 assert.ok(nonProtected.reasons.includes('record-4-non-protected-branch'));
 
-console.log('product-ci-burn-in tests: 5/5 passed');
+const bounded = evaluateBurnIn([
+  run(5, '2026-02-03T00:00:00Z', 'success', { headSha: 'bbbbbbb' + 'a'.repeat(57) }),
+  run(4, '2026-02-02T00:00:00Z', 'failure'),
+  run(3, '2026-02-01T00:00:00Z', 'failure'),
+], { minCompletedRuns: 1, minCalendarDays: 0, baselineAt: '2026-02-02T12:00:00Z', baselineSha: 'bbbbbbb' + 'a'.repeat(57) });
+assert.equal(bounded.claimStatus, 'long-term-green');
+assert.equal(bounded.observed?.historicalRunCount, 2);
+assert.equal(bounded.observed?.postBaselineRunCount, 1);
+
+const missingBoundaryBinding = evaluateBurnIn(base, { minCompletedRuns: 1, minCalendarDays: 0, baselineAt: '2026-01-01T00:00:00Z' });
+assert.equal(missingBoundaryBinding.claimStatus, 'invalid-input');
+assert.ok(missingBoundaryBinding.reasons.includes('baselineSha-required-with-baselineAt'));
+
+const missingBoundaryCommit = evaluateBurnIn(base, { minCompletedRuns: 1, minCalendarDays: 0, baselineAt: '2026-03-01T00:00:00Z', baselineSha: base[0].headSha });
+assert.equal(missingBoundaryCommit.claimStatus, 'invalid-input');
+assert.ok(missingBoundaryCommit.reasons.includes('baseline-no-post-boundary-runs'));
+
+console.log('product-ci-burn-in tests: 8/8 passed');
