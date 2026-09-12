@@ -1,0 +1,90 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T15-49-57-607Z-close-8648f879cc03",
+  "taskId": "TASK-PRF-0029",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260912153241-codex-captain-TASK-PRF-0029-c781f5d3bf",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0029.json",
+  "taskSha256": "sha256:c91cd492cddfa4a149c03a68cfc727e2f7717a9c62928ca49c18e58ecdfc8849",
+  "createdAt": "2026-09-12T15:49:57.607Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0029 --actor codex-captain --status done --historical-delivery 19d893ffdb17a63b31a02b861585356308f1e5bd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260912153241-codex-captain-TASK-PRF-0029-c781f5d3bf",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0029.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "typecheck",
+      "validate:adopter-artifact-manifest",
+      "validate:cli",
+      "validate:module-boundaries",
+      "validate:npm-clean-install",
+      "validate:public-npm-install"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "typecheck",
+      "validate:adopter-artifact-manifest",
+      "validate:cli",
+      "validate:module-boundaries",
+      "validate:npm-clean-install"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-12T15:49:57.595Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0029.*",
+        ".atm/history/task-events/TASK-PRF-0029/**",
+        ".atm/history/tasks/TASK-PRF-0029.json",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "docs/reports/atm-public-npm-install-proof-beta.md",
+        "package.json",
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/command-specs.ts",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/validate-adopter-artifact-manifest.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/adopter-artifact-budget.test.ts",
+        "tests/cli/npm-clean-install.test.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/command-specs.ts",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/validate-adopter-artifact-manifest.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/adopter-artifact-budget.test.ts",
+        "tests/cli/npm-clean-install.test.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+        "typecheck",
+        "validate:adopter-artifact-manifest",
+        "validate:cli",
+        "validate:module-boundaries",
+        "validate:npm-clean-install"
+      ]
+    }
+  }
+}

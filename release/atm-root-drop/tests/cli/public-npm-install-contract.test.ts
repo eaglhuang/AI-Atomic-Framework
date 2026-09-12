@@ -11,6 +11,7 @@ assert.equal(proof.publicRegistry, false);
 assert.equal(proof.usedWorkspaceLink, undefined);
 
 const validatorSource = await import('node:fs').then(({ readFileSync }) => readFileSync(new URL('../../scripts/validate-public-npm-install.ts', import.meta.url), 'utf8'));
+assert.match(validatorSource, /value\('--version', '0\.1\.0-beta\.5'\)/, 'public npm validator must default to the latest published beta train');
 assert.match(validatorSource, /\['dist\.tarball'\]/, 'validator must accept npm view flat dist.tarball metadata');
 assert.match(validatorSource, /shell: process\.platform === 'win32'/, 'validator must execute Windows .cmd bins through the shell');
 assert.match(validatorSource, /dist\.unpackedSize/, 'validator must read public unpacked size metadata');

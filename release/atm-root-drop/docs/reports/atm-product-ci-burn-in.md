@@ -64,6 +64,31 @@ live GitHub API before making a release or product claim.
 | 33024565507 | standard | `b8cdf3c727e6` | success |
 | 33024563526 | standard | `b8cdf3c727e6` | success |
 
+## TASK-PRF-0017 current remote observation
+
+Live GitHub API verification on 2026-09-12 passed after two explicit
+`workflow_dispatch` release-candidate runs. The ten newest `ci` runs on `main`
+all have a successful `Product CI` job, and the first two are release-candidate
+observations on the same candidate SHA. This is command-backed by
+`node --strip-types scripts/validate-ci-product-lane.ts --remote`.
+
+| Run | Classification | SHA | Product CI |
+| --- | --- | --- | --- |
+| 34701051186 | standard | `1bf079072a64` | success |
+| 34700199205 | release-candidate | `6193fd5e9733` | success |
+| 34700197148 | release-candidate | `6193fd5e9733` | success |
+| 34700101071 | standard | `6193fd5e9733` | success |
+| 34700037212 | standard | `ab4f01b53c90` | success |
+| 34699711882 | standard | `aa7263c500b7` | success |
+| 34699465910 | standard | `5d70f7a789ca` | success |
+| 34697745745 | standard | `d76d866b3d78` | success |
+| 34660413501 | standard | `bb5534aff793` | success |
+| 34660319435 | standard | `853ef120084e` | success |
+
+The validator also confirmed that protected `main` requires the `Product CI`
+status. This section is the current observation; earlier sections remain
+historical and are not used as substitutes.
+
 ## TASK-PRF-0014 current remote observation
 
 Read-only GitHub inspection on 2026-09-10 disproves a current green burn-in

@@ -15,7 +15,12 @@ function parseArgs(): Args {
     return i >= 0 ? argv[i + 1] : fallback;
   };
   const packageName = value('--package', '@ai-atomic-framework/cli');
-  const version = value('--version', '0.1.0');
+  // The framework source manifests retain the next stable train version, but
+  // the public CLI is currently released from the beta train. Keep the
+  // default aligned with the latest published package so a bare validator
+  // invocation exercises the real registry artifact instead of an unpublished
+  // placeholder version.
+  const version = value('--version', '0.1.0-beta.5');
   if (!packageName || !version) throw new Error('--package and --version are required');
   return { packageName, version, output: value('--output'), recordBlocked: argv.includes('--record-blocked') };
 }

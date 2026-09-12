@@ -736,6 +736,7 @@
     "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
     "release/atm-root-drop/docs/reports/atm-2-1-paired-ab-v4.md",
     "release/atm-root-drop/docs/reports/atm-2-1-real-parallel-dogfood.md",
+    "release/atm-root-drop/docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
     "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
     "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
     "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
@@ -4810,6 +4811,8 @@
     "release/atm-root-drop/scripts/validate-evidence-ledger-boundary.ts",
     "release/atm-root-drop/scripts/validate-examples.ts",
     "release/atm-root-drop/scripts/validate-experience-loop.ts",
+    "release/atm-root-drop/scripts/validate-external-benchmark-decision.ts",
+    "release/atm-root-drop/scripts/validate-external-benchmark-metrics.ts",
     "release/atm-root-drop/scripts/validate-external-benchmark-protocol.ts",
     "release/atm-root-drop/scripts/validate-external-core-pipeline.ts",
     "release/atm-root-drop/scripts/validate-external-golden.ts",
@@ -6144,8 +6147,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1482,
-    "unchanged": 4627,
+    "copied": 1486,
+    "unchanged": 4626,
     "removed": 0
   },
   "buildMode": "full",
@@ -12496,8 +12499,17 @@
         "replaceable": true
       },
       {
+        "path": "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+        "digest": "3db93f644b87425828913133dc544b23ae491ba2b87fc7b6c6578e048e969e13",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "docs/reports/atm-external-benchmark-decision.md",
-        "digest": "38d628039ebea1bdd5ac2a6727f2ece31acdf216d10c45ccdfe2fc46f3e88cff",
+        "digest": "c3141f5bbf95b4c228ed9aef4b4000cc7f085d82478fa78533c8e6c7ec7c8077",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-external-benchmark-decision.md"
@@ -12533,7 +12545,7 @@
       },
       {
         "path": "docs/reports/atm-product-ci-burn-in.md",
-        "digest": "e95b325e1bfcbd571f047739318fb12880e549dcec11334610357cad56250331",
+        "digest": "f7175df0cd9dd8c17d30ac9753f6be596949272c99d2db5c755f2797f1e1fdea",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-ci-burn-in.md"
@@ -12542,7 +12554,7 @@
       },
       {
         "path": "docs/reports/atm-public-npm-install-proof-beta.md",
-        "digest": "01f72d67f677d07e3361cd914cf30633352028cdb880138937deedeb0d1db03a",
+        "digest": "de7773d1d30fac1c5a8c759cc5e3607decbbcdb721564616273f480ed821528e",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-public-npm-install-proof-beta.md"
@@ -16394,7 +16406,7 @@
       },
       {
         "path": "package.json",
-        "digest": "234bc0e993a1a6f03568ff8866466fd54cc10d23a76b188899229b556d86817e",
+        "digest": "d7a5ef8c454821212c2904edac6b253f7c1ad0a2417c2ed791a32ec0e7c2940b",
         "origin": "source",
         "inputPaths": [
           "package.json"
@@ -47336,7 +47348,7 @@
       },
       {
         "path": "scripts/fixtures/atm-external-benchmark/manifest.json",
-        "digest": "6de75bc48977b538a7c5451d6863f7b46968a37ddaa925ca6a20b20521987ca6",
+        "digest": "c63888b34a4927851cdea1e6d6b05166537c3a3676343edd00fe2b385e9c2f5c",
         "origin": "source",
         "inputPaths": [
           "scripts/fixtures/atm-external-benchmark/manifest.json"
@@ -49153,6 +49165,24 @@
         "replaceable": true
       },
       {
+        "path": "scripts/validate-external-benchmark-decision.ts",
+        "digest": "dd9e6a03f8e26d64f63267a3574dd00a77a4f8331e47efb981dd43c050abbe5f",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/validate-external-benchmark-decision.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/validate-external-benchmark-metrics.ts",
+        "digest": "4a834daaa842d66bceb65a4ef277067b93861ee06c231f804cd2c1361059cb98",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/validate-external-benchmark-metrics.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/validate-external-benchmark-protocol.ts",
         "digest": "f734239ce905a878856abe906dc014c0ae94c38fcc2a2f01ea75ed61ea6b0918",
         "origin": "source",
@@ -49388,7 +49418,7 @@
       },
       {
         "path": "scripts/validate-governance-commands/implementation.ts",
-        "digest": "059a10d804076e6bcb4a165bf16234d5ca7eec864a8aad478dc57d014025f564",
+        "digest": "08070175468c20b29c5b86f03cdfe00b13bf4c1d29307260c0b82e5cf6567f59",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-governance-commands/implementation.ts"
@@ -50225,7 +50255,7 @@
       },
       {
         "path": "scripts/validate-public-npm-install.ts",
-        "digest": "e3e8ec80914be6de339deae91da7aefb66da108868a8b19f6df5f0469266f9cf",
+        "digest": "af9d11a21c8b9240c7334e5553daa02866f88b8b995b2fd2abee3255af1de1c5",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-public-npm-install.ts"
@@ -55040,7 +55070,7 @@
       },
       {
         "path": "tests/cli/npm-clean-install.test.ts",
-        "digest": "e8ee7120ee3ab73f07510a669f1b5db2331005c303aa955482971cf0e65615a4",
+        "digest": "d094cb08b763c452d09f2e277115fa7f26d58115a8eaa50d7ef28101669fa7ea",
         "origin": "source",
         "inputPaths": [
           "tests/cli/npm-clean-install.test.ts"
@@ -56327,7 +56357,7 @@
       },
       {
         "path": "tests/cli/public-npm-install-contract.test.ts",
-        "digest": "2ce13006247cf6648e65e9c21f9ba447a0468a2fa57cba5554d84fef1faa0f81",
+        "digest": "fc6508c11ca44253457f5715c37a3f68c6440b93a5c042bd752af98a09f0b56c",
         "origin": "source",
         "inputPaths": [
           "tests/cli/public-npm-install-contract.test.ts"
@@ -61132,7 +61162,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:fe3d940cfce9b5558782e6fc4788bffbe9086ecfe23b9a382a5cf060df8cafe8"
+    "treeDigest": "sha256:008a09df579bda080834ea49569400489f8f8c439579120be9093b58502c9783"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62677,7 +62707,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:a528d36b8993587ac1ef4b862cf240740c4f3a62e4ce3c60f8324dbd9764abcf"
+    "digest": "sha256:bb44b21b201443e32b4060ef2887402e76cb7ed436b170ddc25d0e414990361b"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63387,6 +63417,7 @@
       "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
       "release/atm-root-drop/docs/reports/atm-2-1-paired-ab-v4.md",
       "release/atm-root-drop/docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "release/atm-root-drop/docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
       "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
       "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
       "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
@@ -67461,6 +67492,8 @@
       "release/atm-root-drop/scripts/validate-evidence-ledger-boundary.ts",
       "release/atm-root-drop/scripts/validate-examples.ts",
       "release/atm-root-drop/scripts/validate-experience-loop.ts",
+      "release/atm-root-drop/scripts/validate-external-benchmark-decision.ts",
+      "release/atm-root-drop/scripts/validate-external-benchmark-metrics.ts",
       "release/atm-root-drop/scripts/validate-external-benchmark-protocol.ts",
       "release/atm-root-drop/scripts/validate-external-core-pipeline.ts",
       "release/atm-root-drop/scripts/validate-external-golden.ts",
@@ -68798,22 +68831,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:c9f249ee98d4bdc567ba1faa6498948069b8b8051f148e804726470f985c2fad",
-  "sealedSourceCommit": "a3de11e68ac13de97c1032985b3497748d8fad81",
+  "buildInputsTreeHash": "sha256:81447408b1195536936789beba429a3299d84646f6f6e22493d4b4062a18cd46",
+  "sealedSourceCommit": "19d893ffdb17a63b31a02b861585356308f1e5bd",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:255042ffca1d4449b771ea9ec576ad5ce2918bd0632eece847ac727600f34626",
+  "incrementalPlanDigest": "sha256:cfd6f058b3c07e3009345068338cf79c4f481549ee1b308c1a4c04a9a6abd8b8",
   "tsBuildCacheDigest": "sha256:1c4a05cbc91185aa531a574d51cc7c4fc0e69121f9874affd3c8a51ad76bcc71",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 47,
-    "skipDecision": 47,
-    "worktreeSetup": 8922,
-    "typescriptBuild": 11439,
-    "rootDropReleaseAssembly": 30369,
-    "onefileReleaseAssembly": 9983,
-    "artifactSync": 5610,
+    "inputHashCalculation": 35,
+    "skipDecision": 48,
+    "worktreeSetup": 11427,
+    "typescriptBuild": 12832,
+    "rootDropReleaseAssembly": 34810,
+    "onefileReleaseAssembly": 13848,
+    "artifactSync": 8287,
     "cleanup": 0,
-    "totalElapsed": 75067
+    "totalElapsed": 95876
   }
 }
