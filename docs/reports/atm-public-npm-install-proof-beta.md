@@ -34,3 +34,14 @@ does not satisfy the slim-runtime artifact contract. The same validator reported
 
 This establishes the baseline: a published version exists, but the required
 small-package proof still depends on publishing beta5 (or a later slim release).
+
+## External release prerequisite
+
+The release workflow already has an `NPM_TOKEN` secret, but the tag run
+`34659077708` failed at the registry `PUT` with npm `E404` (permission denied).
+The next operator action is external to this repository: replace that secret with
+a token that can publish `@ai-atomic-framework/cli` (and satisfies the account's
+2FA policy), or configure npm trusted publishing for this GitHub repository and
+workflow. After that change, rerun the existing release workflow and regenerate
+this proof against the newly published version; do not treat beta4 as a valid
+slim-runtime substitute.
