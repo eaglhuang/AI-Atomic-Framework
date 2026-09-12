@@ -1,0 +1,112 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0017",
+  "updatedAt": "2026-09-12T14:54:38.690Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "lint",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "typecheck",
+    "validate:ci-product-lane"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b41cd8e11144bfb101335f1339066c7e6c9da2dc1de5433c2fa88f793e137149",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-12T14:52:30.958Z",
+      "startedAt": "2026-09-12T14:52:30.556Z",
+      "finishedAt": "2026-09-12T14:52:30.958Z",
+      "durationMs": 402,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "6193fd5e9733ba99b40734af3ff62ecd5aa5cc3c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-12T14:52:44.998Z",
+      "startedAt": "2026-09-12T14:52:34.575Z",
+      "finishedAt": "2026-09-12T14:52:44.998Z",
+      "durationMs": 10423,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "6193fd5e9733ba99b40734af3ff62ecd5aa5cc3c",
+      "cached": false
+    },
+    {
+      "command": "npx eslint scripts/validate-ci-product-lane.ts tests/cli/ci-product-lane-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-09-12T14:52:50.655Z",
+      "startedAt": "2026-09-12T14:52:48.731Z",
+      "finishedAt": "2026-09-12T14:52:50.655Z",
+      "durationMs": 1924,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "6193fd5e9733ba99b40734af3ff62ecd5aa5cc3c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-ci-product-lane.ts --remote",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d1b7b48e620c65885e6d20f871d73a59622ef2ef8a01c9e37aded6e090b4ee1b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-09-12T14:53:02.875Z",
+      "startedAt": "2026-09-12T14:52:54.316Z",
+      "finishedAt": "2026-09-12T14:53:02.875Z",
+      "durationMs": 8559,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "6193fd5e9733ba99b40734af3ff62ecd5aa5cc3c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-ci-product-lane.ts --remote",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d1b7b48e620c65885e6d20f871d73a59622ef2ef8a01c9e37aded6e090b4ee1b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:ci-product-lane"
+      ],
+      "generatedAt": "2026-09-12T14:53:53.786Z",
+      "startedAt": "2026-09-12T14:53:44.811Z",
+      "finishedAt": "2026-09-12T14:53:53.786Z",
+      "durationMs": 8975,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "6193fd5e9733ba99b40734af3ff62ecd5aa5cc3c",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-12T14:54:38.689Z",
+      "startedAt": "2026-09-12T14:54:27.739Z",
+      "finishedAt": "2026-09-12T14:54:38.689Z",
+      "durationMs": 10950,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6193fd5e9733ba99b40734af3ff62ecd5aa5cc3c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
