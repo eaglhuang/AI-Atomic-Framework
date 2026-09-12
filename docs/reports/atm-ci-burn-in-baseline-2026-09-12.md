@@ -63,3 +63,18 @@ claim is `unexplained-failure`, not `long-term-green`. This is a measurement
 improvement, not long-term-green proof. The raw export digest is
 `sha256:1577c58723c4533c28bc250117f97a590583c9856ce335ed1efb809eb4f9b1a2` and
 must be retained at each checkpoint rather than replacing this observation.
+
+## Continuous retention contract
+
+The Product CI workflow now schedules one protected-main burn-in observation
+per day (`17 3 * * *`) in addition to push and manual-dispatch triggers. The
+schedule is deliberately read-only: it has no npm publish, `id-token: write`,
+or `contents: write` permission and remains independent of ATM Dogfood. Re-run
+the deterministic contract with:
+
+```text
+node --strip-types scripts/validate-product-ci-burn-in-schedule.ts --mode validate
+```
+
+This schedule increases the future observation rate; it does not itself prove
+the 30-day/90-run claim or substitute for the independent A/B benchmark.

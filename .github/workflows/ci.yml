@@ -3,6 +3,10 @@ name: ci
 run-name: Product CI burn-in (${{ inputs.release_candidate && 'release-candidate' || 'standard' }})
 
 on:
+  schedule:
+    # A low-cost protected-main observation keeps the burn-in window alive
+    # even when no contributor pushes land on main.
+    - cron: '17 3 * * *'
   workflow_dispatch:
     inputs:
       release_candidate:
