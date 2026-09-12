@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T18-23-57-705Z-close-5d6678967f5d",
+  "taskId": "TASK-PRF-0033",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260912174130-codex-captain-TASK-PRF-0033-cb46f92de6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0033.json",
+  "taskSha256": "sha256:06bb461112050bd95bbf389c36267c47ae052379c7c640cb5a89020d3380cbd2",
+  "createdAt": "2026-09-12T18:23:57.705Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0033 --actor codex-captain --status done --historical-delivery b060525e68860da4a037c91ddccc09b42c7657a0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260912174130-codex-captain-TASK-PRF-0033-cb46f92de6",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0033.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types tests/cli/standard-validator-timeout.test.ts",
+      "typecheck",
+      "validate:standard"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/standard-validator-timeout.test.ts",
+      "typecheck",
+      "validate:standard"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-12T18:23:57.696Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0033.*",
+        ".atm/history/task-events/TASK-PRF-0033/**",
+        ".atm/history/tasks/TASK-PRF-0033.json",
+        ".github/workflows/ci.yml",
+        "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+        "scripts/run-validators/implementation.ts",
+        "tests/cli/standard-validator-timeout.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/run-validators/implementation.ts",
+        "tests/cli/standard-validator-timeout.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types tests/cli/standard-validator-timeout.test.ts",
+        "typecheck",
+        "validate:standard"
+      ]
+    }
+  }
+}

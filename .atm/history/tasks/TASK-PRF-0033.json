@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0033",
   "title": "Fail-closed timeout and diagnostics for Standard Dogfood CI",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0031"
@@ -172,8 +172,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-12T18-19-58-056Z-renew-264891d97426",
-  "lastTransitionAt": "2026-09-12T18:19:58.056Z",
+  "lastTransitionId": "2026-09-12T18-23-57-705Z-close-5d6678967f5d",
+  "lastTransitionAt": "2026-09-12T18:23:57.705Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-09-12T17:41:30.157Z",
@@ -182,7 +182,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-4b834bea2c48",
     "claimedAt": "2026-09-12T17:41:30.167Z",
-    "heartbeatAt": "2026-09-12T18:19:57.538Z",
+    "heartbeatAt": "2026-09-12T18:23:57.703Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0033.json",
@@ -191,13 +191,14 @@
       "scripts/run-validators/implementation.ts",
       "tests/cli/standard-validator-timeout.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260912181957-codex-captain-2199949d2f",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260912181957-codex-captain-2199949d2f\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-12T17:41:30.167Z",
   "startedByActor": "codex-captain",
@@ -297,5 +298,9 @@
     },
     "createdAt": "2026-09-12T17:41:34.366Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-12T18:23:57.703Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260912174130-codex-captain-TASK-PRF-0033-cb46f92de6",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0033.closure-packet.json"
 }

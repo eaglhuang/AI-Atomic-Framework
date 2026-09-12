@@ -1,0 +1,168 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0033",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "b060525e68860da4a037c91ddccc09b42c7657a0",
+  "governedTreeSha": "fb0b80271f7c19a7c5ad47330e45adf2d31aefc6",
+  "targetCommitDelta": {
+    "currentCommitSha": "b060525e68860da4a037c91ddccc09b42c7657a0",
+    "parentCommitShas": [
+      "b060525e68860da4a037c91ddccc09b42c7657a0"
+    ],
+    "governedTreeSha": "fb0b80271f7c19a7c5ad47330e45adf2d31aefc6",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0033.json",
+      ".github/workflows/ci.yml",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/standard-validator-timeout.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/standard-validator-timeout.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4dd3780b7b22cbcf6e919f7f531d83a83e809db3b5ca8f5331097c5a121738b6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/standard-validator-timeout.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4dd3780b7b22cbcf6e919f7f531d83a83e809db3b5ca8f5331097c5a121738b6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:standard",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:70c79349cb5299b1383556c49e2dbbc8079969a12fbeaf6ce51d077f1eae252b",
+      "stderrSha256": "sha256:9f542ff75581555cacb9f7fa785037015331dad42a7794e04a806359231283fa",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "lint",
+    "node --strip-types tests/cli/standard-validator-timeout.test.ts",
+    "typecheck",
+    "validate:standard"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "lint",
+    "node --strip-types tests/cli/standard-validator-timeout.test.ts",
+    "typecheck",
+    "validate:standard"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-12T18:23:57.696Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0033.*",
+      ".atm/history/task-events/TASK-PRF-0033/**",
+      ".atm/history/tasks/TASK-PRF-0033.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/standard-validator-timeout.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/standard-validator-timeout.test.ts"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/standard-validator-timeout.test.ts",
+      "typecheck",
+      "validate:standard"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0033.json",
+  "closedAt": "2026-09-12T18:23:57.696Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260912174130-codex-captain-TASK-PRF-0033-cb46f92de6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "b060525e68860da4a037c91ddccc09b42c7657a0",
+    "taskMatchedFiles": [
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "scripts/run-validators/implementation.ts",
+      "tests/cli/standard-validator-timeout.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0033/2026-09-12T17-40-03-787Z-import-ee1b95f05364.json",
+      ".atm/history/task-events/TASK-PRF-0033/2026-09-12T17-41-30-157Z-reserve-3ab540f50845.json",
+      ".atm/history/task-events/TASK-PRF-0033/2026-09-12T17-41-30-162Z-promote-0dfce46f6c1a.json",
+      ".atm/history/task-events/TASK-PRF-0033/2026-09-12T17-41-34-366Z-claim-a90b83f0dc64.json",
+      ".atm/history/task-events/TASK-PRF-0033/2026-09-12T17-43-15-236Z-metadata-only-import-0ea1c98a1db2.json",
+      ".atm/history/task-events/TASK-PRF-0033/2026-09-12T18-19-58-056Z-renew-264891d97426.json",
+      ".atm/history/tasks/TASK-PRF-0033.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
