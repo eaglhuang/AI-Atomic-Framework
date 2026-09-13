@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T06-40-15-006Z-close-06b99b489d1e",
+  "taskId": "TASK-PRF-0020",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913063056-codex-captain-TASK-PRF-0020-887b32920f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0020.json",
+  "taskSha256": "sha256:cfe1ccfb1aa8264018400ae1f0e9797940b655ff0a4c27cd89f3185bbafb2606",
+  "createdAt": "2026-09-13T06:40:15.006Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0020 --actor codex-captain --status done --historical-delivery 08e28d7973e8443bb11e91a77adcd25f3ea69afb",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913063056-codex-captain-TASK-PRF-0020-887b32920f",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0020.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node --strip-types tests/cli/internal-release-sync.test.ts",
+      "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+      "validate:internal-release-sync -- --mode validate"
+    ],
+    "requiredGates": [
+      "doctor",
+      "node --strip-types tests/cli/internal-release-sync.test.ts",
+      "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+      "validate:internal-release-sync -- --mode validate"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T06:40:14.992Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0020.*",
+        ".atm/history/task-events/TASK-PRF-0020/**",
+        ".atm/history/tasks/TASK-PRF-0020.json",
+        ".github/workflows/release-npm.yml",
+        "packages/cli/src/commands/framework-mode",
+        "packages/cli/src/commands/internal-release",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop",
+        "scripts/run-sealed-runner-build.ts",
+        "tests/cli/internal-release-sync.test.ts",
+        "tests/cli/npm-clean-install.test.ts",
+        "tests/cli/runner-sync-steward-release.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-mode",
+        "packages/cli/src/commands/internal-release",
+        "scripts/run-sealed-runner-build.ts",
+        "tests/cli/internal-release-sync.test.ts",
+        "tests/cli/npm-clean-install.test.ts",
+        "tests/cli/runner-sync-steward-release.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "node --strip-types tests/cli/internal-release-sync.test.ts",
+        "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+        "validate:internal-release-sync -- --mode validate"
+      ]
+    }
+  }
+}

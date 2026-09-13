@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T06-34-08-913Z-scope-amendment-9e433cce011e",
+  "taskId": "TASK-PRF-0020",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0020.json",
+  "taskSha256": "sha256:6b21d7a972e359dc9725ce355f72800a30168743b212c7723d3865dc3eb7f0bf",
+  "createdAt": "2026-09-13T06:34:08.913Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0020 --actor codex-captain --add \".github/workflows/release-npm.yml,tests/cli/npm-clean-install.test.ts\" --reason \"Stable dry-run authoritative failure 34742581194: npm version exits Version not changed when target already applied; regression contract requires these files\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Stable dry-run authoritative failure 34742581194: npm version exits Version not changed when target already applied; regression contract requires these files"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-12T17-41-18-938Z-repair-claim-43819066208e",
+  "taskId": "TASK-PRF-0020",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260912162925-codex-captain-TASK-PRF-0020-5be52be78f",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0020.json",
+  "taskSha256": "sha256:6ce477ed73f62c08a41c7132ffd25d001db87c5dab49eca9e035e1a9e123af15",
+  "createdAt": "2026-09-12T17:41:18.938Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0020 --actor codex-captain --write --reason \"Expired stale claim and dangling governance lock prevent the next product-proof task from being admitted; no valid active lease remains.\" --json"
+}

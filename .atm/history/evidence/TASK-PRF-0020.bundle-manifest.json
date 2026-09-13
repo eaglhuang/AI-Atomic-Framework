@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0020",
+  "updatedAt": "2026-09-13T06:37:23.089Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "doctor",
+    "node --strip-types tests/cli/internal-release-sync.test.ts",
+    "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+    "validate:internal-release-sync -- --mode validate"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run validate:internal-release-sync -- --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:43ffaf9aa7e0423d1060c4c7cbcfa6c8f594525707862e6db7ed13e999338bd4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:internal-release-sync -- --mode validate"
+      ],
+      "generatedAt": "2026-09-13T06:35:00.371Z",
+      "startedAt": "2026-09-13T06:34:59.149Z",
+      "finishedAt": "2026-09-13T06:35:00.371Z",
+      "durationMs": 1222,
+      "runnerKind": "dev-source",
+      "sourceCommit": "8e898ca36d8d1f9c8119f16f836b2f118d164113",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2929c944860e42ff33d59ae60ed3c4b663d0bbe2d10dbbb5d83fe3452f7b2266",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-09-13T06:35:18.004Z",
+      "startedAt": "2026-09-13T06:34:58.361Z",
+      "finishedAt": "2026-09-13T06:35:18.004Z",
+      "durationMs": 19643,
+      "runnerKind": "dev-source",
+      "sourceCommit": "8e898ca36d8d1f9c8119f16f836b2f118d164113",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1d1d7a9fbb09bd6aca59834ca58e712d21b4e96f3ea9bd73a804fd708e6d1b19",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/runner-sync-steward-release.test.ts"
+      ],
+      "generatedAt": "2026-09-13T06:35:23.373Z",
+      "startedAt": "2026-09-13T06:34:58.846Z",
+      "finishedAt": "2026-09-13T06:35:23.373Z",
+      "durationMs": 24527,
+      "runnerKind": "dev-source",
+      "sourceCommit": "8e898ca36d8d1f9c8119f16f836b2f118d164113",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/internal-release-sync.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:81e714fde10c7d42c1cd75bdeeab336e1efc8b20aed4163d10b24987b9391c5d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/internal-release-sync.test.ts"
+      ],
+      "generatedAt": "2026-09-13T06:37:23.087Z",
+      "startedAt": "2026-09-13T06:37:22.281Z",
+      "finishedAt": "2026-09-13T06:37:23.087Z",
+      "durationMs": 806,
+      "runnerKind": "dev-source",
+      "sourceCommit": "8e898ca36d8d1f9c8119f16f836b2f118d164113",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
