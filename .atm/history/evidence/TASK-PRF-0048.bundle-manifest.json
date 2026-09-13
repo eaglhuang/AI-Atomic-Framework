@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0048",
+  "updatedAt": "2026-09-13T13:59:48.293Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "lint",
+    "node --strip-types tests/cli/agent-pack-startup-side-effects.test.ts",
+    "typecheck",
+    "validate:integration-adapter"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/agent-pack-startup-side-effects.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6edae534243dd372777fcc6d3317804dcf3c11344c6de34a11e976b63b6770a7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/agent-pack-startup-side-effects.test.ts"
+      ],
+      "generatedAt": "2026-09-13T13:59:14.462Z",
+      "startedAt": "2026-09-13T13:59:13.637Z",
+      "finishedAt": "2026-09-13T13:59:14.462Z",
+      "durationMs": 825,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e46dfa74f03084cfff845bf9b12af9b97991e181",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-13T13:59:27.791Z",
+      "startedAt": "2026-09-13T13:59:18.294Z",
+      "finishedAt": "2026-09-13T13:59:27.791Z",
+      "durationMs": 9497,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e46dfa74f03084cfff845bf9b12af9b97991e181",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-13T13:59:42.160Z",
+      "startedAt": "2026-09-13T13:59:31.929Z",
+      "finishedAt": "2026-09-13T13:59:42.160Z",
+      "durationMs": 10231,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e46dfa74f03084cfff845bf9b12af9b97991e181",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:integration-adapter",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19063ae4e9017f3439a6036376ae04f39f88e27233b4bfbda0a594b4f7348d3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:integration-adapter"
+      ],
+      "generatedAt": "2026-09-13T13:59:48.292Z",
+      "startedAt": "2026-09-13T13:59:46.221Z",
+      "finishedAt": "2026-09-13T13:59:48.292Z",
+      "durationMs": 2071,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e46dfa74f03084cfff845bf9b12af9b97991e181",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
