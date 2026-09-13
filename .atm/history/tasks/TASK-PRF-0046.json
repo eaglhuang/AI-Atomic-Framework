@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0046",
   "title": "Repair duplicate protocol-v2 import blocking ATM Dogfood lint",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -149,27 +149,27 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-13T08-26-41-362Z-claim-d193f37c24a8",
-  "lastTransitionAt": "2026-09-13T08:26:41.362Z",
+  "lastTransitionId": "2026-09-13T08-28-52-707Z-close-2495363c9e9a",
+  "lastTransitionAt": "2026-09-13T08:28:52.707Z",
   "ledgerContractVersion": "task-ledger/v1",
   "claim": {
     "actorId": "codex-captain",
     "leaseId": "lease-e05ce4322abe",
     "claimedAt": "2026-09-13T08:26:36.342Z",
-    "heartbeatAt": "2026-09-13T08:26:36.342Z",
+    "heartbeatAt": "2026-09-13T08:28:52.704Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0046.json",
       "tests/cli/external-benchmark-v2-contract.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260913082636-codex-captain-2e46b70fa0",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913082636-codex-captain-2e46b70fa0\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "codex-captain",
   "startedAt": "2026-09-13T08:26:36.342Z",
@@ -264,5 +264,9 @@
     },
     "createdAt": "2026-09-13T08:26:41.362Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-13T08:28:52.704Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260913082636-codex-captain-TASK-PRF-0046-f2f49f6148",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0046.closure-packet.json"
 }

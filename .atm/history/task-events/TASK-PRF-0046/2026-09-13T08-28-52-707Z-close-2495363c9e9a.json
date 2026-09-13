@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T08-28-52-707Z-close-2495363c9e9a",
+  "taskId": "TASK-PRF-0046",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913082636-codex-captain-TASK-PRF-0046-f2f49f6148",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0046.json",
+  "taskSha256": "sha256:bee7eb4cd91278ef0739877358f3546d1c46462bfd72c7e73f435da63f64e3ca",
+  "createdAt": "2026-09-13T08:28:52.707Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0046 --actor codex-captain --status done --historical-delivery 968f6498008afd8d8cee04de475c4d4fefe71ed7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913082636-codex-captain-TASK-PRF-0046-f2f49f6148",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0046.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched -- --files tests/cli/external-benchmark-v2-contract.test.ts",
+      "lint",
+      "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+    ],
+    "requiredGates": [
+      "check:encoding:touched -- --files tests/cli/external-benchmark-v2-contract.test.ts",
+      "lint",
+      "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T08:28:52.693Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0046.*",
+        ".atm/history/task-events/TASK-PRF-0046/**",
+        ".atm/history/tasks/TASK-PRF-0046.json",
+        "tests/cli/external-benchmark-v2-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "tests/cli/external-benchmark-v2-contract.test.ts"
+      ],
+      "requiredGates": [
+        "check:encoding:touched -- --files tests/cli/external-benchmark-v2-contract.test.ts",
+        "lint",
+        "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+      ]
+    }
+  }
+}
