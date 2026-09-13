@@ -8,6 +8,34 @@
     "runtime": "runtime.mjs"
   },
   "moduleIdentity": "original-dist-relative-url",
+  "publicSurface": "adopter-core",
+  "publicCommands": [
+    "next",
+    "doctor",
+    "guide",
+    "init",
+    "create",
+    "taskflow",
+    "welcome",
+    "status",
+    "verify",
+    "orient",
+    "evidence",
+    "lock",
+    "broker",
+    "git",
+    "integration",
+    "plan",
+    "actor",
+    "bootstrap",
+    "start",
+    "tasks"
+  ],
+  "omittedPublicAssets": [
+    "^_vendor\\/agent-pack-claude-code\\/templates\\/",
+    "^_vendor\\/integrations-core\\/templates\\/skills\\/atm-deep-module-refactor\\.files\\/references\\/",
+    "^_vendor\\/integrations-core\\/templates\\/skills\\/atm-governance-router\\.files\\/references\\/(?:entry-friction|fallback-design|learning-loop|route-interpretation)\\.md$"
+  ],
   "files": [
     {
       "path": "atm.mjs",
@@ -26,42 +54,6 @@
       "kind": "runtime-entrypoint",
       "bytes": 31,
       "sha256": "sha256:1ca7558789f75d9c52baeec058101733a4042cb7480b5e40248b622a9d398e35"
-    },
-    {
-      "path": "layout/_vendor/agent-pack-claude-code/templates/atm-bootstrap.md.tmpl",
-      "kind": "immutable-runtime-asset",
-      "bytes": 457,
-      "sha256": "sha256:ad49dc9c7c247ffc97652abefdce3e39c803aa6a5af3a9b81539e2b80dda51ea"
-    },
-    {
-      "path": "layout/_vendor/agent-pack-claude-code/templates/atm-evidence.md.tmpl",
-      "kind": "immutable-runtime-asset",
-      "bytes": 456,
-      "sha256": "sha256:e21f80d2d49acc48935c9098c7a5e7a4c155a887d3c8beffb1b68cdb4cb8271e"
-    },
-    {
-      "path": "layout/_vendor/agent-pack-claude-code/templates/atm-handoff.md.tmpl",
-      "kind": "immutable-runtime-asset",
-      "bytes": 562,
-      "sha256": "sha256:8c23cb2afa4fd50ada2ea8cee1e381366cfe7eb61927151236ad15cff6cbbafc"
-    },
-    {
-      "path": "layout/_vendor/agent-pack-claude-code/templates/atm-lock.md.tmpl",
-      "kind": "immutable-runtime-asset",
-      "bytes": 471,
-      "sha256": "sha256:0a62d1a3c8fa8da05110812c96669d8e4eb0c42320a4c4d002f39baa675745ea"
-    },
-    {
-      "path": "layout/_vendor/agent-pack-claude-code/templates/atm-next.md.tmpl",
-      "kind": "immutable-runtime-asset",
-      "bytes": 1134,
-      "sha256": "sha256:73f2a08c110b01a122819c085ea9021a5d8bf30ada841550a94f8593012de0cc"
-    },
-    {
-      "path": "layout/_vendor/agent-pack-claude-code/templates/atm-verify.md.tmpl",
-      "kind": "immutable-runtime-asset",
-      "bytes": 348,
-      "sha256": "sha256:bd1bb17693dfb6b67b04bb8e902f2af9e34a0f06b5e45a6b46353cc994da7b51"
     },
     {
       "path": "layout/_vendor/atm-markdown-task-source/templates/aao-l2-split-template.md",
@@ -86,18 +78,6 @@
       "kind": "immutable-runtime-asset",
       "bytes": 1097,
       "sha256": "sha256:3af74fedb2da3e1533c8d3992586f80bbc249066edae92b083f30736e209fc08"
-    },
-    {
-      "path": "layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/deepening.md",
-      "kind": "immutable-runtime-asset",
-      "bytes": 987,
-      "sha256": "sha256:e1c26acc6c4141decbf8e16ddd74c86fb7d3c15a20f9b5e4dede3b0393725653"
-    },
-    {
-      "path": "layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md",
-      "kind": "immutable-runtime-asset",
-      "bytes": 720,
-      "sha256": "sha256:001de0bde7c11ec3560e36e7b5d271b6aa957159c0d7476a53cfcd9d0e60d86e"
     },
     {
       "path": "layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.skill.md",
@@ -154,34 +134,10 @@
       "sha256": "sha256:bf5089e1534927049946af242683f604b9acc9d097cbf9fb8636080a79597da6"
     },
     {
-      "path": "layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
-      "kind": "immutable-runtime-asset",
-      "bytes": 1503,
-      "sha256": "sha256:a4ec32f7f8736d89c81da9ca945a5af9cd82f1217376b1bdd400600c683d2ed2"
-    },
-    {
-      "path": "layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
-      "kind": "immutable-runtime-asset",
-      "bytes": 816,
-      "sha256": "sha256:76bd9dc38f4fc8ce9a2870a3f61cc1b117365888dc88c77a49d14ee5a114c28c"
-    },
-    {
       "path": "layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
       "kind": "immutable-runtime-asset",
       "bytes": 2983,
       "sha256": "sha256:804b117e036f9534cbee3458917083ec4bac13d0746a725805a59a0dce8118cd"
-    },
-    {
-      "path": "layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
-      "kind": "immutable-runtime-asset",
-      "bytes": 479,
-      "sha256": "sha256:4e5b27a501f502c4f7e2c97010dc76b46ee5de256e5512c1a09fb2267b8f6ca9"
-    },
-    {
-      "path": "layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
-      "kind": "immutable-runtime-asset",
-      "bytes": 529,
-      "sha256": "sha256:0721fca60e61d5ff3b1145a2e72ba8c3d2ae67612302efedf73f6f0632a852d4"
     },
     {
       "path": "layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
@@ -456,10 +412,10 @@
     {
       "path": "runtime.mjs",
       "kind": "runtime-entrypoint",
-      "bytes": 3088780,
-      "sha256": "sha256:818e65146635b55f66228757c41fcc44b5117cf1906c43fef4858771ddd97ce6"
+      "bytes": 2380942,
+      "sha256": "sha256:de9ada42b27de59d572c2f56669c3d854b05418ca459bec6e60bb61ec9b1a672"
     }
   ],
-  "fileCount": 76,
-  "totalBytes": 3334180
+  "fileCount": 64,
+  "totalBytes": 2617880
 }

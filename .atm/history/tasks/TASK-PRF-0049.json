@@ -31,7 +31,9 @@
     ".atm/history/tasks/TASK-PRF-0049.json",
     "packages/cli/src/atm-public.ts",
     "release/atm-onefile/atm.mjs",
-    "release/atm-root-drop"
+    "release/atm-root-drop",
+    "packages/cli/dist",
+    "release/atm-onefile/release-manifest.json"
   ],
   "validators": [
     "npm run validate:package-install",
@@ -101,8 +103,8 @@
   "importedAt": "2026-09-13T16:47:27.869Z",
   "workAdmission": {
     "recoveryMode": "auto",
-    "resolvedRecoveryMode": "disabled",
-    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
   },
   "causalGraph": {
     "causalDependencies": [],
@@ -193,9 +195,11 @@
       ".atm/history/evidence/TASK-PRF-0049.*",
       ".atm/history/task-events/TASK-PRF-0049/**",
       ".atm/history/tasks/TASK-PRF-0049.json",
+      "packages/cli/dist",
       "packages/cli/src/atm-public.ts",
       "packages/cli/src/atm.ts",
       "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop",
       "scripts/build-cli-npm-runtime.ts",
       "scripts/validate-public-npm-install.ts",
@@ -225,9 +229,11 @@
       ".atm/history/evidence/TASK-PRF-0049.*",
       ".atm/history/task-events/TASK-PRF-0049/**",
       ".atm/history/tasks/TASK-PRF-0049.json",
+      "packages/cli/dist",
       "packages/cli/src/atm-public.ts",
       "packages/cli/src/atm.ts",
       "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop",
       "scripts/build-cli-npm-runtime.ts",
       "scripts/validate-public-npm-install.ts",
@@ -256,26 +262,26 @@
     "createdAt": "2026-09-13T16:15:13.471Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-09-13T16-53-27-966Z-scope-amendment-dc9dc4561f8e",
-  "lastTransitionAt": "2026-09-13T16:53:27.966Z",
+  "lastTransitionId": "2026-09-13T16-54-41-934Z-scope-amendment-e43a09991314",
+  "lastTransitionAt": "2026-09-13T16:54:41.934Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-9591bfe974649002",
-    "ticketDigest": "sha256:9591bfe974649002e61e580ec89a1bf4303af467b8927a6ac07e47f2c9417b12",
+    "ticketId": "wat-534166064d03fbf2",
+    "ticketDigest": "sha256:534166064d03fbf2b5256c32dbcf204da01ebb5334cdb49cd84e516ad46e2c11",
     "taskId": "TASK-PRF-0049",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260913161041-codex-captain-190c11b0b7",
     "claimGeneration": "lease-57fb738bc144",
-    "issuedAt": "2026-09-13T16:53:27.844Z",
-    "expiresAt": "2026-09-13T17:23:27.844Z",
-    "scopeDigest": "sha256:c658f20b125aec494f997c2fbf1b280f2dfba0aabe1a9990bcaa69d0fb699cb5",
+    "issuedAt": "2026-09-13T16:54:41.863Z",
+    "expiresAt": "2026-09-13T17:24:41.863Z",
+    "scopeDigest": "sha256:ff1feb2cce21667d609a8828ff7042651f66814d467fd3ca10f6a8d78b46522e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-13T16:53:27.844Z"
+      "selectedAt": "2026-09-13T16:54:41.863Z"
     },
     "grants": [
       {
@@ -285,16 +291,18 @@
           ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0049/**",
           ".atm/history/tasks/TASK-PRF-0049.json",
+          "packages/cli/dist",
           "packages/cli/src/atm-public.ts",
           "packages/cli/src/atm.ts",
           "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
           "release/atm-root-drop",
           "scripts/build-cli-npm-runtime.ts",
           "scripts/validate-public-npm-install.ts",
           "tests/cli/external-benchmark-protocol.test.ts",
           "tests/cli/npm-clean-install.test.ts"
         ],
-        "digest": "sha256:d44acccf4de65fe9f1007a41345d847a482982f26737ab56daaa13f3001271af"
+        "digest": "sha256:4306b91a652669a681c45613e8581f0b312d50d6bd312b3681361921addde518"
       },
       {
         "kind": "lifecycle-operation",
@@ -316,16 +324,16 @@
     "deferredForeignResidue": [],
     "recovery": {
       "requestedMode": "auto",
-      "resolvedMode": "disabled",
+      "resolvedMode": "enabled",
       "reasons": [
-        "low-risk-task"
+        "complex-task"
       ],
-      "maxSavePoints": 0,
-      "perTaskByteBudget": 0,
-      "repositoryByteBudget": 0,
-      "handoffTtlSeconds": 0,
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
       "tempRoot": ".atm/runtime/work-admission-temp",
-      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
   }
 }
