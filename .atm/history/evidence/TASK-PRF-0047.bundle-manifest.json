@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0047",
+  "updatedAt": "2026-09-13T09:30:37.803Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "validate:public-npm-install"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+      ],
+      "generatedAt": "2026-09-13T09:30:21.136Z",
+      "startedAt": "2026-09-13T09:30:20.817Z",
+      "finishedAt": "2026-09-13T09:30:21.136Z",
+      "durationMs": 319,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ba0b6335f4b0e0a9517f5ee176a633408e671c72",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-public-npm-install.ts --package @ai-atomic-framework/cli --version 0.1.0 --require-default-tag",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cedcbd0ebc582572e5f9b8a3084c2c83988b0409ba2b2604bd159d2faa192e94",
+      "stderrSha256": "sha256:f1e95228a34f40d7f954f07a34300fb20f6567f2ac7ad04cdda47e4d10d8772e",
+      "validators": [
+        "validate:public-npm-install"
+      ],
+      "generatedAt": "2026-09-13T09:30:34.085Z",
+      "startedAt": "2026-09-13T09:30:29.064Z",
+      "finishedAt": "2026-09-13T09:30:34.085Z",
+      "durationMs": 5021,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ba0b6335f4b0e0a9517f5ee176a633408e671c72",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/check-encoding-touched.ts --files scripts/validate-public-npm-install.ts tests/cli/product-proof-evidence-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fa135505edb4e0df8380dace242eac5dccbab95a6551c9a655e17a0b6023c913",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:public-npm-install"
+      ],
+      "generatedAt": "2026-09-13T09:30:37.803Z",
+      "startedAt": "2026-09-13T09:30:36.021Z",
+      "finishedAt": "2026-09-13T09:30:37.803Z",
+      "durationMs": 1782,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ba0b6335f4b0e0a9517f5ee176a633408e671c72",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

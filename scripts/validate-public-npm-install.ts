@@ -15,14 +15,15 @@ function parseArgs(): Args {
     return i >= 0 ? argv[i + 1] : fallback;
   };
   const packageName = value('--package', '@ai-atomic-framework/cli');
-  // The framework source manifests retain the next stable train version, but
-  // the public CLI is currently released from the beta train. Keep the
-  // default aligned with the latest published package so a bare validator
-  // invocation exercises the real registry artifact instead of an unpublished
-  // placeholder version.
-  const version = value('--version', '0.1.0-beta.5');
-  if (!packageName || !version) throw new Error('--package and --version are required');
+  if (!packageName) throw new Error('--package is required');
+  const version = value('--version') ?? resolvePublishedLatest(packageName);
   return { packageName, version, output: value('--output'), recordBlocked: argv.includes('--record-blocked'), requireDefaultTag: argv.includes('--require-default-tag') };
+}
+
+function resolvePublishedLatest(packageName: string): string {
+  const latest = runNpm(['view', packageName, 'dist-tags.latest', '--json']).trim().replace(/^\"|\"$/g, '');
+  if (!latest) throw new Error(`npm latest dist-tag is unavailable for ${packageName}; pass --version explicitly`);
+  return latest;
 }
 
 function npmCommand() { return process.platform === 'win32' ? 'npm.cmd' : 'npm'; }
