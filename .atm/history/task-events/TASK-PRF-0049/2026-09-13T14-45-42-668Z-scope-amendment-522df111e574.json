@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T14-45-42-668Z-scope-amendment-522df111e574",
+  "taskId": "TASK-PRF-0049",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0049.json",
+  "taskSha256": "sha256:b430c48a072fd3165f0e8abcfaa692f6fa30da4e6407f7f4084b9596dd1570e9",
+  "createdAt": "2026-09-13T14:45:42.668Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0049 --actor codex-captain --add \"release/atm-onefile/atm.mjs,release/atm-root-drop\" --reason \"Runner sync publication produces these release surfaces; include them in governed scope so publication authority is explicit and auditable.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Runner sync publication produces these release surfaces; include them in governed scope so publication authority is explicit and auditable."
+  }
+}

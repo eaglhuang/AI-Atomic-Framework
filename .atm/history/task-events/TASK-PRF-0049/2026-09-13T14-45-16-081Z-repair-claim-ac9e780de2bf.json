@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T14-45-16-081Z-repair-claim-ac9e780de2bf",
+  "taskId": "TASK-PRF-0049",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913140846-codex-captain-TASK-PRF-0049-d4633f139f",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0049.json",
+  "taskSha256": "sha256:1630507c053f146469693a6d81bfe4b4cef84cfea3aec283d93010f99df99805",
+  "createdAt": "2026-09-13T14:45:16.081Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0049 --actor codex-captain --write --reason \"Restore expired TASK-PRF-0049 lifecycle claim after sealed runner build reached publication queue; preserve Gemini FAIL evidence and reconcile claim/lock scope before further validation.\" --json"
+}

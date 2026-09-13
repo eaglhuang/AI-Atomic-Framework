@@ -5,6 +5,9 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const validator = path.join(root, 'scripts', 'validate-npm-clean-install.ts');
+const publicInstallValidator = path.join(root, 'scripts', 'validate-public-npm-install.ts');
+const runtimeBuilder = path.join(root, 'scripts', 'build-cli-npm-runtime.ts');
+const publicFacade = path.join(root, 'packages', 'cli', 'src', 'atm-public.ts');
 const rootManifest = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8')) as { scripts?: Record<string, string> };
 const releaseWorkflow = path.join(root, '.github', 'workflows', 'release-npm.yml');
 const fixture = JSON.parse(readFileSync(path.join(root, 'tests', 'package-skeleton.fixture.json'), 'utf8')) as {
@@ -14,6 +17,9 @@ const fixture = JSON.parse(readFileSync(path.join(root, 'tests', 'package-skelet
 const publishedPackages = fixture.publishClosure?.publishedPackages ?? [];
 
 assert.ok(existsSync(validator), 'clean-install validator must exist');
+assert.ok(existsSync(publicInstallValidator), 'public npm validator must exist');
+assert.ok(existsSync(runtimeBuilder), 'npm runtime builder must exist');
+assert.ok(existsSync(publicFacade), 'adopter public facade must exist');
 assert.equal(rootManifest.scripts?.['validate:npm-clean-install'], 'node --strip-types scripts/validate-npm-clean-install.ts', 'root package must expose the clean-install validator contract');
 for (const packageSpec of fixture.packages) {
   const expectedFiles = packageSpec.publishFiles ?? ['dist'];
@@ -74,5 +80,16 @@ assert.ok(smokeIndex < publishIndex, 'the clean-install smoke must gate publish,
 const validatorSource = readFileSync(validator, 'utf8');
 assert.match(validatorSource, /integration', 'add', 'codex'/, 'the clean-install validator must exercise a real installed integration');
 assert.match(validatorSource, /REQUIRED_ROUTER_REFERENCE/, 'the clean-install validator must guard router companion files');
+
+const publicInstallValidatorSource = readFileSync(publicInstallValidator, 'utf8');
+assert.match(publicInstallValidatorSource, /--measure/, 'the public npm validator must expose command-backed measurement mode');
+assert.match(publicInstallValidatorSource, /atm\.baselineCandidateMeasurement\.v1/, 'the measurement receipt schema must be explicit');
+assert.match(publicInstallValidatorSource, /measurementOutput/, 'the measurement mode must support an external retained receipt');
+const runtimeBuilderSource = readFileSync(runtimeBuilder, 'utf8');
+assert.match(runtimeBuilderSource, /publicSurface:\s*'adopter-core'/, 'the runtime manifest must identify the bounded adopter surface');
+assert.match(runtimeBuilderSource, /OMITTED_PUBLIC_ASSETS/, 'optional assets must be excluded by an explicit allowlist boundary');
+const publicFacadeSource = readFileSync(publicFacade, 'utf8');
+assert.match(publicFacadeSource, /publicCliCommandNames/, 'the adopter facade must declare its command surface');
+assert.doesNotMatch(publicFacadeSource, /agent-pack['"`]/, 'the bounded adopter facade must not expose the optional agent-pack command');
 
 console.log('[npm-clean-install:test] ok');

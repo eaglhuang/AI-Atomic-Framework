@@ -1,10 +1,22 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
+import { performance } from 'node:perf_hooks';
 
-type Args = { packageName: string; version: string; output?: string; recordBlocked: boolean; requireDefaultTag: boolean };
+type Args = {
+  packageName: string;
+  version: string;
+  output?: string;
+  recordBlocked: boolean;
+  requireDefaultTag: boolean;
+  measure: boolean;
+  candidateDir: string;
+  baselineVersion?: string;
+  measurementOutput?: string;
+  measurementRuns: number;
+};
 
 type ArtifactBudget = { maxPackedBytes: number; maxPackedEntries: number };
 
@@ -17,7 +29,22 @@ function parseArgs(): Args {
   const packageName = value('--package', '@ai-atomic-framework/cli');
   if (!packageName) throw new Error('--package is required');
   const version = value('--version') ?? resolvePublishedLatest(packageName);
-  return { packageName, version, output: value('--output'), recordBlocked: argv.includes('--record-blocked'), requireDefaultTag: argv.includes('--require-default-tag') };
+  const measurementRuns = Number(value('--measurement-runs', '3'));
+  if (!Number.isInteger(measurementRuns) || measurementRuns < 1 || measurementRuns > 10) {
+    throw new Error('--measurement-runs must be an integer from 1 to 10');
+  }
+  return {
+    packageName,
+    version,
+    output: value('--output'),
+    recordBlocked: argv.includes('--record-blocked'),
+    requireDefaultTag: argv.includes('--require-default-tag'),
+    measure: argv.includes('--measure'),
+    candidateDir: resolve(value('--candidate-dir', join('packages', 'cli')) as string),
+    baselineVersion: value('--baseline-version'),
+    measurementOutput: value('--measurement-output'),
+    measurementRuns,
+  };
 }
 
 function resolvePublishedLatest(packageName: string): string {
@@ -54,7 +81,121 @@ function report(args: Args, result: Record<string, unknown>) {
   return payload;
 }
 
+type PackMetadata = {
+  name?: string;
+  version?: string;
+  size?: number;
+  unpackedSize?: number;
+  filename?: string;
+  files?: unknown[];
+};
+
+function parsePackResult(raw: string): PackMetadata {
+  const parsed = JSON.parse(raw.trim());
+  const result = Array.isArray(parsed) ? parsed[0] : parsed;
+  if (!result?.filename || !Number.isFinite(Number(result.unpackedSize)) || !Array.isArray(result.files)) {
+    throw new Error('npm pack metadata is missing filename, unpackedSize, or files');
+  }
+  return result as PackMetadata;
+}
+
+function pack(spec: string, destination: string, cwd?: string): { metadata: PackMetadata; tarball: string } {
+  mkdirSync(destination, { recursive: true });
+  const metadata = parsePackResult(runNpm(['pack', spec, '--ignore-scripts', '--pack-destination', destination, '--json', '--loglevel', 'silent'], cwd));
+  return { metadata, tarball: join(destination, metadata.filename as string) };
+}
+
+function percentile(values: number[], p: number): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  if (sorted.length === 1) return sorted[0];
+  const index = (sorted.length - 1) * p;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  if (lower === upper) return sorted[lower];
+  return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
+}
+
+function runSmoke(tarball: string, root: string, label: string, runs: number) {
+  const consumer = join(root, `${label}-consumer`);
+  const installStarted = performance.now();
+  runNpm(['install', '--ignore-scripts', '--prefix', consumer, tarball], root);
+  const installMs = performance.now() - installStarted;
+  const bin = process.platform === 'win32'
+    ? join(consumer, 'node_modules', '.bin', 'atm.cmd')
+    : join(consumer, 'node_modules', '.bin', 'atm');
+  const commands = [
+    ['version', '--version', '--json'],
+    ['doctor', 'doctor', '--json'],
+    ['next', 'next', '--json'],
+    ['tasks', 'tasks', 'status', '--task', 'TASK-PRF-0049', '--json'],
+  ] as const;
+  const smoke: Record<string, unknown> = {};
+  for (const [name, ...argv] of commands) {
+    const commandRuns: number[] = [];
+    let exitCode = 0;
+    let combined = '';
+    for (let i = 0; i < (name === 'version' ? runs : 1); i += 1) {
+      const started = performance.now();
+      const result = spawnSync(bin, argv, { cwd: consumer, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
+      commandRuns.push(performance.now() - started);
+      exitCode = result.status ?? 1;
+      combined = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+    }
+    const failure = combined.includes('ERR_MODULE_NOT_FOUND') || combined.includes('Cannot find module');
+    smoke[name] = { exitCode, moduleResolutionFailure: failure, startupMs: commandRuns, p50Ms: percentile(commandRuns, 0.5), p95Ms: percentile(commandRuns, 0.95) };
+  }
+  return { installMs, smoke };
+}
+
+function runMeasurement(args: Args): Record<string, unknown> {
+  const root = mkdtempSync(join(tmpdir(), 'atm-public-measure-'));
+  try {
+    const baselineVersion = args.baselineVersion ?? args.version;
+    const baseline = pack(`${args.packageName}@${baselineVersion}`, join(root, 'baseline'));
+    const candidate = pack(args.candidateDir, join(root, 'candidate'), process.cwd());
+    const baselineBytes = Number(baseline.metadata.unpackedSize);
+    const candidateBytes = Number(candidate.metadata.unpackedSize);
+    const baselineEntries = baseline.metadata.files?.length ?? 0;
+    const candidateEntries = candidate.metadata.files?.length ?? 0;
+    const baselineRun = runSmoke(baseline.tarball, root, 'baseline', args.measurementRuns);
+    const candidateRun = runSmoke(candidate.tarball, root, 'candidate', args.measurementRuns);
+    const byteReduction = ((baselineBytes - candidateBytes) / baselineBytes) * 100;
+    const entryReduction = ((baselineEntries - candidateEntries) / baselineEntries) * 100;
+    const candidateFailures = Object.values(candidateRun.smoke as Record<string, { moduleResolutionFailure: boolean }>).filter((x) => x.moduleResolutionFailure).length;
+    const smokeBehaviorMatchesBaseline = Object.keys(baselineRun.smoke as Record<string, { exitCode: number }>).every((name) => {
+      const baselineResult = (baselineRun.smoke as Record<string, { exitCode: number }>)[name];
+      const candidateResult = (candidateRun.smoke as Record<string, { exitCode: number }>)[name];
+      return candidateResult && candidateResult.exitCode === baselineResult.exitCode;
+    });
+    const receipt: Record<string, unknown> = {
+      schemaId: 'atm.baselineCandidateMeasurement.v1',
+      generatedAt: new Date().toISOString(),
+      package: args.packageName,
+      baseline: { version: baseline.metadata.version ?? baselineVersion, unpackedBytes: baselineBytes, entryCount: baselineEntries, tarballBytes: Number(baseline.metadata.size), tarballSha256: sha256(baseline.tarball), ...baselineRun },
+      candidate: { version: candidate.metadata.version ?? 'local', sourceDir: args.candidateDir, unpackedBytes: candidateBytes, entryCount: candidateEntries, tarballBytes: Number(candidate.metadata.size), tarballSha256: sha256(candidate.tarball), ...candidateRun },
+      delta: { unpackedBytes: candidateBytes - baselineBytes, unpackedBytesReductionPercent: byteReduction, entryCount: candidateEntries - baselineEntries, entryCountReductionPercent: entryReduction },
+      acceptance: { minUnpackedBytesReductionPercent: 20, minEntryReductionPercent: 15, unpackedBytesPassed: byteReduction >= 20, entryCountPassed: entryReduction >= 15, candidateCommandsFreeOfModuleResolutionFailure: candidateFailures === 0, smokeBehaviorMatchesBaseline, passed: byteReduction >= 20 && entryReduction >= 15 && candidateFailures === 0 && smokeBehaviorMatchesBaseline },
+      measurement: { hostPlatform: process.platform, nodeVersion: process.version, runs: args.measurementRuns, baselineVersion, candidateDir: args.candidateDir },
+    };
+    if (args.measurementOutput) writeFileSync(args.measurementOutput, JSON.stringify(receipt, null, 2) + '\n', 'utf8');
+    console.log(JSON.stringify(receipt));
+    if (!(receipt.acceptance as { passed: boolean }).passed) process.exitCode = 1;
+    return receipt;
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
 const args = parseArgs();
+if (args.measure) {
+  try {
+    runMeasurement(args);
+  } catch (error) {
+    console.error(JSON.stringify({ schemaId: 'atm.baselineCandidateMeasurement.v1', status: 'blocked', error: String(error) }));
+    process.exitCode = args.recordBlocked ? 0 : 1;
+  }
+  process.exit();
+}
 let root: string | undefined;
 try {
   let metadata: any;

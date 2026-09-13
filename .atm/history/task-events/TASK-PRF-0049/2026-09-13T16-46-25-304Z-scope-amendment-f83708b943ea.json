@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T16-46-25-304Z-scope-amendment-f83708b943ea",
+  "taskId": "TASK-PRF-0049",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0049.json",
+  "taskSha256": "sha256:f9f9b1a311bf18f172e2a9e2c978f1b758f167efd6f1f3ce745a659bf9230ed6",
+  "createdAt": "2026-09-13T16:46:25.304Z",
+  "command": "node atm.mjs tasks scope remove --task TASK-PRF-0049 --actor codex-captain --remove release/atm-onefile/atm.mjs,release/atm-root-drop --json",
+  "amendmentMetadata": {
+    "amendmentClass": "scope-shrink",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Narrow TASK-PRF-0049 to npm runtime boundary deliverables; release runner artifacts remain in the separate runner-sync lane."
+  }
+}

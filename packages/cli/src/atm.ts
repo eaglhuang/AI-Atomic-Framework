@@ -11,84 +11,139 @@ import { runRoute } from './commands/route.ts';
 import { inspectRunnerSourceDrift } from './commands/framework-development/closure-packet-schema.ts';
 import { describeRunnerMode } from './commands/next/runner-mode.ts';
 
-type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandResult | object;
-function lazyRunner(modulePath: string, exportName: string): CliRunner {
-  return async (argv) => {
-    const module = await import(modulePath) as Record<string, unknown>;
-    const runner = module[exportName];
-    if (typeof runner !== 'function') throw new Error(`CLI runner export ${exportName} missing from ${modulePath}`);
-    return (runner as CliRunner)(argv);
-  };
-}
+import { runAtomize } from './commands/atomize.ts';
+import { runATMChart } from './commands/atm-chart.ts';
+import { runBaseline } from './commands/baseline.ts';
+import { runBatch } from './commands/batch.ts';
+import { runBootstrap } from './commands/bootstrap-entry.ts';
+import { runBudget } from './commands/budget.ts';
+import { runCandidates } from './commands/candidates.ts';
+import { runCreate } from './commands/create.ts';
+import { runCreateMap } from './commands/create-map.ts';
+import { runDoctor } from './commands/doctor.ts';
+import { runEmergency } from './commands/emergency.ts';
+import { runExplain } from './commands/explain.ts';
+import { runExperience } from './commands/experience.ts';
+import { runEvidence } from './commands/evidence.ts';
+import { runFrameworkMode } from './commands/framework-development.ts';
+import { runAtmGit } from './commands/git-governance.ts';
+import { runGuard } from './commands/guard.ts';
+import { runGitHooks, runHook } from './commands/hook.ts';
+import { runGuide } from './commands/guide.ts';
+import { runHandoff } from './commands/handoff.ts';
+import { runInit } from './commands/init.ts';
+import { runInternalRelease } from './commands/internal-release.ts';
+import { runIntegration } from './commands/integration.ts';
+import { runLane } from './commands/lane.ts';
+import { runLock } from './commands/lock.ts';
+import { runNext } from './commands/next.ts';
+import { runOrient } from './commands/orient.ts';
+import { runPlan } from './commands/plan.ts';
+import { runPolice } from './commands/police.ts';
+import { runQuickfix } from './commands/quickfix.ts';
+import { runResidue } from './commands/residue.ts';
+import { runSelfHostAlphaAsync } from './commands/self-host-alpha.ts';
+import { runSpec } from './commands/spec.ts';
+import { runStart } from './commands/start.ts';
+import { runStatus } from './commands/status.ts';
+import { runTasks } from './commands/tasks.ts';
+import { runUpgrade } from './commands/upgrade.ts';
+import { runTelemetry } from './commands/telemetry.ts';
+import { runTeam } from './commands/team.ts';
+import { runTestAsync } from './commands/test.ts';
+import { runValidate } from './commands/validate.ts';
+import { runVerify } from './commands/verify.ts';
+import { runWelcome } from './commands/welcome.ts';
+import { runRegistry } from './commands/registry.ts';
+import { runRegistryDiff } from './commands/registry-diff.ts';
+import { runReplacementLane } from './commands/replacement-lane.ts';
+import { runRollback } from './commands/rollback.ts';
+import { runReview } from './commands/review.ts';
+import { runReviewAdvisory } from './commands/review-advisory.ts';
+import { runMigrate } from './commands/migrate.ts';
+import { runAgentPack } from './commands/agent-pack.ts';
+import { runActor } from './commands/actor.ts';
+import { runAtomRef } from './commands/atom-ref.ts';
+import { runAtomCapsule } from './commands/atom-capsule.ts';
+import { runMapCapsule } from './commands/map-capsule.ts';
+import { runRescue } from './commands/rescue.ts';
+import { runDaemon } from './commands/daemon.ts';
+import { runCache } from './commands/cache.ts';
+import { runCleanup } from './commands/cleanup/index.ts';
+import { runHealthReport } from './commands/health-report.ts';
+import { runTaskflow } from './commands/taskflow.ts';
+import { runTaskView } from './commands/task-view.ts';
+import { runWriteTicket } from './commands/write-ticket.ts';
 
+type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandResult | object;
 export const cliCommandRunners: Record<string, CliRunner> = {
-  atomize: lazyRunner('./commands/atomize.ts', 'runAtomize'),
-  'atm-chart': lazyRunner('./commands/atm-chart.ts', 'runATMChart'),
-  baseline: lazyRunner('./commands/baseline.ts', 'runBaseline'),
-  batch: lazyRunner('./commands/batch.ts', 'runBatch'),
-  bootstrap: lazyRunner('./commands/bootstrap-entry.ts', 'runBootstrap'),
-  budget: lazyRunner('./commands/budget.ts', 'runBudget'),
-  candidates: lazyRunner('./commands/candidates.ts', 'runCandidates'),
-  create: lazyRunner('./commands/create.ts', 'runCreate'),
-  'create-map': lazyRunner('./commands/create-map.ts', 'runCreateMap'),
-  doctor: lazyRunner('./commands/doctor.ts', 'runDoctor'),
-  emergency: lazyRunner('./commands/emergency.ts', 'runEmergency'),
-  explain: lazyRunner('./commands/explain.ts', 'runExplain'),
-  experience: lazyRunner('./commands/experience.ts', 'runExperience'),
-  evidence: lazyRunner('./commands/evidence.ts', 'runEvidence'),
-  'framework-mode': lazyRunner('./commands/framework-development.ts', 'runFrameworkMode'),
-  git: lazyRunner('./commands/git-governance.ts', 'runAtmGit'),
-  guard: lazyRunner('./commands/guard.ts', 'runGuard'),
-  hook: lazyRunner('./commands/hook.ts', 'runHook'),
-  guide: lazyRunner('./commands/guide.ts', 'runGuide'),
-  handoff: lazyRunner('./commands/handoff.ts', 'runHandoff'),
-  init: lazyRunner('./commands/init.ts', 'runInit'),
-  'internal-release': lazyRunner('./commands/internal-release.ts', 'runInternalRelease'),
-  'git-hooks': lazyRunner('./commands/hook.ts', 'runGitHooks'),
-  integration: lazyRunner('./commands/integration.ts', 'runIntegration'),
-  lane: lazyRunner('./commands/lane.ts', 'runLane'),
-  lock: lazyRunner('./commands/lock.ts', 'runLock'),
-  next: lazyRunner('./commands/next.ts', 'runNext'),
-  orient: lazyRunner('./commands/orient.ts', 'runOrient'),
-  plan: lazyRunner('./commands/plan.ts', 'runPlan'),
-  police: lazyRunner('./commands/police.ts', 'runPolice'),
-  quickfix: lazyRunner('./commands/quickfix.ts', 'runQuickfix'),
-  residue: lazyRunner('./commands/residue.ts', 'runResidue'),
-  'self-host-alpha': lazyRunner('./commands/self-host-alpha.ts', 'runSelfHostAlphaAsync'),
-  spec: lazyRunner('./commands/spec.ts', 'runSpec'),
-  start: lazyRunner('./commands/start.ts', 'runStart'),
-  status: lazyRunner('./commands/status.ts', 'runStatus'),
-  tasks: lazyRunner('./commands/tasks.ts', 'runTasks'),
-  upgrade: lazyRunner('./commands/upgrade.ts', 'runUpgrade'),
-  telemetry: lazyRunner('./commands/telemetry.ts', 'runTelemetry'),
-  team: lazyRunner('./commands/team.ts', 'runTeam'),
-  test: lazyRunner('./commands/test.ts', 'runTestAsync'),
-  validate: lazyRunner('./commands/validate.ts', 'runValidate'),
-  verify: lazyRunner('./commands/verify.ts', 'runVerify'),
-  welcome: lazyRunner('./commands/welcome.ts', 'runWelcome'),
-  registry: lazyRunner('./commands/registry.ts', 'runRegistry'),
-  'registry-diff': lazyRunner('./commands/registry-diff.ts', 'runRegistryDiff'),
-  'replacement-lane': lazyRunner('./commands/replacement-lane.ts', 'runReplacementLane'),
-  rollback: lazyRunner('./commands/rollback.ts', 'runRollback'),
-  review: lazyRunner('./commands/review.ts', 'runReview'),
-  'review-advisory': lazyRunner('./commands/review-advisory.ts', 'runReviewAdvisory'),
-  migrate: lazyRunner('./commands/migrate.ts', 'runMigrate'),
-  'agent-pack': lazyRunner('./commands/agent-pack.ts', 'runAgentPack'),
-  actor: lazyRunner('./commands/actor.ts', 'runActor'),
-  'atom-ref': lazyRunner('./commands/atom-ref.ts', 'runAtomRef'),
-  'atom-capsule': lazyRunner('./commands/atom-capsule.ts', 'runAtomCapsule'),
-  'map-capsule': lazyRunner('./commands/map-capsule.ts', 'runMapCapsule'),
-  rescue: lazyRunner('./commands/rescue.ts', 'runRescue'),
-  daemon: lazyRunner('./commands/daemon.ts', 'runDaemon'),
-  cache: lazyRunner('./commands/cache.ts', 'runCache'),
-  cleanup: lazyRunner('./commands/cleanup/index.ts', 'runCleanup'),
-  'health-report': lazyRunner('./commands/health-report.ts', 'runHealthReport'),
-  identity: lazyRunner('./commands/identity.ts', 'runIdentity'),
-  taskflow: lazyRunner('./commands/taskflow.ts', 'runTaskflow'),
-  'task-view': lazyRunner('./commands/task-view.ts', 'runTaskView'),
-  broker: lazyRunner('./commands/broker.ts', 'runBroker'),
-  route: lazyRunner('./commands/route.ts', 'runRoute'),
-  'write-ticket': lazyRunner('./commands/write-ticket.ts', 'runWriteTicket')
+  atomize: runAtomize,
+  'atm-chart': runATMChart,
+  baseline: runBaseline,
+  batch: runBatch,
+  bootstrap: runBootstrap,
+  budget: runBudget,
+  candidates: runCandidates,
+  create: runCreate,
+  'create-map': runCreateMap,
+  doctor: runDoctor,
+  emergency: runEmergency,
+  explain: runExplain,
+  experience: runExperience,
+  evidence: runEvidence,
+  'framework-mode': runFrameworkMode,
+  git: runAtmGit,
+  guard: runGuard,
+  hook: runHook,
+  guide: runGuide,
+  handoff: runHandoff,
+  init: runInit,
+  'internal-release': runInternalRelease,
+  'git-hooks': runGitHooks,
+  integration: runIntegration,
+  lane: runLane,
+  lock: runLock,
+  next: runNext,
+  orient: runOrient,
+  plan: runPlan,
+  police: runPolice,
+  quickfix: runQuickfix,
+  residue: runResidue,
+  'self-host-alpha': runSelfHostAlphaAsync,
+  spec: runSpec,
+  start: runStart,
+  status: runStatus,
+  tasks: runTasks,
+  upgrade: runUpgrade,
+  telemetry: runTelemetry,
+  team: runTeam,
+  test: runTestAsync,
+  validate: runValidate,
+  verify: runVerify,
+  welcome: runWelcome,
+  registry: runRegistry,
+  'registry-diff': runRegistryDiff,
+  'replacement-lane': runReplacementLane,
+  rollback: runRollback,
+  review: runReview,
+  'review-advisory': runReviewAdvisory,
+  migrate: runMigrate,
+  'agent-pack': runAgentPack,
+  actor: runActor,
+  'atom-ref': runAtomRef,
+  'atom-capsule': runAtomCapsule,
+  'map-capsule': runMapCapsule,
+  rescue: runRescue,
+  daemon: runDaemon,
+  cache: runCache,
+  cleanup: runCleanup,
+  'health-report': runHealthReport,
+  identity: runIdentity,
+  taskflow: runTaskflow,
+  'task-view': runTaskView,
+  broker: runBroker,
+  route: runRoute,
+  'write-ticket': runWriteTicket
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {

@@ -1,12 +1,17 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0049",
-  "updatedAt": "2026-09-13T14:19:43.674Z",
+  "updatedAt": "2026-09-13T16:45:35.266Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
+    "baseline-vs-candidate measurement",
+    "command-backed baseline-vs-candidate measurement with retained receipt",
+    "lint",
     "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "npm-clean-install test",
     "typecheck",
     "validate:cli",
+    "validate:npm-clean-install",
     "validate:package-install",
     "validate:public-npm-install"
   ],
@@ -147,7 +152,162 @@
       "runnerKind": "dev-source",
       "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
       "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-13T15:59:22.826Z",
+      "startedAt": "2026-09-13T15:59:13.757Z",
+      "finishedAt": "2026-09-13T15:59:22.826Z",
+      "durationMs": 9069,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d085f0830e1471cf065b83481f7eba7e793db65b",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-13T15:59:43.013Z",
+      "startedAt": "2026-09-13T15:59:32.665Z",
+      "finishedAt": "2026-09-13T15:59:43.013Z",
+      "durationMs": 10348,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d085f0830e1471cf065b83481f7eba7e793db65b",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-13T16:21:33.714Z",
+      "startedAt": "2026-09-13T16:21:24.724Z",
+      "finishedAt": "2026-09-13T16:21:33.714Z",
+      "durationMs": 8990,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d085f0830e1471cf065b83481f7eba7e793db65b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:npm-clean-install",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1656f05668c1603de0f5449ba20338fc6d17f8feb106a5b82cdfd652d090eb5b",
+      "stderrSha256": "sha256:3bdbf96b0f5f9df41c06fef5dccdafa3dbc055fd4270d490c9e8a4d3e05cabe4",
+      "validators": [
+        "validate:npm-clean-install"
+      ],
+      "generatedAt": "2026-09-13T16:35:18.913Z",
+      "startedAt": "2026-09-13T16:35:03.517Z",
+      "finishedAt": "2026-09-13T16:35:18.913Z",
+      "durationMs": 15396,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d085f0830e1471cf065b83481f7eba7e793db65b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-public-npm-install.ts --measure --package @ai-atomic-framework/cli --baseline-version 0.1.0 --candidate-dir packages/cli --measurement-runs 3 --measurement-output C:\\Users\\User\\atm-benchmark-sink\\TASK-PRF-0049-current-pack\\baseline-vs-candidate-measurement.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b42c7428f9a0f66b53948b51ab75edab8b4c691cf82345599058dbfc42218c2e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "baseline-vs-candidate measurement"
+      ],
+      "generatedAt": "2026-09-13T16:43:40.227Z",
+      "startedAt": "2026-09-13T16:43:27.734Z",
+      "finishedAt": "2026-09-13T16:43:40.227Z",
+      "durationMs": 12493,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d085f0830e1471cf065b83481f7eba7e793db65b",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-13T16:44:38.243Z",
+      "startedAt": "2026-09-13T16:44:29.363Z",
+      "finishedAt": "2026-09-13T16:44:38.243Z",
+      "durationMs": 8880,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d085f0830e1471cf065b83481f7eba7e793db65b",
+      "cached": false
+    },
+    {
+      "command": "npm run lint --workspace @ai-atomic-framework/cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:50d31235a48f1a3597cdc755c66fc011a43ef9c3a704d3af52eb8e00f2725043",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-13T16:44:45.666Z",
+      "startedAt": "2026-09-13T16:44:40.808Z",
+      "finishedAt": "2026-09-13T16:44:45.666Z",
+      "durationMs": 4858,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d085f0830e1471cf065b83481f7eba7e793db65b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6b8aa00fb0b81b00d6dda72ab6d0de27b464508ab939eca4dd36674d3d023f58",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "npm-clean-install test"
+      ],
+      "generatedAt": "2026-09-13T16:44:48.586Z",
+      "startedAt": "2026-09-13T16:44:48.283Z",
+      "finishedAt": "2026-09-13T16:44:48.586Z",
+      "durationMs": 303,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d085f0830e1471cf065b83481f7eba7e793db65b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-public-npm-install.ts --measure --package @ai-atomic-framework/cli --baseline-version 0.1.0 --candidate-dir packages/cli --measurement-runs 3 --measurement-output C:\\Users\\User\\atm-benchmark-sink\\TASK-PRF-0049-current-pack\\baseline-vs-candidate-measurement.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:85198409604d3230aaefc2ddfac493e693f099d587975741b4f2ad7923e92188",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "command-backed baseline-vs-candidate measurement with retained receipt"
+      ],
+      "generatedAt": "2026-09-13T16:45:35.265Z",
+      "startedAt": "2026-09-13T16:45:21.860Z",
+      "finishedAt": "2026-09-13T16:45:35.265Z",
+      "durationMs": 13405,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d085f0830e1471cf065b83481f7eba7e793db65b",
+      "cached": false
     }
   ],
-  "artifactPaths": []
+  "artifactPaths": [
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0050/command-receipts",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0050/measurements.json",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0050/review.md",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0051/command-receipts",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0051/measurements.json",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0051/reproduction-notes.md",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0051/review.md",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0052/command-receipts",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0052/integrity-manifest.json",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0052/measurements.json",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0052/reproduction-notes.md",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0052/review.md"
+  ]
 }

@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-1b5fa1c0da9c",
+  "recordedAt": "2026-09-13T16:47:28.151Z",
+  "actorId": null,
+  "taskId": "TASK-PRF-0049",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from atm-product-proof/tasks/TASK-PRF-0049-reduce-published-cli-unpacked-runtime-with-measured-boundary-split.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-TASK-PRF-0049-620fd60fd2",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-13T16-47-28-150Z-EMG-TASK-PRF-0049-620fd60fd2.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

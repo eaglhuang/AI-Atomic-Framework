@@ -5,6 +5,12 @@ import { fileURLToPath } from 'node:url';
 import { build, type Plugin } from 'esbuild';
 import ts from 'typescript';
 
+const OMITTED_PUBLIC_ASSETS = [
+  /^_vendor\/agent-pack-claude-code\/templates\//,
+  /^_vendor\/integrations-core\/templates\/skills\/atm-deep-module-refactor\.files\/references\//,
+  /^_vendor\/integrations-core\/templates\/skills\/atm-governance-router\.files\/references\/(?:entry-friction|fallback-design|learning-loop|route-interpretation)\.md$/
+] as const;
+
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = {}) {
   const root = path.resolve(options.repositoryRoot ?? repositoryRoot);
@@ -17,7 +23,7 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = 
     mkdirSync(runtimeRoot, { recursive: true });
     writeFileSync(entryPath, [
       "export * from './index.js';",
-      "export { runCli } from './atm.js';",
+      "export { runPublicCli as runCli, publicCliCommandNames } from './atm-public.js';",
       ''
     ].join('\n'), 'utf8');
 
@@ -69,6 +75,13 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = 
         runtime: 'runtime.mjs'
       },
       moduleIdentity: 'original-dist-relative-url',
+      publicSurface: 'adopter-core',
+      publicCommands: [
+        'next', 'doctor', 'guide', 'init', 'create', 'taskflow', 'welcome',
+        'status', 'verify', 'orient', 'evidence', 'lock', 'broker', 'git',
+        'integration', 'plan', 'actor', 'bootstrap', 'start', 'tasks'
+      ],
+      omittedPublicAssets: OMITTED_PUBLIC_ASSETS.map((pattern) => pattern.source),
       files,
       fileCount: files.length + 1,
       totalBytes: files.reduce((sum, file) => sum + file.bytes, 0)
@@ -143,6 +156,8 @@ function copyRuntimeAssets(sourceRoot: string, targetRoot: string, excludedRoot:
     if (sourcePath.startsWith(`${excludedRoot}${path.sep}`)) continue;
     if (/\.(?:[cm]?js|d\.ts)$/i.test(sourcePath)) continue;
     const relativePath = path.relative(sourceRoot, sourcePath);
+    const normalizedRelativePath = relativePath.replace(/\\/g, '/');
+    if (OMITTED_PUBLIC_ASSETS.some((pattern) => pattern.test(normalizedRelativePath))) continue;
     const targetPath = path.join(targetRoot, relativePath);
     mkdirSync(path.dirname(targetPath), { recursive: true });
     copyFileSync(sourcePath, targetPath);
