@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0035",
   "title": "Repair operation denominators and total cost decision",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0034"
@@ -218,8 +218,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-13T05-21-19-614Z-claim-957931bf27e0",
-  "lastTransitionAt": "2026-09-13T05:21:19.614Z",
+  "lastTransitionId": "2026-09-13T05-28-55-777Z-close-27e2a46f3a55",
+  "lastTransitionAt": "2026-09-13T05:28:55.777Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-benchmark-metrics",
   "reservedAt": "2026-09-13T05:21:14.369Z",
@@ -228,7 +228,7 @@
     "actorId": "codex-benchmark-metrics",
     "leaseId": "lease-653fab9e60be",
     "claimedAt": "2026-09-13T05:21:14.378Z",
-    "heartbeatAt": "2026-09-13T05:21:14.378Z",
+    "heartbeatAt": "2026-09-13T05:28:55.775Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0035.json",
@@ -237,14 +237,14 @@
       "scripts/lib/external-benchmark/report.ts",
       "tests/cli/external-benchmark-v2-metrics.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260913052114-codex-benchmark-metrics-0fdf780303",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913052114-codex-benchmark-metrics-0fdf780303\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-13T05:21:14.378Z",
   "startedByActor": "codex-benchmark-metrics",
@@ -344,5 +344,9 @@
     },
     "createdAt": "2026-09-13T05:21:19.613Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-13T05:28:55.775Z",
+  "closedByActor": "codex-benchmark-metrics",
+  "closedBySessionId": "session-20260913052114-codex-benchmark-metrics-TASK-PRF-0035-4893f55c68",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0035.closure-packet.json"
 }

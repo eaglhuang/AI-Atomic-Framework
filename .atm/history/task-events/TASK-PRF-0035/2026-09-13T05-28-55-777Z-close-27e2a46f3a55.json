@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T05-28-55-777Z-close-27e2a46f3a55",
+  "taskId": "TASK-PRF-0035",
+  "action": "close",
+  "actorId": "codex-benchmark-metrics",
+  "sessionId": "session-20260913052114-codex-benchmark-metrics-TASK-PRF-0035-4893f55c68",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0035.json",
+  "taskSha256": "sha256:13d1d5141dcdbee27bd063aa85194b823a3a0dfab44222f6654a3ce55297ca26",
+  "createdAt": "2026-09-13T05:28:55.777Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0035 --actor codex-benchmark-metrics --status done --historical-delivery 7becfb850d2f05ea75cb1b0dd61af4aab3cd1e05",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913052114-codex-benchmark-metrics-TASK-PRF-0035-4893f55c68",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0035.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T05:28:55.765Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0035.*",
+        ".atm/history/task-events/TASK-PRF-0035/**",
+        ".atm/history/tasks/TASK-PRF-0035.json",
+        "scripts/lib/external-benchmark/adjudication.ts",
+        "scripts/lib/external-benchmark/metrics.ts",
+        "scripts/lib/external-benchmark/report.ts",
+        "tests/cli/external-benchmark-v2-metrics.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/lib/external-benchmark/adjudication.ts",
+        "scripts/lib/external-benchmark/metrics.ts",
+        "scripts/lib/external-benchmark/report.ts",
+        "tests/cli/external-benchmark-v2-metrics.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts"
+      ]
+    }
+  }
+}
