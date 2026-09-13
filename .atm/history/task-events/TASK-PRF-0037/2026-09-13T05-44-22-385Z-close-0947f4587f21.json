@@ -1,0 +1,51 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T05-44-22-385Z-close-0947f4587f21",
+  "taskId": "TASK-PRF-0037",
+  "action": "close",
+  "actorId": "codex-benchmark-telemetry",
+  "sessionId": "session-20260913053732-codex-benchmark-telemetry-TASK-PRF-0037-c4cb826869",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0037.json",
+  "taskSha256": "sha256:aeb89a4ca39186499acb70f83864f9e6ab0dbd6a98872339725c093803293cb9",
+  "createdAt": "2026-09-13T05:44:22.385Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0037 --actor codex-benchmark-telemetry --status done --historical-delivery 872c3c85b89498284a1dee1f6c22078f8da0ba72",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913053732-codex-benchmark-telemetry-TASK-PRF-0037-c4cb826869",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0037.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/external-benchmark-telemetry.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-telemetry.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T05:44:22.372Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0037.*",
+        ".atm/history/task-events/TASK-PRF-0037/**",
+        ".atm/history/tasks/TASK-PRF-0037.json",
+        "docs/benchmark/telemetry-contract.md",
+        "scripts/lib/external-benchmark/telemetry.ts",
+        "tests/cli/external-benchmark-telemetry.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/lib/external-benchmark/telemetry.ts",
+        "tests/cli/external-benchmark-telemetry.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/external-benchmark-telemetry.test.ts"
+      ]
+    }
+  }
+}
