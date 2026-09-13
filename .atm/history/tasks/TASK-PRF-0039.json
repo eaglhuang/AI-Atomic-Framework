@@ -1,0 +1,390 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0039",
+  "title": "Execute paired ATM and Git baseline arms",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0035",
+    "TASK-PRF-0036",
+    "TASK-PRF-0037",
+    "TASK-PRF-0038"
+  ],
+  "acceptance": [
+    "ACC-1: 同模型/reasoning/budget/prompt/repo 的 AB/BA 配對，每 run 新 session，保存 seed/order、指令、merge/rebase 與失敗。",
+    "ACC-2: baseline 執行真 worktree/Git/CI，ATM 完成公開 workflow；不使用 modeled Git 或模擬 provider 作產品數據。",
+    "ACC-3: 提供 --verify-packet --stage pilot|formal|replication|product --packet <summary.json>，解析 Git 外 raw refs、reject 缺檔及偽造來源；支援 timeout/cancel resume。"
+  ],
+  "deliverables": [
+    "scripts/run-atm-external-benchmark.ts",
+    "scripts/lib/external-benchmark/runner.ts",
+    "scripts/lib/external-benchmark/paired-executor.ts",
+    "tests/cli/external-benchmark-paired-executor.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/run-atm-external-benchmark.ts",
+    "scripts/lib/external-benchmark/runner.ts",
+    "scripts/lib/external-benchmark/paired-executor.ts",
+    "tests/cli/external-benchmark-paired-executor.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-bound-case-red-green",
+  "rollbackStrategy": "revert-commit-preserve-raw-evidence",
+  "rollbackNotes": "只回滾本卡程式/公開摘要，原始試驗不可刪改；暫存環境依 owner receipt 清理。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.external-proof-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.benchmark-paired-runner",
+        "pattern": "Policy Object",
+        "source": "scripts/run-atm-external-benchmark.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/run-atm-external-benchmark.ts",
+        "scripts/lib/external-benchmark/runner.ts",
+        "scripts/lib/external-benchmark/paired-executor.ts",
+        "tests/cli/external-benchmark-paired-executor.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0039-execute-paired-atm-and-git-baseline-arms.task.md",
+    "sectionTitle": "TASK-PRF-0039",
+    "headingLine": 79,
+    "hash": "4adf460650c01d61",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0039-execute-paired-atm-and-git-baseline-arms.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4adf460650c01d6186b03f63342dc22d2468cce9c83c1be23f4cb86b48c037b4",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-13T05:56:28.778Z"
+    }
+  },
+  "importedAt": "2026-09-13T05:56:28.778Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0035",
+      "TASK-PRF-0036",
+      "TASK-PRF-0037",
+      "TASK-PRF-0038"
+    ],
+    "startConditions": [
+      "實作前以 target ATM 接手本卡；共用契約由 0034 定義，未交付前可做 docs-first 設計。"
+    ],
+    "softRelations": [
+      "TASK-PRF-0008",
+      "TASK-PRF-0019"
+    ],
+    "changedPublicSeams": [
+      "benchmark_paired_runner"
+    ],
+    "causalImpactEdges": [
+      "benchmark_paired_runner_verified"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-protocol",
+      "role-and-tool-readiness"
+    ],
+    "validatorReferences": [
+      "test_prf_benchmark_paired_runner_1",
+      "test_prf_benchmark_paired_runner_2",
+      "test_prf_benchmark_paired_runner_3"
+    ],
+    "phaseOwner": "benchmark-instrumentation"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_benchmark_paired_runner_1",
+      "targetGroupId": null,
+      "semanticKey": "benchmark_paired_runner_1",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "benchmark_paired_runner_verified"
+      ],
+      "expectedRedPredicate": "只跑一 arm、provider 混淆、前組答案外洩、隱藏失败重跑或只有 summary 無 raw refs 均失敗。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "benchmark_paired_runner",
+      "resourceKey": "benchmark_paired_runner"
+    },
+    {
+      "caseId": "test_prf_benchmark_paired_runner_2",
+      "targetGroupId": null,
+      "semanticKey": "benchmark_paired_runner_2",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "benchmark_paired_runner_verified"
+      ],
+      "expectedRedPredicate": "只跑一 arm、provider 混淆、前組答案外洩、隱藏失败重跑或只有 summary 無 raw refs 均失敗。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "benchmark_paired_runner",
+      "resourceKey": "benchmark_paired_runner"
+    },
+    {
+      "caseId": "test_prf_benchmark_paired_runner_3",
+      "targetGroupId": null,
+      "semanticKey": "benchmark_paired_runner_3",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "benchmark_paired_runner_verified"
+      ],
+      "expectedRedPredicate": "只跑一 arm、provider 混淆、前組答案外洩、隱藏失败重跑或只有 summary 無 raw refs 均失敗。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "benchmark_paired_runner",
+      "resourceKey": "benchmark_paired_runner"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_benchmark_paired_runner_1",
+    "test_prf_benchmark_paired_runner_2",
+    "test_prf_benchmark_paired_runner_3"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0035",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-PRF-0036",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-PRF-0037",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      },
+      {
+        "taskId": "TASK-PRF-0038",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-13T05-56-44-884Z-claim-5c93ba63d8dd",
+  "lastTransitionAt": "2026-09-13T05:56:44.884Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-benchmark-paired",
+  "reservedAt": "2026-09-13T05:56:39.612Z",
+  "promotedAt": "2026-09-13T05:56:39.617Z",
+  "claim": {
+    "actorId": "codex-benchmark-paired",
+    "leaseId": "lease-3c7cbb9638bf",
+    "claimedAt": "2026-09-13T05:56:39.622Z",
+    "heartbeatAt": "2026-09-13T05:56:39.622Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0039.json",
+      "scripts/lib/external-benchmark/paired-executor.ts",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/run-atm-external-benchmark.ts",
+      "tests/cli/external-benchmark-paired-executor.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260913055639-codex-benchmark-paired-632d03be6e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913055639-codex-benchmark-paired-632d03be6e\""
+    }
+  },
+  "startedAt": "2026-09-13T05:56:39.622Z",
+  "startedByActor": "codex-benchmark-paired",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-8c66b11d86c2176f",
+    "ticketDigest": "sha256:8c66b11d86c2176f0931bc8dc573adf6311eb73238d44d785aacd3c489bafbaf",
+    "taskId": "TASK-PRF-0039",
+    "origin": "claim",
+    "actorId": "codex-benchmark-paired",
+    "laneSessionId": "lane-20260913055639-codex-benchmark-paired-632d03be6e",
+    "claimGeneration": "lease-3c7cbb9638bf",
+    "issuedAt": "2026-09-13T05:56:39.622Z",
+    "expiresAt": "2026-09-13T06:26:39.622Z",
+    "scopeDigest": "sha256:c7a283db0e6151e81ab1b7167b51b873682ae984606d2ca18e8e11532b7a5f03",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-13T05:56:39.622Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0039.*",
+          ".atm/history/task-events/TASK-PRF-0039/**",
+          ".atm/history/tasks/TASK-PRF-0039.json",
+          "scripts/lib/external-benchmark/paired-executor.ts",
+          "scripts/lib/external-benchmark/runner.ts",
+          "scripts/run-atm-external-benchmark.ts",
+          "tests/cli/external-benchmark-paired-executor.test.ts"
+        ],
+        "digest": "sha256:8f8e728fde658b453a190317477d50aaea7976c6219c5ef7cc41f37653b1ac9a"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260913055639-codex-benchmark-paired-TASK-PRF-0039-b37e001076",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0039",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0039.*",
+      ".atm/history/task-events/TASK-PRF-0039/**",
+      ".atm/history/tasks/TASK-PRF-0039.json",
+      "scripts/lib/external-benchmark/paired-executor.ts",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/run-atm-external-benchmark.ts",
+      "tests/cli/external-benchmark-paired-executor.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "723a20f0e1c8dabe700862aba822c49210dd11332d4b3b3272d19617efdac897",
+    "actorId": "codex-benchmark-paired",
+    "sessionId": "session-20260913055639-codex-benchmark-paired-TASK-PRF-0039-b37e001076",
+    "laneSession": {
+      "laneSessionId": "lane-20260913055639-codex-benchmark-paired-632d03be6e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913055639-codex-benchmark-paired-632d03be6e\""
+    },
+    "createdAt": "2026-09-13T05:56:44.884Z",
+    "status": "active"
+  }
+}
