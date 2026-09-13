@@ -1,0 +1,432 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0420",
+  "title": "Repair false-green closure when runner scope changes before batch checkpoint",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: Runner-impact classification is data-driven from the declared runner build scope; it does not hard-code PRF-0050, a task id, or one file name.",
+    "ACC-2: A non-runtime package-script/report/test change cannot create a false runner-stale blocker, while an actual runner-affecting source change remains fail-closed until its candidate seal is verified.",
+    "ACC-3: Checkpoint consumes one immutable candidate source snapshot and records its digest, source availability, actor/lane, and runner relationship in command-backed evidence.",
+    "ACC-4: A runner-affecting candidate has a non-circular governed continuation: either the runner is sealed from that candidate before checkpoint, or a receipt-bound continuation can complete publication/close without reopening or reclaiming the task. No emergency bypass is required for the normal path.",
+    "ACC-5: Closure provenance verifies that the actual delivery commit contains the declared task deliverables and rejects the historical false-green shape where only unrelated files were committed.",
+    "ACC-6: Focused tests reproduce the PRF-0050 red predicate and then pass on the same candidate lineage; no raw Git mutation, task-specific allowlist, or `ATM-Emergency` evidence is accepted as completion.",
+    "ACC-7: `validate:cli`, typecheck, and frozen-runner validation pass after a governed sealed build; foreign staged state and unrelated WIP remain byte-identical."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch/implementation.ts",
+    "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+    "scripts/AtmCore/runner-build-scope.json",
+    "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+    "tests/cli/closure-delivery-file-coverage.test.ts",
+    "tests/cli/frozen-runner-validation-foreign-state.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch/implementation.ts",
+    "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+    "scripts/AtmCore/runner-build-scope.json",
+    "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+    "tests/cli/closure-delivery-file-coverage.test.ts",
+    "tests/cli/frozen-runner-validation-foreign-state.test.ts",
+    ".atm/history/evidence/ATM-GOV-0420.*",
+    ".atm/history/task-events/ATM-GOV-0420/**",
+    ".atm/history/tasks/ATM-GOV-0420.json",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "node --strip-types tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+    "node --strip-types tests/cli/closure-delivery-file-coverage.test.ts",
+    "node --strip-types tests/cli/frozen-runner-validation-foreign-state.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+  ],
+  "planningRepo": "C:/Users/User/3KLife/docs/ai_atomic_framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert candidate-seal and closure-provenance changes together; rebuild the frozen runner from reverted committed HEAD and preserve PRF-0050 failure evidence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-source-impact-and-checkpoint-admission",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-source-impact-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.batch-checkpoint-candidate-seal",
+        "pattern": "Adapter/Port",
+        "source": "packages/cli/src/commands/batch/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.closure-delivery-provenance",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0420-repair-false-green-closure-when-runner-scope-changes-before-batch-checkpoint.task.md",
+    "sectionTitle": "ATM-GOV-0420",
+    "headingLine": 170,
+    "hash": "85487ccf9ea6ea8d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0420-repair-false-green-closure-when-runner-scope-changes-before-batch-checkpoint.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:85487ccf9ea6ea8da297d92a09e4047ec6a356578670d7eb7ed25f30fa976eab",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-13T18:02:07.625Z"
+    }
+  },
+  "importedAt": "2026-09-13T18:02:07.625Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0050 reproduces a valid candidate delivery that cannot reach batch checkpoint because the frozen runner seal is computed against a different source snapshot."
+    ],
+    "startConditions": [
+      "The PRF-0050 candidate receipt, runner-sync receipt, and stale-runner checkpoint output remain available as read-only evidence."
+    ],
+    "softRelations": [
+      "ATM-GOV-0345 is historical context only; its closure packet must not be treated as proof that this defect is fixed.",
+      "TASK-PRF-0050 remains independently provenance-preserving."
+    ],
+    "changedPublicSeams": [
+      "atm.runnerSourceImpact.v1",
+      "atm.batchCheckpointCandidateSeal.v1",
+      "atm.closureDeliveryProvenance.v1"
+    ],
+    "causalImpactEdges": [
+      "dirty-runner-scope-change -> checkpoint-admission",
+      "checkpoint-admission -> close-before-commit-deadlock",
+      "closure-packet -> delivery-commit-file-coverage"
+    ],
+    "parallelFrontierInputs": [
+      "immutable candidate source snapshot (index or equivalent governed snapshot)",
+      "runner-sync broker receipt when publication is actually required",
+      "task delivery commit and its declared file set"
+    ],
+    "validatorReferences": [
+      "test_atm_gov_0420_runner_scope_impact_classification",
+      "test_atm_gov_0420_checkpoint_candidate_snapshot",
+      "test_atm_gov_0420_closure_delivery_file_coverage",
+      "validate=cli"
+    ],
+    "phaseOwner": "Wave 3 governance recovery"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_atm_gov_0420_runner_scope_impact_classification",
+      "targetGroupId": "null",
+      "semanticKey": "runner_scope_impact_is_data_driven",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "dirty-runner-scope-change -> checkpoint-admission"
+      ],
+      "expectedRedPredicate": "a non-runtime package-script change is treated as runner-affecting and blocks checkpoint, or a runtime source change is incorrectly allowed without a fresh runner.",
+      "contributionResourceKey": "runner-source-impact",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.runnerSourceImpact.v1",
+      "resourceKey": "runner-source-impact"
+    },
+    {
+      "caseId": "test_atm_gov_0420_checkpoint_candidate_snapshot",
+      "targetGroupId": "null",
+      "semanticKey": "checkpoint_has_non_circular_candidate_seal",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "checkpoint-admission -> close-before-commit-deadlock"
+      ],
+      "expectedRedPredicate": "a valid staged candidate requires a frozen runner built from an unreachable clean HEAD, so checkpoint deadlocks or accepts an unbound runner.",
+      "contributionResourceKey": "batch-checkpoint-candidate-seal",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.batchCheckpointCandidateSeal.v1",
+      "resourceKey": "batch-checkpoint-candidate-seal"
+    },
+    {
+      "caseId": "test_atm_gov_0420_closure_delivery_file_coverage",
+      "targetGroupId": "null",
+      "semanticKey": "closure_packet_matches_delivery_commit",
+      "coversAcceptance": [
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "closure-packet -> delivery-commit-file-coverage"
+      ],
+      "expectedRedPredicate": "a task closes with a successful ledger and evidence packet although the delivery commit does not contain the files required by the card acceptance contract.",
+      "contributionResourceKey": "closure-delivery-provenance",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.closureDeliveryProvenance.v1",
+      "resourceKey": "closure-delivery-provenance"
+    },
+    {
+      "caseId": "test_atm_gov_0420_frozen_runner_and_foreign_state",
+      "targetGroupId": "null",
+      "semanticKey": "frozen_runner_validation_preserves_foreign_state",
+      "coversAcceptance": [
+        "ACC-7"
+      ],
+      "coversImpactEdges": [
+        "checkpoint-admission -> close-before-commit-deadlock"
+      ],
+      "expectedRedPredicate": "a sealed runner validation or checkpoint attempt changes foreign staged entries or passes without a matching frozen-runner receipt.",
+      "contributionResourceKey": "frozen-runner-validation",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "atm.batchCheckpointCandidateSeal.v1",
+      "resourceKey": "frozen-runner-validation"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_atm_gov_0420_runner_scope_impact_classification",
+    "test_atm_gov_0420_checkpoint_candidate_snapshot",
+    "test_atm_gov_0420_closure_delivery_file_coverage",
+    "test_atm_gov_0420_frozen_runner_and_foreign_state"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-13T23-41-51-657Z-renew-5ee7301bec29",
+  "lastTransitionAt": "2026-09-13T23:41:51.657Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-09-13T23:01:51.359Z",
+  "promotedAt": "2026-09-13T23:01:51.366Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-17cab18e59da",
+    "claimedAt": "2026-09-13T23:41:34.480Z",
+    "heartbeatAt": "2026-09-13T23:41:50.729Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0420.json",
+      ".atm/history/evidence/ATM-GOV-0420.*",
+      ".atm/history/task-events/ATM-GOV-0420/**",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop",
+      "scripts/AtmCore/runner-build-scope.json",
+      "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/closure-delivery-file-coverage.test.ts",
+      "tests/cli/frozen-runner-validation-foreign-state.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260913234134-codex-captain-8a045151c1",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913234134-codex-captain-8a045151c1\""
+    }
+  },
+  "startedAt": "2026-09-13T23:01:51.371Z",
+  "startedByActor": "codex-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-e71e111d49b7913d",
+    "ticketDigest": "sha256:e71e111d49b7913d73811a34bd3ede5eba60e42777ce30de8231f343acd984b9",
+    "taskId": "ATM-GOV-0420",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260913234134-codex-captain-8a045151c1",
+    "claimGeneration": "lease-17cab18e59da",
+    "issuedAt": "2026-09-13T23:41:50.729Z",
+    "expiresAt": "2026-09-14T00:11:50.729Z",
+    "scopeDigest": "sha256:ab8c0c977298893ac3483256584ee9edba549dc8158def8f23cfe37a230cb8ff",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-13T23:41:50.729Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/ATM-GOV-0420.*",
+          ".atm/history/task-events/ATM-GOV-0420/**",
+          ".atm/history/tasks/ATM-GOV-0420.json",
+          "packages/cli/src/commands/batch/implementation.ts",
+          "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+          "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop",
+          "scripts/AtmCore/runner-build-scope.json",
+          "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+          "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+          "tests/cli/closure-delivery-file-coverage.test.ts",
+          "tests/cli/frozen-runner-validation-foreign-state.test.ts"
+        ],
+        "digest": "sha256:cbc49b437e886cdccc5fa66e69730a0e2dde4f44231e14fd8771f1e1fd22ad70"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260913234134-codex-captain-ATM-GOV-0420-f575a50582",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "ATM-GOV-0420",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260913230151-codex-captain-b55fd82c5d",
+    "dirtyPaths": [
+      ".atm/history/evidence/ATM-GOV-0420.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0420.runner-sync-receipt.json",
+      ".atm/history/task-events/ATM-GOV-0420/2026-09-13T18-02-07-956Z-import-9e880e794fa0.json",
+      ".atm/history/task-events/ATM-GOV-0420/2026-09-13T23-01-51-360Z-reserve-f699d1aa7f03.json",
+      ".atm/history/task-events/ATM-GOV-0420/2026-09-13T23-01-51-366Z-promote-05bad1ccf208.json",
+      ".atm/history/task-events/ATM-GOV-0420/2026-09-13T23-01-58-124Z-claim-a0af797af537.json",
+      ".atm/history/task-events/ATM-GOV-0420/2026-09-13T23-02-48-460Z-renew-67021ebfc949.json",
+      ".atm/history/task-events/ATM-GOV-0420/2026-09-13T23-19-45-090Z-scope-amendment-56359fa5d555.json",
+      ".atm/history/tasks/ATM-GOV-0420.json",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/AtmCore/runner-build-scope.json",
+      "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/closure-delivery-file-coverage.test.ts",
+      "tests/cli/frozen-runner-validation-foreign-state.test.ts"
+    ],
+    "retainedAt": "2026-09-13T23:41:21.246Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "codex-captain",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0420",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0420.*",
+      ".atm/history/task-events/ATM-GOV-0420/**",
+      ".atm/history/tasks/ATM-GOV-0420.json",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop",
+      "scripts/AtmCore/runner-build-scope.json",
+      "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/closure-delivery-file-coverage.test.ts",
+      "tests/cli/frozen-runner-validation-foreign-state.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d4d8494aa5b57b06d41ae60ea848520732d19031e4e5a9178e2fcecdab21ff6d",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260913234134-codex-captain-ATM-GOV-0420-f575a50582",
+    "laneSession": {
+      "laneSessionId": "lane-20260913234134-codex-captain-8a045151c1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913234134-codex-captain-8a045151c1\""
+    },
+    "createdAt": "2026-09-13T23:41:41.260Z",
+    "status": "active"
+  }
+}

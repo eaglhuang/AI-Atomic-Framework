@@ -34,6 +34,26 @@
     "tsconfig.json",
     "tsconfig.build.json"
   ],
+  "runnerAffectingConfigKeys": {
+    "package.json": [
+      "dependencies",
+      "devDependencies",
+      "peerDependencies",
+      "optionalDependencies",
+      "bundledDependencies",
+      "bundleDependencies",
+      "engines",
+      "bin",
+      "files",
+      "exports",
+      "imports",
+      "type",
+      "workspaces",
+      "packageManager"
+    ],
+    "tsconfig.json": ["*"],
+    "tsconfig.build.json": ["*"]
+  },
   "rootLaunchers": [
     "atm.mjs",
     "atm.dev.mjs"

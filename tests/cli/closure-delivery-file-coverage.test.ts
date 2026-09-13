@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { verifyClosureDeliveryCommit } from '../../packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts';
+
+const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-closure-delivery-'));
+mkdirSync(path.join(repo, 'src'), { recursive: true });
+execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
+execFileSync('git', ['config', 'user.email', 'validator@example.invalid'], { cwd: repo, stdio: 'ignore' });
+execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
+writeFileSync(path.join(repo, 'src', 'declared.ts'), 'export const delivered = true;\n');
+execFileSync('git', ['add', '--', 'src/declared.ts'], { cwd: repo });
+execFileSync('git', ['commit', '-m', 'deliver declared file'], { cwd: repo, stdio: 'ignore' });
+const delivered = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+const pass = verifyClosureDeliveryCommit({ cwd: repo, deliveryCommitSha: delivered, declaredFiles: ['src/declared.ts'] });
+assert.equal(pass.ok, true);
+assert.deepEqual(pass.missingFiles, []);
+const fail = verifyClosureDeliveryCommit({ cwd: repo, deliveryCommitSha: delivered, declaredFiles: ['src/missing.ts'] });
+assert.equal(fail.ok, false);
+assert.deepEqual(fail.missingFiles, ['src/missing.ts']);
+console.log('[closure-delivery-file-coverage.test] ok');

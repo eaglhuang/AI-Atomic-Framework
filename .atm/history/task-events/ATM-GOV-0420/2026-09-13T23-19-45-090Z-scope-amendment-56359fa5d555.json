@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T23-19-45-090Z-scope-amendment-56359fa5d555",
+  "taskId": "ATM-GOV-0420",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0420.json",
+  "taskSha256": "sha256:ceba73997932ee4936fd23a099602c12c675ae0b619803e30fac4eb803e34f5f",
+  "createdAt": "2026-09-13T23:19:45.090Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0420 --actor codex-captain --add \"release/atm-onefile/atm.mjs,release/atm-root-drop\" --reason \"ACC-7 sealed runner validation requires governed generated release surfaces\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ACC-7 sealed runner validation requires governed generated release surfaces"
+  }
+}

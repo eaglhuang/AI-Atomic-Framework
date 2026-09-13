@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T23-41-21-853Z-repair-claim-f2718be29861",
+  "taskId": "ATM-GOV-0420",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913230151-codex-captain-ATM-GOV-0420-d0116506d8",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0420.json",
+  "taskSha256": "sha256:7085be7b4004760aac069a5f2128f84322ef4255fe2660a07f456da93a338b2d",
+  "createdAt": "2026-09-13T23:41:21.853Z",
+  "command": "node atm.mjs tasks repair-claim --task ATM-GOV-0420 --actor codex-captain --write --reason \"恢復 ATM-GOV-0420 的過期 claim、治理鎖與 running 狀態，以便繼續已完成驗證的 runner-scope 修復\" --json"
+}
