@@ -1,0 +1,153 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0049",
+  "updatedAt": "2026-09-13T14:19:43.674Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:package-install",
+    "validate:public-npm-install"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-13T14:15:24.056Z",
+      "startedAt": "2026-09-13T14:15:15.093Z",
+      "finishedAt": "2026-09-13T14:15:24.056Z",
+      "durationMs": 8963,
+      "runnerKind": "dev-source",
+      "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-13T14:15:38.764Z",
+      "startedAt": "2026-09-13T14:15:28.112Z",
+      "finishedAt": "2026-09-13T14:15:38.764Z",
+      "durationMs": 10652,
+      "runnerKind": "dev-source",
+      "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1e6ce66bdf6249295912bb7edccbcada39dbcd347b6d5b7464734d95f64ed1ba",
+      "stderrSha256": "sha256:2c3cb996a4db33ac7aa4e93be6b137a031cc946a7b34f61c54e16c774bdd8f7f",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-09-13T14:16:00.292Z",
+      "startedAt": "2026-09-13T14:15:43.057Z",
+      "finishedAt": "2026-09-13T14:16:00.292Z",
+      "durationMs": 17235,
+      "runnerKind": "dev-source",
+      "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/atm.ts --version --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2ae5c13da716795500007805a0e569454017e1cd688e671826f7b96b934d415b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-13T14:16:05.931Z",
+      "startedAt": "2026-09-13T14:16:04.486Z",
+      "finishedAt": "2026-09-13T14:16:05.931Z",
+      "durationMs": 1445,
+      "runnerKind": "dev-source",
+      "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/atm.ts next --help --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c29cb692a467f5c361483cf40573aa3ef847178c9dee8d68c3f336825f964f1d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-13T14:16:11.033Z",
+      "startedAt": "2026-09-13T14:16:10.339Z",
+      "finishedAt": "2026-09-13T14:16:11.033Z",
+      "durationMs": 694,
+      "runnerKind": "dev-source",
+      "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/write-ticket-command-registration.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8083d1fa17dd77e329bbc3cb881bd9f44aec072039c53212c08a2ed1ed6d1949",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-13T14:18:32.109Z",
+      "startedAt": "2026-09-13T14:18:31.048Z",
+      "finishedAt": "2026-09-13T14:18:32.109Z",
+      "durationMs": 1061,
+      "runnerKind": "dev-source",
+      "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e6592d186ba2506be78325cc4da10c134c4c7fde219d2bcef36ed7ba9436b716",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-protocol.test.ts"
+      ],
+      "generatedAt": "2026-09-13T14:19:19.826Z",
+      "startedAt": "2026-09-13T14:19:18.809Z",
+      "finishedAt": "2026-09-13T14:19:19.826Z",
+      "durationMs": 1017,
+      "runnerKind": "dev-source",
+      "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:package-install",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ef720de7edb2b4cbb499eca0d7efba80269b69a8acd854b5d896e17b7d0ccf09",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:package-install"
+      ],
+      "generatedAt": "2026-09-13T14:19:32.644Z",
+      "startedAt": "2026-09-13T14:19:23.238Z",
+      "finishedAt": "2026-09-13T14:19:32.644Z",
+      "durationMs": 9406,
+      "runnerKind": "dev-source",
+      "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:public-npm-install",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0adff025fcc9ae8af5775bd011483ba34caa06c22ff17b97bbb7b74469255179",
+      "stderrSha256": "sha256:def21889e9bb66d029656acae51b224b03d7297451abc290beca198331acfa2e",
+      "validators": [
+        "validate:public-npm-install"
+      ],
+      "generatedAt": "2026-09-13T14:19:43.673Z",
+      "startedAt": "2026-09-13T14:19:36.288Z",
+      "finishedAt": "2026-09-13T14:19:43.673Z",
+      "durationMs": 7385,
+      "runnerKind": "dev-source",
+      "sourceCommit": "86f98e4cf081b99eaa2b67f0d168480f664fd59f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

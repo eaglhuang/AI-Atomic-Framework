@@ -1,0 +1,309 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0049",
+  "title": "Reduce published CLI unpacked runtime with measured boundary split",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Baseline records published tarball bytes, unpacked bytes, entry count, Node version, and representative command smoke results.",
+    "Candidate clean install succeeds without workspace links and preserves `atm --version`, `next`, `tasks`, and `doctor` smoke commands.",
+    "Candidate unpacked bytes decrease by at least 20% and entry count by at least 15% versus baseline; otherwise no split is accepted.",
+    "Covered generated adopter files remain byte/hash equivalent; unsupported commands fail explicitly with actionable guidance.",
+    "Same-host repeated measurements report p50/p95 install and startup latency, bytes, entries, and failure reasons.",
+    "Existing package budget and release CI remain green; changing thresholds or metadata alone cannot satisfy acceptance."
+  ],
+  "deliverables": [
+    "packages/cli/src/atm.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/validate-public-npm-install.ts",
+    "tests/cli/npm-clean-install.test.ts",
+    "tests/cli/external-benchmark-protocol.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/atm.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/validate-public-npm-install.ts",
+    "tests/cli/npm-clean-install.test.ts",
+    "tests/cli/external-benchmark-protocol.test.ts"
+  ],
+  "validators": [
+    "npm run validate:package-install",
+    "npm run validate:public-npm-install",
+    "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "command-backed baseline-vs-candidate measurement with retained receipt"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/atm.ts",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/npm-clean-install.test.ts",
+        "tests/cli/external-benchmark-protocol.test.ts",
+        "candidate runtime boundary implementation and focused tests",
+        "reproducible baseline-vs-candidate package measurement receipt outside Git history",
+        "clean-consumer install proof for the candidate package"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0049-reduce-published-cli-unpacked-runtime-with-measured-boundary-split.task.md",
+    "sectionTitle": "TASK-PRF-0049",
+    "headingLine": 40,
+    "hash": "ce599263a40c7adb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0049-reduce-published-cli-unpacked-runtime-with-measured-boundary-split.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ce599263a40c7adb180f3dd3da626dd41a5cf8e21ae95c4300cf48c659a5be8d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-13T14:08:13.355Z"
+    }
+  },
+  "importedAt": "2026-09-13T14:08:13.355Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.package.install",
+      "command": "npm run validate:package-install",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.validate.public.npm.install",
+      "command": "npm run validate:public-npm-install",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.external.benchmark.protocol.test.ts",
+      "command": "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_command.backed.baseline.vs.candidate.measurement.with.retained.receipt",
+      "command": "command-backed baseline-vs-candidate measurement with retained receipt",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-13T14-10-19-381Z-renew-f5c91b030d01",
+  "lastTransitionAt": "2026-09-13T14:10:19.381Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-09-13T14:08:46.672Z",
+  "promotedAt": "2026-09-13T14:08:46.676Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-91b3a9cfa2c9",
+    "claimedAt": "2026-09-13T14:08:46.680Z",
+    "heartbeatAt": "2026-09-13T14:10:18.488Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0049.json",
+      "packages/cli/src/atm.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/external-benchmark-protocol.test.ts",
+      "tests/cli/npm-clean-install.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260913140846-codex-captain-591bc923ec",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913140846-codex-captain-591bc923ec\""
+    }
+  },
+  "startedAt": "2026-09-13T14:08:46.680Z",
+  "startedByActor": "codex-captain",
+  "startedBySessionId": "session-20260913140846-codex-captain-TASK-PRF-0049-d4633f139f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0049",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0049.*",
+      ".atm/history/task-events/TASK-PRF-0049/**",
+      ".atm/history/tasks/TASK-PRF-0049.json",
+      "packages/cli/src/atm.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/external-benchmark-protocol.test.ts",
+      "tests/cli/npm-clean-install.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "10051a661ab9e172447829b4a2a9d51e5df95e3910266431cdc028b107a4d56c",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260913140846-codex-captain-TASK-PRF-0049-d4633f139f",
+    "laneSession": {
+      "laneSessionId": "lane-20260913140846-codex-captain-591bc923ec",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913140846-codex-captain-591bc923ec\""
+    },
+    "createdAt": "2026-09-13T14:08:50.256Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-685ba8caac261e33",
+    "ticketDigest": "sha256:685ba8caac261e33257d5d3ac2a55747e327b132517590c351e78d55b63c0dcd",
+    "taskId": "TASK-PRF-0049",
+    "origin": "claim",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260913140846-codex-captain-591bc923ec",
+    "claimGeneration": "lease-91b3a9cfa2c9",
+    "issuedAt": "2026-09-13T14:10:18.488Z",
+    "expiresAt": "2026-09-13T14:40:18.488Z",
+    "scopeDigest": "sha256:8d99207de3a23f2e2f94c5c9e9f24eefb3017467d65bc268c3cd07e2d0112745",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-13T14:10:18.488Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0049.*",
+          ".atm/history/task-events/TASK-PRF-0049/**",
+          ".atm/history/tasks/TASK-PRF-0049.json",
+          "packages/cli/src/atm.ts",
+          "scripts/build-cli-npm-runtime.ts",
+          "scripts/validate-public-npm-install.ts",
+          "tests/cli/external-benchmark-protocol.test.ts",
+          "tests/cli/npm-clean-install.test.ts"
+        ],
+        "digest": "sha256:f5090c6c9e02cc43ae0b8a80885f01ef179930a7affa55e0829a2993d849bd5d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}
