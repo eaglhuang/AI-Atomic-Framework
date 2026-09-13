@@ -1,0 +1,140 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0038",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "cd5b998be1abb3fe408fd7187d490d6c2946a4b5",
+  "governedTreeSha": "370dda67887bfc0d96a654859f3d1dd5301b4cf9",
+  "targetCommitDelta": {
+    "currentCommitSha": "cd5b998be1abb3fe408fd7187d490d6c2946a4b5",
+    "parentCommitShas": [
+      "cd5b998be1abb3fe408fd7187d490d6c2946a4b5"
+    ],
+    "governedTreeSha": "370dda67887bfc0d96a654859f3d1dd5301b4cf9",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0038.json",
+      "docs/benchmark/oracle-runbook.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "scripts/lib/external-benchmark/metrics.ts",
+      "scripts/lib/external-benchmark/oracle.ts",
+      "tests/cli/external-benchmark-oracle.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-oracle.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df21d082b6f7a2eb95b107a86604f7cb5c19d539dbbddd5b8b6974598f00d3e5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-oracle.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df21d082b6f7a2eb95b107a86604f7cb5c19d539dbbddd5b8b6974598f00d3e5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-oracle.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df21d082b6f7a2eb95b107a86604f7cb5c19d539dbbddd5b8b6974598f00d3e5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-oracle.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df21d082b6f7a2eb95b107a86604f7cb5c19d539dbbddd5b8b6974598f00d3e5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-oracle.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df21d082b6f7a2eb95b107a86604f7cb5c19d539dbbddd5b8b6974598f00d3e5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/external-benchmark-oracle.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/external-benchmark-oracle.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-13T05:55:36.604Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0038.*",
+      ".atm/history/task-events/TASK-PRF-0038/**",
+      ".atm/history/tasks/TASK-PRF-0038.json",
+      "docs/benchmark/oracle-runbook.md",
+      "scripts/lib/external-benchmark/oracle.ts",
+      "tests/cli/external-benchmark-oracle.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/lib/external-benchmark/oracle.ts",
+      "tests/cli/external-benchmark-oracle.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-oracle.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0038.json",
+  "closedAt": "2026-09-13T05:55:36.604Z",
+  "closedByActor": "codex-benchmark-oracle",
+  "sessionId": "session-20260913054552-codex-benchmark-oracle-TASK-PRF-0038-393931a766",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "cd5b998be1abb3fe408fd7187d490d6c2946a4b5",
+    "taskMatchedFiles": [
+      "docs/benchmark/oracle-runbook.md",
+      "scripts/lib/external-benchmark/oracle.ts",
+      "tests/cli/external-benchmark-oracle.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0038/2026-09-13T05-45-42-159Z-import-da470422f0ac.json",
+      ".atm/history/task-events/TASK-PRF-0038/2026-09-13T05-45-52-040Z-reserve-0d0d8a1fe9f4.json",
+      ".atm/history/task-events/TASK-PRF-0038/2026-09-13T05-45-52-045Z-promote-bb2dcc9ff58b.json",
+      ".atm/history/task-events/TASK-PRF-0038/2026-09-13T05-45-57-240Z-claim-fac4294acd11.json",
+      ".atm/history/task-events/TASK-PRF-0038/2026-09-13T05-49-23-274Z-renew-fdf5bffb5f9a.json",
+      ".atm/history/tasks/TASK-PRF-0038.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
