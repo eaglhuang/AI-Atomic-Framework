@@ -7,6 +7,7 @@ This checkpoint is append-only evidence metadata, not a replacement for GitHub r
 - Public npm clean-consumer install: verified for `@ai-atomic-framework/cli@0.1.0-beta.5`; the registry tarball is not a workspace link.
 - Latest local package build measures 3,357,358 unpacked bytes across 76 runtime files (registry proof reports 3,357,365 bytes across 78 files). This is within the current 3,365,772-byte cap, but leaves less than 0.3% headroom; it should not be presented as “small” without a follow-up size-reduction pass.
 - Product CI contract: present and validated locally.
+- Repository clean-install validation also passes with `isolatedInstall: true` and `adoptionVerified: true`; it checks the published CLI against the generated 27-package skeleton without a workspace link.
 - Burn-in policy: at least 90 eligible protected-main runs spanning at least 30 calendar days, with failures and cancellations retained.
 - Scheduled protected-main CI runs are eligible observations because the workflow explicitly schedules them to preserve the burn-in window.
 
