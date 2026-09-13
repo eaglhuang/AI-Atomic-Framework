@@ -1,0 +1,135 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0043",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "cbdb3aa5018a4d349687f4032762ea908163b6bf",
+  "governedTreeSha": "4b71b866a5b8b3f9060a56c50a4b0cc0c51f98a3",
+  "targetCommitDelta": {
+    "currentCommitSha": "cbdb3aa5018a4d349687f4032762ea908163b6bf",
+    "parentCommitShas": [
+      "cbdb3aa5018a4d349687f4032762ea908163b6bf"
+    ],
+    "governedTreeSha": "4b71b866a5b8b3f9060a56c50a4b0cc0c51f98a3",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/task-events/TASK-PRF-0043/2026-09-13T09-10-03-842Z-repair-claim-3aa933cb33f2.json",
+      ".atm/history/task-events/TASK-PRF-0043/2026-09-13T09-12-12-984Z-claim-de9da79bdc7a.json",
+      ".atm/history/task-events/TASK-PRF-0043/2026-09-13T09-13-36-409Z-scope-amendment-ad500f629ee2.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0043.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-product-proof-checkpoints.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-public-npm-install.ts --version 0.1.0-beta.5",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bb383b9bed839ba55085480df53f63b115cef1063890c9f3e8e4b6edb50f33bb",
+      "stderrSha256": "sha256:1e5001021cdc128dc72ea96b5963285894fa285a034482727078613d2f446ea9",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "validate:public-npm-install"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-13T09:15:11.988Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0043.*",
+      ".atm/history/task-events/TASK-PRF-0043/**",
+      ".atm/history/tasks/TASK-PRF-0043.json",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0043.json",
+  "closedAt": "2026-09-13T09:15:11.988Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260913091211-codex-captain-TASK-PRF-0043-025ab13450",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "cbdb3aa5018a4d349687f4032762ea908163b6bf",
+    "taskMatchedFiles": [
+      "docs/reports/atm-product-proof-checkpoints.md"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

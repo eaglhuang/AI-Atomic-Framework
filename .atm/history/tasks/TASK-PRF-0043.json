@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0043",
   "title": "Verify sustained CI and clean adopter evidence",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -20,7 +20,10 @@
     "docs/reports/atm-product-proof-checkpoints.md",
     "scripts/measure-product-ci-burn-in.ts",
     "scripts/validate-public-npm-install.ts",
-    "tests/cli/product-proof-evidence-boundary.test.ts"
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    ".atm/history/evidence/TASK-PRF-0043.*",
+    ".atm/history/task-events/TASK-PRF-0043/**",
+    ".atm/history/tasks/TASK-PRF-0043.json"
   ],
   "validators": [
     "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
@@ -201,53 +204,54 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-13T06-06-53-097Z-claim-b503c9e33e05",
-  "lastTransitionAt": "2026-09-13T06:06:53.097Z",
+  "lastTransitionId": "2026-09-13T09-15-11-999Z-close-aef6e4492963",
+  "lastTransitionAt": "2026-09-13T09:15:11.999Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-ci-evidence",
   "reservedAt": "2026-09-13T06:06:47.907Z",
   "promotedAt": "2026-09-13T06:06:47.911Z",
   "claim": {
-    "actorId": "codex-ci-evidence",
-    "leaseId": "lease-acc60e80d2eb",
-    "claimedAt": "2026-09-13T06:06:47.917Z",
-    "heartbeatAt": "2026-09-13T06:06:47.917Z",
+    "actorId": "codex-captain",
+    "leaseId": "lease-030a9f70108d",
+    "claimedAt": "2026-09-13T09:12:11.874Z",
+    "heartbeatAt": "2026-09-13T09:15:11.996Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-PRF-0043.*",
+      ".atm/history/task-events/TASK-PRF-0043/**",
       ".atm/history/tasks/TASK-PRF-0043.json",
       "docs/reports/atm-product-proof-checkpoints.md",
       "scripts/measure-product-ci-burn-in.ts",
       "scripts/validate-public-npm-install.ts",
       "tests/cli/product-proof-evidence-boundary.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260913060648-codex-ci-evidence-f476aedbfd",
+      "laneSessionId": "lane-20260913091212-codex-captain-86279e6b70",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913060648-codex-ci-evidence-f476aedbfd\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913091212-codex-captain-86279e6b70\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-13T06:06:47.917Z",
   "startedByActor": "codex-ci-evidence",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-248510365f19daf4",
-    "ticketDigest": "sha256:248510365f19daf4cdafaf7e90bd1abac7858ba0b9b6b355b7e19ff36f55d916",
+    "ticketId": "wat-056b40292b9c3432",
+    "ticketDigest": "sha256:056b40292b9c34328e04ad287b380c1bac170cd0acf6f312eaa014b6365b678b",
     "taskId": "TASK-PRF-0043",
     "origin": "claim",
-    "actorId": "codex-ci-evidence",
-    "laneSessionId": "lane-20260913060648-codex-ci-evidence-f476aedbfd",
-    "claimGeneration": "lease-acc60e80d2eb",
-    "issuedAt": "2026-09-13T06:06:47.917Z",
-    "expiresAt": "2026-09-13T06:36:47.917Z",
+    "actorId": "codex-captain",
+    "laneSessionId": "lane-20260913091212-codex-captain-86279e6b70",
+    "claimGeneration": "lease-030a9f70108d",
+    "issuedAt": "2026-09-13T09:13:36.351Z",
+    "expiresAt": "2026-09-13T09:43:36.351Z",
     "scopeDigest": "sha256:b04cfc8e8e9030fc4c04e409a5258d27d4c142ec9ced68d023b3b7ee6506ea87",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-13T06:06:47.917Z"
+      "selectedAt": "2026-09-13T09:13:36.351Z"
     },
     "grants": [
       {
@@ -295,7 +299,8 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260913060647-codex-ci-evidence-TASK-PRF-0043-66f915d426",
+  "startedBySessionId": "session-20260913091211-codex-captain-TASK-PRF-0043-025ab13450",
+  "owner": "codex-captain",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -317,15 +322,19 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "493e61a0d5fce644a8e6ac73732fc71a7db5069ee9f2a70648130ce861bb29bd",
-    "actorId": "codex-ci-evidence",
-    "sessionId": "session-20260913060647-codex-ci-evidence-TASK-PRF-0043-66f915d426",
+    "actorId": "codex-captain",
+    "sessionId": "session-20260913091211-codex-captain-TASK-PRF-0043-025ab13450",
     "laneSession": {
-      "laneSessionId": "lane-20260913060648-codex-ci-evidence-f476aedbfd",
+      "laneSessionId": "lane-20260913091212-codex-captain-86279e6b70",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913060648-codex-ci-evidence-f476aedbfd\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913091212-codex-captain-86279e6b70\""
     },
-    "createdAt": "2026-09-13T06:06:53.096Z",
+    "createdAt": "2026-09-13T09:12:12.983Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-13T09:15:11.996Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260913091211-codex-captain-TASK-PRF-0043-025ab13450",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0043.closure-packet.json"
 }

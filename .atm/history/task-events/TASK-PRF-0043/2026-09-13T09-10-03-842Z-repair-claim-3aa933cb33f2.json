@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T09-10-03-842Z-repair-claim-3aa933cb33f2",
+  "taskId": "TASK-PRF-0043",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913060647-codex-ci-evidence-TASK-PRF-0043-66f915d426",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0043.json",
+  "taskSha256": "sha256:502ab6f974aa3ea7efe37ff244393e5209ec74db0beb4e580fa920679ae0ef79",
+  "createdAt": "2026-09-13T09:10:03.842Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0043 --actor codex-captain --write --reason \"expired CI evidence lease blocks current burn-in and npm proof refresh; preserve existing evidence and release stale ownership\" --json"
+}

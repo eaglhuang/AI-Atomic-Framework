@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T09-15-11-999Z-close-aef6e4492963",
+  "taskId": "TASK-PRF-0043",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913091211-codex-captain-TASK-PRF-0043-025ab13450",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0043.json",
+  "taskSha256": "sha256:4451f27cfa3582d13bfac6b9e622c3594a6a79db5a85402929165e07e0b34ed4",
+  "createdAt": "2026-09-13T09:15:11.999Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0043 --actor codex-captain --status done --historical-delivery cbdb3aa5018a4d349687f4032762ea908163b6bf",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913091211-codex-captain-TASK-PRF-0043-025ab13450",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0043.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "validate:public-npm-install"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T09:15:11.988Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0043.*",
+        ".atm/history/task-events/TASK-PRF-0043/**",
+        ".atm/history/tasks/TASK-PRF-0043.json",
+        "docs/reports/atm-product-proof-checkpoints.md",
+        "scripts/measure-product-ci-burn-in.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/product-proof-evidence-boundary.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/measure-product-ci-burn-in.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/product-proof-evidence-boundary.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+      ]
+    }
+  }
+}
