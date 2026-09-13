@@ -25,7 +25,7 @@ export interface RawBenchmarkAggregate {
   readonly durationMs: readonly number[];
   readonly p95DurationMs: number;
   readonly billedCost: number | null;
-  readonly humanMinutes: number;
+  readonly humanMinutes: number | null;
   readonly retries: number;
   readonly tokens?: number | null;
   readonly completionRate?: number | null;

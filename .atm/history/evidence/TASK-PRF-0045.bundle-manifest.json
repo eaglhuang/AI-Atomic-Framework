@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0045",
+  "updatedAt": "2026-09-13T08:20:41.677Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "check:encoding:touched -- --files scripts/lib/external-benchmark/metrics.ts tests/cli/external-benchmark-v2-metrics.test.ts",
+    "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-13T08:20:31.211Z",
+      "startedAt": "2026-09-13T08:20:18.896Z",
+      "finishedAt": "2026-09-13T08:20:31.211Z",
+      "durationMs": 12315,
+      "runnerKind": "dev-source",
+      "sourceCommit": "461079f9d4b042710e6384f1867214b3ea71aadf",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f800fc10372002949db1899276554306832f12651e30385481a72e2d8179614c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts"
+      ],
+      "generatedAt": "2026-09-13T08:20:34.662Z",
+      "startedAt": "2026-09-13T08:20:34.352Z",
+      "finishedAt": "2026-09-13T08:20:34.662Z",
+      "durationMs": 310,
+      "runnerKind": "dev-source",
+      "sourceCommit": "461079f9d4b042710e6384f1867214b3ea71aadf",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/lib/external-benchmark/metrics.ts tests/cli/external-benchmark-v2-metrics.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a257130953e7789c2ad359f8b848261e12138480c0b58b92a25787772cdc520",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files scripts/lib/external-benchmark/metrics.ts tests/cli/external-benchmark-v2-metrics.test.ts"
+      ],
+      "generatedAt": "2026-09-13T08:20:40.190Z",
+      "startedAt": "2026-09-13T08:20:37.827Z",
+      "finishedAt": "2026-09-13T08:20:40.190Z",
+      "durationMs": 2363,
+      "runnerKind": "dev-source",
+      "sourceCommit": "461079f9d4b042710e6384f1867214b3ea71aadf",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f800fc10372002949db1899276554306832f12651e30385481a72e2d8179614c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts"
+      ],
+      "generatedAt": "2026-09-13T08:20:41.676Z",
+      "startedAt": "2026-09-13T08:20:41.384Z",
+      "finishedAt": "2026-09-13T08:20:41.676Z",
+      "durationMs": 292,
+      "runnerKind": "dev-source",
+      "sourceCommit": "461079f9d4b042710e6384f1867214b3ea71aadf",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

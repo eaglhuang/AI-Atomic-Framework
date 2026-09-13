@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T08-21-34-747Z-scope-amendment-87a145b18439",
+  "taskId": "TASK-PRF-0045",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0045.json",
+  "taskSha256": "sha256:0166475a248b5ad444d46393a974db92661d6e0d39776bb41e5cd76bd2d4fdd8",
+  "createdAt": "2026-09-13T08:21:34.747Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0045 --actor codex-captain --add tests/cli/external-benchmark-v2-metrics.test.ts --reason \"Track declared regression deliverable in recovery lane close bundle\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Track declared regression deliverable in recovery lane close bundle"
+  }
+}
