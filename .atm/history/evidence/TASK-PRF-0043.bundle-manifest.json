@@ -1,10 +1,11 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0043",
-  "updatedAt": "2026-09-13T06:09:25.350Z",
+  "updatedAt": "2026-09-13T06:20:36.253Z",
   "updatedBy": "codex-ci-evidence",
   "freshValidationPasses": [
-    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "validate:public-npm-install"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -70,6 +71,22 @@
       "durationMs": 285,
       "runnerKind": "dev-source",
       "sourceCommit": "38e3379b41602ab6d6b6368b87ffa6af0efa75ab",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-public-npm-install.ts --version 0.1.0-beta.5",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bb383b9bed839ba55085480df53f63b115cef1063890c9f3e8e4b6edb50f33bb",
+      "stderrSha256": "sha256:1e5001021cdc128dc72ea96b5963285894fa285a034482727078613d2f446ea9",
+      "validators": [
+        "validate:public-npm-install"
+      ],
+      "generatedAt": "2026-09-13T06:20:36.253Z",
+      "startedAt": "2026-09-13T06:20:30.781Z",
+      "finishedAt": "2026-09-13T06:20:36.253Z",
+      "durationMs": 5472,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d955465549a5e8cde2079cc0412147a656a2a9b5",
       "cached": false
     }
   ],

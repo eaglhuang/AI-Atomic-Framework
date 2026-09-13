@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-type Args = { packageName: string; version: string; output?: string; recordBlocked: boolean };
+type Args = { packageName: string; version: string; output?: string; recordBlocked: boolean; requireDefaultTag: boolean };
 
 type ArtifactBudget = { maxPackedBytes: number; maxPackedEntries: number };
 
@@ -22,7 +22,7 @@ function parseArgs(): Args {
   // placeholder version.
   const version = value('--version', '0.1.0-beta.5');
   if (!packageName || !version) throw new Error('--package and --version are required');
-  return { packageName, version, output: value('--output'), recordBlocked: argv.includes('--record-blocked') };
+  return { packageName, version, output: value('--output'), recordBlocked: argv.includes('--record-blocked'), requireDefaultTag: argv.includes('--require-default-tag') };
 }
 
 function npmCommand() { return process.platform === 'win32' ? 'npm.cmd' : 'npm'; }
@@ -57,8 +57,10 @@ const args = parseArgs();
 let root: string | undefined;
 try {
   let metadata: any;
+  let distTags: any;
   try {
     metadata = JSON.parse(runNpm(['view', `${args.packageName}@${args.version}`, 'version', 'dist.tarball', 'dist.integrity', 'dist.unpackedSize', 'dist.fileCount', '_id', '--json']).trim());
+    distTags = JSON.parse(runNpm(['view', args.packageName, 'dist-tags', '--json']).trim());
   } catch (error) {
     const payload = report(args, { status: 'blocked', publicRegistry: false, temporaryRootRemoved: true, blockedReason: 'npm registry metadata lookup failed or package/version is not published', error: String(error) });
     console.log(JSON.stringify(payload));
@@ -66,6 +68,8 @@ try {
     process.exit();
   }
   const registryTarball = metadata?.dist?.tarball ?? metadata?.['dist.tarball'];
+  const latestVersion = distTags?.latest ?? null;
+  if (args.requireDefaultTag && latestVersion !== args.version) throw new Error(`default latest dist-tag resolves to ${latestVersion ?? 'unknown'}, not ${args.version}`);
   const registryIntegrity = metadata?.dist?.integrity ?? metadata?.['dist.integrity'] ?? null;
   const registryUnpackedSize = Number(metadata?.dist?.unpackedSize ?? metadata?.['dist.unpackedSize']);
   const registryFileCount = Number(metadata?.dist?.fileCount ?? metadata?.['dist.fileCount']);
@@ -89,7 +93,7 @@ try {
   runNpm(['install', '--ignore-scripts', '--prefix', consumer, `${args.packageName}@${args.version}`], root);
   const bin = process.platform === 'win32' ? join(consumer, 'node_modules', '.bin', 'atm.cmd') : join(consumer, 'node_modules', '.bin', 'atm');
   const cliVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' }).trim();
-  const payload = report(args, { status: 'verified', publicRegistry: true, registryVersion: metadata.version, distTarball: registryTarball, distIntegrity: registryIntegrity, registryUnpackedSize: Number.isFinite(registryUnpackedSize) ? registryUnpackedSize : null, registryFileCount: Number.isFinite(registryFileCount) ? registryFileCount : null, artifactBudget: budget, tarballSha256: sha256(tarball), cliVersion, cleanConsumer: true, usedWorkspaceLink: false, temporaryRootRemoved: true });
+  const payload = report(args, { status: 'verified', publicRegistry: true, registryVersion: metadata.version, defaultInstallVersion: latestVersion, defaultInstallMatchesRequested: latestVersion === args.version, distTarball: registryTarball, distIntegrity: registryIntegrity, registryUnpackedSize: Number.isFinite(registryUnpackedSize) ? registryUnpackedSize : null, registryFileCount: Number.isFinite(registryFileCount) ? registryFileCount : null, artifactBudget: budget, tarballSha256: sha256(tarball), cliVersion, cleanConsumer: true, usedWorkspaceLink: false, temporaryRootRemoved: true });
   console.log(JSON.stringify(payload));
 } catch (error) {
   const payload = report(args, { status: 'blocked', publicRegistry: false, temporaryRootRemoved: true, blockedReason: 'public clean-consumer install proof failed', error: String(error) });
