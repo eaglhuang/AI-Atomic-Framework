@@ -11,6 +11,9 @@ export interface BenchmarkDecisionInput {
   readonly atm?: RawBenchmarkAggregate;
   readonly baselineSafety?: AdjudicationRates;
   readonly atmSafety?: AdjudicationRates;
+  readonly minimumCompletionRate?: number;
+  readonly minimumSafetyMargin?: number;
+  readonly costPolicy?: 'total' | 'api-only';
 }
 
 export interface BenchmarkDecision {
@@ -27,9 +30,15 @@ export function decideBenchmark(input: BenchmarkDecisionInput): BenchmarkDecisio
   if (input.baseline.billedCost === null || input.atm.billedCost === null || input.baseline.billedCost <= 0) {
     return { verdict: 'inconclusive', rationale: ['raw billed-cost telemetry is unavailable'], primaryCostImprovement: null };
   }
-  const improvement = (input.baseline.billedCost - input.atm.billedCost) / input.baseline.billedCost;
-  const safetyNonInferior = input.atmSafety.missedConflictRate <= input.baselineSafety.missedConflictRate
-    && input.atmSafety.falseBlockRate <= input.baselineSafety.falseBlockRate;
+  const baselineCost = input.costPolicy === 'total' ? (input.baseline.totalCost ?? null) : input.baseline.billedCost;
+  const atmCost = input.costPolicy === 'total' ? (input.atm.totalCost ?? null) : input.atm.billedCost;
+  if (baselineCost === null || atmCost === null || baselineCost <= 0) return { verdict: 'inconclusive', rationale: ['complete total-cost telemetry is unavailable'], primaryCostImprovement: null };
+  const improvement = (baselineCost - atmCost) / baselineCost;
+  const margin = input.minimumSafetyMargin ?? 0;
+  const safetyNonInferior = input.atmSafety.missedConflictRate <= input.baselineSafety.missedConflictRate + margin
+    && input.atmSafety.falseBlockRate <= input.baselineSafety.falseBlockRate + margin;
+  const completionOk = input.minimumCompletionRate === undefined || ((input.atm.completionRate ?? 1) >= input.minimumCompletionRate && (input.baseline.completionRate ?? 1) >= input.minimumCompletionRate);
+  if (!completionOk) return { verdict: 'stop', rationale: ['minimum completion rate failed'], primaryCostImprovement: improvement };
   if (safetyNonInferior && improvement >= 0.2) return { verdict: 'keep', rationale: ['safety is non-inferior and raw billed cost improved by at least 20%'], primaryCostImprovement: improvement };
   if (!safetyNonInferior) return { verdict: 'stop', rationale: ['safety non-inferiority or false-block requirement failed; name the smallest optional capability before a narrow retest'], primaryCostImprovement: improvement };
   return { verdict: 'narrow', rationale: ['safety passed but the preregistered primary cost threshold was not met'], primaryCostImprovement: improvement };

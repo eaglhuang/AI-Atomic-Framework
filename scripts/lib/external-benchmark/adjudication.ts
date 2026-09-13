@@ -9,12 +9,19 @@ export interface OracleAdjudication {
   readonly falseBlock: boolean;
   readonly missedConflict: boolean;
   readonly completed: boolean;
+  readonly truth?: 'benign' | 'conflict' | 'unknown';
+  readonly decision?: 'allowed' | 'blocked' | 'unknown';
 }
 
 export interface AdjudicationRates {
   readonly falseBlockRate: number;
   readonly missedConflictRate: number;
   readonly completionRate: number;
+  readonly falseBlockCount?: number;
+  readonly falseBlockDenominator?: number;
+  readonly missedConflictCount?: number;
+  readonly missedConflictDenominator?: number;
+  readonly unavailableCount?: number;
 }
 
 export function validateIndependentAdjudications(records: readonly OracleAdjudication[]): void {
@@ -32,9 +39,11 @@ export function calculateAdjudicationRates(records: readonly OracleAdjudication[
   validateIndependentAdjudications(records);
   const selected = records.filter((record) => record.arm === arm);
   if (selected.length === 0) throw new Error(`no independent adjudications for ${arm}`);
-  return {
-    falseBlockRate: selected.filter((record) => record.falseBlock).length / selected.length,
-    missedConflictRate: selected.filter((record) => record.missedConflict).length / selected.length,
-    completionRate: selected.filter((record) => record.completed).length / selected.length
-  };
+  const explicit = selected.some(record => record.truth !== undefined || record.decision !== undefined);
+  const falseBlockDenominator = explicit ? selected.filter(record => record.truth === 'benign' && record.decision !== 'unknown').length : selected.length;
+  const missedConflictDenominator = explicit ? selected.filter(record => record.truth === 'conflict' && record.decision !== 'unknown').length : selected.length;
+  const falseBlockCount = explicit ? selected.filter(record => record.truth === 'benign' && record.decision === 'blocked').length : selected.filter(record => record.falseBlock).length;
+  const missedConflictCount = explicit ? selected.filter(record => record.truth === 'conflict' && record.decision === 'allowed').length : selected.filter(record => record.missedConflict).length;
+  const unavailableCount = explicit ? selected.filter(record => record.truth === 'unknown' || record.decision === 'unknown' || record.truth === undefined || record.decision === undefined).length : 0;
+  return { falseBlockRate: falseBlockDenominator ? falseBlockCount / falseBlockDenominator : Number.NaN, missedConflictRate: missedConflictDenominator ? missedConflictCount / missedConflictDenominator : Number.NaN, completionRate: selected.filter(record => record.completed).length / selected.length, falseBlockCount, falseBlockDenominator, missedConflictCount, missedConflictDenominator, unavailableCount };
 }
