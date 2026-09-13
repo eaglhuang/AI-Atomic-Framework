@@ -30,6 +30,11 @@ for (const [directory, binName] of [
 }
 
 const workflow = readFileSync(releaseWorkflow, 'utf8');
+assert.match(
+  workflow,
+  /npm version "\$version" --workspaces --include-workspace-root --no-git-tag-version --no-workspaces-update --allow-same-version/,
+  'release workflow must make package version synchronization idempotent when the target version is already applied'
+);
 const publishLines = workflow.split(/\r?\n/).filter((line) => line.includes('npm publish'));
 assert.ok(publishLines.length >= 2, 'release workflow must publish in both dry-run and release branches');
 for (const line of publishLines) {
