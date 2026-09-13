@@ -4,10 +4,10 @@ This checkpoint is append-only evidence metadata, not a replacement for GitHub r
 
 ## Current verified observations
 
-- Public npm clean-consumer install: verified for `@ai-atomic-framework/cli@0.1.0-beta.5`; the registry tarball is not a workspace link.
+- Public npm clean-consumer install: verified for `@ai-atomic-framework/cli@0.1.0` after the stable release; the registry tarball is not a workspace link. The earlier beta observation remains historical.
 - Latest local package build measures 3,357,358 unpacked bytes across 76 runtime files (registry proof reports 3,357,365 bytes across 78 files). This is within the current 3,365,772-byte cap, but leaves less than 0.3% headroom; it should not be presented as “small” without a follow-up size-reduction pass.
-- npm dist-tags currently point `latest` to `0.1.0-beta.0` (4,660,644 bytes / 628 files) and `next` to `0.1.0-beta.5` (the slim candidate). Until a non-prerelease stable release is published, adopter instructions must pin `@next` or an exact beta version; bare `npm install @ai-atomic-framework/cli` does not select the slim candidate.
-- Direct public smoke `npx --yes @ai-atomic-framework/cli@next --version` succeeds and reports `0.1.0-beta.5`; this proves the slim candidate is installable when explicitly selected, not that the default `latest` route is fixed.
+- npm dist-tags now point `latest` to `0.1.0` and `next` to `0.1.0-beta.5`. Bare `npm install @ai-atomic-framework/cli` therefore selects the stable installable package; the prior beta-only routing statement is historical.
+- Direct public smoke `npm exec --yes --package=@ai-atomic-framework/cli@0.1.0 atm -- --version` succeeds and reports `ATM framework version 0.1.0`.
 - Product CI contract: present and validated locally.
 - Repository clean-install validation also passes with `isolatedInstall: true` and `adoptionVerified: true`; it checks the published CLI against the generated 27-package skeleton without a workspace link.
 - Burn-in policy: at least 90 eligible protected-main runs spanning at least 30 calendar days, with failures and cancellations retained.
@@ -26,3 +26,7 @@ The public checkpoint may contain digests, counts, and links only. Raw run paylo
 On 2026-09-13, an externally queried GitHub Actions export (100 newest `ci.yml` runs; source digest `sha256:d303ec54f193828c7721d8a59bae8c62954d255b6e853edc7fbf88ddeaf96a04`) produced 31 successes and 69 failures across 6.526343 calendar days. The evaluator therefore returned `unexplained-failure` with `insufficient-calendar-window`; this is a negative observation, not a long-term-green claim.
 
 Assuming a fresh protected-main baseline begins with the latest eligible observation and every subsequent eligible run succeeds, the earliest possible 30-day window date is 2026-10-13. The 90-run minimum must also be reached; either condition failing keeps the claim non-green.
+
+## Stable-release correction (2026-09-13)
+
+The stable release workflow `34748571701` completed successfully, including post-publish validation. A fresh post-boundary burn-in evaluation over the current GitHub export observed one eligible protected-main run (`34747801958`), zero failures, zero calendar days, and returned `insufficient-window`. This updates the npm observations above but does not change the long-term-green conclusion.
