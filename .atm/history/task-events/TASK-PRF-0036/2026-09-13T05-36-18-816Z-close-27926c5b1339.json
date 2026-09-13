@@ -1,0 +1,53 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T05-36-18-816Z-close-27926c5b1339",
+  "taskId": "TASK-PRF-0036",
+  "action": "close",
+  "actorId": "codex-benchmark-isolation",
+  "sessionId": "session-20260913052951-codex-benchmark-isolation-TASK-PRF-0036-c13edd76d8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0036.json",
+  "taskSha256": "sha256:2cbe2af62b43da7196b633ee927631b3fecce860d1efa3b1492ce1f36ecc5249",
+  "createdAt": "2026-09-13T05:36:18.816Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0036 --actor codex-benchmark-isolation --status done --historical-delivery 879e222989b590325b93455d4a694ac8c883a676",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913052951-codex-benchmark-isolation-TASK-PRF-0036-c13edd76d8",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0036.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/external-benchmark-isolation.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-isolation.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T05:36:18.805Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0036.*",
+        ".atm/history/task-events/TASK-PRF-0036/**",
+        ".atm/history/tasks/TASK-PRF-0036.json",
+        "docs/benchmark/isolation-runbook.md",
+        "scripts/fixtures/atm-external-benchmark/environment.json",
+        "scripts/lib/external-benchmark/isolation.ts",
+        "tests/cli/external-benchmark-isolation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/fixtures/atm-external-benchmark/environment.json",
+        "scripts/lib/external-benchmark/isolation.ts",
+        "tests/cli/external-benchmark-isolation.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/external-benchmark-isolation.test.ts"
+      ]
+    }
+  }
+}
