@@ -1,0 +1,325 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0040",
+  "title": "Run bounded isolated AI benchmark pilot",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0039"
+  ],
+  "acceptance": [
+    "ACC-1: 2 repo × 6 情境 × 2 配對，每情境 AB/BA；budget readiness 與隔離負控制通過後執行，保留所有中斷。",
+    "ACC-2: 輸出 false block、missed conflict、completion、人工、Token、費用與缺失來源，逐數值可追 raw。",
+    "ACC-3: 報告明示 internal pilot，不併入正式樣本；列出變異、預算估算、儀器缺陷與正式試驗 readiness。"
+  ],
+  "deliverables": [
+    "docs/reports/atm-isolated-pilot.json",
+    "docs/reports/atm-isolated-pilot.md"
+  ],
+  "scopePaths": [
+    "docs/reports/atm-isolated-pilot.json",
+    "docs/reports/atm-isolated-pilot.md"
+  ],
+  "validators": [
+    "node --strip-types scripts/run-atm-external-benchmark.ts --verify-packet --stage pilot --packet docs/reports/atm-isolated-pilot.json"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-real-execution-with-verifiable-raw-refs",
+  "rollbackStrategy": "revert-commit-preserve-raw-evidence",
+  "rollbackNotes": "只回滾本卡程式/公開摘要，原始試驗不可刪改；暫存環境依 owner receipt 清理。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.external-proof-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.benchmark-pilot",
+        "pattern": "Policy Object",
+        "source": "docs/reports/atm-isolated-pilot.json",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0040-run-bounded-isolated-ai-benchmark-pilot.task.md",
+    "sectionTitle": "TASK-PRF-0040",
+    "headingLine": 76,
+    "hash": "db8a2ccfcab6c6fe",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0040-run-bounded-isolated-ai-benchmark-pilot.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:db8a2ccfcab6c6fe2443319cba5118b542493bd6679034e4ec373d82c68da18b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-13T06:02:30.355Z"
+    }
+  },
+  "importedAt": "2026-09-13T06:02:30.355Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0039"
+    ],
+    "startConditions": [
+      "已封存前置產物與真實操作者、credentials、run budget；未具備先完成文件/預檢，不啟動付費試驗。"
+    ],
+    "softRelations": [
+      "TASK-PRF-0008",
+      "TASK-PRF-0019"
+    ],
+    "changedPublicSeams": [
+      "benchmark_pilot"
+    ],
+    "causalImpactEdges": [
+      "benchmark_pilot_verified"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-protocol",
+      "role-and-tool-readiness"
+    ],
+    "validatorReferences": [
+      "test_prf_benchmark_pilot_1",
+      "test_prf_benchmark_pilot_2",
+      "test_prf_benchmark_pilot_3"
+    ],
+    "phaseOwner": "pilot"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_benchmark_pilot_1",
+      "targetGroupId": null,
+      "semanticKey": "benchmark_pilot_1",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "benchmark_pilot_verified"
+      ],
+      "expectedRedPredicate": "用測試 fixture 或 synthetic provider 代替實跑、缺任一組、或 claim external 都無法驗收。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "benchmark_pilot",
+      "resourceKey": "benchmark_pilot"
+    },
+    {
+      "caseId": "test_prf_benchmark_pilot_2",
+      "targetGroupId": null,
+      "semanticKey": "benchmark_pilot_2",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "benchmark_pilot_verified"
+      ],
+      "expectedRedPredicate": "用測試 fixture 或 synthetic provider 代替實跑、缺任一組、或 claim external 都無法驗收。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "benchmark_pilot",
+      "resourceKey": "benchmark_pilot"
+    },
+    {
+      "caseId": "test_prf_benchmark_pilot_3",
+      "targetGroupId": null,
+      "semanticKey": "benchmark_pilot_3",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "benchmark_pilot_verified"
+      ],
+      "expectedRedPredicate": "用測試 fixture 或 synthetic provider 代替實跑、缺任一組、或 claim external 都無法驗收。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "benchmark_pilot",
+      "resourceKey": "benchmark_pilot"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_benchmark_pilot_1",
+    "test_prf_benchmark_pilot_2",
+    "test_prf_benchmark_pilot_3"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0039",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-13T06-02-41-418Z-claim-c8e96d073f03",
+  "lastTransitionAt": "2026-09-13T06:02:41.418Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-benchmark-pilot",
+  "reservedAt": "2026-09-13T06:02:36.440Z",
+  "promotedAt": "2026-09-13T06:02:36.444Z",
+  "claim": {
+    "actorId": "codex-benchmark-pilot",
+    "leaseId": "lease-cb222b517f9e",
+    "claimedAt": "2026-09-13T06:02:36.449Z",
+    "heartbeatAt": "2026-09-13T06:02:36.449Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      "docs/reports/atm-isolated-pilot.json",
+      "docs/reports/atm-isolated-pilot.md"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260913060236-codex-benchmark-pilot-28a7185918",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913060236-codex-benchmark-pilot-28a7185918\""
+    }
+  },
+  "startedAt": "2026-09-13T06:02:36.449Z",
+  "startedByActor": "codex-benchmark-pilot",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-fb97e96e7df5f199",
+    "ticketDigest": "sha256:fb97e96e7df5f199dbd48ff6e125b1fa92dda1a11d78534be81fa533f590910c",
+    "taskId": "TASK-PRF-0040",
+    "origin": "claim",
+    "actorId": "codex-benchmark-pilot",
+    "laneSessionId": "lane-20260913060236-codex-benchmark-pilot-28a7185918",
+    "claimGeneration": "lease-cb222b517f9e",
+    "issuedAt": "2026-09-13T06:02:36.449Z",
+    "expiresAt": "2026-09-13T06:32:36.449Z",
+    "scopeDigest": "sha256:8fa784e1403c67f6b649d92591c7787dfb10ce07955a0db6ba07c4ef3a302a1a",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-13T06:02:36.449Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0040.*",
+          ".atm/history/task-events/TASK-PRF-0040/**",
+          ".atm/history/tasks/TASK-PRF-0040.json",
+          "docs/reports/atm-isolated-pilot.json",
+          "docs/reports/atm-isolated-pilot.md"
+        ],
+        "digest": "sha256:b81822ff71b3d8458628b9de03183d9ef893b3c65e647d7e5126ec94dfc471a2"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260913060236-codex-benchmark-pilot-TASK-PRF-0040-f887559ffc",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0040",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0040.*",
+      ".atm/history/task-events/TASK-PRF-0040/**",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      "docs/reports/atm-isolated-pilot.json",
+      "docs/reports/atm-isolated-pilot.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "921efabf1e169d6f77a0405956b275380e136d9959123bd33d83bc089971355f",
+    "actorId": "codex-benchmark-pilot",
+    "sessionId": "session-20260913060236-codex-benchmark-pilot-TASK-PRF-0040-f887559ffc",
+    "laneSession": {
+      "laneSessionId": "lane-20260913060236-codex-benchmark-pilot-28a7185918",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913060236-codex-benchmark-pilot-28a7185918\""
+    },
+    "createdAt": "2026-09-13T06:02:41.417Z",
+    "status": "active"
+  }
+}

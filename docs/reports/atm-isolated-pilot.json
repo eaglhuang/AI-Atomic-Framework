@@ -1,0 +1,31 @@
+{
+  "schemaId": "atm.pairedBenchmarkPacket.v1",
+  "stage": "pilot",
+  "status": "blocked-before-run",
+  "classification": "internal-pilot-readiness",
+  "runs": [],
+  "rawRefs": [],
+  "metrics": {
+    "falseBlock": null,
+    "missedConflict": null,
+    "completion": null,
+    "humanMinutes": null,
+    "tokens": null,
+    "cost": null
+  },
+  "blockingReasons": [
+    "approved external repositories are not supplied",
+    "real provider credentials and model budget are not configured",
+    "isolated disposable worktree/container is not provisioned",
+    "external raw-evidence storage destination is not configured"
+  ],
+  "missingSources": [
+    "repository provenance",
+    "provider telemetry export",
+    "Git raw execution refs",
+    "independent oracle adjudication"
+  ],
+  "externalClaim": false,
+  "formalSampleEligible": false,
+  "resumePolicy": "resume only after all blockingReasons are cleared; retain this readiness record and never fill null metrics with estimates"
+}
