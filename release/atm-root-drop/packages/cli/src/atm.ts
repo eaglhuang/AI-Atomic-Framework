@@ -1,6 +1,16 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
+import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
+import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
+import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
+import { runIdentity } from './commands/identity.ts';
+import { runBroker } from './commands/broker.ts';
+import { runRoute } from './commands/route.ts';
+import { inspectRunnerSourceDrift } from './commands/framework-development/closure-packet-schema.ts';
+import { describeRunnerMode } from './commands/next/runner-mode.ts';
+
 import { runAtomize } from './commands/atomize.ts';
 import { runATMChart } from './commands/atm-chart.ts';
 import { runBaseline } from './commands/baseline.ts';
@@ -16,9 +26,9 @@ import { runExplain } from './commands/explain.ts';
 import { runExperience } from './commands/experience.ts';
 import { runEvidence } from './commands/evidence.ts';
 import { runFrameworkMode } from './commands/framework-development.ts';
+import { runAtmGit } from './commands/git-governance.ts';
 import { runGuard } from './commands/guard.ts';
 import { runGitHooks, runHook } from './commands/hook.ts';
-import { runAtmGit } from './commands/git-governance.ts';
 import { runGuide } from './commands/guide.ts';
 import { runHandoff } from './commands/handoff.ts';
 import { runInit } from './commands/init.ts';
@@ -28,8 +38,8 @@ import { runLane } from './commands/lane.ts';
 import { runLock } from './commands/lock.ts';
 import { runNext } from './commands/next.ts';
 import { runOrient } from './commands/orient.ts';
-import { runPolice } from './commands/police.ts';
 import { runPlan } from './commands/plan.ts';
+import { runPolice } from './commands/police.ts';
 import { runQuickfix } from './commands/quickfix.ts';
 import { runResidue } from './commands/residue.ts';
 import { runSelfHostAlphaAsync } from './commands/self-host-alpha.ts';
@@ -38,14 +48,14 @@ import { runStart } from './commands/start.ts';
 import { runStatus } from './commands/status.ts';
 import { runTasks } from './commands/tasks.ts';
 import { runUpgrade } from './commands/upgrade.ts';
-import { runTestAsync } from './commands/test.ts';
 import { runTelemetry } from './commands/telemetry.ts';
 import { runTeam } from './commands/team.ts';
+import { runTestAsync } from './commands/test.ts';
 import { runValidate } from './commands/validate.ts';
 import { runVerify } from './commands/verify.ts';
 import { runWelcome } from './commands/welcome.ts';
-import { runRegistryDiff } from './commands/registry-diff.ts';
 import { runRegistry } from './commands/registry.ts';
+import { runRegistryDiff } from './commands/registry-diff.ts';
 import { runReplacementLane } from './commands/replacement-lane.ts';
 import { runRollback } from './commands/rollback.ts';
 import { runReview } from './commands/review.ts';
@@ -64,17 +74,9 @@ import { runHealthReport } from './commands/health-report.ts';
 import { runTaskflow } from './commands/taskflow.ts';
 import { runTaskView } from './commands/task-view.ts';
 import { runWriteTicket } from './commands/write-ticket.ts';
-import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
-import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
-import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
-import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
-import { runIdentity } from './commands/identity.ts';
-import { runBroker } from './commands/broker.ts';
-import { runRoute } from './commands/route.ts';
-import { inspectRunnerSourceDrift } from './commands/framework-development/closure-packet-schema.ts';
-import { describeRunnerMode } from './commands/next/runner-mode.ts';
 
-export const cliCommandRunners: Record<string, (argv: string[]) => Promise<CommandResult | object> | CommandResult | object> = {
+type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandResult | object;
+export const cliCommandRunners: Record<string, CliRunner> = {
   atomize: runAtomize,
   'atm-chart': runATMChart,
   baseline: runBaseline,

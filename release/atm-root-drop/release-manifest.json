@@ -181,6 +181,10 @@
     "release/atm-root-drop/docs/bench/ATM-AdmissionBench-CONTRACT.md",
     "release/atm-root-drop/docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
     "release/atm-root-drop/docs/bench/ATM-OperationalBench-CONTRACT.md",
+    "release/atm-root-drop/docs/benchmark/independence-contract.md",
+    "release/atm-root-drop/docs/benchmark/isolation-runbook.md",
+    "release/atm-root-drop/docs/benchmark/oracle-runbook.md",
+    "release/atm-root-drop/docs/benchmark/telemetry-contract.md",
     "release/atm-root-drop/docs/cli-error-policy.md",
     "release/atm-root-drop/docs/environment-variables.md",
     "release/atm-root-drop/docs/governance/DOCS_NEUTRALITY_AUDIT.md",
@@ -739,9 +743,12 @@
     "release/atm-root-drop/docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
     "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
     "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
+    "release/atm-root-drop/docs/reports/atm-isolated-pilot.json",
+    "release/atm-root-drop/docs/reports/atm-isolated-pilot.md",
     "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
     "release/atm-root-drop/docs/reports/atm-plan-4-1-dependency-census.json",
     "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
+    "release/atm-root-drop/docs/reports/atm-product-proof-checkpoints.md",
     "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta.md",
     "release/atm-root-drop/docs/reports/atm-public-npm-install-proof.md",
     "release/atm-root-drop/docs/reports/atm-release-surface-budget.md",
@@ -1723,6 +1730,7 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/plugin-sdk/dist/police.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/plugin-sdk/dist/project-adapter.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/plugin-sdk/dist/test-runner.js",
+    "release/atm-root-drop/packages/cli/dist/atm-public.js",
     "release/atm-root-drop/packages/cli/dist/atm.js",
     "release/atm-root-drop/packages/cli/dist/atm.mjs",
     "release/atm-root-drop/packages/cli/dist/commands/actor-registry.js",
@@ -2366,18 +2374,10 @@
     "release/atm-root-drop/packages/cli/dist/npm-runtime/atm.mjs",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/index.d.ts",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/index.js",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-bootstrap.md.tmpl",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-evidence.md.tmpl",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-handoff.md.tmpl",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-lock.md.tmpl",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-next.md.tmpl",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-verify.md.tmpl",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/atm-markdown-task-source/templates/aao-l2-split-template.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-atom-map-refactor.skill.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-bug-backlog.skill.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-create.skill.md",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/deepening.md",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.skill.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-diagnostic-loop.skill.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-dispatch.skill.md",
@@ -2387,11 +2387,7 @@
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-framework-temp-claim.skill.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-git-pathspec-emergency-commit.skill.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
-    "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.skill.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-handoff.skill.md",
@@ -2470,6 +2466,7 @@
     "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/wrappers.json",
     "release/atm-root-drop/packages/cli/dist/templates/root-drop/AGENTS.md",
     "release/atm-root-drop/packages/cli/package.json",
+    "release/atm-root-drop/packages/cli/src/atm-public.ts",
     "release/atm-root-drop/packages/cli/src/atm.ts",
     "release/atm-root-drop/packages/cli/src/commands/__tests__/actor-adopt.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/__tests__/batch-skip-resume.spec.ts",
@@ -4379,6 +4376,7 @@
     "release/atm-root-drop/schemas/evidence/evidence-freshness-certificate.schema.json",
     "release/atm-root-drop/schemas/evidence/example-branch-generators.schema.json",
     "release/atm-root-drop/schemas/evidence/external-benchmark-run.schema.json",
+    "release/atm-root-drop/schemas/evidence/external-benchmark-v2.schema.json",
     "release/atm-root-drop/schemas/evidence/fault-fingerprint.schema.json",
     "release/atm-root-drop/schemas/evidence/four-plan-independent-certificate.schema.json",
     "release/atm-root-drop/schemas/evidence/gap-planning.schema.json",
@@ -4609,6 +4607,7 @@
     "release/atm-root-drop/scripts/fixtures/agr-conflict-benchmark/manifest.json",
     "release/atm-root-drop/scripts/fixtures/atm-admission-bench/manifest.json",
     "release/atm-root-drop/scripts/fixtures/atm-admission-bench/unresolved.json",
+    "release/atm-root-drop/scripts/fixtures/atm-external-benchmark/environment.json",
     "release/atm-root-drop/scripts/fixtures/atm-external-benchmark/manifest.json",
     "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/coverage-ready.json",
     "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-00-00-000Z-control.json",
@@ -4681,9 +4680,14 @@
     "release/atm-root-drop/scripts/lib/agr-conflict-benchmark-runner.ts",
     "release/atm-root-drop/scripts/lib/atom-id-to-cid.ts",
     "release/atm-root-drop/scripts/lib/external-benchmark/adjudication.ts",
+    "release/atm-root-drop/scripts/lib/external-benchmark/isolation.ts",
     "release/atm-root-drop/scripts/lib/external-benchmark/metrics.ts",
+    "release/atm-root-drop/scripts/lib/external-benchmark/oracle.ts",
+    "release/atm-root-drop/scripts/lib/external-benchmark/paired-executor.ts",
+    "release/atm-root-drop/scripts/lib/external-benchmark/protocol-v2.ts",
     "release/atm-root-drop/scripts/lib/external-benchmark/report.ts",
     "release/atm-root-drop/scripts/lib/external-benchmark/runner.ts",
+    "release/atm-root-drop/scripts/lib/external-benchmark/telemetry.ts",
     "release/atm-root-drop/scripts/lib/final-certificate-observation.ts",
     "release/atm-root-drop/scripts/lib/git-boundary-fixtures.ts",
     "release/atm-root-drop/scripts/lib/governance-cost-bench/paired-runner.ts",
@@ -4923,6 +4927,7 @@
     "release/atm-root-drop/scripts/validate-policy-self-version.ts",
     "release/atm-root-drop/scripts/validate-polymorph-template.ts",
     "release/atm-root-drop/scripts/validate-product-charter.ts",
+    "release/atm-root-drop/scripts/validate-product-ci-burn-in-schedule.ts",
     "release/atm-root-drop/scripts/validate-prompt-scoped-next.ts",
     "release/atm-root-drop/scripts/validate-prompt-scoped-next/assertions.ts",
     "release/atm-root-drop/scripts/validate-prompt-scoped-next/batch-scenarios.ts",
@@ -5268,6 +5273,7 @@
     "release/atm-root-drop/tests/cli/adopter-artifact-budget.test.ts",
     "release/atm-root-drop/tests/cli/adopter-compose-first-default.test.ts",
     "release/atm-root-drop/tests/cli/agent-mailbox-protocol.test.ts",
+    "release/atm-root-drop/tests/cli/agent-pack-startup-side-effects.test.ts",
     "release/atm-root-drop/tests/cli/analyze-captain-parallel-ledger-lane-concurrency.test.ts",
     "release/atm-root-drop/tests/cli/atm-2-1-final-closure.test.ts",
     "release/atm-root-drop/tests/cli/atm-3-divergence-census.test.ts",
@@ -5370,8 +5376,14 @@
     "release/atm-root-drop/tests/cli/evidence-seal-task-summary.test.ts",
     "release/atm-root-drop/tests/cli/evidence-write-lock-concurrency.test.ts",
     "release/atm-root-drop/tests/cli/external-benchmark-decision.test.ts",
+    "release/atm-root-drop/tests/cli/external-benchmark-isolation.test.ts",
     "release/atm-root-drop/tests/cli/external-benchmark-metrics.test.ts",
+    "release/atm-root-drop/tests/cli/external-benchmark-oracle.test.ts",
+    "release/atm-root-drop/tests/cli/external-benchmark-paired-executor.test.ts",
     "release/atm-root-drop/tests/cli/external-benchmark-protocol.test.ts",
+    "release/atm-root-drop/tests/cli/external-benchmark-telemetry.test.ts",
+    "release/atm-root-drop/tests/cli/external-benchmark-v2-contract.test.ts",
+    "release/atm-root-drop/tests/cli/external-benchmark-v2-metrics.test.ts",
     "release/atm-root-drop/tests/cli/final-backlog-closeback-provenance.test.ts",
     "release/atm-root-drop/tests/cli/first-layer-command-contracts.test.ts",
     "release/atm-root-drop/tests/cli/first-layer-ux-routing.test.ts",
@@ -5440,6 +5452,7 @@
     "release/atm-root-drop/tests/cli/integration-raw-git-command-guard.test.ts",
     "release/atm-root-drop/tests/cli/integration-reconciliation.test.ts",
     "release/atm-root-drop/tests/cli/integration-source-coverage-parity.test.ts",
+    "release/atm-root-drop/tests/cli/internal-release-sync.test.ts",
     "release/atm-root-drop/tests/cli/lane-adopt-phase.test.ts",
     "release/atm-root-drop/tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
     "release/atm-root-drop/tests/cli/lane-claim-conflict-matrix.test.ts",
@@ -5607,7 +5620,9 @@
     "release/atm-root-drop/tests/cli/pre-push-provisional-closure-packet.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+    "release/atm-root-drop/tests/cli/product-ci-burn-in-schedule.test.ts",
     "release/atm-root-drop/tests/cli/product-ci-burn-in.test.ts",
+    "release/atm-root-drop/tests/cli/product-proof-evidence-boundary.test.ts",
     "release/atm-root-drop/tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
     "release/atm-root-drop/tests/cli/protected-ledger-destructive-guard.test.ts",
     "release/atm-root-drop/tests/cli/protected-override-audit-direction-lock.test.ts",
@@ -5701,6 +5716,7 @@
     "release/atm-root-drop/tests/cli/skill-definition-vnext.test.ts",
     "release/atm-root-drop/tests/cli/skill-distribution-manager.test.ts",
     "release/atm-root-drop/tests/cli/skill-provider-capability-contract.test.ts",
+    "release/atm-root-drop/tests/cli/standard-validator-timeout.test.ts",
     "release/atm-root-drop/tests/cli/standards-spec-review-receipt.test.ts",
     "release/atm-root-drop/tests/cli/startup-known-bad.test.ts",
     "release/atm-root-drop/tests/cli/status-active-workers.test.ts",
@@ -6150,8 +6166,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1483,
-    "unchanged": 4632,
+    "copied": 1506,
+    "unchanged": 4625,
     "removed": 0
   },
   "buildMode": "full",
@@ -7503,6 +7519,42 @@
         "origin": "source",
         "inputPaths": [
           "docs/bench/ATM-OperationalBench-CONTRACT.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/benchmark/independence-contract.md",
+        "digest": "ed138096273e88f8a1a6be7c3d8d23e0af2634878fdcec018902d220c8f930e0",
+        "origin": "source",
+        "inputPaths": [
+          "docs/benchmark/independence-contract.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/benchmark/isolation-runbook.md",
+        "digest": "7d88f0ff88a33d8961c9b2ea5f695d305875adac89fd35920a4aa425c1aa6912",
+        "origin": "source",
+        "inputPaths": [
+          "docs/benchmark/isolation-runbook.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/benchmark/oracle-runbook.md",
+        "digest": "4a291f9250f4794d221307c37752d43e4401ecd95862a0de5127b47e769b9351",
+        "origin": "source",
+        "inputPaths": [
+          "docs/benchmark/oracle-runbook.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/benchmark/telemetry-contract.md",
+        "digest": "2af3fbfbf6d16d89809f97465d259e4b22f0f0be1a47c7bfe283a962aef9aaa9",
+        "origin": "source",
+        "inputPaths": [
+          "docs/benchmark/telemetry-contract.md"
         ],
         "replaceable": true
       },
@@ -12503,7 +12555,7 @@
       },
       {
         "path": "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
-        "digest": "a576585466bb42388d233ecd07a53c3023ca8a24a26e8b0d238bb3476bbeb255",
+        "digest": "f14c577b83b7fede32a74d5cca9c4302eb309914901de8c5d30107ac4758ec6a",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
@@ -12525,6 +12577,24 @@
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-governance-fix-wave.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/atm-isolated-pilot.json",
+        "digest": "291e84732822cf55aae46b499d6abcf8b672b674189ea41ac496e51257b16541",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-isolated-pilot.json"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/atm-isolated-pilot.md",
+        "digest": "a3a3cfea396f2cb1444e421e7452ea678bbb3b3f5bfc55cc022388b8bd525e81",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-isolated-pilot.md"
         ],
         "replaceable": true
       },
@@ -12552,6 +12622,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-ci-burn-in.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/atm-product-proof-checkpoints.md",
+        "digest": "0ba34abe15c1e7ef991e5d73aa51ab446d57207b685419018c762966b790cb47",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-product-proof-checkpoints.md"
         ],
         "replaceable": true
       },
@@ -20351,7 +20430,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/integrations-core/dist/compiler/compile.js",
-        "digest": "1de30188496b0232950a39b80600f1360bb8db0a3a03d1df4164262171dfc39c",
+        "digest": "26bfa65fb197b27793fc7129d5adb46f4d8134df611cb9dae57a5963bafce71c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/integrations-core/dist/compiler/compile.js"
@@ -21385,8 +21464,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/atm-public.js",
+        "digest": "ef10cf72e5b50bd56c2339a1021b05945f99582e1e6994648ac1d6938eccc57c",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/atm-public.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/atm.js",
-        "digest": "9f662ba56bd3e31d98cbd988a706aecd0dcbf391532d3b81c36188712cc92ea8",
+        "digest": "b95026d3d8742ad1de1d90031a8cce74c174a2886c19e738a7bed3a8d62ff048",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/atm.js"
@@ -27172,60 +27260,6 @@
         "replaceable": true
       },
       {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-bootstrap.md.tmpl",
-        "digest": "5278ee4815b9451edba0e8ac7b309c0a67d68a38e825f5631196a27244154c55",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-bootstrap.md.tmpl"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-evidence.md.tmpl",
-        "digest": "b03e0428f5af0538524d49f7da6f456e39aa601d21c05dbbc2aea3e255eccbe9",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-evidence.md.tmpl"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-handoff.md.tmpl",
-        "digest": "77db42a12cb977518f9ab3bb72b663f38bfb9e02b2ed71d4b8fbe8e17b5a791f",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-handoff.md.tmpl"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-lock.md.tmpl",
-        "digest": "95f6a0a8322b946005087cab3fecbf6e213be1357a1c84dadef93d513c4045d8",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-lock.md.tmpl"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-next.md.tmpl",
-        "digest": "60f32aa16080295f71b75641581c796fc0a3c69620479123b3c13d3deb9e65ab",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-next.md.tmpl"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-verify.md.tmpl",
-        "digest": "cbadc48674a74b59cee04d6f37cde60ebf75f1fa198af6fc2aff4b76ce6218d1",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-verify.md.tmpl"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "packages/cli/dist/npm-runtime/layout/_vendor/atm-markdown-task-source/templates/aao-l2-split-template.md",
         "digest": "8b52ce68fdfe1eb0b3b164449dbee2fb44f28fe3228a391f72089f84c3de0ab4",
         "origin": "source",
@@ -27258,24 +27292,6 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-create.skill.md"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/deepening.md",
-        "digest": "a69d3d664f24dfdf8c72bd0394747cbce85ff8646db007edbc92afa98e866b97",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/deepening.md"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md",
-        "digest": "599a948a7386ca79f167f40fd3d23d01bb7e3a7f09d10858c43d312a0031c076",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md"
         ],
         "replaceable": true
       },
@@ -27361,47 +27377,11 @@
         "replaceable": true
       },
       {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
-        "digest": "c4a8dbbfc3b35a36dce9ddad0e940cdd63a0c835e476618ee513b9cec874c5ec",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
-        "digest": "8ba314d98eb87015aeee7db301c37d57425187b12567bea1611587d1c97342eb",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
         "digest": "10b2ccdde51d59d88610ddd6121bfd929e9f4d7ee82acc3c5ade05b32e92c115",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/index.md"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
-        "digest": "70442b98ed5fea1a2ecc5e95dd485aa5c7db057ec0c697479df01ed7f11f8104",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
-        "digest": "ed47ab80bbf904848621db184a35a09404312a857069bdad151f1930dab6754d",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md"
         ],
         "replaceable": true
       },
@@ -27812,7 +27792,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "312a79126f33a5957fe33707f7ed820aab732e07dac69ed96d4ac04504105f60",
+        "digest": "1948b4e4c1722c2668fb24461e9d99f2a3c3c5384da2a30c8c2d0fab1fb98f56",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -27821,7 +27801,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "f978601bd619b674ee6e6de82350c8951e7a0595e9be9bb89a85a8be1012ba5d",
+        "digest": "b60963dd5f403b5a51e2fcaefc0a4d46b5a7c77f5febe669f47839bc816840a3",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -28108,8 +28088,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/atm-public.ts",
+        "digest": "2b36e08ae98c55c3790a902a0bba7af827183ecef53df2b13e557b8aeb00c8f9",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/atm-public.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/atm.ts",
-        "digest": "05e591f9bb433bab55a94eecf52c685cd5501d1b54e6d9b61641bfda57daf5f5",
+        "digest": "0c3e07eba616726a65586d3f168ee79594c58a4bc4722206538503182dda40e3",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/atm.ts"
@@ -42635,7 +42624,7 @@
       },
       {
         "path": "packages/integrations-core/dist/compiler/compile.js",
-        "digest": "1de30188496b0232950a39b80600f1360bb8db0a3a03d1df4164262171dfc39c",
+        "digest": "26bfa65fb197b27793fc7129d5adb46f4d8134df611cb9dae57a5963bafce71c",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/dist/compiler/compile.js"
@@ -42797,7 +42786,7 @@
       },
       {
         "path": "packages/integrations-core/src/compiler/compile.ts",
-        "digest": "d068e8822b5bc2f958ac3e73f59caeeefca141c286a5794a86d19a720e103e9f",
+        "digest": "dfd6f5fa3794278a646be8d5112b5a8c9f7c5a8d40a201ae6cfbf73ff4e20132",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/src/compiler/compile.ts"
@@ -45280,6 +45269,15 @@
         "replaceable": true
       },
       {
+        "path": "schemas/evidence/external-benchmark-v2.schema.json",
+        "digest": "86afd030e3094cee9bf8fdbbe3f04b772d562dc506fcb9ff1b4ec43c0e85a213",
+        "origin": "source",
+        "inputPaths": [
+          "schemas/evidence/external-benchmark-v2.schema.json"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "schemas/evidence/fault-fingerprint.schema.json",
         "digest": "d585229ec9ad93acf2c91c54c2f56f2e9f8b4a6a20bfb7d383ce8858d51c4be1",
         "origin": "source",
@@ -46667,7 +46665,7 @@
       },
       {
         "path": "scripts/build-cli-npm-runtime.ts",
-        "digest": "a424cc6739881a613f392fe3549e8e46fb2d14fd300e860e6bde8dffd54e6907",
+        "digest": "df8ffc9fdcc7f43b081c5ce111eacaeed5750b909dc6ef9d98246c86d9bb04fe",
         "origin": "source",
         "inputPaths": [
           "scripts/build-cli-npm-runtime.ts"
@@ -47350,6 +47348,15 @@
         "replaceable": true
       },
       {
+        "path": "scripts/fixtures/atm-external-benchmark/environment.json",
+        "digest": "69e448d6762a27e59aba6339720e982d7c173140199a18ee2a066656e973f155",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/fixtures/atm-external-benchmark/environment.json"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/fixtures/atm-external-benchmark/manifest.json",
         "digest": "c63888b34a4927851cdea1e6d6b05166537c3a3676343edd00fe2b385e9c2f5c",
         "origin": "source",
@@ -47990,7 +47997,7 @@
       },
       {
         "path": "scripts/lib/external-benchmark/adjudication.ts",
-        "digest": "23dfdbb2b384799c2d19318c63e36006e12bde35e097a1b582707a7d5b8e9e51",
+        "digest": "73eae0278c77106ea838ee1c234a4e6b90bd5524712764fcb56ea21f40925e1f",
         "origin": "source",
         "inputPaths": [
           "scripts/lib/external-benchmark/adjudication.ts"
@@ -47998,8 +48005,17 @@
         "replaceable": true
       },
       {
+        "path": "scripts/lib/external-benchmark/isolation.ts",
+        "digest": "e165ef8ffb85e5e4e73a3b707db1e59c42d970412c5dabed8dccdf7b28586776",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/external-benchmark/isolation.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/lib/external-benchmark/metrics.ts",
-        "digest": "598991385df25d95a1f3aec7a947e20e42c119bd34ec8fd46c946be9d182c084",
+        "digest": "290ac71bf8952ee97ae7b644d9583855b26b5987ac84efa54f8baac84ef652d5",
         "origin": "source",
         "inputPaths": [
           "scripts/lib/external-benchmark/metrics.ts"
@@ -48007,8 +48023,35 @@
         "replaceable": true
       },
       {
+        "path": "scripts/lib/external-benchmark/oracle.ts",
+        "digest": "5840ab11b1b35b1a971fd6d9a92e362c530b2ab00899afb83242bbd11669eaea",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/external-benchmark/oracle.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/lib/external-benchmark/paired-executor.ts",
+        "digest": "932a626e5d8964aba8346813fb1f2f79fd61f0acd2cb4d8d8fcbb9582ef43fad",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/external-benchmark/paired-executor.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/lib/external-benchmark/protocol-v2.ts",
+        "digest": "c85ce64231a75c71817c6738eb619103492150490123570ad9c22d68b50f6954",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/external-benchmark/protocol-v2.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/lib/external-benchmark/report.ts",
-        "digest": "a6275cb5172b968b01d479335a24eed15b0ce71e1aeb5bfb6ffa7ab8419c5fe9",
+        "digest": "613cbe8842bab8db3e0f3a36cb7d8ea3825cd6b758a77369478ee4e729ca1dd3",
         "origin": "source",
         "inputPaths": [
           "scripts/lib/external-benchmark/report.ts"
@@ -48021,6 +48064,15 @@
         "origin": "source",
         "inputPaths": [
           "scripts/lib/external-benchmark/runner.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/lib/external-benchmark/telemetry.ts",
+        "digest": "297118d72710b1b669aac64c11cf456ce3eeb793964517e6119194233f6faa5a",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/lib/external-benchmark/telemetry.ts"
         ],
         "replaceable": true
       },
@@ -48215,7 +48267,7 @@
       },
       {
         "path": "scripts/measure-product-ci-burn-in.ts",
-        "digest": "a6258bacffb05b91e4df3a56ef594ac8449582142342ad65158ef37f9716431b",
+        "digest": "d97f5670748d3d42d196439865ab943641cd79e4484b7549f19c2e458ad126ea",
         "origin": "source",
         "inputPaths": [
           "scripts/measure-product-ci-burn-in.ts"
@@ -48350,7 +48402,7 @@
       },
       {
         "path": "scripts/run-atm-external-benchmark.ts",
-        "digest": "285b8bb9a40a118d8394668ad79b1dd224b24104cef9423fcfafcdfb79d011e8",
+        "digest": "4fe1968694358c61477103fcefe69b69ce5f2b2e459a71d01bc5878a7ad8c11b",
         "origin": "source",
         "inputPaths": [
           "scripts/run-atm-external-benchmark.ts"
@@ -48440,7 +48492,7 @@
       },
       {
         "path": "scripts/run-validators/implementation.ts",
-        "digest": "38c5d278578eb6c94394e2982fd753e15cbc1396d79c3f96648138377d332bbc",
+        "digest": "8a7714727e51af0224e56e95c7d6f237f6d34a86d6adbe7c1d25f0daec700800",
         "origin": "source",
         "inputPaths": [
           "scripts/run-validators/implementation.ts"
@@ -50176,6 +50228,15 @@
         "replaceable": true
       },
       {
+        "path": "scripts/validate-product-ci-burn-in-schedule.ts",
+        "digest": "df2ef54b3b80e223e9dd4b3fe98f6e576715a2fce61abfd1585e15042dc63bf1",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/validate-product-ci-burn-in-schedule.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/validate-prompt-scoped-next.ts",
         "digest": "6776681406b3680338044e1f88035343a7ee9ede8bb9fd05cab290632824852f",
         "origin": "source",
@@ -50267,7 +50328,7 @@
       },
       {
         "path": "scripts/validate-public-npm-install.ts",
-        "digest": "af9d11a21c8b9240c7334e5553daa02866f88b8b995b2fd2abee3255af1de1c5",
+        "digest": "bcb32ca3c67f10e767551992dfe4e1d778bf99c6bd07699973822d593693a0fc",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-public-npm-install.ts"
@@ -53281,6 +53342,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/agent-pack-startup-side-effects.test.ts",
+        "digest": "9d23c7a47d6320dd700f9371d73629af3fae48e3ed56e2e61ead5eab0bd38d7f",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/agent-pack-startup-side-effects.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/analyze-captain-parallel-ledger-lane-concurrency.test.ts",
         "digest": "10fedea1c7bf5f5093c62eddba03df085b50f72ffd901cb1f300237572f1b84d",
         "origin": "source",
@@ -54199,6 +54269,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/external-benchmark-isolation.test.ts",
+        "digest": "bb7536f877b7303b383e6bbc491b8fce4481209066626df13f14ecec55a6e119",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-benchmark-isolation.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/external-benchmark-metrics.test.ts",
         "digest": "4147ca68fdd1f360bae6676121d896721a10fb597c05388bff1e978b1ebdcdac",
         "origin": "source",
@@ -54208,11 +54287,56 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/external-benchmark-oracle.test.ts",
+        "digest": "900b8fc247da069afc76c0780baa6550da88cf612adc4db6ee0e92ab35accc83",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-benchmark-oracle.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/external-benchmark-paired-executor.test.ts",
+        "digest": "86a28ee8044b30270bdac292fb6cdd38656d64e5e6d2c1ad73342b20df8bd99f",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-benchmark-paired-executor.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/external-benchmark-protocol.test.ts",
         "digest": "0f3f39ab0ff595c7ddd12c25fad23a3f7212abf65a00fd6e4cb840debd28d982",
         "origin": "source",
         "inputPaths": [
           "tests/cli/external-benchmark-protocol.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/external-benchmark-telemetry.test.ts",
+        "digest": "939a03ab63de3241d60de639a1128baa5d2deb3771994d9a4f75c99ee62c03d0",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-benchmark-telemetry.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/external-benchmark-v2-contract.test.ts",
+        "digest": "bd89e4c9f0b718663faebd9aadfb84d76436907d8273e9abe027b7d6717acb17",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-benchmark-v2-contract.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/external-benchmark-v2-metrics.test.ts",
+        "digest": "d4ce089323be31cf36461d4850ebe005c0dc40cd4d072b1dfe46442b3d5bace5",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-benchmark-v2-metrics.test.ts"
         ],
         "replaceable": true
       },
@@ -54829,6 +54953,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/internal-release-sync.test.ts",
+        "digest": "b2866dde51c9e185133dccddbb0647c1ecc8ad9df97d7350504752b6d37029bd",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/internal-release-sync.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/lane-adopt-phase.test.ts",
         "digest": "2f2dfc5086dc94d10b73676ad1814b89a485527784445fed19d532a90131a077",
         "origin": "source",
@@ -55082,7 +55215,7 @@
       },
       {
         "path": "tests/cli/npm-clean-install.test.ts",
-        "digest": "d094cb08b763c452d09f2e277115fa7f26d58115a8eaa50d7ef28101669fa7ea",
+        "digest": "2bfa0bcc606eb292a0d86b96b7e16760361eaafafd65049eb1ae60484fe2e723",
         "origin": "source",
         "inputPaths": [
           "tests/cli/npm-clean-install.test.ts"
@@ -56332,11 +56465,29 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/product-ci-burn-in-schedule.test.ts",
+        "digest": "3f1ff6ce468ea76bc65308726cb89cb46b6b73e537331c48c68283ca9f47db4e",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/product-ci-burn-in-schedule.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/product-ci-burn-in.test.ts",
-        "digest": "8f73d4d744a4e2abb62ddaa1fa8416e45ac31a9a29ef0829060730c2537311fe",
+        "digest": "72a97df5efe4f6626b1eba45c3b0292930354311e86ecc7b6c10bb62dd431a48",
         "origin": "source",
         "inputPaths": [
           "tests/cli/product-ci-burn-in.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/product-proof-evidence-boundary.test.ts",
+        "digest": "70baa18fac0c49583d82340a3932fa59f411e1a873bd662e14eebcb8bd67354f",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/product-proof-evidence-boundary.test.ts"
         ],
         "replaceable": true
       },
@@ -57174,6 +57325,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/skill-provider-capability-contract.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/standard-validator-timeout.test.ts",
+        "digest": "47b71a3553d9ce59270807e1c327b33ca890c061cfd4e01d4dfacab2c7a7398d",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/standard-validator-timeout.test.ts"
         ],
         "replaceable": true
       },
@@ -61192,7 +61352,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:8e185bd9a828503a477b70817c3a7d51b75c1a3e312d29a336d59250dc1f7797"
+    "treeDigest": "sha256:8cc2e50c860cc943d1720226852a068f5b7d371f05a8898912106615cc54edfc"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61234,6 +61394,7 @@
       "integrations/codex-skills/atm-upgrade-scan/SKILL.md",
       "integrations/codex-skills/mailbox-worker-execution/SKILL.md",
       "package.json",
+      "packages/cli/src/atm-public.ts",
       "packages/cli/src/atm.ts",
       "packages/cli/src/commands/__tests__/actor-adopt.spec.ts",
       "packages/cli/src/commands/__tests__/batch-skip-resume.spec.ts",
@@ -62521,6 +62682,7 @@
       "schemas/evidence/evidence-freshness-certificate.schema.json",
       "schemas/evidence/example-branch-generators.schema.json",
       "schemas/evidence/external-benchmark-run.schema.json",
+      "schemas/evidence/external-benchmark-v2.schema.json",
       "schemas/evidence/fault-fingerprint.schema.json",
       "schemas/evidence/four-plan-independent-certificate.schema.json",
       "schemas/evidence/gap-planning.schema.json",
@@ -62737,7 +62899,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:c3f2a64e4412f05690023c03ec24f07830353f14a0434cb43694b9e5184f681e"
+    "digest": "sha256:aea16a508cac5dde7b8cd3f747476a157dc5fdb5625bb190f43da6757c6c5fd0"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -62892,6 +63054,10 @@
       "release/atm-root-drop/docs/bench/ATM-AdmissionBench-CONTRACT.md",
       "release/atm-root-drop/docs/bench/ATM-ExternalBenchmark-PROTOCOL.md",
       "release/atm-root-drop/docs/bench/ATM-OperationalBench-CONTRACT.md",
+      "release/atm-root-drop/docs/benchmark/independence-contract.md",
+      "release/atm-root-drop/docs/benchmark/isolation-runbook.md",
+      "release/atm-root-drop/docs/benchmark/oracle-runbook.md",
+      "release/atm-root-drop/docs/benchmark/telemetry-contract.md",
       "release/atm-root-drop/docs/cli-error-policy.md",
       "release/atm-root-drop/docs/environment-variables.md",
       "release/atm-root-drop/docs/governance/DOCS_NEUTRALITY_AUDIT.md",
@@ -63450,9 +63616,12 @@
       "release/atm-root-drop/docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
       "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
       "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
+      "release/atm-root-drop/docs/reports/atm-isolated-pilot.json",
+      "release/atm-root-drop/docs/reports/atm-isolated-pilot.md",
       "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
       "release/atm-root-drop/docs/reports/atm-plan-4-1-dependency-census.json",
       "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
+      "release/atm-root-drop/docs/reports/atm-product-proof-checkpoints.md",
       "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta.md",
       "release/atm-root-drop/docs/reports/atm-public-npm-install-proof.md",
       "release/atm-root-drop/docs/reports/atm-release-surface-budget.md",
@@ -64434,6 +64603,7 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/plugin-sdk/dist/police.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/plugin-sdk/dist/project-adapter.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/plugin-sdk/dist/test-runner.js",
+      "release/atm-root-drop/packages/cli/dist/atm-public.js",
       "release/atm-root-drop/packages/cli/dist/atm.js",
       "release/atm-root-drop/packages/cli/dist/atm.mjs",
       "release/atm-root-drop/packages/cli/dist/commands/actor-registry.js",
@@ -65077,18 +65247,10 @@
       "release/atm-root-drop/packages/cli/dist/npm-runtime/atm.mjs",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/index.d.ts",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/index.js",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-bootstrap.md.tmpl",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-evidence.md.tmpl",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-handoff.md.tmpl",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-lock.md.tmpl",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-next.md.tmpl",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/agent-pack-claude-code/templates/atm-verify.md.tmpl",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/atm-markdown-task-source/templates/aao-l2-split-template.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-atom-map-refactor.skill.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-bug-backlog.skill.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-create.skill.md",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/deepening.md",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.files/references/design-it-twice.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-deep-module-refactor.skill.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-diagnostic-loop.skill.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-dispatch.skill.md",
@@ -65098,11 +65260,7 @@
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-framework-temp-claim.skill.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-git-pathspec-emergency-commit.skill.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/entry-friction.md",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/fallback-design.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/index.md",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/learning-loop.md",
-      "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/route-interpretation.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/tooling-mismatch.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.skill.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-handoff.skill.md",
@@ -65181,6 +65339,7 @@
       "release/atm-root-drop/packages/cli/dist/templates/root-drop/.atm/scripts/wrappers.json",
       "release/atm-root-drop/packages/cli/dist/templates/root-drop/AGENTS.md",
       "release/atm-root-drop/packages/cli/package.json",
+      "release/atm-root-drop/packages/cli/src/atm-public.ts",
       "release/atm-root-drop/packages/cli/src/atm.ts",
       "release/atm-root-drop/packages/cli/src/commands/__tests__/actor-adopt.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/__tests__/batch-skip-resume.spec.ts",
@@ -67090,6 +67249,7 @@
       "release/atm-root-drop/schemas/evidence/evidence-freshness-certificate.schema.json",
       "release/atm-root-drop/schemas/evidence/example-branch-generators.schema.json",
       "release/atm-root-drop/schemas/evidence/external-benchmark-run.schema.json",
+      "release/atm-root-drop/schemas/evidence/external-benchmark-v2.schema.json",
       "release/atm-root-drop/schemas/evidence/fault-fingerprint.schema.json",
       "release/atm-root-drop/schemas/evidence/four-plan-independent-certificate.schema.json",
       "release/atm-root-drop/schemas/evidence/gap-planning.schema.json",
@@ -67320,6 +67480,7 @@
       "release/atm-root-drop/scripts/fixtures/agr-conflict-benchmark/manifest.json",
       "release/atm-root-drop/scripts/fixtures/atm-admission-bench/manifest.json",
       "release/atm-root-drop/scripts/fixtures/atm-admission-bench/unresolved.json",
+      "release/atm-root-drop/scripts/fixtures/atm-external-benchmark/environment.json",
       "release/atm-root-drop/scripts/fixtures/atm-external-benchmark/manifest.json",
       "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/coverage-ready.json",
       "release/atm-root-drop/scripts/fixtures/auto-batch-analyzer/session-events/lane-fixture/2026-01-01T00-00-00-000Z-control.json",
@@ -67392,9 +67553,14 @@
       "release/atm-root-drop/scripts/lib/agr-conflict-benchmark-runner.ts",
       "release/atm-root-drop/scripts/lib/atom-id-to-cid.ts",
       "release/atm-root-drop/scripts/lib/external-benchmark/adjudication.ts",
+      "release/atm-root-drop/scripts/lib/external-benchmark/isolation.ts",
       "release/atm-root-drop/scripts/lib/external-benchmark/metrics.ts",
+      "release/atm-root-drop/scripts/lib/external-benchmark/oracle.ts",
+      "release/atm-root-drop/scripts/lib/external-benchmark/paired-executor.ts",
+      "release/atm-root-drop/scripts/lib/external-benchmark/protocol-v2.ts",
       "release/atm-root-drop/scripts/lib/external-benchmark/report.ts",
       "release/atm-root-drop/scripts/lib/external-benchmark/runner.ts",
+      "release/atm-root-drop/scripts/lib/external-benchmark/telemetry.ts",
       "release/atm-root-drop/scripts/lib/final-certificate-observation.ts",
       "release/atm-root-drop/scripts/lib/git-boundary-fixtures.ts",
       "release/atm-root-drop/scripts/lib/governance-cost-bench/paired-runner.ts",
@@ -67634,6 +67800,7 @@
       "release/atm-root-drop/scripts/validate-policy-self-version.ts",
       "release/atm-root-drop/scripts/validate-polymorph-template.ts",
       "release/atm-root-drop/scripts/validate-product-charter.ts",
+      "release/atm-root-drop/scripts/validate-product-ci-burn-in-schedule.ts",
       "release/atm-root-drop/scripts/validate-prompt-scoped-next.ts",
       "release/atm-root-drop/scripts/validate-prompt-scoped-next/assertions.ts",
       "release/atm-root-drop/scripts/validate-prompt-scoped-next/batch-scenarios.ts",
@@ -67979,6 +68146,7 @@
       "release/atm-root-drop/tests/cli/adopter-artifact-budget.test.ts",
       "release/atm-root-drop/tests/cli/adopter-compose-first-default.test.ts",
       "release/atm-root-drop/tests/cli/agent-mailbox-protocol.test.ts",
+      "release/atm-root-drop/tests/cli/agent-pack-startup-side-effects.test.ts",
       "release/atm-root-drop/tests/cli/analyze-captain-parallel-ledger-lane-concurrency.test.ts",
       "release/atm-root-drop/tests/cli/atm-2-1-final-closure.test.ts",
       "release/atm-root-drop/tests/cli/atm-3-divergence-census.test.ts",
@@ -68081,8 +68249,14 @@
       "release/atm-root-drop/tests/cli/evidence-seal-task-summary.test.ts",
       "release/atm-root-drop/tests/cli/evidence-write-lock-concurrency.test.ts",
       "release/atm-root-drop/tests/cli/external-benchmark-decision.test.ts",
+      "release/atm-root-drop/tests/cli/external-benchmark-isolation.test.ts",
       "release/atm-root-drop/tests/cli/external-benchmark-metrics.test.ts",
+      "release/atm-root-drop/tests/cli/external-benchmark-oracle.test.ts",
+      "release/atm-root-drop/tests/cli/external-benchmark-paired-executor.test.ts",
       "release/atm-root-drop/tests/cli/external-benchmark-protocol.test.ts",
+      "release/atm-root-drop/tests/cli/external-benchmark-telemetry.test.ts",
+      "release/atm-root-drop/tests/cli/external-benchmark-v2-contract.test.ts",
+      "release/atm-root-drop/tests/cli/external-benchmark-v2-metrics.test.ts",
       "release/atm-root-drop/tests/cli/final-backlog-closeback-provenance.test.ts",
       "release/atm-root-drop/tests/cli/first-layer-command-contracts.test.ts",
       "release/atm-root-drop/tests/cli/first-layer-ux-routing.test.ts",
@@ -68151,6 +68325,7 @@
       "release/atm-root-drop/tests/cli/integration-raw-git-command-guard.test.ts",
       "release/atm-root-drop/tests/cli/integration-reconciliation.test.ts",
       "release/atm-root-drop/tests/cli/integration-source-coverage-parity.test.ts",
+      "release/atm-root-drop/tests/cli/internal-release-sync.test.ts",
       "release/atm-root-drop/tests/cli/lane-adopt-phase.test.ts",
       "release/atm-root-drop/tests/cli/lane-capability-secrecy-and-proxy-execution.test.ts",
       "release/atm-root-drop/tests/cli/lane-claim-conflict-matrix.test.ts",
@@ -68318,7 +68493,9 @@
       "release/atm-root-drop/tests/cli/pre-push-provisional-closure-packet.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+      "release/atm-root-drop/tests/cli/product-ci-burn-in-schedule.test.ts",
       "release/atm-root-drop/tests/cli/product-ci-burn-in.test.ts",
+      "release/atm-root-drop/tests/cli/product-proof-evidence-boundary.test.ts",
       "release/atm-root-drop/tests/cli/prompt-scoped-next-claim-dependency-scope.test.ts",
       "release/atm-root-drop/tests/cli/protected-ledger-destructive-guard.test.ts",
       "release/atm-root-drop/tests/cli/protected-override-audit-direction-lock.test.ts",
@@ -68412,6 +68589,7 @@
       "release/atm-root-drop/tests/cli/skill-definition-vnext.test.ts",
       "release/atm-root-drop/tests/cli/skill-distribution-manager.test.ts",
       "release/atm-root-drop/tests/cli/skill-provider-capability-contract.test.ts",
+      "release/atm-root-drop/tests/cli/standard-validator-timeout.test.ts",
       "release/atm-root-drop/tests/cli/standards-spec-review-receipt.test.ts",
       "release/atm-root-drop/tests/cli/startup-known-bad.test.ts",
       "release/atm-root-drop/tests/cli/status-active-workers.test.ts",
@@ -68863,23 +69041,5 @@
     "requiresExplicitStaging": true,
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
-  },
-  "buildInputsTreeHash": "sha256:d9cb1793d9e1782001b0e41db5a4393a87b0193bfb57096a3724ee3847bcfaf7",
-  "sealedSourceCommit": "2f0f7d8ccc19600b2fe0586335504cfbce97d432",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:ce6020b326b9c3be7e8923f71df657e1b7fbc3d1a48a2c6969083f0da90d99f8",
-  "tsBuildCacheDigest": "sha256:1c4a05cbc91185aa531a574d51cc7c4fc0e69121f9874affd3c8a51ad76bcc71",
-  "rawTelemetryPolicy": "gitignored-runtime-only",
-  "phaseTimingsMs": {
-    "inputHashCalculation": 35,
-    "skipDecision": 43,
-    "worktreeSetup": 10120,
-    "typescriptBuild": 11568,
-    "rootDropReleaseAssembly": 29390,
-    "onefileReleaseAssembly": 10254,
-    "artifactSync": 6388,
-    "cleanup": 0,
-    "totalElapsed": 80679
   }
 }

@@ -7,8 +7,7 @@
  * objects ready for installation by the manifest/construct layer.
  */
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
+import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import {
   type RenderedCharterInvariants,
@@ -266,13 +265,6 @@ function loadSkillTemplateCompanionFiles(
 }
 
 function walkCompanionDirectory(directoryPath: string): readonly string[] {
-  const trackedFiles = listTrackedFilesUnder(directoryPath);
-  // A published package can live below an adopter's Git worktree. In that
-  // case `git ls-files` succeeds but returns no node_modules paths; fall back
-  // to the bundled directory instead of treating an empty result as complete.
-  if (trackedFiles && trackedFiles.length > 0) {
-    return trackedFiles;
-  }
   try {
     const entries = readdirSync(directoryPath, { withFileTypes: true });
     return entries.flatMap((entry) => {
@@ -288,27 +280,6 @@ function walkCompanionDirectory(directoryPath: string): readonly string[] {
   } catch {
     return [];
   }
-}
-
-function listTrackedFilesUnder(directoryPath: string): readonly string[] | null {
-  const relativeDirectory = path.relative(integrationsCoreRepoRoot, directoryPath);
-  if (!relativeDirectory || relativeDirectory.startsWith('..')) {
-    return null;
-  }
-  const gitRelativeDirectory = relativeDirectory.replace(/\\/g, '/');
-  const result = spawnSync('git', ['ls-files', '-z', '--', gitRelativeDirectory], {
-    cwd: integrationsCoreRepoRoot,
-    encoding: 'utf8'
-  });
-  if (result.status !== 0) {
-    return null;
-  }
-  return result.stdout
-    .split('\0')
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map((entry) => path.join(integrationsCoreRepoRoot, entry))
-    .filter((entry) => existsSync(entry));
 }
 
 function inferIntegrationFileFormat(filePath: string): IntegrationSourceFile['fileFormat'] {
