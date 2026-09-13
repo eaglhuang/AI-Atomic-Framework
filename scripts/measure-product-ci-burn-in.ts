@@ -67,7 +67,9 @@ function validateRuns(input: unknown, policy: BurnInPolicy): CiRun[] {
     if (run.status !== 'completed') throw new Error(`record-${databaseId}-not-completed`);
     if (typeof run.conclusion !== 'string' || run.conclusion.length === 0) throw new Error(`record-${databaseId}-missing-conclusion`);
     if (typeof run.headSha !== 'string' || !/^[0-9a-f]{7,64}$/i.test(run.headSha)) throw new Error(`record-${databaseId}-missing-headSha`);
-    if (typeof run.event !== 'string' || !['push', 'workflow_dispatch'].includes(run.event)) throw new Error(`record-${databaseId}-unprotected-event`);
+    // Scheduled protected-main observations are part of the product burn-in:
+    // ci.yml uses them to keep the window alive when no contributor push lands.
+    if (typeof run.event !== 'string' || !['push', 'workflow_dispatch', 'schedule'].includes(run.event)) throw new Error(`record-${databaseId}-unprotected-event`);
     if (run.headBranch !== policy.protectedBranch) throw new Error(`record-${databaseId}-non-protected-branch`);
     if (typeof run.createdAt !== 'string') throw new Error(`record-${databaseId}-missing-createdAt`);
     const createdAt = parseDate(run.createdAt, `createdAt-${databaseId}`);

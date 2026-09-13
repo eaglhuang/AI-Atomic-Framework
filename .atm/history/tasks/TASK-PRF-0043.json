@@ -1,0 +1,331 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0043",
+  "title": "Verify sustained CI and clean adopter evidence",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: 至少 30 連續日且 90 eligible protected-main runs 才宣稱 long-term-green；區分 product job/workflow/attempt，保留失敗和取消。",
+    "ACC-2: 乾淨 consumer 從公開 tarball 執行 help/init/實際 workflow；公開版本、SHA、size/count 與 budgets 相符。",
+    "ACC-3: append-only checkpoint 指向 Git 外原始資料並完成 restore；核對 runtime Git 邊界與歷史殘留，未完成不得宣稱清空 history。"
+  ],
+  "deliverables": [
+    "docs/reports/atm-product-proof-checkpoints.md",
+    "scripts/measure-product-ci-burn-in.ts",
+    "scripts/validate-public-npm-install.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts"
+  ],
+  "scopePaths": [
+    "docs/reports/atm-product-proof-checkpoints.md",
+    "scripts/measure-product-ci-burn-in.ts",
+    "scripts/validate-public-npm-install.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-bound-case-red-green",
+  "rollbackStrategy": "revert-commit-preserve-raw-evidence",
+  "rollbackNotes": "只回滾本卡程式/公開摘要，原始試驗不可刪改；暫存環境依 owner receipt 清理。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.external-proof-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.product-sustained-evidence",
+        "pattern": "Policy Object",
+        "source": "docs/reports/atm-product-proof-checkpoints.md",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "docs/reports/atm-product-proof-checkpoints.md",
+        "scripts/measure-product-ci-burn-in.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/product-proof-evidence-boundary.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0043-verify-sustained-ci-and-clean-adopter-evidence.task.md",
+    "sectionTitle": "TASK-PRF-0043",
+    "headingLine": 79,
+    "hash": "718d3ce742393ae7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0043-verify-sustained-ci-and-clean-adopter-evidence.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:718d3ce742393ae7fd31cddc9362bfb8f12a74c207951b1de7ff89556b362516",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-13T06:06:39.915Z"
+    }
+  },
+  "importedAt": "2026-09-13T06:06:39.915Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "實作前以 target ATM 接手本卡；共用契約由 0034 定義，未交付前可做 docs-first 設計。"
+    ],
+    "softRelations": [
+      "TASK-PRF-0008",
+      "TASK-PRF-0019"
+    ],
+    "changedPublicSeams": [
+      "product_sustained_evidence"
+    ],
+    "causalImpactEdges": [
+      "product_sustained_evidence_verified"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-protocol",
+      "role-and-tool-readiness"
+    ],
+    "validatorReferences": [
+      "test_prf_product_sustained_evidence_1",
+      "test_prf_product_sustained_evidence_2",
+      "test_prf_product_sustained_evidence_3"
+    ],
+    "phaseOwner": "benchmark-instrumentation"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_product_sustained_evidence_1",
+      "targetGroupId": null,
+      "semanticKey": "product_sustained_evidence_1",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "product_sustained_evidence_verified"
+      ],
+      "expectedRedPredicate": "短期大量重跑、workflow success 掩蓋 product skip、--version-only、workspace link 或 missing raw refs 不能通過。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product_sustained_evidence",
+      "resourceKey": "product_sustained_evidence"
+    },
+    {
+      "caseId": "test_prf_product_sustained_evidence_2",
+      "targetGroupId": null,
+      "semanticKey": "product_sustained_evidence_2",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "product_sustained_evidence_verified"
+      ],
+      "expectedRedPredicate": "短期大量重跑、workflow success 掩蓋 product skip、--version-only、workspace link 或 missing raw refs 不能通過。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product_sustained_evidence",
+      "resourceKey": "product_sustained_evidence"
+    },
+    {
+      "caseId": "test_prf_product_sustained_evidence_3",
+      "targetGroupId": null,
+      "semanticKey": "product_sustained_evidence_3",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "product_sustained_evidence_verified"
+      ],
+      "expectedRedPredicate": "短期大量重跑、workflow success 掩蓋 product skip、--version-only、workspace link 或 missing raw refs 不能通過。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product_sustained_evidence",
+      "resourceKey": "product_sustained_evidence"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_product_sustained_evidence_1",
+    "test_prf_product_sustained_evidence_2",
+    "test_prf_product_sustained_evidence_3"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-13T06-06-53-097Z-claim-b503c9e33e05",
+  "lastTransitionAt": "2026-09-13T06:06:53.097Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-ci-evidence",
+  "reservedAt": "2026-09-13T06:06:47.907Z",
+  "promotedAt": "2026-09-13T06:06:47.911Z",
+  "claim": {
+    "actorId": "codex-ci-evidence",
+    "leaseId": "lease-acc60e80d2eb",
+    "claimedAt": "2026-09-13T06:06:47.917Z",
+    "heartbeatAt": "2026-09-13T06:06:47.917Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0043.json",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260913060648-codex-ci-evidence-f476aedbfd",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913060648-codex-ci-evidence-f476aedbfd\""
+    }
+  },
+  "startedAt": "2026-09-13T06:06:47.917Z",
+  "startedByActor": "codex-ci-evidence",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-248510365f19daf4",
+    "ticketDigest": "sha256:248510365f19daf4cdafaf7e90bd1abac7858ba0b9b6b355b7e19ff36f55d916",
+    "taskId": "TASK-PRF-0043",
+    "origin": "claim",
+    "actorId": "codex-ci-evidence",
+    "laneSessionId": "lane-20260913060648-codex-ci-evidence-f476aedbfd",
+    "claimGeneration": "lease-acc60e80d2eb",
+    "issuedAt": "2026-09-13T06:06:47.917Z",
+    "expiresAt": "2026-09-13T06:36:47.917Z",
+    "scopeDigest": "sha256:b04cfc8e8e9030fc4c04e409a5258d27d4c142ec9ced68d023b3b7ee6506ea87",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-13T06:06:47.917Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0043.*",
+          ".atm/history/task-events/TASK-PRF-0043/**",
+          ".atm/history/tasks/TASK-PRF-0043.json",
+          "docs/reports/atm-product-proof-checkpoints.md",
+          "scripts/measure-product-ci-burn-in.ts",
+          "scripts/validate-public-npm-install.ts",
+          "tests/cli/product-proof-evidence-boundary.test.ts"
+        ],
+        "digest": "sha256:571941c158a34afdbaddabeac1f5f6031c4943ae14a62416211395d1390afd08"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260913060647-codex-ci-evidence-TASK-PRF-0043-66f915d426",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0043",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0043.*",
+      ".atm/history/task-events/TASK-PRF-0043/**",
+      ".atm/history/tasks/TASK-PRF-0043.json",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "493e61a0d5fce644a8e6ac73732fc71a7db5069ee9f2a70648130ce861bb29bd",
+    "actorId": "codex-ci-evidence",
+    "sessionId": "session-20260913060647-codex-ci-evidence-TASK-PRF-0043-66f915d426",
+    "laneSession": {
+      "laneSessionId": "lane-20260913060648-codex-ci-evidence-f476aedbfd",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913060648-codex-ci-evidence-f476aedbfd\""
+    },
+    "createdAt": "2026-09-13T06:06:53.096Z",
+    "status": "active"
+  }
+}
