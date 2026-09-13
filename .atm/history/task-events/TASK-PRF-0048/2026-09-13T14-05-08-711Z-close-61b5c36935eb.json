@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T14-05-08-711Z-close-61b5c36935eb",
+  "taskId": "TASK-PRF-0048",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913135711-codex-captain-TASK-PRF-0048-b46bdf7623",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0048.json",
+  "taskSha256": "sha256:d772ac3b3a79d056b065c5bf9ba3fa8f5457cddfd0f21d2cb8a7a828c163c780",
+  "createdAt": "2026-09-13T14:05:08.711Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0048 --actor codex-captain --status done --historical-delivery 3ed9b5db0117cd89e1b9db83462ea5ecd459d921",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913135711-codex-captain-TASK-PRF-0048-b46bdf7623",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0048.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types tests/cli/agent-pack-startup-side-effects.test.ts",
+      "typecheck",
+      "validate:integration-adapter"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/agent-pack-startup-side-effects.test.ts",
+      "typecheck",
+      "validate:integration-adapter"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T14:05:08.698Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0048.*",
+        ".atm/history/task-events/TASK-PRF-0048/**",
+        ".atm/history/tasks/TASK-PRF-0048.json",
+        "packages/agent-pack-copilot/src/index.ts",
+        "packages/agent-pack-cursor/src/index.ts",
+        "packages/agent-pack-gemini/src/index.ts",
+        "packages/agent-pack-windsurf/src/index.ts",
+        "packages/integrations-core/src/compiler/compile.ts",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "tests/cli/agent-pack-startup-side-effects.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/agent-pack-copilot/src/index.ts",
+        "packages/agent-pack-cursor/src/index.ts",
+        "packages/agent-pack-gemini/src/index.ts",
+        "packages/agent-pack-windsurf/src/index.ts",
+        "packages/integrations-core/src/compiler/compile.ts",
+        "packages/integrations-core/src/compiler/skill-templates.ts",
+        "tests/cli/agent-pack-startup-side-effects.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types tests/cli/agent-pack-startup-side-effects.test.ts",
+        "typecheck",
+        "validate:integration-adapter"
+      ]
+    }
+  }
+}
