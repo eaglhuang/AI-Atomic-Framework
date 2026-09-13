@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0039",
   "title": "Execute paired ATM and Git baseline arms",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0035",
@@ -260,8 +260,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-13T05-56-44-884Z-claim-5c93ba63d8dd",
-  "lastTransitionAt": "2026-09-13T05:56:44.884Z",
+  "lastTransitionId": "2026-09-13T06-01-47-445Z-close-c2e27c16f2c8",
+  "lastTransitionAt": "2026-09-13T06:01:47.445Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-benchmark-paired",
   "reservedAt": "2026-09-13T05:56:39.612Z",
@@ -270,7 +270,7 @@
     "actorId": "codex-benchmark-paired",
     "leaseId": "lease-3c7cbb9638bf",
     "claimedAt": "2026-09-13T05:56:39.622Z",
-    "heartbeatAt": "2026-09-13T05:56:39.622Z",
+    "heartbeatAt": "2026-09-13T06:01:47.442Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0039.json",
@@ -279,14 +279,14 @@
       "scripts/run-atm-external-benchmark.ts",
       "tests/cli/external-benchmark-paired-executor.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260913055639-codex-benchmark-paired-632d03be6e",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913055639-codex-benchmark-paired-632d03be6e\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-13T05:56:39.622Z",
   "startedByActor": "codex-benchmark-paired",
@@ -386,5 +386,9 @@
     },
     "createdAt": "2026-09-13T05:56:44.884Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-13T06:01:47.442Z",
+  "closedByActor": "codex-benchmark-paired",
+  "closedBySessionId": "session-20260913055639-codex-benchmark-paired-TASK-PRF-0039-b37e001076",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0039.closure-packet.json"
 }

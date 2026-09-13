@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T06-01-47-445Z-close-c2e27c16f2c8",
+  "taskId": "TASK-PRF-0039",
+  "action": "close",
+  "actorId": "codex-benchmark-paired",
+  "sessionId": "session-20260913055639-codex-benchmark-paired-TASK-PRF-0039-b37e001076",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0039.json",
+  "taskSha256": "sha256:a8007ef0a02b9b7a87eebecff4124754f31b11bccf1a6304219106c5c5b2c43e",
+  "createdAt": "2026-09-13T06:01:47.445Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0039 --actor codex-benchmark-paired --status done --historical-delivery d8f17383b963674638b0ae989b2c43cd709f6523",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913055639-codex-benchmark-paired-TASK-PRF-0039-b37e001076",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0039.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T06:01:47.431Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0039.*",
+        ".atm/history/task-events/TASK-PRF-0039/**",
+        ".atm/history/tasks/TASK-PRF-0039.json",
+        "scripts/lib/external-benchmark/paired-executor.ts",
+        "scripts/lib/external-benchmark/runner.ts",
+        "scripts/run-atm-external-benchmark.ts",
+        "tests/cli/external-benchmark-paired-executor.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/lib/external-benchmark/paired-executor.ts",
+        "scripts/lib/external-benchmark/runner.ts",
+        "scripts/run-atm-external-benchmark.ts",
+        "tests/cli/external-benchmark-paired-executor.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts"
+      ]
+    }
+  }
+}

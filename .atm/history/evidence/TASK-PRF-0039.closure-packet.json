@@ -1,0 +1,133 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0039",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d8f17383b963674638b0ae989b2c43cd709f6523",
+  "governedTreeSha": "40c7f52de0095dead8ae081cc54d631e971a445f",
+  "targetCommitDelta": {
+    "currentCommitSha": "d8f17383b963674638b0ae989b2c43cd709f6523",
+    "parentCommitShas": [
+      "d8f17383b963674638b0ae989b2c43cd709f6523"
+    ],
+    "governedTreeSha": "40c7f52de0095dead8ae081cc54d631e971a445f",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "scripts/lib/external-benchmark/metrics.ts",
+      "scripts/lib/external-benchmark/paired-executor.ts",
+      "scripts/run-atm-external-benchmark.ts",
+      "tests/cli/external-benchmark-paired-executor.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7ffc6e2b1937216fe13e2592c3d99b5eabb09218f261c1f1c8aba414d929bcb2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7ffc6e2b1937216fe13e2592c3d99b5eabb09218f261c1f1c8aba414d929bcb2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7ffc6e2b1937216fe13e2592c3d99b5eabb09218f261c1f1c8aba414d929bcb2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7ffc6e2b1937216fe13e2592c3d99b5eabb09218f261c1f1c8aba414d929bcb2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-13T06:01:47.431Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0039.*",
+      ".atm/history/task-events/TASK-PRF-0039/**",
+      ".atm/history/tasks/TASK-PRF-0039.json",
+      "scripts/lib/external-benchmark/paired-executor.ts",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/run-atm-external-benchmark.ts",
+      "tests/cli/external-benchmark-paired-executor.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/lib/external-benchmark/paired-executor.ts",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/run-atm-external-benchmark.ts",
+      "tests/cli/external-benchmark-paired-executor.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0039.json",
+  "closedAt": "2026-09-13T06:01:47.432Z",
+  "closedByActor": "codex-benchmark-paired",
+  "sessionId": "session-20260913055639-codex-benchmark-paired-TASK-PRF-0039-b37e001076",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d8f17383b963674638b0ae989b2c43cd709f6523",
+    "taskMatchedFiles": [
+      "scripts/lib/external-benchmark/paired-executor.ts",
+      "scripts/run-atm-external-benchmark.ts",
+      "tests/cli/external-benchmark-paired-executor.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0039/2026-09-13T05-56-29-032Z-import-c98f127f50f4.json",
+      ".atm/history/task-events/TASK-PRF-0039/2026-09-13T05-56-39-612Z-reserve-5581704817da.json",
+      ".atm/history/task-events/TASK-PRF-0039/2026-09-13T05-56-39-617Z-promote-61ef72030c77.json",
+      ".atm/history/task-events/TASK-PRF-0039/2026-09-13T05-56-44-884Z-claim-5c93ba63d8dd.json",
+      ".atm/history/tasks/TASK-PRF-0039.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
