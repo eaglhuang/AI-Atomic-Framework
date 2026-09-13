@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0049",
   "title": "Reduce published CLI unpacked runtime with measured boundary split",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -189,7 +189,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-57fb738bc144",
     "claimedAt": "2026-09-13T14:45:32.123Z",
-    "heartbeatAt": "2026-09-13T16:37:07.541Z",
+    "heartbeatAt": "2026-09-13T16:58:56.243Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0049.*",
@@ -206,13 +206,14 @@
       "tests/cli/external-benchmark-protocol.test.ts",
       "tests/cli/npm-clean-install.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260913161041-codex-captain-190c11b0b7",
-      "status": "active",
-      "source": "option",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913161041-codex-captain-190c11b0b7\""
-    }
+      "laneSessionId": "lane-20260913165740-codex-captain-13ab356648",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913165740-codex-captain-13ab356648\""
+    },
+    "reason": "closed"
   },
   "owner": "codex-captain",
   "startedAt": "2026-09-13T14:08:46.680Z",
@@ -262,26 +263,26 @@
     "createdAt": "2026-09-13T16:15:13.471Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-09-13T16-54-41-934Z-scope-amendment-e43a09991314",
-  "lastTransitionAt": "2026-09-13T16:54:41.934Z",
+  "lastTransitionId": "2026-09-13T16-58-56-245Z-close-e92b26d3ac65",
+  "lastTransitionAt": "2026-09-13T16:58:56.245Z",
   "ledgerContractVersion": "task-ledger/v1",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-534166064d03fbf2",
-    "ticketDigest": "sha256:534166064d03fbf2b5256c32dbcf204da01ebb5334cdb49cd84e516ad46e2c11",
+    "ticketId": "wat-5079ccce2762c4d8",
+    "ticketDigest": "sha256:5079ccce2762c4d850955264117e47eac4cc5ffb6d47ffb090cc1030f45d5660",
     "taskId": "TASK-PRF-0049",
     "origin": "claim",
     "actorId": "codex-captain",
-    "laneSessionId": "lane-20260913161041-codex-captain-190c11b0b7",
+    "laneSessionId": "lane-20260913165740-codex-captain-13ab356648",
     "claimGeneration": "lease-57fb738bc144",
-    "issuedAt": "2026-09-13T16:54:41.863Z",
-    "expiresAt": "2026-09-13T17:24:41.863Z",
+    "issuedAt": "2026-09-13T16:57:40.174Z",
+    "expiresAt": "2026-09-13T17:27:40.174Z",
     "scopeDigest": "sha256:ff1feb2cce21667d609a8828ff7042651f66814d467fd3ca10f6a8d78b46522e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-13T16:54:41.863Z"
+      "selectedAt": "2026-09-13T16:57:40.174Z"
     },
     "grants": [
       {
@@ -335,5 +336,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
-  }
+  },
+  "closedAt": "2026-09-13T16:58:56.243Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260913144532-codex-captain-TASK-PRF-0049-858cab8cd0",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0049.closure-packet.json"
 }

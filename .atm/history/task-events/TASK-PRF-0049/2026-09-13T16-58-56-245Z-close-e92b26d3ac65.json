@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T16-58-56-245Z-close-e92b26d3ac65",
+  "taskId": "TASK-PRF-0049",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913144532-codex-captain-TASK-PRF-0049-858cab8cd0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0049.json",
+  "taskSha256": "sha256:c5dfa9c62dd273d3b92dc5d0a0c90be08e5e139b39b4b183eccbc6d2f8d2b956",
+  "createdAt": "2026-09-13T16:58:56.245Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0049 --actor codex-captain --status done --historical-delivery d025ade1e790bbc30424f319cb5c2078a11ae28d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913144532-codex-captain-TASK-PRF-0049-858cab8cd0",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0049.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "baseline-vs-candidate measurement",
+      "command-backed baseline-vs-candidate measurement with retained receipt",
+      "lint",
+      "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "npm-clean-install test",
+      "typecheck",
+      "validate:cli",
+      "validate:npm-clean-install",
+      "validate:package-install",
+      "validate:public-npm-install"
+    ],
+    "requiredGates": [
+      "command-backed baseline-vs-candidate measurement with retained receipt",
+      "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+      "validate:package-install",
+      "validate:public-npm-install"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T16:58:56.231Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0049.*",
+        ".atm/history/task-events/TASK-PRF-0049/**",
+        ".atm/history/tasks/TASK-PRF-0049.json",
+        "packages/cli/dist",
+        "packages/cli/src/atm-public.ts",
+        "packages/cli/src/atm.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/external-benchmark-protocol.test.ts",
+        "tests/cli/npm-clean-install.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/src/atm-public.ts",
+        "packages/cli/src/atm.ts",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/external-benchmark-protocol.test.ts",
+        "tests/cli/npm-clean-install.test.ts"
+      ],
+      "requiredGates": [
+        "command-backed baseline-vs-candidate measurement with retained receipt",
+        "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+        "validate:package-install",
+        "validate:public-npm-install"
+      ]
+    }
+  }
+}
