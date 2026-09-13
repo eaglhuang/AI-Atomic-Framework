@@ -21,3 +21,5 @@ The public checkpoint may contain digests, counts, and links only. Raw run paylo
 ## Latest observed CI snapshot
 
 On 2026-09-13, an externally queried GitHub Actions export (100 newest `ci.yml` runs; source digest `sha256:d303ec54f193828c7721d8a59bae8c62954d255b6e853edc7fbf88ddeaf96a04`) produced 31 successes and 69 failures across 6.526343 calendar days. The evaluator therefore returned `unexplained-failure` with `insufficient-calendar-window`; this is a negative observation, not a long-term-green claim.
+
+Assuming a fresh protected-main baseline begins with the latest eligible observation and every subsequent eligible run succeeds, the earliest possible 30-day window date is 2026-10-13. The 90-run minimum must also be reached; either condition failing keeps the claim non-green.
