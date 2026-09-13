@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T08-23-17-575Z-close-d58b53b777c9",
+  "taskId": "TASK-PRF-0045",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913082002-codex-captain-TASK-PRF-0045-6511e6f53a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0045.json",
+  "taskSha256": "sha256:a516badd8dc7a57e77accdffbd8eafcec9fe339f2124c25d80855dbec74c5a26",
+  "createdAt": "2026-09-13T08:23:17.575Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0045 --actor codex-captain --status done --historical-delivery 2ac0d474749aff39fe5106bc884ec3781e9b22ce",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913082002-codex-captain-TASK-PRF-0045-6511e6f53a",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0045.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched -- --files scripts/lib/external-benchmark/metrics.ts tests/cli/external-benchmark-v2-metrics.test.ts",
+      "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "check:encoding:touched -- --files scripts/lib/external-benchmark/metrics.ts tests/cli/external-benchmark-v2-metrics.test.ts",
+      "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T08:23:17.562Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0045.*",
+        ".atm/history/task-events/TASK-PRF-0045/**",
+        ".atm/history/tasks/TASK-PRF-0045.json",
+        "scripts/lib/external-benchmark/metrics.ts",
+        "tests/cli/external-benchmark-v2-metrics.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/lib/external-benchmark/metrics.ts",
+        "tests/cli/external-benchmark-v2-metrics.test.ts"
+      ],
+      "requiredGates": [
+        "check:encoding:touched -- --files scripts/lib/external-benchmark/metrics.ts tests/cli/external-benchmark-v2-metrics.test.ts",
+        "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
