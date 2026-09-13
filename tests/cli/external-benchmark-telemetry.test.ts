@@ -1,0 +1,8 @@
+import assert from 'node:assert/strict';
+import { enforceBudget, measuredTotals, validateTelemetry, verifyRawExport, type TelemetryLedger } from '../../scripts/lib/external-benchmark/telemetry.ts';
+const ref={uri:'store://export',digest:'sha256:'+ 'a'.repeat(64)};
+const ledger:TelemetryLedger={usages:[{requestId:'req-1',runId:'run-1',provider:'p',inputTokens:10,outputTokens:20,billedCost:2,currency:'USD',billingPeriod:'2026-09',sourceRef:ref}],human:[{eventId:'h-1',runId:'run-1',actorId:'human',startedAt:'2026-01-01T00:00:00Z',finishedAt:'2026-01-01T00:10:00Z'}],budget:{maxBilledCost:3,maxTokens:40,maxHumanMinutes:20}};
+validateTelemetry(ledger); assert.deepEqual(measuredTotals(ledger),{inputTokens:10,outputTokens:20,billedCost:2,humanMinutes:10,estimatedSubscriptionCost:null}); assert.equal(enforceBudget(ledger).ok,true);
+assert.throws(()=>validateTelemetry({...ledger,usages:[...ledger.usages,{...ledger.usages[0]}]}),/unique/); assert.equal(measuredTotals({...ledger,usages:[{...ledger.usages[0],billedCost:null,sourceRef:null}]}).billedCost,null); assert.throws(()=>validateTelemetry({...ledger,human:[...ledger.human,{...ledger.human[0],eventId:'h-2',startedAt:'2026-01-01T00:05:00Z'}]}),/overlapping/);
+assert.equal(enforceBudget({...ledger,budget:{...ledger.budget,maxTokens:20}}).ok,false); assert.equal(enforceBudget({...ledger,budget:{...ledger.budget,maxBilledCost:1}}).ok,false); assert.equal(verifyRawExport(new TextEncoder().encode('raw'),{uri:'x',digest:'sha256:'+ 'b'.repeat(64)}),false); assert.equal(validateTelemetry({...ledger,budget:{maxBilledCost:null,maxTokens:null,maxHumanMinutes:null}}),undefined);
+console.log('external-benchmark-telemetry ok');
