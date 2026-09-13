@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-atomic-framework.dev/schemas/evidence/external-benchmark-v2.schema.json",
+  "title": "External benchmark v2 run evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "protocolVersion", "runId", "pairId", "clusterId", "arm", "sequence", "completion", "operations", "cost", "independence", "gates"],
+  "properties": {
+    "schemaId": {"const": "atm.externalBenchmarkRun.v2"},
+    "protocolVersion": {"const": "2.0.0"},
+    "runId": {"$ref": "#/definitions/id"},
+    "pairId": {"$ref": "#/definitions/id"},
+    "clusterId": {"$ref": "#/definitions/id"},
+    "arm": {"enum": ["baseline", "atm"]},
+    "sequence": {"enum": ["AB", "BA"]},
+    "completion": {"enum": ["completed", "failed", "aborted", "unknown"]},
+    "operations": {"type": "array", "items": {"$ref": "#/definitions/operation"}},
+    "cost": {
+      "type": "object", "additionalProperties": false,
+      "required": ["inputTokens", "outputTokens", "billedCost", "currency", "humanMinutes", "computeCost", "billingEvidence", "humanEvidence"],
+      "properties": {
+        "inputTokens": {"type": ["integer", "null"], "minimum": 0},
+        "outputTokens": {"type": ["integer", "null"], "minimum": 0},
+        "billedCost": {"$ref": "#/definitions/measurement"},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+        "humanMinutes": {"$ref": "#/definitions/measurement"},
+        "computeCost": {"$ref": "#/definitions/measurement"},
+        "billingEvidence": {"$ref": "#/definitions/optionalRef"},
+        "humanEvidence": {"$ref": "#/definitions/optionalRef"}
+      }
+    },
+    "independence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sponsorController", "operator", "custodian", "adjudicator", "isolationEvidence", "controllerEvidence"],
+      "properties": {
+        "sponsorController": {"$ref": "#/definitions/id"},
+        "operator": {"$ref": "#/definitions/actor"},
+        "custodian": {"$ref": "#/definitions/actor"},
+        "adjudicator": {"$ref": "#/definitions/actor"},
+        "isolationEvidence": {"$ref": "#/definitions/optionalRef"},
+        "controllerEvidence": {"$ref": "#/definitions/optionalRef"}
+      }
+    },
+    "gates": {
+      "type": "object", "additionalProperties": false, "required": ["preRun", "postRun"],
+      "properties": {
+        "preRun": {
+          "type": "object", "additionalProperties": false, "required": ["package", "corpusSeal"],
+          "properties": {"package": {"$ref": "#/definitions/optionalRef"}, "corpusSeal": {"$ref": "#/definitions/optionalRef"}}
+        },
+        "postRun": {
+          "type": "object", "additionalProperties": false, "required": ["adjudication", "telemetry"],
+          "properties": {"adjudication": {"$ref": "#/definitions/optionalRef"}, "telemetry": {"$ref": "#/definitions/optionalRef"}}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "id": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "measurement": {"type": ["number", "null"], "minimum": 0},
+    "ref": {
+      "type": "object", "additionalProperties": false, "required": ["uri", "digest"],
+      "properties": {"uri": {"$ref": "#/definitions/id"}, "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}
+    },
+    "optionalRef": {"anyOf": [{"type": "null"}, {"$ref": "#/definitions/ref"}]},
+    "actor": {
+      "type": "object", "additionalProperties": false, "required": ["actorId", "controllerId", "keyId"],
+      "properties": {"actorId": {"$ref": "#/definitions/id"}, "controllerId": {"$ref": "#/definitions/id"}, "keyId": {"anyOf": [{"type": "null"}, {"$ref": "#/definitions/id"}]}}
+    },
+    "operation": {
+      "type": "object", "additionalProperties": false, "required": ["operationId", "truth", "decision", "denominator"],
+      "properties": {
+        "operationId": {"$ref": "#/definitions/id"},
+        "truth": {"enum": ["benign", "conflict", "unknown"]},
+        "decision": {"enum": ["allowed", "blocked", "unknown"]},
+        "denominator": {"enum": ["false-block", "missed-conflict", "unavailable"]}
+      }
+    }
+  }
+}
