@@ -1,0 +1,204 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0034",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "da2598dc97519437d645280a1f0e6cb5560e978f",
+  "governedTreeSha": "a0a191e2f4df83f0be79c9a200508b33df5106ad",
+  "targetCommitDelta": {
+    "currentCommitSha": "da2598dc97519437d645280a1f0e6cb5560e978f",
+    "parentCommitShas": [
+      "da2598dc97519437d645280a1f0e6cb5560e978f"
+    ],
+    "governedTreeSha": "a0a191e2f4df83f0be79c9a200508b33df5106ad",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/task-events/TASK-PRF-0034/2026-09-13T00-26-23-936Z-import-61c4f776857c.json",
+      ".atm/history/task-events/TASK-PRF-0034/2026-09-13T00-27-18-153Z-reserve-dcb4e203b354.json",
+      ".atm/history/task-events/TASK-PRF-0034/2026-09-13T00-27-18-159Z-promote-2617990792aa.json",
+      ".atm/history/task-events/TASK-PRF-0034/2026-09-13T00-27-23-559Z-claim-9da41e10856e.json",
+      ".atm/history/task-events/TASK-PRF-0034/2026-09-13T05-18-49-110Z-renew-64f5e06c6fc7.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0034.json",
+      "docs/benchmark/independence-contract.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "schemas/evidence/external-benchmark-v2.schema.json",
+      "scripts/lib/external-benchmark/protocol-v2.ts",
+      "tests/cli/external-benchmark-v2-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_1 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:120cefcc3a330b7992b336c88b3aef355766a206ae4c27280acfefbbd3e414c3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_2 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:9d5afbb3197193f2d708804390798df6d2d6c031db4141c2cbcbb228a40f83f8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_3 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:43981591a949dc61408a801c45e51ce3425078f457c9b82d2058aa0679baba56",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_1 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:b2bc2ce2cc1975a71a62422072e8fbc97610fdd8ea4372bfadfc14be7fb4f70d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_2 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:28683306602a70d3be68dde4c2f58b4f37a7183564f9339c124a17ff2d4c3ae6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_3 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:66c6f99370a93c69340fae93166794df6849a508bcf6cf681e9f5cff0744d6ac",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_1 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:426c6fdd73627f74dd3e7fcd88c5860f33cf275248df6e737e7f9b8b7fb4fd6a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_2 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:9f4d69e577276f8fc2b90895bbdcf7a2ba66f92e2af2f248b530b91eeb4b4645",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_3 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:5e700674f85a20317146e829c243777fd11de47b0ff7c1a2a7072459294aa65f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_1 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1709a0a37a2387eae1543b55b39dc7bfb53376b37833310480a6de513e7c0813",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_2 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3b71aae2f6522c9e6b9b011d2766466e0b508e0751363a44db47208dbd284b3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types --test --test-name-pattern=test_prf_benchmark_v2_contract_3 tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f6c5c11cdbb0677913b55c219b63df45cbacc9cbd6a8017997b51cf45322ee71",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4738b827ce73e50661093ddfd57ab894a539b711a4f841bc1d8d7d561de362ee",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-13T05:20:08.592Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0034.*",
+      ".atm/history/task-events/TASK-PRF-0034/**",
+      ".atm/history/tasks/TASK-PRF-0034.json",
+      "docs/benchmark/independence-contract.md",
+      "schemas/evidence/external-benchmark-v2.schema.json",
+      "scripts/lib/external-benchmark/protocol-v2.ts",
+      "tests/cli/external-benchmark-v2-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "schemas/evidence/external-benchmark-v2.schema.json",
+      "scripts/lib/external-benchmark/protocol-v2.ts",
+      "tests/cli/external-benchmark-v2-contract.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0034.json",
+  "closedAt": "2026-09-13T05:20:08.592Z",
+  "closedByActor": "codex-benchmark-contract",
+  "sessionId": "session-20260913002718-codex-benchmark-contract-TASK-PRF-0034-e89b12ccd4",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "da2598dc97519437d645280a1f0e6cb5560e978f",
+    "taskMatchedFiles": [
+      "docs/benchmark/independence-contract.md",
+      "schemas/evidence/external-benchmark-v2.schema.json",
+      "scripts/lib/external-benchmark/protocol-v2.ts",
+      "tests/cli/external-benchmark-v2-contract.test.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

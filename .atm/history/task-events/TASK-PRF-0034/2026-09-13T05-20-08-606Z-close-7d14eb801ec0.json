@@ -1,0 +1,53 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T05-20-08-606Z-close-7d14eb801ec0",
+  "taskId": "TASK-PRF-0034",
+  "action": "close",
+  "actorId": "codex-benchmark-contract",
+  "sessionId": "session-20260913002718-codex-benchmark-contract-TASK-PRF-0034-e89b12ccd4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0034.json",
+  "taskSha256": "sha256:44c87be7216217d3ae72be599608e8bcccb31bddb19aae3e80c5b2d2218bf43d",
+  "createdAt": "2026-09-13T05:20:08.606Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0034 --actor codex-benchmark-contract --status done --historical-delivery da2598dc97519437d645280a1f0e6cb5560e978f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260913002718-codex-benchmark-contract-TASK-PRF-0034-e89b12ccd4",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0034.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-13T05:20:08.592Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0034.*",
+        ".atm/history/task-events/TASK-PRF-0034/**",
+        ".atm/history/tasks/TASK-PRF-0034.json",
+        "docs/benchmark/independence-contract.md",
+        "schemas/evidence/external-benchmark-v2.schema.json",
+        "scripts/lib/external-benchmark/protocol-v2.ts",
+        "tests/cli/external-benchmark-v2-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "schemas/evidence/external-benchmark-v2.schema.json",
+        "scripts/lib/external-benchmark/protocol-v2.ts",
+        "tests/cli/external-benchmark-v2-contract.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+      ]
+    }
+  }
+}
