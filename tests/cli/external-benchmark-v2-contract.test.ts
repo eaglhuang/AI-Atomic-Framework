@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { parseBenchmarkV2, assertSealedBytes, assessIndependence, assessGates } from '../../scripts/lib/external-benchmark/protocol-v2.ts';
-import type { BenchmarkV2 } from '../../scripts/lib/external-benchmark/protocol-v2.ts';
+import { parseBenchmarkV2, assertSealedBytes, assessIndependence, assessGates, type BenchmarkV2 } from '../../scripts/lib/external-benchmark/protocol-v2.ts';
 
 const ref = { uri: 'evidence://fixture', digest: `sha256:${'a'.repeat(64)}` };
 function fixture(): BenchmarkV2 {

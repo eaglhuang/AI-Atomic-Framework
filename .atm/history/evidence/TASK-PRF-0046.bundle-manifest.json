@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0046",
+  "updatedAt": "2026-09-13T08:27:50.078Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "check:encoding:touched -- --files tests/cli/external-benchmark-v2-contract.test.ts",
+    "lint",
+    "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-13T08:27:34.492Z",
+      "startedAt": "2026-09-13T08:27:08.417Z",
+      "finishedAt": "2026-09-13T08:27:34.492Z",
+      "durationMs": 26075,
+      "runnerKind": "dev-source",
+      "sourceCommit": "08112f3fe8198add65bd159ddf49109ff060c615",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0196858310868b87f1f690bba6a3f0e963963f45dafadf8727f8e614415282f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-v2-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-13T08:27:45.163Z",
+      "startedAt": "2026-09-13T08:27:43.690Z",
+      "finishedAt": "2026-09-13T08:27:45.163Z",
+      "durationMs": 1473,
+      "runnerKind": "dev-source",
+      "sourceCommit": "08112f3fe8198add65bd159ddf49109ff060c615",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files tests/cli/external-benchmark-v2-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0ab8f6ce75c7ad4a9eb5f037d424c5f51bbe3b6862762a7728cb5af6a8c9450a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files tests/cli/external-benchmark-v2-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-13T08:27:50.077Z",
+      "startedAt": "2026-09-13T08:27:47.789Z",
+      "finishedAt": "2026-09-13T08:27:50.077Z",
+      "durationMs": 2288,
+      "runnerKind": "dev-source",
+      "sourceCommit": "08112f3fe8198add65bd159ddf49109ff060c615",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
