@@ -33,14 +33,27 @@ try {
   assert.equal(path.relative(root, runtimePath).replace(/\\/g, '/'), runtimeEvidenceBundleRelativePath(taskId));
   mkdirSync(path.dirname(runtimePath), { recursive: true });
   writeFileSync(runtimePath, `${JSON.stringify({ taskId, evidence: [{ summary: 'runtime-only' }] })}\n`, 'utf8');
+  const runtimeClassPaths = [
+    '.atm/runtime/evidence-ledger/bundles/example.json',
+    '.atm/runtime/evidence-ledger/records/record.json',
+    '.atm/runtime/evidence-ledger/work-items/TASK-BOUNDARY-0001.json'
+  ];
+  for (const relativePath of runtimeClassPaths) {
+    mkdirSync(path.dirname(path.join(root, relativePath)), { recursive: true });
+    if (relativePath !== path.relative(root, runtimePath).replace(/\\/g, '/')) {
+      writeFileSync(path.join(root, relativePath), '{"runtime":true}\n', 'utf8');
+    }
+  }
   const gitEnvironment = {
     ...process.env,
     GIT_CONFIG_NOSYSTEM: '1',
     GIT_CONFIG_GLOBAL: path.join(root, 'missing-global-gitconfig')
   };
-  assert.equal(execFileSync('git', ['check-ignore', '-q', '--no-index', '--', '.atm/runtime/evidence-ledger/bundles/example.json'], { cwd: root, env: gitEnvironment, encoding: 'utf8' }), '');
-  const ignoreSource = execFileSync('git', ['check-ignore', '-v', '--no-index', '--', '.atm/runtime/evidence-ledger/bundles/example.json'], { cwd: root, env: gitEnvironment, encoding: 'utf8' });
-  assert.match(ignoreSource, /\.gitignore/);
+  for (const relativePath of runtimeClassPaths) {
+    assert.equal(execFileSync('git', ['check-ignore', '-q', '--no-index', '--', relativePath], { cwd: root, env: gitEnvironment, encoding: 'utf8' }), '');
+    const ignoreSource = execFileSync('git', ['check-ignore', '-v', '--no-index', '--', relativePath], { cwd: root, env: gitEnvironment, encoding: 'utf8' });
+    assert.match(ignoreSource, /\.gitignore/);
+  }
   assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd: root, env: gitEnvironment, encoding: 'utf8' }), '');
   assert.deepEqual(readEvidenceBundle(root, taskId).evidence, [{ summary: 'runtime-only' }]);
 

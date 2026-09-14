@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -48,6 +48,37 @@ try {
   assert.equal(boundary.records, 1);
   assert.equal(boundary.checkpointDigest, manifest.checkpointDigest);
   assert.ok(boundary.scannedFiles > 3);
+  const missingRuleRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-ledger-missing-rule-'));
+  try {
+    execFileSync('git', ['init', '--quiet'], { cwd: missingRuleRoot });
+    writeFileSync(path.join(missingRuleRoot, '.gitignore'), '.atm/runtime/\n', 'utf8');
+    mkdirSync(path.join(missingRuleRoot, 'docs', 'reports'), { recursive: true });
+    writeFileSync(
+      path.join(missingRuleRoot, 'docs/reports/evidence-ledger-migration-manifest.json'),
+      readFileSync(path.join(root, 'docs/reports/evidence-ledger-migration-manifest.json'), 'utf8'),
+      'utf8'
+    );
+    assert.throws(
+      () => validateEvidenceLedgerBoundary(missingRuleRoot, 'docs/reports/evidence-ledger-migration-manifest.json', process.cwd()),
+      /Repository-owned \.gitignore must ignore/
+    );
+  } finally {
+    rmSync(missingRuleRoot, { recursive: true, force: true });
+  }
+
+  const trackedLedgerPath = path.join(root, '.atm', 'runtime', 'evidence-ledger', 'records', 'tracked.json');
+  mkdirSync(path.dirname(trackedLedgerPath), { recursive: true });
+  writeFileSync(trackedLedgerPath, '{"tracked":true}\n', 'utf8');
+  execFileSync('git', ['add', '-f', '--', '.atm/runtime/evidence-ledger/records/tracked.json'], { cwd: root });
+  try {
+    assert.throws(
+      () => validateEvidenceLedgerBoundary(root, 'docs/reports/evidence-ledger-migration-manifest.json', process.cwd()),
+      /Runtime Evidence Ledger paths must not be tracked/
+    );
+  } finally {
+    execFileSync('git', ['reset', '--quiet', '--', '.atm/runtime/evidence-ledger/records/tracked.json'], { cwd: root });
+  }
+
   const objectPath = path.join(root, '.atm', 'runtime', 'evidence-ledger', 'records', `${manifest.records[0].ledgerDigest.replace(/^sha256:/, '')}.json`);
   const missingRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-ledger-missing-'));
   unlinkSync(objectPath);
