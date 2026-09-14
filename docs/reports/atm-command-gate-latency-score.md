@@ -99,3 +99,47 @@ The change adds no command, gate, registry, daemon, database, or second state
 source. If the same-runner measurement fails to reach the 20% p50 target or
 causes a p95 regression above 10%, revert the single candidate commit and keep
 the failed receipt as evidence.
+
+The first external same-runner paired measurement is now available. It uses 15
+AB/BA pairs plus 8 candidate A/A noise-control runs against the current task
+ledger:
+
+- broad-hydration baseline p50 **129.982 ms**, p95 **142.099 ms**;
+- targeted candidate p50 **111.276 ms**, p95 **126.644 ms**;
+- p50 reduction **14.391%**, p95 change **-10.876%**;
+- candidate A/A noise-control p50 **108.349 ms**.
+
+This is a real, reversible reduction but it does **not** meet the 20% p50
+acceptance target. The result is therefore marked inconclusive for the formal
+gate and retained only as a directional optimization; no product-wide claim
+or frozen-runner release is authorized from it. Receipt:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0105\route-resolution-paired-receipt.json`
+(`sha256:0b44b7aab8db532b95a6195a75913884db2048c671ff0c7dbf97ddb1cb791b59`).
+Rerun harness:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0105\run-route-resolution-paired.mjs`
+(`sha256:f9a0dfc242b5b564aff60e7063de412815843d7b239bdad8010e511e6900ed60`).
+
+## Governance-readiness Git process follow-up (TASK-PRF-0106)
+
+The next source-first profile exposed `build-governance-readiness` at roughly
+500–550ms. Its dirty-worktree helper previously started separate `git diff` and
+`git ls-files` processes. The candidate now consumes one
+`git status --porcelain=v1 -z` snapshot and parses only worktree/untracked
+entries; staged-only files remain owned by the existing staged-file reader.
+The parser regression fixture confirms that the old and new file sets have the
+same 93-path digest.
+
+The external 15-pair AB/BA measurement plus 8 candidate A/A controls reports:
+
+- two-process baseline p50 **264.362 ms**, p95 **308.032 ms**;
+- one-process candidate p50 **120.583 ms**, p95 **167.245 ms**;
+- p50 reduction **54.387%**, p95 change **-45.705%**;
+- candidate A/A p50 **117.800 ms**.
+
+This clears the provisional 20% p50 target for the selected substep while
+preserving classification semantics. Receipt:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0106\git-status-paired-receipt.json`
+(`sha256:0eaf2c6b3d590f61dfe2ecd40cc1cb2f6fe3a0e7cd4fac8e2789e749b0372777`).
+Rerun harness:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0106\run-git-status-paired.mjs`
+(`sha256:7307e457f0eb240f35697ecc47da8cf42bf913c53e62bb4ffe30a2e78cd6e380`).
