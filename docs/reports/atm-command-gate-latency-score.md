@@ -51,3 +51,27 @@ Read `evidence.latencyScore` for the structured score and
 `evidence.latencyMarkdown` for the text report. Omitting `--include-runtime`
 deliberately leaves the latency inventory unobserved; it remains `unknown`,
 not zero.
+
+## Latest paired doctor measurement (TASK-PRF-0104)
+
+The external receipt contains 15 measured AB/BA pairs (15 baseline and 15
+candidate runs) plus four A/A noise-control runs. The observed results are:
+
+- baseline `node atm.mjs doctor --json`: p50 **15,002.931 ms**, p95
+  **15,906.721 ms**;
+- candidate `node atm.dev.mjs doctor --json`: p50 **4,790.618 ms**, p95
+  **4,973.020 ms**;
+- p50 reduction **68.07%**; p95 change **-68.74%**; all 34 measured rows
+  retain exit code `0`;
+- AB/BA ordering is 8/7 pairs and A/A p50 is **4,986.374 ms**.
+
+Receipt: `C:\Users\User\atm-benchmark-sink\TASK-PRF-0104\doctor-paired-receipt-v2.json`
+(`sha256:30a25242a9fdc8f4263e1cff6cbf9a0dcf599aaa94f22642c3b1ee1f44ff7782`).
+Rerun harness: `C:\Users\User\atm-benchmark-sink\TASK-PRF-0104\run-doctor-paired.ps1`
+(`sha256:a25873368ab08ce58861c709a475a277df2fb3c00ce1df82bf830a807fd61a40`).
+
+This is strong directional evidence, not the final product claim: baseline
+uses the existing frozen runner while candidate uses source-first, because the
+frozen runner is still stale. A same-runner release comparison and the full
+multi-gate 30-run matrix remain required before declaring the optimization
+formally proven.
