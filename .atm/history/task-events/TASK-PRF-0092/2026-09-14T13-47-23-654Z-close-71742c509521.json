@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T13-47-23-654Z-close-71742c509521",
+  "taskId": "TASK-PRF-0092",
+  "action": "close",
+  "actorId": "codex-product-proof",
+  "sessionId": "session-20260914134028-codex-product-proof-TASK-PRF-0092-f86c2ac97b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0092.json",
+  "taskSha256": "sha256:739989af1ec10bdb24f95ad6d94f78d9f970616d5749e192978a02e0f6631833",
+  "createdAt": "2026-09-14T13:47:23.654Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0092 --actor codex-product-proof --status done --historical-delivery 473425e09d5ee0f6134866450737e0fca099c4cb",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914134028-codex-product-proof-TASK-PRF-0092-f86c2ac97b",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0092.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+      "typecheck",
+      "validate:evidence-ledger-boundary"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+      "typecheck",
+      "validate:evidence-ledger-boundary"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T13:47:23.641Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0092.*",
+        ".atm/history/task-events/TASK-PRF-0092/**",
+        ".atm/history/tasks/TASK-PRF-0092.json",
+        ".gitignore",
+        "docs/EVIDENCE_LEDGER.md",
+        "docs/reports/evidence-ledger-boundary-baseline.md",
+        "scripts/validate-evidence-ledger-boundary.ts",
+        "tests/cli/evidence-ledger-migration.test.ts",
+        "tests/cli/runtime-evidence-git-boundary.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-evidence-ledger-boundary.ts",
+        "tests/cli/evidence-ledger-migration.test.ts",
+        "tests/cli/runtime-evidence-git-boundary.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+        "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+        "typecheck",
+        "validate:evidence-ledger-boundary"
+      ]
+    }
+  }
+}

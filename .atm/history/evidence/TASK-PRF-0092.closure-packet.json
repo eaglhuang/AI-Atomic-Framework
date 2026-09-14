@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0092",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "473425e09d5ee0f6134866450737e0fca099c4cb",
+  "governedTreeSha": "117f1dfefed8e5b2ab68874fd4693add5669de1a",
+  "targetCommitDelta": {
+    "currentCommitSha": "473425e09d5ee0f6134866450737e0fca099c4cb",
+    "parentCommitShas": [
+      "473425e09d5ee0f6134866450737e0fca099c4cb"
+    ],
+    "governedTreeSha": "117f1dfefed8e5b2ab68874fd4693add5669de1a",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      ".gitignore",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/evidence-ledger-boundary-baseline.md",
+      "scripts/validate-evidence-ledger-boundary.ts",
+      "tests/cli/evidence-ledger-migration.test.ts",
+      "tests/cli/runtime-evidence-git-boundary.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0f09efc248cd2df6a713e748c402d0d07fb72a7f93c26a7ab4ce56dedd7f06a0",
+      "stderrSha256": "sha256:226bb7ae7dde4751608648ffd12b0814d3e1c010833dd8c9a9ed78e861bcb887",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b76f4a00e58e78ec00f9d6ce5bb8d537ecf07130f779d2c8a1a252db31d63837",
+      "stderrSha256": "sha256:da537263704b25f43ba022d6a851ab5deea15e20beb3b2e9ee91b49c9b4bab97",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-evidence-ledger-boundary.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:27d9641979a2543ee1555b11d1737c1840216dcaf6016509be97358a2c6255b0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+    "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+    "typecheck",
+    "validate:evidence-ledger-boundary"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+    "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+    "typecheck",
+    "validate:evidence-ledger-boundary"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-14T13:47:23.641Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0092.*",
+      ".atm/history/task-events/TASK-PRF-0092/**",
+      ".atm/history/tasks/TASK-PRF-0092.json",
+      ".gitignore",
+      "docs/EVIDENCE_LEDGER.md",
+      "docs/reports/evidence-ledger-boundary-baseline.md",
+      "scripts/validate-evidence-ledger-boundary.ts",
+      "tests/cli/evidence-ledger-migration.test.ts",
+      "tests/cli/runtime-evidence-git-boundary.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validate-evidence-ledger-boundary.ts",
+      "tests/cli/evidence-ledger-migration.test.ts",
+      "tests/cli/runtime-evidence-git-boundary.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+      "typecheck",
+      "validate:evidence-ledger-boundary"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0092.json",
+  "closedAt": "2026-09-14T13:47:23.642Z",
+  "closedByActor": "codex-product-proof",
+  "sessionId": "session-20260914134028-codex-product-proof-TASK-PRF-0092-f86c2ac97b",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "473425e09d5ee0f6134866450737e0fca099c4cb",
+    "taskMatchedFiles": [
+      ".gitignore",
+      "docs/reports/evidence-ledger-boundary-baseline.md",
+      "scripts/validate-evidence-ledger-boundary.ts",
+      "tests/cli/evidence-ledger-migration.test.ts",
+      "tests/cli/runtime-evidence-git-boundary.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0092/2026-09-14T13-37-33-759Z-import-547a04796aa3.json",
+      ".atm/history/task-events/TASK-PRF-0092/2026-09-14T13-39-11-317Z-import-1d235d3874e9.json",
+      ".atm/history/task-events/TASK-PRF-0092/2026-09-14T13-40-28-197Z-reserve-e3de201b912e.json",
+      ".atm/history/task-events/TASK-PRF-0092/2026-09-14T13-40-28-203Z-promote-8ac5bebb818c.json",
+      ".atm/history/task-events/TASK-PRF-0092/2026-09-14T13-40-34-563Z-claim-d842341007d8.json",
+      ".atm/history/tasks/TASK-PRF-0092.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
