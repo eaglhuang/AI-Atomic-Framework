@@ -1,0 +1,281 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0098",
+  "title": "Simplify evidence ownership while preserving deviation traceability",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: Map current writers/readers and identify authoritative evidence vs projections; retain original intent, change commit, validator exit/output digest and deviation reason.",
+    "ACC-2: Delete at least one redundant writer/storage representation and its unused production code; replay legacy references or provide reversible read compatibility.",
+    "ACC-3: Missing/tampered external evidence fails required verification; no raw logs/traces enter new Git commits or npm artifacts. Compare tracked bytes and evidence operations before/after; historical retention is reported separately."
+  ],
+  "deliverables": [
+    "scripts/validate-evidence-ledger-boundary.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "tests/cli/runtime-evidence-git-boundary.test.ts",
+    "tests/cli/evidence-ledger-migration.test.ts",
+    "docs/reports/evidence-ledger-boundary-baseline.md"
+  ],
+  "scopePaths": [
+    "scripts/validate-evidence-ledger-boundary.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/evidence",
+    "tests/cli/runtime-evidence-git-boundary.test.ts",
+    "tests/cli/evidence-ledger-migration.test.ts",
+    "docs/reports/evidence-ledger-boundary-baseline.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+    "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only this task's reviewed changes; preserve foreign WIP and external evidence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-command-router-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "disposition": "inline",
+        "inlineReason": "Owner explicitly prioritizes bounded quickfixes and deletion over additional abstraction; scope must shrink to observed behavior before editing."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0098-simplify-evidence-ownership-while-preserving-deviation-traceability.task.md",
+    "sectionTitle": "TASK-PRF-0098",
+    "headingLine": 46,
+    "hash": "ea7f6d7dc1be348c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0098-simplify-evidence-ownership-while-preserving-deviation-traceability.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ea7f6d7dc1be348c7d46934d1d8a48adada8c5dd1679a179da0d16074c856bc8",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T15:20:02.646Z"
+    }
+  },
+  "importedAt": "2026-09-14T15:20:02.646Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.runtime.evidence.git.boundary.test.ts",
+      "command": "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.evidence.ledger.migration.test.ts",
+      "command": "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies",
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T15-59-47-452Z-renew-0bea644e6823",
+  "lastTransitionAt": "2026-09-14T15:59:47.452Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-product-proof",
+  "reservedAt": "2026-09-14T15:59:13.077Z",
+  "promotedAt": "2026-09-14T15:59:13.081Z",
+  "claim": {
+    "actorId": "codex-product-proof",
+    "leaseId": "lease-ae74f16eb527",
+    "claimedAt": "2026-09-14T15:59:13.086Z",
+    "heartbeatAt": "2026-09-14T15:59:47.160Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0098.json",
+      "docs/reports/evidence-ledger-boundary-baseline.md",
+      "packages/cli/src/commands/evidence",
+      "packages/cli/src/commands/evidence.ts",
+      "scripts/validate-evidence-ledger-boundary.ts",
+      "tests/cli/evidence-ledger-migration.test.ts",
+      "tests/cli/runtime-evidence-git-boundary.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260914155913-codex-product-proof-1f70ac2d30",
+      "status": "adopted",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914155913-codex-product-proof-1f70ac2d30\""
+    }
+  },
+  "startedAt": "2026-09-14T15:59:13.086Z",
+  "startedByActor": "codex-product-proof",
+  "startedBySessionId": "session-20260914155913-codex-product-proof-TASK-PRF-0098-1a5223854c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0098",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0098.*",
+      ".atm/history/task-events/TASK-PRF-0098/**",
+      ".atm/history/tasks/TASK-PRF-0098.json",
+      "docs/reports/evidence-ledger-boundary-baseline.md",
+      "packages/cli/src/commands/evidence",
+      "packages/cli/src/commands/evidence.ts",
+      "scripts/validate-evidence-ledger-boundary.ts",
+      "tests/cli/evidence-ledger-migration.test.ts",
+      "tests/cli/runtime-evidence-git-boundary.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "de79355f16927d583e524b3d5f2ba2b1f7daad1a6c57c40b0533eebb595e39d8",
+    "actorId": "codex-product-proof",
+    "sessionId": "session-20260914155913-codex-product-proof-TASK-PRF-0098-1a5223854c",
+    "laneSession": {
+      "laneSessionId": "lane-20260914155913-codex-product-proof-1f70ac2d30",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914155913-codex-product-proof-1f70ac2d30\""
+    },
+    "createdAt": "2026-09-14T15:59:15.636Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-c25b00697537e731",
+    "ticketDigest": "sha256:c25b00697537e731ddcbd2866c6b6ac62c32fb45f4ca147cc10b7de0300ecd8a",
+    "taskId": "TASK-PRF-0098",
+    "origin": "claim",
+    "actorId": "codex-product-proof",
+    "laneSessionId": "lane-20260914155913-codex-product-proof-1f70ac2d30",
+    "claimGeneration": "lease-ae74f16eb527",
+    "issuedAt": "2026-09-14T15:59:47.160Z",
+    "expiresAt": "2026-09-14T16:29:47.160Z",
+    "scopeDigest": "sha256:0a7a2cade4b39df8053972af052c766b971f024cd43c6018f07fe0604c666d2a",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T15:59:47.160Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0098.*",
+          ".atm/history/task-events/TASK-PRF-0098/**",
+          ".atm/history/tasks/TASK-PRF-0098.json",
+          "docs/reports/evidence-ledger-boundary-baseline.md",
+          "packages/cli/src/commands/evidence",
+          "packages/cli/src/commands/evidence.ts",
+          "scripts/validate-evidence-ledger-boundary.ts",
+          "tests/cli/evidence-ledger-migration.test.ts",
+          "tests/cli/runtime-evidence-git-boundary.test.ts"
+        ],
+        "digest": "sha256:5daf774b8b756195cd2a3b0661cf87c36a2826633f362792d113125a8d2083ff"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0098",
+  "updatedAt": "2026-09-14T16:08:08.130Z",
+  "updatedBy": "codex-product-proof",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+    "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b76f4a00e58e78ec00f9d6ce5bb8d537ecf07130f779d2c8a1a252db31d63837",
+      "stderrSha256": "sha256:da537263704b25f43ba022d6a851ab5deea15e20beb3b2e9ee91b49c9b4bab97",
+      "validators": [
+        "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts"
+      ],
+      "generatedAt": "2026-09-14T16:07:41.969Z",
+      "startedAt": "2026-09-14T16:07:41.161Z",
+      "finishedAt": "2026-09-14T16:07:41.969Z",
+      "durationMs": 808,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8ad3bba46fbb123a2e28f75215f755e7e24eb0dc",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/evidence-ledger-migration.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0f09efc248cd2df6a713e748c402d0d07fb72a7f93c26a7ab4ce56dedd7f06a0",
+      "stderrSha256": "sha256:da537263704b25f43ba022d6a851ab5deea15e20beb3b2e9ee91b49c9b4bab97",
+      "validators": [
+        "node --strip-types tests/cli/evidence-ledger-migration.test.ts"
+      ],
+      "generatedAt": "2026-09-14T16:07:44.109Z",
+      "startedAt": "2026-09-14T16:07:43.404Z",
+      "finishedAt": "2026-09-14T16:07:44.109Z",
+      "durationMs": 705,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8ad3bba46fbb123a2e28f75215f755e7e24eb0dc",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-14T16:07:54.577Z",
+      "startedAt": "2026-09-14T16:07:45.560Z",
+      "finishedAt": "2026-09-14T16:07:54.577Z",
+      "durationMs": 9017,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8ad3bba46fbb123a2e28f75215f755e7e24eb0dc",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/evidence-bundle-io-extraction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-14T16:08:02.334Z",
+      "startedAt": "2026-09-14T16:08:01.943Z",
+      "finishedAt": "2026-09-14T16:08:02.334Z",
+      "durationMs": 391,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "8ad3bba46fbb123a2e28f75215f755e7e24eb0dc",
+      "cached": false
+    }
+  ],
+  "artifactPaths": [
+    "docs/reports/evidence-ledger-boundary-baseline.md"
+  ]
+}
