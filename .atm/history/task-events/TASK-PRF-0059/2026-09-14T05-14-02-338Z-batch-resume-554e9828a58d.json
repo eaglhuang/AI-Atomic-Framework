@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T05-14-02-338Z-batch-resume-554e9828a58d",
+  "taskId": "TASK-PRF-0059",
+  "action": "batch-resume",
+  "actorId": "codex-gpt-5.4-mini",
+  "batchId": "batch-69cd68e3c5a3",
+  "reason": "Required external GitHub attempt export and lifecycle receipt are absent. Current read-only window is only 2026-09-06 through 2026-09-14 (100 runs, 36 success/64 failure, all attempt=1), so it cannot satisfy 30 calendar days and 90 eligible completed runs. Preserve the diagnostic reports and do not infer retry/repair telemetry.",
+  "batchIndex": 0,
+  "createdAt": "2026-09-14T05:14:02.338Z",
+  "command": "node atm.mjs batch resume --task TASK-PRF-0059 --batch batch-69cd68e3c5a3 --actor codex-gpt-5.4-mini --json"
+}
