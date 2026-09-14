@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T03-46-11-554Z-close-fa9d9c2c5d40",
+  "taskId": "TASK-PRF-0058",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914033303-codex-gpt-5.4-mini-TASK-PRF-0058-e3ad53e6ac",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0058.json",
+  "taskSha256": "sha256:9f4eeece72efe26f1688a56f8c71e0f8513801eea48d8ff6c000aa7109cdfcbe",
+  "createdAt": "2026-09-14T03:46:11.554Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0058 --actor codex-gpt-5.4-mini --status done --historical-delivery b05dda470aec12beac1df76fad6fa289c4b18afc",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914033303-codex-gpt-5.4-mini-TASK-PRF-0058-e3ad53e6ac",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0058.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "burn-in-replay",
+      "ci-burn-in-evidence-collector",
+      "lint",
+      "node",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --input tests/fixtures/product-ci-burn-in/lifecycle-attempts.json --report-only",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "npm",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --input tests/fixtures/product-ci-burn-in/lifecycle-attempts.json --report-only",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T03:46:11.544Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0058.*",
+        ".atm/history/task-events/TASK-PRF-0058/**",
+        ".atm/history/tasks/TASK-PRF-0058.json",
+        "docs/reports/atm-product-ci-lifecycle-evidence.md",
+        "scripts/collect-ci-burn-in-evidence.ts",
+        "tests/cli/ci-burn-in-evidence-collector.test.ts",
+        "tests/fixtures/product-ci-burn-in/lifecycle-attempts.json"
+      ],
+      "criticalChangedFiles": [
+        "scripts/collect-ci-burn-in-evidence.ts",
+        "tests/cli/ci-burn-in-evidence-collector.test.ts",
+        "tests/fixtures/product-ci-burn-in/lifecycle-attempts.json"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --input tests/fixtures/product-ci-burn-in/lifecycle-attempts.json --report-only",
+        "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
