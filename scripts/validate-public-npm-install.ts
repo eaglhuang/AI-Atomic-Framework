@@ -130,21 +130,33 @@ function runSmoke(tarball: string, root: string, label: string, runs: number) {
     ['tasks', 'tasks', 'status', '--task', 'TASK-PRF-0049', '--json'],
   ] as const;
   const smoke: Record<string, unknown> = {};
+  let versionOutput: string | null = null;
   for (const [name, ...argv] of commands) {
     const commandRuns: number[] = [];
     let exitCode = 0;
     let combined = '';
+    let commandExecuted = true;
     for (let i = 0; i < (name === 'version' ? runs : 1); i += 1) {
       const started = performance.now();
       const result = spawnSync(bin, argv, { cwd: consumer, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
       commandRuns.push(performance.now() - started);
       exitCode = result.status ?? 1;
       combined = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+      if (result.error !== undefined) commandExecuted = false;
     }
     const failure = combined.includes('ERR_MODULE_NOT_FOUND') || combined.includes('Cannot find module');
-    smoke[name] = { exitCode, moduleResolutionFailure: failure, startupMs: commandRuns, p50Ms: percentile(commandRuns, 0.5), p95Ms: percentile(commandRuns, 0.95) };
+    if (name === 'version') versionOutput = combined;
+    smoke[name] = {
+      exitCode,
+      moduleResolutionFailure: failure,
+      commandExecuted,
+      startupMs: commandRuns,
+      p50Ms: percentile(commandRuns, 0.5),
+      p95Ms: percentile(commandRuns, 0.95),
+      outputSha256: createHash('sha256').update(combined).digest('hex')
+    };
   }
-  return { installMs, smoke };
+  return { installMs, smoke, versionOutput };
 }
 
 function runMeasurement(args: Args): Record<string, unknown> {
@@ -231,12 +243,27 @@ try {
   const filename = Array.isArray(packed) ? packed[0]?.filename : packed?.filename;
   if (!filename) throw new Error('npm pack returned no tarball');
   const tarball = join(root, filename);
-  const consumer = join(root, 'consumer');
-  runNpm(['install', '--ignore-scripts', '--prefix', consumer, `${args.packageName}@${args.version}`], root);
-  const bin = process.platform === 'win32' ? join(consumer, 'node_modules', '.bin', 'atm.cmd') : join(consumer, 'node_modules', '.bin', 'atm');
-  const cliVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' }).trim();
-  const payload = report(args, { status: 'verified', publicRegistry: true, registryVersion: metadata.version, defaultInstallVersion: latestVersion, defaultInstallMatchesRequested: latestVersion === args.version, distTarball: registryTarball, distIntegrity: registryIntegrity, registryUnpackedSize: Number.isFinite(registryUnpackedSize) ? registryUnpackedSize : null, registryFileCount: Number.isFinite(registryFileCount) ? registryFileCount : null, artifactBudget: budget, tarballSha256: sha256(tarball), cliVersion, cleanConsumer: true, usedWorkspaceLink: false, temporaryRootRemoved: true });
+  const smokeRun = runSmoke(tarball, root, 'public', args.measurementRuns);
+  const commandMatrix = Object.keys(smokeRun.smoke);
+  const expectedCommands = ['version', 'doctor', 'next', 'tasks'];
+  const smokeEntries = Object.values(smokeRun.smoke) as Array<{ commandExecuted: boolean; moduleResolutionFailure: boolean }>;
+  const moduleResolutionFailures = smokeEntries.filter((entry) => entry.moduleResolutionFailure).length;
+  const validation = {
+    cleanConsumer: true,
+    usedWorkspaceLink: false,
+    commandMatrix,
+    commandMatrixComplete: commandMatrix.length === expectedCommands.length && expectedCommands.every((name) => commandMatrix.includes(name)),
+    versionOnlySmoke: false,
+    moduleResolutionFailures,
+    allCommandsExecuted: smokeEntries.every((entry) => entry.commandExecuted),
+    passed: commandMatrix.length === expectedCommands.length
+      && expectedCommands.every((name) => commandMatrix.includes(name))
+      && moduleResolutionFailures === 0
+      && smokeEntries.every((entry) => entry.commandExecuted)
+  };
+  const payload = report(args, { status: validation.passed ? 'verified' : 'blocked', publicRegistry: true, registryVersion: metadata.version, defaultInstallVersion: latestVersion, defaultInstallMatchesRequested: latestVersion === args.version, distTarball: registryTarball, distIntegrity: registryIntegrity, registryUnpackedSize: Number.isFinite(registryUnpackedSize) ? registryUnpackedSize : null, registryFileCount: Number.isFinite(registryFileCount) ? registryFileCount : null, artifactBudget: budget, tarballSha256: sha256(tarball), cliVersion: smokeRun.versionOutput, smoke: smokeRun.smoke, installMs: smokeRun.installMs, validation, cleanConsumer: true, usedWorkspaceLink: false, temporaryRootRemoved: true });
   console.log(JSON.stringify(payload));
+  if (!validation.passed && !args.recordBlocked) process.exitCode = 1;
 } catch (error) {
   const payload = report(args, { status: 'blocked', publicRegistry: false, temporaryRootRemoved: true, blockedReason: 'public clean-consumer install proof failed', error: String(error) });
   console.log(JSON.stringify(payload));

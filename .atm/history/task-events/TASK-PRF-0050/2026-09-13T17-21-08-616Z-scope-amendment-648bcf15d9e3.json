@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T17-21-08-616Z-scope-amendment-648bcf15d9e3",
+  "taskId": "TASK-PRF-0050",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0050.json",
+  "taskSha256": "sha256:8383b854c169c8a38a60125e918e1f4bef8c1abcff8c81a2e692350a5b2ac8aa",
+  "createdAt": "2026-09-13T17:21:08.616Z",
+  "command": "node atm.mjs tasks scope remove --task TASK-PRF-0050 --actor codex-captain --remove docs/reports/atm-public-npm-install-proof-*.md --json",
+  "amendmentMetadata": {
+    "amendmentClass": "scope-shrink",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Prevent legacy beta reports from entering TASK-PRF-0050 bundle"
+  }
+}

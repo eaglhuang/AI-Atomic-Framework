@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const validator = path.join(root, 'scripts', 'validate-npm-clean-install.ts');
 const publicInstallValidator = path.join(root, 'scripts', 'validate-public-npm-install.ts');
+const candidateInstallValidator = path.join(root, 'scripts', 'validate-candidate-npm-install.ts');
 const runtimeBuilder = path.join(root, 'scripts', 'build-cli-npm-runtime.ts');
 const publicFacade = path.join(root, 'packages', 'cli', 'src', 'atm-public.ts');
 const rootManifest = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8')) as { scripts?: Record<string, string> };
@@ -18,9 +19,11 @@ const publishedPackages = fixture.publishClosure?.publishedPackages ?? [];
 
 assert.ok(existsSync(validator), 'clean-install validator must exist');
 assert.ok(existsSync(publicInstallValidator), 'public npm validator must exist');
+assert.ok(existsSync(candidateInstallValidator), 'candidate npm validator must exist');
 assert.ok(existsSync(runtimeBuilder), 'npm runtime builder must exist');
 assert.ok(existsSync(publicFacade), 'adopter public facade must exist');
 assert.equal(rootManifest.scripts?.['validate:npm-clean-install'], 'node --strip-types scripts/validate-npm-clean-install.ts', 'root package must expose the clean-install validator contract');
+assert.equal(rootManifest.scripts?.['validate:candidate-npm-install'], 'node --strip-types scripts/validate-candidate-npm-install.ts', 'root package must expose the candidate-only validator contract');
 for (const packageSpec of fixture.packages) {
   const expectedFiles = packageSpec.publishFiles ?? ['dist'];
   const directory = packageSpec.directory;
@@ -85,6 +88,9 @@ const publicInstallValidatorSource = readFileSync(publicInstallValidator, 'utf8'
 assert.match(publicInstallValidatorSource, /--measure/, 'the public npm validator must expose command-backed measurement mode');
 assert.match(publicInstallValidatorSource, /atm\.baselineCandidateMeasurement\.v1/, 'the measurement receipt schema must be explicit');
 assert.match(publicInstallValidatorSource, /measurementOutput/, 'the measurement mode must support an external retained receipt');
+const candidateInstallValidatorSource = readFileSync(candidateInstallValidator, 'utf8');
+assert.match(candidateInstallValidatorSource, /atm\.candidateNpmInstallProof\.v1/, 'candidate validator must emit a distinct proof schema');
+assert.match(candidateInstallValidatorSource, /commandMatrixComplete/, 'candidate validator must require the full command matrix');
 const runtimeBuilderSource = readFileSync(runtimeBuilder, 'utf8');
 assert.match(runtimeBuilderSource, /publicSurface:\s*'adopter-core'/, 'the runtime manifest must identify the bounded adopter surface');
 assert.match(runtimeBuilderSource, /OMITTED_PUBLIC_ASSETS/, 'optional assets must be excluded by an explicit allowlist boundary');

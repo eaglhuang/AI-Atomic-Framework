@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T18-24-17-747Z-repair-claim-81f90c5fbd40",
+  "taskId": "TASK-PRF-0050",
+  "action": "repair-claim",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260913170209-codex-captain-TASK-PRF-0050-b923fc3df3",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0050.json",
+  "taskSha256": "sha256:77caee4c9a2a47bdcb321529f0371d44df43b3f9d3ff0259a9d473b51c67fe10",
+  "createdAt": "2026-09-13T18:24:17.747Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0050 --actor codex-captain --write --reason \"Repair expired lane session and dangling lock before resuming governed PRF-0050 checkpoint\" --json"
+}
