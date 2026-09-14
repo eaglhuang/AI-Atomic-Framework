@@ -35,6 +35,19 @@ export type BurnInPolicy = {
   baselineSha?: string;
 };
 
+type LifecycleReceiptInput = {
+  schemaId: 'atm.ciLifecycleEvidence.v1';
+  sourceDigest: string;
+  receiptDigest: string;
+  runs: CiRun[];
+};
+
+type NormalizedBurnInInput = {
+  runs: unknown;
+  sourceDigest: string;
+  receiptDigest: string | null;
+};
+
 const DEFAULT_POLICY: BurnInPolicy = {
   minCompletedRuns: 90,
   minCalendarDays: 30,
@@ -56,6 +69,21 @@ function stableValue(value: unknown): unknown {
 
 function digest(value: unknown): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(stableValue(value))).digest('hex')}`;
+}
+
+function normalizeInput(input: unknown): NormalizedBurnInInput {
+  if (Array.isArray(input)) {
+    return { runs: input, sourceDigest: digest(input), receiptDigest: null };
+  }
+  if (!input || typeof input !== 'object') throw new Error('history-empty');
+  const receipt = input as Partial<LifecycleReceiptInput>;
+  if (receipt.schemaId !== 'atm.ciLifecycleEvidence.v1') throw new Error('unsupported-receipt-schema');
+  if (typeof receipt.sourceDigest !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(receipt.sourceDigest)) throw new Error('invalid-sourceDigest');
+  if (typeof receipt.receiptDigest !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(receipt.receiptDigest)) throw new Error('invalid-receiptDigest');
+  if (!Array.isArray(receipt.runs) || receipt.runs.length === 0) throw new Error('history-empty');
+  const computedReceiptDigest = digest(receipt.runs);
+  if (computedReceiptDigest !== receipt.receiptDigest) throw new Error('receiptDigest-mismatch');
+  return { runs: receipt.runs, sourceDigest: receipt.sourceDigest, receiptDigest: receipt.receiptDigest };
 }
 
 function parseDate(value: string, field: string): number {
@@ -120,9 +148,10 @@ function validateRuns(input: unknown, policy: BurnInPolicy): CiRun[] {
 
 export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPolicy> = {}) {
   const policy = { ...DEFAULT_POLICY, ...suppliedPolicy };
-  const sourceDigest = digest(input);
+  let normalized: NormalizedBurnInInput;
   try {
-    const allRuns = validateRuns(input, policy);
+    normalized = normalizeInput(input);
+    const allRuns = validateRuns(normalized.runs, policy);
     const baselineTimestamp = policy.baselineAt ? parseDate(policy.baselineAt, 'baselineAt') : null;
     if (policy.baselineSha && !/^[0-9a-f]{7,64}$/i.test(policy.baselineSha)) throw new Error('invalid-baselineSha');
     if (baselineTimestamp !== null && !policy.baselineSha) throw new Error('baselineSha-required-with-baselineAt');
@@ -160,7 +189,7 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
     return {
       schemaId: 'atm.productCiBurnInReport.v1',
       policy,
-      input: { sourceDigest, recordCount: runs.length },
+      input: { sourceDigest: normalized.sourceDigest, receiptDigest: normalized.receiptDigest, recordCount: runs.length },
       observed: {
         oldestAt: runs[runs.length - 1].createdAt,
         newestAt: runs[0].createdAt,
@@ -183,15 +212,23 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
         baselineSha: policy.baselineSha ?? null,
       },
       claimStatus: reasons.length === 0 && unresolvedFailures > 0 ? 'unexplained-failure' : claimStatus,
+      semanticVerdict: reasons.length === 0 && unresolvedFailures === 0 ? 'accept' : 'reject',
       reasons,
     } as const;
   } catch (error) {
+    const sourceDigest = digest(input);
+    const recordCount = Array.isArray(input)
+      ? input.length
+      : input && typeof input === 'object' && Array.isArray((input as { runs?: unknown }).runs)
+        ? (input as { runs: unknown[] }).runs.length
+        : null;
     return {
       schemaId: 'atm.productCiBurnInReport.v1',
       policy,
-      input: { sourceDigest, recordCount: Array.isArray(input) ? input.length : null },
+      input: { sourceDigest, receiptDigest: null, recordCount },
       observed: null,
       claimStatus: 'invalid-input',
+      semanticVerdict: 'reject',
       reasons: [error instanceof Error ? error.message : 'invalid-input'],
     } as const;
   }

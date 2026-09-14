@@ -1,11 +1,13 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseAtomicSpecDocument } from '../spec/parse-spec.ts';
+import { computeCanonicalJsonDigest } from '../hash-lock/hash-lock.ts';
 import { createAtomicSpecSemanticFingerprint } from '../registry/semantic-fingerprint.ts';
 import { scaffoldAtomWorkbench } from './scaffold.ts';
+import { restoreAtomBirth, snapshotAtomBirth, type AtomBirthTransaction } from './atom-birth-transaction.ts';
 import { runAtomicTestRunner } from './test-runner.ts';
 import { allocateAtomId, AtomIdAllocationError, normalizeAtomBucket, parseAtomId } from './id-allocator.ts';
-import { createAtomicRegistryEntry, createRegistryDocument, validateRegistryDocumentFile, writeRegistryArtifacts } from '../registry/registry.ts';
+import { createAtomicRegistryEntry, createRegistryDocument, validateRegistryDocument, validateRegistryDocumentFile, writeRegistryArtifacts } from '../registry/registry.ts';
 const defaultRegistryPath = 'atomic-registry.json';
 const defaultCatalogPath = 'atomic_workbench/registry-catalog.md';
 const defaultOwner = Object.freeze({
@@ -125,12 +127,14 @@ interface AllocateAtomIdOptions {
   atomId?: string | null;
   force: boolean;
 }
+
 export function generateAtom(request: unknown, options: GenerateAtomOptions = {}): GenerateAtomResult {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const registryPath = options.registryPath ?? defaultRegistryPath;
   const registryAbsolutePath = path.resolve(repositoryRoot, registryPath);
   const dryRun = options.dryRun === true;
   const phases: PhaseRecord[] = [];
+  let transaction: AtomBirthTransaction | null = null;
   try {
     const normalizedRequest = normalizeRequest(request);
     const registryDocument = readRegistryDocument(registryAbsolutePath, options);
@@ -170,6 +174,7 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
     const specAbsolutePath = path.join(repositoryRoot, paths.specPath);
     const sourceAbsolutePath = path.join(repositoryRoot, paths.sourcePath);
     const testAbsolutePath = path.join(repositoryRoot, paths.testPath);
+    transaction = snapshotAtomBirth(repositoryRoot, paths.workbenchPath, registryPath, options.catalogPath ?? defaultCatalogPath);
     const parsed = recordPhase(phases, 'init-spec', () => {
       const parseResult = parseAtomicSpecDocument(specDocument, { specPath: specAbsolutePath });
       if (!parseResult.ok) {
@@ -242,6 +247,10 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
     const updatedRegistryDocument = upsertRegistryEntry(registryDocument, registryEntry as unknown as RegistryEntry, {
       generatedAt: options.now ?? new Date().toISOString()
     });
+    const candidateValidation = recordPhase(phases, 'validate-registry-candidate', () => validateRegistryDocument(updatedRegistryDocument));
+    if (!candidateValidation.ok) {
+      throw createGeneratorError('ATM_GENERATOR_REGISTRY_INVALID', candidateValidation.promptReport?.summary ?? 'Updated registry is invalid.', { validation: candidateValidation });
+    }
     const writeResult = recordPhase(phases, 'write-registry', () => writeRegistryArtifacts(updatedRegistryDocument as unknown as Record<string, unknown>, {
       repositoryRoot,
       registryPath,
@@ -269,6 +278,9 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
       phases
     });
   } catch (error) {
+    if (!dryRun && transaction) {
+      restoreAtomBirth(transaction);
+    }
     return createFailure(error, phases);
   }
 }
@@ -284,7 +296,7 @@ export function createMinimalAtomSpec(request: CreateMinimalAtomSpecRequest) {
   const validationCommands = Array.isArray(request.validationCommands) && request.validationCommands.length > 0
     ? [...request.validationCommands]
     : [sourcePath ? `node ${JSON.stringify(sourcePath)} --self-check` : `node -e "console.log('${request.atomId} validation ok')"`];
-  return {
+  const specDocument = {
     schemaId: 'atm.atomicSpec',
     specVersion: '0.1.0',
     migration: {
@@ -319,7 +331,7 @@ export function createMinimalAtomSpec(request: CreateMinimalAtomSpecRequest) {
     },
     hashLock: {
       algorithm: 'sha256',
-      digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+      digest: '',
       canonicalization: 'json-stable-v1'
     },
     dependencyPolicy: {
@@ -356,6 +368,8 @@ export function createMinimalAtomSpec(request: CreateMinimalAtomSpecRequest) {
     mutabilityPolicy: 'mutable',
     tags: ['generated', 'provisioning']
   };
+  specDocument.hashLock.digest = computeCanonicalJsonDigest(specDocument);
+  return specDocument;
 }
 function normalizeRequest(request: unknown): NormalizedRequest {
   if (!request || typeof request !== 'object' || Array.isArray(request)) {
@@ -565,6 +579,7 @@ function normalizeError(error: unknown) {
 function normalizeTrailingNewline(value: string): string {
   return String(value).endsWith('\n') ? String(value) : `${value}\n`;
 }
+
 function toPortablePath(value: string): string {
   return String(value).replace(/\\/g, '/');
 }

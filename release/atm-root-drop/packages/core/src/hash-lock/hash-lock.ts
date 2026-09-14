@@ -34,6 +34,15 @@ export function computeSha256ForFiles(filePaths: string[] | string) {
   return `sha256:${hash.digest('hex')}`;
 }
 
+/**
+ * Computes the canonical digest used by atom specs. The hashLock.digest field
+ * is intentionally omitted so the digest is stable and non-self-referential.
+ */
+export function computeCanonicalJsonDigest(value: unknown) {
+  const normalized = normalizeForHash(value);
+  return computeSha256ForContent(`${stableStringify(normalized)}\n`);
+}
+
 export function createSourceHashSnapshot(options: SourceHashSnapshotOptions) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const specPath = resolveInputPath(repositoryRoot, options.specPath);
@@ -109,4 +118,31 @@ function readHashBytes(filePath: string) {
 
 function isLikelyText(content: Buffer) {
   return !content.includes(0);
+}
+
+function normalizeForHash(value: unknown, pathParts: string[] = []): unknown {
+  if (Array.isArray(value)) {
+    return value.map((entry, index) => normalizeForHash(entry, [...pathParts, String(index)]));
+  }
+  if (value && typeof value === 'object') {
+    const normalized: Record<string, unknown> = {};
+    for (const key of Object.keys(value as Record<string, unknown>).sort((left, right) => left.localeCompare(right))) {
+      if (key === 'digest' && pathParts[pathParts.length - 1] === 'hashLock') {
+        continue;
+      }
+      normalized[key] = normalizeForHash((value as Record<string, unknown>)[key], [...pathParts, key]);
+    }
+    return normalized;
+  }
+  return value;
+}
+
+function stableStringify(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map((entry) => stableStringify(entry)).join(',')}]`;
+  }
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>).map(([key, entryValue]) => `${JSON.stringify(key)}:${stableStringify(entryValue)}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
 }

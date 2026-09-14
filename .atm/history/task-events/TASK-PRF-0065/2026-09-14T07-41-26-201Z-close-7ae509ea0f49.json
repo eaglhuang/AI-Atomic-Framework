@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T07-41-26-201Z-close-7ae509ea0f49",
+  "taskId": "TASK-PRF-0065",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914072157-codex-gpt-5.4-mini-TASK-PRF-0065-cbe8ceff40",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0065.json",
+  "taskSha256": "sha256:ef700051e70ff753c2c57771b0615f3b96f16210f4df02b8414a544041dd2ca3",
+  "createdAt": "2026-09-14T07:41:26.201Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0065 --actor codex-gpt-5.4-mini --status done --historical-delivery 69b8fc99ec78d6e62186bd19e8ffca65485e44da",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914072157-codex-gpt-5.4-mini-TASK-PRF-0065-cbe8ceff40",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0065.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/core/atom-generator.test.ts",
+      "node --strip-types tests/registry/registry-entry-portability.test.ts",
+      "validate:generator-provenance",
+      "validate:registry-core"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/core/atom-generator.test.ts",
+      "node --strip-types tests/registry/registry-entry-portability.test.ts",
+      "validate:generator-provenance",
+      "validate:registry-core"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T07:41:26.187Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0065.*",
+        ".atm/history/task-events/TASK-PRF-0065/**",
+        ".atm/history/tasks/TASK-PRF-0065.json",
+        "atomic_workbench/generator-provenance-audit.json",
+        "atomic-registry.json",
+        "docs/reports/atm-atom-generator-reliability.md",
+        "packages/core/src/hash-lock/hash-lock.ts",
+        "packages/core/src/manager/atom-birth-transaction.ts",
+        "packages/core/src/manager/atom-generator.ts",
+        "packages/core/src/registry/registry/document.ts",
+        "packages/core/src/registry/registry/entry.ts",
+        "packages/core/src/registry/registry/paths.ts",
+        "tests/core/atom-generator.test.ts",
+        "tests/registry/registry-entry-portability.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "atomic-registry.json",
+        "packages/core/src/hash-lock/hash-lock.ts",
+        "packages/core/src/manager/atom-birth-transaction.ts",
+        "packages/core/src/manager/atom-generator.ts",
+        "packages/core/src/registry/registry/document.ts",
+        "packages/core/src/registry/registry/entry.ts",
+        "packages/core/src/registry/registry/paths.ts",
+        "tests/core/atom-generator.test.ts",
+        "tests/registry/registry-entry-portability.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/core/atom-generator.test.ts",
+        "node --strip-types tests/registry/registry-entry-portability.test.ts",
+        "validate:generator-provenance",
+        "validate:registry-core"
+      ]
+    }
+  }
+}

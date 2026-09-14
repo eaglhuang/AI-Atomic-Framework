@@ -740,6 +740,7 @@
     "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
     "release/atm-root-drop/docs/reports/atm-2-1-paired-ab-v4.md",
     "release/atm-root-drop/docs/reports/atm-2-1-real-parallel-dogfood.md",
+    "release/atm-root-drop/docs/reports/atm-atom-generator-reliability.md",
     "release/atm-root-drop/docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
     "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
     "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
@@ -1458,6 +1459,7 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/lane-capability-provider.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/lifecycle.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/wip-ownership-transition.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-birth-transaction.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-generator.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-space.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/id-allocator.js",
@@ -3485,6 +3487,7 @@
     "release/atm-root-drop/packages/core/dist/lane/lane-capability-provider.js",
     "release/atm-root-drop/packages/core/dist/lane/lifecycle.js",
     "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.js",
+    "release/atm-root-drop/packages/core/dist/manager/atom-birth-transaction.js",
     "release/atm-root-drop/packages/core/dist/manager/atom-generator.js",
     "release/atm-root-drop/packages/core/dist/manager/atom-space.js",
     "release/atm-root-drop/packages/core/dist/manager/id-allocator.js",
@@ -3893,6 +3896,7 @@
     "release/atm-root-drop/packages/core/src/lane/lane-capability-provider.ts",
     "release/atm-root-drop/packages/core/src/lane/lifecycle.ts",
     "release/atm-root-drop/packages/core/src/lane/wip-ownership-transition.ts",
+    "release/atm-root-drop/packages/core/src/manager/atom-birth-transaction.ts",
     "release/atm-root-drop/packages/core/src/manager/atom-generator.ts",
     "release/atm-root-drop/packages/core/src/manager/atom-space.ts",
     "release/atm-root-drop/packages/core/src/manager/id-allocator.ts",
@@ -6026,6 +6030,7 @@
     "release/atm-root-drop/tests/registry-fixtures/registry-test.ts",
     "release/atm-root-drop/tests/registry-fixtures/registry.atom.json",
     "release/atm-root-drop/tests/registry.fixture.json",
+    "release/atm-root-drop/tests/registry/registry-entry-portability.test.ts",
     "release/atm-root-drop/tests/registry/registry-final-600.test.ts",
     "release/atm-root-drop/tests/registry/replacement-lane-evidence.test.ts",
     "release/atm-root-drop/tests/registry/replacement-lane.test.ts",
@@ -6182,8 +6187,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1525,
-    "unchanged": 4622,
+    "copied": 1528,
+    "unchanged": 4624,
     "removed": 0
   },
   "buildMode": "full",
@@ -6244,7 +6249,7 @@
       },
       {
         "path": "atomic-registry.json",
-        "digest": "d0bebb8948a05ccfe9b4f12a84c9510b555fc2e4921507c28cc8d8234275ee9d",
+        "digest": "2ffc7db3bcf2fa7e3d2361374793a0ac234e9926b578864ae78e9cefef8eef55",
         "origin": "source",
         "inputPaths": [
           "atomic-registry.json"
@@ -12570,6 +12575,15 @@
         "replaceable": true
       },
       {
+        "path": "docs/reports/atm-atom-generator-reliability.md",
+        "digest": "32af05bacc481a864079ec8c6319736425cc8c9e5dd59b4e42fbfc476332fe9f",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-atom-generator-reliability.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
         "digest": "f14c577b83b7fede32a74d5cca9c4302eb309914901de8c5d30107ac4758ec6a",
         "origin": "source",
@@ -12634,7 +12648,7 @@
       },
       {
         "path": "docs/reports/atm-product-ci-burn-in-real-export.md",
-        "digest": "549a713ec8aa93644392b17996dfdb34588a0447903ab8500b897b14e894cda2",
+        "digest": "1f0d9c5ee290b32d07b1aef2df9d692934033f45a74be0951c76cbae9b606563",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-ci-burn-in-real-export.md"
@@ -12652,7 +12666,7 @@
       },
       {
         "path": "docs/reports/atm-product-ci-lifecycle-evidence.md",
-        "digest": "44f037b6c22f5c529c3149d42e8057fa00252c1daae14b30b109d845d70a1273",
+        "digest": "c95144779e5abcc87fa64c670052877119f8578709cf433e7e22e257e18128bc",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-ci-lifecycle-evidence.md"
@@ -18988,7 +19002,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/hash-lock/hash-lock.js",
-        "digest": "ff315e243edc6e0655bab79ebb77f2202291e3b793588948c867a60f6006ced3",
+        "digest": "50bb6bcc57d817f3ab6f7e3ecc18852bb99cb1f1099167ca8e012afd81a459d0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/hash-lock/hash-lock.js"
@@ -19032,8 +19046,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/_vendor/core/dist/manager/atom-birth-transaction.js",
+        "digest": "c3d32433e904ffe95e42711ae86ba9f6da593321b8111ac9dc11e05e53e1b9d2",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/manager/atom-birth-transaction.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/_vendor/core/dist/manager/atom-generator.js",
-        "digest": "795c0fe7533454a18d29e0bea9d27d270476da80c765349b0d305e75307d1655",
+        "digest": "2d0f9a25ed48a5a9311b309a418fb0bffd140a1dd1eaf75c12b3c692fff4274b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/manager/atom-generator.js"
@@ -19717,7 +19740,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/registry/registry/paths.js",
-        "digest": "907b73a74786e9f7b337836f59c049b498f0c09de8a23226b62032cff6946183",
+        "digest": "6689a262d019e97898055e071a4bae61aa071374e8f332ff83528ff96f6e93e8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/registry/registry/paths.js"
@@ -27871,7 +27894,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "fb1abd7c08a79778614d864ae54a6709103163d014ca96b768a573284856a99e",
+        "digest": "c037a24146b86aa5560adf3b736464a2f6a28ba3cb690275a059805debe1b8f6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -27880,7 +27903,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "790a4efc8924794071fff1edb205d3231527a045637be4a8cf168d7adc192b33",
+        "digest": "fe61b7da52dd9749129ed2e11cc4344e23d284f4c14f92fb6223a99cb529c492",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -37231,7 +37254,7 @@
       },
       {
         "path": "packages/core/dist/hash-lock/hash-lock.js",
-        "digest": "ff315e243edc6e0655bab79ebb77f2202291e3b793588948c867a60f6006ced3",
+        "digest": "50bb6bcc57d817f3ab6f7e3ecc18852bb99cb1f1099167ca8e012afd81a459d0",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/hash-lock/hash-lock.js"
@@ -37275,8 +37298,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/core/dist/manager/atom-birth-transaction.js",
+        "digest": "c3d32433e904ffe95e42711ae86ba9f6da593321b8111ac9dc11e05e53e1b9d2",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/manager/atom-birth-transaction.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/core/dist/manager/atom-generator.js",
-        "digest": "795c0fe7533454a18d29e0bea9d27d270476da80c765349b0d305e75307d1655",
+        "digest": "2d0f9a25ed48a5a9311b309a418fb0bffd140a1dd1eaf75c12b3c692fff4274b",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/manager/atom-generator.js"
@@ -37960,7 +37992,7 @@
       },
       {
         "path": "packages/core/dist/registry/registry/paths.js",
-        "digest": "907b73a74786e9f7b337836f59c049b498f0c09de8a23226b62032cff6946183",
+        "digest": "6689a262d019e97898055e071a4bae61aa071374e8f332ff83528ff96f6e93e8",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/registry/registry/paths.js"
@@ -40903,7 +40935,7 @@
       },
       {
         "path": "packages/core/src/hash-lock/hash-lock.ts",
-        "digest": "cf51c7976e7286f3d7b0b90ab64d701b20b5b5b9ba10f27bf17cf14cd820459a",
+        "digest": "c88b57c62816d62fdd35c530b52bcf0dc8aa07e74e1fc6948193ba21e1deb6d4",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/hash-lock/hash-lock.ts"
@@ -40947,8 +40979,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/core/src/manager/atom-birth-transaction.ts",
+        "digest": "d91f2ca888c4274f98da13f077af68e9de5d74a9529585e38ec267db8e399990",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/src/manager/atom-birth-transaction.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/core/src/manager/atom-generator.ts",
-        "digest": "d4846caa8d78b026ee1b9af4f1850e5d920f46cddda6c884747995479c506a90",
+        "digest": "fd472e992c87008f8c70e748af5247ed5361371ed42e8b9a3826c791c8364904",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/manager/atom-generator.ts"
@@ -41695,7 +41736,7 @@
       },
       {
         "path": "packages/core/src/registry/registry/paths.ts",
-        "digest": "0852cb8be2840c0c09579e9f2f5a846f45f1ce09b1bd676513617f2b196b16c2",
+        "digest": "dd3d28dba8e2160aec5503f8fe3f0fe9e2d4393f415b92ff1a3ad7e02de25c8a",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/registry/registry/paths.ts"
@@ -48364,7 +48405,7 @@
       },
       {
         "path": "scripts/measure-product-ci-burn-in.ts",
-        "digest": "e54302bacb9b7b29b367136d46a44452c38d08e163e36d1836cdcb253a7388b6",
+        "digest": "6769989248817625f3eef52645def75f12d7f50308f19b27ee38a9fb91df7804",
         "origin": "source",
         "inputPaths": [
           "scripts/measure-product-ci-burn-in.ts"
@@ -53926,7 +53967,7 @@
       },
       {
         "path": "tests/cli/ci-burn-in-evidence-collector.test.ts",
-        "digest": "ab82c8c64bcdb27b6825bedd5c2ec0df9dbde2ecb1c6e08117198bc37ba5d7d9",
+        "digest": "4da6b27d4eb684e450cdfed347f96d89e9e87668689b4973bb4988cdd43d4706",
         "origin": "source",
         "inputPaths": [
           "tests/cli/ci-burn-in-evidence-collector.test.ts"
@@ -56635,7 +56676,7 @@
       },
       {
         "path": "tests/cli/product-proof-evidence-boundary.test.ts",
-        "digest": "70da3ee1e6bbe47e1d1231655deb92a0a3d42f5b83483344c4579a4c6c58e0a7",
+        "digest": "406d2cd25fb683cae25ea9214906e5224c17cd7d647910213c8177e842506048",
         "origin": "source",
         "inputPaths": [
           "tests/cli/product-proof-evidence-boundary.test.ts"
@@ -58714,7 +58755,7 @@
       },
       {
         "path": "tests/core/atom-generator.test.ts",
-        "digest": "8b81b19e223dcf5034706094e01b2aff1181209f10a299619cb9e1f6c08e9363",
+        "digest": "4b08daeb8510a2d1b77c6c357fce5e5419751fca96ab47792d575bf69ae8750b",
         "origin": "source",
         "inputPaths": [
           "tests/core/atom-generator.test.ts"
@@ -60135,6 +60176,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/registry/registry-entry-portability.test.ts",
+        "digest": "b293bfa923ce5cf34162c892c2298b4f2260fc0a5e197042d29730e9a950d2d5",
+        "origin": "source",
+        "inputPaths": [
+          "tests/registry/registry-entry-portability.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/registry/registry-final-600.test.ts",
         "digest": "2a0589e120007c8413aeeaf99ef3bfe2c321db1eb00573484bda792980ade8d5",
         "origin": "source",
@@ -61512,7 +61562,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:4da5acc2181022271b56ba0f67e85369ffef63dc59d8f0364f0143709dc8a88e"
+    "treeDigest": "sha256:887885280ffb82bd57aab7ba99c0fe5b1b3d1a812997388795c3138fa8696d7f"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62608,6 +62658,7 @@
       "packages/core/src/lane/lane-capability-provider.ts",
       "packages/core/src/lane/lifecycle.ts",
       "packages/core/src/lane/wip-ownership-transition.ts",
+      "packages/core/src/manager/atom-birth-transaction.ts",
       "packages/core/src/manager/atom-generator.ts",
       "packages/core/src/manager/atom-space.ts",
       "packages/core/src/manager/id-allocator.ts",
@@ -63060,7 +63111,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:3a25c18ba8b980bd221a10be224b936c3c456e30a79c34c40cb965da5331f1b2"
+    "digest": "sha256:82c96568e50e224f9becf946fb2b56ed402fe82fbd38a2ab889bfc3dc9e7a439"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63774,6 +63825,7 @@
       "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
       "release/atm-root-drop/docs/reports/atm-2-1-paired-ab-v4.md",
       "release/atm-root-drop/docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "release/atm-root-drop/docs/reports/atm-atom-generator-reliability.md",
       "release/atm-root-drop/docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
       "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
       "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
@@ -64492,6 +64544,7 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/lane-capability-provider.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/lifecycle.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/wip-ownership-transition.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-birth-transaction.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-generator.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-space.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/id-allocator.js",
@@ -66519,6 +66572,7 @@
       "release/atm-root-drop/packages/core/dist/lane/lane-capability-provider.js",
       "release/atm-root-drop/packages/core/dist/lane/lifecycle.js",
       "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.js",
+      "release/atm-root-drop/packages/core/dist/manager/atom-birth-transaction.js",
       "release/atm-root-drop/packages/core/dist/manager/atom-generator.js",
       "release/atm-root-drop/packages/core/dist/manager/atom-space.js",
       "release/atm-root-drop/packages/core/dist/manager/id-allocator.js",
@@ -66927,6 +66981,7 @@
       "release/atm-root-drop/packages/core/src/lane/lane-capability-provider.ts",
       "release/atm-root-drop/packages/core/src/lane/lifecycle.ts",
       "release/atm-root-drop/packages/core/src/lane/wip-ownership-transition.ts",
+      "release/atm-root-drop/packages/core/src/manager/atom-birth-transaction.ts",
       "release/atm-root-drop/packages/core/src/manager/atom-generator.ts",
       "release/atm-root-drop/packages/core/src/manager/atom-space.ts",
       "release/atm-root-drop/packages/core/src/manager/id-allocator.ts",
@@ -69060,6 +69115,7 @@
       "release/atm-root-drop/tests/registry-fixtures/registry-test.ts",
       "release/atm-root-drop/tests/registry-fixtures/registry.atom.json",
       "release/atm-root-drop/tests/registry.fixture.json",
+      "release/atm-root-drop/tests/registry/registry-entry-portability.test.ts",
       "release/atm-root-drop/tests/registry/registry-final-600.test.ts",
       "release/atm-root-drop/tests/registry/replacement-lane-evidence.test.ts",
       "release/atm-root-drop/tests/registry/replacement-lane.test.ts",
@@ -69219,22 +69275,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:3bc6c8a45c9cd5e570350c2e6b84865d49aebfdc4be2698819e408bd292f1f3d",
-  "sealedSourceCommit": "bac08a4b8353d4c3fc071ee834394aa09ab92c30",
+  "buildInputsTreeHash": "sha256:db831e6e2736a06b7c7a7eb81844c65b20dfa221bfb7f12ac1661a16d244d886",
+  "sealedSourceCommit": "69b8fc99ec78d6e62186bd19e8ffca65485e44da",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:22f4d45b9db3aaf8fbf8a0347ceeb58888be6765d51cefa4db3f829e4a0988f7",
-  "tsBuildCacheDigest": "sha256:79153409d91bd555ca7f2f7b4da449248cd002040afe993232238f33d5ee351d",
+  "incrementalPlanDigest": "sha256:b3c7993bc4a8445aecf50ec16fa0c172b11b9515ec40ec6a0b8a9b1298af1cec",
+  "tsBuildCacheDigest": "sha256:b7fd449007fb97d8d0b780176d41ebf01da89ca67ccbd77fe17c6baefd9df396",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 45,
+    "inputHashCalculation": 44,
     "skipDecision": 56,
-    "worktreeSetup": 8648,
-    "typescriptBuild": 10554,
-    "rootDropReleaseAssembly": 29535,
-    "onefileReleaseAssembly": 9471,
-    "artifactSync": 6158,
+    "worktreeSetup": 8965,
+    "typescriptBuild": 14977,
+    "rootDropReleaseAssembly": 32584,
+    "onefileReleaseAssembly": 9406,
+    "artifactSync": 6329,
     "cleanup": 0,
-    "totalElapsed": 78215
+    "totalElapsed": 81966
   }
 }
