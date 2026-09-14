@@ -28,6 +28,10 @@ assert.deepEqual(receipt.runs[0].lifecycle, {
 const replay = evaluateBurnIn(receipt.runs, { minCompletedRuns: 1, minCalendarDays: 0 });
 assert.equal(replay.claimStatus, 'unexplained-failure', JSON.stringify(replay));
 assert.equal(receipt.receiptDigest, canonicalDigest(receipt.runs));
+const wrapperReplay = evaluateBurnIn(receipt, { minCompletedRuns: 1, minCalendarDays: 0 });
+assert.equal(wrapperReplay.claimStatus, 'unexplained-failure', JSON.stringify(wrapperReplay));
+assert.equal(wrapperReplay.semanticVerdict, 'reject');
+assert.equal(wrapperReplay.input.receiptDigest, receipt.receiptDigest);
 const fixtureReplay = evaluateBurnIn(fixture, { minCompletedRuns: 1, minCalendarDays: 0 });
 assert.equal(fixtureReplay.claimStatus, 'unexplained-failure');
 
@@ -42,5 +46,9 @@ assert.throws(() => collectLifecycleEvidence(missingExclusionReason), /missing-e
 const duplicateAttempt = structuredClone(attemptExport);
 duplicateAttempt.attempts.push(duplicateAttempt.attempts[0]);
 assert.throws(() => collectLifecycleEvidence(duplicateAttempt), /duplicate-attempt/);
+
+const tamperedReceipt = structuredClone(receipt);
+tamperedReceipt.runs[0].headSha = 'b'.repeat(40);
+assert.equal(evaluateBurnIn(tamperedReceipt, { minCompletedRuns: 1, minCalendarDays: 0 }).claimStatus, 'invalid-input');
 
 console.log('ci-burn-in-evidence-collector: ok');

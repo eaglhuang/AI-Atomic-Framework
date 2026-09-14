@@ -45,3 +45,70 @@ insufficient for the policy window. `TASK-PRF-0059` therefore remains open
 until a complete external export is collected and replayed; no CI threshold,
 workflow permission, npm publication, benchmark arm, or historical task record
 is changed by this report.
+
+## 2026-09-14 policy-window audit (negative observation)
+
+A fresh read-only GitHub Actions query of workflow `ci` on protected `main`
+returned 800 completed workflow records covering 2026-07-25 through
+2026-09-14 (50.8 calendar days). The slice contained 180 overall successes
+and 620 failures; all 800 records reported `run_attempt=1`. This establishes
+that the repository now has enough calendar history to attempt a 30-day
+export, but it does not establish a green Product CI lifecycle. The query did
+not write a raw export to Git and did not infer Product CI conclusions or
+failure classes from workflow-level conclusions.
+
+The required external artifact and lifecycle receipt are still absent:
+`C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json`
+and `C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json`.
+Until a provider-level export includes Product CI job identity, attempt
+timestamps, explicit failure classes, and exclusion provenance, `TASK-PRF-0059`
+remains open and no long-term-green claim is permitted.
+
+## External export replay (2026-09-14)
+
+An authenticated, read-only GitHub API collection produced 800 completed
+protected-main attempts spanning 50.789502 calendar days. The raw export is
+outside Git at
+`C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json`
+with file SHA-256
+`sha256:9eed187b6808c6a309dc5f77b4030d32dc292a6020f470bdb176138392959efc`.
+The collector replay passed and wrote
+`C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json`
+with file SHA-256
+`sha256:375a15042e1abdfb1a2b4647021fd01695440ea35823c3cdd5e1a11b3831848b`;
+its canonical source digest is
+`sha256:60d67c230ccf496ffddb4398d47b4e084764dfe3f4bfbb66d40b87cf25bac056`
+and receipt digest is
+`sha256:70ebe5078383df3f91b23c27ac25202228c410fd4518b36507c2ee1e8408e8bb`.
+
+The collector output is a wrapper whose `runs` array was replayed separately
+from `lifecycle-runs.json` (file SHA-256
+`sha256:fe3faa0f0d71e3f80840d929311d31c1e13b0dd27da865a07f104ff1392c2de4`).
+That evaluator result is `unexplained-failure`: 800 records, 50.789502 days,
+180 successes, 620 failures, zero retries, and 620 unresolved failures. The
+Before TASK-PRF-0063, the card's literal command that fed
+`lifecycle-receipt.json` directly to the evaluator returned
+`invalid-input: history-empty`, revealing a collector/evaluator shape mismatch.
+That historical result is preserved; the follow-up below records the fix.
+
+This is complete negative evidence, not a green claim. The 30-day and 90-run
+quantity gates are met, but the no-failure and lifecycle contract gates are
+not. `TASK-PRF-0059` remains open pending a Product CI-specific repair window
+and a contract fix for wrapper replay.
+
+## TASK-PRF-0063 contract replay (2026-09-14)
+
+The lifecycle receipt contract is now replayable without manually selecting
+`runs`. `measure-product-ci-burn-in.ts` accepts the collector's
+`atm.ciLifecycleEvidence.v1` wrapper, verifies its `receiptDigest`, and carries
+the source and receipt digests into the report. The same retained 0059 receipt
+therefore replays directly with the card's literal command.
+
+The direct wrapper replay remains a negative observation: `claimStatus` is
+`unexplained-failure`, `semanticVerdict` is `reject`, and the observed counts
+remain 800 records, 50.789502 days, 180 successes, 620 failures, zero retries,
+and 620 unresolved failures. `--report-only` still exits zero so negative
+evidence can be archived, but the explicit semantic verdict prevents that
+exit code from being interpreted as a green burn-in claim. A receipt with a
+tampered `runs` array or missing lifecycle data is rejected as
+`invalid-input`.
