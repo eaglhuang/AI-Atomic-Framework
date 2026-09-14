@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0420",
   "title": "Repair false-green closure when runner scope changes before batch checkpoint",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -265,8 +265,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T00-26-14-324Z-scope-amendment-ea6b295c30f2",
-  "lastTransitionAt": "2026-09-14T00:26:14.324Z",
+  "lastTransitionId": "2026-09-14T00-30-05-789Z-close-66eb6c66c3d5",
+  "lastTransitionAt": "2026-09-14T00:30:05.789Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-09-13T23:01:51.359Z",
   "promotedAt": "2026-09-13T23:01:51.366Z",
@@ -274,7 +274,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-17cab18e59da",
     "claimedAt": "2026-09-13T23:41:34.480Z",
-    "heartbeatAt": "2026-09-14T00:20:06.310Z",
+    "heartbeatAt": "2026-09-14T00:30:05.786Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/ATM-GOV-0420.*",
@@ -300,13 +300,14 @@
       "tests/cli/closure-delivery-file-coverage.test.ts",
       "tests/cli/frozen-runner-validation-foreign-state.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260913234134-codex-captain-8a045151c1",
       "status": "adopted",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913234134-codex-captain-8a045151c1\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-13T23:01:51.371Z",
   "startedByActor": "codex-captain",
@@ -472,5 +473,9 @@
     },
     "createdAt": "2026-09-13T23:41:51.757Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-14T00:30:05.786Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260913234134-codex-captain-ATM-GOV-0420-f575a50582",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0420.closure-packet.json"
 }

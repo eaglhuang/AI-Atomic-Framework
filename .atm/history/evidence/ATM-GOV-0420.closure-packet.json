@@ -1,0 +1,241 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0420",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "080e3d69b84aff94ae9c56857ed378562c1b2e02",
+  "governedTreeSha": "9a4617de198ff72189f977a1b98e553372ee7018",
+  "targetCommitDelta": {
+    "currentCommitSha": "080e3d69b84aff94ae9c56857ed378562c1b2e02",
+    "parentCommitShas": [
+      "080e3d69b84aff94ae9c56857ed378562c1b2e02"
+    ],
+    "governedTreeSha": "9a4617de198ff72189f977a1b98e553372ee7018",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0050.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/commands/batch/implementation.js",
+      "packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "packages/cli/dist/commands/git-governance/implementation/commit-command.js",
+      "packages/cli/dist/commands/git-governance/implementation/commit-task-scoped-branch.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+      "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/batch/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-command.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-task-scoped-branch.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/batch/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/AtmCore/runner-build-scope.json",
+      "release/atm-root-drop/scripts/validate-public-npm-install.ts",
+      "release/atm-root-drop/tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "release/atm-root-drop/tests/cli/public-npm-install-contract.test.ts",
+      "scripts/AtmCore/runner-build-scope.json",
+      "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/closure-delivery-file-coverage.test.ts",
+      "tests/cli/frozen-runner-validation-foreign-state.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d1d0bfdc70e4642f953120cfe9b8935ab0aeb89994c306398fef147d85ba331",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7d825fa5da011b6c49cf315a4545e3d6a24a390efdc5b69fb4bae00cf9c76d2f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/closure-delivery-file-coverage.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e792b2dfd2992484bbb7da3e473479af94ded3a415aff04398e123583cb0ee04",
+      "stderrSha256": "sha256:9027d9733fc89e046358f5d78a25bf3c766c82fd3f6431a5720bf6f92a07614f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/frozen-runner-validation-foreign-state.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d133a18e85dca270a63a56e0a5cc447d936c8c15aa66791e7eba79a2d8660375",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ec28dbdd63dac80be7dbcfab374dbbeab64865b131f3a777ceba90d42fe096a",
+      "stderrSha256": "sha256:04080526837bddf9d632984870edaa6055ab2129fc1a7e751018a5371f2b2095",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "node --strip-types tests/cli/closure-delivery-file-coverage.test.ts",
+    "node --strip-types tests/cli/frozen-runner-validation-foreign-state.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "build",
+    "node --strip-types tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+    "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+    "node --strip-types tests/cli/closure-delivery-file-coverage.test.ts",
+    "node --strip-types tests/cli/frozen-runner-validation-foreign-state.test.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-14T00:30:05.780Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0420.*",
+      ".atm/history/task-events/ATM-GOV-0420/**",
+      ".atm/history/tasks/ATM-GOV-0420.json",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+      "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
+      "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+      "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "scripts/AtmCore/runner-build-scope.json",
+      "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/closure-delivery-file-coverage.test.ts",
+      "tests/cli/frozen-runner-validation-foreign-state.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+      "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
+      "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+      "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+      "scripts/AtmCore/runner-build-scope.json",
+      "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+      "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "tests/cli/closure-delivery-file-coverage.test.ts",
+      "tests/cli/frozen-runner-validation-foreign-state.test.ts"
+    ],
+    "requiredGates": [
+      "build",
+      "node --strip-types tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+      "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
+      "node --strip-types tests/cli/closure-delivery-file-coverage.test.ts",
+      "node --strip-types tests/cli/frozen-runner-validation-foreign-state.test.ts",
+      "typecheck",
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/ATM-GOV-0420.json",
+  "closedAt": "2026-09-14T00:30:05.781Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260913234134-codex-captain-ATM-GOV-0420-f575a50582",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "080e3d69b84aff94ae9c56857ed378562c1b2e02",
+    "taskMatchedFiles": [
+      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "packages/cli/dist/commands/git-governance/implementation/commit-command.js",
+      "packages/cli/dist/commands/git-governance/implementation/commit-task-scoped-branch.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/ATM-GOV-0420/2026-09-14T00-26-14-324Z-scope-amendment-ea6b295c30f2.json",
+      ".atm/history/tasks/ATM-GOV-0420.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-command.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-task-scoped-branch.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
