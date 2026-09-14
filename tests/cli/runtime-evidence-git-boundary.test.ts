@@ -12,13 +12,19 @@ import {
   evidencePathForTask,
   readEvidenceBundle
 } from '../../packages/cli/src/commands/evidence/evidence-store.ts';
-import { validateProductionEvidenceCallers } from '../../scripts/validate-evidence-ledger-boundary.ts';
+import {
+  assertRepositoryOwnsRuntimeIgnoreRule,
+  assertRuntimeLedgerIsNotTracked,
+  validateProductionEvidenceCallers
+} from '../../scripts/validate-evidence-ledger-boundary.ts';
 
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-runtime-evidence-boundary-'));
 
 try {
   execFileSync('git', ['init', '--quiet'], { cwd: root });
-  writeFileSync(path.join(root, '.gitignore'), '.atm/runtime/\n', 'utf8');
+  const repositoryIgnore = readFileSync(path.join(process.cwd(), '.gitignore'), 'utf8');
+  writeFileSync(path.join(root, '.gitignore'), repositoryIgnore, 'utf8');
+  writeFileSync(path.join(root, '.git', 'info', 'exclude'), '# local excludes intentionally empty\n', 'utf8');
   execFileSync('git', ['add', '.gitignore'], { cwd: root });
   execFileSync('git', ['-c', 'user.name=ATM Test', '-c', 'user.email=atm@example.invalid', 'commit', '--quiet', '-m', 'fixture'], { cwd: root });
 
@@ -27,7 +33,15 @@ try {
   assert.equal(path.relative(root, runtimePath).replace(/\\/g, '/'), runtimeEvidenceBundleRelativePath(taskId));
   mkdirSync(path.dirname(runtimePath), { recursive: true });
   writeFileSync(runtimePath, `${JSON.stringify({ taskId, evidence: [{ summary: 'runtime-only' }] })}\n`, 'utf8');
-  assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }), '');
+  const gitEnvironment = {
+    ...process.env,
+    GIT_CONFIG_NOSYSTEM: '1',
+    GIT_CONFIG_GLOBAL: path.join(root, 'missing-global-gitconfig')
+  };
+  assert.equal(execFileSync('git', ['check-ignore', '-q', '--no-index', '--', '.atm/runtime/evidence-ledger/bundles/example.json'], { cwd: root, env: gitEnvironment, encoding: 'utf8' }), '');
+  const ignoreSource = execFileSync('git', ['check-ignore', '-v', '--no-index', '--', '.atm/runtime/evidence-ledger/bundles/example.json'], { cwd: root, env: gitEnvironment, encoding: 'utf8' });
+  assert.match(ignoreSource, /\.gitignore/);
+  assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd: root, env: gitEnvironment, encoding: 'utf8' }), '');
   assert.deepEqual(readEvidenceBundle(root, taskId).evidence, [{ summary: 'runtime-only' }]);
 
   rmSync(runtimePath);
@@ -36,6 +50,14 @@ try {
   writeFileSync(legacyPath, `${JSON.stringify({ taskId, evidence: [{ summary: 'legacy-read-only' }] })}\n`, 'utf8');
   assert.deepEqual(readEvidenceBundle(root, taskId).evidence, [{ summary: 'legacy-read-only' }]);
   assert.equal(durableEvidenceRelativePath(taskId, 'closure-packet'), `.atm/history/evidence/${taskId}.closure-packet.json`);
+
+  const trackedLedgerPath = path.join(root, '.atm', 'runtime', 'evidence-ledger', 'records', 'tracked.json');
+  mkdirSync(path.dirname(trackedLedgerPath), { recursive: true });
+  writeFileSync(trackedLedgerPath, '{}\n', 'utf8');
+  execFileSync('git', ['add', '-f', '--', '.atm/runtime/evidence-ledger/records/tracked.json'], { cwd: root });
+  assertRepositoryOwnsRuntimeIgnoreRule(root);
+  assert.throws(() => assertRuntimeLedgerIsNotTracked(root), /must not be tracked/);
+  execFileSync('git', ['reset', '--quiet', '--', '.atm/runtime/evidence-ledger/records/tracked.json'], { cwd: root });
 
   const callerReport = validateProductionEvidenceCallers(process.cwd());
   assert.deepEqual(callerReport.illegalReferences, []);

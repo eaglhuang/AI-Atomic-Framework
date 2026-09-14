@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -10,6 +11,10 @@ import { validateEvidenceLedgerBoundary } from '../../scripts/validate-evidence-
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-ledger-'));
 
 try {
+  execFileSync('git', ['init', '--quiet'], { cwd: root });
+  writeFileSync(path.join(root, '.gitignore'), '.atm/runtime/evidence-ledger/\n', 'utf8');
+  execFileSync('git', ['add', '.gitignore'], { cwd: root });
+  execFileSync('git', ['-c', 'user.name=ATM Test', '-c', 'user.email=atm@example.invalid', 'commit', '--quiet', '-m', 'fixture'], { cwd: root });
   const stores = createLocalGovernanceStores({ repositoryRoot: root });
   const input = { evidenceKind: 'validation' as const, summary: 'ledger round trip', artifactPaths: [], producedBy: 'fixture' };
   const entry = await stores.evidenceStore.appendEvidence('TASK-PRF-0005', input);
