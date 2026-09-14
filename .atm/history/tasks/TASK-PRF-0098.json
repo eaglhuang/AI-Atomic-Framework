@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0098",
   "title": "Simplify evidence ownership while preserving deviation traceability",
-  "status": "running",
+  "status": "open",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -146,8 +146,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T15-59-47-452Z-renew-0bea644e6823",
-  "lastTransitionAt": "2026-09-14T15:59:47.452Z",
+  "lastTransitionId": "2026-09-14T16-10-41-267Z-release-3a372bcfd0f8",
+  "lastTransitionAt": "2026-09-14T16:10:41.267Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-product-proof",
   "reservedAt": "2026-09-14T15:59:13.077Z",
@@ -156,7 +156,7 @@
     "actorId": "codex-product-proof",
     "leaseId": "lease-ae74f16eb527",
     "claimedAt": "2026-09-14T15:59:13.086Z",
-    "heartbeatAt": "2026-09-14T15:59:47.160Z",
+    "heartbeatAt": "2026-09-14T16:10:39.158Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0098.json",
@@ -167,13 +167,14 @@
       "tests/cli/evidence-ledger-migration.test.ts",
       "tests/cli/runtime-evidence-git-boundary.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260914155913-codex-product-proof-1f70ac2d30",
       "status": "adopted",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914155913-codex-product-proof-1f70ac2d30\""
-    }
+    },
+    "reason": "Release implementation claim after safe helper reduction; storage-layer deletion stopped by replay/tamper stop rule and lifecycle blocker requires runner sync or owner emergency approval."
   },
   "startedAt": "2026-09-14T15:59:13.086Z",
   "startedByActor": "codex-product-proof",
