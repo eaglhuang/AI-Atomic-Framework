@@ -1,0 +1,357 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0055",
+  "title": "Retain CI first-failure retry and repair-time evidence",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0051"
+  ],
+  "acceptance": [
+    "ACC-1: 每個納入或排除的 Product CI observation 都保留穩定 run id、attempt 關聯、head SHA、protected branch、event、conclusion、failure class 與 exclusion reason；failed/cancelled/retried observation 不得從原始分母消失。",
+    "ACC-2: 對每條 failure lifecycle 記錄 firstFailureAt、retryCount、最後一次 retry/attempt 與 repairAcceptedAt（或明確的 unresolved）；repair time 必須 由 raw timestamp 計算，不得由人工敘述或最後成功 run 猜測。",
+    "ACC-3: evaluator 對缺少 lifecycle 欄位、非單調時間、孤立 retry 或無法綁定 修復邊界的 receipt fail closed，輸出 `insufficient-observability` 或等價 狀態；不可把缺值補成 0，也不可因此宣稱 long-term-green。",
+    "ACC-4: 30 天／90 次 protected-main burn-in 門檻與既有 release-candidate 條件維持不變；新報告同時呈現成功率、失敗/重跑/修復統計與人工修復成本， 並保留目前窗口的 red/inconclusive 結論。",
+    "ACC-5: 公開摘要只引用 Git 外 raw export，記錄 query bounds、source commit、 receipt digest、計算命令與排除清單；不得把 runtime raw evidence 寫進 Git history。",
+    "ACC-6: typecheck、lint、focused lifecycle tests 與 burn-in evaluator 測試 全部通過；回滾只撤銷本卡 evaluator/報告變更，不刪除 raw receipt。"
+  ],
+  "deliverables": [
+    "scripts/measure-product-ci-burn-in.ts",
+    "tests/cli/product-ci-burn-in.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-product-ci-burn-in.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "scopePaths": [
+    "scripts/measure-product-ci-burn-in.ts",
+    "tests/cli/product-ci-burn-in.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-product-ci-burn-in.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run lint",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "external-ci-attempt-receipt-with-first-failure-retry-and-repair-time-fields",
+  "rollbackStrategy": "revert-commit-preserve-raw-evidence",
+  "rollbackNotes": "只回滾 evaluator、測試與摘要欄位；保留 Git 外 raw CI export、失敗分類與負向觀測，不刪除或重寫既有 run history。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.external-proof-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.ci-failure-lifecycle-evidence",
+        "pattern": "Policy Object",
+        "source": "scripts/measure-product-ci-burn-in.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "先在既有 evaluator 上補足 failure lifecycle telemetry；若 A/B 與 CI 共用同一 repair-cost schema，再另卡抽出 deep module。"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0055-retain-ci-first-failure-retry-and-repair-time-evidence.task.md",
+    "sectionTitle": "TASK-PRF-0055",
+    "headingLine": 89,
+    "hash": "9ff039a6171aeb55",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0055-retain-ci-first-failure-retry-and-repair-time-evidence.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:9ff039a6171aeb554a4d126dc2fecec21b312b8c8c528550b1eece3db2d2ba72",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T02:23:23.146Z"
+    }
+  },
+  "importedAt": "2026-09-14T02:23:23.146Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0051"
+    ],
+    "startConditions": [
+      "The current burn-in evaluator counts completed protected-main runs, but its input contract does not retain first-failure, retry-chain, repair-time, or explicit exclusion evidence.",
+      "The card must preserve the existing fail-closed 30-day/90-run policy and must not rewrite historical GitHub run history or declare the current red window green."
+    ],
+    "softRelations": [
+      "TASK-PRF-0043",
+      "TASK-PRF-0054"
+    ],
+    "changedPublicSeams": [
+      "product_ci_failure_lifecycle_evidence",
+      "product_ci_burnin_observability"
+    ],
+    "causalImpactEdges": [
+      "sustained-green-ci-claim",
+      "ci_repair_cost_measurement"
+    ],
+    "parallelFrontierInputs": [
+      "live-github-run-export",
+      "retry-attempt-metadata",
+      "repair-boundary"
+    ],
+    "validatorReferences": [
+      "test_prf_ci_failure_lifecycle_contract",
+      "test_prf_ci_missing_observability_fail_closed",
+      "test_prf_ci_repair_cost_provenance"
+    ],
+    "phaseOwner": "release-evidence"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_ci_failure_lifecycle_contract",
+      "targetGroupId": null,
+      "semanticKey": "ci_failure_lifecycle_contract",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "sustained-green-ci-claim",
+        "ci_repair_cost_measurement"
+      ],
+      "expectedRedPredicate": "A failed or retried Product CI run can enter the burn-in report without a stable attempt chain, failure classification, or explicit exclusion reason.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product_ci_failure_lifecycle_evidence",
+      "resourceKey": "live-github-run-export"
+    },
+    {
+      "caseId": "test_prf_ci_missing_observability_fail_closed",
+      "targetGroupId": null,
+      "semanticKey": "ci_missing_observability_fail_closed",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "sustained-green-ci-claim"
+      ],
+      "expectedRedPredicate": "Missing first-failure, retry, or repair-time fields are silently treated as zero or success, allowing a green burn-in claim from incomplete telemetry.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product_ci_burnin_observability",
+      "resourceKey": "incomplete-ci-receipt"
+    },
+    {
+      "caseId": "test_prf_ci_repair_cost_provenance",
+      "targetGroupId": null,
+      "semanticKey": "ci_repair_cost_provenance",
+      "coversAcceptance": [
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "ci_repair_cost_measurement"
+      ],
+      "expectedRedPredicate": "The report publishes repair-time numbers without raw receipt digest, query bounds, source commit, or a reproducible mapping from failed attempt to accepted repair.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product_ci_failure_lifecycle_evidence",
+      "resourceKey": "runtime-evidence-boundary"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_ci_failure_lifecycle_contract",
+    "test_prf_ci_missing_observability_fail_closed",
+    "test_prf_ci_repair_cost_provenance"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0051",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T02-23-38-354Z-claim-6bdca1ef733f",
+  "lastTransitionAt": "2026-09-14T02:23:38.354Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T02:23:35.971Z",
+  "promotedAt": "2026-09-14T02:23:35.975Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-b5d245696c0e",
+    "claimedAt": "2026-09-14T02:23:35.979Z",
+    "heartbeatAt": "2026-09-14T02:23:35.979Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0055.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/product-ci-burn-in.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914022336-codex-gpt-5.4-mini-c0c3597320\""
+    }
+  },
+  "startedAt": "2026-09-14T02:23:35.979Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-43dbbd02f9784ecc",
+    "ticketDigest": "sha256:43dbbd02f9784ecc79c808cffc65d7875c902cc58b1bf68aa47259390ed31d12",
+    "taskId": "TASK-PRF-0055",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
+    "claimGeneration": "lease-b5d245696c0e",
+    "issuedAt": "2026-09-14T02:23:35.979Z",
+    "expiresAt": "2026-09-14T02:53:35.979Z",
+    "scopeDigest": "sha256:520fa62977e6a1a0c63f3bc3148b46d4126af3b60e4e2e535c13fc43fb537ae7",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T02:23:35.979Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0055.*",
+          ".atm/history/task-events/TASK-PRF-0055/**",
+          ".atm/history/tasks/TASK-PRF-0055.json",
+          "docs/reports/atm-product-ci-burn-in.md",
+          "docs/reports/atm-product-proof-checkpoints.md",
+          "scripts/measure-product-ci-burn-in.ts",
+          "tests/cli/product-ci-burn-in.test.ts",
+          "tests/cli/product-proof-evidence-boundary.test.ts"
+        ],
+        "digest": "sha256:6221f0e71f6e9baed8336d7338fdcca5edf96b10e0da87a4686bd1e468ca3396"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914022335-codex-gpt-5.4-mini-TASK-PRF-0055-e72da6dc83",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0055",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0055.*",
+      ".atm/history/task-events/TASK-PRF-0055/**",
+      ".atm/history/tasks/TASK-PRF-0055.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/product-ci-burn-in.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "767d96a96253df917e4bb4d754e32c0c2bffc15fd6b7dbcf51faa11ada9e73f9",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914022335-codex-gpt-5.4-mini-TASK-PRF-0055-e72da6dc83",
+    "laneSession": {
+      "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914022336-codex-gpt-5.4-mini-c0c3597320\""
+    },
+    "createdAt": "2026-09-14T02:23:38.353Z",
+    "status": "active"
+  }
+}

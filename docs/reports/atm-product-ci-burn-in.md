@@ -158,3 +158,31 @@ gh run list --repo eaglhuang/AI-Atomic-Framework --workflow ci.yml --limit 100 -
 This is a command-backed negative observation. It does not establish long-term
 green CI, authorize a push or publication, or remove failed runs from the
 denominator. The raw export and mutable runtime receipts remain outside Git.
+
+## TASK-PRF-0055 lifecycle-observability contract (2026-09-14)
+
+The burn-in evaluator now requires each protected-main observation to carry an
+explicit lifecycle receipt. A receipt records `firstFailureAt`, `retryCount`,
+`lastAttemptAt`, `repairAcceptedAt`, `failureClass`, and (for excluded runs)
+`exclusionReason`. The evaluator reports excluded ids separately, computes
+repair durations only from raw timestamps, and returns fail-closed
+`invalid-input` evidence when lifecycle data is absent or inconsistent. Missing
+telemetry is never treated as zero and cannot produce a `long-term-green` result.
+
+The current live export was deliberately re-run against this stricter contract:
+
+```text
+gh run list --repo eaglhuang/AI-Atomic-Framework --workflow ci.yml --limit 100 --json databaseId,status,conclusion,createdAt,updatedAt,headSha,headBranch,event,displayTitle,workflowName | node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only
+```
+
+It returned:
+
+```json
+{"claimStatus":"invalid-input","reasons":["record-34749756346-missing-lifecycle"]}
+```
+
+This is an intentional negative observation: the existing GitHub export does
+not yet contain enough attempt-level data to measure first failure, retries, or
+repair time. No burn-in claim changed to green, and no raw provider payload was
+written to Git history. The next evidence step is to collect the missing
+attempt/retry metadata outside the repository and rerun the same evaluator.

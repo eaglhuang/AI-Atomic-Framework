@@ -1,0 +1,111 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0055",
+  "updatedAt": "2026-09-14T02:30:22.963Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "lint",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-14T02:28:58.854Z",
+      "startedAt": "2026-09-14T02:28:49.880Z",
+      "finishedAt": "2026-09-14T02:28:58.854Z",
+      "durationMs": 8974,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e322034f1ac3da0694aaf432a9aa8dd31139af0",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-14T02:29:15.787Z",
+      "startedAt": "2026-09-14T02:29:05.635Z",
+      "finishedAt": "2026-09-14T02:29:15.787Z",
+      "durationMs": 10152,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e322034f1ac3da0694aaf432a9aa8dd31139af0",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:85858f50f1e561e340dbdebf7515c39701f14d941dbbbfb2df0d7017aa6f2ed2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/product-ci-burn-in.test.ts"
+      ],
+      "generatedAt": "2026-09-14T02:29:23.568Z",
+      "startedAt": "2026-09-14T02:29:23.256Z",
+      "finishedAt": "2026-09-14T02:29:23.568Z",
+      "durationMs": 312,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e322034f1ac3da0694aaf432a9aa8dd31139af0",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+      ],
+      "generatedAt": "2026-09-14T02:29:30.763Z",
+      "startedAt": "2026-09-14T02:29:30.453Z",
+      "finishedAt": "2026-09-14T02:29:30.763Z",
+      "durationMs": 310,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e322034f1ac3da0694aaf432a9aa8dd31139af0",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\Users\\User\\atm-benchmark-sink\\TASK-PRF-0051\\raw\\ci-runs-2026-09-14.json --report-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6049bc22b9ff235a1aa18d5046d66e669854a5c31a0af45e7bcdf657bb9a14a0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-14T02:29:39.736Z",
+      "startedAt": "2026-09-14T02:29:39.429Z",
+      "finishedAt": "2026-09-14T02:29:39.736Z",
+      "durationMs": 307,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e322034f1ac3da0694aaf432a9aa8dd31139af0",
+      "cached": false
+    },
+    {
+      "command": "Get-Content -Raw C:\\Users\\User\\atm-benchmark-sink\\TASK-PRF-0051\\raw\\ci-runs-2026-09-14.json | node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6049bc22b9ff235a1aa18d5046d66e669854a5c31a0af45e7bcdf657bb9a14a0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only"
+      ],
+      "generatedAt": "2026-09-14T02:30:22.962Z",
+      "startedAt": "2026-09-14T02:30:22.628Z",
+      "finishedAt": "2026-09-14T02:30:22.962Z",
+      "durationMs": 334,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e322034f1ac3da0694aaf432a9aa8dd31139af0",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

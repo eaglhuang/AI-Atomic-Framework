@@ -55,3 +55,18 @@ published runtime cannot complete the ATMChart lifecycle: `bootstrap` passes,
 while `atm-chart render` and `atm-chart verify` fail on the missing
 `default-guards` schema. This is retained as negative evidence and does not
 earn the public core-workflow claim or authorize a release.
+
+## TASK-PRF-0055 CI failure-lifecycle observability (2026-09-14)
+
+The evaluator contract now requires attempt-level lifecycle data before CI
+failure costs can be measured: `firstFailureAt`, `retryCount`,
+`lastAttemptAt`, `repairAcceptedAt`, `failureClass`, and explicit exclusion
+reasons. Missing or inconsistent fields fail closed; they are not treated as
+zero and cannot produce a green burn-in claim.
+
+Re-running the current 100-run GitHub export against the stricter evaluator
+returned `invalid-input` with
+`record-34749756346-missing-lifecycle`. This is negative evidence that the
+existing export is insufficient to measure first failure, retries, and repair
+time. Raw provider payloads remain outside Git; the 90-run/30-day policy and the
+inconclusive status are unchanged.

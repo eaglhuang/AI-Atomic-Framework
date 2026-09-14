@@ -11,6 +11,13 @@ function run(id: number, createdAt: string, conclusion = 'success', extra: Recor
     event: 'push',
     createdAt,
     displayTitle: 'Product CI burn-in (standard)',
+    lifecycle: {
+      firstFailureAt: conclusion === 'success' ? null : createdAt,
+      retryCount: 0,
+      lastAttemptAt: createdAt,
+      repairAcceptedAt: null,
+      failureClass: conclusion === 'success' ? null : 'unknown-failure',
+    },
     ...extra,
   };
 }
@@ -25,6 +32,8 @@ const short = evaluateBurnIn(base, { minCompletedRuns: 3, minCalendarDays: 30 })
 assert.equal(short.claimStatus, 'long-term-green');
 assert.equal(short.observed?.releaseCandidateRuns, 1);
 assert.equal(short.observed?.currentConsecutiveSuccessStreak, 3);
+assert.equal(short.observed?.retryCount, 0);
+assert.equal(short.observed?.averageRepairTimeMs, null);
 
 const failure = evaluateBurnIn([base[0], run(2, '2026-01-15T00:00:00Z', 'failure'), base[2]], { minCompletedRuns: 3, minCalendarDays: 30 });
 assert.equal(failure.claimStatus, 'unexplained-failure');
@@ -59,4 +68,42 @@ const missingBoundaryCommit = evaluateBurnIn(base, { minCompletedRuns: 1, minCal
 assert.equal(missingBoundaryCommit.claimStatus, 'invalid-input');
 assert.ok(missingBoundaryCommit.reasons.includes('baseline-no-post-boundary-runs'));
 
-console.log('product-ci-burn-in tests: 8/8 passed');
+const retried = evaluateBurnIn([
+  run(6, '2026-02-03T00:00:00Z', 'success', {
+    lifecycle: {
+      firstFailureAt: '2026-02-02T23:00:00Z',
+      retryCount: 2,
+      lastAttemptAt: '2026-02-03T01:00:00Z',
+      repairAcceptedAt: '2026-02-03T02:00:00Z',
+      failureClass: 'dependency-install',
+    },
+  }),
+  run(5, '2026-02-02T22:00:00Z', 'failure', {
+    lifecycle: {
+      firstFailureAt: '2026-02-02T22:00:00Z',
+      retryCount: 1,
+      lastAttemptAt: '2026-02-02T23:00:00Z',
+      repairAcceptedAt: null,
+      failureClass: 'dependency-install',
+    },
+  }),
+], { minCompletedRuns: 1, minCalendarDays: 0 });
+assert.equal(retried.claimStatus, 'unexplained-failure');
+assert.equal(retried.observed?.retriedRuns, 2);
+assert.equal(retried.observed?.retryCount, 3);
+assert.equal(retried.observed?.unresolvedFailures, 1);
+assert.deepEqual(retried.observed?.repairTimeMs, [10800000]);
+
+const missingLifecycle = evaluateBurnIn([run(7, '2026-02-04T00:00:00Z', 'success', { lifecycle: undefined })], { minCompletedRuns: 1, minCalendarDays: 0 });
+assert.equal(missingLifecycle.claimStatus, 'invalid-input');
+assert.ok(missingLifecycle.reasons.includes('record-7-missing-lifecycle'));
+
+const excluded = evaluateBurnIn([
+  run(9, '2026-02-04T00:00:00Z', 'success'),
+  run(8, '2026-02-03T00:00:00Z', 'cancelled', { eligible: false, exclusionReason: 'superseded-by-newer-protected-main-run' }),
+], { minCompletedRuns: 1, minCalendarDays: 0 });
+assert.equal(excluded.claimStatus, 'long-term-green');
+assert.equal(excluded.observed?.excludedRunCount, 1);
+assert.deepEqual(excluded.observed?.excludedRunIds, [8]);
+
+console.log('product-ci-burn-in tests: 12/12 passed');
