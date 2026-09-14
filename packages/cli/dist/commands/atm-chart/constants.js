@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { resolveFrameworkRoot } from '../shared.js';
 export const frameworkRoot = resolveFrameworkRoot();
@@ -10,6 +11,14 @@ export const atmChartSourceSchemas = Object.freeze({
     'agent-prompt': 'schemas/agent-prompt.schema.json',
     'upgrade/upgrade-proposal': 'schemas/upgrade/upgrade-proposal.schema.json'
 });
+export function resolveATMChartSchemaPath(relativeSchemaPath) {
+    const candidates = [
+        path.join(frameworkRoot, relativeSchemaPath),
+        path.join(frameworkRoot, 'dist', 'npm-runtime', 'layout', relativeSchemaPath),
+        path.join(frameworkRoot, 'layout', relativeSchemaPath)
+    ];
+    return candidates.find((candidate) => existsSync(candidate)) ?? candidates[0];
+}
 export const fallbackCompatibilityMatrix = Object.freeze({
     schemaVersion: 'atm.compatibilityMatrix.v0.1',
     lastUpdated: '2026-05-18',

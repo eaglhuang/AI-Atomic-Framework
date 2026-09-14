@@ -27,6 +27,7 @@ import { runActor } from './commands/actor.ts';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
 import { runStart } from './commands/start.ts';
 import { runTasks } from './commands/tasks.ts';
+import { runATMChart } from './commands/atm-chart.ts';
 
 type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandResult | object;
 
@@ -38,7 +39,7 @@ type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandRe
 export const publicCliCommandNames = [
   'next', 'doctor', 'guide', 'init', 'create', 'taskflow', 'welcome',
   'status', 'verify', 'orient', 'evidence', 'lock', 'broker', 'git',
-  'integration', 'plan', 'actor', 'bootstrap', 'start', 'tasks'
+  'integration', 'plan', 'actor', 'bootstrap', 'start', 'tasks', 'atm-chart'
 ] as const;
 
 export const publicCliCommandRunners: Record<string, CliRunner> = {
@@ -61,7 +62,8 @@ export const publicCliCommandRunners: Record<string, CliRunner> = {
   actor: runActor,
   bootstrap: runBootstrap,
   start: runStart,
-  tasks: runTasks
+  tasks: runTasks,
+  'atm-chart': runATMChart
 };
 
 export async function runPublicCli(

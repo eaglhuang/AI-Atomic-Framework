@@ -79,7 +79,7 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = 
       publicCommands: [
         'next', 'doctor', 'guide', 'init', 'create', 'taskflow', 'welcome',
         'status', 'verify', 'orient', 'evidence', 'lock', 'broker', 'git',
-        'integration', 'plan', 'actor', 'bootstrap', 'start', 'tasks'
+        'integration', 'plan', 'actor', 'bootstrap', 'start', 'tasks', 'atm-chart'
       ],
       omittedPublicAssets: OMITTED_PUBLIC_ASSETS.map((pattern) => pattern.source),
       files,

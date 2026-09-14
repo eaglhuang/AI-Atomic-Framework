@@ -9,8 +9,17 @@ import { buildCliNpmRuntime } from './build-cli-npm-runtime.ts';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_PACKAGE_DIR = 'packages/cli';
 const VENDOR_DIRNAME = '_vendor';
-const CLI_SCAFFOLD_RUNTIME_ASSETS = [
+// Runtime commands may resolve these schemas through the framework root at
+// runtime (not through an ESM import), so they must be copied explicitly into
+// the npm closure. Keep this list data-only and bounded: it is the source of
+// truth for non-module assets required by the public CLI.
+const CLI_RUNTIME_ASSETS = [
   'schemas/atomic-spec.schema.json',
+  'schemas/governance/default-guards.schema.json',
+  'schemas/charter/charter-invariants.schema.json',
+  'schemas/integrations/install-manifest.schema.json',
+  'schemas/agent-prompt.schema.json',
+  'schemas/upgrade/upgrade-proposal.schema.json',
   'templates/atom.spec.template.json',
   'templates/atom.test.template.ts'
 ] as const;
@@ -413,11 +422,11 @@ function buildCliRuntimeClosure(): void {
   // Keep this allowlist exact: copying the repository-wide templates tree would
   // silently turn the compact product back into a development snapshot.
   let scaffoldRuntimeAssets = 0;
-  for (const assetPath of CLI_SCAFFOLD_RUNTIME_ASSETS) {
+  for (const assetPath of CLI_RUNTIME_ASSETS) {
     const source = path.join(root, assetPath);
     const target = path.join(cliDist, assetPath);
     if (!existsSync(source)) {
-      throw new Error(`Required CLI scaffold runtime asset is missing: ${assetPath}`);
+      throw new Error(`Required CLI runtime asset is missing: ${assetPath}`);
     }
     ensureDir(target);
     copyFileIfChanged(source, target);

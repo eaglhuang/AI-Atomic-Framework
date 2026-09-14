@@ -1,5 +1,11 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { strict as assert } from 'node:assert';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const args = ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.0.0-does-not-exist', '--record-blocked'];
@@ -48,4 +54,49 @@ assert.match(String(oversizedProof.error ?? oversizedProof.blockedReason), /budg
 let failedClosed = false;
 try { execFileSync(npm, args.slice(0, -1), { encoding: 'utf8', windowsHide: true, stdio: 'pipe', shell: process.platform === 'win32' }); } catch { failedClosed = true; }
 assert.equal(failedClosed, true, 'unpublished package must fail closed without --record-blocked');
+
+// A registry smoke cannot prove a not-yet-published candidate. Pack the local
+// runtime, install it into an isolated consumer, and exercise the first
+// post-bootstrap chart lifecycle so missing data assets cannot hide behind a
+// version-only or module-resolution check.
+const localSmokeRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-public-runtime-chart-'));
+try {
+  const packed = JSON.parse(execFileSync(npm, [
+    'pack', '--workspace', '@ai-atomic-framework/cli', '--ignore-scripts', '--pack-destination', localSmokeRoot,
+    '--json', '--loglevel', 'silent'
+  ], { cwd: root, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' }).trim());
+  const tarball = path.join(localSmokeRoot, packed[0].filename);
+  const consumer = path.join(localSmokeRoot, 'consumer');
+  const adopter = path.join(consumer, 'adopter');
+  mkdirSync(adopter, { recursive: true });
+  execFileSync(npm, ['install', '--ignore-scripts', '--no-save', '--prefix', consumer, tarball], {
+    cwd: localSmokeRoot, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
+  });
+  const entrypoint = path.join(consumer, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'atm.mjs');
+  assert.ok(existsSync(entrypoint), 'local candidate install must expose the frozen atm entrypoint');
+  const runAtm = (...args: string[]) => {
+    const result = spawnSync(process.execPath, [entrypoint, ...args], { cwd: adopter, encoding: 'utf8', windowsHide: true });
+    assert.equal(result.status, 0, `local candidate ${args.join(' ')} failed: ${result.stdout}${result.stderr}`);
+    return `${result.stdout}${result.stderr}`;
+  };
+  runAtm('bootstrap', '--cwd', adopter, '--task', 'public runtime chart smoke', '--json');
+  runAtm('atm-chart', 'render', '--cwd', adopter, '--json');
+  runAtm('atm-chart', 'verify', '--cwd', adopter, '--json');
+  const installedLayout = path.join(consumer, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'layout');
+  for (const schemaPath of [
+    'schemas/governance/default-guards.schema.json',
+    'schemas/charter/charter-invariants.schema.json',
+    'schemas/integrations/install-manifest.schema.json',
+    'schemas/agent-prompt.schema.json',
+    'schemas/upgrade/upgrade-proposal.schema.json'
+  ]) {
+    assert.ok(existsSync(path.join(installedLayout, schemaPath)), `local candidate runtime must carry ${schemaPath}`);
+  }
+  const chart = readFileSync(path.join(adopter, '.atm', 'memory', 'atm-chart.md'), 'utf8');
+  for (const schemaId of ['governance/default-guards', 'charter/charter-invariants', 'integrations/install-manifest', 'agent-prompt', 'upgrade/upgrade-proposal']) {
+    assert.match(chart, new RegExp(schemaId.replace('/', '\\/')), `rendered ATMChart must record ${schemaId}`);
+  }
+} finally {
+  rmSync(localSmokeRoot, { recursive: true, force: true });
+}
 console.log('[public-npm-install-contract] ok');

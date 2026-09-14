@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T01-26-32-451Z-scope-amendment-a2693e6c9354",
+  "taskId": "TASK-PRF-0052",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0052.json",
+  "taskSha256": "sha256:9754aab04c6b935876139836247b09de8d6345042142942328ecb813bda2ef70",
+  "createdAt": "2026-09-14T01:26:32.451Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0052 --actor codex-gpt-5.4-mini --add packages/cli/src/atm-public.ts --reason \"Expose atm-chart required by ACC-3 clean adopter workflow\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Expose atm-chart required by ACC-3 clean adopter workflow"
+  }
+}

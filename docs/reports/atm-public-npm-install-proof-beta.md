@@ -28,3 +28,26 @@
   "temporaryRootRemoved": true
 }
 ```
+
+## TASK-PRF-0052 candidate revalidation (2026-09-14)
+
+The public registry receipt above remains historical (`0.1.0-beta.5`). A fresh
+install of the current public `0.1.0` was still **installable-but-core-workflow-incomplete**:
+`--version`, `doctor`, and `bootstrap` passed, while `atm-chart render` failed
+with `ATM_CHART_SCHEMA_SOURCE_MISSING` for
+`schemas/governance/default-guards.schema.json`. The retained external receipt
+is `C:\Users\User\atm-benchmark-sink\TASK-PRF-0051\public-install-2026-09-14\public-install-receipt.json`
+with SHA-256
+`0216e927043b41f27ab69580c5fcdc4c84b229e014437345d41df9a5704c44ba`.
+
+The local candidate built from the repaired source now carries all five
+ATMChart source schemas in `dist/npm-runtime/layout/schemas/**`, exposes the
+`atm-chart` adopter command, and passes an isolated tarball install followed by
+`bootstrap`, `atm-chart render`, and `atm-chart verify`. The candidate pack
+measured 2,684,504 unpacked bytes and 71 entries, below the declared budget of
+3,365,772 bytes and 308 entries. The focused contract also verified that no
+workspace link or extra framework download is needed.
+
+This is candidate evidence only. It does not change the public registry and
+does not authorize npm publish; a new public-registry receipt is required after
+an independently authorized release.
