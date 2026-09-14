@@ -37,3 +37,17 @@ summary and digest. The first implementation reuses:
 
 The report is intentionally JSON/Markdown first. A GUI dashboard is deferred
 until real samples show that a visual surface reduces operator time.
+
+## Existing CLI integration
+
+The existing telemetry report path projects the same runtime gate events into
+this score without introducing a second store:
+
+```text
+node atm.dev.mjs telemetry --report --include-runtime --json
+```
+
+Read `evidence.latencyScore` for the structured score and
+`evidence.latencyMarkdown` for the text report. Omitting `--include-runtime`
+deliberately leaves the latency inventory unobserved; it remains `unknown`,
+not zero.

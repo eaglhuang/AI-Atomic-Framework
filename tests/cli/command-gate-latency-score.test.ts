@@ -1,4 +1,9 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import {
   buildCommandGateLatencyMarkdown,
   buildCommandGateLatencyReport,
@@ -84,5 +89,20 @@ const candidate = buildCommandGateLatencyReport({
 const comparison = compareCommandGateLatencyReports(baseline, candidate);
 assert.equal(comparison.verdict, 'pass');
 assert.ok((comparison.mandatoryWaitingP50ReductionPct ?? 0) >= 20);
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const runtimeRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-latency-cli-report-'));
+try {
+  const emit = spawnSync(process.execPath, ['--strip-types', path.join(root, 'packages', 'cli', 'src', 'atm.ts'), 'telemetry', '--cwd', runtimeRepo, '--emit-fixture', '--check-id', 'next.route-resolution', '--duration-ms', '13', '--json'], { cwd: root, encoding: 'utf8' });
+  assert.equal(emit.status, 0, emit.stderr || emit.stdout);
+  const cliReport = spawnSync(process.execPath, ['--strip-types', path.join(root, 'packages', 'cli', 'src', 'atm.ts'), 'telemetry', '--cwd', runtimeRepo, '--report', '--include-runtime', '--json'], { cwd: root, encoding: 'utf8' });
+  assert.equal(cliReport.status, 0, cliReport.stderr || cliReport.stdout);
+  const cliReportJson = JSON.parse(cliReport.stdout);
+  assert.equal(cliReportJson.evidence.latencyScore.observedCount, 1);
+  assert.equal(cliReportJson.evidence.latencyScore.scores.find((score: { key: string }) => score.key === 'next.route-resolution').p50Ms, 13);
+  assert.match(cliReportJson.evidence.latencyMarkdown, /Unknown values mean no real sample was available/);
+} finally {
+  rmSync(runtimeRepo, { recursive: true, force: true });
+}
 
 console.log('ok - command/gate latency score assertions passed (8 assertions plus negative controls)');
