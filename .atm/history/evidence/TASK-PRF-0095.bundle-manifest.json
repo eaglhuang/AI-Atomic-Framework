@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0095",
+  "updatedAt": "2026-09-14T15:22:37.582Z",
+  "updatedBy": "codex-product-proof",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/public-command-registry.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types --test tests/cli/public-command-registry.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:47b6ca672dde8abc95b0240db6409f94299a26642e667a34fafa7a00a9e57375",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-14T15:21:51.639Z",
+      "startedAt": "2026-09-14T15:21:50.520Z",
+      "finishedAt": "2026-09-14T15:21:51.639Z",
+      "durationMs": 1119,
+      "runnerKind": "dev-source",
+      "sourceCommit": "192d3587a91a6b40fec0c91c0ca248acc7826248",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/public-command-registry.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5b471c69fdea0c9f97f5a72fddc5bcfa3de38381f81a2ffc515871f3163ba769",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/public-command-registry.test.ts"
+      ],
+      "generatedAt": "2026-09-14T15:22:27.081Z",
+      "startedAt": "2026-09-14T15:22:26.033Z",
+      "finishedAt": "2026-09-14T15:22:27.081Z",
+      "durationMs": 1048,
+      "runnerKind": "dev-source",
+      "sourceCommit": "192d3587a91a6b40fec0c91c0ca248acc7826248",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-14T15:22:37.581Z",
+      "startedAt": "2026-09-14T15:22:28.468Z",
+      "finishedAt": "2026-09-14T15:22:37.581Z",
+      "durationMs": 9113,
+      "runnerKind": "dev-source",
+      "sourceCommit": "192d3587a91a6b40fec0c91c0ca248acc7826248",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

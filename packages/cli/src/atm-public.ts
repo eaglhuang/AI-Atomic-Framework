@@ -36,12 +36,6 @@ type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandRe
  * complete command surface in atm.ts; this registry is intentionally explicit
  * so the published bundle has a measurable, reviewable boundary.
  */
-export const publicCliCommandNames = [
-  'next', 'doctor', 'guide', 'init', 'create', 'taskflow', 'welcome',
-  'status', 'verify', 'orient', 'evidence', 'lock', 'broker', 'git',
-  'integration', 'plan', 'actor', 'bootstrap', 'start', 'tasks', 'atm-chart'
-] as const;
-
 export const publicCliCommandRunners: Record<string, CliRunner> = {
   next: runNext,
   doctor: runDoctor,
@@ -65,6 +59,8 @@ export const publicCliCommandRunners: Record<string, CliRunner> = {
   tasks: runTasks,
   'atm-chart': runATMChart
 };
+
+export const publicCliCommandNames = Object.keys(publicCliCommandRunners);
 
 export async function runPublicCli(
   argv = process.argv.slice(2),
@@ -97,7 +93,9 @@ export async function runPublicCli(
     return writeHelp(targetCommand, commandArgs, io, outputFormat);
   }
 
-  const runner = publicCliCommandRunners[commandName];
+  const runner = Object.hasOwn(publicCliCommandRunners, commandName)
+    ? publicCliCommandRunners[commandName]
+    : undefined;
   if (!runner) {
     const result = enrichCommandResult(makeResult({
       ok: false,

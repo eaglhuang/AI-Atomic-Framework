@@ -1,0 +1,252 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0095",
+  "title": "Unify public command registry and reject inherited command names",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: One executable table determines public help and accepted command names; all 21 existing public commands remain available.",
+    "ACC-2: toString, constructor, valueOf, hasOwnProperty and __proto__ return the existing unknown-command result with nonzero exit, both directly and through help; no unhandled exception or accidental runner invocation.",
+    "ACC-3: Every advertised command has a callable runner and --help succeeds; focused red/green and typecheck pass. Report removed duplication, not bundle reduction."
+  ],
+  "deliverables": [
+    "packages/cli/src/atm-public.ts",
+    "tests/cli/public-command-registry.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/atm-public.ts",
+    "tests/cli/public-command-registry.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/public-command-registry.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only this task's reviewed changes; preserve foreign WIP and external evidence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-command-router-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "disposition": "inline",
+        "inlineReason": "Owner explicitly prioritizes bounded quickfixes and deletion over additional abstraction; scope must shrink to observed behavior before editing."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0095-unify-public-command-registry-and-reject-inherited-command-names.task.md",
+    "sectionTitle": "TASK-PRF-0095",
+    "headingLine": 38,
+    "hash": "09a664bebe4b6ffc",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0095-unify-public-command-registry-and-reject-inherited-command-names.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:09a664bebe4b6ffc9375b78332a40b49f9cafc68dba8ddd456320aafadda679d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T15:19:56.860Z"
+    }
+  },
+  "importedAt": "2026-09-14T15:19:56.860Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.public.command.registry.test.ts",
+      "command": "node --strip-types tests/cli/public-command-registry.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies",
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T15-20-25-363Z-claim-3280675e0948",
+  "lastTransitionAt": "2026-09-14T15:20:25.363Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-product-proof",
+  "reservedAt": "2026-09-14T15:20:19.504Z",
+  "promotedAt": "2026-09-14T15:20:19.508Z",
+  "claim": {
+    "actorId": "codex-product-proof",
+    "leaseId": "lease-032a91bc3ef3",
+    "claimedAt": "2026-09-14T15:20:19.512Z",
+    "heartbeatAt": "2026-09-14T15:20:19.512Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0095.json",
+      "packages/cli/src/atm-public.ts",
+      "tests/cli/public-command-registry.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914152019-codex-product-proof-ead887da10",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914152019-codex-product-proof-ead887da10\""
+    }
+  },
+  "startedAt": "2026-09-14T15:20:19.512Z",
+  "startedByActor": "codex-product-proof",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-951560109e47da47",
+    "ticketDigest": "sha256:951560109e47da47a62f9fa962db45286ff7be175a7425f4b5c79e48a2579b00",
+    "taskId": "TASK-PRF-0095",
+    "origin": "claim",
+    "actorId": "codex-product-proof",
+    "laneSessionId": "lane-20260914152019-codex-product-proof-ead887da10",
+    "claimGeneration": "lease-032a91bc3ef3",
+    "issuedAt": "2026-09-14T15:20:19.512Z",
+    "expiresAt": "2026-09-14T15:50:19.512Z",
+    "scopeDigest": "sha256:7073fa40db7eb8831174d840d69302f71be1d4077e7fdff0a98b928cda0d2285",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T15:20:19.512Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0095.*",
+          ".atm/history/task-events/TASK-PRF-0095/**",
+          ".atm/history/tasks/TASK-PRF-0095.json",
+          "packages/cli/src/atm-public.ts",
+          "tests/cli/public-command-registry.test.ts"
+        ],
+        "digest": "sha256:5a88bf03e4c844f20b2a61bdc0145ecd0d35ea520d72c8ea00c7e2295113eba1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914152019-codex-product-proof-TASK-PRF-0095-b225ea03c7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0095",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0095.*",
+      ".atm/history/task-events/TASK-PRF-0095/**",
+      ".atm/history/tasks/TASK-PRF-0095.json",
+      "packages/cli/src/atm-public.ts",
+      "tests/cli/public-command-registry.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "78234059e7d3de8d16609f31093ff4ffd31dd295eb4ad169a33ee0c362637490",
+    "actorId": "codex-product-proof",
+    "sessionId": "session-20260914152019-codex-product-proof-TASK-PRF-0095-b225ea03c7",
+    "laneSession": {
+      "laneSessionId": "lane-20260914152019-codex-product-proof-ead887da10",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914152019-codex-product-proof-ead887da10\""
+    },
+    "createdAt": "2026-09-14T15:20:25.362Z",
+    "status": "active"
+  }
+}
