@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0050",
-  "updatedAt": "2026-09-13T19:24:09.815Z",
+  "updatedAt": "2026-09-14T00:36:00.443Z",
   "updatedBy": "codex-captain",
   "freshValidationPasses": [
     "lint",
@@ -13,7 +13,8 @@
     "validate:candidate-npm-install -- --measurement-runs 3",
     "validate:cli",
     "validate:package-install",
-    "validate:public-npm-install"
+    "validate:public-npm-install",
+    "validate:public-npm-install -- --measure --package @ai-atomic-framework/cli --version 0.1.0 --baseline-version 0.1.0 --candidate-dir packages/cli --measurement-runs 1 --record-blocked"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -317,6 +318,22 @@
       "durationMs": 8554,
       "runnerKind": "dev-source",
       "sourceCommit": "03f043cc3d185e1f8824876ac08ef88d5863bab4",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:public-npm-install -- --measure --package @ai-atomic-framework/cli --version 0.1.0 --baseline-version 0.1.0 --candidate-dir packages/cli --measurement-runs 1 --record-blocked",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6a28d2f6aff856c44c81fb960492ed5d1d10f6d518e6a3d67dc0aebb564f43a9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:public-npm-install -- --measure --package @ai-atomic-framework/cli --version 0.1.0 --baseline-version 0.1.0 --candidate-dir packages/cli --measurement-runs 1 --record-blocked"
+      ],
+      "generatedAt": "2026-09-14T00:35:32.038Z",
+      "startedAt": "2026-09-14T00:35:21.544Z",
+      "finishedAt": "2026-09-14T00:35:32.038Z",
+      "durationMs": 10494,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7e62fb795e65df1bb215dfb89f9d53e424f2101b",
       "cached": false
     }
   ],
