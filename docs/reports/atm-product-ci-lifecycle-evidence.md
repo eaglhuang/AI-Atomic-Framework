@@ -21,3 +21,19 @@ The collector writes a digest-bearing receipt wrapper; the evaluator consumes it
 ## Governance boundary
 
 This collector does not query GitHub, alter workflow policy, weaken `measure-product-ci-burn-in.ts`, or claim that current main is green. It makes the missing attempt-level evidence observable and rerunnable so an external export can be independently replayed before any burn-in claim is made.
+
+## Current protected-main audit snapshot
+
+On 2026-09-14, a read-only GitHub Actions query over the latest 100 `ci.yml`
+runs on `main` returned 36 successes and 64 failures. The records span only
+2026-09-06T15:45:42Z through 2026-09-14T03:31:44Z, and all 100 records report
+`run_attempt=1`; no retry or repair sequence is present in this window. The
+latest run (`34802911175`) is attempt 1 and has Product CI and ATM Dogfood jobs
+with explicit start/end timestamps, but the exported records have not yet been
+normalized into `atm.githubCiAttemptExport.v1` with failure classes and
+exclusion provenance.
+
+This snapshot is diagnostic evidence only. It fails the 30-day/90-run policy
+and must not be used as a long-term-green claim. The real export and lifecycle
+receipt remain external to Git until a complete policy-window collection is
+available.
