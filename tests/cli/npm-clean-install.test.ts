@@ -98,4 +98,8 @@ const publicFacadeSource = readFileSync(publicFacade, 'utf8');
 assert.match(publicFacadeSource, /publicCliCommandNames/, 'the adopter facade must declare its command surface');
 assert.doesNotMatch(publicFacadeSource, /agent-pack['"`]/, 'the bounded adopter facade must not expose the optional agent-pack command');
 
+const guideSource = readFileSync(path.join(root, 'packages', 'cli', 'src', 'commands', 'guide.ts'), 'utf8');
+assert.match(guideSource, /start performs the required orientation internally/, 'guidance must use the existing start orientation instead of requiring a duplicate orient command');
+assert.match(guideSource, /prerequisiteCommands: \[\]/, 'legacy guidance must not rescan the repository before start');
+
 console.log('[npm-clean-install:test] ok');

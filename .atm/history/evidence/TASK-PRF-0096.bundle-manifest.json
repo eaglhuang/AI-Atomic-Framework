@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0096",
+  "updatedAt": "2026-09-14T15:37:19.838Z",
+  "updatedBy": "codex-product-proof",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/npm-clean-install.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6b8aa00fb0b81b00d6dda72ab6d0de27b464508ab939eca4dd36674d3d023f58",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/npm-clean-install.test.ts"
+      ],
+      "generatedAt": "2026-09-14T15:37:04.356Z",
+      "startedAt": "2026-09-14T15:37:04.054Z",
+      "finishedAt": "2026-09-14T15:37:04.356Z",
+      "durationMs": 302,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6270750197b548103b7f64238d929de19f994ee5",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-14T15:37:19.837Z",
+      "startedAt": "2026-09-14T15:37:10.699Z",
+      "finishedAt": "2026-09-14T15:37:19.837Z",
+      "durationMs": 9138,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6270750197b548103b7f64238d929de19f994ee5",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
