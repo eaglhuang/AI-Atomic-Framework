@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T00-26-14-324Z-scope-amendment-ea6b295c30f2",
+  "taskId": "ATM-GOV-0420",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0420.json",
+  "taskSha256": "sha256:9548f73b70bfa2c48ab720a578ce9ba45dd019a295c94a6437d20b306b8abe7a",
+  "createdAt": "2026-09-14T00:26:14.324Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0420 --actor codex-captain --add release/atm-onefile/release-manifest.json --reason \"sealed onefile publication integrity 需要明確納入 release manifest，避免 dirty generated output 被誤判為 foreign\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "sealed onefile publication integrity 需要明確納入 release manifest，避免 dirty generated output 被誤判為 foreign"
+  }
+}

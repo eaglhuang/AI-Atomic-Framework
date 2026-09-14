@@ -111,7 +111,11 @@ export function runGitCommit(options) {
     // A repair-closure ticket is deliberately issued after its original claim has
     // been released.  It bypasses the session requirement, but still needs the
     // normal task-scoped branch to assemble a sealed preview/candidate.
-    if (options.taskId && taskDocument && (!bypassesActiveSession || permitsTerminalRepairClosureSessionBypass(terminalRepairTicket))) {
+    const wipHasLiveTaskClaim = Boolean(options.wip &&
+        claim &&
+        claim.state === 'active' &&
+        claim.actorId === actorId);
+    if (options.taskId && taskDocument && (!bypassesActiveSession || permitsTerminalRepairClosureSessionBypass(terminalRepairTicket) || wipHasLiveTaskClaim)) {
         const taskBranch = routeTaskScopedCommitBranch({ options, actorId, taskDocument, claim, claimForTrailers, session, laneSessionId });
         if (taskBranch.kind === "preview")
             return taskBranch.result;

@@ -2772,6 +2772,7 @@
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/record-commit-payload-assertion.ts",
     "release/atm-root-drop/packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
@@ -6174,8 +6175,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1515,
-    "unchanged": 4624,
+    "copied": 1513,
+    "unchanged": 4627,
     "removed": 0
   },
   "buildMode": "full",
@@ -23453,7 +23454,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
-        "digest": "a52a37546bf7cadd993f2e485b10700c0926279be7aa38912a7fbded2edb695f",
+        "digest": "f615b1c09c0b75e9eb4a73932c9984c8476babd527c40181eccdda84dcabc062",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js"
@@ -23480,7 +23481,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-command.js",
-        "digest": "02077e5cbec55907243a8ca1d88bc4dc209f4fe35fe44a216eb8d7bb2f39f85a",
+        "digest": "824b6c7d7050656852f1f515b2d57c7f8a0eccbca2c553193e0bf4685edd0314",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-command.js"
@@ -23507,7 +23508,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-task-scoped-branch.js",
-        "digest": "524134eb8470afbe3754bc9a137e4ba7500193655b65f43b6a1e683c54d80406",
+        "digest": "355aa49fc17c7110c804fa2d7255c92c7c4aa83fcfa47b12cbd395636c407398",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-task-scoped-branch.js"
@@ -27827,7 +27828,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "c6b2e8e301e21b5655dbd93e2df7e8f0ede88685326b8932371916cdf8159b72",
+        "digest": "ef37c534e32e6e5abb9e2bfff0d60cbc9ae7b826893b4d15e73461f839963e1b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -27836,7 +27837,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "d3e040850cc72a2b11205c1c1874bfc7ff748e1d645cac8b09b38a9fbaf59a10",
+        "digest": "9df5347af3e3d870d63c228f7f46a1c1dbe70b1cb54031b454e5f322dadc10dd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -30410,7 +30411,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
-        "digest": "0a3d284d0463a194e6106d2d1b4ab343fd7747471913d248e6e405e3438324e2",
+        "digest": "d43fd9db46a913382fa1f4ff9c99a665a069b96f30fe7cf2ef24cf2d2562c53a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts"
@@ -30419,7 +30420,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
-        "digest": "ac5d744fc24e1aad18b1991d7308d936a3e9bedb284e4a1f160f28ef8c347384",
+        "digest": "02a27edacdf9cd87d393e1e4456c2249ba8474732ff8a5f7ef112bab106aba54",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts"
@@ -30455,7 +30456,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
-        "digest": "7ca9620e6ba905fc945c949bd9ded97290c0fc7ddfdbbca7c7c3799fb42ea590",
+        "digest": "bb1b5fc0aba8bd688bb2435643edfd09907d4050d0581095844fcaaf581bb283",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-command.ts"
@@ -30491,7 +30492,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
-        "digest": "f488a364ef3cf8125fb49c3039ad6d3cd86805a4b9cb6bbef9839b813b1f4b59",
+        "digest": "7cdce1f8cb745ae0d4004834f8fa0680dbda47877a0b8cb56940f81661f8241c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts"
@@ -30846,6 +30847,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
+        "digest": "8153b66271c10f057f13950a447166508b1b3642229fb84695f2af169b4bcb9e",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts"
         ],
         "replaceable": true
       },
@@ -61432,7 +61442,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:7ac4247e0706e6a1f4d6561b8abb0420a056b52aadc7330686d34a310bc4ef4d"
+    "treeDigest": "sha256:4cfdfbc6e1ed191534841ffbfb19a90cc63a6ffa285d31824e4b23d87e9b20a6"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -61777,6 +61787,7 @@
       "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
       "packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
       "packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
+      "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
       "packages/cli/src/commands/git-governance/protected-governance-state.ts",
       "packages/cli/src/commands/git-governance/record-commit-payload-assertion.ts",
       "packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
@@ -62979,7 +62990,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:474a70fb3a7cfdd77f8cf03d099c25866d52d834d76f8cbca7a230cec83390ab"
+    "digest": "sha256:e78362004bb307bfcd90a146429e9d4fb2626886e7b2a6713edb627577b5f2d2"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -65725,6 +65736,7 @@
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-scope-staging.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/protected-governance-state.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/record-commit-payload-assertion.ts",
       "release/atm-root-drop/packages/cli/src/commands/git-governance/record-only-block-lifecycle-bridge.ts",
@@ -69130,22 +69142,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:3aac99943d2eb4bd96fa3cf6d9fc74f0edcecc6a47d722c03510a26dbb6c4710",
-  "sealedSourceCommit": "f87ac0337a9cb58dd302fb1e6069d8baee85b390",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:9cf8925a7b8d38aecc79f46eb3c4fd1f348deb4573cd5fbf932c8ca831c94d5f",
-  "tsBuildCacheDigest": "sha256:7970a596293f0aa9f7170147ac70919baa3cb94cda9b549917f05e1909f9a4e5",
+  "buildInputsTreeHash": "sha256:31622d1c704434e54273f9b248c9e42b4f40f0c68a68e11cedce1e4c2321cc63",
+  "sealedSourceCommit": "79bc2516072a1bf6e5dc0ff11f8f718c7cf3d7b0",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:27b444533847897a010ed99c328f21765e3663b622af0164451e159d92bf602e",
+  "tsBuildCacheDigest": "sha256:2e0bcec5d3ad63694f415de8a2a61deb01d07cf8302c42dc8b48dddec6d9c39a",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 55,
+    "inputHashCalculation": 45,
     "skipDecision": 57,
-    "worktreeSetup": 9226,
-    "typescriptBuild": 15523,
-    "rootDropReleaseAssembly": 35995,
-    "onefileReleaseAssembly": 9062,
-    "artifactSync": 6641,
+    "worktreeSetup": 9436,
+    "typescriptBuild": 11371,
+    "rootDropReleaseAssembly": 29594,
+    "onefileReleaseAssembly": 9890,
+    "artifactSync": 6944,
     "cleanup": 0,
-    "totalElapsed": 87305
+    "totalElapsed": 81174
   }
 }

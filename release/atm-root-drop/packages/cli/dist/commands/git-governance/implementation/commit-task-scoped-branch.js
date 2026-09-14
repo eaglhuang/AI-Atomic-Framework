@@ -25,6 +25,7 @@ export function routeTaskScopedCommitBranch(input) {
         taskDocument,
         apply: !options.dryRun && (options.autoStage || options.deferForeignStaged),
         autoStage: options.autoStage,
+        wip: options.wip,
         deferForeignStaged: options.deferForeignStaged,
         stageOverrideLease: options.stageOverrideLease,
         brokerConflictResolutionPath: options.brokerConflictResolutionPath,

@@ -45,7 +45,8 @@
     "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
     "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
     "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
-    "packages/cli/dist/**"
+    "packages/cli/dist/**",
+    "release/atm-onefile/release-manifest.json"
   ],
   "validators": [
     "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
@@ -264,8 +265,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T00-23-07-069Z-scope-amendment-50ecb2ee3f3b",
-  "lastTransitionAt": "2026-09-14T00:23:07.069Z",
+  "lastTransitionId": "2026-09-14T00-26-14-324Z-scope-amendment-ea6b295c30f2",
+  "lastTransitionAt": "2026-09-14T00:26:14.324Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-09-13T23:01:51.359Z",
   "promotedAt": "2026-09-13T23:01:51.366Z",
@@ -291,6 +292,7 @@
       "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
       "packages/cli/src/commands/tasks/release-wip-transaction.ts",
       "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop",
       "scripts/AtmCore/runner-build-scope.json",
       "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
@@ -311,26 +313,27 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-c9d892b54a35bb3b",
-    "ticketDigest": "sha256:c9d892b54a35bb3beafb0b0a1794764ee92e2668dc86a7a0289080a4c2eb53bf",
+    "ticketId": "wat-b1962cdf08081fe5",
+    "ticketDigest": "sha256:b1962cdf08081fe512ec4be008109af8ca62a161b045c83f639e893123528f38",
     "taskId": "ATM-GOV-0420",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260913234134-codex-captain-8a045151c1",
     "claimGeneration": "lease-17cab18e59da",
-    "issuedAt": "2026-09-14T00:23:06.946Z",
-    "expiresAt": "2026-09-14T00:53:06.946Z",
-    "scopeDigest": "sha256:f4e13d0f3731d8313e1e422571bb834b71b86af69ad39d1f750cbcab251d772e",
+    "issuedAt": "2026-09-14T00:26:14.146Z",
+    "expiresAt": "2026-09-14T00:56:14.146Z",
+    "scopeDigest": "sha256:dad7f57bf48bf08b97b644b769cf6419a2ffbae2e199e849714110f032eed819",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-14T00:23:06.946Z"
+      "selectedAt": "2026-09-14T00:26:14.146Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/ATM-GOV-0420.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/ATM-GOV-0420/**",
           ".atm/history/tasks/ATM-GOV-0420.json",
           "packages/cli/dist/**",
@@ -345,6 +348,7 @@
           "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
           "packages/cli/src/commands/tasks/release-wip-transaction.ts",
           "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
           "release/atm-root-drop",
           "scripts/AtmCore/runner-build-scope.json",
           "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
@@ -352,7 +356,7 @@
           "tests/cli/closure-delivery-file-coverage.test.ts",
           "tests/cli/frozen-runner-validation-foreign-state.test.ts"
         ],
-        "digest": "sha256:69b2b45b41e16a5aa30c0fdefa518ed5f383db0beac12657b9978c9e87c446dd"
+        "digest": "sha256:feb467965e28f3c6930676aeb81d4b40da46ea8835f83fa9a63d85a37b5ac0ff"
       },
       {
         "kind": "lifecycle-operation",
@@ -439,6 +443,7 @@
       "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
       "packages/cli/src/commands/tasks/release-wip-transaction.ts",
       "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop",
       "scripts/AtmCore/runner-build-scope.json",
       "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
