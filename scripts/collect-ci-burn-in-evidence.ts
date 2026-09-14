@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 
-import type { CiFailureLifecycle, CiRun } from './measure-product-ci-burn-in.ts';
+import type { CiAttemptRecord, CiFailureLifecycle, CiJobProvenance, CiRun } from './measure-product-ci-burn-in.ts';
 
 export type CiAttempt = {
   runId: number;
@@ -14,7 +14,7 @@ export type CiAttempt = {
   createdAt: string;
   attemptStartedAt: string;
   attemptCompletedAt: string;
-  productCi?: { conclusion: string };
+  productCi?: { conclusion: string; job?: CiJobProvenance };
   displayTitle?: string;
   workflowName?: string;
   failureClass?: string | null;
@@ -121,6 +121,28 @@ function validateAttempt(raw: unknown, index: number): CiAttempt {
   return attempt as CiAttempt;
 }
 
+function validateProductJob(job: unknown, runId: number, runAttempt: number): CiJobProvenance {
+  if (!job || typeof job !== 'object') throw new Error(`attempt-${runId}-attempt-${runAttempt}-missing-productJob`);
+  const candidate = job as Partial<CiJobProvenance>;
+  if (!Number.isSafeInteger(candidate.jobId) || candidate.jobId! <= 0) throw new Error(`attempt-${runId}-attempt-${runAttempt}-invalid-jobId`);
+  if (typeof candidate.jobName !== 'string' || candidate.jobName.trim().length === 0) throw new Error(`attempt-${runId}-attempt-${runAttempt}-invalid-jobName`);
+  if (typeof candidate.jobUrl !== 'string' || !/^https?:\/\//i.test(candidate.jobUrl)) throw new Error(`attempt-${runId}-attempt-${runAttempt}-invalid-jobUrl`);
+  return candidate as CiJobProvenance;
+}
+
+function attemptRecord(attempt: CiAttempt): CiAttemptRecord {
+  if (!attempt.productCi) throw new Error(`attempt-${attempt.runId}-attempt-${attempt.runAttempt}-missing-productCi`);
+  return {
+    runAttempt: attempt.runAttempt,
+    attemptStartedAt: attempt.attemptStartedAt,
+    attemptCompletedAt: attempt.attemptCompletedAt,
+    workflowConclusion: attempt.conclusion,
+    productJobConclusion: attempt.productCi.conclusion,
+    failureClass: attempt.failureClass ?? null,
+    productJob: validateProductJob(attempt.productCi.job, attempt.runId, attempt.runAttempt),
+  };
+}
+
 function lifecycleFor(attempts: CiAttempt[], conclusionFor: (attempt: CiAttempt) => string): CiFailureLifecycle {
   const failed = attempts.filter((attempt) => conclusionFor(attempt) !== 'success');
   const firstFailure = failed[0];
@@ -172,7 +194,7 @@ export function collectLifecycleEvidence(input: unknown, rawPolicy?: unknown): L
     const latest = group[group.length - 1];
     const scope = scopeAttempt(latest, policy);
     const conclusionFor = (attempt: CiAttempt) => attempt.productCi?.conclusion ?? attempt.conclusion;
-    const run: CiRun = {
+  const run: CiRun = {
       databaseId: latest.runId,
       status: 'completed',
       conclusion: scope.eligible ? conclusionFor(latest) : latest.conclusion,
@@ -184,6 +206,8 @@ export function collectLifecycleEvidence(input: unknown, rawPolicy?: unknown): L
       workflowName: latest.workflowName,
       workflowConclusion: latest.conclusion,
       productJobConclusion: latest.productCi?.conclusion ?? null,
+      productJob: scope.eligible ? validateProductJob(latest.productCi?.job, latest.runId, latest.runAttempt) : null,
+      attempts: scope.eligible ? group.map(attemptRecord) : undefined,
       eligible: scope.eligible,
       exclusionReason: scope.exclusionReason,
       lifecycle: lifecycleFor(group, scope.eligible ? conclusionFor : (attempt) => attempt.conclusion),

@@ -1,0 +1,360 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0094",
+  "title": "Require job-level provenance in CI lifecycle evidence before burn-in replay",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "**ACC-1:** Each in-scope attempt requires immutable Product CI job identity (`jobId`, `jobName`, and `jobUrl`) in addition to its conclusion; the canonical receipt preserves that source for the grouped logical run.",
+    "**ACC-2:** Grouping retries retains the latest job source, every attempt identity, first-failure timing, retry count, and repair timing without deriving missing values from unrelated timestamps.",
+    "**ACC-3:** Failure classes remain explicit and source-attributable; the implementation does not map provider `missing`, wrapper failures, or absent job data to success or zero-cost values.",
+    "**ACC-4:** Missing or malformed job provenance fails closed in both collector and evaluator-facing replay tests; the negative fixture must return `invalid-input` or a collector error.",
+    "**ACC-5:** The existing TASK-PRF-0059 raw export, lifecycle receipt, and `unexplained-failure` report remain byte-for-byte unchanged; only an append-only report note may reference this follow-up.",
+    "**ACC-6:** Focused collector/evaluator tests, typecheck, and encoding guard pass. No workflow, threshold, npm, benchmark-arm, task-history, or external raw-evidence mutation is allowed."
+  ],
+  "deliverables": [
+    "scripts/collect-ci-burn-in-evidence.ts",
+    "scripts/measure-product-ci-burn-in.ts",
+    "tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "docs/reports/atm-product-ci-lifecycle-evidence.md"
+  ],
+  "scopePaths": [
+    "scripts/collect-ci-burn-in-evidence.ts",
+    "scripts/measure-product-ci-burn-in.ts",
+    "tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "docs/reports/atm-product-ci-lifecycle-evidence.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+    "npm run typecheck",
+    "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit-preserve-negative-receipt",
+  "rollbackNotes": "Revert only collector/evaluator/tests/report changes; retain TASK-PRF-0059 raw export and blocked report unchanged.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.product-ci-burn-in-evidence-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0094-repair-ci-lifecycle-replay-contract-and-failure-classification.task.md",
+    "sectionTitle": "TASK-PRF-0094",
+    "headingLine": 116,
+    "hash": "7d6778f9e76fb466",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0094-repair-ci-lifecycle-replay-contract-and-failure-classification.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:7d6778f9e76fb46616c79052b757861b41588cbeee3cf7c941e14770dfae7e69",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T14:11:43.723Z"
+    }
+  },
+  "importedAt": "2026-09-14T14:11:43.723Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-PRF-0059 remains blocked and is not reopened or relabeled.",
+      "TASK-PRF-0063's wrapper replay fix remains the current canonical contract; this card does not recreate that defect.",
+      "Existing 0059 raw export and negative burn-in result remain immutable external evidence."
+    ],
+    "softRelations": [
+      "TASK-PRF-0059",
+      "TASK-PRF-0063",
+      "TASK-PRF-0058"
+    ],
+    "changedPublicSeams": [
+      "ci-lifecycle-job-provenance"
+    ],
+    "causalImpactEdges": [
+      "product-ci-attempt-to-attributable-job-source",
+      "incomplete-export-to-fail-closed-replay"
+    ],
+    "parallelFrontierInputs": [
+      "github-job-metadata",
+      "failure-classification-contract",
+      "lifecycle-replay-tests"
+    ],
+    "validatorReferences": [
+      "test_prf0094_requires_job_provenance_41a7c9d2",
+      "test_prf0094_preserves_failure_class_and_source_5b2e8f10",
+      "test_prf0094_missing_job_provenance_fails_closed_6c3d9a21"
+    ],
+    "phaseOwner": "phase-4-ci-reliability-proof"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf0094_requires_job_provenance_41a7c9d2",
+      "targetGroupId": null,
+      "semanticKey": "attempt_requires_attributable_product_ci_job",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "product-ci-attempt-to-attributable-job-source"
+      ],
+      "expectedRedPredicate": "An attempt with only a conclusion and no immutable Product CI job identity is accepted into the canonical receipt.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": "github-job-metadata-to-canonical-receipt",
+      "contractEdge": "ci-lifecycle-job-provenance",
+      "resourceKey": "ci-lifecycle-collector"
+    },
+    {
+      "caseId": "test_prf0094_preserves_failure_class_and_source_5b2e8f10",
+      "targetGroupId": null,
+      "semanticKey": "failure_class_and_job_source_survive_grouping",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "product-ci-attempt-to-attributable-job-source"
+      ],
+      "expectedRedPredicate": "Grouping multiple attempts drops the failing job source, retry identity, or explicit failure class.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": "attempt-grouping-to-lifecycle-provenance",
+      "contractEdge": "ci-lifecycle-job-provenance",
+      "resourceKey": "lifecycle-receipt"
+    },
+    {
+      "caseId": "test_prf0094_missing_job_provenance_fails_closed_6c3d9a21",
+      "targetGroupId": null,
+      "semanticKey": "missing_job_provenance_negative_control",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "incomplete-export-to-fail-closed-replay"
+      ],
+      "expectedRedPredicate": "A replay with missing job id, name, or URL is treated as a valid lifecycle record instead of invalid-input.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": "incomplete-export-to-validator-refusal",
+      "contractEdge": "fail-closed-ci-lifecycle-input",
+      "resourceKey": "negative-fixture"
+    },
+    {
+      "caseId": "test_prf0094_legacy_receipt_not_reclassified_7d4e0b32",
+      "targetGroupId": null,
+      "semanticKey": "prior_0059_result_remains_negative",
+      "coversAcceptance": [
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "incomplete-export-to-fail-closed-replay"
+      ],
+      "expectedRedPredicate": "The implementation rewrites, upgrades, or relabels the existing TASK-PRF-0059 unexplained-failure receipt.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": "historical-receipt-to-append-only-report",
+      "contractEdge": "evidence-provenance-boundary",
+      "resourceKey": "prior-negative-receipt"
+    },
+    {
+      "caseId": "test_prf0094_scope_and_validation_contract_8e5f1c43",
+      "targetGroupId": null,
+      "semanticKey": "scope_and_required_validators_remain_explicit",
+      "coversAcceptance": [
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "incomplete-export-to-fail-closed-replay"
+      ],
+      "expectedRedPredicate": "The card or implementation changes workflow policy, thresholds, npm behavior, benchmark arms, or omits a required focused validator.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": "scoped-contract-to-validation-suite",
+      "contractEdge": "scope-preservation",
+      "resourceKey": "scope-review"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf0094_requires_job_provenance_41a7c9d2",
+    "test_prf0094_preserves_failure_class_and_source_5b2e8f10",
+    "test_prf0094_missing_job_provenance_fails_closed_6c3d9a21",
+    "test_prf0094_legacy_receipt_not_reclassified_7d4e0b32",
+    "test_prf0094_scope_and_validation_contract_8e5f1c43"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T14-13-01-544Z-claim-b4842b65c07c",
+  "lastTransitionAt": "2026-09-14T14:13:01.544Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-product-proof",
+  "reservedAt": "2026-09-14T14:12:55.399Z",
+  "promotedAt": "2026-09-14T14:12:55.402Z",
+  "claim": {
+    "actorId": "codex-product-proof",
+    "leaseId": "lease-4a5d081ef05d",
+    "claimedAt": "2026-09-14T14:12:55.406Z",
+    "heartbeatAt": "2026-09-14T14:12:55.406Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0094.json",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914141255-codex-product-proof-d3fce53618",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914141255-codex-product-proof-d3fce53618\""
+    }
+  },
+  "startedAt": "2026-09-14T14:12:55.406Z",
+  "startedByActor": "codex-product-proof",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-a20c998a0aa3646e",
+    "ticketDigest": "sha256:a20c998a0aa3646e63a6c3ad8d7adbeca6ce7d13ac6cc3d95367babf9e2606d2",
+    "taskId": "TASK-PRF-0094",
+    "origin": "claim",
+    "actorId": "codex-product-proof",
+    "laneSessionId": "lane-20260914141255-codex-product-proof-d3fce53618",
+    "claimGeneration": "lease-4a5d081ef05d",
+    "issuedAt": "2026-09-14T14:12:55.406Z",
+    "expiresAt": "2026-09-14T14:42:55.406Z",
+    "scopeDigest": "sha256:6b924a29cf3ed01a524f2bb16c83b6ee4d9879e35fa80dd4d826481faf4b53c6",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T14:12:55.406Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0094.*",
+          ".atm/history/task-events/TASK-PRF-0094/**",
+          ".atm/history/tasks/TASK-PRF-0094.json",
+          "docs/reports/atm-product-ci-lifecycle-evidence.md",
+          "scripts/collect-ci-burn-in-evidence.ts",
+          "scripts/measure-product-ci-burn-in.ts",
+          "tests/cli/ci-burn-in-evidence-collector.test.ts"
+        ],
+        "digest": "sha256:ca6d32e2ba807f6c96d29706925421441db0cfc0d28cf976a607b71604d93e75"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914141255-codex-product-proof-TASK-PRF-0094-4756c8f787",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0094",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0094.*",
+      ".atm/history/task-events/TASK-PRF-0094/**",
+      ".atm/history/tasks/TASK-PRF-0094.json",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "57fbb0d95e3e63fe5909e3746fd4248adb66e873407d5946e68d0c64e4065f0a",
+    "actorId": "codex-product-proof",
+    "sessionId": "session-20260914141255-codex-product-proof-TASK-PRF-0094-4756c8f787",
+    "laneSession": {
+      "laneSessionId": "lane-20260914141255-codex-product-proof-d3fce53618",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914141255-codex-product-proof-d3fce53618\""
+    },
+    "createdAt": "2026-09-14T14:13:01.543Z",
+    "status": "active"
+  }
+}

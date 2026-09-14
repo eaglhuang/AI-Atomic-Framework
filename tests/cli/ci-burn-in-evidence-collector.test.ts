@@ -4,14 +4,15 @@ import { collectLifecycleEvidence, canonicalDigest, validateScopePolicy } from '
 import { evaluateBurnIn } from '../../scripts/measure-product-ci-burn-in.ts';
 
 const fixture = JSON.parse(await readFile(new URL('../fixtures/product-ci-burn-in/lifecycle-attempts.json', import.meta.url), 'utf8'));
+const job = (jobId: number, jobName = 'Product CI') => ({ jobId, jobName, jobUrl: `https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/${jobId}/job/${jobId}` });
 const attemptExport: any = {
   schemaId: 'atm.githubCiAttemptExport.v1',
   repository: 'AI-Atomic-Framework',
   protectedBranch: 'main',
   attempts: [
-    { runId: 5803, runAttempt: 1, status: 'completed', conclusion: 'failure', headSha: fixture[0].headSha, headBranch: 'main', event: 'push', createdAt: fixture[0].createdAt, attemptStartedAt: '2026-09-14T09:00:00Z', attemptCompletedAt: fixture[0].lifecycle.firstFailureAt, productCi: { conclusion: 'failure' }, workflowName: 'Product CI burn-in (standard)', displayTitle: 'Product CI burn-in (standard)', failureClass: 'test-failure' },
-    { runId: 5803, runAttempt: 2, status: 'completed', conclusion: 'failure', headSha: fixture[0].headSha, headBranch: 'main', event: 'push', createdAt: fixture[0].createdAt, attemptStartedAt: '2026-09-14T09:08:00Z', attemptCompletedAt: fixture[0].lifecycle.repairAcceptedAt, productCi: { conclusion: 'success' }, workflowName: 'Product CI burn-in (standard)', displayTitle: 'Product CI burn-in (standard)' },
-    { runId: 5802, runAttempt: 1, status: 'completed', conclusion: 'failure', headSha: fixture[1].headSha, headBranch: 'main', event: 'schedule', createdAt: fixture[1].createdAt, attemptStartedAt: '2026-09-13T09:00:00Z', attemptCompletedAt: fixture[1].lifecycle.lastAttemptAt, productCi: { conclusion: 'failure' }, workflowName: 'Product CI burn-in (standard)', displayTitle: 'Product CI burn-in (standard)', failureClass: 'dependency-install' },
+    { runId: 5803, runAttempt: 1, status: 'completed', conclusion: 'failure', headSha: fixture[0].headSha, headBranch: 'main', event: 'push', createdAt: fixture[0].createdAt, attemptStartedAt: '2026-09-14T09:00:00Z', attemptCompletedAt: fixture[0].lifecycle.firstFailureAt, productCi: { conclusion: 'failure', job: job(58031) }, workflowName: 'Product CI burn-in (standard)', displayTitle: 'Product CI burn-in (standard)', failureClass: 'test-failure' },
+    { runId: 5803, runAttempt: 2, status: 'completed', conclusion: 'failure', headSha: fixture[0].headSha, headBranch: 'main', event: 'push', createdAt: fixture[0].createdAt, attemptStartedAt: '2026-09-14T09:08:00Z', attemptCompletedAt: fixture[0].lifecycle.repairAcceptedAt, productCi: { conclusion: 'success', job: job(58032) }, workflowName: 'Product CI burn-in (standard)', displayTitle: 'Product CI burn-in (standard)' },
+    { runId: 5802, runAttempt: 1, status: 'completed', conclusion: 'failure', headSha: fixture[1].headSha, headBranch: 'main', event: 'schedule', createdAt: fixture[1].createdAt, attemptStartedAt: '2026-09-13T09:00:00Z', attemptCompletedAt: fixture[1].lifecycle.lastAttemptAt, productCi: { conclusion: 'failure', job: job(58021) }, workflowName: 'Product CI burn-in (standard)', displayTitle: 'Product CI burn-in (standard)', failureClass: 'dependency-install' },
   ],
 };
 const receipt = collectLifecycleEvidence(attemptExport);
@@ -21,6 +22,9 @@ assert.equal(receipt.runs[0].databaseId, 5803);
 assert.equal(receipt.runs[0].conclusion, 'success');
 assert.equal(receipt.runs[0].workflowConclusion, 'failure');
 assert.equal(receipt.runs[0].productJobConclusion, 'success');
+assert.deepEqual(receipt.runs[0].productJob, job(58032));
+assert.equal(receipt.runs[0].attempts?.length, 2);
+assert.deepEqual(receipt.runs[0].attempts?.map((attempt) => attempt.productJob.jobId), [58031, 58032]);
 assert.match(receipt.scopePolicyDigest, /^sha256:[0-9a-f]{64}$/);
 assert.deepEqual(receipt.runs[0].lifecycle, {
   firstFailureAt: '2026-09-14T09:04:00Z',
@@ -42,6 +46,15 @@ assert.equal(fixtureReplay.claimStatus, 'unexplained-failure');
 const missingFailureClass = structuredClone(attemptExport);
 missingFailureClass.attempts[0].failureClass = null;
 assert.throws(() => collectLifecycleEvidence(missingFailureClass), /missing-failureClass/);
+
+const missingJobProvenance = structuredClone(attemptExport);
+missingJobProvenance.attempts[0]!.productCi = { conclusion: 'failure' };
+assert.throws(() => collectLifecycleEvidence(missingJobProvenance), /missing-productJob/);
+
+const tamperedJobReceipt = structuredClone(receipt);
+tamperedJobReceipt.runs[0]!.attempts![0]!.productJob.jobUrl = '';
+tamperedJobReceipt.receiptDigest = canonicalDigest(tamperedJobReceipt.runs);
+assert.equal(evaluateBurnIn(tamperedJobReceipt, { minCompletedRuns: 1, minCalendarDays: 0 }).claimStatus, 'invalid-input');
 
 const missingExclusionReason = structuredClone(attemptExport);
 missingExclusionReason.attempts.push({ ...missingExclusionReason.attempts[0], runId: 5804, runAttempt: 1, eligible: false, exclusionReason: null });
