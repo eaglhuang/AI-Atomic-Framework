@@ -58,6 +58,25 @@ receipts can establish a product-performance change. The build-admission
 failure is retained as a failure sample and does not enter a candidate PASS
 denominator.
 
+## Standard validation hotspot inventory
+
+The latest local standard-profile telemetry is a stronger prioritization signal
+than a command-count comparison: the profile took **935,419 ms** in total. Its
+largest validators were `validate-bootstrap` (**146,542 ms**),
+`validate-skew-matrix` (**126,909 ms**), `validate-multi-agent-confidence`
+(**80,337 ms**), `validate-script-parity` (**68,598 ms**), and
+`validate-examples` (**66,990 ms**). The slowest two together account for
+273,451 ms, so they are the first diagnostic targets before adding more
+governance checks.
+
+The current evidence does not yet prove that any one validator can be removed:
+`validate-bootstrap` builds and exercises a pinned onefile runner, while
+`validate-skew-matrix` protects release compatibility. The next optimization
+experiment must therefore measure setup/build versus assertions, then try one
+reusable input or fixture boundary at a time. A candidate is acceptable only if
+the semantic matrix stays unchanged and the paired profile p50 falls without a
+more-than-10% p95 regression.
+
 ## Existing CLI integration
 
 The existing telemetry report path projects the same runtime gate events into
