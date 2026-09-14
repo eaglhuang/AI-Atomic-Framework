@@ -21,9 +21,11 @@ export function buildOnefileRelease(options: any = {}) {
   const outputFilePath = path.join(outputRoot, 'atm.mjs');
 
   ensureBuiltCliDist(repositoryRoot);
-  if (!existsSync(rootDropRoot)) {
-    buildRootDropRelease({ repositoryRoot, releaseRoot: rootDropRoot });
-  }
+  // The root-drop tree contains generated package dist files.  It may already
+  // exist from an older build, so presence alone is not a freshness proof:
+  // reusing it can omit newly generated leaf modules from the onefile payload.
+  // Reconcile the source snapshot before collecting payload files.
+  buildRootDropRelease({ repositoryRoot, releaseRoot: rootDropRoot });
   assertPayloadLauncherIsNotNested(path.join(rootDropRoot, 'atm.mjs'));
 
   const payloadFiles = collectPayloadFiles(rootDropRoot);

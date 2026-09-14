@@ -742,6 +742,7 @@
     "release/atm-root-drop/docs/reports/atm-2-1-real-parallel-dogfood.md",
     "release/atm-root-drop/docs/reports/atm-atom-generator-reliability.md",
     "release/atm-root-drop/docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+    "release/atm-root-drop/docs/reports/atm-command-convergence.md",
     "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
     "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
     "release/atm-root-drop/docs/reports/atm-isolated-pilot.json",
@@ -5648,6 +5649,7 @@
     "release/atm-root-drop/tests/cli/protected-ledger-destructive-guard.test.ts",
     "release/atm-root-drop/tests/cli/protected-override-audit-direction-lock.test.ts",
     "release/atm-root-drop/tests/cli/protected-override-audit-staging.test.ts",
+    "release/atm-root-drop/tests/cli/public-command-registry.test.ts",
     "release/atm-root-drop/tests/cli/public-npm-install-contract.test.ts",
     "release/atm-root-drop/tests/cli/real-build-projection-runner-sync-executor.test.ts",
     "release/atm-root-drop/tests/cli/real-paired-ab-analyzer-v3.test.ts",
@@ -6189,8 +6191,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1512,
-    "unchanged": 4642,
+    "copied": 1508,
+    "unchanged": 4648,
     "removed": 0
   },
   "buildMode": "full",
@@ -12591,6 +12593,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-ci-burn-in-baseline-2026-09-12.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/atm-command-convergence.md",
+        "digest": "3a3edcb1b5d64187886f10cd9c28d9e04c9bf83ba6570c4e98583850b7927cf4",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-command-convergence.md"
         ],
         "replaceable": true
       },
@@ -21578,7 +21589,7 @@
       },
       {
         "path": "packages/cli/dist/atm-public.js",
-        "digest": "1ae9d8989a40c270ffee04f9d75446ff4eee75290236042041d702dd7c537eea",
+        "digest": "f42f365edf24e65fa012cf3dcd585a1eb5e8b46716160b20cc3cf64589751908",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/atm-public.js"
@@ -23981,7 +23992,7 @@
       },
       {
         "path": "packages/cli/dist/commands/guide.js",
-        "digest": "831f242d0938cc8eca9b47004e4179bf42cf384793a4e5b26e59ab419db823cc",
+        "digest": "f2e9668d1b6a143ba983aa2557739e220caa070a31805e5e34a7b0c797b05348",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/guide.js"
@@ -27905,7 +27916,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "c037a24146b86aa5560adf3b736464a2f6a28ba3cb690275a059805debe1b8f6",
+        "digest": "6e5cbe332580de4a37044e8dedf4819997fb0e542eee93f1cd5cbd51dbbc57f1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -27914,7 +27925,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "fe61b7da52dd9749129ed2e11cc4344e23d284f4c14f92fb6223a99cb529c492",
+        "digest": "96b341d8a4a704fe88e9c5e773bc4b836429fc5125dfd9ff0d861b8479f2a211",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -28202,7 +28213,7 @@
       },
       {
         "path": "packages/cli/src/atm-public.ts",
-        "digest": "9dd585c0668180b5bd6abf527418cf2e2a03fe1c62429104779917b8ebb243f1",
+        "digest": "ffc185b67a322cd112809bb6d7dc8bfacb546bffa34de13aa580751b6c8dc9a2",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/atm-public.ts"
@@ -31073,7 +31084,7 @@
       },
       {
         "path": "packages/cli/src/commands/guide.ts",
-        "digest": "167bea2ed9aaaf25b8be37c79edae73f697540e27b76fe8ca78e34da961acf86",
+        "digest": "97f0e85b69f1407d148697c0fd631ae7f402279f8cf4c122c1969481d3050d63",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/guide.ts"
@@ -55427,7 +55438,7 @@
       },
       {
         "path": "tests/cli/npm-clean-install.test.ts",
-        "digest": "aa992ee4b1e771f65ce21f1356744191cc087abf602d18119507a985395245e5",
+        "digest": "fb33e2942eb2581466bc068bd3c8c201ba248d3749f4f6a3679386bd9be7c8bc",
         "origin": "source",
         "inputPaths": [
           "tests/cli/npm-clean-install.test.ts"
@@ -56736,6 +56747,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/protected-override-audit-staging.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/public-command-registry.test.ts",
+        "digest": "05256fc8d0e116ed73630e95328c84f57060551c2078731a109ad7c6187cc0e0",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/public-command-registry.test.ts"
         ],
         "replaceable": true
       },
@@ -61582,7 +61602,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:f3bc2377910daf031bc97a29b5f825ace31fef544f611452156c02f83af64596"
+    "treeDigest": "sha256:da94621708f4f480398d759e78d989236d726e389ded5dce5c16c28accb0370e"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -63131,7 +63151,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:82c96568e50e224f9becf946fb2b56ed402fe82fbd38a2ab889bfc3dc9e7a439"
+    "digest": "sha256:4e18ce83d350a6f47509e118824bda32befe5cafbc51623d6792cc0bbb8d5b80"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63847,6 +63867,7 @@
       "release/atm-root-drop/docs/reports/atm-2-1-real-parallel-dogfood.md",
       "release/atm-root-drop/docs/reports/atm-atom-generator-reliability.md",
       "release/atm-root-drop/docs/reports/atm-ci-burn-in-baseline-2026-09-12.md",
+      "release/atm-root-drop/docs/reports/atm-command-convergence.md",
       "release/atm-root-drop/docs/reports/atm-external-benchmark-decision.md",
       "release/atm-root-drop/docs/reports/atm-governance-fix-wave.md",
       "release/atm-root-drop/docs/reports/atm-isolated-pilot.json",
@@ -68753,6 +68774,7 @@
       "release/atm-root-drop/tests/cli/protected-ledger-destructive-guard.test.ts",
       "release/atm-root-drop/tests/cli/protected-override-audit-direction-lock.test.ts",
       "release/atm-root-drop/tests/cli/protected-override-audit-staging.test.ts",
+      "release/atm-root-drop/tests/cli/public-command-registry.test.ts",
       "release/atm-root-drop/tests/cli/public-npm-install-contract.test.ts",
       "release/atm-root-drop/tests/cli/real-build-projection-runner-sync-executor.test.ts",
       "release/atm-root-drop/tests/cli/real-paired-ab-analyzer-v3.test.ts",
@@ -69296,23 +69318,5 @@
     "requiresExplicitStaging": true,
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
-  },
-  "buildInputsTreeHash": "sha256:0212e781c637e08ccaa5621079147556d9036d2919b6c941c3f57cc71cffa750",
-  "sealedSourceCommit": "14126f7a08ad05ab27a333f03eac6323663be56f",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:a66d7fead8d0deaed52acdf527a11f9b03ae164f25e446249afb72f125364d15",
-  "tsBuildCacheDigest": "sha256:a64bc6bca1df0c8848405a6cf2063fe4aa8d590f4b0d01507f2b35d36aa2f689",
-  "rawTelemetryPolicy": "gitignored-runtime-only",
-  "phaseTimingsMs": {
-    "inputHashCalculation": 45,
-    "skipDecision": 59,
-    "worktreeSetup": 9625,
-    "typescriptBuild": 11732,
-    "rootDropReleaseAssembly": 28695,
-    "onefileReleaseAssembly": 9494,
-    "artifactSync": 6572,
-    "cleanup": 0,
-    "totalElapsed": 103732
   }
 }
