@@ -1,0 +1,400 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0060",
+  "title": "Restore complete npm runtime boundary without fake slimming",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0052"
+  ],
+  "acceptance": [
+    "**ACC-1 — Reachable closure:** the runtime manifest enumerates the command entrypoint and every required ATMChart schema/template asset; a clean installed candidate contains each path and no runtime path depends on the workspace or an extra download.",
+    "**ACC-2 — Complete workflow:** a clean candidate install passes `version`, `doctor`, `bootstrap`, `atm-chart render`, and `atm-chart verify`, with per-command exit codes, module-resolution state, and output digests.",
+    "**ACC-3 — Public failure remains visible:** the existing public `0.1.0` receipt remains labelled blocked/incomplete and is never overwritten by candidate evidence or a local workspace result.",
+    "**ACC-4 — Baseline comparison:** candidate and fixed published baseline are installed from tarballs in separate clean consumers; packed bytes, unpacked bytes, entry count, dependency footprint, startup measurements, source/version, and tarball digests are recorded.",
+    "**ACC-5 — No fake slimming:** the candidate may claim bundle reduction only if all required workflow checks pass and the fixed byte/entry budget and declared reduction thresholds pass; missing assets, workspace links, or runtime downloads are failures.",
+    "**ACC-6 — Stop rule and rollback:** if complete behavior cannot coexist with the reduction threshold, stop with an explicit inconclusive/failed measurement and preserve the receipt; do not enable code-splitting, publish, push, or weaken the validator solely to obtain a green number.",
+    "**ACC-7 — Scope:** no npm token/2FA policy, public publish, GitHub push, external benchmark arm, or historical task record is changed."
+  ],
+  "deliverables": [
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/build-package-dist.ts",
+    "packages/cli/package.json",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "docs/reports/atm-public-npm-install-proof.md",
+    "docs/reports/atm-public-npm-install-proof-task-prf-0060.md"
+  ],
+  "scopePaths": [
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/build-package-dist.ts",
+    "packages/cli/package.json",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "docs/reports/atm-public-npm-install-proof.md",
+    "docs/reports/atm-public-npm-install-proof-task-prf-0060.md"
+  ],
+  "validators": [
+    "npm run build --workspace packages/cli",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+    "npm run validate:candidate-npm-install -- --candidate-dir packages/cli --measurement-runs 3 --record-blocked",
+    "npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-clean-candidate-install-and-fixed-baseline-measurement",
+  "rollbackStrategy": "revert-commit-preserve-failed-public-receipt",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.public-runtime-closure",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/atm-public-npm-install-proof-task-prf-0060.md"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.public-runtime-asset-closure",
+        "pattern": "Policy Object",
+        "source": "scripts/build-package-dist.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.public-runtime-measurement-contract",
+        "pattern": "Policy Object",
+        "source": "tests/cli/public-npm-install-contract.test.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "packages/cli/package.json",
+        "tests/cli/public-npm-install-contract.test.ts",
+        "tests/cli/adopter-artifact-budget.test.ts",
+        "docs/reports/atm-public-npm-install-proof.md",
+        "docs/reports/atm-public-npm-install-proof-task-prf-0060.md",
+        "candidate npm tarball and digest-bearing measurement receipt outside Git"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0060-restore-complete-npm-runtime-boundary-without-fake-slimming.task.md",
+    "sectionTitle": "TASK-PRF-0060",
+    "headingLine": 112,
+    "hash": "4fe4080f29cbd892",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0060-restore-complete-npm-runtime-boundary-without-fake-slimming.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4fe4080f29cbd892b9c73e776cfbfca1155cdf859bc0790a657dab82faf8596d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T04:10:20.060Z"
+    }
+  },
+  "importedAt": "2026-09-14T04:10:20.060Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0052"
+    ],
+    "startConditions": [
+      "A clean public-registry install of @ai-atomic-framework/cli@0.1.0 fails atm-chart render and verify while a local candidate can pass the same workflow.",
+      "The deep-module review receipt recommends a single self-contained runtime and rejects code-splitting as a default slimming strategy."
+    ],
+    "softRelations": [
+      "TASK-PRF-0053",
+      "TASK-PRF-0054"
+    ],
+    "changedPublicSeams": [
+      "cli_npm_runtime_closure",
+      "public_npm_install_proof"
+    ],
+    "causalImpactEdges": [
+      "complete_public_install",
+      "measured_adopter_bundle_size"
+    ],
+    "parallelFrontierInputs": [
+      "candidate_runtime_build",
+      "required_schema_assets",
+      "baseline_tarball_receipt"
+    ],
+    "validatorReferences": [
+      "public-npm-install-contract",
+      "candidate-npm-install",
+      "adopter-artifact-budget"
+    ],
+    "phaseOwner": "release"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf0060_runtime_asset_closure_6d8f2b19",
+      "targetGroupId": "null",
+      "semanticKey": "npm_runtime_required_asset_closure",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "complete_public_install",
+        "measured_adopter_bundle_size"
+      ],
+      "expectedRedPredicate": "candidate or published tarball can pass shallow smoke while a required ATMChart schema is absent from the installed runtime",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "TASK-PRF-0052",
+      "contractEdge": "cli_npm_runtime_closure",
+      "resourceKey": "npm-runtime-manifest"
+    },
+    {
+      "caseId": "test_prf0060_clean_candidate_workflow_4a5e7c20",
+      "targetGroupId": "null",
+      "semanticKey": "clean_candidate_core_workflow",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "complete_public_install"
+      ],
+      "expectedRedPredicate": "clean candidate install does not complete version, doctor, bootstrap, atm-chart render, and atm-chart verify",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "TASK-PRF-0052",
+      "contractEdge": "public_npm_install_proof",
+      "resourceKey": "clean-consumer-core-workflow"
+    },
+    {
+      "caseId": "test_prf0060_measured_size_stop_rule_9c0d4e31",
+      "targetGroupId": "null",
+      "semanticKey": "bundle_measurement_stop_rule",
+      "coversAcceptance": [
+        "ACC-5",
+        "ACC-6",
+        "ACC-7"
+      ],
+      "coversImpactEdges": [
+        "measured_adopter_bundle_size"
+      ],
+      "expectedRedPredicate": "reported slimming omits required files, shifts cost to runtime downloads, or fails the fixed bytes/entries budget",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "measured_bundle_contract",
+      "resourceKey": "npm-artifact-budget"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf0060_runtime_asset_closure_6d8f2b19",
+    "test_prf0060_clean_candidate_workflow_4a5e7c20",
+    "test_prf0060_measured_size_stop_rule_9c0d4e31"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0052",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T04-22-05-432Z-close-f002637e8a82",
+  "lastTransitionAt": "2026-09-14T04:22:05.432Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T04:10:59.058Z",
+  "promotedAt": "2026-09-14T04:10:59.062Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-b21c4f3fb0ee",
+    "claimedAt": "2026-09-14T04:10:59.066Z",
+    "heartbeatAt": "2026-09-14T04:22:05.430Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0060.json",
+      "docs/reports/atm-public-npm-install-proof-task-prf-0060.md",
+      "docs/reports/atm-public-npm-install-proof.md",
+      "packages/cli/package.json",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260914041059-codex-gpt-5.4-mini-5f74d852b3",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914041059-codex-gpt-5.4-mini-5f74d852b3\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-09-14T04:10:59.066Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-82afa910fbf53998",
+    "ticketDigest": "sha256:82afa910fbf53998552a12fb910d3c8a0549ce6d1301a86e1cf6d4293ea9157b",
+    "taskId": "TASK-PRF-0060",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914041059-codex-gpt-5.4-mini-5f74d852b3",
+    "claimGeneration": "lease-b21c4f3fb0ee",
+    "issuedAt": "2026-09-14T04:10:59.066Z",
+    "expiresAt": "2026-09-14T04:40:59.066Z",
+    "scopeDigest": "sha256:9ebbff33c9a08824d36b4e4e1fd509f9cfe9076c7d4c099d862223c2971cc1f3",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T04:10:59.066Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0060.*",
+          ".atm/history/task-events/TASK-PRF-0060/**",
+          ".atm/history/tasks/TASK-PRF-0060.json",
+          "docs/reports/atm-public-npm-install-proof-task-prf-0060.md",
+          "docs/reports/atm-public-npm-install-proof.md",
+          "packages/cli/package.json",
+          "scripts/build-cli-npm-runtime.ts",
+          "scripts/build-package-dist.ts",
+          "tests/cli/adopter-artifact-budget.test.ts",
+          "tests/cli/public-npm-install-contract.test.ts"
+        ],
+        "digest": "sha256:af8b5d1bdd4d9df7a9981c45a1cfeac7df3f62d7f5762e20af820dabaddc2e71"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914041059-codex-gpt-5.4-mini-TASK-PRF-0060-267892f9bf",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0060",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0060.*",
+      ".atm/history/task-events/TASK-PRF-0060/**",
+      ".atm/history/tasks/TASK-PRF-0060.json",
+      "docs/reports/atm-public-npm-install-proof-task-prf-0060.md",
+      "docs/reports/atm-public-npm-install-proof.md",
+      "packages/cli/package.json",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a7385541db9b05a21b7625aa8cbd676fa0903de35c73d50155c29126198d029c",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914041059-codex-gpt-5.4-mini-TASK-PRF-0060-267892f9bf",
+    "laneSession": {
+      "laneSessionId": "lane-20260914041059-codex-gpt-5.4-mini-5f74d852b3",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914041059-codex-gpt-5.4-mini-5f74d852b3\""
+    },
+    "createdAt": "2026-09-14T04:11:04.820Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-14T04:22:05.430Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260914041059-codex-gpt-5.4-mini-TASK-PRF-0060-267892f9bf",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0060.closure-packet.json"
+}

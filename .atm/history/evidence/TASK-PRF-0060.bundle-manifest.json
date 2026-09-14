@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0060",
+  "updatedAt": "2026-09-14T04:16:08.453Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "build --workspace packages/cli",
+    "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "validate:candidate-npm-install -- --candidate-dir packages/cli --measurement-runs 3 --record-blocked",
+    "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run validate:candidate-npm-install -- --candidate-dir packages/cli --measurement-runs 3 --record-blocked",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f5ca926805a61a1fbeee7a9609775dbb2ad6e28fff1a6b5458c09845fda1b1a0",
+      "stderrSha256": "sha256:e3d081eebc5fb6c5e59865a84fd1e48482291c6d3b2724cf112a151fc9d87fdf",
+      "validators": [
+        "validate:candidate-npm-install -- --candidate-dir packages/cli --measurement-runs 3 --record-blocked"
+      ],
+      "generatedAt": "2026-09-14T04:13:39.535Z",
+      "startedAt": "2026-09-14T04:13:32.468Z",
+      "finishedAt": "2026-09-14T04:13:39.535Z",
+      "durationMs": 7067,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0954af241ed96e9dac2eb2539a15e95eed2e84b5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3cd67742294542997602b2b7541cae04cc80a43b5b64416c1ce30226b3093c91",
+      "stderrSha256": "sha256:093d7fa27ccdce025f36ca91549c806955fbe5e0bd76d809be31ab0ddd1412dd",
+      "validators": [
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-14T04:14:58.075Z",
+      "startedAt": "2026-09-14T04:14:36.503Z",
+      "finishedAt": "2026-09-14T04:14:58.075Z",
+      "durationMs": 21572,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0954af241ed96e9dac2eb2539a15e95eed2e84b5",
+      "cached": false
+    },
+    {
+      "command": "npm run build --workspace packages/cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcfbbe9542e334c1bf42c43b1835350467b5d05deda554a78680c668bcbc0cf8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "build --workspace packages/cli"
+      ],
+      "generatedAt": "2026-09-14T04:15:42.632Z",
+      "startedAt": "2026-09-14T04:15:34.993Z",
+      "finishedAt": "2026-09-14T04:15:42.632Z",
+      "durationMs": 7639,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0954af241ed96e9dac2eb2539a15e95eed2e84b5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:12ab0d5ec391f496f6248dbdb96e5a2602cf92cfeff2b8fa7cddc373c5ff670f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/adopter-artifact-budget.test.ts"
+      ],
+      "generatedAt": "2026-09-14T04:15:49.136Z",
+      "startedAt": "2026-09-14T04:15:48.833Z",
+      "finishedAt": "2026-09-14T04:15:49.136Z",
+      "durationMs": 303,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0954af241ed96e9dac2eb2539a15e95eed2e84b5",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a892e8f2114167191e9c9af8012e8706e250c6a4a3c3be3564c24a36e2498b24",
+      "stderrSha256": "sha256:adcecc1cfa63077b026e39dd11eb26298f0ca4bf452f7e52177f9bd0a1e88ac0",
+      "validators": [
+        "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1"
+      ],
+      "generatedAt": "2026-09-14T04:16:08.452Z",
+      "startedAt": "2026-09-14T04:15:56.944Z",
+      "finishedAt": "2026-09-14T04:16:08.452Z",
+      "durationMs": 11508,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "0954af241ed96e9dac2eb2539a15e95eed2e84b5",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

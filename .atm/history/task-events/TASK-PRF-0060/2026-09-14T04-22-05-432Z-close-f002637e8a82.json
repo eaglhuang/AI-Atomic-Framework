@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T04-22-05-432Z-close-f002637e8a82",
+  "taskId": "TASK-PRF-0060",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914041059-codex-gpt-5.4-mini-TASK-PRF-0060-267892f9bf",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0060.json",
+  "taskSha256": "sha256:d2e44dd87fb49e4f448273fda78069eea15b124eab9c0b206a6495d0fce33be7",
+  "createdAt": "2026-09-14T04:22:05.432Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0060 --actor codex-gpt-5.4-mini --status done --historical-delivery 2cc287d11d3c3379be9ef0df12e3863b8720be25",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914041059-codex-gpt-5.4-mini-TASK-PRF-0060-267892f9bf",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0060.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build --workspace packages/cli",
+      "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "validate:candidate-npm-install -- --candidate-dir packages/cli --measurement-runs 3 --record-blocked",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1"
+    ],
+    "requiredGates": [
+      "build --workspace packages/cli",
+      "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "validate:candidate-npm-install -- --candidate-dir packages/cli --measurement-runs 3 --record-blocked",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T04:22:05.423Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0060.*",
+        ".atm/history/task-events/TASK-PRF-0060/**",
+        ".atm/history/tasks/TASK-PRF-0060.json",
+        "docs/reports/atm-public-npm-install-proof-task-prf-0060.md",
+        "docs/reports/atm-public-npm-install-proof.md",
+        "packages/cli/package.json",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "tests/cli/adopter-artifact-budget.test.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/package.json",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "tests/cli/adopter-artifact-budget.test.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "requiredGates": [
+        "build --workspace packages/cli",
+        "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+        "validate:candidate-npm-install -- --candidate-dir packages/cli --measurement-runs 3 --record-blocked",
+        "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1"
+      ]
+    }
+  }
+}
