@@ -75,3 +75,27 @@ uses the existing frozen runner while candidate uses source-first, because the
 frozen runner is still stale. A same-runner release comparison and the full
 multi-gate 30-run matrix remain required before declaring the optimization
 formally proven.
+
+## Route-resolution hotspot follow-up (TASK-PRF-0105)
+
+The cumulative ranking identifies `next.route-resolution` as the first
+mandatory-wait seam to optimize (about 380,415 ms in the observed task chain).
+For an explicit task-ID prompt, the route is already deterministic; the
+candidate therefore keeps status/title/dependency metadata for unrelated task
+records and fully hydrates only the addressed task. Queue and plan prompts keep
+the broad scan, so multi-AI private-read parallelism and shared-write routing
+semantics are unchanged.
+
+The source-first profiler measured `read-json-tasks` at **67 ms** for the
+candidate, compared with the pre-change profile's **95 ms** under the same
+workload shape (directional reduction about **29%**). The focused regression
+test verifies that the addressed task retains `scopePaths` while the unrelated
+task does not get unnecessary scope hydration. This is not yet a formal
+acceptance result: a same-runner 30-sample AB/BA run with A/A noise control is
+still required, and the compact external receipt must remain outside Git
+history.
+
+The change adds no command, gate, registry, daemon, database, or second state
+source. If the same-runner measurement fails to reach the 20% p50 target or
+causes a p95 regression above 10%, revert the single candidate commit and keep
+the failed receipt as evidence.
