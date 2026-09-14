@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0063",
   "title": "Make CI lifecycle receipts replayable and semantically fail-closed",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -223,8 +223,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T06-34-12-516Z-renew-beba6ad7e2be",
-  "lastTransitionAt": "2026-09-14T06:34:12.516Z",
+  "lastTransitionId": "2026-09-14T06-42-05-164Z-close-660fffb68990",
+  "lastTransitionAt": "2026-09-14T06:42:05.164Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-09-14T06:33:56.437Z",
@@ -233,7 +233,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-2d51550d717e",
     "claimedAt": "2026-09-14T06:33:56.447Z",
-    "heartbeatAt": "2026-09-14T06:34:11.569Z",
+    "heartbeatAt": "2026-09-14T06:42:05.162Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0063.json",
@@ -244,13 +244,14 @@
       "tests/cli/ci-burn-in-evidence-collector.test.ts",
       "tests/cli/product-proof-evidence-boundary.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260914063356-codex-gpt-5.4-mini-34eee1d916",
-      "status": "active",
+      "status": "adopted",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914063356-codex-gpt-5.4-mini-34eee1d916\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-14T06:33:56.447Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -354,5 +355,9 @@
     },
     "createdAt": "2026-09-14T06:34:02.848Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-14T06:42:05.162Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260914063356-codex-gpt-5.4-mini-TASK-PRF-0063-9dbe835ab5",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0063.closure-packet.json"
 }

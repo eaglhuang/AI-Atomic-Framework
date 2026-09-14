@@ -1,0 +1,159 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0063",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "a93adc34ca5ab564fd6f577522b3abe14e3138fe",
+  "governedTreeSha": "d577f13e1815ab000022b1920e7cb4ef3b8d6279",
+  "targetCommitDelta": {
+    "currentCommitSha": "a93adc34ca5ab564fd6f577522b3abe14e3138fe",
+    "parentCommitShas": [
+      "a93adc34ca5ab564fd6f577522b3abe14e3138fe"
+    ],
+    "governedTreeSha": "d577f13e1815ab000022b1920e7cb4ef3b8d6279",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      ".atm/history/tasks/TASK-PRF-0063.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:375a15042e1abdfb1a2b4647021fd01695440ea35823c3cdd5e1a11b3831848b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json --report-only",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:79016c30bb8751df8e0d57adac71000e192aabe3ccced05b0dee00c893898414",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0806953b63f3dd0cd10a33120f0bb4a8ac70db87acbfcbe1d0bb918390579562",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json --report-only",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:79016c30bb8751df8e0d57adac71000e192aabe3ccced05b0dee00c893898414",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json --report-only",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json --report-only",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-14T06:42:05.152Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0063.*",
+      ".atm/history/task-events/TASK-PRF-0063/**",
+      ".atm/history/tasks/TASK-PRF-0063.json",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/lifecycle-receipt.json --report-only",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0063.json",
+  "closedAt": "2026-09-14T06:42:05.153Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914063356-codex-gpt-5.4-mini-TASK-PRF-0063-9dbe835ab5",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "a93adc34ca5ab564fd6f577522b3abe14e3138fe",
+    "taskMatchedFiles": [
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0063/2026-09-14T06-33-09-267Z-import-a09ab0e526c5.json",
+      ".atm/history/task-events/TASK-PRF-0063/2026-09-14T06-33-56-438Z-reserve-315f124e4725.json",
+      ".atm/history/task-events/TASK-PRF-0063/2026-09-14T06-33-56-442Z-promote-ae6bd9b1256e.json",
+      ".atm/history/task-events/TASK-PRF-0063/2026-09-14T06-34-02-849Z-claim-a3a50b0c629a.json",
+      ".atm/history/task-events/TASK-PRF-0063/2026-09-14T06-34-12-516Z-renew-beba6ad7e2be.json",
+      ".atm/history/tasks/TASK-PRF-0063.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
