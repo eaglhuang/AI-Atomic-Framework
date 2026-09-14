@@ -1,0 +1,51 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T01-01-12-126Z-close-6723dcdb3548",
+  "taskId": "TASK-PRF-0051",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914005105-codex-gpt-5.4-mini-TASK-PRF-0051-13695cb4ef",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0051.json",
+  "taskSha256": "sha256:0d06ee6ad62ebd715c23398560474b624eb33031008d39558d37c5b738cf0ba3",
+  "createdAt": "2026-09-14T01:01:12.126Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0051 --actor codex-gpt-5.4-mini --status done --historical-delivery d395181e60803f979995e607bf16565972a3fbe0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914005105-codex-gpt-5.4-mini-TASK-PRF-0051-13695cb4ef",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0051.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+      "validate:product-ci-burn-in-schedule"
+    ],
+    "requiredGates": [
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+      "validate:product-ci-burn-in-schedule"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T01:01:12.117Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0051.*",
+        ".atm/history/task-events/TASK-PRF-0051/**",
+        ".atm/history/tasks/TASK-PRF-0051.json",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "docs/reports/atm-product-proof-checkpoints.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+        "validate:product-ci-burn-in-schedule"
+      ]
+    }
+  }
+}

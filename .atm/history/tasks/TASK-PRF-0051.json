@@ -1,0 +1,274 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0051",
+  "title": "Re-establish protected-main Product CI burn-in after delivery drift",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0050"
+  ],
+  "acceptance": [
+    "ACC-1: 從 live GitHub API 取得固定 query bounds 的 `ci.yml` protected-main runs，確認 required context 是 `Product CI`，並在同一窗口至少觀察兩個 eligible `release-candidate` runs；不足時明確判定 `insufficient-window`，不可用 standard run 替代。",
+    "ACC-2: 每個納入窗口的 completed/failed/cancelled run 都保留 run id、head SHA、event、conclusion、Product CI job conclusion 與排除原因；不得把 workflow success 或 advisory Dogfood success 當成 Product CI success。",
+    "ACC-3: 以 `measure-product-ci-burn-in.ts` 驗證至少 90 個 completed eligible protected-main runs 且跨至少 30 個 calendar days；任一條件不足或有未解釋 failure 時，verdict 必須維持 `insufficient-window` 或 `unexplained-failure`，不可標 `pass`。",
+    "ACC-4: 公開摘要 append-only 指向 Git 外 raw export，記錄 validator/measurement 命令、時間界線、commit SHA、source/receipt digest 與限制；不得把 mutable runtime evidence 或秘密寫入 Git history，也不得因本卡授權 push、publish、threshold waiver 或 A/B 結論。"
+  ],
+  "deliverables": [
+    "docs/reports/atm-product-ci-burn-in.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "scopePaths": [
+    "docs/reports/atm-product-ci-burn-in.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "validators": [
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+    "node --strip-types scripts/validate-product-ci-burn-in-schedule.ts --mode validate"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-live-export",
+  "rollbackStrategy": "revert-commit-preserve-raw-evidence",
+  "rollbackNotes": "可回滾本卡新增的公開摘要欄位，但不得刪除 GitHub run history 或 Git 外 raw export；任何負結果與 failure classification 必須保留。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.external-proof-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0051-re-establish-protected-main-product-ci-burn-in-after-delivery-drift.task.md",
+    "sectionTitle": "TASK-PRF-0051",
+    "headingLine": 80,
+    "hash": "e24fdf7eaddd5e04",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0051-re-establish-protected-main-product-ci-burn-in-after-delivery-drift.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:e24fdf7eaddd5e04fd1dedba709bfcfc799ac7b870a962b30f7b633be949320d",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-14T00:59:22.738Z"
+    }
+  },
+  "importedAt": "2026-09-14T00:59:22.738Z",
+  "workAdmission": {
+    "recoveryMode": "auto"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0050"
+    ],
+    "startConditions": [
+      "TASK-PRF-0050 is closed and its fixed-version candidate/public measurement is recorded; current live remote validation is re-run after the latest delivered state."
+    ],
+    "softRelations": [
+      "TASK-PRF-0031",
+      "TASK-PRF-0043",
+      "TASK-PRF-0050"
+    ],
+    "changedPublicSeams": [
+      "product-ci-burn-in-evidence"
+    ],
+    "causalImpactEdges": [
+      "sustained-green-ci-claim"
+    ],
+    "parallelFrontierInputs": [
+      "live-github-ci-export"
+    ],
+    "validatorReferences": [
+      "test_prf_ci_release_candidate_coverage_0051",
+      "test_prf_ci_failure_classification_0051",
+      "test_prf_ci_burnin_window_gate_0051",
+      "test_prf_ci_evidence_boundary_0051"
+    ],
+    "phaseOwner": "release-evidence"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_ci_release_candidate_coverage_0051",
+      "targetGroupId": null,
+      "semanticKey": "ci_release_candidate_coverage",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "sustained-green-ci-claim"
+      ],
+      "expectedRedPredicate": "目前或任何重驗證窗口少於兩個 eligible release-candidate runs 時，remote validator 必須 fail closed，不得以 standard runs 代替。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product-ci-burn-in-evidence",
+      "resourceKey": "live-github-ci-export"
+    },
+    {
+      "caseId": "test_prf_ci_failure_classification_0051",
+      "targetGroupId": null,
+      "semanticKey": "ci_failure_classification",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "sustained-green-ci-claim"
+      ],
+      "expectedRedPredicate": "任何 failed 或 cancelled Product CI attempt 被遺漏、改成 success、或從分母剔除而未分類時，證據驗收必須失敗。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product-ci-burn-in-evidence",
+      "resourceKey": "live-github-ci-export"
+    },
+    {
+      "caseId": "test_prf_ci_burnin_window_gate_0051",
+      "targetGroupId": null,
+      "semanticKey": "ci_burnin_window_gate",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "sustained-green-ci-claim"
+      ],
+      "expectedRedPredicate": "少於 90 completed eligible protected-main runs 或少於 30 calendar days 時，報告只能是 insufficient-window 或 unexplained-failure，不能是 pass。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product-ci-burn-in-evidence",
+      "resourceKey": "product-ci-burn-in-window"
+    },
+    {
+      "caseId": "test_prf_ci_evidence_boundary_0051",
+      "targetGroupId": null,
+      "semanticKey": "ci_evidence_boundary",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "sustained-green-ci-claim"
+      ],
+      "expectedRedPredicate": "缺少 raw export、query bounds、source digest、command 或 mutable runtime evidence 被寫入 Git history 時，不得通過證據邊界驗收。",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "product-ci-burn-in-evidence",
+      "resourceKey": "runtime-evidence-boundary"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_ci_release_candidate_coverage_0051",
+    "test_prf_ci_failure_classification_0051",
+    "test_prf_ci_burnin_window_gate_0051",
+    "test_prf_ci_evidence_boundary_0051"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0050",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-8100a3456843",
+    "claimedAt": "2026-09-14T00:51:05.180Z",
+    "heartbeatAt": "2026-09-14T01:01:12.124Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0051.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "docs/reports/atm-product-proof-checkpoints.md"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260914005105-codex-gpt-5.4-mini-2d21536ee4",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914005105-codex-gpt-5.4-mini-2d21536ee4\""
+    },
+    "reason": "closed"
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "startedAt": "2026-09-14T00:51:05.180Z",
+  "startedBySessionId": "session-20260914005105-codex-gpt-5.4-mini-TASK-PRF-0051-13695cb4ef",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0051",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0051.*",
+      ".atm/history/task-events/TASK-PRF-0051/**",
+      ".atm/history/tasks/TASK-PRF-0051.json",
+      "docs/reports/atm-product-ci-burn-in.md",
+      "docs/reports/atm-product-proof-checkpoints.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "593bdbd4b7679d1a6249f4b0468e70a793ec24d6ea9307c0da490756a87265da",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914005105-codex-gpt-5.4-mini-TASK-PRF-0051-13695cb4ef",
+    "laneSession": {
+      "laneSessionId": "lane-20260914005105-codex-gpt-5.4-mini-2d21536ee4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914005105-codex-gpt-5.4-mini-2d21536ee4\""
+    },
+    "createdAt": "2026-09-14T00:51:08.069Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-09-14T01-01-12-126Z-close-6723dcdb3548",
+  "lastTransitionAt": "2026-09-14T01:01:12.126Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-09-14T01:01:12.124Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260914005105-codex-gpt-5.4-mini-TASK-PRF-0051-13695cb4ef",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0051.closure-packet.json"
+}

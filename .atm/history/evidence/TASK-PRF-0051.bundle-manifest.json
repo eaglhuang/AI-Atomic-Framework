@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0051",
+  "updatedAt": "2026-09-14T00:59:34.831Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+    "validate:product-ci-burn-in-schedule"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-product-ci-burn-in-schedule.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0f5ca14af0b92f6b73a35f833ee5836d2659adef9a13832f50f680180447e0f7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:product-ci-burn-in-schedule"
+      ],
+      "generatedAt": "2026-09-14T00:54:05.973Z",
+      "startedAt": "2026-09-14T00:54:05.699Z",
+      "finishedAt": "2026-09-14T00:54:05.973Z",
+      "durationMs": 274,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d02b4739aedf35d334fc7d72d75d838fca10ddaa",
+      "cached": false
+    },
+    {
+      "command": "gh run list --repo eaglhuang/AI-Atomic-Framework --workflow ci.yml --limit 100 --json databaseId,status,conclusion,headSha,headBranch,createdAt,event,displayTitle | node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0804c33ebece0fda099765a3d48e93944dcaedd100853ad174f5cfd515ff43ab",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-14T00:54:16.621Z",
+      "startedAt": "2026-09-14T00:54:13.799Z",
+      "finishedAt": "2026-09-14T00:54:16.621Z",
+      "durationMs": 2822,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d02b4739aedf35d334fc7d72d75d838fca10ddaa",
+      "cached": false
+    },
+    {
+      "command": "gh run list --repo eaglhuang/AI-Atomic-Framework --workflow ci.yml --limit 100 --json databaseId,status,conclusion,headSha,headBranch,createdAt,event,displayTitle | node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0804c33ebece0fda099765a3d48e93944dcaedd100853ad174f5cfd515ff43ab",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin"
+      ],
+      "generatedAt": "2026-09-14T00:55:24.639Z",
+      "startedAt": "2026-09-14T00:55:22.094Z",
+      "finishedAt": "2026-09-14T00:55:24.639Z",
+      "durationMs": 2545,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d02b4739aedf35d334fc7d72d75d838fca10ddaa",
+      "cached": false
+    },
+    {
+      "command": "gh run list --repo eaglhuang/AI-Atomic-Framework --workflow ci.yml --limit 100 --json databaseId,status,conclusion,headSha,headBranch,createdAt,event,displayTitle | node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0804c33ebece0fda099765a3d48e93944dcaedd100853ad174f5cfd515ff43ab",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only"
+      ],
+      "generatedAt": "2026-09-14T00:59:34.830Z",
+      "startedAt": "2026-09-14T00:59:32.010Z",
+      "finishedAt": "2026-09-14T00:59:34.830Z",
+      "durationMs": 2820,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d02b4739aedf35d334fc7d72d75d838fca10ddaa",
+      "cached": false
+    }
+  ],
+  "artifactPaths": [
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0051/raw/burn-in-report-2026-09-14.json",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0051/raw/ci-runs-2026-09-14.json",
+    "docs/reports/atm-product-ci-burn-in.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ]
+}

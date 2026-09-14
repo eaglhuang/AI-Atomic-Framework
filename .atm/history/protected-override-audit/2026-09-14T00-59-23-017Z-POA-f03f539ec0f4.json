@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-f03f539ec0f4",
+  "recordedAt": "2026-09-14T00:59:23.017Z",
+  "actorId": null,
+  "taskId": "TASK-PRF-0051",
+  "surface": "tasks import --write recovery flags",
+  "command": "node atm.mjs tasks import --from C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0051-re-establish-protected-main-product-ci-burn-in-after-delivery-drift.task.md --write --force --json",
+  "flags": [
+    "--force"
+  ],
+  "permission": "backend.tasks.import.write",
+  "leaseId": "EMG-TASK-PRF-0051-6a899d1e95",
+  "reason": "Force import would overwrite a task with an active or unreadable claim state.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.import.write"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-09-14T00-59-23-016Z-EMG-TASK-PRF-0051-6a899d1e95.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
