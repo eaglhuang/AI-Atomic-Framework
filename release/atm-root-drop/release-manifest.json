@@ -747,14 +747,18 @@
     "release/atm-root-drop/docs/reports/atm-isolated-pilot.md",
     "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
     "release/atm-root-drop/docs/reports/atm-plan-4-1-dependency-census.json",
+    "release/atm-root-drop/docs/reports/atm-product-ci-burn-in-real-export.md",
     "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
+    "release/atm-root-drop/docs/reports/atm-product-ci-lifecycle-evidence.md",
     "release/atm-root-drop/docs/reports/atm-product-proof-checkpoints.md",
     "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta.md",
     "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta1.md",
     "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta4.md",
     "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-task-prf-0050.md",
+    "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-task-prf-0060.md",
     "release/atm-root-drop/docs/reports/atm-public-npm-install-proof.md",
     "release/atm-root-drop/docs/reports/atm-release-surface-budget.md",
+    "release/atm-root-drop/docs/reports/atm-runtime-boundary-entry-reduction.md",
     "release/atm-root-drop/docs/reports/atomization-dogfood-adoption-report.md",
     "release/atm-root-drop/docs/reports/broker-format-adapter-dogfood-report.md",
     "release/atm-root-drop/docs/reports/captain-dispatch-mailbox-atomic-map.md",
@@ -4580,6 +4584,7 @@
     "release/atm-root-drop/scripts/collect-broker-evidence/strings.ts",
     "release/atm-root-drop/scripts/collect-broker-evidence/summaries.ts",
     "release/atm-root-drop/scripts/collect-broker-evidence/types.ts",
+    "release/atm-root-drop/scripts/collect-ci-burn-in-evidence.ts",
     "release/atm-root-drop/scripts/collect-git-stale-remote-artifacts.ts",
     "release/atm-root-drop/scripts/compile-cross-editor-parallel-proof.ts",
     "release/atm-root-drop/scripts/compile-four-plan-independent-certificate.ts",
@@ -5331,6 +5336,7 @@
     "release/atm-root-drop/tests/cli/causal-validator-contract-import.test.ts",
     "release/atm-root-drop/tests/cli/causal-validator-selector.test.ts",
     "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
+    "release/atm-root-drop/tests/cli/ci-burn-in-evidence-collector.test.ts",
     "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
     "release/atm-root-drop/tests/cli/claim-adopt-unowned-wip.test.ts",
     "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
@@ -5956,6 +5962,7 @@
     "release/atm-root-drop/tests/fixtures/plan3-fake-green/timeout-nonterminal.json",
     "release/atm-root-drop/tests/fixtures/plan3-fake-green/unknown-evidence-nonterminal.json",
     "release/atm-root-drop/tests/fixtures/product-ci-burn-in/known-failure.json",
+    "release/atm-root-drop/tests/fixtures/product-ci-burn-in/lifecycle-attempts.json",
     "release/atm-root-drop/tests/fixtures/validator-governance-replay/historical-ab-candidates.json",
     "release/atm-root-drop/tests/governance-local.fixture.json",
     "release/atm-root-drop/tests/governance/map-equivalence-report.test.ts",
@@ -6175,8 +6182,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1513,
-    "unchanged": 4627,
+    "copied": 1525,
+    "unchanged": 4622,
     "removed": 0
   },
   "buildMode": "full",
@@ -12626,8 +12633,17 @@
         "replaceable": true
       },
       {
+        "path": "docs/reports/atm-product-ci-burn-in-real-export.md",
+        "digest": "549a713ec8aa93644392b17996dfdb34588a0447903ab8500b897b14e894cda2",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-product-ci-burn-in-real-export.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "docs/reports/atm-product-ci-burn-in.md",
-        "digest": "f7175df0cd9dd8c17d30ac9753f6be596949272c99d2db5c755f2797f1e1fdea",
+        "digest": "6c6bc871b41b941eafbd2d9c9d481f6854b38451404745ba2cf4092da62ff372",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-ci-burn-in.md"
@@ -12635,8 +12651,17 @@
         "replaceable": true
       },
       {
+        "path": "docs/reports/atm-product-ci-lifecycle-evidence.md",
+        "digest": "44f037b6c22f5c529c3149d42e8057fa00252c1daae14b30b109d845d70a1273",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-product-ci-lifecycle-evidence.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "docs/reports/atm-product-proof-checkpoints.md",
-        "digest": "0ba34abe15c1e7ef991e5d73aa51ab446d57207b685419018c762966b790cb47",
+        "digest": "ab863e5ea943bc18dd628d2d01126fcf0abcd801d46e31970a1cf7f8a6c0ef84",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-proof-checkpoints.md"
@@ -12645,7 +12670,7 @@
       },
       {
         "path": "docs/reports/atm-public-npm-install-proof-beta.md",
-        "digest": "de7773d1d30fac1c5a8c759cc5e3607decbbcdb721564616273f480ed821528e",
+        "digest": "2ea76827a96c899c819f5b577a50891295fa4117d888544624dfaa7f16168db6",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-public-npm-install-proof-beta.md"
@@ -12672,7 +12697,7 @@
       },
       {
         "path": "docs/reports/atm-public-npm-install-proof-task-prf-0050.md",
-        "digest": "239876c8eb721c3b8804b41ae461556f678490702ede59b13b688d9143cd2716",
+        "digest": "edf1f99817490316af7cb48d1149ac4f8c465d00c482d95e452fddd8fc0b748c",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-public-npm-install-proof-task-prf-0050.md"
@@ -12680,8 +12705,17 @@
         "replaceable": true
       },
       {
+        "path": "docs/reports/atm-public-npm-install-proof-task-prf-0060.md",
+        "digest": "e5caf25850a0fb5d8eebb00a9a35c95ff0b1f439f9f87fe67fd18e8591de04dd",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-public-npm-install-proof-task-prf-0060.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "docs/reports/atm-public-npm-install-proof.md",
-        "digest": "3b4837f583fb4e4bc6757e1fe90cb16697259b1610fe86537862f428b945b521",
+        "digest": "aa0137b533f9f5a3450fa3feeec1f6df1a28d7610cff6a3688a36a29a00d886e",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-public-npm-install-proof.md"
@@ -12694,6 +12728,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-release-surface-budget.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/atm-runtime-boundary-entry-reduction.md",
+        "digest": "9b818038ece305cb1e47c4e794048ff187660e1d9f90e58efeed614c4271562a",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-runtime-boundary-entry-reduction.md"
         ],
         "replaceable": true
       },
@@ -21501,7 +21544,7 @@
       },
       {
         "path": "packages/cli/dist/atm-public.js",
-        "digest": "ef10cf72e5b50bd56c2339a1021b05945f99582e1e6994648ac1d6938eccc57c",
+        "digest": "1ae9d8989a40c270ffee04f9d75446ff4eee75290236042041d702dd7c537eea",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/atm-public.js"
@@ -21591,7 +21634,7 @@
       },
       {
         "path": "packages/cli/dist/commands/atm-chart/constants.js",
-        "digest": "6d4cc76a57653980a1e3caf7813ca9a1e33708f4cc111ec8db8bf24c0aba5a7b",
+        "digest": "c6edf6ff462ec211b17654b6849fc126748e2a617071d64f5bbf6b932d5709a9",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/atm-chart/constants.js"
@@ -21600,7 +21643,7 @@
       },
       {
         "path": "packages/cli/dist/commands/atm-chart/render-verify.js",
-        "digest": "937dde2a1d88fcdf6db1d9fcc2123ad29c5961aa0226ca3636ec778ac22c7bdc",
+        "digest": "44e1eecc39e837410b4cc653a39a63727b4946af0c26a9762624a458cece5086",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/atm-chart/render-verify.js"
@@ -27828,7 +27871,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "ef37c534e32e6e5abb9e2bfff0d60cbc9ae7b826893b4d15e73461f839963e1b",
+        "digest": "fb1abd7c08a79778614d864ae54a6709103163d014ca96b768a573284856a99e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -27837,7 +27880,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "9df5347af3e3d870d63c228f7f46a1c1dbe70b1cb54031b454e5f322dadc10dd",
+        "digest": "790a4efc8924794071fff1edb205d3231527a045637be4a8cf168d7adc192b33",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -28125,7 +28168,7 @@
       },
       {
         "path": "packages/cli/src/atm-public.ts",
-        "digest": "2b36e08ae98c55c3790a902a0bba7af827183ecef53df2b13e557b8aeb00c8f9",
+        "digest": "9dd585c0668180b5bd6abf527418cf2e2a03fe1c62429104779917b8ebb243f1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/atm-public.ts"
@@ -28305,7 +28348,7 @@
       },
       {
         "path": "packages/cli/src/commands/atm-chart/constants.ts",
-        "digest": "71d20d85c121b5bff69f5c448a3502a86d6ae657a990195e230a23c71db1d1eb",
+        "digest": "a5944389d62955097a9ab5153fb54fae6758cb523bb095b2eda26b7a1bfa408a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/atm-chart/constants.ts"
@@ -28314,7 +28357,7 @@
       },
       {
         "path": "packages/cli/src/commands/atm-chart/render-verify.ts",
-        "digest": "526608bd4edf4f213b3c1964dd43d9ce450b669baa8425eff7cf7f0d9d6b3f15",
+        "digest": "0332b1f65fb4c800f186724f1ee771f1bf8cedadfbc7e834921d2e14175bee39",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/atm-chart/render-verify.ts"
@@ -46710,7 +46753,7 @@
       },
       {
         "path": "scripts/build-cli-npm-runtime.ts",
-        "digest": "df8ffc9fdcc7f43b081c5ce111eacaeed5750b909dc6ef9d98246c86d9bb04fe",
+        "digest": "3b8a8465bfcdf0b8759c85a16f9114a8efa12b76cc3f01e5d6741f8d63f08192",
         "origin": "source",
         "inputPaths": [
           "scripts/build-cli-npm-runtime.ts"
@@ -46728,7 +46771,7 @@
       },
       {
         "path": "scripts/build-package-dist.ts",
-        "digest": "ef6c3cae4e23db667f9782b99ffc873bd6a3f9fbca94c27343a92e8db8a4cf8e",
+        "digest": "2eafe32d095e031188747400a86e9b09f1351e8f9d91c0e57de0a82d60d22ba6",
         "origin": "source",
         "inputPaths": [
           "scripts/build-package-dist.ts"
@@ -47110,6 +47153,15 @@
         "origin": "source",
         "inputPaths": [
           "scripts/collect-broker-evidence/types.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/collect-ci-burn-in-evidence.ts",
+        "digest": "258fd88f676003b4332f9679cbced5438b87bb05239ad187425e854d68290836",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/collect-ci-burn-in-evidence.ts"
         ],
         "replaceable": true
       },
@@ -48312,7 +48364,7 @@
       },
       {
         "path": "scripts/measure-product-ci-burn-in.ts",
-        "digest": "d97f5670748d3d42d196439865ab943641cd79e4484b7549f19c2e458ad126ea",
+        "digest": "e54302bacb9b7b29b367136d46a44452c38d08e163e36d1836cdcb253a7388b6",
         "origin": "source",
         "inputPaths": [
           "scripts/measure-product-ci-burn-in.ts"
@@ -49041,7 +49093,7 @@
       },
       {
         "path": "scripts/validate-candidate-npm-install.ts",
-        "digest": "da184631e1cb671dd7d0a15ff9bf4f944e38ad0a107040ff534998e61886fa0e",
+        "digest": "98cfb1eb39da48d16a140766b176ed1159b5d4f6d0c1bb17f95ef193e002c030",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-candidate-npm-install.ts"
@@ -50382,7 +50434,7 @@
       },
       {
         "path": "scripts/validate-public-npm-install.ts",
-        "digest": "786a404099bef155556f6507a6c952f24b99ef397a4b6a9bd9b699ac5eed0e5d",
+        "digest": "65e6e3676581a638f72e73d290a268c33138ea6f376d874b58ba736f1901e840",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-public-npm-install.ts"
@@ -53873,6 +53925,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/ci-burn-in-evidence-collector.test.ts",
+        "digest": "ab82c8c64bcdb27b6825bedd5c2ec0df9dbde2ecb1c6e08117198bc37ba5d7d9",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/ci-burn-in-evidence-collector.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/ci-product-lane-contract.test.ts",
         "digest": "e4140b3b5268d03f5bd7d8522e17d0111c0b5712b8f04f1c0a415a9eed5e381b",
         "origin": "source",
@@ -56565,7 +56626,7 @@
       },
       {
         "path": "tests/cli/product-ci-burn-in.test.ts",
-        "digest": "72a97df5efe4f6626b1eba45c3b0292930354311e86ecc7b6c10bb62dd431a48",
+        "digest": "c755cc3e55524b8ee06b6b49e4321290629c465d7f09abda5e428a3710c014cd",
         "origin": "source",
         "inputPaths": [
           "tests/cli/product-ci-burn-in.test.ts"
@@ -56574,7 +56635,7 @@
       },
       {
         "path": "tests/cli/product-proof-evidence-boundary.test.ts",
-        "digest": "70baa18fac0c49583d82340a3932fa59f411e1a873bd662e14eebcb8bd67354f",
+        "digest": "70da3ee1e6bbe47e1d1231655deb92a0a3d42f5b83483344c4579a4c6c58e0a7",
         "origin": "source",
         "inputPaths": [
           "tests/cli/product-proof-evidence-boundary.test.ts"
@@ -56619,7 +56680,7 @@
       },
       {
         "path": "tests/cli/public-npm-install-contract.test.ts",
-        "digest": "42ef78623e55c91de1690aca58fbf3c84a6654776f598e7a7ac52eaa183d9d29",
+        "digest": "6f2a80deaaf8ba5fa35582ce05ca92393e204ec7af946da2e1044ccef57964c0",
         "origin": "source",
         "inputPaths": [
           "tests/cli/public-npm-install-contract.test.ts"
@@ -59498,6 +59559,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/fixtures/product-ci-burn-in/lifecycle-attempts.json",
+        "digest": "b3716f1ca62ba5569d8410a28e9441a50a2d0f3aab35e0c01ab3138c104da158",
+        "origin": "source",
+        "inputPaths": [
+          "tests/fixtures/product-ci-burn-in/lifecycle-attempts.json"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/fixtures/validator-governance-replay/historical-ab-candidates.json",
         "digest": "dd8a235097c567930eb9b6099272bdfbb2c1a29fff86a9cc527a122e3783840d",
         "origin": "source",
@@ -61442,7 +61512,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:4cfdfbc6e1ed191534841ffbfb19a90cc63a6ffa285d31824e4b23d87e9b20a6"
+    "treeDigest": "sha256:4da5acc2181022271b56ba0f67e85369ffef63dc59d8f0364f0143709dc8a88e"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62990,7 +63060,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:e78362004bb307bfcd90a146429e9d4fb2626886e7b2a6713edb627577b5f2d2"
+    "digest": "sha256:3a25c18ba8b980bd221a10be224b936c3c456e30a79c34c40cb965da5331f1b2"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63711,14 +63781,18 @@
       "release/atm-root-drop/docs/reports/atm-isolated-pilot.md",
       "release/atm-root-drop/docs/reports/atm-plan-4-1-cross-editor-parallel-proof.json",
       "release/atm-root-drop/docs/reports/atm-plan-4-1-dependency-census.json",
+      "release/atm-root-drop/docs/reports/atm-product-ci-burn-in-real-export.md",
       "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
+      "release/atm-root-drop/docs/reports/atm-product-ci-lifecycle-evidence.md",
       "release/atm-root-drop/docs/reports/atm-product-proof-checkpoints.md",
       "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta.md",
       "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta1.md",
       "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta4.md",
       "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-task-prf-0050.md",
+      "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-task-prf-0060.md",
       "release/atm-root-drop/docs/reports/atm-public-npm-install-proof.md",
       "release/atm-root-drop/docs/reports/atm-release-surface-budget.md",
+      "release/atm-root-drop/docs/reports/atm-runtime-boundary-entry-reduction.md",
       "release/atm-root-drop/docs/reports/atomization-dogfood-adoption-report.md",
       "release/atm-root-drop/docs/reports/broker-format-adapter-dogfood-report.md",
       "release/atm-root-drop/docs/reports/captain-dispatch-mailbox-atomic-map.md",
@@ -67544,6 +67618,7 @@
       "release/atm-root-drop/scripts/collect-broker-evidence/strings.ts",
       "release/atm-root-drop/scripts/collect-broker-evidence/summaries.ts",
       "release/atm-root-drop/scripts/collect-broker-evidence/types.ts",
+      "release/atm-root-drop/scripts/collect-ci-burn-in-evidence.ts",
       "release/atm-root-drop/scripts/collect-git-stale-remote-artifacts.ts",
       "release/atm-root-drop/scripts/compile-cross-editor-parallel-proof.ts",
       "release/atm-root-drop/scripts/compile-four-plan-independent-certificate.ts",
@@ -68295,6 +68370,7 @@
       "release/atm-root-drop/tests/cli/causal-validator-contract-import.test.ts",
       "release/atm-root-drop/tests/cli/causal-validator-selector.test.ts",
       "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
+      "release/atm-root-drop/tests/cli/ci-burn-in-evidence-collector.test.ts",
       "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
       "release/atm-root-drop/tests/cli/claim-adopt-unowned-wip.test.ts",
       "release/atm-root-drop/tests/cli/claim-foreign-unstaged-wip.test.ts",
@@ -68920,6 +68996,7 @@
       "release/atm-root-drop/tests/fixtures/plan3-fake-green/timeout-nonterminal.json",
       "release/atm-root-drop/tests/fixtures/plan3-fake-green/unknown-evidence-nonterminal.json",
       "release/atm-root-drop/tests/fixtures/product-ci-burn-in/known-failure.json",
+      "release/atm-root-drop/tests/fixtures/product-ci-burn-in/lifecycle-attempts.json",
       "release/atm-root-drop/tests/fixtures/validator-governance-replay/historical-ab-candidates.json",
       "release/atm-root-drop/tests/governance-local.fixture.json",
       "release/atm-root-drop/tests/governance/map-equivalence-report.test.ts",
@@ -69142,22 +69219,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:31622d1c704434e54273f9b248c9e42b4f40f0c68a68e11cedce1e4c2321cc63",
-  "sealedSourceCommit": "79bc2516072a1bf6e5dc0ff11f8f718c7cf3d7b0",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:27b444533847897a010ed99c328f21765e3663b622af0164451e159d92bf602e",
-  "tsBuildCacheDigest": "sha256:2e0bcec5d3ad63694f415de8a2a61deb01d07cf8302c42dc8b48dddec6d9c39a",
+  "buildInputsTreeHash": "sha256:3bc6c8a45c9cd5e570350c2e6b84865d49aebfdc4be2698819e408bd292f1f3d",
+  "sealedSourceCommit": "bac08a4b8353d4c3fc071ee834394aa09ab92c30",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:22f4d45b9db3aaf8fbf8a0347ceeb58888be6765d51cefa4db3f829e4a0988f7",
+  "tsBuildCacheDigest": "sha256:79153409d91bd555ca7f2f7b4da449248cd002040afe993232238f33d5ee351d",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 45,
-    "skipDecision": 57,
-    "worktreeSetup": 9436,
-    "typescriptBuild": 11371,
-    "rootDropReleaseAssembly": 29594,
-    "onefileReleaseAssembly": 9890,
-    "artifactSync": 6944,
+    "skipDecision": 56,
+    "worktreeSetup": 8648,
+    "typescriptBuild": 10554,
+    "rootDropReleaseAssembly": 29535,
+    "onefileReleaseAssembly": 9471,
+    "artifactSync": 6158,
     "cleanup": 0,
-    "totalElapsed": 81174
+    "totalElapsed": 78215
   }
 }

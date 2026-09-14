@@ -11,12 +11,24 @@ export type CiRun = {
   createdAt: string;
   displayTitle?: string;
   workflowName?: string;
+  eligible?: boolean;
+  exclusionReason?: string | null;
+  lifecycle?: CiFailureLifecycle;
+};
+
+export type CiFailureLifecycle = {
+  firstFailureAt: string | null;
+  retryCount: number;
+  lastAttemptAt: string;
+  repairAcceptedAt: string | null;
+  failureClass: string | null;
 };
 
 export type BurnInPolicy = {
   minCompletedRuns: number;
   minCalendarDays: number;
   protectedBranch: string;
+  requireLifecycle: boolean;
   /** Optional immutable remediation boundary. Runs before it remain historical evidence. */
   baselineAt?: string;
   /** Protected-main commit that establishes the remediation boundary. */
@@ -27,6 +39,7 @@ const DEFAULT_POLICY: BurnInPolicy = {
   minCompletedRuns: 90,
   minCalendarDays: 30,
   protectedBranch: 'main',
+  requireLifecycle: true,
 };
 
 function stableValue(value: unknown): unknown {
@@ -49,6 +62,28 @@ function parseDate(value: string, field: string): number {
   const timestamp = Date.parse(value);
   if (!Number.isFinite(timestamp)) throw new Error(`invalid-${field}`);
   return timestamp;
+}
+
+function validateLifecycle(run: CiRun): CiFailureLifecycle {
+  if (!run.lifecycle || typeof run.lifecycle !== 'object') throw new Error(`record-${run.databaseId}-missing-lifecycle`);
+  const lifecycle = run.lifecycle;
+  if (lifecycle.firstFailureAt !== null && typeof lifecycle.firstFailureAt !== 'string') throw new Error(`record-${run.databaseId}-invalid-firstFailureAt`);
+  if (lifecycle.firstFailureAt !== null) parseDate(lifecycle.firstFailureAt, `firstFailureAt-${run.databaseId}`);
+  if (!Number.isSafeInteger(lifecycle.retryCount) || lifecycle.retryCount < 0) throw new Error(`record-${run.databaseId}-invalid-retryCount`);
+  if (typeof lifecycle.lastAttemptAt !== 'string') throw new Error(`record-${run.databaseId}-missing-lastAttemptAt`);
+  const lastAttemptAt = parseDate(lifecycle.lastAttemptAt, `lastAttemptAt-${run.databaseId}`);
+  const createdAt = parseDate(run.createdAt, `createdAt-${run.databaseId}`);
+  if (lastAttemptAt < createdAt) throw new Error(`record-${run.databaseId}-lastAttempt-before-created`);
+  if (lifecycle.repairAcceptedAt !== null && typeof lifecycle.repairAcceptedAt !== 'string') throw new Error(`record-${run.databaseId}-invalid-repairAcceptedAt`);
+  if (lifecycle.repairAcceptedAt !== null) {
+    const repairAcceptedAt = parseDate(lifecycle.repairAcceptedAt, `repairAcceptedAt-${run.databaseId}`);
+    if (lifecycle.firstFailureAt === null) throw new Error(`record-${run.databaseId}-repair-without-first-failure`);
+    if (repairAcceptedAt < parseDate(lifecycle.firstFailureAt, `firstFailureAt-${run.databaseId}`)) throw new Error(`record-${run.databaseId}-repair-before-first-failure`);
+  }
+  if (run.conclusion !== 'success' && lifecycle.firstFailureAt === null) throw new Error(`record-${run.databaseId}-missing-first-failure`);
+  if (run.conclusion !== 'success' && (!lifecycle.failureClass || lifecycle.failureClass.trim().length === 0)) throw new Error(`record-${run.databaseId}-missing-failureClass`);
+  if (run.conclusion === 'success' && lifecycle.retryCount > 0 && (lifecycle.firstFailureAt === null || lifecycle.repairAcceptedAt === null)) throw new Error(`record-${run.databaseId}-unrepaired-retry`);
+  return lifecycle;
 }
 
 function validateRuns(input: unknown, policy: BurnInPolicy): CiRun[] {
@@ -74,6 +109,9 @@ function validateRuns(input: unknown, policy: BurnInPolicy): CiRun[] {
     if (typeof run.createdAt !== 'string') throw new Error(`record-${databaseId}-missing-createdAt`);
     const createdAt = parseDate(run.createdAt, `createdAt-${databaseId}`);
     if (createdAt >= previousCreatedAt) throw new Error(`history-not-newest-first-${run.databaseId}`);
+    const eligible = run.eligible !== false;
+    if (!eligible && (!run.exclusionReason || run.exclusionReason.trim().length === 0)) throw new Error(`record-${databaseId}-missing-exclusionReason`);
+    if (policy.requireLifecycle) validateLifecycle(run as CiRun);
     previousCreatedAt = createdAt;
     runs.push(run as CiRun);
   }
@@ -89,8 +127,11 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
     if (policy.baselineSha && !/^[0-9a-f]{7,64}$/i.test(policy.baselineSha)) throw new Error('invalid-baselineSha');
     if (baselineTimestamp !== null && !policy.baselineSha) throw new Error('baselineSha-required-with-baselineAt');
     if (policy.baselineSha && baselineTimestamp === null) throw new Error('baselineAt-required-with-baselineSha');
-    const runs = baselineTimestamp === null ? allRuns : allRuns.filter((run) => parseDate(run.createdAt, `createdAt-${run.databaseId}`) >= baselineTimestamp);
+    const scopedRuns = baselineTimestamp === null ? allRuns : allRuns.filter((run) => parseDate(run.createdAt, `createdAt-${run.databaseId}`) >= baselineTimestamp);
+    const excludedRuns = scopedRuns.filter((run) => run.eligible === false);
+    const runs = scopedRuns.filter((run) => run.eligible !== false);
     if (baselineTimestamp !== null && runs.length === 0) throw new Error('baseline-no-post-boundary-runs');
+    if (runs.length === 0) throw new Error('no-eligible-runs');
     if (baselineTimestamp !== null && !runs.some((run) => run.headSha.toLowerCase() === policy.baselineSha!.toLowerCase())) throw new Error('baselineSha-not-observed-on-protected-main');
     const newest = parseDate(runs[0].createdAt, 'newest-createdAt');
     const oldest = parseDate(runs[runs.length - 1].createdAt, 'oldest-createdAt');
@@ -103,6 +144,14 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
       streak += 1;
     }
     const releaseCandidateRuns = runs.filter((run) => /release[- ]candidate/i.test(run.displayTitle ?? '')).length;
+    const lifecycles = runs.map((run) => run.lifecycle).filter((lifecycle): lifecycle is CiFailureLifecycle => lifecycle !== undefined);
+    const retriedRuns = lifecycles.filter((lifecycle) => lifecycle.retryCount > 0).length;
+    const retryCount = lifecycles.reduce((total, lifecycle) => total + lifecycle.retryCount, 0);
+    const unresolvedFailures = runs.filter((run) => run.conclusion !== 'success' && run.lifecycle?.repairAcceptedAt === null).length;
+    const repairTimesMs = lifecycles
+      .filter((lifecycle) => lifecycle.firstFailureAt !== null && lifecycle.repairAcceptedAt !== null)
+      .map((lifecycle) => parseDate(lifecycle.repairAcceptedAt!, 'repairAcceptedAt') - parseDate(lifecycle.firstFailureAt!, 'firstFailureAt'));
+    if (repairTimesMs.some((duration) => duration < 0)) throw new Error('negative-repair-time');
     const reasons: string[] = [];
     if (runs.length < policy.minCompletedRuns) reasons.push('insufficient-completed-runs');
     if (calendarDays < policy.minCalendarDays) reasons.push('insufficient-calendar-window');
@@ -121,12 +170,19 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
         failedRuns,
         currentConsecutiveSuccessStreak: streak,
         releaseCandidateRuns,
-        historicalRunCount: allRuns.length - runs.length,
+        excludedRunCount: excludedRuns.length,
+        excludedRunIds: excludedRuns.map((run) => run.databaseId),
+        retriedRuns,
+        retryCount,
+        unresolvedFailures,
+        repairTimeMs: repairTimesMs,
+        averageRepairTimeMs: repairTimesMs.length > 0 ? Math.round(repairTimesMs.reduce((total, duration) => total + duration, 0) / repairTimesMs.length) : null,
+        historicalRunCount: allRuns.length - scopedRuns.length,
         postBaselineRunCount: runs.length,
         baselineAt: policy.baselineAt ?? null,
         baselineSha: policy.baselineSha ?? null,
       },
-      claimStatus,
+      claimStatus: reasons.length === 0 && unresolvedFailures > 0 ? 'unexplained-failure' : claimStatus,
       reasons,
     } as const;
   } catch (error) {

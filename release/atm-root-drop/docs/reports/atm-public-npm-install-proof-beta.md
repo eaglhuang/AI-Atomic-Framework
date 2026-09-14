@@ -28,3 +28,61 @@
   "temporaryRootRemoved": true
 }
 ```
+
+## TASK-PRF-0052 candidate revalidation (2026-09-14)
+
+The public registry receipt above remains historical (`0.1.0-beta.5`). A fresh
+install of the current public `0.1.0` was still **installable-but-core-workflow-incomplete**:
+`--version`, `doctor`, and `bootstrap` passed, while `atm-chart render` failed
+with `ATM_CHART_SCHEMA_SOURCE_MISSING` for
+`schemas/governance/default-guards.schema.json`. The retained external receipt
+is `C:\Users\User\atm-benchmark-sink\TASK-PRF-0051\public-install-2026-09-14\public-install-receipt.json`
+with SHA-256
+`0216e927043b41f27ab69580c5fcdc4c84b229e014437345d41df9a5704c44ba`.
+
+The local candidate built from the repaired source now carries all five
+ATMChart source schemas in `dist/npm-runtime/layout/schemas/**`, exposes the
+`atm-chart` adopter command, and passes an isolated tarball install followed by
+`bootstrap`, `atm-chart render`, and `atm-chart verify`. The candidate pack
+measured 2,684,504 unpacked bytes and 71 entries, below the declared budget of
+3,365,772 bytes and 308 entries. The focused contract also verified that no
+workspace link or extra framework download is needed.
+
+This is candidate evidence only. It does not change the public registry and
+does not authorize npm publish; a new public-registry receipt is required after
+an independently authorized release.
+
+## TASK-PRF-0053 validator boundary (2026-09-14)
+
+The public validator now requires the complete core workflow (`version`,
+`doctor`, `bootstrap`, `atm-chart render`, and `atm-chart verify`) to exit
+successfully. It records `requiredSuccessCommandFailures` and
+`coreWorkflowPassed`, and uses `--record-blocked` only to preserve a negative
+registry receipt rather than turning a failed command into a pass. On the live
+`0.1.0` registry install, chart render and verify remain failed because the
+published package lacks the default-guards chart schema. The local candidate
+passing chart lifecycle remains candidate-only evidence and is not substituted
+for this registry result.
+
+## TASK-PRF-0056 candidate proof boundary (2026-09-14)
+
+The candidate validator now executes the same seven-command install matrix as
+the public validator: `version`, `doctor`, `next`, `tasks`, `bootstrap`,
+`atm-chart render`, and `atm-chart verify`. The five commands that define the
+core workflow are explicit required-success commands; any failure or module
+resolution error fails closed. Candidate receipts also declare
+`candidateOnly: true` and `publicRegistry: false`, so a local tarball cannot be
+mistaken for registry evidence. The validator records the isolated install,
+tarball digest, unpacked bytes, entry count, runtime versions, command exits,
+startup timings, and output digests. This repairs evidence completeness only;
+it does not publish or alter the public `0.1.0` result.
+
+## TASK-PRF-0057 explicit tarball metadata repair (2026-09-14)
+
+An explicit candidate tarball must be self-describing evidence. The prior
+validator path installed the archive correctly but emitted zero-valued unpacked
+size and entry metadata, so that receipt is retained as a failed provenance
+observation. The follow-up requires archive-derived package version, unpacked
+bytes, sorted file inventory, and fail-closed malformed-archive handling. This
+candidate-only repair does not change the public package status or authorize
+npm publication.

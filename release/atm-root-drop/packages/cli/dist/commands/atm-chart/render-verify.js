@@ -3,7 +3,7 @@ import path from 'node:path';
 import { computeSha256ForContent, computeSha256ForFile } from '../../_vendor/core/dist/hash-lock/hash-lock.js';
 import { detectGovernanceRuntime, relativePathFrom } from '../governance-runtime.js';
 import { CliError, makeResult, message } from '../shared.js';
-import { atmChartFrontmatterSchemaVersion, atmChartSourceSchemas, defaultATMChartRelativePath, frameworkRoot } from './constants.js';
+import { atmChartFrontmatterSchemaVersion, atmChartSourceSchemas, defaultATMChartRelativePath, resolveATMChartSchemaSource } from './constants.js';
 import { createVersionCompatibilityReport, findChartRecord, loadCompatibilityMatrix, readFrameworkPackageVersion } from './compatibility.js';
 export function renderATMChart(cwd, atmChartAbsolutePath) {
     const sources = collectATMChartSources(cwd);
@@ -113,8 +113,8 @@ export function collectATMChartSources(cwd) {
         });
     }
     const sourceSchemaSha256s = Object.fromEntries(Object.entries(atmChartSourceSchemas).map(([schemaId, relativeSchemaPath]) => {
-        const absoluteSchemaPath = path.join(frameworkRoot, relativeSchemaPath);
-        if (!existsSync(absoluteSchemaPath)) {
+        const source = resolveATMChartSchemaSource(relativeSchemaPath);
+        if (!source) {
             throw new CliError('ATM_CHART_SCHEMA_SOURCE_MISSING', `Schema source was not found for ${schemaId}.`, {
                 exitCode: 2,
                 details: {
@@ -123,7 +123,7 @@ export function collectATMChartSources(cwd) {
                 }
             });
         }
-        return [schemaId, computeSha256ForFile(absoluteSchemaPath)];
+        return [schemaId, source.kind === 'filesystem' ? computeSha256ForFile(source.path) : source.sha256];
     }));
     return {
         sourceGuardsPath: normalizePath(runtime.paths.defaultGuardsPath),

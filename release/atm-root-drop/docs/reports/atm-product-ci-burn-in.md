@@ -122,3 +122,67 @@ protected-main burn-in requires at least two release-candidate ci runs
 This section is an explicit red/inconclusive evidence result for
 `TASK-PRF-0014`, not a release claim. No push, branch-rule mutation, or npm
 publication was performed.
+
+## TASK-PRF-0051 post-delivery revalidation (2026-09-14)
+
+This append-only observation was taken after TASK-PRF-0050 delivered the fixed
+candidate/public package measurement. It does not rewrite the historical
+sections above. The protected-main required context remains `Product CI`, but
+the current ten-run remote gate has only one `release-candidate` observation;
+`node --strip-types scripts/validate-ci-product-lane.ts --remote` therefore
+failed closed with:
+
+```text
+protected-main burn-in requires at least two release-candidate ci runs
+```
+
+The independent 100-run evaluator was also run against a GitHub export retained
+outside this repository:
+
+```text
+gh run list --repo eaglhuang/AI-Atomic-Framework --workflow ci.yml --limit 100 --json databaseId,status,conclusion,headSha,headBranch,createdAt,event,displayTitle | node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only
+```
+
+| Measure | Result |
+| --- | --- |
+| Raw export | `C:\Users\User\atm-benchmark-sink\TASK-PRF-0051\raw\ci-runs-2026-09-14.json` |
+| Raw export SHA-256 | `sha256:485d082e5addd7e9f1c08d6acf2e1a5b04f44ff8d040dfb91b1673c4139e7517` |
+| Evaluator report SHA-256 | `sha256:d257dab99c9a3a822e33ed206b2058eae2883f1dcccef7343ad8ae542b64c215` |
+| Records / window | `100` / `6.752234` calendar days |
+| Successful / failed | `35` / `65` |
+| Release-candidate runs | `7` in the 100-run export; only `1` in the remote validator's newest-ten gate |
+| Consecutive success streak | `4` |
+| Claim status | `unexplained-failure` |
+| Reasons | `insufficient-calendar-window`, `unexplained-failure-present` |
+
+This is a command-backed negative observation. It does not establish long-term
+green CI, authorize a push or publication, or remove failed runs from the
+denominator. The raw export and mutable runtime receipts remain outside Git.
+
+## TASK-PRF-0055 lifecycle-observability contract (2026-09-14)
+
+The burn-in evaluator now requires each protected-main observation to carry an
+explicit lifecycle receipt. A receipt records `firstFailureAt`, `retryCount`,
+`lastAttemptAt`, `repairAcceptedAt`, `failureClass`, and (for excluded runs)
+`exclusionReason`. The evaluator reports excluded ids separately, computes
+repair durations only from raw timestamps, and returns fail-closed
+`invalid-input` evidence when lifecycle data is absent or inconsistent. Missing
+telemetry is never treated as zero and cannot produce a `long-term-green` result.
+
+The current live export was deliberately re-run against this stricter contract:
+
+```text
+gh run list --repo eaglhuang/AI-Atomic-Framework --workflow ci.yml --limit 100 --json databaseId,status,conclusion,createdAt,updatedAt,headSha,headBranch,event,displayTitle,workflowName | node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only
+```
+
+It returned:
+
+```json
+{"claimStatus":"invalid-input","reasons":["record-34749756346-missing-lifecycle"]}
+```
+
+This is an intentional negative observation: the existing GitHub export does
+not yet contain enough attempt-level data to measure first failure, retries, or
+repair time. No burn-in claim changed to green, and no raw provider payload was
+written to Git history. The next evidence step is to collect the missing
+attempt/retry metadata outside the repository and rerun the same evaluator.
