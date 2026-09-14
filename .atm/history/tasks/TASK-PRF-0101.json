@@ -1,0 +1,307 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0101",
+  "title": "Integrate millisecond cost score into product proof",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: Inventory public commands and mandatory/conditional gates, with applicability and uncovered items. A field/registry declaration without a real sample is reported as `unknown`, never zero.",
+    "ACC-2: For each measured item report external wall `durationMs`, inclusive/exclusive time, startup/queue/I/O/execution/retry/recovery segments when available, frequency, failure/timeout count, and fixed-task cumulative waiting ms. Nested spans are unioned so parent/child time is not double-counted; overlapping AI workers report makespan separately from CPU sum.",
+    "ACC-3: Generate a JSON plus Markdown ranking from the existing report path. Use p50/p95 and sample count; highlight p50 or p95 >=1,000 ms and diagnose >=5,000 ms first, while allowing high-frequency short calls to rank above rare slow calls by cumulative task cost. Raw samples stay in the external evidence sink and only summary/digest enters governed records.",
+    "ACC-4: Bind the report to fixed workload, OS/cache mode, runner/commit, Node and lockfile. Include failed/timeout/retry samples, measurement overhead, and before/after savings. Product acceptance uses fixed-task mandatory waiting p50 (target >=20% reduction) and rejects p95 regression above 10%; insufficient coverage or unproven attribution is a no-go, not a green result."
+  ],
+  "deliverables": [
+    "scripts/plan-performance-report-v4.ts",
+    "packages/core/src/telemetry/observation.ts",
+    "packages/cli/src/commands/telemetry.ts",
+    "scripts/validate-gate-telemetry-coverage.ts",
+    "tests/cli/command-gate-latency-score.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "scopePaths": [
+    "scripts/plan-performance-report-v4.ts",
+    "packages/core/src/telemetry/observation.ts",
+    "packages/cli/src/commands/telemetry.ts",
+    "scripts/validate-gate-telemetry-coverage.ts",
+    "tests/cli/command-gate-latency-score.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+    "node --strip-types tests/cli/next-warm-run-latency-measurement.test.ts",
+    "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only report/instrumentation changes owned by this card; preserve external raw evidence and unrelated WIP.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.telemetry-observation-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "disposition": "inline",
+        "inlineReason": "Reuse existing observation and performance-report seams; a new telemetry registry or service is explicitly out of scope."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0101-integrate-millisecond-cost-score-into-product-proof.task.md",
+    "sectionTitle": "TASK-PRF-0101",
+    "headingLine": 76,
+    "hash": "e92cac4b05cc6cce",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0101-integrate-millisecond-cost-score-into-product-proof.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:e92cac4b05cc6ccef383e773212dc738ecf1c1c4c774bd22266688bc1719e2a5",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-14T17:48:10.680Z"
+    }
+  },
+  "importedAt": "2026-09-14T17:48:10.680Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "A fixed workload can be measured from the current runner; predecessor samples are optional inputs, not a claim blocker.",
+      "No new remote telemetry service is introduced."
+    ],
+    "softRelations": [
+      "TASK-PRF-0096",
+      "TASK-PRF-0097",
+      "TASK-PRF-0098",
+      "TASK-PRF-0099",
+      "TASK-PRF-0100"
+    ],
+    "changedPublicSeams": [
+      "product-proof-performance-report"
+    ],
+    "causalImpactEdges": [
+      "fixed-task-wait-ms",
+      "command-gate-hotspot-ranking",
+      "multi-ai-makespan"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-PRF-0097 startup samples",
+      "TASK-PRF-0099 quickfix samples"
+    ],
+    "validatorReferences": [
+      "tests/cli/next-warm-run-latency-measurement.test.ts",
+      "tests/cli/gate-telemetry-observed-chain.test.ts"
+    ],
+    "phaseOwner": "product-proof"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_command_gate_latency_score_5f2a1c9e",
+      "targetGroupId": "null",
+      "semanticKey": "command_gate_latency_score",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "fixed-task-wait-ms",
+        "command-gate-hotspot-ranking",
+        "multi-ai-makespan"
+      ],
+      "expectedRedPredicate": "Missing samples, invalid inclusive/exclusive spans, or unranked mandatory hot-spots are rejected.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "product-proof-performance-report",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_command_gate_latency_score_5f2a1c9e"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T17-50-32-259Z-claim-0924634ac5a3",
+  "lastTransitionAt": "2026-09-14T17:50:32.259Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T17:50:26.034Z",
+  "promotedAt": "2026-09-14T17:50:26.038Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-7d058d1965ab",
+    "claimedAt": "2026-09-14T17:50:26.042Z",
+    "heartbeatAt": "2026-09-14T17:50:26.042Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0101.json",
+      ".atm/history/evidence/TASK-PRF-0101.*",
+      ".atm/history/task-events/TASK-PRF-0101/**",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/observation.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/validate-gate-telemetry-coverage.ts",
+      "tests/cli/command-gate-latency-score.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914175026-codex-gpt-5.4-mini-3f931e4174",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914175026-codex-gpt-5.4-mini-3f931e4174\""
+    }
+  },
+  "startedAt": "2026-09-14T17:48:25.318Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-917c1f64879c1638",
+    "ticketDigest": "sha256:917c1f64879c16380c22042572c42467b49fd4a288822abea7a6563687cc52e7",
+    "taskId": "TASK-PRF-0101",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914175026-codex-gpt-5.4-mini-3f931e4174",
+    "claimGeneration": "lease-7d058d1965ab",
+    "issuedAt": "2026-09-14T17:50:26.042Z",
+    "expiresAt": "2026-09-14T18:20:26.042Z",
+    "scopeDigest": "sha256:3a09e25c2a6017806c581c7468b1e399a5988893638eeb1f14d048dff97156e7",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T17:50:26.042Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0101.*",
+          ".atm/history/task-events/TASK-PRF-0101/**",
+          ".atm/history/tasks/TASK-PRF-0101.json",
+          "docs/reports/atm-command-gate-latency-score.md",
+          "packages/cli/src/commands/telemetry.ts",
+          "packages/core/src/telemetry/observation.ts",
+          "scripts/plan-performance-report-v4.ts",
+          "scripts/validate-gate-telemetry-coverage.ts",
+          "tests/cli/command-gate-latency-score.test.ts"
+        ],
+        "digest": "sha256:4f8234a3891cea350438e3f327a7df6e0749071603f42f83639440cb3983c73d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20260914175026-codex-gpt-5.4-mini-TASK-PRF-0101-56cbaecd02",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0101",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0101.*",
+      ".atm/history/task-events/TASK-PRF-0101/**",
+      ".atm/history/tasks/TASK-PRF-0101.json",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/observation.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "scripts/validate-gate-telemetry-coverage.ts",
+      "tests/cli/command-gate-latency-score.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d8289f990b4b043cf5920d03ad81719c179a58852026a6b71db075b352c7b258",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914175026-codex-gpt-5.4-mini-TASK-PRF-0101-56cbaecd02",
+    "laneSession": {
+      "laneSessionId": "lane-20260914175026-codex-gpt-5.4-mini-3f931e4174",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914175026-codex-gpt-5.4-mini-3f931e4174\""
+    },
+    "createdAt": "2026-09-14T17:50:32.258Z",
+    "status": "active"
+  }
+}
