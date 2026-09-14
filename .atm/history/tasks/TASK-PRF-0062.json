@@ -1,0 +1,424 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0062",
+  "title": "Re-establish measured entry reduction after complete runtime closure",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0060"
+  ],
+  "acceptance": [
+    "ACC-1: A clean consumer installs the candidate without workspace links or source residue and completes `version`, `doctor`, `bootstrap`, `atm-chart render`, and `atm-chart verify`; each command records exit code, module-resolution state, and output digest.",
+    "ACC-2: Against the fixed public `@ai-atomic-framework/cli@0.1.0` baseline, the same candidate records tarball bytes, unpacked bytes, entry count, dependency footprint, startup p50/p95, Node/npm versions, and exact candidate/baseline digests; acceptance requires at least 20% unpacked-byte and 15% entry-count reduction.",
+    "ACC-3: The candidate manifest proves every runtime asset required by the complete core workflow is present and hash-bound. Missing-asset, extra-download, and unsealed code-splitting negative fixtures fail closed.",
+    "ACC-4: The result preserves one self-contained npm runtime and does not claim slimming when either reduction threshold or functional equivalence fails. If no safe design meets both thresholds, the retained receipt says `unproven` and records the stop reason without weakening the contract.",
+    "ACC-5: Candidate evidence is explicitly separated from public-registry evidence and includes an offline replay command; no local candidate result can be labeled as a public release proof.",
+    "ACC-6: Build, typecheck, lint, focused contract tests, and the baseline/candidate measurement validator pass; all raw evidence stays outside Git and the report links the receipt digest and rollback path."
+  ],
+  "deliverables": [
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/validate-public-npm-install.ts",
+    "tests/cli/npm-clean-install.test.ts",
+    "tests/cli/external-benchmark-protocol.test.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "packages/cli/dist/npm-runtime/manifest.json",
+    "docs/reports/atm-runtime-boundary-entry-reduction.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/atm-public.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "scripts/build-package-dist.ts",
+    "scripts/validate-public-npm-install.ts",
+    "tests/cli/npm-clean-install.test.ts",
+    "tests/cli/external-benchmark-protocol.test.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "packages/cli/dist",
+    "docs/reports/atm-runtime-boundary-entry-reduction.md",
+    ".atm/history/evidence/TASK-PRF-0062.*",
+    ".atm/history/task-events/TASK-PRF-0062/**",
+    ".atm/history/tasks/TASK-PRF-0062.json",
+    "packages/cli/src/commands/atm-chart/constants.ts",
+    "packages/cli/src/commands/atm-chart/render-verify.ts"
+  ],
+  "validators": [
+    "npm run build --workspace packages/cli",
+    "npm run typecheck",
+    "npm run lint",
+    "node --strip-types tests/cli/npm-clean-install.test.ts",
+    "node --strip-types tests/cli/external-benchmark-protocol.test.ts",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "node --strip-types scripts/validate-public-npm-install.ts --measure --package @ai-atomic-framework/cli --baseline-version 0.1.0 --candidate-dir packages/cli --measurement-runs 3 --measurement-output C:\\\\Users\\\\User\\\\atm-benchmark-sink\\\\TASK-PRF-0062\\\\baseline-vs-complete-candidate-measurement.json"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "clean-consumer-measurement-with-fixed-baseline-and-negative-coverage",
+  "rollbackStrategy": "revert-commit-preserve-external-receipt",
+  "rollbackNotes": "只回滾本卡的 runtime boundary、validator、測試與報告；保留外部 measurement receipt 和 0049/0052 歷史 provenance，不刪除未知來源的 release 產物。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.public-runtime-closure",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.public-runtime-asset-closure",
+        "pattern": "Policy Object",
+        "source": "scripts/build-cli-npm-runtime.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.public-runtime-measurement-contract",
+        "pattern": "Policy Object",
+        "source": "scripts/validate-public-npm-install.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0062-re-establish-measured-entry-reduction-after-complete-runtime-closure.task.md",
+    "sectionTitle": "TASK-PRF-0062",
+    "headingLine": 120,
+    "hash": "2a11c46e48648dae",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0062-re-establish-measured-entry-reduction-after-complete-runtime-closure.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:2a11c46e48648dae28a2ea8a9875ea184d4c7c3f43caeea9df49d611e5d1e089",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T05:37:06.321Z"
+    }
+  },
+  "importedAt": "2026-09-14T05:37:06.321Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0060"
+    ],
+    "startConditions": [
+      "A complete candidate exists whose clean-consumer core workflow passes, but the fixed 0.1.0 comparison shows fewer than 15% entry reduction.",
+      "The five chart schema assets restored by TASK-PRF-0052 remain required and are covered by the candidate manifest."
+    ],
+    "softRelations": [
+      "TASK-PRF-0053",
+      "TASK-PRF-0061"
+    ],
+    "changedPublicSeams": [
+      "public_cli_runtime_boundary",
+      "adopter_bundle_measurement"
+    ],
+    "causalImpactEdges": [
+      "complete_public_install",
+      "adopter_bundle_size"
+    ],
+    "parallelFrontierInputs": [
+      "candidate-runtime-build",
+      "baseline-registry-receipt",
+      "clean-consumer-measurement"
+    ],
+    "validatorReferences": [
+      "test_prf_complete_runtime_entry_reduction",
+      "test_prf_required_runtime_asset_closure",
+      "test_prf_boundary_negative_fixture",
+      "test_prf_boundary_provenance"
+    ],
+    "phaseOwner": "release"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_complete_runtime_entry_reduction",
+      "targetGroupId": null,
+      "semanticKey": "complete_runtime_entry_reduction",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "complete_public_install",
+        "adopter_bundle_size"
+      ],
+      "expectedRedPredicate": "A candidate that passes the full core workflow but does not reach the fixed 20% unpacked-byte and 15% entry-count reductions is accepted or reported as green.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "adopter_bundle_measurement",
+      "resourceKey": "clean-consumer-measurement"
+    },
+    {
+      "caseId": "test_prf_required_runtime_asset_closure",
+      "targetGroupId": null,
+      "semanticKey": "required_runtime_asset_closure",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "complete_public_install"
+      ],
+      "expectedRedPredicate": "Removing any chart schema required by bootstrap, atm-chart render, or atm-chart verify still produces a passing candidate or an incomplete manifest.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "public_cli_runtime_boundary",
+      "resourceKey": "runtime-asset-manifest"
+    },
+    {
+      "caseId": "test_prf_boundary_negative_fixture",
+      "targetGroupId": null,
+      "semanticKey": "boundary_negative_fixture",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "complete_public_install",
+        "adopter_bundle_size"
+      ],
+      "expectedRedPredicate": "A candidate using extra runtime downloads, code-splitting without a sealed disposition, or omitted required files is reported as blocked rather than accepted.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "public_cli_runtime_boundary",
+      "resourceKey": "negative-boundary-fixture"
+    },
+    {
+      "caseId": "test_prf_boundary_provenance",
+      "targetGroupId": null,
+      "semanticKey": "boundary_provenance",
+      "coversAcceptance": [
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "adopter_bundle_size"
+      ],
+      "expectedRedPredicate": "A measurement receipt without fixed baseline, candidate digest, clean-consumer status, or command matrix can be presented as product proof.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "adopter_bundle_measurement",
+      "resourceKey": "measurement-receipt"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_complete_runtime_entry_reduction",
+    "test_prf_required_runtime_asset_closure",
+    "test_prf_boundary_negative_fixture",
+    "test_prf_boundary_provenance"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0060",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T05-56-20-998Z-renew-c094c0f46344",
+  "lastTransitionAt": "2026-09-14T05:56:20.998Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T05:40:11.529Z",
+  "promotedAt": "2026-09-14T05:40:11.534Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-abcdfc4660dc",
+    "claimedAt": "2026-09-14T05:40:11.538Z",
+    "heartbeatAt": "2026-09-14T05:56:20.001Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0062.*",
+      ".atm/history/task-events/TASK-PRF-0062/**",
+      ".atm/history/tasks/TASK-PRF-0062.json",
+      "docs/reports/atm-runtime-boundary-entry-reduction.md",
+      "packages/cli/dist",
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/commands/atm-chart/constants.ts",
+      "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/external-benchmark-protocol.test.ts",
+      "tests/cli/npm-clean-install.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260914054011-codex-gpt-5.4-mini-791b0440f3",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914054011-codex-gpt-5.4-mini-791b0440f3\""
+    }
+  },
+  "startedAt": "2026-09-14T05:40:11.538Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-7ee9dec9df5c48c1",
+    "ticketDigest": "sha256:7ee9dec9df5c48c17aba297dc063f87bd52e28b40f2f6ab419c6bb54dfbd03ba",
+    "taskId": "TASK-PRF-0062",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914054011-codex-gpt-5.4-mini-791b0440f3",
+    "claimGeneration": "lease-abcdfc4660dc",
+    "issuedAt": "2026-09-14T05:56:20.001Z",
+    "expiresAt": "2026-09-14T06:26:20.001Z",
+    "scopeDigest": "sha256:7ea079fc52250383fb75c8a084af57bd2172a37023600c974ecdc6df91b470c0",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T05:56:20.001Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0062.*",
+          ".atm/history/task-events/TASK-PRF-0062/**",
+          ".atm/history/tasks/TASK-PRF-0062.json",
+          "docs/reports/atm-runtime-boundary-entry-reduction.md",
+          "packages/cli/dist",
+          "packages/cli/src/atm-public.ts",
+          "packages/cli/src/commands/atm-chart/constants.ts",
+          "packages/cli/src/commands/atm-chart/render-verify.ts",
+          "scripts/build-cli-npm-runtime.ts",
+          "scripts/build-package-dist.ts",
+          "scripts/validate-public-npm-install.ts",
+          "tests/cli/external-benchmark-protocol.test.ts",
+          "tests/cli/npm-clean-install.test.ts",
+          "tests/cli/public-npm-install-contract.test.ts"
+        ],
+        "digest": "sha256:916829d544c2567ce8eafedad3eaa361dcfc226def5576e93398af5ba1c755f5"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260914054011-codex-gpt-5.4-mini-TASK-PRF-0062-0ae2245750",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0062",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0062.*",
+      ".atm/history/task-events/TASK-PRF-0062/**",
+      ".atm/history/tasks/TASK-PRF-0062.json",
+      "docs/reports/atm-runtime-boundary-entry-reduction.md",
+      "packages/cli/dist",
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/commands/atm-chart/constants.ts",
+      "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/external-benchmark-protocol.test.ts",
+      "tests/cli/npm-clean-install.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0062-re-establish-measured-entry-reduction-after-complete-runtime-closure.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0062-re-establish-measured-entry-reduction-after-complete-runtime-closure.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "c23822746075c7b02b70374027215f6888b393f73015ba9e825180b2f5015af8",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260914054011-codex-gpt-5.4-mini-791b0440f3",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914054011-codex-gpt-5.4-mini-791b0440f3\""
+    },
+    "createdAt": "2026-09-14T05:40:18.187Z",
+    "status": "active"
+  }
+}

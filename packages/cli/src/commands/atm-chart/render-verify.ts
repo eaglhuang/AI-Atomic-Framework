@@ -8,7 +8,7 @@ import {
   atmChartFrontmatterSchemaVersion,
   atmChartSourceSchemas,
   defaultATMChartRelativePath,
-  resolveATMChartSchemaPath
+  resolveATMChartSchemaSource
 } from './constants.ts';
 import { createVersionCompatibilityReport, findChartRecord, loadCompatibilityMatrix, readFrameworkPackageVersion } from './compatibility.ts';
 import type { ATMChartFrontmatter, ATMChartSourceSnapshot, ATMChartSummary } from './types.ts';
@@ -129,8 +129,8 @@ export function collectATMChartSources(cwd: string): ATMChartSourceSnapshot {
   }
 
   const sourceSchemaSha256s = Object.fromEntries(Object.entries(atmChartSourceSchemas).map(([schemaId, relativeSchemaPath]) => {
-    const absoluteSchemaPath = resolveATMChartSchemaPath(relativeSchemaPath);
-    if (!existsSync(absoluteSchemaPath)) {
+    const source = resolveATMChartSchemaSource(relativeSchemaPath);
+    if (!source) {
       throw new CliError('ATM_CHART_SCHEMA_SOURCE_MISSING', `Schema source was not found for ${schemaId}.`, {
         exitCode: 2,
         details: {
@@ -139,7 +139,7 @@ export function collectATMChartSources(cwd: string): ATMChartSourceSnapshot {
         }
       });
     }
-    return [schemaId, computeSha256ForFile(absoluteSchemaPath)];
+    return [schemaId, source.kind === 'filesystem' ? computeSha256ForFile(source.path) : source.sha256!];
   }));
 
   return {

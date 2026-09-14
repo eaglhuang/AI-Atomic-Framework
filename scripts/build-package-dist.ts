@@ -15,11 +15,6 @@ const VENDOR_DIRNAME = '_vendor';
 // truth for non-module assets required by the public CLI.
 const CLI_RUNTIME_ASSETS = [
   'schemas/atomic-spec.schema.json',
-  'schemas/governance/default-guards.schema.json',
-  'schemas/charter/charter-invariants.schema.json',
-  'schemas/integrations/install-manifest.schema.json',
-  'schemas/agent-prompt.schema.json',
-  'schemas/upgrade/upgrade-proposal.schema.json',
   'templates/atom.spec.template.json',
   'templates/atom.test.template.ts'
 ] as const;

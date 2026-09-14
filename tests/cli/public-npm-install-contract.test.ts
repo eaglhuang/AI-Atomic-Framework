@@ -106,14 +106,34 @@ try {
   runAtm('atm-chart', 'verify', '--cwd', adopter, '--json');
   const installedLayout = path.join(consumer, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'layout');
   for (const schemaPath of [
-    'schemas/governance/default-guards.schema.json',
-    'schemas/charter/charter-invariants.schema.json',
-    'schemas/integrations/install-manifest.schema.json',
-    'schemas/agent-prompt.schema.json',
-    'schemas/upgrade/upgrade-proposal.schema.json'
+    'schemas/atomic-spec.schema.json'
   ]) {
     assert.ok(existsSync(path.join(installedLayout, schemaPath)), `local candidate runtime must carry ${schemaPath}`);
   }
+  for (const schemaPath of [
+    'schemas/agent-prompt.schema.json',
+    'schemas/charter/charter-invariants.schema.json',
+    'schemas/governance/default-guards.schema.json',
+    'schemas/integrations/install-manifest.schema.json',
+    'schemas/upgrade/upgrade-proposal.schema.json'
+  ]) {
+    assert.equal(existsSync(path.join(installedLayout, schemaPath)), false, `embedded chart schema must not be duplicated as ${schemaPath}`);
+  }
+  const runtimeManifest = JSON.parse(readFileSync(path.join(consumer, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'manifest.json'), 'utf8')) as {
+    embeddedRuntimeAssets?: Array<{ path: string; kind: string; sha256: string }>;
+  };
+  assert.deepEqual(
+    runtimeManifest.embeddedRuntimeAssets?.map((entry) => entry.path),
+    [
+      'schemas/agent-prompt.schema.json',
+      'schemas/charter/charter-invariants.schema.json',
+      'schemas/governance/default-guards.schema.json',
+      'schemas/integrations/install-manifest.schema.json',
+      'schemas/upgrade/upgrade-proposal.schema.json'
+    ],
+    'runtime manifest must enumerate logical embedded chart assets'
+  );
+  assert.ok(runtimeManifest.embeddedRuntimeAssets?.every((entry) => entry.kind === 'bundled-logical-asset' && /^sha256:[0-9a-f]{64}$/.test(entry.sha256)));
   const chart = readFileSync(path.join(adopter, '.atm', 'memory', 'atm-chart.md'), 'utf8');
   for (const schemaId of ['governance/default-guards', 'charter/charter-invariants', 'integrations/install-manifest', 'agent-prompt', 'upgrade/upgrade-proposal']) {
     assert.match(chart, new RegExp(schemaId.replace('/', '\\/')), `rendered ATMChart must record ${schemaId}`);

@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build, type Plugin } from 'esbuild';
 import ts from 'typescript';
+import { embeddedATMChartSchemaAssets } from '../packages/cli/src/commands/atm-chart/constants.ts';
 
 const OMITTED_PUBLIC_ASSETS = [
   /^_vendor\/agent-pack-claude-code\/templates\//,
@@ -82,6 +83,9 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = 
         'integration', 'plan', 'actor', 'bootstrap', 'start', 'tasks', 'atm-chart'
       ],
       omittedPublicAssets: OMITTED_PUBLIC_ASSETS.map((pattern) => pattern.source),
+      embeddedRuntimeAssets: Object.entries(embeddedATMChartSchemaAssets)
+        .map(([path, asset]) => ({ path, kind: 'bundled-logical-asset', sha256: asset.sha256 }))
+        .sort((left, right) => left.path.localeCompare(right.path)),
       files,
       fileCount: files.length + 1,
       totalBytes: files.reduce((sum, file) => sum + file.bytes, 0)
