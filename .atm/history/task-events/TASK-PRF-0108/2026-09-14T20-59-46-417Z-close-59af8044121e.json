@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T20-59-46-417Z-close-59af8044121e",
+  "taskId": "TASK-PRF-0108",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914202919-codex-gpt-5.4-mini-TASK-PRF-0108-1d5fb79d49",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0108.json",
+  "taskSha256": "sha256:b3b016107320532296b4974bb513a2c9fb2c4b7829ff64ebf2ca41654061724d",
+  "createdAt": "2026-09-14T20:59:46.417Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0108 --actor codex-gpt-5.4-mini --status done --historical-delivery 80b06eafb0c886465d97e2db3eeb8fa57728e3b4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914202919-codex-gpt-5.4-mini-TASK-PRF-0108-1d5fb79d49",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0108.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "node --strip-types tests/cli/onefile-root-drop-build-coordination.test.ts",
+      "validate:bootstrap",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "node --strip-types tests/cli/onefile-root-drop-build-coordination.test.ts",
+      "validate:bootstrap",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T20:59:46.407Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0108.*",
+        ".atm/history/task-events/TASK-PRF-0108/**",
+        ".atm/history/tasks/TASK-PRF-0108.json",
+        "docs/reports/atm-command-gate-latency-score.md",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts",
+        "tests/cli/onefile-root-drop-build-coordination.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts",
+        "tests/cli/onefile-root-drop-build-coordination.test.ts"
+      ],
+      "requiredGates": [
+        "check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md",
+        "node --strip-types tests/cli/onefile-root-drop-build-coordination.test.ts",
+        "validate:bootstrap",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
