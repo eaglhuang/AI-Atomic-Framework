@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0057",
+  "updatedAt": "2026-09-14T03:15:17.013Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "lint",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "typecheck",
+    "validate:candidate-npm-install"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-candidate-npm-install.ts --candidate-dir packages/cli --candidate-tarball C:\\Users\\User\\AppData\\Local\\Temp\\ai-atomic-framework-cli-0.1.0.tgz --measurement-runs 1 --record-blocked --output C:\\Users\\User\\atm-benchmark-sink\\TASK-PRF-0057\\explicit-tarball-receipt.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:00ef057decb175da83f93b89fca42c14775dda3dde5a382f17c1efd49abd8f40",
+      "stderrSha256": "sha256:f2ee76691011dc142ac20908f737a07fd23af5b04b7f24a4031d375c2d38a244",
+      "validators": [
+        "validate:candidate-npm-install"
+      ],
+      "generatedAt": "2026-09-14T03:13:30.331Z",
+      "startedAt": "2026-09-14T03:13:24.452Z",
+      "finishedAt": "2026-09-14T03:13:30.331Z",
+      "durationMs": 5879,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0f9883265cae75a95345cd8abaf977902c7f774c",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-14T03:14:23.998Z",
+      "startedAt": "2026-09-14T03:14:13.865Z",
+      "finishedAt": "2026-09-14T03:14:23.998Z",
+      "durationMs": 10133,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0f9883265cae75a95345cd8abaf977902c7f774c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+      ],
+      "generatedAt": "2026-09-14T03:14:33.179Z",
+      "startedAt": "2026-09-14T03:14:32.882Z",
+      "finishedAt": "2026-09-14T03:14:33.179Z",
+      "durationMs": 297,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0f9883265cae75a95345cd8abaf977902c7f774c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3cd67742294542997602b2b7541cae04cc80a43b5b64416c1ce30226b3093c91",
+      "stderrSha256": "sha256:5db70644943f0354518a551d3fa5b8f1a15bc6a7fee5b7de19d07d350aab9b44",
+      "validators": [
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-14T03:15:02.317Z",
+      "startedAt": "2026-09-14T03:14:39.546Z",
+      "finishedAt": "2026-09-14T03:15:02.317Z",
+      "durationMs": 22771,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0f9883265cae75a95345cd8abaf977902c7f774c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-14T03:15:17.012Z",
+      "startedAt": "2026-09-14T03:15:08.092Z",
+      "finishedAt": "2026-09-14T03:15:17.012Z",
+      "durationMs": 8920,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0f9883265cae75a95345cd8abaf977902c7f774c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

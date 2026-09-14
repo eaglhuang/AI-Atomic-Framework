@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
+import { gunzipSync } from 'node:zlib';
 
 type Args = {
   candidateDir: string;
@@ -76,6 +77,72 @@ function sha256(filePath: string): string {
   return createHash('sha256').update(readFileSync(filePath)).digest('hex');
 }
 
+function tarField(buffer: Buffer, offset: number, length: number): string {
+  return buffer.subarray(offset, offset + length).toString('utf8').replace(/\0.*$/, '').trim();
+}
+
+function tarOctalField(buffer: Buffer, offset: number, length: number): number {
+  const raw = tarField(buffer, offset, length).replace(/\0/g, '').trim();
+  if (!raw) return 0;
+  const value = Number.parseInt(raw, 8);
+  if (!Number.isSafeInteger(value) || value < 0) throw new Error(`invalid tar entry size: ${raw}`);
+  return value;
+}
+
+function readExplicitTarballMetadata(tarball: string): PackMetadata {
+  const compressed = readFileSync(tarball);
+  let archive: Buffer;
+  try {
+    archive = gunzipSync(compressed);
+  } catch {
+    throw new Error('candidate tarball is not a valid gzip archive');
+  }
+  const files: Array<{ path: string; size: number }> = [];
+  let packageJson: string | undefined;
+  let offset = 0;
+  while (offset + 512 <= archive.length) {
+    const header = archive.subarray(offset, offset + 512);
+    if (header.every((byte) => byte === 0)) break;
+    const name = tarField(header, 0, 100);
+    const prefix = tarField(header, 345, 155);
+    const entryPath = prefix ? `${prefix}/${name}` : name;
+    if (!entryPath) throw new Error('candidate tarball contains an unnamed entry');
+    const size = tarOctalField(header, 124, 12);
+    const type = String.fromCharCode(header[156] ?? 0);
+    const contentOffset = offset + 512;
+    const contentEnd = contentOffset + size;
+    if (contentEnd > archive.length) throw new Error(`candidate tarball entry is truncated: ${entryPath}`);
+    if (type === '0' || type === '\0') {
+      files.push({ path: entryPath, size });
+      if (entryPath === 'package/package.json') {
+        packageJson = archive.subarray(contentOffset, contentEnd).toString('utf8');
+      }
+    }
+    offset = contentOffset + Math.ceil(size / 512) * 512;
+  }
+  if (offset > archive.length || !packageJson) {
+    throw new Error('candidate tarball is missing package/package.json');
+  }
+  let manifest: { name?: unknown; version?: unknown };
+  try {
+    manifest = JSON.parse(packageJson) as { name?: unknown; version?: unknown };
+  } catch {
+    throw new Error('candidate tarball package/package.json is invalid JSON');
+  }
+  if (typeof manifest.name !== 'string' || typeof manifest.version !== 'string' || !manifest.name || !manifest.version) {
+    throw new Error('candidate tarball package/package.json is missing name or version');
+  }
+  files.sort((left, right) => left.path.localeCompare(right.path));
+  return {
+    filename: path.basename(tarball),
+    name: manifest.name,
+    version: manifest.version,
+    size: compressed.byteLength,
+    unpackedSize: files.reduce((total, entry) => total + entry.size, 0),
+    files
+  };
+}
+
 function percentile(values: readonly number[], percentileValue: number): number {
   const sorted = [...values].sort((left, right) => left - right);
   const index = (sorted.length - 1) * percentileValue;
@@ -90,7 +157,7 @@ function packCandidate(args: Args, packRoot: string): { metadata: PackMetadata; 
   if (args.candidateTarball) {
     const tarball = path.join(packRoot, path.basename(args.candidateTarball));
     writeFileSync(tarball, readFileSync(args.candidateTarball));
-    return { metadata: { filename: path.basename(tarball), files: [] }, tarball, source: 'explicit-tarball' };
+    return { metadata: readExplicitTarballMetadata(tarball), tarball, source: 'explicit-tarball' };
   }
   const metadata = parsePackMetadata(runNpm([
     'pack', args.candidateDir, '--ignore-scripts', '--pack-destination', packRoot, '--json', '--loglevel', 'silent'

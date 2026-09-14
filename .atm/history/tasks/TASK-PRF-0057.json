@@ -1,0 +1,331 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0057",
+  "title": "Preserve complete metadata for explicit candidate tarballs",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: For a valid `--candidate-tarball`, the receipt records package name/version, tarball byte size and SHA-256, unpacked byte total, entry count, and a deterministic archive file inventory with per-file sizes.",
+    "ACC-2: Explicit-tarball metadata is derived from the supplied archive, not from the current candidate directory or a workspace link; the clean install still runs the complete seven-command matrix and preserves `candidateOnly: true` and `publicRegistry: false`.",
+    "ACC-3: Truncated, malformed, or package-metadata-incomplete archives fail closed with an actionable error/blocked receipt and never silently emit zero-valued size or entry metadata.",
+    "ACC-4: Packaging the same candidate and validating it once by directory and once by explicit tarball yields equivalent package version, unpacked bytes, entry count, and file inventory; focused tests, typecheck, lint, and a command-backed external receipt pass. No npm publish or push is authorized."
+  ],
+  "deliverables": [
+    "scripts/validate-candidate-npm-install.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "scopePaths": [
+    "scripts/validate-candidate-npm-install.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run lint",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "node --strip-types scripts/validate-candidate-npm-install.ts --candidate-dir packages/cli --candidate-tarball <sealed-tarball> --record-blocked"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-explicit-tarball-clean-install-metadata-parity",
+  "rollbackStrategy": "revert-commit-preserve-failed-receipts",
+  "rollbackNotes": "Revert only the validator, focused tests, and report additions; retain the original zero-valued explicit-tarball receipt outside Git for audit.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.public-runtime-closure",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.candidate-registry-workflow-validator",
+        "pattern": "Policy Object",
+        "source": "scripts/validate-candidate-npm-install.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "Keep archive metadata recovery cohesive with the candidate proof repair; extract only after a provider-neutral archive reader is shared by another validator."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0057-preserve-complete-metadata-for-explicit-candidate-tarballs.task.md",
+    "sectionTitle": "TASK-PRF-0057",
+    "headingLine": 102,
+    "hash": "d97e860c7dc2c138",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0057-preserve-complete-metadata-for-explicit-candidate-tarballs.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:d97e860c7dc2c1386b38e76a275f204bde1c282e4db98333c9c7b4b60b197128",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T03:08:32.501Z"
+    }
+  },
+  "importedAt": "2026-09-14T03:08:32.501Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0056"
+    ],
+    "startConditions": [],
+    "softRelations": [
+      "TASK-PRF-0053",
+      "TASK-PRF-0056"
+    ],
+    "changedPublicSeams": [
+      "candidate_npm_install_proof"
+    ],
+    "causalImpactEdges": [
+      "candidate_tarball_provenance",
+      "rerunnable_package_metrics"
+    ],
+    "parallelFrontierInputs": [
+      "explicit-tarball",
+      "candidate-directory"
+    ],
+    "validatorReferences": [
+      "test_prf_candidate_explicit_tarball_metadata",
+      "test_prf_candidate_explicit_tarball_fail_closed",
+      "test_prf_candidate_metadata_parity"
+    ],
+    "phaseOwner": "release"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_candidate_explicit_tarball_metadata",
+      "targetGroupId": "null",
+      "semanticKey": "candidate_explicit_tarball_metadata",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "candidate_tarball_provenance"
+      ],
+      "expectedRedPredicate": "An explicit candidate tarball receipt reports version local, zero unpacked bytes, zero entries, or an empty file inventory despite a valid archive.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "candidate_npm_install_proof",
+      "resourceKey": "explicit-tarball-metadata"
+    },
+    {
+      "caseId": "test_prf_candidate_explicit_tarball_fail_closed",
+      "targetGroupId": "null",
+      "semanticKey": "candidate_explicit_tarball_fail_closed",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "rerunnable_package_metrics"
+      ],
+      "expectedRedPredicate": "A truncated, malformed, or package-metadata-incomplete explicit tarball is accepted or produces a misleading zero-valued receipt.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "candidate_npm_install_proof",
+      "resourceKey": "explicit-tarball-fail-closed"
+    },
+    {
+      "caseId": "test_prf_candidate_metadata_parity",
+      "targetGroupId": "null",
+      "semanticKey": "candidate_metadata_parity",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "candidate_tarball_provenance"
+      ],
+      "expectedRedPredicate": "The same packaged candidate produces materially different version, unpacked byte, entry count, or file-list metadata depending on candidate-directory versus explicit-tarball mode.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "candidate_npm_install_proof",
+      "resourceKey": "candidate-metadata-parity"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_candidate_explicit_tarball_metadata",
+    "test_prf_candidate_explicit_tarball_fail_closed",
+    "test_prf_candidate_metadata_parity"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T03-09-20-870Z-claim-374b8afca6a2",
+  "lastTransitionAt": "2026-09-14T03:09:20.870Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T03:09:05.884Z",
+  "promotedAt": "2026-09-14T03:09:05.888Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-06a9a34108de",
+    "claimedAt": "2026-09-14T03:09:19.054Z",
+    "heartbeatAt": "2026-09-14T03:09:19.054Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "scripts/validate-candidate-npm-install.ts",
+      "tests/cli/public-npm-install-contract.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "docs/reports/atm-product-proof-checkpoints.md"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914030906-codex-gpt-5.4-mini-ea74611ba7",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914030906-codex-gpt-5.4-mini-ea74611ba7\""
+    }
+  },
+  "startedAt": "2026-09-14T03:09:05.893Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260914030919-codex-gpt-5.4-mini-TASK-PRF-0057-64a7d5affa",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0057",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0057.*",
+      ".atm/history/task-events/TASK-PRF-0057/**",
+      ".atm/history/tasks/TASK-PRF-0057.json",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "scripts/validate-candidate-npm-install.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "8dadeda5b819a312dd2fccc65effcd4a61dc2e05ac4d126eb00cd8a12a0bc34e",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914030919-codex-gpt-5.4-mini-TASK-PRF-0057-64a7d5affa",
+    "laneSession": {
+      "laneSessionId": "lane-20260914030906-codex-gpt-5.4-mini-ea74611ba7",
+      "status": "active",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914030906-codex-gpt-5.4-mini-ea74611ba7\""
+    },
+    "createdAt": "2026-09-14T03:09:20.869Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-b82d7ad7335a43da",
+    "ticketDigest": "sha256:b82d7ad7335a43dacdc9b07e877f2e42cc69635af86b80b3accd52a1948d577c",
+    "taskId": "TASK-PRF-0057",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914030906-codex-gpt-5.4-mini-ea74611ba7",
+    "claimGeneration": "lease-06a9a34108de",
+    "issuedAt": "2026-09-14T03:09:19.054Z",
+    "expiresAt": "2026-09-14T03:39:19.054Z",
+    "scopeDigest": "sha256:62383f36c6e56c07374ca0a26eb34ea456a03151a55cf577696aee56b13b9304",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T03:09:19.054Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0057.*",
+          ".atm/history/task-events/TASK-PRF-0057/**",
+          ".atm/history/tasks/TASK-PRF-0057.json",
+          "docs/reports/atm-product-proof-checkpoints.md",
+          "docs/reports/atm-public-npm-install-proof-beta.md",
+          "scripts/validate-candidate-npm-install.ts",
+          "tests/cli/product-proof-evidence-boundary.test.ts",
+          "tests/cli/public-npm-install-contract.test.ts"
+        ],
+        "digest": "sha256:79f0c1a34688dd325dd98d54a1a5587b2b3f3cf55532d4d372b28bb2822d6a62"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

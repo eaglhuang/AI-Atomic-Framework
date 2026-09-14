@@ -76,3 +76,13 @@ mistaken for registry evidence. The validator records the isolated install,
 tarball digest, unpacked bytes, entry count, runtime versions, command exits,
 startup timings, and output digests. This repairs evidence completeness only;
 it does not publish or alter the public `0.1.0` result.
+
+## TASK-PRF-0057 explicit tarball metadata repair (2026-09-14)
+
+An explicit candidate tarball must be self-describing evidence. The prior
+validator path installed the archive correctly but emitted zero-valued unpacked
+size and entry metadata, so that receipt is retained as a failed provenance
+observation. The follow-up requires archive-derived package version, unpacked
+bytes, sorted file inventory, and fail-closed malformed-archive handling. This
+candidate-only repair does not change the public package status or authorize
+npm publication.

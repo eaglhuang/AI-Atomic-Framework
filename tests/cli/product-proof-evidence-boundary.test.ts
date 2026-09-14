@@ -23,4 +23,7 @@ assert.match(candidateValidatorSource, /requiredSuccessCommandFailures/);
 assert.match(candidateValidatorSource, /coreWorkflowPassed/);
 assert.match(candidateValidatorSource, /candidateOnly: true/);
 assert.match(candidateValidatorSource, /publicRegistry: false/);
+assert.match(candidateValidatorSource, /readExplicitTarballMetadata/);
+assert.match(candidateValidatorSource, /candidate tarball is not a valid gzip archive/);
+assert.match(candidateValidatorSource, /files\.sort/);
 console.log('product-proof-evidence-boundary ok');

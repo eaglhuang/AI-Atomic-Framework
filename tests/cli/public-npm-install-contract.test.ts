@@ -1,6 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { strict as assert } from 'node:assert';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,6 +45,9 @@ assert.match(candidateValidatorSource, /requiredSuccessCommandFailures/, 'candid
 assert.match(candidateValidatorSource, /coreWorkflowPassed/, 'candidate validator must report core workflow status');
 assert.match(candidateValidatorSource, /candidateOnly: true/, 'candidate receipt must remain candidate-only');
 assert.match(candidateValidatorSource, /publicRegistry: false/, 'candidate receipt must not claim registry evidence');
+assert.match(candidateValidatorSource, /readExplicitTarballMetadata/, 'explicit tarball metadata must be archive-derived');
+assert.match(candidateValidatorSource, /unpackedSize: files\.reduce/, 'explicit tarball metadata must record unpacked bytes');
+assert.match(candidateValidatorSource, /missing package\/package\.json/, 'explicit tarball metadata must fail closed without package manifest');
 
 const live = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.0', '--record-blocked', '--measurement-runs', '1'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
 const liveProof = JSON.parse(live.trim().split(/\r?\n/).at(-1)!);
@@ -115,6 +118,31 @@ try {
   for (const schemaId of ['governance/default-guards', 'charter/charter-invariants', 'integrations/install-manifest', 'agent-prompt', 'upgrade/upgrade-proposal']) {
     assert.match(chart, new RegExp(schemaId.replace('/', '\\/')), `rendered ATMChart must record ${schemaId}`);
   }
+
+  const explicitOutput = execFileSync(process.execPath, [
+    '--strip-types', path.join(root, 'scripts', 'validate-candidate-npm-install.ts'),
+    '--candidate-dir', path.join(root, 'packages', 'cli'), '--candidate-tarball', tarball,
+    '--measurement-runs', '1', '--record-blocked'
+  ], { cwd: root, encoding: 'utf8', windowsHide: true, shell: false });
+  const explicitProof = JSON.parse(explicitOutput.trim().split(/\r?\n/).at(-1)!);
+  assert.equal(explicitProof.candidate.source, 'explicit-tarball');
+  assert.equal(explicitProof.candidate.version, packed[0].version);
+  assert.equal(explicitProof.candidate.unpackedBytes, packed[0].unpackedSize);
+  assert.equal(explicitProof.candidate.entryCount, packed[0].files.length);
+  assert.equal(explicitProof.candidate.files.length, packed[0].files.length);
+  assert.ok(explicitProof.candidate.files.some((entry: { path?: string }) => entry.path === 'package/package.json'));
+  assert.equal(explicitProof.validation.coreWorkflowPassed, true);
+
+  const malformed = path.join(localSmokeRoot, 'malformed.tgz');
+  writeFileSync(malformed, Buffer.from('not a gzip archive'));
+  const malformedOutput = execFileSync(process.execPath, [
+    '--strip-types', path.join(root, 'scripts', 'validate-candidate-npm-install.ts'),
+    '--candidate-dir', path.join(root, 'packages', 'cli'), '--candidate-tarball', malformed,
+    '--measurement-runs', '1', '--record-blocked'
+  ], { cwd: root, encoding: 'utf8', windowsHide: true, shell: false });
+  const malformedProof = JSON.parse(malformedOutput.trim().split(/\r?\n/).at(-1)!);
+  assert.equal(malformedProof.status, 'blocked');
+  assert.match(String(malformedProof.error), /gzip archive/i);
 } finally {
   rmSync(localSmokeRoot, { recursive: true, force: true });
 }

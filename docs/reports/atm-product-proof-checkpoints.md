@@ -82,3 +82,14 @@ Receipts retain candidate-only provenance and cannot be promoted to public
 registry evidence. This checkpoint records validator delivery, not a public
 republish: `@ai-atomic-framework/cli@0.1.0` remains blocked until a separately
 authorized release and fresh registry revalidation.
+
+## TASK-PRF-0057 explicit-tarball provenance boundary (2026-09-14)
+
+The first post-0056 explicit `--candidate-tarball` run exposed a contract bug:
+installation and the complete command matrix passed, but the receipt reported
+`version: local`, `unpackedBytes: 0`, `entryCount: 0`, and no file inventory.
+This is negative evidence only and cannot support a size or reproducibility
+claim. TASK-PRF-0057 requires archive-derived package metadata, deterministic
+file inventory, parity with candidate-directory packing, and fail-closed
+handling for malformed archives. It does not authorize publication or alter
+the public registry result.
