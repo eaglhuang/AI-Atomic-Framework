@@ -1,0 +1,159 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0053",
+  "updatedAt": "2026-09-14T02:01:57.577Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "build --workspace packages/cli",
+    "lint",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "typecheck",
+    "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --require-default-tag --record-blocked --measurement-runs 1",
+    "validate:release-trust"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-14T01:59:30.270Z",
+      "startedAt": "2026-09-14T01:59:21.343Z",
+      "finishedAt": "2026-09-14T01:59:30.270Z",
+      "durationMs": 8927,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    },
+    {
+      "command": "npm run build --workspace @ai-atomic-framework/cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcfbbe9542e334c1bf42c43b1835350467b5d05deda554a78680c668bcbc0cf8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-14T02:00:13.042Z",
+      "startedAt": "2026-09-14T02:00:06.790Z",
+      "finishedAt": "2026-09-14T02:00:13.042Z",
+      "durationMs": 6252,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-14T02:00:34.780Z",
+      "startedAt": "2026-09-14T02:00:24.644Z",
+      "finishedAt": "2026-09-14T02:00:34.780Z",
+      "durationMs": 10136,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3cd67742294542997602b2b7541cae04cc80a43b5b64416c1ce30226b3093c91",
+      "stderrSha256": "sha256:b7af015982d905fefce557cc0d3a07977613cafa16495d3a27de25153807186e",
+      "validators": [
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-14T02:00:53.504Z",
+      "startedAt": "2026-09-14T02:00:36.962Z",
+      "finishedAt": "2026-09-14T02:00:53.504Z",
+      "durationMs": 16542,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+      ],
+      "generatedAt": "2026-09-14T02:00:55.934Z",
+      "startedAt": "2026-09-14T02:00:55.635Z",
+      "finishedAt": "2026-09-14T02:00:55.934Z",
+      "durationMs": 299,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --require-default-tag --record-blocked --measurement-runs 1",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bceb3bcf2e268e526121bfc194da328c320c3eede0e5ab99b9e9e4cb20914dd5",
+      "stderrSha256": "sha256:21513de1fc6a5b81e21b998a9277fa56124ba3bac760b1cd1d9264969a8aaa22",
+      "validators": [
+        "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --require-default-tag --record-blocked --measurement-runs 1"
+      ],
+      "generatedAt": "2026-09-14T02:01:07.881Z",
+      "startedAt": "2026-09-14T02:00:58.100Z",
+      "finishedAt": "2026-09-14T02:01:07.881Z",
+      "durationMs": 9781,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-release-trust.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89d135f0082037c5674d6ef47590ea278eb4b1f1693d6927785be379dfe23d97",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:release-trust"
+      ],
+      "generatedAt": "2026-09-14T02:01:10.422Z",
+      "startedAt": "2026-09-14T02:01:10.056Z",
+      "finishedAt": "2026-09-14T02:01:10.422Z",
+      "durationMs": 366,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b7b3008c7cd31b2c04b199d42aa3cdddd8e0515dd1e8c4a823a28b5ddd6a1dc9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-14T02:01:14.200Z",
+      "startedAt": "2026-09-14T02:01:12.559Z",
+      "finishedAt": "2026-09-14T02:01:14.200Z",
+      "durationMs": 1641,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    },
+    {
+      "command": "npm run build --workspace packages/cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcfbbe9542e334c1bf42c43b1835350467b5d05deda554a78680c668bcbc0cf8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "build --workspace packages/cli"
+      ],
+      "generatedAt": "2026-09-14T02:01:57.576Z",
+      "startedAt": "2026-09-14T02:01:51.921Z",
+      "finishedAt": "2026-09-14T02:01:57.576Z",
+      "durationMs": 5655,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

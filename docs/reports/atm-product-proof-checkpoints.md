@@ -46,3 +46,12 @@ The report output is retained beside it with SHA-256
 `sha256:d257dab99c9a3a822e33ed206b2058eae2883f1dcccef7343ad8ae542b64c215`.
 This checkpoint is negative/inconclusive evidence only; it does not change the
 90-run/30-day policy or claim long-term green CI.
+
+## TASK-PRF-0053 live registry correction (2026-09-14)
+
+The older checkpoint sentence claiming a verified public `0.1.0` install is
+superseded by the live full-matrix recheck. The package is installable, but its
+published runtime cannot complete the ATMChart lifecycle: `bootstrap` passes,
+while `atm-chart render` and `atm-chart verify` fail on the missing
+`default-guards` schema. This is retained as negative evidence and does not
+earn the public core-workflow claim or authorize a release.

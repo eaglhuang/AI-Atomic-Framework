@@ -12,4 +12,9 @@ const validatorSource = readFileSync(new URL('../../scripts/validate-public-npm-
 assert.match(validatorSource, /value\('--version'\) \?\? resolvePublishedLatest\(packageName\)/);
 assert.match(validatorSource, /function resolvePublishedLatest\(packageName: string\)/);
 assert.doesNotMatch(validatorSource, /value\('--version', ['\"]0\.1\.0-beta/);
+assert.match(validatorSource, /atm-chart-render/);
+assert.match(validatorSource, /atm-chart-verify/);
+assert.match(validatorSource, /requiredSuccessCommandFailures/);
+assert.match(validatorSource, /coreWorkflowPassed/);
+assert.match(validatorSource, /publicSmokeCommandNames/);
 console.log('product-proof-evidence-boundary ok');

@@ -27,6 +27,10 @@ assert.match(validatorSource, /maxPackedEntries/, 'validator must enforce the de
 assert.match(validatorSource, /runSmoke\(tarball/, 'public npm validator must execute the installed tarball smoke matrix');
 assert.match(validatorSource, /versionOnlySmoke: false/, 'public npm validator must reject version-only evidence');
 assert.match(validatorSource, /commandMatrixComplete/, 'public npm validator must report complete command-matrix coverage');
+assert.match(validatorSource, /atm-chart-render/, 'public npm validator must exercise chart rendering');
+assert.match(validatorSource, /atm-chart-verify/, 'public npm validator must exercise chart verification');
+assert.match(validatorSource, /requiredSuccessCommandFailures/, 'public npm validator must report required command failures');
+assert.match(validatorSource, /coreWorkflowPassed/, 'public npm validator must report core workflow status');
 
 const candidateValidatorSource = await import('node:fs').then(({ readFileSync }) => readFileSync(new URL('../../scripts/validate-candidate-npm-install.ts', import.meta.url), 'utf8'));
 assert.match(candidateValidatorSource, /--candidate-tarball/, 'candidate validator must accept an explicit tarball');
@@ -35,16 +39,24 @@ assert.match(candidateValidatorSource, /versionOnlySmoke: false/, 'candidate val
 assert.match(candidateValidatorSource, /moduleResolutionFailures/, 'candidate validator must report module-resolution failures');
 assert.match(candidateValidatorSource, /usedWorkspaceLink: false/, 'candidate validator must prove a tarball install rather than a workspace link');
 
-const verified = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.0', '--measurement-runs', '1'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
-const verifiedProof = JSON.parse(verified.trim().split(/\r?\n/).at(-1)!);
-assert.equal(verifiedProof.status, 'verified');
-assert.equal(verifiedProof.validation.cleanConsumer, true);
-assert.equal(verifiedProof.validation.usedWorkspaceLink, false);
-assert.equal(verifiedProof.validation.versionOnlySmoke, false);
-assert.equal(verifiedProof.validation.commandMatrixComplete, true);
-assert.equal(verifiedProof.validation.moduleResolutionFailures, 0);
-assert.equal(verifiedProof.validation.allCommandsExecuted, true);
-assert.equal(verifiedProof.validation.passed, true);
+const live = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.0', '--record-blocked', '--measurement-runs', '1'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
+const liveProof = JSON.parse(live.trim().split(/\r?\n/).at(-1)!);
+assert.equal(liveProof.validation.cleanConsumer, true);
+assert.equal(liveProof.validation.usedWorkspaceLink, false);
+assert.equal(liveProof.validation.versionOnlySmoke, false);
+assert.equal(liveProof.validation.commandMatrixComplete, true);
+assert.deepEqual(liveProof.validation.requiredSuccessCommands, ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify']);
+assert.equal(liveProof.validation.moduleResolutionFailures, 0);
+assert.equal(liveProof.validation.allCommandsExecuted, true);
+if (liveProof.status === 'verified') {
+  assert.equal(liveProof.validation.coreWorkflowPassed, true);
+  assert.equal(liveProof.validation.passed, true);
+} else {
+  assert.equal(liveProof.status, 'blocked');
+  assert.equal(liveProof.validation.coreWorkflowPassed, false);
+  assert.equal(liveProof.validation.passed, false);
+  assert.ok(liveProof.validation.requiredSuccessCommandFailures.length > 0);
+}
 
 const oversized = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.0-beta.4', '--record-blocked'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
 const oversizedProof = JSON.parse(oversized.trim().split(/\r?\n/).at(-1)!);

@@ -115,8 +115,22 @@ function percentile(values: number[], p: number): number {
   return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
 }
 
+const legacySmokeCommandNames = ['version', 'doctor', 'next', 'tasks'] as const;
+const coreWorkflowCommandNames = ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify'] as const;
+const publicSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'bootstrap', 'atm-chart-render', 'atm-chart-verify'] as const;
+
+function commandExitCode(smoke: Record<string, unknown>, name: string): number | null {
+  const entry = smoke[name] as { exitCode?: number } | undefined;
+  return typeof entry?.exitCode === 'number' ? entry.exitCode : null;
+}
+
+function coreWorkflowFailures(smoke: Record<string, unknown>): string[] {
+  return coreWorkflowCommandNames.filter((name) => commandExitCode(smoke, name) !== 0);
+}
+
 function runSmoke(tarball: string, root: string, label: string, runs: number) {
   const consumer = join(root, `${label}-consumer`);
+  const workflow = join(consumer, 'workflow');
   const installStarted = performance.now();
   runNpm(['install', '--ignore-scripts', '--prefix', consumer, tarball], root);
   const installMs = performance.now() - installStarted;
@@ -128,6 +142,9 @@ function runSmoke(tarball: string, root: string, label: string, runs: number) {
     ['doctor', 'doctor', '--json'],
     ['next', 'next', '--json'],
     ['tasks', 'tasks', 'status', '--task', 'TASK-PRF-0049', '--json'],
+    ['bootstrap', 'bootstrap', '--cwd', workflow, '--task', `PUBLIC-NPM-${label}`, '--json'],
+    ['atm-chart-render', 'atm-chart', 'render', '--cwd', workflow, '--json'],
+    ['atm-chart-verify', 'atm-chart', 'verify', '--cwd', workflow, '--json'],
   ] as const;
   const smoke: Record<string, unknown> = {};
   let versionOutput: string | null = null;
@@ -174,11 +191,12 @@ function runMeasurement(args: Args): Record<string, unknown> {
     const byteReduction = ((baselineBytes - candidateBytes) / baselineBytes) * 100;
     const entryReduction = ((baselineEntries - candidateEntries) / baselineEntries) * 100;
     const candidateFailures = Object.values(candidateRun.smoke as Record<string, { moduleResolutionFailure: boolean }>).filter((x) => x.moduleResolutionFailure).length;
-    const smokeBehaviorMatchesBaseline = Object.keys(baselineRun.smoke as Record<string, { exitCode: number }>).every((name) => {
+    const smokeBehaviorMatchesBaseline = legacySmokeCommandNames.every((name) => {
       const baselineResult = (baselineRun.smoke as Record<string, { exitCode: number }>)[name];
       const candidateResult = (candidateRun.smoke as Record<string, { exitCode: number }>)[name];
       return candidateResult && candidateResult.exitCode === baselineResult.exitCode;
     });
+    const candidateCoreWorkflowFailures = coreWorkflowFailures(candidateRun.smoke as Record<string, unknown>);
     const receipt: Record<string, unknown> = {
       schemaId: 'atm.baselineCandidateMeasurement.v1',
       generatedAt: new Date().toISOString(),
@@ -186,7 +204,7 @@ function runMeasurement(args: Args): Record<string, unknown> {
       baseline: { version: baseline.metadata.version ?? baselineVersion, unpackedBytes: baselineBytes, entryCount: baselineEntries, tarballBytes: Number(baseline.metadata.size), tarballSha256: sha256(baseline.tarball), ...baselineRun },
       candidate: { version: candidate.metadata.version ?? 'local', sourceDir: args.candidateDir, unpackedBytes: candidateBytes, entryCount: candidateEntries, tarballBytes: Number(candidate.metadata.size), tarballSha256: sha256(candidate.tarball), ...candidateRun },
       delta: { unpackedBytes: candidateBytes - baselineBytes, unpackedBytesReductionPercent: byteReduction, entryCount: candidateEntries - baselineEntries, entryCountReductionPercent: entryReduction },
-      acceptance: { minUnpackedBytesReductionPercent: 20, minEntryReductionPercent: 15, unpackedBytesPassed: byteReduction >= 20, entryCountPassed: entryReduction >= 15, candidateCommandsFreeOfModuleResolutionFailure: candidateFailures === 0, smokeBehaviorMatchesBaseline, passed: byteReduction >= 20 && entryReduction >= 15 && candidateFailures === 0 && smokeBehaviorMatchesBaseline },
+      acceptance: { minUnpackedBytesReductionPercent: 20, minEntryReductionPercent: 15, unpackedBytesPassed: byteReduction >= 20, entryCountPassed: entryReduction >= 15, candidateCommandsFreeOfModuleResolutionFailure: candidateFailures === 0, candidateCoreWorkflowPassed: candidateCoreWorkflowFailures.length === 0, candidateCoreWorkflowFailures, smokeBehaviorMatchesBaseline, passed: byteReduction >= 20 && entryReduction >= 15 && candidateFailures === 0 && candidateCoreWorkflowFailures.length === 0 && smokeBehaviorMatchesBaseline },
       measurement: { hostPlatform: process.platform, nodeVersion: process.version, runs: args.measurementRuns, baselineVersion, candidateDir: args.candidateDir },
     };
     if (args.measurementOutput) writeFileSync(args.measurementOutput, JSON.stringify(receipt, null, 2) + '\n', 'utf8');
@@ -245,9 +263,10 @@ try {
   const tarball = join(root, filename);
   const smokeRun = runSmoke(tarball, root, 'public', args.measurementRuns);
   const commandMatrix = Object.keys(smokeRun.smoke);
-  const expectedCommands = ['version', 'doctor', 'next', 'tasks'];
+  const expectedCommands = publicSmokeCommandNames;
   const smokeEntries = Object.values(smokeRun.smoke) as Array<{ commandExecuted: boolean; moduleResolutionFailure: boolean }>;
   const moduleResolutionFailures = smokeEntries.filter((entry) => entry.moduleResolutionFailure).length;
+  const requiredSuccessCommandFailures = coreWorkflowFailures(smokeRun.smoke as Record<string, unknown>);
   const validation = {
     cleanConsumer: true,
     usedWorkspaceLink: false,
@@ -256,10 +275,14 @@ try {
     versionOnlySmoke: false,
     moduleResolutionFailures,
     allCommandsExecuted: smokeEntries.every((entry) => entry.commandExecuted),
+    requiredSuccessCommands: [...coreWorkflowCommandNames],
+    requiredSuccessCommandFailures,
+    coreWorkflowPassed: requiredSuccessCommandFailures.length === 0,
     passed: commandMatrix.length === expectedCommands.length
       && expectedCommands.every((name) => commandMatrix.includes(name))
       && moduleResolutionFailures === 0
       && smokeEntries.every((entry) => entry.commandExecuted)
+      && requiredSuccessCommandFailures.length === 0
   };
   const payload = report(args, { status: validation.passed ? 'verified' : 'blocked', publicRegistry: true, registryVersion: metadata.version, defaultInstallVersion: latestVersion, defaultInstallMatchesRequested: latestVersion === args.version, distTarball: registryTarball, distIntegrity: registryIntegrity, registryUnpackedSize: Number.isFinite(registryUnpackedSize) ? registryUnpackedSize : null, registryFileCount: Number.isFinite(registryFileCount) ? registryFileCount : null, artifactBudget: budget, tarballSha256: sha256(tarball), cliVersion: smokeRun.versionOutput, smoke: smokeRun.smoke, installMs: smokeRun.installMs, validation, cleanConsumer: true, usedWorkspaceLink: false, temporaryRootRemoved: true });
   console.log(JSON.stringify(payload));

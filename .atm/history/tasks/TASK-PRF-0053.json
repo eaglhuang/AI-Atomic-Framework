@@ -1,0 +1,383 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0053",
+  "title": "Complete public npm core-workflow proof and authorized release handoff",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0052"
+  ],
+  "acceptance": [
+    "ACC-1: public-install validator 在乾淨、無 workspace/link/source residue 的 consumer 中，對精確 registry version 依序執行 `version`、`doctor`、 `bootstrap`、`atm-chart render`、`atm-chart verify`，逐項保留 exit code、 module-resolution 狀態與 output digest；只跑 version/doctor 不得判定通過。",
+    "ACC-2: validator 與 report 明確區分 registry package、local candidate 與 baseline；每次 public proof 記錄 requested version、default latest tag、 tarball URL/integrity/SHA-256、unpacked bytes、entry count、Node/npm 版本、 是否使用 workspace link，以及完整命令矩陣。",
+    "ACC-3: 當 registry package 缺 schema、命令失敗或依賴額外下載時，結果必須 fail closed 為 blocked/inconclusive，保留外部 raw receipt，不得被 `--version` 或舊報告覆蓋成 verified。",
+    "ACC-4: 只有在 candidate 與 validator 全部通過後，才可進入發布交接；未經 owner 明確授權不得執行 publish。發布後必須重新從 registry 安裝同一版本， 重跑完整命令矩陣並確認 digest/metadata 與發布 artifact 一致。",
+    "ACC-5: release handoff receipt 綁定 trusted publisher 或符合 npm 2FA/automation policy 的認證方式、workflow run/commit、發布版本與 post-publish receipt； 不記錄 token 內容，也不把設定意圖當成成功證據。",
+    "ACC-6: build、typecheck、lint、focused contract、evidence-boundary test 與 release-trust validator 全部通過；失敗與人工授權缺口都保留為可重跑證據。"
+  ],
+  "deliverables": [
+    "scripts/validate-public-npm-install.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-public-npm-install-proof.md",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "scopePaths": [
+    "scripts/validate-public-npm-install.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-public-npm-install-proof.md",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "validators": [
+    "npm run build --workspace packages/cli",
+    "npm run typecheck",
+    "npm run lint",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --require-default-tag",
+    "node --strip-types scripts/validate-release-trust.ts"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "external-registry-clean-install-with-full-command-matrix-and-provenance",
+  "rollbackStrategy": "revert-commit-preserve-public-receipt",
+  "rollbackNotes": "保留失敗或不完整的 registry receipt；只回滾本卡 validator、報告與測試變更，不刪除外部 raw evidence。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.public-runtime-closure",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.public-registry-workflow-validator",
+        "pattern": "Policy Object",
+        "source": "scripts/validate-public-npm-install.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "先把完整命令矩陣補進既有 public-install validator；若多個發布面重複相同 registry/provenance 判定，再另卡抽出 deep module。"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/validate-public-npm-install.ts",
+        "tests/cli/public-npm-install-contract.test.ts",
+        "tests/cli/product-proof-evidence-boundary.test.ts",
+        "docs/reports/atm-public-npm-install-proof.md",
+        "docs/reports/atm-public-npm-install-proof-beta.md",
+        "docs/reports/atm-product-proof-checkpoints.md",
+        "external evidence receipt binding registry metadata, tarball digest, and full core-workflow command matrix"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0053-complete-public-npm-core-workflow-proof-and-authorized-release-handoff.task.md",
+    "sectionTitle": "TASK-PRF-0053",
+    "headingLine": 92,
+    "hash": "6ecb9ea7c219a375",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0053-complete-public-npm-core-workflow-proof-and-authorized-release-handoff.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:6ecb9ea7c219a375d589ec0316abe7c6c8b953c61e5cfaf31f646f399d1f8d05",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T01:51:49.623Z"
+    }
+  },
+  "importedAt": "2026-09-14T01:51:49.623Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0052"
+    ],
+    "startConditions": [
+      "A live registry receipt shows @ai-atomic-framework/cli@0.1.0 exists but the core chart workflow is not yet proven.",
+      "Any publish attempt requires an explicit owner authorization and a configured npm trusted publisher or compliant automation token."
+    ],
+    "softRelations": [
+      "TASK-PRF-0015",
+      "TASK-PRF-0051"
+    ],
+    "changedPublicSeams": [
+      "public_registry_core_workflow",
+      "release_provenance_handoff"
+    ],
+    "causalImpactEdges": [
+      "public_install_complete",
+      "release_provenance"
+    ],
+    "parallelFrontierInputs": [
+      "candidate-delivery-commit",
+      "registry-metadata",
+      "release-authentication"
+    ],
+    "validatorReferences": [
+      "test_prf_registry_core_workflow_matrix",
+      "test_prf_registry_candidate_registry_separation",
+      "test_prf_registry_release_provenance"
+    ],
+    "phaseOwner": "release"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_registry_core_workflow_matrix",
+      "targetGroupId": null,
+      "semanticKey": "public_registry_core_workflow_matrix",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "public_install_complete"
+      ],
+      "expectedRedPredicate": "Validator reports success after version-only smoke while bootstrap, atm-chart render, or atm-chart verify is missing or fails in the clean registry consumer.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "public_registry_core_workflow",
+      "resourceKey": "clean-registry-install"
+    },
+    {
+      "caseId": "test_prf_registry_candidate_registry_separation",
+      "targetGroupId": null,
+      "semanticKey": "candidate_registry_separation",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "public_install_complete",
+        "release_provenance"
+      ],
+      "expectedRedPredicate": "A local candidate receipt is presented as public registry proof, or a mutable latest tag is used without recording the exact requested version and tarball digest.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "public_registry_core_workflow",
+      "resourceKey": "registry-metadata"
+    },
+    {
+      "caseId": "test_prf_registry_release_provenance",
+      "targetGroupId": null,
+      "semanticKey": "authorized_release_provenance",
+      "coversAcceptance": [
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "release_provenance"
+      ],
+      "expectedRedPredicate": "Release handoff lacks provenance, explicit authorization, or an auditable post-publish revalidation receipt.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": null,
+      "contractEdge": "release_provenance_handoff",
+      "resourceKey": "npm-trusted-publisher"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_registry_core_workflow_matrix",
+    "test_prf_registry_candidate_registry_separation",
+    "test_prf_registry_release_provenance"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0052",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T01-53-36-024Z-claim-c3e1e109f13f",
+  "lastTransitionAt": "2026-09-14T01:53:36.024Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T01:53:31.994Z",
+  "promotedAt": "2026-09-14T01:53:31.998Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-5664c1df7eba",
+    "claimedAt": "2026-09-14T01:53:32.003Z",
+    "heartbeatAt": "2026-09-14T01:53:32.003Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      ".atm/history/evidence/TASK-PRF-0053.*",
+      ".atm/history/task-events/TASK-PRF-0053/**",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "docs/reports/atm-public-npm-install-proof.md",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914015202-codex-gpt-5.4-mini-162baadbc1",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914015202-codex-gpt-5.4-mini-162baadbc1\""
+    }
+  },
+  "startedAt": "2026-09-14T01:52:01.771Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260914015332-codex-gpt-5.4-mini-TASK-PRF-0053-0eb6157fd9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0053",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0053.*",
+      ".atm/history/task-events/TASK-PRF-0053/**",
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "docs/reports/atm-public-npm-install-proof.md",
+      "scripts/validate-public-npm-install.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5ffbea8c8f80aac7e47d09296c60da6b9e90df882653954bf3562b0f66665939",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914015332-codex-gpt-5.4-mini-TASK-PRF-0053-0eb6157fd9",
+    "laneSession": {
+      "laneSessionId": "lane-20260914015202-codex-gpt-5.4-mini-162baadbc1",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914015202-codex-gpt-5.4-mini-162baadbc1\""
+    },
+    "createdAt": "2026-09-14T01:53:36.023Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-43bb126145f00d2b",
+    "ticketDigest": "sha256:43bb126145f00d2b7b0c35a990ac3e72330b73a5409ccd0d69e16912e1385f31",
+    "taskId": "TASK-PRF-0053",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914015202-codex-gpt-5.4-mini-162baadbc1",
+    "claimGeneration": "lease-5664c1df7eba",
+    "issuedAt": "2026-09-14T01:53:32.003Z",
+    "expiresAt": "2026-09-14T02:23:32.003Z",
+    "scopeDigest": "sha256:13ce94b02c8eba8ad88882c353caa92fbdc4928771a32ee1a7647943f6530d4b",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T01:53:32.003Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0053.*",
+          ".atm/history/task-events/TASK-PRF-0053/**",
+          ".atm/history/tasks/TASK-PRF-0053.json",
+          "docs/reports/atm-product-proof-checkpoints.md",
+          "docs/reports/atm-public-npm-install-proof-beta.md",
+          "docs/reports/atm-public-npm-install-proof.md",
+          "scripts/validate-public-npm-install.ts",
+          "tests/cli/product-proof-evidence-boundary.test.ts",
+          "tests/cli/public-npm-install-contract.test.ts"
+        ],
+        "digest": "sha256:a036cab3dd369b1118142b878c793988e901e613d274c328fe9c9f74da8c8bfb"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

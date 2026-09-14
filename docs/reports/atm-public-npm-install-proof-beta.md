@@ -51,3 +51,15 @@ workspace link or extra framework download is needed.
 This is candidate evidence only. It does not change the public registry and
 does not authorize npm publish; a new public-registry receipt is required after
 an independently authorized release.
+
+## TASK-PRF-0053 validator boundary (2026-09-14)
+
+The public validator now requires the complete core workflow (`version`,
+`doctor`, `bootstrap`, `atm-chart render`, and `atm-chart verify`) to exit
+successfully. It records `requiredSuccessCommandFailures` and
+`coreWorkflowPassed`, and uses `--record-blocked` only to preserve a negative
+registry receipt rather than turning a failed command into a pass. On the live
+`0.1.0` registry install, chart render and verify remain failed because the
+published package lacks the default-guards chart schema. The local candidate
+passing chart lifecycle remains candidate-only evidence and is not substituted
+for this registry result.
