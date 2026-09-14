@@ -1,0 +1,175 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0108",
+  "updatedAt": "2026-09-14T20:50:20.787Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md",
+    "node --strip-types tests/cli/onefile-root-drop-build-coordination.test.ts",
+    "validate:bootstrap",
+    "validate:onefile-release",
+    "validate:root-drop-release"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/onefile-root-drop-build-coordination.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e88e23e9459ad4ed51f78d5e72cb9ae593b41ed6778183dfef751270fa4f699d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/onefile-root-drop-build-coordination.test.ts"
+      ],
+      "generatedAt": "2026-09-14T20:38:44.387Z",
+      "startedAt": "2026-09-14T20:38:22.982Z",
+      "finishedAt": "2026-09-14T20:38:44.387Z",
+      "durationMs": 21405,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/build-root-drop-release.ts scripts/build-onefile-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ca4401c9ca1f896e6fc0fc7c59fa60ffb532056496f972faeb05b471e9149aa5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-14T20:38:55.644Z",
+      "startedAt": "2026-09-14T20:38:54.184Z",
+      "finishedAt": "2026-09-14T20:38:55.644Z",
+      "durationMs": 1460,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a53878825d610503e464f2c02930fa777c23d5c9accee60ce683a263d59fb49d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:root-drop-release"
+      ],
+      "generatedAt": "2026-09-14T20:41:05.071Z",
+      "startedAt": "2026-09-14T20:39:01.447Z",
+      "finishedAt": "2026-09-14T20:41:05.071Z",
+      "durationMs": 123624,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a8fdb4ec5c9cd585139133c5b20b0ffc899dd8b781738fb0d683bed86232780f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "generatedAt": "2026-09-14T20:42:02.874Z",
+      "startedAt": "2026-09-14T20:42:01.393Z",
+      "finishedAt": "2026-09-14T20:42:02.874Z",
+      "durationMs": 1481,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a8fdb4ec5c9cd585139133c5b20b0ffc899dd8b781738fb0d683bed86232780f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "generatedAt": "2026-09-14T20:42:35.861Z",
+      "startedAt": "2026-09-14T20:42:34.389Z",
+      "finishedAt": "2026-09-14T20:42:35.861Z",
+      "durationMs": 1472,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:719c6d4f14c2288f000df1e0632f2071da7091ead528a2365609b37a7e5515b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-09-14T20:47:08.405Z",
+      "startedAt": "2026-09-14T20:45:49.771Z",
+      "finishedAt": "2026-09-14T20:47:08.405Z",
+      "durationMs": 78634,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:bootstrap",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:72778ffc77389606949a274bdb7fa2c085344f989ffa7ca36dca3fda4d0b52d4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:bootstrap"
+      ],
+      "generatedAt": "2026-09-14T20:48:24.243Z",
+      "startedAt": "2026-09-14T20:47:14.770Z",
+      "finishedAt": "2026-09-14T20:48:24.243Z",
+      "durationMs": 69473,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a8fdb4ec5c9cd585139133c5b20b0ffc899dd8b781738fb0d683bed86232780f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "generatedAt": "2026-09-14T20:48:43.974Z",
+      "startedAt": "2026-09-14T20:48:42.556Z",
+      "finishedAt": "2026-09-14T20:48:43.974Z",
+      "durationMs": 1418,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/onefile-root-drop-build-coordination.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e88e23e9459ad4ed51f78d5e72cb9ae593b41ed6778183dfef751270fa4f699d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/onefile-root-drop-build-coordination.test.ts"
+      ],
+      "generatedAt": "2026-09-14T20:50:17.962Z",
+      "startedAt": "2026-09-14T20:49:55.710Z",
+      "finishedAt": "2026-09-14T20:50:17.962Z",
+      "durationMs": 22252,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a8fdb4ec5c9cd585139133c5b20b0ffc899dd8b781738fb0d683bed86232780f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "generatedAt": "2026-09-14T20:50:20.786Z",
+      "startedAt": "2026-09-14T20:50:19.343Z",
+      "finishedAt": "2026-09-14T20:50:20.786Z",
+      "durationMs": 1443,
+      "runnerKind": "dev-source",
+      "sourceCommit": "4030d0c2f7bcfbf080140375e952a0634d12313b",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -1,0 +1,340 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0108",
+  "title": "Eliminate duplicate package-dist build during onefile/root-drop assembly",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Onefile assembly performs one package-dist build while direct root-drop callers still perform their own freshness build.",
+    "Root-drop and onefile artifact inventories, launcher behavior, and sealed manifest digests remain equivalent to the baseline.",
+    "Clean bootstrap, root-drop, and onefile validators remain green.",
+    "External receipt contains at least 30 interleaved AB/BA measurements and 8 A/A controls for the selected build/bootstrap workload, in milliseconds, with failure/timeout samples retained.",
+    "Candidate p50 for the measured hotspot improves by at least 20% and p95 does not regress by more than 10%; otherwise record inconclusive and stop.",
+    "No new command, registry, daemon, lock boundary, or serialisation of private multi-AI reads is introduced."
+  ],
+  "deliverables": [
+    "scripts/build-onefile-release.ts",
+    "scripts/build-root-drop-release.ts",
+    "tests/cli/onefile-root-drop-build-coordination.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "scopePaths": [
+    "scripts/build-onefile-release.ts",
+    "scripts/build-root-drop-release.ts",
+    "tests/cli/onefile-root-drop-build-coordination.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/onefile-root-drop-build-coordination.test.ts",
+    "npm run validate:root-drop-release",
+    "npm run validate:onefile-release",
+    "npm run validate:bootstrap",
+    "npm run check:encoding:touched -- --files scripts/build-onefile-release.ts scripts/build-root-drop-release.ts tests/cli/onefile-root-drop-build-coordination.test.ts docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "revert the single builder-coordination commit; retain paired receipts and artifact digests",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release.builder-coordination",
+    "atomCid": "null",
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-release-builder-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.release.package-dist-freshness",
+        "pattern": "Deep Module",
+        "source": "scripts/build-root-drop-release.ts",
+        "disposition": "inline",
+        "inlineReason": "the freshness precondition belongs to root-drop assembly; extracting a helper would add surface without a second caller contract"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0108-eliminate-duplicate-package-dist-build-during-onefile-root-drop-assembly.task.md",
+    "sectionTitle": "TASK-PRF-0108",
+    "headingLine": 117,
+    "hash": "4961e82a7eeaa541",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0108-eliminate-duplicate-package-dist-build-during-onefile-root-drop-assembly.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4961e82a7eeaa541fe394dea2e71e6970b0af4c44692ed63f992c5f72c1e35a0",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T20:29:10.072Z"
+    }
+  },
+  "importedAt": "2026-09-14T20:29:10.072Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "latest standard-profile telemetry shows validate-bootstrap as a 146542 ms hotspot",
+      "buildOnefileRelease invokes package-dist directly and root-drop assembly invokes it again",
+      "artifact manifests and runner semantics are available for before/after digest comparison"
+    ],
+    "softRelations": [
+      "TASK-PRF-0101",
+      "TASK-PRF-0107"
+    ],
+    "changedPublicSeams": [
+      "atm.release.onefile-build",
+      "atm.release.root-drop-build"
+    ],
+    "causalImpactEdges": [
+      "standard-validation-wall-time",
+      "bootstrap-runner-correctness",
+      "command-gate-latency-score"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-PRF-0101",
+      "TASK-PRF-0107"
+    ],
+    "validatorReferences": [
+      "onefile-release-manifest-integrity",
+      "root-drop-release-manifest-integrity",
+      "bootstrap-clean-fixture",
+      "paired-build-latency"
+    ],
+    "phaseOwner": "atm-build"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_prf0108_build_once_contract_3e91a7c2",
+      "targetGroupId": "null",
+      "semanticKey": "onefile_root_drop_build_once",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "standard-validation-wall-time",
+        "bootstrap-runner-correctness"
+      ],
+      "expectedRedPredicate": "onefile assembly triggers package-dist more than once or skips the explicit root-drop default build contract",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "bootstrap-runner-correctness",
+      "contractEdge": "atm.release.onefile-build",
+      "resourceKey": "package-dist-build"
+    },
+    {
+      "caseId": "test_task_prf0108_artifact_equivalence_7a5e4d11",
+      "targetGroupId": "null",
+      "semanticKey": "release_manifest_equivalence",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "bootstrap-runner-correctness"
+      ],
+      "expectedRedPredicate": "optimized build changes root-drop or onefile inventory, manifest digest, or launcher behavior",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "onefile-root-drop-build",
+      "contractEdge": "onefile-release-manifest-integrity",
+      "resourceKey": "release-artifact-digest"
+    },
+    {
+      "caseId": "test_task_prf0108_latency_receipt_1c02f9a8",
+      "targetGroupId": "null",
+      "semanticKey": "paired_build_latency",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "standard-validation-wall-time",
+        "command-gate-latency-score"
+      ],
+      "expectedRedPredicate": "receipt lacks paired p50/p95 or semantic failure samples, or candidate p50 does not improve",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "standard-validation-wall-time",
+      "contractEdge": "paired-build-latency",
+      "resourceKey": "build-latency"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_prf0108_build_once_contract_3e91a7c2",
+    "test_task_prf0108_artifact_equivalence_7a5e4d11",
+    "test_task_prf0108_latency_receipt_1c02f9a8"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T20-31-09-907Z-renew-47308a179e57",
+  "lastTransitionAt": "2026-09-14T20:31:09.907Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T20:29:19.081Z",
+  "promotedAt": "2026-09-14T20:29:19.086Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-0bfa08d63173",
+    "claimedAt": "2026-09-14T20:29:19.090Z",
+    "heartbeatAt": "2026-09-14T20:31:09.612Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0108.json",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "tests/cli/onefile-root-drop-build-coordination.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260914202919-codex-gpt-5.4-mini-f7665f6004",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914202919-codex-gpt-5.4-mini-f7665f6004\""
+    }
+  },
+  "startedAt": "2026-09-14T20:29:19.090Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-c2981e062da577ed",
+    "ticketDigest": "sha256:c2981e062da577ed7be2b319bef3bbe21d3678d8f6a1b2e12681e99a02cc8526",
+    "taskId": "TASK-PRF-0108",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914202919-codex-gpt-5.4-mini-f7665f6004",
+    "claimGeneration": "lease-0bfa08d63173",
+    "issuedAt": "2026-09-14T20:31:09.612Z",
+    "expiresAt": "2026-09-14T21:01:09.612Z",
+    "scopeDigest": "sha256:83180c698b61118fd5e7094beb3948ddaa1263e93c3974125c5a3b40a3c1ba5a",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T20:31:09.612Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0108.*",
+          ".atm/history/task-events/TASK-PRF-0108/**",
+          ".atm/history/tasks/TASK-PRF-0108.json",
+          "docs/reports/atm-command-gate-latency-score.md",
+          "scripts/build-onefile-release.ts",
+          "scripts/build-root-drop-release.ts",
+          "tests/cli/onefile-root-drop-build-coordination.test.ts"
+        ],
+        "digest": "sha256:32dc067e2ed70bddc3ccf56df0e593fddd9f46974021fe537638c1ad4af16288"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914202919-codex-gpt-5.4-mini-TASK-PRF-0108-1d5fb79d49",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0108",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0108.*",
+      ".atm/history/task-events/TASK-PRF-0108/**",
+      ".atm/history/tasks/TASK-PRF-0108.json",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "tests/cli/onefile-root-drop-build-coordination.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "98ee1ab02972a17d2aedf1cb45a40b11123c70ddd76d7a6d272c01befbcaef51",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914202919-codex-gpt-5.4-mini-TASK-PRF-0108-1d5fb79d49",
+    "laneSession": {
+      "laneSessionId": "lane-20260914202919-codex-gpt-5.4-mini-f7665f6004",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914202919-codex-gpt-5.4-mini-f7665f6004\""
+    },
+    "createdAt": "2026-09-14T20:29:20.761Z",
+    "status": "active"
+  }
+}

@@ -25,7 +25,7 @@ export function buildOnefileRelease(options: any = {}) {
   // exist from an older build, so presence alone is not a freshness proof:
   // reusing it can omit newly generated leaf modules from the onefile payload.
   // Reconcile the source snapshot before collecting payload files.
-  buildRootDropRelease({ repositoryRoot, releaseRoot: rootDropRoot });
+  buildRootDropRelease({ repositoryRoot, releaseRoot: rootDropRoot, packageDistReady: true });
   assertPayloadLauncherIsNotNested(path.join(rootDropRoot, 'atm.mjs'));
 
   const payloadFiles = collectPayloadFiles(rootDropRoot);
@@ -183,6 +183,7 @@ const onefilePayloadFrameworkMarkers = new Set([
   'packages/cli/src/atm.ts',
   'packages/cli/src/commands/self-host-alpha.ts',
   'packages/core/seed.js',
+  'scripts/plan-performance-report-v4.ts',
   'scripts/validate-seed-registry.ts',
   'scripts/validate-seed-spec.ts'
 ]);
