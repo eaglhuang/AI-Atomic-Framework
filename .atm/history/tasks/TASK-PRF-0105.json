@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0105",
   "title": "Optimize highest cumulative route-resolution latency hotspot",
-  "status": "running",
+  "status": "open",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -187,8 +187,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T19-29-28-502Z-renew-92a93588a103",
-  "lastTransitionAt": "2026-09-14T19:29:28.502Z",
+  "lastTransitionId": "2026-09-14T19-30-35-300Z-release-3b2b6e702566",
+  "lastTransitionAt": "2026-09-14T19:30:35.300Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-09-14T19:21:21.352Z",
@@ -197,7 +197,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-691350e4176c",
     "claimedAt": "2026-09-14T19:21:21.360Z",
-    "heartbeatAt": "2026-09-14T19:29:28.225Z",
+    "heartbeatAt": "2026-09-14T19:30:34.503Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0105.json",
@@ -207,13 +207,14 @@
       "packages/cli/src/commands/next/route-resolution/*.ts",
       "tests/cli/next-route-resolution-latency.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260914192121-codex-gpt-5.4-mini-d64e8ebd97",
       "status": "active",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914192121-codex-gpt-5.4-mini-d64e8ebd97\""
-    }
+    },
+    "reason": "Implementation committed; formal same-runner AB/BA measurement remains pending and frozen runner is stale."
   },
   "startedAt": "2026-09-14T19:21:21.360Z",
   "startedByActor": "codex-gpt-5.4-mini",
