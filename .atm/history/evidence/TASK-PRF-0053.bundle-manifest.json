@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0053",
-  "updatedAt": "2026-09-14T02:01:57.577Z",
+  "updatedAt": "2026-09-14T02:39:29.257Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "build --workspace packages/cli",
@@ -152,6 +152,22 @@
       "durationMs": 5655,
       "runnerKind": "dev-source",
       "sourceCommit": "5dd68e086f05c272b4395ae64e9bec469f9c9fc3",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3cd67742294542997602b2b7541cae04cc80a43b5b64416c1ce30226b3093c91",
+      "stderrSha256": "sha256:8564a28b4a18d1a9316b15a3decec3cd611f768ec2caa7054f75188a5b3aab46",
+      "validators": [
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-14T02:39:29.256Z",
+      "startedAt": "2026-09-14T02:39:11.805Z",
+      "finishedAt": "2026-09-14T02:39:29.256Z",
+      "durationMs": 17451,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1c8d15e59664bc5ac399b32d3e52a5b304031d10",
       "cached": false
     }
   ],

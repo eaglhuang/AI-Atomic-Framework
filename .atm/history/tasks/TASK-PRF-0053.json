@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0053",
   "title": "Complete public npm core-workflow proof and authorized release handoff",
-  "status": "running",
+  "status": "blocked",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0052"
@@ -245,17 +245,17 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T01-53-36-024Z-claim-c3e1e109f13f",
-  "lastTransitionAt": "2026-09-14T01:53:36.024Z",
+  "lastTransitionId": "2026-09-14T02-41-15-645Z-block-431c92e55bf7",
+  "lastTransitionAt": "2026-09-14T02:41:15.645Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-09-14T01:53:31.994Z",
-  "promotedAt": "2026-09-14T01:53:31.998Z",
+  "reservedAt": "2026-09-14T02:37:02.251Z",
+  "promotedAt": "2026-09-14T02:37:02.256Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-5664c1df7eba",
-    "claimedAt": "2026-09-14T01:53:32.003Z",
-    "heartbeatAt": "2026-09-14T01:53:32.003Z",
+    "leaseId": "lease-8ded20c9ae8b",
+    "claimedAt": "2026-09-14T02:37:02.260Z",
+    "heartbeatAt": "2026-09-14T02:41:15.644Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0053.json",
@@ -268,18 +268,18 @@
       "tests/cli/product-proof-evidence-boundary.test.ts",
       "tests/cli/public-npm-install-contract.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260914015202-codex-gpt-5.4-mini-162baadbc1",
+      "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
       "status": "adopted",
-      "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914015202-codex-gpt-5.4-mini-162baadbc1\""
-    }
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914022336-codex-gpt-5.4-mini-c0c3597320\""
+    },
+    "reason": "Public registry @ai-atomic-framework/cli@0.1.0 still fails the required chart core workflow; preserve blocked receipt and await authorized republish plus post-publish revalidation."
   },
   "startedAt": "2026-09-14T01:52:01.771Z",
   "startedByActor": "codex-gpt-5.4-mini",
-  "startedBySessionId": "session-20260914015332-codex-gpt-5.4-mini-TASK-PRF-0053-0eb6157fd9",
+  "startedBySessionId": "session-20260914023702-codex-gpt-5.4-mini-TASK-PRF-0053-20ab50ef5a",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -304,33 +304,33 @@
     "allowPlanningMirror": false,
     "promptHash": "5ffbea8c8f80aac7e47d09296c60da6b9e90df882653954bf3562b0f66665939",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260914015332-codex-gpt-5.4-mini-TASK-PRF-0053-0eb6157fd9",
+    "sessionId": "session-20260914023702-codex-gpt-5.4-mini-TASK-PRF-0053-20ab50ef5a",
     "laneSession": {
-      "laneSessionId": "lane-20260914015202-codex-gpt-5.4-mini-162baadbc1",
+      "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
       "status": "adopted",
       "source": "env",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914015202-codex-gpt-5.4-mini-162baadbc1\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914022336-codex-gpt-5.4-mini-c0c3597320\""
     },
-    "createdAt": "2026-09-14T01:53:36.023Z",
+    "createdAt": "2026-09-14T02:37:03.742Z",
     "status": "active"
   },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-43bb126145f00d2b",
-    "ticketDigest": "sha256:43bb126145f00d2b7b0c35a990ac3e72330b73a5409ccd0d69e16912e1385f31",
+    "ticketId": "wat-6ce1df5d392bfadb",
+    "ticketDigest": "sha256:6ce1df5d392bfadb2383cef73d374f311ecc3f41f4c4d18409384ba2d1f5c941",
     "taskId": "TASK-PRF-0053",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260914015202-codex-gpt-5.4-mini-162baadbc1",
-    "claimGeneration": "lease-5664c1df7eba",
-    "issuedAt": "2026-09-14T01:53:32.003Z",
-    "expiresAt": "2026-09-14T02:23:32.003Z",
+    "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
+    "claimGeneration": "lease-8ded20c9ae8b",
+    "issuedAt": "2026-09-14T02:40:06.861Z",
+    "expiresAt": "2026-09-14T03:10:06.861Z",
     "scopeDigest": "sha256:13ce94b02c8eba8ad88882c353caa92fbdc4928771a32ee1a7647943f6530d4b",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-14T01:53:32.003Z"
+      "selectedAt": "2026-09-14T02:40:06.861Z"
     },
     "grants": [
       {
@@ -379,5 +379,9 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  }
+  },
+  "closedAt": "2026-09-14T02:41:15.644Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260914023702-codex-gpt-5.4-mini-TASK-PRF-0053-20ab50ef5a",
+  "closeReason": "Public registry @ai-atomic-framework/cli@0.1.0 still fails the required chart core workflow; preserve blocked receipt and await authorized republish plus post-publish revalidation."
 }
