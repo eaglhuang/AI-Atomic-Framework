@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0064",
+  "updatedAt": "2026-09-14T07:52:32.291Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json --report-only",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0806953b63f3dd0cd10a33120f0bb4a8ac70db87acbfcbe1d0bb918390579562",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts"
+      ],
+      "generatedAt": "2026-09-14T07:52:24.383Z",
+      "startedAt": "2026-09-14T07:52:24.059Z",
+      "finishedAt": "2026-09-14T07:52:24.383Z",
+      "durationMs": 324,
+      "runnerKind": "dev-source",
+      "sourceCommit": "310e7c9cbb12367e9bc31f3011823785ff8756c2",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+      ],
+      "generatedAt": "2026-09-14T07:52:27.043Z",
+      "startedAt": "2026-09-14T07:52:26.744Z",
+      "finishedAt": "2026-09-14T07:52:27.043Z",
+      "durationMs": 299,
+      "runnerKind": "dev-source",
+      "sourceCommit": "310e7c9cbb12367e9bc31f3011823785ff8756c2",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4e364b3eece7a8e68571b758bad9a95368d17b319e9a5f94233355e5d417e5ef",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json"
+      ],
+      "generatedAt": "2026-09-14T07:52:29.687Z",
+      "startedAt": "2026-09-14T07:52:29.369Z",
+      "finishedAt": "2026-09-14T07:52:29.687Z",
+      "durationMs": 318,
+      "runnerKind": "dev-source",
+      "sourceCommit": "310e7c9cbb12367e9bc31f3011823785ff8756c2",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json --report-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:db966a13ee3859abd14e6fda487183c9fd5145ce59f27de43fbda1eba7a1fc5c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json --report-only"
+      ],
+      "generatedAt": "2026-09-14T07:52:32.290Z",
+      "startedAt": "2026-09-14T07:52:31.979Z",
+      "finishedAt": "2026-09-14T07:52:32.290Z",
+      "durationMs": 311,
+      "runnerKind": "dev-source",
+      "sourceCommit": "310e7c9cbb12367e9bc31f3011823785ff8756c2",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

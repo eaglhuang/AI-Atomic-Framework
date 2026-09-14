@@ -11,6 +11,8 @@ export type CiRun = {
   createdAt: string;
   displayTitle?: string;
   workflowName?: string;
+  workflowConclusion?: string | null;
+  productJobConclusion?: string | null;
   eligible?: boolean;
   exclusionReason?: string | null;
   lifecycle?: CiFailureLifecycle;
@@ -39,6 +41,7 @@ type LifecycleReceiptInput = {
   schemaId: 'atm.ciLifecycleEvidence.v1';
   sourceDigest: string;
   receiptDigest: string;
+  scopePolicyDigest?: string;
   runs: CiRun[];
 };
 
@@ -46,6 +49,7 @@ type NormalizedBurnInInput = {
   runs: unknown;
   sourceDigest: string;
   receiptDigest: string | null;
+  scopePolicyDigest: string | null;
 };
 
 const DEFAULT_POLICY: BurnInPolicy = {
@@ -73,17 +77,18 @@ function digest(value: unknown): string {
 
 function normalizeInput(input: unknown): NormalizedBurnInInput {
   if (Array.isArray(input)) {
-    return { runs: input, sourceDigest: digest(input), receiptDigest: null };
+    return { runs: input, sourceDigest: digest(input), receiptDigest: null, scopePolicyDigest: null };
   }
   if (!input || typeof input !== 'object') throw new Error('history-empty');
   const receipt = input as Partial<LifecycleReceiptInput>;
   if (receipt.schemaId !== 'atm.ciLifecycleEvidence.v1') throw new Error('unsupported-receipt-schema');
   if (typeof receipt.sourceDigest !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(receipt.sourceDigest)) throw new Error('invalid-sourceDigest');
   if (typeof receipt.receiptDigest !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(receipt.receiptDigest)) throw new Error('invalid-receiptDigest');
+  if (receipt.scopePolicyDigest !== undefined && (typeof receipt.scopePolicyDigest !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(receipt.scopePolicyDigest))) throw new Error('invalid-scopePolicyDigest');
   if (!Array.isArray(receipt.runs) || receipt.runs.length === 0) throw new Error('history-empty');
   const computedReceiptDigest = digest(receipt.runs);
   if (computedReceiptDigest !== receipt.receiptDigest) throw new Error('receiptDigest-mismatch');
-  return { runs: receipt.runs, sourceDigest: receipt.sourceDigest, receiptDigest: receipt.receiptDigest };
+  return { runs: receipt.runs, sourceDigest: receipt.sourceDigest, receiptDigest: receipt.receiptDigest, scopePolicyDigest: receipt.scopePolicyDigest ?? null };
 }
 
 function parseDate(value: string, field: string): number {
@@ -140,6 +145,7 @@ function validateRuns(input: unknown, policy: BurnInPolicy): CiRun[] {
     const eligible = run.eligible !== false;
     if (!eligible && (!run.exclusionReason || run.exclusionReason.trim().length === 0)) throw new Error(`record-${databaseId}-missing-exclusionReason`);
     if (policy.requireLifecycle) validateLifecycle(run as CiRun);
+    if (eligible && run.productJobConclusion !== undefined && run.productJobConclusion !== run.conclusion) throw new Error(`record-${databaseId}-product-conclusion-mismatch`);
     previousCreatedAt = createdAt;
     runs.push(run as CiRun);
   }
@@ -173,6 +179,11 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
       streak += 1;
     }
     const releaseCandidateRuns = runs.filter((run) => /release[- ]candidate/i.test(run.displayTitle ?? '')).length;
+    const excludedRunReasons = Object.fromEntries([...excludedRuns.reduce((counts, run) => {
+      const reason = run.exclusionReason ?? 'unspecified';
+      counts.set(reason, (counts.get(reason) ?? 0) + 1);
+      return counts;
+    }, new Map<string, number>())].sort(([left], [right]) => left.localeCompare(right)));
     const lifecycles = runs.map((run) => run.lifecycle).filter((lifecycle): lifecycle is CiFailureLifecycle => lifecycle !== undefined);
     const retriedRuns = lifecycles.filter((lifecycle) => lifecycle.retryCount > 0).length;
     const retryCount = lifecycles.reduce((total, lifecycle) => total + lifecycle.retryCount, 0);
@@ -189,7 +200,7 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
     return {
       schemaId: 'atm.productCiBurnInReport.v1',
       policy,
-      input: { sourceDigest: normalized.sourceDigest, receiptDigest: normalized.receiptDigest, recordCount: runs.length },
+      input: { sourceDigest: normalized.sourceDigest, receiptDigest: normalized.receiptDigest, scopePolicyDigest: normalized.scopePolicyDigest, recordCount: runs.length },
       observed: {
         oldestAt: runs[runs.length - 1].createdAt,
         newestAt: runs[0].createdAt,
@@ -201,6 +212,7 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
         releaseCandidateRuns,
         excludedRunCount: excludedRuns.length,
         excludedRunIds: excludedRuns.map((run) => run.databaseId),
+        excludedRunReasons,
         retriedRuns,
         retryCount,
         unresolvedFailures,

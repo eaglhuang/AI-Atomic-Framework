@@ -112,3 +112,34 @@ evidence can be archived, but the explicit semantic verdict prevents that
 exit code from being interpreted as a green burn-in claim. A receipt with a
 tampered `runs` array or missing lifecycle data is rejected as
 `invalid-input`.
+
+## TASK-PRF-0064 scoped replay (2026-09-14)
+
+The product burn-in boundary is now explicit and digest-bound by
+`scripts/product-ci-burn-in-workflow-scope.json`. It includes the standard and
+release-candidate Product CI workflows, retains release-candidate runs, and
+excludes every other workflow. Missing or mismatched workflow identity is
+excluded with a machine-readable reason; an explicit source exclusion is
+preserved. For retained runs, `productJobConclusion` drives burn-in while
+`workflowConclusion` remains provenance.
+
+Replay commands:
+
+```text
+node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json
+node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json --report-only
+```
+
+The policy digest is
+`sha256:54ed1ef6676f4b6a0e7327784f44c6009ab146c797ed6e4e1f0b5081c71e6dfe`.
+The scoped receipt has source digest
+`sha256:60d67c230ccf496ffddb4398d47b4e084764dfe3f4bfbb66d40b87cf25bac056`,
+receipt digest
+`sha256:e583cb70d7e306e69a875767201c9f18af555e22032ba5739a2cf580a7a9cc58`,
+630 retained runs, and 170 excluded `ci` workflow runs. The evaluator reports
+627 product-job successes, 3 product-job failures, 18.157894 calendar days,
+and `semanticVerdict: reject` with reasons
+`insufficient-calendar-window` and `unexplained-failure-present`.
+
+This is a corrected, replayable negative observation. It does not alter the
+0059 export and does not authorize CI permission changes or npm publication.

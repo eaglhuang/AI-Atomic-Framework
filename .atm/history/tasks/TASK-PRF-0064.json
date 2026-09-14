@@ -1,0 +1,383 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0064",
+  "title": "Scope CI burn-in evidence to the product workflow",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A versioned scope policy explicitly identifies the product CI workflow(s) and the release-candidate treatment; the collector applies it deterministically and records the policy digest.",
+    "ACC-2: Generic `ci`, unknown, missing, and ambiguous workflow identities are excluded with non-empty machine-readable reasons; they cannot enter the eligible denominator or satisfy the 30-day/90-run gate. For retained workflows, product-job and workflow-level conclusions remain distinct and only the product-job conclusion drives burn-in.",
+    "ACC-3: Replaying the unchanged 0059 export produces a canonical receipt and report with scoped count, excluded count/reasons, failure-class distribution, calendar window, and semantic verdict. The existing negative result remains negative when scoped failures or unresolved repairs remain.",
+    "ACC-4: Focused tests cover exact in-scope, out-of-scope, missing identity, explicit exclusion, and tampered scope-policy cases; malformed or digest-mismatched scope input fails closed."
+  ],
+  "deliverables": [
+    "scripts/collect-ci-burn-in-evidence.ts",
+    "scripts/measure-product-ci-burn-in.ts",
+    "scripts/product-ci-burn-in-workflow-scope.json",
+    "tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-product-ci-lifecycle-evidence.md",
+    "docs/reports/atm-product-ci-burn-in-real-export.md"
+  ],
+  "scopePaths": [
+    "scripts/collect-ci-burn-in-evidence.ts",
+    "scripts/measure-product-ci-burn-in.ts",
+    "scripts/product-ci-burn-in-workflow-scope.json",
+    "tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-product-ci-lifecycle-evidence.md",
+    "docs/reports/atm-product-ci-burn-in-real-export.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json --report-only"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.product-ci-burn-in-evidence",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "docs/reports/atm-product-ci-burn-in-real-export.md"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.ci-burn-in-workflow-scope-policy",
+        "pattern": "Policy Object",
+        "source": "scripts/product-ci-burn-in-workflow-scope.json",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0064-scope-ci-burn-in-evidence-to-the-product-workflow.task.md",
+    "sectionTitle": "TASK-PRF-0064",
+    "headingLine": 143,
+    "hash": "c660b2201e01d4c6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0064-scope-ci-burn-in-evidence-to-the-product-workflow.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:c660b2201e01d4c6b23855bc9bf2f02bf35bab12c5b6b2e2677433967ef03e9f",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-14T07:02:18.004Z"
+    }
+  },
+  "importedAt": "2026-09-14T07:02:18.004Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-PRF-0059 external export remains preserved outside Git with a digest",
+      "TASK-PRF-0063 replay contract is available on the target source baseline"
+    ],
+    "softRelations": [
+      "TASK-PRF-0059",
+      "TASK-PRF-0063"
+    ],
+    "changedPublicSeams": [
+      "ci-burn-in-evidence-contract",
+      "product-ci-burn-in-report"
+    ],
+    "causalImpactEdges": [
+      "workflow-scope-to-eligible-count",
+      "excluded-reason-to-replayability"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-PRF-0059-external-export"
+    ],
+    "validatorReferences": [
+      "test_prf0064_exact_product_workflow_scope_7c1a2d4e",
+      "test_prf0064_ambiguous_workflow_fails_closed_91d4e7b2",
+      "test_prf0064_product_job_conclusion_is_authoritative_6a4f91c0",
+      "test_prf0064_replay_scope_receipt_c43e8a19"
+    ],
+    "phaseOwner": "atm-product-proof"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf0064_exact_product_workflow_scope_7c1a2d4e",
+      "targetGroupId": "null",
+      "semanticKey": "exact_product_workflow_is_eligible",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "workflow-scope-to-eligible-count"
+      ],
+      "expectedRedPredicate": "an exact in-scope product workflow is retained as eligible and uses its product-job conclusion",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "ci-workflow-scope-contract",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "test_prf0064_ambiguous_workflow_fails_closed_91d4e7b2",
+      "targetGroupId": "null",
+      "semanticKey": "ambiguous_workflow_identity_is_excluded",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "workflow-scope-to-eligible-count"
+      ],
+      "expectedRedPredicate": "missing or out-of-scope workflow identity cannot enter the eligible denominator",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "ci-workflow-scope-contract",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "test_prf0064_product_job_conclusion_is_authoritative_6a4f91c0",
+      "targetGroupId": "null",
+      "semanticKey": "product_job_conclusion_is_separate_from_workflow_conclusion",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "workflow-scope-to-eligible-count"
+      ],
+      "expectedRedPredicate": "dogfood-only workflow failure does not become a product-CI failure while product workflow provenance is retained",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "ci-workflow-scope-contract",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "test_prf0064_replay_scope_receipt_c43e8a19",
+      "targetGroupId": "null",
+      "semanticKey": "scoped_receipt_replays_with_exclusion_reasons",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "excluded-reason-to-replayability"
+      ],
+      "expectedRedPredicate": "replay reports scoped counts and exclusion reasons without changing the negative verdict",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "ci-lifecycle-receipt-contract",
+      "resourceKey": "null"
+    },
+    {
+      "caseId": "test_prf0064_tampered_scope_fails_closed_2e8b6d41",
+      "targetGroupId": "null",
+      "semanticKey": "tampered_scope_policy_is_rejected",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "excluded-reason-to-replayability"
+      ],
+      "expectedRedPredicate": "malformed or digest-mismatched scope policy is rejected before a receipt is emitted",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "ci-workflow-scope-contract",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf0064_exact_product_workflow_scope_7c1a2d4e",
+    "test_prf0064_ambiguous_workflow_fails_closed_91d4e7b2",
+    "test_prf0064_product_job_conclusion_is_authoritative_6a4f91c0",
+    "test_prf0064_replay_scope_receipt_c43e8a19",
+    "test_prf0064_tampered_scope_fails_closed_2e8b6d41"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T07-44-43-396Z-claim-8a5dcaebf212",
+  "lastTransitionAt": "2026-09-14T07:44:43.396Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T07:44:40.794Z",
+  "promotedAt": "2026-09-14T07:44:40.797Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-eb2e1181b585",
+    "claimedAt": "2026-09-14T07:44:40.801Z",
+    "heartbeatAt": "2026-09-14T07:44:40.801Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0064.json",
+      ".atm/history/evidence/TASK-PRF-0064.*",
+      ".atm/history/task-events/TASK-PRF-0064/**",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/product-ci-burn-in-workflow-scope.json",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914074441-codex-gpt-5.4-mini-2d8a9bf95e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914074441-codex-gpt-5.4-mini-2d8a9bf95e\""
+    }
+  },
+  "startedAt": "2026-09-14T07:02:32.795Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-77368e41c29fcadc",
+    "ticketDigest": "sha256:77368e41c29fcadc60350b71c5a25eb326b562642eea47a1ef961cc40dede4b6",
+    "taskId": "TASK-PRF-0064",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914074441-codex-gpt-5.4-mini-2d8a9bf95e",
+    "claimGeneration": "lease-eb2e1181b585",
+    "issuedAt": "2026-09-14T07:44:40.801Z",
+    "expiresAt": "2026-09-14T08:14:40.801Z",
+    "scopeDigest": "sha256:440345bd5a86a154d5b0d136e157536202f53a1a732201af6b27e23c95822981",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T07:44:40.801Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0064.*",
+          ".atm/history/task-events/TASK-PRF-0064/**",
+          ".atm/history/tasks/TASK-PRF-0064.json",
+          "docs/reports/atm-product-ci-burn-in-real-export.md",
+          "docs/reports/atm-product-ci-lifecycle-evidence.md",
+          "scripts/collect-ci-burn-in-evidence.ts",
+          "scripts/measure-product-ci-burn-in.ts",
+          "scripts/product-ci-burn-in-workflow-scope.json",
+          "tests/cli/ci-burn-in-evidence-collector.test.ts",
+          "tests/cli/product-proof-evidence-boundary.test.ts"
+        ],
+        "digest": "sha256:7999764f963fd12868bc9383c01c43f07ab5c3b06668e2fb0a09d3b029bfef6f"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914074440-codex-gpt-5.4-mini-TASK-PRF-0064-1b7a1c3530",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0064",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0064.*",
+      ".atm/history/task-events/TASK-PRF-0064/**",
+      ".atm/history/tasks/TASK-PRF-0064.json",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/product-ci-burn-in-workflow-scope.json",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5b9b0f04dbee96759f245884bbd0911d0659dfa6f76286f68b9f26fea779a305",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914074440-codex-gpt-5.4-mini-TASK-PRF-0064-1b7a1c3530",
+    "laneSession": {
+      "laneSessionId": "lane-20260914074441-codex-gpt-5.4-mini-2d8a9bf95e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914074441-codex-gpt-5.4-mini-2d8a9bf95e\""
+    },
+    "createdAt": "2026-09-14T07:44:43.396Z",
+    "status": "active"
+  }
+}
