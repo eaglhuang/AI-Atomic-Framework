@@ -1,0 +1,251 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0052",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "5079799da82e66b36f545a50d4d9f2b909dc37b1",
+  "governedTreeSha": "89d83139210fbcc81394c89712930dfc95a9dc75",
+  "targetCommitDelta": {
+    "currentCommitSha": "5079799da82e66b36f545a50d4d9f2b909dc37b1",
+    "parentCommitShas": [
+      "5079799da82e66b36f545a50d4d9f2b909dc37b1"
+    ],
+    "governedTreeSha": "89d83139210fbcc81394c89712930dfc95a9dc75",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0052.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "packages/cli/dist/commands/atm-chart/constants.js",
+      "packages/cli/dist/commands/atm-chart/render-verify.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/commands/atm-chart/constants.ts",
+      "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
+      "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta.md",
+      "release/atm-root-drop/packages/cli/dist/commands/atm-chart/constants.js",
+      "release/atm-root-drop/packages/cli/dist/commands/atm-chart/render-verify.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/atm-chart/constants.ts",
+      "release/atm-root-drop/packages/cli/src/commands/atm-chart/render-verify.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/build-package-dist.ts",
+      "release/atm-root-drop/tests/cli/public-npm-install-contract.test.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run build --workspace packages/cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5031f29f49ce348938c2abc36bebd6ef771999eb56300b34764f498477231d21",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run build --workspace packages/cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bd8c18fc0b93f803ba2c6ac71efb74fde56ae80329d33636ad3387796075ee85",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run build --workspace packages/cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcfbbe9542e334c1bf42c43b1835350467b5d05deda554a78680c668bcbc0cf8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3cd67742294542997602b2b7541cae04cc80a43b5b64416c1ce30226b3093c91",
+      "stderrSha256": "sha256:4467a0b3e0c6640576b5075c165c83cd18ac484679ae75a1cf0188441abe82c8",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm pack --workspace packages/cli --dry-run --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5670cba53b5375036241176eaa114c8735a918d958b2849d1479a673d2a6f60e",
+      "stderrSha256": "sha256:6f6bca804bfc43fbedca57c4f1018fcfacef88b743e9d9880b4459804afe38f4",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-adopter-artifact-manifest.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1475ac6c319496e3c100acd76d227f0e6232082fcd1c927c2de07c588ccd9578",
+      "stderrSha256": "sha256:3f8ad5c38468fbde4a1b1ddd68d172f0ea2e5d56d0c2684b526d7ca4748a1c7c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-npm-clean-install.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed127c39b81cb29336c6b6c0a1155d491b4e1bc37b650b991e41444ea41fd8fd",
+      "stderrSha256": "sha256:23b35e18328a0604e4e98c06f50a93c2a63fb912de86e67890e63b479a80d260",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run build",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:04a7281ed0c6e6ac7b1dc039dee8ea33e58ce3bff7ab3aee51eb40699bc075d3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "build --workspace packages/cli",
+    "lint",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "npm pack --workspace packages/cli --dry-run --json",
+    "typecheck",
+    "validate:adopter-artifact-manifest",
+    "validate:npm-clean-install"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "build --workspace packages/cli",
+    "lint",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "npm pack --workspace packages/cli --dry-run --json",
+    "typecheck",
+    "validate:adopter-artifact-manifest",
+    "validate:npm-clean-install"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-14T01:43:07.132Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0052.*",
+      ".atm/history/task-events/TASK-PRF-0052/**",
+      ".atm/history/tasks/TASK-PRF-0052.json",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "packages/cli/dist/commands/atm-chart/**",
+      "packages/cli/dist/npm-runtime/**",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/dist/npm-runtime/schemas/**",
+      "packages/cli/package.json",
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/commands/atm-chart/constants.ts",
+      "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-release-integrity.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/commands/atm-chart/**",
+      "packages/cli/dist/npm-runtime/**",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/dist/npm-runtime/schemas/**",
+      "packages/cli/package.json",
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/commands/atm-chart/constants.ts",
+      "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "scripts/build-release-integrity.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "requiredGates": [
+      "build --workspace packages/cli",
+      "lint",
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "npm pack --workspace packages/cli --dry-run --json",
+      "typecheck",
+      "validate:adopter-artifact-manifest",
+      "validate:npm-clean-install"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0052.json",
+  "closedAt": "2026-09-14T01:43:07.132Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914011822-codex-gpt-5.4-mini-TASK-PRF-0052-808d87d911",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e62546837cf7409cc45b54fa0a87f2ed0be02202",
+    "taskMatchedFiles": [
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "packages/cli/dist/commands/atm-chart/constants.js",
+      "packages/cli/dist/commands/atm-chart/render-verify.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/commands/atm-chart/constants.ts",
+      "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "scripts/build-package-dist.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0052/2026-09-14T01-17-44-864Z-import-e1def224046f.json",
+      ".atm/history/task-events/TASK-PRF-0052/2026-09-14T01-18-22-264Z-reserve-5be71e525c9f.json",
+      ".atm/history/task-events/TASK-PRF-0052/2026-09-14T01-18-22-268Z-promote-49ff7c8e7e20.json",
+      ".atm/history/task-events/TASK-PRF-0052/2026-09-14T01-18-28-120Z-claim-1126ac3379e6.json",
+      ".atm/history/task-events/TASK-PRF-0052/2026-09-14T01-26-32-451Z-scope-amendment-a2693e6c9354.json",
+      ".atm/history/task-events/TASK-PRF-0052/2026-09-14T01-26-42-804Z-scope-amendment-db87dafba99f.json",
+      ".atm/history/task-events/TASK-PRF-0052/2026-09-14T01-28-43-349Z-scope-amendment-15b5034392bc.json",
+      ".atm/history/task-events/TASK-PRF-0052/2026-09-14T01-31-48-733Z-scope-amendment-75a8b2ed643c.json",
+      ".atm/history/tasks/TASK-PRF-0052.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

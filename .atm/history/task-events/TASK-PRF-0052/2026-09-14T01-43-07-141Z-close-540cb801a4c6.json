@@ -1,0 +1,91 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T01-43-07-141Z-close-540cb801a4c6",
+  "taskId": "TASK-PRF-0052",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914011822-codex-gpt-5.4-mini-TASK-PRF-0052-808d87d911",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0052.json",
+  "taskSha256": "sha256:5887f76baec67de4e22fc71d901985e42f82ec8194d5f2884693eaaf0be38c6c",
+  "createdAt": "2026-09-14T01:43:07.141Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0052 --actor codex-gpt-5.4-mini --status done --historical-delivery e62546837cf7409cc45b54fa0a87f2ed0be02202",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914011822-codex-gpt-5.4-mini-TASK-PRF-0052-808d87d911",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0052.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build --workspace packages/cli",
+      "lint",
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "npm pack --workspace packages/cli --dry-run --json",
+      "typecheck",
+      "validate:adopter-artifact-manifest",
+      "validate:npm-clean-install"
+    ],
+    "requiredGates": [
+      "build --workspace packages/cli",
+      "lint",
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "npm pack --workspace packages/cli --dry-run --json",
+      "typecheck",
+      "validate:adopter-artifact-manifest",
+      "validate:npm-clean-install"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T01:43:07.132Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0052.*",
+        ".atm/history/task-events/TASK-PRF-0052/**",
+        ".atm/history/tasks/TASK-PRF-0052.json",
+        "docs/reports/atm-public-npm-install-proof-beta.md",
+        "packages/cli/dist/commands/atm-chart/**",
+        "packages/cli/dist/npm-runtime/**",
+        "packages/cli/dist/npm-runtime/manifest.json",
+        "packages/cli/dist/npm-runtime/runtime.mjs",
+        "packages/cli/dist/npm-runtime/schemas/**",
+        "packages/cli/package.json",
+        "packages/cli/src/atm-public.ts",
+        "packages/cli/src/commands/atm-chart/constants.ts",
+        "packages/cli/src/commands/atm-chart/render-verify.ts",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-release-integrity.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/commands/atm-chart/**",
+        "packages/cli/dist/npm-runtime/**",
+        "packages/cli/dist/npm-runtime/manifest.json",
+        "packages/cli/dist/npm-runtime/runtime.mjs",
+        "packages/cli/dist/npm-runtime/schemas/**",
+        "packages/cli/package.json",
+        "packages/cli/src/atm-public.ts",
+        "packages/cli/src/commands/atm-chart/constants.ts",
+        "packages/cli/src/commands/atm-chart/render-verify.ts",
+        "scripts/build-cli-npm-runtime.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-release-integrity.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "requiredGates": [
+        "build --workspace packages/cli",
+        "lint",
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+        "npm pack --workspace packages/cli --dry-run --json",
+        "typecheck",
+        "validate:adopter-artifact-manifest",
+        "validate:npm-clean-install"
+      ]
+    }
+  }
+}
