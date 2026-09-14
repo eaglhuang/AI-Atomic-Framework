@@ -1,0 +1,348 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0056",
+  "title": "Require the complete core workflow in candidate npm proof",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A clean tarball consumer runs the same five-command core workflow required by the public proof and records each exit code, output digest, startup timing, and module-resolution result.",
+    "ACC-2: Missing required chart data or schema fails closed as blocked/inconclusive; no legacy smoke result can override it.",
+    "ACC-3: The receipt distinguishes candidate, registry, and baseline data; records exact package source, tarball digest, unpacked bytes, entry count, Node/npm versions, workspace-link status, and the complete command matrix.",
+    "ACC-4: Focused contract, evidence-boundary, typecheck, lint, and candidate validator checks pass; the report states candidate-only evidence and does not imply a public release or authorize npm publish."
+  ],
+  "deliverables": [
+    "scripts/validate-candidate-npm-install.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "scopePaths": [
+    "scripts/validate-candidate-npm-install.ts",
+    "tests/cli/public-npm-install-contract.test.ts",
+    "tests/cli/product-proof-evidence-boundary.test.ts",
+    "docs/reports/atm-public-npm-install-proof-beta.md",
+    "docs/reports/atm-product-proof-checkpoints.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run lint",
+    "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+    "node --strip-types scripts/validate-candidate-npm-install.ts --candidate-dir packages/cli --record-blocked"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-candidate-tarball-clean-install-full-core-workflow",
+  "rollbackStrategy": "revert-commit-preserve-candidate-receipt",
+  "rollbackNotes": "Revert only the candidate validator, tests, and report updates; retain failed or blocked candidate receipts outside Git for audit.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.public-runtime-closure",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.candidate-registry-workflow-validator",
+        "pattern": "Policy Object",
+        "source": "scripts/validate-candidate-npm-install.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "Keep the first repair cohesive; extract only if candidate and public validators later share a stable provider-neutral boundary."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/validate-candidate-npm-install.ts",
+        "tests/cli/public-npm-install-contract.test.ts",
+        "tests/cli/product-proof-evidence-boundary.test.ts",
+        "docs/reports/atm-public-npm-install-proof-beta.md",
+        "docs/reports/atm-product-proof-checkpoints.md",
+        "external candidate tarball receipt with full core-workflow command matrix and provenance"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0056-require-the-complete-core-workflow-in-candidate-npm-proof.task.md",
+    "sectionTitle": "TASK-PRF-0056",
+    "headingLine": 103,
+    "hash": "ce193bd343d4eecb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0056-require-the-complete-core-workflow-in-candidate-npm-proof.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ce193bd343d4eecb8c80c1c9c2066c5aeec0d7a03bce21ec655fa0a1c4344ad0",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T02:48:55.180Z"
+    }
+  },
+  "importedAt": "2026-09-14T02:48:55.180Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-PRF-0053 established the public core-workflow contract, while candidate validation still covers only the legacy smoke commands.",
+      "The current local candidate already carries the required chart schemas; this card repairs evidence completeness rather than changing the runtime split."
+    ],
+    "softRelations": [
+      "TASK-PRF-0053",
+      "TASK-PRF-0052"
+    ],
+    "changedPublicSeams": [
+      "candidate_npm_install_proof"
+    ],
+    "causalImpactEdges": [
+      "candidate_install_complete",
+      "release_provenance"
+    ],
+    "parallelFrontierInputs": [
+      "candidate-tarball",
+      "core-workflow-contract"
+    ],
+    "validatorReferences": [
+      "test_prf_candidate_core_workflow_matrix",
+      "test_prf_candidate_fail_closed_missing_schema",
+      "test_prf_candidate_registry_separation"
+    ],
+    "phaseOwner": "release"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_candidate_core_workflow_matrix",
+      "targetGroupId": "null",
+      "semanticKey": "candidate_core_workflow_matrix",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "candidate_install_complete"
+      ],
+      "expectedRedPredicate": "A candidate tarball is accepted after legacy smoke commands even though bootstrap, atm-chart render, or atm-chart verify is absent or fails in the clean consumer.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "candidate_npm_install_proof",
+      "resourceKey": "clean-candidate-install"
+    },
+    {
+      "caseId": "test_prf_candidate_fail_closed_missing_schema",
+      "targetGroupId": "null",
+      "semanticKey": "candidate_fail_closed_missing_schema",
+      "coversAcceptance": [
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "candidate_install_complete"
+      ],
+      "expectedRedPredicate": "Removing a required chart schema still yields blocked/inconclusive candidate evidence and never a pass.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "candidate_npm_install_proof",
+      "resourceKey": "candidate-schema-closure"
+    },
+    {
+      "caseId": "test_prf_candidate_registry_separation",
+      "targetGroupId": "null",
+      "semanticKey": "candidate_registry_separation",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "release_provenance"
+      ],
+      "expectedRedPredicate": "A candidate receipt cannot be labeled as public registry proof and must retain exact source, metadata, digest, and workspace-link fields.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "candidate_npm_install_proof",
+      "resourceKey": "candidate-provenance"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_candidate_core_workflow_matrix",
+    "test_prf_candidate_fail_closed_missing_schema",
+    "test_prf_candidate_registry_separation"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T03-00-09-972Z-claim-25cea4337e49",
+  "lastTransitionAt": "2026-09-14T03:00:09.972Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T02:51:05.969Z",
+  "promotedAt": "2026-09-14T02:51:05.975Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-72ab2b6e641f",
+    "claimedAt": "2026-09-14T03:00:05.241Z",
+    "heartbeatAt": "2026-09-14T03:00:05.241Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0056.json",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "scripts/validate-candidate-npm-install.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914022336-codex-gpt-5.4-mini-c0c3597320\""
+    }
+  },
+  "startedAt": "2026-09-14T02:51:05.981Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260914030005-codex-gpt-5.4-mini-TASK-PRF-0056-b439cd5abe",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0056",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0056.*",
+      ".atm/history/task-events/TASK-PRF-0056/**",
+      ".atm/history/tasks/TASK-PRF-0056.json",
+      "docs/reports/atm-product-proof-checkpoints.md",
+      "docs/reports/atm-public-npm-install-proof-beta.md",
+      "scripts/validate-candidate-npm-install.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts",
+      "tests/cli/public-npm-install-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "2a81c223e2763c083fc8f4deb02d72af2efa260be8f70862f84975ab0681b537",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914030005-codex-gpt-5.4-mini-TASK-PRF-0056-b439cd5abe",
+    "laneSession": {
+      "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914022336-codex-gpt-5.4-mini-c0c3597320\""
+    },
+    "createdAt": "2026-09-14T03:00:09.971Z",
+    "status": "active"
+  },
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-00d1f7bddfb521fb",
+    "ticketDigest": "sha256:00d1f7bddfb521fb27a008081bc8c6650dbfee448fb8769fdffb375e7b9fa27f",
+    "taskId": "TASK-PRF-0056",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
+    "claimGeneration": "lease-72ab2b6e641f",
+    "issuedAt": "2026-09-14T03:00:05.241Z",
+    "expiresAt": "2026-09-14T03:30:05.241Z",
+    "scopeDigest": "sha256:ea458754dca93f22df9b51be497e7ad053d4e5fd49eb95e0c85ca2760bba7aa8",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T03:00:05.241Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0056.*",
+          ".atm/history/task-events/TASK-PRF-0056/**",
+          ".atm/history/tasks/TASK-PRF-0056.json",
+          "docs/reports/atm-product-proof-checkpoints.md",
+          "docs/reports/atm-public-npm-install-proof-beta.md",
+          "scripts/validate-candidate-npm-install.ts",
+          "tests/cli/product-proof-evidence-boundary.test.ts",
+          "tests/cli/public-npm-install-contract.test.ts"
+        ],
+        "digest": "sha256:04835f7dc8627344720582e5a77df072d9f8a8d1a039e551484753b2a37e4ebb"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  }
+}

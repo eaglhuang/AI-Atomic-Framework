@@ -38,6 +38,13 @@ assert.match(candidateValidatorSource, /atm\.candidateNpmInstallProof\.v1/, 'can
 assert.match(candidateValidatorSource, /versionOnlySmoke: false/, 'candidate validator must reject version-only evidence');
 assert.match(candidateValidatorSource, /moduleResolutionFailures/, 'candidate validator must report module-resolution failures');
 assert.match(candidateValidatorSource, /usedWorkspaceLink: false/, 'candidate validator must prove a tarball install rather than a workspace link');
+assert.match(candidateValidatorSource, /atm-chart-render/, 'candidate validator must exercise chart rendering');
+assert.match(candidateValidatorSource, /atm-chart-verify/, 'candidate validator must exercise chart verification');
+assert.match(candidateValidatorSource, /requiredSuccessCommands/, 'candidate validator must declare required core workflow commands');
+assert.match(candidateValidatorSource, /requiredSuccessCommandFailures/, 'candidate validator must fail closed on required command failures');
+assert.match(candidateValidatorSource, /coreWorkflowPassed/, 'candidate validator must report core workflow status');
+assert.match(candidateValidatorSource, /candidateOnly: true/, 'candidate receipt must remain candidate-only');
+assert.match(candidateValidatorSource, /publicRegistry: false/, 'candidate receipt must not claim registry evidence');
 
 const live = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.0', '--record-blocked', '--measurement-runs', '1'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
 const liveProof = JSON.parse(live.trim().split(/\r?\n/).at(-1)!);

@@ -70,3 +70,15 @@ returned `invalid-input` with
 existing export is insufficient to measure first failure, retries, and repair
 time. Raw provider payloads remain outside Git; the 90-run/30-day policy and the
 inconclusive status are unchanged.
+
+## TASK-PRF-0056 candidate validator completeness (2026-09-14)
+
+Candidate npm proof is now fail-closed on the complete core workflow rather
+than the former four-command legacy smoke. The isolated tarball consumer runs
+`version`, `doctor`, `next`, `tasks`, `bootstrap`, `atm-chart render`, and
+`atm-chart verify`; the required-success subset is
+`version`/`doctor`/`bootstrap`/`atm-chart render`/`atm-chart verify`.
+Receipts retain candidate-only provenance and cannot be promoted to public
+registry evidence. This checkpoint records validator delivery, not a public
+republish: `@ai-atomic-framework/cli@0.1.0` remains blocked until a separately
+authorized release and fresh registry revalidation.

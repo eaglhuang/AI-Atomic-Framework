@@ -108,15 +108,28 @@ type SmokeResult = {
   outputSha256: string;
 };
 
+const legacySmokeCommandNames = ['version', 'doctor', 'next', 'tasks'] as const;
+const coreWorkflowCommandNames = ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify'] as const;
+const candidateSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'bootstrap', 'atm-chart-render', 'atm-chart-verify'] as const;
+
 const smokeCommands = [
   ['version', '--version', '--json'],
+  ['doctor', 'doctor', '--json'],
   ['next', 'next', '--json'],
   ['tasks', 'tasks', 'status', '--task', 'TASK-PRF-0050', '--json'],
-  ['doctor', 'doctor', '--json']
+  ['bootstrap', 'bootstrap', '--cwd', 'WORKFLOW_PLACEHOLDER', '--task', 'PUBLIC-CANDIDATE', '--json'],
+  ['atm-chart-render', 'atm-chart', 'render', '--cwd', 'WORKFLOW_PLACEHOLDER', '--json'],
+  ['atm-chart-verify', 'atm-chart', 'verify', '--cwd', 'WORKFLOW_PLACEHOLDER', '--json']
 ] as const;
+
+function coreWorkflowFailures(smoke: Record<string, SmokeResult>): string[] {
+  return coreWorkflowCommandNames.filter((name) => smoke[name]?.exitCode !== 0);
+}
 
 function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs: number; smoke: Record<string, SmokeResult>; bin: string } {
   const consumer = path.join(tempRoot, 'consumer');
+  const workflow = path.join(consumer, 'workflow');
+  mkdirSync(workflow, { recursive: true });
   const installStart = performance.now();
   runNpm(['install', '--ignore-scripts', '--prefix', consumer, tarball], tempRoot);
   const installMs = performance.now() - installStart;
@@ -126,7 +139,8 @@ function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs:
   if (!existsSync(bin)) throw new Error(`candidate install did not expose atm bin: ${bin}`);
 
   const smoke: Record<string, SmokeResult> = {};
-  for (const [name, ...commandArgs] of smokeCommands) {
+  for (const [name, ...rawCommandArgs] of smokeCommands) {
+    const commandArgs = rawCommandArgs.map((argument) => argument === 'WORKFLOW_PLACEHOLDER' ? workflow : argument);
     const startupMs: number[] = [];
     let result = spawnSync(bin, commandArgs, {
       cwd: consumer,
@@ -180,6 +194,11 @@ try {
   const files = packed.metadata.files ?? [];
   const moduleResolutionFailures = Object.values(smokeRun.smoke).filter((entry) => entry.moduleResolutionFailure).length;
   const commands = Object.keys(smokeRun.smoke);
+  const requiredSuccessCommandFailures = coreWorkflowFailures(smokeRun.smoke);
+  const allCommandsExecuted = Object.values(smokeRun.smoke).every((entry) => entry.commandExecuted);
+  const commandMatrixComplete = commands.length === candidateSmokeCommandNames.length
+    && candidateSmokeCommandNames.every((name) => commands.includes(name));
+  const coreWorkflowPassed = requiredSuccessCommandFailures.length === 0;
   const candidate = {
     source: packed.source,
     sourceDir: args.candidateDir,
@@ -201,13 +220,19 @@ try {
       cleanConsumer: true,
       usedWorkspaceLink: false,
       commandMatrix: commands,
-      commandMatrixComplete: commands.length === smokeCommands.length,
+      commandMatrixComplete,
       versionOnlySmoke: false,
       moduleResolutionFailures,
-      allCommandsExecuted: Object.values(smokeRun.smoke).every((entry) => entry.commandExecuted),
-      passed: commands.length === smokeCommands.length
+      allCommandsExecuted,
+      requiredSuccessCommands: [...coreWorkflowCommandNames],
+      requiredSuccessCommandFailures,
+      coreWorkflowPassed,
+      candidateOnly: true,
+      publicRegistry: false,
+      passed: commandMatrixComplete
         && moduleResolutionFailures === 0
-        && Object.values(smokeRun.smoke).every((entry) => entry.commandExecuted)
+        && allCommandsExecuted
+        && coreWorkflowPassed
     },
     measurement: {
       hostPlatform: process.platform,
@@ -228,6 +253,11 @@ try {
       commandMatrix: smokeCommands.map(([name]) => name),
       commandMatrixComplete: false,
       versionOnlySmoke: false,
+      requiredSuccessCommands: [...coreWorkflowCommandNames],
+      requiredSuccessCommandFailures: [...coreWorkflowCommandNames],
+      coreWorkflowPassed: false,
+      candidateOnly: true,
+      publicRegistry: false,
       passed: false
     },
     status: args.recordBlocked ? 'blocked' : 'failed',

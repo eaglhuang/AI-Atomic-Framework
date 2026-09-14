@@ -63,3 +63,16 @@ registry receipt rather than turning a failed command into a pass. On the live
 published package lacks the default-guards chart schema. The local candidate
 passing chart lifecycle remains candidate-only evidence and is not substituted
 for this registry result.
+
+## TASK-PRF-0056 candidate proof boundary (2026-09-14)
+
+The candidate validator now executes the same seven-command install matrix as
+the public validator: `version`, `doctor`, `next`, `tasks`, `bootstrap`,
+`atm-chart render`, and `atm-chart verify`. The five commands that define the
+core workflow are explicit required-success commands; any failure or module
+resolution error fails closed. Candidate receipts also declare
+`candidateOnly: true` and `publicRegistry: false`, so a local tarball cannot be
+mistaken for registry evidence. The validator records the isolated install,
+tarball digest, unpacked bytes, entry count, runtime versions, command exits,
+startup timings, and output digests. This repairs evidence completeness only;
+it does not publish or alter the public `0.1.0` result.
