@@ -1,0 +1,99 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0107",
+  "updatedAt": "2026-09-14T20:14:22.894Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "check:encoding:touched -- --files packages/cli/src/commands/atm-chart/constants.ts packages/cli/src/commands/atm-chart/render-verify.ts scripts/build-cli-npm-runtime.ts tests/cli/atm-chart-public-runtime.test.ts docs/reports/atm-command-gate-latency-score.md",
+    "node --strip-types tests/cli/atm-chart-public-runtime.test.ts",
+    "typecheck -- --pretty false",
+    "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1 --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0107/registry-proof-atm.json"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/atm-chart-public-runtime.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9b8c2b176a77c51bd12f7c7a811c22e13e7d30e3d297c0d43cb7296b276abb54",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/atm-chart-public-runtime.test.ts"
+      ],
+      "generatedAt": "2026-09-14T20:05:05.197Z",
+      "startedAt": "2026-09-14T20:05:04.884Z",
+      "finishedAt": "2026-09-14T20:05:05.197Z",
+      "durationMs": 313,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fb2a3ce767b9cedf51870797bbf9f8a2cc106128",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b4f74faa4576a8a1d06c4481fca16ab5537578dff7c9d225b5bc4bc4a6d3ffb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck -- --pretty false"
+      ],
+      "generatedAt": "2026-09-14T20:05:15.595Z",
+      "startedAt": "2026-09-14T20:05:06.563Z",
+      "finishedAt": "2026-09-14T20:05:15.595Z",
+      "durationMs": 9032,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fb2a3ce767b9cedf51870797bbf9f8a2cc106128",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files packages/cli/src/commands/atm-chart/constants.ts packages/cli/src/commands/atm-chart/render-verify.ts scripts/build-cli-npm-runtime.ts tests/cli/atm-chart-public-runtime.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ec8c299c1b1290edeea100fe3439c7e2a913def5a8832bf9be6c4b98bf741ee0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files packages/cli/src/commands/atm-chart/constants.ts packages/cli/src/commands/atm-chart/render-verify.ts scripts/build-cli-npm-runtime.ts tests/cli/atm-chart-public-runtime.test.ts docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "generatedAt": "2026-09-14T20:05:18.456Z",
+      "startedAt": "2026-09-14T20:05:17.021Z",
+      "finishedAt": "2026-09-14T20:05:18.456Z",
+      "durationMs": 1435,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fb2a3ce767b9cedf51870797bbf9f8a2cc106128",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1 --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0107/registry-proof-atm.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c5960a63323dfcaf3460d044ca587d028d90c1f0906f76c9bd3eb6b667317453",
+      "stderrSha256": "sha256:456df004e287df6b58ee415715742c85e2c2bd886385365d12d63524e42028d0",
+      "validators": [
+        "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1 --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0107/registry-proof-atm.json"
+      ],
+      "generatedAt": "2026-09-14T20:12:10.917Z",
+      "startedAt": "2026-09-14T20:11:59.756Z",
+      "finishedAt": "2026-09-14T20:12:10.917Z",
+      "durationMs": 11161,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fb2a3ce767b9cedf51870797bbf9f8a2cc106128",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files docs/reports/atm-command-gate-latency-score.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:15c63f37b9d5418adab2abf707b76e78dfaea598fc545fbbd11190fef6eb99c8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-14T20:14:22.894Z",
+      "startedAt": "2026-09-14T20:14:21.449Z",
+      "finishedAt": "2026-09-14T20:14:22.894Z",
+      "durationMs": 1445,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fb2a3ce767b9cedf51870797bbf9f8a2cc106128",
+      "cached": false
+    }
+  ],
+  "artifactPaths": [
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0107/candidate-proof.json",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0107/chart-runtime-paired-receipt.json",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0107/registry-proof.json",
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0107/run-chart-runtime-paired.mjs"
+  ]
+}

@@ -1,0 +1,346 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0107",
+  "title": "Restore installable npm chart lifecycle without inflating the bundle",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "**ACC-1 — Clean-install function:** from an empty temporary project, `atm-chart render` and `atm-chart verify` execute against the installed package without depending on the framework repository root.",
+    "**ACC-2 — Schema integrity:** chart output records the same sealed schema digests as the source runner; missing, tampered, or invalid schema data still returns the existing fail-closed error and never a false PASS.",
+    "**ACC-3 — Existing product matrix:** `validate:public-npm-install` runs init, next/tasks, doctor/guide and chart lifecycle commands for the exact candidate version; any blocked or failed command remains visible.",
+    "**ACC-4 — Bundle budget:** candidate unpacked bytes and entries do not exceed the current package budget and no broad `schemas/` copy or new registry is introduced.",
+    "**ACC-5 — Millisecond evidence:** external receipt has at least 30 interleaved AB/BA pairs and 8 A/A controls with tarball/runner digests, failure samples, clean-install wall p50/p95, and chart command/gate p50/p95; no claim is made if the candidate cannot pass the functional matrix.",
+    "**ACC-6 — No concurrency regression:** no broker, lock, or multi-AI ownership semantics change; read-only/private evidence work remains parallel."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/atm-chart/constants.ts",
+    "packages/cli/src/commands/atm-chart/render-verify.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "tests/cli/atm-chart-public-runtime.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/atm-chart/constants.ts",
+    "packages/cli/src/commands/atm-chart/render-verify.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "tests/cli/atm-chart-public-runtime.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/atm-chart-public-runtime.test.ts",
+    "npm run validate:public-npm-install",
+    "npm run typecheck -- --pretty false",
+    "npm run build:packages -- --packages cli",
+    "npm run check:encoding:touched -- --files packages/cli/src/commands/atm-chart/constants.ts packages/cli/src/commands/atm-chart/render-verify.ts scripts/build-cli-npm-runtime.ts tests/cli/atm-chart-public-runtime.test.ts docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "revert the single runtime seam and test change; retain external receipts and the documented npm failure evidence",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli.atm-chart-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/maps/atm-cli-command-router-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.cli.atm-chart-schema-source",
+        "pattern": "Deep Module",
+        "source": "packages/cli/src/commands/atm-chart/constants.ts",
+        "disposition": "inline",
+        "inlineReason": "existing resolver and embedded digest table already form one bounded seam; extracting a second module would increase bundle surface without another adapter"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0107-restore-installable-npm-chart-lifecycle-without-inflating-the-bundle.task.md",
+    "sectionTitle": "TASK-PRF-0107",
+    "headingLine": 120,
+    "hash": "291f9cdde0c84e28",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0107-restore-installable-npm-chart-lifecycle-without-inflating-the-bundle.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:604c3d0bab646003cb500be8d762d913a006e8c38c3f2c3b57eeab34be33a74d",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-14T20:10:47.729Z"
+    }
+  },
+  "importedAt": "2026-09-14T19:55:08.923Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "clean npm install of @ai-atomic-framework/cli@0.1.0 reproduces ATM_CHART_SCHEMA_SOURCE_MISSING",
+      "embedded schema digests and runtime manifest are available for comparison",
+      "artifact budget and existing chart fail-closed behavior remain unchanged"
+    ],
+    "softRelations": [
+      "TASK-PRF-0101",
+      "TASK-PRF-0102",
+      "TASK-PRF-0106"
+    ],
+    "changedPublicSeams": [
+      "atm.cli.atm-chart.render",
+      "atm.cli.atm-chart.verify",
+      "atm.cli.public-npm-runtime"
+    ],
+    "causalImpactEdges": [
+      "public-clean-install-completeness",
+      "npm-chart-lifecycle-correctness",
+      "command-gate-latency-score"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-PRF-0101",
+      "TASK-PRF-0106"
+    ],
+    "validatorReferences": [
+      "public-npm-install-command-matrix",
+      "npm-runtime-artifact-budget",
+      "atm-chart-schema-fail-closed"
+    ],
+    "phaseOwner": "null"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_prf0107_chart_schema_fallback_8e7a1c44",
+      "targetGroupId": "null",
+      "semanticKey": "public_chart_schema_fallback",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "public-clean-install-completeness",
+        "npm-chart-lifecycle-correctness"
+      ],
+      "expectedRedPredicate": "a runtime-only chart render or verify cannot resolve a schema without the monorepo root",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "npm-chart-lifecycle-correctness",
+      "contractEdge": "atm.cli.atm-chart.render",
+      "resourceKey": "atm-chart-schema"
+    },
+    {
+      "caseId": "test_task_prf0107_chart_schema_negative_0c2d9b71",
+      "targetGroupId": "null",
+      "semanticKey": "public_chart_schema_fail_closed",
+      "coversAcceptance": [
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "npm-chart-lifecycle-correctness"
+      ],
+      "expectedRedPredicate": "missing or invalid schema data is silently accepted or reported as a passing chart lifecycle",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "npm-chart-schema-fail-closed",
+      "contractEdge": "atm.cli.atm-chart.verify",
+      "resourceKey": "atm-chart-schema-negative"
+    },
+    {
+      "caseId": "test_task_prf0107_public_install_latency_2a91f0de",
+      "targetGroupId": "null",
+      "semanticKey": "public_install_latency_receipt",
+      "coversAcceptance": [
+        "ACC-4",
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "command-gate-latency-score"
+      ],
+      "expectedRedPredicate": "receipt omits failure samples, tarball identity, or paired p50/p95 milliseconds",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "public-clean-install-completeness",
+      "contractEdge": "external-receipt-boundary",
+      "resourceKey": "public-install-latency"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_prf0107_chart_schema_fallback_8e7a1c44",
+    "test_task_prf0107_chart_schema_negative_0c2d9b71",
+    "test_task_prf0107_public_install_latency_2a91f0de"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T20-10-48-027Z-metadata-only-import-b701c652cae8",
+  "lastTransitionAt": "2026-09-14T20:10:48.027Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T19:55:26.843Z",
+  "promotedAt": "2026-09-14T19:55:26.847Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-d1db935e9be1",
+    "claimedAt": "2026-09-14T19:55:26.851Z",
+    "heartbeatAt": "2026-09-14T19:55:26.851Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0107.json",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "packages/cli/src/commands/atm-chart/constants.ts",
+      "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "tests/cli/atm-chart-public-runtime.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea\""
+    }
+  },
+  "startedAt": "2026-09-14T19:55:26.851Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-28d0703243198989",
+    "ticketDigest": "sha256:28d07032431989895b288d2efe2b543bc13fefe6ac7c48ac53fd6460e6aff4ce",
+    "taskId": "TASK-PRF-0107",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea",
+    "claimGeneration": "lease-d1db935e9be1",
+    "issuedAt": "2026-09-14T19:55:26.851Z",
+    "expiresAt": "2026-09-14T20:25:26.851Z",
+    "scopeDigest": "sha256:6bb925a16f242b0bda62c4939db26e12292afce14d74fe5da497a6851460c13d",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T19:55:26.851Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0107.*",
+          ".atm/history/task-events/TASK-PRF-0107/**",
+          ".atm/history/tasks/TASK-PRF-0107.json",
+          "docs/reports/atm-command-gate-latency-score.md",
+          "packages/cli/src/commands/atm-chart/constants.ts",
+          "packages/cli/src/commands/atm-chart/render-verify.ts",
+          "scripts/build-cli-npm-runtime.ts",
+          "tests/cli/atm-chart-public-runtime.test.ts"
+        ],
+        "digest": "sha256:f42727662a49f82a972bf206f9de06d5be9543114974e71e048ccc6ec23d467d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914195526-codex-gpt-5.4-mini-TASK-PRF-0107-f9dad7b1fe",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0107",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0107.*",
+      ".atm/history/task-events/TASK-PRF-0107/**",
+      ".atm/history/tasks/TASK-PRF-0107.json",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "packages/cli/src/commands/atm-chart/constants.ts",
+      "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "tests/cli/atm-chart-public-runtime.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "24ec8806a0b60f33806e884cc022fd73c30c911ca3ba0b00e412a16b88707bdc",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914195526-codex-gpt-5.4-mini-TASK-PRF-0107-f9dad7b1fe",
+    "laneSession": {
+      "laneSessionId": "lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea\""
+    },
+    "createdAt": "2026-09-14T19:55:28.877Z",
+    "status": "active"
+  }
+}

@@ -38,6 +38,26 @@ summary and digest. The first implementation reuses:
 The report is intentionally JSON/Markdown first. A GUI dashboard is deferred
 until real samples show that a visual surface reduces operator time.
 
+## Current command-cost inventory (TASK-PRF-0107 evidence)
+
+These are command-level observations from the current candidate run, not a
+claim that every ATM path is covered. Failed or blocked commands remain in the
+inventory so a fast refusal cannot be mistaken for zero cost:
+
+| command/gate | observed wall ms | outcome | interpretation |
+|---|---:|---|---|
+| `validate:public-npm-install` (registry 0.1.0) | 11,161 | blocked product result | release evidence is expensive and still exposes the chart failure |
+| `npm run typecheck -- --pretty false` | 9,032 | pass | second-order hotspot; optimize only after correctness and release blockers |
+| `check:encoding:touched` | 1,435 | pass | low-frequency hygiene cost; do not optimize before second-level gates |
+| `atm-chart-public-runtime` test | 313 | pass | focused regression cost |
+| `build:packages -- --packages cli` admission | 777.589 | failed before build | missing release-surface claim; this is a gate precondition cost, not a build success |
+
+The inventory is deliberately separate from the paired p50/p95 sections below:
+single observations identify candidates, while only repeated AB/BA plus A/A
+receipts can establish a product-performance change. The build-admission
+failure is retained as a failure sample and does not enter a candidate PASS
+denominator.
+
 ## Existing CLI integration
 
 The existing telemetry report path projects the same runtime gate events into
@@ -143,3 +163,52 @@ preserving classification semantics. Receipt:
 Rerun harness:
 `C:\Users\User\atm-benchmark-sink\TASK-PRF-0106\run-git-status-paired.mjs`
 (`sha256:7307e457f0eb240f35697ecc47da8cf42bf913c53e62bb4ffe30a2e78cd6e380`).
+
+## Public npm chart lifecycle follow-up (TASK-PRF-0107)
+
+The clean candidate tarball now passes the complete local install contract,
+including `bootstrap`, `atm-chart render`, and `atm-chart verify`; the registry
+version `@ai-atomic-framework/cli@0.1.0` remains a separate blocked result and
+must not be relabeled as fixed until a trusted publish and post-publish rerun.
+The candidate is still a single runtime: no broad schema directory was copied;
+the five chart schemas remain logical embedded assets identified by sealed
+digests.
+
+The external installed-tarball AB/BA run used 30 interleaved samples per
+runner, eight candidate A/A controls, and the same bootstrap → render → verify
+workload in isolated temporary adopters. All 60 baseline/candidate runs and all
+eight controls passed:
+
+- frozen baseline chart render p50 **854.582 ms**, p95 **891.755 ms**;
+- installed candidate chart render p50 **134.925 ms**, p95 **146.960 ms**;
+- frozen baseline chart verify p50 **847.263 ms**, p95 **887.496 ms**;
+- installed candidate chart verify p50 **136.559 ms**, p95 **150.538 ms**;
+- candidate tarball install cost **1,848.443 ms** (reported separately from
+  command latency), unpacked **2,651,636 bytes**, **66 entries**;
+- candidate A/A render p50 **135.917 ms**, verify p50 **137.955 ms**.
+
+These are valid local-tarball packaging measurements, not registry evidence;
+the baseline is a frozen onefile and the candidate is the installed local
+tarball, so the functional result is stronger than a version-only smoke but
+the product publication gate remains open. Candidate contract receipt:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0107\candidate-proof.json`
+(`sha256:53e257bb2d20facad8841e972db9eebe550bb8981003e2d683359d87edc7fc42`).
+Paired receipt:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0107\chart-runtime-paired-receipt.json`
+(`sha256:2b669ac8987e7cbabed14e6add1eaa2a148ef46f9e00025c5df449b8ec941cc6`).
+Rerun harness:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0107\run-chart-runtime-paired.mjs`
+(`sha256:fe11d375974ea07a072b09abe36eb0b30bc1978aff3aafde72cef8955b835e72`).
+
+The public registry rerun remains **blocked**: `@ai-atomic-framework/cli@0.1.0`
+has **3,357,358 bytes / 78 files**, and its clean install still returns
+`ATM_CHART_SCHEMA_SOURCE_MISSING` for both chart commands. Registry receipt:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0107\registry-proof.json`
+(`sha256:e855c5be6f136ca12ef32030aabad45153487e04018bbf6e253aa965cadcee17`).
+This is the exact publication blocker that trusted publishing or a correctly
+scoped `NPM_TOKEN` must clear; it is not evidence against the local candidate.
+
+The first harness revision used Windows shell invocation for Node and produced
+all-failure measurements; it was discarded as harness-invalid evidence. The
+final receipt uses direct Node process spawning and records zero failures. No
+broker, lock, or multi-AI ownership behavior changed.
