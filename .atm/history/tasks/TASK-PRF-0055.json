@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0055",
   "title": "Retain CI first-failure retry and repair-time evidence",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0051"
@@ -224,8 +224,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T02-23-38-354Z-claim-6bdca1ef733f",
-  "lastTransitionAt": "2026-09-14T02:23:38.354Z",
+  "lastTransitionId": "2026-09-14T02-35-27-072Z-close-fc730e448d40",
+  "lastTransitionAt": "2026-09-14T02:35:27.072Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-09-14T02:23:35.971Z",
@@ -234,7 +234,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-b5d245696c0e",
     "claimedAt": "2026-09-14T02:23:35.979Z",
-    "heartbeatAt": "2026-09-14T02:23:35.979Z",
+    "heartbeatAt": "2026-09-14T02:35:27.070Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0055.json",
@@ -244,14 +244,14 @@
       "tests/cli/product-ci-burn-in.test.ts",
       "tests/cli/product-proof-evidence-boundary.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260914022336-codex-gpt-5.4-mini-c0c3597320",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914022336-codex-gpt-5.4-mini-c0c3597320\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-14T02:23:35.979Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -353,5 +353,9 @@
     },
     "createdAt": "2026-09-14T02:23:38.353Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-14T02:35:27.070Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260914022335-codex-gpt-5.4-mini-TASK-PRF-0055-e72da6dc83",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0055.closure-packet.json"
 }

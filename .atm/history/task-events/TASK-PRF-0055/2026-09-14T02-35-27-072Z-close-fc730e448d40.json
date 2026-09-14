@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T02-35-27-072Z-close-fc730e448d40",
+  "taskId": "TASK-PRF-0055",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914022335-codex-gpt-5.4-mini-TASK-PRF-0055-e72da6dc83",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0055.json",
+  "taskSha256": "sha256:ea27125096bbcaf78dac9ac6e289b721bf4b838f60b09c3e62a5844ccbc48064",
+  "createdAt": "2026-09-14T02:35:27.072Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0055 --actor codex-gpt-5.4-mini --status done --historical-delivery e32deaf328b5611899c881f1a0822de61640f19e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914022335-codex-gpt-5.4-mini-TASK-PRF-0055-e72da6dc83",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0055.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T02:35:27.063Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0055.*",
+        ".atm/history/task-events/TASK-PRF-0055/**",
+        ".atm/history/tasks/TASK-PRF-0055.json",
+        "docs/reports/atm-product-ci-burn-in.md",
+        "docs/reports/atm-product-proof-checkpoints.md",
+        "scripts/measure-product-ci-burn-in.ts",
+        "tests/cli/product-ci-burn-in.test.ts",
+        "tests/cli/product-proof-evidence-boundary.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/measure-product-ci-burn-in.ts",
+        "tests/cli/product-ci-burn-in.test.ts",
+        "tests/cli/product-proof-evidence-boundary.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --stdin --report-only",
+        "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+        "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
