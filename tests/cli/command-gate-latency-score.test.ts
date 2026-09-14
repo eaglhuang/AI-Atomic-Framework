@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {
   buildCommandGateLatencyMarkdown,
   buildCommandGateLatencyReport,
+  buildCommandGateLatencyReportFromEvents,
   compareCommandGateLatencyReports,
   unionIntervalsMs,
   validateCommandGateLatencyReport,
@@ -48,6 +49,18 @@ assert.equal(report.scores.find((score) => score.key === 'doctor.integrity')?.ex
 assert.equal(report.scores.find((score) => score.key === 'next.route')?.cumulativeTaskWaitingMs, 10000);
 assert.equal(report.hotspots[0]?.key, 'next.route', 'frequency-weighted cost must outrank a rare slow command');
 assert.match(buildCommandGateLatencyMarkdown(report), /Unknown values mean no real sample was available/);
+
+const projected = buildCommandGateLatencyReportFromEvents({
+  inventory,
+  mandatoryKeys: ['next.route'],
+  events: [{
+    eventId: 'event-1', checkId: 'next.route', gate: 'next', command: 'node atm.mjs next',
+    durationMs: 125, result: 'pass', taskId: 'TASK-1', runId: 'run-1'
+  }]
+});
+assert.equal(projected.observedCount, 1);
+assert.equal(projected.scores.find((score) => score.key === 'next.route')?.p50Ms, 125);
+assert.equal(projected.scores.find((score) => score.key === 'next.route')?.mandatory, true);
 
 assert.throws(() => buildCommandGateLatencyReport({
   inventory,

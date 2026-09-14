@@ -202,6 +202,19 @@ export type CommandGateLatencySample = {
   readonly evidenceRef?: string | null;
 };
 
+/** Structural subset of the existing gate telemetry event used for projection. */
+export type CommandGateTelemetryEvent = {
+  readonly eventId?: string;
+  readonly checkId: string;
+  readonly gate: string;
+  readonly command?: string;
+  readonly durationMs: number;
+  readonly result: string;
+  readonly taskId?: string | null;
+  readonly runId?: string | null;
+  readonly evidenceReadRef?: string | null;
+};
+
 export type CommandGateLatencyScore = {
   readonly key: string;
   readonly command: string;
@@ -388,6 +401,46 @@ export function buildCommandGateLatencyReport(input: {
     scores,
     hotspots
   };
+}
+
+/**
+ * Project the already-recorded gate telemetry events into the latency score.
+ * This keeps the event stream as the sole source of truth; no second store is
+ * created and absent runtime events remain unknown.
+ */
+export function buildCommandGateLatencyReportFromEvents(input: {
+  readonly inventory: readonly CommandGateLatencyInventoryEntry[];
+  readonly events: readonly CommandGateTelemetryEvent[];
+  readonly mandatoryKeys?: readonly string[];
+  readonly generatedAt?: string;
+  readonly measurementOverheadMs?: number | null;
+}): CommandGateLatencyReport {
+  const mandatory = new Set(input.mandatoryKeys ?? []);
+  const inventoryByKey = new Map(input.inventory.map((entry) => [entry.key, entry]));
+  const samples = input.events
+    .filter((event) => inventoryByKey.has(event.checkId))
+    .map((event, index): CommandGateLatencySample => {
+      const entry = inventoryByKey.get(event.checkId)!;
+      return {
+        sampleId: event.eventId ?? `${event.checkId}-${index}`,
+        key: entry.key,
+        command: event.command ?? entry.command,
+        gate: event.gate || entry.gate,
+        mandatory: mandatory.has(entry.key) || entry.mandatory,
+        applicability: entry.applicability,
+        durationMs: event.durationMs,
+        outcome: event.result === 'block' ? 'blocked' : event.result === 'error' ? 'fail' : event.result === 'warn' || event.result === 'skip' ? 'unknown' : 'pass',
+        taskId: event.taskId ?? null,
+        runId: event.runId ?? null,
+        evidenceRef: event.evidenceReadRef ?? null
+      };
+    });
+  return buildCommandGateLatencyReport({
+    inventory: input.inventory,
+    samples,
+    generatedAt: input.generatedAt,
+    measurementOverheadMs: input.measurementOverheadMs
+  });
 }
 
 export function validateCommandGateLatencyReport(report: CommandGateLatencyReport): readonly string[] {
