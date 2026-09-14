@@ -35,16 +35,26 @@ function taskIdsFromPaths(paths: readonly string[]): string[] {
 }
 
 export function inspectHistoricalCommitScopePatrol(root: string, limit = 200): CommitScopePatrolResult {
-  const log = runGit(root, ['log', '--all', '--format=%H%x1f%B%x1e', '-n', String(limit)]);
+  // Include each commit's changed paths in the same Git process.  The old
+  // implementation started one `git diff-tree` child for every commit in the
+  // patrol window (up to 200), which made doctor spend seconds in process
+  // startup even though the check itself is advisory.
+  const log = runGit(root, ['log', '--all', '--root', '--format=%H%x1f%B%x1e', '--name-only', '-n', String(limit)]);
   const findings: CommitScopePatrolFinding[] = [];
-  const records = log.split('\x1e').filter(Boolean);
+  const markers = [...log.matchAll(/(^|\r?\n)([0-9a-f]{40})\x1f/gm)];
 
-  for (const record of records) {
-    const separator = record.indexOf('\x1f');
+  for (let index = 0; index < markers.length; index += 1) {
+    const marker = markers[index];
+    const nextMarker = markers[index + 1];
+    const markerPrefix = marker[1] ?? '';
+    const start = (marker.index ?? 0) + markerPrefix.length;
+    const end = nextMarker?.index ?? log.length;
+    const record = log.slice(start, end);
+    const separator = record.indexOf('\x1e');
     if (separator < 0) continue;
-    const commitSha = record.slice(0, separator).trim();
-    const body = record.slice(separator + 1);
-    const paths = runGit(root, ['diff-tree', '--root', '--no-commit-id', '--name-only', '-r', commitSha])
+    const commitSha = marker[2];
+    const body = record.slice(41, separator);
+    const paths = record.slice(separator + 1)
       .split(/\r?\n/).map((value) => value.trim().replace(/\\/g, '/')).filter(Boolean);
     const pathTaskIds = taskIdsFromPaths(paths);
     const declaredMatch = body.match(/^ATM-Task:\s*([^\s]+)/im);
@@ -55,5 +65,5 @@ export function inspectHistoricalCommitScopePatrol(root: string, limit = 200): C
     }
   }
 
-  return { ok: true, scannedCommits: records.length, findings, advisory: true };
+  return { ok: true, scannedCommits: markers.length, findings, advisory: true };
 }
