@@ -1,0 +1,335 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0102",
+  "title": "Instrument mandatory ATM gates with millisecond telemetry",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1：`doctor.readiness`、`guard.framework-mode`、`tasks.claim-admission`、`taskflow.close-readiness`、`batch.checkpoint-readiness`、`broker.shared-surface-admission` 在真實命令路徑各產生可驗證事件；事件缺 correlation、負 duration 或非終態 outcome 時測試 fail。",
+    "ACC-2：`telemetry --report --include-runtime --json` 將事件投影至 0101 的同一份 `latencyScore`，輸出 coverage、unknown、p50/p95、inclusive/exclusive、累積必經等待、失敗／timeout／retry／recovery 與測量 overhead；未跑過的路徑不能顯示 0。",
+    "ACC-3：以固定 workload 產生至少 30 組 baseline，報告每個 gate 的樣本數與頻次，依頻次加權累積成本及 p50/p95 排名；p50 或 p95 ≥1,000 ms 標為 hotspot，≥5,000 ms 優先診斷。",
+    "ACC-4：量測開銷相對 command wall time 可辨識且不改變既有命令結果；新增測試、typecheck 與 encoding guard 通過，並以單一 revert commit 可回退。"
+  ],
+  "deliverables": [
+    "packages/cli/src/atm.ts",
+    "packages/cli/src/commands/doctor/run-doctor.ts",
+    "packages/cli/src/commands/framework-development/critical-path-gate.ts",
+    "packages/cli/src/commands/tasks/legacy-impl.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/batch/implementation.ts",
+    "packages/cli/src/commands/broker/implementation.ts",
+    "packages/cli/src/commands/telemetry.ts",
+    "packages/core/src/telemetry/observation.ts",
+    "scripts/plan-performance-report-v4.ts",
+    "tests/cli/mandatory-gate-telemetry.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/atm.ts",
+    "packages/cli/src/commands/doctor/run-doctor.ts",
+    "packages/cli/src/commands/framework-development/critical-path-gate.ts",
+    "packages/cli/src/commands/tasks/legacy-impl.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/batch/implementation.ts",
+    "packages/cli/src/commands/broker/implementation.ts",
+    "packages/cli/src/commands/telemetry.ts",
+    "packages/core/src/telemetry/observation.ts",
+    "scripts/plan-performance-report-v4.ts",
+    "tests/cli/mandatory-gate-telemetry.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+    "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+    "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only event instrumentation and its tests/report projection; preserve the 0101 pure score functions and external receipts.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.telemetry-observation-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.command-gate-telemetry-adapter",
+        "pattern": "Adapter",
+        "source": "packages/cli/src/atm.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0102-instrument-mandatory-atm-gates-with-millisecond-telemetry.task.md",
+    "sectionTitle": "TASK-PRF-0102",
+    "headingLine": 89,
+    "hash": "9e5b974827749a3d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0102-instrument-mandatory-atm-gates-with-millisecond-telemetry.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:9e5b974827749a3d52d97b4757e3a57bf0778095150feba0a77839d57570786b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T18:21:47.002Z"
+    }
+  },
+  "importedAt": "2026-09-14T18:21:47.002Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0101"
+    ],
+    "startConditions": [],
+    "softRelations": [
+      "TASK-PRF-0099",
+      "TASK-PRF-0100"
+    ],
+    "changedPublicSeams": [
+      "product-proof-performance-report",
+      "gate-telemetry-event-chain"
+    ],
+    "causalImpactEdges": [
+      "mandatory-gate-coverage",
+      "fixed-task-wait-ms",
+      "hotspot-ranking"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-PRF-0101 latency score"
+    ],
+    "validatorReferences": [
+      "tests/cli/mandatory-gate-telemetry.test.ts",
+      "tests/cli/command-gate-latency-score.test.ts"
+    ],
+    "phaseOwner": "product-proof"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_mandatory_gate_telemetry_62c0a4fd",
+      "targetGroupId": "null",
+      "semanticKey": "mandatory_gate_telemetry",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "mandatory-gate-coverage",
+        "fixed-task-wait-ms",
+        "hotspot-ranking"
+      ],
+      "expectedRedPredicate": "A mandatory gate invocation without a monotonic duration/outcome event, or an event with missing correlation, is rejected.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "mandatory-gate-telemetry-contract",
+      "contractEdge": "gate-telemetry-event-chain",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_mandatory_gate_telemetry_62c0a4fd"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T18-22-12-260Z-claim-897e29ef9081",
+  "lastTransitionAt": "2026-09-14T18:22:12.260Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T18:22:05.799Z",
+  "promotedAt": "2026-09-14T18:22:05.803Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-c633c15a3e4d",
+    "claimedAt": "2026-09-14T18:22:05.807Z",
+    "heartbeatAt": "2026-09-14T18:22:05.807Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0102.json",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "packages/cli/src/atm.ts",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/framework-development/critical-path-gate.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/observation.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "tests/cli/mandatory-gate-telemetry.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914182206-codex-gpt-5.4-mini-68bf911fbe",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914182206-codex-gpt-5.4-mini-68bf911fbe\""
+    }
+  },
+  "startedAt": "2026-09-14T18:22:05.807Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-42a65061961884ac",
+    "ticketDigest": "sha256:42a65061961884ac4895b4093eccb74e3c22ef58b5c89e3df0d7748f1274b4b0",
+    "taskId": "TASK-PRF-0102",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914182206-codex-gpt-5.4-mini-68bf911fbe",
+    "claimGeneration": "lease-c633c15a3e4d",
+    "issuedAt": "2026-09-14T18:22:05.807Z",
+    "expiresAt": "2026-09-14T18:52:05.807Z",
+    "scopeDigest": "sha256:9d5ec2714639ff1ac49dac9105f9a4f0fa8679932384f64ca4afae5fd8679e04",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T18:22:05.807Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0102.*",
+          ".atm/history/task-events/TASK-PRF-0102/**",
+          ".atm/history/tasks/TASK-PRF-0102.json",
+          "docs/reports/atm-command-gate-latency-score.md",
+          "packages/cli/src/atm.ts",
+          "packages/cli/src/commands/batch/implementation.ts",
+          "packages/cli/src/commands/broker/implementation.ts",
+          "packages/cli/src/commands/doctor/run-doctor.ts",
+          "packages/cli/src/commands/framework-development/critical-path-gate.ts",
+          "packages/cli/src/commands/taskflow/implementation.ts",
+          "packages/cli/src/commands/tasks/legacy-impl.ts",
+          "packages/cli/src/commands/telemetry.ts",
+          "packages/core/src/telemetry/observation.ts",
+          "scripts/plan-performance-report-v4.ts",
+          "tests/cli/mandatory-gate-telemetry.test.ts"
+        ],
+        "digest": "sha256:4eb48be837757844bb6301e6b6af3b1b1f88797d6aa9b84571561f2c45433bb9"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260914182205-codex-gpt-5.4-mini-TASK-PRF-0102-2801c60932",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0102",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0102.*",
+      ".atm/history/task-events/TASK-PRF-0102/**",
+      ".atm/history/tasks/TASK-PRF-0102.json",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "packages/cli/src/atm.ts",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/framework-development/critical-path-gate.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/telemetry.ts",
+      "packages/core/src/telemetry/observation.ts",
+      "scripts/plan-performance-report-v4.ts",
+      "tests/cli/mandatory-gate-telemetry.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "419b3799038763d8cafafebf3cb9730dc4ce405b0e41ab1c72ed3a69fbc34170",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914182205-codex-gpt-5.4-mini-TASK-PRF-0102-2801c60932",
+    "laneSession": {
+      "laneSessionId": "lane-20260914182206-codex-gpt-5.4-mini-68bf911fbe",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914182206-codex-gpt-5.4-mini-68bf911fbe\""
+    },
+    "createdAt": "2026-09-14T18:22:12.259Z",
+    "status": "active"
+  }
+}
