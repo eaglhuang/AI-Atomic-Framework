@@ -1,0 +1,241 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0094",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "61ad6cdc8fc19e87d5b7498cfc3f3fcdb9063426",
+  "governedTreeSha": "fe5fab9e4d68b4a9bce89d84d0915c2dc4ac936f",
+  "targetCommitDelta": {
+    "currentCommitSha": "61ad6cdc8fc19e87d5b7498cfc3f3fcdb9063426",
+    "parentCommitShas": [
+      "61ad6cdc8fc19e87d5b7498cfc3f3fcdb9063426"
+    ],
+    "governedTreeSha": "fe5fab9e4d68b4a9bce89d84d0915c2dc4ac936f",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/evidence/TASK-PRF-0094.bundle-manifest.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-31-41-491Z-scope-amendment-eaa62468e37a.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-35-24-836Z-renew-46c23dc93c88.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-42-44-473Z-renew-181fb934af8b.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-43-21-396Z-scope-amendment-2af88d84b87e.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-43-27-044Z-renew-f6c68eb580ed.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-45-04-167Z-scope-amendment-bc68a400f26a.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-45-11-023Z-renew-fa7f67e4f46f.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      ".atm/history/tasks/TASK-PRF-0094.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/reports/atm-product-ci-burn-in-real-export.md",
+      "release/atm-root-drop/docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/measure-product-ci-burn-in.ts",
+      "release/atm-root-drop/scripts/validate-evidence-ledger-boundary.ts",
+      "release/atm-root-drop/tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0806953b63f3dd0cd10a33120f0bb4a8ac70db87acbfcbe1d0bb918390579562",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:85858f50f1e561e340dbdebf7515c39701f14d941dbbbfb2df0d7017aa6f2ed2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fc27d69328a77c36a01c269bfd2ffe32437970e5b34ead83988643434b8ccbb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fc27d69328a77c36a01c269bfd2ffe32437970e5b34ead83988643434b8ccbb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fc27d69328a77c36a01c269bfd2ffe32437970e5b34ead83988643434b8ccbb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md --json",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:a7b786f005ecfb215dd3886428e45a3d58fa9679cb3da6033baf90cfba9a164f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fc27d69328a77c36a01c269bfd2ffe32437970e5b34ead83988643434b8ccbb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fc27d69328a77c36a01c269bfd2ffe32437970e5b34ead83988643434b8ccbb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fc27d69328a77c36a01c269bfd2ffe32437970e5b34ead83988643434b8ccbb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fc27d69328a77c36a01c269bfd2ffe32437970e5b34ead83988643434b8ccbb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fc27d69328a77c36a01c269bfd2ffe32437970e5b34ead83988643434b8ccbb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fc27d69328a77c36a01c269bfd2ffe32437970e5b34ead83988643434b8ccbb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "check:encoding:touched",
+    "check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts",
+    "check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+    "docs/reports/atm-product-ci-lifecycle-evidence.md",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+    "scripts/measure-product-ci-burn-in.ts",
+    "tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-14T14:50:23.019Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0094.*",
+      ".atm/history/task-events/TASK-PRF-0094/**",
+      ".atm/history/tasks/TASK-PRF-0094.json",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/**",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts"
+    ],
+    "requiredGates": [
+      "check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0094.json",
+  "closedAt": "2026-09-14T14:50:23.020Z",
+  "closedByActor": "codex-product-proof",
+  "sessionId": "session-20260914141255-codex-product-proof-TASK-PRF-0094-4756c8f787",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "14126f7a08ad05ab27a333f03eac6323663be56f",
+    "taskMatchedFiles": [
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-11-44-008Z-import-92e82839edb8.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-12-55-399Z-reserve-eedc1c1a4876.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-12-55-402Z-promote-7635e92b8d8b.json",
+      ".atm/history/task-events/TASK-PRF-0094/2026-09-14T14-13-01-544Z-claim-b4842b65c07c.json",
+      ".atm/history/tasks/TASK-PRF-0094.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

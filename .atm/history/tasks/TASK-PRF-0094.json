@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0094",
   "title": "Require job-level provenance in CI lifecycle evidence before burn-in replay",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -23,7 +23,14 @@
     "scripts/collect-ci-burn-in-evidence.ts",
     "scripts/measure-product-ci-burn-in.ts",
     "tests/cli/ci-burn-in-evidence-collector.test.ts",
-    "docs/reports/atm-product-ci-lifecycle-evidence.md"
+    "docs/reports/atm-product-ci-lifecycle-evidence.md",
+    ".atm/history/evidence/TASK-PRF-0094.*",
+    ".atm/history/task-events/TASK-PRF-0094/**",
+    ".atm/history/tasks/TASK-PRF-0094.json",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/**"
   ],
   "validators": [
     "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
@@ -230,8 +237,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T14-13-01-544Z-claim-b4842b65c07c",
-  "lastTransitionAt": "2026-09-14T14:13:01.544Z",
+  "lastTransitionId": "2026-09-14T14-50-23-029Z-close-a8c85fe323db",
+  "lastTransitionAt": "2026-09-14T14:50:23.029Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-product-proof",
   "reservedAt": "2026-09-14T14:12:55.399Z",
@@ -240,57 +247,68 @@
     "actorId": "codex-product-proof",
     "leaseId": "lease-4a5d081ef05d",
     "claimedAt": "2026-09-14T14:12:55.406Z",
-    "heartbeatAt": "2026-09-14T14:12:55.406Z",
-    "ttlSeconds": 1800,
+    "heartbeatAt": "2026-09-14T14:50:23.027Z",
+    "ttlSeconds": 3600,
     "files": [
+      ".atm/history/evidence/TASK-PRF-0094.*",
+      ".atm/history/task-events/TASK-PRF-0094/**",
       ".atm/history/tasks/TASK-PRF-0094.json",
       "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/**",
       "scripts/collect-ci-burn-in-evidence.ts",
       "scripts/measure-product-ci-burn-in.ts",
       "tests/cli/ci-burn-in-evidence-collector.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260914141255-codex-product-proof-d3fce53618",
+      "laneSessionId": "lane-20260914144326-codex-product-proof-ce15bc3d5b",
       "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914141255-codex-product-proof-d3fce53618\""
-    }
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914144326-codex-product-proof-ce15bc3d5b\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-14T14:12:55.406Z",
   "startedByActor": "codex-product-proof",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-a20c998a0aa3646e",
-    "ticketDigest": "sha256:a20c998a0aa3646e63a6c3ad8d7adbeca6ce7d13ac6cc3d95367babf9e2606d2",
+    "ticketId": "wat-31745727146fa0ad",
+    "ticketDigest": "sha256:31745727146fa0ad3c7c5efd2f178c6dd7e6180c6f89d7c86a6d31801f24b4f8",
     "taskId": "TASK-PRF-0094",
     "origin": "claim",
     "actorId": "codex-product-proof",
-    "laneSessionId": "lane-20260914141255-codex-product-proof-d3fce53618",
+    "laneSessionId": "lane-20260914144326-codex-product-proof-ce15bc3d5b",
     "claimGeneration": "lease-4a5d081ef05d",
-    "issuedAt": "2026-09-14T14:12:55.406Z",
-    "expiresAt": "2026-09-14T14:42:55.406Z",
-    "scopeDigest": "sha256:6b924a29cf3ed01a524f2bb16c83b6ee4d9879e35fa80dd4d826481faf4b53c6",
+    "issuedAt": "2026-09-14T14:45:10.404Z",
+    "expiresAt": "2026-09-14T15:45:10.404Z",
+    "scopeDigest": "sha256:cef6a87ca5538f075079c9ba44fb186262ae52b26e7d20a702a8d5793d96eaf0",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-14T14:12:55.406Z"
+      "selectedAt": "2026-09-14T14:45:10.404Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0094.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0094/**",
           ".atm/history/tasks/TASK-PRF-0094.json",
           "docs/reports/atm-product-ci-lifecycle-evidence.md",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-onefile/release-manifest.json",
+          "release/atm-root-drop",
+          "release/atm-root-drop/**",
           "scripts/collect-ci-burn-in-evidence.ts",
           "scripts/measure-product-ci-burn-in.ts",
           "tests/cli/ci-burn-in-evidence-collector.test.ts"
         ],
-        "digest": "sha256:ca6d32e2ba807f6c96d29706925421441db0cfc0d28cf976a607b71604d93e75"
+        "digest": "sha256:1ba8fe0ef5be2bb67ad11b3c26748ea39061c88f94bf4b1b3bb12484c5c44e78"
       },
       {
         "kind": "lifecycle-operation",
@@ -338,23 +356,38 @@
       ".atm/history/task-events/TASK-PRF-0094/**",
       ".atm/history/tasks/TASK-PRF-0094.json",
       "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop",
+      "release/atm-root-drop/**",
       "scripts/collect-ci-burn-in-evidence.ts",
       "scripts/measure-product-ci-burn-in.ts",
       "tests/cli/ci-burn-in-evidence-collector.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0094-repair-ci-lifecycle-replay-contract-and-failure-classification.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0094-repair-ci-lifecycle-replay-contract-and-failure-classification.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "57fbb0d95e3e63fe5909e3746fd4248adb66e873407d5946e68d0c64e4065f0a",
     "actorId": "codex-product-proof",
-    "sessionId": "session-20260914141255-codex-product-proof-TASK-PRF-0094-4756c8f787",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260914141255-codex-product-proof-d3fce53618",
       "status": "active",
-      "source": "minted",
+      "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914141255-codex-product-proof-d3fce53618\""
     },
-    "createdAt": "2026-09-14T14:13:01.543Z",
+    "createdAt": "2026-09-14T14:42:44.561Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-14T14:50:23.027Z",
+  "closedByActor": "codex-product-proof",
+  "closedBySessionId": "session-20260914141255-codex-product-proof-TASK-PRF-0094-4756c8f787",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0094.closure-packet.json"
 }

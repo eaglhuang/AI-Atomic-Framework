@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T14-50-23-029Z-close-a8c85fe323db",
+  "taskId": "TASK-PRF-0094",
+  "action": "close",
+  "actorId": "codex-product-proof",
+  "sessionId": "session-20260914141255-codex-product-proof-TASK-PRF-0094-4756c8f787",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0094.json",
+  "taskSha256": "sha256:e951f1f7d119983881248244c9bff3795ad105f26a5a01486f4421fb7b6dcc56",
+  "createdAt": "2026-09-14T14:50:23.029Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0094 --actor codex-product-proof --status done --historical-delivery 14126f7a08ad05ab27a333f03eac6323663be56f --historical-delivery 61ad6cdc8fc19e87d5b7498cfc3f3fcdb9063426",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914141255-codex-product-proof-TASK-PRF-0094-4756c8f787",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0094.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts",
+      "check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T14:50:23.019Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0094.*",
+        ".atm/history/task-events/TASK-PRF-0094/**",
+        ".atm/history/tasks/TASK-PRF-0094.json",
+        "docs/reports/atm-product-ci-lifecycle-evidence.md",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop",
+        "release/atm-root-drop/**",
+        "scripts/collect-ci-burn-in-evidence.ts",
+        "scripts/measure-product-ci-burn-in.ts",
+        "tests/cli/ci-burn-in-evidence-collector.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/collect-ci-burn-in-evidence.ts",
+        "scripts/measure-product-ci-burn-in.ts",
+        "tests/cli/ci-burn-in-evidence-collector.test.ts"
+      ],
+      "requiredGates": [
+        "check:encoding:touched -- --files scripts/collect-ci-burn-in-evidence.ts,scripts/measure-product-ci-burn-in.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-lifecycle-evidence.md",
+        "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+        "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
