@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0064",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "69cf8d3305c9132c1b8e0820846e26de91380a29",
+  "governedTreeSha": "2dbe284c0f28e6dce4425c3a7f4c37358863a7df",
+  "targetCommitDelta": {
+    "currentCommitSha": "69cf8d3305c9132c1b8e0820846e26de91380a29",
+    "parentCommitShas": [
+      "69cf8d3305c9132c1b8e0820846e26de91380a29"
+    ],
+    "governedTreeSha": "2dbe284c0f28e6dce4425c3a7f4c37358863a7df",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/product-ci-burn-in-workflow-scope.json",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0806953b63f3dd0cd10a33120f0bb4a8ac70db87acbfcbe1d0bb918390579562",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36eb9dd0c2d59737e5db9827d454e377dd2a55820dfa1903dbca327dffab2d45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4e364b3eece7a8e68571b758bad9a95368d17b319e9a5f94233355e5d417e5ef",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json --report-only",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:db966a13ee3859abd14e6fda487183c9fd5145ce59f27de43fbda1eba7a1fc5c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json --report-only",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json --report-only",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-14T07:54:57.249Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0064.*",
+      ".atm/history/task-events/TASK-PRF-0064/**",
+      ".atm/history/tasks/TASK-PRF-0064.json",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "docs/reports/atm-product-ci-lifecycle-evidence.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/product-ci-burn-in-workflow-scope.json",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/product-ci-burn-in-workflow-scope.json",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-proof-evidence-boundary.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0064/scoped-lifecycle-receipt.json --report-only",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0064.json",
+  "closedAt": "2026-09-14T07:54:57.249Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914074440-codex-gpt-5.4-mini-TASK-PRF-0064-1b7a1c3530",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "69cf8d3305c9132c1b8e0820846e26de91380a29",
+    "taskMatchedFiles": [
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/product-ci-burn-in-workflow-scope.json",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T06-58-30-437Z-import-19cd0f7df907.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-02-18-281Z-import-0ca5041291f4.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-02-32-785Z-reserve-bc47696e386d.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-02-32-790Z-promote-90a9d1269d0f.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-02-35-187Z-claim-e0df1e749f1e.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-03-04-018Z-release-1f7552f6d7f0.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-04-48-331Z-reserve-2c8d765f6c12.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-04-48-336Z-promote-61769b816362.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-04-50-721Z-claim-7f62535cf2d4.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-05-18-842Z-release-3274b1d5f62b.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-11-24-440Z-release-80c9b2d167cb.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-12-02-485Z-reserve-97e90dfb1a91.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-12-02-490Z-promote-bd073b17d118.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-12-04-826Z-claim-b90c56d1c735.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-14-26-140Z-release-a7122d55e68d.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-44-40-794Z-reserve-2c61a1c6a301.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-44-40-797Z-promote-2a7ca49a3640.json",
+      ".atm/history/task-events/TASK-PRF-0064/2026-09-14T07-44-43-396Z-claim-8a5dcaebf212.json",
+      ".atm/history/tasks/TASK-PRF-0064.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
