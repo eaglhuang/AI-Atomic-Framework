@@ -1,0 +1,53 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T15-31-35-829Z-close-9a7f5e4bf63c",
+  "taskId": "TASK-PRF-0095",
+  "action": "close",
+  "actorId": "codex-product-proof",
+  "sessionId": "session-20260914152019-codex-product-proof-TASK-PRF-0095-b225ea03c7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0095.json",
+  "taskSha256": "sha256:630504aa46c29fa96cb026669c1c9fa11a38115857296f0970b75ce23aa28dce",
+  "createdAt": "2026-09-14T15:31:35.829Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0095 --actor codex-product-proof --status done --historical-delivery 33a9631c902902eab8dacdc2fdc80d4002768292",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914152019-codex-product-proof-TASK-PRF-0095-b225ea03c7",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0095.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/public-command-registry.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/public-command-registry.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T15:31:35.820Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0095.*",
+        ".atm/history/task-events/TASK-PRF-0095/**",
+        ".atm/history/tasks/TASK-PRF-0095.json",
+        "packages/cli/src/atm-public.ts",
+        "tests/cli/public-command-registry.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/atm-public.ts",
+        "tests/cli/public-command-registry.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/public-command-registry.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
