@@ -17,11 +17,11 @@ requires `version`, `next`, `tasks`, and `doctor` together.
 | Field | Value |
 |---|---:|
 | Package | `@ai-atomic-framework/cli@0.1.0` (local candidate) |
-| Candidate tarball bytes | 734,810 |
-| Candidate unpacked bytes | 2,638,544 |
+| Candidate tarball bytes | 735,558 |
+| Candidate unpacked bytes | 2,640,961 |
 | Candidate entries | 66 |
-| Candidate tarball SHA-256 | `d219303ffa217cb981601c6dc0d8fde4084dde25e2c6fec0e049280cdbca208a` |
-| Install time (one run) | 1,973.85 ms |
+| Candidate tarball SHA-256 | `5d804b14456a10d28d6661bd1a1d06c6f8df519ac5b0bae25ea43b9cf5e5d327` |
+| Install time (one run) | 1,445.34 ms |
 | Workspace link used | `false` |
 
 ## Command matrix (three measurement runs for `version`)
@@ -73,10 +73,10 @@ The retained baseline-vs-candidate receipt is outside Git history at:
 
 | Field | Published baseline `0.1.0` | Candidate | Delta |
 |---|---:|---:|---:|
-| Unpacked bytes | 3,357,358 | 2,638,544 | −718,814 (−21.41%) |
+| Unpacked bytes | 3,357,358 | 2,640,961 | −716,397 (−21.34%) |
 | Entries | 78 | 66 | −12 (−15.38%) |
-| Tarball bytes | 930,492 | 734,810 | −195,682 |
-| Tarball SHA-256 | `e35de3cb1778691dd691b12666d8d379de5f4ffd97081690de2c63d963f43d14` | `d219303ffa217cb981601c6dc0d8fde4084dde25e2c6fec0e049280cdbca208a` | — |
+| Tarball bytes | 930,492 | 735,558 | −194,934 |
+| Tarball SHA-256 | `e35de3cb1778691dd691b12666d8d379de5f4ffd97081690de2c63d963f43d14` | `5d804b14456a10d28d6661bd1a1d06c6f8df519ac5b0bae25ea43b9cf5e5d327` | — |
 
 The measured reduction clears the 20% byte and 15% entry thresholds. The
 baseline and candidate smoke exit statuses match, and the candidate has zero
@@ -89,6 +89,7 @@ npm run validate:candidate-npm-install -- --measurement-runs 3
 node --strip-types tests/cli/cli-published-command-smoke.test.ts
 node --strip-types tests/cli/public-npm-install-contract.test.ts
 npm run validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --measurement-runs 1
+npm run validate:public-npm-install -- --measure --package @ai-atomic-framework/cli --version 0.1.0 --baseline-version 0.1.0 --candidate-dir packages/cli --measurement-runs 1 --record-blocked
 ```
 
 Receipt schema: `atm.candidateNpmInstallProof.v1`.
