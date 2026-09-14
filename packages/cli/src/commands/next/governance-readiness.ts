@@ -22,6 +22,12 @@ export function buildGovernanceReadinessHintContract(input: {
   readonly readTaskWorkFiles: (cwd: string, taskId: string) => string[];
   readonly buildActiveWorkSummary: (cwd: string, actorId?: string | null, ownFiles?: readonly string[]) => unknown;
   readonly createFrameworkModeStatus: (input: { cwd: string }) => GovernanceReadinessFrameworkStatus;
+  /**
+   * Cheap identity probe used by normal guidance.  Full framework status is
+   * deliberately reserved for claim/guard boundaries; guidance still needs
+   * to preserve the framework-claim hint without paying that full cost.
+   */
+  readonly isFrameworkRepository: (cwd: string) => boolean;
   readonly isFrameworkMaintenancePrompt: (prompt: string) => boolean;
   readonly isProtectedFrameworkBranchTarget: (branch: string) => boolean;
 }) {
@@ -30,8 +36,11 @@ export function buildGovernanceReadinessHintContract(input: {
   const upstreamRef = gitReadiness.upstreamRef;
   const aheadCount = gitReadiness.aheadCount;
   const protectedBranchTarget = Boolean(currentBranch && input.isProtectedFrameworkBranchTarget(currentBranch));
-  const needsFrameworkStatus = Boolean(input.frameworkClaimRequired) || input.isFrameworkMaintenancePrompt(input.prompt);
+  const maintenancePrompt = input.isFrameworkMaintenancePrompt(input.prompt);
+  const needsFrameworkStatus = Boolean(input.frameworkClaimRequired);
   const frameworkStatus = needsFrameworkStatus ? input.createFrameworkModeStatus({ cwd: input.cwd }) : null;
+  const frameworkClaimHintRequired = Boolean(input.frameworkClaimRequired)
+    || (maintenancePrompt && input.isFrameworkRepository(input.cwd));
   const ownFiles = input.uniqueSorted([
     ...(input.ownFiles ?? []),
     ...(input.taskId ? input.readTaskWorkFiles(input.cwd, input.taskId) : [])
@@ -46,7 +55,7 @@ export function buildGovernanceReadinessHintContract(input: {
   const earlyPreparation = [
     'Read evidence.nextAction.playbook before editing, closing, or committing.',
     'Resolve explicit actor identity before claim, commit, or report.',
-    ...(input.frameworkClaimRequired || (frameworkStatus?.repoIdentity.isFrameworkRepo && input.isFrameworkMaintenancePrompt(input.prompt))
+    ...(frameworkClaimHintRequired
       ? ['Acquire framework-mode claim before editing framework-critical files.']
       : []),
     ...(input.channel === 'batch'

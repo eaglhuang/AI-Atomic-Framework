@@ -1,0 +1,322 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0109",
+  "title": "Defer full framework status from normal next guidance",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1：普通 `next` guidance 不再無條件執行完整 framework status；輸出的 readiness 仍明確告知需要 claim 的情境，且 claim／guard 路徑仍執行完整 status。",
+    "ACC-2：framework critical files、stale lock、pinned runner、Git worktree 等 blocker 的判定與既有結果一致；multi-AI private-read、foreign dirty ownership 與 shared-index 分類不變。",
+    "ACC-3：固定 runner／Node／cache／prompt fixture 至少 30 組 AB/BA，另有 A/A noise control；候選 p50 至少降低 20%，p95 不得回歸超過 10%。",
+    "ACC-4：不得新增 ATM command、gate、registry、daemon、database、第二狀態來源或 跨程序 cache；改動必須是一個可 revert 的既有 projection boundary。",
+    "ACC-5：外部 receipt 記錄每次毫秒值、runner/Node/cache、結果、失敗與重試； raw runtime evidence 留在 `atm-benchmark-sink`，不進 Git history。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next/governance-readiness.ts",
+    "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+    "packages/cli/src/commands/next/prompt-results.ts",
+    "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+    "tests/cli/next-playbook-projection-contracts.test.ts",
+    "tests/cli/next-governance-readiness-latency.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next/governance-readiness.ts",
+    "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+    "packages/cli/src/commands/next/prompt-results.ts",
+    "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+    "tests/cli/next-playbook-projection-contracts.test.ts",
+    "tests/cli/next-governance-readiness-latency.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/next-governance-readiness-latency.test.ts",
+    "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+    "npm run typecheck -- --pretty false"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the readiness deferral; retain the latency receipt and failed measurements.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm-cli-command-router",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.cli.next.governance-readiness",
+        "pattern": "Policy Object",
+        "disposition": "inline",
+        "inlineReason": "This is a timing boundary in an existing projection; no new atom or registry is justified."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0109-defer-full-framework-status-from-normal-next-guidance.task.md",
+    "sectionTitle": "TASK-PRF-0109",
+    "headingLine": 84,
+    "hash": "1799a807340de6ea",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0109-defer-full-framework-status-from-normal-next-guidance.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:1799a807340de6ea6b863a947b956be2883d399507bc86dc0857317934992ab9",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T23:23:18.988Z"
+    }
+  },
+  "importedAt": "2026-09-14T23:23:18.988Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0102"
+    ],
+    "startConditions": [
+      "Fresh profiling shows build-governance-readiness is materially slower for framework prompts than ordinary task prompts.",
+      "Framework claim and guard commands remain available as the authoritative full-status boundary."
+    ],
+    "softRelations": [
+      "TASK-PRF-0103",
+      "TASK-PRF-0106"
+    ],
+    "changedPublicSeams": [
+      "next-governance-readiness"
+    ],
+    "causalImpactEdges": [
+      "governance-readiness-process-startup",
+      "multi-ai-private-read-parallelism"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-PRF-0102"
+    ],
+    "validatorReferences": [
+      "next-governance-readiness-latency",
+      "next-governance-readiness-safety"
+    ],
+    "phaseOwner": "product-proof"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_task_prf0109_readiness_safety_4c2d8e91",
+      "targetGroupId": "null",
+      "semanticKey": "next_governance_readiness_safety",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "governance-readiness-process-startup",
+        "multi-ai-private-read-parallelism"
+      ],
+      "expectedRedPredicate": "Normal next guidance loses a required framework-claim hint, or claim/guard safety semantics change.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": "governance-readiness-process-startup",
+      "contractEdge": "next-governance-readiness",
+      "resourceKey": "readiness-safety"
+    },
+    {
+      "caseId": "test_task_prf0109_latency_receipt_7f14a6bc",
+      "targetGroupId": "null",
+      "semanticKey": "next_governance_readiness_latency_receipt",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "governance-readiness-process-startup"
+      ],
+      "expectedRedPredicate": "Latency receipt lacks AB/BA or A/A controls, or misses p50/p95/cumulative millisecond evidence.",
+      "contributionResourceKey": null,
+      "responsibility": "task-required",
+      "dependencyEdge": "governance-readiness-process-startup",
+      "contractEdge": "external-receipt-boundary",
+      "resourceKey": "external-receipt"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_task_prf0109_readiness_safety_4c2d8e91",
+    "test_task_prf0109_latency_receipt_7f14a6bc"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T23-24-15-907Z-claim-75e11eb0c2cd",
+  "lastTransitionAt": "2026-09-14T23:24:15.907Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T23:24:13.116Z",
+  "promotedAt": "2026-09-14T23:24:13.121Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-b060427228d0",
+    "claimedAt": "2026-09-14T23:24:13.126Z",
+    "heartbeatAt": "2026-09-14T23:24:13.126Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0109.json",
+      "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+      "packages/cli/src/commands/next/governance-readiness.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/prompt-results.ts",
+      "tests/cli/next-governance-readiness-latency.test.ts",
+      "tests/cli/next-playbook-projection-contracts.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914232413-codex-gpt-5.4-mini-8cdaeb3a32",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914232413-codex-gpt-5.4-mini-8cdaeb3a32\""
+    }
+  },
+  "startedAt": "2026-09-14T23:24:13.126Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-af967fef2e8f97ba",
+    "ticketDigest": "sha256:af967fef2e8f97baee4702d991ede337f5a061cc9c75d4f5c64715fd619e3ee3",
+    "taskId": "TASK-PRF-0109",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914232413-codex-gpt-5.4-mini-8cdaeb3a32",
+    "claimGeneration": "lease-b060427228d0",
+    "issuedAt": "2026-09-14T23:24:13.126Z",
+    "expiresAt": "2026-09-14T23:54:13.126Z",
+    "scopeDigest": "sha256:f9e08bf4bed4828acc85d75570731574db1e0d68d786cda6b5b4f9bbc0f8b5a9",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T23:24:13.126Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0109.*",
+          ".atm/history/task-events/TASK-PRF-0109/**",
+          ".atm/history/tasks/TASK-PRF-0109.json",
+          "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+          "packages/cli/src/commands/next/governance-readiness.ts",
+          "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+          "packages/cli/src/commands/next/prompt-results.ts",
+          "tests/cli/next-governance-readiness-latency.test.ts",
+          "tests/cli/next-playbook-projection-contracts.test.ts"
+        ],
+        "digest": "sha256:54c5e284b0dffb2570b3c5fbab980bc5ce937cc159dd1bb5107e07263d926c10"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914232413-codex-gpt-5.4-mini-TASK-PRF-0109-b54402e6d2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0109",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0109.*",
+      ".atm/history/task-events/TASK-PRF-0109/**",
+      ".atm/history/tasks/TASK-PRF-0109.json",
+      "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+      "packages/cli/src/commands/next/governance-readiness.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/prompt-results.ts",
+      "tests/cli/next-governance-readiness-latency.test.ts",
+      "tests/cli/next-playbook-projection-contracts.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "27d4929b564f5e9bee5d5ac70d66e40994e43933f3e6d120c0d659a4607672c7",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914232413-codex-gpt-5.4-mini-TASK-PRF-0109-b54402e6d2",
+    "laneSession": {
+      "laneSessionId": "lane-20260914232413-codex-gpt-5.4-mini-8cdaeb3a32",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914232413-codex-gpt-5.4-mini-8cdaeb3a32\""
+    },
+    "createdAt": "2026-09-14T23:24:15.907Z",
+    "status": "active"
+  }
+}
