@@ -30,3 +30,19 @@ Assuming a fresh protected-main baseline begins with the latest eligible observa
 ## Stable-release correction (2026-09-13)
 
 The stable release workflow `34748571701` completed successfully, including post-publish validation. A fresh post-boundary burn-in evaluation over the current GitHub export observed one eligible protected-main run (`34747801958`), zero failures, zero calendar days, and returned `insufficient-window`. This updates the npm observations above but does not change the long-term-green conclusion.
+
+## TASK-PRF-0051 post-delivery revalidation (2026-09-14)
+
+The latest retained GitHub export contains 100 newest `ci.yml` runs, spanning
+6.752234 calendar days, with 35 successes and 65 failures. The evaluator
+returned `unexplained-failure` with reasons
+`insufficient-calendar-window` and `unexplained-failure-present`. The current
+remote ten-run validator also fails closed because only one of those ten runs
+is labelled `release-candidate`, below the required pair.
+
+Raw export: `C:\Users\User\atm-benchmark-sink\TASK-PRF-0051\raw\ci-runs-2026-09-14.json`
+(SHA-256 `sha256:485d082e5addd7e9f1c08d6acf2e1a5b04f44ff8d040dfb91b1673c4139e7517`).
+The report output is retained beside it with SHA-256
+`sha256:d257dab99c9a3a822e33ed206b2058eae2883f1dcccef7343ad8ae542b64c215`.
+This checkpoint is negative/inconclusive evidence only; it does not change the
+90-run/30-day policy or claim long-term green CI.
