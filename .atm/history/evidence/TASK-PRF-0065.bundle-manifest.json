@@ -1,0 +1,224 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0065",
+  "updatedAt": "2026-09-14T07:35:32.222Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/core/atom-generator.test.ts",
+    "node --strip-types tests/registry/registry-entry-portability.test.ts",
+    "validate:generator-provenance",
+    "validate:registry-core"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/atom-generator.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c23dcf6aeeba769ed7f97c062c661511a3c703e6d2bbdb76b7719166b960bbe4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/atom-generator.test.ts"
+      ],
+      "generatedAt": "2026-09-14T07:29:44.183Z",
+      "startedAt": "2026-09-14T07:29:43.337Z",
+      "finishedAt": "2026-09-14T07:29:44.183Z",
+      "durationMs": 846,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/registry/registry-entry-portability.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:21c7f0f114bc6f5152d57e263879eaf416b54e8bf75223c895f8d0a60b6d413b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/registry/registry-entry-portability.test.ts"
+      ],
+      "generatedAt": "2026-09-14T07:29:46.946Z",
+      "startedAt": "2026-09-14T07:29:46.540Z",
+      "finishedAt": "2026-09-14T07:29:46.946Z",
+      "durationMs": 406,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-registry-core.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c8a872ec42fc4adf34815cec98a0aca6251714d57c2b2831c430bbb9956675a0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:registry-core"
+      ],
+      "generatedAt": "2026-09-14T07:29:52.621Z",
+      "startedAt": "2026-09-14T07:29:52.011Z",
+      "finishedAt": "2026-09-14T07:29:52.621Z",
+      "durationMs": 610,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-generator-provenance.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fb164511233e8c0b27bf6dfa07ed2507a542bc30560365f149436c77ca191205",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:generator-provenance"
+      ],
+      "generatedAt": "2026-09-14T07:31:13.501Z",
+      "startedAt": "2026-09-14T07:31:13.093Z",
+      "finishedAt": "2026-09-14T07:31:13.501Z",
+      "durationMs": 408,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-registry-core.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c8a872ec42fc4adf34815cec98a0aca6251714d57c2b2831c430bbb9956675a0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:registry-core"
+      ],
+      "generatedAt": "2026-09-14T07:31:16.239Z",
+      "startedAt": "2026-09-14T07:31:15.619Z",
+      "finishedAt": "2026-09-14T07:31:16.239Z",
+      "durationMs": 620,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/core/atom-generator.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c23dcf6aeeba769ed7f97c062c661511a3c703e6d2bbdb76b7719166b960bbe4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/atom-generator.test.ts"
+      ],
+      "generatedAt": "2026-09-14T07:32:45.324Z",
+      "startedAt": "2026-09-14T07:32:44.492Z",
+      "finishedAt": "2026-09-14T07:32:45.324Z",
+      "durationMs": 832,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/registry/registry-entry-portability.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:21c7f0f114bc6f5152d57e263879eaf416b54e8bf75223c895f8d0a60b6d413b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/registry/registry-entry-portability.test.ts"
+      ],
+      "generatedAt": "2026-09-14T07:32:47.844Z",
+      "startedAt": "2026-09-14T07:32:47.457Z",
+      "finishedAt": "2026-09-14T07:32:47.844Z",
+      "durationMs": 387,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-generator-provenance.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fb164511233e8c0b27bf6dfa07ed2507a542bc30560365f149436c77ca191205",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:generator-provenance"
+      ],
+      "generatedAt": "2026-09-14T07:32:50.373Z",
+      "startedAt": "2026-09-14T07:32:49.969Z",
+      "finishedAt": "2026-09-14T07:32:50.373Z",
+      "durationMs": 404,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-registry-core.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c8a872ec42fc4adf34815cec98a0aca6251714d57c2b2831c430bbb9956675a0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:registry-core"
+      ],
+      "generatedAt": "2026-09-14T07:32:53.036Z",
+      "startedAt": "2026-09-14T07:32:52.447Z",
+      "finishedAt": "2026-09-14T07:32:53.036Z",
+      "durationMs": 589,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/core/atom-generator.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c23dcf6aeeba769ed7f97c062c661511a3c703e6d2bbdb76b7719166b960bbe4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/atom-generator.test.ts"
+      ],
+      "generatedAt": "2026-09-14T07:35:24.531Z",
+      "startedAt": "2026-09-14T07:35:23.663Z",
+      "finishedAt": "2026-09-14T07:35:24.531Z",
+      "durationMs": 868,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/registry/registry-entry-portability.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:21c7f0f114bc6f5152d57e263879eaf416b54e8bf75223c895f8d0a60b6d413b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/registry/registry-entry-portability.test.ts"
+      ],
+      "generatedAt": "2026-09-14T07:35:26.944Z",
+      "startedAt": "2026-09-14T07:35:26.567Z",
+      "finishedAt": "2026-09-14T07:35:26.944Z",
+      "durationMs": 377,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-generator-provenance.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fb164511233e8c0b27bf6dfa07ed2507a542bc30560365f149436c77ca191205",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:generator-provenance"
+      ],
+      "generatedAt": "2026-09-14T07:35:29.451Z",
+      "startedAt": "2026-09-14T07:35:29.041Z",
+      "finishedAt": "2026-09-14T07:35:29.451Z",
+      "durationMs": 410,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-registry-core.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c8a872ec42fc4adf34815cec98a0aca6251714d57c2b2831c430bbb9956675a0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:registry-core"
+      ],
+      "generatedAt": "2026-09-14T07:35:32.221Z",
+      "startedAt": "2026-09-14T07:35:31.615Z",
+      "finishedAt": "2026-09-14T07:35:32.221Z",
+      "durationMs": 606,
+      "runnerKind": "dev-source",
+      "sourceCommit": "bc68b765860e38b3f8511d0468b8f3a14b888e12",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -1,0 +1,365 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0065",
+  "title": "Make atom birth transactional and portable before CI evidence work",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A generated registry candidate is fully schema-validated before any registry, catalog, or workbench write. Injected validation failure leaves pre-existing files byte-identical and leaves no newly created atom directory; the failure receipt names the rejected phase.",
+    "ACC-2: Every generated registry entry stores a repository-relative `schemas/*.schema.json` path. Source and packaged/frozen-root runs must never persist an absolute Temp, user-home, drive-letter, or node-module cache path.",
+    "ACC-3: The generated spec and registry entry carry non-placeholder SHA-256 hash locks that match the canonical generated spec and source snapshot. All hashes remain stable across an unchanged rerun.",
+    "ACC-4: A successful birth produces a schema-valid registry, catalog, workbench witness files, and command-backed test report. Repeating the same logical name is idempotent: one registry entry, no duplicate catalog row, and no unintended overwrite.",
+    "ACC-5: Focused red/green tests cover failed birth with no residue, portable schema resolution, hash fidelity, successful birth, and idempotent rerun. The report records the original 0064 failure receipt and the post-repair replay result."
+  ],
+  "deliverables": [
+    "packages/core/src/manager/atom-generator.ts",
+    "packages/core/src/registry/registry/entry.ts",
+    "packages/core/src/registry/registry/paths.ts",
+    "packages/core/src/registry/registry/document.ts",
+    "tests/core/atom-generator.test.ts",
+    "tests/registry/registry-entry-portability.test.ts",
+    "docs/reports/atm-atom-generator-reliability.md"
+  ],
+  "scopePaths": [
+    "packages/core/src/manager/atom-generator.ts",
+    "packages/core/src/registry/registry/entry.ts",
+    "packages/core/src/registry/registry/paths.ts",
+    "packages/core/src/registry/registry/document.ts",
+    "tests/core/atom-generator.test.ts",
+    "tests/registry/registry-entry-portability.test.ts",
+    "docs/reports/atm-atom-generator-reliability.md",
+    ".atm/history/evidence/TASK-PRF-0065.*",
+    ".atm/history/task-events/TASK-PRF-0065/**",
+    ".atm/history/tasks/TASK-PRF-0065.json",
+    "packages/core/src/hash-lock/hash-lock.ts",
+    "atomic_workbench/generator-provenance-audit.json",
+    "atomic-registry.json",
+    "packages/core/src/manager/atom-birth-transaction.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/core/atom-generator.test.ts",
+    "node --strip-types tests/registry/registry-entry-portability.test.ts",
+    "node --strip-types scripts/validate-generator-provenance.ts --mode validate",
+    "node --strip-types scripts/validate-registry-core.ts --mode validate"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Restore the generator and retain the failed-birth receipt; never retain a partially registered atom or rewrite existing user files during rollback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.core-atom-generator",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/manager/atom-generator.ts",
+        "packages/core/src/registry/registry/entry.ts",
+        "packages/core/src/registry/registry/paths.ts",
+        "packages/core/src/registry/registry/document.ts",
+        "tests/core/atom-generator.test.ts",
+        "tests/registry/registry-entry-portability.test.ts",
+        "docs/reports/atm-atom-generator-reliability.md"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0065-make-atom-birth-transactional-and-portable-before-ci-evidence-work.task.md",
+    "sectionTitle": "TASK-PRF-0065",
+    "headingLine": 73,
+    "hash": "a23039d6a657657b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0065-make-atom-birth-transactional-and-portable-before-ci-evidence-work.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:a23039d6a657657b5b77c1842606552c118153546ca513c44ffd2edc95a0ef00",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T07:21:33.485Z"
+    }
+  },
+  "importedAt": "2026-09-14T07:21:33.485Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "reason=0064 cannot safely register its policy atom until atom birth produces a valid portable registry entry or fails without residue.; relation=validation; taskId=TASK-PRF-0064"
+    ],
+    "startConditions": [],
+    "softRelations": [
+      "TASK-PRF-0064"
+    ],
+    "changedPublicSeams": [
+      "atom-generator-birth-transaction",
+      "portable-registry-entry"
+    ],
+    "causalImpactEdges": [
+      "precommit-validation-to-zero-residue",
+      "packaged-schema-resolution-to-portable-registry",
+      "source-hash-to-registry-integrity"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-PRF-0064-deep-module-review"
+    ],
+    "validatorReferences": [
+      "test_prf0065_failed_birth_leaves_no_residue_8d2f1c6a",
+      "test_prf0065_registry_paths_are_portable_1e6b4a90",
+      "test_prf0065_hash_lock_matches_generated_spec_4ac7d2e1",
+      "test_prf0065_successful_birth_is_idempotent_7b9c0f34"
+    ],
+    "phaseOwner": "atm-product-proof"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.core.atom.generator.test.ts",
+      "command": "node --strip-types tests/core/atom-generator.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.registry.registry.entry.portability.test.ts",
+      "command": "node --strip-types tests/registry/registry-entry-portability.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.generator.provenance.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-generator-provenance.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.registry.core.ts.mode.validate",
+      "command": "node --strip-types scripts/validate-registry-core.ts --mode validate",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T07-33-35-016Z-scope-amendment-bf26ca457beb",
+  "lastTransitionAt": "2026-09-14T07:33:35.016Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T07:21:57.684Z",
+  "promotedAt": "2026-09-14T07:21:57.689Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-8aec8eead09c",
+    "claimedAt": "2026-09-14T07:21:57.693Z",
+    "heartbeatAt": "2026-09-14T07:22:13.220Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0065.*",
+      ".atm/history/task-events/TASK-PRF-0065/**",
+      ".atm/history/tasks/TASK-PRF-0065.json",
+      "atomic_workbench/generator-provenance-audit.json",
+      "atomic-registry.json",
+      "docs/reports/atm-atom-generator-reliability.md",
+      "packages/core/src/hash-lock/hash-lock.ts",
+      "packages/core/src/manager/atom-birth-transaction.ts",
+      "packages/core/src/manager/atom-generator.ts",
+      "packages/core/src/registry/registry/document.ts",
+      "packages/core/src/registry/registry/entry.ts",
+      "packages/core/src/registry/registry/paths.ts",
+      "tests/core/atom-generator.test.ts",
+      "tests/registry/registry-entry-portability.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260914070233-codex-gpt-5.4-mini-0a335b0e2a",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914070233-codex-gpt-5.4-mini-0a335b0e2a\""
+    }
+  },
+  "startedAt": "2026-09-14T07:21:57.693Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-d848bc433ba61e9c",
+    "ticketDigest": "sha256:d848bc433ba61e9c5d51b0296404d6f3979e72a24955bf295ea4f2ac8faff1a8",
+    "taskId": "TASK-PRF-0065",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914070233-codex-gpt-5.4-mini-0a335b0e2a",
+    "claimGeneration": "lease-8aec8eead09c",
+    "issuedAt": "2026-09-14T07:33:34.956Z",
+    "expiresAt": "2026-09-14T08:03:34.956Z",
+    "scopeDigest": "sha256:4ac4e1518877355ad1e1d6ce180d6708f732f64f51ccd67fbd4a85f325cdd5aa",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T07:33:34.956Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0065.*",
+          ".atm/history/task-events/TASK-PRF-0065/**",
+          ".atm/history/tasks/TASK-PRF-0065.json",
+          "atomic-registry.json",
+          "atomic_workbench/generator-provenance-audit.json",
+          "docs/reports/atm-atom-generator-reliability.md",
+          "packages/core/src/hash-lock/hash-lock.ts",
+          "packages/core/src/manager/atom-birth-transaction.ts",
+          "packages/core/src/manager/atom-generator.ts",
+          "packages/core/src/registry/registry/document.ts",
+          "packages/core/src/registry/registry/entry.ts",
+          "packages/core/src/registry/registry/paths.ts",
+          "tests/core/atom-generator.test.ts",
+          "tests/registry/registry-entry-portability.test.ts"
+        ],
+        "digest": "sha256:0cfc7b24786647bcb2dfdeec10a39324bdadffb224964e73131b51c7ae192bd1"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20260914072157-codex-gpt-5.4-mini-TASK-PRF-0065-cbe8ceff40",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0065",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0065.*",
+      ".atm/history/task-events/TASK-PRF-0065/**",
+      ".atm/history/tasks/TASK-PRF-0065.json",
+      "atomic_workbench/generator-provenance-audit.json",
+      "atomic-registry.json",
+      "docs/reports/atm-atom-generator-reliability.md",
+      "packages/core/src/hash-lock/hash-lock.ts",
+      "packages/core/src/manager/atom-birth-transaction.ts",
+      "packages/core/src/manager/atom-generator.ts",
+      "packages/core/src/registry/registry/document.ts",
+      "packages/core/src/registry/registry/entry.ts",
+      "packages/core/src/registry/registry/paths.ts",
+      "tests/core/atom-generator.test.ts",
+      "tests/registry/registry-entry-portability.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0065-make-atom-birth-transactional-and-portable-before-ci-evidence-work.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0065-make-atom-birth-transactional-and-portable-before-ci-evidence-work.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "76e35b621ed7155be706ae02bfac111de09ff77c2706a671101e777066c21f7f",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260914070233-codex-gpt-5.4-mini-0a335b0e2a",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914070233-codex-gpt-5.4-mini-0a335b0e2a\""
+    },
+    "createdAt": "2026-09-14T07:22:14.224Z",
+    "status": "active"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T07-30-43-850Z-scope-amendment-241ef0a4da0e",
+  "taskId": "TASK-PRF-0065",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0065.json",
+  "taskSha256": "sha256:0d620598f548cb7cf04e29bc979591fde54eb11bd7a32b6393fb12076766479f",
+  "createdAt": "2026-09-14T07:30:43.850Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0065 --actor codex-gpt-5.4-mini --add \"atomic-registry.json,atomic_workbench/generator-provenance-audit.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

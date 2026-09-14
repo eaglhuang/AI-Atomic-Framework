@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { generateAtom, createMinimalAtomSpec } from '../../packages/core/src/manager/atom-generator.ts';
+import { computeCanonicalJsonDigest } from '../../packages/core/src/hash-lock/hash-lock.ts';
 
 if (process.argv.includes('--self-check')) {
   const spec = createMinimalAtomSpec({
@@ -15,6 +16,8 @@ if (process.argv.includes('--self-check')) {
   });
   assert.equal(spec.id, 'ATM-CORE-9999');
   assert.equal(spec.logicalName, 'atom.core-self-check');
+  assert.match(spec.hashLock.digest, /^sha256:[a-f0-9]{64}$/);
+  assert.equal(spec.hashLock.digest, computeCanonicalJsonDigest(spec));
   assert.equal(spec.validation.commands[0], 'node -e "console.log(\'ATM-CORE-9999 validation ok\')"');
   console.log('[atom-generator:self-check] ok');
   process.exit(0);
@@ -50,6 +53,9 @@ try {
   const registry = JSON.parse(readFileSync(path.join(tempRoot, 'atomic-registry.json'), 'utf8'));
   assert.equal(registry.entries.length, 1);
   assert.equal(registry.entries[0].logicalName, 'atom.core-generated-atom');
+  assert.match(registry.entries[0].hashLock.digest, /^sha256:[a-f0-9]{64}$/);
+  assert.equal(registry.entries[0].hashLock.digest, JSON.parse(readFileSync(path.join(tempRoot, first.specPath!), 'utf8')).hashLock.digest);
+  assert.match(registry.entries[0].schemaPath, /^schemas\/.+\.schema\.json$/);
   assert.deepEqual(registry.entries[0].location.codePaths, [first.sourcePath]);
   assert.notEqual(registry.entries[0].selfVerification.sourcePaths.code[0], registry.entries[0].selfVerification.sourcePaths.spec);
 
@@ -77,6 +83,17 @@ try {
   }, { repositoryRoot: tempRoot, now: '2026-01-01T00:00:00.000Z' });
   assert.equal(next.ok, true);
   assert.equal(next.atomId, 'ATM-CORE-0002');
+
+  const failed = generateAtom({
+    bucket: 'CORE',
+    title: 'Failed Atom',
+    description: 'Injected source failure must leave no residue.',
+    logicalName: 'atom.core-failed-atom'
+  }, { repositoryRoot: tempRoot, sourceContent: 'process.exit(1);\n', now: '2026-01-01T00:00:00.000Z' });
+  assert.equal(failed.ok, false);
+  assert.equal(failed.error!.code, 'ATM_GENERATOR_TEST_FAILED');
+  assert.equal(existsSync(path.join(tempRoot, 'atomic_workbench/atoms/ATM-CORE-0003')), false);
+  assert.deepEqual(JSON.parse(readFileSync(path.join(tempRoot, 'atomic-registry.json'), 'utf8')).entries.map((entry: { atomId: string }) => entry.atomId), ['ATM-CORE-0001', 'ATM-CORE-0002']);
 
   const invalidBucket = generateAtom({ bucket: '', title: 'Bad', description: 'Bad.' }, { repositoryRoot: tempRoot });
   assert.equal(invalidBucket.ok, false);

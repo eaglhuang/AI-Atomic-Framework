@@ -48,6 +48,19 @@ export function normalizeSchemaPath(repositoryRoot: string, value: string | unde
     return frameworkRelative;
   }
 
+  // A frozen CLI bundle resolves its schema relative to the bundled package.
+  // Preserve the portable repository contract when the same schema exists in
+  // the adopter/framework repository, without leaking the bundle's temp path.
+  const schemaMarker = `${path.sep}schemas${path.sep}`;
+  const markerIndex = resolvedPath.lastIndexOf(schemaMarker);
+  if (markerIndex >= 0) {
+    const suffix = resolvedPath.slice(markerIndex + 1).replace(/\\/g, '/');
+    const repositorySchemaPath = path.resolve(repositoryRoot, suffix);
+    if (existsSync(repositorySchemaPath)) {
+      return suffix;
+    }
+  }
+
   return toPortablePath(resolvedPath);
 }
 
