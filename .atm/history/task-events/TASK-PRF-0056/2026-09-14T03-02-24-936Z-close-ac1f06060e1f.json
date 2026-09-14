@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T03-02-24-936Z-close-ac1f06060e1f",
+  "taskId": "TASK-PRF-0056",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914030005-codex-gpt-5.4-mini-TASK-PRF-0056-b439cd5abe",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0056.json",
+  "taskSha256": "sha256:4ed0ea336530f8779a57502230901eb1fc3ef62f90176202c390fc5bcd761887",
+  "createdAt": "2026-09-14T03:02:24.936Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0056 --actor codex-gpt-5.4-mini --status done --historical-delivery d455422a021b790cdd06be7dd0b3c50c257e63d6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914030005-codex-gpt-5.4-mini-TASK-PRF-0056-b439cd5abe",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0056.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "lint",
+      "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "typecheck",
+      "validate:candidate-npm-install"
+    ],
+    "requiredGates": [
+      "lint",
+      "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+      "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+      "typecheck",
+      "validate:candidate-npm-install"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T03:02:24.927Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0056.*",
+        ".atm/history/task-events/TASK-PRF-0056/**",
+        ".atm/history/tasks/TASK-PRF-0056.json",
+        "docs/reports/atm-product-proof-checkpoints.md",
+        "docs/reports/atm-public-npm-install-proof-beta.md",
+        "scripts/validate-candidate-npm-install.ts",
+        "tests/cli/product-proof-evidence-boundary.test.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-candidate-npm-install.ts",
+        "tests/cli/product-proof-evidence-boundary.test.ts",
+        "tests/cli/public-npm-install-contract.test.ts"
+      ],
+      "requiredGates": [
+        "lint",
+        "node --strip-types tests/cli/product-proof-evidence-boundary.test.ts",
+        "node --strip-types tests/cli/public-npm-install-contract.test.ts",
+        "typecheck",
+        "validate:candidate-npm-install"
+      ]
+    }
+  }
+}
