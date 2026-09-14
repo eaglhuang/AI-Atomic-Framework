@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0097",
+  "updatedAt": "2026-09-14T15:56:03.413Z",
+  "updatedBy": "codex-product-proof",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+    "node --strip-types tests/cli/npm-clean-install.test.ts",
+    "typecheck",
+    "validate:candidate-npm-install"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-candidate-npm-install.ts --measurement-runs 5 --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0097/candidate-baseline.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a99a6875b574b98e7129f97c4bcfa2f5e0751e0ad6f66a5daff12cbc4557253",
+      "stderrSha256": "sha256:826e0f315d493e86d939f7ec6092f2e5bfb89828ae4229a9b637115a3018ebd9",
+      "validators": [
+        "validate:candidate-npm-install"
+      ],
+      "generatedAt": "2026-09-14T15:55:09.798Z",
+      "startedAt": "2026-09-14T15:55:02.110Z",
+      "finishedAt": "2026-09-14T15:55:09.798Z",
+      "durationMs": 7688,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f18b76a34da434389031082cee0a4046556a9859",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6b8aa00fb0b81b00d6dda72ab6d0de27b464508ab939eca4dd36674d3d023f58",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/npm-clean-install.test.ts"
+      ],
+      "generatedAt": "2026-09-14T15:55:42.301Z",
+      "startedAt": "2026-09-14T15:55:42.018Z",
+      "finishedAt": "2026-09-14T15:55:42.301Z",
+      "durationMs": 283,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f18b76a34da434389031082cee0a4046556a9859",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:12ab0d5ec391f496f6248dbdb96e5a2602cf92cfeff2b8fa7cddc373c5ff670f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/adopter-artifact-budget.test.ts"
+      ],
+      "generatedAt": "2026-09-14T15:55:48.867Z",
+      "startedAt": "2026-09-14T15:55:48.575Z",
+      "finishedAt": "2026-09-14T15:55:48.867Z",
+      "durationMs": 292,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f18b76a34da434389031082cee0a4046556a9859",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-14T15:56:03.413Z",
+      "startedAt": "2026-09-14T15:55:54.313Z",
+      "finishedAt": "2026-09-14T15:56:03.413Z",
+      "durationMs": 9100,
+      "runnerKind": "dev-source",
+      "sourceCommit": "f18b76a34da434389031082cee0a4046556a9859",
+      "cached": false
+    }
+  ],
+  "artifactPaths": [
+    "C:/Users/User/atm-benchmark-sink/TASK-PRF-0097/reviews/TASK-PRF-0097-deep-module-review.json",
+    "docs/reports/atm-runtime-convergence.md"
+  ]
+}

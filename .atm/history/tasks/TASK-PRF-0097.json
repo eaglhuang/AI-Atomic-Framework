@@ -1,0 +1,329 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0097",
+  "title": "Reduce runtime dependency closure with measured feature retirement",
+  "status": "blocked",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0095"
+  ],
+  "acceptance": [
+    "ACC-1: Pin baseline commit, exact tarball hash, package version, lock and environment; count tarball bytes, all unpacked files including manifests and installed dependency bytes.",
+    "ACC-2: Candidate actual unpacked bytes fall at least 20% from this frozen baseline; compressed bytes, file count and complete dependency bytes do not increase. Existing stricter caps remain in force.",
+    "ACC-3: Core clean-install workflow passes on Windows and Linux with repo/cache isolation and no implicit download; missing runtime module/schema negative controls fail. No variable-import omission or splitting-only savings.",
+    "ACC-4: Measure startup median/p95 with >=30 paired samples per environment, report cold/warm definition and no >10% p95 regression. Stop after two failed strategies and retain failed evidence."
+  ],
+  "deliverables": [
+    "packages/cli/src/atm-public.ts",
+    "packages/cli/src/index.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "packages/cli/package.json",
+    "package-lock.json",
+    "tests/cli/npm-clean-install.test.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "docs/reports/atm-runtime-convergence.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/atm-public.ts",
+    "packages/cli/src/index.ts",
+    "scripts/build-cli-npm-runtime.ts",
+    "packages/cli/package.json",
+    "package-lock.json",
+    "tests/cli/npm-clean-install.test.ts",
+    "tests/cli/adopter-artifact-budget.test.ts",
+    "docs/reports/atm-runtime-convergence.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/npm-clean-install.test.ts",
+    "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only this task's reviewed changes; preserve foreign WIP and external evidence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-command-router-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "disposition": "inline",
+        "inlineReason": "Owner explicitly prioritizes bounded quickfixes and deletion over additional abstraction; scope must shrink to observed behavior before editing."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/atm-public.ts",
+        "packages/cli/src/index.ts",
+        "scripts/build-cli-npm-runtime.ts",
+        "packages/cli/package.json",
+        "package-lock.json",
+        "tests/cli/npm-clean-install.test.ts",
+        "tests/cli/adopter-artifact-budget.test.ts",
+        "docs/reports/atm-runtime-convergence.md"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0097-reduce-runtime-dependency-closure-with-measured-feature-retirement.task.md",
+    "sectionTitle": "TASK-PRF-0097",
+    "headingLine": 51,
+    "hash": "f81807cbcd4777d5",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0097-reduce-runtime-dependency-closure-with-measured-feature-retirement.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:f81807cbcd4777d54f282e1c18c3734bd23ac7712e8b274580a67039272a491a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T15:20:00.743Z"
+    }
+  },
+  "importedAt": "2026-09-14T15:20:00.743Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.npm.clean.install.test.ts",
+      "command": "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.adopter.artifact.budget.test.ts",
+      "command": "node --strip-types tests/cli/adopter-artifact-budget.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0095",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies",
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T15-56-39-124Z-block-275cee1048d8",
+  "lastTransitionAt": "2026-09-14T15:56:39.124Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-product-proof",
+  "reservedAt": "2026-09-14T15:42:56.147Z",
+  "promotedAt": "2026-09-14T15:42:56.151Z",
+  "claim": {
+    "actorId": "codex-product-proof",
+    "leaseId": "lease-1212a6d82efc",
+    "claimedAt": "2026-09-14T15:42:56.156Z",
+    "heartbeatAt": "2026-09-14T15:56:39.123Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0097.json",
+      "docs/reports/atm-runtime-convergence.md",
+      "package-lock.json",
+      "packages/cli/package.json",
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/index.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/npm-clean-install.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20260914154256-codex-product-proof-6dee5d815e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914154256-codex-product-proof-6dee5d815e\""
+    },
+    "reason": "Stop rule: two safe runtime-boundary alternatives retained multi-AI tasks/broker capability but achieved only about 15% static bundle reduction; the 20% unpacked-byte target is not met. Owner must choose a measured public-boundary change before further edits."
+  },
+  "startedAt": "2026-09-14T15:42:56.156Z",
+  "startedByActor": "codex-product-proof",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6d3357246c056803",
+    "ticketDigest": "sha256:6d3357246c056803c2381021edd6b956065df006a200f41c49b77a3ca8df89f7",
+    "taskId": "TASK-PRF-0097",
+    "origin": "claim",
+    "actorId": "codex-product-proof",
+    "laneSessionId": "lane-20260914154256-codex-product-proof-6dee5d815e",
+    "claimGeneration": "lease-1212a6d82efc",
+    "issuedAt": "2026-09-14T15:42:56.156Z",
+    "expiresAt": "2026-09-14T16:12:56.156Z",
+    "scopeDigest": "sha256:328191b7fe10c539f851e654c27b0669b384256608476dfe7fba0183c3f4b537",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T15:42:56.156Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0097.*",
+          ".atm/history/task-events/TASK-PRF-0097/**",
+          ".atm/history/tasks/TASK-PRF-0097.json",
+          "docs/reports/atm-runtime-convergence.md",
+          "package-lock.json",
+          "packages/cli/package.json",
+          "packages/cli/src/atm-public.ts",
+          "packages/cli/src/index.ts",
+          "scripts/build-cli-npm-runtime.ts",
+          "tests/cli/adopter-artifact-budget.test.ts",
+          "tests/cli/npm-clean-install.test.ts"
+        ],
+        "digest": "sha256:6a63d06160782a27470d3e4044da10db402976742281332e520135f77afaec51"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914154256-codex-product-proof-TASK-PRF-0097-600f01fe12",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0097",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0097.*",
+      ".atm/history/task-events/TASK-PRF-0097/**",
+      ".atm/history/tasks/TASK-PRF-0097.json",
+      "docs/reports/atm-runtime-convergence.md",
+      "package-lock.json",
+      "packages/cli/package.json",
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/index.ts",
+      "scripts/build-cli-npm-runtime.ts",
+      "tests/cli/adopter-artifact-budget.test.ts",
+      "tests/cli/npm-clean-install.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3e86a01f26a05ede27f3e2216b918e42ef68df2c6a9f988adf28aa8339905123",
+    "actorId": "codex-product-proof",
+    "sessionId": "session-20260914154256-codex-product-proof-TASK-PRF-0097-600f01fe12",
+    "laneSession": {
+      "laneSessionId": "lane-20260914154256-codex-product-proof-6dee5d815e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914154256-codex-product-proof-6dee5d815e\""
+    },
+    "createdAt": "2026-09-14T15:43:02.111Z",
+    "status": "active"
+  },
+  "closedAt": "2026-09-14T15:56:39.123Z",
+  "closedByActor": "codex-product-proof",
+  "closedBySessionId": "session-20260914154256-codex-product-proof-TASK-PRF-0097-600f01fe12",
+  "closeReason": "Stop rule: two safe runtime-boundary alternatives retained multi-AI tasks/broker capability but achieved only about 15% static bundle reduction; the 20% unpacked-byte target is not met. Owner must choose a measured public-boundary change before further edits."
+}
