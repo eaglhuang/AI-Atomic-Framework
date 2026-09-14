@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T15-42-24-035Z-close-930e60202dc6",
+  "taskId": "TASK-PRF-0096",
+  "action": "close",
+  "actorId": "codex-product-proof",
+  "sessionId": "session-20260914153333-codex-product-proof-TASK-PRF-0096-2059d8ce9f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0096.json",
+  "taskSha256": "sha256:40665ba032e71856a652f8cee51f39f0b307450bf2d3a77d455eb4489dfde99e",
+  "createdAt": "2026-09-14T15:42:24.035Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0096 --actor codex-product-proof --status done --historical-delivery 1ca70a70773fb8381f76b357763666a12c03aca4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260914153333-codex-product-proof-TASK-PRF-0096-2059d8ce9f",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0096.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-14T15:42:24.026Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0096.*",
+        ".atm/history/task-events/TASK-PRF-0096/**",
+        ".atm/history/tasks/TASK-PRF-0096.json",
+        "docs/reports/atm-command-convergence.md",
+        "docs/SELF_HOSTING_ALPHA.md",
+        "packages/cli/src/atm-public.ts",
+        "packages/cli/src/commands/command-specs",
+        "packages/cli/src/commands/guide.ts",
+        "packages/cli/src/commands/orient.ts",
+        "packages/cli/src/commands/start.ts",
+        "packages/cli/src/commands/welcome.ts",
+        "tests/cli/npm-clean-install.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/atm-public.ts",
+        "packages/cli/src/commands/command-specs",
+        "packages/cli/src/commands/guide.ts",
+        "packages/cli/src/commands/orient.ts",
+        "packages/cli/src/commands/start.ts",
+        "packages/cli/src/commands/welcome.ts",
+        "tests/cli/npm-clean-install.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/npm-clean-install.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

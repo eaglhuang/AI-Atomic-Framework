@@ -1,0 +1,139 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0096",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "1ca70a70773fb8381f76b357763666a12c03aca4",
+  "governedTreeSha": "cfdada1257b52044fb93784886562aa3328f5392",
+  "targetCommitDelta": {
+    "currentCommitSha": "1ca70a70773fb8381f76b357763666a12c03aca4",
+    "parentCommitShas": [
+      "1ca70a70773fb8381f76b357763666a12c03aca4"
+    ],
+    "governedTreeSha": "cfdada1257b52044fb93784886562aa3328f5392",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-sync-receipt.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0017.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/atm-command-convergence.md",
+      "packages/cli/dist/commands/guide.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/commands/guide.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/guide.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/guide.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/npm-clean-install.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6b8aa00fb0b81b00d6dda72ab6d0de27b464508ab939eca4dd36674d3d023f58",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/npm-clean-install.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/npm-clean-install.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-14T15:42:24.026Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0096.*",
+      ".atm/history/task-events/TASK-PRF-0096/**",
+      ".atm/history/tasks/TASK-PRF-0096.json",
+      "docs/reports/atm-command-convergence.md",
+      "docs/SELF_HOSTING_ALPHA.md",
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/commands/command-specs",
+      "packages/cli/src/commands/guide.ts",
+      "packages/cli/src/commands/orient.ts",
+      "packages/cli/src/commands/start.ts",
+      "packages/cli/src/commands/welcome.ts",
+      "tests/cli/npm-clean-install.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/atm-public.ts",
+      "packages/cli/src/commands/command-specs",
+      "packages/cli/src/commands/guide.ts",
+      "packages/cli/src/commands/orient.ts",
+      "packages/cli/src/commands/start.ts",
+      "packages/cli/src/commands/welcome.ts",
+      "tests/cli/npm-clean-install.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/npm-clean-install.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0096.json",
+  "closedAt": "2026-09-14T15:42:24.027Z",
+  "closedByActor": "codex-product-proof",
+  "sessionId": "session-20260914153333-codex-product-proof-TASK-PRF-0096-2059d8ce9f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "1ca70a70773fb8381f76b357763666a12c03aca4",
+    "taskMatchedFiles": [
+      "docs/reports/atm-command-convergence.md",
+      "packages/cli/src/commands/guide.ts",
+      "tests/cli/npm-clean-install.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0096/2026-09-14T15-19-59-112Z-import-cddd7dc9c1df.json",
+      ".atm/history/task-events/TASK-PRF-0096/2026-09-14T15-33-33-086Z-reserve-6d6e39cfc92e.json",
+      ".atm/history/task-events/TASK-PRF-0096/2026-09-14T15-33-33-090Z-promote-9c500e05c4f7.json",
+      ".atm/history/task-events/TASK-PRF-0096/2026-09-14T15-33-39-194Z-claim-c68727c71bfb.json",
+      ".atm/history/tasks/TASK-PRF-0096.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
