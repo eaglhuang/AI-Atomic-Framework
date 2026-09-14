@@ -90,6 +90,37 @@ try {
     projectedInstall.manifest
   );
   assert.equal(projectedReport.ok, true, 'references must not count as source-coverage drift');
+
+  const deferredBase = createStaticIntegrationAdapter({
+    id: 'deferred-health-fixture',
+    displayName: 'Deferred health fixture',
+    adapterVersion: '1.0.0',
+    targetDir: '.atm/deferred-health-fixture',
+    fileFormat: 'markdown',
+    placeholderStyle: 'none',
+    sourceFiles: [{ relativePath: 'one.md', content: 'one\n', source: 'template' as const, fileFormat: 'markdown' as const }]
+  });
+  const deferredInstalled = await deferredBase.install({
+    repositoryRoot,
+    dryRun: false,
+    manifestPath: '.atm/integrations/deferred-health-fixture.manifest.json'
+  });
+  const deferredAdapter = {
+    ...deferredBase,
+    install(context: any) {
+      if (context.dryRun === true) throw new Error('deferred health must not compile source parity');
+      return deferredInstalled;
+    }
+  } as any;
+  const deferredReport = await verifyInstalledManifest(
+    repositoryRoot,
+    '.atm/integrations/deferred-health-fixture.manifest.json',
+    deferredAdapter,
+    deferredInstalled.manifest,
+    { sourceParity: 'deferred' }
+  );
+  assert.equal(deferredReport.ok, true);
+  assert.equal(deferredReport.sourceParity, 'deferred');
   console.log('[integration-source-coverage-parity] ok');
 } finally {
   rmSync(repositoryRoot, { recursive: true, force: true });

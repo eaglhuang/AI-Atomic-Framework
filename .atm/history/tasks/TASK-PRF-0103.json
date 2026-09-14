@@ -1,0 +1,297 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0103",
+  "title": "Short-circuit doctor integration parity checks",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1：`checkIntegrationHealth(..., { sourceParity: 'deferred' })` 不呼叫 adapter `dryRunInstall`，輸出明確標示 `sourceParity: deferred`，且仍驗證 manifest 與已安裝檔案 hash。",
+    "ACC-2：`runDoctor` 使用 fast health；`integration verify` 與 `integration parity` 維持完整 source-parity 行為，對 source drift 仍回報既有錯誤碼與修復指引。",
+    "ACC-3：固定工作區／Node／cache 下至少 30 組 before/after doctor 量測；p50 降低 ≥30%，p95 回歸不得 >10%，並把結果接入 0102 latency score。",
+    "ACC-4：既有 integration parity 測試、fast-path regression、mandatory telemetry 與 typecheck 全部通過；未達性能門檻標記未證明，不放寬門檻。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/integration/health.ts",
+    "packages/cli/src/commands/doctor/run-doctor.ts",
+    "tests/cli/doctor-integration-fast-health.test.ts",
+    "tests/cli/integration-source-coverage-parity.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/integration/health.ts",
+    "packages/cli/src/commands/doctor/run-doctor.ts",
+    "tests/cli/doctor-integration-fast-health.test.ts",
+    "tests/cli/integration-source-coverage-parity.test.ts",
+    "docs/reports/atm-command-gate-latency-score.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/doctor-integration-fast-health.test.ts",
+    "node --strip-types tests/cli/integration-source-coverage-parity.test.ts",
+    "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the fast-path option and its tests; preserve 0102 telemetry and the explicit deep parity commands.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.integration-health-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "disposition": "inline",
+        "inlineReason": "health.ts already owns adapter verification and the change is a single option boundary; no new module is justified by the measured hotspot."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0103-short-circuit-doctor-integration-parity-checks.task.md",
+    "sectionTitle": "TASK-PRF-0103",
+    "headingLine": 74,
+    "hash": "aac56bda841b4f36",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0103-short-circuit-doctor-integration-parity-checks.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:aac56bda841b4f367be78bee750ef9ada8ae4cb57e6f6afc47a50b2321311e5f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-14T18:33:48.311Z"
+    }
+  },
+  "importedAt": "2026-09-14T18:33:48.311Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0102"
+    ],
+    "startConditions": [
+      "CPU profile or repeated wall timing identifies integration source-parity compilation as a doctor hotspot.",
+      "Explicit integration verify/parity commands remain available for deep source comparison."
+    ],
+    "softRelations": [
+      "TASK-PRF-0100",
+      "TASK-PRF-0101"
+    ],
+    "changedPublicSeams": [
+      "doctor-integration-health",
+      "integration-deep-parity"
+    ],
+    "causalImpactEdges": [
+      "doctor-control-plane-latency",
+      "integration-drift-detection"
+    ],
+    "parallelFrontierInputs": [
+      "TASK-PRF-0102 doctor.readiness samples"
+    ],
+    "validatorReferences": [
+      "tests/cli/doctor-integration-fast-health.test.ts",
+      "tests/cli/integration-source-coverage-parity.test.ts"
+    ],
+    "phaseOwner": "product-proof"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_doctor_fast_integration_health_0db50f31",
+      "targetGroupId": "null",
+      "semanticKey": "doctor_fast_integration_health",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "doctor-control-plane-latency",
+        "integration-drift-detection"
+      ],
+      "expectedRedPredicate": "Doctor deep parity is not deferred, or explicit integration verify no longer performs source parity.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "doctor-integration-health",
+      "contractEdge": "integration-deep-parity",
+      "resourceKey": "null"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_doctor_fast_integration_health_0db50f31"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-14T18-34-02-297Z-claim-0c4e01484cea",
+  "lastTransitionAt": "2026-09-14T18:34:02.297Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-14T18:33:56.257Z",
+  "promotedAt": "2026-09-14T18:33:56.261Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-0451b7e10e69",
+    "claimedAt": "2026-09-14T18:33:56.265Z",
+    "heartbeatAt": "2026-09-14T18:33:56.265Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0103.json",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/integration/health.ts",
+      "tests/cli/doctor-integration-fast-health.test.ts",
+      "tests/cli/integration-source-coverage-parity.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260914183356-codex-gpt-5.4-mini-7eab9a0d92",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914183356-codex-gpt-5.4-mini-7eab9a0d92\""
+    }
+  },
+  "startedAt": "2026-09-14T18:33:56.265Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-fa4abb7b79b0b0c4",
+    "ticketDigest": "sha256:fa4abb7b79b0b0c4037a249d73e6f91b5e1775d79c227e4ee925f06682b408be",
+    "taskId": "TASK-PRF-0103",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260914183356-codex-gpt-5.4-mini-7eab9a0d92",
+    "claimGeneration": "lease-0451b7e10e69",
+    "issuedAt": "2026-09-14T18:33:56.265Z",
+    "expiresAt": "2026-09-14T19:03:56.265Z",
+    "scopeDigest": "sha256:87bc7c3fefda1fff477270939fa407431eddf4298cef653693cf269f51d10e6c",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-14T18:33:56.265Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0103.*",
+          ".atm/history/task-events/TASK-PRF-0103/**",
+          ".atm/history/tasks/TASK-PRF-0103.json",
+          "docs/reports/atm-command-gate-latency-score.md",
+          "packages/cli/src/commands/doctor/run-doctor.ts",
+          "packages/cli/src/commands/integration/health.ts",
+          "tests/cli/doctor-integration-fast-health.test.ts",
+          "tests/cli/integration-source-coverage-parity.test.ts"
+        ],
+        "digest": "sha256:345275e4cf6c5057012e028f953db6bbb7297d57753d0001370bd284e173f831"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260914183356-codex-gpt-5.4-mini-TASK-PRF-0103-1fd4d826c5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0103",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0103.*",
+      ".atm/history/task-events/TASK-PRF-0103/**",
+      ".atm/history/tasks/TASK-PRF-0103.json",
+      "docs/reports/atm-command-gate-latency-score.md",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/integration/health.ts",
+      "tests/cli/doctor-integration-fast-health.test.ts",
+      "tests/cli/integration-source-coverage-parity.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b585a8314ec91fdc2d3223db7d026c1f2196291887814f1fcc5f5f51992e6cf6",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260914183356-codex-gpt-5.4-mini-TASK-PRF-0103-1fd4d826c5",
+    "laneSession": {
+      "laneSessionId": "lane-20260914183356-codex-gpt-5.4-mini-7eab9a0d92",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914183356-codex-gpt-5.4-mini-7eab9a0d92\""
+    },
+    "createdAt": "2026-09-14T18:34:02.296Z",
+    "status": "active"
+  }
+}

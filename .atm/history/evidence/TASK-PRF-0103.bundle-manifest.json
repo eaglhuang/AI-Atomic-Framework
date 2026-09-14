@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0103",
+  "updatedAt": "2026-09-14T18:38:18.706Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/doctor-integration-fast-health.test.ts",
+    "node --strip-types tests/cli/integration-source-coverage-parity.test.ts",
+    "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/doctor-integration-fast-health.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:445c38f34a1366390b9664937a0de47d60a4e38638730828ddd3dd1cc75cd769",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/doctor-integration-fast-health.test.ts"
+      ],
+      "generatedAt": "2026-09-14T18:38:00.605Z",
+      "startedAt": "2026-09-14T18:37:59.124Z",
+      "finishedAt": "2026-09-14T18:38:00.605Z",
+      "durationMs": 1481,
+      "runnerKind": "dev-source",
+      "sourceCommit": "264521fd6850aaf57f92488ea5b71c052238cd7a",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/integration-source-coverage-parity.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:243d932571d4c20e3b598ad409ac6d9c5c32c6a0d36bcc36654dba9cd44d7c5e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/integration-source-coverage-parity.test.ts"
+      ],
+      "generatedAt": "2026-09-14T18:38:03.249Z",
+      "startedAt": "2026-09-14T18:38:02.839Z",
+      "finishedAt": "2026-09-14T18:38:03.249Z",
+      "durationMs": 410,
+      "runnerKind": "dev-source",
+      "sourceCommit": "264521fd6850aaf57f92488ea5b71c052238cd7a",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:af4bef562cb152f26d5a7310a6f7c8f4b72e725a5e1b63d60ed0e8ac64bbfbef",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts"
+      ],
+      "generatedAt": "2026-09-14T18:38:07.244Z",
+      "startedAt": "2026-09-14T18:38:05.308Z",
+      "finishedAt": "2026-09-14T18:38:07.244Z",
+      "durationMs": 1936,
+      "runnerKind": "dev-source",
+      "sourceCommit": "264521fd6850aaf57f92488ea5b71c052238cd7a",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b4f74faa4576a8a1d06c4481fca16ab5537578dff7c9d225b5bc4bc4a6d3ffb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-14T18:38:18.706Z",
+      "startedAt": "2026-09-14T18:38:09.369Z",
+      "finishedAt": "2026-09-14T18:38:18.706Z",
+      "durationMs": 9337,
+      "runnerKind": "dev-source",
+      "sourceCommit": "264521fd6850aaf57f92488ea5b71c052238cd7a",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
