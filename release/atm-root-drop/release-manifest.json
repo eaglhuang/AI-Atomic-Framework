@@ -766,6 +766,7 @@
     "release/atm-root-drop/docs/reports/captain-parallel-ledger-analysis.md",
     "release/atm-root-drop/docs/reports/closure-packet-schema-map.md",
     "release/atm-root-drop/docs/reports/evidence-command-atomic-map.md",
+    "release/atm-root-drop/docs/reports/evidence-ledger-boundary-baseline.md",
     "release/atm-root-drop/docs/reports/evidence-ledger-migration-manifest.json",
     "release/atm-root-drop/docs/reports/evidence-shell-deletion-receipt.json",
     "release/atm-root-drop/docs/reports/framework-development-atomic-map.md",
@@ -4731,6 +4732,7 @@
     "release/atm-root-drop/scripts/plan-performance-report-v4.ts",
     "release/atm-root-drop/scripts/pricing/parse-provider-price-page.ts",
     "release/atm-root-drop/scripts/pricing/refresh-model-prices.ts",
+    "release/atm-root-drop/scripts/product-ci-burn-in-workflow-scope.json",
     "release/atm-root-drop/scripts/render-agent-matrix.ts",
     "release/atm-root-drop/scripts/render-atm-admission-report.ts",
     "release/atm-root-drop/scripts/repro/bug-atm-0045-planning-root-preference.mjs",
@@ -6187,8 +6189,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1528,
-    "unchanged": 4624,
+    "copied": 1512,
+    "unchanged": 4642,
     "removed": 0
   },
   "buildMode": "full",
@@ -12648,7 +12650,7 @@
       },
       {
         "path": "docs/reports/atm-product-ci-burn-in-real-export.md",
-        "digest": "1f0d9c5ee290b32d07b1aef2df9d692934033f45a74be0951c76cbae9b606563",
+        "digest": "f982b836a4e71fe132d0d73742f9541322ce823728a14df0941d7333ecb531a1",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-ci-burn-in-real-export.md"
@@ -12666,7 +12668,7 @@
       },
       {
         "path": "docs/reports/atm-product-ci-lifecycle-evidence.md",
-        "digest": "c95144779e5abcc87fa64c670052877119f8578709cf433e7e22e257e18128bc",
+        "digest": "09105569fb7c2ccfb1886eec59f9a8a39e7201b78a0471aada18f98a6eed8780",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-ci-lifecycle-evidence.md"
@@ -12805,6 +12807,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/reports/evidence-command-atomic-map.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/evidence-ledger-boundary-baseline.md",
+        "digest": "11457e9826fd7303bfa2c670c90a738d06c61866851d67de6e8dcf56f565dad3",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/evidence-ledger-boundary-baseline.md"
         ],
         "replaceable": true
       },
@@ -47199,7 +47210,7 @@
       },
       {
         "path": "scripts/collect-ci-burn-in-evidence.ts",
-        "digest": "258fd88f676003b4332f9679cbced5438b87bb05239ad187425e854d68290836",
+        "digest": "fe37decedec3fa48d987a550634da073ca73462e47c2d7374932657ca4ff594e",
         "origin": "source",
         "inputPaths": [
           "scripts/collect-ci-burn-in-evidence.ts"
@@ -48405,7 +48416,7 @@
       },
       {
         "path": "scripts/measure-product-ci-burn-in.ts",
-        "digest": "6769989248817625f3eef52645def75f12d7f50308f19b27ee38a9fb91df7804",
+        "digest": "038a47e44b6a1919aa1757ccb25c9e420ae2e0cd5853d72a3b5a97ae987a7ec1",
         "origin": "source",
         "inputPaths": [
           "scripts/measure-product-ci-burn-in.ts"
@@ -48481,6 +48492,15 @@
         "origin": "source",
         "inputPaths": [
           "scripts/pricing/refresh-model-prices.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/product-ci-burn-in-workflow-scope.json",
+        "digest": "3e5740d801b578f0588c5cd6cd93c14f3e9d496d5a7f4245da2c68a0d7f7b3d3",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/product-ci-burn-in-workflow-scope.json"
         ],
         "replaceable": true
       },
@@ -49350,7 +49370,7 @@
       },
       {
         "path": "scripts/validate-evidence-ledger-boundary.ts",
-        "digest": "b299e925b9df9defa0d553d4933a1f632ecd75827c4f4f0c0246cc255d0ac97e",
+        "digest": "86a688cdc2c6870a5f28da5468ada5f64fc4553bd127c0feab3b247214666d7a",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-evidence-ledger-boundary.ts"
@@ -53967,7 +53987,7 @@
       },
       {
         "path": "tests/cli/ci-burn-in-evidence-collector.test.ts",
-        "digest": "4da6b27d4eb684e450cdfed347f96d89e9e87668689b4973bb4988cdd43d4706",
+        "digest": "c76e418112eda8e7360b0fb4f2a2dbdbf8eeb254734cf1fca53602c3ff5ddda0",
         "origin": "source",
         "inputPaths": [
           "tests/cli/ci-burn-in-evidence-collector.test.ts"
@@ -54417,7 +54437,7 @@
       },
       {
         "path": "tests/cli/evidence-ledger-migration.test.ts",
-        "digest": "fda970835102af837e9eb4393f7a93eb61d3ab92af358d8dddbe5984396817f8",
+        "digest": "7f88987f1c287aa29992047cc51a8a26a9e6b651f8b6ac7c42d0170accbc1f4a",
         "origin": "source",
         "inputPaths": [
           "tests/cli/evidence-ledger-migration.test.ts"
@@ -57351,7 +57371,7 @@
       },
       {
         "path": "tests/cli/runtime-evidence-git-boundary.test.ts",
-        "digest": "fa4f8f9d5e450bd48b337ab560b17cdfe5c5e1990b393caef03d6812458fc034",
+        "digest": "889509c801aaaaed3d637da4d48aba14eb5910cfcec8e36144bc1c4870b11706",
         "origin": "source",
         "inputPaths": [
           "tests/cli/runtime-evidence-git-boundary.test.ts"
@@ -61562,7 +61582,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:887885280ffb82bd57aab7ba99c0fe5b1b3d1a812997388795c3138fa8696d7f"
+    "treeDigest": "sha256:f3bc2377910daf031bc97a29b5f825ace31fef544f611452156c02f83af64596"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -63851,6 +63871,7 @@
       "release/atm-root-drop/docs/reports/captain-parallel-ledger-analysis.md",
       "release/atm-root-drop/docs/reports/closure-packet-schema-map.md",
       "release/atm-root-drop/docs/reports/evidence-command-atomic-map.md",
+      "release/atm-root-drop/docs/reports/evidence-ledger-boundary-baseline.md",
       "release/atm-root-drop/docs/reports/evidence-ledger-migration-manifest.json",
       "release/atm-root-drop/docs/reports/evidence-shell-deletion-receipt.json",
       "release/atm-root-drop/docs/reports/framework-development-atomic-map.md",
@@ -67816,6 +67837,7 @@
       "release/atm-root-drop/scripts/plan-performance-report-v4.ts",
       "release/atm-root-drop/scripts/pricing/parse-provider-price-page.ts",
       "release/atm-root-drop/scripts/pricing/refresh-model-prices.ts",
+      "release/atm-root-drop/scripts/product-ci-burn-in-workflow-scope.json",
       "release/atm-root-drop/scripts/render-agent-matrix.ts",
       "release/atm-root-drop/scripts/render-atm-admission-report.ts",
       "release/atm-root-drop/scripts/repro/bug-atm-0045-planning-root-preference.mjs",
@@ -69275,22 +69297,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:db831e6e2736a06b7c7a7eb81844c65b20dfa221bfb7f12ac1661a16d244d886",
-  "sealedSourceCommit": "69b8fc99ec78d6e62186bd19e8ffca65485e44da",
+  "buildInputsTreeHash": "sha256:0212e781c637e08ccaa5621079147556d9036d2919b6c941c3f57cc71cffa750",
+  "sealedSourceCommit": "14126f7a08ad05ab27a333f03eac6323663be56f",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:b3c7993bc4a8445aecf50ec16fa0c172b11b9515ec40ec6a0b8a9b1298af1cec",
-  "tsBuildCacheDigest": "sha256:b7fd449007fb97d8d0b780176d41ebf01da89ca67ccbd77fe17c6baefd9df396",
+  "incrementalPlanDigest": "sha256:a66d7fead8d0deaed52acdf527a11f9b03ae164f25e446249afb72f125364d15",
+  "tsBuildCacheDigest": "sha256:a64bc6bca1df0c8848405a6cf2063fe4aa8d590f4b0d01507f2b35d36aa2f689",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 44,
-    "skipDecision": 56,
-    "worktreeSetup": 8965,
-    "typescriptBuild": 14977,
-    "rootDropReleaseAssembly": 32584,
-    "onefileReleaseAssembly": 9406,
-    "artifactSync": 6329,
+    "inputHashCalculation": 45,
+    "skipDecision": 59,
+    "worktreeSetup": 9625,
+    "typescriptBuild": 11732,
+    "rootDropReleaseAssembly": 28695,
+    "onefileReleaseAssembly": 9494,
+    "artifactSync": 6572,
     "cleanup": 0,
-    "totalElapsed": 81966
+    "totalElapsed": 103732
   }
 }

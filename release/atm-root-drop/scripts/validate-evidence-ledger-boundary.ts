@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
@@ -20,6 +21,10 @@ const approvedLegacyReferenceFiles = new Set([
   'packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts',
   'packages/cli/src/commands/git-governance/implementation/terminal-history-cleanup.ts',
   'packages/cli/src/commands/hook/pre-commit/support.ts',
+  // Close orchestration still emits the legacy close envelope during the
+  // non-destructive compatibility window; writers are governed separately.
+  'packages/cli/src/commands/tasks/close-orchestrator.ts',
+  'packages/cli/src/commands/tasks/close-orchestrator/close-write.ts',
   'packages/plugin-governance-local/src/layout.ts',
   'packages/plugin-governance-local/src/stores.ts',
   'packages/plugin-sdk/src/governance/layout.ts'
@@ -39,6 +44,35 @@ const approvedDurableReferencePatterns = [
   /\.runner-sync-receipt\.json/,
   /\.seal-and-commit\.json/
 ] as const;
+
+const runtimeEvidenceRoot = '.atm/runtime/evidence-ledger/';
+
+export function assertRepositoryOwnsRuntimeIgnoreRule(repositoryRoot: string) {
+  const gitignorePath = path.join(repositoryRoot, '.gitignore');
+  if (!existsSync(gitignorePath)) throw new Error('Repository-owned .gitignore is missing.');
+  const rules = readFileSync(gitignorePath, 'utf8')
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/^\//, ''))
+    .filter((line) => line.length > 0 && !line.startsWith('#'));
+  if (!rules.some((rule) => rule === runtimeEvidenceRoot || rule === runtimeEvidenceRoot.slice(0, -1))) {
+    throw new Error(`Repository-owned .gitignore must ignore ${runtimeEvidenceRoot}.`);
+  }
+}
+
+export function assertRuntimeLedgerIsNotTracked(repositoryRoot: string) {
+  let tracked: string;
+  try {
+    tracked = execFileSync('git', ['ls-files', '--cached', '--', runtimeEvidenceRoot], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+  } catch (error) {
+    throw new Error(`Unable to inspect tracked runtime Evidence Ledger paths: ${String(error)}`);
+  }
+  const paths = tracked.split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
+  if (paths.length > 0) throw new Error(`Runtime Evidence Ledger paths must not be tracked: ${paths.join(', ')}`);
+}
 
 function listTypeScriptFiles(root: string): string[] {
   if (!existsSync(root)) return [];
@@ -85,6 +119,8 @@ export function validateEvidenceLedgerBoundary(
 ) {
   const repositoryRoot = path.resolve(cwd);
   const resolvedSourceRoot = path.resolve(sourceRoot);
+  assertRepositoryOwnsRuntimeIgnoreRule(repositoryRoot);
+  assertRuntimeLedgerIsNotTracked(repositoryRoot);
   const callerReport = validateProductionEvidenceCallers(resolvedSourceRoot);
   const illegalLegacyReferences = callerReport.illegalReferences;
   if (illegalLegacyReferences.length > 0) {
@@ -102,7 +138,14 @@ export function validateEvidenceLedgerBoundary(
   }
   const checkpointDigest = sha256({ entryDigests: [...new Set(manifest.records.map((record) => record.ledgerDigest))].sort() });
   if (checkpointDigest !== manifest.checkpointDigest) throw new Error('Evidence Ledger checkpoint drifted after migration.');
-  return { ok: true, records: manifest.records.length, checkpointDigest, scannedFiles: callerReport.scannedFiles };
+  return {
+    ok: true,
+    records: manifest.records.length,
+    checkpointDigest,
+    scannedFiles: callerReport.scannedFiles,
+    runtimeEvidenceRoot,
+    ignoreRule: '.gitignore'
+  };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(import.meta.filename)) {

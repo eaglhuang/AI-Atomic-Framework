@@ -93,3 +93,13 @@ failures, zero retries, and 620 unresolved failures. Report-only process exit
 status is not a claim of acceptance. Missing lifecycle fields, malformed
 receipt metadata, or a digest mismatch return `invalid-input` and cannot be
 used to satisfy the burn-in gate.
+
+## TASK-PRF-0094 provenance-boundary follow-up (2026-09-14)
+
+The 0059 negative receipt remains unchanged. The collector/evaluator contract
+now requires a canonical receipt to preserve immutable Product CI job
+provenance (`jobId`, `jobName`, and `jobUrl`) for every in-scope attempt,
+including each retry grouped into a logical run. Missing or malformed job
+identity is rejected as invalid input; it is never inferred as success, zero
+retries, or a resolved failure. A new provider export must satisfy this
+boundary before another burn-in replay can be considered.
