@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T00-03-25-278Z-scope-amendment-cef60a4c3140",
+  "taskId": "ATM-GOV-0420",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0420.json",
+  "taskSha256": "sha256:867b6095b767bbb205eeb518bc06d5f10d0f6868cd1b823f11c373590adb9ff1",
+  "createdAt": "2026-09-14T00:03:25.278Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0420 --actor codex-captain --add \"packages/cli/src/commands/git-governance/implementation/commit-command.ts,packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts,packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts\" --reason \"讓 WIP preservation 暫存並還原 governance index，且以 task-scoped candidate 收存所有 source WIP\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "讓 WIP preservation 暫存並還原 governance index，且以 task-scoped candidate 收存所有 source WIP"
+  }
+}

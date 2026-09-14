@@ -72,7 +72,7 @@ assert.equal(existsSync(contextlessEvidence), true, 'contextless diagnostic byte
 // Git ignore rules must not make a task-declared deliverable invisible to the
 // governed candidate index.  Discovery stays path-bounded: a sibling ignored
 // file that is absent from the sealed task scope must remain excluded.
-writeFileSync(path.join(cwd, '.gitignore'), 'ignored-deliverables/\n');
+writeFileSync(path.join(cwd, '.gitignore'), 'ignored-deliverables/\n.atm/history/evidence/TASK-IGNORED-RELEASED.live-index-reconciliation.json\n');
 mkdirSync(path.join(cwd, 'ignored-deliverables'), { recursive: true });
 const declaredIgnoredPath = 'ignored-deliverables/declared.md';
 const undeclaredIgnoredPath = 'ignored-deliverables/foreign.md';
@@ -290,10 +290,10 @@ assert.equal(
 );
 execFileSync('git', ['restore', '--staged', '--', releasedEvidencePath], { cwd });
 
-// A real claimed task's effective scope includes its own evidence/event
-// patterns.  Those intrinsic wildcard entries must not make an otherwise
+// A real claimed task's effective scope includes its own durable
+// evidence/event paths.  Those intrinsic entries must not make an otherwise
 // history-only cleanup ineligible to preserve one exactly named released
-// receipt; no foreign wildcard is allowed.
+// receipt; mutable runtime evidence remains outside Git history.
 const ignoredReleasedTaskId = 'TASK-IGNORED-RELEASED';
 const ignoredReleasedEvidencePath = `.atm/history/evidence/${ignoredReleasedTaskId}.live-index-reconciliation.json`;
 writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${ignoredReleasedTaskId}.json`), `${JSON.stringify({
@@ -310,7 +310,7 @@ ignoredHistoryCleanupTask.source = {
 };
 ignoredHistoryCleanupTask.scopePaths = [
   ignoredReleasedEvidencePath,
-  `.atm/history/evidence/${historyCleanupTaskId}.*`,
+  `.atm/history/evidence/${historyCleanupTaskId}.live-index-reconciliation.json`,
   `.atm/history/task-events/${historyCleanupTaskId}/**`,
   `.atm/history/tasks/${historyCleanupTaskId}.json`,
 ];
@@ -405,4 +405,5 @@ const closureBundle = resolveTaskScopedCommitBundle({
   brokerConflictResolutionPath: null,
 });
 assert.ok(!closureBundle.stageFiles.includes(foreignClosurePath), 'a closure packet must never be admitted through historical cleanup');
+
 console.log('commit-bundle-resolution: foreign released residue preserved');

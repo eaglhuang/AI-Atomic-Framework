@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-13T23-59-59-963Z-scope-amendment-362fa5559784",
+  "taskId": "ATM-GOV-0420",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0420.json",
+  "taskSha256": "sha256:7a42dfd6cb2f8f4dbdd36200212225e6730b2b7b357c40023b230a67c8059e8e",
+  "createdAt": "2026-09-13T23:59:59.963Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0420 --actor codex-captain --add \"packages/cli/src/commands/tasks/release-wip-transaction.ts,packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts\" --reason \"修復 WIP preservation 先 commit 後寫 release transition，避免 protected-state 假阻塞\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "修復 WIP preservation 先 commit 後寫 release transition，避免 protected-state 假阻塞"
+  }
+}

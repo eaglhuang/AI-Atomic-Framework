@@ -37,7 +37,15 @@
     ".atm/history/task-events/ATM-GOV-0420/**",
     ".atm/history/tasks/ATM-GOV-0420.json",
     "release/atm-onefile/atm.mjs",
-    "release/atm-root-drop"
+    "release/atm-root-drop",
+    "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+    "packages/cli/src/commands/tasks/release-wip-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+    "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+    "packages/cli/dist/**"
   ],
   "validators": [
     "node --strip-types tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
@@ -256,8 +264,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-13T23-41-51-657Z-renew-5ee7301bec29",
-  "lastTransitionAt": "2026-09-13T23:41:51.657Z",
+  "lastTransitionId": "2026-09-14T00-23-07-069Z-scope-amendment-50ecb2ee3f3b",
+  "lastTransitionAt": "2026-09-14T00:23:07.069Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-09-13T23:01:51.359Z",
   "promotedAt": "2026-09-13T23:01:51.366Z",
@@ -265,15 +273,23 @@
     "actorId": "codex-captain",
     "leaseId": "lease-17cab18e59da",
     "claimedAt": "2026-09-13T23:41:34.480Z",
-    "heartbeatAt": "2026-09-13T23:41:50.729Z",
+    "heartbeatAt": "2026-09-14T00:20:06.310Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/ATM-GOV-0420.json",
       ".atm/history/evidence/ATM-GOV-0420.*",
       ".atm/history/task-events/ATM-GOV-0420/**",
+      ".atm/history/tasks/ATM-GOV-0420.json",
+      "packages/cli/dist/**",
       "packages/cli/src/commands/batch/implementation.ts",
       "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
       "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+      "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
+      "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+      "packages/cli/src/commands/tasks/release-wip-transaction.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-root-drop",
       "scripts/AtmCore/runner-build-scope.json",
@@ -285,7 +301,7 @@
     "state": "active",
     "laneSession": {
       "laneSessionId": "lane-20260913234134-codex-captain-8a045151c1",
-      "status": "active",
+      "status": "adopted",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913234134-codex-captain-8a045151c1\""
     }
@@ -295,20 +311,20 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-e71e111d49b7913d",
-    "ticketDigest": "sha256:e71e111d49b7913d73811a34bd3ede5eba60e42777ce30de8231f343acd984b9",
+    "ticketId": "wat-c9d892b54a35bb3b",
+    "ticketDigest": "sha256:c9d892b54a35bb3beafb0b0a1794764ee92e2668dc86a7a0289080a4c2eb53bf",
     "taskId": "ATM-GOV-0420",
     "origin": "claim",
     "actorId": "codex-captain",
     "laneSessionId": "lane-20260913234134-codex-captain-8a045151c1",
     "claimGeneration": "lease-17cab18e59da",
-    "issuedAt": "2026-09-13T23:41:50.729Z",
-    "expiresAt": "2026-09-14T00:11:50.729Z",
-    "scopeDigest": "sha256:ab8c0c977298893ac3483256584ee9edba549dc8158def8f23cfe37a230cb8ff",
+    "issuedAt": "2026-09-14T00:23:06.946Z",
+    "expiresAt": "2026-09-14T00:53:06.946Z",
+    "scopeDigest": "sha256:f4e13d0f3731d8313e1e422571bb834b71b86af69ad39d1f750cbcab251d772e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-13T23:41:50.729Z"
+      "selectedAt": "2026-09-14T00:23:06.946Z"
     },
     "grants": [
       {
@@ -317,9 +333,17 @@
           ".atm/history/evidence/ATM-GOV-0420.*",
           ".atm/history/task-events/ATM-GOV-0420/**",
           ".atm/history/tasks/ATM-GOV-0420.json",
+          "packages/cli/dist/**",
           "packages/cli/src/commands/batch/implementation.ts",
           "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
           "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+          "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
+          "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+          "packages/cli/src/commands/tasks/release-wip-transaction.ts",
           "release/atm-onefile/atm.mjs",
           "release/atm-root-drop",
           "scripts/AtmCore/runner-build-scope.json",
@@ -328,7 +352,7 @@
           "tests/cli/closure-delivery-file-coverage.test.ts",
           "tests/cli/frozen-runner-validation-foreign-state.test.ts"
         ],
-        "digest": "sha256:cbc49b437e886cdccc5fa66e69730a0e2dde4f44231e14fd8771f1e1fd22ad70"
+        "digest": "sha256:69b2b45b41e16a5aa30c0fdefa518ed5f383db0beac12657b9978c9e87c446dd"
       },
       {
         "kind": "lifecycle-operation",
@@ -403,9 +427,17 @@
       ".atm/history/evidence/ATM-GOV-0420.*",
       ".atm/history/task-events/ATM-GOV-0420/**",
       ".atm/history/tasks/ATM-GOV-0420.json",
+      "packages/cli/dist/**",
       "packages/cli/src/commands/batch/implementation.ts",
       "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
       "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-command.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-task-scoped-branch.ts",
+      "packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts",
+      "packages/cli/src/commands/tasks/__tests__/release-wip-transaction.test.ts",
+      "packages/cli/src/commands/tasks/release-wip-transaction.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-root-drop",
       "scripts/AtmCore/runner-build-scope.json",
@@ -414,19 +446,26 @@
       "tests/cli/closure-delivery-file-coverage.test.ts",
       "tests/cli/frozen-runner-validation-foreign-state.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0420-repair-false-green-closure-when-runner-scope-changes-before-batch-checkpoint.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/ATM-GOV-0420-repair-false-green-closure-when-runner-scope-changes-before-batch-checkpoint.task.md"
+    ],
     "allowPlanningMirror": false,
-    "promptHash": "d4d8494aa5b57b06d41ae60ea848520732d19031e4e5a9178e2fcecdab21ff6d",
+    "promptHash": "01c7f0761e96b811550ec9bd4d2be86d99a4371f5b72d6eb5bb2a59fd88a6fb3",
     "actorId": "codex-captain",
-    "sessionId": "session-20260913234134-codex-captain-ATM-GOV-0420-f575a50582",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260913234134-codex-captain-8a045151c1",
       "status": "active",
-      "source": "minted",
+      "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260913234134-codex-captain-8a045151c1\""
     },
-    "createdAt": "2026-09-13T23:41:41.260Z",
+    "createdAt": "2026-09-13T23:41:51.757Z",
     "status": "active"
   }
 }

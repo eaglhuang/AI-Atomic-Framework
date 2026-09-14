@@ -500,14 +500,17 @@ function newestFrameworkSourceMtime(rootDir) { let newest = 0; for (const entryP
 } return newest; }
 function runnerAffectingMtimeRoots(rootDir) { const manifest = readRunnerBuildScopeManifest(rootDir); if (!manifest)
     return ['packages/cli/src', 'scripts']; const roots = runnerAffectingPatterns(manifest).filter((pattern) => !pattern.startsWith('release/')).map((pattern) => pattern.includes('*') ? pattern.slice(0, pattern.indexOf('*')) : pattern).map((pattern) => pattern.replace(/\/$/, '')).filter((pattern) => pattern.length > 0); return [...new Set(roots)]; }
-function readRunnerSourceSealBlobIds(rootDir) { const dirtyResult = spawnSync('git', ['diff', '--name-only'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const dirty = new Set(String(dirtyResult.stdout ?? '').split(/\r?\n/).filter(Boolean).map((entry) => entry.replace(/\\/g, '/'))); const indexResult = spawnSync('git', ['ls-files', '-s'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const blobs = new Map(); if ((indexResult.status ?? 1) !== 0)
+function readRunnerSourceSealBlobIds(rootDir) { const dirtyResult = spawnSync('git', ['diff', '--name-only'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const cachedResult = spawnSync('git', ['diff', '--cached', '--name-only'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const changed = new Set([...String(dirtyResult.stdout ?? '').split(/\r?\n/), ...String(cachedResult.stdout ?? '').split(/\r?\n/)].map((entry) => normalizeRelativePath(entry)).filter(Boolean)); const indexResult = spawnSync('git', ['ls-files', '-s'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const blobs = new Map(); if ((indexResult.status ?? 1) !== 0)
     return blobs; for (const line of String(indexResult.stdout ?? '').split(/\r?\n/)) {
     const match = line.match(/^\d+\s+([0-9a-f]+)\s+\d+\t(.+)$/);
     if (!match)
         continue;
-    const relativePath = match[2].replace(/\\/g, '/');
-    if (!dirty.has(relativePath))
-        blobs.set(relativePath, match[1]);
+    const relativePath = normalizeRelativePath(match[2]);
+    if (!changed.has(relativePath) || !classifyRunnerSourceImpact(rootDir, relativePath).runnerAffecting) {
+        const baseline = changed.has(relativePath) ? readRunnerGitBlobId(rootDir, relativePath) : match[1];
+        if (baseline)
+            blobs.set(relativePath, baseline);
+    }
 } return blobs; }
 function verifyRunnerSourceSeal(rootDir) { const manifestPath = path.join(rootDir, 'release', 'atm-root-drop', 'release-manifest.json'); if (!existsSync(manifestPath))
     return { present: false, valid: false, digest: null }; try {
@@ -1146,3 +1149,23 @@ function isObjectRecord(value) { return Boolean(value) && typeof value === 'obje
 function requireValue(argv, index, flag) { const value = argv[index + 1]; if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `framework development command requires a value for ${flag}`, { exitCode: 2 });
 } return value; }
+function readRunnerGitText(rootDir, args) { const result = spawnSync('git', args, { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); return (result.status ?? 1) === 0 ? String(result.stdout ?? '') : null; }
+function readRunnerGitBlobId(rootDir, relativePath) { const value = readRunnerGitText(rootDir, ['rev-parse', `HEAD:${relativePath}`]); return value?.trim() || null; }
+function runnerPatternMatches(filePath, pattern) { const file = normalizeRelativePath(filePath); const normalized = normalizeRelativePath(pattern); if (normalized.endsWith('/'))
+    return file.startsWith(normalized); if (!normalized.includes('*'))
+    return file === normalized; const escaped = normalized.split('*').map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*'); return new RegExp(`^${escaped}$`).test(file); }
+function readRunnerConfigObject(rootDir, relativePath, ref) { const text = ref === 'HEAD' ? readRunnerGitText(rootDir, ['show', `HEAD:${relativePath}`]) : existsSync(path.join(rootDir, relativePath)) ? readFileSync(path.join(rootDir, relativePath), 'utf8') : null; if (text === null)
+    return null; try {
+    const value = JSON.parse(text);
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
+}
+catch {
+    return null;
+} }
+function classifyRunnerConfigImpact(rootDir, relativePath, manifest) { const configured = manifest.runnerAffectingConfigKeys?.[relativePath]; const head = readRunnerConfigObject(rootDir, relativePath, 'HEAD'); const current = readRunnerConfigObject(rootDir, relativePath, 'WORKTREE'); if (!configured || !head || !current)
+    return { schemaId: 'atm.runnerSourceImpact.v1', path: relativePath, runnerAffecting: true, reason: 'config policy or snapshot unavailable; fail closed', changedConfigKeys: [] }; const changedConfigKeys = [...new Set([...Object.keys(head), ...Object.keys(current)].filter((key) => JSON.stringify(head[key]) !== JSON.stringify(current[key])))].sort((left, right) => left.localeCompare(right)); if (changedConfigKeys.length === 0)
+    return { schemaId: 'atm.runnerSourceImpact.v1', path: relativePath, runnerAffecting: false, reason: 'config content matches sealed HEAD', changedConfigKeys }; const runnerAffecting = configured.includes('*') || changedConfigKeys.some((key) => configured.includes(key)); return { schemaId: 'atm.runnerSourceImpact.v1', path: relativePath, runnerAffecting, reason: runnerAffecting ? 'declared runner-affecting config key changed' : 'only non-runner config keys changed', changedConfigKeys }; }
+export function classifyRunnerSourceImpact(rootDir, filePath) { const normalizedRoot = path.resolve(rootDir); const normalized = normalizeRelativePath(filePath); const manifest = readRunnerBuildScopeManifest(normalizedRoot); if (!manifest)
+    return { schemaId: 'atm.runnerSourceImpact.v1', path: normalized, runnerAffecting: true, reason: 'runner build scope manifest unavailable; fail closed', changedConfigKeys: [] }; const configPaths = new Set(manifest.buildConfigPaths.map(normalizeRelativePath)); if (configPaths.has(normalized))
+    return classifyRunnerConfigImpact(normalizedRoot, normalized, manifest); const matched = runnerAffectingPatterns(manifest).find((pattern) => runnerPatternMatches(normalized, pattern)); return { schemaId: 'atm.runnerSourceImpact.v1', path: normalized, runnerAffecting: Boolean(matched), reason: matched ? `matched declared runner scope ${matched}` : 'outside declared runner build scope', changedConfigKeys: [] }; }
+export function verifyClosureDeliveryCommit(input) { const declaredFiles = uniqueSorted(input.declaredFiles.map(normalizeRelativePath).filter(Boolean)); const parentRow = readRunnerGitText(input.cwd, ['rev-list', '--parents', '-n', '1', input.deliveryCommitSha]) ?? ''; const hasParent = parentRow.trim().split(/\s+/).length > 1; const args = hasParent ? ['diff-tree', '--no-commit-id', '--name-only', '-r', input.deliveryCommitSha] : ['show', '--name-only', '--format=', '--root', input.deliveryCommitSha]; const raw = readRunnerGitText(input.cwd, args); const changedFiles = uniqueSorted(String(raw ?? '').split(/\r?\n/).map(normalizeRelativePath).filter(Boolean)); const matchedFiles = uniqueSorted(changedFiles.filter((file) => declaredFiles.some((declared) => file === declared || file.startsWith(`${declared.replace(/\/$/, '')}/`)))); const missingFiles = declaredFiles.filter((declared) => !matchedFiles.some((file) => file === declared || file.startsWith(`${declared.replace(/\/$/, '')}/`))); const ok = raw !== null && missingFiles.length === 0 && declaredFiles.length > 0; return { schemaId: 'atm.closureDeliveryProvenance.v1', deliveryCommitSha: input.deliveryCommitSha, declaredFiles, changedFiles, matchedFiles, missingFiles, ok, reason: ok ? null : raw === null ? 'delivery commit is unavailable' : declaredFiles.length === 0 ? 'no declared deliverables supplied' : 'delivery commit does not contain every declared deliverable' }; }

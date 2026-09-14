@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T00-09-23-433Z-scope-amendment-d9eb425b59ef",
+  "taskId": "ATM-GOV-0420",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0420.json",
+  "taskSha256": "sha256:6462a84c359591caf72356a94f4ec2cd0e994af32135bf0407efc1522ba9ee50",
+  "createdAt": "2026-09-14T00:09:23.433Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0420 --actor codex-captain --add packages/cli/src/commands/git-governance/implementation/wip-governance-staging.test.ts --reason \"補充獨立 WIP preservation regression，隔離既有 ignored-history fixture 失敗\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "補充獨立 WIP preservation regression，隔離既有 ignored-history fixture 失敗"
+  }
+}

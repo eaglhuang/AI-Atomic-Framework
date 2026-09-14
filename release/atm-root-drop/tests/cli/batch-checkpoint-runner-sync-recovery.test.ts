@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildBatchCheckpointRunnerRecoveryArgs, categorizeCheckpointCloseFailure } from '../../packages/cli/src/commands/batch/runner-recovery-forwarding.ts';
+import { classifyRunnerSourceImpact } from '../../packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts';
 import { isTaskflowOperatorLaneActive, withTaskflowOperatorLane } from '../../packages/cli/src/commands/emergency/context.ts';
 
 assert.deepEqual(
@@ -27,6 +28,12 @@ assert.deepEqual(
   [],
   'without an approval the batch adapter must preserve the stale-runner fail-closed default'
 );
+const sourceImpact = classifyRunnerSourceImpact(process.cwd(), 'package.json');
+assert.equal(sourceImpact.schemaId, 'atm.runnerSourceImpact.v1');
+assert.equal(sourceImpact.runnerAffecting, false, 'package-script-only changes must not create a stale-runner blocker');
+assert.deepEqual(sourceImpact.changedConfigKeys, ['scripts']);
+const runtimeImpact = classifyRunnerSourceImpact(process.cwd(), 'packages/cli/src/commands/batch/implementation.ts');
+assert.equal(runtimeImpact.runnerAffecting, true, 'declared runner source must remain fail-closed');
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-batch-checkpoint-recovery-'));
 mkdirSync(repo, { recursive: true });

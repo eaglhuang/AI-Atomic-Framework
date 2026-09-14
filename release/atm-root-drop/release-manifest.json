@@ -750,6 +750,9 @@
     "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
     "release/atm-root-drop/docs/reports/atm-product-proof-checkpoints.md",
     "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta.md",
+    "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta1.md",
+    "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta4.md",
+    "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-task-prf-0050.md",
     "release/atm-root-drop/docs/reports/atm-public-npm-install-proof.md",
     "release/atm-root-drop/docs/reports/atm-release-surface-budget.md",
     "release/atm-root-drop/docs/reports/atomization-dogfood-adoption-report.md",
@@ -4790,6 +4793,7 @@
     "release/atm-root-drop/scripts/validate-broker-registry.ts",
     "release/atm-root-drop/scripts/validate-broker-steward.ts",
     "release/atm-root-drop/scripts/validate-brokered-write.ts",
+    "release/atm-root-drop/scripts/validate-candidate-npm-install.ts",
     "release/atm-root-drop/scripts/validate-captain-dispatch-atomic-map.ts",
     "release/atm-root-drop/scripts/validate-captain-dispatch-protocol.ts",
     "release/atm-root-drop/scripts/validate-charter.ts",
@@ -5290,6 +5294,7 @@
     "release/atm-root-drop/tests/cli/backlog-census-authority.test.ts",
     "release/atm-root-drop/tests/cli/backlog-deferred-waiver-register.test.ts",
     "release/atm-root-drop/tests/cli/backlog-release-blocking-subset.test.ts",
+    "release/atm-root-drop/tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
     "release/atm-root-drop/tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
     "release/atm-root-drop/tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
     "release/atm-root-drop/tests/cli/batch-deliver-and-close-forwarding.test.ts",
@@ -5331,12 +5336,14 @@
     "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
     "release/atm-root-drop/tests/cli/claim-renew-expired-lane.test.ts",
     "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
+    "release/atm-root-drop/tests/cli/cli-published-command-smoke.test.ts",
     "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
     "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
     "release/atm-root-drop/tests/cli/close-orchestrator-final-600.test.ts",
     "release/atm-root-drop/tests/cli/close-preflight-foreign-line-budget.test.ts",
     "release/atm-root-drop/tests/cli/close-window-residue-diagnosis.test.ts",
     "release/atm-root-drop/tests/cli/closure-acceptance-evidence-gate.test.ts",
+    "release/atm-root-drop/tests/cli/closure-delivery-file-coverage.test.ts",
     "release/atm-root-drop/tests/cli/closure-packet-schema-extraction.test.ts",
     "release/atm-root-drop/tests/cli/closure-repair-write-ticket-commit.test.ts",
     "release/atm-root-drop/tests/cli/closure-required-gates-contract.test.ts",
@@ -5399,6 +5406,7 @@
     "release/atm-root-drop/tests/cli/framework-temp-lock-admission-parity.test.ts",
     "release/atm-root-drop/tests/cli/framework-temp-task-id-normalization.test.ts",
     "release/atm-root-drop/tests/cli/frontmatter-nested-object-list.test.ts",
+    "release/atm-root-drop/tests/cli/frozen-runner-validation-foreign-state.test.ts",
     "release/atm-root-drop/tests/cli/gate-telemetry-coverage-repair.test.ts",
     "release/atm-root-drop/tests/cli/gate-telemetry-observed-chain.test.ts",
     "release/atm-root-drop/tests/cli/gate-telemetry-v1.test.ts",
@@ -6166,8 +6174,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 1496,
-    "unchanged": 4635,
+    "copied": 1515,
+    "unchanged": 4624,
     "removed": 0
   },
   "buildMode": "full",
@@ -12644,6 +12652,33 @@
         "replaceable": true
       },
       {
+        "path": "docs/reports/atm-public-npm-install-proof-beta1.md",
+        "digest": "ae928fbcec842d3505ab035318f38fb20dc87d9ac460cf0dc48f4666ef98459f",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-public-npm-install-proof-beta1.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/atm-public-npm-install-proof-beta4.md",
+        "digest": "e05e6e5a0a0e042540702c2928abaccbc34473f39fcc602946c2853afdf2c13f",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-public-npm-install-proof-beta4.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/reports/atm-public-npm-install-proof-task-prf-0050.md",
+        "digest": "239876c8eb721c3b8804b41ae461556f678490702ede59b13b688d9143cd2716",
+        "origin": "source",
+        "inputPaths": [
+          "docs/reports/atm-public-npm-install-proof-task-prf-0050.md"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "docs/reports/atm-public-npm-install-proof.md",
         "digest": "3b4837f583fb4e4bc6757e1fe90cb16697259b1610fe86537862f428b945b521",
         "origin": "source",
@@ -16488,7 +16523,7 @@
       },
       {
         "path": "package.json",
-        "digest": "76a2e569b059d4aade78f5cf5ccc1f33db26e6934e1448022a609cde318179cd",
+        "digest": "db03f81d051218023d1a21a50931ce6a186424bae81b747a0bc724669509903a",
         "origin": "source",
         "inputPaths": [
           "package.json"
@@ -21654,7 +21689,7 @@
       },
       {
         "path": "packages/cli/dist/commands/batch/implementation.js",
-        "digest": "69b85ebf2c0740ae4176f0b24786a4f48323210b4cd29f9be4cdd08fc7d70963",
+        "digest": "0041cad78f6131aa0e9e002a5a037ac2148f5854dffca4a557dbfe3514661120",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/batch/implementation.js"
@@ -23130,7 +23165,7 @@
       },
       {
         "path": "packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
-        "digest": "4caf18050f5309fbb19f3bd1a0bd62677233ed98dde40030d9ee165ba00afa61",
+        "digest": "1b49e0c44bea58268c828315fec998c4892107349f5943c36cd53d048bd05de0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js"
@@ -27792,7 +27827,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "1948b4e4c1722c2668fb24461e9d99f2a3c3c5384da2a30c8c2d0fab1fb98f56",
+        "digest": "c6b2e8e301e21b5655dbd93e2df7e8f0ede88685326b8932371916cdf8159b72",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -27801,7 +27836,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "b60963dd5f403b5a51e2fcaefc0a4d46b5a7c77f5febe669f47839bc816840a3",
+        "digest": "d3e040850cc72a2b11205c1c1874bfc7ff748e1d645cac8b09b38a9fbaf59a10",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -28377,7 +28412,7 @@
       },
       {
         "path": "packages/cli/src/commands/batch/implementation.ts",
-        "digest": "a72ad9b6e262f85d55e2f053f4b2188473b7ef51dc902df5ec924867894ce56b",
+        "digest": "df693d97299fc012326a3d139d38b673aab802875a4e518ac0cc2789bc7b52fc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/batch/implementation.ts"
@@ -30015,7 +30050,7 @@
       },
       {
         "path": "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
-        "digest": "23f1e6b8ebc09dcb579c1f6f7469ffc1ad2b703d27ed670b4424876cd1859f7c",
+        "digest": "8c14ffe40969ea2f9b4cab70924e2a58e3f8fdce71eadd7684a53885b8c4d8ec",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts"
@@ -46557,7 +46592,7 @@
       },
       {
         "path": "scripts/AtmCore/runner-build-scope.json",
-        "digest": "c32f6984f9b5837cb46c39de2e0b8dc993100b5c8aa84908618a69533dbe0af8",
+        "digest": "1575d13eb6deee4b5ed3ed8674b338f383960f859d2437e04f7247bc39449fab",
         "origin": "source",
         "inputPaths": [
           "scripts/AtmCore/runner-build-scope.json"
@@ -48995,6 +49030,15 @@
         "replaceable": true
       },
       {
+        "path": "scripts/validate-candidate-npm-install.ts",
+        "digest": "da184631e1cb671dd7d0a15ff9bf4f944e38ad0a107040ff534998e61886fa0e",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/validate-candidate-npm-install.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "scripts/validate-captain-dispatch-atomic-map.ts",
         "digest": "f548cbdbb27d31db01139c0924a8502586c57e79f8ae1740e0622a2591bba4be",
         "origin": "source",
@@ -50328,7 +50372,7 @@
       },
       {
         "path": "scripts/validate-public-npm-install.ts",
-        "digest": "bcb32ca3c67f10e767551992dfe4e1d778bf99c6bd07699973822d593693a0fc",
+        "digest": "786a404099bef155556f6507a6c952f24b99ef397a4b6a9bd9b699ac5eed0e5d",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-public-npm-install.ts"
@@ -53495,6 +53539,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
+        "digest": "8ee2dcf58ec7ce97cd6eac0b70d3592e8f1c4511c333e33629c1b97b5ac58597",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/batch-checkpoint-candidate-snapshot.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
         "digest": "d7f5d816182d3afbaed56702326e016cce6b850b3aa54b8fa6e7a4ef91d8721c",
         "origin": "source",
@@ -53505,7 +53558,7 @@
       },
       {
         "path": "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
-        "digest": "d17515fbc3704683867ce446936604a89392d3f978e0f19acbb975f55939dd6d",
+        "digest": "6ab67cbc5fd3c7d9edcd86d81b124bcda4f923e3eafa25da5668eb09da2c195a",
         "origin": "source",
         "inputPaths": [
           "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
@@ -53864,6 +53917,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/cli-published-command-smoke.test.ts",
+        "digest": "9e55d7d3b2d49754f4c98d8a4520b602565a59aa00e7190d720cc6f03686155b",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/cli-published-command-smoke.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/cli-result-contract.test.ts",
         "digest": "43b2c100102634048e0423cae16b321dc391f9f8352335db88a8069037f6a87a",
         "origin": "source",
@@ -53914,6 +53976,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/closure-acceptance-evidence-gate.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/closure-delivery-file-coverage.test.ts",
+        "digest": "155c5626b9d36613f7b073d86df8b4b36a793230c2ce7983ecca2e2ae28083b7",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/closure-delivery-file-coverage.test.ts"
         ],
         "replaceable": true
       },
@@ -54472,6 +54543,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/frontmatter-nested-object-list.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/frozen-runner-validation-foreign-state.test.ts",
+        "digest": "82c867edc05f68c6ae33fa87a639cd4374e226142f60b96f17f8c8bf696826d1",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/frozen-runner-validation-foreign-state.test.ts"
         ],
         "replaceable": true
       },
@@ -55215,7 +55295,7 @@
       },
       {
         "path": "tests/cli/npm-clean-install.test.ts",
-        "digest": "2bfa0bcc606eb292a0d86b96b7e16760361eaafafd65049eb1ae60484fe2e723",
+        "digest": "aa992ee4b1e771f65ce21f1356744191cc087abf602d18119507a985395245e5",
         "origin": "source",
         "inputPaths": [
           "tests/cli/npm-clean-install.test.ts"
@@ -56529,7 +56609,7 @@
       },
       {
         "path": "tests/cli/public-npm-install-contract.test.ts",
-        "digest": "fc6508c11ca44253457f5715c37a3f68c6440b93a5c042bd752af98a09f0b56c",
+        "digest": "42ef78623e55c91de1690aca58fbf3c84a6654776f598e7a7ac52eaa183d9d29",
         "origin": "source",
         "inputPaths": [
           "tests/cli/public-npm-install-contract.test.ts"
@@ -61352,7 +61432,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:8cc2e50c860cc943d1720226852a068f5b7d371f05a8898912106615cc54edfc"
+    "treeDigest": "sha256:7ac4247e0706e6a1f4d6561b8abb0420a056b52aadc7330686d34a310bc4ef4d"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62899,7 +62979,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:aea16a508cac5dde7b8cd3f747476a157dc5fdb5625bb190f43da6757c6c5fd0"
+    "digest": "sha256:474a70fb3a7cfdd77f8cf03d099c25866d52d834d76f8cbca7a230cec83390ab"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -63623,6 +63703,9 @@
       "release/atm-root-drop/docs/reports/atm-product-ci-burn-in.md",
       "release/atm-root-drop/docs/reports/atm-product-proof-checkpoints.md",
       "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta.md",
+      "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta1.md",
+      "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-beta4.md",
+      "release/atm-root-drop/docs/reports/atm-public-npm-install-proof-task-prf-0050.md",
       "release/atm-root-drop/docs/reports/atm-public-npm-install-proof.md",
       "release/atm-root-drop/docs/reports/atm-release-surface-budget.md",
       "release/atm-root-drop/docs/reports/atomization-dogfood-adoption-report.md",
@@ -67663,6 +67746,7 @@
       "release/atm-root-drop/scripts/validate-broker-registry.ts",
       "release/atm-root-drop/scripts/validate-broker-steward.ts",
       "release/atm-root-drop/scripts/validate-brokered-write.ts",
+      "release/atm-root-drop/scripts/validate-candidate-npm-install.ts",
       "release/atm-root-drop/scripts/validate-captain-dispatch-atomic-map.ts",
       "release/atm-root-drop/scripts/validate-captain-dispatch-protocol.ts",
       "release/atm-root-drop/scripts/validate-charter.ts",
@@ -68163,6 +68247,7 @@
       "release/atm-root-drop/tests/cli/backlog-census-authority.test.ts",
       "release/atm-root-drop/tests/cli/backlog-deferred-waiver-register.test.ts",
       "release/atm-root-drop/tests/cli/backlog-release-blocking-subset.test.ts",
+      "release/atm-root-drop/tests/cli/batch-checkpoint-candidate-snapshot.test.ts",
       "release/atm-root-drop/tests/cli/batch-checkpoint-runner-sync-recovery-bridge.test.ts",
       "release/atm-root-drop/tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
       "release/atm-root-drop/tests/cli/batch-deliver-and-close-forwarding.test.ts",
@@ -68204,12 +68289,14 @@
       "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
       "release/atm-root-drop/tests/cli/claim-renew-expired-lane.test.ts",
       "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
+      "release/atm-root-drop/tests/cli/cli-published-command-smoke.test.ts",
       "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
       "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
       "release/atm-root-drop/tests/cli/close-orchestrator-final-600.test.ts",
       "release/atm-root-drop/tests/cli/close-preflight-foreign-line-budget.test.ts",
       "release/atm-root-drop/tests/cli/close-window-residue-diagnosis.test.ts",
       "release/atm-root-drop/tests/cli/closure-acceptance-evidence-gate.test.ts",
+      "release/atm-root-drop/tests/cli/closure-delivery-file-coverage.test.ts",
       "release/atm-root-drop/tests/cli/closure-packet-schema-extraction.test.ts",
       "release/atm-root-drop/tests/cli/closure-repair-write-ticket-commit.test.ts",
       "release/atm-root-drop/tests/cli/closure-required-gates-contract.test.ts",
@@ -68272,6 +68359,7 @@
       "release/atm-root-drop/tests/cli/framework-temp-lock-admission-parity.test.ts",
       "release/atm-root-drop/tests/cli/framework-temp-task-id-normalization.test.ts",
       "release/atm-root-drop/tests/cli/frontmatter-nested-object-list.test.ts",
+      "release/atm-root-drop/tests/cli/frozen-runner-validation-foreign-state.test.ts",
       "release/atm-root-drop/tests/cli/gate-telemetry-coverage-repair.test.ts",
       "release/atm-root-drop/tests/cli/gate-telemetry-observed-chain.test.ts",
       "release/atm-root-drop/tests/cli/gate-telemetry-v1.test.ts",
@@ -69041,5 +69129,23 @@
     "requiresExplicitStaging": true,
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
+  },
+  "buildInputsTreeHash": "sha256:3aac99943d2eb4bd96fa3cf6d9fc74f0edcecc6a47d722c03510a26dbb6c4710",
+  "sealedSourceCommit": "f87ac0337a9cb58dd302fb1e6069d8baee85b390",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:9cf8925a7b8d38aecc79f46eb3c4fd1f348deb4573cd5fbf932c8ca831c94d5f",
+  "tsBuildCacheDigest": "sha256:7970a596293f0aa9f7170147ac70919baa3cb94cda9b549917f05e1909f9a4e5",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
+  "phaseTimingsMs": {
+    "inputHashCalculation": 55,
+    "skipDecision": 57,
+    "worktreeSetup": 9226,
+    "typescriptBuild": 15523,
+    "rootDropReleaseAssembly": 35995,
+    "onefileReleaseAssembly": 9062,
+    "artifactSync": 6641,
+    "cleanup": 0,
+    "totalElapsed": 87305
   }
 }

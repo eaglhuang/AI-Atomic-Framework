@@ -56,6 +56,12 @@ import { listTaskDeclaredIgnoredWorktreeFiles } from './task-ignored-deliverable
 import { isUncommittableTaskEvidenceArtifact } from './task-evidence-admission.ts';
 import { resolvePublicationSliceAdmission } from './publication-slice-admission.ts';
 type LegacyValue = ReturnType<typeof JSON.parse>;
+
+function isWipGovernanceStatePath(filePath: string): boolean {
+  const normalized = normalizeRelativePath(filePath).toLowerCase();
+  return normalized.startsWith('.atm/history/');
+}
+
 export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   const declaredScope = resolveTaskDeclaredScope(
     input.cwd,
@@ -75,6 +81,25 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     trailers: input.trailers,
   });
   let stagedFiles = readStagedFiles(input.cwd);
+  // A WIP-preservation commit is a source snapshot, not a governance-state
+  // transition.  The release lane may already have task ledgers/events staged
+  // from an earlier checkpoint; leave those bytes staged for the later
+  // release transition, but park them during this source-only commit so the
+  // protected-state hook does not demand a transition that has not happened.
+  // The normal commit transaction restores this snapshot on both success and
+  // failure, so the caller's index remains lossless.
+  const wipGovernanceStagedFiles = input.wip && input.apply
+    ? stagedFiles.filter((filePath: LegacyValue) => isWipGovernanceStatePath(filePath))
+    : [];
+  let wipGovernanceSnapshotPath: string | null = null;
+  if (wipGovernanceStagedFiles.length > 0) {
+    wipGovernanceSnapshotPath = deferStagedFilePaths(
+      input.cwd,
+      input.taskId,
+      wipGovernanceStagedFiles,
+    );
+    stagedFiles = readStagedFiles(input.cwd);
+  }
   // `--defer-foreign-staged` promises an isolated commit transaction.  The
   // complete pre-existing index is therefore the preservation boundary: a
   // path that happens to look like current-task evidence must not leak into
@@ -127,10 +152,14 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   const lifecycleAuthorizedForeignDefer =
     input.deferForeignStaged &&
     releasedResidueTransaction.disposition === 'park-and-restore';
-  let deferredForeignStagedSnapshot = null;
+  let deferredForeignStagedSnapshot = wipGovernanceSnapshotPath;
   let deferredForeignStagedFiles: readonly string[] = [];
+  if (wipGovernanceStagedFiles.length > 0) {
+    deferredForeignStagedFiles = wipGovernanceStagedFiles;
+  }
   if (
     input.deferForeignStaged &&
+    deferredForeignStagedFiles.length === 0 &&
     preexistingStagedFiles.length > 0 &&
     input.apply &&
     !hasAuthorizedIndexLease &&
@@ -260,6 +289,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     ...taskOwnedProtectedOverrideAudits,
   ]).filter(
     (filePath: LegacyValue) =>
+      (!input.wip || !isWipGovernanceStatePath(filePath)) &&
       (taskOwnedProtectedOverrideAudits.has(normalizeRelativePath(filePath)) ||
         !isRuntimeCommitSideEffect(filePath)) &&
       (taskOwnedProtectedOverrideAudits.has(normalizeRelativePath(filePath)) ||
@@ -414,6 +444,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     blockedSummary = protectedGovernanceStateReport.summary;
   } else if (
     input.deferForeignStaged &&
+    deferredForeignStagedFiles.length === 0 &&
     gitIndexOwnership.foreignActiveStaged.length > 0 &&
     !protectedForeignDeferAuthorized &&
     !lifecycleAuthorizedForeignDefer &&
@@ -426,6 +457,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
       : `Refusing to unstage/defer foreign-active staged files owned by ${diagnostic.ownerTaskIds.join(", ")}: ${diagnostic.stagedPaths.join(", ")}. Wait for the owner, request a Broker index lane, or use an explicit stage-override lease with human approval.`;
   } else if (
     input.deferForeignStaged &&
+    deferredForeignStagedFiles.length === 0 &&
     protectedForeignStagedOwnershipFiles.length > 0 &&
     !protectedForeignDeferAuthorized &&
     !lifecycleAuthorizedForeignDefer &&

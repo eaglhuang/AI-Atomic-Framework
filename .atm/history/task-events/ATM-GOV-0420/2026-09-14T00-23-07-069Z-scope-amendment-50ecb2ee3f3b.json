@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-14T00-23-07-069Z-scope-amendment-50ecb2ee3f3b",
+  "taskId": "ATM-GOV-0420",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0420.json",
+  "taskSha256": "sha256:c36d99c07c31bb29ca97f3508e0a73ea790f947cad953629517b340d3066c49e",
+  "createdAt": "2026-09-14T00:23:07.069Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0420 --actor codex-captain --add \"packages/cli/dist/**\" --reason \"sealed runner build 同步更新 npm runtime dist，避免 source 與可安裝 artifact 脫鉤\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "sealed runner build 同步更新 npm runtime dist，避免 source 與可安裝 artifact 脫鉤"
+  }
+}
