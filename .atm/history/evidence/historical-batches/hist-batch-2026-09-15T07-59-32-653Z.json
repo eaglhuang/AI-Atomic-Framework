@@ -1,0 +1,223 @@
+{
+  "schemaId": "atm.historicalBatchEvidence.v1",
+  "batchId": "hist-batch-2026-09-15T07-59-32-653Z",
+  "createdAt": "2026-09-15T07:59:32.653Z",
+  "producedBy": "codex-gpt-5.4-mini",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+  "deliveryRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "commits": [
+    "6999db5c8",
+    "bb0e75ae3"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/doctor-integration-fast-health.test.ts",
+    "node --strip-types tests/cli/integration-source-coverage-parity.test.ts",
+    "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+    "typecheck"
+  ],
+  "validatorRuns": [
+    {
+      "command": "node --strip-types tests/cli/doctor-integration-fast-health.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:445c38f34a1366390b9664937a0de47d60a4e38638730828ddd3dd1cc75cd769",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/doctor-integration-fast-health.test.ts"
+      ],
+      "generatedAt": "2026-09-15T07:59:34.022Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "node --strip-types tests/cli/integration-source-coverage-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:243d932571d4c20e3b598ad409ac6d9c5c32c6a0d36bcc36654dba9cd44d7c5e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/integration-source-coverage-parity.test.ts"
+      ],
+      "generatedAt": "2026-09-15T07:59:34.433Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:af4bef562cb152f26d5a7310a6f7c8f4b72e725a5e1b63d60ed0e8ac64bbfbef",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts"
+      ],
+      "generatedAt": "2026-09-15T07:59:36.234Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-15T07:59:45.366Z",
+      "runnerKind": "unknown"
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "TASK-PRF-0103",
+      "ok": true,
+      "coverageStatus": "complete",
+      "okToRecordEvidence": true,
+      "okToCloseTask": true,
+      "diagnosticOnly": false,
+      "declaredDeliverables": [
+        "packages/cli/src/commands/integration/health.ts",
+        "packages/cli/src/commands/doctor/run-doctor.ts",
+        "tests/cli/doctor-integration-fast-health.test.ts",
+        "tests/cli/integration-source-coverage-parity.test.ts",
+        "docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "matchedDeliverables": [
+        "packages/cli/src/commands/integration/health.ts",
+        "packages/cli/src/commands/doctor/run-doctor.ts",
+        "tests/cli/doctor-integration-fast-health.test.ts",
+        "tests/cli/integration-source-coverage-parity.test.ts",
+        "docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "missingCoverage": [],
+      "validatorClaims": [
+        {
+          "gate": "node --strip-types tests/cli/doctor-integration-fast-health.test.ts",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "node --strip-types tests/cli/integration-source-coverage-parity.test.ts",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        },
+        {
+          "gate": "typecheck",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        }
+      ],
+      "atomHealthClaims": [
+        {
+          "atomOrMapId": "atm.integration-health-map",
+          "kind": "owner",
+          "generatedByTask": true,
+          "validatorHealthy": true
+        }
+      ],
+      "matchedCommits": [
+        "6999db5c81f6d509909076cdc8ff159816ebfb06",
+        "bb0e75ae3146e9091971f4f3efd3a37d9b1ed7f9"
+      ],
+      "matchedFiles": [
+        "docs/reports/atm-command-gate-latency-score.md",
+        "packages/cli/src/commands/doctor/run-doctor.ts",
+        "packages/cli/src/commands/integration/health.ts",
+        "tests/cli/doctor-integration-fast-health.test.ts",
+        "tests/cli/integration-source-coverage-parity.test.ts"
+      ],
+      "outOfScopeFiles": [],
+      "reports": [
+        {
+          "requestedRef": "6999db5c8",
+          "commitSha": "6999db5c81f6d509909076cdc8ff159816ebfb06",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/TASK-PRF-0103.bundle-manifest.json",
+            ".atm/history/task-events/TASK-PRF-0103/2026-09-14T18-33-48-624Z-import-4d139fe72e66.json",
+            ".atm/history/task-events/TASK-PRF-0103/2026-09-14T18-33-56-257Z-reserve-d1f9f396aa60.json",
+            ".atm/history/task-events/TASK-PRF-0103/2026-09-14T18-33-56-261Z-promote-a2cee3da41f3.json",
+            ".atm/history/task-events/TASK-PRF-0103/2026-09-14T18-34-02-297Z-claim-0c4e01484cea.json",
+            ".atm/history/tasks/TASK-PRF-0103.json",
+            "packages/cli/src/commands/doctor/run-doctor.ts",
+            "packages/cli/src/commands/integration/health.ts",
+            "tests/cli/doctor-integration-fast-health.test.ts",
+            "tests/cli/integration-source-coverage-parity.test.ts"
+          ],
+          "deliverableFiles": [
+            "packages/cli/src/commands/doctor/run-doctor.ts",
+            "packages/cli/src/commands/integration/health.ts",
+            "tests/cli/doctor-integration-fast-health.test.ts",
+            "tests/cli/integration-source-coverage-parity.test.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/cli/src/commands/doctor/run-doctor.ts",
+              "packages/cli/src/commands/integration/health.ts",
+              "tests/cli/doctor-integration-fast-health.test.ts",
+              "tests/cli/integration-source-coverage-parity.test.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/task-events/TASK-PRF-0103/2026-09-14T18-33-48-624Z-import-4d139fe72e66.json",
+              ".atm/history/task-events/TASK-PRF-0103/2026-09-14T18-33-56-257Z-reserve-d1f9f396aa60.json",
+              ".atm/history/task-events/TASK-PRF-0103/2026-09-14T18-33-56-261Z-promote-a2cee3da41f3.json",
+              ".atm/history/task-events/TASK-PRF-0103/2026-09-14T18-34-02-297Z-claim-0c4e01484cea.json",
+              ".atm/history/tasks/TASK-PRF-0103.json"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": [
+              ".atm/history/evidence/TASK-PRF-0103.bundle-manifest.json"
+            ]
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "bb0e75ae3",
+          "commitSha": "bb0e75ae3146e9091971f4f3efd3a37d9b1ed7f9",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/TASK-PRF-0104.bundle-manifest.json",
+            ".atm/history/task-events/TASK-PRF-0104/2026-09-14T18-43-47-087Z-import-4c35a0c75144.json",
+            ".atm/history/task-events/TASK-PRF-0104/2026-09-14T18-46-59-994Z-reserve-13ff49e94207.json",
+            ".atm/history/task-events/TASK-PRF-0104/2026-09-14T18-47-00-002Z-promote-1f710724f128.json",
+            ".atm/history/task-events/TASK-PRF-0104/2026-09-14T18-47-01-643Z-claim-6e6adcc8c381.json",
+            ".atm/history/task-events/TASK-PRF-0104/2026-09-14T19-13-50-065Z-renew-ccb1dcbf101e.json",
+            ".atm/history/tasks/TASK-PRF-0104.json",
+            "docs/reports/atm-command-gate-latency-score.md"
+          ],
+          "deliverableFiles": [
+            "docs/reports/atm-command-gate-latency-score.md"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "docs/reports/atm-command-gate-latency-score.md"
+            ],
+            "governanceFiles": [],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": [
+              ".atm/history/evidence/TASK-PRF-0104.bundle-manifest.json",
+              ".atm/history/task-events/TASK-PRF-0104/2026-09-14T18-43-47-087Z-import-4c35a0c75144.json",
+              ".atm/history/task-events/TASK-PRF-0104/2026-09-14T18-46-59-994Z-reserve-13ff49e94207.json",
+              ".atm/history/task-events/TASK-PRF-0104/2026-09-14T18-47-00-002Z-promote-1f710724f128.json",
+              ".atm/history/task-events/TASK-PRF-0104/2026-09-14T18-47-01-643Z-claim-6e6adcc8c381.json",
+              ".atm/history/task-events/TASK-PRF-0104/2026-09-14T19-13-50-065Z-renew-ccb1dcbf101e.json",
+              ".atm/history/tasks/TASK-PRF-0104.json"
+            ]
+          },
+          "waiverApplied": false
+        }
+      ]
+    }
+  ]
+}

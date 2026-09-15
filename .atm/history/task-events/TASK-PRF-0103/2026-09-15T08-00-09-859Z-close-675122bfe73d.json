@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-15T08-00-09-859Z-close-675122bfe73d",
+  "taskId": "TASK-PRF-0103",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260915075757-codex-gpt-5.4-mini-TASK-PRF-0103-d8e41aa429",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0103.json",
+  "taskSha256": "sha256:ab46e4477bfda3da154b1dc36591299e29407a9ffdf1bf06551854eb183d5cb5",
+  "createdAt": "2026-09-15T08:00:09.859Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0103 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-cedb634c5643 --historical-delivery 6999db5c81f6d509909076cdc8ff159816ebfb06 --historical-delivery bb0e75ae3146e9091971f4f3efd3a37d9b1ed7f9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-cedb634c5643",
+    "sessionId": "session-20260915075757-codex-gpt-5.4-mini-TASK-PRF-0103-d8e41aa429",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0103.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/doctor-integration-fast-health.test.ts",
+      "node --strip-types tests/cli/integration-source-coverage-parity.test.ts",
+      "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/doctor-integration-fast-health.test.ts",
+      "node --strip-types tests/cli/integration-source-coverage-parity.test.ts",
+      "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-15T08:00:09.845Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0103.*",
+        ".atm/history/task-events/TASK-PRF-0103/**",
+        ".atm/history/tasks/TASK-PRF-0103.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "node --strip-types tests/cli/doctor-integration-fast-health.test.ts",
+        "node --strip-types tests/cli/integration-source-coverage-parity.test.ts",
+        "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

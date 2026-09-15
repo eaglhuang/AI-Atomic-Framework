@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0103",
   "title": "Short-circuit doctor integration parity checks",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -164,34 +164,29 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T18-34-02-297Z-claim-0c4e01484cea",
-  "lastTransitionAt": "2026-09-14T18:34:02.297Z",
+  "lastTransitionId": "2026-09-15T08-00-09-859Z-close-675122bfe73d",
+  "lastTransitionAt": "2026-09-15T08:00:09.859Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-09-14T18:33:56.257Z",
-  "promotedAt": "2026-09-14T18:33:56.261Z",
+  "reservedAt": "2026-09-15T07:57:57.116Z",
+  "promotedAt": "2026-09-15T07:57:57.120Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-0451b7e10e69",
-    "claimedAt": "2026-09-14T18:33:56.265Z",
-    "heartbeatAt": "2026-09-14T18:33:56.265Z",
+    "leaseId": "lease-5aa8b01e31ff",
+    "claimedAt": "2026-09-15T07:57:57.126Z",
+    "heartbeatAt": "2026-09-15T08:00:09.857Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/TASK-PRF-0103.json",
-      "docs/reports/atm-command-gate-latency-score.md",
-      "packages/cli/src/commands/doctor/run-doctor.ts",
-      "packages/cli/src/commands/integration/health.ts",
-      "tests/cli/doctor-integration-fast-health.test.ts",
-      "tests/cli/integration-source-coverage-parity.test.ts"
+      ".atm/history/tasks/TASK-PRF-0103.json"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260914183356-codex-gpt-5.4-mini-7eab9a0d92",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914183356-codex-gpt-5.4-mini-7eab9a0d92\""
-    }
+      "laneSessionId": "lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-14T18:33:56.265Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -260,38 +255,37 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260914183356-codex-gpt-5.4-mini-TASK-PRF-0103-1fd4d826c5",
+  "startedBySessionId": "session-20260915075757-codex-gpt-5.4-mini-TASK-PRF-0103-d8e41aa429",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "TASK-PRF-0103",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
+    "batchId": "batch-cedb634c5643",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-c15389d6a8d3a044",
+    "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/TASK-PRF-0103.*",
       ".atm/history/task-events/TASK-PRF-0103/**",
-      ".atm/history/tasks/TASK-PRF-0103.json",
-      "docs/reports/atm-command-gate-latency-score.md",
-      "packages/cli/src/commands/doctor/run-doctor.ts",
-      "packages/cli/src/commands/integration/health.ts",
-      "tests/cli/doctor-integration-fast-health.test.ts",
-      "tests/cli/integration-source-coverage-parity.test.ts"
+      ".atm/history/tasks/TASK-PRF-0103.json"
     ],
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "b585a8314ec91fdc2d3223db7d026c1f2196291887814f1fcc5f5f51992e6cf6",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260914183356-codex-gpt-5.4-mini-TASK-PRF-0103-1fd4d826c5",
+    "sessionId": "session-20260915075757-codex-gpt-5.4-mini-TASK-PRF-0103-d8e41aa429",
     "laneSession": {
-      "laneSessionId": "lane-20260914183356-codex-gpt-5.4-mini-7eab9a0d92",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914183356-codex-gpt-5.4-mini-7eab9a0d92\""
+      "laneSessionId": "lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a\""
     },
-    "createdAt": "2026-09-14T18:34:02.296Z",
+    "createdAt": "2026-09-15T07:57:58.749Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-15T08:00:09.857Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260915075757-codex-gpt-5.4-mini-TASK-PRF-0103-d8e41aa429",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0103.closure-packet.json"
 }
