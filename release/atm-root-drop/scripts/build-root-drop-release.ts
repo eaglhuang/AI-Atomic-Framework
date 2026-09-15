@@ -59,7 +59,13 @@ export function buildRootDropRelease(options: any = {}) {
   // than relying on a caller (such as the onefile builder) having happened to
   // do so first; otherwise two consecutive root-drop builds can seal different
   // inputs into their manifests.
-  ensureBuiltPackageDist(repositoryRoot);
+  // Direct root-drop callers keep the safe default and refresh package dist.
+  // A higher-level builder may explicitly attest that it already performed
+  // this build; that avoids repeating the same expensive work while keeping
+  // the default path fail-closed for standalone use.
+  if (options.packageDistReady !== true) {
+    ensureBuiltPackageDist(repositoryRoot);
+  }
   mkdirSync(releaseRoot, { recursive: true });
 
   const sourceFiles = listReleaseSourceFiles(repositoryRoot);

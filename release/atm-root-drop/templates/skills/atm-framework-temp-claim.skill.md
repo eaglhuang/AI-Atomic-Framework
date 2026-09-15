@@ -30,6 +30,11 @@ evidence.** This skill does not replace ATM lifecycle authority — `next`,
 still own the decisions. The skill only makes framework quickfix work legible as
 a single specialist lane instead of a bag of scattered CLI snippets.
 
+For a fast quickfix, keep the operator path bounded to claim → focused validator
+→ one ATM commit with `--auto-stage`. The wrapper stages only the claimed files
+and required governed provenance; do not add a separate `git add` step or invent
+another coordination command.
+
 ## First command
 
 ```bash

@@ -1,9 +1,15 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.ts';
 import { type CommandSpec, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.ts';
 import { buildGateTelemetryRegistryCoverageReport, buildGateTelemetryTaskSummary, canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../../../core/src/telemetry/index.ts';
 import { buildSharedWriteGateCoverageReport } from '../../../core/src/telemetry/shared-write-coverage.ts';
+import {
+  buildCommandGateLatencyMarkdown,
+  buildCommandGateLatencyReportFromEvents,
+  type CommandGateTelemetryEvent
+} from '../../../../scripts/plan-performance-report-v4.ts';
 
 export async function runTelemetry(argv: string[]) {
   const spec = getCommandSpec('telemetry') as CommandSpec;
@@ -112,12 +118,29 @@ export async function runTelemetry(argv: string[]) {
 
   if (requestedReport) {
     const report = reportGateTelemetry(cwd, parsed.options.includeRuntime === true);
+    const latencyInventory = canonicalGateCheckRegistry.map((entry) => ({
+      key: entry.checkId,
+      command: entry.gate,
+      gate: entry.gate,
+      mandatory: entry.checkId === 'next.route-resolution' || entry.checkId === 'doctor.readiness' || entry.checkId === 'guard.framework-mode',
+      applicability: entry.summary
+    }));
+    const latencyEvents = parsed.options.includeRuntime === true ? readRuntimeLatencyEvents(cwd) : [];
+    const latencyScore = buildCommandGateLatencyReportFromEvents({
+      inventory: latencyInventory,
+      events: latencyEvents,
+      mandatoryKeys: latencyInventory.filter((entry) => entry.mandatory).map((entry) => entry.key)
+    });
     return makeResult({
       ok: true,
       command: 'telemetry',
       cwd,
       messages: [message('info', 'ATM_GATE_TELEMETRY_REPORT_READY', 'Gate telemetry report is ready.')],
-      evidence: report
+      evidence: {
+        ...report,
+        latencyScore,
+        latencyMarkdown: buildCommandGateLatencyMarkdown(latencyScore)
+      }
     });
   }
 
@@ -158,4 +181,32 @@ function normalizeGateTelemetryResult(value: unknown): 'pass' | 'block' | 'warn'
 
 function normalizeTaskSummaryRole(value: unknown): 'baseline' | 'treatment' | 'm2-preflight' | 'unknown' {
   return value === 'baseline' || value === 'treatment' || value === 'm2-preflight' ? value : 'unknown';
+}
+
+function readRuntimeLatencyEvents(cwd: string): CommandGateTelemetryEvent[] {
+  const root = path.join(cwd, '.atm', 'runtime', 'telemetry', 'gate-events');
+  if (!existsSync(root)) return [];
+  const events: CommandGateTelemetryEvent[] = [];
+  const visit = (directory: string): void => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const target = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        visit(target);
+        continue;
+      }
+      if (!entry.isFile() || !entry.name.endsWith('.jsonl')) continue;
+      for (const line of readFileSync(target, 'utf8').split(/\r?\n/)) {
+        if (!line.trim()) continue;
+        try {
+          const value = JSON.parse(line) as CommandGateTelemetryEvent;
+          if (value && typeof value.checkId === 'string' && typeof value.durationMs === 'number' && typeof value.result === 'string') events.push(value);
+        } catch {
+          // Existing telemetry report remains authoritative; malformed runtime
+          // lines are excluded and surfaced by its meta-health fields.
+        }
+      }
+    }
+  };
+  visit(root);
+  return events;
 }

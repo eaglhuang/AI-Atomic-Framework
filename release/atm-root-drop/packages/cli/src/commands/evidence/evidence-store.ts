@@ -18,12 +18,6 @@ export function evidencePathForTask(cwd: string, taskId: string) {
 export function legacyEvidenceDirectory(cwd: string) {
   return path.join(cwd, EVIDENCE_STORAGE_POLICY.legacyRoot);
 }
-export function evidenceBundleManifestRelativePath(taskId: string) {
-  return `.atm/history/evidence/${taskId}.bundle-manifest.json`;
-}
-export function evidenceBundleManifestPathForTask(cwd: string, taskId: string) {
-  return path.join(cwd, evidenceBundleManifestRelativePath(taskId));
-}
 export function taskPathForEvidence(cwd: string, taskId: string) {
   return path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
 }

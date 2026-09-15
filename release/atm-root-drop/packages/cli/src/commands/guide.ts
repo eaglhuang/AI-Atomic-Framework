@@ -208,7 +208,7 @@ function buildOverviewGuide() {
       {
         channel: 'guidance-first',
         when: 'An agent is entering an unfamiliar repository or goal.',
-        action: 'Run `node atm.mjs orient --cwd . --json`, then `node atm.mjs start --cwd . --goal "<goal>" --json`.'
+        action: 'Run `node atm.mjs start --cwd . --goal "<goal>" --json`; start performs the required orientation internally.'
       },
       {
         channel: 'single-next-action',
@@ -269,9 +269,7 @@ function buildGoalGuide(cwd: string, goal: string) {
     confidence: classification.confidence,
     matchedTerms: classification.matchedTerms,
     requiredFlow: classification.requiredFlow,
-    prerequisiteCommands: routeIntent === 'legacy-atomization'
-      ? ['node atm.mjs orient --cwd . --json']
-      : [],
+    prerequisiteCommands: [],
     nextCommand,
     readFirst,
     guidedFallback: {

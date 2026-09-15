@@ -3,11 +3,13 @@ import path from 'node:path';
 import { TEAM_DIRECT_API_PROVIDER_IDS } from '../../_vendor/core/dist/team-runtime/provider-contract.js';
 import { readJsonFile, CliError, resolveValue } from '../shared.js';
 import { createIntegrationAdapter, createIntegrationContext, isKnownIntegrationAdapter, manifestPathForIntegration } from './adapters.js';
-export async function checkIntegrationHealth(repositoryRoot) {
+export async function checkIntegrationHealth(repositoryRoot, options = {}) {
+    const sourceParity = options.sourceParity ?? 'full';
     const manifestDirectory = path.join(repositoryRoot, '.atm', 'integrations');
     if (!existsSync(manifestDirectory)) {
         return {
             ok: true,
+            sourceParity,
             manifestDir: '.atm/integrations',
             installed: [],
             manifests: [],
@@ -18,10 +20,11 @@ export async function checkIntegrationHealth(repositoryRoot) {
     const manifestReports = await Promise.all(readdirSync(manifestDirectory)
         .filter((entryName) => entryName.endsWith('.manifest.json'))
         .sort((left, right) => left.localeCompare(right))
-        .map((entryName) => verifyManifestFile(repositoryRoot, entryName)));
+        .map((entryName) => verifyManifestFile(repositoryRoot, entryName, { sourceParity })));
     const teamRuntimeBackends = inspectTeamRuntimeBackendCapabilities(repositoryRoot);
     return {
         ok: manifestReports.every((report) => report.ok),
+        sourceParity,
         manifestDir: '.atm/integrations',
         installed: manifestReports.filter((report) => report.adapterId).map((report) => report.adapterId),
         manifests: manifestReports,
@@ -97,7 +100,8 @@ export function normalizeTeamRuntimeCapabilities(manifest, manifestPath) {
         && ['supported', 'experimental', 'unavailable'].includes(capability.status)
         && capability.evidence.length > 0);
 }
-export async function verifyManifestFile(repositoryRoot, entryName) {
+export async function verifyManifestFile(repositoryRoot, entryName, options = {}) {
+    const sourceParity = options.sourceParity ?? 'full';
     const manifestPath = `.atm/integrations/${entryName}`;
     let manifest;
     try {
@@ -110,7 +114,8 @@ export async function verifyManifestFile(repositoryRoot, entryName) {
             manifestPath,
             adapterId: null,
             findings: [{ level: 'error', code: 'manifest-unreadable', path: manifestPath, message: error instanceof Error ? error.message : String(error) }],
-            driftedFiles: []
+            driftedFiles: [],
+            sourceParity
         });
     }
     if (!isKnownIntegrationAdapter(manifest.adapterId)) {
@@ -120,7 +125,8 @@ export async function verifyManifestFile(repositoryRoot, entryName) {
             manifestPath,
             adapterId: manifest.adapterId ?? null,
             findings: [{ level: 'error', code: 'adapter-unknown', path: manifestPath, message: `Unknown integration adapter in manifest: ${manifest.adapterId}` }],
-            driftedFiles: []
+            driftedFiles: [],
+            sourceParity
         });
     }
     const expectedManifestPath = manifestPathForIntegration(manifest.adapterId);
@@ -131,13 +137,15 @@ export async function verifyManifestFile(repositoryRoot, entryName) {
             manifestPath,
             adapterId: manifest.adapterId,
             findings: [{ level: 'error', code: 'manifest-path-mismatch', path: manifestPath, message: `Manifest path should be ${expectedManifestPath}.` }],
-            driftedFiles: []
+            driftedFiles: [],
+            sourceParity
         });
     }
     const adapter = createIntegrationAdapter(manifest.adapterId);
-    return verifyInstalledManifest(repositoryRoot, manifestPath, adapter, manifest);
+    return verifyInstalledManifest(repositoryRoot, manifestPath, adapter, manifest, { sourceParity });
 }
-export async function verifyInstalledManifest(repositoryRoot, manifestPath, adapter, preloadedManifest) {
+export async function verifyInstalledManifest(repositoryRoot, manifestPath, adapter, preloadedManifest, options = {}) {
+    const sourceParity = options.sourceParity ?? 'full';
     const manifest = preloadedManifest ?? readIntegrationManifest(repositoryRoot, adapter.id);
     const verifyReport = await resolveValue(adapter.verify(createIntegrationContext(repositoryRoot, adapter, {}), manifest));
     if (!verifyReport.ok) {
@@ -148,7 +156,21 @@ export async function verifyInstalledManifest(repositoryRoot, manifestPath, adap
             adapterId: adapter.id,
             findings: verifyReport.findings,
             driftedFiles: verifyReport.driftedFiles,
-            staleFields: []
+            staleFields: [],
+            sourceParity
+        });
+    }
+    if (sourceParity === 'deferred') {
+        return createManifestHealthReport({
+            ok: true,
+            status: 'ok',
+            manifestPath,
+            adapterId: adapter.id,
+            findings: verifyReport.findings,
+            driftedFiles: [],
+            staleFields: ['sourceParity'],
+            sourceParity,
+            teamRuntimeCapabilities: normalizeTeamRuntimeCapabilities(manifest, manifestPath)
         });
     }
     const dryRunInstall = await resolveValue(adapter.install(createIntegrationContext(repositoryRoot, adapter, { dryRun: true })));
@@ -181,7 +203,8 @@ export async function verifyInstalledManifest(repositoryRoot, manifestPath, adap
                 }
             ],
             driftedFiles: [],
-            staleFields: ['sourceCoverage']
+            staleFields: ['sourceCoverage'],
+            sourceParity
         });
     }
     if (!parity.ok) {
@@ -200,7 +223,8 @@ export async function verifyInstalledManifest(repositoryRoot, manifestPath, adap
                 }
             ],
             driftedFiles: parity.changedFiles,
-            staleFields: parity.changedFields
+            staleFields: parity.changedFields,
+            sourceParity
         });
     }
     return createManifestHealthReport({
@@ -211,6 +235,7 @@ export async function verifyInstalledManifest(repositoryRoot, manifestPath, adap
         findings: verifyReport.findings,
         driftedFiles: [],
         staleFields: [],
+        sourceParity,
         teamRuntimeCapabilities: normalizeTeamRuntimeCapabilities(manifest, manifestPath)
     });
 }
@@ -264,6 +289,7 @@ function createManifestHealthReport(input) {
         findings: input.findings,
         driftedFiles: input.driftedFiles,
         staleFields: Array.isArray(input.staleFields) ? input.staleFields : [],
+        sourceParity: input.sourceParity ?? 'full',
         teamRuntimeCapabilities: Array.isArray(input.teamRuntimeCapabilities) ? input.teamRuntimeCapabilities : []
     };
 }

@@ -337,12 +337,39 @@ function readForeignDirtyFiles(cwd: string, dirtyFilesInput: readonly string[], 
 }
 
 function readDirtyWorktreeFiles(cwd: string): readonly string[] {
-  const diff = spawnSync('git', ['diff', '--name-only'], { cwd, encoding: 'utf8' });
-  const untracked = spawnSync('git', ['ls-files', '--others', '--exclude-standard'], { cwd, encoding: 'utf8' });
-  return uniqueSorted([
-    ...(diff.status === 0 ? diff.stdout.split(/\r?\n/) : []),
-    ...(untracked.status === 0 ? untracked.stdout.split(/\r?\n/) : [])
-  ].map(normalizeWorkPath).filter(Boolean));
+  const result = spawnSync('git', ['status', '--porcelain=v1', '-z', '--untracked-files=all'], {
+    cwd,
+    encoding: 'utf8',
+    windowsHide: true
+  });
+  if (result.status !== 0) return [];
+  return parsePorcelainWorktreePaths(String(result.stdout ?? ''));
+}
+
+/**
+ * Preserve the old dirty-worktree contract while consuming one Git snapshot:
+ * staged-only paths stay in readStagedFiles, and only worktree/untracked paths
+ * enter dirtyFiles. Porcelain -z keeps rename paths unambiguous.
+ */
+export function parsePorcelainWorktreePaths(output: string): string[] {
+  const paths: string[] = [];
+  const entries = output.split('\0');
+  for (let index = 0; index < entries.length; index += 1) {
+    const entry = entries[index];
+    if (!entry || entry.length < 3) continue;
+    const indexStatus = entry[0];
+    const worktreeStatus = entry[1];
+    const isUntracked = indexStatus === '?' && worktreeStatus === '?';
+    if (!isUntracked && worktreeStatus === ' ') continue;
+    let filePath = entry.slice(3);
+    if ((indexStatus === 'R' || indexStatus === 'C' || worktreeStatus === 'R' || worktreeStatus === 'C') && entries[index + 1]) {
+      filePath = entries[index + 1];
+      index += 1;
+    }
+    const normalized = normalizeWorkPath(filePath);
+    if (normalized) paths.push(normalized);
+  }
+  return uniqueSorted(paths);
 }
 
 function isFrameworkFoundationPath(filePath: string): boolean {

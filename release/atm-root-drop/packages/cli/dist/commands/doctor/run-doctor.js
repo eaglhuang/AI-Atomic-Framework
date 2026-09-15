@@ -93,7 +93,11 @@ export async function runDoctor(argv) {
         .filter((entry) => !existsSync(entry.js) || !existsSync(entry.dts))
         .map((entry) => packageDirLabel(root, entry.packageDir));
     const charterIntegrity = checkCharterIntegrityV2(root);
-    const integrationHealth = await checkIntegrationHealth(root);
+    // Doctor is a control-plane readiness check. Full source parity compiles
+    // every installed adapter and belongs to the explicit integration verify /
+    // parity commands; keep the mandatory doctor path on the manifest/file fast
+    // path and report that parity was deferred.
+    const integrationHealth = await checkIntegrationHealth(root, { sourceParity: 'deferred' });
     const frameworkHookReadiness = (await import('../integration-hooks.js')).inspectFrameworkHookReadiness(root);
     const cleanCheckoutFrameworkHookContractOk = repoIdentity.isFrameworkRepo
         && frameworkHookReadiness.gitHooks.installedHookFiles.every((entry) => entry.present && entry.markerPresent)

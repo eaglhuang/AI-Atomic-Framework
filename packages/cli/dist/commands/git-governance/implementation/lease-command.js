@@ -39,7 +39,14 @@ export function runGitLease(options) {
         cwd: options.cwd,
         taskId: options.taskId,
     });
-    const stagedEntries = ownership.foreignActiveStaged.map((entry) => ({
+    // A released/abandoned task's staged governance records remain protected
+    // until they are explicitly parked or restored.  The commit resolver uses
+    // the same ownership classes; keep lease issuance aligned so recovery does
+    // not deadlock after the original task has already released its claim.
+    const stagedEntries = ownership.entries
+        .filter((entry) => entry.ownership === 'foreign-active-owned' ||
+        entry.ownership === 'foreign-released-or-abandoned')
+        .map((entry) => ({
         path: entry.path,
         stagedBlobId: entry.stagedBlobId,
         stagedMode: entry.stagedMode,

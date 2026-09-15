@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, relativePathFrom } from './shared.js';
 import { readActiveTaskDirectionLocks } from './task-direction/active-locks.js';
@@ -90,24 +90,85 @@ function orderTaskIdsByDependencies(tasks, requestedTaskIds) {
 }
 export function findActiveTaskQueue(cwd, sourcePrompt, selector = {}) {
     const promptHash = sourcePrompt?.trim() ? sha256(sourcePrompt.trim()) : null;
-    const queues = listTaskQueues(cwd)
-        .filter((queue) => queue.status === 'active')
-        .map((queue) => normalizeTaskQueueForTerminalBatchRun(cwd, queue))
-        .map((queue) => normalizeTaskQueueForTerminalLedgerTasks(cwd, queue))
-        .filter((queue) => queue.status === 'active');
-    if (selector.queueId)
-        return queues.find((queue) => queue.queueId === selector.queueId) ?? null;
-    if (selector.batchId)
-        return queues.find((queue) => queue.batchId === selector.batchId) ?? null;
-    if (selector.scopeKey)
-        return queues.find((queue) => queue.scopeKey === selector.scopeKey) ?? null;
-    if (selector.taskId)
-        return queues.find((queue) => queue.taskIds.includes(selector.taskId ?? '')) ?? null;
-    if (promptHash) {
-        const exact = queues.find((queue) => queue.sourcePromptHash === promptHash);
-        return exact ?? null;
+    const hasSelector = Boolean(selector.queueId || selector.batchId || selector.scopeKey || selector.taskId || promptHash);
+    const activeQueues = hasSelector
+        ? listActiveTaskQueueCandidates(cwd, selector, promptHash)
+        : listTaskQueues(cwd).filter((queue) => queue.status === 'active');
+    // Selector lookups are the hot path used by `next`: terminal normalization
+    // reads batch/task ledgers and may write repaired queue state.  Filter by
+    // immutable queue metadata first so unrelated queues do not pay that cost.
+    // The unselected status query keeps the historical normalize-all behavior so
+    // it can continue cleaning up stale queues for callers such as `tasks queue`.
+    if (!hasSelector) {
+        return activeQueues
+            .map((queue) => normalizeTaskQueueForTerminalBatchRun(cwd, queue))
+            .map((queue) => normalizeTaskQueueForTerminalLedgerTasks(cwd, queue))
+            .filter((queue) => queue.status === 'active')
+            .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0] ?? null;
     }
-    return queues.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0] ?? null;
+    const candidates = activeQueues.filter((queue) => {
+        if (selector.queueId)
+            return queue.queueId === selector.queueId;
+        if (selector.batchId)
+            return queue.batchId === selector.batchId;
+        if (selector.scopeKey)
+            return queue.scopeKey === selector.scopeKey;
+        if (selector.taskId)
+            return queue.taskIds.includes(selector.taskId);
+        return queue.sourcePromptHash === promptHash;
+    });
+    for (const candidate of candidates) {
+        const normalized = normalizeTaskQueueForTerminalLedgerTasks(cwd, normalizeTaskQueueForTerminalBatchRun(cwd, candidate));
+        if (normalized.status === 'active')
+            return normalized;
+    }
+    return null;
+}
+function listActiveTaskQueueCandidates(cwd, selector, promptHash) {
+    const queueId = selector.queueId?.trim();
+    if (queueId) {
+        const queue = readTaskQueue(cwd, queueId);
+        return queue?.status === 'active' ? [queue] : [];
+    }
+    const root = path.join(cwd, '.atm', 'runtime', 'task-queues');
+    if (!existsSync(root))
+        return [];
+    const entries = readdirSync(root).filter((entry) => entry.endsWith('.json'));
+    const candidates = [];
+    for (const entry of entries) {
+        const filePath = path.join(root, entry);
+        let raw;
+        try {
+            raw = readFileSync(filePath, 'utf8');
+        }
+        catch {
+            continue;
+        }
+        if (!/"status"\s*:\s*"active"/.test(raw))
+            continue;
+        if (selector.batchId && !jsonStringFieldMatches(raw, 'batchId', selector.batchId))
+            continue;
+        // Older queues may omit scopeKey; read them so readTaskQueue can derive it.
+        if (selector.scopeKey && hasJsonStringField(raw, 'scopeKey') && !jsonStringFieldMatches(raw, 'scopeKey', selector.scopeKey))
+            continue;
+        if (selector.taskId && !raw.includes(`"${selector.taskId}"`))
+            continue;
+        if (promptHash && hasJsonStringField(raw, 'sourcePromptHash') && !jsonStringFieldMatches(raw, 'sourcePromptHash', promptHash))
+            continue;
+        const queue = readTaskQueue(cwd, entry.replace(/\.json$/, ''));
+        if (queue?.status === 'active')
+            candidates.push(queue);
+    }
+    return candidates;
+}
+function hasJsonStringField(raw, field) {
+    return new RegExp(`"${field}"\\s*:\\s*"`).test(raw);
+}
+function jsonStringFieldMatches(raw, field, expected) {
+    return new RegExp(`"${field}"\\s*:\\s*"${escapeRegExp(expected)}"`).test(raw);
+}
+function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 function normalizeTaskQueueForTerminalBatchRun(cwd, queue) {
     if (!queue.batchId)

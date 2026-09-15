@@ -46,21 +46,21 @@ export function buildChannelPlaybook(input) {
                 `Run: ${defaultClaimCommand}`,
                 'Edit only the allowed files returned by ATM.',
                 'Run the smallest relevant validator for the touched file.',
-                'Commit only the real non-.atm diff and same-commit governed provenance staged by the ATM git wrapper.'
+                'Commit only the real non-.atm diff with the ATM git wrapper; auto-stage is bounded by the quickfix lock.'
             ],
             doNot: [
                 'Do not edit .atm/history/**.',
                 'Do not close task cards.',
-                `Do not expand the scope after the ${fastClaimLabel} is created.`
+                `Do not expand the scope after the ${fastClaimLabel} is created.`,
+                'Do not run a separate git add; --auto-stage performs the bounded staging step.'
             ],
             commandSequence: [
                 defaultClaimCommand,
                 '<edit allowed files>',
                 '<run focused validator>',
-                'git add <changed files>',
-                `node atm.mjs git commit --actor ${actor} --message "<message>" --json`
+                `node atm.mjs git commit --actor ${actor} --message "<message>" --auto-stage --json`
             ],
-            commitTiming: 'Commit after the focused validator passes. Prefer `node atm.mjs git commit` for governed framework work; bare `git commit` is for read-only inspection or non-governed maintenance only.',
+            commitTiming: 'Commit after the focused validator passes. The ATM wrapper auto-stages only the quickfix-allowed files and governed provenance; bare `git commit` is for read-only inspection or non-governed maintenance only.',
             governedGitEntrypoint: {
                 preferredCommand: `node atm.mjs git commit --actor ${actor} --message "<message>" --json`,
                 directGitPolicy: 'Direct git remains available for read-only commands and non-governed maintenance. When staging .atm/history/** task or evidence files, use the ATM wrapper so trailers and claim binding stay consistent.'

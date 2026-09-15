@@ -2,7 +2,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { buildGovernanceReadinessHintContract } from '../governance-readiness.js';
-import { createFrameworkModeStatus } from '../../framework-development.js';
+import { createFrameworkModeStatus, detectFrameworkRepoIdentity } from '../../framework-development.js';
 import { isFrameworkMaintenancePrompt } from '../route-predicates.js';
 import { uniqueSorted } from '../view-projections.js';
 import { parseJsonText } from '../../shared.js';
@@ -16,6 +16,7 @@ export function buildGovernanceReadinessHint(cwd, input) {
         readTaskWorkFiles,
         buildActiveWorkSummary,
         createFrameworkModeStatus,
+        isFrameworkRepository: (repositoryRoot) => detectFrameworkRepoIdentity(repositoryRoot).isFrameworkRepo,
         isFrameworkMaintenancePrompt,
         isProtectedFrameworkBranchTarget
     });

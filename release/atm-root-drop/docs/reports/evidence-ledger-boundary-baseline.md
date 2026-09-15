@@ -1,43 +1,50 @@
-# Evidence Ledger boundary baseline
+# Evidence Ledger boundary baseline (TASK-PRF-0098)
 
-Date: 2026-09-14  
-Source: `TASK-PRF-0091-runtime-evidence-history-audit-2026-09-14.json`
+Observed 2026-09-15 before implementation. This is a source and runtime
+baseline; it does not claim that historical Git evidence was reduced.
 
-This report separates historical Git footprint from future runtime growth. It
-does not claim that Git history was shrunk and it does not authorize history
-rewriting.
+## Current ownership map
 
-## Historical footprint (retained)
+| Surface | Current writer | Current reader | Retention |
+| --- | --- | --- | --- |
+| Runtime ledger records/indexes | `createLocalGovernanceStores().evidenceStore.appendEvidence` in `packages/plugin-governance-local/src/stores.ts` | the same store (`resolveEvidence`, `listEvidence`, `checkpointEvidence`) | ignored runtime state |
+| Runtime task evidence envelope | `writeEvidenceEnvelope` in `packages/cli/src/commands/evidence/bundle-io/implementation.ts` (used by `evidence add` and historical-batch paths) | `readEvidenceBundle` in `packages/cli/src/commands/evidence/evidence-store.ts` | ignored runtime state; legacy read fallback retained |
+| Durable bundle manifest | `writeEvidenceBundleManifest` in `bundle-io/implementation.ts` | `readEvidenceBundleManifest` in the same implementation | tracked close projection |
+| Legacy task envelope | no new writer is authorized; compatibility writers/readers remain in explicitly approved migration/close paths | `readEvidenceBundle` and migration code | historical Git evidence |
 
-| Measure | Baseline |
-| --- | ---: |
-| Tracked `.atm/history/evidence` files | 3,398 |
-| Tracked `.atm/history/evidence` bytes | 93,473,105 |
-| Evidence-touching commits | 3,658 |
-| Runner-sync class files | 178 |
-| Runner-sync class bytes | 55,492,875 |
-| Migration manifest records | 5,752 |
-| Legacy paths represented by the manifest | 849 |
+The first two runtime surfaces carry overlapping task evidence semantics but
+are not interchangeable: the ledger is content-addressed and immutable, while
+the task envelope supports ordered historical-batch removal. The durable
+manifest is a compact close projection and is intentionally retained.
 
-These files remain retained legacy inputs. No deletion, redaction, relocation,
-or rewrite is part of this boundary change.
+## Measured baseline
 
-## Future growth avoided
+- `node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts` — PASS.
+- `node --strip-types tests/cli/evidence-ledger-migration.test.ts` — PASS.
+- `node --strip-types scripts/validate-evidence-ledger-boundary.ts` — PASS;
+  5,752 ledger records, checkpoint
+  `sha256:a476361a681d91a73d8962cd345831ccd875a2122bd119a19e05efed65cc6785`,
+  978 production files scanned.
+- `npm run typecheck` — PASS.
+- `implementation.ts` is 94,892 bytes and contains five envelope-writer
+  call-sites plus six direct `writeFileSync` occurrences. The separately
+  extracted `manifest-reader.ts` is 2,343 bytes, while the implementation
+  still contains its own manifest reader/path implementation. This is a
+  verified duplicate production module, not a second authoritative store.
 
-New runtime evidence is written below `.atm/runtime/evidence-ledger/` and is
-ignored by the repository-owned `.gitignore` rule. The avoided growth is the
-future payload that would otherwise have been added to Git; it is not a
-reduction of the historical byte baseline above. Runtime records remain
-content-addressed and can be exported/restored through the migration manifest
-and checkpoint verification.
+## Bounded reduction and stop rule
 
-## Verification and rollback
+The first safe reduction removes two unused manifest-path helpers from
+`evidence-store.ts`; the canonical manifest path implementation remains in
+`bundle-io/implementation.ts`, and the bounded extraction module remains
+covered by its existing extraction test. This is a small production-code
+deletion and does not alter any persisted path.
 
-The boundary validator fails closed when the repository-owned ignore rule is
-missing or a runtime-ledger path is tracked. A clean clone test disables global
-and local excludes and attributes the ignore decision to `.gitignore`.
-
-Rollback is a single governed revert of the ignore, validator, tests, and
-documentation changes. Legacy evidence remains untouched. Any future history
-rewrite requires a separate owner-authorized migration card with an export,
-restore, checkpoint, and recovery receipt before execution.
+The stronger storage reduction (removing either the task envelope or the
+content-addressed ledger) is intentionally stopped in this card. The current
+historical-batch remove/replay flow still depends on the envelope, while the
+ledger is the tamper-verifiable authority. Removing either without a replay
+adapter would violate ACC-1/ACC-3 and could erase deviation history. Therefore
+ACC-2's storage-representation portion remains unmet and must not be reported
+as completed; a later bounded card may address it only with replay, tamper and
+concurrency evidence.

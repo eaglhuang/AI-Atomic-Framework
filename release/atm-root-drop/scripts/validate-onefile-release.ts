@@ -122,11 +122,18 @@ try {
     repositoryRoot: root,
     releaseRoot: path.join(tempRoot, 'release', 'atm-root-drop')
   });
+  // Regression guard: an existing but stale root-drop must be reconciled
+  // before onefile payload collection, otherwise generated command-spec leaf
+  // modules can be absent from the extracted runtime.
+  const staleCommandSpec = path.join(rootDrop.releaseRoot, 'packages', 'cli', 'dist', 'commands', 'command-specs', 'cleanup.spec.js');
+  assert(existsSync(staleCommandSpec), 'root-drop fixture must contain generated cleanup command spec before stale-snapshot test');
+  rmSync(staleCommandSpec, { force: true });
   const release = buildOnefileRelease({
     repositoryRoot: root,
     rootDropRoot: rootDrop.releaseRoot,
     outputRoot: path.join(tempRoot, 'release', 'atm-onefile')
   });
+  assert(existsSync(staleCommandSpec), 'onefile build must refresh an existing stale root-drop snapshot');
   assert(existsSync(path.join(rootDrop.releaseRoot, governanceRouterSkillRelativePath)), 'root-drop source for onefile must include governance router skill');
   assert(existsSync(release.outputFilePath), 'onefile build must emit release/atm-onefile/atm.mjs');
 

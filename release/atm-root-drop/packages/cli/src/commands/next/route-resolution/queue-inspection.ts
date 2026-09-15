@@ -109,7 +109,14 @@ export function inspectImportedTaskQueue(
         const workItemId = metadata.workItemId;
         if (!workItemId) return [];
         const status = metadata.status ?? 'planned';
-        const shouldHydrateScope = isTaskRoutable(status, taskIntent)
+        // An explicit task-id prompt is already a deterministic route.  Do not
+        // fully parse every open task just to score candidates that cannot win;
+        // keep their metadata/status for dependency checks and hydrate only the
+        // addressed task (or fall back to the broad scan for plan/queue prompts).
+        const targetedTaskLookup = Boolean(taskIntent
+          && !taskIntent.queueRequested
+          && (taskIntent.mentionedTaskIds.length > 0 || taskIntent.explicitTaskIds.length > 0));
+        const shouldHydrateScope = (!targetedTaskLookup && isTaskRoutable(status, taskIntent))
           || isTaskIdMentioned(workItemId, taskIntent)
           || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && normalizeTaskRouteStatus(status) === 'running');
         if (!shouldHydrateScope) {

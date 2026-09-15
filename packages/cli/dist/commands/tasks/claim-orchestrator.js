@@ -28,7 +28,7 @@ function normalizeTaskStatus(value) {
     return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
 }
 export async function runTasksClaimLifecycle(action, argv) {
-    const claimLifecycleStartedAt = Date.now();
+    const claimLifecycleStartedAt = process.hrtime.bigint(), elapsedMs = (startedAt) => Number(process.hrtime.bigint() - startedAt) / 1_000_000;
     const claimLifecyclePhases = [];
     const options = parseClaimLifecycleOptions(action, argv);
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -79,7 +79,7 @@ export async function runTasksClaimLifecycle(action, argv) {
                 leaseId: currentClaim.leaseId
             });
         }
-        const claimIntentResolution = resolveTaskClaimIntent({
+        const claimIntentStartedAt = process.hrtime.bigint(), claimIntentResolution = resolveTaskClaimIntent({
             cwd: options.cwd,
             taskId: options.taskId,
             taskDocument,
@@ -87,7 +87,7 @@ export async function runTasksClaimLifecycle(action, argv) {
             autoIntent: options.autoIntent === true && options.claimIntentExplicit !== true,
             explicitClaimIntent: options.claimIntentExplicit === true
         });
-        claimLifecyclePhases.push({ phase: 'claim-intent-resolution', durationMs: 0 });
+        claimLifecyclePhases.push({ phase: 'claim-intent-resolution', durationMs: elapsedMs(claimIntentStartedAt) });
         if (options.claimIntentExplicit === true
             && options.claimIntent === 'closeout-only'
             && claimIntentResolution.dirtyInScopeFiles.length > 0) {
@@ -101,7 +101,7 @@ export async function runTasksClaimLifecycle(action, argv) {
                 }
             });
         }
-        const claimAdmission = evaluateTaskClaimAdmission({
+        const claimAdmissionStartedAt = process.hrtime.bigint(), claimAdmission = evaluateTaskClaimAdmission({
             taskId: options.taskId,
             actorId,
             status: String(taskDocument.status ?? ''),
@@ -109,15 +109,15 @@ export async function runTasksClaimLifecycle(action, argv) {
             currentClaimActorId: currentClaim?.actorId ?? null,
             currentClaimState: currentClaim?.state ?? null
         });
-        claimLifecyclePhases.push({ phase: 'claim-admission', durationMs: 0 });
+        claimLifecyclePhases.push({ phase: 'claim-admission', durationMs: elapsedMs(claimAdmissionStartedAt) });
         if (!claimAdmission.ok) {
             throw new CliError(claimAdmission.code, claimAdmission.message, {
                 exitCode: 1,
                 details: claimAdmission.details
             });
         }
-        const dependencyBlockers = findTaskClaimDependencyBlockers(options.cwd, options.taskId, taskDocument);
-        claimLifecyclePhases.push({ phase: 'dependency-gate', durationMs: 0 });
+        const dependencyGateStartedAt = process.hrtime.bigint(), dependencyBlockers = findTaskClaimDependencyBlockers(options.cwd, options.taskId, taskDocument);
+        claimLifecyclePhases.push({ phase: 'dependency-gate', durationMs: elapsedMs(dependencyGateStartedAt) });
         if (dependencyBlockers.length > 0) {
             const firstBlocker = dependencyBlockers[0];
             const closeoutBlocker = firstBlocker;
@@ -187,7 +187,7 @@ export async function runTasksClaimLifecycle(action, argv) {
                 taskDirectionLock: claimCompletion.taskDirectionLock,
                 claimLatency: {
                     schemaId: 'atm.claimLatencyTelemetry.v1',
-                    totalMs: Date.now() - claimLifecycleStartedAt,
+                    totalMs: elapsedMs(claimLifecycleStartedAt),
                     phases: claimLifecyclePhases
                 }
             }
