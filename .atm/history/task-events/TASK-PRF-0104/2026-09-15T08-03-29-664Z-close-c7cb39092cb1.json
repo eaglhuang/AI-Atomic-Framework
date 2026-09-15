@@ -1,0 +1,52 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-15T08-03-29-664Z-close-c7cb39092cb1",
+  "taskId": "TASK-PRF-0104",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260915080047-codex-gpt-5.4-mini-TASK-PRF-0104-3358deb455",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0104.json",
+  "taskSha256": "sha256:284c6bb74c4bdc0d8b9f19c5b92841f9cd74761c2d1009570d7099dd5fa639c6",
+  "createdAt": "2026-09-15T08:03:29.664Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0104 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-cedb634c5643 --historical-delivery 8b6d2d8d564952496306aa35effec4c4c541b34b --historical-delivery ba6fddb7f966c07c3391bd834bfda1744b62562c --historical-delivery bb0e75ae3146e9091971f4f3efd3a37d9b1ed7f9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-cedb634c5643",
+    "sessionId": "session-20260915080047-codex-gpt-5.4-mini-TASK-PRF-0104-3358deb455",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0104.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+      "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+      "typecheck",
+      "typecheck -- --pretty false"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+      "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+      "typecheck -- --pretty false"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-15T08:03:29.650Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0104.*",
+        ".atm/history/task-events/TASK-PRF-0104/**",
+        ".atm/history/tasks/TASK-PRF-0104.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+        "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+        "typecheck -- --pretty false"
+      ]
+    }
+  }
+}
