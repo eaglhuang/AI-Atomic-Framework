@@ -158,6 +158,29 @@ Rerun harness:
 `C:\Users\User\atm-benchmark-sink\TASK-PRF-0105\run-route-resolution-paired.mjs`
 (`sha256:f9a0dfc242b5b564aff60e7063de412815843d7b239bdad8010e511e6900ed60`).
 
+### Queue lookup candidate prefilter rerun (2026-09-15)
+
+The candidate now filters active queue files by the requested prompt/task
+selector before reading batch and task ledgers for terminal normalization. The
+unselected `tasks queue` status path keeps its normalize-all cleanup behavior;
+no conflict, dependency, or multi-AI private-read rule was removed. In the
+same 15-pair AB/BA harness with eight candidate A/A controls, the fresh run
+reported:
+
+- broad-hydration baseline p50 **218.971 ms**, p95 **227.720 ms**, cumulative
+  **3,257.203 ms**;
+- targeted candidate p50 **197.338 ms**, p95 **211.837 ms**, cumulative
+  **2,928.591 ms**;
+- p50 reduction **9.879%**, p95 change **-6.975%**; candidate A/A p50
+  **201.552 ms**.
+
+This confirms a reversible reduction at the queue-lookup boundary, but the
+20% p50 acceptance target is still not met. Per the stop rule, the result is
+inconclusive rather than a product-wide performance claim; do not expand this
+card into more route heuristics. Receipt:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0105\route-resolution-paired-receipt-20260915.json`
+(`sha256:a10e388a38f576c0c596e25d791606f2970491cb69663c64badb897549780246`).
+
 ## Governance-readiness Git process follow-up (TASK-PRF-0106)
 
 The next source-first profile exposed `build-governance-readiness` at roughly

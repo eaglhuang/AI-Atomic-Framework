@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0105",
   "title": "Optimize highest cumulative route-resolution latency hotspot",
-  "status": "open",
+  "status": "running",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -25,7 +25,11 @@
     "packages/cli/src/commands/next/route-resolution/*.ts",
     "packages/cli/src/commands/next/route-predicates.ts",
     "tests/cli/next-route-resolution-latency.test.ts",
-    "docs/reports/atm-command-gate-latency-score.md"
+    "docs/reports/atm-command-gate-latency-score.md",
+    ".atm/history/evidence/TASK-PRF-0105.*",
+    ".atm/history/task-events/TASK-PRF-0105/**",
+    ".atm/history/tasks/TASK-PRF-0105.json",
+    "packages/cli/src/commands/task-direction.ts"
   ],
   "validators": [
     "node --strip-types tests/cli/next-route-resolution-latency.test.ts",
@@ -187,54 +191,57 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T19-30-35-300Z-release-3b2b6e702566",
-  "lastTransitionAt": "2026-09-14T19:30:35.300Z",
+  "lastTransitionId": "2026-09-15T00-44-04-132Z-scope-amendment-9d8915a8f55e",
+  "lastTransitionAt": "2026-09-15T00:44:04.132Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-09-14T19:21:21.352Z",
-  "promotedAt": "2026-09-14T19:21:21.356Z",
+  "reservedAt": "2026-09-15T00:41:54.869Z",
+  "promotedAt": "2026-09-15T00:41:54.875Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-691350e4176c",
-    "claimedAt": "2026-09-14T19:21:21.360Z",
-    "heartbeatAt": "2026-09-14T19:30:34.503Z",
+    "leaseId": "lease-d8f941b1b4ae",
+    "claimedAt": "2026-09-15T00:41:54.880Z",
+    "heartbeatAt": "2026-09-15T00:41:54.880Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-PRF-0105.*",
+      ".atm/history/task-events/TASK-PRF-0105/**",
       ".atm/history/tasks/TASK-PRF-0105.json",
       "docs/reports/atm-command-gate-latency-score.md",
       "packages/cli/src/commands/next/route-predicates.ts",
       "packages/cli/src/commands/next/route-resolution.ts",
       "packages/cli/src/commands/next/route-resolution/*.ts",
+      "packages/cli/src/commands/task-direction.ts",
       "tests/cli/next-route-resolution-latency.test.ts"
     ],
-    "state": "released",
+    "state": "active",
+    "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260914192121-codex-gpt-5.4-mini-d64e8ebd97",
-      "status": "active",
-      "source": "option",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914192121-codex-gpt-5.4-mini-d64e8ebd97\""
-    },
-    "reason": "Implementation committed; formal same-runner AB/BA measurement remains pending and frozen runner is stale."
+      "laneSessionId": "lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c\""
+    }
   },
   "startedAt": "2026-09-14T19:21:21.360Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-36108bf6b5878afa",
-    "ticketDigest": "sha256:36108bf6b5878afac0489a312a6426074564e8456ac83bab5502357e64d64d20",
+    "ticketId": "wat-0c75f4316a9b70a6",
+    "ticketDigest": "sha256:0c75f4316a9b70a6581257c10c70940faa4d96a5b1612e4a7f2abecfcd03c4e5",
     "taskId": "TASK-PRF-0105",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260914192121-codex-gpt-5.4-mini-d64e8ebd97",
-    "claimGeneration": "lease-691350e4176c",
-    "issuedAt": "2026-09-14T19:29:28.225Z",
-    "expiresAt": "2026-09-14T19:59:28.225Z",
-    "scopeDigest": "sha256:4cd128d77283e2859c0c84a44261f79da156bf9dad27fb7995b25df7ea3c0725",
+    "laneSessionId": "lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c",
+    "claimGeneration": "lease-d8f941b1b4ae",
+    "issuedAt": "2026-09-15T00:44:04.010Z",
+    "expiresAt": "2026-09-15T01:14:04.010Z",
+    "scopeDigest": "sha256:f31909bf1c56458fceffe78aab789d00647291a254faec76111780cad48df0c7",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-14T19:29:28.225Z"
+      "selectedAt": "2026-09-15T00:44:04.010Z"
     },
     "grants": [
       {
@@ -247,9 +254,10 @@
           "packages/cli/src/commands/next/route-predicates.ts",
           "packages/cli/src/commands/next/route-resolution.ts",
           "packages/cli/src/commands/next/route-resolution/*.ts",
+          "packages/cli/src/commands/task-direction.ts",
           "tests/cli/next-route-resolution-latency.test.ts"
         ],
-        "digest": "sha256:effeabe7431c04c34e3de9444f6062a700b0da0101d67b9c910625e036d0f232"
+        "digest": "sha256:8839fccc55136f4c83962f7ba4367b4d25a818ea32920a275982a59bb9a10263"
       },
       {
         "kind": "lifecycle-operation",
@@ -283,7 +291,7 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260914192121-codex-gpt-5.4-mini-TASK-PRF-0105-9e29e16233",
+  "startedBySessionId": "session-20260915004154-codex-gpt-5.4-mini-TASK-PRF-0105-2ebd7be489",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -300,21 +308,29 @@
       "packages/cli/src/commands/next/route-predicates.ts",
       "packages/cli/src/commands/next/route-resolution.ts",
       "packages/cli/src/commands/next/route-resolution/*.ts",
+      "packages/cli/src/commands/task-direction.ts",
       "tests/cli/next-route-resolution-latency.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0105-optimize-highest-cumulative-route-resolution-latency-hotspot.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0105-optimize-highest-cumulative-route-resolution-latency-hotspot.task.md"
+    ],
     "allowPlanningMirror": false,
-    "promptHash": "5d3707b9abe5c71566eeff89485fc76cd4e551224f00668aa72b820d7bca8471",
+    "promptHash": "51a5f864681be94d6807907823e0ad8cb53220d4a527c3c24f1fced5496f15a9",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260914192121-codex-gpt-5.4-mini-TASK-PRF-0105-9e29e16233",
+    "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20260914192121-codex-gpt-5.4-mini-d64e8ebd97",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914192121-codex-gpt-5.4-mini-d64e8ebd97\""
+      "laneSessionId": "lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c\""
     },
-    "createdAt": "2026-09-14T19:21:23.001Z",
+    "createdAt": "2026-09-15T00:41:57.070Z",
     "status": "active"
   }
 }
