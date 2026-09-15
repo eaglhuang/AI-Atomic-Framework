@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-15T07-55-51-518Z-close-1071ca066b9a",
+  "taskId": "TASK-PRF-0101",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260915075034-codex-gpt-5.4-mini-TASK-PRF-0101-da2a2a1c4c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0101.json",
+  "taskSha256": "sha256:3423430826a49c96a1336da167edd7dc74a83eee9c6215a76ca9a019acdb6b9c",
+  "createdAt": "2026-09-15T07:55:51.518Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0101 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-cedb634c5643 --historical-delivery 0f24213f698921c27f646edca8b24e5950215e55 --historical-delivery 1943539d02c49c752113c5c05b4f1c00ac589a7b --historical-delivery 85962ade2fa4202c1e7a967dfc8cb93e5168acb7 --historical-delivery 8b6d2d8d564952496306aa35effec4c4c541b34b --historical-delivery b1de0bf94ff66d130220717f2550e2c704bbc450",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-cedb634c5643",
+    "sessionId": "session-20260915075034-codex-gpt-5.4-mini-TASK-PRF-0101-da2a2a1c4c",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0101.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+      "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+      "node --strip-types tests/cli/next-warm-run-latency-measurement.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+      "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+      "node --strip-types tests/cli/next-warm-run-latency-measurement.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-15T07:55:51.501Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0101.*",
+        ".atm/history/task-events/TASK-PRF-0101/**",
+        ".atm/history/tasks/TASK-PRF-0101.json",
+        "docs/reports/atm-command-gate-latency-score.md",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/observation.ts",
+        "scripts/plan-performance-report-v4.ts",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/command-gate-latency-score.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/observation.ts",
+        "scripts/plan-performance-report-v4.ts",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/command-gate-latency-score.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+        "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+        "node --strip-types tests/cli/next-warm-run-latency-measurement.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

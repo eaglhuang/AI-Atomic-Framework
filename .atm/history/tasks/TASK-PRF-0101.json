@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0101",
   "title": "Integrate millisecond cost score into product proof",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -169,17 +169,17 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T17-50-32-259Z-claim-0924634ac5a3",
-  "lastTransitionAt": "2026-09-14T17:50:32.259Z",
+  "lastTransitionId": "2026-09-15T07-55-51-518Z-close-1071ca066b9a",
+  "lastTransitionAt": "2026-09-15T07:55:51.518Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-09-14T17:50:26.034Z",
-  "promotedAt": "2026-09-14T17:50:26.038Z",
+  "reservedAt": "2026-09-15T07:50:34.431Z",
+  "promotedAt": "2026-09-15T07:50:34.438Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-7d058d1965ab",
-    "claimedAt": "2026-09-14T17:50:26.042Z",
-    "heartbeatAt": "2026-09-14T17:50:26.042Z",
+    "leaseId": "lease-2aa75b48944c",
+    "claimedAt": "2026-09-15T07:50:34.443Z",
+    "heartbeatAt": "2026-09-15T07:55:51.515Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0101.json",
@@ -192,14 +192,14 @@
       "scripts/validate-gate-telemetry-coverage.ts",
       "tests/cli/command-gate-latency-score.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260914175026-codex-gpt-5.4-mini-3f931e4174",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914175026-codex-gpt-5.4-mini-3f931e4174\""
-    }
+      "laneSessionId": "lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-14T17:48:25.318Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -269,15 +269,15 @@
       "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
     }
   },
-  "startedBySessionId": "session-20260914175026-codex-gpt-5.4-mini-TASK-PRF-0101-56cbaecd02",
+  "startedBySessionId": "session-20260915075034-codex-gpt-5.4-mini-TASK-PRF-0101-da2a2a1c4c",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "TASK-PRF-0101",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
+    "batchId": "batch-cedb634c5643",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-bb609c10084121b6",
+    "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/TASK-PRF-0101.*",
       ".atm/history/task-events/TASK-PRF-0101/**",
@@ -294,14 +294,18 @@
     "allowPlanningMirror": false,
     "promptHash": "d8289f990b4b043cf5920d03ad81719c179a58852026a6b71db075b352c7b258",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260914175026-codex-gpt-5.4-mini-TASK-PRF-0101-56cbaecd02",
+    "sessionId": "session-20260915075034-codex-gpt-5.4-mini-TASK-PRF-0101-da2a2a1c4c",
     "laneSession": {
-      "laneSessionId": "lane-20260914175026-codex-gpt-5.4-mini-3f931e4174",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914175026-codex-gpt-5.4-mini-3f931e4174\""
+      "laneSessionId": "lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a\""
     },
-    "createdAt": "2026-09-14T17:50:32.258Z",
+    "createdAt": "2026-09-15T07:50:36.472Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-15T07:55:51.515Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260915075034-codex-gpt-5.4-mini-TASK-PRF-0101-da2a2a1c4c",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0101.closure-packet.json"
 }
