@@ -1,15 +1,17 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0102",
-  "updatedAt": "2026-09-14T18:27:37.736Z",
+  "updatedAt": "2026-09-15T00:18:37.211Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "command-gate-latency-score",
+    "gate-telemetry-observed-chain",
     "mandatory-gate-telemetry",
     "node --strip-types tests/cli/command-gate-latency-score.test.ts",
     "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
     "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
-    "typecheck"
+    "typecheck",
+    "validate:gate-telemetry-v1"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -107,6 +109,142 @@
       "durationMs": 1823,
       "runnerKind": "dev-source",
       "sourceCommit": "85962ade2fa4202c1e7a967dfc8cb93e5168acb7",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:af4bef562cb152f26d5a7310a6f7c8f4b72e725a5e1b63d60ed0e8ac64bbfbef",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "mandatory-gate-telemetry"
+      ],
+      "generatedAt": "2026-09-14T22:59:30.696Z",
+      "startedAt": "2026-09-14T22:59:28.504Z",
+      "finishedAt": "2026-09-14T22:59:30.696Z",
+      "durationMs": 2192,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "417ab04cc22cd3c3b590fe97ec01b8a1f0fb8fc9",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c4f049e142e29773683c3d848da98a9acae290812505cea62e3170e0b497c574",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "gate-telemetry-observed-chain"
+      ],
+      "generatedAt": "2026-09-14T22:59:55.234Z",
+      "startedAt": "2026-09-14T22:59:51.268Z",
+      "finishedAt": "2026-09-14T22:59:55.234Z",
+      "durationMs": 3966,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "417ab04cc22cd3c3b590fe97ec01b8a1f0fb8fc9",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b4f74faa4576a8a1d06c4481fca16ab5537578dff7c9d225b5bc4bc4a6d3ffb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-14T23:00:12.772Z",
+      "startedAt": "2026-09-14T23:00:03.341Z",
+      "finishedAt": "2026-09-14T23:00:12.772Z",
+      "durationMs": 9431,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "417ab04cc22cd3c3b590fe97ec01b8a1f0fb8fc9",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:af4bef562cb152f26d5a7310a6f7c8f4b72e725a5e1b63d60ed0e8ac64bbfbef",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts"
+      ],
+      "generatedAt": "2026-09-15T00:01:31.162Z",
+      "startedAt": "2026-09-15T00:01:29.226Z",
+      "finishedAt": "2026-09-15T00:01:31.162Z",
+      "durationMs": 1936,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3b7e541f04172b7f9f60675cf9e0769250af0e3e",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-15T00:01:44.286Z",
+      "startedAt": "2026-09-15T00:01:33.949Z",
+      "finishedAt": "2026-09-15T00:01:44.286Z",
+      "durationMs": 10337,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3b7e541f04172b7f9f60675cf9e0769250af0e3e",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b4f74faa4576a8a1d06c4481fca16ab5537578dff7c9d225b5bc4bc4a6d3ffb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-15T00:01:56.038Z",
+      "startedAt": "2026-09-15T00:01:47.016Z",
+      "finishedAt": "2026-09-15T00:01:56.038Z",
+      "durationMs": 9022,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3b7e541f04172b7f9f60675cf9e0769250af0e3e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae3fb3d729be92f3d724e5c0a94061ace8eb5bf084e6634456f4c52b96051340",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-15T00:14:42.724Z",
+      "startedAt": "2026-09-15T00:14:42.441Z",
+      "finishedAt": "2026-09-15T00:14:42.724Z",
+      "durationMs": 283,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3b7e541f04172b7f9f60675cf9e0769250af0e3e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/tasks-claim-auto-intent.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9968c1be9108fcf267214522bffbf9dc9f99855822afc868754b4e22f81e9eb4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-15T00:18:08.072Z",
+      "startedAt": "2026-09-15T00:17:45.827Z",
+      "finishedAt": "2026-09-15T00:18:08.072Z",
+      "durationMs": 22245,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3b7e541f04172b7f9f60675cf9e0769250af0e3e",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:gate-telemetry-v1",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:801d3f6afcd61622182bce52e282aa139b069b149a56ae7ace7a77b103987f7c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:gate-telemetry-v1"
+      ],
+      "generatedAt": "2026-09-15T00:18:37.210Z",
+      "startedAt": "2026-09-15T00:18:30.560Z",
+      "finishedAt": "2026-09-15T00:18:37.210Z",
+      "durationMs": 6650,
+      "runnerKind": "dev-source",
+      "sourceCommit": "3b7e541f04172b7f9f60675cf9e0769250af0e3e",
       "cached": false
     }
   ],

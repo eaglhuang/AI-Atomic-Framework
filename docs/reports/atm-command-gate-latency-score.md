@@ -231,3 +231,73 @@ The first harness revision used Windows shell invocation for Node and produced
 all-failure measurements; it was discarded as harness-invalid evidence. The
 final receipt uses direct Node process spawning and records zero failures. No
 broker, lock, or multi-AI ownership behavior changed.
+
+### Fresh local-tarball rerun (2026-09-15)
+
+The same harness was rerun against the current candidate source and frozen
+baseline. It contains 30 interleaved AB/BA samples and 8 candidate A/A
+controls; bootstrap, chart render, and chart verify passed in every sample.
+
+- baseline chart render: p50 **879.239 ms**, p95 **897.402 ms**;
+- candidate chart render: p50 **134.895 ms**, p95 **140.679 ms**;
+- baseline chart verify: p50 **882.900 ms**, p95 **909.982 ms**;
+- candidate chart verify: p50 **135.782 ms**, p95 **146.837 ms**;
+- candidate A/A: render p50 **134.832 ms**, verify p50 **137.761 ms**;
+- candidate tarball: **2,652,423 unpacked bytes / 66 entries**, versus the
+  registry baseline **3,357,358 / 78** (about **21.0% / 15.4%** lower).
+
+The receipt is still local-tarball evidence and does not authorize publishing:
+`C:\Users\User\atm-benchmark-sink\TASK-PRF-0107\chart-runtime-paired-receipt.json`
+(`sha256:f80b0317bd3bacb65d5771615480bc427a44bc0d5a84043dbb876bea2c4cf026`).
+The candidate tarball digest is
+`sha256:48818feaa42e80f7e2b12aef371abacc63cf1da0a832ca70d4d050eda5bc9298`.
+The registry proof remains blocked until a new version is published and the
+same clean-install matrix passes from npm.
+
+### Sealed package-build admission (2026-09-15)
+
+The declared `build:packages -- --packages cli` validator reached the isolated
+sealed build, then stopped at publication because 11 pre-existing foreign
+generated outputs were retained. The failure is therefore a real workspace
+coordination blocker, not a TypeScript or package-content failure. The runner
+receipt measured **39,715 ms** total elapsed and **11,590 ms** for the dominant
+`typescriptBuild` phase (single run; not an optimization claim).
+
+- broker ticket: `runner-sync-4611ea2b:417ab04cc22cd3c3b590fe97ec01b8a1f0fb8fc9`;
+- disposition: `recovery-retained`;
+- retained outputs: `packages/cli/dist/**` generated files, including the npm
+  runtime manifest and runtime bundle;
+- receipt: `.atm/history/evidence/TASK-PRF-0107.runner-sync-receipt.json`
+  (`sha256:048483452d7c784c9940770633a2dcc0a29ab0e3667ab5df0bc2b03f28f5b543`).
+
+This is now a high-value latency target: before changing the build, collect
+repeated phase timings and separate unavoidable TypeScript work from the
+coordination wait. Do not overwrite the foreign generated outputs merely to
+turn this validator green.
+
+### Current mandatory-gate ranking (2026-09-15)
+
+The existing telemetry command was rerun with runtime history included
+(`eventCount=995`, coverage **8/8**, no dropped or malformed events). The
+frequency-weighted ranking now gives a concrete optimization order:
+
+| rank | mandatory gate | samples | p50 / p95 ms | cumulative wait ms |
+|---:|---|---:|---:|---:|
+| 1 | `next.route-resolution` | 872 | 307 / 1,518 | 427,296 |
+| 2 | `doctor.readiness` | 53 | 3,601 / 4,107 | 193,711 |
+| 3 | `guard.framework-mode` | 3 | 0 / 0.9 | 1 |
+
+The mandatory-task waiting score is **313.5 ms p50 / 3,462 ms p95**. Although
+`doctor` has the higher per-run latency, `next` currently dominates total user
+wait because it is exercised far more often. Therefore the next optimization
+experiment should target `next.route-resolution` first, while a separate
+doctor experiment should address its 3.6-second median. Both experiments must
+retain the same route semantics and report AB/BA plus A/A timing evidence.
+
+Non-mandatory close readiness is also expensive (`14,456 ms p50`, `31,290 ms
+p95`, 157,427 ms cumulative), but it should not be optimized ahead of the two
+mandatory gates unless task-level frequency or makespan data shows it is the
+actual dominant path for adopters.
+
+Telemetry receipt: `C:\Users\User\atm-benchmark-sink\TASK-PRF-0107\telemetry-report-20260915.json`
+(`sha256:d76763a652180d003c379d4907ce90772482f492cebcc69b6ebabb6dab7165c2`).

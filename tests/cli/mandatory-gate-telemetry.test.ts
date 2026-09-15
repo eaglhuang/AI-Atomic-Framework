@@ -2,8 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { recordCommandGateTelemetry } from '../../packages/cli/src/atm.ts';
-import { runCli } from '../../packages/cli/src/atm.ts';
+import { recordCommandGateTelemetry, runCli } from '../../packages/cli/src/atm.ts';
 
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-mandatory-gate-'));
 try {
