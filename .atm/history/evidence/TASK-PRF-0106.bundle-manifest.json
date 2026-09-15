@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0106",
-  "updatedAt": "2026-09-14T19:45:25.996Z",
+  "updatedAt": "2026-09-15T01:09:48.976Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "node --strip-types tests/cli/governance-readiness-git-status.test.ts",
@@ -39,6 +39,38 @@
       "durationMs": 9102,
       "runnerKind": "dev-source",
       "sourceCommit": "01c408259daf05350c924861149d22da43e27d1d",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/governance-readiness-git-status.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:615561d032c8e8a35d813842d2abd6eeadbc4eca1a94f14b55b83754f8ca86ca",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/governance-readiness-git-status.test.ts"
+      ],
+      "generatedAt": "2026-09-15T01:09:37.688Z",
+      "startedAt": "2026-09-15T01:09:37.257Z",
+      "finishedAt": "2026-09-15T01:09:37.688Z",
+      "durationMs": 431,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "29887ac6efc05d285c8122b86cc21f4f3ef33897",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b4f74faa4576a8a1d06c4481fca16ab5537578dff7c9d225b5bc4bc4a6d3ffb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck -- --pretty false"
+      ],
+      "generatedAt": "2026-09-15T01:09:48.975Z",
+      "startedAt": "2026-09-15T01:09:39.817Z",
+      "finishedAt": "2026-09-15T01:09:48.975Z",
+      "durationMs": 9158,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "29887ac6efc05d285c8122b86cc21f4f3ef33897",
       "cached": false
     }
   ],
