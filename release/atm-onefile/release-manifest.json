@@ -2,11 +2,11 @@
   "schemaVersion": "atm.onefileRelease.v0.2",
   "generatedAt": "1970-01-01T00:00:00.000Z",
   "entrypoint": "atm.mjs",
-  "payloadSha256": "26e10d3d3b275fa7a61a4cb9718c45bd9e6f5050ae8a8bc27ae0aa75a4325529",
-  "payloadInputManifestHash": "sha256:434529a6e5a3339dece7a0f609ad31be86bf0efc31d2184aee772892981b20d4",
+  "payloadSha256": "ca7040648d36233ea5f4dd84684c67e60c0bf4323b571e995b2d2638498ed429",
+  "payloadInputManifestHash": "sha256:4231327a9123f543df517d2f46ea816eb94bbce3e60a67f678dcf8526b106368",
   "payloadReuse": false,
   "sourceRoot": "release/atm-root-drop",
-  "fileCount": 1487,
+  "fileCount": 1488,
   "generatedFiles": [
     "release/atm-onefile/README.onefile.md",
     "release/atm-onefile/atm.mjs",
@@ -24,35 +24,5 @@
     "contractSurface": "release-manifest.json",
     "dependsOnRootDropManifest": "release/atm-root-drop/release-manifest.json",
     "rationale": "release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list."
-  },
-  "buildInputsTreeHash": "sha256:0212e781c637e08ccaa5621079147556d9036d2919b6c941c3f57cc71cffa750",
-  "sealedSourceCommit": "192d3587a91a6b40fec0c91c0ca248acc7826248",
-  "buildDecision": "cacheHitSkip",
-  "buildDecisionReason": "build input tree hash matches release manifests",
-  "incrementalPlanDigest": null,
-  "tsBuildCacheDigest": null,
-  "rawTelemetryPolicy": "gitignored-runtime-only",
-  "phaseTimingsMs": {
-    "inputHashCalculation": 45,
-    "skipDecision": 70,
-    "worktreeSetup": 0,
-    "typescriptBuild": 0,
-    "rootDropReleaseAssembly": 0,
-    "onefileReleaseAssembly": 0,
-    "artifactSync": 0,
-    "cleanup": 0,
-    "totalElapsed": 31691
-  },
-  "dominantPhaseSummary": {
-    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "skipDecision",
-    "dominantPhaseMs": 70,
-    "totalElapsedMs": 31691,
-    "dominanceRatio": 0.0022,
-    "phaseMedianMs": 0,
-    "phaseP95Ms": 70,
-    "measuredPhaseCount": 8,
-    "optimizationVerdict": "inconclusive",
-    "basis": "single-run"
   }
 }

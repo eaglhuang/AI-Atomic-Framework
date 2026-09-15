@@ -1,6 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
@@ -22,6 +22,14 @@ type PackMetadata = {
   size?: number;
   unpackedSize?: number;
   files?: Array<{ path?: string; size?: number }>;
+};
+
+type DependencyFootprint = {
+  nodeModulesBytes: number;
+  nodeModulesFiles: number;
+  nodeModulesEntries: number;
+  packageJsonCount: number;
+  semantics: string;
 };
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -152,6 +160,36 @@ function percentile(values: readonly number[], percentileValue: number): number 
   return (sorted[lower] ?? 0) + ((sorted[upper] ?? 0) - (sorted[lower] ?? 0)) * (index - lower);
 }
 
+function measureDependencyFootprint(consumer: string): DependencyFootprint {
+  const nodeModules = path.join(consumer, 'node_modules');
+  let nodeModulesBytes = 0;
+  let nodeModulesFiles = 0;
+  let nodeModulesEntries = 0;
+  let packageJsonCount = 0;
+  const visit = (directory: string): void => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const entryPath = path.join(directory, entry.name);
+      nodeModulesEntries += 1;
+      if (entry.isDirectory()) {
+        visit(entryPath);
+        continue;
+      }
+      const size = lstatSync(entryPath).size;
+      nodeModulesBytes += size;
+      nodeModulesFiles += 1;
+      if (entry.name === 'package.json') packageJsonCount += 1;
+    }
+  };
+  visit(nodeModules);
+  return {
+    nodeModulesBytes,
+    nodeModulesFiles,
+    nodeModulesEntries,
+    packageJsonCount,
+    semantics: 'sum of lstat file bytes under consumer/node_modules; directories excluded and symlinks counted as lstat entries'
+  };
+}
+
 function packCandidate(args: Args, packRoot: string): { metadata: PackMetadata; tarball: string; source: string } {
   mkdirSync(packRoot, { recursive: true });
   if (args.candidateTarball) {
@@ -193,13 +231,14 @@ function coreWorkflowFailures(smoke: Record<string, SmokeResult>): string[] {
   return coreWorkflowCommandNames.filter((name) => smoke[name]?.exitCode !== 0);
 }
 
-function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs: number; smoke: Record<string, SmokeResult>; bin: string } {
+function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs: number; smoke: Record<string, SmokeResult>; bin: string; dependencyFootprint: DependencyFootprint } {
   const consumer = path.join(tempRoot, 'consumer');
   const workflow = path.join(consumer, 'workflow');
   mkdirSync(workflow, { recursive: true });
   const installStart = performance.now();
   runNpm(['install', '--ignore-scripts', '--prefix', consumer, tarball], tempRoot);
   const installMs = performance.now() - installStart;
+  const dependencyFootprint = measureDependencyFootprint(consumer);
   const bin = process.platform === 'win32'
     ? path.join(consumer, 'node_modules', '.bin', 'atm.cmd')
     : path.join(consumer, 'node_modules', '.bin', 'atm');
@@ -242,7 +281,7 @@ function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs:
       outputSha256: createHash('sha256').update(combined).digest('hex')
     };
   }
-  return { installMs, smoke, bin };
+  return { installMs, smoke, bin, dependencyFootprint };
 }
 
 function writeProof(args: Args, proof: Record<string, unknown>): void {
@@ -277,6 +316,7 @@ try {
     entryCount: files.length,
     files: files.map((entry) => ({ path: entry.path ?? '', size: entry.size ?? null })),
     installMs: smokeRun.installMs,
+    dependencyFootprint: smokeRun.dependencyFootprint,
     smoke: smokeRun.smoke
   };
   const proof: Record<string, unknown> = {
