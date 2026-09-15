@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0098",
   "title": "Simplify evidence ownership while preserving deviation traceability",
-  "status": "open",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -23,7 +23,10 @@
     "packages/cli/src/commands/evidence",
     "tests/cli/runtime-evidence-git-boundary.test.ts",
     "tests/cli/evidence-ledger-migration.test.ts",
-    "docs/reports/evidence-ledger-boundary-baseline.md"
+    "docs/reports/evidence-ledger-boundary-baseline.md",
+    ".atm/history/evidence/TASK-PRF-0098.*",
+    ".atm/history/task-events/TASK-PRF-0098/**",
+    ".atm/history/tasks/TASK-PRF-0098.json"
   ],
   "validators": [
     "node --strip-types tests/cli/runtime-evidence-git-boundary.test.ts",
@@ -146,19 +149,21 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T16-10-41-267Z-release-3a372bcfd0f8",
-  "lastTransitionAt": "2026-09-14T16:10:41.267Z",
+  "lastTransitionId": "2026-09-15T03-22-22-138Z-close-fbba5554d43f",
+  "lastTransitionAt": "2026-09-15T03:22:22.138Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-product-proof",
-  "reservedAt": "2026-09-14T15:59:13.077Z",
-  "promotedAt": "2026-09-14T15:59:13.081Z",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-15T03:17:24.428Z",
+  "promotedAt": "2026-09-15T03:17:24.432Z",
   "claim": {
-    "actorId": "codex-product-proof",
-    "leaseId": "lease-ae74f16eb527",
-    "claimedAt": "2026-09-14T15:59:13.086Z",
-    "heartbeatAt": "2026-09-14T16:10:39.158Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-833fec77c9e0",
+    "claimedAt": "2026-09-15T03:17:24.436Z",
+    "heartbeatAt": "2026-09-15T03:22:22.135Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-PRF-0098.*",
+      ".atm/history/task-events/TASK-PRF-0098/**",
       ".atm/history/tasks/TASK-PRF-0098.json",
       "docs/reports/evidence-ledger-boundary-baseline.md",
       "packages/cli/src/commands/evidence",
@@ -169,24 +174,24 @@
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260914155913-codex-product-proof-1f70ac2d30",
+      "laneSessionId": "lane-20260915024137-codex-gpt-5.4-mini-3a604ceae6",
       "status": "adopted",
-      "source": "option",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914155913-codex-product-proof-1f70ac2d30\""
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915024137-codex-gpt-5.4-mini-3a604ceae6\""
     },
-    "reason": "Release implementation claim after safe helper reduction; storage-layer deletion stopped by replay/tamper stop rule and lifecycle blocker requires runner sync or owner emergency approval."
+    "reason": "Historical delivery commits contain the declared evidence-boundary files plus predecessor governance/source companions; accept only the task-matched files and retain all unrelated provenance unchanged."
   },
   "startedAt": "2026-09-14T15:59:13.086Z",
   "startedByActor": "codex-product-proof",
-  "startedBySessionId": "session-20260914155913-codex-product-proof-TASK-PRF-0098-1a5223854c",
+  "startedBySessionId": "session-20260915031724-codex-gpt-5.4-mini-TASK-PRF-0098-62bb37f0a6",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "TASK-PRF-0098",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
+    "batchId": "batch-cedb634c5643",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-3a9f5d1007962d5c",
+    "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/TASK-PRF-0098.*",
       ".atm/history/task-events/TASK-PRF-0098/**",
@@ -201,35 +206,35 @@
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
-    "promptHash": "de79355f16927d583e524b3d5f2ba2b1f7daad1a6c57c40b0533eebb595e39d8",
-    "actorId": "codex-product-proof",
-    "sessionId": "session-20260914155913-codex-product-proof-TASK-PRF-0098-1a5223854c",
+    "promptHash": "d8289f990b4b043cf5920d03ad81719c179a58852026a6b71db075b352c7b258",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20260914155913-codex-product-proof-1f70ac2d30",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914155913-codex-product-proof-1f70ac2d30\""
+      "laneSessionId": "lane-20260915024137-codex-gpt-5.4-mini-3a604ceae6",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915024137-codex-gpt-5.4-mini-3a604ceae6\""
     },
-    "createdAt": "2026-09-14T15:59:15.636Z",
+    "createdAt": "2026-09-15T03:17:31.771Z",
     "status": "active"
   },
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-c25b00697537e731",
-    "ticketDigest": "sha256:c25b00697537e731ddcbd2866c6b6ac62c32fb45f4ca147cc10b7de0300ecd8a",
+    "ticketId": "wat-22bf3aa2825c8c6d",
+    "ticketDigest": "sha256:22bf3aa2825c8c6df4836fc6962afe3ec24a0cb283d9ab526e2aa3569ea5ea3a",
     "taskId": "TASK-PRF-0098",
     "origin": "claim",
-    "actorId": "codex-product-proof",
-    "laneSessionId": "lane-20260914155913-codex-product-proof-1f70ac2d30",
-    "claimGeneration": "lease-ae74f16eb527",
-    "issuedAt": "2026-09-14T15:59:47.160Z",
-    "expiresAt": "2026-09-14T16:29:47.160Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260915024137-codex-gpt-5.4-mini-3a604ceae6",
+    "claimGeneration": "lease-833fec77c9e0",
+    "issuedAt": "2026-09-15T03:19:32.881Z",
+    "expiresAt": "2026-09-15T03:49:32.881Z",
     "scopeDigest": "sha256:0a7a2cade4b39df8053972af052c766b971f024cd43c6018f07fe0604c666d2a",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-14T15:59:47.160Z"
+      "selectedAt": "2026-09-15T03:19:32.881Z"
     },
     "grants": [
       {
@@ -278,5 +283,10 @@
       "tempRoot": ".atm/runtime/work-admission-temp",
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
-  }
+  },
+  "closedAt": "2026-09-15T03:22:22.135Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260915031724-codex-gpt-5.4-mini-TASK-PRF-0098-62bb37f0a6",
+  "closeReason": "Historical delivery commits contain the declared evidence-boundary files plus predecessor governance/source companions; accept only the task-matched files and retain all unrelated provenance unchanged.",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0098.closure-packet.json"
 }
