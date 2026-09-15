@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-15T00-54-53-547Z-close-b169360ba10f",
+  "taskId": "TASK-PRF-0105",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260915004154-codex-gpt-5.4-mini-TASK-PRF-0105-2ebd7be489",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0105.json",
+  "taskSha256": "sha256:15f5aa26207c432b4586e274eff2677d59fc6515121be1b29dde4b7ca46954fc",
+  "createdAt": "2026-09-15T00:54:53.547Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0105 --actor codex-gpt-5.4-mini --status done --historical-delivery 32219a899942a402c4f29fd021f6f749481e36f9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260915004154-codex-gpt-5.4-mini-TASK-PRF-0105-2ebd7be489",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0105.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts",
+      "node --strip-types tests/cli/next-route-resolution-latency.test.ts",
+      "typecheck -- --pretty false"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts",
+      "node --strip-types tests/cli/next-route-resolution-latency.test.ts",
+      "typecheck -- --pretty false"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-15T00:54:53.538Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0105.*",
+        ".atm/history/task-events/TASK-PRF-0105/**",
+        ".atm/history/tasks/TASK-PRF-0105.json",
+        "docs/reports/atm-command-gate-latency-score.md",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/next/route-resolution.ts",
+        "packages/cli/src/commands/next/route-resolution/*.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "tests/cli/next-route-resolution-latency.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/next/route-resolution.ts",
+        "packages/cli/src/commands/next/route-resolution/*.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "tests/cli/next-route-resolution-latency.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts",
+        "node --strip-types tests/cli/next-route-resolution-latency.test.ts",
+        "typecheck -- --pretty false"
+      ]
+    }
+  }
+}
