@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0099",
   "title": "Deliver bounded quickfix workflow with fewer operator decisions",
-  "status": "open",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -139,58 +139,49 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T16-21-43-392Z-release-685c4e796bcb",
-  "lastTransitionAt": "2026-09-14T16:21:43.392Z",
+  "lastTransitionId": "2026-09-15T07-46-22-911Z-close-b1e0e53e59b4",
+  "lastTransitionAt": "2026-09-15T07:46:22.911Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-product-proof",
-  "reservedAt": "2026-09-14T16:12:07.479Z",
-  "promotedAt": "2026-09-14T16:12:07.483Z",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-15T07:41:55.663Z",
+  "promotedAt": "2026-09-15T07:41:55.667Z",
   "claim": {
-    "actorId": "codex-product-proof",
-    "leaseId": "lease-5c14af24aec8",
-    "claimedAt": "2026-09-14T16:12:07.488Z",
-    "heartbeatAt": "2026-09-14T16:21:37.987Z",
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-b8879e2cec12",
+    "claimedAt": "2026-09-15T07:42:50.101Z",
+    "heartbeatAt": "2026-09-15T07:46:22.908Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/evidence/TASK-PRF-0099.*",
-      ".atm/history/task-events/TASK-PRF-0099/**",
-      ".atm/history/tasks/TASK-PRF-0099.json",
-      "docs/reports/atm-quickfix-convergence.md",
-      "packages/cli/src/commands/framework-development",
-      "packages/cli/src/commands/framework-development.ts",
-      "packages/cli/src/commands/next/channel-playbook.ts",
-      "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
-      "templates/skills/atm-framework-temp-claim.skill.md",
-      "tests/cli/quickfix-operator-convergence.test.ts"
+      ".atm/history/tasks/TASK-PRF-0099.json"
     ],
     "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260914161207-codex-product-proof-76e84cb4da",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914161207-codex-product-proof-76e84cb4da\""
+      "laneSessionId": "lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a\""
     },
-    "reason": "Delivery commit 280f0ab is complete and validated; formal close deferred because frozen runner sync requires a separate steward lane."
+    "reason": "closed"
   },
   "startedAt": "2026-09-14T16:12:07.488Z",
   "startedByActor": "codex-product-proof",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-2e71c514c6a4b615",
-    "ticketDigest": "sha256:2e71c514c6a4b6154fe0cba37cebf145aa4d609fa8f7d49fa0118b74d7df1163",
+    "ticketId": "wat-3ceca11a4f4ced25",
+    "ticketDigest": "sha256:3ceca11a4f4ced25d10d89017afe8ee65f2d5c301d85dffb36d9de270afd44ce",
     "taskId": "TASK-PRF-0099",
     "origin": "claim",
-    "actorId": "codex-product-proof",
-    "laneSessionId": "lane-20260914161207-codex-product-proof-76e84cb4da",
-    "claimGeneration": "lease-5c14af24aec8",
-    "issuedAt": "2026-09-14T16:19:41.492Z",
-    "expiresAt": "2026-09-14T16:49:41.492Z",
-    "scopeDigest": "sha256:42da18be71b70540ebc7f96df52d8422ee6fd80bb1ebd08cec0ad23405d1ee3e",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a",
+    "claimGeneration": "lease-b8879e2cec12",
+    "issuedAt": "2026-09-15T07:42:50.101Z",
+    "expiresAt": "2026-09-15T08:12:50.101Z",
+    "scopeDigest": "sha256:02dafd34cf6da1519f53f4d59f03cde83712080edbff0bc9aeab6e304dcb8990",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-14T16:19:41.492Z"
+      "selectedAt": "2026-09-15T07:42:50.101Z"
     },
     "grants": [
       {
@@ -198,16 +189,9 @@
         "values": [
           ".atm/history/evidence/TASK-PRF-0099.*",
           ".atm/history/task-events/TASK-PRF-0099/**",
-          ".atm/history/tasks/TASK-PRF-0099.json",
-          "docs/reports/atm-quickfix-convergence.md",
-          "packages/cli/src/commands/framework-development",
-          "packages/cli/src/commands/framework-development.ts",
-          "packages/cli/src/commands/next/channel-playbook.ts",
-          "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
-          "templates/skills/atm-framework-temp-claim.skill.md",
-          "tests/cli/quickfix-operator-convergence.test.ts"
+          ".atm/history/tasks/TASK-PRF-0099.json"
         ],
-        "digest": "sha256:a8903f4953e2463e24449651c515458f09c68716eb4c5ab31b2161566f21554f"
+        "digest": "sha256:e2391f727cb1c543ac13f39cfd68e7e74cbefdcdb3200d1e6be54655319717ed"
       },
       {
         "kind": "lifecycle-operation",
@@ -241,47 +225,37 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260914161207-codex-product-proof-TASK-PRF-0099-e94358508c",
+  "startedBySessionId": "session-20260915074250-codex-gpt-5.4-mini-TASK-PRF-0099-efb90b1f92",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "TASK-PRF-0099",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
+    "batchId": "batch-cedb634c5643",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-3e33a2ca202d2a87",
+    "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/TASK-PRF-0099.*",
       ".atm/history/task-events/TASK-PRF-0099/**",
-      ".atm/history/tasks/TASK-PRF-0099.json",
-      "docs/reports/atm-quickfix-convergence.md",
-      "packages/cli/src/commands/framework-development",
-      "packages/cli/src/commands/framework-development.ts",
-      "packages/cli/src/commands/next/channel-playbook.ts",
-      "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
-      "templates/skills/atm-framework-temp-claim.skill.md",
-      "tests/cli/quickfix-operator-convergence.test.ts"
+      ".atm/history/tasks/TASK-PRF-0099.json"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0099-deliver-bounded-quickfix-workflow-with-fewer-operator-decisions.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/atm-product-proof/",
-      "docs/ai_atomic_framework/atm-product-proof/tasks/",
-      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0099-deliver-bounded-quickfix-workflow-with-fewer-operator-decisions.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
-    "promptHash": "3599774a4e383b1bda695e135ef3140148fce776157e6b90f6975536e3c76e9e",
-    "actorId": "codex-product-proof",
-    "sessionId": null,
+    "promptHash": "cbf9273a059537c18ea18e45e5dd4020559cc3f4add83efddbc7504cb795b747",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20260915074250-codex-gpt-5.4-mini-TASK-PRF-0099-efb90b1f92",
     "laneSession": {
-      "laneSessionId": "lane-20260914161207-codex-product-proof-76e84cb4da",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914161207-codex-product-proof-76e84cb4da\""
+      "laneSessionId": "lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915074155-codex-gpt-5.4-mini-b22d912c9a\""
     },
-    "createdAt": "2026-09-14T16:12:13.443Z",
+    "createdAt": "2026-09-15T07:42:55.227Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-15T07:46:22.908Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260915074250-codex-gpt-5.4-mini-TASK-PRF-0099-efb90b1f92",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0099.closure-packet.json"
 }

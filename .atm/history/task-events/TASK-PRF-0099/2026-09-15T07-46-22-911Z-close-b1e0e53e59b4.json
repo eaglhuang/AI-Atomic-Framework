@@ -1,0 +1,48 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-15T07-46-22-911Z-close-b1e0e53e59b4",
+  "taskId": "TASK-PRF-0099",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260915074250-codex-gpt-5.4-mini-TASK-PRF-0099-efb90b1f92",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0099.json",
+  "taskSha256": "sha256:b56b2df0c388af90328d4c150cf83d0c4104335d0ffdea0c4d95b1cbeb841d03",
+  "createdAt": "2026-09-15T07:46:22.911Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0099 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-cedb634c5643",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-cedb634c5643",
+    "sessionId": "session-20260915074250-codex-gpt-5.4-mini-TASK-PRF-0099-efb90b1f92",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0099.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/quickfix-operator-convergence.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/quickfix-operator-convergence.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-15T07:46:22.897Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0099.*",
+        ".atm/history/task-events/TASK-PRF-0099/**",
+        ".atm/history/tasks/TASK-PRF-0099.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "node --strip-types tests/cli/quickfix-operator-convergence.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
