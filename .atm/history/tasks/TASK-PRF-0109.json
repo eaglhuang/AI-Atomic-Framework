@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0109",
   "title": "Defer full framework status from normal next guidance",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -186,20 +186,20 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T23-56-34-790Z-renew-1054b06cb330",
-  "lastTransitionAt": "2026-09-14T23:56:34.790Z",
+  "lastTransitionId": "2026-09-15T01-06-50-394Z-close-362ddf622b26",
+  "lastTransitionAt": "2026-09-15T01:06:50.394Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-09-14T23:24:13.116Z",
   "promotedAt": "2026-09-14T23:24:13.121Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-b060427228d0",
-    "claimedAt": "2026-09-14T23:24:13.126Z",
-    "heartbeatAt": "2026-09-14T23:56:33.770Z",
+    "leaseId": "lease-a8c9321f0105",
+    "claimedAt": "2026-09-15T01:02:52.651Z",
+    "heartbeatAt": "2026-09-15T01:06:50.391Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0109.json",
+      "docs/reports/atm-command-gate-latency-score.md",
       "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
       "packages/cli/src/commands/next/governance-readiness.ts",
       "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
@@ -207,42 +207,43 @@
       "tests/cli/next-governance-readiness-latency.test.ts",
       "tests/cli/next-playbook-projection-contracts.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20260914235633-codex-gpt-5.4-mini-c3bc49c101",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914235633-codex-gpt-5.4-mini-c3bc49c101\""
-    }
+      "laneSessionId": "lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c",
+      "status": "adopted",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-14T23:24:13.126Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-d9e6e72d22bc115d",
-    "ticketDigest": "sha256:d9e6e72d22bc115d2c4dda7046fcf1088c8c8b33964ddcfdceb5095a12c7f5f8",
+    "ticketId": "wat-c29de1691d35f715",
+    "ticketDigest": "sha256:c29de1691d35f7156c617fb871d338b12d764bbc83a8be0235b31085e3f6a225",
     "taskId": "TASK-PRF-0109",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260914235633-codex-gpt-5.4-mini-c3bc49c101",
-    "claimGeneration": "lease-b060427228d0",
-    "issuedAt": "2026-09-14T23:56:33.770Z",
-    "expiresAt": "2026-09-15T00:26:33.770Z",
-    "scopeDigest": "sha256:427772a7b42b2c47bdbc6c0af270a9c7c304d242e67c9b3651b617fd055cfcd3",
+    "laneSessionId": "lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c",
+    "claimGeneration": "lease-a8c9321f0105",
+    "issuedAt": "2026-09-15T01:04:50.562Z",
+    "expiresAt": "2026-09-15T01:34:50.562Z",
+    "scopeDigest": "sha256:93026987beed6a940ebdbb72fa25253daa8e5aa1839e9930c6bd0e8f79d99404",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-14T23:56:33.770Z"
+      "selectedAt": "2026-09-15T01:04:50.562Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0109.*",
-          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0109/**",
           ".atm/history/tasks/TASK-PRF-0109.json",
+          "docs/reports/atm-command-gate-latency-score.md",
           "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
           "packages/cli/src/commands/next/governance-readiness.ts",
           "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
@@ -250,7 +251,7 @@
           "tests/cli/next-governance-readiness-latency.test.ts",
           "tests/cli/next-playbook-projection-contracts.test.ts"
         ],
-        "digest": "sha256:625bc28ba0865059b9cd94d2a67fc2293325172514b34bc9a3aec3bf0bcc332e"
+        "digest": "sha256:1af925a1f257483d58eb2167d93f634c2dd668c1563fb52f69ac0ba40f857c6c"
       },
       {
         "kind": "lifecycle-operation",
@@ -284,7 +285,8 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260914232413-codex-gpt-5.4-mini-TASK-PRF-0109-b54402e6d2",
+  "startedBySessionId": "session-20260915010252-codex-gpt-5.4-mini-TASK-PRF-0109-d0c11d94bf",
+  "owner": "codex-gpt-5.4-mini",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -297,6 +299,7 @@
       ".atm/history/evidence/TASK-PRF-0109.*",
       ".atm/history/task-events/TASK-PRF-0109/**",
       ".atm/history/tasks/TASK-PRF-0109.json",
+      "docs/reports/atm-command-gate-latency-score.md",
       "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
       "packages/cli/src/commands/next/governance-readiness.ts",
       "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
@@ -309,14 +312,18 @@
     "allowPlanningMirror": false,
     "promptHash": "27d4929b564f5e9bee5d5ac70d66e40994e43933f3e6d120c0d659a4607672c7",
     "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260914232413-codex-gpt-5.4-mini-TASK-PRF-0109-b54402e6d2",
+    "sessionId": "session-20260915010252-codex-gpt-5.4-mini-TASK-PRF-0109-d0c11d94bf",
     "laneSession": {
-      "laneSessionId": "lane-20260914232413-codex-gpt-5.4-mini-8cdaeb3a32",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914232413-codex-gpt-5.4-mini-8cdaeb3a32\""
+      "laneSessionId": "lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260915003344-codex-gpt-5.4-mini-2a7de4679c\""
     },
-    "createdAt": "2026-09-14T23:24:15.907Z",
+    "createdAt": "2026-09-15T01:02:54.739Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-15T01:06:50.391Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260915010252-codex-gpt-5.4-mini-TASK-PRF-0109-d0c11d94bf",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0109.closure-packet.json"
 }

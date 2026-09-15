@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0109",
-  "updatedAt": "2026-09-14T23:50:15.759Z",
+  "updatedAt": "2026-09-15T01:04:07.645Z",
   "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
     "next-governance-readiness-latency",
@@ -90,6 +90,54 @@
       "durationMs": 305,
       "runnerKind": "dev-source",
       "sourceCommit": "417ab04cc22cd3c3b590fe97ec01b8a1f0fb8fc9",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/next-governance-readiness-latency.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:059958bdc78cbef8da0162d3287d749f3cf248763c9ebe323016506fea514b1e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/next-governance-readiness-latency.test.ts"
+      ],
+      "generatedAt": "2026-09-15T01:03:57.983Z",
+      "startedAt": "2026-09-15T01:03:57.658Z",
+      "finishedAt": "2026-09-15T01:03:57.983Z",
+      "durationMs": 325,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "6c92fa5f40d0f3e6be5bb4c97910fbe122383f5c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d236f5f48d39d1e3d5f0d97b20140f3a962936e1d18ff77362235b6f1e715970",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts"
+      ],
+      "generatedAt": "2026-09-15T01:04:04.370Z",
+      "startedAt": "2026-09-15T01:04:00.152Z",
+      "finishedAt": "2026-09-15T01:04:04.370Z",
+      "durationMs": 4218,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "6c92fa5f40d0f3e6be5bb4c97910fbe122383f5c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:500d1ed0378f136be6f0da11f7f27c228e7b32ad4fb03f0675fbd1c1efac5f7b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts"
+      ],
+      "generatedAt": "2026-09-15T01:04:07.644Z",
+      "startedAt": "2026-09-15T01:04:06.487Z",
+      "finishedAt": "2026-09-15T01:04:07.644Z",
+      "durationMs": 1157,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "6c92fa5f40d0f3e6be5bb4c97910fbe122383f5c",
       "cached": false
     }
   ],
