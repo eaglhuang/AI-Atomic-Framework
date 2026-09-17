@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-17T16-10-03-313Z-scope-amendment-f1ad82b7e998",
+  "taskId": "TASK-TMP-0028",
+  "action": "scope-amendment",
+  "actorId": "claude-code-opus-5",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TMP-0028.json",
+  "taskSha256": "sha256:f9e42de05e979691734d33210ad3a18fd5be4b7016c0ad2407815b5beb175b1b",
+  "createdAt": "2026-09-17T16:10:03.313Z",
+  "command": "node atm.mjs tasks scope remove --task TASK-TMP-0028 --actor claude-code-opus-5 --remove .atm/history/** --json",
+  "amendmentMetadata": {
+    "amendmentClass": "scope-shrink",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "narrow to exact terminal-task record paths"
+  }
+}

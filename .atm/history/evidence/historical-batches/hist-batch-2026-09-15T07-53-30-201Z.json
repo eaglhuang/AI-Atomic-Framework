@@ -1,0 +1,333 @@
+{
+  "schemaId": "atm.historicalBatchEvidence.v1",
+  "batchId": "hist-batch-2026-09-15T07-53-30-201Z",
+  "createdAt": "2026-09-15T07:53:30.201Z",
+  "producedBy": "codex-gpt-5.4-mini",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+  "deliveryRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "commits": [
+    "0f24213f6",
+    "1943539d0",
+    "85962ade2",
+    "8b6d2d8d5",
+    "b1de0bf94"
+  ],
+  "validators": [
+    "typecheck"
+  ],
+  "validatorRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-15T07:53:39.489Z",
+      "runnerKind": "unknown"
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "TASK-PRF-0101",
+      "ok": true,
+      "coverageStatus": "complete",
+      "okToRecordEvidence": true,
+      "okToCloseTask": false,
+      "diagnosticOnly": true,
+      "declaredDeliverables": [
+        "scripts/plan-performance-report-v4.ts",
+        "packages/core/src/telemetry/observation.ts",
+        "packages/cli/src/commands/telemetry.ts",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/command-gate-latency-score.test.ts",
+        "docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "matchedDeliverables": [
+        "scripts/plan-performance-report-v4.ts",
+        "packages/core/src/telemetry/observation.ts",
+        "packages/cli/src/commands/telemetry.ts",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/command-gate-latency-score.test.ts",
+        "docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "missingCoverage": [],
+      "validatorClaims": [
+        {
+          "gate": "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+          "kind": "taskSpecific",
+          "satisfied": false,
+          "requiredForClose": true
+        },
+        {
+          "gate": "node --strip-types tests/cli/gate-telemetry-observed-chain.test.ts",
+          "kind": "taskSpecific",
+          "satisfied": false,
+          "requiredForClose": true
+        },
+        {
+          "gate": "node --strip-types tests/cli/next-warm-run-latency-measurement.test.ts",
+          "kind": "taskSpecific",
+          "satisfied": false,
+          "requiredForClose": true
+        },
+        {
+          "gate": "typecheck",
+          "kind": "taskSpecific",
+          "satisfied": true,
+          "requiredForClose": true
+        }
+      ],
+      "atomHealthClaims": [
+        {
+          "atomOrMapId": "atm.telemetry-observation-map",
+          "kind": "owner",
+          "generatedByTask": true,
+          "validatorHealthy": false
+        }
+      ],
+      "matchedCommits": [
+        "0f24213f698921c27f646edca8b24e5950215e55",
+        "1943539d02c49c752113c5c05b4f1c00ac589a7b",
+        "85962ade2fa4202c1e7a967dfc8cb93e5168acb7",
+        "8b6d2d8d564952496306aa35effec4c4c541b34b",
+        "b1de0bf94ff66d130220717f2550e2c704bbc450"
+      ],
+      "matchedFiles": [
+        "docs/reports/atm-command-gate-latency-score.md",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/observation.ts",
+        "scripts/plan-performance-report-v4.ts",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/command-gate-latency-score.test.ts"
+      ],
+      "outOfScopeFiles": [
+        "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+        "packages/cli/src/commands/evidence/command-runs.ts",
+        "packages/cli/src/commands/evidence/shared-utils.ts",
+        "packages/core/src/telemetry/index.ts",
+        "scripts/validate-telemetry-observation-interface.ts",
+        "tests/cli/gate-telemetry-coverage-repair.test.ts",
+        "tests/cli/telemetry-observation-interface-migration.test.ts"
+      ],
+      "reports": [
+        {
+          "requestedRef": "0f24213f6",
+          "commitSha": "0f24213f698921c27f646edca8b24e5950215e55",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/ATM-GOV-0195.bundle-manifest.json",
+            ".atm/history/evidence/ATM-GOV-0195.json",
+            ".atm/history/evidence/git-head.jsonl",
+            ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-48-40-558Z-import-988cc6f73e9e.json",
+            ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-48-47-364Z-reserve-0120ac30f447.json",
+            ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-48-47-366Z-promote-cd8440d08975.json",
+            ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-48-51-835Z-claim-2cbff85a3267.json",
+            ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-54-43-573Z-scope-amendment-8bcbc0eeb25e.json",
+            ".atm/history/tasks/ATM-GOV-0195.json",
+            "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+            "packages/cli/src/commands/telemetry.ts",
+            "packages/core/src/telemetry/index.ts",
+            "scripts/validate-gate-telemetry-coverage.ts",
+            "tests/cli/gate-telemetry-coverage-repair.test.ts"
+          ],
+          "deliverableFiles": [
+            "packages/cli/src/commands/telemetry.ts",
+            "scripts/validate-gate-telemetry-coverage.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/cli/src/commands/telemetry.ts",
+              "scripts/validate-gate-telemetry-coverage.ts"
+            ],
+            "governanceFiles": [],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/cli/src/commands/command-specs/telemetry.spec.ts",
+              "packages/core/src/telemetry/index.ts",
+              "tests/cli/gate-telemetry-coverage-repair.test.ts"
+            ],
+            "ignoredFiles": [
+              ".atm/history/evidence/ATM-GOV-0195.bundle-manifest.json",
+              ".atm/history/evidence/ATM-GOV-0195.json",
+              ".atm/history/evidence/git-head.jsonl",
+              ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-48-40-558Z-import-988cc6f73e9e.json",
+              ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-48-47-364Z-reserve-0120ac30f447.json",
+              ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-48-47-366Z-promote-cd8440d08975.json",
+              ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-48-51-835Z-claim-2cbff85a3267.json",
+              ".atm/history/task-events/ATM-GOV-0195/2026-07-19T13-54-43-573Z-scope-amendment-8bcbc0eeb25e.json",
+              ".atm/history/tasks/ATM-GOV-0195.json"
+            ]
+          },
+          "waiverApplied": true
+        },
+        {
+          "requestedRef": "1943539d0",
+          "commitSha": "1943539d02c49c752113c5c05b4f1c00ac589a7b",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/TASK-PRF-0101.bundle-manifest.json",
+            ".atm/history/evidence/TASK-PRF-0101.live-index-reconciliation.json",
+            "packages/cli/src/commands/telemetry.ts",
+            "scripts/plan-performance-report-v4.ts",
+            "tests/cli/command-gate-latency-score.test.ts"
+          ],
+          "deliverableFiles": [
+            "packages/cli/src/commands/telemetry.ts",
+            "scripts/plan-performance-report-v4.ts",
+            "tests/cli/command-gate-latency-score.test.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/cli/src/commands/telemetry.ts",
+              "scripts/plan-performance-report-v4.ts",
+              "tests/cli/command-gate-latency-score.test.ts"
+            ],
+            "governanceFiles": [],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": [
+              ".atm/history/evidence/TASK-PRF-0101.bundle-manifest.json",
+              ".atm/history/evidence/TASK-PRF-0101.live-index-reconciliation.json"
+            ]
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "85962ade2",
+          "commitSha": "85962ade2fa4202c1e7a967dfc8cb93e5168acb7",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/TASK-PRF-0101.bundle-manifest.json",
+            "docs/reports/atm-command-gate-latency-score.md",
+            "tests/cli/command-gate-latency-score.test.ts"
+          ],
+          "deliverableFiles": [
+            "docs/reports/atm-command-gate-latency-score.md",
+            "tests/cli/command-gate-latency-score.test.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "docs/reports/atm-command-gate-latency-score.md",
+              "tests/cli/command-gate-latency-score.test.ts"
+            ],
+            "governanceFiles": [],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": [
+              ".atm/history/evidence/TASK-PRF-0101.bundle-manifest.json"
+            ]
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "8b6d2d8d5",
+          "commitSha": "8b6d2d8d564952496306aa35effec4c4c541b34b",
+          "ok": true,
+          "reason": "scoped-deliverable-files-present",
+          "changedFiles": [
+            ".atm/history/evidence/TASK-PRF-0101.bundle-manifest.json",
+            ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-46-51-428Z-import-c93d07dbd34a.json",
+            ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-48-10-980Z-import-12240ab060b4.json",
+            ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-48-25-307Z-reserve-f517ecc06158.json",
+            ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-48-25-314Z-promote-45309fd9b796.json",
+            ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-48-31-348Z-claim-d40179ef4c82.json",
+            ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-49-05-942Z-release-1519fde56282.json",
+            ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-50-26-034Z-reserve-6bc2721774aa.json",
+            ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-50-26-038Z-promote-cc3018969e71.json",
+            ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-50-32-259Z-claim-0924634ac5a3.json",
+            ".atm/history/tasks/TASK-PRF-0101.json",
+            "docs/reports/atm-command-gate-latency-score.md",
+            "scripts/plan-performance-report-v4.ts",
+            "tests/cli/command-gate-latency-score.test.ts"
+          ],
+          "deliverableFiles": [
+            "docs/reports/atm-command-gate-latency-score.md",
+            "scripts/plan-performance-report-v4.ts",
+            "tests/cli/command-gate-latency-score.test.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "docs/reports/atm-command-gate-latency-score.md",
+              "scripts/plan-performance-report-v4.ts",
+              "tests/cli/command-gate-latency-score.test.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-46-51-428Z-import-c93d07dbd34a.json",
+              ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-48-10-980Z-import-12240ab060b4.json",
+              ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-48-25-307Z-reserve-f517ecc06158.json",
+              ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-48-25-314Z-promote-45309fd9b796.json",
+              ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-48-31-348Z-claim-d40179ef4c82.json",
+              ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-49-05-942Z-release-1519fde56282.json",
+              ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-50-26-034Z-reserve-6bc2721774aa.json",
+              ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-50-26-038Z-promote-cc3018969e71.json",
+              ".atm/history/task-events/TASK-PRF-0101/2026-09-14T17-50-32-259Z-claim-0924634ac5a3.json",
+              ".atm/history/tasks/TASK-PRF-0101.json"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [],
+            "ignoredFiles": [
+              ".atm/history/evidence/TASK-PRF-0101.bundle-manifest.json"
+            ]
+          },
+          "waiverApplied": false
+        },
+        {
+          "requestedRef": "b1de0bf94",
+          "commitSha": "b1de0bf94ff66d130220717f2550e2c704bbc450",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/ATM-GOV-0205.bundle-manifest.json",
+            ".atm/history/evidence/ATM-GOV-0205.json",
+            ".atm/history/evidence/git-head.jsonl",
+            ".atm/history/task-events/ATM-GOV-0205/2026-07-20T07-24-53-230Z-import-76e13fb7b001.json",
+            ".atm/history/task-events/ATM-GOV-0205/2026-07-20T07-25-09-447Z-reserve-e0d9bd8b5740.json",
+            ".atm/history/task-events/ATM-GOV-0205/2026-07-20T07-25-09-449Z-promote-af2472fb0cc7.json",
+            ".atm/history/task-events/ATM-GOV-0205/2026-07-20T07-25-10-240Z-claim-0f99c21d12e4.json",
+            ".atm/history/tasks/ATM-GOV-0205.json",
+            "packages/cli/src/commands/evidence/command-runs.ts",
+            "packages/cli/src/commands/evidence/shared-utils.ts",
+            "packages/core/src/telemetry/index.ts",
+            "packages/core/src/telemetry/observation.ts",
+            "scripts/validate-telemetry-observation-interface.ts",
+            "tests/cli/telemetry-observation-interface-migration.test.ts"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/telemetry/observation.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/telemetry/observation.ts"
+            ],
+            "governanceFiles": [],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/cli/src/commands/evidence/command-runs.ts",
+              "packages/cli/src/commands/evidence/shared-utils.ts",
+              "packages/core/src/telemetry/index.ts",
+              "scripts/validate-telemetry-observation-interface.ts",
+              "tests/cli/telemetry-observation-interface-migration.test.ts"
+            ],
+            "ignoredFiles": [
+              ".atm/history/evidence/ATM-GOV-0205.bundle-manifest.json",
+              ".atm/history/evidence/ATM-GOV-0205.json",
+              ".atm/history/evidence/git-head.jsonl",
+              ".atm/history/task-events/ATM-GOV-0205/2026-07-20T07-24-53-230Z-import-76e13fb7b001.json",
+              ".atm/history/task-events/ATM-GOV-0205/2026-07-20T07-25-09-447Z-reserve-e0d9bd8b5740.json",
+              ".atm/history/task-events/ATM-GOV-0205/2026-07-20T07-25-09-449Z-promote-af2472fb0cc7.json",
+              ".atm/history/task-events/ATM-GOV-0205/2026-07-20T07-25-10-240Z-claim-0f99c21d12e4.json",
+              ".atm/history/tasks/ATM-GOV-0205.json"
+            ]
+          },
+          "waiverApplied": true
+        }
+      ]
+    }
+  ]
+}
