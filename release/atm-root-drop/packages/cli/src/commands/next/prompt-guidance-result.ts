@@ -94,10 +94,11 @@ export function buildPromptGuidanceNextResult(input: {
         prompt,
         actorId: input.actor,
         // This is pre-claim guidance.  Preserve the claim hint, but defer
-        // full framework status and active-work enumeration until claim/guard.
+        // full framework status and the upstream ahead count until claim/guard.
+        // Active-work enumeration stays live (about 1 s) so concurrent-work
+        // broker advice still reaches agents before they claim.
         frameworkClaimRequired: false,
-        deferAheadCount: true,
-        deferActiveWorkSummary: true
+        deferAheadCount: true
       }),
       allowedCommands: [
         claimCommand,
