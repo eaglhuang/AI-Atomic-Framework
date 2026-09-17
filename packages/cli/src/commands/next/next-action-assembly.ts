@@ -99,7 +99,8 @@ export type NextActionLike = {
     readonly currentBranch: string | null;
     readonly upstreamRef: string | null;
     readonly protectedBranchTarget: boolean;
-    readonly aheadCount: number;
+    /** `null` means the informational probe was intentionally deferred. */
+    readonly aheadCount: number | null;
     readonly frameworkClaimRequired: boolean;
     readonly earlyPreparation: readonly string[];
     readonly queueRetryCodes: readonly string[];
