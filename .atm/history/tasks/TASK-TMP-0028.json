@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TMP-0028",
   "title": "Inventory and quarantine unintegrated ATM residue",
-  "status": "running",
+  "status": "blocked",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -277,8 +277,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-17T16-10-03-313Z-scope-amendment-f1ad82b7e998",
-  "lastTransitionAt": "2026-09-17T16:10:03.313Z",
+  "lastTransitionId": "2026-09-17T16-13-33-426Z-block-df601ee0b96b",
+  "lastTransitionAt": "2026-09-17T16:13:33.426Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-code-opus-5",
   "reservedAt": "2026-09-17T16:05:44.932Z",
@@ -287,7 +287,7 @@
     "actorId": "claude-code-opus-5",
     "leaseId": "lease-9af62329dad8",
     "claimedAt": "2026-09-17T16:05:44.942Z",
-    "heartbeatAt": "2026-09-17T16:05:44.942Z",
+    "heartbeatAt": "2026-09-17T16:13:33.424Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/catalog/registry/actors.json",
@@ -322,14 +322,14 @@
       ".atm/history/tasks/TASK-TMP-0028.json",
       "packages/cli/.atm/**"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260917160545-claude-code-opus-5-b3adfc3963",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260917160545-claude-code-opus-5-b3adfc3963\""
-    }
+    },
+    "reason": "Settled 27 terminal-task records (6dcb06e06) and quarantined 2 misplaced packages/cli/.atm files. 98 paths remain owned by non-terminal tasks PRF-0040/0107/0053/0019/0111/0054/0100/0110/0059/0097 (commit on their own claim) or excluded evidence; actors.json identity change awaits owner. Card cannot close done: close requires a non-.atm deliverable. Disposition: atm-benchmark-sink/ATM-PRODUCT-PROOF-20260918/tmp-0028-quarantine/disposition.md"
   },
   "startedAt": "2026-09-17T16:05:44.942Z",
   "startedByActor": "claude-code-opus-5",
@@ -575,5 +575,9 @@
     },
     "createdAt": "2026-09-17T16:05:46.060Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-17T16:13:33.424Z",
+  "closedByActor": "claude-code-opus-5",
+  "closedBySessionId": "session-20260917160544-claude-code-opus-5-TASK-TMP-0028-71733db430",
+  "closeReason": "Settled 27 terminal-task records (6dcb06e06) and quarantined 2 misplaced packages/cli/.atm files. 98 paths remain owned by non-terminal tasks PRF-0040/0107/0053/0019/0111/0054/0100/0110/0059/0097 (commit on their own claim) or excluded evidence; actors.json identity change awaits owner. Card cannot close done: close requires a non-.atm deliverable. Disposition: atm-benchmark-sink/ATM-PRODUCT-PROOF-20260918/tmp-0028-quarantine/disposition.md"
 }
