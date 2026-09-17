@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-17T15-46-11-586Z-close-67f404180000",
+  "taskId": "TASK-PRF-0113",
+  "action": "close",
+  "actorId": "claude-code-opus-5",
+  "sessionId": "session-20260917145724-claude-code-opus-5-TASK-PRF-0113-9150629600",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0113.json",
+  "taskSha256": "sha256:4db57ddb7061a8e514021bf6759bd8b751fba391623be6fa2298a2ee853f65ee",
+  "createdAt": "2026-09-17T15:46:11.586Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0113 --actor claude-code-opus-5 --status done --historical-delivery 13b8882c8",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260917145724-claude-code-opus-5-TASK-PRF-0113-9150629600",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0113.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/release-version-compatibility.test.ts",
+      "node --strip-types tests/release/release-trust.test.ts",
+      "typecheck -- --pretty false"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/release-version-compatibility.test.ts",
+      "node --strip-types tests/release/release-trust.test.ts",
+      "typecheck -- --pretty false"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-17T15:46:11.577Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0113.*",
+        ".atm/history/task-events/TASK-PRF-0113/**",
+        ".atm/history/tasks/TASK-PRF-0113.json",
+        ".github/workflows/release-npm.yml",
+        "scripts/validate-release-trust.ts",
+        "tests/cli/release-version-compatibility.test.ts",
+        "tests/release/release-trust.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-release-trust.ts",
+        "tests/cli/release-version-compatibility.test.ts",
+        "tests/release/release-trust.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types tests/cli/release-version-compatibility.test.ts",
+        "node --strip-types tests/release/release-trust.test.ts",
+        "typecheck -- --pretty false"
+      ]
+    }
+  }
+}

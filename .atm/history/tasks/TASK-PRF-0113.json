@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0113",
   "title": "Move the npm release workflow to Trusted Publishing without token fallback",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -171,8 +171,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-17T15-36-09-881Z-renew-8cb8a55c6944",
-  "lastTransitionAt": "2026-09-17T15:36:09.881Z",
+  "lastTransitionId": "2026-09-17T15-46-11-586Z-close-67f404180000",
+  "lastTransitionAt": "2026-09-17T15:46:11.586Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-code-opus-5",
   "reservedAt": "2026-09-17T14:57:24.663Z",
@@ -181,7 +181,7 @@
     "actorId": "claude-code-opus-5",
     "leaseId": "lease-ea136b09a40f",
     "claimedAt": "2026-09-17T14:57:24.674Z",
-    "heartbeatAt": "2026-09-17T15:36:09.603Z",
+    "heartbeatAt": "2026-09-17T15:46:11.584Z",
     "ttlSeconds": 3600,
     "files": [
       ".atm/history/tasks/TASK-PRF-0113.json",
@@ -190,13 +190,14 @@
       "tests/cli/release-version-compatibility.test.ts",
       "tests/release/release-trust.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260917153609-claude-code-opus-5-ba28f5d616",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260917153609-claude-code-opus-5-ba28f5d616\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-17T14:57:24.674Z",
   "startedByActor": "claude-code-opus-5",
@@ -296,5 +297,9 @@
     },
     "createdAt": "2026-09-17T14:57:30.298Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-17T15:46:11.584Z",
+  "closedByActor": "claude-code-opus-5",
+  "closedBySessionId": "session-20260917145724-claude-code-opus-5-TASK-PRF-0113-9150629600",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0113.closure-packet.json"
 }

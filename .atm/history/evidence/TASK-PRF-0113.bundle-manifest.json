@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0113",
+  "updatedAt": "2026-09-17T15:41:54.854Z",
+  "updatedBy": "claude-code-opus-5",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/release-version-compatibility.test.ts",
+    "node --strip-types tests/release/release-trust.test.ts",
+    "typecheck -- --pretty false"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-09-17T15:41:37.442Z",
+      "startedAt": "2026-09-17T15:41:37.139Z",
+      "finishedAt": "2026-09-17T15:41:37.442Z",
+      "durationMs": 303,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "13b8882c8c84525f97f5019339da6ef08ebdea09",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/release-version-compatibility.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:840d2b90bd3bf9c05e539abedd5e5c22a4a2b6b5a1fc5603ccc86baeaa511b43",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/release-version-compatibility.test.ts"
+      ],
+      "generatedAt": "2026-09-17T15:41:40.088Z",
+      "startedAt": "2026-09-17T15:41:39.780Z",
+      "finishedAt": "2026-09-17T15:41:40.088Z",
+      "durationMs": 308,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "13b8882c8c84525f97f5019339da6ef08ebdea09",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/release/release-trust.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dcfa2cf621d57e14ea977ca26840ae627ba8b665a0f75e38f92ffa7ae3994342",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/release/release-trust.test.ts"
+      ],
+      "generatedAt": "2026-09-17T15:41:42.673Z",
+      "startedAt": "2026-09-17T15:41:42.363Z",
+      "finishedAt": "2026-09-17T15:41:42.673Z",
+      "durationMs": 310,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "13b8882c8c84525f97f5019339da6ef08ebdea09",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b4f74faa4576a8a1d06c4481fca16ab5537578dff7c9d225b5bc4bc4a6d3ffb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck -- --pretty false"
+      ],
+      "generatedAt": "2026-09-17T15:41:54.853Z",
+      "startedAt": "2026-09-17T15:41:44.957Z",
+      "finishedAt": "2026-09-17T15:41:54.853Z",
+      "durationMs": 9896,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "13b8882c8c84525f97f5019339da6ef08ebdea09",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
