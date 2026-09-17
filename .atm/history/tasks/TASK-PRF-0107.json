@@ -25,7 +25,13 @@
     "packages/cli/src/commands/atm-chart/render-verify.ts",
     "scripts/build-cli-npm-runtime.ts",
     "tests/cli/atm-chart-public-runtime.test.ts",
-    "docs/reports/atm-command-gate-latency-score.md"
+    "docs/reports/atm-command-gate-latency-score.md",
+    ".atm/history/evidence/TASK-PRF-0107.*",
+    ".atm/history/task-events/TASK-PRF-0107/**",
+    ".atm/history/tasks/TASK-PRF-0107.json",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-root-drop",
+    "release/atm-root-drop/release-manifest.json"
   ],
   "validators": [
     "node --strip-types tests/cli/atm-chart-public-runtime.test.ts",
@@ -69,7 +75,7 @@
     "planPath": "atm-product-proof/tasks/TASK-PRF-0107-restore-installable-npm-chart-lifecycle-without-inflating-the-bundle.task.md",
     "sectionTitle": "TASK-PRF-0107",
     "headingLine": 120,
-    "hash": "291f9cdde0c84e28",
+    "hash": "604c3d0bab646003",
     "planningSourceSeal": {
       "schemaId": "atm.planningSourceSeal.v1",
       "repoIdentity": "https://github.com/eaglhuang/3klife.git",
@@ -78,10 +84,10 @@
       "planningCommitSha": null,
       "contentDigest": "sha256:604c3d0bab646003cb500be8d762d913a006e8c38c3f2c3b57eeab34be33a74d",
       "amendmentEpoch": 1,
-      "sealedAt": "2026-09-14T20:10:47.729Z"
+      "sealedAt": "2026-09-15T08:22:26.596Z"
     }
   },
-  "importedAt": "2026-09-14T19:55:08.923Z",
+  "importedAt": "2026-09-15T08:22:26.596Z",
   "workAdmission": {
     "recoveryMode": "auto",
     "resolvedRecoveryMode": "disabled",
@@ -213,54 +219,57 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-14T20-10-48-027Z-metadata-only-import-b701c652cae8",
-  "lastTransitionAt": "2026-09-14T20:10:48.027Z",
+  "lastTransitionId": "2026-09-17T23-39-42-193Z-scope-amendment-c3c1deb77548",
+  "lastTransitionAt": "2026-09-17T23:39:42.193Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-09-14T19:55:26.843Z",
-  "promotedAt": "2026-09-14T19:55:26.847Z",
+  "reservedAt": "2026-09-17T23:37:58.382Z",
+  "promotedAt": "2026-09-17T23:37:58.386Z",
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-d1db935e9be1",
-    "claimedAt": "2026-09-14T19:55:26.851Z",
-    "heartbeatAt": "2026-09-14T19:55:26.851Z",
+    "actorId": "claude-code-opus-5",
+    "leaseId": "lease-0c418543f466",
+    "claimedAt": "2026-09-17T23:37:58.391Z",
+    "heartbeatAt": "2026-09-17T23:37:58.391Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-PRF-0107.*",
+      ".atm/history/task-events/TASK-PRF-0107/**",
       ".atm/history/tasks/TASK-PRF-0107.json",
       "docs/reports/atm-command-gate-latency-score.md",
       "packages/cli/src/commands/atm-chart/constants.ts",
       "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop/release-manifest.json",
       "scripts/build-cli-npm-runtime.ts",
       "tests/cli/atm-chart-public-runtime.test.ts"
     ],
     "state": "active",
     "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea",
+      "laneSessionId": "lane-20260917233758-claude-code-opus-5-baa5f48153",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260917233758-claude-code-opus-5-baa5f48153\""
     }
   },
-  "startedAt": "2026-09-14T19:55:26.851Z",
+  "startedAt": "2026-09-15T08:23:17.277Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-28d0703243198989",
-    "ticketDigest": "sha256:28d07032431989895b288d2efe2b543bc13fefe6ac7c48ac53fd6460e6aff4ce",
+    "ticketId": "wat-9d9438e3032f3293",
+    "ticketDigest": "sha256:9d9438e3032f3293b77b3479be4fcb0bd898e890f84acdba0c3886d8e3af8448",
     "taskId": "TASK-PRF-0107",
     "origin": "claim",
-    "actorId": "codex-gpt-5.4-mini",
-    "laneSessionId": "lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea",
-    "claimGeneration": "lease-d1db935e9be1",
-    "issuedAt": "2026-09-14T19:55:26.851Z",
-    "expiresAt": "2026-09-14T20:25:26.851Z",
-    "scopeDigest": "sha256:6bb925a16f242b0bda62c4939db26e12292afce14d74fe5da497a6851460c13d",
+    "actorId": "claude-code-opus-5",
+    "laneSessionId": "lane-20260917233758-claude-code-opus-5-baa5f48153",
+    "claimGeneration": "lease-0c418543f466",
+    "issuedAt": "2026-09-17T23:37:58.391Z",
+    "expiresAt": "2026-09-18T00:07:58.391Z",
+    "scopeDigest": "sha256:1eac3a8dd82cc3492cf24b9a307474ecef73f319aa0ca6237d0799244056bf97",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-14T19:55:26.851Z"
+      "selectedAt": "2026-09-17T23:37:58.391Z"
     },
     "grants": [
       {
@@ -272,10 +281,13 @@
           "docs/reports/atm-command-gate-latency-score.md",
           "packages/cli/src/commands/atm-chart/constants.ts",
           "packages/cli/src/commands/atm-chart/render-verify.ts",
+          "release/atm-onefile/atm.mjs",
+          "release/atm-root-drop",
+          "release/atm-root-drop/release-manifest.json",
           "scripts/build-cli-npm-runtime.ts",
           "tests/cli/atm-chart-public-runtime.test.ts"
         ],
-        "digest": "sha256:f42727662a49f82a972bf206f9de06d5be9543114974e71e048ccc6ec23d467d"
+        "digest": "sha256:67d9361b8a4b05491b16182a9663ce49717e23f4395be7e1726e8751a6051271"
       },
       {
         "kind": "lifecycle-operation",
@@ -309,7 +321,80 @@
       "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
     }
   },
-  "startedBySessionId": "session-20260914195526-codex-gpt-5.4-mini-TASK-PRF-0107-f9dad7b1fe",
+  "startedBySessionId": "session-20260917233758-claude-code-opus-5-TASK-PRF-0107-057761c6c5",
+  "wipOwnership": {
+    "schemaId": "atm.retainedWipOwnership.v1",
+    "taskId": "TASK-PRF-0107",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260915085328-codex-gpt-5.4-mini-0c9b07463f",
+    "dirtyPaths": [
+      ".atm/history/evidence/TASK-PRF-0107.bundle-manifest.json",
+      ".atm/history/evidence/TASK-PRF-0107.live-index-reconciliation.json",
+      ".atm/history/evidence/TASK-PRF-0107.runner-publication-takeover.json",
+      ".atm/history/evidence/TASK-PRF-0107.runner-sync-receipt.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-14T21-10-30-431Z-renew-4b86bb9d0a81.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-14T21-12-56-571Z-renew-2023930da73e.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-14T21-17-24-468Z-scope-amendment-bea42bae5bca.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-14T21-17-24-469Z-scope-amendment-44c7c8aefc19.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T00-32-04-381Z-repair-claim-1f7c24f41631.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T02-55-16-342Z-claim-c1a65432394f.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T02-59-17-376Z-scope-amendment-eda667824452.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T03-05-55-197Z-scope-amendment-bc2466fb4efe.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T03-12-30-829Z-block-b16bba3c7058.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T03-27-16-281Z-repair-claim-01636badfe7c.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T08-22-26-857Z-import-8419c3938ad1.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T08-23-17-266Z-reserve-d734eb313767.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T08-23-17-273Z-promote-ecaa231db226.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T08-23-19-555Z-claim-8b7114a9d94f.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T08-23-38-723Z-renew-d871f5c36d40.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T08-46-50-130Z-scope-amendment-f658a5a1b52f.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T08-53-29-661Z-renew-59092643d43a.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T09-07-59-006Z-renew-946e0d1b023b.json",
+      ".atm/history/task-events/TASK-PRF-0107/2026-09-15T09-22-23-404Z-renew-6691838a98e4.json",
+      ".atm/history/tasks/TASK-PRF-0107.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop/docs/reports/evidence-ledger-boundary-baseline.md",
+      "release/atm-root-drop/packages/cli/dist/atm.js",
+      "release/atm-root-drop/packages/cli/dist/commands/doctor/run-doctor.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/evidence-store.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/lease-command.js",
+      "release/atm-root-drop/packages/cli/dist/commands/guide.js",
+      "release/atm-root-drop/packages/cli/dist/commands/integration/health.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/governance-readiness.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection/active-work-summary.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection/channel-playbook.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection/governance-readiness.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-resolution/queue-inspection.js",
+      "release/atm-root-drop/packages/cli/dist/commands/task-direction.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/telemetry.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/atm.ts",
+      "release/atm-root-drop/packages/cli/src/commands/doctor/run-doctor.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/evidence-store.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/lease-command.ts",
+      "release/atm-root-drop/packages/cli/src/commands/guide.ts",
+      "release/atm-root-drop/packages/cli/src/commands/integration/health.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/governance-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+      "release/atm-root-drop/packages/cli/src/commands/task-direction.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/telemetry.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/build-onefile-release.ts",
+      "release/atm-root-drop/scripts/build-root-drop-release.ts",
+      "release/atm-root-drop/scripts/plan-performance-report-v4.ts",
+      "release/atm-root-drop/scripts/validate-onefile-release.ts",
+      "release/atm-root-drop/templates/skills/atm-framework-temp-claim.skill.md"
+    ],
+    "retainedAt": "2026-09-15T10:04:42.148Z",
+    "transitionClass": "release-wip-retained"
+  },
+  "owner": "claude-code-opus-5",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -325,22 +410,31 @@
       "docs/reports/atm-command-gate-latency-score.md",
       "packages/cli/src/commands/atm-chart/constants.ts",
       "packages/cli/src/commands/atm-chart/render-verify.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-root-drop/release-manifest.json",
       "scripts/build-cli-npm-runtime.ts",
       "tests/cli/atm-chart-public-runtime.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0107-restore-installable-npm-chart-lifecycle-without-inflating-the-bundle.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0107-restore-installable-npm-chart-lifecycle-without-inflating-the-bundle.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "24ec8806a0b60f33806e884cc022fd73c30c911ca3ba0b00e412a16b88707bdc",
-    "actorId": "codex-gpt-5.4-mini",
-    "sessionId": "session-20260914195526-codex-gpt-5.4-mini-TASK-PRF-0107-f9dad7b1fe",
+    "actorId": "claude-code-opus-5",
+    "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea",
+      "laneSessionId": "lane-20260917233758-claude-code-opus-5-baa5f48153",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260914195527-codex-gpt-5.4-mini-cdc47915ea\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260917233758-claude-code-opus-5-baa5f48153\""
     },
-    "createdAt": "2026-09-14T19:55:28.877Z",
+    "createdAt": "2026-09-17T23:37:59.575Z",
     "status": "active"
   }
 }

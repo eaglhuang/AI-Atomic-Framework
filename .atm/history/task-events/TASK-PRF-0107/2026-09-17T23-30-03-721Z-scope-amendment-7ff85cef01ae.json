@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-17T23-30-03-721Z-scope-amendment-7ff85cef01ae",
+  "taskId": "TASK-PRF-0107",
+  "action": "scope-amendment",
+  "actorId": "claude-code-opus-5",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0107.json",
+  "taskSha256": "sha256:43685e081f427a7b251a4068a7d0fa364580e67582d0dbddb241c64a20fd4fa8",
+  "createdAt": "2026-09-17T23:30:03.721Z",
+  "command": "node atm.mjs tasks scope remove --task TASK-PRF-0107 --actor claude-code-opus-5 --remove release/atm-root-drop --json",
+  "amendmentMetadata": {
+    "amendmentClass": "scope-shrink",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "exact artifact paths avoid Windows ENAMETOOLONG in sealed commit bundle"
+  }
+}

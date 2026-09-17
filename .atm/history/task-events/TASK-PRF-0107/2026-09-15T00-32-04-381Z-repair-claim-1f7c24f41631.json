@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-15T00-32-04-381Z-repair-claim-1f7c24f41631",
+  "taskId": "TASK-PRF-0107",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260914195526-codex-gpt-5.4-mini-TASK-PRF-0107-f9dad7b1fe",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0107.json",
+  "taskSha256": "sha256:10366c5b678a0538b966f22bdfb61e3decb53f221bca177dd9dfe7f817642675",
+  "createdAt": "2026-09-15T00:32:04.381Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0107 --actor codex-gpt-5.4-mini --write --reason \"清理已過期 claim 與 dangling lock，解除共享報告的假阻塞；保留所有 WIP 與證據\" --json"
+}

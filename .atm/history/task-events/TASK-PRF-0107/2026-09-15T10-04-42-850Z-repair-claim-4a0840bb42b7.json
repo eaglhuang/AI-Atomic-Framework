@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-15T10-04-42-850Z-repair-claim-4a0840bb42b7",
+  "taskId": "TASK-PRF-0107",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260915082317-codex-gpt-5.4-mini-TASK-PRF-0107-9c4a0739cb",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0107.json",
+  "taskSha256": "sha256:502fb27e9d722e43aef393a264570e376328069077bf547f08250963594d730d",
+  "createdAt": "2026-09-15T10:04:42.850Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0107 --actor codex-gpt-5.4-mini --write --reason \"TASK-PRF-0107 local candidate evidence is already retained; prior lease and lane are expired. Release stale ownership while preserving all WIP, receipts, and deliverables for a fresh governed continuation.\" --json"
+}

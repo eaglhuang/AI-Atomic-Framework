@@ -324,3 +324,70 @@ actual dominant path for adopters.
 
 Telemetry receipt: `C:\Users\User\atm-benchmark-sink\TASK-PRF-0107\telemetry-report-20260915.json`
 (`sha256:d76763a652180d003c379d4907ce90772482f492cebcc69b6ebabb6dab7165c2`).
+
+### Live-registry confirmation and closure readiness (2026-09-18)
+
+TASK-PRF-0107's source and test deliverables (`constants.ts`, `render-verify.ts`,
+`build-cli-npm-runtime.ts`, `atm-chart-public-runtime.test.ts`) were already
+committed on 2026-09-14/15; this session's contribution is a fresh, independent
+confirmation against the actual live published package rather than a frozen
+onefile baseline, plus completion of the previously blocked `build:packages`
+validator.
+
+**Functional matrix.** `npm run validate:public-npm-install --candidate-dir
+packages/cli --version 0.1.0 --measure --measurement-runs 5` compared the
+current HEAD candidate against the real registry package
+`@ai-atomic-framework/cli@0.1.0` (tarball sha256
+`e35de3cb1778691dd691b12666d8d379de5f4ffd97081690de2c63d963f43d14`):
+`candidateCoreWorkflowPassed: true`, `candidateCoreWorkflowFailures: []`,
+`candidateCommandsFreeOfModuleResolutionFailure: true`,
+`unpackedBytesReductionPercent: 20.93`, `entryCountReductionPercent: 15.38`,
+both above the script's own 20%/15% acceptance floor. Receipt:
+`C:\Users\User\atm-benchmark-sink\ATM-PRODUCT-PROOF-20260918\prf-0107\measure-baseline0.1.0-vs-candidate-head.json`
+(sha256 `58947793b23a494b2ce9c11c67729e49fad9614c5b4557a13be096905a5ec77b`).
+The literal card validator `npm run validate:public-npm-install` (default args,
+registry latest) still reports `status: blocked`,
+`requiredSuccessCommandFailures: ["atm-chart-render","atm-chart-verify"]` — this
+is the expected, documented state of the still-unpublished registry package,
+not a regression; publishing the fix requires a separate Owner-approved publish
+window (TASK-PRF-0053/0054/0113) and is out of this card's scope.
+
+**Interleaved AB/BA against the live registry tarball.** 30 AB/BA pairs plus
+8 candidate A/A controls, alternating which arm installs first each pair, each
+sample doing a fresh `npm install` of the tarball into an isolated temp
+directory followed by `bootstrap` → `atm-chart render` → `atm-chart verify`:
+
+| metric | baseline (published 0.1.0) | candidate (HEAD) |
+|---|---:|---:|
+| render exit code (30/30) | `2` (`ATM_CHART_SCHEMA_SOURCE_MISSING`) | `0` |
+| verify exit code (30/30) | `2` | `0` |
+| install p50 / p95 ms | 1,662.5 / 1,729.8 | 1,609.0 / 1,691.6 |
+| render p50 / p95 ms | 862.5 / 904.4 | 182.0 / 203.1 |
+| verify p50 / p95 ms | 860.5 / 882.9 | 181.5 / 208.6 |
+
+Candidate A/A control (16 runs, noise check): install p50 1,625.0 ms, render
+p50 190.0 ms, verify p50 192.0 ms — within measurement noise of the candidate
+arm above, and zero install failures across all 76 runs. This reconfirms the
+2026-09-15 frozen-onefile-baseline result (render/verify p50 ~850-880 ms
+baseline vs ~135-141 ms candidate) using the actual live registry artifact as
+the baseline instead. Render/verify timing on the baseline arm reflects a fast
+fail path (`exit 2`), not a successful-but-slow chart lifecycle; the functional
+result (100% fail vs 100% pass across 30 samples) is the primary evidence, not
+the latency delta. Raw data: `abab-chart-lifecycle.csv`
+(sha256 `d7b7e68c04d956c8fa6c0eb3f54fb699b20a1dd266f902c7190d6539256f9e93`);
+harness: `run-abab-chart-lifecycle.sh`
+(sha256 `cc4fddedb9e75dbf2dcb8123a7e31fb4402670ab3fa6e9e2412e830c2035ec75`);
+baseline tarball sha256 `e35de3cb1778691dd691b12666d8d379de5f4ffd97081690de2c63d963f43d14`;
+candidate tarball sha256 `4edf69f4d6a309f66a84590729cc21cdbc31d4cb315f0d04cd5622501e20ac62`;
+both under `C:\Users\User\atm-benchmark-sink\ATM-PRODUCT-PROOF-20260918\prf-0107\`.
+
+**Previously blocked validator now green.** The 2026-09-15 note above recorded
+`build:packages -- --packages cli` stopping at publication because a prior
+runner-sync reservation had no active release-surface claim. With
+`TASK-PRF-0107`'s claim scope explicitly including `release/atm-onefile/atm.mjs`
+and `release/atm-root-drop`, and a fresh runner-sync queue-head reservation for
+the current HEAD, the same validator now completes: `cli artifact budget ok:
+2650708 bytes / 64 files`, exit 0. No workspace coordination blocker remains.
+
+No broker, lock, or multi-AI ownership behavior changed by this confirmation
+pass; all activity was read-only measurement and one documentation append.
