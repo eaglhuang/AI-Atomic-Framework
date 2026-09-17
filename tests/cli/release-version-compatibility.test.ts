@@ -59,5 +59,14 @@ const validatorSource = readFileSync(path.join(repositoryRoot, 'scripts', 'valid
 const releaseWorkflow = readFileSync(path.join(repositoryRoot, '.github', 'workflows', 'release-npm.yml'), 'utf8');
 assert.match(validatorSource, /process\.env\.ATM_RELEASE_TAG/, 'release compatibility must consume the workflow-provided tag when run through the full validator profile');
 assert.match(releaseWorkflow, /ATM_RELEASE_TAG="\$release_version" npm run validate:full/, 'post-publish full validation must pass its resolved release tag into the validator process');
+const postPublishBlock = releaseWorkflow.match(/- name: Post-publish full validation[\s\S]*?(?=\n      - name:|$)/)?.[0] ?? '';
+const dryRunSkipCondition = /if:\s*\$\{\{\s*always\(\)\s*&&\s*!cancelled\(\)\s*&&\s*!\(\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*inputs\.dry_run\s*==\s*true\s*\)\s*\}\}/;
+assert.match(postPublishBlock, dryRunSkipCondition, 'post-publish validation must skip exactly workflow_dispatch dry-run');
+assert.doesNotMatch(postPublishBlock.replace('&& !(', '&& ('), dryRunSkipCondition, 'removing the negation must fail the dry-run gate contract');
+assert.doesNotMatch(postPublishBlock.replace('== true', '== false'), dryRunSkipCondition, 'reversing the dry-run condition must fail the dry-run gate contract');
+assert.match(postPublishBlock, /ATM_RELEASE_TAG="\$release_version" npm run validate:full/, 'tag path must retain the full validator command');
+const prePublishSmokeIndex = releaseWorkflow.indexOf('- name: Clean-install npx smoke (publish gate)');
+const publishIndex = releaseWorkflow.indexOf('- name: Publish public workspace closure');
+assert.ok(prePublishSmokeIndex >= 0 && publishIndex > prePublishSmokeIndex, 'pre-publish clean-install smoke must remain before publish');
 
 console.log('[release-version-compatibility:test] ok');

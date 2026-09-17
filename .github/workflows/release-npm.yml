@@ -61,7 +61,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
+          # npm Trusted Publishing uses the GitHub Actions OIDC token. Do not
+          # create a token-based .npmrc here; that would silently select the
+          # legacy NPM_TOKEN path and make the configured publisher unused.
 
       - name: Install dependencies
         run: npm ci
@@ -242,11 +244,8 @@ jobs:
               sleep 3
             done
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Post-publish full validation
-        if: ${{ always() && !cancelled() }}
+        if: ${{ always() && !cancelled() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
         timeout-minutes: 45
         shell: bash
         run: |

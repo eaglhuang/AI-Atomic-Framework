@@ -1,0 +1,300 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0113",
+  "title": "Move the npm release workflow to Trusted Publishing without token fallback",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`release-npm.yml` grants `id-token: write`, has no token-based `registry-url` `.npmrc`, and has no `NODE_AUTH_TOKEN` on any publish step.",
+    "`scripts/validate-release-trust.ts` fails when any of those three conditions regresses; the release-trust test proves each failure case.",
+    "A `workflow_dispatch` run with `dry_run: true` skips the post-publish gate instead of reporting a registry proof.",
+    "Validators pass in the canonical worktree; the change lands as one commit.",
+    "No publish, no token creation, no 2FA or package-access change, no new governance command or evidence family.",
+    "Stop rule: if the parked patch no longer applies or a validator fails twice after a fix, keep the patch parked and record the failure instead of iterating."
+  ],
+  "deliverables": [
+    ".github/workflows/release-npm.yml",
+    "scripts/validate-release-trust.ts"
+  ],
+  "scopePaths": [
+    ".github/workflows/release-npm.yml",
+    "scripts/validate-release-trust.ts",
+    "tests/release/release-trust.test.ts",
+    "tests/cli/release-version-compatibility.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/release/release-trust.test.ts",
+    "node --strip-types tests/cli/release-version-compatibility.test.ts",
+    "npm run typecheck -- --pretty false",
+    "git diff --check"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "C:/Users/User/AI-Atomic-Framework",
+  "closureAuthority": "adopter",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0113-npm-trusted-publishing.task.md",
+    "sectionTitle": "TASK-PRF-0113",
+    "headingLine": 38,
+    "hash": "62f2e3beff66cd6b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0113-npm-trusted-publishing.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:62f2e3beff66cd6b51edb025be5def0307909ecdb395c5652b2ec97798509386",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-17T14:49:13.070Z"
+    }
+  },
+  "importedAt": "2026-09-17T14:49:13.070Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "Parked patch E-npm-trusted-publishing.patch applies cleanly to HEAD"
+    ],
+    "softRelations": [
+      "TASK-PRF-0054",
+      "TASK-PRF-0107"
+    ],
+    "changedPublicSeams": [
+      "npm-release-authentication"
+    ],
+    "causalImpactEdges": [
+      "publish-safety"
+    ],
+    "parallelFrontierInputs": [
+      "atm-benchmark-sink/ATM-PRODUCT-PROOF-20260917/parked-wip-20260917T2210/E-npm-trusted-publishing.patch"
+    ],
+    "validatorReferences": [
+      "tests/release/release-trust.test.ts",
+      "tests/cli/release-version-compatibility.test.ts"
+    ],
+    "phaseOwner": "product-proof"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.release.release.trust.test.ts",
+      "command": "node --strip-types tests/release/release-trust.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.release.version.compatibility.test.ts",
+      "command": "node --strip-types tests/cli/release-version-compatibility.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck.pretty.false",
+      "command": "npm run typecheck -- --pretty false",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-17T15-36-09-881Z-renew-8cb8a55c6944",
+  "lastTransitionAt": "2026-09-17T15:36:09.881Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-code-opus-5",
+  "reservedAt": "2026-09-17T14:57:24.663Z",
+  "promotedAt": "2026-09-17T14:57:24.668Z",
+  "claim": {
+    "actorId": "claude-code-opus-5",
+    "leaseId": "lease-ea136b09a40f",
+    "claimedAt": "2026-09-17T14:57:24.674Z",
+    "heartbeatAt": "2026-09-17T15:36:09.603Z",
+    "ttlSeconds": 3600,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0113.json",
+      ".github/workflows/release-npm.yml",
+      "scripts/validate-release-trust.ts",
+      "tests/cli/release-version-compatibility.test.ts",
+      "tests/release/release-trust.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260917153609-claude-code-opus-5-ba28f5d616",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260917153609-claude-code-opus-5-ba28f5d616\""
+    }
+  },
+  "startedAt": "2026-09-17T14:57:24.674Z",
+  "startedByActor": "claude-code-opus-5",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-ac6bb6c864373e2f",
+    "ticketDigest": "sha256:ac6bb6c864373e2fb80041ee28f8c54a08598dc1fd99ab4b3db17896b5f8a915",
+    "taskId": "TASK-PRF-0113",
+    "origin": "claim",
+    "actorId": "claude-code-opus-5",
+    "laneSessionId": "lane-20260917153609-claude-code-opus-5-ba28f5d616",
+    "claimGeneration": "lease-ea136b09a40f",
+    "issuedAt": "2026-09-17T15:36:09.603Z",
+    "expiresAt": "2026-09-17T16:36:09.603Z",
+    "scopeDigest": "sha256:b8df5c41a021e95ce71022743e276373127d07476bc3758fe769805b9524592b",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-17T15:36:09.603Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0113.*",
+          ".atm/history/task-events/TASK-PRF-0113/**",
+          ".atm/history/tasks/TASK-PRF-0113.json",
+          ".github/workflows/release-npm.yml",
+          "scripts/validate-release-trust.ts",
+          "tests/cli/release-version-compatibility.test.ts",
+          "tests/release/release-trust.test.ts"
+        ],
+        "digest": "sha256:1e912bfd13e714ec445c589fd6f90a7e480e6ea10ded1cfdd687e7194f0e4b82"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260917145724-claude-code-opus-5-TASK-PRF-0113-9150629600",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0113",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0113.*",
+      ".atm/history/task-events/TASK-PRF-0113/**",
+      ".atm/history/tasks/TASK-PRF-0113.json",
+      ".github/workflows/release-npm.yml",
+      "scripts/validate-release-trust.ts",
+      "tests/cli/release-version-compatibility.test.ts",
+      "tests/release/release-trust.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0fb5280a47743f2899db291d89a249f42a0ee988f133ca6a8c1e3eb09609984a",
+    "actorId": "claude-code-opus-5",
+    "sessionId": "session-20260917145724-claude-code-opus-5-TASK-PRF-0113-9150629600",
+    "laneSession": {
+      "laneSessionId": "lane-20260917145724-claude-code-opus-5-ba97221347",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260917145724-claude-code-opus-5-ba97221347\""
+    },
+    "createdAt": "2026-09-17T14:57:30.298Z",
+    "status": "active"
+  }
+}

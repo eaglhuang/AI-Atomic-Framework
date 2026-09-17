@@ -46,6 +46,12 @@ const workflowPath = path.join(root, '.github', 'workflows', 'release-npm.yml');
 assert(existsSync(workflowPath), '.github/workflows/release-npm.yml must exist');
 
 const workflow = existsSync(workflowPath) ? readFileSync(workflowPath, 'utf8') : '';
+// The package is configured with npm Trusted Publishing.  Keep the release
+// path on OIDC instead of silently reintroducing a long-lived token through
+// setup-node or a publish-step environment variable.
+assert(/^\s*id-token:\s*write\s*$/m.test(workflow), 'release-npm.yml: must grant id-token: write for npm Trusted Publishing');
+assert(!/^\s*registry-url:\s*['\"]?https:\/\/registry\.npmjs\.org['\"]?\s*$/m.test(workflow), 'release-npm.yml: trusted publishing must not create a token-based registry .npmrc');
+assert(!/^\s*NODE_AUTH_TOKEN:\s*\S+/m.test(workflow), 'release-npm.yml: trusted publishing must not inject NODE_AUTH_TOKEN');
 const packageFixturePath = path.join(root, 'tests', 'package-skeleton.fixture.json');
 const packageFixture = existsSync(packageFixturePath)
   ? JSON.parse(readFileSync(packageFixturePath, 'utf8')) as {
