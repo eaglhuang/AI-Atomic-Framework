@@ -29,7 +29,10 @@
     "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
     "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
     "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
-    "tests/cli/root-drop-release-source-list.test.ts"
+    "tests/cli/root-drop-release-source-list.test.ts",
+    ".atm/history/evidence/TASK-PRF-0112.*",
+    ".atm/history/task-events/TASK-PRF-0112/**",
+    ".atm/history/tasks/TASK-PRF-0112.json"
   ],
   "validators": [
     "node --strip-types tests/cli/next-governance-readiness-latency.test.ts",
@@ -222,8 +225,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-17T16-26-09-932Z-claim-b3a04e16b281",
-  "lastTransitionAt": "2026-09-17T16:26:09.932Z",
+  "lastTransitionId": "2026-09-17T16-30-38-022Z-scope-amendment-c6f377d8ebe5",
+  "lastTransitionAt": "2026-09-17T16:30:38.022Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-code-opus-5",
   "reservedAt": "2026-09-17T16:26:05.325Z",
@@ -235,8 +238,11 @@
     "heartbeatAt": "2026-09-17T16:26:05.334Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-PRF-0112.*",
+      ".atm/history/task-events/TASK-PRF-0112/**",
       ".atm/history/tasks/TASK-PRF-0112.json",
       "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
       "packages/cli/src/commands/next/governance-readiness.ts",
       "packages/cli/src/commands/next/next-action-assembly.ts",
@@ -258,29 +264,31 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-478430a0942ac8d4",
-    "ticketDigest": "sha256:478430a0942ac8d476530c07d273d4d5cc70186d285fcab219d05fa59992d92c",
+    "ticketId": "wat-8a58894307297811",
+    "ticketDigest": "sha256:8a588943072978119dbfcae9e1b450c1ac1ffe096f58396282fb75b1e48cf47d",
     "taskId": "TASK-PRF-0112",
     "origin": "claim",
     "actorId": "claude-code-opus-5",
     "laneSessionId": "lane-20260917162605-claude-code-opus-5-c04e0d83e6",
     "claimGeneration": "lease-15d85963bdef",
-    "issuedAt": "2026-09-17T16:26:05.334Z",
-    "expiresAt": "2026-09-17T16:56:05.334Z",
-    "scopeDigest": "sha256:21975c2857a21b1dfc572d97271efda21d529dc6e9b199710a83c2a7cc8a4cfb",
+    "issuedAt": "2026-09-17T16:30:37.952Z",
+    "expiresAt": "2026-09-17T17:00:37.952Z",
+    "scopeDigest": "sha256:3d052bcd5db583cc28b786bbbc9d5a025fe7bb34d870b4bc2517558f5a07df87",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-17T16:26:05.334Z"
+      "selectedAt": "2026-09-17T16:30:37.952Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0112.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0112/**",
           ".atm/history/tasks/TASK-PRF-0112.json",
           "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
           "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
           "packages/cli/src/commands/next/governance-readiness.ts",
           "packages/cli/src/commands/next/next-action-assembly.ts",
@@ -288,7 +296,7 @@
           "packages/cli/src/commands/next/prompt-guidance-result.ts",
           "tests/cli/next-governance-readiness-latency.test.ts"
         ],
-        "digest": "sha256:e481b3cebdd03d441877a65b8cebda71528b1f653991b8def2d9c4b261d3943a"
+        "digest": "sha256:be11c673389aa4a4b74c6a1c313c0f654b4a8747aba3cea042dabe3410c68941"
       },
       {
         "kind": "lifecycle-operation",
@@ -336,6 +344,7 @@
       ".atm/history/task-events/TASK-PRF-0112/**",
       ".atm/history/tasks/TASK-PRF-0112.json",
       "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
       "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
       "packages/cli/src/commands/next/governance-readiness.ts",
       "packages/cli/src/commands/next/next-action-assembly.ts",
@@ -343,19 +352,26 @@
       "packages/cli/src/commands/next/prompt-guidance-result.ts",
       "tests/cli/next-governance-readiness-latency.test.ts"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0112-next-readiness-git.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0112-next-readiness-git.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "564f217741b026792057402a51db29fb5436d5a1b17639fc71fe2c4107a2f739",
     "actorId": "claude-code-opus-5",
-    "sessionId": "session-20260917162605-claude-code-opus-5-TASK-PRF-0112-20d6691444",
+    "sessionId": null,
     "laneSession": {
       "laneSessionId": "lane-20260917162605-claude-code-opus-5-c04e0d83e6",
       "status": "active",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260917162605-claude-code-opus-5-c04e0d83e6\""
     },
-    "createdAt": "2026-09-17T16:26:09.931Z",
+    "createdAt": "2026-09-17T16:26:09.953Z",
     "status": "active"
   }
 }

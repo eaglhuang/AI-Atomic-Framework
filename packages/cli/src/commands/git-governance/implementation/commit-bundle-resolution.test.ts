@@ -6,6 +6,7 @@ import path from 'node:path';
 import { isTombstone } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
 import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.ts';
 import { inspectTaskScopedStagedGovernanceBundle } from './task-scope-staging.ts';
+import { listTaskDeclaredIgnoredWorktreeFiles } from './task-ignored-deliverable-discovery.ts';
 
 const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-foreign-residue-'));
 execFileSync('git', ['init', '-q'], { cwd });
@@ -99,6 +100,12 @@ assert.equal(ignoredDeliverableBundle.ok, true, `declared ignored deliverable mu
 assert.ok(ignoredDeliverableBundle.stageFiles.includes(declaredIgnoredPath), 'the declared ignored deliverable must enter the sealed candidate');
 assert.ok(!ignoredDeliverableBundle.stageFiles.includes(undeclaredIgnoredPath), 'an ignored sibling outside sealed scope must remain excluded');
 assert.ok(ignoredDeliverableBundle.sealedBundle.entries.some((entry: { path: string }) => entry.path === declaredIgnoredPath), 'the sealed candidate must bind the declared ignored deliverable bytes');
+
+// Scoped ignored discovery narrows `git ls-files` to the literal parent of a
+// glob declaration; the ATM matcher must still decide the final set, and an
+// oversized pathspec must fall back to the full scan without losing matches.
+assert.deepEqual(listTaskDeclaredIgnoredWorktreeFiles(cwd, ['ignored-deliverables/decl*.md']), [declaredIgnoredPath], 'glob scope must find the declared ignored file through its parent pathspec and exclude siblings');
+assert.deepEqual(listTaskDeclaredIgnoredWorktreeFiles(cwd, [declaredIgnoredPath, ...Array.from({ length: 400 }, (_, index) => `unrelated/very-long-scope-entry-${index}.md`)]), [declaredIgnoredPath], 'oversized scope must fall back to the full ignored scan and keep the declared file');
 
 // A retained foreign deletion must likewise stay out of a different task's
 // bounded commit.  The safety gate protects destructive writes that enter the
