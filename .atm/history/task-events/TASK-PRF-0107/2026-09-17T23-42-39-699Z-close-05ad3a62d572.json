@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-17T23-42-39-699Z-close-05ad3a62d572",
+  "taskId": "TASK-PRF-0107",
+  "action": "close",
+  "actorId": "claude-code-opus-5",
+  "sessionId": "session-20260917233758-claude-code-opus-5-TASK-PRF-0107-057761c6c5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0107.json",
+  "taskSha256": "sha256:9fd414cac3cb297d9fbf8f8baf7096603372132bc1489bcf498b050e0ef8ff62",
+  "createdAt": "2026-09-17T23:42:39.699Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0107 --actor claude-code-opus-5 --status done --historical-delivery 36b780ff3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260917233758-claude-code-opus-5-TASK-PRF-0107-057761c6c5",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0107.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build:packages -- --packages cli",
+      "check:encoding:touched -- --files docs/reports/atm-command-gate-latency-score.md",
+      "check:encoding:touched -- --files packages/cli/src/commands/atm-chart/constants.ts packages/cli/src/commands/atm-chart/render-verify.ts scripts/build-cli-npm-runtime.ts tests/cli/atm-chart-public-runtime.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "git diff --check",
+      "node --strip-types tests/cli/atm-chart-public-runtime.test.ts",
+      "typecheck -- --pretty false",
+      "validate:public-npm-install",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1 --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0107/registry-proof-atm.json",
+      "validate:public-npm-install -- --package @ai-atomic-framework/cli --version 0.1.0 --record-blocked --measurement-runs 1 --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0107/registry-proof-current.json",
+      "validate:public-npm-install --measure (local candidate)"
+    ],
+    "requiredGates": [
+      "build:packages -- --packages cli",
+      "check:encoding:touched -- --files packages/cli/src/commands/atm-chart/constants.ts packages/cli/src/commands/atm-chart/render-verify.ts scripts/build-cli-npm-runtime.ts tests/cli/atm-chart-public-runtime.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "node --strip-types tests/cli/atm-chart-public-runtime.test.ts",
+      "typecheck -- --pretty false",
+      "validate:public-npm-install"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-17T23:42:39.688Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0107.*",
+        ".atm/history/task-events/TASK-PRF-0107/**",
+        ".atm/history/tasks/TASK-PRF-0107.json",
+        "docs/reports/atm-command-gate-latency-score.md",
+        "packages/cli/src/commands/atm-chart/constants.ts",
+        "packages/cli/src/commands/atm-chart/render-verify.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop",
+        "release/atm-root-drop/release-manifest.json",
+        "scripts/build-cli-npm-runtime.ts",
+        "tests/cli/atm-chart-public-runtime.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/atm-chart/constants.ts",
+        "packages/cli/src/commands/atm-chart/render-verify.ts",
+        "scripts/build-cli-npm-runtime.ts",
+        "tests/cli/atm-chart-public-runtime.test.ts"
+      ],
+      "requiredGates": [
+        "build:packages -- --packages cli",
+        "check:encoding:touched -- --files packages/cli/src/commands/atm-chart/constants.ts packages/cli/src/commands/atm-chart/render-verify.ts scripts/build-cli-npm-runtime.ts tests/cli/atm-chart-public-runtime.test.ts docs/reports/atm-command-gate-latency-score.md",
+        "node --strip-types tests/cli/atm-chart-public-runtime.test.ts",
+        "typecheck -- --pretty false",
+        "validate:public-npm-install"
+      ]
+    }
+  }
+}

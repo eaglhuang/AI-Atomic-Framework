@@ -1,12 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0107",
-  "updatedAt": "2026-09-17T23:23:56.766Z",
+  "updatedAt": "2026-09-17T23:41:11.487Z",
   "updatedBy": "claude-code-opus-5",
   "freshValidationPasses": [
     "build:packages -- --packages cli",
     "check:encoding:touched -- --files docs/reports/atm-command-gate-latency-score.md",
     "check:encoding:touched -- --files packages/cli/src/commands/atm-chart/constants.ts packages/cli/src/commands/atm-chart/render-verify.ts scripts/build-cli-npm-runtime.ts tests/cli/atm-chart-public-runtime.test.ts docs/reports/atm-command-gate-latency-score.md",
+    "git diff --check",
     "node --strip-types tests/cli/atm-chart-public-runtime.test.ts",
     "typecheck -- --pretty false",
     "validate:public-npm-install",
@@ -340,6 +341,22 @@
       "durationMs": 1648,
       "runnerKind": "frozen-runner",
       "sourceCommit": "fe55fd860c36b559f18409b16da66feb9d98a67c",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-09-17T23:41:11.486Z",
+      "startedAt": "2026-09-17T23:41:11.191Z",
+      "finishedAt": "2026-09-17T23:41:11.486Z",
+      "durationMs": 295,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "36b780ff329763713dfa5a1e8d82b015cecad121",
       "cached": false
     }
   ],
