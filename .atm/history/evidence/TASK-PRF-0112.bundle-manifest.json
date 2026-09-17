@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0112",
+  "updatedAt": "2026-09-17T16:54:01.282Z",
+  "updatedBy": "claude-code-opus-5",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "node --strip-types tests/cli/next-governance-readiness-latency.test.ts",
+    "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+    "node --strip-types tests/cli/root-drop-release-source-list.test.ts",
+    "typecheck -- --pretty false"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/next-governance-readiness-latency.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:059958bdc78cbef8da0162d3287d749f3cf248763c9ebe323016506fea514b1e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/next-governance-readiness-latency.test.ts"
+      ],
+      "generatedAt": "2026-09-17T16:53:31.604Z",
+      "startedAt": "2026-09-17T16:53:31.212Z",
+      "finishedAt": "2026-09-17T16:53:31.604Z",
+      "durationMs": 392,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "965999f135b67e958d6353fc52f52fdd883a0058",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d236f5f48d39d1e3d5f0d97b20140f3a962936e1d18ff77362235b6f1e715970",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts"
+      ],
+      "generatedAt": "2026-09-17T16:53:36.142Z",
+      "startedAt": "2026-09-17T16:53:33.793Z",
+      "finishedAt": "2026-09-17T16:53:36.142Z",
+      "durationMs": 2349,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "965999f135b67e958d6353fc52f52fdd883a0058",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:974173d6ff4cd6d2a3c8aa603d8f0c0a0c3af85f80cca6acd212e939353d4041",
+      "stderrSha256": "sha256:5ecb833f70aa0160edb1e81055f69cade1dec37e5b64386e2d63c2227d329f26",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts"
+      ],
+      "generatedAt": "2026-09-17T16:53:44.999Z",
+      "startedAt": "2026-09-17T16:53:38.287Z",
+      "finishedAt": "2026-09-17T16:53:44.999Z",
+      "durationMs": 6712,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "965999f135b67e958d6353fc52f52fdd883a0058",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/root-drop-release-source-list.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8001a6bead2304a0e23f72e83f40df8709e6bd9f3b0d53908e84194950d6f20f",
+      "stderrSha256": "sha256:9628745ea14f54e985fbce20fe27fce2970baad72d7e2dce1c5b38e6cb93b8b1",
+      "validators": [
+        "node --strip-types tests/cli/root-drop-release-source-list.test.ts"
+      ],
+      "generatedAt": "2026-09-17T16:53:47.850Z",
+      "startedAt": "2026-09-17T16:53:47.129Z",
+      "finishedAt": "2026-09-17T16:53:47.850Z",
+      "durationMs": 721,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "965999f135b67e958d6353fc52f52fdd883a0058",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b4f74faa4576a8a1d06c4481fca16ab5537578dff7c9d225b5bc4bc4a6d3ffb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck -- --pretty false"
+      ],
+      "generatedAt": "2026-09-17T16:53:58.825Z",
+      "startedAt": "2026-09-17T16:53:49.942Z",
+      "finishedAt": "2026-09-17T16:53:58.825Z",
+      "durationMs": 8883,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "965999f135b67e958d6353fc52f52fdd883a0058",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-09-17T16:54:01.281Z",
+      "startedAt": "2026-09-17T16:54:01.006Z",
+      "finishedAt": "2026-09-17T16:54:01.281Z",
+      "durationMs": 275,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "965999f135b67e958d6353fc52f52fdd883a0058",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

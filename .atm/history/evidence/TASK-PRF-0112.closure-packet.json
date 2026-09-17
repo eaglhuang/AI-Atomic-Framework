@@ -1,0 +1,217 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0112",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "965999f135b67e958d6353fc52f52fdd883a0058",
+  "governedTreeSha": "8e018460b02afb1ff70866b65969aec55c925171",
+  "targetCommitDelta": {
+    "currentCommitSha": "965999f135b67e958d6353fc52f52fdd883a0058",
+    "parentCommitShas": [
+      "965999f135b67e958d6353fc52f52fdd883a0058"
+    ],
+    "governedTreeSha": "8e018460b02afb1ff70866b65969aec55c925171",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-publication-takeover.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/evidence/TASK-PRF-0107.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      ".atm/history/tasks/TASK-PRF-0107.json",
+      "packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+      "packages/cli/dist/commands/next/governance-readiness.js",
+      "packages/cli/dist/commands/next/playbook-projection/governance-readiness.js",
+      "packages/cli/dist/commands/next/prompt-guidance-result.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
+      "packages/cli/src/commands/next/governance-readiness.ts",
+      "packages/cli/src/commands/next/next-action-assembly.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/prompt-guidance-result.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/governance-readiness.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection/governance-readiness.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/prompt-guidance-result.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/governance-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/next-action-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/prompt-guidance-result.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/measure-product-ci-burn-in.ts",
+      "release/atm-root-drop/scripts/validate-release-trust.ts",
+      "release/atm-root-drop/tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "release/atm-root-drop/tests/release/release-trust.test.ts",
+      "tests/cli/next-governance-readiness-latency.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/next-governance-readiness-latency.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:059958bdc78cbef8da0162d3287d749f3cf248763c9ebe323016506fea514b1e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d236f5f48d39d1e3d5f0d97b20140f3a962936e1d18ff77362235b6f1e715970",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:974173d6ff4cd6d2a3c8aa603d8f0c0a0c3af85f80cca6acd212e939353d4041",
+      "stderrSha256": "sha256:5ecb833f70aa0160edb1e81055f69cade1dec37e5b64386e2d63c2227d329f26",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/root-drop-release-source-list.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8001a6bead2304a0e23f72e83f40df8709e6bd9f3b0d53908e84194950d6f20f",
+      "stderrSha256": "sha256:9628745ea14f54e985fbce20fe27fce2970baad72d7e2dce1c5b38e6cb93b8b1",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b4f74faa4576a8a1d06c4481fca16ab5537578dff7c9d225b5bc4bc4a6d3ffb8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "node --strip-types tests/cli/next-governance-readiness-latency.test.ts",
+    "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+    "node --strip-types tests/cli/root-drop-release-source-list.test.ts",
+    "typecheck -- --pretty false"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "node --strip-types tests/cli/next-governance-readiness-latency.test.ts",
+    "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+    "node --strip-types tests/cli/root-drop-release-source-list.test.ts",
+    "typecheck -- --pretty false"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-17T16:55:59.371Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0112.*",
+      ".atm/history/task-events/TASK-PRF-0112/**",
+      ".atm/history/tasks/TASK-PRF-0112.json",
+      "packages/cli/dist/**",
+      "packages/cli/dist/commands/next/prompt-guidance-result.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
+      "packages/cli/src/commands/next/governance-readiness.ts",
+      "packages/cli/src/commands/next/next-action-assembly.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/prompt-guidance-result.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "release/atm-root-drop/packages/cli/dist/commands/next/prompt-guidance-result.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/next/prompt-guidance-result.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/next-governance-readiness-latency.test.ts",
+      "tests/cli/root-drop-release-source-list.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/**",
+      "packages/cli/dist/commands/next/prompt-guidance-result.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
+      "packages/cli/src/commands/next/governance-readiness.ts",
+      "packages/cli/src/commands/next/next-action-assembly.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/prompt-guidance-result.ts",
+      "tests/cli/next-governance-readiness-latency.test.ts",
+      "tests/cli/root-drop-release-source-list.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "node --strip-types tests/cli/next-governance-readiness-latency.test.ts",
+      "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+      "node --strip-types tests/cli/root-drop-release-source-list.test.ts",
+      "typecheck -- --pretty false"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0112.json",
+  "closedAt": "2026-09-17T16:55:59.372Z",
+  "closedByActor": "claude-code-opus-5",
+  "sessionId": "session-20260917162605-claude-code-opus-5-TASK-PRF-0112-20d6691444",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "9474cc211159127d5353766a0616e4ed15f4b785",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0112/2026-09-17T16-30-38-022Z-scope-amendment-c6f377d8ebe5.json",
+      ".atm/history/tasks/TASK-PRF-0112.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
