@@ -1,5 +1,5 @@
 import { buildFirstUseUserNotice } from '../first-use-notice.ts';
-import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from '../framework-development.ts';
+import { buildFrameworkTempClaimCommand, detectFrameworkRepoIdentity } from '../framework-development.ts';
 import { inspectIntegrationBootstrap } from '../integration.ts';
 import { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
 import { makeResult, message } from '../shared.ts';
@@ -69,8 +69,11 @@ export function buildPromptGuidanceNextResult(input: {
     });
   }
   if (isFrameworkMaintenancePrompt(prompt)) {
-    const frameworkStatus = createFrameworkModeStatus({ cwd: input.cwd });
-    if (!frameworkStatus.repoIdentity.isFrameworkRepo) {
+    // Pre-claim guidance only needs a cheap repository identity probe.  Full
+    // framework status enumerates dirty work, locks and runner state; defer it
+    // to the claim/guard boundary where it can affect an admission decision.
+    const frameworkRepoIdentity = detectFrameworkRepoIdentity(input.cwd);
+    if (!frameworkRepoIdentity.isFrameworkRepo) {
       return buildGeneralPromptGuidanceResult(input, prompt);
     }
     const claimCommand = buildFrameworkTempClaimCommand([], prompt);
@@ -90,7 +93,11 @@ export function buildPromptGuidanceNextResult(input: {
         channel: 'fast',
         prompt,
         actorId: input.actor,
-        frameworkClaimRequired: true
+        // This is pre-claim guidance.  Preserve the claim hint, but defer
+        // full framework status and active-work enumeration until claim/guard.
+        frameworkClaimRequired: false,
+        deferAheadCount: true,
+        deferActiveWorkSummary: true
       }),
       allowedCommands: [
         claimCommand,
@@ -120,7 +127,9 @@ export function buildPromptGuidanceNextResult(input: {
         recommendedChannel: 'fast',
         agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
         taskIntent: input.taskIntent,
-        frameworkStatus,
+        frameworkRepoIdentity,
+        frameworkStatus: null,
+        frameworkStatusDeferred: true,
         integrationBootstrap: input.integrationBootstrap,
         runtimeAdapterReadiness: input.runtimeAdapterReadiness
       }

@@ -72,6 +72,19 @@ const outOfScopeReceipt = collectLifecycleEvidence(outOfScope);
 assert.equal(outOfScopeReceipt.runs.every((run) => run.eligible === false), true);
 assert.equal(outOfScopeReceipt.runs[0].exclusionReason, 'out-of-scope-workflow');
 
+// A real export can contain eligible and scope-excluded runs together.  The
+// collector omits attempts for excluded runs, so replay must validate only the
+// eligible records rather than rejecting the whole receipt as malformed.
+const mixedScope = structuredClone(attemptExport);
+mixedScope.attempts[0].workflowName = 'ci';
+mixedScope.attempts[1].workflowName = 'ci';
+const mixedScopeReceipt = collectLifecycleEvidence(mixedScope);
+assert.equal(mixedScopeReceipt.runs.some((run) => run.eligible === false), true);
+assert.equal(mixedScopeReceipt.runs.some((run) => run.eligible !== false), true);
+assert.equal(mixedScopeReceipt.runs.find((run) => run.eligible === false)?.attempts, undefined);
+const mixedScopeReplay = evaluateBurnIn(mixedScopeReceipt, { minCompletedRuns: 1, minCalendarDays: 0 });
+assert.notEqual(mixedScopeReplay.claimStatus, 'invalid-input', JSON.stringify(mixedScopeReplay));
+
 const missingIdentity = structuredClone(attemptExport);
 delete missingIdentity.attempts[0].workflowName;
 delete missingIdentity.attempts[1].workflowName;

@@ -500,7 +500,7 @@ function newestFrameworkSourceMtime(rootDir) { let newest = 0; for (const entryP
 } return newest; }
 function runnerAffectingMtimeRoots(rootDir) { const manifest = readRunnerBuildScopeManifest(rootDir); if (!manifest)
     return ['packages/cli/src', 'scripts']; const roots = runnerAffectingPatterns(manifest).filter((pattern) => !pattern.startsWith('release/')).map((pattern) => pattern.includes('*') ? pattern.slice(0, pattern.indexOf('*')) : pattern).map((pattern) => pattern.replace(/\/$/, '')).filter((pattern) => pattern.length > 0); return [...new Set(roots)]; }
-function readRunnerSourceSealBlobIds(rootDir) { const dirtyResult = spawnSync('git', ['diff', '--name-only'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const cachedResult = spawnSync('git', ['diff', '--cached', '--name-only'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const changed = new Set([...String(dirtyResult.stdout ?? '').split(/\r?\n/), ...String(cachedResult.stdout ?? '').split(/\r?\n/)].map((entry) => normalizeRelativePath(entry)).filter(Boolean)); const indexResult = spawnSync('git', ['ls-files', '-s'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); const blobs = new Map(); if ((indexResult.status ?? 1) !== 0)
+function readRunnerSourceSealBlobIds(rootDir) { const gitEnv = runnerGitEnvironment(rootDir); const dirtyResult = spawnSync('git', ['diff', '--name-only'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, env: gitEnv }); const cachedResult = spawnSync('git', ['diff', '--cached', '--name-only'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, env: gitEnv }); const changed = new Set([...String(dirtyResult.stdout ?? '').split(/\r?\n/), ...String(cachedResult.stdout ?? '').split(/\r?\n/)].map((entry) => normalizeRelativePath(entry)).filter(Boolean)); const indexResult = spawnSync('git', ['ls-files', '-s'], { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, env: gitEnv }); const blobs = new Map(); if ((indexResult.status ?? 1) !== 0)
     return blobs; for (const line of String(indexResult.stdout ?? '').split(/\r?\n/)) {
     const match = line.match(/^\d+\s+([0-9a-f]+)\s+\d+\t(.+)$/);
     if (!match)
@@ -1149,8 +1149,43 @@ function isObjectRecord(value) { return Boolean(value) && typeof value === 'obje
 function requireValue(argv, index, flag) { const value = argv[index + 1]; if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `framework development command requires a value for ${flag}`, { exitCode: 2 });
 } return value; }
-function readRunnerGitText(rootDir, args) { const result = spawnSync('git', args, { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); return (result.status ?? 1) === 0 ? String(result.stdout ?? '') : null; }
-function readRunnerGitBlobId(rootDir, relativePath) { const value = readRunnerGitText(rootDir, ['rev-parse', `HEAD:${relativePath}`]); return value?.trim() || null; }
+function readRunnerGitText(rootDir, args) { const result = spawnSync('git', args, { cwd: rootDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, env: runnerGitEnvironment(rootDir) }); return (result.status ?? 1) === 0 ? String(result.stdout ?? '') : null; }
+function runnerGitEnvironment(rootDir) { if (process.platform !== 'linux' || !rootDir.startsWith('/mnt/') || !existsSync(path.join(rootDir, '.git')))
+    return process.env; return { ...process.env, GIT_DIR: path.join(rootDir, '.git'), GIT_WORK_TREE: rootDir }; }
+const runnerGitBlobCache = new Map();
+function readRunnerGitBlobId(rootDir, relativePath) {
+    const cacheKey = path.resolve(rootDir);
+    let blobs = runnerGitBlobCache.get(cacheKey);
+    if (!blobs) {
+        const result = spawnSync('git', ['ls-tree', '-r', '-z', 'HEAD'], {
+            cwd: rootDir,
+            encoding: 'utf8',
+            maxBuffer: 64 * 1024 * 1024,
+            env: runnerGitEnvironment(rootDir)
+        });
+        const parsed = new Map();
+        if ((result.status ?? 1) === 0) {
+            for (const row of String(result.stdout ?? '').split('\0')) {
+                const tab = row.indexOf('\t');
+                if (tab < 0)
+                    continue;
+                const header = row.slice(0, tab).split(/\s+/);
+                const objectId = header[2];
+                const filePath = normalizeRelativePath(row.slice(tab + 1));
+                if (objectId && filePath)
+                    parsed.set(filePath, objectId);
+            }
+        }
+        blobs = parsed;
+        runnerGitBlobCache.set(cacheKey, blobs);
+    }
+    const normalizedPath = normalizeRelativePath(relativePath);
+    const cached = blobs.get(normalizedPath);
+    if (cached)
+        return cached;
+    const value = readRunnerGitText(rootDir, ['rev-parse', `HEAD:${normalizedPath}`]);
+    return value?.trim() || null;
+}
 function runnerPatternMatches(filePath, pattern) { const file = normalizeRelativePath(filePath); const normalized = normalizeRelativePath(pattern); if (normalized.endsWith('/'))
     return file.startsWith(normalized); if (!normalized.includes('*'))
     return file === normalized; const escaped = normalized.split('*').map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*'); return new RegExp(`^${escaped}$`).test(file); }

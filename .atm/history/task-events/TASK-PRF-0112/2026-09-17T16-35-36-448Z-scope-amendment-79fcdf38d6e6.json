@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-17T16-35-36-448Z-scope-amendment-79fcdf38d6e6",
+  "taskId": "TASK-PRF-0112",
+  "action": "scope-amendment",
+  "actorId": "claude-code-opus-5",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0112.json",
+  "taskSha256": "sha256:5a1ce085fc10064610773084ebf01bf57161de873af42864cbf045acf0ca4215",
+  "createdAt": "2026-09-17T16:35:36.448Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0112 --actor claude-code-opus-5 --add \"release/atm-onefile/atm.mjs,release/atm-root-drop/**,packages/cli/dist/**,release/atm-onefile/release-manifest.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

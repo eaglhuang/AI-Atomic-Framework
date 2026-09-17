@@ -191,7 +191,10 @@ function validateRuns(input: unknown, policy: BurnInPolicy, requiresJobProvenanc
     if (!eligible && (!run.exclusionReason || run.exclusionReason.trim().length === 0)) throw new Error(`record-${databaseId}-missing-exclusionReason`);
     if (policy.requireLifecycle) validateLifecycle(run as CiRun);
     if (eligible && run.productJobConclusion !== undefined && run.productJobConclusion !== run.conclusion) throw new Error(`record-${databaseId}-product-conclusion-mismatch`);
-    if (requiresJobProvenance) validateAttemptProvenance(run as CiRun);
+    // The collector deliberately omits attempt provenance for scope-excluded
+    // runs.  Validate provenance for eligible observations only; excluded
+    // records still need their exclusion reason and lifecycle validated above.
+    if (requiresJobProvenance && eligible) validateAttemptProvenance(run as CiRun);
     previousCreatedAt = createdAt;
     runs.push(run as CiRun);
   }

@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 export function buildGovernanceReadinessHintContract(input) {
-    const gitReadiness = readFastGitReadiness(input.cwd);
+    const gitReadiness = readFastGitReadiness(input.cwd, { deferAheadCount: input.deferAheadCount === true });
     const currentBranch = gitReadiness.currentBranch;
     const upstreamRef = gitReadiness.upstreamRef;
     const aheadCount = gitReadiness.aheadCount;
@@ -16,7 +16,7 @@ export function buildGovernanceReadinessHintContract(input) {
         ...(input.ownFiles ?? []),
         ...(input.taskId ? input.readTaskWorkFiles(input.cwd, input.taskId) : [])
     ]);
-    const activeWorkSummary = input.channel === null
+    const activeWorkSummary = input.deferActiveWorkSummary === true || input.channel === null
         ? {
             schemaId: 'atm.activeWorkSummary.v1',
             status: 'deferred',
@@ -56,15 +56,17 @@ export function buildGovernanceReadinessHintContract(input) {
             : null
     };
 }
-function readFastGitReadiness(cwd) {
+function readFastGitReadiness(cwd, options = {}) {
     const gitDirectory = resolveGitDirectory(cwd);
     const currentBranch = gitDirectory ? readCurrentBranchFromGitDir(gitDirectory) : runGitScalar(cwd, ['branch', '--show-current']);
     const upstreamRef = currentBranch && gitDirectory
         ? readUpstreamFromGitConfig(gitDirectory, currentBranch) ?? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`])
         : (currentBranch ? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`]) : null);
-    const aheadCount = currentBranch && upstreamRef && gitDirectory
-        ? (readAheadCountFast(gitDirectory, currentBranch, upstreamRef) ?? Number.parseInt(runGitScalar(cwd, ['rev-list', '--count', `${upstreamRef}..HEAD`]) ?? '0', 10)) || 0
-        : 0;
+    const aheadCount = options.deferAheadCount
+        ? null
+        : currentBranch && upstreamRef && gitDirectory
+            ? (readAheadCountFast(gitDirectory, currentBranch, upstreamRef) ?? Number.parseInt(runGitScalar(cwd, ['rev-list', '--count', `${upstreamRef}..HEAD`]) ?? '0', 10)) || 0
+            : 0;
     return { currentBranch, upstreamRef, aheadCount };
 }
 function resolveGitDirectory(cwd) {

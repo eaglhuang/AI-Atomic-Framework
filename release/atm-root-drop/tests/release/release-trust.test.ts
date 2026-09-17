@@ -8,6 +8,10 @@ import { createTempWorkspace } from '../../scripts/temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tempRoot = createTempWorkspace('atm-release-trust-');
+const releaseWorkflow = readFileSync(path.join(root, '.github', 'workflows', 'release-npm.yml'), 'utf8');
+assert.match(releaseWorkflow, /^\s*id-token:\s*write\s*$/m);
+assert.doesNotMatch(releaseWorkflow, /^\s*registry-url:\s*['\"]?https:\/\/registry\.npmjs\.org['\"]?\s*$/m);
+assert.doesNotMatch(releaseWorkflow, /^\s*NODE_AUTH_TOKEN:\s*\S+/m);
 
 function sha256Prefixed(value: string) {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;

@@ -12,6 +12,11 @@ export function buildGovernanceReadinessHint(cwd, input) {
     return buildGovernanceReadinessHintContract({
         cwd,
         ...input,
+        // A channel-less prompt has no claim/guard decision to consume this
+        // value.  Deferring the upstream commit count removes a potentially
+        // multi-second `git rev-list` from the normal guidance path.
+        deferAheadCount: input.deferAheadCount ?? (input.channel === null && input.frameworkClaimRequired !== true),
+        deferActiveWorkSummary: input.deferActiveWorkSummary,
         uniqueSorted,
         readTaskWorkFiles,
         buildActiveWorkSummary,

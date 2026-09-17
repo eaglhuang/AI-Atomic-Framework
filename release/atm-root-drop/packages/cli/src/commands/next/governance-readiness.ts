@@ -30,8 +30,16 @@ export function buildGovernanceReadinessHintContract(input: {
   readonly isFrameworkRepository: (cwd: string) => boolean;
   readonly isFrameworkMaintenancePrompt: (prompt: string) => boolean;
   readonly isProtectedFrameworkBranchTarget: (branch: string) => boolean;
+  /**
+   * Unscoped guidance is informational only.  Do not spend seconds counting
+   * commits ahead of upstream until a claim/guard boundary actually needs the
+   * value.  `null` is intentional: it means not measured, never zero.
+   */
+  readonly deferAheadCount?: boolean;
+  /** Skip live dirty-worktree enumeration until a scoped admission boundary. */
+  readonly deferActiveWorkSummary?: boolean;
 }) {
-  const gitReadiness = readFastGitReadiness(input.cwd);
+  const gitReadiness = readFastGitReadiness(input.cwd, { deferAheadCount: input.deferAheadCount === true });
   const currentBranch = gitReadiness.currentBranch;
   const upstreamRef = gitReadiness.upstreamRef;
   const aheadCount = gitReadiness.aheadCount;
@@ -45,7 +53,7 @@ export function buildGovernanceReadinessHintContract(input: {
     ...(input.ownFiles ?? []),
     ...(input.taskId ? input.readTaskWorkFiles(input.cwd, input.taskId) : [])
   ]);
-  const activeWorkSummary = input.channel === null
+  const activeWorkSummary = input.deferActiveWorkSummary === true || input.channel === null
     ? {
         schemaId: 'atm.activeWorkSummary.v1' as const,
         status: 'deferred' as const,
@@ -86,13 +94,15 @@ export function buildGovernanceReadinessHintContract(input: {
   };
 }
 
-function readFastGitReadiness(cwd: string) {
+function readFastGitReadiness(cwd: string, options: { readonly deferAheadCount?: boolean } = {}) {
   const gitDirectory = resolveGitDirectory(cwd);
   const currentBranch = gitDirectory ? readCurrentBranchFromGitDir(gitDirectory) : runGitScalar(cwd, ['branch', '--show-current']);
   const upstreamRef = currentBranch && gitDirectory
     ? readUpstreamFromGitConfig(gitDirectory, currentBranch) ?? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`])
     : (currentBranch ? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`]) : null);
-  const aheadCount = currentBranch && upstreamRef && gitDirectory
+  const aheadCount = options.deferAheadCount
+    ? null
+    : currentBranch && upstreamRef && gitDirectory
     ? (readAheadCountFast(gitDirectory, currentBranch, upstreamRef) ?? Number.parseInt(runGitScalar(cwd, ['rev-list', '--count', `${upstreamRef}..HEAD`]) ?? '0', 10)) || 0
     : 0;
   return { currentBranch, upstreamRef, aheadCount };
