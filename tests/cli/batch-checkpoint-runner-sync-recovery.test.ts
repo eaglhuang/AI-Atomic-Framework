@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildBatchCheckpointRunnerRecoveryArgs, categorizeCheckpointCloseFailure } from '../../packages/cli/src/commands/batch/runner-recovery-forwarding.ts';
@@ -28,10 +28,6 @@ assert.deepEqual(
   [],
   'without an approval the batch adapter must preserve the stale-runner fail-closed default'
 );
-const sourceImpact = classifyRunnerSourceImpact(process.cwd(), 'package.json');
-assert.equal(sourceImpact.schemaId, 'atm.runnerSourceImpact.v1');
-assert.equal(sourceImpact.runnerAffecting, false, 'package-script-only changes must not create a stale-runner blocker');
-assert.deepEqual(sourceImpact.changedConfigKeys, ['scripts']);
 const runtimeImpact = classifyRunnerSourceImpact(process.cwd(), 'packages/cli/src/commands/batch/implementation.ts');
 assert.equal(runtimeImpact.runnerAffecting, true, 'declared runner source must remain fail-closed');
 
@@ -40,8 +36,30 @@ mkdirSync(repo, { recursive: true });
 execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
 execFileSync('git', ['config', 'user.email', 'validator@example.invalid'], { cwd: repo, stdio: 'ignore' });
 execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
-execFileSync('git', ['commit', '--allow-empty', '-m', 'base'], { cwd: repo, stdio: 'ignore' });
+
+// classifyRunnerSourceImpact diffs the config file's HEAD blob against the
+// live worktree copy, so its "changed keys" contract must be exercised
+// against a self-contained fixture repo, not the real AI-Atomic-Framework
+// checkout: a clean CI checkout has no uncommitted package.json edit, so
+// asserting on process.cwd()'s own package.json was inherently
+// non-deterministic (it silently depended on whatever local edit happened
+// to be dirty at test time, which is never true right after a push).
+mkdirSync(path.join(repo, 'scripts', 'AtmCore'), { recursive: true });
+writeFileSync(path.join(repo, 'scripts', 'AtmCore', 'runner-build-scope.json'), JSON.stringify({
+  buildConfigPaths: ['package.json'],
+  runnerAffectingConfigKeys: { 'package.json': ['dependencies', 'devDependencies', 'engines'] },
+  runnerAffectingPatterns: []
+}), 'utf8');
+writeFileSync(path.join(repo, 'package.json'), JSON.stringify({ name: 'fixture', scripts: { build: 'echo head' } }, null, 2), 'utf8');
+execFileSync('git', ['add', '.'], { cwd: repo, stdio: 'ignore' });
+execFileSync('git', ['commit', '-m', 'base'], { cwd: repo, stdio: 'ignore' });
 const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+writeFileSync(path.join(repo, 'package.json'), JSON.stringify({ name: 'fixture', scripts: { build: 'echo worktree' } }, null, 2), 'utf8');
+
+const sourceImpact = classifyRunnerSourceImpact(repo, 'package.json');
+assert.equal(sourceImpact.schemaId, 'atm.runnerSourceImpact.v1');
+assert.equal(sourceImpact.runnerAffecting, false, 'package-script-only changes must not create a stale-runner blocker');
+assert.deepEqual(sourceImpact.changedConfigKeys, ['scripts']);
 
 const runnerSync = categorizeCheckpointCloseFailure({
   ok: false,
