@@ -93,3 +93,39 @@ claim. TASK-PRF-0057 requires archive-derived package metadata, deterministic
 file inventory, parity with candidate-directory packing, and fail-closed
 handling for malformed archives. It does not authorize publication or alter
 the public registry result.
+
+## TASK-PRF-0054 fail-closed post-publish registry gate (2026-09-18)
+
+The release workflow (`.github/workflows/release-npm.yml`) now runs a
+"Verify public npm registry post-publish" step immediately after the real
+`npm publish` step, before the broader post-publish validation suite. It
+re-installs the exact tagged version from the live public registry into a
+clean consumer with `--require-default-tag` (never mutable `latest`, never a
+`--version`-only smoke) and runs the complete core-workflow matrix; it does
+not pass `--record-blocked`, so a real registry defect fails the workflow
+rather than being recorded as a passing blocked result. The receipt
+(`release/public-npm-install-post-publish-proof.md`, containing requested
+version, registry metadata, tarball SHA-256, unpacked bytes, entry count, and
+per-command exit codes) is uploaded as a downloadable workflow artifact
+(`public-npm-install-post-publish-proof`). The step is skipped, not silently
+passed, on the `workflow_dispatch` dry-run path (same condition as the
+adjacent full-validation step).
+
+Focused contract test `tests/cli/release-public-registry-gate.test.ts`
+statically asserts these properties against the workflow source (command,
+`--require-default-tag`, absence of `--record-blocked`, dry-run skip
+condition, artifact upload, and step ordering after publish). It was verified
+to actually catch regressions, not just assert a tautology: two independent
+negative controls (reintroducing `--record-blocked`; deleting the
+`--require-default-tag` line) were applied to a scratch copy of the workflow
+and confirmed the test fails on each, before being discarded.
+
+This card modifies only the workflow, the focused test, and this report — it
+does not execute `npm publish`, change tokens/2FA, or authorize a release.
+`@ai-atomic-framework/cli@0.1.0` remains the currently published, incomplete
+version; running `npm run validate:public-npm-install -- --version 0.1.0
+--require-default-tag --record-blocked --measurement-runs 1` against it still
+returns `status: blocked` today, as expected — the gate protects the *next*
+publish, it does not retroactively fix the one already on the registry. That
+requires TASK-PRF-0107's fix (already merged to `main`) to actually be
+published, which remains a separate, Owner-approved decision.

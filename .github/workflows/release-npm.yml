@@ -244,6 +244,37 @@ jobs:
               sleep 3
             done
           fi
+      # Fail-closed post-publish registry gate (TASK-PRF-0054). Pre-publish
+      # candidate checks above answer "is the file we are about to publish
+      # correct?"; this step answers "is the file the market actually
+      # received still correct?" The two questions are not interchangeable,
+      # so this step re-installs the exact tagged version from the live
+      # public registry (never mutable `latest`) into a clean consumer and
+      # runs the complete core-workflow matrix, not a `--version`-only smoke.
+      # It never runs on workflow_dispatch/dry-run (the `if` below matches
+      # the job-level dry-run gate, so GitHub Actions reports this step as
+      # skipped rather than silently passing) and never uses
+      # --record-blocked, so a real registry defect fails the workflow.
+      - name: Verify public npm registry post-publish
+        if: ${{ always() && !cancelled() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
+        shell: bash
+        run: |
+          release_version="${GITHUB_REF_NAME#v}"
+          mkdir -p release
+          node --experimental-strip-types scripts/validate-public-npm-install.ts \
+            --package @ai-atomic-framework/cli \
+            --version "$release_version" \
+            --require-default-tag \
+            --output release/public-npm-install-post-publish-proof.md
+
+      - name: Attach public registry post-publish proof
+        if: ${{ always() && !cancelled() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-npm-install-post-publish-proof
+          path: release/public-npm-install-post-publish-proof.md
+          if-no-files-found: warn
+
       - name: Post-publish full validation
         if: ${{ always() && !cancelled() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
         timeout-minutes: 45
