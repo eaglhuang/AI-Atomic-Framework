@@ -50,8 +50,20 @@ export function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write',
             const targetedTaskLookup = Boolean(taskIntent
                 && !taskIntent.queueRequested
                 && (taskIntent.mentionedTaskIds.length > 0 || taskIntent.explicitTaskIds.length > 0));
+            // `isTaskIdMentioned` only reads `mentionedTaskIds` (prompt-text
+            // mentions), not `explicitTaskIds` (an explicit --task/--tasks id).
+            // A claim that names its own task only via --task, with no prompt
+            // text repeating the id, produced empty mentionedTaskIds; this task
+            // is then treated as "not targeted" and skips scope hydration,
+            // leaving scopePaths/targetAllowedFiles empty for the very task
+            // being claimed. Debugger-traced root cause (2026-09-18): confirmed
+            // via Chrome DevTools Protocol breakpoints that explicitTaskIds
+            // already contains the correct id at this point; only the OR check
+            // below was missing it.
+            const isExplicitlyTargeted = Boolean(taskIntent?.explicitTaskIds.includes(workItemId.trim().toUpperCase()));
             const shouldHydrateScope = (!targetedTaskLookup && isTaskRoutable(status, taskIntent))
                 || isTaskIdMentioned(workItemId, taskIntent)
+                || isExplicitlyTargeted
                 || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && normalizeTaskRouteStatus(status) === 'running');
             if (!shouldHydrateScope) {
                 return [buildMinimalImportedJsonTaskSummary({
