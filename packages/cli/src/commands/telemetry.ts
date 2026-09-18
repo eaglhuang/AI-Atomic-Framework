@@ -9,7 +9,7 @@ import {
   buildCommandGateLatencyMarkdown,
   buildCommandGateLatencyReportFromEvents,
   type CommandGateTelemetryEvent
-} from '../../../../scripts/plan-performance-report-v4.ts';
+} from '../../../core/src/telemetry/command-gate-latency-score.ts';
 
 export async function runTelemetry(argv: string[]) {
   const spec = getCommandSpec('telemetry') as CommandSpec;
