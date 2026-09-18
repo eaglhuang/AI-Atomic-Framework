@@ -1601,6 +1601,7 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/team-runtime/providers/openai.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/broker/decision-outcome.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/broker/index.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/command-gate-latency-score.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/compact-receipts.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/index.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/observation.js",
@@ -3630,6 +3631,7 @@
     "release/atm-root-drop/packages/core/dist/team-runtime/providers/openai.js",
     "release/atm-root-drop/packages/core/dist/telemetry/broker/decision-outcome.js",
     "release/atm-root-drop/packages/core/dist/telemetry/broker/index.js",
+    "release/atm-root-drop/packages/core/dist/telemetry/command-gate-latency-score.js",
     "release/atm-root-drop/packages/core/dist/telemetry/compact-receipts.js",
     "release/atm-root-drop/packages/core/dist/telemetry/index.js",
     "release/atm-root-drop/packages/core/dist/telemetry/observation.js",
@@ -4048,6 +4050,7 @@
     "release/atm-root-drop/packages/core/src/team-runtime/providers/openai.ts",
     "release/atm-root-drop/packages/core/src/telemetry/broker/decision-outcome.ts",
     "release/atm-root-drop/packages/core/src/telemetry/broker/index.ts",
+    "release/atm-root-drop/packages/core/src/telemetry/command-gate-latency-score.ts",
     "release/atm-root-drop/packages/core/src/telemetry/compact-receipts.ts",
     "release/atm-root-drop/packages/core/src/telemetry/index.ts",
     "release/atm-root-drop/packages/core/src/telemetry/observation.ts",
@@ -6204,7 +6207,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 6168,
+    "unchanged": 6171,
     "removed": 0
   },
   "buildMode": "full",
@@ -12619,7 +12622,7 @@
       },
       {
         "path": "docs/reports/atm-command-gate-latency-score.md",
-        "digest": "94c02d467627a80b7f8ef14c49f228de1db8e93c2d1357bf4bbee67f526ff62b",
+        "digest": "cf7ab0f5de24e2650595083e7d510e2b45c023c177947a7fde985efe06a1b421",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-command-gate-latency-score.md"
@@ -20340,6 +20343,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/_vendor/core/dist/telemetry/command-gate-latency-score.js",
+        "digest": "e2a92ea44cad96d8e59a1475411c4383b2018bb0ed749266e944fcb302429e5d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/telemetry/command-gate-latency-score.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/_vendor/core/dist/telemetry/compact-receipts.js",
         "digest": "12ceb2c9e9ea451a3ca185b84a34fbb87dfb0d585227f3c1fa64d841f80e4814",
         "origin": "source",
@@ -27145,7 +27157,7 @@
       },
       {
         "path": "packages/cli/dist/commands/telemetry.js",
-        "digest": "f1cde51e54a1c5d1f748197512c3fdd39de2d35aa5cd4ed1a6adc8c7c0f4f1da",
+        "digest": "517e5623ba46e95b8de7f4498df09cc807e0a58a19d4433d1470b7c347b1899b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/telemetry.js"
@@ -35209,7 +35221,7 @@
       },
       {
         "path": "packages/cli/src/commands/telemetry.ts",
-        "digest": "de403f35d1da98b0967f0faa1727a152ad5c1ebafa70c353850b953d44b8eb71",
+        "digest": "625c856e6c6bf93dd92831f3bd7523944536fdd58c64e6d4003f3d5374e7cd06",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/telemetry.ts"
@@ -38597,6 +38609,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/telemetry/broker/index.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/dist/telemetry/command-gate-latency-score.js",
+        "digest": "e2a92ea44cad96d8e59a1475411c4383b2018bb0ed749266e944fcb302429e5d",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/telemetry/command-gate-latency-score.js"
         ],
         "replaceable": true
       },
@@ -42359,6 +42380,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/core/src/telemetry/broker/index.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/src/telemetry/command-gate-latency-score.ts",
+        "digest": "5b3ad0043f5de623c33b786591bee7f9dd37831d779f862756f5800fbae4ec4c",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/src/telemetry/command-gate-latency-score.ts"
         ],
         "replaceable": true
       },
@@ -48520,7 +48550,7 @@
       },
       {
         "path": "scripts/plan-performance-report-v4.ts",
-        "digest": "1cd1350d78c1f30d4e102646cd203745b38130f419f38e0606c78c95d1e9ff00",
+        "digest": "f479259b074eaf29e05819afb4eeffe3954e27ab6e20ce2225a20fea7f92cc07",
         "origin": "source",
         "inputPaths": [
           "scripts/plan-performance-report-v4.ts"
@@ -61722,7 +61752,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:3f0734db1d7d97ff0ff65a4a881376f560b04c676a9c2319b7e2b8c244761500"
+    "treeDigest": "sha256:b7d721f4919f9ac29f23d4a912dc34116873d4f92beb626a687cecdddfc0f98f"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62966,6 +62996,7 @@
       "packages/core/src/team-runtime/providers/openai.ts",
       "packages/core/src/telemetry/broker/decision-outcome.ts",
       "packages/core/src/telemetry/broker/index.ts",
+      "packages/core/src/telemetry/command-gate-latency-score.ts",
       "packages/core/src/telemetry/compact-receipts.ts",
       "packages/core/src/telemetry/index.ts",
       "packages/core/src/telemetry/observation.ts",
@@ -63272,7 +63303,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:0c25c8d3c053f3624e29a1796118eb3201ace988486ef1cca0296339f175e15f"
+    "digest": "sha256:a8b824b98d236d2efb3829ffa7a60e1010b3a013caab691f294d21345c05d4a5"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -64847,6 +64878,7 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/team-runtime/providers/openai.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/broker/decision-outcome.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/broker/index.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/command-gate-latency-score.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/compact-receipts.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/index.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/telemetry/observation.js",
@@ -66876,6 +66908,7 @@
       "release/atm-root-drop/packages/core/dist/team-runtime/providers/openai.js",
       "release/atm-root-drop/packages/core/dist/telemetry/broker/decision-outcome.js",
       "release/atm-root-drop/packages/core/dist/telemetry/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/telemetry/command-gate-latency-score.js",
       "release/atm-root-drop/packages/core/dist/telemetry/compact-receipts.js",
       "release/atm-root-drop/packages/core/dist/telemetry/index.js",
       "release/atm-root-drop/packages/core/dist/telemetry/observation.js",
@@ -67294,6 +67327,7 @@
       "release/atm-root-drop/packages/core/src/team-runtime/providers/openai.ts",
       "release/atm-root-drop/packages/core/src/telemetry/broker/decision-outcome.ts",
       "release/atm-root-drop/packages/core/src/telemetry/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/telemetry/command-gate-latency-score.ts",
       "release/atm-root-drop/packages/core/src/telemetry/compact-receipts.ts",
       "release/atm-root-drop/packages/core/src/telemetry/index.ts",
       "release/atm-root-drop/packages/core/src/telemetry/observation.ts",
@@ -69452,22 +69486,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:8748c88765215c8be77b6e2a609211b7343a12ea89fe46d42517e8e1556962ec",
-  "sealedSourceCommit": "ea675732f28332245e958144ebe2bf6f71aeeb57",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:8842319ee66bfe19418019e0226a47e67f8b8eb4415e97efcb0c10a9f83a4246",
-  "tsBuildCacheDigest": "sha256:dbb14fb9560c29da1d978ec4521fe58513b14954d7a36ba2a83236201ad20651",
+  "buildInputsTreeHash": "sha256:07df0ef1dd6461af55cbf4c91650fd066dea9a7e34f2966c7b57fd612619a15d",
+  "sealedSourceCommit": "54872bf11f644a872473c1cf187253609b78b81a",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:c8d809b17fee17a22925f27b72fade8cc89d7ee141dc21b9f8293a52eaa60b9f",
+  "tsBuildCacheDigest": "sha256:20c174d67f54dc1ef6634f376bb56291fd2c23af20e05bd0dd3eb7e96bb76307",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 46,
-    "skipDecision": 48,
-    "worktreeSetup": 9287,
-    "typescriptBuild": 18564,
-    "rootDropReleaseAssembly": 31221,
-    "onefileReleaseAssembly": 19530,
-    "artifactSync": 3807,
+    "inputHashCalculation": 36,
+    "skipDecision": 47,
+    "worktreeSetup": 9424,
+    "typescriptBuild": 12856,
+    "rootDropReleaseAssembly": 29313,
+    "onefileReleaseAssembly": 19345,
+    "artifactSync": 4341,
     "cleanup": 0,
-    "totalElapsed": 95696
+    "totalElapsed": 117803
   }
 }

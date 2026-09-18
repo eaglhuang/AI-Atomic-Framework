@@ -5,7 +5,7 @@ import { makeResult, message, parseArgsForCommand } from './shared.js';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.js';
 import { buildGateTelemetryRegistryCoverageReport, buildGateTelemetryTaskSummary, canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../_vendor/core/dist/telemetry/index.js';
 import { buildSharedWriteGateCoverageReport } from '../_vendor/core/dist/telemetry/shared-write-coverage.js';
-import { buildCommandGateLatencyMarkdown, buildCommandGateLatencyReportFromEvents } from '../../../../scripts/plan-performance-report-v4.ts';
+import { buildCommandGateLatencyMarkdown, buildCommandGateLatencyReportFromEvents } from '../_vendor/core/dist/telemetry/command-gate-latency-score.js';
 export async function runTelemetry(argv) {
     const spec = getCommandSpec('telemetry');
     const parsed = parseArgsForCommand(spec, argv);
