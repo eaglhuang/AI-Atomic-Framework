@@ -68,6 +68,16 @@ assert.match(
   'the gate step must write the same file path the artifact step uploads'
 );
 
+// The registry serves a new version some time after `npm publish` returns.
+// The gate must wait for the exact version and its dist-tag before verifying,
+// and fail closed if they never appear, rather than racing the registry.
+const waitIndex = gateStep.indexOf('npm view "@ai-atomic-framework/cli@$release_version" version');
+const tagWaitIndex = gateStep.indexOf('"dist-tags.$NPM_DIST_TAG"');
+const validatorIndex = gateStep.indexOf('validate-public-npm-install.ts');
+assert.ok(waitIndex >= 0 && tagWaitIndex >= 0, 'the gate must poll the registry for the exact version and its dist-tag');
+assert.ok(waitIndex < validatorIndex && tagWaitIndex < validatorIndex, 'the registry wait must happen before the validator runs');
+assert.match(gateStep, /if \[\[ "\$visible" != "true" \]\]; then[\s\S]*?exit 1/, 'a registry that never serves the version must fail the gate');
+
 // ACC-1: the gate must run after the real publish, not before it.
 const publishIndex = workflow.indexOf("- name: Publish public workspace closure");
 const gateIndex = workflow.indexOf('- name: Verify public npm registry post-publish');

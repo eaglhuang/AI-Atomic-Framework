@@ -261,6 +261,25 @@ jobs:
         run: |
           release_version="${GITHUB_REF_NAME#v}"
           mkdir -p release
+          # npm answers `publish` before the version is readable from the
+          # registry; v0.1.1's gate ran seconds after publish and failed with
+          # "registry metadata lookup failed". Wait for the exact version and
+          # its dist-tag to be visible, bounded, and fail closed on timeout.
+          visible=false
+          for attempt in $(seq 1 40); do
+            published=$(npm view "@ai-atomic-framework/cli@$release_version" version 2>/dev/null || true)
+            tagged=$(npm view @ai-atomic-framework/cli "dist-tags.$NPM_DIST_TAG" 2>/dev/null || true)
+            if [[ "$published" == "$release_version" && "$tagged" == "$release_version" ]]; then
+              visible=true
+              break
+            fi
+            echo "registry not yet serving $release_version on $NPM_DIST_TAG (attempt $attempt/40)"
+            sleep 15
+          done
+          if [[ "$visible" != "true" ]]; then
+            echo "::error::@ai-atomic-framework/cli@$release_version was not visible on dist-tag $NPM_DIST_TAG within 10 minutes"
+            exit 1
+          fi
           node --experimental-strip-types scripts/validate-public-npm-install.ts \
             --package @ai-atomic-framework/cli \
             --version "$release_version" \
