@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-19T02-43-15-822Z-close-6e6afbb41376",
+  "taskId": "TASK-PRF-0114",
+  "action": "close",
+  "actorId": "claude-code-opus-5",
+  "sessionId": "session-20260919022214-claude-code-opus-5-TASK-PRF-0114-3795ff7515",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0114.json",
+  "taskSha256": "sha256:f0be8239cb8ff5afc399b8897f89aa2578378569fde44166ac3d73ad7e74be0a",
+  "createdAt": "2026-09-19T02:43:15.822Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0114 --actor claude-code-opus-5 --status done --historical-delivery ec1b7e69d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260919022214-claude-code-opus-5-TASK-PRF-0114-3795ff7515",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0114.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/run-validators.ts standard --filter validate-external-benchmark-executor",
+      "node --strip-types tests/cli/external-benchmark-executor.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types scripts/run-validators.ts standard --filter validate-external-benchmark-executor",
+      "node --strip-types tests/cli/external-benchmark-executor.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-19T02:43:15.813Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0114.*",
+        ".atm/history/task-events/TASK-PRF-0114/**",
+        ".atm/history/tasks/TASK-PRF-0114.json",
+        "scripts/lib/external-benchmark/arm-driver.ts",
+        "scripts/lib/external-benchmark/executor.ts",
+        "scripts/lib/external-benchmark/paired-executor.ts",
+        "scripts/run-atm-external-benchmark.ts",
+        "scripts/validators.config.json",
+        "tests/cli/external-benchmark-executor.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/lib/external-benchmark/arm-driver.ts",
+        "scripts/lib/external-benchmark/executor.ts",
+        "scripts/lib/external-benchmark/paired-executor.ts",
+        "scripts/run-atm-external-benchmark.ts",
+        "scripts/validators.config.json",
+        "tests/cli/external-benchmark-executor.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types scripts/run-validators.ts standard --filter validate-external-benchmark-executor",
+        "node --strip-types tests/cli/external-benchmark-executor.test.ts"
+      ]
+    }
+  }
+}
