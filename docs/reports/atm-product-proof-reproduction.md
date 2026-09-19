@@ -93,9 +93,19 @@ the root cause can be checked in the public CI logs.
 
 Latest result: on 2026-09-19 at 15:00 UTC the exporter returned 776 runs since 2026-08-10 (none dropped); the collector kept 650 eligible runs and excluded 126 as `out-of-scope-workflow`. Window `2026-08-26T23:44:22Z` to `2026-09-19T10:28:08Z` (23.4 days); 647 successful and 3 failed runs, all 3 repaired and explained (repair times 101, 124 and 8.5 minutes), 0 unexplained, 0 reruns, current streak 26. Verdict `reject` with the single reason `insufficient-calendar-window`.
 
-Known limit: Product CI runs a focused step list, and only a small fraction of
-the `tests/cli` suites are registered in any CI validator profile, so "covers
-test" is currently partial.
+Test coverage: Product CI runs a `CLI test sweep` step
+(`scripts/run-cli-test-sweep.ts`) that executes every `tests/cli/*.test.ts`
+file except those in the quarantine in `scripts/cli-test-sweep.config.json`. A
+test fails the sweep if it exits non-zero, times out, or modifies the worktree.
+Every quarantined test records a reason and a disposition. When the sweep was
+introduced (2026-09-20), 534 of 599 files ran and passed on Linux (WSL2 Ubuntu,
+Node 24.21, shallow clone; 168 s wall clock). The 65 quarantined files are 54
+that fail on `main` and have not been root-caused yet, 6 that pass but rewrite
+tracked files, and 5 that pass on Windows but fail on Linux.
+
+Known limit: runs before the sweep step was added did not execute most
+`tests/cli` suites, so "covers test" holds only for runs from that commit on,
+and the 65 quarantined files are still not covered.
 
 ## Proof 3 — net benefit over a simple baseline
 

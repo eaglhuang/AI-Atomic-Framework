@@ -1,0 +1,399 @@
+{
+  "schemaId": "atm.cliTestSweep.v1",
+  "testDir": "tests/cli",
+  "timeoutMs": 180000,
+  "concurrency": 4,
+  "quarantine": [
+    {
+      "test": "abandon-residue-governed-disposition.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ode:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: true,\r expected: false,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "atm-2-1-final-closure.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ION_PASSED=1` only after standard passes.\\n',\r expected: /420-cell paired A\\/B v4 met rollout metrics and safety controller \\| pass/,\r operator: 'match',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "atm-3-red-baseline-discrimination.test.ts",
+      "reason": "writes-tracked-files",
+      "detail": "Passes, but regenerates tracked files: artifacts/generated/atm-plan3-red-green/summary.json",
+      "disposition": "fix"
+    },
+    {
+      "test": "backlog-deferred-waiver-register.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): er (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 50,\r expected: 133,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "backlog-release-blocking-subset.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): r (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 477,\r expected: 391,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "broker-replay-command-surface.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: 0,\r expected: 1,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "captain-parallel-ledger-analysis.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "cli-published-command-smoke.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): lead to security vulnerabilities, as the arguments are not escaped, only concatenated.\\n' +\r '(Use `node --trace-deprecation ...` to show where the warning was created)\\n'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "command-manifest-recovery-chain.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: true,\r expected: false,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "create-map-from-plan.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: 1,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "create-map-from-spec.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: 2,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "create.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): oader (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 1,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "cross-editor-parallel-proof.test.ts",
+      "reason": "environment-dependent",
+      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): ERR_ASSERTION actual 'unmet', expected 'met'",
+      "disposition": "fix"
+    },
+    {
+      "test": "encoding-guard-argv-budget.test.ts",
+      "reason": "environment-dependent",
+      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): ERR_ASSERTION actual false, expected true",
+      "disposition": "fix"
+    },
+    {
+      "test": "evidence-write-lock-concurrency.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): code: 'ENOENT',\r syscall: 'open',\r path: 'C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\atm-evidence-write-lock-nuxvum\\\\.atm\\\\history\\\\evidence\\\\TASK-GOV-0408-CONCURRENCY.json'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "four-plan-closeout-blocker-map.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): neratedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'actionable-not-complete',\r expected: 'complete-closeout-certified',\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "four-plan-independent-certificate.test.ts",
+      "reason": "environment-dependent",
+      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): ERR_ASSERTION actual 'complete', expected 'not-complete'",
+      "disposition": "fix"
+    },
+    {
+      "test": "four-plan-objective-authority-review.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): , 115, 101, 32, 105, 102, 32, 40, 33, 101, 120, 105,\r 115, 116, 115, 83, 121, 110, 99, 40, 97, 98, 115, 111,\r 108, 117, 116, 101,\r ... 748 more items\r ]\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "framework-auto-stage-pathspec-batching.test.ts",
+      "reason": "environment-dependent",
+      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): ERR_ASSERTION actual false, expected true",
+      "disposition": "fix"
+    },
+    {
+      "test": "git-hook-runtime-env.test.ts",
+      "reason": "environment-dependent",
+      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): expects a hard-coded Windows Git PATH",
+      "disposition": "fix"
+    },
+    {
+      "test": "git-record-commit.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): vidence/git-head.json\\n' +\r '.atm/history/tasks/TASK-RECORD-0001.json\\n',\r expected: /\\.atm\\/history\\/evidence\\/git-head\\.jsonl/,\r operator: 'match',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "governance-hotfile-sharding.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): cli/governance-hotfile-sharding.test.ts:79:10 {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "historical-residue-cleanup.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "next-prompt-results-contract-extraction.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "next-route-selector.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: 1,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "paired-ab-v4-safety-controller.test.ts",
+      "reason": "writes-tracked-files",
+      "detail": "Passes, but regenerates tracked files: artifacts/generated/atm-ab-v4/{cells,summary}.json, docs/reports/atm-2-1-paired-ab-v4.md",
+      "disposition": "fix"
+    },
+    {
+      "test": "plan3-shared-governance-state-readiness.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ityForCommit } from './implementation/identity-check-command.ts';\\n\",\r expected: /inspectProtectedGovernanceStateDestructiveChanges/,\r operator: 'match',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "plan32-dashboard-consumption.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 29,\r expected: 9,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "plan32-terminal-verdict-fail-closed.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): nator\": 29,\\n' +\r ' \"verified\": 29,\\n' +\r ' \"notComplete\": 0,\\n' +\r ' \"verdict\": \"not-complete\",\\n' +\r ' \"failClosed\": false\\n' +\r '}\\n',\r stderr: ''\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "plan4-successor-wave-consumption.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ' ],\\n' +\r ' \"findings\": [\\n' +\r ' \"source digest mismatch: docs/reports/plan-3x-4x-backlog-disposition-census.json\"\\n' +\r ' ]\\n' +\r '}\\n',\r stderr: ''\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "plan4-successor-wave-objective-map.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): 7, 116, 99, 104, 58, 32, 100, 111, 99, 115, 47, 114,\r 101, 112, 111, 114, 116, 115, 47, 112, 108, 97, 110, 45,\r 51, 120, 45, 52,\r ... 34 more items\r ]\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "public-npm-install-contract.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): cli/public-npm-install-contract.test.ts:98:10 {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "real-paired-ab-analyzer-v3.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): odules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'inconclusive',\r expected: 'improved',\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "real-parallel-dogfood-harness.test.ts",
+      "reason": "writes-tracked-files",
+      "detail": "Passes, but regenerates tracked files: artifacts/generated/atm-parallel-dogfood/{summary,workers}.json, docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "disposition": "fix"
+    },
+    {
+      "test": "root-drop-release-incremental-overlay.test.ts",
+      "reason": "writes-tracked-files",
+      "detail": "Passes, but on Linux leaves packages/cli/dist/atm.mjs modified; on Windows it also failed when run next to other tests.",
+      "disposition": "fix"
+    },
+    {
+      "test": "root-drop-release-manifest-integrity.test.ts",
+      "reason": "writes-tracked-files",
+      "detail": "Passes, but on Linux leaves packages/cli/dist/atm.mjs modified.",
+      "disposition": "fix"
+    },
+    {
+      "test": "runbook-completion-evidence.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): , 102, 108, 97, 103, 41, 41, 59, 13, 10, 32, 32,\r 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,\r 32, 32, 32, 32,\r ... 776 more items\r ]\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "runbook-release-authority-review.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): , 120, 105, 115, 116, 115, 83, 121, 110, 99, 40, 114,\r 117, 110, 98, 111, 111, 107, 65, 98, 115, 111, 108, 117,\r 116, 101, 41, 41,\r ... 768 more items\r ]\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "runner-arbitration-evidence.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): les/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'dev-source',\r expected: 'frozen-runner',\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "runner-sync-incremental-build-dogfood.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ode:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "skill-corpus-canary-rewrite.test.ts",
+      "reason": "writes-tracked-files",
+      "detail": "Passes, but regenerates tracked files: artifacts/generated/skill-corpus-audit.json",
+      "disposition": "fix"
+    },
+    {
+      "test": "skill-distribution-manager.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): der (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 25,\r expected: 18,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "skill-provider-capability-contract.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "standards-spec-review-receipt.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "steward-receipt-pre-commit-gate.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ode:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: true,\r expected: false,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "task-dependency-semantics-census.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "task-id-casing.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): AN_DETECTED_HEADING',\r text: 'Acceptance Criteria',\r sourceLine: 10\r }\r ],\r planPath: 'TASK-APO-0030-python-language-adapter-plugin.task.md'\r }\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "task-view-dashboard.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ode:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: true,\r expected: false,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "taskflow-auto-evidence.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "taskflow-close-orchestration.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): n.test.ts:109:10 {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'tasks-reconcile',\r expected: 'tasks-close',\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "taskflow-host-policy.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): :32:10 {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'TASK-GOVERNED-0001',\r expected: 'TASK-GOVERNED-0002',\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "taskflow-open-orchestration.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): /cli/taskflow-open-orchestration.test.ts:53:10 {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "tasks-repair-claim.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): cli/tasks-repair-claim.test.ts:106:8 {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "tasks-roster-update.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): 658b3fd6844fb0aaba81216c6e0bb68cef9bb65',\r expected: 'sha256:5a2c3183e7cc532c432369b1048fa523a7b90c1fb60347cd4c05fd652c2b58b2',\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "tasks-scope-add-error-clarity.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: 1,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "team-cost-accounting.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): nternal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 0.017625,\r expected: 0.03525,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "team-legacy-command-extraction.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "team-legacy-crew-decision-extraction.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "team-legacy-patrol-contract-extraction.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "team-legacy-permission-lease-extraction.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "team-legacy-plan-orchestration-extraction.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "team-legacy-runtime-contract-extraction.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "team-legacy-runtime-governance-extraction.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "test-map-equivalence.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): oader (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 1,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    },
+    {
+      "test": "validation-receipt-reuse.test.ts",
+      "reason": "failing-on-main",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ode:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "disposition": "triage"
+    }
+  ],
+  "serial": []
+}
