@@ -32,6 +32,15 @@ function writeDirectionLock(taskId: string): void {
     status: 'active',
     allowedFiles: [sharedFile]
   }), 'utf8');
+  // A runtime direction lock is only a projection; it counts as a live write
+  // claim only while the task ledger holds a matching active claim.
+  const taskDir = path.join(cwd, '.atm', 'history', 'tasks');
+  mkdirSync(taskDir, { recursive: true });
+  const now = new Date().toISOString();
+  writeFileSync(path.join(taskDir, `${taskId}.json`), JSON.stringify({
+    taskId,
+    claim: { actorId: `actor-${taskId.toLowerCase()}`, leaseId: `lease-${taskId}`, claimedAt: now, heartbeatAt: now, ttlSeconds: 1800, state: 'active', intent: 'write', files: [sharedFile] }
+  }), 'utf8');
 }
 
 function writeSharedFile(body: string): void {

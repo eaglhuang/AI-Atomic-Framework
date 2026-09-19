@@ -42,13 +42,24 @@ export type CiFailureLifecycle = {
   lastAttemptAt: string;
   repairAcceptedAt: string | null;
   failureClass: string | null;
+  /** Fix-forward repair: a later successful protected-main run that resolved this failure. */
+  repairRunId?: number | null;
+  rootCause?: string | null;
 };
+
+/**
+ * `repaired-and-explained`: a failure does not block the verdict once it has a
+ * specific root-cause class and an accepted repair. `zero-tolerance`: any
+ * failure in the window blocks it. Owner decision 2026-09-19.
+ */
+export type BurnInFailurePolicy = 'repaired-and-explained' | 'zero-tolerance';
 
 export type BurnInPolicy = {
   minCompletedRuns: number;
   minCalendarDays: number;
   protectedBranch: string;
   requireLifecycle: boolean;
+  failurePolicy: BurnInFailurePolicy;
   /** Optional immutable remediation boundary. Runs before it remain historical evidence. */
   baselineAt?: string;
   /** Protected-main commit that establishes the remediation boundary. */
@@ -76,7 +87,14 @@ const DEFAULT_POLICY: BurnInPolicy = {
   minCalendarDays: 30,
   protectedBranch: 'main',
   requireLifecycle: true,
+  failurePolicy: 'repaired-and-explained',
 };
+
+const GENERIC_FAILURE_CLASSES = new Set(['unknown-failure']);
+
+function isExplainedFailureClass(failureClass: string | null | undefined): boolean {
+  return typeof failureClass === 'string' && failureClass.trim().length > 0 && !GENERIC_FAILURE_CLASSES.has(failureClass.trim());
+}
 
 function stableValue(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(stableValue);
@@ -206,6 +224,7 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
   let normalized: NormalizedBurnInInput;
   try {
     normalized = normalizeInput(input);
+    if (policy.failurePolicy !== 'repaired-and-explained' && policy.failurePolicy !== 'zero-tolerance') throw new Error('invalid-failurePolicy');
     const allRuns = validateRuns(normalized.runs, policy, normalized.requiresJobProvenance);
     const baselineTimestamp = policy.baselineAt ? parseDate(policy.baselineAt, 'baselineAt') : null;
     if (policy.baselineSha && !/^[0-9a-f]{7,64}$/i.test(policy.baselineSha)) throw new Error('invalid-baselineSha');
@@ -241,11 +260,25 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
       .filter((lifecycle) => lifecycle.firstFailureAt !== null && lifecycle.repairAcceptedAt !== null)
       .map((lifecycle) => parseDate(lifecycle.repairAcceptedAt!, 'repairAcceptedAt') - parseDate(lifecycle.firstFailureAt!, 'firstFailureAt'));
     if (repairTimesMs.some((duration) => duration < 0)) throw new Error('negative-repair-time');
+    const runsById = new Map(runs.map((run) => [run.databaseId, run]));
+    for (const run of runs) {
+      const repairRunId = run.lifecycle?.repairRunId;
+      if (repairRunId === undefined || repairRunId === null) continue;
+      const repairRun = runsById.get(repairRunId);
+      if (!repairRun) throw new Error(`record-${run.databaseId}-repair-run-${repairRunId}-not-in-window`);
+      if (repairRun.conclusion !== 'success') throw new Error(`record-${run.databaseId}-repair-run-${repairRunId}-not-successful`);
+      if (parseDate(repairRun.createdAt, 'repairRun-createdAt') <= parseDate(run.createdAt, 'createdAt')) throw new Error(`record-${run.databaseId}-repair-run-${repairRunId}-not-later`);
+    }
+    const repairedFailures = runs.filter((run) => run.conclusion !== 'success'
+      && run.lifecycle?.repairAcceptedAt !== null
+      && run.lifecycle?.repairAcceptedAt !== undefined
+      && isExplainedFailureClass(run.lifecycle?.failureClass)).length;
+    const unexplainedFailures = policy.failurePolicy === 'zero-tolerance' ? failedRuns : failedRuns - repairedFailures;
     const reasons: string[] = [];
     if (runs.length < policy.minCompletedRuns) reasons.push('insufficient-completed-runs');
     if (calendarDays < policy.minCalendarDays) reasons.push('insufficient-calendar-window');
-    if (failedRuns > 0) reasons.push('unexplained-failure-present');
-    const claimStatus = reasons.length === 0 ? 'long-term-green' : failedRuns > 0 ? 'unexplained-failure' : 'insufficient-window';
+    if (unexplainedFailures > 0) reasons.push('unexplained-failure-present');
+    const claimStatus = reasons.length === 0 ? 'long-term-green' : unexplainedFailures > 0 ? 'unexplained-failure' : 'insufficient-window';
     return {
       schemaId: 'atm.productCiBurnInReport.v1',
       policy,
@@ -265,6 +298,8 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
         retriedRuns,
         retryCount,
         unresolvedFailures,
+        repairedFailures,
+        unexplainedFailures,
         repairTimeMs: repairTimesMs,
         averageRepairTimeMs: repairTimesMs.length > 0 ? Math.round(repairTimesMs.reduce((total, duration) => total + duration, 0) / repairTimesMs.length) : null,
         historicalRunCount: allRuns.length - scopedRuns.length,
@@ -272,8 +307,8 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
         baselineAt: policy.baselineAt ?? null,
         baselineSha: policy.baselineSha ?? null,
       },
-      claimStatus: reasons.length === 0 && unresolvedFailures > 0 ? 'unexplained-failure' : claimStatus,
-      semanticVerdict: reasons.length === 0 && unresolvedFailures === 0 ? 'accept' : 'reject',
+      claimStatus,
+      semanticVerdict: reasons.length === 0 ? 'accept' : 'reject',
       reasons,
     } as const;
   } catch (error) {

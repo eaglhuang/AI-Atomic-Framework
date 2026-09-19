@@ -48,7 +48,10 @@ function runInstallSmoke(): void {
     const coreWorkflow = [
       ['bootstrap', ['bootstrap', '--cwd', workflowRoot, '--task', 'CLEAN-INSTALL-SMOKE', '--json']],
       ['atm-chart-render', ['atm-chart', 'render', '--cwd', workflowRoot, '--json']],
-      ['atm-chart-verify', ['atm-chart', 'verify', '--cwd', workflowRoot, '--json']]
+      ['atm-chart-verify', ['atm-chart', 'verify', '--cwd', workflowRoot, '--json']],
+      // create validates the generated atom report and registry against
+      // schemas the public 0.1.1 tarball did not ship.
+      ['create', ['create', '--cwd', workflowRoot, '--bucket', 'smoke', '--title', 'CleanInstallSmoke', '--description', 'Clean-install-smoke-atom.', '--json']]
     ] as const;
     const coreWorkflowResults: Record<string, number> = {};
     for (const [name, argv] of coreWorkflow) {

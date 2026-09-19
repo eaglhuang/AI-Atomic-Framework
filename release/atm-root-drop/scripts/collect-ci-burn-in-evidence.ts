@@ -22,12 +22,57 @@ export type CiAttempt = {
   exclusionReason?: string | null;
 };
 
+/**
+ * Root cause and fix-forward repair for a protected-main failure that was not
+ * rescued by a rerun. Part of the export, so it is bound into sourceDigest.
+ */
+export type CiFailureDisposition = {
+  runId: number;
+  failureClass: string;
+  rootCause: string;
+  repairRunId: number;
+};
+
 export type CiAttemptExport = {
   schemaId: 'atm.githubCiAttemptExport.v1';
   repository: string;
   protectedBranch: string;
   attempts: CiAttempt[];
+  failureDispositions?: CiFailureDisposition[];
 };
+
+function applyFailureDispositions(runs: CiRun[], dispositions: unknown): void {
+  if (dispositions === undefined) return;
+  if (!Array.isArray(dispositions)) throw new Error('failureDispositions-not-array');
+  const byId = new Map(runs.map((run) => [run.databaseId, run]));
+  const seen = new Set<number>();
+  for (const raw of dispositions) {
+    const disposition = raw as Partial<CiFailureDisposition>;
+    const runId = disposition?.runId;
+    if (!Number.isSafeInteger(runId)) throw new Error('failureDisposition-invalid-runId');
+    const id = runId as number;
+    if (seen.has(id)) throw new Error(`failureDisposition-${id}-duplicate`);
+    seen.add(id);
+    if (typeof disposition.failureClass !== 'string' || disposition.failureClass.trim().length === 0 || disposition.failureClass.trim() === 'unknown-failure') {
+      throw new Error(`failureDisposition-${id}-requires-specific-failureClass`);
+    }
+    if (typeof disposition.rootCause !== 'string' || disposition.rootCause.trim().length === 0) throw new Error(`failureDisposition-${id}-missing-rootCause`);
+    const failed = byId.get(id);
+    if (!failed || !failed.eligible) throw new Error(`failureDisposition-${id}-not-an-eligible-run`);
+    if (failed.conclusion === 'success') throw new Error(`failureDisposition-${id}-run-did-not-fail`);
+    const repair = Number.isSafeInteger(disposition.repairRunId) ? byId.get(disposition.repairRunId as number) : undefined;
+    if (!repair || !repair.eligible) throw new Error(`failureDisposition-${id}-repair-run-not-eligible`);
+    if (repair.conclusion !== 'success') throw new Error(`failureDisposition-${id}-repair-run-not-successful`);
+    if (Date.parse(repair.createdAt) <= Date.parse(failed.createdAt)) throw new Error(`failureDisposition-${id}-repair-run-not-later`);
+    failed.lifecycle = {
+      ...failed.lifecycle!,
+      failureClass: disposition.failureClass.trim(),
+      rootCause: disposition.rootCause.trim(),
+      repairRunId: repair.databaseId,
+      repairAcceptedAt: repair.lifecycle!.lastAttemptAt,
+    };
+  }
+}
 
 export type CiWorkflowScopePolicy = {
   schemaId: 'atm.ciWorkflowScopePolicy.v1';
@@ -214,6 +259,7 @@ export function collectLifecycleEvidence(input: unknown, rawPolicy?: unknown): L
     };
     return run;
   }).sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
+  applyFailureDispositions(runs, source.failureDispositions);
   const canonicalRuns = stableValue(runs) as CiRun[];
   const sourceDigest = canonicalDigest(input);
   return {

@@ -1,9 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveShippedSchemaPath } from '../../schema-location.ts';
 
 export const repoRoot = resolveFrameworkRoot();
-export const defaultRegistrySchemaPath = path.join(repoRoot, 'schemas', 'registry.schema.json');
+export const defaultRegistrySchemaPath = resolveShippedSchemaPath(import.meta.url, 'registry.schema.json', repoRoot);
 
 function resolveFrameworkRoot(moduleUrl = import.meta.url): string {
   let cursor = path.dirname(fileURLToPath(moduleUrl));
@@ -56,7 +57,12 @@ export function normalizeSchemaPath(repositoryRoot: string, value: string | unde
   if (markerIndex >= 0) {
     const suffix = resolvedPath.slice(markerIndex + 1).replace(/\\/g, '/');
     const repositorySchemaPath = path.resolve(repositoryRoot, suffix);
-    if (existsSync(repositorySchemaPath)) {
+    // A schema shipped inside the framework distribution (for example the CLI
+    // bundle's own schemas/ copy) has the same portable identity even when the
+    // adopter repository has no copy of it.
+    const frameworkRelativePath = path.relative(repoRoot, resolvedPath);
+    const shippedByFramework = !frameworkRelativePath.startsWith('..') && !path.isAbsolute(frameworkRelativePath);
+    if (shippedByFramework || existsSync(repositorySchemaPath)) {
       return suffix;
     }
   }

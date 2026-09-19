@@ -106,4 +106,50 @@ const tamperedReceipt = structuredClone(receipt);
 tamperedReceipt.runs[0].headSha = 'b'.repeat(40);
 assert.equal(evaluateBurnIn(tamperedReceipt, { minCompletedRuns: 1, minCalendarDays: 0 }).claimStatus, 'invalid-input');
 
+// Fix-forward repair: run 7001 failed, a later commit fixed it and run 7002 passed.
+const standard = { workflowName: 'Product CI burn-in (standard)', displayTitle: 'Product CI burn-in (standard)' };
+const fixForward = (outcome: 'failure' | 'success', runId: number, at: string, jobId: number) => ({
+  runId, runAttempt: 1, status: 'completed', conclusion: outcome, headSha: String(runId).padStart(40, 'c'), headBranch: 'main', event: 'push',
+  createdAt: at, attemptStartedAt: at, attemptCompletedAt: at, productCi: { conclusion: outcome, job: job(jobId) }, ...standard,
+  ...(outcome === 'failure' ? { failureClass: 'unknown-failure' } : {}),
+});
+const fixForwardExport = (failureDispositions?: unknown) => ({
+  schemaId: 'atm.githubCiAttemptExport.v1', repository: 'AI-Atomic-Framework', protectedBranch: 'main',
+  attempts: [
+    fixForward('success', 7000, '2026-09-10T00:00:00Z', 70001),
+    fixForward('failure', 7001, '2026-09-11T00:00:00Z', 70011),
+    fixForward('success', 7002, '2026-09-12T00:00:00Z', 70021),
+  ],
+  ...(failureDispositions === undefined ? {} : { failureDispositions }),
+});
+const disposition = { runId: 7001, failureClass: 'typecheck-failure', rootCause: 'TS2322 in metrics.ts', repairRunId: 7002 };
+
+const undisposed = collectLifecycleEvidence(fixForwardExport());
+assert.equal(evaluateBurnIn(undisposed, { minCompletedRuns: 1, minCalendarDays: 0 }).semanticVerdict, 'reject',
+  'a fix-forward failure without a disposition must stay unexplained');
+
+const disposed = collectLifecycleEvidence(fixForwardExport([disposition]));
+const disposedRun = disposed.runs.find((run) => run.databaseId === 7001)!;
+assert.equal(disposedRun.lifecycle?.repairRunId, 7002);
+assert.equal(disposedRun.lifecycle?.repairAcceptedAt, '2026-09-12T00:00:00Z');
+assert.equal(disposedRun.lifecycle?.failureClass, 'typecheck-failure');
+assert.equal(disposedRun.lifecycle?.rootCause, 'TS2322 in metrics.ts');
+assert.notEqual(disposed.sourceDigest, undisposed.sourceDigest, 'the disposition must be bound into sourceDigest');
+const disposedVerdict = evaluateBurnIn(disposed, { minCompletedRuns: 1, minCalendarDays: 0 });
+assert.equal(disposedVerdict.semanticVerdict, 'accept', JSON.stringify(disposedVerdict));
+assert.equal(disposedVerdict.observed?.failedRuns, 1);
+assert.equal(disposedVerdict.observed?.repairedFailures, 1);
+assert.equal(evaluateBurnIn(disposed, { minCompletedRuns: 1, minCalendarDays: 0, failurePolicy: 'zero-tolerance' }).semanticVerdict, 'reject');
+
+for (const [override, expected] of [
+  [{ failureClass: 'unknown-failure' }, /failureDisposition-7001-requires-specific-failureClass/],
+  [{ rootCause: ' ' }, /failureDisposition-7001-missing-rootCause/],
+  [{ repairRunId: 7000 }, /failureDisposition-7001-repair-run-not-later/],
+  [{ repairRunId: 9999 }, /failureDisposition-7001-repair-run-not-eligible/],
+  [{ runId: 7002, repairRunId: 7002 }, /failureDisposition-7002-run-did-not-fail/],
+] as const) {
+  assert.throws(() => collectLifecycleEvidence(fixForwardExport([{ ...disposition, ...override }])), expected);
+}
+assert.throws(() => collectLifecycleEvidence(fixForwardExport([disposition, disposition])), /failureDisposition-7001-duplicate/);
+
 console.log('ci-burn-in-evidence-collector: ok');
