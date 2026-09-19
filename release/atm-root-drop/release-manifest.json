@@ -5357,6 +5357,7 @@
     "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
     "release/atm-root-drop/tests/cli/claim-renew-expired-lane.test.ts",
     "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
+    "release/atm-root-drop/tests/cli/clean-install-core-workflow-gate.test.ts",
     "release/atm-root-drop/tests/cli/cli-published-command-smoke.test.ts",
     "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
     "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
@@ -5676,6 +5677,7 @@
     "release/atm-root-drop/tests/cli/recover-push-fail-timeout.test.ts",
     "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
     "release/atm-root-drop/tests/cli/release-prepublish-gate.test.ts",
+    "release/atm-root-drop/tests/cli/release-public-registry-gate.test.ts",
     "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
     "release/atm-root-drop/tests/cli/release-version-compatibility.test.ts",
     "release/atm-root-drop/tests/cli/release-workspace-versions.test.ts",
@@ -6207,7 +6209,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 6171,
+    "unchanged": 6173,
     "removed": 0
   },
   "buildMode": "full",
@@ -7033,7 +7035,7 @@
       },
       {
         "path": "compatibility-matrix.json",
-        "digest": "c714c5030da24cd9e6e7af5297e18d210be2629429b445187470f5d8bd39ec24",
+        "digest": "8b569a5cf823c24ab59a5211a84ed35e16d953a47b8d047c91cbf2081d601327",
         "origin": "source",
         "inputPaths": [
           "compatibility-matrix.json"
@@ -12712,7 +12714,7 @@
       },
       {
         "path": "docs/reports/atm-product-proof-checkpoints.md",
-        "digest": "ab863e5ea943bc18dd628d2d01126fcf0abcd801d46e31970a1cf7f8a6c0ef84",
+        "digest": "d8a2b00d8a43abf36200fd69c0fa8ace452d75cfc511dcd7e312cc20d57e02cf",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-proof-checkpoints.md"
@@ -14206,7 +14208,7 @@
       },
       {
         "path": "examples/atom-evolution-loop/package.json",
-        "digest": "2d92659360442a9fced8c3b9599eb15300ab9e310e6db95b9a8c9a4227993691",
+        "digest": "54ea00e5b9df1b5a93ef26198d9c54f5e0982be44e4bf9bfa947e162070d09f0",
         "origin": "source",
         "inputPaths": [
           "examples/atom-evolution-loop/package.json"
@@ -14359,7 +14361,7 @@
       },
       {
         "path": "examples/hello-world/package.json",
-        "digest": "df1a2af0af1dc0923e90244d2c2bda2500f3e6109137bb692861d7c07732eceb",
+        "digest": "a7d0e87c353a4d10fb873a4ccc5cd79193f5b45d4ef20399b73acbd60bfb5863",
         "origin": "source",
         "inputPaths": [
           "examples/hello-world/package.json"
@@ -14404,7 +14406,7 @@
       },
       {
         "path": "examples/legacy-strangler-minimal/package.json",
-        "digest": "78cc067d4656c17e5b11abc7fe66d4c46a69cd915c260fbea3902f49f0edb27f",
+        "digest": "b074c43a621ef0846d54eba4b02c95cd077a3baadfe9a4a8454d026d10096504",
         "origin": "source",
         "inputPaths": [
           "examples/legacy-strangler-minimal/package.json"
@@ -16627,7 +16629,7 @@
       },
       {
         "path": "package-lock.json",
-        "digest": "c3113711c9097906aeced3b0bd4ed4e4dfd281d4e929c59a89aafc9938ebd7ac",
+        "digest": "e0a6a39887648e0e171e1be4fcdddc050212fbf40bf61be3c3db5511a1366164",
         "origin": "source",
         "inputPaths": [
           "package-lock.json"
@@ -16636,7 +16638,7 @@
       },
       {
         "path": "package.json",
-        "digest": "db03f81d051218023d1a21a50931ce6a186424bae81b747a0bc724669509903a",
+        "digest": "ba57de6167ec069b40c27cd936feaadb57783e753bd970a5cc293fff57a98d98",
         "origin": "source",
         "inputPaths": [
           "package.json"
@@ -16672,7 +16674,7 @@
       },
       {
         "path": "packages/adapter-local-git/package.json",
-        "digest": "89ef83238757643345d5b37b36e27f3bb521c07c291aa8df9bc4d046fc50963b",
+        "digest": "2c979062355a4a50f936ebcd24462193488a2d638bca1edab2367c21321b9543",
         "origin": "source",
         "inputPaths": [
           "packages/adapter-local-git/package.json"
@@ -16717,7 +16719,7 @@
       },
       {
         "path": "packages/agent-pack-claude-code/package.json",
-        "digest": "fc5d5f2a36b5c764cd7b8985cdd584bca7817c7f5fe97ae96333f8f87161eba1",
+        "digest": "a79a93bafc4901149d0f3269343128fe94e91e39ae720fb99217ddf657a643e0",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-claude-code/package.json"
@@ -16807,7 +16809,7 @@
       },
       {
         "path": "packages/agent-pack-copilot/package.json",
-        "digest": "2e0bf09f27b9e8ceed74c248f29e6956862901cd40049181263ab72070216cbb",
+        "digest": "8625228eab48394faf8174d703b1b75ae91383c3562aeb8256434ed6dca16e39",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-copilot/package.json"
@@ -16843,7 +16845,7 @@
       },
       {
         "path": "packages/agent-pack-cursor/package.json",
-        "digest": "3d1c2104b16a3b6c89bb91156df46f11fef3f3203e611a8e2620a1edfd3f6215",
+        "digest": "b08033330410eb9cbd1cdbf88e94b85a0bdb0c135ab59502499378654103c9a1",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-cursor/package.json"
@@ -16879,7 +16881,7 @@
       },
       {
         "path": "packages/agent-pack-gemini/package.json",
-        "digest": "7a9c8a33ba777f5202f64c184d872a8608825ae1e437851dbe39f6c88bf2e0ac",
+        "digest": "c175e889b55c1eb579119bb80f46197433ba7da2d7cfec4dcb58aacab6565b6e",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-gemini/package.json"
@@ -16933,7 +16935,7 @@
       },
       {
         "path": "packages/agent-pack-sdk/package.json",
-        "digest": "f5878f03b4bbfa5f3ece11054873ba7359f8a38c9c2345aa391e7d741a86080e",
+        "digest": "4764ddfe352ccea704b8d49b017e03d24175f2386494e3fe1688a56dca46419e",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-sdk/package.json"
@@ -16987,7 +16989,7 @@
       },
       {
         "path": "packages/agent-pack-windsurf/package.json",
-        "digest": "3c682bb381475f32fa68ce1d76aabb7d44e44927f44da19004bdbca1c7555ef6",
+        "digest": "97a41b29be38ac529c27ea209f0cdd780c069c24c1c00bc2154eaaf5c06f77c1",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-windsurf/package.json"
@@ -17041,7 +17043,7 @@
       },
       {
         "path": "packages/atm-markdown-task-source/package.json",
-        "digest": "05cd4a8b5ab7337173ad3ada4418fc3c14bf7c53fbbb25cf4094b7a3542cf2e7",
+        "digest": "b4cd8c7fdb54136677ebb5e152addde7486cdba1307ede156e295a84d711619d",
         "origin": "source",
         "inputPaths": [
           "packages/atm-markdown-task-source/package.json"
@@ -28246,7 +28248,7 @@
       },
       {
         "path": "packages/cli/package.json",
-        "digest": "6ec64375d814c652f39a59da2a983232066c42554ac5b3e7628c0475e83cf4b7",
+        "digest": "2672b8a3becc8252c597afcd9f562d240265de23ff63c311b9db96090e7485b4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/package.json"
@@ -38812,7 +38814,7 @@
       },
       {
         "path": "packages/core/package.json",
-        "digest": "f0c3966f13456917fb9911ee31a94b89902782821b4984bd108c0ae91f0468c9",
+        "digest": "0536d2a38cd7a881db6c33fcb102e8f05aa333bbca4ab4e1b97176edd4a3f3c1",
         "origin": "source",
         "inputPaths": [
           "packages/core/package.json"
@@ -42610,7 +42612,7 @@
       },
       {
         "path": "packages/create-atm/package.json",
-        "digest": "991fb20a64649ec4f9924824e0f9e583a47b33b9a49498289cd53b6dd5ca79b2",
+        "digest": "f09206d9ee85e9bf0808f3d8ed87b03d99d4a421dddbdea35c4cbc59154ec5a2",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/package.json"
@@ -42655,7 +42657,7 @@
       },
       {
         "path": "packages/integration-claude-code/package.json",
-        "digest": "952ff40f3ef6fa48035f12ec9f2595790a18ea82f52fe41803bdea22edae4ff5",
+        "digest": "7028a9ef15a3edd12273eb32d4fa4e31c52fe5ec402a8e5aba7326d5560aea15",
         "origin": "source",
         "inputPaths": [
           "packages/integration-claude-code/package.json"
@@ -42691,7 +42693,7 @@
       },
       {
         "path": "packages/integration-codex/package.json",
-        "digest": "2ddb0a0c8e9d8cc5e730aef16179fbb3ec96916ad64d6e7b29db2220f6ca97ee",
+        "digest": "4b71203299cb60ba451101c91e93e6d31ac92556d928bbe256c9139abbb5b272",
         "origin": "source",
         "inputPaths": [
           "packages/integration-codex/package.json"
@@ -42727,7 +42729,7 @@
       },
       {
         "path": "packages/integration-copilot/package.json",
-        "digest": "cb56e9292bdb3dc155c107b864e95e115755014b8a7bda6f1d36aff9a287cdb4",
+        "digest": "cb426a8d6c76fbb25b4c4c97be662d68011e5bece5abfe22ce1c28c17466b446",
         "origin": "source",
         "inputPaths": [
           "packages/integration-copilot/package.json"
@@ -42763,7 +42765,7 @@
       },
       {
         "path": "packages/integration-cursor/package.json",
-        "digest": "944b2db7099d342dacf55cfd3cf31f4e83af2f5e375a6d150d9333f10f401345",
+        "digest": "c8a712c31411f4c031843ae56368214eb3120bfe63f3e91141973b99fc8ac176",
         "origin": "source",
         "inputPaths": [
           "packages/integration-cursor/package.json"
@@ -42799,7 +42801,7 @@
       },
       {
         "path": "packages/integration-gemini/package.json",
-        "digest": "9268a0101262411192bdf4ba95eece0fb14683080312233956e558cfef68919d",
+        "digest": "f9e94eb751b029efbde5a361c8c40db5281a5af8e7a30dfb4082cbd3e2cdd3b4",
         "origin": "source",
         "inputPaths": [
           "packages/integration-gemini/package.json"
@@ -42988,7 +42990,7 @@
       },
       {
         "path": "packages/integrations-core/package.json",
-        "digest": "e9821a8cdfa552add15edea27d44677ec4d6907835d1e50f86d17a9ffc4735b6",
+        "digest": "4dec25252698072feb2f81c842d5138c295699b789ec24b8026f1eb3784880ec",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/package.json"
@@ -43492,7 +43494,7 @@
       },
       {
         "path": "packages/language-csharp/package.json",
-        "digest": "29a468efda9aa54897a2a3bc58bf8ee618c171c9f0027466facaa25d66a37fcc",
+        "digest": "bc76ea60086d6460f421ffbcb01ef9a20ddd242ec16705409a6e38c53c4c4c00",
         "origin": "source",
         "inputPaths": [
           "packages/language-csharp/package.json"
@@ -43546,7 +43548,7 @@
       },
       {
         "path": "packages/language-js/package.json",
-        "digest": "39b3d723b952add068926f25ec33945d326ce419dd3c6342acc45b6d126536f3",
+        "digest": "9c0a5f65ec38b7cfebf7879536f2fdeff5ec75eb032f3be742e865f98c8cbc5a",
         "origin": "source",
         "inputPaths": [
           "packages/language-js/package.json"
@@ -43708,7 +43710,7 @@
       },
       {
         "path": "packages/language-python/package.json",
-        "digest": "82d936e9f80ed4f3618288390e0b57ba6583cf07a02ae1be22e2d7d5feb1e56a",
+        "digest": "72e5587c1ef63c99e929156b368244c0478411ab297985bb55aa007222b8cb2d",
         "origin": "source",
         "inputPaths": [
           "packages/language-python/package.json"
@@ -43942,7 +43944,7 @@
       },
       {
         "path": "packages/plugin-behavior-pack/package.json",
-        "digest": "56ae10b33649f7881c01c644203a8ad1eca38db7069d68512b076f039571ce73",
+        "digest": "8fad786e3bd072c0f8aba50f9ffe5ba449912fac5812a10c486e580af4d203e0",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-behavior-pack/package.json"
@@ -44068,7 +44070,7 @@
       },
       {
         "path": "packages/plugin-experience-loop/package.json",
-        "digest": "01986e14b15d1e811ac5031d20d0a8a95a6e26312284e9c8759b4b2dfa5bc0aa",
+        "digest": "e3d66607a67fbeab53f11577f91e692286da2dedf97177cb98d0b28d181ffcaa",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-experience-loop/package.json"
@@ -44248,7 +44250,7 @@
       },
       {
         "path": "packages/plugin-governance-local/package.json",
-        "digest": "81fa5e87bedcf0598011f3a60a3156273d50a0fac8beb3e53db95002e51dad14",
+        "digest": "1cf1d23334cd82b2bef56e404d19d51d0fd7805100898318e22b69ffab267a76",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/package.json"
@@ -44419,7 +44421,7 @@
       },
       {
         "path": "packages/plugin-human-review/package.json",
-        "digest": "26ac9636b57dd565f5358728643dee436dd5cb5d68b96dc55980d14e0cb3cf0f",
+        "digest": "cb32ad55a7bef7d2850ced779e489656c36d198e5762ead69c9457e5d1bea634",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-human-review/package.json"
@@ -44509,7 +44511,7 @@
       },
       {
         "path": "packages/plugin-review-advisory/package.json",
-        "digest": "5c19d2c13fe0a055b55effd6e72bf00df194c75f9e73a47050580255d33a6e25",
+        "digest": "9e3fbf8aa3a00e8a2631620ef15adbc87429d591871373692e0ce9a6c13a2825",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-review-advisory/package.json"
@@ -44599,7 +44601,7 @@
       },
       {
         "path": "packages/plugin-rule-guard/package.json",
-        "digest": "24dd5492bc40c9d1c5b2ec523a90d6560ecdc92bbf02fbfe60a48aef01a4fceb",
+        "digest": "4097175d6bb6450f8b85d2187788f03a7b5fe0f339669a883f54af1e09c57c7e",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-rule-guard/package.json"
@@ -44869,7 +44871,7 @@
       },
       {
         "path": "packages/plugin-sdk/package.json",
-        "digest": "696168d5ae4f786c0f98f5669c96ce31a5c7666bbc3fa6f48d20c18325d391c2",
+        "digest": "fed69d5511eaeccd48440db85a63be65fae8340812b4a49fdbbc4572edd21fff",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-sdk/package.json"
@@ -48847,7 +48849,7 @@
       },
       {
         "path": "scripts/skew-matrix.config.json",
-        "digest": "36b69e24c22bb3e4bb37dcee629a96d0227014a4bb243e2c6842aaab04a27fdf",
+        "digest": "95a8e56ee43512f21e4a5ca95fb9cb7a39190167dee12e0d554fa671e8c7d760",
         "origin": "source",
         "inputPaths": [
           "scripts/skew-matrix.config.json"
@@ -50071,7 +50073,7 @@
       },
       {
         "path": "scripts/validate-package-skeleton.ts",
-        "digest": "13f901c5016a30e3c1677645cd16c4c2de199e85dd2e442bd9713b491a8f0b0c",
+        "digest": "98a3c37ce0f64e7acc285d9ec2555e8a3c4aa53fb2ef7a19ecfdcd3554127649",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-package-skeleton.ts"
@@ -51376,7 +51378,7 @@
       },
       {
         "path": "scripts/validators.config.json",
-        "digest": "6e08ee742445784791541084246946c6988f02061f9de0ffdd0e13b7e5bab5ed",
+        "digest": "e641ab3ac1f537712f081e5578458339c20acaea4b0e2db278c122c0889427d0",
         "origin": "source",
         "inputPaths": [
           "scripts/validators.config.json"
@@ -53770,7 +53772,7 @@
       },
       {
         "path": "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts",
-        "digest": "6ab67cbc5fd3c7d9edcd86d81b124bcda4f923e3eafa25da5668eb09da2c195a",
+        "digest": "befd6da0b080ced59c228122a2a3a5f4a55f55568464b8b7d0281ae1cdef7e5f",
         "origin": "source",
         "inputPaths": [
           "tests/cli/batch-checkpoint-runner-sync-recovery.test.ts"
@@ -54134,6 +54136,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/claim-repair-wip-ownership-continuity.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/clean-install-core-workflow-gate.test.ts",
+        "digest": "9ae508466a3a9baffcc0f5b7a56a682ca66184819ba659a353f8022a495dc51d",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/clean-install-core-workflow-gate.test.ts"
         ],
         "replaceable": true
       },
@@ -57005,6 +57016,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/release-prepublish-gate.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/release-public-registry-gate.test.ts",
+        "digest": "2b95d4bc15634c242844d87a3930ad877a35749e29e050e76973522ece91946b",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/release-public-registry-gate.test.ts"
         ],
         "replaceable": true
       },
@@ -61752,7 +61772,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:5be26e053e173ae522a99a0c1f297a0b044b717644eb43854225a2f06d510643"
+    "treeDigest": "sha256:fb4a48f8134aa3a0106750a73c728d59b0da340608b1b2ac3f47ce6ac05ac6c9"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -63303,7 +63323,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:4c0711eb2c898ba965535475031d7f13ed8e45ae25d8dc2b07164d9f0b77f486"
+    "digest": "sha256:48af7809e3baf8891d5dd5102db9d4761cf299425907828ac9716a5203017dcb"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -68634,6 +68654,7 @@
       "release/atm-root-drop/tests/cli/claim-owner-mismatch-message.test.ts",
       "release/atm-root-drop/tests/cli/claim-renew-expired-lane.test.ts",
       "release/atm-root-drop/tests/cli/claim-repair-wip-ownership-continuity.test.ts",
+      "release/atm-root-drop/tests/cli/clean-install-core-workflow-gate.test.ts",
       "release/atm-root-drop/tests/cli/cli-published-command-smoke.test.ts",
       "release/atm-root-drop/tests/cli/cli-result-contract.test.ts",
       "release/atm-root-drop/tests/cli/close-commit-window-mutex.test.ts",
@@ -68953,6 +68974,7 @@
       "release/atm-root-drop/tests/cli/recover-push-fail-timeout.test.ts",
       "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
       "release/atm-root-drop/tests/cli/release-prepublish-gate.test.ts",
+      "release/atm-root-drop/tests/cli/release-public-registry-gate.test.ts",
       "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
       "release/atm-root-drop/tests/cli/release-version-compatibility.test.ts",
       "release/atm-root-drop/tests/cli/release-workspace-versions.test.ts",
@@ -69486,22 +69508,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:5fbb60af7064a6f2bf88625e901a49721ce176aa0b2a11032d3f26e19897030f",
-  "sealedSourceCommit": "09f3b918434ffd80a228e8992682c449f3d91e16",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:16fef7c276c0fc31c79253a4c6c7aa8b7d6ec14b33f28b9a958a83f7acde7ef1",
-  "tsBuildCacheDigest": "sha256:05a3834d03cf868dd0cf5e9f31b156afa55515f501753605950bce28558c0e36",
+  "buildInputsTreeHash": "sha256:03e65e71069ad8c1a1612c8343f95b84ee1e51e5213b2713ebecd106cf637314",
+  "sealedSourceCommit": "6b821629d7f8d0f1402211a8c23df50a5c91a2db",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:5464faf8190355611ea8ecf9355fac1790a788a4f6ff94d07fd17f369c71a4d8",
+  "tsBuildCacheDigest": "sha256:f51a97f13524aae440b068e8e30f74301ec0a37fad6cb8a6f26d519311aef2bf",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 51,
-    "skipDecision": 49,
-    "worktreeSetup": 13042,
-    "typescriptBuild": 25705,
-    "rootDropReleaseAssembly": 36108,
-    "onefileReleaseAssembly": 20674,
-    "artifactSync": 4811,
+    "inputHashCalculation": 42,
+    "skipDecision": 55,
+    "worktreeSetup": 13535,
+    "typescriptBuild": 16311,
+    "rootDropReleaseAssembly": 43349,
+    "onefileReleaseAssembly": 24121,
+    "artifactSync": 6373,
     "cleanup": 0,
-    "totalElapsed": 119335
+    "totalElapsed": 151217
   }
 }
