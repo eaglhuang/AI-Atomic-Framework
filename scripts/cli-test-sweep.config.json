@@ -269,12 +269,6 @@
       "disposition": "triage"
     },
     {
-      "test": "steward-receipt-pre-commit-gate.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ode:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: true,\r expected: false,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
       "test": "task-dependency-semantics-census.test.ts",
       "reason": "failing-on-main",
       "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
@@ -318,9 +312,9 @@
     },
     {
       "test": "tasks-repair-claim.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): cli/tasks-repair-claim.test.ts:106:8 {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Root-caused with a debugger: the fixture's \"valid active claim\" has no lane session, and current policy treats an active claim without a live lane session as repairable (unresolved-claim-lane), not blocking. The gate behaves as designed; the fixture must create a live lane session.",
+      "disposition": "fix"
     },
     {
       "test": "tasks-roster-update.test.ts",
