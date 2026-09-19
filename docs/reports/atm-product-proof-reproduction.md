@@ -91,7 +91,7 @@ introduced, so the 30-day threshold cannot be met before
 `docs/reports/product-ci-failure-dispositions.json` names its failing job so
 the root cause can be checked in the public CI logs.
 
-Latest result: on 2026-09-19 at 15:00 UTC the exporter returned 776 runs since 2026-08-10 (none dropped); the collector kept 650 eligible runs and excluded 126 as `out-of-scope-workflow`. Window `2026-08-26T23:44:22Z` to `2026-09-19T10:28:08Z` (23.4 days); 647 successful and 3 failed runs, all 3 repaired and explained (repair times 101, 124 and 8.5 minutes), 0 unexplained, 0 reruns, current streak 26. Verdict `reject` with the single reason `insufficient-calendar-window`.
+Latest result: after the CLI test sweep landed, the exporter returned 779 runs since 2026-08-10 (none dropped); the collector kept 653 eligible runs and excluded 126 as `out-of-scope-workflow`. The window is 23.7 days, starting `2026-08-26T23:44:22Z`. There were 649 successful and 4 failed runs; all 4 were repaired and explained, 0 were unexplained, and there were 0 reruns. The fourth failure (run 35455553721) was the sweep's first run, which exposed a test that depended on clone depth. The current streak restarted at 1. Verdict `reject` with the single reason `insufficient-calendar-window`.
 
 Test coverage: Product CI runs a `CLI test sweep` step
 (`scripts/run-cli-test-sweep.ts`) that executes every `tests/cli/*.test.ts`

@@ -16,5 +16,11 @@
     "failureClass": "typecheck-failure",
     "rootCause": "Product CI Typecheck step: TS2322 number | null not assignable to number in scripts/lib/external-benchmark/metrics.ts(75,5). Job 103686938762.",
     "repairRunId": 34747569011
+  },
+  {
+    "runId": 35455553721,
+    "failureClass": "test-environment-assumption",
+    "rootCause": "Product CI CLI test sweep step (first run of the new step): tests/cli/rescue-worktree-normal-write-classification.test.ts used the framework HEAD as its rescue commit; in the depth-1 CI checkout that commit has no parent, so git diff-tree listed no files and violationCount was 0 instead of 1. Fixed in 5e57bc4c7 with a self-contained two-commit fixture. Job 105930068003.",
+    "repairRunId": 35456332855
   }
 ]
