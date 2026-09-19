@@ -129,3 +129,34 @@ returns `status: blocked` today, as expected — the gate protects the *next*
 publish, it does not retroactively fix the one already on the registry. That
 requires TASK-PRF-0107's fix (already merged to `main`) to actually be
 published, which remains a separate, Owner-approved decision.
+
+## Proof 2 failure policy: repaired-and-explained (owner decision, 2026-09-19)
+
+**Original problem.** `scripts/measure-product-ci-burn-in.ts` pushed `unexplained-failure-present` whenever any
+failed run was in the window (`failedRuns > 0`), even though the lifecycle schema already carried
+`firstFailureAt` / `retryCount` / `repairAcceptedAt`. The verdict never used `repairAcceptedAt`, so the
+implementation was zero-tolerance while the product goal reads "retain first failure, reruns and repair time".
+The collector also only recognised a repair when the *same* run succeeded on a rerun; the three real failures in
+the 2026-08-26..2026-09-18 window (two typecheck regressions, one vendored-module packaging failure) were all
+fixed forward by later commits, so they could never count as repaired.
+
+**Decision.** The owner chose `repaired-and-explained` over zero-tolerance. The policy is now an explicit
+`failurePolicy` field recorded in every report; `zero-tolerance` remains selectable.
+
+**Rules (fail-closed).** A failed run stops blocking the verdict only when all of these hold:
+
+1. its failure class is specific — `unknown-failure` never counts as explained;
+2. it has an accepted repair — either a successful rerun of the same run, or a fix-forward disposition;
+3. a fix-forward disposition (`failureDispositions[]` in the `atm.githubCiAttemptExport.v1` export) names a
+   non-empty `rootCause` and a `repairRunId` that is an eligible, successful protected-main run in the same
+   export and strictly later than the failure. The disposition is part of the export, so it is bound into
+   `sourceDigest`; the verifier re-checks the repair run against the receipt.
+
+Failed runs are still reported: `failedRuns`, `repairedFailures`, `unexplainedFailures` and `repairTimeMs` appear
+in `observed`, so a repaired failure is never hidden. Calendar-window and run-count thresholds are unchanged.
+
+**Evidence.** `tests/cli/product-ci-burn-in.test.ts` (19 cases) and `tests/cli/ci-burn-in-evidence-collector.test.ts`
+cover the accept path and each abuse path (generic class, blank root cause, repair run earlier / missing /
+failed, duplicate disposition, invalid policy). Negative controls: disabling the disposition hook, or reverting
+the default to zero-tolerance, makes both suites fail. Both suites are now registered in the `standard`
+validator profile; previously neither ran in CI.

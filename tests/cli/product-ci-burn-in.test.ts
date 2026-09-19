@@ -106,4 +106,57 @@ assert.equal(excluded.claimStatus, 'long-term-green');
 assert.equal(excluded.observed?.excludedRunCount, 1);
 assert.deepEqual(excluded.observed?.excludedRunIds, [8]);
 
-console.log('product-ci-burn-in tests: 12/12 passed');
+// Fix-forward repair: failure 11 is resolved by a later successful run 12.
+function repairedFailure(failureClass: string, repairRunId: number | null, repairAcceptedAt = '2026-02-06T00:00:00Z') {
+  return run(11, '2026-02-05T00:00:00Z', 'failure', {
+    lifecycle: {
+      firstFailureAt: '2026-02-05T00:00:00Z',
+      retryCount: 0,
+      lastAttemptAt: '2026-02-05T00:00:00Z',
+      repairAcceptedAt,
+      failureClass,
+      repairRunId,
+      rootCause: 'typecheck error introduced by a test refactor',
+    },
+  });
+}
+const later = run(12, '2026-02-06T00:00:00Z');
+const earlier = run(10, '2026-02-04T00:00:00Z');
+const window = { minCompletedRuns: 1, minCalendarDays: 0 };
+
+const repaired = evaluateBurnIn([later, repairedFailure('typecheck-failure', 12), earlier], window);
+assert.equal(repaired.semanticVerdict, 'accept');
+assert.equal(repaired.claimStatus, 'long-term-green');
+assert.equal(repaired.observed?.failedRuns, 1, 'a repaired failure must still be reported, not hidden');
+assert.equal(repaired.observed?.repairedFailures, 1);
+assert.equal(repaired.observed?.unexplainedFailures, 0);
+
+const genericClass = evaluateBurnIn([later, repairedFailure('unknown-failure', 12), earlier], window);
+assert.equal(genericClass.semanticVerdict, 'reject', 'a repair without a specific root cause must not count as explained');
+assert.ok(genericClass.reasons.includes('unexplained-failure-present'));
+
+const zeroTolerance = evaluateBurnIn([later, repairedFailure('typecheck-failure', 12), earlier], { ...window, failurePolicy: 'zero-tolerance' });
+assert.equal(zeroTolerance.semanticVerdict, 'reject');
+assert.ok(zeroTolerance.reasons.includes('unexplained-failure-present'));
+
+const repairBeforeFailure = evaluateBurnIn([later, repairedFailure('typecheck-failure', 10), earlier], window);
+assert.equal(repairBeforeFailure.claimStatus, 'invalid-input');
+assert.ok(repairBeforeFailure.reasons.includes('record-11-repair-run-10-not-later'));
+
+const repairOutsideWindow = evaluateBurnIn([later, repairedFailure('typecheck-failure', 99), earlier], window);
+assert.equal(repairOutsideWindow.claimStatus, 'invalid-input');
+assert.ok(repairOutsideWindow.reasons.includes('record-11-repair-run-99-not-in-window'));
+
+const repairRunFailed = evaluateBurnIn([
+  run(12, '2026-02-06T00:00:00Z', 'failure'),
+  repairedFailure('typecheck-failure', 12),
+  earlier,
+], window);
+assert.equal(repairRunFailed.claimStatus, 'invalid-input');
+assert.ok(repairRunFailed.reasons.includes('record-11-repair-run-12-not-successful'));
+
+const badPolicy = evaluateBurnIn(base, { ...window, failurePolicy: 'lenient' as never });
+assert.equal(badPolicy.claimStatus, 'invalid-input');
+assert.ok(badPolicy.reasons.includes('invalid-failurePolicy'));
+
+console.log('product-ci-burn-in tests: 19/19 passed');
