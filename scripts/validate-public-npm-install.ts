@@ -116,8 +116,8 @@ function percentile(values: number[], p: number): number {
 }
 
 const legacySmokeCommandNames = ['version', 'doctor', 'next', 'tasks'] as const;
-const coreWorkflowCommandNames = ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify'] as const;
-const publicSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'bootstrap', 'atm-chart-render', 'atm-chart-verify'] as const;
+const coreWorkflowCommandNames = ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
+const publicSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
 
 function commandExitCode(smoke: Record<string, unknown>, name: string): number | null {
   const entry = smoke[name] as { exitCode?: number } | undefined;
@@ -145,6 +145,7 @@ function runSmoke(tarball: string, root: string, label: string, runs: number) {
     ['bootstrap', 'bootstrap', '--cwd', workflow, '--task', `PUBLIC-NPM-${label}`, '--json'],
     ['atm-chart-render', 'atm-chart', 'render', '--cwd', workflow, '--json'],
     ['atm-chart-verify', 'atm-chart', 'verify', '--cwd', workflow, '--json'],
+    ['create', 'create', '--cwd', workflow, '--bucket', 'smoke', '--title', 'PublicNpmSmoke', '--description', 'Public-npm-smoke-atom.', '--json'],
   ] as const;
   const smoke: Record<string, unknown> = {};
   let versionOutput: string | null = null;

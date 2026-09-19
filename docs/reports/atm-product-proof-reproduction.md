@@ -5,11 +5,11 @@ ATM product proofs with public inputs only. It records the latest results so a
 rerun can be compared against them. A proof counts as met only when a rerun
 reproduces it; this document is not the evidence by itself.
 
-Status as of 2026-09-19:
+Status as of 2026-09-20:
 
 | Proof | Status |
 |---|---|
-| 1. Small, complete installable package | **Met** for `@ai-atomic-framework/cli@0.1.1` |
+| 1. Small, complete installable package | **Not met** — `atm create` fails in the published 0.1.1; fixed on `main`, not yet released |
 | 2. Sustained delivery reliability | **Not yet met** — calendar window too short (see below) |
 | 3. Net benefit over a simple baseline | **Not proven** — no paired experiment has run |
 
@@ -26,7 +26,7 @@ Status as of 2026-09-19:
 
 Clean-install a fixed published version into an empty directory and run the
 core workflow command matrix (`--version`, `doctor`, `next`, `tasks`,
-`bootstrap`, `atm-chart render`, `atm-chart verify`):
+`bootstrap`, `atm-chart render`, `atm-chart verify`, `create`):
 
 ```bash
 node --strip-types scripts/validate-public-npm-install.ts --package @ai-atomic-framework/cli --version 0.1.1 --require-default-tag --measurement-runs 3 --output proof-0.1.1.md
@@ -56,7 +56,17 @@ commands single runs):
 | Transitive packages | 6 | 6 |
 | Install time | 1,840 ms | 1,642 ms |
 | `atm --version` p50 | 696 ms | 170 ms |
-| Core workflow | fails | passes |
+| Core workflow (without `create`) | fails | passes |
+| `atm create` | fails | fails |
+
+On 2026-09-20 `create` was added to the matrix and 0.1.1 failed it: the npm
+package shipped only `atomic-spec.schema.json`, so creating an atom failed
+with `ATM_GENERATOR_TEST_FAILED` (missing test-report schema). The fix
+(`180c79204`) ships the registry and test-report schemas, locates schemas the
+way the installed layout places them, and adds `create` to the clean-install
+smoke that runs in Product CI. It adds about 28 KB unpacked
+(2,683,003 bytes). Proof 1 is not met again until a release that contains the
+fix passes this matrix from the public registry.
 
 Earlier prereleases show why each dimension is measured separately:
 `0.1.0-beta.0` cannot be installed (it depends on an unpublished package), and
@@ -101,11 +111,15 @@ Every quarantined test records a reason and a disposition. When the sweep was
 introduced (2026-09-20), 534 of 599 files ran and passed on Linux (WSL2 Ubuntu,
 Node 24.21, shallow clone; 168 s wall clock). The 65 quarantined files are 54
 that fail on `main` and have not been root-caused yet, 6 that pass but rewrite
-tracked files, and 5 that pass on Windows but fail on Linux.
+tracked files, and 5 that pass on Windows but fail on Linux. Since then two
+quarantined tests were root-caused with a debugger as stale fixtures and
+restored (`steward-receipt-pre-commit-gate`) or fixed by the `atm create`
+repair (`create`), and one (`tasks-repair-claim`) was reclassified as a stale
+assertion; 63 files remain quarantined.
 
 Known limit: runs before the sweep step was added did not execute most
 `tests/cli` suites, so "covers test" holds only for runs from that commit on,
-and the 65 quarantined files are still not covered.
+and the 63 quarantined files are still not covered.
 
 ## Proof 3 — net benefit over a simple baseline
 

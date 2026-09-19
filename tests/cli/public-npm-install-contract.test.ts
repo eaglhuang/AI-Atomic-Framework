@@ -55,7 +55,7 @@ assert.equal(liveProof.validation.cleanConsumer, true);
 assert.equal(liveProof.validation.usedWorkspaceLink, false);
 assert.equal(liveProof.validation.versionOnlySmoke, false);
 assert.equal(liveProof.validation.commandMatrixComplete, true);
-assert.deepEqual(liveProof.validation.requiredSuccessCommands, ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify']);
+assert.deepEqual(liveProof.validation.requiredSuccessCommands, ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create']);
 assert.equal(liveProof.validation.moduleResolutionFailures, 0);
 assert.equal(liveProof.validation.allCommandsExecuted, true);
 if (liveProof.status === 'verified') {
