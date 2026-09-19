@@ -3,12 +3,13 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createTestReportMetrics } from '../../test-runner/metrics-collector.ts';
+import { resolveShippedSchemaPath } from '../../schema-location.ts';
 
 const repoRoot = resolveFrameworkRoot();
 const require = createRequire(import.meta.url);
 
-export const defaultTestReportSchemaPath = path.join(repoRoot, 'schemas', 'test-report.schema.json');
-export const defaultTestReportMetricsSchemaPath = path.join(repoRoot, 'schemas', 'test-report', 'metrics.schema.json');
+export const defaultTestReportSchemaPath = resolveShippedSchemaPath(import.meta.url, 'test-report.schema.json', repoRoot);
+export const defaultTestReportMetricsSchemaPath = resolveShippedSchemaPath(import.meta.url, 'test-report/metrics.schema.json', repoRoot);
 export const defaultTestReportMigration = Object.freeze({
   strategy: 'none',
   fromVersion: null,

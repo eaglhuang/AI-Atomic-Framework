@@ -15,6 +15,10 @@ const VENDOR_DIRNAME = '_vendor';
 // truth for non-module assets required by the public CLI.
 const CLI_RUNTIME_ASSETS = [
   'schemas/atomic-spec.schema.json',
+  // `atm create` validates the generated atom report and the updated registry.
+  'schemas/registry.schema.json',
+  'schemas/test-report.schema.json',
+  'schemas/test-report/metrics.schema.json',
   'templates/atom.spec.template.json',
   'templates/atom.test.template.ts'
 ] as const;
