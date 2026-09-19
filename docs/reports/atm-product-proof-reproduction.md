@@ -108,6 +108,18 @@ node --strip-types scripts/run-atm-external-benchmark.ts --execute --plan <trial
 node --strip-types scripts/run-atm-external-benchmark.ts --verify-packet --stage dry-run --packet <sink>/<plan>/<pair>/packet.json
 ```
 
+Latest dry-run result: on 2026-09-19 the simulated pipeline was run in a clean
+WSL2 Ubuntu environment (Linux 6.6.87.1, Node v24.21.0) against a local
+single-commit fixture repository, with `pairsPerScenario: 2`. It produced two
+packets (replicate 0 ran AB, replicate 1 ran BA), gave each of the four arms
+its own fresh clone and removed all four afterwards, and wrote raw evidence to a
+sink outside the repository. Both packets verified under `--stage dry-run`;
+the same packet verified under `--stage pilot` was rejected with
+`packet stage mismatch`. Usage was 0 tokens and US$0. This shows only that the
+executor pipeline runs on Linux; it says nothing about net benefit, because no
+model was called and no independent role took part. A clean environment does
+not replace the independent roles below.
+
 A real experiment still needs: sealed scenario tasks from an independent
 hidden-corpus custodian, an independent adjudicator, attributable provider cost
 telemetry, a real provider driver, and approved token, cost and wall-clock caps.
