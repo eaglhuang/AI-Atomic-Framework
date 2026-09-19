@@ -1,7 +1,10 @@
 import { createHash } from 'node:crypto';
 
 export type BenchmarkArm = 'atm' | 'baseline';
-export type BenchmarkStage = 'pilot' | 'formal' | 'replication' | 'product';
+/** `dry-run` exercises the executor pipeline with a simulated driver; it is never evidence. */
+export type BenchmarkStage = 'dry-run' | 'pilot' | 'formal' | 'replication' | 'product';
+
+export const SIMULATED_PROVIDER = 'simulated';
 
 export interface PairedRun {
   readonly pairId: string;
@@ -19,6 +22,11 @@ export interface PairedRun {
   readonly command: string;
   readonly rawRef: string;
   readonly status: 'completed' | 'failed' | 'timeout' | 'cancelled';
+  readonly synthetic?: boolean;
+}
+
+function isSyntheticRun(run: PairedRun): boolean {
+  return run.synthetic === true || run.provider === SIMULATED_PROVIDER;
 }
 
 export interface PairedPacket {
@@ -70,5 +78,11 @@ export function verifyPacket(packet: unknown, expectedStage?: BenchmarkStage): s
   const { packetDigest: _digest, ...unsigned } = value;
   if (!SHA256.test(value.packetDigest ?? '') || digest(unsigned) !== value.packetDigest) errors.push('packet digest mismatch');
   for (const run of value.runs ?? []) if (!run.rawRef || run.rawRef.startsWith('summary:')) errors.push('raw refs must point outside the summary packet');
+  const syntheticRuns = (value.runs ?? []).filter(isSyntheticRun).length;
+  if (value.stage === 'dry-run') {
+    if (syntheticRuns !== (value.runs ?? []).length) errors.push('dry-run packets must be synthetic');
+  } else if (syntheticRuns > 0) {
+    errors.push(`synthetic runs are not admissible for ${value.stage}`);
+  }
   return [...new Set(errors)];
 }

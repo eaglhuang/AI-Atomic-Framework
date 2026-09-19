@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-19T02-23-23-026Z-scope-amendment-e0fda0e9637b",
+  "taskId": "TASK-PRF-0114",
+  "action": "scope-amendment",
+  "actorId": "claude-code-opus-5",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0114.json",
+  "taskSha256": "sha256:e4a9dc3bccae85ac217bdc051bdd23af6584f7b78ebf4ff514d74b2b3a6dd2d5",
+  "createdAt": "2026-09-19T02:23:23.026Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0114 --actor claude-code-opus-5 --add scripts/lib/external-benchmark/paired-executor.ts --reason \"ACC-2 requires verifyPacket to reject synthetic packets\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ACC-2 requires verifyPacket to reject synthetic packets"
+  }
+}
