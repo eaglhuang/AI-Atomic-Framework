@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
@@ -37,6 +37,31 @@ function runInstallSmoke(): void {
     if (!/ATM_CLI_VERSION|framework version/i.test(versionOutput)) {
       throw new Error(`installed atm --version output was not recognized: ${versionOutput.trim()}`);
     }
+    // `--version` cannot observe a missing runtime data asset: the published
+    // 0.1.0 tarball passed a version-only smoke while shipping no
+    // governance/default-guards schema source, so `atm-chart render` failed
+    // with ATM_CHART_SCHEMA_SOURCE_MISSING for every adopter. Module
+    // resolution was clean, and `bootstrap` still exited 0, so only a command
+    // that actually consumes the asset can catch that class of defect.
+    const workflowRoot = path.join(consumerRoot, 'workflow');
+    mkdirSync(workflowRoot, { recursive: true });
+    const coreWorkflow = [
+      ['bootstrap', ['bootstrap', '--cwd', workflowRoot, '--task', 'CLEAN-INSTALL-SMOKE', '--json']],
+      ['atm-chart-render', ['atm-chart', 'render', '--cwd', workflowRoot, '--json']],
+      ['atm-chart-verify', ['atm-chart', 'verify', '--cwd', workflowRoot, '--json']]
+    ] as const;
+    const coreWorkflowResults: Record<string, number> = {};
+    for (const [name, argv] of coreWorkflow) {
+      const result = spawnSync(binPath, [...argv], {
+        cwd: consumerRoot, encoding: 'utf8', shell: process.platform === 'win32', windowsHide: true
+      });
+      coreWorkflowResults[name] = result.status ?? -1;
+      if (result.status !== 0) {
+        throw new Error(
+          `clean-install core workflow command failed: ${name} exited ${result.status}\n${(result.stdout ?? '') + (result.stderr ?? '')}`
+        );
+      }
+    }
     const jsonStart = packOutput.search(/\n\[\s*\{/);
     if (jsonStart < 0) throw new Error('npm pack did not emit a JSON inventory');
     const inventory = JSON.parse(packOutput.slice(jsonStart + 1)) as Array<{ files?: Array<{ path?: string }>; unpackedSize?: number; filename?: string }>;
@@ -50,6 +75,7 @@ function runInstallSmoke(): void {
       unpackedSize: inventory[0]?.unpackedSize ?? null, entryCount: files.length,
       installCommand: 'npm install --ignore-scripts <tarball>', publicCommand: 'atm --version',
       publicCommandOutputSha256: createHash('sha256').update(versionOutput).digest('hex'),
+      coreWorkflowExitCodes: coreWorkflowResults,
       elapsedMs: Date.now() - startedAt, temporaryRootRemoved: true
     }));
   } finally {
