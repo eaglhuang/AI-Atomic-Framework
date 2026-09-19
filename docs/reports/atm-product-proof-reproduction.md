@@ -1,0 +1,114 @@
+# Reproducing the ATM product proofs
+
+This runbook lets anyone outside the project rerun the evidence behind the three
+ATM product proofs with public inputs only. It records the latest results so a
+rerun can be compared against them. A proof counts as met only when a rerun
+reproduces it; this document is not the evidence by itself.
+
+Status as of 2026-09-19:
+
+| Proof | Status |
+|---|---|
+| 1. Small, complete installable package | **Met** for `@ai-atomic-framework/cli@0.1.1` |
+| 2. Sustained delivery reliability | **Not yet met** — calendar window too short (see below) |
+| 3. Net benefit over a simple baseline | **Not proven** — no paired experiment has run |
+
+## Prerequisites
+
+- Node.js 24 and npm, network access to `https://registry.npmjs.org`.
+- For Proof 2: the GitHub CLI (`gh`) authenticated with read access to the
+  repository. If `gh` is not on the `PATH` that Node sees, set `ATM_GH_BIN` to
+  its full path.
+- A clone of this repository for the measurement scripts. The package under
+  test is always installed from the public registry, never from the clone.
+
+## Proof 1 — installable package
+
+Clean-install a fixed published version into an empty directory and run the
+core workflow command matrix (`--version`, `doctor`, `next`, `tasks`,
+`bootstrap`, `atm-chart render`, `atm-chart verify`):
+
+```bash
+node --strip-types scripts/validate-public-npm-install.ts --package @ai-atomic-framework/cli --version 0.1.1 --require-default-tag --measurement-runs 3 --output proof-0.1.1.md
+```
+
+Pass criteria in the JSON receipt: `status: "verified"`,
+`validation.coreWorkflowPassed: true`, `validation.moduleResolutionFailures: 0`,
+`cleanConsumer: true`, `usedWorkspaceLink: false`. Rerun with `--version 0.1.0`
+for the comparison baseline; `0.1.0` fails `atm-chart render` and
+`atm-chart verify` with `ATM_CHART_SCHEMA_SOURCE_MISSING` because it did not
+ship the `governance/default-guards` schema source.
+
+Measure the full installed footprint, which tarball size alone cannot show:
+
+```bash
+node --strip-types scripts/measure-npm-dependency-footprint.ts 0.1.0 0.1.1 --output footprint.json
+```
+
+Latest results (Windows, Node v24.12.0; `--version` p50 over 3 runs, other
+commands single runs):
+
+| Metric | 0.1.0 | 0.1.1 |
+|---|---|---|
+| Unpacked size (bytes) | 3,357,358 | 2,654,835 |
+| Files | 78 | 66 |
+| Installed `node_modules` (bytes) | 4,712,004 | 4,009,481 |
+| Transitive packages | 6 | 6 |
+| Install time | 1,840 ms | 1,642 ms |
+| `atm --version` p50 | 696 ms | 170 ms |
+| Core workflow | fails | passes |
+
+Earlier prereleases show why each dimension is measured separately:
+`0.1.0-beta.0` cannot be installed (it depends on an unpublished package), and
+`0.1.0-beta.1` unpacks to 4.66 MB but installs 31 MB because it pulls
+`typescript` at runtime.
+
+Limits: sizes and timings were measured on one Windows host. Linux clean
+installs, including the core workflow, run on every Product CI execution but
+were not size- or time-benchmarked.
+
+## Proof 2 — sustained delivery reliability
+
+Policy: at least 30 calendar days and 90 eligible Product CI runs on protected
+`main`, covering build, test, package and clean install. Every failure in the
+window stays in the report; a failure stops blocking the verdict only when it
+has a specific root-cause class and an accepted repair (a green rerun, or a
+later green run named in a fix-forward disposition). See
+`docs/reports/atm-product-proof-checkpoints.md` for the policy decision.
+
+```bash
+node --strip-types scripts/export-github-ci-attempts.ts --repo eaglhuang/AI-Atomic-Framework --since 2026-08-10 --dispositions docs/reports/product-ci-failure-dispositions.json --output ci-export.json
+node --strip-types scripts/collect-ci-burn-in-evidence.ts --input ci-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output ci-receipt.json
+node --strip-types scripts/measure-product-ci-burn-in.ts --input ci-receipt.json --report-only
+```
+
+The exporter keeps every rerun attempt, lists every run it drops with a reason
+(`droppedRuns`), and fails if a completed run has no job data. The collector
+excludes runs that are not Product CI burn-in runs; the eligible window starts
+at `2026-08-26T23:44:22Z`, when the `Product CI burn-in` run name was
+introduced, so the 30-day threshold cannot be met before
+`2026-09-25T23:44:22Z`. Each entry in
+`docs/reports/product-ci-failure-dispositions.json` names its failing job so
+the root cause can be checked in the public CI logs.
+
+Latest result: on 2026-09-19 the exporter returned 773 runs since 2026-08-10 (none dropped); the collector kept 647 eligible runs and excluded 126 as `out-of-scope-workflow`. Window `2026-08-26T23:44:22Z` to `2026-09-19T02:44:28Z` (23.1 days); 3 failed runs, all 3 repaired and explained, 0 unexplained, 0 reruns, current streak 23. Verdict `reject` with the single reason `insufficient-calendar-window`.
+
+Known limit: Product CI runs a focused step list, and only a small fraction of
+the `tests/cli` suites are registered in any CI validator profile, so "covers
+test" is currently partial.
+
+## Proof 3 — net benefit over a simple baseline
+
+Not proven. The paired executor exists (`TASK-PRF-0114`) and can be exercised
+at no cost with the simulated driver; simulated packets verify only under the
+`dry-run` stage and are rejected for every evidence stage:
+
+```bash
+node --strip-types scripts/run-atm-external-benchmark.ts --execute --plan <trial-plan.json> --driver simulated --workspace-root <dir-outside-repo> --sink <dir-outside-repo>
+node --strip-types scripts/run-atm-external-benchmark.ts --verify-packet --stage dry-run --packet <sink>/<plan>/<pair>/packet.json
+```
+
+A real experiment still needs: sealed scenario tasks from an independent
+hidden-corpus custodian, an independent adjudicator, attributable provider cost
+telemetry, a real provider driver, and approved token, cost and wall-clock caps.
+Until a paired experiment runs, no claim of net benefit is made.
