@@ -19,7 +19,7 @@
     {
       "test": "atm-3-red-baseline-discrimination.test.ts",
       "reason": "writes-tracked-files",
-      "detail": "Passes, but regenerates tracked files: artifacts/generated/atm-plan3-red-green/summary.json",
+      "detail": "Regenerates tracked artifacts by design: it calls the plan3 red/green generator in generate mode, and that script writes to paths fixed at module level (artifacts/generated/** and docs/reports/**). Enabling it needs an output-root option so the test can write to a temporary directory.",
       "disposition": "fix"
     },
     {
@@ -133,7 +133,7 @@
     {
       "test": "paired-ab-v4-safety-controller.test.ts",
       "reason": "writes-tracked-files",
-      "detail": "Passes, but regenerates tracked files: artifacts/generated/atm-ab-v4/{cells,summary}.json, docs/reports/atm-2-1-paired-ab-v4.md",
+      "detail": "Regenerates tracked artifacts by design: it calls scripts/run-paired-ab-v4.ts in generate mode, and that script writes to paths fixed at module level (artifacts/generated/** and docs/reports/**). Enabling it needs an output-root option so the test can write to a temporary directory.",
       "disposition": "fix"
     },
     {
@@ -181,7 +181,7 @@
     {
       "test": "real-parallel-dogfood-harness.test.ts",
       "reason": "writes-tracked-files",
-      "detail": "Passes, but regenerates tracked files: artifacts/generated/atm-parallel-dogfood/{summary,workers}.json, docs/reports/atm-2-1-real-parallel-dogfood.md",
+      "detail": "Regenerates tracked artifacts by design: it calls scripts/run-real-parallel-dogfood.ts in generate mode, and that script writes to paths fixed at module level (artifacts/generated/** and docs/reports/**). Enabling it needs an output-root option so the test can write to a temporary directory.",
       "disposition": "fix"
     },
     {
@@ -219,12 +219,6 @@
       "reason": "failing-on-main",
       "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ode:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: 'strictEqual',\r diff: 'simple'\r }",
       "disposition": "triage"
-    },
-    {
-      "test": "skill-corpus-canary-rewrite.test.ts",
-      "reason": "writes-tracked-files",
-      "detail": "Passes, but regenerates tracked files: artifacts/generated/skill-corpus-audit.json",
-      "disposition": "fix"
     },
     {
       "test": "skill-distribution-manager.test.ts",

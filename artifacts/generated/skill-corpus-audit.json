@@ -6,9 +6,165 @@
   "sourceSnapshot": {
     "schemaId": "atm.skillCorpusSourceSnapshot.v1",
     "compilerVersion": "0.1.0",
-    "templateCount": 21,
-    "sourceDigest": "sha256:1a05520299b26b548311adec526268101fc6bf01fabd24e15d3f95c69d631578",
+    "templateCount": 25,
+    "sourceDigest": "sha256:ea7946c0ba71c1b5b98a6df2b558151419812e088f3e7bead07a26a9eead2fbc",
     "ignoredSourceTemplatePaths": []
+  },
+  "sourceUniverse": {
+    "schemaId": "atm.skillSourceUniverse.v1",
+    "sealed": true,
+    "sourceRoot": "templates/skills",
+    "universeDigest": "sha256:9af3b5a94259a2e94023b7dbed2f40e5917fc7e21eee6022cfe0b94f3de5eee7",
+    "trackedSourceTemplateCount": 25,
+    "untrackedSourceTemplatePaths": [],
+    "ignoredSourceTemplatePaths": [],
+    "findings": []
+  },
+  "installedProjectionParity": {
+    "installedSkillRoot": ".agents/skills",
+    "comparedAgainst": "atm.skillCorpusProjection.v1:claude-code",
+    "manifestDigest": "sha256:bfb868fd22a451da3a09ef4ce109a84623a07fe2501a9cd8f579f6c4e21cd041",
+    "dispositionCounts": {
+      "sync": 24,
+      "approved-baseline": 0,
+      "explicit-waiver": 1,
+      "fail-closed": 0
+    },
+    "declaredDispositions": [
+      {
+        "templateId": "atm-atom-map-refactor",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-bug-backlog",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-create",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-deep-module-refactor",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-error-code-resolver",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-evidence",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-git-pathspec-emergency-commit",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-governance-router",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-handoff",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-internal-build-sync",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-lock",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-memory-consolidate",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-next",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-orient",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-plan-authoring",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-task-card-authoring",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-task-intent-resolver",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-upgrade-scan",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "mailbox-worker-execution",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy was baked before charter invariant INV-ATM-014 existed; sync route is `node atm.mjs integration add --id claude-code --force`, which rewrites .agents/skills outside this card's scope",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-dispatch",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy diverges structurally from the compiled projection while templates/skills/atm-dispatch.skill.md carries another actor's in-flight edit; parity cannot be judged until that delivery lands",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-framework-temp-claim",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy still carries the pre-INV-ATM-013 section ordering; same rebake route as the stale-charter entries above",
+        "owningTaskId": "TASK-SKL-0038"
+      },
+      {
+        "templateId": "atm-framework-quickfix",
+        "disposition": "explicit-waiver",
+        "reason": "installed copy predates the argument-hint frontmatter field the current compiler emits; same rebake route as the stale-charter entries above",
+        "owningTaskId": "TASK-SKL-0038"
+      }
+    ],
+    "failClosed": []
   },
   "canaryOrder": [
     "atm-governance-router",
@@ -22,10 +178,18 @@
     {
       "id": "atm-atom-map-refactor",
       "sourcePath": "templates/skills/atm-atom-map-refactor.skill.md",
-      "sourceDigest": "sha256:6339c4e5082cfc04a3014a2fcd840163391f9b957cd93725d7bf2137a4da5d7a",
+      "sourceDigest": "sha256:4fd845256f5f1f9217f813eba709003d642cb430e8e4b8ebc91076a36ae17162",
       "class": "minimum-entry",
       "action": "keep",
       "progressiveDisclosure": true
+    },
+    {
+      "id": "atm-bug-backlog",
+      "sourcePath": "templates/skills/atm-bug-backlog.skill.md",
+      "sourceDigest": "sha256:50d8e14ad2bdb9b5a70ea7d1956eadd2bd19165d4f914b87ccacbf6b81ddcabf",
+      "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
     },
     {
       "id": "atm-create",
@@ -38,15 +202,23 @@
     {
       "id": "atm-deep-module-refactor",
       "sourcePath": "templates/skills/atm-deep-module-refactor.skill.md",
-      "sourceDigest": "sha256:d57cb7e178482fbabf880d5d06c8732b37d95582e6ae1067eaaeb7c8efd9a753",
+      "sourceDigest": "sha256:03b2b515127f7759aa93f9bd523b2abcdd9830e74aa8e8bf2016368ee99eac6c",
       "class": "provider-reference",
       "action": "keep",
       "progressiveDisclosure": true
     },
     {
+      "id": "atm-diagnostic-loop",
+      "sourcePath": "templates/skills/atm-diagnostic-loop.skill.md",
+      "sourceDigest": "sha256:2dac47b7489163797403645e95bcc7fce75701b5d7a399b0757f0e4f00bf914c",
+      "class": "specialist",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
       "id": "atm-dispatch",
       "sourcePath": "templates/skills/atm-dispatch.skill.md",
-      "sourceDigest": "sha256:c8947d22c91f52bf439c484e3da4889dfef8dfd71753e80a2cb898af6773aeb3",
+      "sourceDigest": "sha256:2d5d873370e050561530de573243de22d8bffacbc7d55c82f8d1b994cc18e7d4",
       "class": "rewrite-canary",
       "action": "canary-rewritten",
       "progressiveDisclosure": false
@@ -62,15 +234,23 @@
     {
       "id": "atm-evidence",
       "sourcePath": "templates/skills/atm-evidence.skill.md",
-      "sourceDigest": "sha256:b513f26f199be41da3ac1ad8a70708cd38f2742541cfc6ecc32cc7f2f4754e6f",
+      "sourceDigest": "sha256:e5797a1d87dfbc70de5916a9b918bb02900a26b802d17979b6d756574229b7f9",
       "class": "minimum-entry",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
+      "id": "atm-framework-quickfix",
+      "sourcePath": "templates/skills/atm-framework-quickfix.skill.md",
+      "sourceDigest": "sha256:7add49ac4f04c7efee6f5c8e43959d475e839b86c45a3df00f61d2a0a63560a7",
+      "class": "specialist",
       "action": "keep",
       "progressiveDisclosure": false
     },
     {
       "id": "atm-framework-temp-claim",
       "sourcePath": "templates/skills/atm-framework-temp-claim.skill.md",
-      "sourceDigest": "sha256:9e9b6938418ab24cb828d7c17f2d3bb7da339e99b150ef3317ffd69522bf4a2c",
+      "sourceDigest": "sha256:bc6a8541e842b4ae8ac8eddadfa4f3c9e1fc871fec1f41f771a7fbc65fe53b49",
       "class": "rewrite-canary",
       "action": "canary-rewritten",
       "progressiveDisclosure": false
@@ -150,15 +330,23 @@
     {
       "id": "atm-plan-authoring",
       "sourcePath": "templates/skills/atm-plan-authoring.skill.md",
-      "sourceDigest": "sha256:965015a35f974da4fa5087145968d5d07550159e3acc3f1257cea28d68e66e44",
+      "sourceDigest": "sha256:90303ee43fdd6793538f241fbd4e83127809d06d7a3426761079610f7c4f36e0",
       "class": "rewrite-canary",
       "action": "canary-rewritten",
       "progressiveDisclosure": false
     },
     {
+      "id": "atm-residue-cleanup",
+      "sourcePath": "templates/skills/atm-residue-cleanup.skill.md",
+      "sourceDigest": "sha256:411d2ceeeaa4639fb4207987b2f2bc3abe260f85d50c3e0105a7f4fb4a163d4a",
+      "class": "specialist",
+      "action": "keep",
+      "progressiveDisclosure": false
+    },
+    {
       "id": "atm-task-card-authoring",
       "sourcePath": "templates/skills/atm-task-card-authoring.skill.md",
-      "sourceDigest": "sha256:6cbc0494a61a6936b8f5d1854a44a7e487f28b71137e5610aa2b54f836098497",
+      "sourceDigest": "sha256:e36e3fc94f82f0871ed01a4479d1b55ff87753f1811d75cc30395b119ab457bd",
       "class": "rewrite-canary",
       "action": "canary-rewritten",
       "progressiveDisclosure": false
@@ -206,11 +394,12 @@
       "candidate": {
         "moduleId": "skill-corpus-source-snapshot",
         "sourcePaths": [
+          "packages/integrations-core/src/compiler/skill-source-universe.ts",
           "packages/integrations-core/src/compiler/skill-templates.ts",
           "scripts/audit-skill-corpus.ts"
         ],
         "ownerAtomOrMap": "atom-skill-template-compiler",
-        "publicInterface": "loadSkillCorpusSourceSnapshot(templateDirectory)",
+        "publicInterface": "loadSkillCorpusSourceSnapshot(templateDirectory, { sourceUniverse })",
         "rollback": "revert TASK-SKL-0028 corpus snapshot and audit changes",
         "causalValidators": [
           "node --strip-types tests/cli/skill-corpus-canary-rewrite.test.ts",
@@ -226,7 +415,7 @@
         "fileLengthAdvisoryOnly": true
       },
       "seam": {
-        "proposedInterface": "loadSkillCorpusSourceSnapshot(templateDirectory)",
+        "proposedInterface": "loadSkillCorpusSourceSnapshot(templateDirectory, { sourceUniverse })",
         "requiresTwoAdapters": true,
         "proposedAdapters": [
           "filesystem-template-corpus",
@@ -251,7 +440,7 @@
         "npm run validate:skill-templates"
       ],
       "confidence": "high",
-      "receiptFingerprint": "deep-module-review:1c8317d2",
+      "receiptFingerprint": "deep-module-review:03e15daf",
       "baselineLabel": "source-snapshot-boundary",
       "baselineFingerprint": "deep-module-review:52470e9f"
     },
@@ -266,6 +455,7 @@
       "candidate": {
         "moduleId": "skill-corpus-projection",
         "sourcePaths": [
+          "packages/integrations-core/src/compiler/skill-projection-parity.ts",
           "packages/integrations-core/src/compiler/skill-templates.ts"
         ],
         "ownerAtomOrMap": "atom-skill-template-compiler",
@@ -310,7 +500,7 @@
         "npm run typecheck"
       ],
       "confidence": "high",
-      "receiptFingerprint": "deep-module-review:30cecbd9",
+      "receiptFingerprint": "deep-module-review:90651750",
       "baselineLabel": "projection-boundary",
       "baselineFingerprint": "deep-module-review:52b3cbe6"
     }
