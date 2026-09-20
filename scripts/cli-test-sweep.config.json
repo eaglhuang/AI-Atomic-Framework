@@ -11,18 +11,6 @@
       "disposition": "fix"
     },
     {
-      "test": "backlog-deferred-waiver-register.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Asserts a fixed count (133) over the live docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json, which now holds 50. The register changes as waivers are granted and retired.",
-      "disposition": "fix"
-    },
-    {
-      "test": "backlog-release-blocking-subset.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Asserts a fixed count (391) over the live docs/reports/plan-3x-4x-backlog-release-blocking-subset.json, which now holds 477. The subset changes as backlog items are opened and closed.",
-      "disposition": "fix"
-    },
-    {
       "test": "broker-replay-command-surface.test.ts",
       "reason": "stale-assertion",
       "detail": "Snapshots live repository state: it asserts broker replay status stays remain-open \"while closure evidence is incomplete\". The evidence is now complete, so the command correctly reports ready-to-close and exits 0. The test needs a fixture instead of the live repository.",

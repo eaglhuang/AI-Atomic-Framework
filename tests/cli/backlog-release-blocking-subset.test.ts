@@ -6,12 +6,16 @@ const report = JSON.parse(readFileSync('docs/reports/plan-3x-4x-backlog-release-
 
 assert.equal(report.schemaId, 'atm.backlogReleaseBlockingSubset.v1');
 assert.equal(report.status, 'release-blocking-subset-separated');
-assert.equal(report.totals.backlogTotal, 391);
-assert.equal(report.totals.terminal, 219);
-assert.equal(report.totals.deferred, 170);
-assert.equal(report.totals.releaseBlockingNow, 0);
-assert.equal(report.totals.needsTaskCardBeforeFinalRelease, 133);
-assert.equal(report.totals.ownerTrackedDeferred, 37);
+// Backlog sizes move as items are opened and closed. What must hold is the
+// arithmetic of the subset and the release-blocking invariant; the validator
+// below re-derives the totals from the live backlog and fails on drift.
+for (const key of ['backlogTotal', 'terminal', 'deferred', 'releaseBlockingNow', 'needsTaskCardBeforeFinalRelease', 'ownerTrackedDeferred'] as const) {
+  assert.ok(Number.isInteger(report.totals[key]) && report.totals[key] >= 0, `totals.${key} must be a count`);
+}
+assert.equal(report.totals.terminal + report.totals.deferred, report.totals.backlogTotal, 'terminal and deferred must partition the backlog');
+assert.ok(report.totals.ownerTrackedDeferred <= report.totals.deferred);
+assert.ok(report.totals.needsTaskCardBeforeFinalRelease <= report.totals.deferred);
+assert.equal(report.totals.releaseBlockingNow, 0, 'the subset exists to keep the release-blocking count at zero');
 assert.deepEqual(report.nextExecutionOrder.map((entry: any) => entry.id), [
   'task-cardize-unowned-deferred',
   'sample-owner-tracked-deferred',
