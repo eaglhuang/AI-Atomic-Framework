@@ -35,6 +35,12 @@
       "disposition": "triage"
     },
     {
+      "test": "cli-published-command-smoke.test.ts",
+      "reason": "environment-dependent",
+      "detail": "Passes standalone on Windows and Linux, including twice in a row, but fails inside the sweep on Linux with \"candidate install did not expose atm bin\". Running it serially did not help, so the interaction with earlier sweep batches is not yet identified. The bin mode defect it exposed (a rebuild dropped the executable bit) is fixed separately.",
+      "disposition": "fix"
+    },
+    {
       "test": "cross-editor-parallel-proof.test.ts",
       "reason": "environment-dependent",
       "detail": "Needs full git history: acc5 depends on whether a recorded SHA is reachable, and the depth-1 CI checkout cannot answer that, so the status is unmet. Passes in a full clone. Enabling it would require fetch-depth: 0 in Product CI.",
@@ -227,10 +233,5 @@
       "disposition": "triage"
     }
   ],
-  "serial": [
-    {
-      "test": "cli-published-command-smoke.test.ts",
-      "detail": "Packs and installs the CLI candidate; running it beside another test that packs the same workspace raced and left node_modules/.bin/atm missing on Linux."
-    }
-  ]
+  "serial": []
 }
