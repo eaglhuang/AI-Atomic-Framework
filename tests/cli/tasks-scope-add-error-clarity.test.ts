@@ -79,9 +79,9 @@ try {
   assert.equal(existsSync(claimFirstEventDir), true);
   assert.match(readFileSync(findEventByAction(claimFirstEventDir, 'scope-amendment.claim-first-resolved'), 'utf8'), /scope-amendment\.claim-first-resolved/);
 
-  const blockerDepPlan = writeTaskCard('TASK-MAO-CLARITY-DEP', 'Blocking dependency', ['src/feature.ts']);
-  const blockerTaskPlan = writeTaskCard('TASK-MAO-CLARITY-0003', 'Scope add claim-first blocked', ['src/feature.ts'], ['TASK-MAO-CLARITY-DEP']);
-  importAndPrepareTask('TASK-MAO-CLARITY-DEP', blockerDepPlan);
+  const blockerDepPlan = writeTaskCard('TASK-MAO-CLARITY-0009', 'Blocking dependency', ['src/feature.ts']);
+  const blockerTaskPlan = writeTaskCard('TASK-MAO-CLARITY-0003', 'Scope add claim-first blocked', ['src/feature.ts'], ['TASK-MAO-CLARITY-0009']);
+  importAndPrepareTask('TASK-MAO-CLARITY-0009', blockerDepPlan);
   importAndPrepareTask('TASK-MAO-CLARITY-0003', blockerTaskPlan);
   const blockedResult = runAtm([
     'tasks', 'scope', 'add',

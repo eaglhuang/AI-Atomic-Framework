@@ -30,7 +30,11 @@ try {
     result: {
       name: 'validate-example',
       ok: true,
-      exitCode: 0
+      exitCode: 0,
+      // A pass with zero observed cases is rejected as evidence, so the
+      // fixture must report the cases it claims to have run.
+      caseCount: 1,
+      assertionCount: 1
     },
     scopePaths: [scopeFile]
   };
