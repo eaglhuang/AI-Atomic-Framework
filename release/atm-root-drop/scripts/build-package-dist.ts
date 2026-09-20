@@ -13,17 +13,39 @@ const VENDOR_DIRNAME = '_vendor';
 // runtime (not through an ESM import), so they must be copied explicitly into
 // the npm closure. Keep this list data-only and bounded: it is the source of
 // truth for non-module assets required by the public CLI.
-const CLI_RUNTIME_ASSETS = [
-  'schemas/atomic-spec.schema.json',
-  // `atm create` validates the generated atom report and the updated registry.
-  'schemas/registry.schema.json',
-  'schemas/test-report.schema.json',
-  'schemas/test-report/metrics.schema.json',
-  // create-map validates its spec against the atomic map schema.
-  'schemas/registry/atomic-map.schema.json',
+const CLI_TEMPLATE_ASSETS = [
   'templates/atom.spec.template.json',
   'templates/atom.test.template.ts'
 ] as const;
+
+// Every schema a runtime module resolves by path must travel with the closure.
+// A hand-kept list drifted twice (atm create and create-map both failed with a
+// missing schema in the published package and in the frozen runner), so the set
+// is derived from the sources that name one. Test sources are excluded: they may
+// name paths that do not exist.
+function collectReferencedSchemaAssets(): string[] {
+  const literalPattern = /schemas\/[A-Za-z0-9/_-]+\.schema\.json/g;
+  // resolveShippedSchemaPath names a schema relative to the schemas/ directory,
+  // so those call sites carry no literal path to match.
+  const shippedPattern = /resolveShippedSchemaPath\(\s*import\.meta\.url\s*,\s*['"]([A-Za-z0-9/_-]+\.schema\.json)['"]/g;
+  const referenced = new Set<string>();
+  for (const file of listFiles(path.join(root, 'packages'))) {
+    if (!file.endsWith('.ts') || file.includes('__tests__') || file.endsWith('.test.ts')) continue;
+    const source = readFileSync(file, 'utf8');
+    for (const match of source.matchAll(literalPattern)) referenced.add(match[0]);
+    for (const match of source.matchAll(shippedPattern)) referenced.add(`schemas/${match[1]}`);
+  }
+  const resolved: string[] = [];
+  const missing: string[] = [];
+  for (const schema of [...referenced].sort()) {
+    if (existsSync(path.join(root, schema))) resolved.push(schema);
+    else missing.push(schema);
+  }
+  if (missing.length > 0) {
+    throw new Error(`Runtime code names schemas that do not exist: ${missing.join(', ')}`);
+  }
+  return resolved;
+}
 const onlyPackage = process.argv.includes('--package')
   ? process.argv[process.argv.indexOf('--package') + 1]
   : null;
@@ -423,7 +445,7 @@ function buildCliRuntimeClosure(): void {
   // Keep this allowlist exact: copying the repository-wide templates tree would
   // silently turn the compact product back into a development snapshot.
   let scaffoldRuntimeAssets = 0;
-  for (const assetPath of CLI_RUNTIME_ASSETS) {
+  for (const assetPath of [...collectReferencedSchemaAssets(), ...CLI_TEMPLATE_ASSETS]) {
     const source = path.join(root, assetPath);
     const target = path.join(cliDist, assetPath);
     if (!existsSync(source)) {

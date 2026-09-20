@@ -85,9 +85,22 @@ try {
   assert.equal(blockedUpgrade.exitCode, 0, JSON.stringify(blockedUpgrade.parsed, null, 2));
   assert.equal(blockedUpgrade.parsed.ok, true);
   assert.equal(blockedUpgrade.parsed.evidence.status, 'blocked');
-  assert.equal(blockedUpgrade.parsed.evidence.nextActionHint.route, 'map-equivalence-required');
-  assert.deepEqual(blockedUpgrade.parsed.evidence.nextActionHint.requiredEvidenceKinds, ['map-equivalence']);
-  assert.match(blockedUpgrade.parsed.evidence.nextActionHint.command, /--equivalence-fixtures/);
+  // The hint now routes through governed next and names every outstanding
+  // evidence gate with the option that supplies it, instead of only the first.
+  assert.equal(blockedUpgrade.parsed.evidence.nextActionHint.route, 'governed-next');
+  assert.ok(
+    blockedUpgrade.parsed.evidence.nextActionHint.requiredEvidenceKinds.includes('map-equivalence'),
+    'a blocked promotion must still name the missing map equivalence evidence'
+  );
+  assert.deepEqual(
+    blockedUpgrade.parsed.evidence.nextActionHint.requiredEvidenceKinds,
+    ['map-equivalence', 'propagation-report', 'review-advisory', 'human-review']
+  );
+  assert.deepEqual(
+    blockedUpgrade.parsed.evidence.nextActionHint.requiredCliOptions,
+    ['--equivalence-report', '--propagation-report', '--review-advisory', '--human-review']
+  );
+  assert.match(blockedUpgrade.parsed.evidence.nextActionHint.command, /atm.mjs next/);
 
   const powerShellRoot = createTempWorkspace('atm cli spec powershell smoke ');
   mkdirSync(path.join(powerShellRoot, 'spec inputs'), { recursive: true });
