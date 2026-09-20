@@ -84,7 +84,31 @@ assert.equal(applyResult.after.status, 'ready', 'stale running task must reset t
 assert.equal(applyResult.after.claim?.state, 'released', 'expired claim must be released');
 assert.ok(applyResult.repairActions.length > 0, 'repair must record actions');
 
+// An active claim only holds mutation authority while its lane session is
+// live, so the blocking fixture carries one.
+const liveLaneId = 'lane-20260920000000-live-worker-0000000000';
+mkdirSync(path.join(repo, '.atm', 'runtime', 'lane-sessions'), { recursive: true });
+writeFileSync(path.join(repo, '.atm', 'runtime', 'lane-sessions', `${liveLaneId}.json`), `${JSON.stringify({
+  schemaId: 'atm.laneSession.v1',
+  specVersion: '0.1.0',
+  laneId: liveLaneId,
+  actorId: 'live-worker',
+  taskId: `${taskId}-blocked`,
+  status: 'active',
+  createdAt: nowIso,
+  updatedAt: nowIso,
+  expiresAt: new Date(Date.now() + 1_800_000).toISOString(),
+  ttlMs: 1_800_000,
+  identity: { actorId: 'live-worker', resolutionSource: 'explicit' },
+  adoptionSource: 'created',
+  handoffTokenHash: null,
+  lastCommand: null,
+  lastHeartbeatAt: nowIso
+}, null, 2)}
+`, 'utf8');
+
 const activeClaim = {
+  laneSession: { laneSessionId: liveLaneId, status: 'active', source: 'explicit', exportHint: `export ATM_LANE_SESSION_ID="${liveLaneId}"` },
   ...createClaimRecord({
     taskId: `${taskId}-blocked`,
     actorId: 'live-worker',

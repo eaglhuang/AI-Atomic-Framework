@@ -195,12 +195,6 @@
       "reason": "writes-tracked-files",
       "detail": "Root-caused 2026-09-20: taskflow open resolves its output root from the profile path (resolveTaskflowOpenOutputRoot returns the profile repo git root), not from --cwd. The test passes a profile that lives in this repository, so the generated card lands in the framework repo docs/tasks instead of the requested cwd, and the run dirties the worktree. Whether a profile may redirect writes outside --cwd is an owner decision; do not change the resolver to make the test pass.",
       "disposition": "triage"
-    },
-    {
-      "test": "tasks-repair-claim.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Root-caused with a debugger: the fixture's \"valid active claim\" has no lane session, and current policy treats an active claim without a live lane session as repairable (unresolved-claim-lane), not blocking. The gate behaves as designed; the fixture must create a live lane session.",
-      "disposition": "fix"
     }
   ],
   "serial": []
