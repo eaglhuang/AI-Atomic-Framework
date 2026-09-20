@@ -227,5 +227,10 @@
       "disposition": "triage"
     }
   ],
-  "serial": []
+  "serial": [
+    {
+      "test": "cli-published-command-smoke.test.ts",
+      "detail": "Packs and installs the CLI candidate; running it beside another test that packs the same workspace raced and left node_modules/.bin/atm missing on Linux."
+    }
+  ]
 }
