@@ -192,9 +192,9 @@
     },
     {
       "test": "task-view-dashboard.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ode:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: true,\r expected: false,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "environment-dependent",
+      "detail": "Asserts on live repository state for the historical TASK-MAO-0043: it expects a complete close, but the dashboard reports a partial close because the planning-mirror field cannot be confirmed without the planning repository checked out beside this one. Reporting partial when the mirror is unverifiable is fail-closed and correct; the test needs a fixture instead of the live ledger.",
+      "disposition": "fix"
     },
     {
       "test": "taskflow-close-orchestration.test.ts",
