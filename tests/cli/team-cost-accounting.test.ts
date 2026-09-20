@@ -49,7 +49,7 @@ function testOpenAICachedTokens(): void {
   // Derive the expected charge from the catalog so a price revision cannot
   // leave a hard-coded number behind. The previous literal was twice the rate
   // card, and the test never ran in CI to catch it.
-  const terraRates = catalog.prices.find((entry) => entry.model === 'gpt-5.6-terra')!.rates;
+  const terraRates = requireRates('gpt-5.6-terra');
   const expectedCashCost = (2_000 * terraRates.input + 8_000 * terraRates.cacheRead + 1_000 * terraRates.cacheWrite + 500 * terraRates.output) / 1_000_000;
   assert.equal(receipt.incrementalCashCost, expectedCashCost);
   assert.equal(receipt.lineItems.some((item) => item.dimension === 'cacheWrite'), true);
@@ -153,9 +153,20 @@ function testMissingRateDimensions(): void {
   assert.equal(receipt.incompleteReasons.includes('missing-price-row'), true);
 }
 
+/** Every rate an expectation needs, or a failure naming what the catalog lacks. */
+function requireRates(model: string): { input: number; output: number; cacheRead: number; cacheWrite: number } {
+  const entry = catalog.prices.find((price) => price.model === model);
+  assert.ok(entry, `catalog must price ${model}`);
+  const { input, output, cacheRead, cacheWrite } = entry.rates;
+  for (const [dimension, rate] of Object.entries({ input, output })) {
+    assert.equal(typeof rate, 'number', `catalog must carry a ${dimension} rate for ${model}`);
+  }
+  return { input: input as number, output: output as number, cacheRead: (cacheRead ?? 0) as number, cacheWrite: (cacheWrite ?? 0) as number };
+}
+
 /** List price for one million input plus one million output tokens. */
 function millionTokenListPrice(model: string): number {
-  const rates = catalog.prices.find((entry) => entry.model === model)!.rates;
+  const rates = requireRates(model);
   return (1_000_000 * rates.input + 1_000_000 * rates.output) / 1_000_000;
 }
 
