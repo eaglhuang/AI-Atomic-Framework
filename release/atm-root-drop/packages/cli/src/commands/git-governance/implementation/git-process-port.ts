@@ -336,17 +336,21 @@ export function addTrustedGitHookRuntimePath(
     readonly pathExists?: (candidate: string) => boolean;
   } = {},
 ): NodeJS.ProcessEnv {
-  if ((options.platform ?? process.platform) !== "win32") return env;
+  const platform = options.platform ?? process.platform;
+  if (platform !== "win32") return env;
 
   const gitExecutable = options.gitExecutable ?? resolveGitExecutable();
   const pathExists = options.pathExists ?? existsSync;
-  const gitRoot = path.dirname(path.dirname(gitExecutable));
-  const hookRuntimePath = path.join(gitRoot, "usr", "bin");
-  if (!pathExists(path.join(hookRuntimePath, "sh.exe"))) return env;
+  // The caller may declare the target platform, so Windows path rules must come
+  // from that declaration rather than from the host running this process.
+  const windowsPath = path.win32;
+  const gitRoot = windowsPath.dirname(windowsPath.dirname(gitExecutable));
+  const hookRuntimePath = windowsPath.join(gitRoot, "usr", "bin");
+  if (!pathExists(windowsPath.join(hookRuntimePath, "sh.exe"))) return env;
 
   const existingEntries = Object.entries(env)
     .filter(([key]) => key.toLowerCase() === "path")
-    .flatMap(([, value]) => String(value ?? "").split(path.delimiter))
+    .flatMap(([, value]) => String(value ?? "").split(windowsPath.delimiter))
     .filter(Boolean);
   for (const key of Object.keys(env)) {
     if (key.toLowerCase() === "path") delete env[key];
@@ -356,7 +360,7 @@ export function addTrustedGitHookRuntimePath(
   }
   // Git for Windows' MSYS runtime reads the conventional uppercase spelling
   // when resolving a shebang through /usr/bin/env.
-  env.PATH = existingEntries.join(path.delimiter);
+  env.PATH = existingEntries.join(windowsPath.delimiter);
   return env;
 }
 
