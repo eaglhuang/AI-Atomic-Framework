@@ -54,7 +54,10 @@ assert.equal(degraded.evidence.schemaId, 'atm.skillProviderDegradation.v1');
 const schema = JSON.parse(readFileSync('templates/skills/skill.schema.json', 'utf8'));
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 const validate = ajv.compile(schema);
-assert.equal(validate({
+// The template contract grew owner, tier, install profiles, invocation policy,
+// companion files and adapter capability requirements; a template without them
+// is no longer valid.
+const templateInstance = {
   schemaId: 'atm.skillTemplate',
   specVersion: '0.1.0',
   id: 'atm-next',
@@ -64,7 +67,20 @@ assert.equal(validate({
   firstCommand: 'node atm.mjs next --json',
   'charter-invariants-injected': true,
   handoffs: 'node atm.mjs next --json',
+  owner: 'atm-core',
+  tier: 'entry',
+  installProfiles: ['framework-full'],
+  invocationPolicy: 'model-or-user',
+  companionFiles: [],
+  adapterCapabilityRequirements: [{ adapterId: 'provider-a', requires: ['code'] }],
   skillDefinition: definition
-}), true);
+};
+assert.equal(validate(templateInstance), true, ajv.errorsText(validate.errors));
+
+// Dropping any newly required field must fail closed.
+for (const field of ['owner', 'tier', 'installProfiles', 'invocationPolicy', 'companionFiles', 'adapterCapabilityRequirements']) {
+  const { [field]: _removed, ...withoutField } = templateInstance as Record<string, unknown>;
+  assert.equal(validate(withoutField), false, `template without ${field} must be rejected`);
+}
 
 console.log('[skill-provider-capability-contract.test] ok');

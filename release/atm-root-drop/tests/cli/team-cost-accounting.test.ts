@@ -46,7 +46,12 @@ function testOpenAICachedTokens(): void {
   });
   assert.equal(receipt.measurementStatus, 'complete');
   assert.equal(receipt.promotionEligible, true);
-  assert.equal(receipt.incrementalCashCost, 0.03525);
+  // Derive the expected charge from the catalog so a price revision cannot
+  // leave a hard-coded number behind. The previous literal was twice the rate
+  // card, and the test never ran in CI to catch it.
+  const terraRates = requireRates('gpt-5.6-terra');
+  const expectedCashCost = (2_000 * terraRates.input + 8_000 * terraRates.cacheRead + 1_000 * terraRates.cacheWrite + 500 * terraRates.output) / 1_000_000;
+  assert.equal(receipt.incrementalCashCost, expectedCashCost);
   assert.equal(receipt.lineItems.some((item) => item.dimension === 'cacheWrite'), true);
 }
 
@@ -60,7 +65,7 @@ function testProviderReportedChargeWins(): void {
     })
   });
   assert.equal(receipt.incrementalCashCost, 0.42);
-  assert.equal(receipt.listPriceEquivalentCost, 10.5);
+  assert.equal(receipt.listPriceEquivalentCost, millionTokenListPrice('gpt-5.4-mini'));
 }
 
 function testCheapAndFrontierModels(): void {
@@ -68,7 +73,7 @@ function testCheapAndFrontierModels(): void {
     catalog,
     usage: usage({
       providerId: 'gemini-direct',
-      modelId: 'gemini-3.5-flash',
+      modelId: 'gemini-3.1-flash-lite',
       billingProduct: 'gemini-api',
       inputTokens: 1_000_000,
       outputTokens: 1_000_000
@@ -82,8 +87,19 @@ function testCheapAndFrontierModels(): void {
       outputTokens: 1_000_000
     })
   });
-  assert.equal(cheap.incrementalCashCost, 1.75);
-  assert.equal(frontier.incrementalCashCost, 35);
+  assert.equal(cheap.incrementalCashCost, millionTokenListPrice('gemini-3.1-flash-lite'));
+  assert.equal(cheap.measurementStatus, 'complete');
+
+  // A model the catalog does not price must report an incomplete measurement
+  // rather than a zero charge that looks like a free run.
+  const unpriced = calculateTeamCostReceipt({
+    catalog,
+    usage: usage({ providerId: 'gemini-direct', modelId: 'model-not-in-catalog', billingProduct: 'gemini-api', inputTokens: 1_000_000, outputTokens: 1_000_000 })
+  });
+  assert.equal(unpriced.incrementalCashCost, 0);
+  assert.equal(unpriced.measurementStatus, 'cost-measurement-incomplete');
+  assert.equal(unpriced.promotionEligible, false);
+  assert.equal(frontier.incrementalCashCost, millionTokenListPrice('gpt-5.6-terra'));
 }
 
 function testSubscriptionFullyLoadedCost(): void {
@@ -124,7 +140,7 @@ function testCurrencyConversion(): void {
     }
   });
   assert.equal(receipt.currency, 'TWD');
-  assert.equal(receipt.incrementalCashCost, 336);
+  assert.equal(receipt.incrementalCashCost, millionTokenListPrice('gpt-5.4-mini') / 0.03125);
 }
 
 function testMissingRateDimensions(): void {
@@ -135,6 +151,23 @@ function testMissingRateDimensions(): void {
   assert.equal(receipt.measurementStatus, 'cost-measurement-incomplete');
   assert.equal(receipt.promotionEligible, false);
   assert.equal(receipt.incompleteReasons.includes('missing-price-row'), true);
+}
+
+/** Every rate an expectation needs, or a failure naming what the catalog lacks. */
+function requireRates(model: string): { input: number; output: number; cacheRead: number; cacheWrite: number } {
+  const entry = catalog.prices.find((price) => price.model === model);
+  assert.ok(entry, `catalog must price ${model}`);
+  const { input, output, cacheRead, cacheWrite } = entry.rates;
+  for (const [dimension, rate] of Object.entries({ input, output })) {
+    assert.equal(typeof rate, 'number', `catalog must carry a ${dimension} rate for ${model}`);
+  }
+  return { input: input as number, output: output as number, cacheRead: (cacheRead ?? 0) as number, cacheWrite: (cacheWrite ?? 0) as number };
+}
+
+/** List price for one million input plus one million output tokens. */
+function millionTokenListPrice(model: string): number {
+  const rates = requireRates(model);
+  return (1_000_000 * rates.input + 1_000_000 * rates.output) / 1_000_000;
 }
 
 function usage(overrides: Partial<TeamProviderBillableUsage>): TeamProviderBillableUsage {

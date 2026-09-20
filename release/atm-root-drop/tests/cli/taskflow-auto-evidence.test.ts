@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { normalizeValidatorToken } from '../../packages/cli/src/commands/evidence/validator-classification.ts';
 import { fileURLToPath } from 'node:url';
 import {
   buildAutoEvidencePlan,
@@ -90,13 +91,16 @@ try {
   });
   assert.equal(passExecution.ok, true, JSON.stringify(passExecution, null, 2));
   assert.ok(passExecution.runs.some((run) => run.validator === 'git diff --check' && run.ok));
-  const evidenceAfterPass = JSON.parse(readFileSync(path.join(tempDir, '.atm/history/evidence', `${passTaskId}.json`), 'utf8'));
+  // A validation pass is recorded in the task's evidence bundle manifest,
+  // which carries the fresh passes and the command run that produced them.
+  const manifestAfterPass = JSON.parse(readFileSync(path.join(tempDir, '.atm/history/evidence', `${passTaskId}.bundle-manifest.json`), 'utf8'));
   assert.ok(
-    evidenceAfterPass.evidence.some((record: { details?: { validationPasses?: string[] } }) =>
-      Array.isArray(record.details?.validationPasses)
-      && record.details.validationPasses.includes('git diff --check')
-    ),
+    manifestAfterPass.freshValidationPasses?.includes('git diff --check'),
     'auto-evidence must record command-backed validation pass evidence'
+  );
+  assert.ok(
+    manifestAfterPass.commandRuns?.some((run: { command?: string; exitCode?: number }) => run.command === 'git diff --check' && run.exitCode === 0),
+    'the recorded pass must be backed by a successful command run'
   );
 
   const failTaskId = 'TASK-AUTO-EVIDENCE-FAIL';
@@ -121,10 +125,13 @@ try {
     actorId: 'fixture-agent'
   });
   assert.equal(failExecution.ok, false);
-  assert.equal(failExecution.failedValidator, failingCommand);
+  // Validator identity is the normalized command, so `node -e "x"` and
+  // `node -e x` name the same validator.
+  assert.equal(failExecution.failedValidator, normalizeValidatorToken(failingCommand));
   assert.ok(failExecution.remediationCommand?.includes('evidence run'));
-  const evidenceAfterFail = JSON.parse(readFileSync(path.join(tempDir, '.atm/history/evidence', `${failTaskId}.json`), 'utf8'));
-  assert.equal(evidenceAfterFail.evidence.length, 0, 'failed validator runs must not create pass evidence');
+  const failManifestPath = path.join(tempDir, '.atm/history/evidence', `${failTaskId}.bundle-manifest.json`);
+  const failManifest = existsSync(failManifestPath) ? JSON.parse(readFileSync(failManifestPath, 'utf8')) : { freshValidationPasses: [] };
+  assert.equal((failManifest.freshValidationPasses ?? []).length, 0, 'failed validator runs must not create pass evidence');
 
   const approvalPlan = buildAutoEvidencePlan({
     cwd: tempDir,
