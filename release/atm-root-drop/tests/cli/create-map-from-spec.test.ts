@@ -102,6 +102,8 @@ try {
   );
   assert.match(blockedUpgrade.parsed.evidence.nextActionHint.command, /atm.mjs next/);
 
+  // The PowerShell quoting smoke only has a host on Windows.
+  if (process.platform === 'win32') {
   const powerShellRoot = createTempWorkspace('atm cli spec powershell smoke ');
   mkdirSync(path.join(powerShellRoot, 'spec inputs'), { recursive: true });
   copyFileSync(fixture02, path.join(powerShellRoot, 'spec inputs', 'atomic map 0.2 replacement.json'));
@@ -118,11 +120,12 @@ try {
   assert.equal(powerShellPayload.ok, true);
   assert.equal(powerShellPayload.evidence.mapId, 'ATM-MAP-9102');
   rmSync(powerShellRoot, { recursive: true, force: true });
+  }
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
-console.log('[cli-create-map-from-spec:test] ok (0.1/0.2 spec create, invalid schema, powershell path smoke)');
+console.log(`[cli-create-map-from-spec:test] ok (0.1/0.2 spec create, invalid schema${process.platform === 'win32' ? ', powershell path smoke' : '; powershell smoke skipped off Windows'})`);
 
 function runAtm(args: string[]) {
   const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {

@@ -50,13 +50,13 @@ function isAbandonedTaskOwnedPath(taskId: string, filePath: string): boolean {
   const lower = normalizeRel(filePath).toLowerCase();
   const id = taskId.toLowerCase();
   const evidencePrefix = `.atm/history/evidence/${id}`;
-  const durableEvidenceSuffixes = [
-    '.bundle-manifest.json',
-    '.closure-packet.json',
-    '.abandon-residue-disposition.json'
-  ];
+  // Every evidence file the task owns, not a fixed suffix list: the task's own
+  // evidence record (.atm/history/evidence/<id>.json) was missing from that
+  // list and stayed staged after an abandon, ready to ride along in the next
+  // commit. The trailing dot keeps a longer task id from matching.
   return lower === `.atm/history/tasks/${id}.json`
-    || durableEvidenceSuffixes.some((suffix) => lower === `${evidencePrefix}${suffix}`)
+    || lower === `${evidencePrefix}.json`
+    || lower.startsWith(`${evidencePrefix}.`)
     || lower.startsWith(`.atm/history/task-events/${id}/`);
 }
 

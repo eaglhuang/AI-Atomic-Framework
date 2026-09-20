@@ -116,6 +116,15 @@ function writeForeignDirectionLock(cwd: string, taskId: string, allowedFiles: re
       status: 'active'
     }
   });
+  // A runtime lock is a projection: it only holds authority while the ledger
+  // carries a matching live claim for the same actor.
+  const now = new Date().toISOString();
+  writeJson(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`), {
+    taskId,
+    status: 'running',
+    owner: 'foreign-agent',
+    claim: { actorId: 'foreign-agent', leaseId: `lease-${taskId}`, claimedAt: now, heartbeatAt: now, ttlSeconds: 1800, state: 'active', intent: 'write', files: [...allowedFiles] }
+  });
 }
 
 function writeTrackedFile(cwd: string, relativePath: string, content: string) {
