@@ -89,12 +89,6 @@
       "disposition": "fix"
     },
     {
-      "test": "taskflow-close-orchestration.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Expects a historical-delivery close to route to the tasks-close backend, but the backend is tasks-close only when the planning-authority delivery gate passes. The fixture supplies a fabricated sha (abc123def456) that cannot verify, so the product fail-closes to tasks-reconcile, which is correct. The fixture needs a real commit that touches the declared deliverables.",
-      "disposition": "fix"
-    },
-    {
       "test": "taskflow-host-policy.test.ts",
       "reason": "environment-dependent",
       "detail": "Same root cause as taskflow-open-orchestration: host policy allocates the next task id by scanning the profile repository’s docs/tasks, not the --cwd fixture, so the expected TASK-GOVERNED-0002 depends on whether a 0001 card is left in this repository. Whether a profile may redirect reads and writes outside --cwd is an owner decision.",
