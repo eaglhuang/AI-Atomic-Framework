@@ -13,7 +13,9 @@ const manifest = buildCommandManifest({
 });
 
 assert.equal(manifest.schemaId, 'atm.commandManifest.v1');
-assert.equal('shell' in manifest, false);
+// The manifest carries argv, never a shell command string. `shell` is now an
+// explicit flag that only an adapter may turn on, so assert the default.
+assert.equal(manifest.shell, false);
 assert.equal('command' in manifest, false);
 assert.deepEqual(manifest.argv, ['-e', 'console.log("ok")']);
 assert.match(manifest.ioDigest ?? '', /^sha256:[a-f0-9]{64}$/);
@@ -38,7 +40,7 @@ assert.deepEqual(chain.map((entry) => entry.id), [
 ]);
 for (const step of chain) {
   assert.equal(step.manifest.schemaId, 'atm.commandManifest.v1');
-  assert.equal('shell' in step.manifest, false);
+  assert.equal(step.manifest.shell, false, 'recovery steps must never opt into a shell');
   assert.equal('command' in step.manifest, false);
   assert.equal(step.display.includes('&&'), false);
   assert.ok(step.actorAuthority);
