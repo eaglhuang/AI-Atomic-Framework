@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { writeTextWithRetry } from './lib/windows-write-retry.ts';
 import { buildCliNpmRuntime } from './build-cli-npm-runtime.ts';
+import { embeddedATMChartSchemaAssets } from '../packages/cli/src/commands/atm-chart/constants.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_PACKAGE_DIR = 'packages/cli';
@@ -35,6 +36,8 @@ function collectReferencedSchemaAssets(): string[] {
     for (const match of source.matchAll(literalPattern)) referenced.add(match[0]);
     for (const match of source.matchAll(shippedPattern)) referenced.add(`schemas/${match[1]}`);
   }
+  // Schemas the bundle already embeds must not travel a second time as files.
+  for (const embedded of Object.keys(embeddedATMChartSchemaAssets)) referenced.delete(embedded);
   const resolved: string[] = [];
   const missing: string[] = [];
   for (const schema of [...referenced].sort()) {

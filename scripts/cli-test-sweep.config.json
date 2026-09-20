@@ -35,12 +35,6 @@
       "disposition": "fix"
     },
     {
-      "test": "cli-published-command-smoke.test.ts",
-      "reason": "environment-dependent",
-      "detail": "Passes standalone on Windows and Linux, including twice in a row, but fails inside the sweep on Linux with \"candidate install did not expose atm bin\". Running it serially did not help, so the interaction with earlier sweep batches is not yet identified. The bin mode defect it exposed (a rebuild dropped the executable bit) is fixed separately.",
-      "disposition": "fix"
-    },
-    {
       "test": "cross-editor-parallel-proof.test.ts",
       "reason": "environment-dependent",
       "detail": "Needs full git history: acc5 depends on whether a recorded SHA is reachable, and the depth-1 CI checkout cannot answer that, so the status is unmet. Passes in a full clone. Enabling it would require fetch-depth: 0 in Product CI.",
@@ -113,12 +107,6 @@
       "disposition": "fix"
     },
     {
-      "test": "public-npm-install-contract.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): cli/public-npm-install-contract.test.ts:98:10 {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
       "test": "real-paired-ab-analyzer-v3.test.ts",
       "reason": "stale-assertion",
       "detail": "Analyzes live paired A/B artifacts and expects the verdict improved; the current data yields inconclusive. The analyzer is correct; the expectation is a snapshot.",
@@ -162,9 +150,9 @@
     },
     {
       "test": "taskflow-close-orchestration.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): n.test.ts:109:10 {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'tasks-reconcile',\r expected: 'tasks-close',\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Expects a historical-delivery close to route to the tasks-close backend, but the backend is tasks-close only when the planning-authority delivery gate passes. The fixture supplies a fabricated sha (abc123def456) that cannot verify, so the product fail-closes to tasks-reconcile, which is correct. The fixture needs a real commit that touches the declared deliverables.",
+      "disposition": "fix"
     },
     {
       "test": "taskflow-host-policy.test.ts",

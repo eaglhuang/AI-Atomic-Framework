@@ -197,6 +197,16 @@ function packCandidate(args: Args, packRoot: string): { metadata: PackMetadata; 
     writeFileSync(tarball, readFileSync(args.candidateTarball));
     return { metadata: readExplicitTarballMetadata(tarball), tarball, source: 'explicit-tarball' };
   }
+  // --ignore-scripts keeps the consumer install honest, but it also skips
+  // prepack, so the pack would ship whatever dist happens to sit in the
+  // checkout. A fresh clone carries only the tracked subset (dist/schemas is
+  // generated and ignored), which produced a tarball whose atm create failed.
+  // Build the candidate first so the gate measures the package it would publish.
+  execFileSync(process.execPath, ['--strip-types', path.join(root, 'scripts', 'build-package-dist.ts')], {
+    cwd: root,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    encoding: 'utf8'
+  });
   const metadata = parsePackMetadata(runNpm([
     'pack', args.candidateDir, '--ignore-scripts', '--pack-destination', packRoot, '--json', '--loglevel', 'silent'
   ], root));
