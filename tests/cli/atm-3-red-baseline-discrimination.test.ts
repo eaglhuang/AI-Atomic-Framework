@@ -16,7 +16,11 @@ import {
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const harnessScript = path.join(repoRoot, 'scripts', 'run-plan3-red-green-discrimination.ts');
-const artifactSummary = path.join(repoRoot, 'artifacts', 'generated', 'atm-plan3-red-green', 'summary.json');
+// Generate into a temporary output root so the harness does not rewrite the
+// repository's tracked artifacts while it is under test.
+const outputRoot = mkdtempSync(path.join(tmpdir(), 'atm-red-green-out-'));
+const harnessEnv = { ...process.env, ATM_PLAN3_OUTPUT_ROOT: outputRoot };
+const artifactSummary = path.join(outputRoot, 'artifacts', 'generated', 'atm-plan3-red-green', 'summary.json');
 
 const scenario = sealDiscriminationScenario({
   scenarioId: 'discrimination-contract',
@@ -159,6 +163,7 @@ assert.match(harnessSource, /--scenario/);
 
 const generate = spawnSync(process.execPath, ['--strip-types', harnessScript, '--mode', 'generate', '--use-fixtures'], {
   cwd: repoRoot,
+  env: harnessEnv,
   encoding: 'utf8',
   maxBuffer: 1024 * 1024
 });
@@ -176,6 +181,7 @@ assert.ok(!('failureShapes' in summary.historical));
 
 const validate = spawnSync(process.execPath, ['--strip-types', harnessScript, '--mode', 'validate'], {
   cwd: repoRoot,
+  env: harnessEnv,
   encoding: 'utf8',
   maxBuffer: 1024 * 1024
 });
@@ -215,6 +221,7 @@ try {
     '2222222222222222222222222222222222222222'
   ], {
     cwd: repoRoot,
+    env: harnessEnv,
     encoding: 'utf8',
     maxBuffer: 1024 * 1024
   });

@@ -17,12 +17,6 @@
       "disposition": "triage"
     },
     {
-      "test": "atm-3-red-baseline-discrimination.test.ts",
-      "reason": "writes-tracked-files",
-      "detail": "Regenerates tracked artifacts by design: it calls the plan3 red/green generator in generate mode, and that script writes to paths fixed at module level (artifacts/generated/** and docs/reports/**). Enabling it needs an output-root option so the test can write to a temporary directory.",
-      "disposition": "fix"
-    },
-    {
       "test": "backlog-deferred-waiver-register.test.ts",
       "reason": "failing-on-main",
       "detail": "Failed on main at 0b986834d (Windows, Node 24.12): er (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 50,\r expected: 133,\r operator: 'strictEqual',\r diff: 'simple'\r }",
@@ -131,12 +125,6 @@
       "disposition": "triage"
     },
     {
-      "test": "paired-ab-v4-safety-controller.test.ts",
-      "reason": "writes-tracked-files",
-      "detail": "Regenerates tracked artifacts by design: it calls scripts/run-paired-ab-v4.ts in generate mode, and that script writes to paths fixed at module level (artifacts/generated/** and docs/reports/**). Enabling it needs an output-root option so the test can write to a temporary directory.",
-      "disposition": "fix"
-    },
-    {
       "test": "plan3-shared-governance-state-readiness.test.ts",
       "reason": "failing-on-main",
       "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ityForCommit } from './implementation/identity-check-command.ts';\\n\",\r expected: /inspectProtectedGovernanceStateDestructiveChanges/,\r operator: 'match',\r diff: 'simple'\r }",
@@ -177,12 +165,6 @@
       "reason": "failing-on-main",
       "detail": "Failed on main at 0b986834d (Windows, Node 24.12): odules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'inconclusive',\r expected: 'improved',\r operator: 'strictEqual',\r diff: 'simple'\r }",
       "disposition": "triage"
-    },
-    {
-      "test": "real-parallel-dogfood-harness.test.ts",
-      "reason": "writes-tracked-files",
-      "detail": "Regenerates tracked artifacts by design: it calls scripts/run-real-parallel-dogfood.ts in generate mode, and that script writes to paths fixed at module level (artifacts/generated/** and docs/reports/**). Enabling it needs an output-root option so the test can write to a temporary directory.",
-      "disposition": "fix"
     },
     {
       "test": "root-drop-release-incremental-overlay.test.ts",

@@ -24,7 +24,10 @@ import {
 } from '../packages/core/src/broker/replay/runner-discrimination.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const artifactDir = path.join(repoRoot, 'artifacts', 'generated', 'atm-plan3-red-green');
+// ATM_PLAN3_OUTPUT_ROOT lets a caller (a test) generate into a temporary
+// directory instead of rewriting the repository's tracked artifacts.
+const outputRoot = process.env.ATM_PLAN3_OUTPUT_ROOT ? path.resolve(process.env.ATM_PLAN3_OUTPUT_ROOT) : repoRoot;
+const artifactDir = path.join(outputRoot, 'artifacts', 'generated', 'atm-plan3-red-green');
 const summaryPath = path.join(artifactDir, 'summary.json');
 const scenarioPathDefault = path.join(artifactDir, 'scenario.json');
 const fixtureDir = path.join(artifactDir, 'fixtures');

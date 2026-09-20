@@ -17,7 +17,7 @@ try {
   assert.equal(cells.every((cell) => cell.baRepeats.length === 3), true);
   assert.equal(cells.every((cell) => cell.negativeControl.rejectedBeforeCanonicalWrite), true);
 
-  const summary = await runPairedAbV4({ mode: 'generate' });
+  const summary = await runPairedAbV4({ mode: 'generate', outputRoot: tmp });
   assert.equal(summary.cellCount, 70);
   assert.equal(summary.acceptedCellCount, 70);
   assert.ok(summary.metrics.medianMakespanImprovementPct >= 25);
