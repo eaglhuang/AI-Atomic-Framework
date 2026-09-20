@@ -214,8 +214,10 @@ type SmokeResult = {
 };
 
 const legacySmokeCommandNames = ['version', 'doctor', 'next', 'tasks'] as const;
-const coreWorkflowCommandNames = ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify'] as const;
-const candidateSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'bootstrap', 'atm-chart-render', 'atm-chart-verify'] as const;
+// The candidate gate runs the same core workflow the public matrix measures;
+// create was missing here, which is how a broken create reached 0.1.1.
+const coreWorkflowCommandNames = ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
+const candidateSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
 
 const smokeCommands = [
   ['version', '--version', '--json'],
@@ -224,7 +226,8 @@ const smokeCommands = [
   ['tasks', 'tasks', 'status', '--task', 'TASK-PRF-0050', '--json'],
   ['bootstrap', 'bootstrap', '--cwd', 'WORKFLOW_PLACEHOLDER', '--task', 'PUBLIC-CANDIDATE', '--json'],
   ['atm-chart-render', 'atm-chart', 'render', '--cwd', 'WORKFLOW_PLACEHOLDER', '--json'],
-  ['atm-chart-verify', 'atm-chart', 'verify', '--cwd', 'WORKFLOW_PLACEHOLDER', '--json']
+  ['atm-chart-verify', 'atm-chart', 'verify', '--cwd', 'WORKFLOW_PLACEHOLDER', '--json'],
+  ['create', 'create', '--cwd', 'WORKFLOW_PLACEHOLDER', '--bucket', 'smoke', '--title', 'CandidateSmoke', '--description', 'Candidate-smoke-atom.', '--json']
 ] as const;
 
 function coreWorkflowFailures(smoke: Record<string, SmokeResult>): string[] {
