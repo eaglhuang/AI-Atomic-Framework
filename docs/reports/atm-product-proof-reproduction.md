@@ -9,7 +9,7 @@ Status as of 2026-09-20:
 
 | Proof | Status |
 |---|---|
-| 1. Small, complete installable package | **Not met** — `atm create` fails in the published 0.1.1; fixed on `main`, not yet released |
+| 1. Small, complete installable package | **Met** for `@ai-atomic-framework/cli@0.1.2` |
 | 2. Sustained delivery reliability | **Not yet met** — calendar window too short (see below) |
 | 3. Net benefit over a simple baseline | **Not proven** — no paired experiment has run |
 
@@ -29,7 +29,7 @@ core workflow command matrix (`--version`, `doctor`, `next`, `tasks`,
 `bootstrap`, `atm-chart render`, `atm-chart verify`, `create`):
 
 ```bash
-node --strip-types scripts/validate-public-npm-install.ts --package @ai-atomic-framework/cli --version 0.1.1 --require-default-tag --measurement-runs 3 --output proof-0.1.1.md
+node --strip-types scripts/validate-public-npm-install.ts --package @ai-atomic-framework/cli --version 0.1.2 --require-default-tag --measurement-runs 3 --output proof-0.1.2.md
 ```
 
 Pass criteria in the JSON receipt: `status: "verified"`,
@@ -48,16 +48,16 @@ node --strip-types scripts/measure-npm-dependency-footprint.ts 0.1.0 0.1.1 --out
 Latest results (Windows, Node v24.12.0; `--version` p50 over 3 runs, other
 commands single runs):
 
-| Metric | 0.1.0 | 0.1.1 |
-|---|---|---|
-| Unpacked size (bytes) | 3,357,358 | 2,654,835 |
-| Files | 78 | 66 |
-| Installed `node_modules` (bytes) | 4,712,004 | 4,009,481 |
-| Transitive packages | 6 | 6 |
-| Install time | 1,840 ms | 1,642 ms |
-| `atm --version` p50 | 696 ms | 170 ms |
-| Core workflow (without `create`) | fails | passes |
-| `atm create` | fails | fails |
+| Metric | 0.1.0 | 0.1.1 | 0.1.2 |
+|---|---|---|---|
+| Unpacked size (bytes) | 3,357,358 | 2,654,835 | 2,683,003 |
+| Files | 78 | 66 | 69 |
+| Installed `node_modules` (bytes) | 4,712,004 | 4,009,481 | 4,037,649 |
+| Transitive packages | 6 | 6 | 6 |
+| Install time | 1,840 ms | 1,642 ms | 1,213 ms |
+| `atm --version` p50 | 696 ms | 170 ms | 159 ms |
+| Core workflow (without `create`) | fails | passes | passes |
+| `atm create` | fails | fails | passes |
 
 On 2026-09-20 `create` was added to the matrix and 0.1.1 failed it: the npm
 package shipped only `atomic-spec.schema.json`, so creating an atom failed
@@ -65,8 +65,9 @@ with `ATM_GENERATOR_TEST_FAILED` (missing test-report schema). The fix
 (`180c79204`) ships the registry and test-report schemas, locates schemas the
 way the installed layout places them, and adds `create` to the clean-install
 smoke that runs in Product CI. It adds about 28 KB unpacked
-(2,683,003 bytes). Proof 1 is not met again until a release that contains the
-fix passes this matrix from the public registry.
+(2,683,003 bytes, +1.1%). 0.1.2 was published with the fix and passes the full
+matrix from the public registry, including `create`
+(`coreWorkflowPassed: true`), so Proof 1 is met again for 0.1.2.
 
 Earlier prereleases show why each dimension is measured separately:
 `0.1.0-beta.0` cannot be installed (it depends on an unpublished package), and
