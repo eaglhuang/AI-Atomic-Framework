@@ -46,7 +46,10 @@ function oversizedTrackedFileSet(): string[] {
     .map((entry) => entry.trim())
     .filter((entry) => /\.ts$/.test(entry) && !entry.includes('/dist/'));
 
-  const budgetBytes = resolvePathspecArgvBudget().budgetBytes;
+  // The repository cannot produce a file list longer than the POSIX budget
+  // (~2 MB), so the fixture is always sized against the Windows budget: the
+  // batching rule under test is the same on both platforms.
+  const budgetBytes = targetBudget.budgetBytes;
   const picked: string[] = [];
   let joinedBytes = 0;
   for (const filePath of tracked) {
@@ -61,6 +64,7 @@ function oversizedTrackedFileSet(): string[] {
   return picked;
 }
 
+const targetBudget = resolvePathspecArgvBudget('win32');
 const files = oversizedTrackedFileSet();
 
 // The single oversized argument really is unspawnable: this is the failure the
@@ -80,7 +84,7 @@ const files = oversizedTrackedFileSet();
 // Batching splits the same work into runnable invocations and drops nothing:
 // the planned batches must reproduce the input set exactly.
 {
-  const plan = planPathspecBatches({ paths: files, fixedArgs: GUARD_FIXED_ARGS });
+  const plan = planPathspecBatches({ paths: files, fixedArgs: GUARD_FIXED_ARGS, budgetBytes: targetBudget.budgetBytes });
   assert.ok(plan.batches.length > 1, 'this fixture must require more than one batch');
   assert.deepEqual(
     [...plan.batches.flat()].sort(),

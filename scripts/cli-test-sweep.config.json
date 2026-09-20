@@ -73,13 +73,7 @@
     {
       "test": "cross-editor-parallel-proof.test.ts",
       "reason": "environment-dependent",
-      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): ERR_ASSERTION actual 'unmet', expected 'met'",
-      "disposition": "fix"
-    },
-    {
-      "test": "encoding-guard-argv-budget.test.ts",
-      "reason": "environment-dependent",
-      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): ERR_ASSERTION actual false, expected true",
+      "detail": "Needs full git history: acc5 depends on whether a recorded SHA is reachable, and the depth-1 CI checkout cannot answer that, so the status is unmet. Passes in a full clone. Enabling it would require fetch-depth: 0 in Product CI.",
       "disposition": "fix"
     },
     {
@@ -97,7 +91,7 @@
     {
       "test": "four-plan-independent-certificate.test.ts",
       "reason": "environment-dependent",
-      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): ERR_ASSERTION actual 'complete', expected 'not-complete'",
+      "detail": "Needs full git history: it asserts that origin/main descends from the SHA the certificate is bound to, which a depth-1 CI checkout cannot establish. Enabling it would require fetch-depth: 0 in Product CI.",
       "disposition": "fix"
     },
     {
@@ -105,18 +99,6 @@
       "reason": "failing-on-main",
       "detail": "Failed on main at 0b986834d (Windows, Node 24.12): , 115, 101, 32, 105, 102, 32, 40, 33, 101, 120, 105,\r 115, 116, 115, 83, 121, 110, 99, 40, 97, 98, 115, 111,\r 108, 117, 116, 101,\r ... 748 more items\r ]\r }",
       "disposition": "triage"
-    },
-    {
-      "test": "framework-auto-stage-pathspec-batching.test.ts",
-      "reason": "environment-dependent",
-      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): ERR_ASSERTION actual false, expected true",
-      "disposition": "fix"
-    },
-    {
-      "test": "git-hook-runtime-env.test.ts",
-      "reason": "environment-dependent",
-      "detail": "Passes on Windows, fails on Linux (WSL2 Ubuntu, Node 24.21, shallow clone): expects a hard-coded Windows Git PATH",
-      "disposition": "fix"
     },
     {
       "test": "git-record-commit.test.ts",

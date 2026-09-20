@@ -21,8 +21,12 @@ import {
   frameworkLockClaimsRunnerReceipt
 } from '../../packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts';
 
+// The fixture is sized from the host budget: a fixed count that overflows the
+// Windows limit still fits in one POSIX invocation, where the budget is larger.
+const samplePath = `release/atm-root-drop/packages/cli/dist/commands/governance/deeply-nested-generated-0000.js`;
+const pathCount = Math.ceil((resolvePathspecArgvBudget().budgetBytes * 1.4) / (Buffer.byteLength(samplePath, 'utf8') + 1));
 const paths = Array.from(
-  { length: 1_100 },
+  { length: pathCount },
   (_, index) => `release/atm-root-drop/packages/cli/dist/commands/governance/deeply-nested-generated-${String(index).padStart(4, '0')}.js`
 );
 const observed: string[][] = [];
