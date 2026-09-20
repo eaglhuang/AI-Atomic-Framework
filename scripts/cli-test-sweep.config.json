@@ -47,12 +47,6 @@
       "disposition": "fix"
     },
     {
-      "test": "evidence-write-lock-concurrency.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): code: 'ENOENT',\r syscall: 'open',\r path: 'C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\atm-evidence-write-lock-nuxvum\\\\.atm\\\\history\\\\evidence\\\\TASK-GOV-0408-CONCURRENCY.json'\r }",
-      "disposition": "triage"
-    },
-    {
       "test": "four-plan-closeout-blocker-map.test.ts",
       "reason": "failing-on-main",
       "detail": "Failed on main at 0b986834d (Windows, Node 24.12): neratedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'actionable-not-complete',\r expected: 'complete-closeout-certified',\r operator: 'strictEqual',\r diff: 'simple'\r }",
@@ -216,8 +210,8 @@
     },
     {
       "test": "taskflow-open-orchestration.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): /cli/taskflow-open-orchestration.test.ts:53:10 {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "reason": "writes-tracked-files",
+      "detail": "Root-caused 2026-09-20: taskflow open resolves its output root from the profile path (resolveTaskflowOpenOutputRoot returns the profile repo git root), not from --cwd. The test passes a profile that lives in this repository, so the generated card lands in the framework repo docs/tasks instead of the requested cwd, and the run dirties the worktree. Whether a profile may redirect writes outside --cwd is an owner decision; do not change the resolver to make the test pass.",
       "disposition": "triage"
     },
     {

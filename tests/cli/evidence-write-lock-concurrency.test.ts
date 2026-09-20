@@ -88,10 +88,14 @@ try {
   assert.equal(secondResult.output.code, 'ATM_EVIDENCE_WRITE_LOCK_CONFLICT');
   assert.equal(existsSync(lockPath), false, 'the successful writer must remove its lock');
 
-  const evidence = JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`), 'utf8')) as {
-    evidence?: unknown[];
+  // The run is recorded in the task's evidence bundle manifest; only the
+  // writer that held the lock may leave a command run behind.
+  const manifest = JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.bundle-manifest.json`), 'utf8')) as {
+    commandRuns?: unknown[];
+    freshValidationPasses?: string[];
   };
-  assert.equal(evidence.evidence?.length, 1, 'the losing writer must not append partial evidence');
+  assert.equal(manifest.commandRuns?.length, 1, 'the losing writer must not append partial evidence');
+  assert.deepEqual(manifest.freshValidationPasses, ['gov0408-evidence-lock-probe']);
   console.log('[evidence-write-lock-concurrency] ok');
 } finally {
   rmSync(cwd, { recursive: true, force: true });
