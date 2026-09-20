@@ -36,9 +36,9 @@
     },
     {
       "test": "broker-replay-command-surface.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: 0,\r expected: 1,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Snapshots live repository state: it asserts broker replay status stays remain-open \"while closure evidence is incomplete\". The evidence is now complete, so the command correctly reports ready-to-close and exits 0. The test needs a fixture instead of the live repository.",
+      "disposition": "fix"
     },
     {
       "test": "captain-parallel-ledger-analysis.test.ts",
@@ -120,9 +120,9 @@
     },
     {
       "test": "git-record-commit.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): vidence/git-head.json\\n' +\r '.atm/history/tasks/TASK-RECORD-0001.json\\n',\r expected: /\\.atm\\/history\\/evidence\\/git-head\\.jsonl/,\r operator: 'match',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Expects .atm/history/evidence/git-head.jsonl, but the append-only log was replaced by git-head.json (the .jsonl file was deleted in 0feeb741c). The command behaves as designed; the assertion names the retired filename.",
+      "disposition": "fix"
     },
     {
       "test": "governance-hotfile-sharding.test.ts",
@@ -326,48 +326,6 @@
       "test": "team-cost-accounting.test.ts",
       "reason": "failing-on-main",
       "detail": "Failed on main at 0b986834d (Windows, Node 24.12): nternal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 0.017625,\r expected: 0.03525,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
-      "test": "team-legacy-command-extraction.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
-      "test": "team-legacy-crew-decision-extraction.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
-      "test": "team-legacy-patrol-contract-extraction.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
-      "test": "team-legacy-permission-lease-extraction.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
-      "test": "team-legacy-plan-orchestration-extraction.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
-      "test": "team-legacy-runtime-contract-extraction.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
-      "test": "team-legacy-runtime-governance-extraction.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
       "disposition": "triage"
     },
     {
