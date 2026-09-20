@@ -18,6 +18,41 @@ execFileSync('git', ['config', 'user.email', 'atm-test@example.invalid'], { cwd:
 execFileSync('git', ['add', '.'], { cwd: root, stdio: 'ignore' });
 execFileSync('git', ['commit', '-m', 'baseline'], { cwd: root, stdio: 'ignore' });
 
+// review-advisory attests task change coverage, so it needs a current work
+// admission: a runtime direction lock over the reviewed file plus the live
+// ledger claim that backs it.
+const now = new Date().toISOString();
+mkdirSync(path.join(root, '.atm/runtime/locks'), { recursive: true });
+mkdirSync(path.join(root, '.atm/history/tasks'), { recursive: true });
+writeFileSync(path.join(root, '.atm/runtime/locks/TASK-SKL-0021.lock.json'), JSON.stringify({
+  files: ['src/feature.ts'],
+  status: 'active',
+  actorId: 'atm-test',
+  taskDirectionLock: {
+    schemaId: 'atm.taskDirectionLock.v1',
+    specVersion: '0.1.0',
+    taskId: 'TASK-SKL-0021',
+    batchId: null,
+    scopeKey: null,
+    queueId: null,
+    queueIndex: null,
+    allowedFiles: ['src/feature.ts'],
+    planningReadOnlyPaths: [],
+    planningMirrorPaths: [],
+    allowPlanningMirror: false,
+    promptHash: null,
+    actorId: 'atm-test',
+    createdAt: now,
+    status: 'active'
+  }
+}, null, 2), 'utf8');
+writeFileSync(path.join(root, '.atm/history/tasks/TASK-SKL-0021.json'), JSON.stringify({
+  taskId: 'TASK-SKL-0021',
+  status: 'running',
+  owner: 'atm-test',
+  claim: { actorId: 'atm-test', leaseId: 'lease-TASK-SKL-0021', claimedAt: now, heartbeatAt: now, ttlSeconds: 1800, state: 'active', intent: 'write', files: ['src/feature.ts'] }
+}, null, 2), 'utf8');
+
 const reportPath = '.atm/history/reports/review-advisory/TASK-SKL-0021.json';
 const advisory = runReviewAdvisory([
   '--cwd', root,

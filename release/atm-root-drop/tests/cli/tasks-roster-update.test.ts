@@ -31,8 +31,12 @@ try {
   assert.equal(dryRun.ok, true);
   assert.equal(dryRun.evidence.dryRun, true);
   assert.equal(dryRun.evidence.beforeHash, `sha256:${beforeHash}`);
-  assert.equal(dryRun.evidence.afterHash, `sha256:${beforeHash}`);
-  assert.equal(hashFile(indexPath), beforeHash);
+  // A dry run previews the result: afterHash is the hash the file would carry,
+  // and `unchanged` says whether the row actually moves. What must not change
+  // is the file on disk.
+  assert.notEqual(dryRun.evidence.afterHash, `sha256:${beforeHash}`);
+  assert.equal(dryRun.evidence.unchanged, false);
+  assert.equal(hashFile(indexPath), beforeHash, 'a dry run must not write the roster');
   const dryDiff = dryRun.evidence.diff as { after: string };
   assert.ok(dryDiff.after.includes('updated roster title'));
   assert.ok(dryDiff.after.includes('TASK-ROSTER-0000'));
