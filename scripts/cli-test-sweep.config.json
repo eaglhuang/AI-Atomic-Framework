@@ -29,6 +29,12 @@
       "disposition": "fix"
     },
     {
+      "test": "four-plan-objective-authority-review.test.ts",
+      "reason": "stale-assertion",
+      "disposition": "fix",
+      "detail": "The review records targetHead as the commit it was generated at, so it goes stale on the very next commit, including the one that refreshes it. Regenerating with --mode write yields proven with zero findings but cannot stay valid in CI, which always runs at a later HEAD. Fixing this needs the reviewer to bind its freshness to the commits that last touched the reviewed inputs rather than to HEAD."
+    },
+    {
       "test": "historical-residue-cleanup.test.ts",
       "reason": "stale-assertion",
       "detail": "Expects at least one governance residue receipt in the live .atm history; the residue it was written against has since been cleaned, so the census is legitimately empty. It also rewrites docs/reports/historical-governance-residue-cleanup.md, so it needs a fixture history and a temporary output root.",
