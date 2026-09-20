@@ -29,7 +29,15 @@ assert.equal(parallel.repairClosureCount, 0);
 assert.ok(serial.repairClosureCount > parallel.repairClosureCount);
 assert.equal(typeof report.comparison.throughputRatio, 'number');
 assert.equal(typeof report.comparison.activeTimeThroughputRatio, 'number');
-assert.equal(report.runtimeFrameworkLockSnapshot.caveat.includes('runtime snapshot'), true);
+// The snapshot carries a different caveat when no lock files are retained;
+// both must disclaim that this is not an append-only claim history.
+const lockSnapshot = report.runtimeFrameworkLockSnapshot;
+assert.ok(typeof lockSnapshot.caveat === 'string' && lockSnapshot.caveat.length > 0, 'the snapshot must carry a caveat');
+if (lockSnapshot.lockCount > 0) {
+  assert.ok(lockSnapshot.caveat.includes('runtime snapshot'), 'a populated snapshot must say it is a runtime snapshot');
+} else {
+  assert.ok(/not observable|currently observable/.test(lockSnapshot.caveat), 'an empty snapshot must say why nothing is observable');
+}
 assert.ok(report.observabilityGaps.some((gap: { lane: string; status: string }) => gap.lane === 'framework-mode temp claims' && gap.status === 'snapshot-only'));
 assert.ok(report.observabilityGaps.some((gap: { lane: string; status: string }) => gap.lane === 'cross-repository planning or implementation' && gap.status === 'not-observable-from-this-ledger'));
 

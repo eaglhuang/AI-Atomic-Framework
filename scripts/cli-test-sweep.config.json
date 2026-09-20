@@ -11,18 +11,6 @@
       "disposition": "fix"
     },
     {
-      "test": "broker-replay-command-surface.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Snapshots live repository state: it asserts broker replay status stays remain-open \"while closure evidence is incomplete\". The evidence is now complete, so the command correctly reports ready-to-close and exits 0. The test needs a fixture instead of the live repository.",
-      "disposition": "fix"
-    },
-    {
-      "test": "captain-parallel-ledger-analysis.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Runs scripts/analyze-captain-parallel-ledger.ts over the live .atm ledger, so its counts follow current work.",
-      "disposition": "fix"
-    },
-    {
       "test": "cross-editor-parallel-proof.test.ts",
       "reason": "environment-dependent",
       "detail": "Needs full git history: acc5 depends on whether a recorded SHA is reachable, and the depth-1 CI checkout cannot answer that, so the status is unmet. Passes in a full clone. Enabling it would require fetch-depth: 0 in Product CI.",
