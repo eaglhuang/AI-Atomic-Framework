@@ -1,11 +1,22 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
 const protectedPolicy = path.join(root, 'packages/cli/src/commands/git-governance/protected-governance-state.ts');
 const closeReconcile = path.join(root, 'packages/cli/src/commands/taskflow/close-side-effect-reconcile.ts');
-const gitGovernance = readFileSync(path.join(root, 'packages/cli/src/commands/git-governance/implementation.ts'), 'utf8');
+// Read the whole git-governance surface: the protected-state call moved from
+// implementation.ts into implementation/commit-bundle-resolution.ts, and
+// pinning one file reports a refactor as a missing gate.
+function readSourceTree(directory: string): string {
+  return readdirSync(directory)
+    .map((entry) => path.join(directory, entry))
+    .flatMap((entryPath) => (statSync(entryPath).isDirectory()
+      ? [readSourceTree(entryPath)]
+      : entryPath.endsWith('.ts') && !entryPath.includes('__tests__') ? [readFileSync(entryPath, 'utf8')] : []))
+    .join('\n');
+}
+const gitGovernance = readSourceTree(path.join(root, 'packages/cli/src/commands/git-governance'));
 const closeContract = readFileSync(closeReconcile, 'utf8');
 
 assert.equal(existsSync(protectedPolicy), true, 'protected governance state policy atom must exist');

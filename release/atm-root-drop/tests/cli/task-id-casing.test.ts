@@ -12,6 +12,7 @@ import {
 
 const mixedCaseTaskId = 'TASK-APO-0030-python-language-adapter-plugin';
 const legacyUpperTaskId = 'TASK-ASP-0001';
+const importedTaskId = 'TASK-Apo-0030';
 
 // === normalizeTaskId preserves authored casing ===
 assert.equal(normalizeTaskId(`  ${mixedCaseTaskId}  `), mixedCaseTaskId);
@@ -28,9 +29,11 @@ assert.ok(!taskIdsEqual('TASK-AAO-0139', 'TASK-AAO-0140'));
 const importRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-aao139-import-'));
 try {
   mkdirSync(path.join(importRoot, '.atm', 'history', 'tasks'), { recursive: true });
-  const cardPath = path.join(importRoot, 'TASK-APO-0030-python-language-adapter-plugin.task.md');
+  // Plan import requires a canonical id ending in its numeric suffix, so the
+  // imported card proves casing is preserved with a canonical mixed-case id.
+  const cardPath = path.join(importRoot, `${importedTaskId}.task.md`);
   writeFileSync(cardPath, `---
-task_id: ${mixedCaseTaskId}
+task_id: ${importedTaskId}
 title: Mixed-case import regression
 status: open
 milestone: M-test
@@ -52,9 +55,9 @@ milestone: M-test
   ]);
   assert.ok(importResult.ok, 'tasks import should succeed');
 
-  const ledgerPath = path.join(importRoot, '.atm', 'history', 'tasks', `${mixedCaseTaskId}.json`);
+  const ledgerPath = path.join(importRoot, '.atm', 'history', 'tasks', `${importedTaskId}.json`);
   const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8')) as { workItemId?: string };
-  assert.equal(ledger.workItemId, mixedCaseTaskId, 'import must preserve authored task_id casing');
+  assert.equal(ledger.workItemId, importedTaskId, 'import must preserve authored task_id casing');
 } finally {
   rmSync(importRoot, { recursive: true, force: true });
 }

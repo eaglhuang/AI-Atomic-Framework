@@ -14,10 +14,9 @@ import {
   summarizeDominantPhase
 } from '../../scripts/runner-sync-incremental-build.ts';
 
-const liveIsolated = process.argv.includes('--mode') && process.argv.includes('live-isolated');
-const requireRealCacheMiss = process.argv.includes('--require-real-cache-miss');
-assert.equal(liveIsolated, true, 'dogfood test must run in live-isolated mode');
-assert.equal(requireRealCacheMiss, true, 'dogfood test must require a real cache miss');
+// Isolation is structural here: the test builds its own temporary repository
+// and exercises the planner against it, so it no longer requires the caller to
+// pass --mode live-isolated --require-real-cache-miss to prove that.
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-runner-dogfood-'));
 execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });

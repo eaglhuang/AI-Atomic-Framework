@@ -83,6 +83,12 @@ assert.equal(failedClosed, true, 'unpublished package must fail closed without -
 // version-only or module-resolution check.
 const localSmokeRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-public-runtime-chart-'));
 try {
+  // --ignore-scripts also skips prepack, so a fresh checkout would pack the
+  // tracked subset of dist rather than the package that would ship. Build the
+  // CLI closure first.
+  execFileSync(process.execPath, ['--strip-types', path.join(root, 'scripts', 'build-package-dist.ts')], {
+    cwd: root, encoding: 'utf8', windowsHide: true
+  });
   const packed = JSON.parse(execFileSync(npm, [
     'pack', '--workspace', '@ai-atomic-framework/cli', '--ignore-scripts', '--pack-destination', localSmokeRoot,
     '--json', '--loglevel', 'silent'

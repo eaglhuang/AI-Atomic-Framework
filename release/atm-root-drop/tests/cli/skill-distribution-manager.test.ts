@@ -52,7 +52,15 @@ assert(plan.managedSkillIds.includes('atm-next'));
 assert(plan.managedSkillIds.includes('atm-dispatch'));
 assert(!plan.managedSkillIds.includes('atm-deep-module-refactor'));
 assert(!plan.managedSkillIds.includes('atm-git-pathspec-emergency-commit'));
-assert.equal(plan.additions.length, plan.managedSkillIds.length);
+// A skill contributes its SKILL.md plus any companion files it ships, so the
+// plan installs one SKILL.md per managed skill and may add more files.
+const addedSkillDocuments = plan.additions.filter((entry: { relativePath: string }) => entry.relativePath.endsWith('/SKILL.md'));
+assert.equal(addedSkillDocuments.length, plan.managedSkillIds.length);
+assert.deepEqual(
+  [...new Set(plan.additions.map((entry: { skillId: string }) => entry.skillId))].sort(),
+  [...plan.managedSkillIds].sort(),
+  'every added file must belong to a managed skill'
+);
 assert.equal(plan.updates.length, 0);
 assert.equal(plan.collisions.length, 0);
 assert.equal(plan.degradationFindings.length, 0);
