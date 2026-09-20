@@ -70069,5 +70069,23 @@
     "requiresExplicitStaging": true,
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
+  },
+  "buildInputsTreeHash": "sha256:a2d0e7d95dc7111271651de8d40d12d5dcc0c02765ae295f022407ddc6140ae4",
+  "sealedSourceCommit": "7fb15408b40ecc8e618a5c3b79649441b68acd8a",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:3a5533d23530f5e11cd32581931dd4c27f08da42110333eca0f0283dd61c55c9",
+  "tsBuildCacheDigest": "sha256:24a0f1d17da8926409935842e54786be53588671714f0c1a61bbac1d0c2d4a3a",
+  "rawTelemetryPolicy": "gitignored-runtime-only",
+  "phaseTimingsMs": {
+    "inputHashCalculation": 37,
+    "skipDecision": 53,
+    "worktreeSetup": 11761,
+    "typescriptBuild": 12789,
+    "rootDropReleaseAssembly": 31879,
+    "onefileReleaseAssembly": 20307,
+    "artifactSync": 5123,
+    "cleanup": 0,
+    "totalElapsed": 91410
   }
 }
