@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -48,6 +48,7 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = 
       '',
       'process.exitCode = await runCli(process.argv.slice(2));'
     ].join('\n')}\n`, 'utf8');
+    markExecutable(path.join(runtimeRoot, 'atm.mjs'));
     writeFileSync(path.join(runtimeRoot, 'index.js'), "export * from './runtime.mjs';\n", 'utf8');
     const declarationPath = path.join(root, '.types', 'packages', 'cli', 'src', 'index.d.ts');
     const declaration = existsSync(declarationPath)
@@ -95,6 +96,16 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = 
     return manifest;
   } finally {
     rmSync(entryPath, { force: true });
+  }
+}
+
+/** npm links a bin only when it is executable; a rewrite drops that mode. */
+function markExecutable(filePath: string): void {
+  if (process.platform === 'win32') return;
+  try {
+    chmodSync(filePath, 0o755);
+  } catch {
+    // a read-only checkout cannot regress the mode further
   }
 }
 
