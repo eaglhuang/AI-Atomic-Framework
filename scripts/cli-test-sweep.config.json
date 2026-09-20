@@ -12,15 +12,15 @@
     },
     {
       "test": "backlog-deferred-waiver-register.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): er (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 50,\r expected: 133,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Asserts a fixed count (133) over the live docs/reports/plan-3x-4x-backlog-deferred-waiver-register.json, which now holds 50. The register changes as waivers are granted and retired.",
+      "disposition": "fix"
     },
     {
       "test": "backlog-release-blocking-subset.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): r (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 477,\r expected: 391,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Asserts a fixed count (391) over the live docs/reports/plan-3x-4x-backlog-release-blocking-subset.json, which now holds 477. The subset changes as backlog items are opened and closed.",
+      "disposition": "fix"
     },
     {
       "test": "broker-replay-command-surface.test.ts",
@@ -30,9 +30,9 @@
     },
     {
       "test": "captain-parallel-ledger-analysis.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Runs scripts/analyze-captain-parallel-ledger.ts over the live .atm ledger, so its counts follow current work.",
+      "disposition": "fix"
     },
     {
       "test": "cli-published-command-smoke.test.ts",
@@ -48,9 +48,9 @@
     },
     {
       "test": "four-plan-closeout-blocker-map.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): neratedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'actionable-not-complete',\r expected: 'complete-closeout-certified',\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Asserts a closeout verdict over the live docs/reports/plan-3x-4x-closeout-blocker-map.json: expects complete-closeout-certified, reads actionable-not-complete. The report tracks work in progress, so the verdict moves; the test needs a fixture report.",
+      "disposition": "fix"
     },
     {
       "test": "four-plan-independent-certificate.test.ts",
@@ -60,9 +60,9 @@
     },
     {
       "test": "four-plan-objective-authority-review.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): , 115, 101, 32, 105, 102, 32, 40, 33, 101, 120, 105,\r 115, 116, 115, 83, 121, 110, 99, 40, 97, 98, 115, 111,\r 108, 117, 116, 101,\r ... 748 more items\r ]\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Reviews the live docs/reports/reviews/plan-3x-4x-objective-authority-review.json, which is regenerated as objectives are certified.",
+      "disposition": "fix"
     },
     {
       "test": "git-record-commit.test.ts",
@@ -90,27 +90,27 @@
     },
     {
       "test": "plan32-dashboard-consumption.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 29,\r expected: 9,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Runs scripts/validate-plan32-dashboard-consumption.ts against live governance data and asserts 9 rows; the dashboard now reports 29. The row count follows current work.",
+      "disposition": "fix"
     },
     {
       "test": "plan32-terminal-verdict-fail-closed.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): nator\": 29,\\n' +\r ' \"verified\": 29,\\n' +\r ' \"notComplete\": 0,\\n' +\r ' \"verdict\": \"not-complete\",\\n' +\r ' \"failClosed\": false\\n' +\r '}\\n',\r stderr: ''\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Runs scripts/validate-plan32-terminal-verdict-fail-closed.ts against live data and expects a terminal verdict that the current state no longer produces (verdict not-complete, failClosed false).",
+      "disposition": "fix"
     },
     {
       "test": "plan4-successor-wave-consumption.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ' ],\\n' +\r ' \"findings\": [\\n' +\r ' \"source digest mismatch: docs/reports/plan-3x-4x-backlog-disposition-census.json\"\\n' +\r ' ]\\n' +\r '}\\n',\r stderr: ''\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Runs scripts/validate-plan4-successor-wave-consumption.ts against live reports; it fails on a source digest mismatch for docs/reports/plan-3x-4x-backlog-disposition-census.json, which is regenerated as the census changes.",
+      "disposition": "fix"
     },
     {
       "test": "plan4-successor-wave-objective-map.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): 7, 116, 99, 104, 58, 32, 100, 111, 99, 115, 47, 114,\r 101, 112, 111, 114, 116, 115, 47, 112, 108, 97, 110, 45,\r 51, 120, 45, 52,\r ... 34 more items\r ]\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Asserts over the live docs/reports/plan4-successor-wave-objective-map.json, which is regenerated as the wave progresses.",
+      "disposition": "fix"
     },
     {
       "test": "public-npm-install-contract.test.ts",
@@ -120,9 +120,9 @@
     },
     {
       "test": "real-paired-ab-analyzer-v3.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): odules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'inconclusive',\r expected: 'improved',\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Analyzes live paired A/B artifacts and expects the verdict improved; the current data yields inconclusive. The analyzer is correct; the expectation is a snapshot.",
+      "disposition": "fix"
     },
     {
       "test": "root-drop-release-incremental-overlay.test.ts",
@@ -138,15 +138,15 @@
     },
     {
       "test": "runbook-completion-evidence.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): , 102, 108, 97, 103, 41, 41, 59, 13, 10, 32, 32,\r 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,\r 32, 32, 32, 32,\r ... 776 more items\r ]\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Compiles runbook completion evidence from live docs/reports/plan-3x-4x-runbook-completion-evidence.json and the live evidence ledger, so the verdict follows current state.",
+      "disposition": "fix"
     },
     {
       "test": "runbook-release-authority-review.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): , 120, 105, 115, 116, 115, 83, 121, 110, 99, 40, 114,\r 117, 110, 98, 111, 111, 107, 65, 98, 115, 111, 108, 117,\r 116, 101, 41, 41,\r ... 768 more items\r ]\r }",
-      "disposition": "triage"
+      "reason": "stale-assertion",
+      "detail": "Reviews release authority from the live docs/reports/plan-3x-4x-runbook-completion-evidence.json, so its verdict follows current state.",
+      "disposition": "fix"
     },
     {
       "test": "task-dependency-semantics-census.test.ts",
