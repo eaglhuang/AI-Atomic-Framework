@@ -31,7 +31,7 @@
     {
       "test": "four-plan-closeout-blocker-map.test.ts",
       "reason": "stale-assertion",
-      "detail": "Asserts a closeout verdict over the live docs/reports/plan-3x-4x-closeout-blocker-map.json: expects complete-closeout-certified, reads actionable-not-complete. The report tracks work in progress, so the verdict moves; the test needs a fixture report.",
+      "detail": "The test now asserts the map contract rather than frozen totals, but it still cannot pass: scripts/validate-four-plan-closeout-blocker-map.ts reports source digest mismatches for plan-3x-4x-backlog-disposition-census.json, plan-3x-4x-independent-certificate.json and others, so the committed map is stale against its own sources. The repository has no generator for this map, and editing the recorded digests by hand would fabricate a certification, so refreshing it needs an owner decision on who regenerates the map.",
       "disposition": "fix"
     },
     {
