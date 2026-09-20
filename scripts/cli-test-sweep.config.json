@@ -121,8 +121,8 @@
     {
       "test": "next-route-selector.test.ts",
       "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: 1,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "detail": "Runs scripts/validate-prompt-scoped-next.ts, which walks many routing scenarios. Two real routing defects it exposed are fixed (journaling vs repair intent); it now stops at a different scenario: an exact task id inside an active batch no longer reports ATM_NEXT_TASK_QUEUE_READY. That batch/queue drift is not yet root-caused.",
+      "disposition": "fix"
     },
     {
       "test": "plan3-shared-governance-state-readiness.test.ts",

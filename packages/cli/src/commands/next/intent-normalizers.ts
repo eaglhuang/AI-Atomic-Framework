@@ -54,9 +54,14 @@ export function isQueueRequestedPrompt(prompt: string): boolean {
 export function isJournalingPrompt(prompt: string): boolean {
   const hasBacklogSurface = /\bATM-BUG-\d{4}-\d{2}-\d{2}-\d+\b|backlog|bug\s+backlog|journal(?:ing)?|\u8a18\u9304|\u56de\u5beb|\u5beb\u5165|\u65b0\u589e/i.test(prompt);
   if (!hasBacklogSurface) return false;
-  const hasWriteIntent = /\u8a18\u4e00\u7b46|\u8a18\u9304|\u56de\u5beb|\u5beb\u5165|\u65b0\u589e|\u52a0\u5165|\u767b\u9304|record|log|write(?:\s+back)?|append|add/i.test(prompt);
+  // The Latin verbs need word boundaries: "log" also occurs inside "backlog",
+  // which routed every backlog repair request to the journaling contract.
+  const hasWriteIntent = /記一筆|記錄|回寫|寫入|新增|加入|登錄|\brecord\b|\blog\b|\bwrite(?:\s+back)?\b|\bappend\b|\badd\b/i.test(prompt);
   if (hasWriteIntent) return true;
-  if (/\bATM-BUG-\d{4}-\d{2}-\d{2}-\d+\b/i.test(prompt) && !isQueueRequestedPrompt(prompt)) return true;
+  // A bug id alone reads as a journal entry, but an explicit repair intent for
+  // that id is maintenance work, not a record-keeping request.
+  const hasRepairIntent = /\bfix(?:es|ed|ing)?\b|\brepair\b|\bresolve[ds]?\b|\bpatch\b|修復|修正|解決|處理/i.test(prompt);
+  if (/\bATM-BUG-\d{4}-\d{2}-\d{2}-\d+\b/i.test(prompt) && !isQueueRequestedPrompt(prompt) && !hasRepairIntent) return true;
   return false;
 }
 
