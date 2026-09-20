@@ -161,16 +161,10 @@
       "disposition": "triage"
     },
     {
-      "test": "skill-distribution-manager.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): der (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 25,\r expected: 18,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
       "test": "task-dependency-semantics-census.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
-      "disposition": "triage"
+      "reason": "environment-dependent",
+      "detail": "Reads the planning repository through resolvePlanningRoot(), which defaults to a sibling 3KLife checkout (override: ATM_PLANNING_REPO_ROOT). A CI clone has no such sibling, so the census denominator is 0. It needs a fixture planning root instead of the live one.",
+      "disposition": "fix"
     },
     {
       "test": "task-view-dashboard.test.ts",
