@@ -22,20 +22,6 @@
       "coverage_status": "active"
     },
     {
-      "path_pattern": "packages/cli/src/commands/next/**/*.ts",
-      "atom_id": "atm.next-command-router-map",
-      "capability": "TASK-RFT-0049 next command router modules for claim orchestration, prompt guidance, result compaction, and command facade support.",
-      "coverage_status": "active",
-      "source_task": "TASK-RFT-0049"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/next/foreign-dirty-wip-admission.ts",
-      "atom_id": "atm.claim.foreign-unstaged-wip-admission",
-      "capability": "Claim admission policy that blocks candidate code scope when staged, unstaged, or untracked WIP is foreign or unowned.",
-      "coverage_status": "active",
-      "source_task": "ATM-GOV-0169"
-    },
-    {
       "path_pattern": "packages/cli/src/commands/next/intent-normalizers.ts",
       "atom_id": "atm.cli-next-intent-resolver",
       "capability": "Pure parsing/normalization helpers for next.ts intent resolution: frontmatter parse, status/intent/scope normalizers, list splitters",
@@ -46,41 +32,6 @@
       "atom_id": "atm.cli-next-match-and-sort",
       "capability": "Pure comparators, hashers, matchers, weights for next.ts task scoring and queue ordering",
       "coverage_status": "active"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/next/plan-scoped-preflight.ts",
-      "atom_id": "atm.plan-scoped-routing-preflight",
-      "capability": "ATM-GOV-0182 plan-scoped routing preflight: source plan digest, identity/lane presence, WIP provenance classes, single recovery command, and next.route-resolution telemetry.",
-      "coverage_status": "active",
-      "source_task": "ATM-GOV-0182"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/next/playbook-projection.ts",
-      "atom_id": "atm.next-playbook-projection",
-      "capability": "Channel playbook, active-work summary, governance readiness, legacy proposal, and next message projection extracted from next.ts.",
-      "coverage_status": "active",
-      "source_task": "TASK-RFT-0031"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/next/playbook-projection/**/*.ts",
-      "atom_id": "atm.next-playbook-projection-contracts",
-      "capability": "TASK-RFT-0048 bounded modules for legacy guidance, task routing, active-work summary, channel playbooks, message assembly, and governance readiness projection.",
-      "coverage_status": "active",
-      "source_task": "TASK-RFT-0048"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/next/prompt-result-contracts.ts",
-      "atom_id": "atm.next-prompt-result-contracts",
-      "capability": "Prompt-scoped next result contract helpers for queue, planning-card import, read-only miss, and profiler projections extracted from prompt-results.ts.",
-      "coverage_status": "active",
-      "source_task": "TASK-RFT-0046"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/next/prompt-results.ts",
-      "atom_id": "atm.next-route-resolution",
-      "capability": "Prompt-scoped next result builders for task route ready, import-required, queue, mirror-sync, and no-prompt route projections.",
-      "coverage_status": "active",
-      "source_task": "TASK-RFT-0031"
     },
     {
       "path_pattern": "packages/cli/src/commands/next/route-predicates.ts",
@@ -101,6 +52,27 @@
       "capability": "Bounded strategy modules for prompt route intent, runtime queue lookup, task matching, artifact-scope hydration, pending worktree hints, task-card discovery, and imported queue inspection.",
       "coverage_status": "active",
       "source_task": "TASK-RFT-0047"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/prompt-results.ts",
+      "atom_id": "atm.next-route-resolution",
+      "capability": "Prompt-scoped next result builders for task route ready, import-required, queue, mirror-sync, and no-prompt route projections.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0031"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/prompt-result-contracts.ts",
+      "atom_id": "atm.next-prompt-result-contracts",
+      "capability": "Prompt-scoped next result contract helpers for queue, planning-card import, read-only miss, and profiler projections extracted from prompt-results.ts.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0046"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/playbook-projection.ts",
+      "atom_id": "atm.next-playbook-projection",
+      "capability": "Channel playbook, active-work summary, governance readiness, legacy proposal, and next message projection extracted from next.ts.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0031"
     },
     {
       "path_pattern": "packages/cli/src/commands/next/view-projections.ts",
