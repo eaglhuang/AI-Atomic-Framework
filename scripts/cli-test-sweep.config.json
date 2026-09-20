@@ -121,7 +121,7 @@
     {
       "test": "next-route-selector.test.ts",
       "reason": "failing-on-main",
-      "detail": "Runs scripts/validate-prompt-scoped-next.ts, which walks many routing scenarios. Two real routing defects it exposed are fixed (journaling vs repair intent); it now stops at a different scenario: an exact task id inside an active batch no longer reports ATM_NEXT_TASK_QUEUE_READY. That batch/queue drift is not yet root-caused.",
+      "detail": "Runs scripts/validate-prompt-scoped-next.ts over many routing scenarios. Two real routing defects it exposed are fixed (journaling vs repair intent, 17a27270f). It now stops at the batch scenario: asking for an exact task id inside an active batch reports task-queue-head-claim-blocked instead of ATM_NEXT_TASK_QUEUE_READY, because the prompt carries no actor and the queue head already holds the batch’s own active claim, so diagnoseClaimReadinessForTasks treats it as a blocker. Whether an actor-less query should warn instead of block is an owner decision; do not relax the gate just to make the test pass.",
       "disposition": "fix"
     },
     {
