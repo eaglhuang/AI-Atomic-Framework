@@ -173,12 +173,6 @@
       "disposition": "triage"
     },
     {
-      "test": "task-id-casing.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): AN_DETECTED_HEADING',\r text: 'Acceptance Criteria',\r sourceLine: 10\r }\r ],\r planPath: 'TASK-APO-0030-python-language-adapter-plugin.task.md'\r }\r }",
-      "disposition": "triage"
-    },
-    {
       "test": "task-view-dashboard.test.ts",
       "reason": "environment-dependent",
       "detail": "Asserts on live repository state for the historical TASK-MAO-0043: it expects a complete close, but the dashboard reports a partial close because the planning-mirror field cannot be confirmed without the planning repository checked out beside this one. Reporting partial when the mirror is unverifiable is fail-closed and correct; the test needs a fixture instead of the live ledger.",
@@ -192,8 +186,8 @@
     },
     {
       "test": "taskflow-host-policy.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): :32:10 {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 'TASK-GOVERNED-0001',\r expected: 'TASK-GOVERNED-0002',\r operator: 'strictEqual',\r diff: 'simple'\r }",
+      "reason": "environment-dependent",
+      "detail": "Same root cause as taskflow-open-orchestration: host policy allocates the next task id by scanning the profile repository’s docs/tasks, not the --cwd fixture, so the expected TASK-GOVERNED-0002 depends on whether a 0001 card is left in this repository. Whether a profile may redirect reads and writes outside --cwd is an owner decision.",
       "disposition": "triage"
     },
     {
