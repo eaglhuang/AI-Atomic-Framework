@@ -7,7 +7,7 @@
     {
       "test": "atm-2-1-final-closure.test.ts",
       "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ION_PASSED=1` only after standard passes.\\n',\r expected: /420-cell paired A\\/B v4 met rollout metrics and safety controller \\| pass/,\r operator: 'match',\r diff: 'simple'\r }",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ION_PASSED=1` only after standard passes.\\n',\r expected: /420-cell paired A\\/B v4 met rollout metrics and safety controller \\| pass/,\r operator: 'match',\r diff: 'simple'\r } Also rewrites docs/reports/atm-2-1-final-closure.md when it runs, so it cannot join the sweep until it generates into a temporary root.",
       "disposition": "triage"
     },
     {
@@ -79,7 +79,7 @@
     {
       "test": "historical-residue-cleanup.test.ts",
       "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r }",
+      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): Loader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: false,\r expected: true,\r operator: '==',\r diff: 'simple'\r } Also rewrites docs/reports/historical-governance-residue-cleanup.md when it runs, so it cannot join the sweep until it generates into a temporary root.",
       "disposition": "triage"
     },
     {
@@ -213,18 +213,6 @@
       "reason": "stale-assertion",
       "detail": "Root-caused with a debugger: the fixture's \"valid active claim\" has no lane session, and current policy treats an active claim without a live lane session as repairable (unresolved-claim-lane), not blocking. The gate behaves as designed; the fixture must create a live lane session.",
       "disposition": "fix"
-    },
-    {
-      "test": "tasks-roster-update.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): 658b3fd6844fb0aaba81216c6e0bb68cef9bb65',\r expected: 'sha256:5a2c3183e7cc532c432369b1048fa523a7b90c1fb60347cd4c05fd652c2b58b2',\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
-      "test": "test-map-equivalence.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): oader (node:internal/modules/run_main:101:5) {\r generatedMessage: true,\r code: 'ERR_ASSERTION',\r actual: 1,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
     }
   ],
   "serial": []
