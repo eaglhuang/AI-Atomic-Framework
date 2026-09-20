@@ -108,19 +108,28 @@ Test coverage: Product CI runs a `CLI test sweep` step
 (`scripts/run-cli-test-sweep.ts`) that executes every `tests/cli/*.test.ts`
 file except those in the quarantine in `scripts/cli-test-sweep.config.json`. A
 test fails the sweep if it exits non-zero, times out, or modifies the worktree.
-Every quarantined test records a reason and a disposition. When the sweep was
-introduced (2026-09-20), 534 of 599 files ran and passed on Linux (WSL2 Ubuntu,
-Node 24.21, shallow clone; 168 s wall clock). The 65 quarantined files are 54
-that fail on `main` and have not been root-caused yet, 6 that pass but rewrite
-tracked files, and 5 that pass on Windows but fail on Linux. Since then two
-quarantined tests were root-caused with a debugger as stale fixtures and
-restored (`steward-receipt-pre-commit-gate`) or fixed by the `atm create`
-repair (`create`), and one (`tasks-repair-claim`) was reclassified as a stale
-assertion; 63 files remain quarantined.
+Every quarantined test records a reason, a disposition and its root cause.
+
+The sweep was introduced on 2026-09-20 with 534 of 599 files running and 65
+quarantined, of which 54 had not been root-caused. As of the same day 581 of
+600 files run and pass on Linux, and the 19 that remain are quarantined for a
+named reason, none of them unexplained:
+
+| Reason | Files | What it means |
+|---|---|---|
+| `stale-assertion` | 9 | Asserts governance data that has legitimately moved, or a report that is stale against its own sources |
+| `environment-dependent` | 7 | Needs the sibling planning repository, full git history, or a Windows host |
+| `writes-tracked-files` | 3 | Regenerates tracked artifacts, so it needs an output-root option first |
+
+Four of these need an owner decision rather than an edit: two governance
+reports are stale against their sources with no generator in the repository,
+one review binds its freshness to the commit it was generated at and so
+invalidates itself on the next commit, and `taskflow open` resolves its output
+root from the profile path rather than `--cwd`.
 
 Known limit: runs before the sweep step was added did not execute most
 `tests/cli` suites, so "covers test" holds only for runs from that commit on,
-and the 63 quarantined files are still not covered.
+and the 19 quarantined files are still not covered.
 
 ## Proof 3 — net benefit over a simple baseline
 
