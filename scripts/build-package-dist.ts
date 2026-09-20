@@ -19,6 +19,8 @@ const CLI_RUNTIME_ASSETS = [
   'schemas/registry.schema.json',
   'schemas/test-report.schema.json',
   'schemas/test-report/metrics.schema.json',
+  // create-map validates its spec against the atomic map schema.
+  'schemas/registry/atomic-map.schema.json',
   'templates/atom.spec.template.json',
   'templates/atom.test.template.ts'
 ] as const;
