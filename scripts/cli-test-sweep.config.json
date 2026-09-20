@@ -47,18 +47,6 @@
       "disposition": "triage"
     },
     {
-      "test": "create-map-from-plan.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: 1,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
-      "test": "create-map-from-spec.test.ts",
-      "reason": "failing-on-main",
-      "detail": "Failed on main at 0b986834d (Windows, Node 24.12): ader (node:internal/modules/run_main:101:5) {\r generatedMessage: false,\r code: 'ERR_ASSERTION',\r actual: 2,\r expected: 0,\r operator: 'strictEqual',\r diff: 'simple'\r }",
-      "disposition": "triage"
-    },
-    {
       "test": "cross-editor-parallel-proof.test.ts",
       "reason": "environment-dependent",
       "detail": "Needs full git history: acc5 depends on whether a recorded SHA is reachable, and the depth-1 CI checkout cannot answer that, so the status is unmet. Passes in a full clone. Enabling it would require fetch-depth: 0 in Product CI.",
