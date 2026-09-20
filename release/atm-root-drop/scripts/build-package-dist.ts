@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -156,6 +156,21 @@ function writeCliEntrypointWrapper(distRoot: string): void {
     '',
     'process.exitCode = await runCli(process.argv.slice(2));'
   ].join('\n')}\n`);
+  markExecutable(wrapperPath);
+}
+
+/**
+ * npm links a package bin only when the file is executable, and rewriting the
+ * file drops that mode on POSIX. A package packed straight after a rebuild
+ * then installs with no usable atm command.
+ */
+export function markExecutable(filePath: string): void {
+  if (process.platform === 'win32') return;
+  try {
+    chmodSync(filePath, 0o755);
+  } catch {
+    // a read-only checkout cannot regress the mode further
+  }
 }
 
 function buildPackage(packageDir: string, mode: 'full' | 'incremental'): void {
