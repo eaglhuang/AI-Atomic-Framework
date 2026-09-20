@@ -47,12 +47,6 @@
       "disposition": "fix"
     },
     {
-      "test": "git-record-commit.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Expects .atm/history/evidence/git-head.jsonl, but the append-only log was replaced by git-head.json (the .jsonl file was deleted in 0feeb741c). The command behaves as designed; the assertion names the retired filename.",
-      "disposition": "fix"
-    },
-    {
       "test": "historical-residue-cleanup.test.ts",
       "reason": "stale-assertion",
       "detail": "Expects at least one governance residue receipt in the live .atm history; the residue it was written against has since been cleaned, so the census is legitimately empty. It also rewrites docs/reports/historical-governance-residue-cleanup.md, so it needs a fixture history and a temporary output root.",
@@ -86,12 +80,6 @@
       "test": "plan4-successor-wave-objective-map.test.ts",
       "reason": "stale-assertion",
       "detail": "Asserts over the live docs/reports/plan4-successor-wave-objective-map.json, which is regenerated as the wave progresses.",
-      "disposition": "fix"
-    },
-    {
-      "test": "real-paired-ab-analyzer-v3.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Analyzes live paired A/B artifacts and expects the verdict improved; the current data yields inconclusive. The analyzer is correct; the expectation is a snapshot.",
       "disposition": "fix"
     },
     {
