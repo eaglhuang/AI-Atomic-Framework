@@ -29,12 +29,6 @@
       "disposition": "fix"
     },
     {
-      "test": "four-plan-objective-authority-review.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Reviews the live docs/reports/reviews/plan-3x-4x-objective-authority-review.json, which is regenerated as objectives are certified.",
-      "disposition": "fix"
-    },
-    {
       "test": "historical-residue-cleanup.test.ts",
       "reason": "stale-assertion",
       "detail": "Expects at least one governance residue receipt in the live .atm history; the residue it was written against has since been cleaned, so the census is legitimately empty. It also rewrites docs/reports/historical-governance-residue-cleanup.md, so it needs a fixture history and a temporary output root.",
@@ -78,14 +72,14 @@
     },
     {
       "test": "runbook-completion-evidence.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Compiles runbook completion evidence from live docs/reports/plan-3x-4x-runbook-completion-evidence.json and the live evidence ledger, so the verdict follows current state.",
+      "reason": "environment-dependent",
+      "detail": "Needs the planning repository: it compiles runbook completion evidence from a sibling 3KLife checkout that a CI clone does not have.",
       "disposition": "fix"
     },
     {
       "test": "runbook-release-authority-review.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Reviews release authority from the live docs/reports/plan-3x-4x-runbook-completion-evidence.json, so its verdict follows current state.",
+      "reason": "environment-dependent",
+      "detail": "Needs the planning repository: the reviewer fails with \"missing runbook: ../3KLife/docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md\". A CI clone has no sibling 3KLife checkout.",
       "disposition": "fix"
     },
     {
