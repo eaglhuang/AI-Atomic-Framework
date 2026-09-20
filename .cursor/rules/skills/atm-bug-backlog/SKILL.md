@@ -17,14 +17,15 @@ Choose the owning backlog before writing anything:
 
 - ATM product, framework, CLI, governance lifecycle, Team Agents, integration
   packs, release runner, or ATM docs: write one
-  `atm.governanceBacklogItem.v1` item shard under the ATM backlog item
-  directory, then regenerate the Markdown projection.
+  `atm.governanceBacklogItem.v1` item shard at
+  `docs/governance/atm-bug-and-optimization-backlog.items/<ATM-BUG-YYYY-MM-DD-NNN>.json`,
+  then regenerate the Markdown projection.
 - Current adopter or app behavior: write only that repository's project backlog.
 - Cross-repo unclear: record the adopter symptom first; add an ATM item only
   when evidence points to ATM itself.
 
 The item shard is the record authority. The Markdown backlog is a generated
-projection for humans. Do not directly author new ATM rows in the projection.
+projection for humans. Do not directly author new ATM backlog rows in the Markdown projection.
 
 ## Incident Learning Intake
 
