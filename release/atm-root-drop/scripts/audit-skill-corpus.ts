@@ -281,6 +281,9 @@ function countDispositions(findings: readonly { readonly disposition: string }[]
   return counts;
 }
 
+// Writing the audit artifact is what running this script means; importing its
+// helpers, as tests do, must not rewrite a tracked file as a side effect.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
 const audit = buildSkillCorpusAudit();
 mkdirSync(path.dirname(outputPath), { recursive: true });
 writeFileSync(outputPath, `${JSON.stringify(audit, null, 2)}\n`);
@@ -296,3 +299,4 @@ console.log(JSON.stringify({
   deepModuleReviewFingerprints: audit.deepModuleReviews.map((review) => review.receiptFingerprint),
   baselineFingerprints: audit.deepModuleReviews.map((review) => review.baselineFingerprint)
 }));
+}

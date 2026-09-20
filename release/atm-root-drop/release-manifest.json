@@ -5529,6 +5529,7 @@
     "release/atm-root-drop/tests/cli/next-emitted-command-executability.test.ts",
     "release/atm-root-drop/tests/cli/next-external-scan-guard.test.ts",
     "release/atm-root-drop/tests/cli/next-governance-readiness-latency.test.ts",
+    "release/atm-root-drop/tests/cli/next-journaling-vs-repair-routing.test.ts",
     "release/atm-root-drop/tests/cli/next-playbook-projection-contracts.test.ts",
     "release/atm-root-drop/tests/cli/next-prompt-results-contract-extraction.test.ts",
     "release/atm-root-drop/tests/cli/next-route-resolution-latency.test.ts",
@@ -6229,7 +6230,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 6193,
+    "unchanged": 6194,
     "removed": 0
   },
   "buildMode": "full",
@@ -24839,7 +24840,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/intent-normalizers.js",
-        "digest": "7e4dd8a1a45284fe853e6c11245e61e1fb6b8ae7d9aac6cbe15fd6ca8e40ff6b",
+        "digest": "344612d7f6f89a726ae33af63aabfd456d5bc5f0e4d139fb01d62346361b4de5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/intent-normalizers.js"
@@ -28034,7 +28035,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "d9d89f53ffbf06eb31a7cb311f0426e131c4c07ef117b8043458e60853490b0f",
+        "digest": "6ea84bd5859d65b61f30c98c2572ccf9b206ce5b3ef2f26e7e2f7df9fc225cc6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -28043,7 +28044,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "6024686139d9fec5c30ecf6178e733bdb808a545fbae7dcf94a7d1f64b0e723f",
+        "digest": "12d283209e56417b415ca3c96d21ba041b0616e655f3e895d41a603c69d10d82",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -32255,7 +32256,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/intent-normalizers.ts",
-        "digest": "cefcfa06824afe3aedcd7d2b2f4c535034699b6aa95ae96997580af7aa0ac303",
+        "digest": "a6eb6f45894f4a4abfffdcfac2fb55ff969de96e9845771401c54abe8f91573c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/intent-normalizers.ts"
@@ -46961,7 +46962,7 @@
       },
       {
         "path": "scripts/audit-skill-corpus.ts",
-        "digest": "ef5dc7b72b87353c2cca99996fe8ec072db848ed878d2af0e9d92174489f33f9",
+        "digest": "f996dfdbdbfde88336598d249a41c678af07f413f7eefe57b919a8087755f442",
         "origin": "source",
         "inputPaths": [
           "scripts/audit-skill-corpus.ts"
@@ -47330,7 +47331,7 @@
       },
       {
         "path": "scripts/cli-test-sweep.config.json",
-        "digest": "a64177ab2c62c5b817ab88e2c27c80ac9fc3e296dbc62b5a685ee5a622b047d0",
+        "digest": "5137bf0f11589b0d5e82dc076b4668e5c380dfef17cd8835ea6e6ec808685187",
         "origin": "source",
         "inputPaths": [
           "scripts/cli-test-sweep.config.json"
@@ -48842,7 +48843,7 @@
       },
       {
         "path": "scripts/run-paired-ab-v4.ts",
-        "digest": "76bd98db92349de9fbec61a6c9de2b1665bda750c26c8f96a23905dbcb8c1009",
+        "digest": "599b4fbcc6dc4ed98a2e9c4a82597e620e7314f6d0bedcdcd31696f75eef5532",
         "origin": "source",
         "inputPaths": [
           "scripts/run-paired-ab-v4.ts"
@@ -48851,7 +48852,7 @@
       },
       {
         "path": "scripts/run-plan3-red-green-discrimination.ts",
-        "digest": "ce40b2a60d698738e4052368d6d77d318b077e1ddbade2b2d73e2ff418a426ea",
+        "digest": "2c5ec0102115f4e546965eca30738aae1306d2497f65833ee72a1a419dc5088d",
         "origin": "source",
         "inputPaths": [
           "scripts/run-plan3-red-green-discrimination.ts"
@@ -48860,7 +48861,7 @@
       },
       {
         "path": "scripts/run-real-parallel-dogfood.ts",
-        "digest": "1053d8ba3d33f8b88dde8cbbff656c87de07395fef6e13af59abed42220856fd",
+        "digest": "0df6ed60cb5b0f806543667904e404be6fb834cf3f2fb3eec4ce0dc744880259",
         "origin": "source",
         "inputPaths": [
           "scripts/run-real-parallel-dogfood.ts"
@@ -53819,7 +53820,7 @@
       },
       {
         "path": "tests/cli/atm-3-red-baseline-discrimination.test.ts",
-        "digest": "79c0326cb2c85db1805f5d56648a67cc10bed126b8c4778b3a5a563fc5dbafdb",
+        "digest": "22af94652bc7d82b94b7f4621e45d6b1ee4e5c839009a4d25daef35e75fb38ed",
         "origin": "source",
         "inputPaths": [
           "tests/cli/atm-3-red-baseline-discrimination.test.ts"
@@ -55708,6 +55709,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/next-journaling-vs-repair-routing.test.ts",
+        "digest": "48a41f9fa0aadcfd0e04a605736bb2d2fee0c0ef2da015b42637cc3c06bedf0c",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/next-journaling-vs-repair-routing.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/next-playbook-projection-contracts.test.ts",
         "digest": "d66fa36aac4819764c87810e37c2f2edbce529d9f0d6efb719e92680a3cbce8e",
         "origin": "source",
@@ -55853,7 +55863,7 @@
       },
       {
         "path": "tests/cli/paired-ab-v4-safety-controller.test.ts",
-        "digest": "bfcb9a9bbba8d70d64a9b4f407aa6ada8ce49dbfb9a1ff0162e8d27a962b9cb9",
+        "digest": "a89cb58cf17cd1e006d22bd7a42a314035f991429e542cddb1f4d8e02b352952",
         "origin": "source",
         "inputPaths": [
           "tests/cli/paired-ab-v4-safety-controller.test.ts"
@@ -57158,7 +57168,7 @@
       },
       {
         "path": "tests/cli/real-parallel-dogfood-harness.test.ts",
-        "digest": "8d94e427abf7f75f719c40d5e6c80981f836d938059b251eab55d9da388d881c",
+        "digest": "187d968bcb47121857d9592cd12962d2edbbfa2a9c21c155581da6ed90fc09a6",
         "origin": "source",
         "inputPaths": [
           "tests/cli/real-parallel-dogfood-harness.test.ts"
@@ -61972,7 +61982,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:db8184ded16ca3ef2f17c47e0215564001d0c6e050e2c3dcc853181baf393e9b"
+    "treeDigest": "sha256:603b3d36df5e0f893d047d781c5018607d39c24f09fc2c6adabd5e145f3356ee"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -63524,7 +63534,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:148c5175f4e579f0d3852e42cb01c40ffcb3b12798e8c84aa8ca59fab8a1950f"
+    "digest": "sha256:dee5a75b7a28ee7af4e40152293f6ab6133c196869df06fd42ad3d09e1143e42"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -69027,6 +69037,7 @@
       "release/atm-root-drop/tests/cli/next-emitted-command-executability.test.ts",
       "release/atm-root-drop/tests/cli/next-external-scan-guard.test.ts",
       "release/atm-root-drop/tests/cli/next-governance-readiness-latency.test.ts",
+      "release/atm-root-drop/tests/cli/next-journaling-vs-repair-routing.test.ts",
       "release/atm-root-drop/tests/cli/next-playbook-projection-contracts.test.ts",
       "release/atm-root-drop/tests/cli/next-prompt-results-contract-extraction.test.ts",
       "release/atm-root-drop/tests/cli/next-route-resolution-latency.test.ts",
@@ -69729,22 +69740,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:53b320de9ffddb1c02e659c9022177f62d81faaa69af275e9a2628324dace9c4",
-  "sealedSourceCommit": "3d6c1a6eb5ad8fbdfbd7bd40f407e166e36a6ef3",
+  "buildInputsTreeHash": "sha256:12fec27f0f82dbeb35fbbd0f21ce4980262072e2f56aaa43a50d8fbdd98521fa",
+  "sealedSourceCommit": "17a27270fcf1b5191a83f25a263add56c1a88ff9",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:dd624a61df527bece2312ca34a638f05a424ac7f8350b7211111792be2e57a0d",
-  "tsBuildCacheDigest": "sha256:bf533f673fd6335cb4534854aeeb81036482a4ff057ce2c4de2d0d3ab038561e",
+  "incrementalPlanDigest": "sha256:5d5e9bd90099f25babb4119780fc73a841f299503c8cc6bd24b0520c30c1ad45",
+  "tsBuildCacheDigest": "sha256:7acd0dd0e556ca832b0788d4188de9bec69ee2d969d46fdee211b21f21a48fb2",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 37,
-    "skipDecision": 46,
-    "worktreeSetup": 9251,
-    "typescriptBuild": 11942,
-    "rootDropReleaseAssembly": 29148,
-    "onefileReleaseAssembly": 18808,
-    "artifactSync": 5030,
+    "inputHashCalculation": 35,
+    "skipDecision": 43,
+    "worktreeSetup": 9307,
+    "typescriptBuild": 11003,
+    "rootDropReleaseAssembly": 29404,
+    "onefileReleaseAssembly": 18601,
+    "artifactSync": 5043,
     "cleanup": 0,
-    "totalElapsed": 112098
+    "totalElapsed": 83033
   }
 }

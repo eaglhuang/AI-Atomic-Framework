@@ -2,10 +2,14 @@ import { strict as assert } from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { runRealParallelDogfood, validateSummaryFile, type RealParallelDogfoodSummary } from '../../scripts/run-real-parallel-dogfood.ts';
+import { mkdtempSync } from 'node:fs';
+import os from 'node:os';
+
+const outputRoot = mkdtempSync(join(os.tmpdir(), 'atm-dogfood-out-'));
 
 const repoRoot = process.cwd();
 
-const summary = await runRealParallelDogfood({ mode: 'generate' });
+const summary = await runRealParallelDogfood({ mode: 'generate', outputRoot: outputRoot });
 assert.equal(summary.schemaId, 'atm.realParallelDogfood.v1');
 assert.equal(summary.taskId, 'ATM-GOV-0223');
 assert.ok(summary.workerCount >= 4);

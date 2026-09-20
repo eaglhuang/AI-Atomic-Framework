@@ -19,10 +19,15 @@ import {
 } from './plan-performance-report-v4.ts';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-const artifactDir = join(repoRoot, 'artifacts/generated/atm-ab-v4');
-const summaryPath = join(artifactDir, 'summary.json');
-const cellsPath = join(artifactDir, 'cells.json');
-const reportPath = join(repoRoot, 'docs/reports/atm-2-1-paired-ab-v4.md');
+// Output paths are relative to an output root so a caller (a test) can generate
+// into a temporary directory instead of rewriting the repository's artifacts.
+const ARTIFACT_DIR = 'artifacts/generated/atm-ab-v4';
+const REPORT_PATH = 'docs/reports/atm-2-1-paired-ab-v4.md';
+export function resolveOutputPaths(outputRoot: string = repoRoot) {
+  const artifactDir = join(outputRoot, ARTIFACT_DIR);
+  return { artifactDir, summaryPath: join(artifactDir, 'summary.json'), cellsPath: join(artifactDir, 'cells.json'), reportPath: join(outputRoot, REPORT_PATH) };
+}
+const { summaryPath } = resolveOutputPaths();
 const execFileAsync = promisify(execFile);
 
 export const arms: readonly PairedAbV4Arm[] = ['queue-only', 'atm-compose-first'];
@@ -35,7 +40,8 @@ const policyProfiles: Record<PairedAbV4Arm, { readonly proposalConcurrency: numb
   'atm-compose-first': { proposalConcurrency: 2, validationConcurrency: 2, composeBatchSize: 2, stewardWrites: 1 }
 };
 
-export async function runPairedAbV4(options: { readonly mode: 'generate' | 'validate' | 'command-backed' } = { mode: 'generate' }): Promise<PairedAbV4Summary> {
+export async function runPairedAbV4(options: { readonly mode: 'generate' | 'validate' | 'command-backed'; readonly outputRoot?: string } = { mode: 'generate' }): Promise<PairedAbV4Summary> {
+  const { artifactDir, summaryPath, cellsPath, reportPath } = resolveOutputPaths(options.outputRoot);
   if (options.mode === 'validate') {
     const findings = await validateSummaryFile(summaryPath);
     if (findings.length) throw new Error(`paired AB v4 validation failed: ${findings.join('; ')}`);

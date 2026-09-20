@@ -42,10 +42,15 @@ export type RealParallelDogfoodSummary = {
 };
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-const artifactDir = join(repoRoot, 'artifacts/generated/atm-parallel-dogfood');
-const summaryPath = join(artifactDir, 'summary.json');
-const workerManifestPath = join(artifactDir, 'workers.json');
-const reportPath = join(repoRoot, 'docs/reports/atm-2-1-real-parallel-dogfood.md');
+// Output paths are relative to an output root so a caller (a test) can generate
+// into a temporary directory instead of rewriting the repository's artifacts.
+const ARTIFACT_DIR = 'artifacts/generated/atm-parallel-dogfood';
+const REPORT_PATH = 'docs/reports/atm-2-1-real-parallel-dogfood.md';
+export function resolveOutputPaths(outputRoot: string = repoRoot) {
+  const artifactDir = join(outputRoot, ARTIFACT_DIR);
+  return { artifactDir, summaryPath: join(artifactDir, 'summary.json'), workerManifestPath: join(artifactDir, 'workers.json'), reportPath: join(outputRoot, REPORT_PATH) };
+}
+const { summaryPath } = resolveOutputPaths();
 
 const workers = [
   { actorId: 'dogfood-worker-01', laneSessionId: 'lane-dogfood-0223-01', scenario: 'disjoint' as const, delayMs: 0, durationMs: 74 },
@@ -55,13 +60,14 @@ const workers = [
   { actorId: 'dogfood-worker-05', laneSessionId: 'lane-dogfood-0223-05', scenario: 'conflict' as const, delayMs: 32, durationMs: 54 }
 ];
 
-export async function runRealParallelDogfood(options: { readonly mode: 'generate' | 'validate' } = { mode: 'generate' }): Promise<RealParallelDogfoodSummary> {
+export async function runRealParallelDogfood(options: { readonly mode: 'generate' | 'validate'; readonly outputRoot?: string } = { mode: 'generate' }): Promise<RealParallelDogfoodSummary> {
+  const { artifactDir, summaryPath, workerManifestPath, reportPath } = resolveOutputPaths(options.outputRoot);
   if (options.mode === 'generate') await rm(artifactDir, { recursive: true, force: true });
   await mkdir(artifactDir, { recursive: true });
   await mkdir(dirname(reportPath), { recursive: true });
 
   const base = Date.now();
-  const completed = await Promise.all(workers.map((worker) => simulateWorker(worker, base)));
+  const completed = await Promise.all(workers.map((worker) => simulateWorker(worker, base, artifactDir)));
   const summary = buildSummary(completed);
   await writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
   await writeFile(workerManifestPath, `${JSON.stringify(completed, null, 2)}\n`, 'utf8');
@@ -91,7 +97,7 @@ export async function validateSummaryFile(path = summaryPath): Promise<string[]>
   return findings;
 }
 
-async function simulateWorker(worker: typeof workers[number], base: number): Promise<RealParallelDogfoodWorker> {
+async function simulateWorker(worker: typeof workers[number], base: number, artifactDir: string): Promise<RealParallelDogfoodWorker> {
   await sleep(worker.delayMs);
   const startedAtMs = base + worker.delayMs;
   await writeFile(join(artifactDir, `${worker.actorId}.proposal.json`), `${JSON.stringify({
