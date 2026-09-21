@@ -22,5 +22,23 @@
     "failureClass": "test-environment-assumption",
     "rootCause": "Product CI CLI test sweep step (first run of the new step): tests/cli/rescue-worktree-normal-write-classification.test.ts used the framework HEAD as its rescue commit; in the depth-1 CI checkout that commit has no parent, so git diff-tree listed no files and violationCount was 0 instead of 1. Fixed in 5e57bc4c7 with a self-contained two-commit fixture. Job 105930068003.",
     "repairRunId": 35456332855
+  },
+  {
+    "runId": 35611206022,
+    "failureClass": "generated-artifact-out-of-date",
+    "rootCause": "Product CI CLI test sweep job 106370472156 (https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/35611206022/job/106370472156): commit 8e91890fa changed CLI source under packages/cli/src without rebuilding the sealed runner, so packages/cli/dist lagged its own source. cli-published-command-smoke.test.ts, public-npm-install-contract.test.ts, root-drop-release-incremental-overlay.test.ts and root-drop-release-manifest-integrity.test.ts all exited 0 -- they passed -- but each rebuilt dist and so left packages/cli/dist and release/** dirty, which the sweep attributes as a worktree write and fails on. This was not a concurrency race: a race shows a non-zero exit, as run 35613071140 later did. Fixed in 9f63771ec by rebuilding and republishing the sealed runner at the fix commit. That rebuild run, 35613071140, then failed on a separate shared-build race recorded under its own disposition, so the first successful run after this failure is 35614323601.",
+    "repairRunId": 35614323601
+  },
+  {
+    "runId": 35613071140,
+    "failureClass": "test-generated-output-race",
+    "rootCause": "Product CI CLI test sweep job 106376796403 (https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/35613071140/job/106376796403): root-drop-release-manifest-integrity.test.ts failed because build-package-dist exited non-zero while other sweep members regenerated the same packages/cli/dist and release/** trees. Fixed in 065352233 by marking the shared-build tests serial; path-limited diff scripts/cli-test-sweep.config.json digest sha256:08ef09eece9a499680ea61d3f3efb6472e72d659f84ca3207588ac4e0b8912a6. Successor run 35614323601 reported all 585 selected tests (600 minus 15 quarantine entries) with failures: [].",
+    "repairRunId": 35614323601
+  },
+  {
+    "runId": 35617577008,
+    "failureClass": "test-live-repository-assumption",
+    "rootCause": "Product CI CLI test sweep job 106392144866 (https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/35617577008/job/106392144866): historical-residue-cleanup.test.ts asserted that the CI clone itself contained a governance residue receipt. Fresh CI checkouts need not contain that historical residue, so the test failed with 'expected at least one governance residue receipt'. Fixed in 282dc293 by a self-contained fixture that creates and asserts reachable, quarantineable, and active residue shapes; path-limited diff tests/cli/historical-residue-cleanup.test.ts digest sha256:164640dd67716aa5ec03735fb050d860d579ee9b7bef862fd55ed5e642ac86b0. Successor run 35619033450 reported all 589 selected tests (600 minus 11 quarantine entries), including this non-quarantined fixture test, with failures: [].",
+    "repairRunId": 35619033450
   }
 ]
