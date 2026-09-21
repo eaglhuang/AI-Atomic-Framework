@@ -4,13 +4,17 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
+// The census now carries thousands of receipts, which overruns spawnSync's 1 MiB
+// default buffer and kills the child with ENOBUFS long before it can fail on its
+// own terms. --no-report keeps the run from rewriting the tracked report: the
+// report contract is asserted below against the committed file.
 const result = spawnSync(
   process.execPath,
-  ["--strip-types", "scripts/cleanup-historical-governance-residue.ts", "--dry-run", "--json"],
-  { cwd: root, encoding: "utf8" },
+  ["--strip-types", "scripts/cleanup-historical-governance-residue.ts", "--dry-run", "--json", "--no-report"],
+  { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
 );
 
-assert.equal(result.status, 0, result.stderr);
+assert.equal(result.status, 0, result.error ? String(result.error) : result.stderr);
 
 const summary = JSON.parse(result.stdout);
 assert.equal(summary.schemaId, "atm.historicalResidueCleanup.v1");

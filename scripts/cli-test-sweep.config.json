@@ -17,12 +17,6 @@
       "disposition": "fix"
     },
     {
-      "test": "historical-residue-cleanup.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Expects at least one governance residue receipt in the live .atm history; the residue it was written against has since been cleaned, so the census is legitimately empty. It also rewrites docs/reports/historical-governance-residue-cleanup.md, so it needs a fixture history and a temporary output root.",
-      "disposition": "fix"
-    },
-    {
       "test": "next-prompt-results-contract-extraction.test.ts",
       "reason": "stale-assertion",
       "detail": "Guards a 600-line budget on the CLI owner shard, which holds 184 mappings in 1256 lines. Sharding it along the families the model already uses brings the main shard to 579 lines, but 26 other tests read owner-shard-cli.json directly and expect their mapping there, and 9 of them failed when the split was tried (batch-final-600, broker-command-facade-final-600, close-orchestrator-final-600, closure-packet-schema-extraction, git-governance-command-extraction, next-command-facade-final-600, next-playbook-projection-contracts, taskflow-final-600, tasks-legacy-impl-extraction). Splitting the shard needs those tests to read the merged projection first; the attempt was reverted.",
