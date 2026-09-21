@@ -43,13 +43,13 @@
     {
       "test": "taskflow-host-policy.test.ts",
       "reason": "environment-dependent",
-      "detail": "Same root cause as taskflow-open-orchestration: host policy allocates the next task id by scanning the profile repository’s docs/tasks, not the --cwd fixture, so the expected TASK-GOVERNED-0002 depends on whether a 0001 card is left in this repository. Whether a profile may redirect reads and writes outside --cwd is an owner decision.",
+      "detail": "Same root cause as taskflow-open-orchestration and blocked on the same owner decision: host policy allocates the next task id by scanning the profile repository's docs/tasks rather than the --cwd fixture, so the expected TASK-GOVERNED-0002 depends on whether a TASK-GOVERNED-0001 card is left in this repository. Running taskflow-open-orchestration is one way such a card appears. Whether a profile may redirect reads and writes outside --cwd is the owner's decision.",
       "disposition": "triage"
     },
     {
       "test": "taskflow-open-orchestration.test.ts",
       "reason": "writes-tracked-files",
-      "detail": "Root-caused 2026-09-20: taskflow open resolves its output root from the profile path (resolveTaskflowOpenOutputRoot returns the profile repo git root), not from --cwd. The test passes a profile that lives in this repository, so the generated card lands in the framework repo docs/tasks instead of the requested cwd, and the run dirties the worktree. Whether a profile may redirect writes outside --cwd is an owner decision; do not change the resolver to make the test pass.",
+      "detail": "Root-caused 2026-09-20, re-verified 2026-09-22: taskflow open resolves its output root from the profile path (resolveTaskflowOpenOutputRoot returns the profile repo git root), not from --cwd. The test passes a profile that lives in this repository, so the generated card lands in the framework repo's docs/tasks and line 53's existsSync under --cwd fails. Making it pass requires either changing the resolver, which is the owner decision, or asserting the current behaviour instead, which decides the same question from the other side; neither is this project's call. Two practical notes for whoever runs it: the test's temporary directory is created inside the repository (.atm-temp-test-taskflow-open at the root), and on failure it leaves docs/tasks/TASK-GOVERNED-0001.task.md behind because the finally block only removes the temporary directory. That stray card is what makes taskflow-host-policy's expected next id depend on repository state, so the two quarantined tests interact through this residue -- delete it before reading either result.",
       "disposition": "triage"
     }
   ],
