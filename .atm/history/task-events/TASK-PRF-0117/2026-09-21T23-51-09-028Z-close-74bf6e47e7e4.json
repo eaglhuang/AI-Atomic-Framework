@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-21T23-51-09-028Z-close-74bf6e47e7e4",
+  "taskId": "TASK-PRF-0117",
+  "action": "close",
+  "actorId": "codex-gpt-5-4-mini",
+  "sessionId": "session-20260921162613-codex-gpt-5-4-mini-TASK-PRF-0117-abfc0fe79c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0117.json",
+  "taskSha256": "sha256:2e267b3c223b382f78f4ac3a3d5c6c6f36910abe2cd57f7006a25d5a935b5df4",
+  "createdAt": "2026-09-21T23:51:09.028Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0117 --actor codex-gpt-5-4-mini --status done --historical-delivery b84f35fca3ddb6fd6a5d2d7e6cb5cc6d765e6c5b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260921162613-codex-gpt-5-4-mini-TASK-PRF-0117-abfc0fe79c",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0117.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "framework-development",
+      "node --strip-types tests/cli/internal-release-sync.test.ts"
+    ],
+    "requiredGates": [
+      "build",
+      "framework-development",
+      "node --strip-types tests/cli/internal-release-sync.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-21T23:51:09.014Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0117.*",
+        ".atm/history/task-events/TASK-PRF-0117/**",
+        ".atm/history/tasks/TASK-PRF-0117.json",
+        "atm.mjs",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**",
+        "scripts/run-sealed-runner-build.ts",
+        "tests/cli/internal-release-sync.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "atm.mjs",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "tests/cli/internal-release-sync.test.ts"
+      ],
+      "requiredGates": [
+        "build",
+        "framework-development",
+        "node --strip-types tests/cli/internal-release-sync.test.ts"
+      ]
+    }
+  }
+}
