@@ -5,11 +5,11 @@ ATM product proofs with public inputs only. It records the latest results so a
 rerun can be compared against them. A proof counts as met only when a rerun
 reproduces it; this document is not the evidence by itself.
 
-Status as of 2026-09-20:
+Status as of 2026-09-22:
 
 | Proof | Status |
 |---|---|
-| 1. Small, complete installable package | **Met** for `@ai-atomic-framework/cli@0.1.2` |
+| 1. Small, complete installable package | **Met** for `@ai-atomic-framework/cli@0.1.2`, with one unproven Windows caveat below |
 | 2. Sustained delivery reliability | **Not yet met** — calendar window too short (see below) |
 | 3. Net benefit over a simple baseline | **Not proven** — no paired experiment has run |
 
@@ -50,6 +50,7 @@ commands single runs):
 
 | Metric | 0.1.0 | 0.1.1 | 0.1.2 |
 |---|---|---|---|
+| Compressed size (bytes) | 930,492 | 740,065 | 743,606 |
 | Unpacked size (bytes) | 3,357,358 | 2,654,835 | 2,683,003 |
 | Files | 78 | 66 | 69 |
 | Installed `node_modules` (bytes) | 4,712,004 | 4,009,481 | 4,037,649 |
@@ -68,6 +69,30 @@ smoke that runs in Product CI. It adds about 28 KB unpacked
 (2,683,003 bytes, +1.1%). 0.1.2 was published with the fix and passes the full
 matrix from the public registry, including `create`
 (`coreWorkflowPassed: true`), so Proof 1 is met again for 0.1.2.
+
+Compressed size is the byte length of the published tarball as the registry
+serves it, fetched directly from `dist.tarball` rather than from a local pack,
+so a rerun measures the same artifact a user downloads:
+
+```bash
+curl -sL -o cli.tgz "$(npm view @ai-atomic-framework/cli@0.1.2 dist.tarball)" && wc -c < cli.tgz
+```
+
+### Unproven Windows caveat
+
+Proof 1 asks for an install that completes the core workflow in a clean
+environment, and on Windows an install can fail on path length alone. The
+deepest published file installs to a 165-character suffix under the project
+root, so a project directory longer than 94 characters produces a path past the
+260-character limit that applies unless long path support is enabled, which is
+off by default.
+
+This is measured but **not proven to fail**: the install succeeded on the
+machine that measured it, because that machine has long path support enabled in
+both the registry and git, so it is not a stock Windows host. Confirming or
+dismissing it needs a host with that support off. Tracked as
+`ATM-BUG-2026-09-21-001`. A build-time ratchet now caps the installed path
+length at the measured 165 characters so it cannot grow unobserved.
 
 Earlier prereleases show why each dimension is measured separately:
 `0.1.0-beta.0` cannot be installed (it depends on an unpublished package), and
