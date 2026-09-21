@@ -176,7 +176,7 @@ export function detectActiveTaskDivergence(cwd, taskIntent, importedTaskQueue) {
     const prompt = taskIntent?.userPrompt?.trim() ?? '';
     if (!prompt)
         return null;
-    if (importedTaskQueue.promptScope && importedTaskQueue.promptScope.status !== 'not-found')
+    if (importedTaskQueue?.promptScope && importedTaskQueue.promptScope.status !== 'not-found')
         return null;
     const activeTasks = readActiveClaimedTasks(cwd);
     if (activeTasks.length === 0)

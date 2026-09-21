@@ -9,6 +9,7 @@ import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint,
 import { findActiveBatchRunForIntent, findActiveTaskQueueForIntent } from './route-resolution.js';
 import { quoteCliValue } from './view-projections.js';
 import { diagnoseClaimReadinessForTasks } from './claim-readiness.js';
+import { normalizeTaskRouteStatus } from './intent-normalizers.js';
 export function createNextProfiler(header = 'ATM_NEXT_PROFILE') {
     const enabled = process.env.ATM_NEXT_PROFILE === '1';
     const startedAt = Date.now();
@@ -126,7 +127,16 @@ export function buildPromptScopeQueueResult(input) {
         queueHeadTaskId
     };
     const queueHeadImport = input.queueHeadTask ? buildPlanningCardImportRequirement(input.queueHeadTask) : null;
-    const claimReadiness = input.queueHeadTask && !queueHeadImport
+    // An active batch's queue head is work in flight, not a claim candidate.
+    // Running the claim-readiness gate over it answered every in-batch
+    // orientation call with "cannot be claimed yet" -- a false block on the task
+    // the agent is already delivering. A running live head of an active batch is
+    // that batch's own work, so gate only a head that is not in that state.
+    const queueHeadInFlight = Boolean(activeBatch)
+        && Boolean(input.queueHeadTask)
+        && queueHeadTaskId === input.queueHeadTask.workItemId
+        && normalizeTaskRouteStatus(input.queueHeadTask.status ?? '') === 'running';
+    const claimReadiness = input.queueHeadTask && !queueHeadImport && !queueHeadInFlight
         ? diagnoseClaimReadinessForTasks(input.cwd, [input.queueHeadTask], 'write')
         : null;
     if (claimReadiness?.primaryBlocker) {

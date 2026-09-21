@@ -289,6 +289,22 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
     && resolveQuickfixScope(unscopedPrompt).length > 0,
   );
   if (taskIntent && taskIntent.taskScopeMentioned === false && !claimedQuickfixPrompt) {
+    // An unscoped prompt is exactly where silent auto-attach to whatever is
+    // already in flight is the risk, so divergence is decided before guidance
+    // short-circuits the route. It needs no queue: an unscoped prompt selected
+    // no task scope by definition.
+    const unscopedDivergence = buildActiveTaskDivergenceResult({
+      cwd: options.cwd,
+      taskIntent,
+      importedTaskQueue: null,
+      integrationBootstrap,
+      runtimeAdapterReadiness
+    });
+    if (unscopedDivergence) {
+      profile.mark('build-unscoped-active-task-divergence-result');
+      profile.flush('unscoped-active-task-divergence-result');
+      return withRunnerMode(unscopedDivergence, options.cwd);
+    }
     const unscopedGuidance = buildPromptGuidanceNextResult({
       cwd: options.cwd,
       actor: options.agent,

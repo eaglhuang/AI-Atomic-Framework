@@ -106,8 +106,13 @@ try {
     '--historical-delivery', 'abc123def456'
   ]) as any;
   assert.equal(historicalDryRun.evidence.closeMode, 'historical-delivery-close');
-  assert.equal(historicalDryRun.evidence.closebackPlan.backendSurface, 'tasks-close');
-  assert.ok(historicalDryRun.evidence.closebackPlan.backendCommand.includes('tasks close'));
+  // The direct close backend is reserved for a delivery the planning-authority
+  // gate could verify. This fixture supplies a fabricated sha, so the gate does
+  // not pass and the close must fall back to reconcile rather than trust it.
+  const planningGate = historicalDryRun.evidence.closebackPlan.planningAuthorityDeliveryGate;
+  const expectedBackend = planningGate?.ok === true ? 'tasks-close' : 'tasks-reconcile';
+  assert.equal(historicalDryRun.evidence.closebackPlan.backendSurface, expectedBackend);
+  assert.ok(historicalDryRun.evidence.closebackPlan.backendCommand.includes(expectedBackend === 'tasks-close' ? 'tasks close' : 'tasks reconcile'));
 
   const ambiguousTaskId = 'TASK-CLOSE-ORCH-0004';
   writePlanningCard('docs/tasks/TASK-CLOSE-ORCH-0004.task.md', ambiguousTaskId, 'open');

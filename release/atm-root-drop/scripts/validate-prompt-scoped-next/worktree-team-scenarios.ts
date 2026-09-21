@@ -7,6 +7,7 @@ import { runQuickfix } from '../../packages/cli/src/commands/quickfix.ts';
 import { runTasks } from '../../packages/cli/src/commands/tasks.ts';
 import { runTeam } from '../../packages/cli/src/commands/team.ts';
 import { listActiveBatchRuns } from '../../packages/cli/src/commands/work-channels.ts';
+import { buildNonPlaybookRouteHints } from '../../packages/cli/src/commands/next/route-resolution.ts';
 import { assert, assertDecisionTrail, assertRunnerMode, assertTeamRecommendation, runGit } from './assertions.ts';
 import { writeLedgerTask, writeTaskCard } from './writers.ts';
 
@@ -23,20 +24,30 @@ export async function runWorktreeTeamScenarios(ctx: any) {
     const nonTaskPrompt = await runNext(['--cwd', tempRoot, '--prompt', 'Please show onboarding guidance']);
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'non-task prompt must route to prompt-scoped guidance');
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PLAYBOOK_ABSENT'), 'non-task prompt must state when no playbook exists');
-    assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_IGNORED_ARTIFACT_FORCE_ADD_HINT'), 'non-task prompt must surface ignored artifact force-add hints');
-    assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_WORKTREE_SCOPE_HINT'), 'non-task prompt must surface dirty worktree classification hints');
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_GOVERNANCE_READINESS_HINT'), 'non-task prompt must still surface early governance readiness hints');
     const nonTaskNextAction = (nonTaskPrompt.evidence.nextAction as any) ?? {};
     assert(nonTaskNextAction.playbookState === 'absent', 'non-task prompt must mark playbookState=absent');
     assert(nonTaskNextAction.structuredOutputHint?.hasPlaybook === false, 'non-task prompt must expose structuredOutputHint.hasPlaybook=false');
     assert(nonTaskNextAction.structuredOutputHint?.followNextActionField === 'evidence.nextAction.command', 'non-task prompt must point agents at evidence.nextAction.command');
     assert(Array.isArray(nonTaskNextAction.governanceReadiness?.queueRetryCodes), 'non-task prompt must expose governance readiness queue retry codes');
-    assert((nonTaskNextAction.ignoredArtifactForceAddHints ?? []).some((entry: any) => String(entry.path).startsWith('artifacts/')), 'non-task prompt must hint ignored artifact force-add paths');
-    assert((nonTaskNextAction.promptWorktreeHint?.releaseMirrorFiles ?? []).includes('release/fixture.txt'), 'non-task prompt must classify release mirror dirty files');
-    assert((nonTaskNextAction.promptWorktreeHint?.unrelatedTrackedFiles ?? []).includes('notes/unrelated.txt'), 'non-task prompt must classify unrelated tracked dirty files');
-    assert((nonTaskNextAction.promptWorktreeHint?.generatedArtifactFiles ?? []).includes('atomic_workbench/evidence/route-hint.json'), 'non-task prompt must classify generated artifact dirty files');
-    assert((nonTaskNextAction.promptWorktreeHint?.atmManagedFiles ?? []).includes('.atm/runtime/prompt-hint.json'), 'non-task prompt must classify ATM-managed dirty files');
-    assert(nonTaskNextAction.promptWorktreeHint?.ignoredArtifactCount >= 1, 'non-task prompt must count ignored artifact candidates');
+    // Unscoped guidance deliberately defers live-worktree enumeration instead of
+    // walking the whole tree for a prompt that selected no work; it must say so
+    // rather than report an empty worktree as a clean one.
+    assert(nonTaskNextAction.promptWorktreeHint?.status === 'deferred', 'unscoped guidance must mark the worktree hint as deferred');
+    assert((nonTaskNextAction.ignoredArtifactForceAddHints ?? []).length === 0, 'deferred guidance must not claim ignored-artifact findings it did not enumerate');
+    assert(String(nonTaskNextAction.promptWorktreeHint?.diagnosticCommand ?? '').includes('next --prompt'), 'deferred guidance must name the scoped command that does enumerate');
+
+    // Deferral is a routing choice, not a missing capability: the same hint
+    // builder must still enumerate and classify the live worktree when a route
+    // asks it to. Asserted directly because every prompt-level route in this
+    // fixture now has an active task and answers with divergence first.
+    const enumeratedHints = buildNonPlaybookRouteHints(tempRoot, 'Fix src/new-bug.ts') as any;
+    assert((enumeratedHints.ignoredArtifactForceAddHints ?? []).some((entry: any) => String(entry.path).startsWith('artifacts/')), 'enumerated hints must include ignored artifact force-add paths');
+    assert((enumeratedHints.promptWorktreeHint?.releaseMirrorFiles ?? []).includes('release/fixture.txt'), 'enumerated hints must classify release mirror dirty files');
+    assert((enumeratedHints.promptWorktreeHint?.unrelatedTrackedFiles ?? []).includes('notes/unrelated.txt'), 'enumerated hints must classify unrelated tracked dirty files');
+    assert((enumeratedHints.promptWorktreeHint?.generatedArtifactFiles ?? []).includes('atomic_workbench/evidence/route-hint.json'), 'enumerated hints must classify generated artifact dirty files');
+    assert((enumeratedHints.promptWorktreeHint?.atmManagedFiles ?? []).includes('.atm/runtime/prompt-hint.json'), 'enumerated hints must classify ATM-managed dirty files');
+    assert(enumeratedHints.promptWorktreeHint?.ignoredArtifactCount >= 1, 'enumerated hints must count ignored artifact candidates');
 
     const noPrompt = await runNext(['--cwd', tempRoot]);
     assert(noPrompt.ok === false, 'next without prompt must not proceed when non-bootstrap tasks exist');

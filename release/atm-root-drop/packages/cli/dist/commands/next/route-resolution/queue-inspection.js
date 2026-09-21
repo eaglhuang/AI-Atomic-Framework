@@ -64,7 +64,13 @@ export function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write',
             const shouldHydrateScope = (!targetedTaskLookup && isTaskRoutable(status, taskIntent))
                 || isTaskIdMentioned(workItemId, taskIntent)
                 || isExplicitlyTargeted
-                || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && normalizeTaskRouteStatus(status) === 'running');
+                // A running task is in flight under a live claim, and routing needs
+                // that claim identity (owner, lane, intent) even when the prompt
+                // addresses a different task: the minimal summary reports it as
+                // unclaimed, which turned an active batch head into both a claim
+                // blocker and a foreign-lane conflict. Running tasks are few, so
+                // hydrate them regardless of which prompt is asking.
+                || normalizeTaskRouteStatus(status) === 'running';
             if (!shouldHydrateScope) {
                 return [buildMinimalImportedJsonTaskSummary({
                         cwd,

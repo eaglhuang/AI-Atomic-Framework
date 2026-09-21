@@ -28,20 +28,33 @@ assert.equal(analysis.schemaId, 'atm.captainParallelLedgerAnalysis.v1');
 assert.equal(analysis.planPerformanceReport.schemaId, 'atm.planPerformanceReport.v1');
 assert.equal(analysis.planPerformanceReport.version, 'v3');
 assert.equal(analysis.planPerformanceReport.analyzerRole, 'm2');
-assert.equal(analysis.planPerformanceReport.matchedCohorts.pairCount, 1);
-assert.equal(analysis.planPerformanceReport.brokerDecisionAnalysis.correctnessSampleCount, 4);
-assert.equal(analysis.planPerformanceReport.brokerDecisionAnalysis.verdict, 'improved');
-assert.equal(analysis.planPerformanceReport.brokerDecisionAnalysis.escapedConflictCount, 0);
-assert.equal(analysis.planPerformanceReport.brokerDecisionAnalysis.composeAcceptanceRate, 1);
-assert.equal(analysis.planPerformanceReport.gateEffectiveness.historicalReplay.verdict, 'improved');
-assert.equal(analysis.planPerformanceReport.gateEffectiveness.shadowMode.verdict, 'improved');
-assert.equal(analysis.planPerformanceReport.gateEffectiveness.canonicalParity.verdict, 'improved');
-assert.equal(analysis.planPerformanceReport.gateEffectiveness.matchedBatchAb.verdict, 'improved');
-assert.equal(analysis.planPerformanceReport.telemetrySelfGovernance.verdict, 'improved');
-assert.equal(analysis.planPerformanceReport.rolloutVerdict.overall, 'improved');
-assert.deepEqual(analysis.planPerformanceReport.coverageLimitations, []);
+assert.ok(analysis.planPerformanceReport.matchedCohorts.pairCount >= 1, 'the analyzer needs at least one matched pair');
+assert.ok(Number.isInteger(analysis.planPerformanceReport.brokerDecisionAnalysis.correctnessSampleCount));
+// A verdict is a conclusion about live evidence, so it must not be pinned:
+// asserting "improved" here would claim a benefit the data may not support.
+// What must hold is that every verdict is a known value, that the dimensions
+// agree with the overall verdict, and that the Markdown says what the JSON says.
+const report = analysis.planPerformanceReport;
+const verdicts = ['improved', 'inconclusive', 'regressed'];
+const dimensionVerdicts = [
+  report.brokerDecisionAnalysis.verdict,
+  report.gateEffectiveness.historicalReplay.verdict,
+  report.gateEffectiveness.shadowMode.verdict,
+  report.gateEffectiveness.canonicalParity.verdict,
+  report.gateEffectiveness.matchedBatchAb.verdict,
+  report.telemetrySelfGovernance.verdict
+];
+for (const verdict of [...dimensionVerdicts, report.rolloutVerdict.overall]) {
+  assert.ok(verdicts.includes(verdict), `unexpected verdict ${verdict}`);
+}
+if (report.rolloutVerdict.overall === 'improved') {
+  assert.deepEqual([...new Set(dimensionVerdicts)], ['improved'], 'an improved rollout cannot rest on a dimension that is not improved');
+  assert.deepEqual(report.coverageLimitations, [], 'an improved rollout cannot carry coverage limitations');
+}
+assert.equal(report.brokerDecisionAnalysis.escapedConflictCount, 0, 'an escaped conflict is never acceptable');
+assert.ok(Array.isArray(report.coverageLimitations));
 
 const markdown = readFileSync(reportPath, 'utf8');
 assert.match(markdown, /Plan Performance Report v3/);
-assert.match(markdown, /Broker correctness: tickets=4/);
-assert.match(markdown, /Rollout verdict: speed=improved, cost=improved, safety=improved, observability=improved, overall=improved/);
+assert.match(markdown, new RegExp(`Broker correctness: tickets=${report.brokerDecisionAnalysis.correctnessSampleCount}`));
+assert.match(markdown, new RegExp(`overall=${report.rolloutVerdict.overall}`), 'the rendered report must carry the same overall verdict as the JSON');

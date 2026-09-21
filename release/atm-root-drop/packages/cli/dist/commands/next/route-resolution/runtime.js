@@ -31,9 +31,15 @@ export function reconcilePromptScopeRuntimeForClaim(cwd, taskIntent, selectedTas
     const existingQueue = findActiveTaskQueueForIntent(cwd, taskIntent, {
         taskId: selectedTasks[0]?.workItemId ?? null
     });
+    // A queue that belongs to an active batch is keyed by the batch's original
+    // prompt, and `batch repair`/`checkpoint` look it up by exactly that prompt.
+    // Re-keying it to whichever prompt happens to be asking abandoned the live
+    // queue and left the batch with ATM_BATCH_QUEUE_MISSING and no route back.
     const refreshedQueue = createOrRefreshTaskQueue({
         cwd,
-        sourcePrompt,
+        sourcePrompt: existingQueue?.batchId && existingQueue.status === 'active'
+            ? existingQueue.sourcePrompt
+            : sourcePrompt,
         tasks: selectedTasks,
         taskIds: selectedTasks.map((task) => task.workItemId),
         actorId: null,
