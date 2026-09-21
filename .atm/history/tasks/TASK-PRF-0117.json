@@ -1,0 +1,309 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0117",
+  "title": "Reseal the frozen runner from the current committed source",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "**ACC-1:** A release build from the committed HEAD produces the sealed runner, CLI distribution, and release manifests without consuming uncommitted product source changes.",
+    "**ACC-2:** The frozen runner no longer reports `ATM_RUNNER_SYNC_REQUIRED` after the build, and the existing internal release-sync test passes.",
+    "**ACC-3:** The committed diff contains only generated release artifacts and this task's ATM-managed evidence; no source behavior, npm publish configuration, artifact budget, or benchmark surface changes."
+  ],
+  "deliverables": [
+    "atm.mjs",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**"
+  ],
+  "scopePaths": [
+    "atm.mjs",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**",
+    ".atm/history/evidence/TASK-PRF-0117.*",
+    ".atm/history/task-events/TASK-PRF-0117/**",
+    ".atm/history/tasks/TASK-PRF-0117.json",
+    "scripts/run-sealed-runner-build.ts",
+    "tests/cli/internal-release-sync.test.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+  ],
+  "validators": [
+    "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+    "node --strip-types tests/cli/internal-release-sync.test.ts",
+    "node atm.mjs next --json"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-runner-sync-receipt",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the generated release-artifact commit and rebuild from the prior committed source; do not alter the source commit or relax source-seal validation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-surface-budget-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0117-reseal-the-frozen-runner-from-the-current-committed-source.task.md",
+    "sectionTitle": "TASK-PRF-0117",
+    "headingLine": 69,
+    "hash": "af10cce14dffc59a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0117-reseal-the-frozen-runner-from-the-current-committed-source.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:af10cce14dffc59a579509c16ed9ce489445923354052fbfdadd232585fde091",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-21T22:58:04.183Z"
+    }
+  },
+  "importedAt": "2026-09-21T16:26:03.435Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "The stable frozen runner reports a source-seal mismatch at committed HEAD.",
+      "No active runner-sync steward reservation overlaps the release surfaces."
+    ],
+    "softRelations": [
+      "TASK-PRF-0116",
+      "TASK-PRF-0115"
+    ],
+    "changedPublicSeams": [
+      "frozen-runner-release-consistency"
+    ],
+    "causalImpactEdges": [
+      "installable-cli-integrity",
+      "ci-evidence-closeout-unblocking"
+    ],
+    "parallelFrontierInputs": [
+      "committed-source-head",
+      "runner-sync-queue"
+    ],
+    "validatorReferences": [
+      "internal-release-sync",
+      "sealed-runner-build",
+      "frozen-next"
+    ],
+    "phaseOwner": "release-maintenance"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf0117_resealed_runner_matches_committed_source_3a1f8c2d",
+      "targetGroupId": "null",
+      "semanticKey": "frozen_runner_release_consistency",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2",
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "installable-cli-integrity",
+        "ci-evidence-closeout-unblocking"
+      ],
+      "expectedRedPredicate": "a runner built from an older or mismatched source seal, or a rebuild that changes source behavior, is rejected by the release-sync validator or diff boundary review",
+      "contributionResourceKey": "sealed-runner-release",
+      "responsibility": "task-required",
+      "dependencyEdge": "committed-source-head",
+      "contractEdge": "frozen-runner-release-consistency",
+      "resourceKey": "runner-sync"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf0117_resealed_runner_matches_committed_source_3a1f8c2d"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-21T23-25-56-365Z-scope-amendment-abe382cd9dc5",
+  "lastTransitionAt": "2026-09-21T23:25:56.365Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-4-mini",
+  "reservedAt": "2026-09-21T16:26:13.931Z",
+  "promotedAt": "2026-09-21T16:26:13.935Z",
+  "claim": {
+    "actorId": "codex-gpt-5-4-mini",
+    "leaseId": "lease-d4470ecd032b",
+    "claimedAt": "2026-09-21T16:26:13.939Z",
+    "heartbeatAt": "2026-09-21T22:58:46.963Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0117.*",
+      ".atm/history/task-events/TASK-PRF-0117/**",
+      ".atm/history/tasks/TASK-PRF-0117.json",
+      "atm.mjs",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/internal-release-sync.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260921225846-codex-gpt-5-4-mini-1a7de0323d",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260921225846-codex-gpt-5-4-mini-1a7de0323d\""
+    }
+  },
+  "startedAt": "2026-09-21T16:26:13.939Z",
+  "startedByActor": "codex-gpt-5-4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-39772709dbe54e87",
+    "ticketDigest": "sha256:39772709dbe54e877548757e412a1d6acd56d145257c97c3cb5000f567e4cbdb",
+    "taskId": "TASK-PRF-0117",
+    "origin": "claim",
+    "actorId": "codex-gpt-5-4-mini",
+    "laneSessionId": "lane-20260921225846-codex-gpt-5-4-mini-1a7de0323d",
+    "claimGeneration": "lease-d4470ecd032b",
+    "issuedAt": "2026-09-21T23:25:56.312Z",
+    "expiresAt": "2026-09-21T23:55:56.312Z",
+    "scopeDigest": "sha256:251f4f57432d979e28a3ad68f826fab82849b79e5228d9fdae36912a19e49e7b",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-21T23:25:56.312Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0117.*",
+          ".atm/history/task-events/TASK-PRF-0117/**",
+          ".atm/history/tasks/TASK-PRF-0117.json",
+          "atm.mjs",
+          "packages/cli/dist/**",
+          "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+          "release/atm-onefile/**",
+          "release/atm-root-drop/**",
+          "scripts/run-sealed-runner-build.ts",
+          "tests/cli/internal-release-sync.test.ts"
+        ],
+        "digest": "sha256:c88c25edff315ad4485d57ca73d44d65da84ca2b38899fac14d6a2e7a650675d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260921162613-codex-gpt-5-4-mini-TASK-PRF-0117-abfc0fe79c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0117",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0117.*",
+      ".atm/history/task-events/TASK-PRF-0117/**",
+      ".atm/history/tasks/TASK-PRF-0117.json",
+      "atm.mjs",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/internal-release-sync.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0117-reseal-the-frozen-runner-from-the-current-committed-source.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0117-reseal-the-frozen-runner-from-the-current-committed-source.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "9cba19eb76cae9e7e363bc33e5a036c3a515e69443ebb72cee6bca4c2a83be62",
+    "actorId": "codex-gpt-5-4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260921225846-codex-gpt-5-4-mini-1a7de0323d",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260921225846-codex-gpt-5-4-mini-1a7de0323d\""
+    },
+    "createdAt": "2026-09-21T22:58:48.105Z",
+    "status": "active"
+  }
+}

@@ -5,8 +5,11 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   buildTaskflowCommitBundle,
-  finalizeTaskflowCommitBundle
+  finalizeTaskflowCommitBundle,
+  GIT_SUBPROCESS_MAX_BUFFER
 } from '../commit-bundle-assembly.ts';
+
+assert(GIT_SUBPROCESS_MAX_BUFFER >= 16 * 1024 * 1024, 'taskflow git subprocesses need a large bounded output buffer');
 
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });

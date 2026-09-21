@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-21T22-55-53-472Z-scope-amendment-01defae3ad47",
+  "taskId": "TASK-PRF-0117",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5-4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0117.json",
+  "taskSha256": "sha256:1e1221c793516e5b646cceeef6be9db20a26e0d4a14ef136cd51d76d273a7008",
+  "createdAt": "2026-09-21T22:55:53.472Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0117 --actor codex-gpt-5-4-mini --add \"scripts/run-sealed-runner-build.ts,tests/cli/internal-release-sync.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

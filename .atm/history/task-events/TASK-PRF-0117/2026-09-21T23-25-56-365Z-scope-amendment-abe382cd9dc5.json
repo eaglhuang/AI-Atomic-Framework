@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-21T23-25-56-365Z-scope-amendment-abe382cd9dc5",
+  "taskId": "TASK-PRF-0117",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5-4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0117.json",
+  "taskSha256": "sha256:80c74aa70cc10b9a4c4d1ff870f5a99b61f0de6eeb8cec91c3f54dfb69413a21",
+  "createdAt": "2026-09-21T23:25:56.365Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0117 --actor codex-gpt-5-4-mini --add \"packages/cli/src/commands/taskflow/commit-bundle-assembly.ts,packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts\" --reason \"Resolve reproducible ATM_TASKFLOW_CLOSE ENOBUFS caused by bounded git subprocess output while closing this runner publication task.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Resolve reproducible ATM_TASKFLOW_CLOSE ENOBUFS caused by bounded git subprocess output while closing this runner publication task."
+  }
+}
