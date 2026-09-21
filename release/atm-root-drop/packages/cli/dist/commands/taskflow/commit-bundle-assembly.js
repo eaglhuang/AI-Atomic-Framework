@@ -65,8 +65,9 @@ catch {
     return null;
 } }
 function isImmediateTaskflowDeliveryParent(cwd, taskId) { const message = tryGitScalar(cwd, ['log', '-1', '--format=%B']); return message?.includes(`chore(taskflow): deliver ${taskId} source bundle`) === true; }
-function runGitOrThrow(cwd, args) { execFileSync('git', [...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }); }
-function runGitWithEnv(cwd, args, env) { execFileSync('git', [...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env }); }
+export const GIT_SUBPROCESS_MAX_BUFFER = 64 * 1024 * 1024;
+function runGitOrThrow(cwd, args) { execFileSync('git', [...args], { cwd, encoding: 'utf8', maxBuffer: GIT_SUBPROCESS_MAX_BUFFER, stdio: ['ignore', 'pipe', 'pipe'] }); }
+function runGitWithEnv(cwd, args, env) { execFileSync('git', [...args], { cwd, encoding: 'utf8', maxBuffer: GIT_SUBPROCESS_MAX_BUFFER, stdio: ['ignore', 'pipe', 'pipe'], env }); }
 const GIT_PATHSPEC_ARGV_BUDGET = 8_000;
 export function chunkGitPathspecs(paths, budget = GIT_PATHSPEC_ARGV_BUDGET) { const chunks = []; let current = []; let size = 0; for (const path of paths) {
     const nextSize = Buffer.byteLength(path, 'utf8') + 1;
