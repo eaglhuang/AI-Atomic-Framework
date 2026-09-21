@@ -35,7 +35,11 @@ export interface TestResult {
   readonly stderrTail: string;
 }
 
-const REASONS = new Set(['failing-on-main', 'stale-assertion', 'writes-tracked-files', 'environment-dependent', 'too-slow']);
+// 'stale-source-digest' is distinct from 'stale-assertion': the test's own
+// expectations still hold, and what has drifted is a report's recorded binding
+// to a source that was refreshed without recompiling it. The two send a reader
+// to different places -- one to the test, one to whoever owns the report chain.
+const REASONS = new Set(['failing-on-main', 'stale-assertion', 'stale-source-digest', 'writes-tracked-files', 'environment-dependent', 'too-slow']);
 const DISPOSITIONS = new Set(['triage', 'fix', 'delete', 'move-to-slow-profile']);
 
 export function validateConfig(config: SweepConfig, available: readonly string[]): string[] {
