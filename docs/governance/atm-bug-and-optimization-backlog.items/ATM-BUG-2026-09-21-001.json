@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-21-001",
+  "date": "2026-09-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Packaging / Proof 1 clean install",
+  "finding": "The published @ai-atomic-framework/cli tarball carries paths long enough to exceed the Windows MAX_PATH limit of 260 characters for ordinary project locations. The deepest entry is dist/npm-runtime/layout/_vendor/integrations-core/templates/skills/atm-governance-router.files/references/boundary-confusion.md at 127 characters, and installing adds node_modules/@ai-atomic-framework/cli/ for a fixed 165-character suffix under the project root. Any project directory longer than 94 characters therefore produces an absolute path past 260. This sits directly on the Proof 1 acceptance surface: install from public npm in a clean environment and complete the core workflow.",
+  "expectedBehavior": "A clean install should succeed on a default Windows installation, where long path support is off, for project directories of ordinary depth. Shortening must come from restructuring or renaming the vendored skill reference tree, never from dropping required modules or moving them to a separate download, which Proof 1 forbids.",
+  "evidenceOrRepro": "npm pack of packages/cli at 0.1.2, then tar -tzf sorted by path length, gives 135 characters including the package/ prefix, so 127 relative. Installing that tarball into a 106-character project root (C:\\Users\\User\\Documents\\atm-install-probe\\a-realistically-named-client-project\\services\\api-gateway-worker) produced a 272-character absolute path for the same file. The install succeeded here, but only because this machine has HKLM\\SYSTEM\\CurrentControlSet\\Control\\FileSystem LongPathsEnabled set to 1 and git core.longpaths set to true. NOT YET PROVEN on a default Windows machine: reproducing the failure needs a host with long path support off, which was not available and which this session declined to change, since it is a system setting.",
+  "followUp": "Confirm the failure on a stock Windows host with LongPathsEnabled at 0 before sizing a fix. The same depth already breaks locally in a different tool path: git clone of this repository into a long destination fails checkout with 'Filename too long' on .atm/history/evidence and release/atm-root-drop entries. If confirmed, shorten the vendored templates/skills/*.files/references/ layout and add a packaged-path-length budget to the release gates so the limit cannot regress."
+}
