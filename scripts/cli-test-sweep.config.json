@@ -31,14 +31,14 @@
     {
       "test": "runbook-completion-evidence.test.ts",
       "reason": "environment-dependent",
-      "detail": "Needs the planning repository: it compiles runbook completion evidence from a sibling 3KLife checkout that a CI clone does not have.",
-      "disposition": "fix"
+      "detail": "Same shape as runbook-release-authority-review and the same limit: the compiler's DEFAULT_PLANNING_ROOT resolves to a sibling 3KLife checkout and the test asserts that directly, then compiles completion evidence from runbook documents that live there. The evidence is a projection of those documents, so a fixture would be a projection of itself. Needs the same owner decision about vendoring or about where this compiler is run.",
+      "disposition": "triage"
     },
     {
       "test": "runbook-release-authority-review.test.ts",
       "reason": "environment-dependent",
-      "detail": "Needs the planning repository: the reviewer fails with \"missing runbook: ../3KLife/docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md\". A CI clone has no sibling 3KLife checkout.",
-      "disposition": "fix"
+      "detail": "Cannot be fixed with a fixture, unlike the other planning-root tests. The reviewer's whole job is a cross-document check: for every row in docs/reports/plan-3x-4x-runbook-completion-evidence.json it reads the runbook line at row.sourceLine, requires the row's requirement text to appear there verbatim, and requires sha256(requirement) to equal row.requirementDigest. The runbook it reads lives in the sibling planning repository ('missing runbook: ../3KLife/docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md'). A synthesised runbook would have to be generated from the completion report it is meant to check, which makes the comparison match by construction and proves nothing. Every other assertion in the file is already fixture-based and passes. Resolving this needs an owner decision on whether the runbook is vendored into this repository, which INV-ATM-006 bears on, or whether the reviewer is only ever run where the planning repository is checked out.",
+      "disposition": "triage"
     },
     {
       "test": "taskflow-host-policy.test.ts",
