@@ -145,7 +145,9 @@ interface ActiveTaskDivergence {
 export function buildActiveTaskDivergenceResult(input: {
   readonly cwd: string;
   readonly taskIntent: TaskIntent | null;
-  readonly importedTaskQueue: ImportedTaskQueue;
+  // Divergence only needs to know whether the prompt selected a task scope, so an
+  // unscoped prompt can be checked before the queue is inspected at all.
+  readonly importedTaskQueue: ImportedTaskQueue | null;
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
@@ -209,11 +211,11 @@ export function buildActiveTaskDivergenceResult(input: {
 export function detectActiveTaskDivergence(
   cwd: string,
   taskIntent: TaskIntent | null,
-  importedTaskQueue: ImportedTaskQueue
+  importedTaskQueue: ImportedTaskQueue | null
 ): ActiveTaskDivergence | null {
   const prompt = taskIntent?.userPrompt?.trim() ?? '';
   if (!prompt) return null;
-  if (importedTaskQueue.promptScope && importedTaskQueue.promptScope.status !== 'not-found') return null;
+  if (importedTaskQueue?.promptScope && importedTaskQueue.promptScope.status !== 'not-found') return null;
   const activeTasks = readActiveClaimedTasks(cwd);
   if (activeTasks.length === 0) return null;
   const activeTaskIds = activeTasks.map((task) => task.workItemId.toUpperCase());
