@@ -11,28 +11,10 @@
       "disposition": "fix"
     },
     {
-      "test": "cross-editor-parallel-proof.test.ts",
-      "reason": "environment-dependent",
-      "detail": "Needs full git history: acc5 depends on whether a recorded SHA is reachable, and the depth-1 CI checkout cannot answer that, so the status is unmet. Passes in a full clone. Enabling it would require fetch-depth: 0 in Product CI.",
-      "disposition": "fix"
-    },
-    {
       "test": "four-plan-closeout-blocker-map.test.ts",
       "reason": "stale-assertion",
       "detail": "The test now asserts the map contract rather than frozen totals, but it still cannot pass: scripts/validate-four-plan-closeout-blocker-map.ts reports source digest mismatches for plan-3x-4x-backlog-disposition-census.json, plan-3x-4x-independent-certificate.json and others, so the committed map is stale against its own sources. The repository has no generator for this map, and editing the recorded digests by hand would fabricate a certification, so refreshing it needs an owner decision on who regenerates the map.",
       "disposition": "fix"
-    },
-    {
-      "test": "four-plan-independent-certificate.test.ts",
-      "reason": "environment-dependent",
-      "detail": "Needs full git history: it asserts that origin/main descends from the SHA the certificate is bound to, which a depth-1 CI checkout cannot establish. Enabling it would require fetch-depth: 0 in Product CI.",
-      "disposition": "fix"
-    },
-    {
-      "test": "four-plan-objective-authority-review.test.ts",
-      "reason": "stale-assertion",
-      "disposition": "fix",
-      "detail": "The review records targetHead as the commit it was generated at, so it goes stale on the very next commit, including the one that refreshes it. Regenerating with --mode write yields proven with zero findings but cannot stay valid in CI, which always runs at a later HEAD. Fixing this needs the reviewer to bind its freshness to the commits that last touched the reviewed inputs rather than to HEAD."
     },
     {
       "test": "historical-residue-cleanup.test.ts",

@@ -28,6 +28,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The sweep asserts over commit reachability -- whether a sealed
+          # review target or a recorded proof SHA is an ancestor of this head --
+          # which a depth-1 checkout cannot answer at all. Measured cost of the
+          # full history here is 40s against a ~10min job.
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
