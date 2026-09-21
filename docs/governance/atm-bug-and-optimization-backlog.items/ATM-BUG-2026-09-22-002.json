@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-22-002",
+  "date": "2026-09-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Gap",
+  "severity": "Medium",
+  "status": "Open — owner decision required",
+  "area": "Plan 3.x/4 governance report chain",
+  "finding": "Three quarantined tests share one root cause rather than three. Commit 4d3bce0e4 refreshed docs/reports/plan-3x-4x-backlog-disposition-census.json on 2026-09-06, along with the deferred waiver register and the release-blocking subset, and the downstream reports that bind themselves to those sources by digest were never recompiled: plan4-successor-wave-objective-map.json, plan4-successor-wave-consumption and four-plan-closeout-blocker-map. Their own assertions still hold against live data -- the objective map still reports 17 of 17 anchors mapped and 0 unmapped -- so what is stale is the binding, not the content. The closeout blocker map additionally reports a deferred count mismatch and a fail-closed certificate conflict.",
+  "expectedBehavior": "A source refresh should either recompile the reports bound to it or mark them as stale in a way the validators can report. Today the chain silently drifts and only surfaces when a quarantined test is run.",
+  "evidenceOrRepro": "node --strip-types scripts/validate-plan4-successor-wave-objective-map.ts and scripts/validate-plan4-successor-wave-consumption.ts both fail with 'source digest mismatch: docs/reports/plan-3x-4x-backlog-disposition-census.json'. scripts/validate-four-plan-closeout-blocker-map.ts fails on four source digests plus 'backlog deferred count mismatch' and 'certificate must remain fail-closed while blocker map is actionable-not-complete'. Recorded census digest sha256:a2074fc99dbc7ff8faf9ae3670839f73058cf4103082034dd2f1ff6331170906, actual sha256:d7db0e638aa6f5ca30430a199c8f00db32a4a58b39c5b8d281d09f52b244047f.",
+  "followUp": "Owner decision. The repository has no generator for any of these three maps, so updating the recorded digests by hand would assert a recompilation that did not happen -- the digest exists precisely to prevent that. Either name who regenerates them, or write a generator, before these tests leave quarantine. The previous quarantine notes described this as three separate stale assertions over live reports, which sent a reader looking for three fixes instead of one decision."
+}
