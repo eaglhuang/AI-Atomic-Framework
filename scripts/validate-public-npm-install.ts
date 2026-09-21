@@ -18,7 +18,7 @@ type Args = {
   measurementRuns: number;
 };
 
-type ArtifactBudget = { maxPackedBytes: number; maxPackedEntries: number };
+type ArtifactBudget = { maxPackedBytes: number; maxPackedEntries: number; maxInstalledPathChars?: number };
 
 function parseArgs(): Args {
   const argv = process.argv.slice(2);
@@ -70,7 +70,11 @@ function loadArtifactBudget(packageName: string): ArtifactBudget | null {
   }
   const maxPackedBytes = budget?.maxPackedBytes;
   const maxPackedEntries = budget?.maxPackedEntries;
-  return { maxPackedBytes: maxPackedBytes as number, maxPackedEntries: maxPackedEntries as number };
+  return {
+    maxPackedBytes: maxPackedBytes as number,
+    maxPackedEntries: maxPackedEntries as number,
+    ...(Number.isInteger(budget?.maxInstalledPathChars) ? { maxInstalledPathChars: budget!.maxInstalledPathChars as number } : {})
+  };
 }
 function report(args: Args, result: Record<string, unknown>) {
   const payload: Record<string, unknown> = { schemaId: 'atm.publicNpmInstallProof.v1', package: args.packageName, version: args.version, registry: 'https://registry.npmjs.org', ...result };
@@ -89,6 +93,54 @@ type PackMetadata = {
   filename?: string;
   files?: unknown[];
 };
+
+// Windows resolves paths against a 260-character limit unless long path support
+// is enabled, and that support is off by default. An install can therefore fail
+// on path length alone, which is squarely inside what this proof claims. Record
+// the measurement, and record whether the host that ran it could have observed
+// the failure at all -- a host with long path support on proves nothing about
+// the hosts that do not have it.
+const WINDOWS_MAX_PATH = 260;
+
+function measureInstalledPathLength(packageName: string, packFiles: unknown[]): {
+  longestInstalledPathChars: number;
+  longestEntry: string | null;
+  projectDirCharsRemaining: number;
+} {
+  const installedPrefix = `node_modules/${packageName}/`;
+  let longestInstalledPathChars = 0;
+  let longestEntry: string | null = null;
+  for (const entry of packFiles) {
+    const entryPath = typeof entry === 'string' ? entry : String((entry as { path?: unknown })?.path ?? '');
+    if (!entryPath) continue;
+    const chars = installedPrefix.length + entryPath.split(String.fromCharCode(92)).join('/').length;
+    if (chars > longestInstalledPathChars) {
+      longestInstalledPathChars = chars;
+      longestEntry = entryPath;
+    }
+  }
+  return {
+    longestInstalledPathChars,
+    longestEntry,
+    projectDirCharsRemaining: WINDOWS_MAX_PATH - longestInstalledPathChars - 1
+  };
+}
+
+function detectWindowsLongPathSupport(): boolean | null {
+  if (process.platform !== 'win32') return null;
+  try {
+    const out = execFileSync('reg', [
+      'query',
+      'HKLM\\SYSTEM\\CurrentControlSet\\Control\\FileSystem',
+      '/v',
+      'LongPathsEnabled'
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    const match = /LongPathsEnabled\s+REG_DWORD\s+0x([0-9a-f]+)/i.exec(out);
+    return match ? Number.parseInt(match[1], 16) !== 0 : false;
+  } catch {
+    return null;
+  }
+}
 
 function parsePackResult(raw: string): PackMetadata {
   const parsed = JSON.parse(raw.trim());
@@ -262,6 +314,11 @@ try {
   const filename = Array.isArray(packed) ? packed[0]?.filename : packed?.filename;
   if (!filename) throw new Error('npm pack returned no tarball');
   const tarball = join(root, filename);
+  const pathLength = measureInstalledPathLength(args.packageName, (Array.isArray(packed) ? packed[0]?.files : packed?.files) ?? []);
+  if (budget?.maxInstalledPathChars !== undefined && pathLength.longestInstalledPathChars > budget.maxInstalledPathChars) {
+    throw new Error(`public tarball exceeds the installed path budget: ${pathLength.longestInstalledPathChars}/${budget.maxInstalledPathChars} characters for ${pathLength.longestEntry}`);
+  }
+  const windowsLongPathsEnabled = detectWindowsLongPathSupport();
   const smokeRun = runSmoke(tarball, root, 'public', args.measurementRuns);
   const commandMatrix = Object.keys(smokeRun.smoke);
   const expectedCommands = publicSmokeCommandNames;
@@ -285,7 +342,16 @@ try {
       && smokeEntries.every((entry) => entry.commandExecuted)
       && requiredSuccessCommandFailures.length === 0
   };
-  const payload = report(args, { status: validation.passed ? 'verified' : 'blocked', publicRegistry: true, registryVersion: metadata.version, defaultInstallVersion: latestVersion, defaultInstallMatchesRequested: latestVersion === args.version, distTarball: registryTarball, distIntegrity: registryIntegrity, registryUnpackedSize: Number.isFinite(registryUnpackedSize) ? registryUnpackedSize : null, registryFileCount: Number.isFinite(registryFileCount) ? registryFileCount : null, artifactBudget: budget, tarballSha256: sha256(tarball), cliVersion: smokeRun.versionOutput, smoke: smokeRun.smoke, installMs: smokeRun.installMs, validation, cleanConsumer: true, usedWorkspaceLink: false, temporaryRootRemoved: true });
+  const payload = report(args, { status: validation.passed ? 'verified' : 'blocked', publicRegistry: true, registryVersion: metadata.version, defaultInstallVersion: latestVersion, defaultInstallMatchesRequested: latestVersion === args.version, distTarball: registryTarball, distIntegrity: registryIntegrity, registryUnpackedSize: Number.isFinite(registryUnpackedSize) ? registryUnpackedSize : null, registryFileCount: Number.isFinite(registryFileCount) ? registryFileCount : null, artifactBudget: budget, tarballSha256: sha256(tarball), cliVersion: smokeRun.versionOutput, smoke: smokeRun.smoke, installMs: smokeRun.installMs, installedPathLength: {
+    ...pathLength,
+    windowsMaxPath: WINDOWS_MAX_PATH,
+    hostPlatform: process.platform,
+    windowsLongPathsEnabled,
+    // A pass here only says the package installed on THIS host. It proves the
+    // package fits a default Windows host only when that host could have
+    // failed: Windows with long path support off.
+    provesDefaultWindowsHost: process.platform === 'win32' && windowsLongPathsEnabled === false
+  }, validation, cleanConsumer: true, usedWorkspaceLink: false, temporaryRootRemoved: true });
   console.log(JSON.stringify(payload));
   if (!validation.passed && !args.recordBlocked) process.exitCode = 1;
 } catch (error) {

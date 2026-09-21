@@ -58,7 +58,9 @@
     "budget": {
       "maxPackedBytes": 3365772,
       "maxPackedEntries": 308,
-      "semantics": "ACC-3 vs this unmodified Phase-2 inventory: unpacked CLI bytes must fall at least 70% (remain <= 3365772) and entry count at least 80% (remain <= 308). The budget is a cap. Forbidden classes stay rejected even if they would fit."
+      "semantics": "ACC-3 vs this unmodified Phase-2 inventory: unpacked CLI bytes must fall at least 70% (remain <= 3365772) and entry count at least 80% (remain <= 308). The budget is a cap. Forbidden classes stay rejected even if they would fit.",
+      "maxInstalledPathChars": 165,
+      "installedPathSemantics": "Windows resolves paths against a 260-character limit unless long path support is enabled, which is off by default. An installed file sits at <project>/node_modules/@ai-atomic-framework/cli/<dist-relative path>, so this cap bounds that suffix and the remainder is what a user's project directory may occupy: 260 - 165 - 1 = 94 characters at the current cap. The cap is a ratchet at the measured maximum. Raising it shortens the project paths this package can be installed into, so it needs the same scrutiny as the byte budget."
     },
     "runtimeClosure": {
       "schemaId": "atm.cliRuntimeClosure.v1",
