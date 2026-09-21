@@ -1,0 +1,373 @@
+import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import path from 'node:path';
+import { pathMatchesWriteScope } from '../packages/core/src/broker/write-scope-policy.ts';
+import { readFrameworkTempLockProjection } from '../packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts';
+import {
+  assertRunnerSyncAdmission,
+  inspectRunnerSyncAdmission,
+  type RunnerSyncAdmissionReport
+} from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
+import {
+  captureRunnerBuildOutputSnapshot,
+  validateRunnerPublicationTakeoverPlan,
+  type RunnerBuildOutputTarget
+} from '../packages/core/src/broker/runner-build-output-inventory.ts';
+import { getActiveTasks } from '../packages/core/src/broker/cross-task-mutation-guard.ts';
+import { normalizeIdentitySegment } from '../packages/cli/src/commands/shared/identity-normalization.ts';
+
+/**
+ * The narrow publication boundary for a sealed candidate. Candidate compilation
+ * occurs elsewhere; this module performs the queue-head revalidation and
+ * captures the root snapshot immediately before the shared write.
+ */
+export function resolveSealedRunnerPublication(input: {
+  readonly cwd: string;
+  readonly stewardActorId: string;
+  readonly sealedSourceSha: string;
+  readonly buildTarget: RunnerBuildOutputTarget;
+  readonly publicationTaskId?: string | null;
+  readonly beforeBuildSnapshot?: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
+  /** Physical output surface used to validate a producer takeover receipt. */
+  readonly beforeBuildTakeoverSnapshot?: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
+}): {
+  readonly admission: RunnerSyncAdmissionReport;
+  readonly currentTaskId: string | null;
+  readonly beforeBuildSnapshot: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
+  readonly takeoverPaths: readonly string[];
+} {
+  const admission = ensureRunnerPublicationReservation(input);
+  assertRunnerSyncAdmission(admission);
+  const currentTaskId = admission.queueHeadOwnership.waitingTasks[0] ?? null;
+  const currentTask = currentTaskId
+    ? getActiveTasks(input.cwd).find((entry) => entry.taskId === currentTaskId.toUpperCase())
+    : null;
+  const currentTaskAllowedFiles = mergePublicationAuthorityScopes(
+    currentTask?.allowedFiles,
+    readActivePublicationLockFiles({
+      cwd: input.cwd,
+      taskId: currentTaskId,
+      actorId: input.stewardActorId,
+      now: new Date().toISOString()
+    }),
+    readLinkedTemporaryPublicationLockFiles(input.cwd, currentTaskId, input.stewardActorId),
+  );
+  const beforeBuildSnapshot = input.beforeBuildSnapshot ?? captureRunnerBuildOutputSnapshot({
+    cwd: input.cwd,
+    buildTarget: input.buildTarget,
+    currentTaskId,
+    currentTaskAllowedFiles
+  });
+  // A takeover receipt authorizes the physical generated surface.  It must not
+  // inherit the scoped preservation filter: that filter deliberately omits
+  // current-task outputs, whereas a producer may need to attest those outputs
+  // before the consumer replaces them.
+  const beforeBuildTakeoverSnapshot = input.beforeBuildTakeoverSnapshot ?? captureRunnerBuildOutputSnapshot({
+    cwd: input.cwd,
+    buildTarget: input.buildTarget,
+    currentTaskId: null,
+    currentTaskAllowedFiles: []
+  });
+  return {
+    admission,
+    currentTaskId,
+    beforeBuildSnapshot,
+    takeoverPaths: readValidatedPublicationTakeover({
+      cwd: input.cwd,
+      taskId: currentTaskId,
+      sealedSourceSha: input.sealedSourceSha,
+      snapshot: beforeBuildTakeoverSnapshot
+    })
+  };
+}
+
+/**
+ * Capture the live publication surface before private candidate generation.
+ * This deliberately resolves the same task authority as the later publication
+ * boundary without acquiring the queue; it keeps queue residency minimal while
+ * making a digest-bound takeover receipt stable across the private build.
+ */
+export function captureSealedRunnerPublicationSnapshot(input: {
+  readonly cwd: string;
+  readonly stewardActorId: string;
+  readonly buildTarget: RunnerBuildOutputTarget;
+  readonly publicationTaskId?: string | null;
+}): {
+  readonly scopedSnapshot: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
+  readonly takeoverSnapshot: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
+} {
+  const currentTaskId = resolveActiveRunnerPublicationTask({
+    cwd: input.cwd,
+    actorId: input.stewardActorId,
+    now: new Date().toISOString(),
+    taskId: input.publicationTaskId
+  });
+  const currentTask = getActiveTasks(input.cwd).find((entry) => entry.taskId === currentTaskId.toUpperCase());
+  const currentTaskAllowedFiles = mergePublicationAuthorityScopes(
+    currentTask?.allowedFiles,
+    readActivePublicationLockFiles({
+      cwd: input.cwd,
+      taskId: currentTaskId,
+      actorId: input.stewardActorId,
+      now: new Date().toISOString()
+    }),
+    readLinkedTemporaryPublicationLockFiles(input.cwd, currentTaskId, input.stewardActorId),
+  );
+  return {
+    scopedSnapshot: captureRunnerBuildOutputSnapshot({
+      cwd: input.cwd,
+      buildTarget: input.buildTarget,
+      currentTaskId,
+      currentTaskAllowedFiles
+    }),
+    takeoverSnapshot: captureRunnerBuildOutputSnapshot({
+      cwd: input.cwd,
+      buildTarget: input.buildTarget,
+      currentTaskId: null,
+      currentTaskAllowedFiles: []
+    })
+  };
+}
+
+/**
+ * Framework-temporary publication authority is intentionally lock-backed and
+ * has no task-ledger row. The takeover producer and publication consumer must
+ * therefore resolve the same active lock, or their snapshot digests diverge.
+ */
+export function readActivePublicationLockFiles(input: {
+  readonly cwd: string;
+  readonly taskId: string | null;
+  readonly actorId: string;
+  readonly now: string;
+}): readonly string[] | undefined {
+  if (!input.taskId) return undefined;
+  const lockPath = path.join(input.cwd, '.atm', 'runtime', 'locks', `${input.taskId}.lock.json`);
+  if (!existsSync(lockPath)) return undefined;
+  try {
+    const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+    const lockTaskId = String(lock.workItemId ?? '').trim();
+    const lockActorId = String(lock.actorId ?? lock.lockedBy ?? '').trim();
+    const heartbeatAt = Date.parse(String(lock.heartbeatAt ?? lock.lockedAt ?? ''));
+    const ttlSeconds = Number(lock.ttlSeconds ?? 0);
+    const nowMs = Date.parse(input.now);
+    const active = lock.released !== true
+      && String(lock.status ?? '').trim().toLowerCase() !== 'released'
+      && lockTaskId === input.taskId
+      && sameActorIdentity(lockActorId, input.actorId)
+      && Number.isFinite(nowMs)
+      && Number.isFinite(heartbeatAt)
+      && Number.isFinite(ttlSeconds)
+      && ttlSeconds > 0
+      && nowMs < heartbeatAt + ttlSeconds * 1000;
+    return active && Array.isArray(lock.files) ? lock.files.map(String) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * A normal task claim and its bounded framework-publication lock describe the
+ * same current producer from different authority surfaces. Both must be
+ * honoured: using either as a fallback makes an authorised generated output
+ * look foreign and turns one failed publication into a per-file retry loop.
+ */
+export function mergePublicationAuthorityScopes(
+  taskAllowedFiles: readonly string[] | undefined,
+  publicationLockFiles: readonly string[] | undefined,
+  temporaryPublicationLockFiles: readonly string[] | undefined = [],
+): readonly string[] {
+  return [...new Set([...(taskAllowedFiles ?? []), ...(publicationLockFiles ?? []), ...(temporaryPublicationLockFiles ?? [])])]
+    .sort((left, right) => left.localeCompare(right));
+}
+
+function readLinkedTemporaryPublicationLockFiles(
+  cwd: string,
+  taskId: string | null,
+  actorId: string,
+): readonly string[] {
+  if (!taskId) return [];
+  return readFrameworkTempLockProjection(cwd)
+    .filter((lock) => sameActorIdentity(lock.actorId, actorId) && lock.linkedTaskId === taskId && lock.leaseFresh === true)
+    .flatMap((lock) => lock.files);
+}
+
+/**
+ * Acquire the runner-sync mutex at the publication boundary, after the sealed
+ * candidate has been built.  Framework claims declare ownership; they must not
+ * force callers to reserve the globally serialized publication queue while a
+ * detached, private build is still running.
+ */
+export function ensureRunnerPublicationReservation(input: {
+  readonly cwd: string;
+  readonly stewardActorId: string;
+  readonly sealedSourceSha: string;
+  readonly buildTarget: RunnerBuildOutputTarget;
+  readonly publicationTaskId?: string | null;
+}): RunnerSyncAdmissionReport {
+  const inspect = () => inspectRunnerSyncAdmission({
+    cwd: input.cwd,
+    stewardActorId: input.stewardActorId,
+    sealedSourceSha: input.sealedSourceSha,
+    candidateSourceIsolation: 'sealed-detached'
+  });
+  const initial = inspect();
+  if (initial.queueHeadOwnership.ok) return initial;
+  if (initial.runnerSyncSteward) {
+    runAtm(input.cwd, [
+      'broker', 'runner-sync', 'cleanup',
+      '--actor', input.stewardActorId,
+      '--json'
+    ], 'Runner publication stale-queue reconciliation');
+    const reconciled = inspect();
+    if (reconciled.queueHeadOwnership.ok || reconciled.runnerSyncSteward) return reconciled;
+  }
+
+  const taskId = resolveActiveRunnerPublicationTask({
+    cwd: input.cwd,
+    actorId: input.stewardActorId,
+    now: new Date().toISOString(),
+    taskId: input.publicationTaskId
+  });
+  const surfaces = publicationSurfaces(input.buildTarget);
+  runAtm(input.cwd, [
+    'broker', 'runner-sync', 'enqueue',
+    '--task', taskId,
+    '--actor', input.stewardActorId,
+    '--sealed-source-sha', input.sealedSourceSha,
+    ...surfaces.flatMap((surface) => ['--surface', surface]),
+    '--json'
+  ], 'Runner publication queue acquisition');
+  return inspect();
+}
+
+function runAtm(cwd: string, argv: readonly string[], operation: string): void {
+  const result = spawnSync(process.execPath, [path.join(cwd, 'atm.mjs'), ...argv], {
+    cwd,
+    env: process.env,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if ((result.status ?? 1) !== 0) {
+    const detail = String(result.stderr || result.stdout || '').trim();
+    throw new Error(`${operation} failed: ${detail || `exit ${result.status ?? 1}`}`);
+  }
+}
+
+export function resolveActiveRunnerPublicationTask(input: {
+  readonly cwd: string;
+  readonly actorId: string;
+  readonly now: string;
+  readonly taskId?: string | null;
+}): string {
+  const lockRoot = path.join(input.cwd, '.atm', 'runtime', 'locks');
+  const nowMs = Date.parse(input.now);
+  const explicitlyRequested = input.taskId?.trim();
+  const frameworkTempCandidates = readFrameworkTempLockProjection(input.cwd, nowMs)
+    .filter((lock) => lock.workItemId.startsWith('ATM-FRAMEWORK-TEMP-'))
+    .filter((lock) => sameActorIdentity(lock.actorId, input.actorId) && lock.disposition === 'foreign-live')
+    .filter((lock) => !explicitlyRequested || lock.workItemId === explicitlyRequested || lock.linkedTaskId === explicitlyRequested)
+    .filter((lock) => ownsReleaseSurface(lock.files))
+    // A temporary claim linked to a live delivery card delegates the runner
+    // publication surface to that card.  Count that authority once unless the
+    // caller explicitly selected the temporary work item itself.
+    .map((lock) => explicitlyRequested === lock.workItemId ? lock.workItemId : lock.linkedTaskId ?? lock.workItemId);
+  // A runner-sync reservation is granted to a live task claim, not to the
+  // incidental presence of a direction-lock file.  Direction locks are one
+  // projection of authority, but renewal and recovery paths can legitimately
+  // leave an active ledger claim without recreating that projection.  Read the
+  // same active-task snapshot used by the cross-task mutation guard, then keep
+  // the claim TTL check here because publication is a time-sensitive write.
+  const ledgerCandidates = getActiveTasks(input.cwd)
+    .filter((task) => sameActorIdentity(task.owner, input.actorId))
+    .filter((task) => !task.taskId.startsWith('ATM-FRAMEWORK-TEMP-'))
+    .filter((task) => !explicitlyRequested || task.taskId === explicitlyRequested.toUpperCase())
+    .filter((task) => ownsReleaseSurface(task.allowedFiles))
+    .filter((task) => hasActiveLedgerClaim(input.cwd, task.taskId, input.actorId, nowMs))
+    .map((task) => task.taskId);
+  const candidates = existsSync(lockRoot)
+    ? readdirSync(lockRoot, { withFileTypes: true }).flatMap((entry) => {
+      if (!entry.isFile() || !entry.name.endsWith('.lock.json')) return [];
+      try {
+        const lock = JSON.parse(readFileSync(path.join(lockRoot, entry.name), 'utf8')) as Record<string, unknown>;
+        const taskId = String(lock.workItemId ?? '');
+        const actorId = String(lock.actorId ?? lock.lockedBy ?? '');
+        const heartbeatAt = Date.parse(String(lock.heartbeatAt ?? lock.lockedAt ?? ''));
+        const ttlSeconds = Number(lock.ttlSeconds ?? 0);
+        const files = Array.isArray(lock.files) ? lock.files.map(String) : [];
+        const lockActive = Number.isFinite(nowMs)
+          && Number.isFinite(heartbeatAt)
+          && Number.isFinite(ttlSeconds)
+          && nowMs < heartbeatAt + ttlSeconds * 1000;
+        return sameActorIdentity(actorId, input.actorId)
+          && !taskId.startsWith('ATM-FRAMEWORK-TEMP-')
+          && (explicitlyRequested ? hasActiveLedgerClaim(input.cwd, taskId, input.actorId, nowMs) : lockActive)
+          && (explicitlyRequested
+            ? taskId === explicitlyRequested
+            : ownsReleaseSurface(files))
+          ? [taskId]
+          : [];
+      } catch {
+        return [];
+      }
+    })
+    : [];
+  const unique = [...new Set([...candidates, ...ledgerCandidates, ...frameworkTempCandidates])].sort();
+  if (unique.length !== 1) {
+    throw new Error(`Runner publication requires exactly one active release-surface claim for ${input.actorId}; found ${unique.length}.`);
+  }
+  return unique[0];
+}
+
+function sameActorIdentity(left: unknown, right: unknown): boolean {
+  const normalizedLeft = normalizeIdentitySegment(String(left ?? ''));
+  const normalizedRight = normalizeIdentitySegment(String(right ?? ''));
+  return normalizedLeft.length > 0 && normalizedLeft === normalizedRight;
+}
+
+function ownsReleaseSurface(files: readonly string[]): boolean {
+  return ['release/atm-onefile/atm.mjs', 'release/atm-root-drop']
+    .some((surface) => files.some((file) => pathMatchesWriteScope(surface, file)));
+}
+
+function hasActiveLedgerClaim(cwd: string, taskId: string, actorId: string, nowMs: number): boolean {
+  try {
+    const task = JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`), 'utf8')) as { claim?: Record<string, unknown> };
+    const claim = task.claim;
+    const heartbeatAt = Date.parse(String(claim?.heartbeatAt ?? claim?.claimedAt ?? ''));
+    const ttlSeconds = Number(claim?.ttlSeconds ?? 0);
+    return claim?.state === 'active' && sameActorIdentity(claim.actorId, actorId) && Number.isFinite(nowMs) && Number.isFinite(heartbeatAt) && Number.isFinite(ttlSeconds) && nowMs < heartbeatAt + ttlSeconds * 1000;
+  } catch { return false; }
+}
+
+function publicationSurfaces(buildTarget: RunnerBuildOutputTarget): readonly string[] {
+  if (buildTarget === 'onefile') return ['release/atm-onefile/atm.mjs'];
+  if (buildTarget === 'root-drop') return ['release/atm-root-drop'];
+  return ['release/atm-onefile/atm.mjs', 'release/atm-root-drop'];
+}
+
+function readValidatedPublicationTakeover(input: {
+  readonly cwd: string;
+  readonly taskId: string | null;
+  readonly sealedSourceSha: string;
+  readonly snapshot: ReturnType<typeof captureRunnerBuildOutputSnapshot>;
+}): readonly string[] {
+  if (!input.taskId || input.snapshot.preexistingDirtyPaths.length === 0) return [];
+  const relative = `.atm/history/evidence/${input.taskId}.runner-publication-takeover.json`;
+  const absolute = path.join(input.cwd, relative);
+  if (!existsSync(absolute)) return [];
+  let document: unknown;
+  try {
+    document = JSON.parse(readFileSync(absolute, 'utf8'));
+  } catch {
+    throw new Error(`Runner publication takeover receipt is not valid JSON: ${relative}`);
+  }
+  const validated = validateRunnerPublicationTakeoverPlan({
+    plan: document,
+    sealedSourceSha: input.sealedSourceSha,
+    snapshot: input.snapshot
+  });
+  if (!validated.ok || !validated.plan) {
+    throw new Error(`Runner publication takeover receipt is invalid: ${validated.reason ?? relative}`);
+  }
+  return validated.plan.entries.map((entry) => entry.path);
+}

@@ -1,0 +1,49 @@
+{
+  "schemaId": "atm.evidenceShellDeletionReceipt.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0331",
+  "status": "partial-integration-evidence",
+  "statement": "This receipt records verified production callers and explicitly names retained public seams. It is not a terminal certification for the whole Plan 3.x/4.0 programme.",
+  "deepModules": [
+    {
+      "module": "packages/core/src/evidence/observed-source.ts",
+      "contract": "atm.observationSnapshot.v1",
+      "productionCaller": "packages/cli/src/commands/evidence/verbs/run.ts",
+      "callerBehavior": "The evidence CLI derives process facts and digests through observed-source-loader; it does not accept an outcome flag."
+    },
+    {
+      "module": "packages/core/src/broker/replay/lifecycle-receipt-observability.ts",
+      "contract": "telemetry coverage and obligation seal",
+      "productionCaller": "packages/core/src/telemetry/parallel-replay/index.ts",
+      "callerBehavior": "Parallel replay telemetry delegates coverage classification and sealing to the deep module."
+    }
+  ],
+  "retainedPublicSeams": [
+    {
+      "module": "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "seam": "resolveAutoEvidenceValidationContract",
+      "reason": "Public lifecycle adapter; its observedOutcome receipts are evaluated by the shared core evaluator."
+    },
+    {
+      "module": "packages/cli/src/commands/taskflow/close-preflight.ts",
+      "seam": "resolveClosePreflightValidationContract",
+      "reason": "Public lifecycle adapter; an observed outcome overrides a caller-supplied status claim."
+    },
+    {
+      "module": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "seam": "inspectObservedTaskEvidence",
+      "reason": "taskflow pre-close publishes the inspector output as observedTaskEvidence. It derives an observation digest from persisted command facts and marks malformed facts invalid."
+    }
+  ],
+  "deletedShells": [],
+  "nonClaims": [
+    "No zero-caller module was deleted merely to satisfy a metric.",
+    "No terminal close or runner publication is claimed by this receipt.",
+    "Legacy receipts without observedOutcome remain compatible during migration; they are not upgraded by this work."
+  ],
+  "verification": {
+    "focusedTest": "node --strip-types tests/cli/observed-evidence-production-callers.test.ts",
+    "typecheck": "npm run typecheck",
+    "moduleBoundaries": "npm run validate:module-boundaries"
+  }
+}

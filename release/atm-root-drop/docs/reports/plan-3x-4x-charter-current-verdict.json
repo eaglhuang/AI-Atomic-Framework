@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.fourPlanCharterCurrentVerdict.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-13T00:00:00.000Z",
+  "status": "proven",
+  "nonClaim": "This report proves charter conformance of the current closeout evidence shape; final release authority remains the independent certificate.",
+  "sourceReports": [
+    {
+      "path": ".atm/charter/atomic-charter.md",
+      "digest": "sha256:4e87a2d9134205de4f2361d4faa101d3bc84a4e9b22d70b46b1ca922ab5c0740"
+    },
+    {
+      "path": ".atm/charter/atm-first-principles.md",
+      "digest": "sha256:4936539324d5c04a3275eda735a75f9af6bf8bdce83cb5584420fdf43d33f7e2"
+    },
+    {
+      "path": ".atm/charter/charter-invariants.json",
+      "digest": "sha256:5b04346c3a4d515234b045d1faf3bcae6d4a8f2a25e9152226f4c949491efa5c"
+    }
+  ],
+  "invariantChecks": [
+    {
+      "invariantId": "INV-ATM-008",
+      "status": "proven",
+      "summary": "The closeout blocker map converts blocking state into executable next actions rather than bare refusal.",
+      "evidenceRefs": [
+        ".atm/charter/charter-invariants.json",
+        "docs/reports/plan-3x-4x-closeout-blocker-map.json"
+      ]
+    },
+    {
+      "invariantId": "INV-ATM-009",
+      "status": "proven",
+      "summary": "The blocker map groups failures by general evidence seams instead of hard-coding one-off row exceptions.",
+      "evidenceRefs": [
+        ".atm/charter/charter-invariants.json",
+        "docs/reports/plan-3x-4x-closeout-blocker-map.json",
+        "scripts/validate-four-plan-closeout-blocker-map.ts"
+      ]
+    },
+    {
+      "invariantId": "INV-ATM-010",
+      "status": "proven",
+      "summary": "The current evidence path preserves the canonical worktree and does not rely on detached rescue worktrees as normal completion authority.",
+      "evidenceRefs": [
+        ".atm/charter/charter-invariants.json",
+        "docs/reports/plan-3x-4x-closeout-blocker-map.json"
+      ]
+    },
+    {
+      "invariantId": "INV-ATM-011",
+      "status": "proven",
+      "summary": "The blocker map orders long preparation outside scarce commit/runner queues and leaves final bottleneck writes to the end.",
+      "evidenceRefs": [
+        ".atm/charter/charter-invariants.json",
+        "docs/reports/plan-3x-4x-closeout-blocker-map.json"
+      ]
+    }
+  ],
+  "firstPrinciplesChecks": [
+    {
+      "id": "FP-evidence-before-completion",
+      "status": "proven",
+      "summary": "The charter verdict does not override the independent certificate; deferred backlog release treatment is governed by the waiver register."
+    },
+    {
+      "id": "FP-cost-and-time-boundary",
+      "status": "proven",
+      "summary": "The next execution order favors focused validators and current evidence seams before long full-suite replay."
+    },
+    {
+      "id": "FP-deep-module-seams",
+      "status": "proven",
+      "summary": "The report exposes stable blocker classes B1-B5 rather than scattering completion logic across individual certificate rows."
+    }
+  ],
+  "certificateEffect": {
+    "dimensionId": "charter-verdict",
+    "newStatus": "proven",
+    "objectiveVerdictUnchanged": "proven",
+    "releaseAuthorizedUnchanged": true
+  }
+}

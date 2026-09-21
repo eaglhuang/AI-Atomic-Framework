@@ -1,0 +1,275 @@
+{
+  "schemaId": "atm.plan3xFreshCommandReplayReceipts.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-08-13T04:30:00.000Z",
+  "status": "fresh-command-replay-partially-consumed",
+  "nonClaim": "These receipts prove that focused Plan 3.x validators execute against current files and that 69 rows were consumed into source replay; they do not certify the full runbook complete until Plan 4, backlog, closeout, and full validation evidence are audited.",
+  "sourceReports": [
+    {
+      "path": "docs/reports/plan-3x-current-row-proof-map.json",
+      "digest": "sha256:6612b4bf3748f822178c72c1dca87eca32ffa8a3fe8993c196338b88ae96e13f"
+    },
+    {
+      "path": "docs/reports/plan-3-0-objective-replay.json",
+      "digest": "sha256:ab25f5d87e1fdc26bb559f943c00f690dc1e30d8a815dcb9bcf75656edaabd36"
+    },
+    {
+      "path": "docs/reports/plan-3-1-objective-replay.json",
+      "digest": "sha256:21fb2c2cf9b09d021eb85afc8e951f4260db5f06c385048fd9f12431d423946e"
+    },
+    {
+      "path": "docs/reports/plan-3-2-objective-replay.json",
+      "digest": "sha256:dc9a5b92d528b998f93ca36bc148a4a0f2c248320d499cf292ec873b5a9ba812"
+    }
+  ],
+  "familyDisposition": {
+    "proofFamilyId": "fresh-command-replay-needed",
+    "sourceRowCount": 0,
+    "focusedCommandsExecuted": 32,
+    "commandsGreen": 32,
+    "rowsConsumedIntoSourceReplay": 69,
+    "rowsCertifiedCompleteByTheseReceipts": 0,
+    "remainingRowsInFamily": 0,
+    "reasonRowsRemainOpen": "Sixty-nine current receipts were consumed into source replay. Row-level Plan 3.x proof is now saturated; full completion still requires Plan 4, backlog disposition, terminal closeout, push provenance, and full validation audit."
+  },
+  "commandRuns": [
+    {
+      "id": "plan30-final-closure-replay",
+      "command": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.0 --expect-rows 17 --input docs/reports/plan-3-0-objective-replay.json",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-atm-3-final-closure] ok plan=3.0 rows=17 verdict=not-complete",
+      "semanticBoundary": "current replay shape only; terminal verdict remains not-complete"
+    },
+    {
+      "id": "plan31-final-closure-replay",
+      "command": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.1 --expect-rows 23 --input docs/reports/plan-3-1-objective-replay.json",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-atm-3-final-closure] ok plan=3.1 rows=23 verdict=not-complete",
+      "semanticBoundary": "current replay shape only; terminal verdict remains not-complete"
+    },
+    {
+      "id": "plan32-final-closure-replay",
+      "command": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.2 --expect-rows 29 --input docs/reports/plan-3-2-objective-replay.json",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-atm-3-final-closure] ok plan=3.2 rows=29 verdict=not-complete",
+      "semanticBoundary": "current replay shape only; terminal verdict remains not-complete"
+    },
+    {
+      "id": "plan30-four-plan-objectives",
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.0 --mode validate",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-four-plan-objectives] ok {\"Plan 3.0\":17,\"Plan 3.1\":0,\"Plan 3.2\":0,\"Plan 4.0\":0} digest=sha256:501d025959066a83fa3e7cd9160ff3a1e93d5a9345bfa1a39bc5677eda2b6027",
+      "semanticBoundary": "denominator and objective addressability, not completion"
+    },
+    {
+      "id": "plan31-four-plan-objectives",
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.1 --mode validate",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-four-plan-objectives] ok {\"Plan 3.0\":0,\"Plan 3.1\":23,\"Plan 3.2\":0,\"Plan 4.0\":0} digest=sha256:972d5ea61b851a84d575fc50ffd201123b6ab76791628a43e1f1eae52aa2fe68",
+      "semanticBoundary": "denominator and objective addressability, not completion"
+    },
+    {
+      "id": "plan32-four-plan-objectives",
+      "command": "node --strip-types scripts/validate-four-plan-objectives.ts --plan 3.2 --mode validate",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-four-plan-objectives] ok {\"Plan 3.0\":0,\"Plan 3.1\":0,\"Plan 3.2\":29,\"Plan 4.0\":0} digest=sha256:ade6d232bdb5cd65e2035981b565da2580e43f2eff9cb61030fac8d32cfd5998",
+      "semanticBoundary": "denominator and objective addressability, not completion"
+    },
+    {
+      "id": "atm3-final-closure-negative-controls",
+      "command": "node --strip-types tests/cli/atm-3-final-closure.test.ts",
+      "exitCode": 0,
+      "stdoutPreview": "atm 3 final closure replay ok",
+      "semanticBoundary": "fail-closed regression coverage, not positive completion"
+    },
+    {
+      "id": "git-head-evidence-current-validator",
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutPreview": "[git-head-evidence:validate] ok (doctor git evidence states verified)",
+      "semanticBoundary": "current git-head evidence validator is green; individual Plan 3.x provenance rows still need terminal consumption"
+    },
+    {
+      "id": "plan30-protected-closure-fail-closed",
+      "command": "node --strip-types scripts/validate-plan30-protected-closure.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan30-protected-closure] ok cells=420 failClosed=true",
+      "semanticBoundary": "objective-aligned protected fault fail-closed evidence, not completion evidence for Plan 3.0"
+    },
+    {
+      "id": "plan32-provenance-mismatch-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-provenance-mismatch.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-provenance-mismatch] ok verdict=fail-closed diagnostics=head-mismatch,task-provenance-mismatch",
+      "semanticBoundary": "objective-aligned provenance mismatch fail-closed evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-timeout-nonterminal-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-timeout-nonterminal.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-timeout-nonterminal] ok verdict=not-complete diagnostics=timeout-is-nonterminal,timeout-must-not-green",
+      "semanticBoundary": "objective-aligned timeout non-terminal evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-attestation-boundary-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-attestation-boundary.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-attestation-boundary] ok verdict=not-complete diagnostics=attestation-is-not-machine-proof,prose-must-not-green",
+      "semanticBoundary": "objective-aligned attestation boundary evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-unknown-evidence-nonterminal-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-unknown-evidence-nonterminal.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-unknown-evidence-nonterminal] ok verdict=not-complete diagnostics=unknown-evidence-is-nonterminal,unknown-must-not-green",
+      "semanticBoundary": "objective-aligned unknown evidence non-terminal evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-machine-readable-blocker",
+      "command": "node --strip-types scripts/validate-plan32-machine-readable-blocker.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-machine-readable-blocker] ok verdict=machine-readable-nonterminal-blocker diagnostics=blocker-code-present,next-safe-command-present,terminal-false",
+      "semanticBoundary": "objective-aligned machine-readable blocker evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-dashboard-consumption",
+      "command": "node --strip-types scripts/validate-plan32-dashboard-consumption.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-dashboard-consumption] ok rows=29 verified=9 notComplete=20 digest=sha256:3ef96ec583ebcae01041afd04f85ea2b0801abe845f1956a2e74ff3d61a662cb",
+      "semanticBoundary": "Plan 3.2 replay is consumed by the dashboard engine as not completion evidence while the whole four-plan dashboard remains not-ready"
+    },
+    {
+      "id": "plan32-stale-evidence-nonterminal-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-stale-evidence-nonterminal.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-stale-evidence-nonterminal] ok verdict=not-complete diagnostics=stale-evidence-is-nonterminal,stale-reference-must-not-green",
+      "semanticBoundary": "objective-aligned stale evidence non-terminal evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-terminal-verdict-fail-closed",
+      "command": "node --strip-types scripts/validate-plan32-terminal-verdict-fail-closed.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-terminal-verdict-fail-closed] ok verified=11/29 verdict=not-complete",
+      "semanticBoundary": "objective-aligned terminal verdict fail-closed evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-queue-only-no-override",
+      "command": "node --strip-types scripts/validate-plan32-queue-only-no-override.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-queue-only-no-override] ok verdict=wait-only diagnostics=queue-is-required,override-lease-absent,wait-does-not-green",
+      "semanticBoundary": "objective-aligned queue-only no-override evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-parallel-prepare-outside-queue",
+      "command": "node --strip-types scripts/validate-plan32-parallel-prepare-outside-queue.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-parallel-prepare-outside-queue] ok queueResidencyMs=4500 diagnostics=prepare-outside-queue,validation-outside-queue,critical-section-only",
+      "semanticBoundary": "objective-aligned queue residency minimality evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-legal-recovery-lane",
+      "command": "node --strip-types scripts/validate-plan32-legal-recovery-lane.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-legal-recovery-lane] ok lane=atm-git-pathspec-emergency-commit diagnostics=lane-named,authority-preconditions-before-use,emergency-not-success-metric,exact-keep-list-required,post-commit-and-backlog-required",
+      "semanticBoundary": "objective-aligned legal recovery lane evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-sealed-bundle-tree-subset",
+      "command": "node --strip-types scripts/validate-plan32-sealed-bundle-tree-subset.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-sealed-bundle-tree-subset] ok sealed=2 candidate=3 diagnostics=sealed-paths-subset-of-candidate-tree,foreign-live-surface-excluded,empty-missing-from-candidate",
+      "semanticBoundary": "objective-aligned sealed bundle tree subset evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-shared-delivery-no-override",
+      "command": "node --strip-types scripts/validate-plan32-shared-delivery-no-override.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-shared-delivery-no-override] ok mode=steward-composed diagnostics=shared-delivery-authorized,member-attribution-required,override-lease-absent,manual-foreign-bytes-forbidden",
+      "semanticBoundary": "objective-aligned shared delivery without override evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan32-batch-split-handoff-boundary",
+      "command": "node --strip-types scripts/validate-plan32-batch-split-handoff-boundary.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-batch-split-handoff-boundary] ok batch=batch-2522d44aebb6 children=2 diagnostics=batch-checkpoint-required,handoff-is-continuation-only,handoff-cannot-close-batch,queue-head-only",
+      "semanticBoundary": "objective-aligned batch split/handoff boundary evidence, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "plan30-closure-evidence-boundaries",
+      "command": "node --strip-types scripts/validate-plan30-closure-evidence-boundaries.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan30-closure-evidence-boundaries] ok rows=4 diagnostics=divergence-command-backed,closure-predicate-not-caller-asserted,telemetry-not-correctness,circuit-breaker-reset-digest",
+      "semanticBoundary": "objective-aligned Plan 3.0 closure boundary evidence for four rows, not completion evidence for Plan 3.0"
+    },
+    {
+      "id": "plan30-operational-state-safety",
+      "command": "node --strip-types scripts/validate-plan30-operational-state-safety.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan30-operational-state-safety] ok rows=3 diagnostics=rollback-path-preserved,exactly-once-transition-durable,legacy-authority-retirement-deferred",
+      "semanticBoundary": "objective-aligned Plan 3.0 operational state safety evidence for three rows, not completion evidence for Plan 3.0"
+    },
+    {
+      "id": "plan30-parity-policy-boundaries",
+      "command": "node --strip-types scripts/validate-plan30-parity-policy-boundaries.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan30-parity-policy-boundaries] ok rows=3 diagnostics=source-frozen-parity-digests,release-adopter-parity-observable,locked-policy-no-correctness-debt",
+      "semanticBoundary": "objective-aligned Plan 3.0 parity/policy boundary evidence for three rows, not completion evidence for Plan 3.0"
+    },
+    {
+      "id": "plan31-realness-autonomy-boundaries",
+      "command": "node --strip-types scripts/validate-plan31-realness-autonomy-boundaries.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan31-realness-autonomy-boundaries] ok rows=3 diagnostics=missing-class-command-backed,stale-history-rejected,emergency-not-autonomous-replay",
+      "semanticBoundary": "objective-aligned Plan 3.1 realness/autonomy boundary evidence for three rows, not completion evidence for Plan 3.1"
+    },
+    {
+      "id": "plan31-lifecycle-concurrency-boundaries",
+      "command": "node --strip-types scripts/validate-plan31-lifecycle-concurrency-boundaries.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan31-lifecycle-concurrency-boundaries] ok rows=6 diagnostics=two-key-close-causal,queue-wakeup-observable,lifecycle-command-backed,sealed-set-live-index-separated,rollback-retained,actor-continuity-replayable",
+      "semanticBoundary": "objective-aligned Plan 3.1 lifecycle/concurrency boundary evidence for six rows, not completion evidence for Plan 3.1"
+    },
+    {
+      "id": "plan31-parity-cost-digest-boundaries",
+      "command": "node --strip-types scripts/validate-plan31-parity-cost-digest-boundaries.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan31-parity-cost-digest-boundaries] ok rows=4 diagnostics=old-new-frozen-digest-replayable,cost-correctness-separated,parity-breaker-digests,runner-sync-digest-visible",
+      "semanticBoundary": "objective-aligned Plan 3.1 parity/cost/digest boundary evidence for four rows, not completion evidence for Plan 3.1"
+    },
+    {
+      "id": "governed-state-ownership-routing-boundaries",
+      "command": "node --strip-types scripts/validate-governed-state-ownership-routing-boundaries.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-governed-state-ownership-routing-boundaries] ok rows=9 diagnostics=machine-authority-over-prose,compose-steward-separated,incident-and-backlog-machine-readable,row-owner-not-completion,foreign-work-fail-closed,generic-stale-routing",
+      "semanticBoundary": "objective-aligned governed-state ownership/routing boundary evidence for nine rows, not completion evidence for Plan 3.x"
+    },
+    {
+      "id": "plan32-foundation-runner-boundaries",
+      "command": "node --strip-types scripts/validate-plan32-foundation-runner-boundaries.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-plan32-foundation-runner-boundaries] ok rows=6 diagnostics=freshness-binding-explicit,runner-saga-digest,sealed-apply-recoverable,compose-attribution-explicit,deferral-order-deterministic,generic-plan4-fixture-boundary",
+      "semanticBoundary": "objective-aligned Plan 3.2 foundation/runner boundary evidence for six rows, not completion evidence for Plan 3.2"
+    },
+    {
+      "id": "final-backlog-closeback-provenance",
+      "command": "node --strip-types scripts/validate-final-backlog-closeback-provenance.ts",
+      "exitCode": 0,
+      "stdoutPreview": "[validate-final-backlog-closeback-provenance] ok rows=4 diagnostics=backlog-census-machine-readable,closeback-sha-explicit,close-seam-visible,final-release-push-sha-required",
+      "semanticBoundary": "objective-aligned final backlog/closeback provenance boundary evidence for four rows, not completion evidence for full runbook"
+    }
+  ],
+  "nextExecutionOrder": [
+    {
+      "id": "positive-row-receipts",
+      "whyFirst": "Fresh-command family is empty; preserve these current receipts and move next to governed-state and runner-release parity rows."
+    },
+    {
+      "id": "source-replay-row-recompute",
+      "whySecond": "Only after positive receipts exist should source replay rows be recomputed from not-complete to verified."
+    },
+    {
+      "id": "objective-verdict-recompute",
+      "whyThird": "The independent certificate objective verdict may move only after source replay rows change."
+    }
+  ]
+}

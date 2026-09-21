@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-31-012",
+  "date": "2026-07-31",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Closed",
+  "area": "Evidence / Test Catalog",
+  "finding": "The test-case catalog schema accepts only test_int_ or test_task_ case-id namespaces. CORRECTED SCOPE (ATM-GOV-0313, full-catalog enumeration): the defect is five invalid case ids across three shards, not \"three test_atm_gov_ ids in the commit-attribution shard\". The five are test_broker_apply_admission_before_ref_update, test_sealed_commit_dual_lane_prepare_and_broker_finalization and test_governed_commit_seal_source_and_provenance_gates in test_group_commit_attribution, plus test_atm_gov_0277_model_relative_certificate_vocabulary_0d0fd68c and test_atm_gov_0279_obligation_inventory_drift_detector_5c7f6251. The original diagnosis was wrong in both directions: it missed the test_broker_/test_sealed_/test_governed_ family entirely, and it condemned the test_task_atm_gov_* namespace, which is schema-valid and used by six cases belonging to already-closed cards. Root cause of the miscount: the shard validator asserted per shard and aborted on the first failure, so only one of the three offending shards was ever reported.",
+  "expectedBehavior": "Every catalog shard and task requiredTestCaseId must use one schema-valid canonical namespace, and the focused catalog validator must pass on the complete repository catalog without silently skipping any shard.",
+  "evidenceOrRepro": "Before: node --strip-types tests/cli/test-case-catalog-shards.test.ts -> exit 1, AssertionError: shard test_group_commit_attribution must validate. After ATM-GOV-0313: exit 0, with the shard loop aggregating every schema failure across all shards instead of aborting on the first.",
+  "resolution": "Closed by ATM-GOV-0313. The five ids were migrated to deterministic buildTestCaseId output; the pre-migration ids are preserved through a new narrow legacyAliases seam in schemas/validators/test-case-group.schema.json, so the closed cards ATM-GOV-0277, ATM-GOV-0279 and TASK-GIT-0029 resolve their legacy requiredTestCaseIds without any edit to their sealed closure evidence. The six valid test_task_atm_gov_* ids were left byte-identical and a negative control in tests/cli/plan4-catalog-contract.test.ts asserts they were not renamed.",
+  "followUp": "Superseded in part by ATM-BUG-2026-07-31-013, which records the catalog reachability blind spot discovered while repairing this item. A green full-catalog validator is NOT sufficient evidence of catalog completeness until 013 is closed."
+}

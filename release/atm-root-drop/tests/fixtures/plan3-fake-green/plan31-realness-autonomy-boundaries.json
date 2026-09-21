@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.plan31RealnessAutonomyBoundariesFixture.v1",
+  "specVersion": "0.1.0",
+  "rows": [
+    {
+      "objectiveId": "P31-OBJ-01",
+      "evidenceKind": "missing-class",
+      "commandBacked": true,
+      "exactMissingClass": true,
+      "historicalOnly": false
+    },
+    {
+      "objectiveId": "P31-OBJ-05",
+      "evidenceKind": "realness",
+      "staleHistoricalOnlyRejected": true,
+      "currentReceiptRequired": true,
+      "proseSubstitutionAllowed": false
+    },
+    {
+      "objectiveId": "P31-OBJ-22",
+      "evidenceKind": "autonomous-replay",
+      "zeroManualCommandReplay": true,
+      "emergencyApprovalCountsAsAutonomy": false,
+      "approvalHistorySeparated": true
+    }
+  ],
+  "expectedVerdict": "plan31-realness-autonomy-boundaries-proven",
+  "diagnostics": [
+    "missing-class-command-backed",
+    "stale-history-rejected",
+    "emergency-not-autonomous-replay"
+  ]
+}

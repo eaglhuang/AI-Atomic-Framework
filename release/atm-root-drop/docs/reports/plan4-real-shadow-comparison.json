@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.shadowComparisonRun.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0337",
+  "generatedAt": "2026-08-12T18:45:00.000Z",
+  "authorityDigest": "sha256:a63f4a145f70d207b8d3f4d7e399a1b12755b7f1d7dcc9223cbeaa03414bb9cd",
+  "policyEpoch": "plan4-shadow-epoch-2026-08-12",
+  "candidate": {
+    "sourceDigest": "sha256:da9926f354e08b1eaa2b2f8e5cb9dbfffb5979693c61b61e456fc8630175a4fb",
+    "runnerDigest": "sha256:74be16979710d4c4e7c6647856088456a08d634a2734f8c0ef0f1fd7f02672ce",
+    "catalogDigest": "sha256:08979fcb033882d7f41d3a21ce03dcaa2064215d422abb48c9cd0b617a7f154e",
+    "candidateDigest": "sha256:1af8c4e0e924411a24df4fcf30fcc7cb9aa0f7db80309544e335d07f59da7e50"
+  },
+  "commands": {
+    "selected": {
+      "command": "node --strip-types tests/core/real-shadow-comparison.test.ts --profile selected",
+      "runId": "shadow-selected-0337",
+      "artifactPath": "docs/reports/plan4-real-shadow-comparison.json",
+      "stale": false
+    },
+    "full": {
+      "command": "node --strip-types tests/core/real-shadow-comparison.test.ts --profile full",
+      "runId": "shadow-full-0337",
+      "artifactPath": "docs/reports/plan4-real-shadow-comparison.json",
+      "stale": false
+    }
+  },
+  "legacyLatencyMs": 30,
+  "cases": [
+    { "caseId": "typecheck", "selected": true, "legacy": "pass", "selectedResult": "pass", "latencyMs": 9, "cached": true },
+    { "caseId": "validate-four-plan-objectives", "selected": true, "legacy": "pass", "selectedResult": "pass", "latencyMs": 8, "cached": false },
+    { "caseId": "validate-governance-fix-wave", "selected": true, "legacy": "pass", "selectedResult": "pass", "latencyMs": 2, "cached": false },
+    { "caseId": "validate-skew-matrix", "selected": false, "legacy": "pass", "selectedResult": "pass", "latencyMs": 0, "cached": true },
+    { "caseId": "validate-examples", "selected": false, "legacy": "pass", "selectedResult": "pass", "latencyMs": 0, "cached": true },
+    { "caseId": "validate-test-facade", "selected": false, "legacy": "pass", "selectedResult": "fail", "latencyMs": 0, "cached": false }
+  ],
+  "expected": {
+    "selected": [
+      "typecheck",
+      "validate-four-plan-objectives",
+      "validate-governance-fix-wave"
+    ],
+    "skipped": [
+      "validate-examples",
+      "validate-skew-matrix",
+      "validate-test-facade"
+    ],
+    "falseBlocks": [
+      "validate-test-facade"
+    ],
+    "escapedDefects": [],
+    "unknown": []
+  },
+  "negativeControls": [
+    "candidate-digest-mismatch",
+    "full-source-missing",
+    "full-receipt-stale",
+    "escaped-defect-invalidates-policy-epoch"
+  ],
+  "artifactPaths": [
+    "docs/reports/plan4-real-shadow-comparison.json"
+  ],
+  "nonClaims": [
+    "shadow-comparison-does-not-replace-full-release-validation",
+    "false-block-accounting-is-diagnostic-only",
+    "escaped-defect-invalidates-policy-epoch"
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "schemaId": "atm.pathToAtomMapOwnerShard.v1",
+  "owner": "cli",
+  "shard": "cli-team",
+  "mappings": [
+    {
+      "path_pattern": "packages/cli/src/commands/hook.ts",
+      "atom_id": "atm.validator-envelope-map",
+      "capability": "pre-commit blocking findings and validator-compatible failure envelope output",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook.ts",
+      "atom_id": "atm.task-direction-map",
+      "capability": "pre-commit hook runs diagnoseTaskDirectionLockAllowedFiles per active direction lock and emits ATM_DIRECTION_LOCK_ALLOWED_FILES_MISMATCH warning (non-blocking) with drift evidence when canonical allowedFiles diverges from governance lock files or claim.files (TASK-AAO-0012).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/commit-range-guard.ts",
+      "atom_id": "atom-cli-hook-commit-range-guard",
+      "capability": "TASK-RFT-0094 bounded commit range guard facade preserving public exports for argument parsing, report generation, baseline, staged tree, and git-head evidence helpers.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0094"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/commit-range-guard/**/*.ts",
+      "atom_id": "atom-cli-hook-commit-range-guard",
+      "capability": "TASK-RFT-0094 extracted commit range guard modules for CLI args, legacy baseline ancestry, implementation logic, and pure support helpers while keeping every physical source file below 600 lines.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0094"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/context-map-advisor.ts",
+      "atom_id": "atm.context-map-advisor-map",
+      "capability": "Advisory advisor checks for staged files outside of task scopePaths",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/pre-commit.ts",
+      "atom_id": "atm.pre-commit-hook-guard-map",
+      "capability": "TASK-RFT-0037 pre-commit hook facade preserving protected state, direction lock, identity, residue, and framework validation guard exports.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/pre-commit/cross-file-consistency.ts",
+      "atom_id": "atm.pre-commit-hook-guard-map",
+      "capability": "TASK-RFT-0037 extracted pre-commit cross-file consistency guard module.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
+      "atom_id": "atm.pre-commit-hook-guard-map",
+      "capability": "TASK-RFT-0037 extracted pre-commit failure-envelope and residue finding helpers.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "atom_id": "atm.pre-commit-hook-guard-map",
+      "capability": "TASK-RFT-0037 transitional pre-commit implementation carrier for protected ATM state, task direction locks, same-file ownership, identity provenance, residue, and cross-file consistency checks.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/pre-commit/input-state.ts",
+      "atom_id": "atm.pre-commit-hook-guard-map",
+      "capability": "TASK-RFT-0037 extracted pre-commit staged input and git-head evidence helpers.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/pre-commit/scope-ownership.ts",
+      "atom_id": "atm.pre-commit-hook-guard-map",
+      "capability": "TASK-RFT-0037 extracted pre-commit same-file scope ownership helper module.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook/pre-commit/support.ts",
+      "atom_id": "atm.pre-commit-hook-guard-map",
+      "capability": "TASK-RFT-0037 bounded transitional support carrier for pre-commit guard helper routines.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0037"
+    }
+  ]
+}

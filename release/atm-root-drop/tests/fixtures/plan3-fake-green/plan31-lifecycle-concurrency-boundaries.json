@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.plan31LifecycleConcurrencyBoundariesFixture.v1",
+  "specVersion": "0.1.0",
+  "rows": [
+    {
+      "objectiveId": "P31-OBJ-06",
+      "evidenceKind": "two-key-close",
+      "causalRequirementRepresented": true,
+      "singleActorCloseAllowed": false,
+      "dryRunMaySubstituteForClose": false
+    },
+    {
+      "objectiveId": "P31-OBJ-11",
+      "evidenceKind": "conflict-queue-wakeup",
+      "queueReceiptObservable": true,
+      "wakeupReceiptObservable": true,
+      "bareRefusalAllowed": false
+    },
+    {
+      "objectiveId": "P31-OBJ-12",
+      "evidenceKind": "full-lifecycle-receipt",
+      "reservePromoteClaimCloseRepresented": true,
+      "commandBacked": true,
+      "statusTextAloneAllowed": false
+    },
+    {
+      "objectiveId": "P31-OBJ-14",
+      "evidenceKind": "sealed-set-live-index-boundary",
+      "sealedSetIndependentOfLiveResidue": true,
+      "foreignStagedResidueIsAuthority": false,
+      "candidateTreeRequired": true
+    },
+    {
+      "objectiveId": "P31-OBJ-17",
+      "evidenceKind": "rollback-retained",
+      "rollbackPathRetained": true,
+      "rollbackExecutionRequiredForProof": false,
+      "destructiveRollbackForbidden": true
+    },
+    {
+      "objectiveId": "P31-OBJ-20",
+      "evidenceKind": "actor-continuity",
+      "actorContinuityPreserved": true,
+      "receiptChainMachineReplayable": true,
+      "ambientActorSubstitutionAllowed": false
+    }
+  ],
+  "expectedVerdict": "plan31-lifecycle-concurrency-boundaries-proven",
+  "diagnostics": [
+    "two-key-close-causal",
+    "queue-wakeup-observable",
+    "lifecycle-command-backed",
+    "sealed-set-live-index-separated",
+    "rollback-retained",
+    "actor-continuity-replayable"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.dev/schemas/evidence/constraint-solver.schema.json",
+  "title": "ATM Constraint Solver Result",
+  "type": "object",
+  "required": ["schemaId", "specVersion", "solverId", "resultId", "authority", "status", "assignments", "semanticQuotient", "diagnostics", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaId": { "const": "atm.constraintSolverResult.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "solverId": { "type": "string", "minLength": 1 },
+    "resultId": { "type": "string", "pattern": "^constraint_result_[0-9a-f]{16}$" },
+    "authority": { "$ref": "#/$defs/authority" },
+    "status": { "enum": ["satisfiable", "infeasible", "blocked", "unsupported", "stale"] },
+    "assignments": { "type": "array", "items": { "$ref": "#/$defs/assignment" } },
+    "semanticQuotient": { "type": "array", "items": { "$ref": "#/$defs/semanticClass" } },
+    "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/diagnostic" } },
+    "provenance": { "$ref": "#/$defs/provenance" }
+  },
+  "$defs": {
+    "authority": { "type": "object", "required": ["authorityId", "sealed", "digest", "version"], "additionalProperties": false, "properties": { "authorityId": { "type": "string", "minLength": 1 }, "sealed": { "type": "boolean" }, "digest": { "type": "string", "minLength": 1 }, "version": { "type": ["string", "null"] } } },
+    "value": { "type": ["string", "number", "boolean", "null", "array"], "items": { "type": ["string", "number", "boolean", "null"] } },
+    "assignment": { "type": "object", "required": ["variable", "kind", "value"], "additionalProperties": false, "properties": { "variable": { "type": "string", "minLength": 1 }, "kind": { "enum": ["exact", "set", "interval", "unresolved"] }, "value": { "$ref": "#/$defs/value" } } },
+    "semanticClass": { "type": "object", "required": ["classId", "memberConstraintIds", "signature"], "additionalProperties": false, "properties": { "classId": { "type": "string", "minLength": 1 }, "memberConstraintIds": { "type": "array", "items": { "type": "string" } }, "signature": { "type": "string", "minLength": 1 } } },
+    "diagnostic": { "type": "object", "required": ["code", "severity", "message", "ref", "repairCommand"], "additionalProperties": false, "properties": { "code": { "type": "string", "minLength": 1 }, "severity": { "enum": ["error", "warning"] }, "message": { "type": "string", "minLength": 1 }, "ref": { "type": ["string", "null"] }, "repairCommand": { "type": ["string", "null"] } } },
+    "provenance": { "type": "object", "required": ["inputDigest", "constraintCount", "assumptionIds"], "additionalProperties": false, "properties": { "inputDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }, "constraintCount": { "type": "integer", "minimum": 0 }, "assumptionIds": { "type": "array", "items": { "type": "string" } } } }
+  }
+}

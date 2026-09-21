@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-14-007",
+  "date": "2026-08-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Closed — claim takeover lifecycle authority matrix is verified in the sealed runner",
+  "area": "Task claim takeover / retained WIP authority lifecycle",
+  "finding": "A released claim can retain a fresh heartbeat for durable WIP provenance, but takeover previously checked heartbeat expiry alone. After a takeover it wrote claim.state=taken_over without the normal claim lane, admission ticket, session, or direction lock, so downstream consumers treated the successor as non-live while retained WIP still named the predecessor.",
+  "expectedBehavior": "Claim authority is one canonical state-plus-TTL fact: only an active, unexpired claim is live. Takeover is an append-only transition event that creates the same active claim bundle as ordinary claim acquisition, then removes superseded retained-WIP ownership only after successor authority is durable.",
+  "evidenceOrRepro": "2026-08-14 ATM-GOV-0363: repair-claim left a released/taken_over provenance record with a fresh heartbeat, frozen next --claim returned ATM_CLAIM_FOREIGN_UNSTAGED_WIP, and takeover produced running/taken_over without lane metadata. Source-first regression then showed the repaired path yields running/active with minted lane, admission ticket, active work session, direction lock, and no stale wipOwnership.",
+  "followUp": "No remaining repair follow-up for this finding. The sealed runner and current regressions verify released fresh heartbeat, active fresh/expired lease, retained-WIP successor takeover, lane mismatch, and concurrent foreign-owner/lock handling. Broader lifecycle policy review remains separate."
+}

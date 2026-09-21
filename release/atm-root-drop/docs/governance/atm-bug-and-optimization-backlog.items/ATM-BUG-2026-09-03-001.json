@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-03-001",
+  "date": "2026-09-03",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Closed — lifecycle receipt-contract extraction completed 2026-09-03",
+  "area": "Runner publication / physical line budget",
+  "finding": "The repository physical-line-budget gate fails because runner-publication-lifecycle.ts reached 621 lines, exceeding the 600-line hard limit.",
+  "expectedBehavior": "The runner-publication lifecycle facade must remain below the physical-line budget while preserving receipt inspection and controlled residue reconciliation behavior.",
+  "evidenceOrRepro": "2026-09-03 `node --strip-types tests/cli/physical-line-budget-gate.test.ts` reported runner-publication-lifecycle.ts:621 as one of three hard violations. The defect is independently reproducible from the repository gate.",
+  "followUp": "Resolved by extracting the receipt inspection and controlled residue reconciliation Result Contract Object into `runner-publication-residue.ts`; the lifecycle facade retains its existing public exports. Revalidated 2026-09-03: reconciliation and disposition tests, typecheck, and the touched physical-line gate all exit 0. The other repository hard-violation modules remain separate follow-up scopes."
+}

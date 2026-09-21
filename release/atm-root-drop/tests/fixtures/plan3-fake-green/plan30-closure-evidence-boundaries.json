@@ -1,0 +1,41 @@
+{
+  "schemaId": "atm.plan30ClosureEvidenceBoundariesFixture.v1",
+  "specVersion": "0.1.0",
+  "rows": [
+    {
+      "objectiveId": "P30-OBJ-01",
+      "evidenceKind": "divergence",
+      "commandBacked": true,
+      "sealedRawInputs": true,
+      "callerAsserted": false
+    },
+    {
+      "objectiveId": "P30-OBJ-09",
+      "evidenceKind": "closure-predicate",
+      "commandBacked": true,
+      "predicateComputedByVerifier": true,
+      "callerAsserted": false
+    },
+    {
+      "objectiveId": "P30-OBJ-11",
+      "evidenceKind": "telemetry-boundary",
+      "telemetryAvailable": true,
+      "telemetryCountsAsCorrectness": false,
+      "requiresIndependentCorrectnessReceipt": true
+    },
+    {
+      "objectiveId": "P30-OBJ-14",
+      "evidenceKind": "circuit-breaker-reset",
+      "digestEvidencePresent": true,
+      "resetIsObservable": true,
+      "digestRequiredForClosure": true
+    }
+  ],
+  "expectedVerdict": "plan30-closure-boundaries-command-backed",
+  "diagnostics": [
+    "divergence-command-backed",
+    "closure-predicate-not-caller-asserted",
+    "telemetry-not-correctness",
+    "circuit-breaker-reset-digest"
+  ]
+}

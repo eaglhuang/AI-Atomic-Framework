@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/evidence/obligation-inventory.schema.json",
+  "title": "ATM Obligation Inventory",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "inventoryId",
+    "modelId",
+    "generatedAt",
+    "entries",
+    "inventoryDigest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.obligationInventory.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "inventoryId": { "type": "string", "minLength": 1 },
+    "modelId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "minLength": 1 },
+    "inventoryDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "obligationId",
+          "semanticFamily",
+          "owningSeam",
+          "lifecycleStatus",
+          "sourceRefs",
+          "validatorRefs",
+          "entryDigest"
+        ],
+        "properties": {
+          "obligationId": { "type": "string", "minLength": 1 },
+          "semanticFamily": { "type": "string", "minLength": 1 },
+          "owningSeam": { "type": "string", "minLength": 1 },
+          "lifecycleStatus": { "enum": ["active", "deprecated", "excluded", "draft"] },
+          "sourceRefs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "ref"],
+              "properties": {
+                "kind": { "enum": ["file", "schema", "task", "plan", "seam", "other"] },
+                "ref": { "type": "string", "minLength": 1 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "validatorRefs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["command"],
+              "properties": {
+                "command": { "type": "string", "minLength": 1 },
+                "caseId": { "type": ["string", "null"] }
+              },
+              "additionalProperties": false
+            }
+          },
+          "description": { "type": ["string", "null"] },
+          "observedAt": { "type": ["string", "null"] },
+          "entryDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

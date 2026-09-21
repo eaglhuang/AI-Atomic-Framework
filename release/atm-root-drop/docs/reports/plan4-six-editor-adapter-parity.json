@@ -1,0 +1,134 @@
+{
+  "schemaId": "atm.plan4SixEditorAdapterParity.v1",
+  "taskId": "ATM-GOV-0338",
+  "generatedAt": "2026-08-12T18:50:15.857Z",
+  "sealedSourceSha": "33d3e3fc65338313b47d3108d55af63d920c1c38",
+  "source": {
+    "templateRoot": "templates/skills",
+    "fileCount": 24,
+    "digest": "sha256:6117728d1629fcbd1ffc61d9daf1b2ebe3e9e13d30d71b724791e8a1efe528ac"
+  },
+  "compiler": {
+    "files": [
+      "packages/integrations-core/src/index.ts",
+      "packages/integration-claude-code/src/index.ts",
+      "packages/integration-codex/src/index.ts",
+      "packages/integration-copilot/src/index.ts",
+      "packages/integration-cursor/src/index.ts",
+      "packages/integration-gemini/src/index.ts",
+      "scripts/validate-integration-adapter.ts"
+    ],
+    "version": "integration-adapter-validator-current-source",
+    "digest": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0"
+  },
+  "expectedCompilerDigests": {
+    "codex": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+    "claude-code": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+    "cursor": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+    "copilot": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+    "gemini": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+    "antigravity": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0"
+  },
+  "expectedManifestDigests": {
+    "codex": "sha256:1ca3ed7866188fd1d31a6166a10f8d103756c23ef2f19f8a93d2d8d3b12d9f36",
+    "claude-code": "sha256:0be1894d8960a0e133272be12b5552e1b2fea77a1d5feba8df1bd7a301f482f4",
+    "cursor": "sha256:b0587f76b162a93f8d1c9a4b700cd03de03f41d13c4b2132b3a232f33cf214b5",
+    "copilot": "sha256:b1f3d700cd6403429bf8c2f26ddf08826aaa9b98f156a57434a454429563fb1a",
+    "gemini": "sha256:f808fcd1412d9fd63a4c4a120411698a5e1f183145dc68669adcf6b83b270e98",
+    "antigravity": "sha256:191cf698dc393be4c2f6d7f0d6eee612fd6c88d5ec83dd466f28788876a3c104"
+  },
+  "adapters": [
+    {
+      "editor": "codex",
+      "sourceDigest": "sha256:6117728d1629fcbd1ffc61d9daf1b2ebe3e9e13d30d71b724791e8a1efe528ac",
+      "compilerDigest": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+      "manifestDigest": "sha256:1ca3ed7866188fd1d31a6166a10f8d103756c23ef2f19f8a93d2d8d3b12d9f36",
+      "installCommand": "node atm.mjs integration add codex --json",
+      "verifyCommand": "node atm.mjs integration verify codex --json",
+      "installExitCode": 0,
+      "verifyExitCode": 0,
+      "degradationDiagnostics": [],
+      "reinstallSmoke": true,
+      "frozenRunnerSmoke": true
+    },
+    {
+      "editor": "claude-code",
+      "sourceDigest": "sha256:6117728d1629fcbd1ffc61d9daf1b2ebe3e9e13d30d71b724791e8a1efe528ac",
+      "compilerDigest": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+      "manifestDigest": "sha256:0be1894d8960a0e133272be12b5552e1b2fea77a1d5feba8df1bd7a301f482f4",
+      "installCommand": "node atm.mjs integration add claude-code --json",
+      "verifyCommand": "node atm.mjs integration verify claude-code --json",
+      "installExitCode": 0,
+      "verifyExitCode": 0,
+      "degradationDiagnostics": [],
+      "reinstallSmoke": true,
+      "frozenRunnerSmoke": true
+    },
+    {
+      "editor": "cursor",
+      "sourceDigest": "sha256:6117728d1629fcbd1ffc61d9daf1b2ebe3e9e13d30d71b724791e8a1efe528ac",
+      "compilerDigest": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+      "manifestDigest": "sha256:b0587f76b162a93f8d1c9a4b700cd03de03f41d13c4b2132b3a232f33cf214b5",
+      "installCommand": "node atm.mjs integration add cursor --json",
+      "verifyCommand": "node atm.mjs integration verify cursor --json",
+      "installExitCode": 0,
+      "verifyExitCode": 0,
+      "degradationDiagnostics": [],
+      "reinstallSmoke": true,
+      "frozenRunnerSmoke": true
+    },
+    {
+      "editor": "copilot",
+      "sourceDigest": "sha256:6117728d1629fcbd1ffc61d9daf1b2ebe3e9e13d30d71b724791e8a1efe528ac",
+      "compilerDigest": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+      "manifestDigest": "sha256:b1f3d700cd6403429bf8c2f26ddf08826aaa9b98f156a57434a454429563fb1a",
+      "installCommand": "node atm.mjs integration add copilot --json",
+      "verifyCommand": "node atm.mjs integration verify copilot --json",
+      "installExitCode": 0,
+      "verifyExitCode": 0,
+      "degradationDiagnostics": [],
+      "reinstallSmoke": true,
+      "frozenRunnerSmoke": true
+    },
+    {
+      "editor": "gemini",
+      "sourceDigest": "sha256:6117728d1629fcbd1ffc61d9daf1b2ebe3e9e13d30d71b724791e8a1efe528ac",
+      "compilerDigest": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+      "manifestDigest": "sha256:f808fcd1412d9fd63a4c4a120411698a5e1f183145dc68669adcf6b83b270e98",
+      "installCommand": "node atm.mjs integration add gemini --json",
+      "verifyCommand": "node atm.mjs integration verify gemini --json",
+      "installExitCode": 0,
+      "verifyExitCode": 0,
+      "degradationDiagnostics": [],
+      "reinstallSmoke": true,
+      "frozenRunnerSmoke": true
+    },
+    {
+      "editor": "antigravity",
+      "sourceDigest": "sha256:6117728d1629fcbd1ffc61d9daf1b2ebe3e9e13d30d71b724791e8a1efe528ac",
+      "compilerDigest": "sha256:089aaf5bac3adbc68dfc04ea2fc069c3bd5cd6ab68f4178fe7397c2ce56fb6a0",
+      "manifestDigest": "sha256:191cf698dc393be4c2f6d7f0d6eee612fd6c88d5ec83dd466f28788876a3c104",
+      "installCommand": "node atm.mjs integration add antigravity --json",
+      "verifyCommand": "node atm.mjs integration verify antigravity --json",
+      "installExitCode": 0,
+      "verifyExitCode": 0,
+      "degradationDiagnostics": [],
+      "reinstallSmoke": true,
+      "frozenRunnerSmoke": true
+    }
+  ],
+  "frozenRunner": {
+    "entrypoint": "release/atm-onefile/atm.mjs",
+    "smokeCommand": "node atm.mjs integration verify <adapter> --json"
+  },
+  "negativeControls": [
+    "direct-only installed edit must change manifest digest or verify drift",
+    "missing install/verify command blocks adapter",
+    "provider-specific authority cannot replace sealed source digest",
+    "stale projection blocks adapter parity"
+  ],
+  "rollback": {
+    "strategy": "reinstall-last-known-good-sealed-corpus-and-preserve-degradation-report",
+    "byteStableReinstallRequired": true
+  }
+}

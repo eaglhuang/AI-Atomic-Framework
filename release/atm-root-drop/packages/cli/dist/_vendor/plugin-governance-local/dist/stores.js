@@ -1,0 +1,485 @@
+import { createEvidenceLedgerEntry, sha256, verifyEvidenceLedgerEntry } from '../../core/dist/evidence/evidence-ledger.js';
+import { resolveLocalGovernanceLayout } from './layout.js';
+import { assertCanonicalShardInput, assertGeneratedKnowledgeCacheOutput, appendManifestRecord, capabilityResult, closeSync, createAbsoluteLayout, createContextBudgetSummary, createDefaultContextBudgetPolicy, createEmptyRegistry, createLockConflictError, evaluateContextBudget, existsSync, extractFsErrorCode, listFilesRecursive, mkdirSync, normalizeRelativePath, normalizeWorkItem, openSync, path, readDocumentIndex, readEvidenceDocument, readFileSync, readJsonFile, readManifestRecords, readUnknownFile, readdirSync, relativePathFrom, renderContextSummaryMarkdown, resolveRepoPath, sanitizeBudgetFileId, writeContentFile, writeFileSync, writeJsonFile, writeSync, writeUnknownFile, withJsonExtension, isReleasedLockRecord } from './stores/helpers.js';
+export function createLocalGovernanceStores(config) {
+    const repositoryRoot = path.resolve(config.repositoryRoot);
+    const layout = resolveLocalGovernanceLayout(config.layout);
+    const legacyEvidenceStorePath = path.join(repositoryRoot, layout.legacyEvidenceStorePath ?? '.atm/history/evidence');
+    const now = config.now ?? (() => new Date().toISOString());
+    const absoluteLayout = createAbsoluteLayout(repositoryRoot, layout);
+    function ensureAllDirectories() {
+        for (const directoryPath of Object.values(absoluteLayout)) {
+            mkdirSync(directoryPath, { recursive: true });
+        }
+    }
+    function initializeStore(kind) {
+        ensureAllDirectories();
+        return capabilityResult(`Initialized ${kind}.`);
+    }
+    const taskStore = {
+        initialize: () => initializeStore('task store'),
+        healthCheck: () => capabilityResult(`Task store is ready at ${layout.taskStorePath}.`),
+        createTask(workItem) {
+            ensureAllDirectories();
+            const filePath = path.join(absoluteLayout.taskStorePath, `${workItem.workItemId}.json`);
+            writeJsonFile(filePath, {
+                schemaVersion: 'atm.workItem.v0.1',
+                id: workItem.workItemId,
+                title: workItem.title,
+                status: workItem.status
+            });
+            return workItem;
+        },
+        getTask(workItemId) {
+            const filePath = path.join(absoluteLayout.taskStorePath, `${workItemId}.json`);
+            return existsSync(filePath) ? normalizeWorkItem(readJsonFile(filePath)) : null;
+        },
+        updateTaskStatus(workItemId, status) {
+            const filePath = path.join(absoluteLayout.taskStorePath, `${workItemId}.json`);
+            if (!existsSync(filePath)) {
+                throw new Error(`Task not found: ${workItemId}`);
+            }
+            const current = readJsonFile(filePath);
+            const updated = { ...current, status };
+            writeJsonFile(filePath, updated);
+            const normalized = normalizeWorkItem(updated);
+            if (!normalized) {
+                throw new Error(`Task store generated an invalid work item record for ${workItemId}`);
+            }
+            return normalized;
+        },
+        listTasks() {
+            if (!existsSync(absoluteLayout.taskStorePath)) {
+                return [];
+            }
+            return readdirSync(absoluteLayout.taskStorePath)
+                .filter((entry) => entry.endsWith('.json'))
+                .map((entry) => normalizeWorkItem(readJsonFile(path.join(absoluteLayout.taskStorePath, entry))))
+                .filter((entry) => entry !== null)
+                .sort((left, right) => left.workItemId.localeCompare(right.workItemId));
+        }
+    };
+    const lockStore = {
+        initialize: () => initializeStore('lock store'),
+        healthCheck: () => capabilityResult(`Lock store is ready at ${layout.lockStorePath}.`),
+        acquireLock(workItem, files, actor, laneSessionId) {
+            ensureAllDirectories();
+            const filePath = path.join(absoluteLayout.lockStorePath, `${workItem.workItemId}.lock.json`);
+            const timestamp = now();
+            const leaseEpoch = Date.parse(timestamp);
+            const record = {
+                schemaId: 'atm.governanceScopeLock',
+                specVersion: '0.1.0',
+                migration: {
+                    strategy: 'none',
+                    fromVersion: null,
+                    notes: 'Scope lock baseline record.'
+                },
+                workItemId: workItem.workItemId,
+                lockedBy: actor,
+                lockedAt: timestamp,
+                actorId: actor,
+                leaseId: `lease-${timestamp.replace(/[:.]/g, '-')}`,
+                leaseEpoch,
+                heartbeatAt: timestamp,
+                ttlSeconds: 1800,
+                // ATM-GOV-0395: record the lane explicitly when the caller knows it.
+                // Readers must be able to tell 'bound to another lane' from 'lane was
+                // never recorded'; a null here means the latter, never the former.
+                laneSessionId: typeof laneSessionId === 'string' && laneSessionId.trim().length > 0 ? laneSessionId.trim() : null,
+                files: Array.from(new Set(files.map((filePath) => normalizeRelativePath(filePath)).filter(Boolean)))
+            };
+            if (existsSync(filePath)) {
+                const existing = readJsonFile(filePath);
+                if (isReleasedLockRecord(existing) || existing.lockedBy === actor || existing.actorId === actor) {
+                    // A same-owner acquire refreshes the short-lived scope projection. It
+                    // must not erase a live task-direction authority embedded by the
+                    // lifecycle writer: that would leave the ledger and runtime views of
+                    // one task disagreeing after an ordinary renew/lock operation.
+                    // Released records deliberately do not carry this authority forward;
+                    // a later governed claim materializes a fresh direction lock.
+                    const taskDirectionLock = !isReleasedLockRecord(existing)
+                        && existing.taskDirectionLock
+                        && typeof existing.taskDirectionLock === 'object'
+                        && !Array.isArray(existing.taskDirectionLock)
+                        ? existing.taskDirectionLock
+                        : null;
+                    const refreshed = taskDirectionLock
+                        ? { ...record, taskDirectionLock }
+                        : record;
+                    writeJsonFile(filePath, refreshed);
+                    return refreshed;
+                }
+                throw createLockConflictError(workItem.workItemId, existing);
+            }
+            try {
+                const descriptor = openSync(filePath, 'wx');
+                try {
+                    writeSync(descriptor, `${JSON.stringify(record, null, 2)}\n`, undefined, 'utf8');
+                }
+                finally {
+                    closeSync(descriptor);
+                }
+            }
+            catch (error) {
+                const errorCode = extractFsErrorCode(error);
+                if (errorCode === 'EEXIST') {
+                    const existing = existsSync(filePath) ? readJsonFile(filePath) : null;
+                    throw createLockConflictError(workItem.workItemId, existing);
+                }
+                throw error;
+            }
+            return record;
+        },
+        getLock(workItemId) {
+            const filePath = path.join(absoluteLayout.lockStorePath, `${workItemId}.lock.json`);
+            if (!existsSync(filePath))
+                return null;
+            const record = readJsonFile(filePath);
+            return isReleasedLockRecord(record) ? null : record;
+        },
+        releaseLock(workItemId, actor) {
+            const filePath = path.join(absoluteLayout.lockStorePath, `${workItemId}.lock.json`);
+            const timestamp = now();
+            const current = existsSync(filePath)
+                ? readJsonFile(filePath)
+                : {
+                    schemaId: 'atm.governanceScopeLock',
+                    specVersion: '0.1.0',
+                    migration: {
+                        strategy: 'none',
+                        fromVersion: null,
+                        notes: 'Scope lock release marker.'
+                    },
+                    workItemId
+                };
+            writeJsonFile(filePath, {
+                ...current,
+                workItemId,
+                released: true,
+                status: 'released',
+                releasedAt: timestamp,
+                releasedBy: actor,
+                releaseEpoch: Date.parse(timestamp)
+            });
+            return capabilityResult(`Released scope lock for ${workItemId}.`);
+        }
+    };
+    const documentIndex = {
+        initialize: () => initializeStore('document index'),
+        healthCheck: () => capabilityResult(`Document index is ready at ${layout.documentIndexPath}.`),
+        resolveDocumentId(documentId) {
+            const exact = readDocumentIndex(absoluteLayout.documentIndexPath).find((entry) => entry.documentId === documentId || entry.path === documentId);
+            return exact?.path ?? null;
+        },
+        searchDocuments(query) {
+            const normalizedQuery = String(query || '').trim().toLowerCase();
+            if (!normalizedQuery) {
+                return [];
+            }
+            return readDocumentIndex(absoluteLayout.documentIndexPath)
+                .filter((entry) => JSON.stringify(entry).toLowerCase().includes(normalizedQuery))
+                .map((entry) => entry.path);
+        },
+        updateDocument(documentPath, metadata) {
+            ensureAllDirectories();
+            const indexPath = path.join(absoluteLayout.documentIndexPath, 'documents.json');
+            const entries = readDocumentIndex(absoluteLayout.documentIndexPath).filter((entry) => entry.path !== documentPath);
+            entries.push({
+                documentId: String(metadata.documentId ?? documentPath),
+                path: normalizeRelativePath(documentPath),
+                metadata
+            });
+            writeJsonFile(indexPath, entries);
+            return capabilityResult(`Indexed document ${documentPath}.`);
+        }
+    };
+    const shardStore = {
+        initialize: () => initializeStore('shard store'),
+        healthCheck: () => capabilityResult(`Shard store is ready at ${layout.shardStorePath}.`),
+        readShard(shardPath) {
+            assertCanonicalShardInput(shardPath);
+            const absolutePath = resolveRepoPath(repositoryRoot, shardPath);
+            return existsSync(absolutePath) ? readUnknownFile(absolutePath) : null;
+        },
+        writeShard(shardPath, value) {
+            assertCanonicalShardInput(shardPath);
+            ensureAllDirectories();
+            writeUnknownFile(resolveRepoPath(repositoryRoot, shardPath), value);
+            return capabilityResult(`Wrote shard ${normalizeRelativePath(shardPath)}.`);
+        },
+        rebuildIndex(indexPath) {
+            assertGeneratedKnowledgeCacheOutput(indexPath);
+            ensureAllDirectories();
+            const entries = listFilesRecursive(absoluteLayout.shardStorePath).map((filePath) => relativePathFrom(repositoryRoot, filePath));
+            writeJsonFile(resolveRepoPath(repositoryRoot, indexPath), {
+                updatedAt: now(),
+                entries
+            });
+            return capabilityResult(`Rebuilt shard index ${normalizeRelativePath(indexPath)}.`);
+        }
+    };
+    const artifactStore = {
+        initialize: () => initializeStore('artifact store'),
+        healthCheck: () => capabilityResult(`Artifact store is ready at ${layout.artifactStorePath}.`),
+        writeArtifact(record, content) {
+            ensureAllDirectories();
+            const targetPath = resolveRepoPath(repositoryRoot, record.artifactPath);
+            mkdirSync(path.dirname(targetPath), { recursive: true });
+            writeContentFile(targetPath, content);
+            appendManifestRecord(path.join(absoluteLayout.artifactStorePath, 'manifest.json'), record);
+            return record;
+        },
+        listArtifacts(workItemId) {
+            return readManifestRecords(path.join(absoluteLayout.artifactStorePath, 'manifest.json'))
+                .filter((record) => record.artifactPath.includes(workItemId));
+        }
+    };
+    const logStore = {
+        initialize: () => initializeStore('log store'),
+        healthCheck: () => capabilityResult(`Log store is ready at ${layout.logStorePath}.`),
+        appendLog(workItemId, message) {
+            ensureAllDirectories();
+            const filePath = path.join(absoluteLayout.logStorePath, `${workItemId}.log`);
+            writeFileSync(filePath, `${existsSync(filePath) ? readFileSync(filePath, 'utf8') : ''}${message}\n`, 'utf8');
+            return capabilityResult(`Appended log for ${workItemId}.`);
+        },
+        readLog(workItemId) {
+            const filePath = path.join(absoluteLayout.logStorePath, `${workItemId}.log`);
+            return existsSync(filePath) ? readFileSync(filePath, 'utf8') : '';
+        }
+    };
+    const runReportStore = {
+        initialize: () => initializeStore('run report store'),
+        healthCheck: () => capabilityResult(`Run report store is ready at ${layout.runReportStorePath}.`),
+        writeRunReport(reportId, report) {
+            ensureAllDirectories();
+            writeJsonFile(path.join(absoluteLayout.runReportStorePath, withJsonExtension(reportId)), report);
+            return capabilityResult(`Wrote run report ${reportId}.`);
+        },
+        readRunReport(reportId) {
+            const filePath = path.join(absoluteLayout.runReportStorePath, withJsonExtension(reportId));
+            return existsSync(filePath) ? readJsonFile(filePath) : null;
+        }
+    };
+    const stateStore = {
+        initialize: () => initializeStore('state store'),
+        healthCheck: () => capabilityResult(`State store is ready at ${layout.stateStorePath}.`),
+        readMarkdown(filePath) {
+            const absolutePath = resolveRepoPath(repositoryRoot, filePath);
+            return existsSync(absolutePath) ? readFileSync(absolutePath, 'utf8') : '';
+        },
+        writeMarkdown(filePath, content) {
+            const absolutePath = resolveRepoPath(repositoryRoot, filePath);
+            mkdirSync(path.dirname(absolutePath), { recursive: true });
+            writeFileSync(absolutePath, content, 'utf8');
+            return capabilityResult(`Wrote markdown state ${normalizeRelativePath(filePath)}.`);
+        },
+        readJson(filePath) {
+            const absolutePath = resolveRepoPath(repositoryRoot, filePath);
+            return existsSync(absolutePath) ? readJsonFile(absolutePath) : null;
+        },
+        writeJson(filePath, value) {
+            writeJsonFile(resolveRepoPath(repositoryRoot, filePath), value);
+            return capabilityResult(`Wrote JSON state ${normalizeRelativePath(filePath)}.`);
+        }
+    };
+    const ruleGuard = {
+        initialize: () => initializeStore('rule guard'),
+        healthCheck: () => capabilityResult(`Rule guard is ready at ${layout.ruleGuardPath}.`),
+        runGuard(guardId, context) {
+            ensureAllDirectories();
+            const artifactPath = path.join(layout.ruleGuardPath, withJsonExtension(guardId));
+            writeJsonFile(resolveRepoPath(repositoryRoot, artifactPath), {
+                guardId,
+                ok: true,
+                generatedAt: now(),
+                context
+            });
+            return capabilityResult(`Recorded rule guard result for ${guardId}.`, [{
+                    artifactPath,
+                    artifactKind: 'report',
+                    producedBy: '@ai-atomic-framework/plugin-governance-local:rule-guard'
+                }]);
+        }
+    };
+    const appendLedgerEvidence = (workItemId, evidence) => {
+        const entry = createEvidenceLedgerEntry(workItemId, evidence);
+        const ledgerRoot = path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger');
+        const recordsRoot = path.join(ledgerRoot, 'records');
+        const workItemsRoot = path.join(ledgerRoot, 'work-items');
+        mkdirSync(recordsRoot, { recursive: true });
+        mkdirSync(workItemsRoot, { recursive: true });
+        const recordPath = path.join(recordsRoot, `${entry.digest.slice('sha256:'.length)}.json`);
+        if (!existsSync(recordPath))
+            writeJsonFile(recordPath, entry);
+        const indexPath = path.join(workItemsRoot, `${workItemId}.json`);
+        const existing = existsSync(indexPath) ? readJsonFile(indexPath) : {};
+        const digests = Array.isArray(existing.digests) ? existing.digests.filter((digest) => typeof digest === 'string') : [];
+        if (!digests.includes(entry.digest))
+            writeJsonFile(indexPath, { schemaId: 'atm.evidenceLedgerWorkItemIndex.v1', workItemId, digests: [...digests, entry.digest] });
+        return entry;
+    };
+    const resolveLedgerEvidence = (digest) => {
+        const recordPath = path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'records', `${digest.replace(/^sha256:/, '')}.json`);
+        if (!existsSync(recordPath))
+            return null;
+        const entry = readJsonFile(recordPath);
+        return verifyEvidenceLedgerEntry(entry) ? entry : null;
+    };
+    const checkpointLedgerEvidence = () => {
+        const recordsRoot = path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'records');
+        const entryDigests = existsSync(recordsRoot)
+            ? readdirSync(recordsRoot).filter((entry) => entry.endsWith('.json')).map((entry) => `sha256:${entry.slice(0, -'.json'.length)}`).sort()
+            : [];
+        return { schemaId: 'atm.evidenceLedgerCheckpoint.v1', entryDigests, digest: sha256({ entryDigests }) };
+    };
+    const evidenceStore = {
+        initialize: () => {
+            mkdirSync(path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'records'), { recursive: true });
+            mkdirSync(path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'work-items'), { recursive: true });
+            return capabilityResult('Evidence Ledger is ready outside Git history.');
+        },
+        healthCheck: () => capabilityResult('Evidence Ledger is ready outside Git history.'),
+        appendEvidence(workItemId, evidence) {
+            return appendLedgerEvidence(workItemId, evidence);
+        },
+        resolveEvidence(digest) {
+            return resolveLedgerEvidence(digest);
+        },
+        verifyEvidence(digest) {
+            const entry = resolveLedgerEvidence(digest);
+            return entry !== null && verifyEvidenceLedgerEntry(entry);
+        },
+        checkpointEvidence() {
+            return checkpointLedgerEvidence();
+        },
+        writeEvidence(workItemId, evidence) {
+            return appendLedgerEvidence(workItemId, evidence).record;
+        },
+        listEvidence(workItemId) {
+            const indexPath = path.join(repositoryRoot, '.atm', 'runtime', 'evidence-ledger', 'work-items', `${workItemId}.json`);
+            if (existsSync(indexPath)) {
+                const index = readJsonFile(indexPath);
+                const entries = Array.isArray(index.digests) ? index.digests.map((digest) => typeof digest === 'string' ? resolveLedgerEvidence(digest) : null).filter((entry) => entry !== null) : [];
+                return entries.map((entry) => entry.record);
+            }
+            return readEvidenceDocument(path.join(legacyEvidenceStorePath, `${workItemId}.json`)).evidence;
+        }
+    };
+    const registryStore = {
+        initialize: () => initializeStore('registry store'),
+        healthCheck: () => capabilityResult(`Registry store is ready at ${layout.registryStorePath ?? '.atm/catalog/registry'}.`),
+        readRegistry() {
+            ensureAllDirectories();
+            const filePath = path.join(absoluteLayout.registryStorePath, 'registry.json');
+            if (!existsSync(filePath)) {
+                const emptyRegistry = createEmptyRegistry(now());
+                writeJsonFile(filePath, emptyRegistry);
+                return emptyRegistry;
+            }
+            return readJsonFile(filePath);
+        },
+        writeRegistryEntry(entry) {
+            const filePath = path.join(absoluteLayout.registryStorePath, 'registry.json');
+            const registry = existsSync(filePath)
+                ? readJsonFile(filePath)
+                : createEmptyRegistry(now());
+            const nextEntries = registry.entries.filter((candidate) => ('atomId' in candidate ? candidate.atomId : candidate.mapId) !== entry.atomId);
+            nextEntries.push(entry);
+            writeJsonFile(filePath, {
+                ...registry,
+                generatedAt: now(),
+                entries: nextEntries
+            });
+            return entry;
+        }
+    };
+    const contextBudgetGuard = {
+        initialize() {
+            ensureAllDirectories();
+            const defaultPolicy = createDefaultContextBudgetPolicy(now());
+            const filePath = path.join(absoluteLayout.contextBudgetStorePath, `${defaultPolicy.policyId}.json`);
+            if (!existsSync(filePath)) {
+                writeJsonFile(filePath, defaultPolicy);
+            }
+            return capabilityResult(`Initialized context budget guard at ${layout.contextBudgetStorePath ?? '.atm/runtime/budget'}.`);
+        },
+        healthCheck: () => capabilityResult(`Context budget guard is ready at ${layout.contextBudgetStorePath ?? '.atm/runtime/budget'}.`),
+        readPolicy(policyId = 'default-policy') {
+            const filePath = path.join(absoluteLayout.contextBudgetStorePath, `${policyId}.json`);
+            return existsSync(filePath) ? readJsonFile(filePath) : null;
+        },
+        writePolicy(policy) {
+            ensureAllDirectories();
+            writeJsonFile(path.join(absoluteLayout.contextBudgetStorePath, `${policy.policyId}.json`), policy);
+            return policy;
+        },
+        evaluateBudget(input) {
+            ensureAllDirectories();
+            const defaultPolicyPath = path.join(absoluteLayout.contextBudgetStorePath, 'default-policy.json');
+            const policy = existsSync(defaultPolicyPath)
+                ? readJsonFile(defaultPolicyPath)
+                : createDefaultContextBudgetPolicy(now());
+            const evaluation = evaluateContextBudget(policy, input, now());
+            const reportPath = path.join(layout.runReportStorePath, 'context-budget', `${sanitizeBudgetFileId(input.budgetId)}.json`);
+            writeJsonFile(resolveRepoPath(repositoryRoot, reportPath), {
+                budgetId: input.budgetId,
+                workItemId: input.workItemId ?? null,
+                policyId: policy.policyId,
+                decision: evaluation.decision,
+                estimatedTokens: evaluation.estimatedTokens,
+                inlineArtifacts: evaluation.inlineArtifacts,
+                generatedAt: evaluation.generatedAt,
+                reason: evaluation.reason
+            });
+            let summaryPath;
+            if (evaluation.decision !== 'pass') {
+                summaryPath = path.join(layout.contextBudgetStorePath ?? '.atm/runtime/budget', `${sanitizeBudgetFileId(input.budgetId)}.md`);
+                writeFileSync(resolveRepoPath(repositoryRoot, summaryPath), createContextBudgetSummary(policy, input, evaluation), 'utf8');
+            }
+            return {
+                ...evaluation,
+                policyId: policy.policyId,
+                budgetId: input.budgetId,
+                reportPath: normalizeRelativePath(reportPath),
+                summaryPath: summaryPath ? normalizeRelativePath(summaryPath) : undefined
+            };
+        }
+    };
+    const contextSummaryStore = {
+        initialize: () => initializeStore('context summary store'),
+        healthCheck: () => capabilityResult(`Context summary store is ready at ${layout.contextSummaryStorePath ?? '.atm/history/handoff'}.`),
+        writeSummary(summary) {
+            ensureAllDirectories();
+            const filePath = path.join(absoluteLayout.contextSummaryStorePath, `${summary.workItemId}.json`);
+            const markdownPath = path.join(absoluteLayout.contextSummaryStorePath, `${summary.workItemId}.md`);
+            const materializedSummary = {
+                ...summary,
+                summaryMarkdownPath: summary.summaryMarkdownPath ?? normalizeRelativePath(path.join(layout.contextSummaryStorePath ?? '.atm/history/handoff', `${summary.workItemId}.md`))
+            };
+            writeJsonFile(filePath, materializedSummary);
+            writeFileSync(markdownPath, renderContextSummaryMarkdown(materializedSummary), 'utf8');
+            return materializedSummary;
+        },
+        readSummary(workItemId) {
+            const filePath = path.join(absoluteLayout.contextSummaryStorePath, `${workItemId}.json`);
+            return existsSync(filePath) ? readJsonFile(filePath) : null;
+        }
+    };
+    return {
+        taskStore,
+        lockStore,
+        documentIndex,
+        shardStore,
+        artifactStore,
+        logStore,
+        runReportStore,
+        stateStore,
+        ruleGuard,
+        evidenceStore,
+        registryStore,
+        contextBudgetGuard,
+        contextSummaryStore
+    };
+}

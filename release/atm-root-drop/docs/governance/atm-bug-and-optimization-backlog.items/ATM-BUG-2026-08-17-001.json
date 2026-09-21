@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-17-001",
+  "date": "2026-08-17",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P2",
+  "status": "Closed — structured proposal-first recovery contract shipped and verified 2026-09-05",
+  "area": "Team Agents proposal-first rejections lacked machine-actionable recovery contract with requiredCommands and schema bindings",
+  "finding": "When team plan or team start encountered a hot shared surface requiring proposal-first broker admission, the command failed closed with proposal-first-required but only emitted human-targeted text hints without a structured, machine-actionable recovery payload. Automated caller agents and CLI integrations could not programmatically parse the required schema, hotFiles, broker subject decision, or exact recovery commands (such as node atm.mjs team plan --task <task> --broker-proposal-file <proposal.json> --json), hindering agentic auto-recovery.",
+  "expectedBehavior": "When broker lane evaluation rejects a team run on hot shared surfaces (state: proposal-submitted), the resulting PermissionFinding and CLI messages/evidence must attach a structured TeamProposalRecoveryContract with schemaId: 'atm.patchProposal.v1', hotFiles, brokerSubject, requiredCommands (planPreview, teamStart, brokerActivate), and explicit assertions that runtimeWritten, teamRunMinted, and writeLeaseGranted are false.",
+  "evidenceOrRepro": "Observed during dogfooding where hot surface collisions triggered ATM_TEAM_START_BLOCKED and ATM_TEAM_PLAN_INVALID without structured recovery properties. The repair is present in 6843a288 and the focused regression tests/cli/team-proposal-first-recovery.test.ts passed on 2026-09-05.",
+  "followUp": "Source repair and focused regression are complete. Formal backlog closeout remains a steward action; no new source change is warranted unless a new recovery-shape reproduction appears."
+}

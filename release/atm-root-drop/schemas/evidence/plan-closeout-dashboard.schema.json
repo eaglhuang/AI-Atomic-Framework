@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atm.local/schemas/evidence/plan-closeout-dashboard.schema.json",
+  "title": "ATM Plan Closeout Dashboard",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "generatedAt",
+    "producer",
+    "readOnly",
+    "readiness",
+    "authorityDigest",
+    "timeWindow",
+    "rawArtifacts",
+    "rawInputDigest",
+    "layers",
+    "objectiveVerdict",
+    "staleCounterReuse",
+    "blockers",
+    "digest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.planCloseoutDashboard.v1" },
+    "generatedAt": { "type": "string" },
+    "producer": { "type": "string" },
+    "readOnly": { "const": true },
+    "readiness": { "enum": ["ready", "not-ready"] },
+    "authorityDigest": { "type": "string" },
+    "timeWindow": {
+      "type": "object",
+      "required": ["startedAt", "endedAt", "watermark"],
+      "properties": {
+        "startedAt": { "type": "string" },
+        "endedAt": { "type": ["string", "null"] },
+        "watermark": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "rawArtifacts": { "type": "array" },
+    "rawInputDigest": { "type": "string" },
+    "layers": { "type": "array" },
+    "objectiveVerdict": {
+      "type": "object",
+      "required": ["schemaId", "expectedDenominators", "observedDenominators", "sortedRowDigest", "findings", "status"],
+      "properties": {
+        "schemaId": { "const": "atm.fourPlanObjectiveVerdict.v1" },
+        "expectedDenominators": { "type": "object" },
+        "observedDenominators": { "type": "object" },
+        "sortedRowDigest": { "type": "string" },
+        "findings": { "type": "array" },
+        "status": { "enum": ["ready", "not-ready"] }
+      },
+      "additionalProperties": true
+    },
+    "staleCounterReuse": { "const": false },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "digest": { "type": "string" }
+  },
+  "additionalProperties": false
+}

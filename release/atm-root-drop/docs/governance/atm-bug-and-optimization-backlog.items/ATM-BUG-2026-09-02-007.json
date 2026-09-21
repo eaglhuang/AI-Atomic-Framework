@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-02-007",
+  "date": "2026-09-02",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Closed — timeout fixture now establishes its required temporary claim",
+  "area": "Governed git commit timeout and status regression coverage",
+  "finding": "git-commit-timeout-and-status.test.ts invoked a framework governed commit without the temporary framework claim now required before any commit execution. The command therefore failed at admission with ATM_GIT_COMMIT_FRAMEWORK_CLAIM_REQUIRED, so the test no longer reached its intended hanging pre-commit hook or verified timeout and commit-status semantics.",
+  "expectedBehavior": "The timeout fixture must establish the same narrow temporary claim required in production before issuing its commit. It must then prove that a hanging hook returns ATM_GIT_COMMIT_FAILED within the configured timeout and that commit-status records the timeout before also proving the successful retry path.",
+  "evidenceOrRepro": "On 2026-09-02 the unmodified fixture failed at tests/cli/git-commit-timeout-and-status.test.ts:115: expected ATM_GIT_COMMIT_FAILED but actual ATM_GIT_COMMIT_FRAMEWORK_CLAIM_REQUIRED. The repair calls runFrameworkTempClaim with only src/hangs.ts and src/succeeds.ts before the first commit. The focused test then passes, including timeout and post-success commit-status assertions; npm run typecheck also passes.",
+  "containment": "Fixture-only change. It does not relax framework commit admission, alter timeout behavior, or create a taskless bypass; the temporary fixture repository is removed in finally.",
+  "followUp": "Closed after replaying the exact fixture with its real claim prerequisite. Future governed-commit fixtures must establish the admission capability required to reach the behavior under test."
+}

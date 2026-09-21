@@ -1,0 +1,99 @@
+{
+  "schemaId": "atm.governanceIncidentFixture.v1",
+  "specVersion": "0.1.0",
+  "semanticFamily": "shared-index-commit-attribution",
+  "title": "Governed commit absorbs content it did not admit",
+  "faultFingerprint": {
+    "violatedInvariant": "commit-content-attribution-boundary",
+    "surface": "governed-commit",
+    "preconditions": [
+      "two writers share one canonical worktree and one index",
+      "writer-a resolves and admits a bundle of paths",
+      "writer-b mutates the index or the worktree before writer-a's commit executes"
+    ],
+    "observation": "the resulting commit tree is not equal to the bundle writer-a admitted",
+    "writeOutcome": "ref advanced with unadmitted content"
+  },
+  "variants": [
+    {
+      "variantId": "unexpected-path",
+      "summary": "A path no admitted slice declared appears in the candidate tree.",
+      "expectedInvariant": "candidate tree equals sealed bundle",
+      "expectedOutcome": "fail-closed before any ref update",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_MISMATCH"
+    },
+    {
+      "variantId": "same-path-blob-substitution",
+      "summary": "An admitted path keeps its name but its content is replaced between admission and assembly.",
+      "expectedInvariant": "committed blob equals the sealed blob",
+      "expectedOutcome": "the sealed content is committed; the substitution never lands",
+      "expectedCode": null
+    },
+    {
+      "variantId": "empty-bundle-live-index-fallback",
+      "summary": "No task-scoped bundle resolves and the executor would commit whatever the shared index holds.",
+      "expectedInvariant": "no governed commit without a sealed bundle",
+      "expectedOutcome": "fail-closed",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_EMPTY_BUNDLE"
+    },
+    {
+      "variantId": "apply-before-admission",
+      "summary": "A shared-delivery plan is rejected after the commit object was written and the ref advanced.",
+      "expectedInvariant": "a rejected plan leaves HEAD unchanged",
+      "expectedOutcome": "no commit object is published and HEAD is byte-identical",
+      "expectedCode": null
+    },
+    {
+      "variantId": "staged-deletion-dropped-from-seal",
+      "summary": "A staged deletion has no index entry, so a seal built only from present content omits it and the file survives the commit.",
+      "expectedInvariant": "deletion is sealed as an explicit tombstone and the committed tree omits the path",
+      "expectedOutcome": "the deletion and any accompanying modification both land",
+      "expectedCode": null
+    },
+    {
+      "variantId": "tombstone-not-honoured",
+      "summary": "A tombstoned path is still present in the candidate tree.",
+      "expectedInvariant": "a tombstone requires absence from the committed tree",
+      "expectedOutcome": "fail-closed before any ref update",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_MISMATCH"
+    },
+    {
+      "variantId": "out-of-scope-deletion",
+      "summary": "A deletion outside the admitted scope is staged alongside an admitted one.",
+      "expectedInvariant": "unadmitted removals are excluded, never absorbed",
+      "expectedOutcome": "excluded from the candidate; forcing it in fails closed",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_MISMATCH"
+    },
+    {
+      "variantId": "concurrent-sealed-preparation",
+      "summary": "Two writers seal their own slices from the one shared index at overlapping times.",
+      "expectedInvariant": "a prepared seal is stable while the other writer stages",
+      "expectedOutcome": "both seals carry only their own paths and each candidate tree proves independently",
+      "expectedCode": null
+    },
+    {
+      "variantId": "unsealed-live-index-fallback",
+      "summary": "A governed commit reaches candidate assembly with no admitted bundle and no named seal route.",
+      "expectedInvariant": "sealing the live shared index is a named decision, never a default",
+      "expectedOutcome": "fail-closed before a candidate index exists",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_UNSEALED_BUNDLE"
+    },
+    {
+      "variantId": "provenance-relabel",
+      "summary": "An overlay re-declares an admitted path with identical content under a different provenance.",
+      "expectedInvariant": "supersession is allowed only for paths the transaction declares it staged",
+      "expectedOutcome": "fail-closed before any ref update, with the conflict named",
+      "expectedCode": "ATM_COMMIT_ATTRIBUTION_MISMATCH"
+    },
+    {
+      "variantId": "head-moved-after-admission",
+      "summary": "Another lane advances HEAD between admission and ref update.",
+      "expectedInvariant": "ref update is compare-and-swap, never a force",
+      "expectedOutcome": "the other lane's commit survives and the delivery requeues",
+      "expectedCode": "ATM_BROKER_BATCH_COMMIT_HEAD_MOVED"
+    }
+  ],
+  "redGreenRunner": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+  "additionalRunners": ["node --strip-types tests/cli/commit-attribution-concurrency-gates.test.ts"],
+  "notes": "Writer identities, paths and timestamps in this fixture are synthetic. The family reproduces from the shape of the interleaving, not from any recorded task, actor or date."
+}

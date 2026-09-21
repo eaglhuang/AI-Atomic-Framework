@@ -1,0 +1,50 @@
+[
+  {
+    "runId": 33742327598,
+    "failureClass": "typecheck-failure",
+    "rootCause": "Product CI Typecheck step: TS18048/TS2339 in tests/cli/task-scope-amendment.test.ts (CommandSpec options/examples typing). Job 100606858743.",
+    "repairRunId": 33743079931
+  },
+  {
+    "runId": 34607184874,
+    "failureClass": "packaging-vendored-module-missing",
+    "rootCause": "Product CI Clean-install packed CLI smoke step: npm pack esbuild could not resolve ../_vendor/agent-pack-*/dist/index.js (280 errors). Job 103288384280.",
+    "repairRunId": 34619400251
+  },
+  {
+    "runId": 34743447406,
+    "failureClass": "typecheck-failure",
+    "rootCause": "Product CI Typecheck step: TS2322 number | null not assignable to number in scripts/lib/external-benchmark/metrics.ts(75,5). Job 103686938762.",
+    "repairRunId": 34747569011
+  },
+  {
+    "runId": 35455553721,
+    "failureClass": "test-environment-assumption",
+    "rootCause": "Product CI CLI test sweep step (first run of the new step): tests/cli/rescue-worktree-normal-write-classification.test.ts used the framework HEAD as its rescue commit; in the depth-1 CI checkout that commit has no parent, so git diff-tree listed no files and violationCount was 0 instead of 1. Fixed in 5e57bc4c7 with a self-contained two-commit fixture. Job 105930068003.",
+    "repairRunId": 35456332855
+  },
+  {
+    "runId": 35611206022,
+    "failureClass": "generated-artifact-out-of-date",
+    "rootCause": "Product CI CLI test sweep job 106370472156 (https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/35611206022/job/106370472156): commit 8e91890fa changed CLI source under packages/cli/src without rebuilding the sealed runner, so packages/cli/dist lagged its own source. cli-published-command-smoke.test.ts, public-npm-install-contract.test.ts, root-drop-release-incremental-overlay.test.ts and root-drop-release-manifest-integrity.test.ts all exited 0 -- they passed -- but each rebuilt dist and so left packages/cli/dist and release/** dirty, which the sweep attributes as a worktree write and fails on. This was not a concurrency race: a race shows a non-zero exit, as run 35613071140 later did. Fixed in 9f63771ec by rebuilding and republishing the sealed runner at the fix commit. That rebuild run, 35613071140, then failed on a separate shared-build race recorded under its own disposition, so the first successful run after this failure is 35614323601.",
+    "repairRunId": 35614323601
+  },
+  {
+    "runId": 35613071140,
+    "failureClass": "test-generated-output-race",
+    "rootCause": "Product CI CLI test sweep job 106376796403 (https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/35613071140/job/106376796403): root-drop-release-manifest-integrity.test.ts failed because build-package-dist exited non-zero while other sweep members regenerated the same packages/cli/dist and release/** trees. Fixed in 065352233 by marking the shared-build tests serial; path-limited diff scripts/cli-test-sweep.config.json digest sha256:08ef09eece9a499680ea61d3f3efb6472e72d659f84ca3207588ac4e0b8912a6. Successor run 35614323601 reported all 585 selected tests (600 minus 15 quarantine entries) with failures: [].",
+    "repairRunId": 35614323601
+  },
+  {
+    "runId": 35617577008,
+    "failureClass": "test-live-repository-assumption",
+    "rootCause": "Product CI CLI test sweep job 106392144866 (https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/35617577008/job/106392144866): historical-residue-cleanup.test.ts asserted that the CI clone itself contained a governance residue receipt. Fresh CI checkouts need not contain that historical residue, so the test failed with 'expected at least one governance residue receipt'. Fixed in 282dc293 by a self-contained fixture that creates and asserts reachable, quarantineable, and active residue shapes; path-limited diff tests/cli/historical-residue-cleanup.test.ts digest sha256:164640dd67716aa5ec03735fb050d860d579ee9b7bef862fd55ed5e642ac86b0. Successor run 35619033450 reported all 589 selected tests (600 minus 11 quarantine entries), including this non-quarantined fixture test, with failures: [].",
+    "repairRunId": 35619033450
+  },
+  {
+    "runId": 35635887383,
+    "failureClass": "validation-gate-aborted-receipt",
+    "rootCause": "Product CI CLI test sweep job 106453074821 (https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/35635887383/job/106453074821): commit 767595d9d added an installed-path-length budget to scripts/validate-public-npm-install.ts and enforced it by throwing. The validator is also run against older versions to produce the comparison baseline, and the published 0.1.0 measures 167 characters against a cap of 165 ratcheted from 0.1.2. The throw fired before the receipt was assembled, so the 0.1.0 run returned no validation block at all and public-npm-install-contract.test.ts failed with 'Cannot read properties of undefined (reading cleanConsumer)'. The gate itself was correct; applying a cap meant for the version under development to every version it measures was not, and the effect was to delete the evidence rather than to block a regression. Fixed in 451e9016f by recording the measurement for every version and reporting a breach as validation.installedPathBudgetExceeded, which forces passed false while leaving the receipt complete; the build-time gate in scripts/build-package-dist.ts remains a hard stop. Verified against the published 0.1.0: validation present, path 167, exceeded true, passed false, historical core-workflow failures preserved. Path-limited diff scripts/validate-public-npm-install.ts digest sha256:07b6fbe4bfbd4efc47f35ee0dc6864ca556ed7907fed06eb988794abe71d06c2. Successor run 35637469628 reported Product CI success.",
+    "repairRunId": 35637469628
+  }
+]

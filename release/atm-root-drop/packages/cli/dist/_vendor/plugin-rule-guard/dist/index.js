@@ -1,0 +1,8 @@
+export const pluginRuleGuardPackage = {
+    packageName: '@ai-atomic-framework/plugin-rule-guard',
+    packageRole: 'deterministic-rule-guards',
+    packageVersion: '0.0.0'
+};
+export { defaultNeutralityPolicyRelativePath, formatGitHubAnnotations, loadNeutralityPolicy, scanNeutralityRepository, scanNeutralityText } from './neutrality-scanner.js';
+export { LIFECYCLE_POLICE_WRITER, buildCallerMigrationNotices, canWriteQuarantine, lifecyclePolicePlugin, runLifecyclePolice } from './lifecycle-police.js';
+export { checkGuardJustification } from './rule-justification.js';

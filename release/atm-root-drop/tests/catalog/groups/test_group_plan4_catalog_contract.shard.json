@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_plan4_catalog_contract",
+  "theme": "Canonical test-catalog namespace and migration contract",
+  "resourceKey": "plan4-catalog-contract",
+  "maintainers": ["atm-core"],
+  "supportedSeams": [
+    "catalog-id-generation",
+    "historical-alias-lineage",
+    "full-catalog-validation"
+  ],
+  "dependencyEdges": ["catalog-contract-completeness"],
+  "cases": [
+    {
+      "caseId": "test_task_atm_gov_0313_historical_shard_namespace_migration_8a48480f",
+      "semanticKey": "historical_shard_namespace_migration",
+      "responsibility": "task-required",
+      "command": "node --strip-types tests/cli/plan4-catalog-contract.test.ts",
+      "coversAcceptance": ["ACC-1", "ACC-2", "ACC-4"],
+      "coversImpactEdges": ["historical-alias-lineage"]
+    },
+    {
+      "caseId": "test_task_atm_gov_0313_complete_catalog_schema_contract_7d958211",
+      "semanticKey": "complete_catalog_schema_contract",
+      "responsibility": "task-required",
+      "command": "node --strip-types tests/cli/plan4-catalog-contract.test.ts",
+      "coversAcceptance": ["ACC-3", "ACC-5", "ACC-6"],
+      "coversImpactEdges": ["catalog-contract-completeness", "full-catalog-validation"]
+    }
+  ],
+  "aliases": [],
+  "lineage": [],
+  "costBudgetMs": 30000,
+  "timeoutMs": 60000,
+  "quarantine": false,
+  "checkpointPolicy": "task-required"
+}

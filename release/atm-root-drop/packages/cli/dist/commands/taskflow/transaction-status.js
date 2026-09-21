@@ -1,0 +1,3 @@
+export const TRANSACTION_STATUS_SCHEMA_ID = 'atm.transactionStatusReceipt.v1';
+export function createTransactionStatus(input) { const ticketId = String(input?.ticketId ?? '').trim(); const idempotencyKey = String(input?.idempotencyKey ?? '').trim(); return { schemaId: TRANSACTION_STATUS_SCHEMA_ID, ticketId, phase: input?.phase ?? 'blocked', readOnlyRecoveryCommand: `node atm.mjs transaction status --ticket ${ticketId} --json`, idempotencyKey, noWrite: input?.noWrite !== false }; }
+export function retryTransactionStatus(receipt) { return { ...receipt, noWrite: true, readOnlyRecoveryCommand: `node atm.mjs transaction status --ticket ${receipt.ticketId} --json` }; }

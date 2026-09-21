@@ -1,0 +1,7 @@
+import assert from 'node:assert/strict';
+import { compileEvidenceFreshnessCertificate } from '../../packages/core/src/evidence/evidence-freshness-certificate.ts';
+const base = { certificateId: 'cert-2', authorityDigest: 'sha256:authority', expectedWatermark: 'wm-1', expectedCacheDigest: 'sha256:cache', expectedResumeCursor: 'cursor-1', observations: [{ observationId: 'o-1', digest: 'sha256:o1', sealed: true as const }], knownObservationIds: ['o-1'] };
+const stale = compileEvidenceFreshnessCertificate({ ...base, observedWatermark: 'wm-old', observedCacheDigest: 'sha256:cache', observedResumeCursor: 'cursor-1' }); assert.equal(stale.status, 'stale'); assert.equal(stale.invalidation?.code, 'ATM_EVIDENCE_FRESHNESS_MISMATCH');
+const resume = compileEvidenceFreshnessCertificate({ ...base, observedWatermark: 'wm-1', observedCacheDigest: 'sha256:collision', observedResumeCursor: 'cursor-old' }); assert.equal(resume.status, 'stale'); assert.equal(resume.invalidation?.code, 'ATM_EVIDENCE_RESUME_BINDING_MISMATCH');
+const unknown = compileEvidenceFreshnessCertificate({ ...base, observedWatermark: 'wm-1', observedCacheDigest: 'sha256:cache', observedResumeCursor: 'cursor-1', observations: [{ observationId: 'o-unknown', digest: 'sha256:x', sealed: true as const }] }); assert.equal(unknown.status, 'contradictory'); assert.equal(unknown.invalidation !== null, true);
+console.log('plan4 certificate binding: ok');

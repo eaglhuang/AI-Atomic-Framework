@@ -1,0 +1,117 @@
+{
+  "schemaId": "atm.pathToAtomMapOwnerShard.v1",
+  "owner": "cli",
+  "shard": "cli-team",
+  "mappings": [
+    {
+      "path_pattern": "packages/cli/src/commands/batch.ts",
+      "atom_id": "atm.batch-checkpoint-map",
+      "capability": "batch lifecycle, checkpoint delivery windows, and status: checkpoint can formally close scoped framework critical deliveries before the required single commit. TASK-AAO-0013: checkpoint failure returns structured category+requiredCommand (ATM_BATCH_CHECKPOINT_CLOSE_FAILED); partial completion uses ATM_BATCH_CHECKPOINT_PARTIAL_OK to prevent AI misreading partial-ok as batch-complete.",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "batch checkpoint failure (ATM_BATCH_CHECKPOINT_CLOSE_FAILED) passes through tldr, missingValidationPasses, and blockingFindings from the inner tasks close failure via categorizeCheckpointCloseFailure; requiredCommand for missing-evidence now points to evidence missing subcommand (TASK-AAO-0017).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch.ts",
+      "atom_id": "atm.batch-command-map",
+      "capability": "TASK-RFT-0057 bounded batch command facade over extracted checkpoint, status, skip/resume, and team integration implementation carrier.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0057"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch/**/*.ts",
+      "atom_id": "atm.batch-command-map",
+      "capability": "TASK-RFT-0057 batch extracted command implementation carrier modules.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0057"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch/implementation.ts",
+      "atom_id": "atm.batch-wave-selector",
+      "capability": "ATM-GOV-0173 compact batch current selector that turns eligible queue-head tasks into a deterministic read-only wave manifest candidate with deferred reasons and dispatch guidance; ATM-GOV-0179 auto-batch rollout controls and circuit-breaker admission.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0173; ATM-GOV-0179"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch/implementation.ts#checkpoint-readiness",
+      "atom_id": "atm.wave-generated-checkpoint-executor",
+      "capability": "ATM-GOV-0177 batch checkpoint-readiness action evaluating atomic wave commit/build/projection receipt coverage.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0177"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch/runner-recovery-forwarding.ts",
+      "atom_id": "atm.batch-checkpoint-runner-sync",
+      "capability": "Governed batch checkpoint runner recovery bridge and candidate-bound refusal contract",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0060"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker.ts",
+      "atom_id": "atm.broker-command-map",
+      "capability": "TASK-RFT-0051 bounded Broker command facade over extracted command handler modules.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker.ts#sharedSurfaceQueue",
+      "atom_id": "atm.broker-shared-surface-queue",
+      "capability": "Seven-layer CID-gated shared-surface queue admission and owner-first release ordering",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0076"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker/**/*.ts",
+      "atom_id": "atm.broker-command-map",
+      "capability": "TASK-RFT-0051 Broker command map modules for parser, persistence, shared-surface registry handling, steward queues, proposals, runtime activation, and mutation batch planning.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "atom_id": "atm.shared-delivery-commit-executor",
+      "capability": "ATM-GOV-0176 broker batch execute commit CLI handler that consumes durable scheduler decisions and emits shared write receipts.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0176"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker/batch-execute-actions.ts",
+      "atom_id": "atm.wave-generated-checkpoint-executor",
+      "capability": "ATM-GOV-0177 broker batch execute support for build/projection generated write receipts.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0177"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker/broker-decision-observation.ts",
+      "atom_id": "atm.broker-decision-outcome-classifier",
+      "capability": "ATM-GOV-0199 CLI import adapter for canonical broker decision/outcome telemetry observation and correctness summary helpers.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0199"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker/census/**",
+      "atom_id": "atm.broker.census",
+      "capability": "ATM-GOV-0226 CLI census facade for shared-write gate coverage receipts and replay contract probes.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0226"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker/steward-queues.ts",
+      "atom_id": "atm.runner-sync.clean-close",
+      "capability": "ATM-GOV-0171 broker runner-sync release validation against atm.runnerSyncReceipt.v1 before clearing steward queue head.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0171"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker/wave-scheduler-actions.ts",
+      "atom_id": "atm.wave-broker-scheduler",
+      "capability": "ATM-GOV-0175 broker schedule CLI actions for durable wave ticket enqueue, status, and batch decision planning.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0175"
+    }
+  ]
+}

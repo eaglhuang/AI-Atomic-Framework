@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-02-008",
+  "date": "2026-09-02",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Closed — failure-residue fixture now establishes claim and defers caller staging",
+  "area": "Governed git commit failure rollback regression coverage",
+  "finding": "git-commit-failure-residue-rollback.test.ts invoked a framework governed commit without the temporary framework claim now required before execution, and mixed a caller-staged path with the claim scope without requesting its prescribed deferral. It consequently stopped at admission instead of reaching the deterministic signing failure and rollback behavior under test.",
+  "expectedBehavior": "The fixture must establish its narrow temporary claim and use --defer-foreign-staged for the deliberately caller-staged notes.txt path. It must then prove a signing failure reports ATM_GIT_COMMIT_FAILED, rolls back the auto-staged claim path, and restores the caller's staged state byte-for-byte.",
+  "evidenceOrRepro": "On 2026-09-02 the unmodified fixture returned ATM_GIT_COMMIT_FRAMEWORK_CLAIM_REQUIRED. After adding the real temporary claim, it returned ATM_GIT_COMMIT_FRAMEWORK_STAGING_AMBIGUOUS for the intentional caller staging. The repair adds the prescribed --defer-foreign-staged route and asserts the reported rollback contains src/app.ts rather than assuming a particular provenance file. The focused regression passes after the repair.",
+  "containment": "Fixture-only change. It does not relax claim or staged-index admission, alter rollback implementation, or bypass foreign staging; the temporary fixture repository is discarded in finally.",
+  "followUp": "Closed after replaying the complete failure path with its production admission prerequisites. Future framework commit fixtures must explicitly establish their claim and defer any deliberate caller-owned staging."
+}

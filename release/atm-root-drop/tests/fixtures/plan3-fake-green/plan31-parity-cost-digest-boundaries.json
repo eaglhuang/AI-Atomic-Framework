@@ -1,0 +1,41 @@
+{
+  "schemaId": "atm.plan31ParityCostDigestBoundariesFixture.v1",
+  "specVersion": "0.1.0",
+  "rows": [
+    {
+      "objectiveId": "P31-OBJ-08",
+      "evidenceKind": "old-new-frozen-same-digest",
+      "oldDigestPresent": true,
+      "newDigestPresent": true,
+      "redGreenReplayable": true
+    },
+    {
+      "objectiveId": "P31-OBJ-15",
+      "evidenceKind": "cost-correctness-boundary",
+      "correctnessIndependentOfPerformance": true,
+      "costIndependentOfCorrectness": true,
+      "performanceSignalMayGreenCorrectness": false
+    },
+    {
+      "objectiveId": "P31-OBJ-18",
+      "evidenceKind": "parity-breaker-digest",
+      "parityDigestPresent": true,
+      "breakerDigestPresent": true,
+      "digestRequiredForTerminalProof": true
+    },
+    {
+      "objectiveId": "P31-OBJ-19",
+      "evidenceKind": "runner-sync-digest",
+      "runnerSyncDigestPresent": true,
+      "visibleToFinalCertificate": true,
+      "receiptTextMaySubstituteDigest": false
+    }
+  ],
+  "expectedVerdict": "plan31-parity-cost-digest-boundaries-proven",
+  "diagnostics": [
+    "old-new-frozen-digest-replayable",
+    "cost-correctness-separated",
+    "parity-breaker-digests",
+    "runner-sync-digest-visible"
+  ]
+}

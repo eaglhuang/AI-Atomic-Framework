@@ -1,0 +1,86 @@
+{
+  "schemaId": "atm.cliTestSweep.v1",
+  "testDir": "tests/cli",
+  "timeoutMs": 180000,
+  "concurrency": 4,
+  "quarantine": [
+    {
+      "test": "four-plan-closeout-blocker-map.test.ts",
+      "reason": "stale-source-digest",
+      "detail": "Shared root cause with plan4-successor-wave-consumption, plan4-successor-wave-objective-map and four-plan-closeout-blocker-map, tracked as ATM-BUG-2026-09-22-002: commit 4d3bce0e4 refreshed docs/reports/plan-3x-4x-backlog-disposition-census.json on 2026-09-06 and the reports whose digests bind them to it were never recompiled. The recorded assertions in this test still hold against the live data; what fails is the validator's source digest check. No generator for these maps exists in the repository, so refreshing the digests by hand would assert a recompilation that did not happen. Needs an owner decision on who regenerates them, or a generator, before the test can leave quarantine.",
+      "disposition": "triage"
+    },
+    {
+      "test": "next-prompt-results-contract-extraction.test.ts",
+      "reason": "stale-assertion",
+      "detail": "Guards a 600-line budget on the CLI owner shard, which holds 184 mappings in 1256 lines. Sharding it along the families the model already uses brings the main shard to 579 lines, but 26 other tests read owner-shard-cli.json directly and expect their mapping there, and 9 of them failed when the split was tried (batch-final-600, broker-command-facade-final-600, close-orchestrator-final-600, closure-packet-schema-extraction, git-governance-command-extraction, next-command-facade-final-600, next-playbook-projection-contracts, taskflow-final-600, tasks-legacy-impl-extraction). Splitting the shard needs those tests to read the merged projection first; the attempt was reverted.",
+      "disposition": "triage"
+    },
+    {
+      "test": "plan4-successor-wave-consumption.test.ts",
+      "reason": "stale-source-digest",
+      "detail": "Shared root cause with plan4-successor-wave-consumption, plan4-successor-wave-objective-map and four-plan-closeout-blocker-map, tracked as ATM-BUG-2026-09-22-002: commit 4d3bce0e4 refreshed docs/reports/plan-3x-4x-backlog-disposition-census.json on 2026-09-06 and the reports whose digests bind them to it were never recompiled. The recorded assertions in this test still hold against the live data; what fails is the validator's source digest check. No generator for these maps exists in the repository, so refreshing the digests by hand would assert a recompilation that did not happen. Needs an owner decision on who regenerates them, or a generator, before the test can leave quarantine.",
+      "disposition": "triage"
+    },
+    {
+      "test": "plan4-successor-wave-objective-map.test.ts",
+      "reason": "stale-source-digest",
+      "detail": "Shared root cause with plan4-successor-wave-consumption, plan4-successor-wave-objective-map and four-plan-closeout-blocker-map, tracked as ATM-BUG-2026-09-22-002: commit 4d3bce0e4 refreshed docs/reports/plan-3x-4x-backlog-disposition-census.json on 2026-09-06 and the reports whose digests bind them to it were never recompiled. The recorded assertions in this test still hold against the live data; what fails is the validator's source digest check. No generator for these maps exists in the repository, so refreshing the digests by hand would assert a recompilation that did not happen. Needs an owner decision on who regenerates them, or a generator, before the test can leave quarantine.",
+      "disposition": "triage"
+    },
+    {
+      "test": "runbook-completion-evidence.test.ts",
+      "reason": "environment-dependent",
+      "detail": "Same shape as runbook-release-authority-review and the same limit: the compiler's DEFAULT_PLANNING_ROOT resolves to a sibling 3KLife checkout and the test asserts that directly, then compiles completion evidence from runbook documents that live there. The evidence is a projection of those documents, so a fixture would be a projection of itself. Needs the same owner decision about vendoring or about where this compiler is run.",
+      "disposition": "triage"
+    },
+    {
+      "test": "runbook-release-authority-review.test.ts",
+      "reason": "environment-dependent",
+      "detail": "Cannot be fixed with a fixture, unlike the other planning-root tests. The reviewer's whole job is a cross-document check: for every row in docs/reports/plan-3x-4x-runbook-completion-evidence.json it reads the runbook line at row.sourceLine, requires the row's requirement text to appear there verbatim, and requires sha256(requirement) to equal row.requirementDigest. The runbook it reads lives in the sibling planning repository ('missing runbook: ../3KLife/docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md'). A synthesised runbook would have to be generated from the completion report it is meant to check, which makes the comparison match by construction and proves nothing. Every other assertion in the file is already fixture-based and passes. Resolving this needs an owner decision on whether the runbook is vendored into this repository, which INV-ATM-006 bears on, or whether the reviewer is only ever run where the planning repository is checked out.",
+      "disposition": "triage"
+    },
+    {
+      "test": "taskflow-host-policy.test.ts",
+      "reason": "environment-dependent",
+      "detail": "Same root cause as taskflow-open-orchestration and blocked on the same owner decision: host policy allocates the next task id by scanning the profile repository's docs/tasks rather than the --cwd fixture, so the expected TASK-GOVERNED-0002 depends on whether a TASK-GOVERNED-0001 card is left in this repository. Running taskflow-open-orchestration is one way such a card appears. Whether a profile may redirect reads and writes outside --cwd is the owner's decision.",
+      "disposition": "triage"
+    },
+    {
+      "test": "taskflow-open-orchestration.test.ts",
+      "reason": "writes-tracked-files",
+      "detail": "Root-caused 2026-09-20, re-verified 2026-09-22: taskflow open resolves its output root from the profile path (resolveTaskflowOpenOutputRoot returns the profile repo git root), not from --cwd. The test passes a profile that lives in this repository, so the generated card lands in the framework repo's docs/tasks and line 53's existsSync under --cwd fails. Making it pass requires either changing the resolver, which is the owner decision, or asserting the current behaviour instead, which decides the same question from the other side; neither is this project's call. Two practical notes for whoever runs it: the test's temporary directory is created inside the repository (.atm-temp-test-taskflow-open at the root), and on failure it leaves docs/tasks/TASK-GOVERNED-0001.task.md behind because the finally block only removes the temporary directory. That stray card is what makes taskflow-host-policy's expected next id depend on repository state, so the two quarantined tests interact through this residue -- delete it before reading either result.",
+      "disposition": "triage"
+    }
+  ],
+  "serial": [
+    {
+      "test": "onefile-root-drop-build-coordination.test.ts",
+      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
+    },
+    {
+      "test": "public-npm-install-contract.test.ts",
+      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
+    },
+    {
+      "test": "root-drop-release-incremental-overlay.test.ts",
+      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
+    },
+    {
+      "test": "root-drop-release-manifest-integrity.test.ts",
+      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
+    },
+    {
+      "test": "root-drop-release-source-list.test.ts",
+      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
+    },
+    {
+      "test": "runner-sync-incremental-build-dogfood.test.ts",
+      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
+    },
+    {
+      "test": "runner-sync-incremental-build.test.ts",
+      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
+    }
+  ]
+}

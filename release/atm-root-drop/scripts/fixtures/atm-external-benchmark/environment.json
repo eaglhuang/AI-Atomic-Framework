@@ -1,0 +1,17 @@
+{
+  "schemaId": "atm.externalBenchmarkEnvironment.v1",
+  "runId": "fixture-run",
+  "repository": "fixture/repository",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "osImageDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "toolchainDigest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "arm": "atm",
+  "packageTarballDigest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "mounts": { "readable": ["public-cache"], "denied": ["oracle", "other-run", "framework-workspace", "home-credentials"] },
+  "negativeControls": [
+    { "target": "oracle", "blocked": true, "observedAt": "2026-09-13T00:00:00.000Z" },
+    { "target": "other-run", "blocked": true, "observedAt": "2026-09-13T00:00:00.000Z" },
+    { "target": "framework-workspace", "blocked": true, "observedAt": "2026-09-13T00:00:00.000Z" },
+    { "target": "home-credentials", "blocked": true, "observedAt": "2026-09-13T00:00:00.000Z" }
+  ]
+}

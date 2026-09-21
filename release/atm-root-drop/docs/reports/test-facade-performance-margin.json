@@ -1,0 +1,608 @@
+{
+  "schemaId": "atm.validatorRunSummary.v1",
+  "profile": "standard",
+  "mode": "validate",
+  "total": 1,
+  "passed": 1,
+  "failed": 0,
+  "durationMs": 196531,
+  "filters": [
+    "validate-skew-matrix"
+  ],
+  "focusPaths": [],
+  "focusMode": "none",
+  "baseValidatorCount": 87,
+  "focusReducedValidatorCount": 87,
+  "parallel": true,
+  "legacy": false,
+  "cache": false,
+  "skipSlow": false,
+  "run": {
+    "schemaId": "atm.validatorRunCheckpoint.v1",
+    "enabled": false
+  },
+  "baselinePath": null,
+  "performanceBaselinePath": null,
+  "baselineFingerprintCount": 0,
+  "cached": 0,
+  "resumed": 0,
+  "selection": {
+    "schemaId": "atm.validatorSelectionReport.v1",
+    "catalogSchemaId": "atm.testCatalog.v1",
+    "catalogSourcePath": "C:/Users/User/AI-Atomic-Framework/scripts/test-catalog.config.json",
+    "capability": "validator",
+    "profile": "standard",
+    "totalCatalogValidators": 112,
+    "baseProfileValidatorCount": 87,
+    "selectedValidatorCount": 1,
+    "focusReducedValidatorCount": 87,
+    "focusMode": "none",
+    "duplicateDedupeKeys": [],
+    "obligationMap": {
+      "schemaId": "atm.validationObligationMap.v1",
+      "mappingVersion": "2026-07-14.phase1",
+      "changedPaths": [],
+      "validators": [],
+      "matchedRules": [],
+      "deferred": {
+        "symbolLevelMinimization": {
+          "status": "deferred",
+          "reason": "Phase 1 uses path-level obligations only; symbol-level minimization needs import graph or fs-trace evidence.",
+          "requiredEvidence": [
+            "import-graph",
+            "fs-trace"
+          ]
+        }
+      }
+    },
+    "sealedCommitCanary": {
+      "schemaId": "atm.sealedCommitCanaryPlan.v1",
+      "mappingVersion": "2026-07-14.phase1",
+      "commitSha": "928d04716c2d4a314e5303e7c4d2712c36076e8d",
+      "mode": "non-blocking",
+      "checkout": {
+        "cleanCheckoutRequired": true,
+        "exactCommitSha": "928d04716c2d4a314e5303e7c4d2712c36076e8d"
+      },
+      "validators": [
+        "full-suite"
+      ],
+      "command": "git worktree add --detach <clean-checkout-dir> 928d04716c2d4a314e5303e7c4d2712c36076e8d && node --strip-types scripts/run-validators.ts full --parallel --json",
+      "failureIncidentSchemaId": "atm.mappingGapIncident.v1"
+    },
+    "familyCount": 1,
+    "dominantFamilies": [
+      {
+        "familyId": "release-trust",
+        "familyLabel": "Release and version trust",
+        "description": "Release bundle, trust, compatibility, skew, and versioning checks.",
+        "validatorCount": 1,
+        "totalDurationMs": 196252,
+        "validators": [
+          {
+            "name": "validate-skew-matrix",
+            "durationMs": 196252,
+            "slow": false,
+            "cached": false,
+            "tags": [
+              "release",
+              "skew",
+              "matrix"
+            ]
+          }
+        ]
+      }
+    ],
+    "families": [
+      {
+        "familyId": "release-trust",
+        "familyLabel": "Release and version trust",
+        "description": "Release bundle, trust, compatibility, skew, and versioning checks.",
+        "validatorCount": 1,
+        "totalDurationMs": 196252,
+        "validators": [
+          {
+            "name": "validate-skew-matrix",
+            "durationMs": 196252,
+            "slow": false,
+            "cached": false,
+            "tags": [
+              "release",
+              "skew",
+              "matrix"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "performance": {
+    "schemaId": "atm.validatorPerformanceReport.v1",
+    "profile": "standard",
+    "durationMs": 196531,
+    "budgetMs": 600000,
+    "fastValidatorBudgetMs": 10000,
+    "slowValidatorBudgetMs": 90000,
+    "baselinePresent": false,
+    "warningCount": 2,
+    "slowestValidators": [
+      {
+        "name": "validate-skew-matrix",
+        "durationMs": 196252,
+        "durationBudgetMs": 180000,
+        "overBudgetMs": 16252,
+        "cached": false,
+        "slow": false,
+        "catalogKey": "validator.validate.skew.matrix",
+        "family": "release-trust",
+        "command": "node --strip-types scripts/validate-skew-matrix.ts --mode validate"
+      }
+    ],
+    "slowestEntries": [
+      {
+        "name": "validate-skew-matrix",
+        "durationMs": 196252,
+        "durationBudgetMs": 180000,
+        "overBudgetMs": 16252,
+        "cached": false,
+        "slow": false,
+        "catalogKey": "validator.validate.skew.matrix",
+        "family": "release-trust",
+        "command": "node --strip-types scripts/validate-skew-matrix.ts --mode validate"
+      }
+    ],
+    "familyHotspots": [
+      {
+        "familyId": "release-trust",
+        "familyLabel": "Release and version trust",
+        "description": "Release bundle, trust, compatibility, skew, and versioning checks.",
+        "validatorCount": 1,
+        "totalDurationMs": 196252,
+        "validators": [
+          {
+            "name": "validate-skew-matrix",
+            "durationMs": 196252,
+            "slow": false,
+            "cached": false,
+            "tags": [
+              "release",
+              "skew",
+              "matrix"
+            ]
+          }
+        ],
+        "averageDurationMs": 196252,
+        "totalDurationShare": 1,
+        "overBudgetValidators": 1
+      }
+    ],
+    "duplicateDedupeKeys": [],
+    "budgetViolations": [
+      {
+        "code": "ATM_VALIDATOR_DURATION_BUDGET_EXCEEDED",
+        "validatorName": "validate-skew-matrix",
+        "durationMs": 196252,
+        "durationBudgetMs": 180000,
+        "overBudgetMs": 16252,
+        "slow": false,
+        "key": "validator.validate.skew.matrix",
+        "family": "release-trust",
+        "command": "node --strip-types scripts/validate-skew-matrix.ts --mode validate",
+        "message": "validate-skew-matrix took 196252ms, over budget 180000ms",
+        "remediation": "Reduce fixture scope, split broad assertions, use focused regressions, or explicitly raise the validator budget with justification."
+      }
+    ],
+    "regressions": [],
+    "optimizationCandidates": [
+      {
+        "kind": "validator-budget",
+        "validatorName": "validate-skew-matrix",
+        "severity": "high",
+        "durationMs": 196252,
+        "durationBudgetMs": 180000,
+        "overBudgetMs": 16252,
+        "rationale": "validate-skew-matrix took 196252ms, over budget 180000ms",
+        "remediation": "Reduce fixture scope, split broad assertions, use focused regressions, or explicitly raise the validator budget with justification."
+      },
+      {
+        "kind": "family-overweight",
+        "familyId": "release-trust",
+        "familyLabel": "Release and version trust",
+        "severity": "high",
+        "validatorCount": 1,
+        "totalDurationMs": 196252,
+        "totalDurationShare": 1,
+        "overBudgetValidators": 1,
+        "rationale": "Release and version trust owns 1 validators and 100% of profile runtime",
+        "remediation": "Consider routing this family from task scope first, sharing one source inventory across sibling validators, or merging repeated assertions into a family runner."
+      }
+    ],
+    "warnings": [
+      {
+        "code": "ATM_VALIDATOR_DURATION_BUDGET_EXCEEDED",
+        "validatorName": "validate-skew-matrix",
+        "durationMs": 196252,
+        "durationBudgetMs": 180000,
+        "overBudgetMs": 16252,
+        "slow": false,
+        "key": "validator.validate.skew.matrix",
+        "family": "release-trust",
+        "command": "node --strip-types scripts/validate-skew-matrix.ts --mode validate",
+        "message": "validate-skew-matrix took 196252ms, over budget 180000ms",
+        "remediation": "Reduce fixture scope, split broad assertions, use focused regressions, or explicitly raise the validator budget with justification."
+      },
+      {
+        "code": "ATM_VALIDATOR_FAMILY_OVERWEIGHT",
+        "familyId": "release-trust",
+        "familyLabel": "Release and version trust",
+        "validatorCount": 1,
+        "totalDurationMs": 196252,
+        "totalDurationShare": 1,
+        "overBudgetValidators": 1,
+        "message": "Release and version trust owns 1 validators and 100% of profile runtime",
+        "remediation": "Consider routing this family from task scope first, sharing one source inventory across sibling validators, or merging repeated assertions into a family runner."
+      }
+    ]
+  },
+  "dag": {
+    "schemaId": "atm.validatorDag.v1",
+    "nodeCount": 1,
+    "edgeCount": 0,
+    "hasDependencies": false,
+    "nodes": [
+      {
+        "name": "validate-skew-matrix",
+        "index": 0,
+        "dependsOn": [],
+        "cacheSharingKey": "validator.validate.skew.matrix",
+        "tier": "default",
+        "args": [],
+        "parallelSafe": false,
+        "executionMode": "serial-required",
+        "resourceProfile": "release-mirror",
+        "resourceLocks": [
+          "release-mirrors"
+        ]
+      }
+    ],
+    "edges": [],
+    "scheduler": {
+      "schemaId": "atm.validatorScheduler.v1",
+      "resourceAware": true,
+      "maxParallel": 4,
+      "lockedNodeCount": 1,
+      "executionModeCounts": {
+        "serial-required": 1
+      }
+    },
+    "cacheSharingGroups": [
+      {
+        "cacheSharingKey": "validator.validate.skew.matrix",
+        "validatorNames": [
+          "validate-skew-matrix"
+        ],
+        "fanOutEligible": false
+      }
+    ]
+  },
+  "schedulerDiagnostics": {
+    "schemaId": "atm.validatorSchedulerDiagnostics.v1",
+    "isolationRerunCount": 0,
+    "recoveredParallelFailureCount": 0,
+    "trueFailureAfterIsolationCount": 0,
+    "classification": "not-needed",
+    "recoveredValidators": [],
+    "trueFailureValidators": [],
+    "recommendation": null
+  },
+  "usageTelemetry": {
+    "schemaId": "atm.validatorUsageTelemetry.v1",
+    "profile": "standard",
+    "mode": "validate",
+    "validatorCount": 1,
+    "invocationCount": 1,
+    "skippedCount": 0,
+    "cacheHits": 0,
+    "cacheMisses": 0,
+    "cacheBypasses": 1,
+    "fanOutCoverage": 0,
+    "archiveCandidates": [],
+    "dataDrivenDecision": "m1-baseline-captured",
+    "validators": [
+      {
+        "schemaId": "atm.validatorUsageCounter.v1",
+        "validatorId": "validate-skew-matrix",
+        "validatorVersion": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+        "tier": "default",
+        "invocationCount": 1,
+        "skippedCount": 0,
+        "durationMs": 196252,
+        "failureCount": 0,
+        "blockingCount": 0,
+        "cacheHit": 0,
+        "cacheMiss": 0,
+        "cacheBypass": 1,
+        "cacheDecision": "cache-bypass",
+        "fanOutConsumerCount": 0,
+        "downstreamIncidentRef": null,
+        "usedForDecision": false
+      }
+    ]
+  },
+  "lifecycleTelemetry": {
+    "schemaId": "atm.validatorLifecycleSummary.v1",
+    "profile": "standard",
+    "mode": "validate",
+    "optimizationId": "ATM-GOV-0200",
+    "sourceTaskId": "ATM-GOV-0200",
+    "dataDrivenDecision": "insufficient-observation",
+    "historyDigest": "sha256:395060adcd1bb2020ec451efaee6493c97f55dcf8bafde03de321cc85ff87254",
+    "configDigest": "sha256:fb75b101bb8144255719842e39041d468102a8fc9e54da3e51588fdc1f342525",
+    "observedWindow": {
+      "eligibleCount": 1,
+      "invokedCount": 1,
+      "skippedCount": 0,
+      "cacheHitCount": 0,
+      "cacheMissCount": 0,
+      "cacheBypassCount": 1,
+      "receiptReuseCount": 0,
+      "fanOutEventCount": 0,
+      "blockedCount": 0,
+      "durationMs": 196531
+    },
+    "tierProposal": {
+      "fast": [],
+      "default": [
+        "validate-skew-matrix"
+      ],
+      "full": [],
+      "archiveCandidate": [],
+      "insufficientObservation": [
+        "validate-skew-matrix"
+      ]
+    },
+    "rollbackReceipt": {
+      "schemaId": "atm.validatorTierRollbackReceipt.v1",
+      "optimizationId": "ATM-GOV-0200",
+      "restoresConfigDigest": "sha256:fb75b101bb8144255719842e39041d468102a8fc9e54da3e51588fdc1f342525",
+      "restoresOrderingDigest": "sha256:2cd83764a22489918694a57e324fc17ca32d01085cd1838f9865269fde4730cc",
+      "invalidatesTreatmentCache": true,
+      "parityValidator": "node --strip-types tests/cli/validator-observed-lifecycle.test.ts"
+    },
+    "consumedReceipt": {
+      "schemaId": "atm.validatorLifecycleConsumedReceipt.v1",
+      "producerTaskId": "ATM-GOV-0200",
+      "historyDigest": "sha256:395060adcd1bb2020ec451efaee6493c97f55dcf8bafde03de321cc85ff87254",
+      "configDigest": "sha256:fb75b101bb8144255719842e39041d468102a8fc9e54da3e51588fdc1f342525",
+      "consumedBy": "ATM-GOV-0202"
+    },
+    "events": [
+      {
+        "schemaId": "atm.validatorLifecycleEvent.v1",
+        "validatorId": "validate-skew-matrix",
+        "validatorVersion": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+        "tier": "default",
+        "durationMs": 196252,
+        "cacheDecision": "cache-bypass",
+        "fanOutConsumerCount": 0,
+        "blockingCount": 0,
+        "reusedFromReceipt": false,
+        "usedForDecision": false,
+        "event": "eligible"
+      },
+      {
+        "schemaId": "atm.validatorLifecycleEvent.v1",
+        "validatorId": "validate-skew-matrix",
+        "validatorVersion": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+        "tier": "default",
+        "durationMs": 196252,
+        "cacheDecision": "cache-bypass",
+        "fanOutConsumerCount": 0,
+        "blockingCount": 0,
+        "reusedFromReceipt": false,
+        "usedForDecision": false,
+        "event": "invoked"
+      },
+      {
+        "schemaId": "atm.validatorLifecycleEvent.v1",
+        "validatorId": "validate-skew-matrix",
+        "validatorVersion": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+        "tier": "default",
+        "durationMs": 196252,
+        "cacheDecision": "cache-bypass",
+        "fanOutConsumerCount": 0,
+        "blockingCount": 0,
+        "reusedFromReceipt": false,
+        "usedForDecision": false,
+        "event": "cache-bypass"
+      },
+      {
+        "schemaId": "atm.validatorLifecycleEvent.v1",
+        "validatorId": "validate-skew-matrix",
+        "validatorVersion": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+        "tier": "default",
+        "durationMs": 196252,
+        "cacheDecision": "cache-bypass",
+        "fanOutConsumerCount": 0,
+        "blockingCount": 0,
+        "reusedFromReceipt": false,
+        "usedForDecision": false,
+        "event": "passed"
+      }
+    ]
+  },
+  "validatorLifecycle": {
+    "schemaId": "atm.validatorLifecycleSummary.v1",
+    "profile": "standard",
+    "mode": "validate",
+    "optimizationId": "ATM-GOV-0200",
+    "sourceTaskId": "ATM-GOV-0200",
+    "dataDrivenDecision": "insufficient-observation",
+    "historyDigest": "sha256:395060adcd1bb2020ec451efaee6493c97f55dcf8bafde03de321cc85ff87254",
+    "configDigest": "sha256:fb75b101bb8144255719842e39041d468102a8fc9e54da3e51588fdc1f342525",
+    "observedWindow": {
+      "eligibleCount": 1,
+      "invokedCount": 1,
+      "skippedCount": 0,
+      "cacheHitCount": 0,
+      "cacheMissCount": 0,
+      "cacheBypassCount": 1,
+      "receiptReuseCount": 0,
+      "fanOutEventCount": 0,
+      "blockedCount": 0,
+      "durationMs": 196531
+    },
+    "tierProposal": {
+      "fast": [],
+      "default": [
+        "validate-skew-matrix"
+      ],
+      "full": [],
+      "archiveCandidate": [],
+      "insufficientObservation": [
+        "validate-skew-matrix"
+      ]
+    },
+    "rollbackReceipt": {
+      "schemaId": "atm.validatorTierRollbackReceipt.v1",
+      "optimizationId": "ATM-GOV-0200",
+      "restoresConfigDigest": "sha256:fb75b101bb8144255719842e39041d468102a8fc9e54da3e51588fdc1f342525",
+      "restoresOrderingDigest": "sha256:2cd83764a22489918694a57e324fc17ca32d01085cd1838f9865269fde4730cc",
+      "invalidatesTreatmentCache": true,
+      "parityValidator": "node --strip-types tests/cli/validator-observed-lifecycle.test.ts"
+    },
+    "consumedReceipt": {
+      "schemaId": "atm.validatorLifecycleConsumedReceipt.v1",
+      "producerTaskId": "ATM-GOV-0200",
+      "historyDigest": "sha256:395060adcd1bb2020ec451efaee6493c97f55dcf8bafde03de321cc85ff87254",
+      "configDigest": "sha256:fb75b101bb8144255719842e39041d468102a8fc9e54da3e51588fdc1f342525",
+      "consumedBy": "ATM-GOV-0202"
+    },
+    "events": [
+      {
+        "schemaId": "atm.validatorLifecycleEvent.v1",
+        "validatorId": "validate-skew-matrix",
+        "validatorVersion": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+        "tier": "default",
+        "durationMs": 196252,
+        "cacheDecision": "cache-bypass",
+        "fanOutConsumerCount": 0,
+        "blockingCount": 0,
+        "reusedFromReceipt": false,
+        "usedForDecision": false,
+        "event": "eligible"
+      },
+      {
+        "schemaId": "atm.validatorLifecycleEvent.v1",
+        "validatorId": "validate-skew-matrix",
+        "validatorVersion": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+        "tier": "default",
+        "durationMs": 196252,
+        "cacheDecision": "cache-bypass",
+        "fanOutConsumerCount": 0,
+        "blockingCount": 0,
+        "reusedFromReceipt": false,
+        "usedForDecision": false,
+        "event": "invoked"
+      },
+      {
+        "schemaId": "atm.validatorLifecycleEvent.v1",
+        "validatorId": "validate-skew-matrix",
+        "validatorVersion": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+        "tier": "default",
+        "durationMs": 196252,
+        "cacheDecision": "cache-bypass",
+        "fanOutConsumerCount": 0,
+        "blockingCount": 0,
+        "reusedFromReceipt": false,
+        "usedForDecision": false,
+        "event": "cache-bypass"
+      },
+      {
+        "schemaId": "atm.validatorLifecycleEvent.v1",
+        "validatorId": "validate-skew-matrix",
+        "validatorVersion": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+        "tier": "default",
+        "durationMs": 196252,
+        "cacheDecision": "cache-bypass",
+        "fanOutConsumerCount": 0,
+        "blockingCount": 0,
+        "reusedFromReceipt": false,
+        "usedForDecision": false,
+        "event": "passed"
+      }
+    ]
+  },
+  "requiredCommand": null,
+  "blockingFindings": [],
+  "baselineFailures": [],
+  "currentTaskFailures": [],
+  "environmentFindings": [],
+  "currentTaskFindings": [],
+  "currentTaskOk": true,
+  "taskLevelOk": true,
+  "focusedValidatorCommand": null,
+  "validators": [
+    {
+      "name": "validate-skew-matrix",
+      "entry": "scripts/validate-skew-matrix.ts",
+      "tags": [
+        "release",
+        "skew",
+        "matrix"
+      ],
+      "slow": false,
+      "performanceBudgetMs": 180000,
+      "catalogKey": "validator.validate.skew.matrix",
+      "capability": "validator",
+      "family": "release-trust",
+      "scope": "release-blocking",
+      "dedupeKeys": [
+        "validator:validate-skew-matrix"
+      ],
+      "catalogCostBudgetMs": 180000,
+      "mode": "validate",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 196252,
+      "command": "node --strip-types scripts/validate-skew-matrix.ts --mode validate",
+      "cacheKey": "ce415427b6f6bfb85ca1be4de3810ad02a818d9d71e170fe2c6a3916199974d1",
+      "cached": false,
+      "cacheDecision": "cache-bypass",
+      "timedOut": false,
+      "requiredCommand": null,
+      "blockingFindings": [],
+      "envelope": {
+        "schemaId": "atm.validatorFailureEnvelope.v1",
+        "ok": true,
+        "validatorName": "validate-skew-matrix",
+        "command": "node --strip-types scripts/validate-skew-matrix.ts --mode validate",
+        "entry": "scripts/validate-skew-matrix.ts",
+        "mode": "validate",
+        "exitCode": 0,
+        "durationMs": 196252,
+        "requiredCommand": null,
+        "blockingFindings": [],
+        "baselineFailures": [],
+        "currentTaskFailures": [],
+        "repairHints": [],
+        "diagnostics": {
+          "stdoutSha256": "sha256:fe4def8e31730f9c2268723e7b7aa998ab84ee9cc17f32ef810605ab02d7cfbb",
+          "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutTail": "[skew-matrix:validate] ok — verified 6 CLI × Plugin SDK × Adapter combination(s)\n",
+          "stderrTail": null,
+          "spawnError": null,
+          "classificationCodes": []
+        }
+      },
+      "schedulerLane": "serial-required",
+      "schedulerBatchSize": 1,
+      "executionMode": "serial-required",
+      "resourceProfile": "release-mirror",
+      "resourceLocks": [
+        "release-mirrors"
+      ],
+      "parallelSafe": false
+    }
+  ]
+}

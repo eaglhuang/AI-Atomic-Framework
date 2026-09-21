@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.dev/schemas/evidence/quality-gauntlet.schema.json",
+  "title": "ATM Quality Gauntlet Transition",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "gauntletId",
+    "runId",
+    "checkpoint",
+    "fromState",
+    "toState",
+    "verdict",
+    "terminal",
+    "emittedEvents",
+    "view",
+    "transitionDigest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.qualityGauntletTransition.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "gauntletId": { "const": "atm.qualityGauntlet.v1" },
+    "runId": { "type": "string", "minLength": 1 },
+    "checkpoint": { "type": "string", "minLength": 1 },
+    "fromState": { "$ref": "#/$defs/state" },
+    "toState": { "$ref": "#/$defs/state" },
+    "verdict": { "$ref": "#/$defs/verdict" },
+    "terminal": { "type": "boolean" },
+    "emittedEvents": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" }
+    },
+    "view": { "$ref": "#/$defs/view" },
+    "transitionDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "state": {
+      "enum": [
+        "running",
+        "stopped-proven",
+        "stopped-sufficient",
+        "blocked-counterexample",
+        "indeterminate"
+      ]
+    },
+    "verdict": {
+      "enum": ["in-progress", "proven", "sufficient", "blocked", "indeterminate"]
+    },
+    "obligationStatus": {
+      "enum": ["pending", "covered", "excluded", "counterexample", "unknown"]
+    },
+    "event": {
+      "type": "object",
+      "description": "Public event contract downstream selection reads without touching reducer state.",
+      "required": [
+        "schemaId",
+        "specVersion",
+        "eventId",
+        "kind",
+        "runId",
+        "checkpoint",
+        "occurredAt",
+        "obligationId",
+        "semanticFamily",
+        "owningSeam",
+        "validatorCommand",
+        "validatorCaseId",
+        "outcome",
+        "detail"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.qualityGauntletEvent.v1" },
+        "specVersion": { "const": "0.1.0" },
+        "eventId": { "type": "string", "minLength": 1 },
+        "kind": {
+          "enum": [
+            "assurance-started",
+            "obligation-observed",
+            "validator-progress",
+            "counterexample-found",
+            "assurance-indeterminate",
+            "assurance-stopped"
+          ]
+        },
+        "runId": { "type": "string", "minLength": 1 },
+        "checkpoint": { "type": "string", "minLength": 1 },
+        "occurredAt": { "type": "string", "minLength": 1 },
+        "obligationId": { "type": ["string", "null"] },
+        "semanticFamily": { "type": ["string", "null"] },
+        "owningSeam": { "type": ["string", "null"] },
+        "validatorCommand": { "type": ["string", "null"] },
+        "validatorCaseId": { "type": ["string", "null"] },
+        "outcome": {
+          "oneOf": [
+            { "enum": ["pass", "fail", "skipped", "excluded", "unknown"] },
+            { "type": "null" }
+          ]
+        },
+        "detail": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "view": {
+      "type": "object",
+      "required": [
+        "schemaId",
+        "specVersion",
+        "machineId",
+        "runId",
+        "checkpoint",
+        "state",
+        "verdict",
+        "terminal",
+        "obligations",
+        "counterexamples",
+        "progress",
+        "appliedEventIds",
+        "duplicateEventIds",
+        "diagnostics",
+        "viewDigest"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.closureAssuranceView.v1" },
+        "specVersion": { "const": "0.1.0" },
+        "machineId": { "const": "atm.closureAssuranceMachine.v1" },
+        "runId": { "type": "string", "minLength": 1 },
+        "checkpoint": { "type": "string", "minLength": 1 },
+        "state": { "$ref": "#/$defs/state" },
+        "verdict": { "$ref": "#/$defs/verdict" },
+        "terminal": { "type": "boolean" },
+        "obligations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["obligationId", "semanticFamily", "owningSeam", "status", "validatorCommands"],
+            "properties": {
+              "obligationId": { "type": "string", "minLength": 1 },
+              "semanticFamily": { "type": ["string", "null"] },
+              "owningSeam": { "type": ["string", "null"] },
+              "status": { "$ref": "#/$defs/obligationStatus" },
+              "validatorCommands": { "type": "array", "items": { "type": "string" } }
+            },
+            "additionalProperties": false
+          }
+        },
+        "counterexamples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["obligationId", "validatorCommand", "detail", "observedAt"],
+            "properties": {
+              "obligationId": { "type": ["string", "null"] },
+              "validatorCommand": { "type": ["string", "null"] },
+              "detail": { "type": ["string", "null"] },
+              "observedAt": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "progress": {
+          "type": "object",
+          "required": ["total", "covered", "pending", "unknown", "excluded", "counterexample"],
+          "properties": {
+            "total": { "type": "integer", "minimum": 0 },
+            "covered": { "type": "integer", "minimum": 0 },
+            "pending": { "type": "integer", "minimum": 0 },
+            "unknown": { "type": "integer", "minimum": 0 },
+            "excluded": { "type": "integer", "minimum": 0 },
+            "counterexample": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "appliedEventIds": { "type": "array", "items": { "type": "string" } },
+        "duplicateEventIds": { "type": "array", "items": { "type": "string" } },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["code", "eventId", "kind", "detail"],
+            "properties": {
+              "code": {
+                "enum": [
+                  "ATM_ASSURANCE_DUPLICATE_EVENT",
+                  "ATM_ASSURANCE_EVENT_AFTER_TERMINAL",
+                  "ATM_ASSURANCE_RUN_MISMATCH",
+                  "ATM_ASSURANCE_UNKNOWN_OBLIGATION",
+                  "ATM_ASSURANCE_STOP_WITH_OPEN_OBLIGATIONS"
+                ]
+              },
+              "eventId": { "type": ["string", "null"] },
+              "kind": { "type": ["string", "null"] },
+              "detail": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "viewDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

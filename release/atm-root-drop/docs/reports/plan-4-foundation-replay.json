@@ -1,0 +1,113 @@
+{
+  "schemaId": "atm.plan4FoundationReplay.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0336",
+  "generatedAt": "2026-08-12T18:35:00.000Z",
+  "verdict": "successor-wave-consumed",
+  "nonClaims": [
+    "foundation-replay-is-not-final-plan4-certification",
+    "successor-wave-consumption-does-not-substitute-for-full-release-certificate",
+    "fixture-replay-does-not-substitute-for-hostile-dogfood-or-release-provenance"
+  ],
+  "plan4ObjectiveDenominator": {
+    "planId": "Plan 4.0",
+    "expected": 17,
+    "observed": 17,
+    "status": "ready",
+    "source": "scripts/validate-four-plan-objectives.ts --plan 4.0 --mode validate"
+  },
+  "foundationTopology": {
+    "causalDependencies": [
+      "ATM-GOV-0335"
+    ],
+    "startConditions": [
+      "Plan 3.0, 3.1 and 3.2 replay artifacts exist and validate their denominators.",
+      "Plan 4.0 denominator has exactly 17 objective anchors.",
+      "Plan 4.0 foundation evidence remains fail-closed rather than declaring final certification."
+    ],
+    "publicSeam": "atm.plan4FoundationReplay.v1",
+    "deepModules": [
+      "packages/core/src/evidence/phase-suite.ts",
+      "packages/core/src/evidence/state-replay.ts",
+      "packages/core/src/evidence/quality-authority.ts"
+    ],
+    "impactEdges": [
+      "plan4-topology",
+      "catalog-foundation",
+      "incident-corpus",
+      "quality-certificate"
+    ]
+  },
+  "phaseSuite": {
+    "checkpoint": "plan-verdict",
+    "requiredCaseIds": [
+      "test_task_atm_gov_0321_authority_5c8e1d42",
+      "test_task_atm_gov_0321_epoch_capability_8a3f6b19",
+      "test_task_atm_gov_0307_state_replay_4f2d8c71",
+      "test_task_atm_gov_0307_incident_corpus_9a1e6b34",
+      "test_plan4_foundation_topology_and_17_anchors_0336"
+    ],
+    "satisfiedCaseIds": [
+      "test_task_atm_gov_0321_authority_5c8e1d42",
+      "test_task_atm_gov_0321_epoch_capability_8a3f6b19",
+      "test_task_atm_gov_0307_state_replay_4f2d8c71",
+      "test_task_atm_gov_0307_incident_corpus_9a1e6b34",
+      "test_plan4_foundation_topology_and_17_anchors_0336"
+    ],
+    "promotionAllowed": true,
+    "catalogPhaseCaseCount": 5
+  },
+  "incidentCorpus": {
+    "requiredFamilies": [
+      "active-batch-router",
+      "close-deferral-derived-manifest",
+      "import-frontmatter-fidelity",
+      "runner-sync-protected-state",
+      "sealed-deletion-tombstone",
+      "shared-index-commit-attribution",
+      "stale-mixed-batch"
+    ],
+    "requiredDogfoodSignals": [
+      "active-batch-routing",
+      "close-deferral",
+      "cross-lane-shared-index"
+    ],
+    "status": "proven"
+  },
+  "qualityAuthority": {
+    "authorityId": "plan4-foundation-authority",
+    "policyEpoch": "plan4-foundation-epoch-2026-08-12",
+    "protectedSurfaces": [
+      "phase-suite",
+      "state-replay",
+      "quality-authority",
+      "plan4-objective-denominator"
+    ],
+    "status": "proven"
+  },
+  "objectiveAnchors": [
+    { "objectiveId": "OBJ-01", "status": "verified", "foundationPhase": "topology", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-02", "status": "verified", "foundationPhase": "catalog-foundation", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-03", "status": "verified", "foundationPhase": "catalog-foundation", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-04", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-05", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-06", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-07", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-08", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-09", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-10", "status": "verified", "foundationPhase": "topology", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-11", "status": "verified", "foundationPhase": "topology", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-12", "status": "verified", "foundationPhase": "catalog-foundation", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-13", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-14", "status": "verified", "foundationPhase": "incident-corpus", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-15", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-16", "status": "verified", "foundationPhase": "quality-certificate", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" },
+    { "objectiveId": "OBJ-17", "status": "verified", "foundationPhase": "topology", "consumedBy": "scripts/validate-plan4-successor-wave-consumption.ts" }
+  ],
+  "validators": [
+    "node --strip-types tests/cli/plan4-foundation-topology.test.ts",
+    "node --strip-types scripts/validate-four-plan-objectives.ts --plan 4.0 --mode validate",
+    "npm run validate:governance-fix-wave",
+    "node --strip-types scripts/validate-plan4-successor-wave-consumption.ts"
+  ]
+}

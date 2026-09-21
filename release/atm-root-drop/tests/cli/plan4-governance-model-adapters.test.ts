@@ -1,0 +1,4 @@
+import assert from 'node:assert/strict';
+import { adaptGovernanceModels, replayGovernanceModelAdapters, validateGovernanceModelAdapters } from '../../packages/core/src/evidence/governance-model-adapters.ts';
+const input = { runId: 'fixture', authority: { authorityId: 'fixture-v1', sealed: true, digest: 'sha256:fixture' }, models: [{ modelId: 'task-1', kind: 'task' as const, state: 'READY', owner: 'captain' }, { modelId: 'runner-1', kind: 'runner' as const, state: 'published' }] };
+const result = adaptGovernanceModels(input); assert.equal(result.status, 'adapted'); assert.equal(result.projections.length, 2); assert.equal(validateGovernanceModelAdapters(result).ok, true); assert.equal(replayGovernanceModelAdapters(input, result).deterministic, true); console.log('plan4 governance model adapters: PASS');

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.plan3QueueOnlyNoOverrideFixture.v1",
+  "specVersion": "0.1.0",
+  "queueDecision": {
+    "state": "waiting",
+    "queueRequired": true,
+    "overrideLease": null,
+    "emergencyApproval": null,
+    "releaseCondition": "queue-head"
+  },
+  "expectedVerdict": "wait-only",
+  "forbiddenActions": ["bypass-queue", "grant-override", "mark-ready"],
+  "diagnostics": ["queue-is-required", "override-lease-absent", "wait-does-not-green"]
+}

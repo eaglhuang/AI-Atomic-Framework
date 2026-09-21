@@ -1,0 +1,10 @@
+---
+description: Acquire or release an ATM task lock before starting or finishing work.
+---
+
+1. To lock a task before starting, run:
+   - `node atm.mjs lock --task <task-id> --agent <agent-id> --json`
+2. If the lock returns a conflict, stop immediately and do not proceed.
+3. To unlock after completing work, run:
+   - `node atm.mjs unlock --task <task-id> --agent <agent-id> --json`
+4. Never skip the lock step — concurrent agents without locks cause merge conflicts.

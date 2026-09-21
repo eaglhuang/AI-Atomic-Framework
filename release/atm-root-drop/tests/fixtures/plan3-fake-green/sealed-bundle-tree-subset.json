@@ -1,0 +1,31 @@
+{
+  "schemaId": "atm.plan3SealedBundleTreeSubsetFixture.v1",
+  "specVersion": "0.1.0",
+  "candidateTree": {
+    "treeSha": "sha256:candidate-tree",
+    "paths": [
+      "docs/reports/plan-3-2-objective-replay.json",
+      "scripts/validate-plan32-sealed-bundle-tree-subset.ts",
+      "tests/cli/plan32-sealed-bundle-tree-subset.test.ts"
+    ]
+  },
+  "sealedBundle": {
+    "paths": [
+      "docs/reports/plan-3-2-objective-replay.json",
+      "scripts/validate-plan32-sealed-bundle-tree-subset.ts"
+    ]
+  },
+  "liveSurfaceResidue": {
+    "paths": [
+      ".atm/history/evidence/foreign-runner-sync.json",
+      "tests/cli/foreign-lane-in-progress.test.ts"
+    ],
+    "mustNotBeInSealedBundle": true
+  },
+  "expectedVerdict": "sealed-bundle-is-tree-subset",
+  "diagnostics": [
+    "sealed-paths-subset-of-candidate-tree",
+    "foreign-live-surface-excluded",
+    "empty-missing-from-candidate"
+  ]
+}

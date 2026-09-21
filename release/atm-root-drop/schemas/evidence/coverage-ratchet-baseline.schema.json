@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.coverageRatchetBaseline.v1",
+  "type": "object",
+  "required": ["schemaId", "specVersion", "compilerId", "ratchetId", "generatedAt", "authority", "minimumRatio", "baselines", "projection", "status", "diagnostics", "resultDigest"],
+  "properties": {
+    "schemaId": { "const": "atm.coverageRatchetBaseline.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "compilerId": { "const": "atm.coverageRatchetBaselineAdapter.v1" },
+    "ratchetId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "minLength": 1 },
+    "authority": { "type": "object", "required": ["authorityId", "digest", "sealed"], "properties": { "authorityId": { "type": "string" }, "digest": { "type": "string", "pattern": "^sha256:" }, "sealed": { "const": true } }, "additionalProperties": false },
+    "minimumRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+    "baselines": { "type": "array", "items": { "type": "object", "required": ["scope", "ratio", "covered", "total", "digest"], "properties": { "scope": { "enum": ["changed", "impacted", "repository"] }, "ratio": { "type": "number", "minimum": 0, "maximum": 1 }, "covered": { "type": "integer", "minimum": 0 }, "total": { "type": "integer", "minimum": 0 }, "digest": { "type": "string" } }, "additionalProperties": false } },
+    "projection": { "type": "object" },
+    "status": { "enum": ["proven", "blocked", "stale", "contradictory"] },
+    "diagnostics": { "type": "array", "items": { "type": "string" } },
+    "resultDigest": { "type": "string", "pattern": "^sha256:" }
+  },
+  "additionalProperties": false
+}

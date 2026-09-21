@@ -1,0 +1,16 @@
+{
+  "schemaId": "atm.plan3MachineReadableBlockerFixture.v1",
+  "specVersion": "0.1.0",
+  "objectiveId": "P32-OBJ-26",
+  "status": "not-complete",
+  "blockers": [
+    {
+      "code": "P32_BLOCKER_TEXT_MACHINE_READABLE",
+      "message": "blocker is present but not resolved",
+      "nextSafeCommand": "node --strip-types scripts/validate-atm-3-final-closure.ts --mode validate --plan 3.2 --expect-rows 29 --input docs/reports/plan-3-2-objective-replay.json",
+      "terminal": false
+    }
+  ],
+  "expectedVerdict": "machine-readable-nonterminal-blocker",
+  "diagnostics": ["blocker-code-present", "next-safe-command-present", "terminal-false"]
+}

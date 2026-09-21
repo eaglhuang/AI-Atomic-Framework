@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.observedEvidenceSource.v1",
+  "type": "object",
+  "required": ["schemaId", "specVersion", "status", "sourceIds", "observedAt", "value", "valueDigest", "diagnostics"],
+  "properties": {
+    "schemaId": { "const": "atm.observationSnapshot.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "status": { "enum": ["observed", "unavailable", "conflicting"] },
+    "sourceIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "value": {},
+    "valueDigest": { "type": ["string", "null"], "pattern": "^sha256:[a-fA-F0-9]{64}$" },
+    "diagnostics": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+  },
+  "additionalProperties": false
+}

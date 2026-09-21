@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.dev/schemas/evidence/coverage-universe.schema.json",
+  "title": "ATM Coverage Universe",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "compilerId",
+    "universeId",
+    "generatedAt",
+    "model",
+    "entries",
+    "obligationInventory",
+    "gapCandidates",
+    "reachabilitySummary",
+    "universeDigest"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.coverageUniverse.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "compilerId": { "const": "atm.coverageUniverseCompiler.v1" },
+    "universeId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "minLength": 1 },
+    "model": {
+      "type": "object",
+      "required": ["modelId", "modelVersion", "modelDigest"],
+      "properties": {
+        "modelId": { "type": "string", "minLength": 1 },
+        "modelVersion": { "type": ["string", "null"] },
+        "modelDigest": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    },
+    "obligationInventory": { "type": "object" },
+    "gapCandidates": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/gapCandidate" }
+    },
+    "reachabilitySummary": {
+      "type": "object",
+      "required": ["reachable", "unreachable", "unsupported", "excluded", "unknown"],
+      "properties": {
+        "reachable": { "type": "integer", "minimum": 0 },
+        "unreachable": { "type": "integer", "minimum": 0 },
+        "unsupported": { "type": "integer", "minimum": 0 },
+        "excluded": { "type": "integer", "minimum": 0 },
+        "unknown": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "universeDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "reachabilityStatus": {
+      "enum": ["reachable", "unreachable", "unsupported", "excluded", "unknown"]
+    },
+    "sourceRef": {
+      "type": "object",
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": { "enum": ["file", "schema", "task", "plan", "seam", "other"] },
+        "ref": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "validatorRef": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "caseId": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "entry": {
+      "type": "object",
+      "required": [
+        "obligationId",
+        "semanticKey",
+        "semanticFamily",
+        "owningSeam",
+        "reachabilityStatus",
+        "sourceRefs",
+        "validatorRefs",
+        "description",
+        "exclusionReason",
+        "inventoryEntryDigest",
+        "gapKind"
+      ],
+      "properties": {
+        "obligationId": { "type": "string", "minLength": 1 },
+        "semanticKey": { "type": "string", "minLength": 1 },
+        "semanticFamily": { "type": "string", "minLength": 1 },
+        "owningSeam": { "type": "string", "minLength": 1 },
+        "reachabilityStatus": { "$ref": "#/$defs/reachabilityStatus" },
+        "sourceRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceRef" }
+        },
+        "validatorRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/validatorRef" }
+        },
+        "description": { "type": ["string", "null"] },
+        "exclusionReason": { "type": ["string", "null"] },
+        "inventoryEntryDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "gapKind": { "enum": ["none", "gap", "unsupported", "excluded", "unknown"] }
+      },
+      "additionalProperties": false
+    },
+    "gapCandidate": {
+      "type": "object",
+      "required": [
+        "obligationId",
+        "semanticFamily",
+        "owningSeam",
+        "reachabilityStatus",
+        "reason",
+        "candidateTestCaseId"
+      ],
+      "properties": {
+        "obligationId": { "type": "string", "minLength": 1 },
+        "semanticFamily": { "type": "string", "minLength": 1 },
+        "owningSeam": { "type": "string", "minLength": 1 },
+        "reachabilityStatus": { "$ref": "#/$defs/reachabilityStatus" },
+        "reason": { "type": "string", "minLength": 1 },
+        "candidateTestCaseId": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

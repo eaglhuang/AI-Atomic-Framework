@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-08-09-007",
+  "date": "2026-08-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Closed — source repair and focused validation verified; formal backlog closeout reconciled 2026-09-07",
+  "area": "Batch routing and recovery",
+  "finding": "A whole-plan next route returned a mandatory batch playbook with state repair-required and command node atm.mjs batch repair --actor <id> --json. The commanded repair then failed with ATM_BATCH_RUN_MISSING, while node atm.mjs batch status --json reported no active batch and internally consistent state.",
+  "expectedBehavior": "A returned recovery command must be executable against the state that produced it. If no active batch exists, next must either create or name a batch run before prescribing repair, or return a non-batch wait/claim route with the actual dependency blocker.",
+  "evidenceOrRepro": "Historical reproduction was rechecked against current source: a queue-scoped prompt with no active batch now returns a structured non-repair route. Added tests/cli/batch-repair-route-no-active-batch.test.ts; it passes and asserts the route is not batch-state-repair-required and never prescribes batch repair. Existing batch implementation still requires a real active batch for repair and returns ATM_BATCH_RUN_MISSING otherwise.",
+  "followUp": "Keep the no-active-batch regression alongside the existing strict batch repair behavior; any future repair advice must include a real batch id when one exists. Frozen release artifacts must be rebuilt if this source test is later accompanied by source changes."
+}

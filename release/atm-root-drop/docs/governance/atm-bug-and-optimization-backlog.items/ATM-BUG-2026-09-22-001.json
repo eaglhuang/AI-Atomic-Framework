@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-22-001",
+  "date": "2026-09-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Gap",
+  "severity": "High",
+  "status": "Open — owner decision required",
+  "area": "Proof 3 pre-registration",
+  "finding": "The sealed external benchmark protocol registers how the paired experiment is measured but not how it is decided. scripts/fixtures/atm-external-benchmark/manifest.json carries arms, four distinct roles, six controls, AB/BA counterbalancing, environment pinning and eight metric definitions, all bound under a preregistration digest, and has no success threshold, stopping condition or analysis method. Proof 3 requires independent judgment criteria, success thresholds and stopping conditions to be fixed in advance.",
+  "expectedBehavior": "Before the first paired run, the manifest should seal, per metric: the direction and size of difference that counts as a benefit rather than merely a measured difference; how paired replicates are aggregated and what is reported when a metric is unavailable, which the manifest already permits for tokens and billed cost; the stopping condition including budget and wall-clock cap, and whether a halted run is reported or discarded; and what result would count as ATM failing to show net benefit. The rule must fall inside the preregistration digest so it cannot be edited after data exists.",
+  "evidenceOrRepro": "node --strip-types scripts/validate-external-benchmark-protocol.ts reports status=preregistered repositories=2 execution=blocked:hiddenCorpusAcceptance. The manifest's top-level keys are schemaId, protocolVersion, preregistrationDigest, status, sealedAt, externalRepositories, arms, oracle, counterbalancing, metrics, controls, executionPrerequisites and runEligibility. No decisionRule, thresholds, stopping or analysis section is present.",
+  "followUp": "Owner decision, not an implementation task. This session deliberately did not choose the numbers: the party that would be setting the bar is the party whose product is being judged, and a threshold picked by that party after seeing what is achievable is not a threshold. Once the owner fixes the rule, fold it into the manifest, extend validate-external-benchmark-protocol.ts to require it, and reseal the preregistration digest before any paired run."
+}

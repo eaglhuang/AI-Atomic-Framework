@@ -1,0 +1,32 @@
+{
+  "schemaId": "atm.plan3ParallelPrepareOutsideQueueFixture.v1",
+  "specVersion": "0.1.0",
+  "workflow": {
+    "preparePhase": {
+      "parallelizable": true,
+      "insideScarceQueue": false,
+      "durationMs": 120000
+    },
+    "criticalSection": {
+      "insideScarceQueue": true,
+      "durationMs": 4500,
+      "operations": ["publish-runner-pointer", "commit-pointer"]
+    },
+    "validationPhase": {
+      "parallelizable": true,
+      "insideScarceQueue": false,
+      "durationMs": 600000
+    }
+  },
+  "expectedVerdict": "queue-residency-minimal",
+  "forbiddenActions": [
+    "hold-queue-during-prepare",
+    "hold-queue-during-validation",
+    "treat-wait-as-pass"
+  ],
+  "diagnostics": [
+    "prepare-outside-queue",
+    "validation-outside-queue",
+    "critical-section-only"
+  ]
+}

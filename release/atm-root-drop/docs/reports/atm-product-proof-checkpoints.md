@@ -1,0 +1,162 @@
+# ATM product-proof checkpoints
+
+This checkpoint is append-only evidence metadata, not a replacement for GitHub run history or npm registry evidence. Raw CI/provider exports remain outside Git.
+
+## Current verified observations
+
+- Public npm clean-consumer install: verified for `@ai-atomic-framework/cli@0.1.0` after the stable release; the registry tarball is not a workspace link. The earlier beta observation remains historical.
+- Latest local package build measures 3,357,358 unpacked bytes across 76 runtime files (registry proof reports 3,357,365 bytes across 78 files). This is within the current 3,365,772-byte cap, but leaves less than 0.3% headroom; it should not be presented as “small” without a follow-up size-reduction pass.
+- npm dist-tags now point `latest` to `0.1.0` and `next` to `0.1.0-beta.5`. Bare `npm install @ai-atomic-framework/cli` therefore selects the stable installable package; the prior beta-only routing statement is historical.
+- Direct public smoke `npm exec --yes --package=@ai-atomic-framework/cli@0.1.0 atm -- --version` succeeds and reports `ATM framework version 0.1.0`.
+- Product CI contract: present and validated locally.
+- Repository clean-install validation also passes with `isolatedInstall: true` and `adoptionVerified: true`; it checks the published CLI against the generated 27-package skeleton without a workspace link.
+- Burn-in policy: at least 90 eligible protected-main runs spanning at least 30 calendar days, with failures and cancellations retained.
+- Scheduled protected-main CI runs are eligible observations because the workflow explicitly schedules them to preserve the burn-in window.
+
+## Claims not yet earned
+
+The current GitHub history is not yet a 30-day, 90-run all-success window. Earlier failures remain part of the denominator. Therefore `long-term-green` is not claimed here. Re-run the burn-in evaluator against an externally retained, newest-first GitHub export after each scheduled observation.
+
+## Boundary
+
+The public checkpoint may contain digests, counts, and links only. Raw run payloads, provider billing exports, and runtime evidence stay in the external evidence ledger and must be restorable by digest.
+
+## Latest observed CI snapshot
+
+On 2026-09-13, an externally queried GitHub Actions export (100 newest `ci.yml` runs; source digest `sha256:d303ec54f193828c7721d8a59bae8c62954d255b6e853edc7fbf88ddeaf96a04`) produced 31 successes and 69 failures across 6.526343 calendar days. The evaluator therefore returned `unexplained-failure` with `insufficient-calendar-window`; this is a negative observation, not a long-term-green claim.
+
+Assuming a fresh protected-main baseline begins with the latest eligible observation and every subsequent eligible run succeeds, the earliest possible 30-day window date is 2026-10-13. The 90-run minimum must also be reached; either condition failing keeps the claim non-green.
+
+## Stable-release correction (2026-09-13)
+
+The stable release workflow `34748571701` completed successfully, including post-publish validation. A fresh post-boundary burn-in evaluation over the current GitHub export observed one eligible protected-main run (`34747801958`), zero failures, zero calendar days, and returned `insufficient-window`. This updates the npm observations above but does not change the long-term-green conclusion.
+
+## TASK-PRF-0051 post-delivery revalidation (2026-09-14)
+
+The latest retained GitHub export contains 100 newest `ci.yml` runs, spanning
+6.752234 calendar days, with 35 successes and 65 failures. The evaluator
+returned `unexplained-failure` with reasons
+`insufficient-calendar-window` and `unexplained-failure-present`. The current
+remote ten-run validator also fails closed because only one of those ten runs
+is labelled `release-candidate`, below the required pair.
+
+Raw export: `C:\Users\User\atm-benchmark-sink\TASK-PRF-0051\raw\ci-runs-2026-09-14.json`
+(SHA-256 `sha256:485d082e5addd7e9f1c08d6acf2e1a5b04f44ff8d040dfb91b1673c4139e7517`).
+The report output is retained beside it with SHA-256
+`sha256:d257dab99c9a3a822e33ed206b2058eae2883f1dcccef7343ad8ae542b64c215`.
+This checkpoint is negative/inconclusive evidence only; it does not change the
+90-run/30-day policy or claim long-term green CI.
+
+## TASK-PRF-0053 live registry correction (2026-09-14)
+
+The older checkpoint sentence claiming a verified public `0.1.0` install is
+superseded by the live full-matrix recheck. The package is installable, but its
+published runtime cannot complete the ATMChart lifecycle: `bootstrap` passes,
+while `atm-chart render` and `atm-chart verify` fail on the missing
+`default-guards` schema. This is retained as negative evidence and does not
+earn the public core-workflow claim or authorize a release.
+
+## TASK-PRF-0055 CI failure-lifecycle observability (2026-09-14)
+
+The evaluator contract now requires attempt-level lifecycle data before CI
+failure costs can be measured: `firstFailureAt`, `retryCount`,
+`lastAttemptAt`, `repairAcceptedAt`, `failureClass`, and explicit exclusion
+reasons. Missing or inconsistent fields fail closed; they are not treated as
+zero and cannot produce a green burn-in claim.
+
+Re-running the current 100-run GitHub export against the stricter evaluator
+returned `invalid-input` with
+`record-34749756346-missing-lifecycle`. This is negative evidence that the
+existing export is insufficient to measure first failure, retries, and repair
+time. Raw provider payloads remain outside Git; the 90-run/30-day policy and the
+inconclusive status are unchanged.
+
+## TASK-PRF-0056 candidate validator completeness (2026-09-14)
+
+Candidate npm proof is now fail-closed on the complete core workflow rather
+than the former four-command legacy smoke. The isolated tarball consumer runs
+`version`, `doctor`, `next`, `tasks`, `bootstrap`, `atm-chart render`, and
+`atm-chart verify`; the required-success subset is
+`version`/`doctor`/`bootstrap`/`atm-chart render`/`atm-chart verify`.
+Receipts retain candidate-only provenance and cannot be promoted to public
+registry evidence. This checkpoint records validator delivery, not a public
+republish: `@ai-atomic-framework/cli@0.1.0` remains blocked until a separately
+authorized release and fresh registry revalidation.
+
+## TASK-PRF-0057 explicit-tarball provenance boundary (2026-09-14)
+
+The first post-0056 explicit `--candidate-tarball` run exposed a contract bug:
+installation and the complete command matrix passed, but the receipt reported
+`version: local`, `unpackedBytes: 0`, `entryCount: 0`, and no file inventory.
+This is negative evidence only and cannot support a size or reproducibility
+claim. TASK-PRF-0057 requires archive-derived package metadata, deterministic
+file inventory, parity with candidate-directory packing, and fail-closed
+handling for malformed archives. It does not authorize publication or alter
+the public registry result.
+
+## TASK-PRF-0054 fail-closed post-publish registry gate (2026-09-18)
+
+The release workflow (`.github/workflows/release-npm.yml`) now runs a
+"Verify public npm registry post-publish" step immediately after the real
+`npm publish` step, before the broader post-publish validation suite. It
+re-installs the exact tagged version from the live public registry into a
+clean consumer with `--require-default-tag` (never mutable `latest`, never a
+`--version`-only smoke) and runs the complete core-workflow matrix; it does
+not pass `--record-blocked`, so a real registry defect fails the workflow
+rather than being recorded as a passing blocked result. The receipt
+(`release/public-npm-install-post-publish-proof.md`, containing requested
+version, registry metadata, tarball SHA-256, unpacked bytes, entry count, and
+per-command exit codes) is uploaded as a downloadable workflow artifact
+(`public-npm-install-post-publish-proof`). The step is skipped, not silently
+passed, on the `workflow_dispatch` dry-run path (same condition as the
+adjacent full-validation step).
+
+Focused contract test `tests/cli/release-public-registry-gate.test.ts`
+statically asserts these properties against the workflow source (command,
+`--require-default-tag`, absence of `--record-blocked`, dry-run skip
+condition, artifact upload, and step ordering after publish). It was verified
+to actually catch regressions, not just assert a tautology: two independent
+negative controls (reintroducing `--record-blocked`; deleting the
+`--require-default-tag` line) were applied to a scratch copy of the workflow
+and confirmed the test fails on each, before being discarded.
+
+This card modifies only the workflow, the focused test, and this report — it
+does not execute `npm publish`, change tokens/2FA, or authorize a release.
+`@ai-atomic-framework/cli@0.1.0` remains the currently published, incomplete
+version; running `npm run validate:public-npm-install -- --version 0.1.0
+--require-default-tag --record-blocked --measurement-runs 1` against it still
+returns `status: blocked` today, as expected — the gate protects the *next*
+publish, it does not retroactively fix the one already on the registry. That
+requires TASK-PRF-0107's fix (already merged to `main`) to actually be
+published, which remains a separate, Owner-approved decision.
+
+## Proof 2 failure policy: repaired-and-explained (owner decision, 2026-09-19)
+
+**Original problem.** `scripts/measure-product-ci-burn-in.ts` pushed `unexplained-failure-present` whenever any
+failed run was in the window (`failedRuns > 0`), even though the lifecycle schema already carried
+`firstFailureAt` / `retryCount` / `repairAcceptedAt`. The verdict never used `repairAcceptedAt`, so the
+implementation was zero-tolerance while the product goal reads "retain first failure, reruns and repair time".
+The collector also only recognised a repair when the *same* run succeeded on a rerun; the three real failures in
+the 2026-08-26..2026-09-18 window (two typecheck regressions, one vendored-module packaging failure) were all
+fixed forward by later commits, so they could never count as repaired.
+
+**Decision.** The owner chose `repaired-and-explained` over zero-tolerance. The policy is now an explicit
+`failurePolicy` field recorded in every report; `zero-tolerance` remains selectable.
+
+**Rules (fail-closed).** A failed run stops blocking the verdict only when all of these hold:
+
+1. its failure class is specific — `unknown-failure` never counts as explained;
+2. it has an accepted repair — either a successful rerun of the same run, or a fix-forward disposition;
+3. a fix-forward disposition (`failureDispositions[]` in the `atm.githubCiAttemptExport.v1` export) names a
+   non-empty `rootCause` and a `repairRunId` that is an eligible, successful protected-main run in the same
+   export and strictly later than the failure. The disposition is part of the export, so it is bound into
+   `sourceDigest`; the verifier re-checks the repair run against the receipt.
+
+Failed runs are still reported: `failedRuns`, `repairedFailures`, `unexplainedFailures` and `repairTimeMs` appear
+in `observed`, so a repaired failure is never hidden. Calendar-window and run-count thresholds are unchanged.
+
+**Evidence.** `tests/cli/product-ci-burn-in.test.ts` (19 cases) and `tests/cli/ci-burn-in-evidence-collector.test.ts`
+cover the accept path and each abuse path (generic class, blank root cause, repair run earlier / missing /
+failed, duplicate disposition, invalid policy). Negative controls: disabling the disposition hook, or reverting
+the default to zero-tolerance, makes both suites fail. Both suites are now registered in the `standard`
+validator profile; previously neither ran in CI.

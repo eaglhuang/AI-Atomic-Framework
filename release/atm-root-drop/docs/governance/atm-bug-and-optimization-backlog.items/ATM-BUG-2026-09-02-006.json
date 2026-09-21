@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-09-02-006",
+  "date": "2026-09-02",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P1",
+  "status": "Closed — canonical recursive scope fixture and residue regression verified",
+  "area": "Runner publication / temporary-lock residue classification test",
+  "finding": "runner-publication-residue-classification.test.ts modeled temporary framework lock scope with bare directory names such as packages/cli/dist. The canonical write-scope policy intentionally treats a bare directory as an exact path and requires dir/** for recursive child authority, so the fixture's live lock did not own packages/cli/dist/atm.js and falsely failed before residue classification assertions ran.",
+  "expectedBehavior": "A fixture that models ownership of generated descendants must use the same explicit recursive dir/** scope used by governed task cards. The stale fixture remains explicitly stale, so the test continues to distinguish foreign-live, unowned, and stale-recovery publication outputs.",
+  "evidenceOrRepro": "On 2026-09-02 the unmodified test failed with expected ATM-FRAMEWORK-TEMP-g9 but actual undefined at the live-lock assertion. readFrameworkTempLockProjection correctly returned the lock, but frameworkTempLockOwnsPath delegated to pathMatchesWriteScope, which only matches descendants for scopes ending in /**. Existing task scopes and runner publication amendments use packages/cli/dist/** and release/atm-onefile/**. The repair makes the fixture use those canonical recursive forms.",
+  "containment": "This changes only fixture scope syntax. It does not broaden pathMatchesWriteScope, relax write-ticket authority, alter runner publication ownership, or change any production command.",
+  "followUp": "Closed after the focused residue-classification regression passes with the live and stale dispositions still asserted. Keep fixture scopes canonical: bare paths are exact, while descendants require /**."
+}
