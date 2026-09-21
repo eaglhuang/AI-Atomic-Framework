@@ -183,3 +183,34 @@ A real experiment still needs: sealed scenario tasks from an independent
 hidden-corpus custodian, an independent adjudicator, attributable provider cost
 telemetry, a real provider driver, and approved token, cost and wall-clock caps.
 Until a paired experiment runs, no claim of net benefit is made.
+
+### The pre-registration is missing its decision rule
+
+`scripts/fixtures/atm-external-benchmark/manifest.json` seals how the experiment
+is *measured*: the two arms, four mutually distinct roles, six required
+controls, AB/BA counterbalancing, environment pinning, and a definition for each
+of the eight metrics. `validate-external-benchmark-protocol.ts` binds all of it
+under a preregistration digest.
+
+It does not seal how the experiment is *decided*. There is no success threshold,
+no stopping condition, and no analysis method in the manifest, and Proof 3 asks
+for all three in advance. The reason they have to be fixed before any data
+exists is that afterwards there is always a defensible-looking reading that
+favours whoever picks it, and the party who would be picking here is the party
+whose product is on trial.
+
+These are owner decisions and this project deliberately does not fill them in.
+What has to be chosen and sealed, per metric, before the first paired run:
+
+- the direction and size of difference that counts as a benefit, not merely a
+  measured difference;
+- how paired replicates are aggregated, and what is reported when a metric is
+  unavailable, which the manifest already allows for tokens and billed cost;
+- the stopping condition, including the budget and wall-clock cap at which the
+  run halts, and whether a halted run is reported or discarded;
+- what result would count as ATM failing to show net benefit, stated as plainly
+  as the success case.
+
+Until that rule is sealed and folded into the preregistration digest, a paired
+run can produce numbers but cannot settle the question. Tracked as
+`ATM-BUG-2026-09-22-001`.
