@@ -6,10 +6,12 @@ import path from 'node:path';
 import {
   buildTaskflowCommitBundle,
   finalizeTaskflowCommitBundle,
-  GIT_SUBPROCESS_MAX_BUFFER
+  GIT_SUBPROCESS_MAX_BUFFER,
+  chunkGitPathspecs
 } from '../commit-bundle-assembly.ts';
 
 assert(GIT_SUBPROCESS_MAX_BUFFER >= 16 * 1024 * 1024, 'taskflow git subprocesses need a large bounded output buffer');
+assert(chunkGitPathspecs(Array.from({ length: 2000 }, (_, index) => `release/${index}/file.ts`)).length > 1, 'taskflow reset pathspecs must stay below the platform argv budget');
 
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });

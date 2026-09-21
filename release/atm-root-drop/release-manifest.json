@@ -25787,7 +25787,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
-        "digest": "8c82c5223b94eca80e5d4889ff7ff2a4f68e4d4444294be5642eb81ab44e7a9c",
+        "digest": "ba28eb4aa7aae6378fa153db6f970c364c2f5c3c1149b5e453d82a4d8e20b093",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js"
@@ -28235,7 +28235,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "61add9c819cbf96df0ac6e25e1ee601ddc1ed2c9caf922a9a29c42ee2ede4155",
+        "digest": "c4d07e44bc904f432d9319cd48627d65b860eee3b6a369d6022d12178c484dc1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -28244,7 +28244,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "21e966eeeb4962bfbc5f7ac4cd6a189516d8eb55ded666b61295a3d579729830",
+        "digest": "8752e0a2fadae5016c233dcf83f3e4bf44b5f090242ba1412247dc06aa10f9a3",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -33554,7 +33554,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
-        "digest": "721baab712030ae4388a6da1e2088c75d740c05f89207336842ca8bf3027aff1",
+        "digest": "50a56cc2e6bfbe2a456e635cba9cbedf36f84e63be71e6419d9a840df3492a3e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts"
@@ -33680,7 +33680,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-        "digest": "e99b854a165997980e7b595da8e448e311eac456cf94c33e49abd4ae409219ca",
+        "digest": "febe59d281dd823b48ca7bda3e03c42b2a41f118f5e4bbf66c895d1b8634d7bd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
@@ -49169,7 +49169,7 @@
       },
       {
         "path": "scripts/run-sealed-runner-build.ts",
-        "digest": "df3609139906a4cd17f4991c0a60b6fd2a2e2a89cde9c9299c8595c69aeca899",
+        "digest": "596feeb9fd5d576ba2a37e30f056ef4750ce00970bd5e1bff7be97eea9575c6e",
         "origin": "source",
         "inputPaths": [
           "scripts/run-sealed-runner-build.ts"
@@ -62272,7 +62272,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:68f2d9ae6e591da4fea8fb6e9c9b8194b71c46f0c4451ddcab660aee43ab0139"
+    "treeDigest": "sha256:50076a222a7e118f711d97f446525048e54f43e103974f50d12a8b09d31f38b0"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -63824,7 +63824,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:6e76fd29be341e2b482e819281806251acb72b0c0b92d4a16464589719e84ac8"
+    "digest": "sha256:c38e6a0dc6bfeef890c0a43ac3a1e07fd4c37b6ca955cf3263f774bf5fcba76a"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -70059,22 +70059,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:f5eed41268a2144d032b7d16ca0ce12ae42b4a11275dbc8b12a48226c3375f35",
-  "sealedSourceCommit": "bc8638e5e42ea4a44a208327e8a0dde5ee9f5f4d",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:3af93109aa0073a1f6cb198a038f0f273b25ef9ab336378ded381cddcd8cb640",
-  "tsBuildCacheDigest": "sha256:2266a1a0864789e2551318908a35faef8232e2bbc16005c552244650ea454ba8",
+  "buildInputsTreeHash": "sha256:d1165d73bbb9cbf9bcc39734156ba5a42a5ff08b79c02267eb913b136f1a91a5",
+  "sealedSourceCommit": "9c474291f10d488d468c22a96d5e2a847262797d",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:787bd7e4a991d6d06f22faaa6d1a2bf2f5e9228e56fcd1ea036f2f8362253f9b",
+  "tsBuildCacheDigest": "sha256:5a267709d3cb4fc5175e357ea95723c04cd08e19e7d609f3b15ef5615acc7966",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 49,
-    "skipDecision": 46,
-    "worktreeSetup": 9134,
-    "typescriptBuild": 22271,
-    "rootDropReleaseAssembly": 31056,
-    "onefileReleaseAssembly": 19146,
-    "artifactSync": 5016,
+    "inputHashCalculation": 40,
+    "skipDecision": 52,
+    "worktreeSetup": 10144,
+    "typescriptBuild": 11508,
+    "rootDropReleaseAssembly": 31254,
+    "onefileReleaseAssembly": 19065,
+    "artifactSync": 4913,
     "cleanup": 0,
-    "totalElapsed": 102826
+    "totalElapsed": 86481
   }
 }

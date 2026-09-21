@@ -353,7 +353,10 @@ function runTimedInnerBuild(
   if (buildTarget === 'full') {
     const packageArgs = incrementalPlan?.affectedPackages.length ? ['--packages', incrementalPlan.affectedPackages.join(',')] : [];
     timePhase(timings, 'typescriptBuildMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'packages', ...packageArgs]));
-    const overlayArgs = incrementalPlan ? ['--overlay-paths', JSON.stringify(incrementalPlan.changedPaths), '--previous-sealed-source', incrementalPlan.previousSealedSourceSha ?? ''] : [];
+    const overlayPayload = incrementalPlan ? JSON.stringify(incrementalPlan.changedPaths) : null;
+    const overlayArgs = overlayPayload && Buffer.byteLength(overlayPayload, 'utf8') <= 8_000
+      ? ['--overlay-paths', overlayPayload, '--previous-sealed-source', incrementalPlan?.previousSealedSourceSha ?? '']
+      : [];
     timePhase(timings, 'rootDropAssemblyMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'root-drop', ...overlayArgs]));
     timePhase(timings, 'onefileAssemblyMs', () => runNode(worktreeRoot, ['--strip-types', 'scripts/run-sealed-runner-build.ts', '--inner', 'onefile']));
     return;

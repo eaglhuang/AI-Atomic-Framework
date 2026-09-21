@@ -561,7 +561,9 @@ function commitRepoWithTemporaryIndex(input) {
         }
         runGitWithEnv(input.repoRoot, input.args, env);
         if (input.stageFiles.length > 0) {
-            runGitOrThrow(input.repoRoot, ['reset', '--quiet', '--', ...input.stageFiles]);
+            for (const chunk of chunkGitPathspecs(input.stageFiles)) {
+                runGitOrThrow(input.repoRoot, ['reset', '--quiet', '--', ...chunk]);
+            }
         }
     }
     finally {
