@@ -25,22 +25,22 @@
     "dependsOnRootDropManifest": "release/atm-root-drop/release-manifest.json",
     "rationale": "release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list."
   },
-  "buildInputsTreeHash": "sha256:2c104893a178c182742e9799c8ba6aaea7bdd07e5085f5dc4f22d2783a234a2e",
-  "sealedSourceCommit": "217982501629cddd6a583dd75fc032f41438e378",
+  "buildInputsTreeHash": "sha256:cbfe938e3daeafb392f1910b191181554f411e12ab65b38fc4cf3bc818d47a04",
+  "sealedSourceCommit": "767595d9dff1683e93347bb28870cd9533b239b3",
   "buildDecision": "fullRebuild",
-  "buildDecisionReason": "release artifacts are dirty or missing",
-  "incrementalPlanDigest": "sha256:58fbc3f05f7223f8ba861b717b9d19a669dd2ec2683f27684bb440897178addf",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:227ea549a5cfa9345d22027a924cca240ec0d5daf6ac6c5d657544d43f96cb06",
   "tsBuildCacheDigest": "sha256:5f879a781a3d522c2c7e02c3503e710c6f2c4189132005c0ad1a1c8b1cb0ed35",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 30,
-    "skipDecision": 156,
-    "worktreeSetup": 9331,
-    "typescriptBuild": 11290,
-    "rootDropReleaseAssembly": 30537,
-    "onefileReleaseAssembly": 18787,
-    "artifactSync": 4992,
+    "inputHashCalculation": 32,
+    "skipDecision": 39,
+    "worktreeSetup": 9062,
+    "typescriptBuild": 10883,
+    "rootDropReleaseAssembly": 30548,
+    "onefileReleaseAssembly": 18338,
+    "artifactSync": 5013,
     "cleanup": 0,
-    "totalElapsed": 86022
+    "totalElapsed": 86057
   }
 }
