@@ -315,9 +315,14 @@ try {
   if (!filename) throw new Error('npm pack returned no tarball');
   const tarball = join(root, filename);
   const pathLength = measureInstalledPathLength(args.packageName, (Array.isArray(packed) ? packed[0]?.files : packed?.files) ?? []);
-  if (budget?.maxInstalledPathChars !== undefined && pathLength.longestInstalledPathChars > budget.maxInstalledPathChars) {
-    throw new Error(`public tarball exceeds the installed path budget: ${pathLength.longestInstalledPathChars}/${budget.maxInstalledPathChars} characters for ${pathLength.longestEntry}`);
-  }
+  // Recorded for every version and reported as a validation failure rather than
+  // thrown. The cap ratchets the version under development, but this validator
+  // is also run against older versions to produce the comparison baseline, and
+  // an older release that predates the cap still has to yield a full receipt.
+  // Throwing here lost the whole receipt: 0.1.0 measures 167 characters and its
+  // run came back with no validation block at all.
+  const installedPathBudgetExceeded = budget?.maxInstalledPathChars !== undefined
+    && pathLength.longestInstalledPathChars > budget.maxInstalledPathChars;
   const windowsLongPathsEnabled = detectWindowsLongPathSupport();
   const smokeRun = runSmoke(tarball, root, 'public', args.measurementRuns);
   const commandMatrix = Object.keys(smokeRun.smoke);
@@ -336,7 +341,9 @@ try {
     requiredSuccessCommands: [...coreWorkflowCommandNames],
     requiredSuccessCommandFailures,
     coreWorkflowPassed: requiredSuccessCommandFailures.length === 0,
-    passed: commandMatrix.length === expectedCommands.length
+    installedPathBudgetExceeded,
+    passed: !installedPathBudgetExceeded
+      && commandMatrix.length === expectedCommands.length
       && expectedCommands.every((name) => commandMatrix.includes(name))
       && moduleResolutionFailures === 0
       && smokeEntries.every((entry) => entry.commandExecuted)
