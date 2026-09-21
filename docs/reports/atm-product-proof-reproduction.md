@@ -127,7 +127,9 @@ introduced, so the 30-day threshold cannot be met before
 `docs/reports/product-ci-failure-dispositions.json` names its failing job so
 the root cause can be checked in the public CI logs.
 
-Latest result: after the CLI test sweep landed, the exporter returned 779 runs since 2026-08-10 (none dropped); the collector kept 653 eligible runs and excluded 126 as `out-of-scope-workflow`. The window is 23.7 days, starting `2026-08-26T23:44:22Z`. There were 649 successful and 4 failed runs; all 4 were repaired and explained, 0 were unexplained, and there were 0 reruns. The fourth failure (run 35455553721) was the sweep's first run, which exposed a test that depended on clone depth. The current streak restarted at 1. Verdict `reject` with the single reason `insufficient-calendar-window`.
+Latest result (2026-09-22): the exporter returned 838 runs since 2026-08-10, none dropped; the collector kept 712 eligible runs and excluded 126 as `out-of-scope-workflow`. The window is 25.778704 days, starting `2026-08-26T23:44:22Z`, so the earliest possible pass is `2026-09-25T23:44:22Z`. There were 704 successful and 8 failed runs; all 8 were repaired and explained, 0 unexplained, 0 unresolved, 0 reruns. Four of the eight were caused on 2026-09-21 while un-quarantining tests and adding the installed-path budget, and each carries its own disposition and repair chain. Verdict `reject` with the single reason `insufficient-calendar-window`.
+
+An earlier measurement the same day reported 9 failures and 1 unexplained. That reading was taken while the GitHub API still showed run 35638310600's Product CI job as in progress with a null conclusion, about ten minutes after every one of its steps had succeeded; the exporter recorded the run as `unknown`. Once the job object caught up the same pipeline returned the numbers above. The instrument was not changed to accommodate the transient reading, and a rerun of the export is the way to tell a real unexplained failure from a lagging one.
 
 Test coverage: Product CI runs a `CLI test sweep` step
 (`scripts/run-cli-test-sweep.ts`) that executes every `tests/cli/*.test.ts`
@@ -135,26 +137,21 @@ file except those in the quarantine in `scripts/cli-test-sweep.config.json`. A
 test fails the sweep if it exits non-zero, times out, or modifies the worktree.
 Every quarantined test records a reason, a disposition and its root cause.
 
-The sweep was introduced on 2026-09-20 with 534 of 599 files running and 65
-quarantined, of which 54 had not been root-caused. As of the same day 581 of
-600 files run and pass on Linux, and the 19 that remain are quarantined for a
-named reason, none of them unexplained:
+The sweep was introduced on 2026-09-20 with 534 of 599 files running and 65 quarantined, of which 54 had not been root-caused. As of 2026-09-22, 590 of 600 files run and pass, and the 10 that remain are quarantined for a named reason, none of them unexplained:
 
 | Reason | Files | What it means |
 |---|---|---|
-| `stale-assertion` | 9 | Asserts governance data that has legitimately moved, or a report that is stale against its own sources |
-| `environment-dependent` | 7 | Needs the sibling planning repository, full git history, or a Windows host |
-| `writes-tracked-files` | 3 | Regenerates tracked artifacts, so it needs an output-root option first |
+| `stale-assertion` | 5 | Asserts governance data that has legitimately moved, or a report that is stale against its own sources |
+| `environment-dependent` | 4 | Needs the sibling planning repository or a Windows host |
+| `writes-tracked-files` | 1 | Regenerates tracked artifacts, so it needs an output-root option first |
 
-Four of these need an owner decision rather than an edit: two governance
-reports are stale against their sources with no generator in the repository,
-one review binds its freshness to the commit it was generated at and so
-invalidates itself on the next commit, and `taskflow open` resolves its output
-root from the profile path rather than `--cwd`.
+Three need an owner decision rather than an edit: sharding the CLI owner map (`next-prompt-results-contract-extraction`), and whether a profile may redirect reads and writes outside `--cwd` (`taskflow-host-policy`, `taskflow-open-orchestration`).
+
+Seven tests drive the shared package-dist and root-drop build under the repository root and run in the sweep's serial lane, because two of them at once leave each other half-written output.
 
 Known limit: runs before the sweep step was added did not execute most
 `tests/cli` suites, so "covers test" holds only for runs from that commit on,
-and the 19 quarantined files are still not covered.
+and the 10 quarantined files are still not covered.
 
 ## Proof 3 — net benefit over a simple baseline
 
