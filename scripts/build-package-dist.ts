@@ -262,7 +262,8 @@ console.log(`[build-package-dist] built ${packageDirs.length} packages (${mode})
 function assertCliArtifactBudget(): void {
   const packageJsonPath = path.join(root, CLI_PACKAGE_DIR, 'package.json');
   const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as {
-    atmArtifactBudget?: { budget?: { maxPackedBytes?: number; maxPackedEntries?: number } }
+    name?: string;
+    atmArtifactBudget?: { budget?: { maxPackedBytes?: number; maxPackedEntries?: number; maxInstalledPathChars?: number } }
   };
   const budget = packageJson.atmArtifactBudget?.budget;
   const runtimeRoot = path.join(root, CLI_PACKAGE_DIR, 'dist', 'npm-runtime');
@@ -276,7 +277,32 @@ function assertCliArtifactBudget(): void {
   if (bytes > maxPackedBytes || files.length > maxPackedEntries) {
     throw new Error(`CLI npm-runtime exceeds artifact budget: ${bytes}/${maxPackedBytes} bytes, ${files.length}/${maxPackedEntries} files`);
   }
-  console.log(`[build-package-dist] cli artifact budget ok: ${bytes} bytes / ${files.length} files`);
+  // Windows resolves paths against a 260-character limit unless long path
+  // support is enabled, which is off by default, and an over-long entry fails
+  // at extraction rather than at any point this project controls. Measure the
+  // installed suffix so the depth a user's project directory can afford stays
+  // an explicit number instead of whatever the deepest vendored file happens
+  // to be.
+  const installedPrefix = `node_modules/${packageJson.name ?? '@ai-atomic-framework/cli'}/`;
+  const longest = files
+    .map((filePath) => ({
+      chars: installedPrefix.length + path.relative(path.join(root, CLI_PACKAGE_DIR), filePath).split(path.sep).join('/').length,
+      filePath
+    }))
+    .sort((left, right) => right.chars - left.chars)[0];
+  const maxInstalledPathChars = budget.maxInstalledPathChars;
+  if (!Number.isInteger(maxInstalledPathChars)) {
+    throw new Error('CLI artifact budget is missing maxInstalledPathChars; refusing to produce a publishable runtime');
+  }
+  if (longest && longest.chars > (maxInstalledPathChars as number)) {
+    throw new Error(
+      `CLI npm-runtime exceeds the installed path budget: ${longest.chars}/${maxInstalledPathChars} characters `
+      + `for ${path.relative(root, longest.filePath)}. On Windows this leaves a project directory only `
+      + `${260 - longest.chars - 1} characters, down from ${260 - (maxInstalledPathChars as number) - 1}. `
+      + 'Shorten the path rather than raising the cap.'
+    );
+  }
+  console.log(`[build-package-dist] cli artifact budget ok: ${bytes} bytes / ${files.length} files / ${longest?.chars ?? 0} installed path chars`);
 }
 
 function writeTextIfChanged(filePath: string, content: string): void {
