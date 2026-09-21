@@ -6,9 +6,9 @@
   "quarantine": [
     {
       "test": "four-plan-closeout-blocker-map.test.ts",
-      "reason": "stale-assertion",
-      "detail": "The test now asserts the map contract rather than frozen totals, but it still cannot pass: scripts/validate-four-plan-closeout-blocker-map.ts reports source digest mismatches for plan-3x-4x-backlog-disposition-census.json, plan-3x-4x-independent-certificate.json and others, so the committed map is stale against its own sources. The repository has no generator for this map, and editing the recorded digests by hand would fabricate a certification, so refreshing it needs an owner decision on who regenerates the map.",
-      "disposition": "fix"
+      "reason": "stale-source-digest",
+      "detail": "Shared root cause with plan4-successor-wave-consumption, plan4-successor-wave-objective-map and four-plan-closeout-blocker-map, tracked as ATM-BUG-2026-09-22-002: commit 4d3bce0e4 refreshed docs/reports/plan-3x-4x-backlog-disposition-census.json on 2026-09-06 and the reports whose digests bind them to it were never recompiled. The recorded assertions in this test still hold against the live data; what fails is the validator's source digest check. No generator for these maps exists in the repository, so refreshing the digests by hand would assert a recompilation that did not happen. Needs an owner decision on who regenerates them, or a generator, before the test can leave quarantine.",
+      "disposition": "triage"
     },
     {
       "test": "next-prompt-results-contract-extraction.test.ts",
@@ -18,15 +18,15 @@
     },
     {
       "test": "plan4-successor-wave-consumption.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Runs scripts/validate-plan4-successor-wave-consumption.ts against live reports; it fails on a source digest mismatch for docs/reports/plan-3x-4x-backlog-disposition-census.json, which is regenerated as the census changes.",
-      "disposition": "fix"
+      "reason": "stale-source-digest",
+      "detail": "Shared root cause with plan4-successor-wave-consumption, plan4-successor-wave-objective-map and four-plan-closeout-blocker-map, tracked as ATM-BUG-2026-09-22-002: commit 4d3bce0e4 refreshed docs/reports/plan-3x-4x-backlog-disposition-census.json on 2026-09-06 and the reports whose digests bind them to it were never recompiled. The recorded assertions in this test still hold against the live data; what fails is the validator's source digest check. No generator for these maps exists in the repository, so refreshing the digests by hand would assert a recompilation that did not happen. Needs an owner decision on who regenerates them, or a generator, before the test can leave quarantine.",
+      "disposition": "triage"
     },
     {
       "test": "plan4-successor-wave-objective-map.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Asserts over the live docs/reports/plan4-successor-wave-objective-map.json, which is regenerated as the wave progresses.",
-      "disposition": "fix"
+      "reason": "stale-source-digest",
+      "detail": "Shared root cause with plan4-successor-wave-consumption, plan4-successor-wave-objective-map and four-plan-closeout-blocker-map, tracked as ATM-BUG-2026-09-22-002: commit 4d3bce0e4 refreshed docs/reports/plan-3x-4x-backlog-disposition-census.json on 2026-09-06 and the reports whose digests bind them to it were never recompiled. The recorded assertions in this test still hold against the live data; what fails is the validator's source digest check. No generator for these maps exists in the repository, so refreshing the digests by hand would assert a recompilation that did not happen. Needs an owner decision on who regenerates them, or a generator, before the test can leave quarantine.",
+      "disposition": "triage"
     },
     {
       "test": "runbook-completion-evidence.test.ts",
@@ -38,12 +38,6 @@
       "test": "runbook-release-authority-review.test.ts",
       "reason": "environment-dependent",
       "detail": "Needs the planning repository: the reviewer fails with \"missing runbook: ../3KLife/docs/ai_atomic_framework/governance-optimization/plan-3x-4x-false-green-correction-complete-closeout-runbook-2026-08-09.md\". A CI clone has no sibling 3KLife checkout.",
-      "disposition": "fix"
-    },
-    {
-      "test": "task-dependency-semantics-census.test.ts",
-      "reason": "environment-dependent",
-      "detail": "Reads the planning repository through resolvePlanningRoot(), which defaults to a sibling 3KLife checkout (override: ATM_PLANNING_REPO_ROOT). A CI clone has no such sibling, so the census denominator is 0. It needs a fixture planning root instead of the live one.",
       "disposition": "fix"
     },
     {
