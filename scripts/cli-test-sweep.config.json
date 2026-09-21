@@ -5,12 +5,6 @@
   "concurrency": 4,
   "quarantine": [
     {
-      "test": "atm-2-1-final-closure.test.ts",
-      "reason": "stale-assertion",
-      "detail": "Regenerates docs/reports/atm-2-1-final-closure.md from live data and expects the row \"420-cell paired A/B v4 met rollout metrics and safety controller | pass\". The current data no longer yields that verdict, consistent with real-paired-ab-analyzer-v3 reading inconclusive. It also rewrites the tracked report, so it needs a fixture data set and a temporary output root.",
-      "disposition": "fix"
-    },
-    {
       "test": "four-plan-closeout-blocker-map.test.ts",
       "reason": "stale-assertion",
       "detail": "The test now asserts the map contract rather than frozen totals, but it still cannot pass: scripts/validate-four-plan-closeout-blocker-map.ts reports source digest mismatches for plan-3x-4x-backlog-disposition-census.json, plan-3x-4x-independent-certificate.json and others, so the committed map is stale against its own sources. The repository has no generator for this map, and editing the recorded digests by hand would fabricate a certification, so refreshing it needs an owner decision on who regenerates the map.",

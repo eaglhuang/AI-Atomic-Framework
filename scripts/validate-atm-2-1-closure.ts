@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 
 const ROOT = process.cwd();
 const REPORT_PATH = "docs/reports/atm-2-1-final-closure.md";
@@ -54,7 +54,7 @@ type ValidatorRunEntry = {
 };
 
 function read(path: string): string {
-  return readFileSync(join(ROOT, path), "utf8");
+  return readFileSync(isAbsolute(path) ? path : join(ROOT, path), "utf8");
 }
 
 function digest(path: string): string {
@@ -298,12 +298,18 @@ function renderReport(rows: MatrixRow[]): string {
 }
 
 const mode = process.argv.includes("--mode") ? process.argv[process.argv.indexOf("--mode") + 1] : "validate";
+// The report is a tracked artifact, so a caller that only wants to read the
+// matrix -- a test, or a dry inspection -- needs somewhere else to put it.
+// Rewriting the tracked copy on every read made this validator unusable from
+// any check that must leave the worktree clean.
+const outputFlag = process.argv.indexOf("--output");
+const outputPath = outputFlag >= 0 ? process.argv[outputFlag + 1] : REPORT_PATH;
 const matrix = buildMatrix();
 const report = renderReport(matrix);
-writeFileSync(join(ROOT, REPORT_PATH), report, "utf8");
+writeFileSync(isAbsolute(outputPath) ? outputPath : join(ROOT, outputPath), report, "utf8");
 
 assert.equal(mode, "validate", `unsupported mode: ${mode}`);
 assert.equal(matrix.filter((row) => row.status === "fail").length, 0, "final closure matrix has failures");
-assert.ok(reportContains(REPORT_PATH, [/Verdict: pass/, /Failed Cells\n\nNone\./]));
+assert.ok(reportContains(outputPath, [/Verdict: pass/, /Failed Cells\n\nNone\./]));
 
 process.stdout.write(`[atm-2-1-final-closure] ok (${matrix.length} requirements)\n`);
