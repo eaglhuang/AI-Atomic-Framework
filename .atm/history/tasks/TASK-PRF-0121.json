@@ -1,0 +1,352 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0121",
+  "title": "Decouple CI build validation from release publication authority",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "**ACC-1:** Product CI invokes the validation-only mode and obtains a command-backed successful build receipt without a release-surface claim.",
+    "**ACC-2:** Validation-only mode builds from the sealed source SHA in a temporary output root, verifies the expected output/digest contract, and leaves the canonical release surfaces byte-for-byte unchanged.",
+    "**ACC-3:** The normal publication path still requires exactly one active release-surface claim and keeps its existing CAS, runner-sync and fail-closed behavior; an explicit publication negative test proves this.",
+    "**ACC-4:** No new ATM command, registry, daemon, long-lived cache, second task store, or npm runtime dependency is introduced. Rollback is one revert commit."
+  ],
+  "deliverables": [
+    "scripts/run-sealed-runner-build.ts",
+    ".github/workflows/ci.yml",
+    "tests/cli/runner-build-validation-only.test.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "docs/reports/atm-product-ci-burn-in-real-export.md"
+  ],
+  "scopePaths": [
+    "scripts/run-sealed-runner-build.ts",
+    ".github/workflows/ci.yml",
+    "tests/cli/runner-build-validation-only.test.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "docs/reports/atm-product-ci-burn-in-real-export.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runner-build-validation-only.test.ts",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "npm run build -- --validation-only",
+    "npm run typecheck",
+    "npm run lint"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-validation-only-build-and-publication-negative-receipts",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the validation-only flag and Product CI invocation together; leave the formal release workflow and release-surface admission unchanged.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release.builder-coordination",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.sealed-runner-build-mode",
+        "pattern": "Policy Object",
+        "source": "scripts/run-sealed-runner-build.ts",
+        "disposition": "inline",
+        "inlineReason": "The change is one bounded execution-mode seam in a 537-line builder; extracting a new module would add surface without a second caller."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0121-decouple-ci-build-validation-from-release-publication-authority.task.md",
+    "sectionTitle": "TASK-PRF-0121",
+    "headingLine": 115,
+    "hash": "32505b30652accc8",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0121-decouple-ci-build-validation-from-release-publication-authority.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:32505b30652accc8ec35c34c1e0b2585a0be559d5130ab645cd5fc1da075c8e5",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-09-22T03:38:43.183Z"
+    }
+  },
+  "importedAt": "2026-09-22T03:38:43.183Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [
+      "TASK-PRF-0066 delivery commit af93da682c34c42a2b1f3ec942421bb74e6a0f28 exists, and its Product CI build step reproduces the missing release-surface claim blocker.",
+      "The validation path must not own or mutate a release-surface claim."
+    ],
+    "softRelations": [
+      "TASK-PRF-0066",
+      "TASK-PRF-0115",
+      "TASK-PRF-0117"
+    ],
+    "changedPublicSeams": [
+      "product-ci-build-validation-mode"
+    ],
+    "causalImpactEdges": [
+      "ci-evidence-closeout",
+      "release-publication-safety"
+    ],
+    "parallelFrontierInputs": [
+      "sealed-build-input-digest",
+      "release-publication-admission"
+    ],
+    "validatorReferences": [
+      "sealed-runner-build",
+      "product-ci-lane-contract"
+    ],
+    "phaseOwner": "ci-product"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf0121_validation_only_build_without_publication_claim_8c1a2e4d",
+      "targetGroupId": "null",
+      "semanticKey": "validation_only_build_without_publication_claim",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "ci-evidence-closeout"
+      ],
+      "expectedRedPredicate": "Product CI build exits before compilation because no release-surface claim exists, or validation mode writes the live release surface.",
+      "contributionResourceKey": "sealed-runner-build",
+      "responsibility": "task-required",
+      "dependencyEdge": "sealed-build-input-digest",
+      "contractEdge": "product-ci-build-validation-mode",
+      "resourceKey": "ci-build-validation"
+    },
+    {
+      "caseId": "test_prf0121_publish_path_remains_claim_gated_6f4b7d91",
+      "targetGroupId": "null",
+      "semanticKey": "publish_path_remains_claim_gated",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "release-publication-safety"
+      ],
+      "expectedRedPredicate": "A default release build or explicit publication attempt succeeds without exactly one active release-surface claim, or its existing CAS/release-sync guard is bypassed.",
+      "contributionResourceKey": "sealed-runner-publication",
+      "responsibility": "task-required",
+      "dependencyEdge": "release-publication-admission",
+      "contractEdge": "release-publication-claim-gate",
+      "resourceKey": "release-publication"
+    },
+    {
+      "caseId": "test_prf0121_product_ci_invokes_validation_mode_2a9e5f70",
+      "targetGroupId": "null",
+      "semanticKey": "product_ci_invokes_validation_mode",
+      "coversAcceptance": [
+        "ACC-1"
+      ],
+      "coversImpactEdges": [
+        "ci-evidence-closeout"
+      ],
+      "expectedRedPredicate": "Product CI invokes the publication path and therefore cannot produce build evidence without a release-surface claim.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "product-ci-build-command",
+      "resourceKey": "product-ci"
+    },
+    {
+      "caseId": "test_prf0121_surface_scope_remains_bounded_4d7c8a12",
+      "targetGroupId": "null",
+      "semanticKey": "surface_scope_remains_bounded",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "ci-evidence-closeout",
+        "release-publication-safety"
+      ],
+      "expectedRedPredicate": "The candidate adds a new ATM command, registry, daemon, long-lived cache, second task store, or npm runtime dependency instead of one bounded build-mode seam.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "bounded-build-mode-scope",
+      "resourceKey": "product-ci"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf0121_validation_only_build_without_publication_claim_8c1a2e4d",
+    "test_prf0121_publish_path_remains_claim_gated_6f4b7d91",
+    "test_prf0121_product_ci_invokes_validation_mode_2a9e5f70",
+    "test_prf0121_surface_scope_remains_bounded_4d7c8a12"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-22T03-38-54-789Z-claim-382a44e64f0b",
+  "lastTransitionAt": "2026-09-22T03:38:54.789Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-product-ci-coverage",
+  "reservedAt": "2026-09-22T03:38:51.995Z",
+  "promotedAt": "2026-09-22T03:38:51.999Z",
+  "claim": {
+    "actorId": "codex-product-ci-coverage",
+    "leaseId": "lease-88b1d772bc9e",
+    "claimedAt": "2026-09-22T03:38:52.002Z",
+    "heartbeatAt": "2026-09-22T03:38:52.002Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0121.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/ci-product-lane-contract.test.ts",
+      "tests/cli/runner-build-validation-only.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260922033852-codex-product-ci-coverage-2cc5dca781",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260922033852-codex-product-ci-coverage-2cc5dca781\""
+    }
+  },
+  "startedAt": "2026-09-22T03:38:52.002Z",
+  "startedByActor": "codex-product-ci-coverage",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-2455e7aac7eab145",
+    "ticketDigest": "sha256:2455e7aac7eab145e8a863bcd6d522291d0b056ba0199da57d266766437c54f6",
+    "taskId": "TASK-PRF-0121",
+    "origin": "claim",
+    "actorId": "codex-product-ci-coverage",
+    "laneSessionId": "lane-20260922033852-codex-product-ci-coverage-2cc5dca781",
+    "claimGeneration": "lease-88b1d772bc9e",
+    "issuedAt": "2026-09-22T03:38:52.002Z",
+    "expiresAt": "2026-09-22T04:08:52.002Z",
+    "scopeDigest": "sha256:0508f3e0b54a0143671e2232c39f13622fde84f2c6b61102a04f72971141e1f1",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-22T03:38:52.002Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0121.*",
+          ".atm/history/task-events/TASK-PRF-0121/**",
+          ".atm/history/tasks/TASK-PRF-0121.json",
+          ".github/workflows/ci.yml",
+          "docs/reports/atm-product-ci-burn-in-real-export.md",
+          "scripts/run-sealed-runner-build.ts",
+          "tests/cli/ci-product-lane-contract.test.ts",
+          "tests/cli/runner-build-validation-only.test.ts"
+        ],
+        "digest": "sha256:67305acea284256c4ae56e236ea62d022c59be34e353c1369ef2730f20546d12"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260922033852-codex-product-ci-coverage-TASK-PRF-0121-c145c17cf2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0121",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0121.*",
+      ".atm/history/task-events/TASK-PRF-0121/**",
+      ".atm/history/tasks/TASK-PRF-0121.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/ci-product-lane-contract.test.ts",
+      "tests/cli/runner-build-validation-only.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "63f39638693cba4b52ed1bbdb7f52ea4057b3a53550a923b24246e5ab494f3f4",
+    "actorId": "codex-product-ci-coverage",
+    "sessionId": "session-20260922033852-codex-product-ci-coverage-TASK-PRF-0121-c145c17cf2",
+    "laneSession": {
+      "laneSessionId": "lane-20260922033852-codex-product-ci-coverage-2cc5dca781",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260922033852-codex-product-ci-coverage-2cc5dca781\""
+    },
+    "createdAt": "2026-09-22T03:38:54.789Z",
+    "status": "active"
+  }
+}

@@ -157,3 +157,13 @@ when a required step is missing, duplicated, or not completed successfully;
 the evaluator therefore cannot count a workflow-level success without complete
 Product CI step provenance.  The unchanged TASK-PRF-0059 export remains a
 negative replay until a new post-change provider export is collected.
+
+## TASK-PRF-0121 CI build validation without publication authority
+
+Product CI invokes `npm run build -- --validation-only`. This mode resolves the
+sealed source SHA, builds in a detached temporary worktree, records the output
+inventory and digest, and verifies that canonical release surfaces are unchanged.
+It does not acquire a release-surface claim or publish bytes. The normal
+publication path remains claim-gated and is still exercised only by the release
+workflow. A successful validation-only build is therefore build reproducibility
+evidence, not release-publication evidence.
