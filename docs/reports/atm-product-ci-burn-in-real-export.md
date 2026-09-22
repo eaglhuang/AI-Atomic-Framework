@@ -131,7 +131,7 @@ node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/a
 ```
 
 The policy digest is
-`sha256:54ed1ef6676f4b6a0e7327784f44c6009ab146c797ed6e4e1f0b5081c71e6dfe`.
+`sha256:39a058e23bfe864620ca8b37f7c3d60e3195835d315d8585efae955c6dd11236`.
 The scoped receipt has source digest
 `sha256:60d67c230ccf496ffddb4398d47b4e084764dfe3f4bfbb66d40b87cf25bac056`,
 receipt digest
@@ -143,3 +143,17 @@ and `semanticVerdict: reject` with reasons
 
 This is a corrected, replayable negative observation. It does not alter the
 0059 export and does not authorize CI permission changes or npm publication.
+
+## TASK-PRF-0066 Product CI step coverage (post-change)
+
+The Product CI job now executes the repository build and full test suite in the
+same required job as clean install, typecheck, lint, package smoke, workspace
+packing, and clean-install validation.  The step policy is recorded in
+`scripts/product-ci-burn-in-workflow-scope.json` and is digest-bound.
+
+The external attempt export must include Product CI job steps with immutable
+step names, execution status, and conclusions.  The collector excludes a run
+when a required step is missing, duplicated, or not completed successfully;
+the evaluator therefore cannot count a workflow-level success without complete
+Product CI step provenance.  The unchanged TASK-PRF-0059 export remains a
+negative replay until a new post-change provider export is collected.

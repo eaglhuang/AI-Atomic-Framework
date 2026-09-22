@@ -4,7 +4,24 @@ import { collectLifecycleEvidence, canonicalDigest, validateScopePolicy } from '
 import { evaluateBurnIn } from '../../scripts/measure-product-ci-burn-in.ts';
 
 const fixture = JSON.parse(await readFile(new URL('../fixtures/product-ci-burn-in/lifecycle-attempts.json', import.meta.url), 'utf8'));
-const job = (jobId: number, jobName = 'Product CI') => ({ jobId, jobName, jobUrl: `https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/${jobId}/job/${jobId}` });
+const requiredStepNames = [
+  'Clean install',
+  'Build',
+  'Typecheck',
+  'Lint',
+  'Full test',
+  'Package skeleton smoke',
+  'Clean-install packed CLI smoke',
+  'Workspace package smoke',
+  'Clean-install repeat smoke',
+];
+const job = (jobId: number, jobName = 'Product CI') => ({
+  jobId,
+  jobName,
+  jobUrl: `https://github.com/eaglhuang/AI-Atomic-Framework/actions/runs/${jobId}/job/${jobId}`,
+  steps: requiredStepNames.map((name) => ({ name, status: 'completed', conclusion: 'success' })),
+  stepCoverage: { complete: true, missing: [], ambiguous: [], unsuccessful: [] },
+});
 const attemptExport: any = {
   schemaId: 'atm.githubCiAttemptExport.v1',
   repository: 'AI-Atomic-Framework',
@@ -49,7 +66,9 @@ assert.throws(() => collectLifecycleEvidence(missingFailureClass), /missing-fail
 
 const missingJobProvenance = structuredClone(attemptExport);
 missingJobProvenance.attempts[0]!.productCi = { conclusion: 'failure' };
-assert.throws(() => collectLifecycleEvidence(missingJobProvenance), /missing-productJob/);
+const missingJobReceipt = collectLifecycleEvidence(missingJobProvenance);
+assert.equal(missingJobReceipt.runs.find((run) => run.databaseId === 5803)?.eligible, false);
+assert.equal(missingJobReceipt.runs.find((run) => run.databaseId === 5803)?.exclusionReason, 'missing-product-job-coverage');
 
 const tamperedJobReceipt = structuredClone(receipt);
 tamperedJobReceipt.runs[0]!.attempts![0]!.productJob.jobUrl = '';
@@ -71,6 +90,29 @@ outOfScope.attempts[2].workflowName = 'ci';
 const outOfScopeReceipt = collectLifecycleEvidence(outOfScope);
 assert.equal(outOfScopeReceipt.runs.every((run) => run.eligible === false), true);
 assert.equal(outOfScopeReceipt.runs[0].exclusionReason, 'out-of-scope-workflow');
+
+const missingStepCoverage = structuredClone(attemptExport);
+delete missingStepCoverage.attempts[0].productCi.job.steps;
+const missingStepReceipt = collectLifecycleEvidence(missingStepCoverage);
+const missingStepRun = missingStepReceipt.runs.find((run) => run.databaseId === 5803)!;
+assert.equal(missingStepRun.eligible, false);
+assert.equal(missingStepRun.exclusionReason, 'missing-required-step-coverage');
+assert.equal(missingStepRun.attempts, undefined);
+
+const ambiguousStepCoverage = structuredClone(attemptExport);
+ambiguousStepCoverage.attempts[1].productCi.job.steps.push({ name: 'Build', status: 'completed', conclusion: 'success' });
+const ambiguousStepReceipt = collectLifecycleEvidence(ambiguousStepCoverage);
+assert.equal(ambiguousStepReceipt.runs.find((run) => run.databaseId === 5803)?.exclusionReason, 'ambiguous-required-step-coverage');
+
+const failedStepCoverage = structuredClone(attemptExport);
+failedStepCoverage.attempts[1].productCi.job.steps.find((step: any) => step.name === 'Build').conclusion = 'failure';
+const failedStepReceipt = collectLifecycleEvidence(failedStepCoverage);
+assert.equal(failedStepReceipt.runs.find((run) => run.databaseId === 5803)?.exclusionReason, 'unsuccessful-required-step-coverage');
+
+const tamperedStepCoverage = structuredClone(receipt);
+tamperedStepCoverage.runs[0]!.productJob!.stepCoverage!.complete = false;
+tamperedStepCoverage.receiptDigest = canonicalDigest(tamperedStepCoverage.runs);
+assert.equal(evaluateBurnIn(tamperedStepCoverage, { minCompletedRuns: 1, minCalendarDays: 0 }).claimStatus, 'invalid-input');
 
 // A real export can contain eligible and scope-excluded runs together.  The
 // collector omits attempts for excluded runs, so replay must validate only the

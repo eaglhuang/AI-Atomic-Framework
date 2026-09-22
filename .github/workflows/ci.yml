@@ -44,6 +44,9 @@ jobs:
       - name: Clean install
         run: npm ci
 
+      - name: Build
+        run: npm run build
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -56,6 +59,10 @@ jobs:
       - name: CLI test sweep
         timeout-minutes: 20
         run: node --strip-types scripts/run-cli-test-sweep.ts
+
+      - name: Full test
+        timeout-minutes: 20
+        run: npm test
 
       - name: Package skeleton smoke
         run: node --strip-types scripts/validate-package-skeleton.ts

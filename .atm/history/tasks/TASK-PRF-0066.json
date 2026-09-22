@@ -1,0 +1,368 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0066",
+  "title": "Make Product CI coverage match the burn-in claim",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0064"
+  ],
+  "acceptance": [
+    "ACC-1: The required Product CI job executes `npm ci`, `npm run build`, `npm run typecheck`, the declared lint gate, `npm test`, package smoke, `npm pack --workspaces --dry-run`, and clean-install validation. A missing or skipped required step fails the job and is visible in the receipt.",
+    "ACC-2: The Product CI contract test statically asserts the complete required command set and keeps Product CI independent from ATM Dogfood.",
+    "ACC-3: The collector records required-step identities, conclusions and execution status for each retained Product CI run. Missing or ambiguous step coverage is excluded or reported inconclusive, never eligible green.",
+    "ACC-4: The evaluator requires complete successful step coverage before a run contributes to the 30-day/90-run burn-in count, while preserving workflow conclusion and exclusion reasons as provenance.",
+    "ACC-5: Replaying the unchanged 0059 export remains negative and reproducible; no historical run is promoted because of the new contract.",
+    "ACC-6: typecheck, lint, build, full test, focused contract tests, and the collector/evaluator replay pass. Raw exports remain outside Git and the report records digests plus an executable replay command."
+  ],
+  "deliverables": [
+    ".github/workflows/ci.yml",
+    "scripts/product-ci-burn-in-workflow-scope.json",
+    "scripts/collect-ci-burn-in-evidence.ts",
+    "scripts/measure-product-ci-burn-in.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "docs/reports/atm-product-ci-burn-in-real-export.md"
+  ],
+  "scopePaths": [
+    ".github/workflows/ci.yml",
+    "scripts/product-ci-burn-in-workflow-scope.json",
+    "scripts/collect-ci-burn-in-evidence.ts",
+    "scripts/measure-product-ci-burn-in.ts",
+    "tests/cli/ci-product-lane-contract.test.ts",
+    "tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "docs/reports/atm-product-ci-burn-in-real-export.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run lint",
+    "npm run build",
+    "npm test",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json --report-only"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "protected-main-product-ci-step-coverage-and-negative-replay",
+  "rollbackStrategy": "revert-commit-preserve-external-receipts",
+  "rollbackNotes": "保留既有 0059/0064 原始匯出與負結果；只回滾 workflow、coverage contract、collector/evaluator 與報告變更。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.product-ci-burn-in",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.product-ci-step-coverage-policy",
+        "pattern": "Policy Object",
+        "source": "scripts/product-ci-burn-in-workflow-scope.json",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0066-make-product-ci-coverage-match-the-burn-in-claim.task.md",
+    "sectionTitle": "TASK-PRF-0066",
+    "headingLine": 107,
+    "hash": "1341c0afcc056ef7",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0066-make-product-ci-coverage-match-the-burn-in-claim.task.md",
+      "planningCommitSha": "6f3364424d94923e66f318dba5c2a94d530e028c",
+      "contentDigest": "sha256:1341c0afcc056ef743a814c4be6e045deb2240d3743675b58136a626ceaa7e1b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-09-22T03:07:24.406Z"
+    }
+  },
+  "importedAt": "2026-09-22T03:07:24.406Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0064"
+    ],
+    "startConditions": [
+      "The scoped burn-in evaluator counts Product CI jobs, but the current product lane does not run the repository build or the full npm test suite.",
+      "The existing 0059 export is historical negative evidence and must remain non-eligible; only post-change exports may accumulate toward the 30-day/90-run gate."
+    ],
+    "softRelations": [
+      "TASK-PRF-0059",
+      "TASK-PRF-0063"
+    ],
+    "changedPublicSeams": [
+      "product_ci_required_step_coverage",
+      "protected_main_burn_in"
+    ],
+    "causalImpactEdges": [
+      "ci_burn_in_validity",
+      "product_delivery_reliability"
+    ],
+    "parallelFrontierInputs": [
+      "workflow_contract",
+      "step_coverage_receipt",
+      "historical_negative_replay"
+    ],
+    "validatorReferences": [
+      "test_prf_product_ci_required_steps",
+      "test_prf_burnin_step_coverage",
+      "test_prf_historical_negative_preserved"
+    ],
+    "phaseOwner": "ci"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_product_ci_required_steps",
+      "targetGroupId": "null",
+      "semanticKey": "product_ci_required_step_contract",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "ci_burn_in_validity"
+      ],
+      "expectedRedPredicate": "Product CI can be green while npm run build or npm test is absent, skipped, or only represented by ATM Dogfood.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "product_ci_required_step_coverage",
+      "resourceKey": "ci-workflow"
+    },
+    {
+      "caseId": "test_prf_burnin_step_coverage",
+      "targetGroupId": "null",
+      "semanticKey": "burnin_step_coverage_provenance",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "ci_burn_in_validity"
+      ],
+      "expectedRedPredicate": "A receipt with an overall Product CI success but missing required-step evidence is counted as eligible green burn-in.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "null",
+      "contractEdge": "protected_main_burn_in",
+      "resourceKey": "step-coverage-receipt"
+    },
+    {
+      "caseId": "test_prf_historical_negative_preserved",
+      "targetGroupId": "null",
+      "semanticKey": "historical_negative_replay",
+      "coversAcceptance": [
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "product_delivery_reliability"
+      ],
+      "expectedRedPredicate": "The unchanged 0059 export is retroactively promoted to long-term-green or loses its missing-step provenance.",
+      "contributionResourceKey": "null",
+      "responsibility": "task-required",
+      "dependencyEdge": "TASK-PRF-0064",
+      "contractEdge": "protected_main_burn_in",
+      "resourceKey": "historical-export"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_product_ci_required_steps",
+    "test_prf_burnin_step_coverage",
+    "test_prf_historical_negative_preserved"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0064",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-22T03-07-48-300Z-renew-b6ef398129a5",
+  "lastTransitionAt": "2026-09-22T03:07:48.300Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-product-ci-coverage",
+  "reservedAt": "2026-09-22T03:07:34.053Z",
+  "promotedAt": "2026-09-22T03:07:34.057Z",
+  "claim": {
+    "actorId": "codex-product-ci-coverage",
+    "leaseId": "lease-419e63893983",
+    "claimedAt": "2026-09-22T03:07:34.061Z",
+    "heartbeatAt": "2026-09-22T03:07:47.338Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0066.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/product-ci-burn-in-workflow-scope.json",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260922030734-codex-product-ci-coverage-06c9ea8bc9",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260922030734-codex-product-ci-coverage-06c9ea8bc9\""
+    }
+  },
+  "startedAt": "2026-09-22T03:07:34.061Z",
+  "startedByActor": "codex-product-ci-coverage",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-b4fb4c1a083c0583",
+    "ticketDigest": "sha256:b4fb4c1a083c0583ca1109a0d6f465bd5d86626b8dddfeb8e851d72123f200d8",
+    "taskId": "TASK-PRF-0066",
+    "origin": "claim",
+    "actorId": "codex-product-ci-coverage",
+    "laneSessionId": "lane-20260922030734-codex-product-ci-coverage-06c9ea8bc9",
+    "claimGeneration": "lease-419e63893983",
+    "issuedAt": "2026-09-22T03:07:47.338Z",
+    "expiresAt": "2026-09-22T03:37:47.338Z",
+    "scopeDigest": "sha256:d479915877cf85508d7f919eafca71cadc3add38c4992a869f9df2904fd0c8b4",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-22T03:07:47.338Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0066.*",
+          ".atm/history/task-events/TASK-PRF-0066/**",
+          ".atm/history/tasks/TASK-PRF-0066.json",
+          ".github/workflows/ci.yml",
+          "docs/reports/atm-product-ci-burn-in-real-export.md",
+          "scripts/collect-ci-burn-in-evidence.ts",
+          "scripts/measure-product-ci-burn-in.ts",
+          "scripts/product-ci-burn-in-workflow-scope.json",
+          "tests/cli/ci-burn-in-evidence-collector.test.ts",
+          "tests/cli/ci-product-lane-contract.test.ts"
+        ],
+        "digest": "sha256:c4fbbf8c1025db20e4ec7b233abfce2d3616683ce86180de07f0c0fcec219077"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20260922030734-codex-product-ci-coverage-TASK-PRF-0066-3a614adc72",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0066",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0066.*",
+      ".atm/history/task-events/TASK-PRF-0066/**",
+      ".atm/history/tasks/TASK-PRF-0066.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "scripts/collect-ci-burn-in-evidence.ts",
+      "scripts/measure-product-ci-burn-in.ts",
+      "scripts/product-ci-burn-in-workflow-scope.json",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "48b076464e9a3ba60c1870da11f54ae6c38c5685be009f39ebb3299b241e5d57",
+    "actorId": "codex-product-ci-coverage",
+    "sessionId": "session-20260922030734-codex-product-ci-coverage-TASK-PRF-0066-3a614adc72",
+    "laneSession": {
+      "laneSessionId": "lane-20260922030734-codex-product-ci-coverage-06c9ea8bc9",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260922030734-codex-product-ci-coverage-06c9ea8bc9\""
+    },
+    "createdAt": "2026-09-22T03:07:39.503Z",
+    "status": "active"
+  }
+}

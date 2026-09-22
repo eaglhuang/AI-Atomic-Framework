@@ -1,0 +1,131 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0066",
+  "updatedAt": "2026-09-22T03:28:34.480Z",
+  "updatedBy": "codex-product-ci-coverage",
+  "freshValidationPasses": [
+    "lint",
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json --report-only",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "test",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0806953b63f3dd0cd10a33120f0bb4a8ac70db87acbfcbe1d0bb918390579562",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts"
+      ],
+      "generatedAt": "2026-09-22T03:24:43.908Z",
+      "startedAt": "2026-09-22T03:24:43.418Z",
+      "finishedAt": "2026-09-22T03:24:43.908Z",
+      "durationMs": 490,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0cf6778857640305677ab83c6fb95552056bef83",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b41cd8e11144bfb101335f1339066c7e6c9da2dc1de5433c2fa88f793e137149",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "generatedAt": "2026-09-22T03:24:46.766Z",
+      "startedAt": "2026-09-22T03:24:46.380Z",
+      "finishedAt": "2026-09-22T03:24:46.766Z",
+      "durationMs": 386,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0cf6778857640305677ab83c6fb95552056bef83",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-22T03:24:58.793Z",
+      "startedAt": "2026-09-22T03:24:49.161Z",
+      "finishedAt": "2026-09-22T03:24:58.793Z",
+      "durationMs": 9632,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0cf6778857640305677ab83c6fb95552056bef83",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ab17309c2bd95040e222770bd51ca5210f16bf5a8faf0898304ed9826773afde",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-09-22T03:25:21.816Z",
+      "startedAt": "2026-09-22T03:25:01.304Z",
+      "finishedAt": "2026-09-22T03:25:21.816Z",
+      "durationMs": 20512,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0cf6778857640305677ab83c6fb95552056bef83",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:00291836f0471968f67eed8cdb9ac33b6988301655aa514b8ea91ce007d11054",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json"
+      ],
+      "generatedAt": "2026-09-22T03:25:34.317Z",
+      "startedAt": "2026-09-22T03:25:33.992Z",
+      "finishedAt": "2026-09-22T03:25:34.317Z",
+      "durationMs": 325,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0cf6778857640305677ab83c6fb95552056bef83",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json --report-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f7561ac96faa2c2734eecfc15bebf9b83a9394e2b5a8f99e1c8f2f785f04ba17",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json --report-only"
+      ],
+      "generatedAt": "2026-09-22T03:25:37.130Z",
+      "startedAt": "2026-09-22T03:25:36.803Z",
+      "finishedAt": "2026-09-22T03:25:37.130Z",
+      "durationMs": 327,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0cf6778857640305677ab83c6fb95552056bef83",
+      "cached": false
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cebbaa52932caa9c79e2aa2678c68771e5f105b4baf1f953a50c957ae9ffd86a",
+      "stderrSha256": "sha256:b2d9db56880bef7954508d2395f42905732e650dbf9c0e0152038ada6cad2875",
+      "validators": [
+        "test"
+      ],
+      "generatedAt": "2026-09-22T03:28:34.479Z",
+      "startedAt": "2026-09-22T03:27:12.646Z",
+      "finishedAt": "2026-09-22T03:28:34.479Z",
+      "durationMs": 81833,
+      "runnerKind": "dev-source",
+      "sourceCommit": "0cf6778857640305677ab83c6fb95552056bef83",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

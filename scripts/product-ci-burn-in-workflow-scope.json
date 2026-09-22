@@ -15,5 +15,16 @@
     }
   ],
   "releaseCandidateTreatment": "include",
-  "policyDigest": "sha256:54ed1ef6676f4b6a0e7327784f44c6009ab146c797ed6e4e1f0b5081c71e6dfe"
+  "requiredProductCiSteps": [
+    { "stepName": "Clean install", "command": "npm ci" },
+    { "stepName": "Build", "command": "npm run build" },
+    { "stepName": "Typecheck", "command": "npm run typecheck" },
+    { "stepName": "Lint", "command": "npx eslint scripts/validate-ci-product-lane.ts tests/cli/ci-product-lane-contract.test.ts" },
+    { "stepName": "Full test", "command": "npm test" },
+    { "stepName": "Package skeleton smoke", "command": "validate-package-skeleton.ts" },
+    { "stepName": "Clean-install packed CLI smoke", "command": "npm run validate:package-install" },
+    { "stepName": "Workspace package smoke", "command": "npm pack --workspaces --dry-run" },
+    { "stepName": "Clean-install repeat smoke", "command": "npm ci --ignore-scripts" }
+  ],
+  "policyDigest": "sha256:39a058e23bfe864620ca8b37f7c3d60e3195835d315d8585efae955c6dd11236"
 }

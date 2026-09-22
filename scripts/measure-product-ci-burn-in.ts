@@ -24,6 +24,21 @@ export type CiJobProvenance = {
   jobId: number;
   jobName: string;
   jobUrl: string;
+  steps?: CiStepProvenance[];
+  stepCoverage?: CiStepCoverage;
+};
+
+export type CiStepProvenance = {
+  name: string;
+  status: string;
+  conclusion: string | null;
+};
+
+export type CiStepCoverage = {
+  complete: boolean;
+  missing: string[];
+  ambiguous: string[];
+  unsuccessful: string[];
 };
 
 export type CiAttemptRecord = {
@@ -71,6 +86,7 @@ type LifecycleReceiptInput = {
   sourceDigest: string;
   receiptDigest: string;
   scopePolicyDigest?: string;
+  requiresStepCoverage?: boolean;
   runs: CiRun[];
 };
 
@@ -80,6 +96,7 @@ type NormalizedBurnInInput = {
   receiptDigest: string | null;
   scopePolicyDigest: string | null;
   requiresJobProvenance: boolean;
+  requiresStepCoverage: boolean;
 };
 
 const DEFAULT_POLICY: BurnInPolicy = {
@@ -114,7 +131,7 @@ function digest(value: unknown): string {
 
 function normalizeInput(input: unknown): NormalizedBurnInInput {
   if (Array.isArray(input)) {
-    return { runs: input, sourceDigest: digest(input), receiptDigest: null, scopePolicyDigest: null, requiresJobProvenance: false };
+    return { runs: input, sourceDigest: digest(input), receiptDigest: null, scopePolicyDigest: null, requiresJobProvenance: false, requiresStepCoverage: false };
   }
   if (!input || typeof input !== 'object') throw new Error('history-empty');
   const receipt = input as Partial<LifecycleReceiptInput>;
@@ -125,7 +142,14 @@ function normalizeInput(input: unknown): NormalizedBurnInInput {
   if (!Array.isArray(receipt.runs) || receipt.runs.length === 0) throw new Error('history-empty');
   const computedReceiptDigest = digest(receipt.runs);
   if (computedReceiptDigest !== receipt.receiptDigest) throw new Error('receiptDigest-mismatch');
-  return { runs: receipt.runs, sourceDigest: receipt.sourceDigest, receiptDigest: receipt.receiptDigest, scopePolicyDigest: receipt.scopePolicyDigest ?? null, requiresJobProvenance: true };
+  return {
+    runs: receipt.runs,
+    sourceDigest: receipt.sourceDigest,
+    receiptDigest: receipt.receiptDigest,
+    scopePolicyDigest: receipt.scopePolicyDigest ?? null,
+    requiresJobProvenance: true,
+    requiresStepCoverage: receipt.requiresStepCoverage === true,
+  };
 }
 
 function parseDate(value: string, field: string): number {
@@ -156,16 +180,36 @@ function validateLifecycle(run: CiRun): CiFailureLifecycle {
   return lifecycle;
 }
 
-function validateJobProvenance(job: unknown, field: string): CiJobProvenance {
+function validateJobProvenance(job: unknown, field: string, requireStepCoverage = false): CiJobProvenance {
   if (!job || typeof job !== 'object') throw new Error(`${field}-missing-productJob`);
   const candidate = job as Partial<CiJobProvenance>;
   if (!Number.isSafeInteger(candidate.jobId) || candidate.jobId! <= 0) throw new Error(`${field}-invalid-jobId`);
   if (typeof candidate.jobName !== 'string' || candidate.jobName.trim().length === 0) throw new Error(`${field}-invalid-jobName`);
   if (typeof candidate.jobUrl !== 'string' || !/^https?:\/\//i.test(candidate.jobUrl)) throw new Error(`${field}-invalid-jobUrl`);
+  if (candidate.steps !== undefined) {
+    if (!Array.isArray(candidate.steps)) throw new Error(`${field}-invalid-steps`);
+    for (const [index, rawStep] of candidate.steps.entries()) {
+      if (!rawStep || typeof rawStep !== 'object') throw new Error(`${field}-step-${index}-not-object`);
+      const step = rawStep as Partial<CiStepProvenance>;
+      if (typeof step.name !== 'string' || step.name.trim().length === 0) throw new Error(`${field}-step-${index}-invalid-name`);
+      if (typeof step.status !== 'string' || step.status.trim().length === 0) throw new Error(`${field}-step-${index}-invalid-status`);
+      if (step.conclusion !== null && typeof step.conclusion !== 'string') throw new Error(`${field}-step-${index}-invalid-conclusion`);
+    }
+  }
+  if (requireStepCoverage) {
+    if (!Array.isArray(candidate.steps)) throw new Error(`${field}-missing-step-coverage`);
+    const coverage = candidate.stepCoverage;
+    if (!coverage || typeof coverage !== 'object' || coverage.complete !== true
+      || !Array.isArray(coverage.missing) || coverage.missing.length > 0
+      || !Array.isArray(coverage.ambiguous) || coverage.ambiguous.length > 0
+      || !Array.isArray(coverage.unsuccessful) || coverage.unsuccessful.length > 0) {
+      throw new Error(`${field}-incomplete-step-coverage`);
+    }
+  }
   return candidate as CiJobProvenance;
 }
 
-function validateAttemptProvenance(run: CiRun): void {
+function validateAttemptProvenance(run: CiRun, requireStepCoverage = false): void {
   if (!Array.isArray(run.attempts) || run.attempts.length === 0) throw new Error(`record-${run.databaseId}-missing-attempt-provenance`);
   const seen = new Set<number>();
   for (const [index, raw] of run.attempts.entries()) {
@@ -178,11 +222,11 @@ function validateAttemptProvenance(run: CiRun): void {
     if (typeof attempt.workflowConclusion !== 'string' || attempt.workflowConclusion.length === 0) throw new Error(`record-${run.databaseId}-attempt-${index}-missing-workflow-conclusion`);
     if (typeof attempt.productJobConclusion !== 'string' || attempt.productJobConclusion.length === 0) throw new Error(`record-${run.databaseId}-attempt-${index}-missing-product-conclusion`);
     if (attempt.failureClass !== null && typeof attempt.failureClass !== 'string') throw new Error(`record-${run.databaseId}-attempt-${index}-invalid-failureClass`);
-    validateJobProvenance(attempt.productJob, `record-${run.databaseId}-attempt-${index}`);
+    validateJobProvenance(attempt.productJob, `record-${run.databaseId}-attempt-${index}`, requireStepCoverage);
   }
 }
 
-function validateRuns(input: unknown, policy: BurnInPolicy, requiresJobProvenance = false): CiRun[] {
+function validateRuns(input: unknown, policy: BurnInPolicy, requiresJobProvenance = false, requiresStepCoverage = false): CiRun[] {
   if (!Array.isArray(input) || input.length === 0) throw new Error('history-empty');
   const seenIds = new Set<number>();
   let previousCreatedAt = Number.POSITIVE_INFINITY;
@@ -212,7 +256,10 @@ function validateRuns(input: unknown, policy: BurnInPolicy, requiresJobProvenanc
     // The collector deliberately omits attempt provenance for scope-excluded
     // runs.  Validate provenance for eligible observations only; excluded
     // records still need their exclusion reason and lifecycle validated above.
-    if (requiresJobProvenance && eligible) validateAttemptProvenance(run as CiRun);
+    if (requiresJobProvenance && eligible) {
+      validateAttemptProvenance(run as CiRun, requiresStepCoverage);
+      if (requiresStepCoverage) validateJobProvenance(run.productJob, `record-${databaseId}`, true);
+    }
     previousCreatedAt = createdAt;
     runs.push(run as CiRun);
   }
@@ -225,7 +272,7 @@ export function evaluateBurnIn(input: unknown, suppliedPolicy: Partial<BurnInPol
   try {
     normalized = normalizeInput(input);
     if (policy.failurePolicy !== 'repaired-and-explained' && policy.failurePolicy !== 'zero-tolerance') throw new Error('invalid-failurePolicy');
-    const allRuns = validateRuns(normalized.runs, policy, normalized.requiresJobProvenance);
+    const allRuns = validateRuns(normalized.runs, policy, normalized.requiresJobProvenance, normalized.requiresStepCoverage);
     const baselineTimestamp = policy.baselineAt ? parseDate(policy.baselineAt, 'baselineAt') : null;
     if (policy.baselineSha && !/^[0-9a-f]{7,64}$/i.test(policy.baselineSha)) throw new Error('invalid-baselineSha');
     if (baselineTimestamp !== null && !policy.baselineSha) throw new Error('baselineSha-required-with-baselineAt');
