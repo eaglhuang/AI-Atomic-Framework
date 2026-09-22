@@ -63,7 +63,15 @@ const dirs = (name: string) => ({ workspaceRoot: path.join(scratch, `${name}-wor
       assert.ok(run.rawRef.startsWith('sink:'), 'raw refs point into the external sink');
       const raw = JSON.parse(readFileSync(path.join(where.sinkDir, run.rawRef.slice('sink:'.length)), 'utf8'));
       assert.equal(raw.headSha, commitSha, 'the arm ran on the pinned commit');
+      assert.equal(raw.provider, 'provider-under-test', 'raw evidence binds provider');
+      assert.equal(raw.model, 'model-under-test', 'raw evidence binds model');
+      assert.equal(raw.packageVersion, null, 'missing package version is explicit');
+      assert.equal(raw.promptDigest, `sha256:${'a'.repeat(64)}`, 'raw evidence binds prompt');
       assert.match(raw.gitStatus, /ATM_BENCHMARK_SIMULATED/, 'the arm change is captured as Git evidence');
+      assert.equal(raw.telemetry.completion, 'unknown', 'synthetic execution must not claim oracle completion');
+      assert.equal(raw.telemetry.completionEvidence, null, 'synthetic execution must expose missing completion evidence');
+      assert.ok(Array.isArray(raw.telemetry.unavailableReasons) && raw.telemetry.unavailableReasons.length > 0);
+      assert.ok(raw.telemetry.unavailableReasons.includes('package-version-unavailable'));
     }
   }
   assert.ok(existsSync(path.join(where.sinkDir, summary.summaryRef.slice('sink:'.length))), 'the execution summary is written to the sink');

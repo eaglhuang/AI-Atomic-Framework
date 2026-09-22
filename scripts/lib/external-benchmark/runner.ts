@@ -1,6 +1,6 @@
 import { createHash, verify } from 'node:crypto';
 import { calculateAdjudicationRates, type OracleAdjudication } from './adjudication.ts';
-import { aggregateRawRuns, type RawBenchmarkRun } from './metrics.ts';
+import { aggregateRawRuns, rawRunsFromExecutionEvidence, type ExecutionArmRawEvidence, type ExecutionRunContext, type RawBenchmarkRun } from './metrics.ts';
 import { decideBenchmark, type BenchmarkDecision } from './report.ts';
 
 export interface ProtocolManifest {
@@ -246,4 +246,18 @@ export function executeExternalBenchmark(protocol: ProtocolManifest, runs: reado
   const atmSafety = calculateAdjudicationRates(adjudications, 'atm');
   const rounds = [...new Set(runs.map((run) => run.sequence))];
   return decideBenchmark({ eligible: true, blockingReasons: [], rounds, baseline, atm, baselineSafety, atmSafety });
+}
+
+/**
+ * Canonical data-plane entrypoint: runner decisions must be replayable from
+ * the executor's sealed raw sink, not from a second hand-built run shape.
+ */
+export function executeExternalBenchmarkFromExecutionEvidence(
+  protocol: ProtocolManifest,
+  evidence: readonly ExecutionArmRawEvidence[],
+  contexts: readonly ExecutionRunContext[],
+  adjudications: readonly OracleAdjudication[],
+  artifacts?: ExternalPrerequisiteArtifacts,
+): BenchmarkDecision {
+  return executeExternalBenchmark(protocol, rawRunsFromExecutionEvidence(evidence, contexts), adjudications, artifacts);
 }

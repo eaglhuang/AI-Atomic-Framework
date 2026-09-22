@@ -1,5 +1,5 @@
 import { createValidator } from './lib/validator-harness.ts';
-import { aggregateRawRuns, type RawBenchmarkRun } from './lib/external-benchmark/metrics.ts';
+import { aggregateRawRuns, rawRunFromExecutionEvidence, type RawBenchmarkRun } from './lib/external-benchmark/metrics.ts';
 
 const harness = createValidator('external-benchmark-metrics', { argv: process.argv.slice(2), defaultMode: 'validate' });
 
@@ -19,7 +19,9 @@ const run = (arm: 'baseline' | 'atm', id: string, cost: number | null): RawBench
   retries: 0,
   commands: ['git status'],
   repairs: [],
-  environmentDigest: 'sha256:test'
+  environmentDigest: 'sha256:test',
+  completion: true,
+  repairTimeMs: 0
 });
 
 function validate(): void {
@@ -30,6 +32,15 @@ function validate(): void {
   harness.assert(baseline.p95DurationMs === 1000 && atm.p95DurationMs === 1000, 'p95 must derive from raw timestamps');
   harness.assert(baseline.billedCost === 30 && atm.billedCost === 10, 'billed cost must aggregate only complete raw telemetry');
   harness.assert(atm.humanMinutes === 2 && atm.retries === 0, 'human minutes and retries must be retained');
+  harness.assert(atm.completionRate === 1 && atm.repairTimeMs === 0, 'completion and repair telemetry must be retained');
+  const adapted = rawRunFromExecutionEvidence({
+    schemaId: 'atm.benchmarkArmRawEvidence.v1', pairId: 'pair', arm: 'atm', repositoryUrl: 'example/repo', commitSha: 'a'.repeat(40),
+    startedAt: '2026-09-12T00:00:00.000Z', completedAt: '2026-09-12T00:00:01.000Z', wallClockMs: 1000,
+    provider: 'provider', model: 'model', reasoning: 'default', packageVersion: '0.1.2', promptDigest: `sha256:${'b'.repeat(64)}`,
+    tokens: 1, costUsd: 1, command: 'atm --version',
+    telemetry: { completion: 'completed', completionEvidence: 'oracle:run', humanMinutes: 1, humanIntervals: null, retries: 0, repairTimeMs: 0, repairTimestamps: null, unavailableReasons: [] }
+  }, { runId: 'adapted', roundId: 'pair', sequence: 'AB', prompt: 'sealed benchmark task', environmentDigest: 'sha256:test' });
+  harness.assert(adapted.completion === true && adapted.repairTimeMs === 0, 'executor evidence must adapt to the canonical metrics record');
   let rejectedInvalidTimestamp = false;
   try {
     aggregateRawRuns([{ ...run('atm', 'bad', 1), startedAt: 'invalid' }], 'atm');

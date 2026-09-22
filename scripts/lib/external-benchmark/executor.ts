@@ -20,6 +20,8 @@ export interface TrialPlan {
   readonly provider: string;
   readonly model: string;
   readonly reasoning: string;
+  /** Optional sealed package version; null is retained as an explicit unavailable value. */
+  readonly packageVersion?: string | null;
   readonly budget: { readonly maxTokens: number | null; readonly maxCostUsd: number | null; readonly maxWallClockMs: number | null };
   readonly repositories: ReadonlyArray<{ readonly name: string; readonly repositoryUrl: string; readonly commitSha: string }>;
   readonly scenarios: ReadonlyArray<{ readonly scenarioId: string; readonly promptDigest: string }>;
@@ -174,13 +176,31 @@ export async function executeTrialPlan(options: ExecuteOptions): Promise<Executi
             interrupted = { reason: `driver-error:${driverError}`, pairId, arm };
             break outer;
           }
+          const telemetry = outcome.telemetry ?? {
+            completion: null,
+            completionEvidence: null,
+            humanMinutes: null,
+            humanIntervals: null,
+            retries: null,
+            repairTimeMs: null,
+            repairTimestamps: null,
+            unavailableReasons: ['driver-did-not-supply-canonical-telemetry'],
+          };
+          const unavailableReasons = [
+            ...telemetry.unavailableReasons,
+            ...(plan.packageVersion == null ? ['package-version-unavailable'] : []),
+          ];
           const rawRef = writeSink(path.join(pairDir, `${arm}.json`), {
             schemaId: 'atm.benchmarkArmRawEvidence.v1',
             planId: plan.planId, pairId, arm, order, seed, driverId: driver.id, synthetic: driver.synthetic,
             workspaceDir, repositoryUrl: repository.repositoryUrl, commitSha: repository.commitSha, headSha,
             gitStatus, gitDiffStat, startedAt, completedAt: new Date().toISOString(), wallClockMs,
             status: outcome.status, sessionId: outcome.sessionId, command: outcome.command,
-            tokens: outcome.tokens, costUsd: outcome.costUsd, driverEvidence: outcome.rawEvidence,
+            provider: plan.provider, model: plan.model, reasoning: plan.reasoning,
+            packageVersion: plan.packageVersion ?? null, promptDigest: scenario.promptDigest,
+            tokens: outcome.tokens, costUsd: outcome.costUsd,
+            telemetry: { ...telemetry, unavailableReasons },
+            driverEvidence: outcome.rawEvidence,
           });
           runs.push({
             pairId,

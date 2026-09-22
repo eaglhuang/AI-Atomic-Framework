@@ -105,6 +105,9 @@ const boundProtocol = { ...protocolBase, executionPrerequisites: {
   independentAdjudication: { sealed: true, evidenceDigest: digest(boundArtifacts.independentAdjudication) },
   providerTelemetry: { sealed: true, evidenceDigest: digest(boundArtifacts.providerTelemetry) }
 } };
+const incompleteDataDecision = executeExternalBenchmark(boundProtocol, boundRuns, boundAdjudications, boundArtifacts);
+assert.equal(incompleteDataDecision.verdict, 'inconclusive');
+assert.match(incompleteDataDecision.rationale.join('\n'), /completion evidence|human-time telemetry|repair-time telemetry/i);
 const unboundAdjudication = signed({ schemaId: 'atm.adjudicationManifest.v1', protocolVersion: '1.0.0', protocolDigest: preregistrationDigest, signerRole: 'independent-adjudicator', signerId: 'adjudicator', hiddenCorpusOwner: 'custodian', inputDigest: `sha256:${'9'.repeat(64)}`, outputDigest: digest(boundAdjudications), labeledAt: '2026-08-30T00:00:00.000Z' });
 const unboundAdjudicationDecision = executeExternalBenchmark({ ...boundProtocol, executionPrerequisites: { ...boundProtocol.executionPrerequisites, independentAdjudication: { sealed: true, evidenceDigest: digest(unboundAdjudication) } } }, boundRuns, boundAdjudications, {
   ...boundArtifacts,

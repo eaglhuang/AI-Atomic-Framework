@@ -1,0 +1,426 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0118",
+  "title": "Complete external benchmark data-plane metrics and fail-closed validation",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0007"
+  ],
+  "acceptance": [
+    "**ACC-1 — Canonical raw record:** Every real paired arm record carries immutable run/pair/arm/repository/version bindings plus status, start and finish timestamps, wall-clock, provider/model, token usage, billed cost, human intervention intervals, retry count, repair timestamps, and an explicit completion/oracle reference. Unavailable values are `null` with a reason, never omitted or coerced to zero.",
+    "**ACC-2 — One aggregation path:** The execution output consumed by `runner.ts` and `report.ts` is the same canonical record used by the metric validator; the disconnected legacy `RawBenchmarkRun` path is removed or made an explicit adapter with a test proving equivalence.",
+    "**ACC-3 — Fail closed:** Missing completion, oracle adjudication, false-block/missed-conflict denominator, human-time evidence, billed-cost evidence, retry count, or repair timestamps yields `inconclusive` (or an explicit unavailable metric) and can never default to a successful completion or a `keep` verdict.",
+    "**ACC-4 — Negative controls:** Tests prove that incomplete runs, mismatched run bindings, forged provider exports, and missing cost or repair evidence cannot produce a positive product decision.",
+    "**ACC-5 — Decision replay:** From the sealed raw records, oracle labels, provider export digest, and preregistered thresholds, an independent verifier can recompute completion, false-block, missed-conflict, human-minutes, tokens, billed cost, retries, repair time, and the final `keep`/`narrow`/`stop`/`inconclusive` verdict.",
+    "**ACC-6 — Scope discipline:** No paid/provider-backed benchmark is run; no npm publish, manifest reseal, hidden-corpus change, provider credential change, or historical evidence rewrite is included."
+  ],
+  "deliverables": [
+    "scripts/lib/external-benchmark/executor.ts",
+    "scripts/lib/external-benchmark/metrics.ts",
+    "scripts/lib/external-benchmark/runner.ts",
+    "scripts/lib/external-benchmark/report.ts",
+    "scripts/validate-external-benchmark-metrics.ts",
+    "tests/cli/external-benchmark-executor.test.ts",
+    "tests/cli/external-benchmark-v2-metrics.test.ts",
+    "tests/cli/external-benchmark-decision.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/lib/external-benchmark/arm-driver.ts",
+    "scripts/lib/external-benchmark/executor.ts",
+    "scripts/lib/external-benchmark/paired-executor.ts",
+    "scripts/lib/external-benchmark/metrics.ts",
+    "scripts/lib/external-benchmark/adjudication.ts",
+    "scripts/lib/external-benchmark/report.ts",
+    "scripts/lib/external-benchmark/runner.ts",
+    "scripts/run-atm-external-benchmark.ts",
+    "scripts/validate-external-benchmark-metrics.ts",
+    "tests/cli/external-benchmark-executor.test.ts",
+    "tests/cli/external-benchmark-paired-executor.test.ts",
+    "tests/cli/external-benchmark-v2-metrics.test.ts",
+    "tests/cli/external-benchmark-decision.test.ts",
+    ".atm/history/evidence/TASK-PRF-0118.*",
+    ".atm/history/task-events/TASK-PRF-0118/**",
+    ".atm/history/tasks/TASK-PRF-0118.json",
+    "scripts/validate-external-benchmark-decision.ts"
+  ],
+  "validators": [
+    "node atm.mjs tasks import --from C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0118-complete-external-benchmark-data-plane-metrics-and-fail-closed-validation.task.md --dry-run --json",
+    "node --strip-types tests/cli/external-benchmark-executor.test.ts",
+    "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts",
+    "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts",
+    "node --strip-types tests/cli/external-benchmark-decision.test.ts",
+    "node scripts/validate-external-benchmark-metrics.ts",
+    "git diff --check -- scripts/lib/external-benchmark/arm-driver.ts scripts/lib/external-benchmark/executor.ts scripts/lib/external-benchmark/metrics.ts scripts/lib/external-benchmark/report.ts scripts/lib/external-benchmark/runner.ts scripts/run-atm-external-benchmark.ts scripts/validate-external-benchmark-metrics.ts tests/cli/external-benchmark-executor.test.ts tests/cli/external-benchmark-paired-executor.test.ts tests/cli/external-benchmark-v2-metrics.test.ts tests/cli/external-benchmark-decision.test.ts"
+  ],
+  "planningRepo": "docs",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [
+    "Do not execute a paid provider or formal external benchmark.",
+    "Do not change the preregistered manifest, package version pin, hidden corpus, oracle custody, or provider credentials.",
+    "Do not redesign the benchmark protocol or add a second incompatible raw-record format."
+  ],
+  "evidenceRequired": "canonical-raw-record-and-fail-closed-decision-replay",
+  "rollbackStrategy": "revert-data-plane-only",
+  "rollbackNotes": "Revert only the scoped benchmark data-plane changes; do not alter the preregistered manifest, hidden corpus, provider exports, npm package pin, historical benchmark records, or unrelated task state.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.external-benchmark-decision-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/lib/external-benchmark/arm-driver.ts",
+        "scripts/lib/external-benchmark/executor.ts",
+        "scripts/lib/external-benchmark/paired-executor.ts",
+        "scripts/lib/external-benchmark/metrics.ts",
+        "scripts/lib/external-benchmark/adjudication.ts",
+        "scripts/lib/external-benchmark/report.ts",
+        "scripts/lib/external-benchmark/runner.ts",
+        "scripts/run-atm-external-benchmark.ts",
+        "scripts/validate-external-benchmark-metrics.ts",
+        "tests/cli/external-benchmark-executor.test.ts",
+        "tests/cli/external-benchmark-paired-executor.test.ts",
+        "tests/cli/external-benchmark-v2-metrics.test.ts",
+        "tests/cli/external-benchmark-decision.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-product-proof/tasks/TASK-PRF-0118-complete-external-benchmark-data-plane-metrics-and-fail-closed-validation.task.md",
+    "sectionTitle": "TASK-PRF-0118",
+    "headingLine": 111,
+    "hash": "3be4039f43c126bd",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "atm-product-proof/tasks/TASK-PRF-0118-complete-external-benchmark-data-plane-metrics-and-fail-closed-validation.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:3821ca10ed78ce610ff9ea5ea3619f9cf18b9eb64ab92cac02a2604efb8b90d2",
+      "amendmentEpoch": 2,
+      "sealedAt": "2026-09-22T00:39:54.501Z"
+    }
+  },
+  "importedAt": "2026-09-22T00:32:44.680Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0007"
+    ],
+    "startConditions": [
+      "The benchmark protocol names completion, false-block, missed-conflict, human-time, token, billed-cost, retry, and repair-time metrics, but the real paired executor does not emit one canonical record containing them.",
+      "No paid or provider-backed benchmark run may start while a missing field can be interpreted as zero or a missing completion value can default to success."
+    ],
+    "softRelations": [
+      "TASK-PRF-0019",
+      "TASK-PRF-0042"
+    ],
+    "changedPublicSeams": [
+      "external-benchmark-raw-record",
+      "external-benchmark-decision"
+    ],
+    "causalImpactEdges": [
+      "benchmark-metrics-are-observed",
+      "incomplete-runs-fail-closed",
+      "product-decision-is-replayable"
+    ],
+    "parallelFrontierInputs": [
+      "executor-raw-packet",
+      "oracle-adjudication",
+      "provider-telemetry"
+    ],
+    "validatorReferences": [
+      "test_prf0118_canonical_raw_record",
+      "test_prf0118_missing_completion_fail_closed",
+      "test_prf0118_decision_replay"
+    ],
+    "phaseOwner": "phase-5-benchmark-execution"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf0118_canonical_raw_record",
+      "targetGroupId": "null",
+      "semanticKey": "canonical_raw_record_carries_required_observed_metrics",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "benchmark-metrics-are-observed"
+      ],
+      "expectedRedPredicate": "The real paired executor emits a packet that omits completion, oracle decision binding, human intervals, retries, repair timestamps, or an explicit unavailable value.",
+      "contributionResourceKey": "external-benchmark-raw-record",
+      "responsibility": "task-required",
+      "dependencyEdge": "TASK-PRF-0007",
+      "contractEdge": "benchmark-metrics-are-observed",
+      "resourceKey": "canonical-raw-record"
+    },
+    {
+      "caseId": "test_prf0118_missing_completion_fail_closed",
+      "targetGroupId": "null",
+      "semanticKey": "missing_completion_cannot_become_success",
+      "coversAcceptance": [
+        "ACC-3",
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "incomplete-runs-fail-closed"
+      ],
+      "expectedRedPredicate": "A run with missing or incomplete completion evidence reaches keep, stop, or a 100% completion default instead of inconclusive.",
+      "contributionResourceKey": "external-benchmark-fail-closed",
+      "responsibility": "task-required",
+      "dependencyEdge": "TASK-PRF-0007",
+      "contractEdge": "product-decision-net-benefit",
+      "resourceKey": "missing-completion-negative"
+    },
+    {
+      "caseId": "test_prf0118_decision_replay",
+      "targetGroupId": "null",
+      "semanticKey": "decision_replays_from_raw_records_and_oracle_labels",
+      "coversAcceptance": [
+        "ACC-5",
+        "ACC-6"
+      ],
+      "coversImpactEdges": [
+        "product-decision-is-replayable"
+      ],
+      "expectedRedPredicate": "The decision layer reports a positive product result without recomputing completion, false-block, missed-conflict, cost, retries, and repair-time from bound raw records.",
+      "contributionResourceKey": "external-benchmark-decision",
+      "responsibility": "task-required",
+      "dependencyEdge": "TASK-PRF-0007",
+      "contractEdge": "product-decision-net-benefit",
+      "resourceKey": "decision-replay"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf0118_canonical_raw_record",
+    "test_prf0118_missing_completion_fail_closed",
+    "test_prf0118_decision_replay"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0007",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-09-22T00-39-54-795Z-metadata-only-import-59e175287898",
+  "lastTransitionAt": "2026-09-22T00:39:54.795Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-09-22T00:32:52.906Z",
+  "promotedAt": "2026-09-22T00:32:52.910Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-7cff99247309",
+    "claimedAt": "2026-09-22T00:32:52.914Z",
+    "heartbeatAt": "2026-09-22T00:33:06.485Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0118.*",
+      ".atm/history/task-events/TASK-PRF-0118/**",
+      ".atm/history/tasks/TASK-PRF-0118.json",
+      "scripts/lib/external-benchmark/adjudication.ts",
+      "scripts/lib/external-benchmark/arm-driver.ts",
+      "scripts/lib/external-benchmark/executor.ts",
+      "scripts/lib/external-benchmark/metrics.ts",
+      "scripts/lib/external-benchmark/paired-executor.ts",
+      "scripts/lib/external-benchmark/report.ts",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/run-atm-external-benchmark.ts",
+      "scripts/validate-external-benchmark-decision.ts",
+      "scripts/validate-external-benchmark-metrics.ts",
+      "tests/cli/external-benchmark-decision.test.ts",
+      "tests/cli/external-benchmark-executor.test.ts",
+      "tests/cli/external-benchmark-paired-executor.test.ts",
+      "tests/cli/external-benchmark-v2-metrics.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20260922003253-codex-gpt-5.4-mini-3f4af33b26",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260922003253-codex-gpt-5.4-mini-3f4af33b26\""
+    }
+  },
+  "startedAt": "2026-09-22T00:32:52.914Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-c03c6d2866a93df9",
+    "ticketDigest": "sha256:c03c6d2866a93df9b9802908084a666082b628271bd69fa5c7582826e8ab493f",
+    "taskId": "TASK-PRF-0118",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20260922003253-codex-gpt-5.4-mini-3f4af33b26",
+    "claimGeneration": "lease-7cff99247309",
+    "issuedAt": "2026-09-22T00:39:19.959Z",
+    "expiresAt": "2026-09-22T01:09:19.959Z",
+    "scopeDigest": "sha256:13fc91a6fe05ad5a06e062a894eecd254b6897512116f7de01968561d99d13f8",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-09-22T00:39:19.959Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0118.*",
+          ".atm/history/task-events/TASK-PRF-0118/**",
+          ".atm/history/tasks/TASK-PRF-0118.json",
+          "scripts/lib/external-benchmark/adjudication.ts",
+          "scripts/lib/external-benchmark/arm-driver.ts",
+          "scripts/lib/external-benchmark/executor.ts",
+          "scripts/lib/external-benchmark/metrics.ts",
+          "scripts/lib/external-benchmark/paired-executor.ts",
+          "scripts/lib/external-benchmark/report.ts",
+          "scripts/lib/external-benchmark/runner.ts",
+          "scripts/run-atm-external-benchmark.ts",
+          "scripts/validate-external-benchmark-decision.ts",
+          "scripts/validate-external-benchmark-metrics.ts",
+          "tests/cli/external-benchmark-decision.test.ts",
+          "tests/cli/external-benchmark-executor.test.ts",
+          "tests/cli/external-benchmark-paired-executor.test.ts",
+          "tests/cli/external-benchmark-v2-metrics.test.ts"
+        ],
+        "digest": "sha256:be6bde01136c361eca25626ab59f6d2efbb069601998625dff3e1ce7ab671485"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20260922003252-codex-gpt-5.4-mini-TASK-PRF-0118-9c114f376e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0118",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0118.*",
+      ".atm/history/task-events/TASK-PRF-0118/**",
+      ".atm/history/tasks/TASK-PRF-0118.json",
+      "scripts/lib/external-benchmark/adjudication.ts",
+      "scripts/lib/external-benchmark/arm-driver.ts",
+      "scripts/lib/external-benchmark/executor.ts",
+      "scripts/lib/external-benchmark/metrics.ts",
+      "scripts/lib/external-benchmark/paired-executor.ts",
+      "scripts/lib/external-benchmark/report.ts",
+      "scripts/lib/external-benchmark/runner.ts",
+      "scripts/run-atm-external-benchmark.ts",
+      "scripts/validate-external-benchmark-decision.ts",
+      "scripts/validate-external-benchmark-metrics.ts",
+      "tests/cli/external-benchmark-decision.test.ts",
+      "tests/cli/external-benchmark-executor.test.ts",
+      "tests/cli/external-benchmark-paired-executor.test.ts",
+      "tests/cli/external-benchmark-v2-metrics.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0118-complete-external-benchmark-data-plane-metrics-and-fail-closed-validation.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-product-proof/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/",
+      "docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0118-complete-external-benchmark-data-plane-metrics-and-fail-closed-validation.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "da824aa28ac78c3c972aa1c4c14772338e42f232c92473e7d6b166f28f0d0d15",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20260922003253-codex-gpt-5.4-mini-3f4af33b26",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260922003253-codex-gpt-5.4-mini-3f4af33b26\""
+    },
+    "createdAt": "2026-09-22T00:33:07.516Z",
+    "status": "active"
+  }
+}

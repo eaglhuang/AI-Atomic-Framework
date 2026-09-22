@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0118",
+  "updatedAt": "2026-09-22T00:46:05.261Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/external-benchmark-decision.test.ts",
+    "node --strip-types tests/cli/external-benchmark-executor.test.ts",
+    "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts",
+    "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts",
+    "node atm.mjs tasks import --from C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0118-complete-external-benchmark-data-plane-metrics-and-fail-closed-validation.task.md --dry-run --json",
+    "validate:external-benchmark-metrics"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-decision.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19cf1f8c3401c3d82d6a915ed31c73884ecceb25555f9f8f35bfb3e28309868b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-decision.test.ts"
+      ],
+      "generatedAt": "2026-09-22T00:45:33.925Z",
+      "startedAt": "2026-09-22T00:45:33.593Z",
+      "finishedAt": "2026-09-22T00:45:33.925Z",
+      "durationMs": 332,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce1d85ff3a0cf80d43eafe1f42c6363e39d17a57",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-executor.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2bef2db7bedd41fb0e6138386dc8a803746ba0bccda28cf368dffe8e91ccccae",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-executor.test.ts"
+      ],
+      "generatedAt": "2026-09-22T00:45:52.523Z",
+      "startedAt": "2026-09-22T00:45:49.673Z",
+      "finishedAt": "2026-09-22T00:45:52.523Z",
+      "durationMs": 2850,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce1d85ff3a0cf80d43eafe1f42c6363e39d17a57",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7ffc6e2b1937216fe13e2592c3d99b5eabb09218f261c1f1c8aba414d929bcb2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-paired-executor.test.ts"
+      ],
+      "generatedAt": "2026-09-22T00:45:55.425Z",
+      "startedAt": "2026-09-22T00:45:55.152Z",
+      "finishedAt": "2026-09-22T00:45:55.425Z",
+      "durationMs": 273,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce1d85ff3a0cf80d43eafe1f42c6363e39d17a57",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f800fc10372002949db1899276554306832f12651e30385481a72e2d8179614c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/external-benchmark-v2-metrics.test.ts"
+      ],
+      "generatedAt": "2026-09-22T00:45:58.345Z",
+      "startedAt": "2026-09-22T00:45:58.015Z",
+      "finishedAt": "2026-09-22T00:45:58.345Z",
+      "durationMs": 330,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce1d85ff3a0cf80d43eafe1f42c6363e39d17a57",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs tasks import --from C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0118-complete-external-benchmark-data-plane-metrics-and-fail-closed-validation.task.md --dry-run --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d7935499c7ca21211096d7d2bf971ea76015b18b78968d2cfaca9fe7aef60d09",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs tasks import --from C:/Users/User/3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0118-complete-external-benchmark-data-plane-metrics-and-fail-closed-validation.task.md --dry-run --json"
+      ],
+      "generatedAt": "2026-09-22T00:46:02.389Z",
+      "startedAt": "2026-09-22T00:46:00.959Z",
+      "finishedAt": "2026-09-22T00:46:02.389Z",
+      "durationMs": 1430,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce1d85ff3a0cf80d43eafe1f42c6363e39d17a57",
+      "cached": false
+    },
+    {
+      "command": "node scripts/validate-external-benchmark-metrics.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a860994f5127dfca51b8ebbc372d47fbd0fd27d152dd12c754e1e56c1b3edc53",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:external-benchmark-metrics"
+      ],
+      "generatedAt": "2026-09-22T00:46:05.260Z",
+      "startedAt": "2026-09-22T00:46:04.914Z",
+      "finishedAt": "2026-09-22T00:46:05.260Z",
+      "durationMs": 346,
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce1d85ff3a0cf80d43eafe1f42c6363e39d17a57",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

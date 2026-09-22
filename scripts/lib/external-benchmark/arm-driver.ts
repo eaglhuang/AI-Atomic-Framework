@@ -26,6 +26,17 @@ export interface ArmOutcome {
   readonly tokens: number | null;
   readonly costUsd: number | null;
   readonly rawEvidence: Record<string, unknown>;
+  /** Canonical observed metrics. Unknown values are explicit nulls with reasons. */
+  readonly telemetry?: {
+    readonly completion: 'completed' | 'failed' | 'aborted' | 'unknown' | null;
+    readonly completionEvidence: string | null;
+    readonly humanMinutes: number | null;
+    readonly humanIntervals: readonly { readonly startedAt: string; readonly endedAt: string }[] | null;
+    readonly retries: number | null;
+    readonly repairTimeMs: number | null;
+    readonly repairTimestamps: readonly { readonly startedAt: string; readonly endedAt: string }[] | null;
+    readonly unavailableReasons: readonly string[];
+  };
 }
 
 export interface ArmDriver {
@@ -51,6 +62,16 @@ export function createSimulatedDriver(): ArmDriver {
         tokens: 0,
         costUsd: 0,
         rawEvidence: { simulated: true },
+        telemetry: {
+          completion: 'unknown',
+          completionEvidence: null,
+          humanMinutes: null,
+          humanIntervals: null,
+          retries: null,
+          repairTimeMs: null,
+          repairTimestamps: null,
+          unavailableReasons: ['synthetic-driver-has-no-oracle-or-cost-evidence'],
+        },
       };
     },
   };
