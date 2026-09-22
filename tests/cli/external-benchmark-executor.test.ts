@@ -56,6 +56,7 @@ const dirs = (name: string) => ({ workspaceRoot: path.join(scratch, `${name}-wor
     assert.equal(receipt.removed, true);
     assert.equal(existsSync(receipt.workspace), false, 'worktrees are removed after the arm');
     assert.ok(path.resolve(receipt.workspace).startsWith(path.resolve(where.workspaceRoot)), 'worktrees live under the workspace root');
+    assert.match(path.basename(receipt.workspace), /^pair-\d+-(atm|baseline)$/, 'transient checkout names stay compact');
   }
   for (const packet of summary.packets) {
     assert.ok(!JSON.stringify(packet).includes('gitStatus'), 'packets carry refs and digests, not raw evidence');
@@ -75,6 +76,18 @@ const dirs = (name: string) => ({ workspaceRoot: path.join(scratch, `${name}-wor
     }
   }
   assert.ok(existsSync(path.join(where.sinkDir, summary.summaryRef.slice('sink:'.length))), 'the execution summary is written to the sink');
+
+  const longPlan = plan({
+    planId: `plan-${'x'.repeat(180)}`,
+    repositories: [{ name: `repo-${'r'.repeat(120)}`, repositoryUrl: fixtureRepo, commitSha }],
+    scenarios: [{ scenarioId: `scenario-${'s'.repeat(120)}`, promptDigest: `sha256:${'a'.repeat(64)}` }],
+    pairsPerScenario: 1,
+  });
+  const longWhere = dirs('acc1-long-identifiers');
+  const longSummary = await executeTrialPlan({ plan: longPlan, driver: createSimulatedDriver(), ...longWhere });
+  assert.equal(longSummary.interrupted, null, 'long logical IDs must not prevent checkout');
+  assert.equal(longSummary.cleanup.length, 2);
+  assert.ok(longSummary.cleanup.every(({ workspace }) => path.basename(workspace).length < 32), 'physical checkout paths are bounded independently of logical IDs');
 
   await assert.rejects(
     executeTrialPlan({ plan: plan(), driver: createSimulatedDriver(), ...where, workspaceRoot: path.join(frameworkRoot, '.tmp-executor-work') }),
