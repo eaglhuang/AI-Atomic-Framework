@@ -1,9 +1,10 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-PRF-0066",
-  "updatedAt": "2026-09-22T03:28:34.480Z",
-  "updatedBy": "codex-product-ci-coverage",
+  "updatedAt": "2026-09-22T05:32:17.597Z",
+  "updatedBy": "codex-gpt-5.4-mini",
   "freshValidationPasses": [
+    "build",
     "lint",
     "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json",
     "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json --report-only",
@@ -124,6 +125,22 @@
       "durationMs": 81833,
       "runnerKind": "dev-source",
       "sourceCommit": "0cf6778857640305677ab83c6fb95552056bef83",
+      "cached": false
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:55a657e2dd33c49d1a19fd6b1abe8ee50967215e593839696723f9f79e323e21",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "build"
+      ],
+      "generatedAt": "2026-09-22T05:32:17.597Z",
+      "startedAt": "2026-09-22T05:32:04.955Z",
+      "finishedAt": "2026-09-22T05:32:17.597Z",
+      "durationMs": 12642,
+      "runnerKind": "dev-source",
+      "sourceCommit": "a8e1e173a702ad0258a5b739656f3996275af9fe",
       "cached": false
     }
   ],

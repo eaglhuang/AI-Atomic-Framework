@@ -180,7 +180,7 @@ function validateLifecycle(run: CiRun): CiFailureLifecycle {
   return lifecycle;
 }
 
-function validateJobProvenance(job: unknown, field: string, requireStepCoverage = false): CiJobProvenance {
+function validateJobProvenance(job: unknown, field: string, requireStepCoverage = false, allowUnsuccessfulStepCoverage = false): CiJobProvenance {
   if (!job || typeof job !== 'object') throw new Error(`${field}-missing-productJob`);
   const candidate = job as Partial<CiJobProvenance>;
   if (!Number.isSafeInteger(candidate.jobId) || candidate.jobId! <= 0) throw new Error(`${field}-invalid-jobId`);
@@ -202,7 +202,8 @@ function validateJobProvenance(job: unknown, field: string, requireStepCoverage 
     if (!coverage || typeof coverage !== 'object' || coverage.complete !== true
       || !Array.isArray(coverage.missing) || coverage.missing.length > 0
       || !Array.isArray(coverage.ambiguous) || coverage.ambiguous.length > 0
-      || !Array.isArray(coverage.unsuccessful) || coverage.unsuccessful.length > 0) {
+      || !Array.isArray(coverage.unsuccessful)
+      || (!allowUnsuccessfulStepCoverage && coverage.unsuccessful.length > 0)) {
       throw new Error(`${field}-incomplete-step-coverage`);
     }
   }
@@ -222,7 +223,12 @@ function validateAttemptProvenance(run: CiRun, requireStepCoverage = false): voi
     if (typeof attempt.workflowConclusion !== 'string' || attempt.workflowConclusion.length === 0) throw new Error(`record-${run.databaseId}-attempt-${index}-missing-workflow-conclusion`);
     if (typeof attempt.productJobConclusion !== 'string' || attempt.productJobConclusion.length === 0) throw new Error(`record-${run.databaseId}-attempt-${index}-missing-product-conclusion`);
     if (attempt.failureClass !== null && typeof attempt.failureClass !== 'string') throw new Error(`record-${run.databaseId}-attempt-${index}-invalid-failureClass`);
-    validateJobProvenance(attempt.productJob, `record-${run.databaseId}-attempt-${index}`, requireStepCoverage);
+    validateJobProvenance(
+      attempt.productJob,
+      `record-${run.databaseId}-attempt-${index}`,
+      requireStepCoverage,
+      attempt.productJobConclusion !== 'success'
+    );
   }
 }
 
@@ -258,7 +264,14 @@ function validateRuns(input: unknown, policy: BurnInPolicy, requiresJobProvenanc
     // records still need their exclusion reason and lifecycle validated above.
     if (requiresJobProvenance && eligible) {
       validateAttemptProvenance(run as CiRun, requiresStepCoverage);
-      if (requiresStepCoverage) validateJobProvenance(run.productJob, `record-${databaseId}`, true);
+      if (requiresStepCoverage) {
+        validateJobProvenance(
+          run.productJob,
+          `record-${databaseId}`,
+          true,
+          run.productJobConclusion !== 'success'
+        );
+      }
     }
     previousCreatedAt = createdAt;
     runs.push(run as CiRun);

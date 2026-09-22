@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-22T05-26-04-090Z-scope-amendment-d52b333e342d",
+  "taskId": "TASK-PRF-0066",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0066.json",
+  "taskSha256": "sha256:d537af0ac6fe09160e2dd13b7afc080c959d48718a442db1e88b9637971d896b",
+  "createdAt": "2026-09-22T05:26:04.090Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0066 --actor codex-gpt-5.4-mini --add \"scripts/collect-ci-burn-in-evidence.ts,tests/cli/ci-burn-in-evidence-collector.test.ts,docs/reports/atm-product-ci-burn-in-real-export.md,scripts/product-ci-burn-in-workflow-scope.json,scripts/measure-product-ci-burn-in.ts,.github/workflows/ci.yml,tests/cli/ci-product-lane-contract.test.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

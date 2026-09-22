@@ -109,6 +109,17 @@ failedStepCoverage.attempts[1].productCi.job.steps.find((step: any) => step.name
 const failedStepReceipt = collectLifecycleEvidence(failedStepCoverage);
 assert.equal(failedStepReceipt.runs.find((run) => run.databaseId === 5803)?.exclusionReason, 'unsuccessful-required-step-coverage');
 
+// A failed product job with all required step names present remains eligible
+// so the failure can be classified and paired with a later repair run.
+const failedProductJob = structuredClone(attemptExport);
+failedProductJob.attempts[0].productCi.job.steps.find((step: any) => step.name === 'Build').conclusion = 'failure';
+const failedProductReceipt = collectLifecycleEvidence(failedProductJob);
+const failedProductRun = failedProductReceipt.runs.find((run) => run.databaseId === 5803)!;
+assert.equal(failedProductRun.eligible, true);
+assert.equal(failedProductRun.productJob?.stepCoverage?.complete, true);
+assert.equal(failedProductRun.attempts?.[0]?.productJob.stepCoverage?.complete, true);
+assert.deepEqual(failedProductRun.attempts?.[0]?.productJob.stepCoverage?.unsuccessful, ['Build']);
+
 const tamperedStepCoverage = structuredClone(receipt);
 tamperedStepCoverage.runs[0]!.productJob!.stepCoverage!.complete = false;
 tamperedStepCoverage.receiptDigest = canonicalDigest(tamperedStepCoverage.runs);

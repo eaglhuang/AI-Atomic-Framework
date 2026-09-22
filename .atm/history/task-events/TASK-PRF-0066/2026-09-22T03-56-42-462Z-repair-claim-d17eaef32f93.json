@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-22T03-56-42-462Z-repair-claim-d17eaef32f93",
+  "taskId": "TASK-PRF-0066",
+  "action": "repair-claim",
+  "actorId": "codex-product-ci-coverage",
+  "sessionId": "session-20260922030734-codex-product-ci-coverage-TASK-PRF-0066-3a614adc72",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0066.json",
+  "taskSha256": "sha256:3fc07486c148122ea13472a7a7ab663b221cce4b86db49d857e54d7d220fbc2a",
+  "createdAt": "2026-09-22T03:56:42.462Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PRF-0066 --actor codex-product-ci-coverage --write --reason \"Lease expired and no valid active claim remains; TASK-PRF-0121 supersedes the publication-coupled build validator while preserving all existing WIP and delivery history.\" --json"
+}
