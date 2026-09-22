@@ -5753,6 +5753,7 @@
     "release/atm-root-drop/tests/cli/runbook-release-authority-review.test.ts",
     "release/atm-root-drop/tests/cli/runner-arbitration-evidence.test.ts",
     "release/atm-root-drop/tests/cli/runner-build-scope.test.ts",
+    "release/atm-root-drop/tests/cli/runner-build-validation-only.test.ts",
     "release/atm-root-drop/tests/cli/runner-compatibility-digest-precondition.test.ts",
     "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
     "release/atm-root-drop/tests/cli/runner-publication-inventory-parity.test.ts",
@@ -6259,7 +6260,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 6223,
+    "unchanged": 6224,
     "removed": 0
   },
   "buildMode": "full",
@@ -12818,7 +12819,7 @@
       },
       {
         "path": "docs/reports/atm-product-ci-burn-in-real-export.md",
-        "digest": "f982b836a4e71fe132d0d73742f9541322ce823728a14df0941d7333ecb531a1",
+        "digest": "1f3fe2c7a0cb1e70c5a1510298ce358aa5f44bac74faddc3f4d1f3738d03945a",
         "origin": "source",
         "inputPaths": [
           "docs/reports/atm-product-ci-burn-in-real-export.md"
@@ -47711,7 +47712,7 @@
       },
       {
         "path": "scripts/collect-ci-burn-in-evidence.ts",
-        "digest": "320c168e9174030894c1d9ae5f1a077159d2b35ced4dbf0c7bcb8ba17d557df2",
+        "digest": "aa17b793ebc046ae1506ae1cf573d8323b235558b35925e6c4131fde2566b39d",
         "origin": "source",
         "inputPaths": [
           "scripts/collect-ci-burn-in-evidence.ts"
@@ -48953,7 +48954,7 @@
       },
       {
         "path": "scripts/measure-product-ci-burn-in.ts",
-        "digest": "41e82f359a2dae79f3a02a1e9f4a4624d7a34bcb1b7368cda565e2abb3bbc00a",
+        "digest": "3ae2bf0ef16a359633c559df5d49c71d821700fcd45d2bb3c33a9e776b681cb8",
         "origin": "source",
         "inputPaths": [
           "scripts/measure-product-ci-burn-in.ts"
@@ -49034,7 +49035,7 @@
       },
       {
         "path": "scripts/product-ci-burn-in-workflow-scope.json",
-        "digest": "3e5740d801b578f0588c5cd6cd93c14f3e9d496d5a7f4245da2c68a0d7f7b3d3",
+        "digest": "f6cb3814e7816ad4ccba0cbabca3c5709baf28b8bfdb80efa64e73c8c7d4b729",
         "origin": "source",
         "inputPaths": [
           "scripts/product-ci-burn-in-workflow-scope.json"
@@ -49169,7 +49170,7 @@
       },
       {
         "path": "scripts/run-sealed-runner-build.ts",
-        "digest": "596feeb9fd5d576ba2a37e30f056ef4750ce00970bd5e1bff7be97eea9575c6e",
+        "digest": "4de25c9f11a39c78c13ebc8a0126c1cad2729a36800d3eb54a9f5c554153af22",
         "origin": "source",
         "inputPaths": [
           "scripts/run-sealed-runner-build.ts"
@@ -54542,7 +54543,7 @@
       },
       {
         "path": "tests/cli/ci-burn-in-evidence-collector.test.ts",
-        "digest": "6479b65b748579b925ec89000f3300d79f1fa94dd27ef856bb808ddf3a79a4e5",
+        "digest": "bce10cf87250428bb9dc117c8b46a9db6f268b011c68240e010e287a4aac7142",
         "origin": "source",
         "inputPaths": [
           "tests/cli/ci-burn-in-evidence-collector.test.ts"
@@ -54551,7 +54552,7 @@
       },
       {
         "path": "tests/cli/ci-product-lane-contract.test.ts",
-        "digest": "9831857a15eec76ce5824026b1e3311be675c9cbacf73bceefc3d3fcfa035556",
+        "digest": "e8cbe715f583be272bbf43194ff6fcb962fd9848da147367f46d53b7a051d4e6",
         "origin": "source",
         "inputPaths": [
           "tests/cli/ci-product-lane-contract.test.ts"
@@ -57750,6 +57751,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/runner-build-scope.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/runner-build-validation-only.test.ts",
+        "digest": "fe51b59c1b0b344177e554bf5835d85fb5aa78c0b40d4e65957d00d79bc1744a",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/runner-build-validation-only.test.ts"
         ],
         "replaceable": true
       },
@@ -62272,7 +62282,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:8e85a24c353a27eb88422b4cb6bc31c4452b3fc87727bf4739a84cf4737f93fb"
+    "treeDigest": "sha256:6e05855863e1cf3d3bebc70374194c67dade291f4b07f98956b53a8db03a4359"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -63824,7 +63834,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:2054d11515052cfe1dd66985a3c55f3d03293a234d0aee8824f78e24de09c933"
+    "digest": "sha256:555e8f4418a6354e3f21b89cd86004c2b855f5e0ff3f42fe1e7e079e4bc04582"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -69551,6 +69561,7 @@
       "release/atm-root-drop/tests/cli/runbook-release-authority-review.test.ts",
       "release/atm-root-drop/tests/cli/runner-arbitration-evidence.test.ts",
       "release/atm-root-drop/tests/cli/runner-build-scope.test.ts",
+      "release/atm-root-drop/tests/cli/runner-build-validation-only.test.ts",
       "release/atm-root-drop/tests/cli/runner-compatibility-digest-precondition.test.ts",
       "release/atm-root-drop/tests/cli/runner-publication-disposition-gate.test.ts",
       "release/atm-root-drop/tests/cli/runner-publication-inventory-parity.test.ts",
@@ -70059,22 +70070,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:325a75186964ece47b0427bc46277d85ae575b2d2a5e64ac33c7502b0b590905",
-  "sealedSourceCommit": "70ebc167d56bc7588ac9f0437ac7c51e3ff6d7a1",
+  "buildInputsTreeHash": "sha256:a1226535eabb3f88e8f657ec5c29a0301fb96c7a205442be64ef0b88ceac969e",
+  "sealedSourceCommit": "cdbcb9e8648f9056944f6b15b75548c671df2c03",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:e0d26995a9974db5b50daf810a03d06474dbe395d917817292f42e4e6d902e53",
-  "tsBuildCacheDigest": "sha256:daaa4be89196eb0b6dfdaa5d93cd885689a7bc0bc0060cc9347012f4860c02fb",
+  "incrementalPlanDigest": "sha256:be136cde9d3fb466ae96e2b560f26afcfa61a92584bd504297fd419d07579d46",
+  "tsBuildCacheDigest": "sha256:39d989a88ed23c5999101f6431b2654f80b1a21cdab6767a52da81ecd8479a2b",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 39,
-    "skipDecision": 48,
-    "worktreeSetup": 9855,
-    "typescriptBuild": 15846,
-    "rootDropReleaseAssembly": 34973,
-    "onefileReleaseAssembly": 19041,
-    "artifactSync": 5012,
+    "inputHashCalculation": 41,
+    "skipDecision": 46,
+    "worktreeSetup": 9675,
+    "typescriptBuild": 11692,
+    "rootDropReleaseAssembly": 33455,
+    "onefileReleaseAssembly": 18400,
+    "artifactSync": 4864,
     "cleanup": 0,
-    "totalElapsed": 92378
+    "totalElapsed": 85953
   }
 }

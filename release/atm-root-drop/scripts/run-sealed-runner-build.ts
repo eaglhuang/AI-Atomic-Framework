@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, rmdirSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -16,7 +17,7 @@ import {
   type RunnerSyncReceipt,
   type TsBuildCacheSummary
 } from './runner-sync-incremental-build.ts';
-import { scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
+import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
 import { captureSealedRunnerPublicationSnapshot, resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
@@ -90,8 +91,60 @@ if (invokedAsCli) {
   const target = parseTarget(process.argv.slice(2));
   if (process.argv.includes('--inner')) {
     runInnerBuild(target);
+  } else if (process.argv.includes('--validation-only')) {
+    runValidationOnlyBuild(target);
   } else {
     runSealedBuild(target);
+  }
+}
+
+function runValidationOnlyBuild(buildTarget: BuildTarget): void {
+  const timings = createPhaseTimings();
+  const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
+  if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
+  const buildInputsTreeHash = timePhase(timings, 'inputHashCalculationMs', () => computeBuildInputsTreeHash(repoRoot, sealedSourceSha));
+  const canonicalBefore = captureRunnerBuildOutputSnapshot({ cwd: repoRoot, buildTarget });
+  const worktreeRoot = path.join(repoRoot, '.atm-temp', 'sealed-runner-validation', `${process.pid}-${sealedSourceSha.slice(0, 12)}`);
+  removeTreeWithoutFollowingLinks(worktreeRoot);
+  mkdirSync(path.dirname(worktreeRoot), { recursive: true });
+  try {
+    timePhase(timings, 'worktreeSetupMs', () => runGit(repoRoot, ['worktree', 'add', '--detach', worktreeRoot, sealedSourceSha]));
+    linkNodeModules(worktreeRoot);
+    runTimedInnerBuild(worktreeRoot, buildTarget, timings, null);
+    const outputSnapshot = captureRunnerBuildOutputSnapshot({ cwd: worktreeRoot, buildTarget });
+    const outputEntryCount = Object.keys(outputSnapshot.members).length;
+    if (outputEntryCount === 0) fail('Validation-only sealed runner build produced no release output members.', 1);
+    const canonicalAfter = captureRunnerBuildOutputSnapshot({ cwd: repoRoot, buildTarget });
+    const digest = (snapshot: typeof canonicalBefore): string => `sha256:${createHash('sha256').update(JSON.stringify({ ...snapshot, preexistingDirtyPaths: [...snapshot.preexistingDirtyPaths].sort() })).digest('hex')}`;
+    const canonicalBeforeDigest = digest(canonicalBefore);
+    const canonicalAfterDigest = digest(canonicalAfter);
+    if (canonicalBeforeDigest !== canonicalAfterDigest) fail('Validation-only sealed runner build changed canonical release surfaces.', 1);
+    timings.totalElapsedMs = elapsedSince(timings.startedAt);
+    console.log(JSON.stringify({
+      ok: true,
+      mode: 'validation-only',
+      buildTarget,
+      sealedSourceSha,
+      buildInputsTreeHash,
+      outputInventoryDigest: digest(outputSnapshot),
+      outputEntryCount,
+      canonicalOutputDigest: canonicalBeforeDigest,
+      timings
+    }, null, 2));
+  } finally {
+    unlinkWorktreeNodeModulesLink(worktreeRoot);
+    timePhase(timings, 'cleanupMs', () => {
+      const remove = spawnSync('git', ['worktree', 'remove', '--force', worktreeRoot], {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe']
+      });
+      if ((remove.status ?? 1) !== 0 || existsSync(worktreeRoot)) {
+        unlinkWorktreeNodeModulesLink(worktreeRoot);
+        removeTreeWithoutFollowingLinks(worktreeRoot);
+      }
+    });
+    timings.totalElapsedMs = elapsedSince(timings.startedAt);
   }
 }
 

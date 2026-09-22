@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 
-import type { CiAttemptRecord, CiFailureLifecycle, CiJobProvenance, CiRun } from './measure-product-ci-burn-in.ts';
+import type { CiAttemptRecord, CiFailureLifecycle, CiJobProvenance, CiRun, CiStepCoverage } from './measure-product-ci-burn-in.ts';
 
 export type CiAttempt = {
   runId: number;
@@ -84,6 +84,7 @@ export type CiWorkflowScopePolicy = {
     classification: 'standard' | 'release-candidate';
   }>;
   releaseCandidateTreatment: 'include' | 'exclude';
+  requiredProductCiSteps: Array<{ stepName: string; command: string }>;
   policyDigest: string;
 };
 
@@ -92,6 +93,7 @@ export type LifecycleReceipt = {
   sourceDigest: string;
   receiptDigest: string;
   scopePolicyDigest: string;
+  requiresStepCoverage: true;
   runs: CiRun[];
 };
 
@@ -127,6 +129,15 @@ export function validateScopePolicy(raw: unknown): CiWorkflowScopePolicy {
   if (typeof policy.protectedBranch !== 'string' || policy.protectedBranch.length === 0) throw new Error('missing-scope-policy-branch');
   if (!Array.isArray(policy.workflows) || policy.workflows.length === 0) throw new Error('scope-policy-workflows-empty');
   if (policy.releaseCandidateTreatment !== 'include' && policy.releaseCandidateTreatment !== 'exclude') throw new Error('invalid-release-candidate-treatment');
+  if (!Array.isArray(policy.requiredProductCiSteps) || policy.requiredProductCiSteps.length === 0) throw new Error('required-product-ci-steps-empty');
+  const requiredStepNames = new Set<string>();
+  for (const [index, step] of policy.requiredProductCiSteps.entries()) {
+    if (!step || typeof step !== 'object') throw new Error(`required-product-ci-step-${index}-not-object`);
+    if (typeof step.stepName !== 'string' || step.stepName.trim().length === 0) throw new Error(`required-product-ci-step-${index}-missing-name`);
+    if (typeof step.command !== 'string' || step.command.trim().length === 0) throw new Error(`required-product-ci-step-${index}-missing-command`);
+    if (requiredStepNames.has(step.stepName)) throw new Error(`required-product-ci-step-${index}-duplicate-name`);
+    requiredStepNames.add(step.stepName);
+  }
   const seen = new Set<string>();
   for (const [index, entry] of policy.workflows.entries()) {
     if (!entry || typeof entry !== 'object') throw new Error(`scope-policy-workflow-${index}-not-object`);
@@ -172,10 +183,56 @@ function validateProductJob(job: unknown, runId: number, runAttempt: number): Ci
   if (!Number.isSafeInteger(candidate.jobId) || candidate.jobId! <= 0) throw new Error(`attempt-${runId}-attempt-${runAttempt}-invalid-jobId`);
   if (typeof candidate.jobName !== 'string' || candidate.jobName.trim().length === 0) throw new Error(`attempt-${runId}-attempt-${runAttempt}-invalid-jobName`);
   if (typeof candidate.jobUrl !== 'string' || !/^https?:\/\//i.test(candidate.jobUrl)) throw new Error(`attempt-${runId}-attempt-${runAttempt}-invalid-jobUrl`);
+  if (candidate.steps !== undefined) {
+    if (!Array.isArray(candidate.steps)) throw new Error(`attempt-${runId}-attempt-${runAttempt}-invalid-steps`);
+    for (const [index, rawStep] of candidate.steps.entries()) {
+      if (!rawStep || typeof rawStep !== 'object') throw new Error(`attempt-${runId}-attempt-${runAttempt}-step-${index}-not-object`);
+      const step = rawStep as { name?: unknown; status?: unknown; conclusion?: unknown };
+      if (typeof step.name !== 'string' || step.name.trim().length === 0) throw new Error(`attempt-${runId}-attempt-${runAttempt}-step-${index}-invalid-name`);
+      if (typeof step.status !== 'string' || step.status.trim().length === 0) throw new Error(`attempt-${runId}-attempt-${runAttempt}-step-${index}-invalid-status`);
+      if (step.conclusion !== null && typeof step.conclusion !== 'string') throw new Error(`attempt-${runId}-attempt-${runAttempt}-step-${index}-invalid-conclusion`);
+    }
+  }
   return candidate as CiJobProvenance;
 }
 
-function attemptRecord(attempt: CiAttempt): CiAttemptRecord {
+function stepCoverage(job: CiJobProvenance, policy: CiWorkflowScopePolicy): CiStepCoverage {
+  const missing: string[] = [];
+  const ambiguous: string[] = [];
+  const unsuccessful: string[] = [];
+  const steps = Array.isArray(job.steps) ? job.steps : [];
+  for (const required of policy.requiredProductCiSteps) {
+    const matches = steps.filter((step) => step.name === required.stepName);
+    if (matches.length === 0) {
+      missing.push(required.stepName);
+    } else if (matches.length > 1) {
+      ambiguous.push(required.stepName);
+    } else if (matches[0].status !== 'completed' || matches[0].conclusion !== 'success') {
+      unsuccessful.push(required.stepName);
+    }
+  }
+  return { complete: missing.length === 0 && ambiguous.length === 0 && unsuccessful.length === 0, missing, ambiguous, unsuccessful };
+}
+
+function productJobEvidence(attempt: CiAttempt, policy: CiWorkflowScopePolicy): { job: CiJobProvenance | null; coverage: CiStepCoverage; exclusionReason: string | null } {
+  const missingCoverage = { complete: false, missing: policy.requiredProductCiSteps.map((step) => step.stepName), ambiguous: [], unsuccessful: [] } satisfies CiStepCoverage;
+  if (!attempt.productCi?.job) return { job: null, coverage: missingCoverage, exclusionReason: 'missing-product-job-coverage' };
+  let job: CiJobProvenance;
+  try {
+    job = validateProductJob(attempt.productCi.job, attempt.runId, attempt.runAttempt);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('missing-productJob')) return { job: null, coverage: missingCoverage, exclusionReason: 'missing-product-job-coverage' };
+    throw error;
+  }
+  const coverage = stepCoverage(job, policy);
+  let exclusionReason: string | null = null;
+  if (coverage.missing.length > 0) exclusionReason = 'missing-required-step-coverage';
+  else if (coverage.ambiguous.length > 0) exclusionReason = 'ambiguous-required-step-coverage';
+  else if (coverage.unsuccessful.length > 0) exclusionReason = 'unsuccessful-required-step-coverage';
+  return { job: { ...job, stepCoverage: coverage }, coverage, exclusionReason };
+}
+
+function attemptRecord(attempt: CiAttempt, job: CiJobProvenance): CiAttemptRecord {
   if (!attempt.productCi) throw new Error(`attempt-${attempt.runId}-attempt-${attempt.runAttempt}-missing-productCi`);
   return {
     runAttempt: attempt.runAttempt,
@@ -184,7 +241,7 @@ function attemptRecord(attempt: CiAttempt): CiAttemptRecord {
     workflowConclusion: attempt.conclusion,
     productJobConclusion: attempt.productCi.conclusion,
     failureClass: attempt.failureClass ?? null,
-    productJob: validateProductJob(attempt.productCi.job, attempt.runId, attempt.runAttempt),
+    productJob: job,
   };
 }
 
@@ -213,7 +270,9 @@ function scopeAttempt(attempt: CiAttempt, policy: CiWorkflowScopePolicy): { elig
   if (matches.length !== 1) return { eligible: false, exclusionReason: matches.length === 0 ? 'out-of-scope-workflow' : 'ambiguous-workflow-identity', identity: null };
   const identity = matches[0];
   if (identity.classification === 'release-candidate' && policy.releaseCandidateTreatment === 'exclude') return { eligible: false, exclusionReason: 'release-candidate-excluded-by-policy', identity };
-  if (!attempt.productCi || typeof attempt.productCi.conclusion !== 'string') throw new Error(`attempt-${attempt.runId}-missing-productCi`);
+  if (!attempt.productCi || typeof attempt.productCi.conclusion !== 'string') return { eligible: false, exclusionReason: 'missing-product-job-coverage', identity };
+  const evidence = productJobEvidence(attempt, policy);
+  if (evidence.exclusionReason) return { eligible: false, exclusionReason: evidence.exclusionReason, identity };
   return { eligible: true, exclusionReason: null, identity };
 }
 
@@ -237,9 +296,16 @@ export function collectLifecycleEvidence(input: unknown, rawPolicy?: unknown): L
   const runs = [...groups.values()].map((group) => {
     group.sort((left, right) => left.runAttempt - right.runAttempt);
     const latest = group[group.length - 1];
-    const scope = scopeAttempt(latest, policy);
+    let scope = scopeAttempt(latest, policy);
+    let productJobs: CiJobProvenance[] | undefined;
+    if (scope.eligible) {
+      const evidences = group.map((attempt) => productJobEvidence(attempt, policy));
+      const incomplete = evidences.find((evidence) => evidence.exclusionReason || !evidence.job);
+      if (incomplete) scope = { ...scope, eligible: false, exclusionReason: incomplete.exclusionReason };
+      else productJobs = evidences.map((evidence) => evidence.job!);
+    }
     const conclusionFor = (attempt: CiAttempt) => attempt.productCi?.conclusion ?? attempt.conclusion;
-  const run: CiRun = {
+    const run: CiRun = {
       databaseId: latest.runId,
       status: 'completed',
       conclusion: scope.eligible ? conclusionFor(latest) : latest.conclusion,
@@ -251,8 +317,8 @@ export function collectLifecycleEvidence(input: unknown, rawPolicy?: unknown): L
       workflowName: latest.workflowName,
       workflowConclusion: latest.conclusion,
       productJobConclusion: latest.productCi?.conclusion ?? null,
-      productJob: scope.eligible ? validateProductJob(latest.productCi?.job, latest.runId, latest.runAttempt) : null,
-      attempts: scope.eligible ? group.map(attemptRecord) : undefined,
+      productJob: scope.eligible ? productJobs![productJobs!.length - 1] : null,
+      attempts: scope.eligible ? group.map((attempt, index) => attemptRecord(attempt, productJobs![index])) : undefined,
       eligible: scope.eligible,
       exclusionReason: scope.exclusionReason,
       lifecycle: lifecycleFor(group, scope.eligible ? conclusionFor : (attempt) => attempt.conclusion),
@@ -267,6 +333,7 @@ export function collectLifecycleEvidence(input: unknown, rawPolicy?: unknown): L
     sourceDigest,
     receiptDigest: canonicalDigest(canonicalRuns),
     scopePolicyDigest: policy.policyDigest,
+    requiresStepCoverage: true,
     runs: canonicalRuns,
   };
 }
@@ -280,7 +347,18 @@ export const DEFAULT_SCOPE_POLICY: CiWorkflowScopePolicy = {
     { workflowName: 'Product CI burn-in (release-candidate)', displayTitle: 'Product CI burn-in (release-candidate)', classification: 'release-candidate' },
   ],
   releaseCandidateTreatment: 'include',
-  policyDigest: 'sha256:54ed1ef6676f4b6a0e7327784f44c6009ab146c797ed6e4e1f0b5081c71e6dfe',
+  requiredProductCiSteps: [
+    { stepName: 'Clean install', command: 'npm ci' },
+    { stepName: 'Build', command: 'npm run build' },
+    { stepName: 'Typecheck', command: 'npm run typecheck' },
+    { stepName: 'Lint', command: 'npx eslint scripts/validate-ci-product-lane.ts tests/cli/ci-product-lane-contract.test.ts' },
+    { stepName: 'Full test', command: 'npm test' },
+    { stepName: 'Package skeleton smoke', command: 'validate-package-skeleton.ts' },
+    { stepName: 'Clean-install packed CLI smoke', command: 'npm run validate:package-install' },
+    { stepName: 'Workspace package smoke', command: 'npm pack --workspaces --dry-run' },
+    { stepName: 'Clean-install repeat smoke', command: 'npm ci --ignore-scripts' },
+  ],
+  policyDigest: 'sha256:39a058e23bfe864620ca8b37f7c3d60e3195835d315d8585efae955c6dd11236',
 };
 
 function option(args: string[], name: string): string | undefined {

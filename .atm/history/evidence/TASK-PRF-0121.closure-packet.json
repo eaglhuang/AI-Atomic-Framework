@@ -1,0 +1,167 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0121",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "cdbcb9e8648f9056944f6b15b75548c671df2c03",
+  "governedTreeSha": "4f74dc05a3138e352b345446b3f7fb35eeed86d3",
+  "targetCommitDelta": {
+    "currentCommitSha": "cdbcb9e8648f9056944f6b15b75548c671df2c03",
+    "parentCommitShas": [
+      "cdbcb9e8648f9056944f6b15b75548c671df2c03"
+    ],
+    "governedTreeSha": "4f74dc05a3138e352b345446b3f7fb35eeed86d3",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-publication-takeover.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      ".atm/history/tasks/TASK-PRF-0066.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/reports/atm-product-ci-burn-in-real-export.md",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/collect-ci-burn-in-evidence.ts",
+      "release/atm-root-drop/scripts/measure-product-ci-burn-in.ts",
+      "release/atm-root-drop/scripts/product-ci-burn-in-workflow-scope.json",
+      "release/atm-root-drop/scripts/run-sealed-runner-build.ts",
+      "release/atm-root-drop/tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/ci-product-lane-contract.test.ts",
+      "tests/cli/runner-build-validation-only.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/runner-build-validation-only.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fde45b2aae5bac6a6f7b4a7e3e30325f4bd584bad66deaa4c431cb4a050d2eb3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b41cd8e11144bfb101335f1339066c7e6c9da2dc1de5433c2fa88f793e137149",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ab17309c2bd95040e222770bd51ca5210f16bf5a8faf0898304ed9826773afde",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run build -- --validation-only",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c051a3e28a92d28990d4359574ccc81bab22d6e7703bbf76cc9bed95405ac5fe",
+      "stderrSha256": "sha256:4494fc9e6040c60f711d03e6ef74569808fbb387197ebb1e6532b924f91224cc",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "build -- --validation-only",
+    "lint",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "node --strip-types tests/cli/runner-build-validation-only.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "build -- --validation-only",
+    "lint",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "node --strip-types tests/cli/runner-build-validation-only.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-22T04:02:10.587Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0121.*",
+      ".atm/history/task-events/TASK-PRF-0121/**",
+      ".atm/history/tasks/TASK-PRF-0121.json",
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/ci-product-lane-contract.test.ts",
+      "tests/cli/runner-build-validation-only.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/ci-product-lane-contract.test.ts",
+      "tests/cli/runner-build-validation-only.test.ts"
+    ],
+    "requiredGates": [
+      "build -- --validation-only",
+      "lint",
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "node --strip-types tests/cli/runner-build-validation-only.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0121.json",
+  "closedAt": "2026-09-22T04:02:10.588Z",
+  "closedByActor": "codex-product-ci-coverage",
+  "sessionId": "session-20260922033852-codex-product-ci-coverage-TASK-PRF-0121-c145c17cf2",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "cdbcb9e8648f9056944f6b15b75548c671df2c03",
+    "taskMatchedFiles": [
+      ".github/workflows/ci.yml",
+      "docs/reports/atm-product-ci-burn-in-real-export.md",
+      "scripts/run-sealed-runner-build.ts",
+      "tests/cli/ci-product-lane-contract.test.ts",
+      "tests/cli/runner-build-validation-only.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0121/2026-09-22T03-37-37-330Z-import-4a2fabf023dc.json",
+      ".atm/history/task-events/TASK-PRF-0121/2026-09-22T03-38-43-469Z-import-2b9e496aee7c.json",
+      ".atm/history/task-events/TASK-PRF-0121/2026-09-22T03-38-51-995Z-reserve-51bd24f99d85.json",
+      ".atm/history/task-events/TASK-PRF-0121/2026-09-22T03-38-51-999Z-promote-b45733750ceb.json",
+      ".atm/history/task-events/TASK-PRF-0121/2026-09-22T03-38-54-789Z-claim-382a44e64f0b.json",
+      ".atm/history/tasks/TASK-PRF-0121.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
