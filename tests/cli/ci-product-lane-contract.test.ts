@@ -8,7 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const workflowPath = path.join(root, '.github', 'workflows', 'ci.yml');
 const validatorPath = path.join(root, 'scripts', 'validate-ci-product-lane.ts');
 const reportPath = path.join(root, 'docs', 'reports', 'atm-product-ci-burn-in.md');
-const cliEntrypoint = 'packages/cli/dist/atm.mjs';
+const cliEntrypoint = 'packages/cli/dist/npm-runtime/atm.mjs';
 
 for (const filePath of [workflowPath, validatorPath, reportPath]) {
   assert.ok(existsSync(filePath), `TASK-PRF-0003 deliverable is missing: ${path.relative(root, filePath)}`);
