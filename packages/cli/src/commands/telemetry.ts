@@ -1,9 +1,9 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { getCommandSpec } from './command-specs.ts';
+import { getCommandSpec, listCommandSpecs } from './command-specs.ts';
 import { type CommandSpec, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.ts';
-import { buildGateTelemetryRegistryCoverageReport, buildGateTelemetryTaskSummary, canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../../../core/src/telemetry/index.ts';
+import { buildGateTelemetryRegistryCoverageReport, buildGateTelemetryTaskSummary, canonicalGateCheckRegistry, commandGateCheckId, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../../../core/src/telemetry/index.ts';
 import { buildSharedWriteGateCoverageReport } from '../../../core/src/telemetry/shared-write-coverage.ts';
 import {
   buildCommandGateLatencyMarkdown,
@@ -118,12 +118,13 @@ export async function runTelemetry(argv: string[]) {
 
   if (requestedReport) {
     const report = reportGateTelemetry(cwd, parsed.options.includeRuntime === true);
-    const latencyInventory = canonicalGateCheckRegistry.map((entry) => ({
-      key: entry.checkId,
-      command: entry.gate,
-      gate: entry.gate,
-      mandatory: entry.checkId === 'next.route-resolution' || entry.checkId === 'doctor.readiness' || entry.checkId === 'guard.framework-mode',
-      applicability: entry.summary
+    const mandatoryCommands = new Set(['next', 'doctor', 'guard']);
+    const latencyInventory = listCommandSpecs().map((spec) => ({
+      key: commandGateCheckId(spec.name),
+      command: spec.name,
+      gate: spec.name,
+      mandatory: mandatoryCommands.has(spec.name),
+      applicability: spec.summary
     }));
     const latencyEvents = parsed.options.includeRuntime === true ? readRuntimeLatencyEvents(cwd) : [];
     const latencyScore = buildCommandGateLatencyReportFromEvents({

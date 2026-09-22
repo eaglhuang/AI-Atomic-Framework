@@ -1,0 +1,142 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0111",
+  "updatedAt": "2026-09-22T01:00:37.509Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "check:encoding:touched",
+    "check:encoding:touched -- --files packages/cli/src/atm.ts packages/cli/src/commands/telemetry.ts packages/core/src/telemetry/index.ts scripts/plan-performance-report-v4.ts tests/cli/command-gate-latency-score.test.ts tests/cli/mandatory-gate-telemetry.test.ts docs/reports/atm-command-gate-latency-score.md",
+    "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+    "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+    "typecheck",
+    "validate:gate-telemetry-coverage"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:324dddcee33ffae6d7855352cc8910613e1de4c96454b848c84b8bdaf66293d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/command-gate-latency-score.test.ts"
+      ],
+      "generatedAt": "2026-09-22T00:59:03.210Z",
+      "startedAt": "2026-09-22T00:59:00.494Z",
+      "finishedAt": "2026-09-22T00:59:03.210Z",
+      "durationMs": 2716,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2623136077b6bd2699b0140f192eff6575167090",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:af4bef562cb152f26d5a7310a6f7c8f4b72e725a5e1b63d60ed0e8ac64bbfbef",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts"
+      ],
+      "generatedAt": "2026-09-22T00:59:16.350Z",
+      "startedAt": "2026-09-22T00:59:14.497Z",
+      "finishedAt": "2026-09-22T00:59:16.350Z",
+      "durationMs": 1853,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2623136077b6bd2699b0140f192eff6575167090",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5bcaf6f2b2474eeff43dd75b18c0b8ba7f81388a0bbaf64ee5e7752ab3a952bd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-22T00:59:27.894Z",
+      "startedAt": "2026-09-22T00:59:18.915Z",
+      "finishedAt": "2026-09-22T00:59:27.894Z",
+      "durationMs": 8979,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2623136077b6bd2699b0140f192eff6575167090",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode command-matrix --receipt C:\\Users\\User\\atm-benchmark-sink\\TASK-PRF-0111-command-matrix.json --validate-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:24fc64d7dc31dd07fffea78bedeb137cfe9a3ed17261d1edfa576b33e17d3142",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:gate-telemetry-coverage"
+      ],
+      "generatedAt": "2026-09-22T00:59:30.878Z",
+      "startedAt": "2026-09-22T00:59:30.520Z",
+      "finishedAt": "2026-09-22T00:59:30.878Z",
+      "durationMs": 358,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2623136077b6bd2699b0140f192eff6575167090",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files packages/cli/src/atm.ts packages/cli/src/commands/telemetry.ts packages/core/src/telemetry/index.ts scripts/plan-performance-report-v4.ts scripts/validate-gate-telemetry-coverage.ts tests/cli/command-gate-latency-score.test.ts tests/cli/mandatory-gate-telemetry.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:288c85b47c6a2278581e2c8797d06070f6bc6f3527b9ba4a27fe0272004d6655",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-22T00:59:35.016Z",
+      "startedAt": "2026-09-22T00:59:33.443Z",
+      "finishedAt": "2026-09-22T00:59:35.016Z",
+      "durationMs": 1573,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2623136077b6bd2699b0140f192eff6575167090",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck -- --pretty false",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5bcaf6f2b2474eeff43dd75b18c0b8ba7f81388a0bbaf64ee5e7752ab3a952bd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-09-22T00:59:59.352Z",
+      "startedAt": "2026-09-22T00:59:50.485Z",
+      "finishedAt": "2026-09-22T00:59:59.352Z",
+      "durationMs": 8867,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2623136077b6bd2699b0140f192eff6575167090",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files packages/cli/src/atm.ts packages/cli/src/commands/telemetry.ts packages/core/src/telemetry/index.ts scripts/plan-performance-report-v4.ts scripts/validate-gate-telemetry-coverage.ts tests/cli/command-gate-latency-score.test.ts tests/cli/mandatory-gate-telemetry.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:288c85b47c6a2278581e2c8797d06070f6bc6f3527b9ba4a27fe0272004d6655",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched"
+      ],
+      "generatedAt": "2026-09-22T01:00:03.549Z",
+      "startedAt": "2026-09-22T01:00:01.978Z",
+      "finishedAt": "2026-09-22T01:00:03.549Z",
+      "durationMs": 1571,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2623136077b6bd2699b0140f192eff6575167090",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files packages/cli/src/atm.ts packages/cli/src/commands/telemetry.ts packages/core/src/telemetry/index.ts scripts/plan-performance-report-v4.ts tests/cli/command-gate-latency-score.test.ts tests/cli/mandatory-gate-telemetry.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:66172a521ff6a4702e5e27c68fa302512a2da1bfad0166a11bc486d25cf59512",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files packages/cli/src/atm.ts packages/cli/src/commands/telemetry.ts packages/core/src/telemetry/index.ts scripts/plan-performance-report-v4.ts tests/cli/command-gate-latency-score.test.ts tests/cli/mandatory-gate-telemetry.test.ts docs/reports/atm-command-gate-latency-score.md"
+      ],
+      "generatedAt": "2026-09-22T01:00:37.508Z",
+      "startedAt": "2026-09-22T01:00:35.928Z",
+      "finishedAt": "2026-09-22T01:00:37.508Z",
+      "durationMs": 1580,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2623136077b6bd2699b0140f192eff6575167090",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

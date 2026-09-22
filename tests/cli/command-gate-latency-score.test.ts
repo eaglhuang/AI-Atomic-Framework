@@ -14,6 +14,7 @@ import {
   type CommandGateLatencyInventoryEntry,
   type CommandGateLatencySample
 } from '../../scripts/plan-performance-report-v4.ts';
+import { listCommandSpecs } from '../../packages/cli/src/commands/command-specs.ts';
 
 const inventory: readonly CommandGateLatencyInventoryEntry[] = [
   { key: 'next.route', command: 'next', gate: 'route', mandatory: true, applicability: 'every task' },
@@ -99,6 +100,7 @@ try {
   assert.equal(cliReport.status, 0, cliReport.stderr || cliReport.stdout);
   const cliReportJson = JSON.parse(cliReport.stdout);
   assert.equal(cliReportJson.evidence.latencyScore.observedCount, 1);
+  assert.equal(cliReportJson.evidence.latencyScore.inventoryCount, listCommandSpecs().length);
   assert.equal(cliReportJson.evidence.latencyScore.scores.find((score: { key: string }) => score.key === 'next.route-resolution').p50Ms, 13);
   assert.match(cliReportJson.evidence.latencyMarkdown, /Unknown values mean no real sample was available/);
 } finally {
