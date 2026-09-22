@@ -35,6 +35,18 @@ export interface TestResult {
   readonly stderrTail: string;
 }
 
+export interface SweepBatchTrace {
+  readonly tests: readonly string[];
+  readonly execution: 'parallel' | 'serial';
+  readonly attempt: 'initial' | 'retry';
+  readonly durationMs: number;
+  readonly dirtyRetry: boolean;
+}
+
+export interface SweepRunOptions {
+  readonly onBatch?: (trace: SweepBatchTrace) => void;
+}
+
 // 'stale-source-digest' is distinct from 'stale-assertion': the test's own
 // expectations still hold, and what has drifted is a report's recorded binding
 // to a source that was refreshed without recompiling it. The two send a reader
@@ -88,7 +100,7 @@ function runOne(root: string, testDir: string, test: string, timeoutMs: number):
   });
 }
 
-export async function runSweep(root: string, config: SweepConfig, only?: readonly string[]): Promise<TestResult[]> {
+export async function runSweep(root: string, config: SweepConfig, only?: readonly string[], options: SweepRunOptions = {}, attempt: SweepBatchTrace['attempt'] = 'initial'): Promise<TestResult[]> {
   const testDir = path.join(root, config.testDir);
   const tests = only ?? readdirSync(testDir).filter((name) => name.endsWith('.test.ts')).sort();
   const results: TestResult[] = [];
@@ -97,8 +109,17 @@ export async function runSweep(root: string, config: SweepConfig, only?: readonl
   for (let index = 0; index < tests.length; index += config.concurrency) {
     const batch = tests.slice(index, index + config.concurrency);
     const before = worktreeState(root);
+    const batchStarted = Date.now();
     const outcomes = await Promise.all(batch.map((test) => runOne(root, testDir, test, config.timeoutMs)));
     const added = [...worktreeState(root)].filter((line) => !before.has(line));
+    const dirtyRetry = added.length > 0 && batch.length > 1;
+    options.onBatch?.({
+      tests: batch,
+      execution: batch.length === 1 ? 'serial' : 'parallel',
+      attempt,
+      durationMs: Date.now() - batchStarted,
+      dirtyRetry,
+    });
     if (added.length === 0 || batch.length === 1) {
       for (const outcome of outcomes) results.push({ ...outcome, dirtied: batch.length === 1 ? added : [] });
       continue;
@@ -106,7 +127,7 @@ export async function runSweep(root: string, config: SweepConfig, only?: readonl
     spawnSync('git', ['stash', 'push', '--include-untracked', '--quiet'], { cwd: root });
     spawnSync('git', ['stash', 'drop', '--quiet'], { cwd: root });
     for (const test of batch) {
-      const [single] = await runSweep(root, config, [test]);
+      const [single] = await runSweep(root, config, [test], options, 'retry');
       results.push(single);
       if (single.dirtied.length) {
         spawnSync('git', ['stash', 'push', '--include-untracked', '--quiet'], { cwd: root });
@@ -136,19 +157,38 @@ async function main(): Promise<void> {
   }
   const quarantined = new Set(config.quarantine.map((entry) => entry.test));
   const includeQuarantine = process.argv.includes('--check-quarantine');
+  const batches: SweepBatchTrace[] = [];
+  const startedAt = Date.now();
   const selected = available.filter((test) => includeQuarantine ? quarantined.has(test) : !quarantined.has(test)).sort();
   const serial = new Set((config.serial ?? []).map((entry) => entry.test));
   const results = [
-    ...await runSweep(root, config, selected.filter((test) => !serial.has(test))),
-    ...await runSweep(root, { ...config, concurrency: 1 }, selected.filter((test) => serial.has(test))),
+    ...await runSweep(root, config, selected.filter((test) => !serial.has(test)), { onBatch: (trace) => batches.push(trace) }),
+    ...await runSweep(root, { ...config, concurrency: 1 }, selected.filter((test) => serial.has(test)), { onBatch: (trace) => batches.push(trace) }),
   ];
   const failures = results.filter((result) => includeQuarantine ? isClean(result) : !isClean(result));
+  const slowTests = [...results]
+    .sort((left, right) => right.durationMs - left.durationMs || left.test.localeCompare(right.test))
+    .slice(0, 20)
+    .map(({ test, durationMs, exitCode, timedOut, dirtied }) => ({ test, durationMs, exitCode, timedOut, dirtied }));
+  const slowBatches = [...batches]
+    .sort((left, right) => right.durationMs - left.durationMs)
+    .slice(0, 20);
   const summary = {
     ok: failures.length === 0,
     mode: includeQuarantine ? 'check-quarantine' : 'sweep',
     ran: results.length,
     quarantined: quarantined.size,
     totalDurationMs: results.reduce((sum, result) => sum + result.durationMs, 0),
+    wallClockDurationMs: Date.now() - startedAt,
+    timing: {
+      parallelBatches: batches.filter((batch) => batch.execution === 'parallel').length,
+      serialBatches: batches.filter((batch) => batch.execution === 'serial').length,
+      dirtyRetryBatches: batches.filter((batch) => batch.dirtyRetry).length,
+      initialBatches: batches.filter((batch) => batch.attempt === 'initial').length,
+      retryBatches: batches.filter((batch) => batch.attempt === 'retry').length,
+      slowTests,
+      slowBatches,
+    },
     failures: failures.map((result) => includeQuarantine
       ? { test: result.test, problem: 'quarantined test now passes cleanly; remove it from the quarantine' }
       : { test: result.test, exitCode: result.exitCode, timedOut: result.timedOut, dirtied: result.dirtied, stderrTail: result.stderrTail }),
