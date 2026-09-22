@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0111",
   "title": "Complete full ATM command and mandatory-gate millisecond coverage",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0101"
@@ -207,8 +207,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-22T00-50-23-821Z-claim-4232b7dda8ce",
-  "lastTransitionAt": "2026-09-22T00:50:23.821Z",
+  "lastTransitionId": "2026-09-22T01-05-18-398Z-close-2b69646fa839",
+  "lastTransitionAt": "2026-09-22T01:05:18.398Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-09-22T00:50:18.558Z",
@@ -217,7 +217,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-314a82aefaea",
     "claimedAt": "2026-09-22T00:50:18.566Z",
-    "heartbeatAt": "2026-09-22T00:50:18.566Z",
+    "heartbeatAt": "2026-09-22T01:05:18.396Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-PRF-0111.json",
@@ -230,14 +230,14 @@
       "tests/cli/command-gate-latency-score.test.ts",
       "tests/cli/mandatory-gate-telemetry.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260922005018-codex-gpt-5.4-mini-e6fd885548",
-      "status": "active",
+      "status": "adopted",
       "source": "minted",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260922005018-codex-gpt-5.4-mini-e6fd885548\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-22T00:50:18.566Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -345,5 +345,9 @@
     },
     "createdAt": "2026-09-22T00:50:23.820Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-22T01:05:18.396Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260922005018-codex-gpt-5.4-mini-TASK-PRF-0111-4d974c03f2",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0111.closure-packet.json"
 }

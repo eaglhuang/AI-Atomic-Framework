@@ -14,6 +14,11 @@ service or telemetry registry.
   presented as wall-time savings.
 - Missing real samples are `unknown`, never zero. Uncovered mandatory paths
   prevent a product-performance claim.
+- The command inventory is derived at runtime from the public
+  `listCommandSpecs()` authority (currently 62 commands), not from a
+  hand-maintained historical list. Commands without a workflow-specific gate
+  receive a deterministic `command.<name>.execution` identity so a new command
+  cannot silently create an unmeasured hole.
 
 ## Ranking and acceptance
 
@@ -90,6 +95,19 @@ Read `evidence.latencyScore` for the structured score and
 `evidence.latencyMarkdown` for the text report. Omitting `--include-runtime`
 deliberately leaves the latency inventory unobserved; it remains `unknown`,
 not zero.
+
+The reproducible command-matrix validator runs each public command's help path
+once and writes a bound receipt outside Git history:
+
+```text
+node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode command-matrix --receipt <external-sink>/TASK-PRF-0111-command-matrix.json
+node --strip-types scripts/validate-gate-telemetry-coverage.ts --mode command-matrix --receipt <external-sink>/TASK-PRF-0111-command-matrix.json --validate-only
+```
+
+The receipt binds every positive-duration sample to the runner entrypoint,
+framework version, commit SHA, workload id, task id, run id, and outcome. The
+validator fails closed for a missing command, missing identity, or
+`durationMs: 0`.
 
 ## Latest paired doctor measurement (TASK-PRF-0104)
 

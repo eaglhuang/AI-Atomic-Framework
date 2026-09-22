@@ -23,6 +23,8 @@ try {
   assert.ok((event.durationMs as number) >= 3);
   assert.equal(typeof event.runId, 'string');
   assert.equal(typeof event.correlationId, 'string');
+  assert.equal(typeof event.runnerVersion, 'string');
+  assert.equal(event.workloadId, 'cli-command:doctor');
 
   const originalCwd = process.cwd();
   process.chdir(root);
@@ -44,6 +46,10 @@ try {
 
   recordCommandGateTelemetry(root, 'not-registered', startedAt, { ok: true });
   assert.equal(readdirSync(eventRoot).length, runDirectoriesAfterCommand.length);
+  const allEvents = readdirSync(eventRoot).flatMap((directory) =>
+    readdirSync(path.join(eventRoot, directory)).flatMap((file) =>
+      readFileSync(path.join(eventRoot, directory, file), 'utf8').trim().split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line) as Record<string, unknown>)));
+  assert.ok(allEvents.some((entry) => entry.checkId === 'command.not-registered.execution'));
   console.log('[mandatory-gate-telemetry.test] ok');
 } finally {
   rmSync(root, { recursive: true, force: true });

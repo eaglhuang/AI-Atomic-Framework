@@ -17,6 +17,21 @@ export const canonicalGateCheckRegistry = Object.freeze([
     { checkId: 'broker.shared-surface-admission', checkVersion: '1.0.0', gate: 'broker', owner: 'atm-core', summary: 'Shared surface broker admission check.' },
     { checkId: 'telemetry.registry-coverage', checkVersion: '1.0.0', gate: 'telemetry', owner: 'atm-core', summary: 'Gate telemetry registry coverage and M2 preflight report.' }
 ]);
+/**
+ * Return the stable check identity for a top-level CLI command.
+ *
+ * The canonical governance gates keep their historical identities.  Every
+ * other public command gets a deterministic command-level execution identity
+ * so latency coverage cannot silently disappear just because the command has
+ * no workflow-specific gate mapping yet.
+ */
+export function commandGateCheckId(commandName) {
+    const canonical = canonicalGateCheckRegistry.find((entry) => entry.gate === commandName);
+    if (canonical)
+        return canonical.checkId;
+    const slug = commandName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'unknown';
+    return `command.${slug}.execution`;
+}
 export const canonicalGateTelemetryRequiredNodes = Object.freeze([
     coverageNode('claim-reservation-lane-presence', 'claim/reservation/lane presence', 'instrumented', ['tasks.claim-admission'], ['ATM-GOV-0190'], []),
     coverageNode('next-preflight-guard-doctor', 'next/preflight/guard/doctor', 'instrumented', ['next.route-resolution', 'doctor.readiness', 'guard.framework-mode'], ['ATM-GOV-0190'], []),
@@ -139,7 +154,7 @@ export function emitGateTelemetryEvent(cwd, input) {
             eligible: input.eligible ?? true,
             result: input.result,
             reasonClass: input.reasonClass ?? input.result,
-            durationMs: Math.max(0, Math.trunc(input.durationMs ?? 0)),
+            durationMs: Math.max(0, input.durationMs ?? 0),
             actorId: input.actorId ?? process.env.ATM_ACTOR_ID ?? 'unknown',
             runId,
             correlationId: input.correlationId ?? `corr-${randomUUID()}`,
@@ -148,6 +163,8 @@ export function emitGateTelemetryEvent(cwd, input) {
             batchId: input.batchId ?? null,
             waveId: input.waveId ?? null,
             command: input.command ?? 'unknown',
+            runnerVersion: input.runnerVersion ?? null,
+            workloadId: input.workloadId ?? null,
             inputDigest: input.inputDigest ?? digestJson({ command: input.command ?? 'unknown', checkId: input.checkId }),
             configDigest: input.configDigest ?? digestJson({ registry: canonicalGateCheckRegistry.map((check) => check.checkId) }),
             source: input.source ?? 'runtime',

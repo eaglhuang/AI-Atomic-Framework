@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-22T01-05-18-398Z-close-2b69646fa839",
+  "taskId": "TASK-PRF-0111",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260922005018-codex-gpt-5.4-mini-TASK-PRF-0111-4d974c03f2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0111.json",
+  "taskSha256": "sha256:ddc82141508062de9e3e33c2d70049695bbe2377f08812cdcc75f4b60e693993",
+  "createdAt": "2026-09-22T01:05:18.398Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0111 --actor codex-gpt-5.4-mini --status done --historical-delivery 70ebc167d56bc7588ac9f0437ac7c51e3ff6d7a1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260922005018-codex-gpt-5.4-mini-TASK-PRF-0111-4d974c03f2",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0111.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "check:encoding:touched -- --files packages/cli/src/atm.ts packages/cli/src/commands/telemetry.ts packages/core/src/telemetry/index.ts scripts/plan-performance-report-v4.ts tests/cli/command-gate-latency-score.test.ts tests/cli/mandatory-gate-telemetry.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+      "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+      "typecheck",
+      "validate:gate-telemetry-coverage"
+    ],
+    "requiredGates": [
+      "check:encoding:touched -- --files packages/cli/src/atm.ts packages/cli/src/commands/telemetry.ts packages/core/src/telemetry/index.ts scripts/plan-performance-report-v4.ts tests/cli/command-gate-latency-score.test.ts tests/cli/mandatory-gate-telemetry.test.ts docs/reports/atm-command-gate-latency-score.md",
+      "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+      "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+      "typecheck",
+      "validate:gate-telemetry-coverage"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-22T01:05:18.385Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0111.*",
+        ".atm/history/task-events/TASK-PRF-0111/**",
+        ".atm/history/tasks/TASK-PRF-0111.json",
+        "docs/reports/atm-command-gate-latency-score.md",
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/index.ts",
+        "scripts/plan-performance-report-v4.ts",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/command-gate-latency-score.test.ts",
+        "tests/cli/mandatory-gate-telemetry.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/telemetry.ts",
+        "packages/core/src/telemetry/index.ts",
+        "scripts/plan-performance-report-v4.ts",
+        "scripts/validate-gate-telemetry-coverage.ts",
+        "tests/cli/command-gate-latency-score.test.ts",
+        "tests/cli/mandatory-gate-telemetry.test.ts"
+      ],
+      "requiredGates": [
+        "check:encoding:touched -- --files packages/cli/src/atm.ts packages/cli/src/commands/telemetry.ts packages/core/src/telemetry/index.ts scripts/plan-performance-report-v4.ts tests/cli/command-gate-latency-score.test.ts tests/cli/mandatory-gate-telemetry.test.ts docs/reports/atm-command-gate-latency-score.md",
+        "node --strip-types tests/cli/command-gate-latency-score.test.ts",
+        "node --strip-types tests/cli/mandatory-gate-telemetry.test.ts",
+        "typecheck",
+        "validate:gate-telemetry-coverage"
+      ]
+    }
+  }
+}

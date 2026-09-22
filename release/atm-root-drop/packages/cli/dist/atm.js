@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { emitGateTelemetryEvent } from './_vendor/core/dist/telemetry/index.js';
+import { commandGateCheckId, emitGateTelemetryEvent } from './_vendor/core/dist/telemetry/index.js';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.js';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.js';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.js';
@@ -276,20 +276,8 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         return result.exitCode;
     }
 }
-const commandGateCheckIds = Object.freeze({
-    next: 'next.route-resolution',
-    doctor: 'doctor.readiness',
-    guard: 'guard.framework-mode',
-    tasks: 'tasks.claim-admission',
-    taskflow: 'taskflow.close-readiness',
-    batch: 'batch.checkpoint-readiness',
-    broker: 'broker.shared-surface-admission',
-    telemetry: 'telemetry.registry-coverage'
-});
 export function recordCommandGateTelemetry(cwd, commandName, startedAt, result) {
-    const checkId = commandGateCheckIds[commandName];
-    if (!checkId)
-        return;
+    const checkId = commandGateCheckId(commandName);
     const elapsedMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
     const gateResult = result.ok
         ? 'pass'
@@ -303,6 +291,8 @@ export function recordCommandGateTelemetry(cwd, commandName, startedAt, result) 
         reasonClass: gateResult,
         durationMs: elapsedMs,
         command: commandName,
+        runnerVersion: readFrameworkVersion(),
+        workloadId: `cli-command:${commandName}`,
         source: 'runtime'
     });
 }

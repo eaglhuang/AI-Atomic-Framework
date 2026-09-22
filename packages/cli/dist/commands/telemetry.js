@@ -1,9 +1,9 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { getCommandSpec } from './command-specs.js';
+import { getCommandSpec, listCommandSpecs } from './command-specs.js';
 import { makeResult, message, parseArgsForCommand } from './shared.js';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.js';
-import { buildGateTelemetryRegistryCoverageReport, buildGateTelemetryTaskSummary, canonicalGateCheckRegistry, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../_vendor/core/dist/telemetry/index.js';
+import { buildGateTelemetryRegistryCoverageReport, buildGateTelemetryTaskSummary, canonicalGateCheckRegistry, commandGateCheckId, emitGateTelemetryEvent, reportGateTelemetry, sealGateTelemetry } from '../_vendor/core/dist/telemetry/index.js';
 import { buildSharedWriteGateCoverageReport } from '../_vendor/core/dist/telemetry/shared-write-coverage.js';
 import { buildCommandGateLatencyMarkdown, buildCommandGateLatencyReportFromEvents } from '../_vendor/core/dist/telemetry/command-gate-latency-score.js';
 export async function runTelemetry(argv) {
@@ -106,12 +106,13 @@ export async function runTelemetry(argv) {
     }
     if (requestedReport) {
         const report = reportGateTelemetry(cwd, parsed.options.includeRuntime === true);
-        const latencyInventory = canonicalGateCheckRegistry.map((entry) => ({
-            key: entry.checkId,
-            command: entry.gate,
-            gate: entry.gate,
-            mandatory: entry.checkId === 'next.route-resolution' || entry.checkId === 'doctor.readiness' || entry.checkId === 'guard.framework-mode',
-            applicability: entry.summary
+        const mandatoryCommands = new Set(['next', 'doctor', 'guard']);
+        const latencyInventory = listCommandSpecs().map((spec) => ({
+            key: commandGateCheckId(spec.name),
+            command: spec.name,
+            gate: spec.name,
+            mandatory: mandatoryCommands.has(spec.name),
+            applicability: spec.summary
         }));
         const latencyEvents = parsed.options.includeRuntime === true ? readRuntimeLatencyEvents(cwd) : [];
         const latencyScore = buildCommandGateLatencyReportFromEvents({

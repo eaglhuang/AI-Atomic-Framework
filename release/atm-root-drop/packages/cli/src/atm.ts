@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { emitGateTelemetryEvent, type GateTelemetryResult } from '../../core/src/telemetry/index.ts';
+import { commandGateCheckId, emitGateTelemetryEvent, type GateTelemetryResult } from '../../core/src/telemetry/index.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
@@ -288,25 +288,13 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
   }
 }
 
-const commandGateCheckIds: Readonly<Record<string, string>> = Object.freeze({
-  next: 'next.route-resolution',
-  doctor: 'doctor.readiness',
-  guard: 'guard.framework-mode',
-  tasks: 'tasks.claim-admission',
-  taskflow: 'taskflow.close-readiness',
-  batch: 'batch.checkpoint-readiness',
-  broker: 'broker.shared-surface-admission',
-  telemetry: 'telemetry.registry-coverage'
-});
-
 export function recordCommandGateTelemetry(
   cwd: string,
   commandName: string,
   startedAt: bigint,
   result: { readonly ok: boolean; readonly messages?: readonly { readonly level?: string }[] }
 ) {
-  const checkId = commandGateCheckIds[commandName];
-  if (!checkId) return;
+  const checkId = commandGateCheckId(commandName);
   const elapsedMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
   const gateResult: GateTelemetryResult = result.ok
     ? 'pass'
@@ -320,6 +308,8 @@ export function recordCommandGateTelemetry(
     reasonClass: gateResult,
     durationMs: elapsedMs,
     command: commandName,
+    runnerVersion: readFrameworkVersion(),
+    workloadId: `cli-command:${commandName}`,
     source: 'runtime'
   });
 }
