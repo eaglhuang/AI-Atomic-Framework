@@ -211,7 +211,11 @@ function stepCoverage(job: CiJobProvenance, policy: CiWorkflowScopePolicy): CiSt
       unsuccessful.push(required.stepName);
     }
   }
-  return { complete: missing.length === 0 && ambiguous.length === 0 && unsuccessful.length === 0, missing, ambiguous, unsuccessful };
+  // Coverage completeness answers whether every required step is present
+  // exactly once.  A failed required step is still useful lifecycle evidence;
+  // its outcome is validated against the product-job conclusion below rather
+  // than being discarded as if the step were missing.
+  return { complete: missing.length === 0 && ambiguous.length === 0, missing, ambiguous, unsuccessful };
 }
 
 function productJobEvidence(attempt: CiAttempt, policy: CiWorkflowScopePolicy): { job: CiJobProvenance | null; coverage: CiStepCoverage; exclusionReason: string | null } {
@@ -228,7 +232,12 @@ function productJobEvidence(attempt: CiAttempt, policy: CiWorkflowScopePolicy): 
   let exclusionReason: string | null = null;
   if (coverage.missing.length > 0) exclusionReason = 'missing-required-step-coverage';
   else if (coverage.ambiguous.length > 0) exclusionReason = 'ambiguous-required-step-coverage';
-  else if (coverage.unsuccessful.length > 0) exclusionReason = 'unsuccessful-required-step-coverage';
+  // Keep a failed product job eligible so its first failure and later repair
+  // can be measured.  A successful product job with an unsuccessful required
+  // step is contradictory and remains excluded as invalid coverage.
+  else if (coverage.unsuccessful.length > 0 && attempt.productCi.conclusion === 'success') {
+    exclusionReason = 'unsuccessful-required-step-coverage';
+  }
   return { job: { ...job, stepCoverage: coverage }, coverage, exclusionReason };
 }
 

@@ -47712,7 +47712,7 @@
       },
       {
         "path": "scripts/collect-ci-burn-in-evidence.ts",
-        "digest": "aa17b793ebc046ae1506ae1cf573d8323b235558b35925e6c4131fde2566b39d",
+        "digest": "26c7668a842eea2a3cd8c071996edcf6fd3f0aac8f989368255751b40ddf310a",
         "origin": "source",
         "inputPaths": [
           "scripts/collect-ci-burn-in-evidence.ts"
@@ -48675,7 +48675,7 @@
       },
       {
         "path": "scripts/lib/external-benchmark/executor.ts",
-        "digest": "0771b4a6eea465f762f4f1df670b7c6ee4afc215490265c31b71f30c59356cf7",
+        "digest": "05d8062a01ecc4ed39c9b014f89905ec0a50fb8bf27078bd441dd28aeea6e97c",
         "origin": "source",
         "inputPaths": [
           "scripts/lib/external-benchmark/executor.ts"
@@ -48954,7 +48954,7 @@
       },
       {
         "path": "scripts/measure-product-ci-burn-in.ts",
-        "digest": "3ae2bf0ef16a359633c559df5d49c71d821700fcd45d2bb3c33a9e776b681cb8",
+        "digest": "e92d178cdb4a8763dbad4c2ff9ad222deb6594064b1b878d30f68a6d2da65329",
         "origin": "source",
         "inputPaths": [
           "scripts/measure-product-ci-burn-in.ts"
@@ -54543,7 +54543,7 @@
       },
       {
         "path": "tests/cli/ci-burn-in-evidence-collector.test.ts",
-        "digest": "bce10cf87250428bb9dc117c8b46a9db6f268b011c68240e010e287a4aac7142",
+        "digest": "a617be73bbec2ffd09cccb0cdf0ce12dcc5300a9c1f047c23aa662aa560b355d",
         "origin": "source",
         "inputPaths": [
           "tests/cli/ci-burn-in-evidence-collector.test.ts"
@@ -54552,7 +54552,7 @@
       },
       {
         "path": "tests/cli/ci-product-lane-contract.test.ts",
-        "digest": "e8cbe715f583be272bbf43194ff6fcb962fd9848da147367f46d53b7a051d4e6",
+        "digest": "873fba93400910bf54f66bb02427c4d3c5de7f1adcbab39ab0b70199381bd7d9",
         "origin": "source",
         "inputPaths": [
           "tests/cli/ci-product-lane-contract.test.ts"
@@ -55074,7 +55074,7 @@
       },
       {
         "path": "tests/cli/external-benchmark-executor.test.ts",
-        "digest": "cf1f210f050738997350c5e1fdf1ec3052c0524e2a0e2d0f8d4527b1b24b2d63",
+        "digest": "bcb569e9ec76dc2de25e73beae3fdf77a4c624be5c7ae7b11cdd1e664514d194",
         "origin": "source",
         "inputPaths": [
           "tests/cli/external-benchmark-executor.test.ts"
@@ -62282,7 +62282,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:08710af936a1248d4c0ec2a5849bd2646600d752d2177ed14a5d8dc25fe7bc5b"
+    "treeDigest": "sha256:a616b3106a163fd947ad9335c70a142da5ebbceca6cc7fd0bf779ac50ec1815c"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -70070,34 +70070,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:1901bbdf9c4e4c1f9410f49b2aa38243da81bb5557a01195db3f14909b038346",
-  "sealedSourceCommit": "a8e1e173a702ad0258a5b739656f3996275af9fe",
-  "buildDecision": "cacheHitSkip",
-  "buildDecisionReason": "build input tree hash matches release manifests",
-  "incrementalPlanDigest": null,
-  "tsBuildCacheDigest": null,
+  "buildInputsTreeHash": "sha256:b4afca87258cc3a5578bf3a4d68f84da9d78a3723cb9b4c68e61b49d38569a38",
+  "sealedSourceCommit": "8d72c255886704e9a220ae07bfeda8e7737c5b09",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:64d673ba692c4ff24dceef3fd780298d7130026c4c127ab994b6f2a644f43e84",
+  "tsBuildCacheDigest": "sha256:39d989a88ed23c5999101f6431b2654f80b1a21cdab6767a52da81ecd8479a2b",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 51,
-    "skipDecision": 54,
-    "worktreeSetup": 0,
-    "typescriptBuild": 0,
-    "rootDropReleaseAssembly": 0,
-    "onefileReleaseAssembly": 0,
-    "artifactSync": 0,
+    "inputHashCalculation": 54,
+    "skipDecision": 56,
+    "worktreeSetup": 9716,
+    "typescriptBuild": 10893,
+    "rootDropReleaseAssembly": 30170,
+    "onefileReleaseAssembly": 17806,
+    "artifactSync": 5002,
     "cleanup": 0,
-    "totalElapsed": 8619
-  },
-  "dominantPhaseSummary": {
-    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "skipDecision",
-    "dominantPhaseMs": 54,
-    "totalElapsedMs": 8619,
-    "dominanceRatio": 0.0063,
-    "phaseMedianMs": 0,
-    "phaseP95Ms": 54,
-    "measuredPhaseCount": 8,
-    "optimizationVerdict": "inconclusive",
-    "basis": "single-run"
+    "totalElapsed": 79439
   }
 }

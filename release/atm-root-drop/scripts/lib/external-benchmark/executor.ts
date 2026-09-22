@@ -60,10 +60,6 @@ function isInside(parent: string, child: string): boolean {
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
-function slug(value: string): string {
-  return value.replace(/[^A-Za-z0-9._-]+/g, '_');
-}
-
 function positive(value: number | null): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value > 0;
 }
@@ -121,7 +117,10 @@ export async function executeTrialPlan(options: ExecuteOptions): Promise<Executi
   if (isInside(frameworkRoot, sinkDir)) throw new Error('sinkDir must be outside the framework repository');
   validatePlan(plan, driver);
 
-  const planDir = slug(plan.planId);
+  // Logical identifiers can be supplied by an external preregistration and
+  // are not bounded by the host filesystem. Keep the sink directory compact;
+  // the full planId remains in every JSON record and summary.
+  const planDir = `plan-${digest(plan.planId).slice('sha256:'.length, 'sha256:'.length + 16)}`;
   mkdirSync(workspaceRoot, { recursive: true });
   mkdirSync(path.join(sinkDir, planDir), { recursive: true });
   const writeSink = (relative: string, value: unknown): string => {
@@ -136,19 +135,26 @@ export async function executeTrialPlan(options: ExecuteOptions): Promise<Executi
   const cleanup: ExecutionSummary['cleanup'] = [];
   const usage = { tokens: 0, costUsd: 0, wallClockMs: 0 };
   let interrupted: ExecutionSummary['interrupted'] = null;
+  let pairOrdinal = 0;
 
   outer:
   for (const repository of plan.repositories) {
     for (const scenario of plan.scenarios) {
       for (let replicate = 0; replicate < plan.pairsPerScenario; replicate += 1) {
         const pairId = `${plan.planId}:${repository.name}:${scenario.scenarioId}:${replicate}`;
-        const pairDir = path.join(planDir, slug(`${repository.name}-${scenario.scenarioId}-${replicate}`));
+        const compactPairId = pairOrdinal;
+        pairOrdinal += 1;
+        const pairDir = path.join(planDir, `pair-${compactPairId}`);
         const seed = digest(`${plan.planId}|${pairId}`).slice('sha256:'.length, 'sha256:'.length + 16);
         const arms: BenchmarkArm[] = replicate % 2 === 0 ? ['atm', 'baseline'] : ['baseline', 'atm'];
         const runs: PairedRun[] = [];
         for (const [index, arm] of arms.entries()) {
           const order = index + 1;
-          const workspaceDir = path.join(workspaceRoot, `${slug(pairDir)}-${arm}`);
+          // Keep transient checkout paths short on Windows. The full pair ID
+          // remains in the raw sink record and packet refs; it must not be
+          // encoded into a filesystem path where long plan/repository names
+          // can exceed MAX_PATH before the arm even starts.
+          const workspaceDir = path.join(workspaceRoot, `pair-${compactPairId}-${arm}`);
           if (existsSync(workspaceDir)) throw new Error(`workspace ${workspaceDir} already exists; refusing to reuse state`);
           const headSha = checkout(repository, workspaceDir);
           const startedAt = new Date().toISOString();
