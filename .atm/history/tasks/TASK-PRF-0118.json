@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0118",
   "title": "Complete external benchmark data-plane metrics and fail-closed validation",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0007"
@@ -258,8 +258,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-09-22T00-39-54-795Z-metadata-only-import-59e175287898",
-  "lastTransitionAt": "2026-09-22T00:39:54.795Z",
+  "lastTransitionId": "2026-09-22T00-48-06-004Z-close-695cfd7ce3cc",
+  "lastTransitionAt": "2026-09-22T00:48:06.004Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-09-22T00:32:52.906Z",
@@ -268,7 +268,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-7cff99247309",
     "claimedAt": "2026-09-22T00:32:52.914Z",
-    "heartbeatAt": "2026-09-22T00:33:06.485Z",
+    "heartbeatAt": "2026-09-22T00:48:06.001Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-PRF-0118.*",
@@ -289,39 +289,41 @@
       "tests/cli/external-benchmark-paired-executor.test.ts",
       "tests/cli/external-benchmark-v2-metrics.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20260922003253-codex-gpt-5.4-mini-3f4af33b26",
-      "status": "active",
+      "status": "adopted",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260922003253-codex-gpt-5.4-mini-3f4af33b26\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-09-22T00:32:52.914Z",
   "startedByActor": "codex-gpt-5.4-mini",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-c03c6d2866a93df9",
-    "ticketDigest": "sha256:c03c6d2866a93df9b9802908084a666082b628271bd69fa5c7582826e8ab493f",
+    "ticketId": "wat-898c6a7b783579be",
+    "ticketDigest": "sha256:898c6a7b783579be08de61121c9a680fe7a9b052df2c6870115c2a65a6942dc5",
     "taskId": "TASK-PRF-0118",
     "origin": "claim",
     "actorId": "codex-gpt-5.4-mini",
     "laneSessionId": "lane-20260922003253-codex-gpt-5.4-mini-3f4af33b26",
     "claimGeneration": "lease-7cff99247309",
-    "issuedAt": "2026-09-22T00:39:19.959Z",
-    "expiresAt": "2026-09-22T01:09:19.959Z",
-    "scopeDigest": "sha256:13fc91a6fe05ad5a06e062a894eecd254b6897512116f7de01968561d99d13f8",
+    "issuedAt": "2026-09-22T00:47:27.002Z",
+    "expiresAt": "2026-09-22T01:17:27.002Z",
+    "scopeDigest": "sha256:97e962baf7821de5b1b5587151edee6d0e32372ea591799bd5ae86e1a3a50f59",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-09-22T00:39:19.959Z"
+      "selectedAt": "2026-09-22T00:47:27.002Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0118.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0118/**",
           ".atm/history/tasks/TASK-PRF-0118.json",
           "scripts/lib/external-benchmark/adjudication.ts",
@@ -339,7 +341,7 @@
           "tests/cli/external-benchmark-paired-executor.test.ts",
           "tests/cli/external-benchmark-v2-metrics.test.ts"
         ],
-        "digest": "sha256:be6bde01136c361eca25626ab59f6d2efbb069601998625dff3e1ce7ab671485"
+        "digest": "sha256:815c29b906e127508f58b4403e7c9efaea22e4d99dd12d4f30ddec3aa7b057d1"
       },
       {
         "kind": "lifecycle-operation",
@@ -422,5 +424,9 @@
     },
     "createdAt": "2026-09-22T00:33:07.516Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-09-22T00:48:06.001Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260922003252-codex-gpt-5.4-mini-TASK-PRF-0118-9c114f376e",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0118.closure-packet.json"
 }
