@@ -26,6 +26,12 @@ export interface GhJob {
   html_url: string;
   started_at: string | null;
   completed_at: string | null;
+  /** GitHub job steps are required for the burn-in collector's coverage gate. */
+  steps?: Array<{
+    name: string;
+    status: string;
+    conclusion: string | null;
+  }>;
 }
 
 export interface ExportInput {
@@ -75,7 +81,17 @@ export function buildAttemptExport(input: ExportInput): AttemptExportWithDrops {
         createdAt: run.createdAt,
         attemptStartedAt: product?.started_at ?? run.createdAt,
         attemptCompletedAt: product?.completed_at ?? run.createdAt,
-        ...(product ? { productCi: { conclusion: productConclusion!, job: { jobId: product.id, jobName: product.name, jobUrl: product.html_url } } } : {}),
+        ...(product ? {
+          productCi: {
+            conclusion: productConclusion!,
+            job: {
+              jobId: product.id,
+              jobName: product.name,
+              jobUrl: product.html_url,
+              ...(product.steps ? { steps: product.steps } : {}),
+            },
+          },
+        } : {}),
         displayTitle: run.displayTitle,
         workflowName: run.displayTitle,
         // Out-of-scope runs are judged by the workflow conclusion, in-scope runs by

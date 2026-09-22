@@ -7,12 +7,24 @@ import { buildAttemptExport, type GhJob, type GhRun } from '../../scripts/export
 import { evaluateBurnIn } from '../../scripts/measure-product-ci-burn-in.ts';
 
 const standard = 'Product CI burn-in (standard)';
+const requiredStepNames = [
+  'Clean install',
+  'Build',
+  'Typecheck',
+  'Lint',
+  'Full test',
+  'Package skeleton smoke',
+  'Clean-install packed CLI smoke',
+  'Workspace package smoke',
+  'Clean-install repeat smoke',
+];
 const run = (id: number, at: string, overrides: Partial<GhRun> = {}): GhRun => ({
   databaseId: id, attempt: 1, status: 'completed', conclusion: 'success', createdAt: at,
   headSha: String(id).padStart(40, 'a'), headBranch: 'main', event: 'push', displayTitle: standard, ...overrides,
 });
 const job = (id: number, conclusion: string, at: string, name = 'Product CI'): GhJob => ({
   id, name, conclusion, html_url: `https://github.com/o/r/actions/runs/1/job/${id}`, started_at: at, completed_at: at,
+  steps: requiredStepNames.map((name) => ({ name, status: 'completed', conclusion: 'success' })),
 });
 
 const runs: GhRun[] = [
@@ -43,6 +55,7 @@ assert.deepEqual(exported.droppedRuns, [
 assert.deepEqual(exported.failureDispositions, dispositions);
 const first = exported.attempts[0];
 assert.equal(first.productCi?.job?.jobId, 1000, 'the Product CI job, not another job, is bound');
+assert.deepEqual(first.productCi?.job?.steps, requiredStepNames.map((name) => ({ name, status: 'completed', conclusion: 'success' })), 'Product CI steps are preserved for coverage validation');
 assert.equal(first.attemptCompletedAt, '2026-09-10T00:05:00Z', 'attempt timing comes from the job, not the run creation time');
 
 const receipt = collectLifecycleEvidence(exported);
