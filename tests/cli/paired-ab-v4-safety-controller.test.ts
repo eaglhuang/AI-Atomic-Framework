@@ -9,7 +9,10 @@ const tmp = mkdtempSync(path.join(os.tmpdir(), 'atm-paired-ab-v4-'));
 
 try {
   process.chdir(root);
-  const cells = await buildCommandBackedCells();
+  type CommandBackedCells = Awaited<ReturnType<typeof buildCommandBackedCells>>;
+  let cells: CommandBackedCells | undefined;
+  const summary = await runPairedAbV4({ mode: 'generate', outputRoot: tmp, onCells: (generatedCells) => { cells = generatedCells as CommandBackedCells; } });
+  assert.ok(cells);
   assert.equal(cells.length, 70);
   assert.equal(new Set(cells.map((cell) => cell.scale)).size, 7);
   assert.equal(new Set(cells.map((cell) => cell.contention)).size, 5);
@@ -17,7 +20,6 @@ try {
   assert.equal(cells.every((cell) => cell.baRepeats.length === 3), true);
   assert.equal(cells.every((cell) => cell.negativeControl.rejectedBeforeCanonicalWrite), true);
 
-  const summary = await runPairedAbV4({ mode: 'generate', outputRoot: tmp });
   assert.equal(summary.cellCount, 70);
   assert.equal(summary.acceptedCellCount, 70);
   assert.ok(summary.metrics.medianMakespanImprovementPct >= 25);

@@ -40,7 +40,7 @@ const policyProfiles: Record<PairedAbV4Arm, { readonly proposalConcurrency: numb
   'atm-compose-first': { proposalConcurrency: 2, validationConcurrency: 2, composeBatchSize: 2, stewardWrites: 1 }
 };
 
-export async function runPairedAbV4(options: { readonly mode: 'generate' | 'validate' | 'command-backed'; readonly outputRoot?: string } = { mode: 'generate' }): Promise<PairedAbV4Summary> {
+export async function runPairedAbV4(options: { readonly mode: 'generate' | 'validate' | 'command-backed'; readonly outputRoot?: string; readonly onCells?: (cells: readonly PairedAbV4Cell[]) => void } = { mode: 'generate' }): Promise<PairedAbV4Summary> {
   const { artifactDir, summaryPath, cellsPath, reportPath } = resolveOutputPaths(options.outputRoot);
   if (options.mode === 'validate') {
     const findings = await validateSummaryFile(summaryPath);
@@ -52,6 +52,7 @@ export async function runPairedAbV4(options: { readonly mode: 'generate' | 'vali
   await mkdir(dirname(reportPath), { recursive: true });
 
   const cells = await buildCommandBackedCells();
+  options.onCells?.(cells);
   const summary = buildSummary(cells);
   await writeFile(cellsPath, `${JSON.stringify(cells, null, 2)}\n`, 'utf8');
   await writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
