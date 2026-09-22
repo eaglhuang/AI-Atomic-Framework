@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0116",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "dd0cd0afed4f21afcc736caabc8d130a5d975d37",
+  "governedTreeSha": "e1c22481c6da87450e42e0a0d72ad1b38a6bf57b",
+  "targetCommitDelta": {
+    "currentCommitSha": "dd0cd0afed4f21afcc736caabc8d130a5d975d37",
+    "parentCommitShas": [
+      "dd0cd0afed4f21afcc736caabc8d130a5d975d37"
+    ],
+    "governedTreeSha": "e1c22481c6da87450e42e0a0d72ad1b38a6bf57b",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-5-4-mini.runner-publication-takeover.json",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0019.bundle-manifest.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-21T15-59-45-462Z-import-efd033e3d678.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-21T16-00-47-141Z-reserve-0c8936fd0d02.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-21T16-00-47-145Z-promote-967717caab4c.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-21T16-00-52-365Z-claim-94055264b4ab.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-22T01-13-41-844Z-renew-1547a1c191f5.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-22T01-21-01-211Z-handoff-dc49cccda54e.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-22T01-21-41-395Z-reserve-3d84a8e61852.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-22T01-21-41-399Z-promote-4764c448154a.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-22T01-21-44-983Z-claim-a1206b69a311.json",
+      ".atm/history/task-events/TASK-PRF-0116/2026-09-22T01-22-08-790Z-renew-95264c3909b3.json",
+      ".atm/history/tasks/TASK-PRF-0019.json",
+      ".atm/history/tasks/TASK-PRF-0040.json",
+      ".atm/history/tasks/TASK-PRF-0053.json",
+      ".atm/history/tasks/TASK-PRF-0116.json",
+      "docs/reports/product-ci-failure-dispositions.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0806953b63f3dd0cd10a33120f0bb4a8ac70db87acbfcbe1d0bb918390579562",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6b05dd007f1353033698c9e36362cbbdaa3a9236eae0ebb2f08d2bf454907615",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\\\Users\\\\User\\\\atm-benchmark-sink\\\\ATM-PRODUCT-PROOF-20260921\\\\ci-burn-in-receipt-reconciled.json --report-only",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e7636de51674cce775c076a2e862a8cb57448d9bc085d197cd1571e18be772cc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stderr.log",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json --report-only > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stderr.log",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stderr.log",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json --report-only > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stderr.log",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input <external-ci-attempts.json> --scope-config scripts/product-ci-burn-in-workflow-scope.json --output <external-receipt.json>",
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stderr.log",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input <external-receipt.json> --report-only",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json --report-only > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stderr.log",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input <external-ci-attempts.json> --scope-config scripts/product-ci-burn-in-workflow-scope.json --output <external-receipt.json>",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input <external-receipt.json> --report-only",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-09-22T01:23:29.649Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0116.*",
+      ".atm/history/task-events/TASK-PRF-0116/**",
+      ".atm/history/tasks/TASK-PRF-0116.json",
+      "docs/reports/product-ci-failure-dispositions.json",
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-ci-burn-in.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "tests/cli/product-ci-burn-in.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input <external-ci-attempts.json> --scope-config scripts/product-ci-burn-in-workflow-scope.json --output <external-receipt.json>",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --input <external-receipt.json> --report-only",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "node --strip-types tests/cli/product-ci-burn-in.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0116.json",
+  "closedAt": "2026-09-22T01:23:29.650Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260922012141-codex-gpt-5.4-mini-TASK-PRF-0116-9f7ecfcf95",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "691ded246050407a5ddf0bb673e87092748e1c54",
+    "taskMatchedFiles": [
+      "docs/reports/product-ci-failure-dispositions.json"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

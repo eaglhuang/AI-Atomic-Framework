@@ -1,0 +1,131 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0116",
+  "updatedAt": "2026-09-22T01:15:10.785Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input <external-ci-attempts.json> --scope-config scripts/product-ci-burn-in-workflow-scope.json --output <external-receipt.json>",
+    "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stderr.log",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input <external-receipt.json> --report-only",
+    "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json --report-only > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stderr.log",
+    "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+    "node --strip-types tests/cli/product-ci-burn-in.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0806953b63f3dd0cd10a33120f0bb4a8ac70db87acbfcbe1d0bb918390579562",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts"
+      ],
+      "generatedAt": "2026-09-21T16:01:50.237Z",
+      "startedAt": "2026-09-21T16:01:49.930Z",
+      "finishedAt": "2026-09-21T16:01:50.237Z",
+      "durationMs": 307,
+      "runnerKind": "dev-source",
+      "sourceCommit": "587be85344d7f8063651c8ed9de0df25e1822e53",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/product-ci-burn-in.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6b05dd007f1353033698c9e36362cbbdaa3a9236eae0ebb2f08d2bf454907615",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/product-ci-burn-in.test.ts"
+      ],
+      "generatedAt": "2026-09-21T16:01:52.478Z",
+      "startedAt": "2026-09-21T16:01:52.162Z",
+      "finishedAt": "2026-09-21T16:01:52.478Z",
+      "durationMs": 316,
+      "runnerKind": "dev-source",
+      "sourceCommit": "587be85344d7f8063651c8ed9de0df25e1822e53",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\\\Users\\\\User\\\\atm-benchmark-sink\\\\ATM-PRODUCT-PROOF-20260921\\\\ci-burn-in-receipt-reconciled.json --report-only",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e7636de51674cce775c076a2e862a8cb57448d9bc085d197cd1571e18be772cc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-09-21T16:02:14.752Z",
+      "startedAt": "2026-09-21T16:02:14.429Z",
+      "finishedAt": "2026-09-21T16:02:14.752Z",
+      "durationMs": 323,
+      "runnerKind": "dev-source",
+      "sourceCommit": "587be85344d7f8063651c8ed9de0df25e1822e53",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stderr.log",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stderr.log"
+      ],
+      "generatedAt": "2026-09-22T01:14:11.848Z",
+      "startedAt": "2026-09-22T01:14:10.872Z",
+      "finishedAt": "2026-09-22T01:14:11.848Z",
+      "durationMs": 976,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "dd0cd0afed4f21afcc736caabc8d130a5d975d37",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json --report-only > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stderr.log",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json --report-only > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stderr.log"
+      ],
+      "generatedAt": "2026-09-22T01:14:23.265Z",
+      "startedAt": "2026-09-22T01:14:22.890Z",
+      "finishedAt": "2026-09-22T01:14:23.265Z",
+      "durationMs": 375,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "dd0cd0afed4f21afcc736caabc8d130a5d975d37",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-collector-0116.stderr.log",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input <external-ci-attempts.json> --scope-config scripts/product-ci-burn-in-workflow-scope.json --output <external-receipt.json>"
+      ],
+      "generatedAt": "2026-09-22T01:15:01.286Z",
+      "startedAt": "2026-09-22T01:15:00.331Z",
+      "finishedAt": "2026-09-22T01:15:01.286Z",
+      "durationMs": 955,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "dd0cd0afed4f21afcc736caabc8d130a5d975d37",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-receipt-0116-replay.json --report-only > C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stdout.json 2> C:\\Users\\User\\atm-benchmark-sink\\goal-progress-20260922\\ci-measure-0116.stderr.log",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --input <external-receipt.json> --report-only"
+      ],
+      "generatedAt": "2026-09-22T01:15:10.784Z",
+      "startedAt": "2026-09-22T01:15:10.443Z",
+      "finishedAt": "2026-09-22T01:15:10.784Z",
+      "durationMs": 341,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "dd0cd0afed4f21afcc736caabc8d130a5d975d37",
+      "cached": false
+    }
+  ],
+  "artifactPaths": [
+    "C:/Users/User/atm-benchmark-sink/ATM-PRODUCT-PROOF-20260921/ci-attempts-reconciled.json",
+    "C:/Users/User/atm-benchmark-sink/ATM-PRODUCT-PROOF-20260921/ci-burn-in-receipt-final.json"
+  ]
+}
