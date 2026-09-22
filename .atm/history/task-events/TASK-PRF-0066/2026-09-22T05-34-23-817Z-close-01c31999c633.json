@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-09-22T05-34-23-817Z-close-01c31999c633",
+  "taskId": "TASK-PRF-0066",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260922052543-codex-gpt-5.4-mini-TASK-PRF-0066-2b5f697509",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0066.json",
+  "taskSha256": "sha256:1a79e7cf94f56eb897d83672753e4ea3801ce6f66a1d546e6b551f62779a7879",
+  "createdAt": "2026-09-22T05:34:23.817Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0066 --actor codex-gpt-5.4-mini --status done --historical-delivery 239242f94f006dcc911bf30f6d93a7ae37bea8d0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260922052543-codex-gpt-5.4-mini-TASK-PRF-0066-2b5f697509",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0066.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build",
+      "lint",
+      "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json --report-only",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "test",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "build",
+      "lint",
+      "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json",
+      "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json --report-only",
+      "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "test",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-09-22T05:34:23.807Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0066.*",
+        ".atm/history/task-events/TASK-PRF-0066/**",
+        ".atm/history/tasks/TASK-PRF-0066.json",
+        ".github/workflows/ci.yml",
+        "docs/reports/atm-product-ci-burn-in-real-export.md",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop",
+        "scripts/collect-ci-burn-in-evidence.ts",
+        "scripts/measure-product-ci-burn-in.ts",
+        "scripts/product-ci-burn-in-workflow-scope.json",
+        "tests/cli/ci-burn-in-evidence-collector.test.ts",
+        "tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/collect-ci-burn-in-evidence.ts",
+        "scripts/measure-product-ci-burn-in.ts",
+        "scripts/product-ci-burn-in-workflow-scope.json",
+        "tests/cli/ci-burn-in-evidence-collector.test.ts",
+        "tests/cli/ci-product-lane-contract.test.ts"
+      ],
+      "requiredGates": [
+        "build",
+        "lint",
+        "node --strip-types scripts/collect-ci-burn-in-evidence.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0059/github-attempt-export.json --scope-config scripts/product-ci-burn-in-workflow-scope.json --output C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json",
+        "node --strip-types scripts/measure-product-ci-burn-in.ts --input C:/Users/User/atm-benchmark-sink/TASK-PRF-0066/scoped-lifecycle-receipt.json --report-only",
+        "node --strip-types tests/cli/ci-burn-in-evidence-collector.test.ts",
+        "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+        "test",
+        "typecheck"
+      ]
+    }
+  }
+}
