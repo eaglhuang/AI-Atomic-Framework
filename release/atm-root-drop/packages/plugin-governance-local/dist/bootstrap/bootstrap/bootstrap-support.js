@@ -101,6 +101,9 @@ function createPackageManagerCommand(cwd, packageJson, scriptName) {
     }
     return `npm run ${scriptName}`;
 }
+export function resolveBootstrapCommandPrefix(status) {
+    return status === 'source-unavailable' ? 'npm exec -- atm' : 'node atm.mjs';
+}
 export function ensureDirectory(directoryPath, cwd, created, unchanged) {
     if (existsSync(directoryPath)) {
         unchanged.push(relativePathFrom(cwd, directoryPath));
@@ -120,7 +123,7 @@ export function installPinnedRunner(cwd, force, created, unchanged) {
             schemaVersion: 'atm.pinnedRunner.v0.1',
             runnerPath: 'atm.mjs',
             metadataPath: metadataRelativePath,
-            command: 'node atm.mjs next --prompt "<current user prompt>" --json',
+            command: `${resolveBootstrapCommandPrefix('source-unavailable')} next --prompt "<current user prompt>" --json`,
             status: 'source-unavailable',
             sourceKind: 'unavailable',
             frameworkVersion: '0.0.0',
@@ -154,7 +157,7 @@ export function installPinnedRunner(cwd, force, created, unchanged) {
         schemaVersion: 'atm.pinnedRunner.v0.1',
         runnerPath: 'atm.mjs',
         metadataPath: metadataRelativePath,
-        command: 'node atm.mjs next --prompt "<current user prompt>" --json',
+        command: `${resolveBootstrapCommandPrefix(status)} next --prompt "<current user prompt>" --json`,
         status,
         sourceKind: source.kind,
         sourcePath: describePinnedRunnerSource(source),
