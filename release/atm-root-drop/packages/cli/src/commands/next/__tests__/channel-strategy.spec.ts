@@ -40,6 +40,12 @@ const runtimeAction = decideRuntimeNextAction({ config: null }, null, emptyQueue
 assert.equal(runtimeAction.status, 'needs-bootstrap');
 assert.equal(runtimeAction.command.includes('bootstrap'), true);
 
+const npmRecovery = decideRuntimeNextAction({ config: null }, null, emptyQueue, 'npm exec -- atm');
+assert.equal(npmRecovery.command, 'npm exec -- atm bootstrap --cwd . --task "Bootstrap ATM in this repository"');
+assert.ok(npmRecovery.allowedCommands.includes('npm exec -- atm orient --cwd . --json'));
+const npmOnboardingRecovery = decideRuntimeNextAction({ config: true }, 'onboarding-lifecycle', emptyQueue, 'npm exec -- atm');
+assert.equal(npmOnboardingRecovery.command, 'npm exec -- atm atm-chart render --cwd . --json');
+
 const inputProbe = { probe: 'value', nested: { count: 1 } };
 assert.equal(channelStrategyPreservesInput(inputProbe, () => selectQuickfixChannel()), true);
 

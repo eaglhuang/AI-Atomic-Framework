@@ -4,7 +4,7 @@ import { inspectRunnerSourceDrift } from '../framework-development/closure-packe
 import { message } from '../shared.ts';
 import type { PlanningRootWarning } from './planning-root-preference.ts';
 
-export type RunnerModeClass = 'frozen' | 'source-first' | 'source-import' | 'unknown';
+export type RunnerModeClass = 'frozen' | 'npm-package' | 'source-first' | 'source-import' | 'unknown';
 
 export function normalizeRelativePath(root: string, entryPath: string): string {
   const relative = path.relative(root, entryPath).replace(/\\/g, '/');
@@ -14,6 +14,9 @@ export function normalizeRelativePath(root: string, entryPath: string): string {
 export function classifyRunnerMode(entrypoint: string | null): RunnerModeClass {
   if (!entrypoint) return 'unknown';
   const normalized = entrypoint.replace(/\\/g, '/');
+  if (normalized.includes('node_modules/@ai-atomic-framework/cli/')
+    || normalized.endsWith('node_modules/.bin/atm')
+    || normalized.endsWith('node_modules/.bin/atm.cmd')) return 'npm-package';
   if (normalized === 'atm.dev.mjs') return 'source-first';
   if (normalized === 'atm.mjs'
     || normalized === 'release/atm-onefile/atm.mjs'
@@ -28,19 +31,24 @@ export function classifyRunnerMode(entrypoint: string | null): RunnerModeClass {
   return 'unknown';
 }
 
+export function governanceCommandPrefix(entrypoint: string | null): string {
+  return classifyRunnerMode(entrypoint) === 'npm-package' ? 'npm exec -- atm' : 'node atm.mjs';
+}
+
 export function describeRunnerMode(cwd: string) {
   const releaseHygienePolicy = describeBuildReleaseHygienePolicy();
   const root = path.resolve(cwd);
   const entrypointPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
   const entrypoint = entrypointPath ? normalizeRelativePath(root, entrypointPath) : null;
   const mode = classifyRunnerMode(entrypoint);
+  const commandPrefix = governanceCommandPrefix(entrypoint);
   const sourceDrift = inspectRunnerSourceDrift(cwd);
   return {
     schemaId: 'atm.runnerMode.v1',
     mode,
     entrypoint,
     sourceDrift,
-    normalGovernanceCommand: 'node atm.mjs ...',
+    normalGovernanceCommand: `${commandPrefix} ...`,
     sourceFirstCommand: 'node atm.dev.mjs ...',
     sourceFirstOnlyWhen: 'explicit source-first framework validation is requested for unbuilt source changes',
     syncCommand: releaseHygienePolicy.runnerSyncCommand,
@@ -50,7 +58,7 @@ export function describeRunnerMode(cwd: string) {
     ],
     guidance: mode === 'source-first' || mode === 'source-import'
       ? `Use this only for explicit source-first framework validation. Run ${releaseHygienePolicy.runnerSyncCommand} before release-like validation through node atm.mjs.`
-      : `Use node atm.mjs for normal governance routing. If ATM_RUNNER_SYNC_REQUIRED appears, run ${releaseHygienePolicy.runnerSyncCommand} and rerun the frozen entrypoint.`
+      : `Use ${commandPrefix} for normal governance routing. If ATM_RUNNER_SYNC_REQUIRED appears, run ${releaseHygienePolicy.runnerSyncCommand} and rerun the frozen entrypoint.`
   };
 }
 

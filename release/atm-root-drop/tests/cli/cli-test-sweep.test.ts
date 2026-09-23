@@ -7,7 +7,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isClean, runSweep, validateConfig, type SweepConfig } from '../../scripts/run-cli-test-sweep.ts';
+import { isClean, runSweep, validateConfig, type SweepBatchTrace, type SweepConfig } from '../../scripts/run-cli-test-sweep.ts';
 
 const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const fixture = mkdtempSync(path.join(os.tmpdir(), 'atm-cli-sweep-'));
@@ -28,7 +28,8 @@ git('add', '.');
 git('commit', '--quiet', '-m', 'fixture');
 
 const config: SweepConfig = { schemaId: 'atm.cliTestSweep.v1', testDir: 'tests', timeoutMs: 5000, concurrency: 4, quarantine: [], serial: [] };
-const results = await runSweep(fixture, config, Object.keys(tests).sort());
+const traces: SweepBatchTrace[] = [];
+const results = await runSweep(fixture, config, Object.keys(tests).sort(), { onBatch: (trace) => traces.push(trace) });
 const byName = Object.fromEntries(results.map((result) => [result.test, result]));
 assert.equal(isClean(byName['pass.test.ts']), true);
 assert.equal(byName['fail.test.ts'].exitCode, 3);
@@ -39,6 +40,8 @@ assert.deepEqual(byName['writer.test.ts'].dirtied, [' M tracked.txt'], 'the writ
 assert.equal(isClean(byName['writer.test.ts']), false, 'a test that writes into the worktree fails the sweep');
 assert.equal(byName['pass.test.ts'].dirtied.length, 0, 'tests that share a batch with the writer are not blamed');
 assert.equal(readFileSync(path.join(fixture, 'tracked.txt'), 'utf8').replace(/\r\n/g, '\n'), 'original\n', 'writes made by tests are discarded');
+assert.ok(traces.some((trace) => trace.attempt === 'initial' && trace.dirtyRetry), 'a dirty parallel batch is recorded before retry');
+assert.ok(traces.some((trace) => trace.attempt === 'retry' && trace.execution === 'serial' && trace.tests.includes('writer.test.ts')), 'the dirty writer retry is recorded as serial');
 
 const available = Object.keys(tests);
 assert.deepEqual(validateConfig({ ...config, quarantine: [{ test: 'fail.test.ts', reason: 'failing-on-main', detail: 'exit 3', disposition: 'triage' }] }, available), []);

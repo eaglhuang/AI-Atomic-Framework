@@ -1,6 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { strict as assert } from 'node:assert';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -86,7 +86,13 @@ try {
   // --ignore-scripts also skips prepack, so a fresh checkout would pack the
   // tracked subset of dist rather than the package that would ship. Build the
   // CLI closure first.
-  execFileSync(process.execPath, ['--strip-types', path.join(root, 'scripts', 'build-package-dist.ts')], {
+  const packageDirs = readdirSync(path.join(root, 'packages'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && existsSync(path.join(root, 'packages', entry.name, 'package.json')))
+    .map((entry) => path.join(root, 'packages', entry.name, 'dist'));
+  const workspaceBuildReady = packageDirs.every((distRoot) => existsSync(distRoot));
+  const buildArgs = ['--strip-types', path.join(root, 'scripts', 'build-package-dist.ts')];
+  if (workspaceBuildReady) buildArgs.push('--package', 'packages/cli');
+  execFileSync(process.execPath, buildArgs, {
     cwd: root, encoding: 'utf8', windowsHide: true
   });
   const packed = JSON.parse(execFileSync(npm, [
