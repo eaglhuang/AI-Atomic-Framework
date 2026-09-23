@@ -23,13 +23,13 @@ export interface RuntimeNextAction {
   readonly selectedTask?: unknown;
 }
 
-export function allowedGuidanceBootstrapCommands(): readonly string[] {
+export function allowedGuidanceBootstrapCommands(commandPrefix = 'node atm.mjs'): readonly string[] {
   return [
-    'node atm.mjs orient --cwd . --json',
-    'node atm.mjs start --cwd . --goal "<goal>" --json',
-    'node atm.mjs next --prompt "<current user prompt>" --json',
-    'node atm.mjs next --cwd . --json',
-    'node atm.mjs explain --why blocked --json'
+    `${commandPrefix} orient --cwd . --json`,
+    `${commandPrefix} start --cwd . --goal "<goal>" --json`,
+    `${commandPrefix} next --prompt "<current user prompt>" --json`,
+    `${commandPrefix} next --cwd . --json`,
+    `${commandPrefix} explain --why blocked --json`
   ];
 }
 
@@ -46,33 +46,34 @@ export function blockedMutationCommands(): readonly string[] {
 export function decideRuntimeNextAction(
   runtime: Record<string, unknown>,
   failedCheckName: string | null | undefined,
-  importedTaskQueue: ImportedTaskQueue
+  importedTaskQueue: ImportedTaskQueue,
+  commandPrefix = 'node atm.mjs'
 ): RuntimeNextAction {
   if (runtime.migrationNeeded || runtime.hasV1 && runtime.hasV2 === false) {
     return {
       status: 'needs-bootstrap',
-      command: 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"',
+      command: `${commandPrefix} bootstrap --cwd . --force --task "Bootstrap ATM in this repository"`,
       reason: 'legacy layout needs migration to runtime/history/catalog',
-      allowedCommands: allowedGuidanceBootstrapCommands(),
+      allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
       blockedCommands: blockedMutationCommands()
     };
   }
   if (failedCheckName === 'onboarding-lifecycle') {
     return {
       status: 'needs-onboarding-refresh',
-      command: 'node atm.mjs atm-chart render --cwd . --json',
+      command: `${commandPrefix} atm-chart render --cwd . --json`,
       reason: 'onboarding ATMChart sources are missing or stale',
       afterNextAction: 'After this onboarding refresh succeeds, return to the user original request and continue the actual work.',
-      allowedCommands: allowedGuidanceBootstrapCommands(),
+      allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
       blockedCommands: blockedMutationCommands()
     };
   }
   if (!runtime.config) {
     return {
       status: 'needs-bootstrap',
-      command: 'node atm.mjs bootstrap --cwd . --task "Bootstrap ATM in this repository"',
+      command: `${commandPrefix} bootstrap --cwd . --task "Bootstrap ATM in this repository"`,
       reason: '.atm/config.json is missing',
-      allowedCommands: allowedGuidanceBootstrapCommands(),
+      allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
       blockedCommands: blockedMutationCommands()
     };
   }
@@ -80,36 +81,36 @@ export function decideRuntimeNextAction(
     if (importedTaskQueue.selectedTask) {
       return {
         status: 'ready',
-        command: `node atm.mjs start --cwd . --goal ${quoteCliValue(importedTaskQueue.selectedTask.title)} --json`,
+        command: `${commandPrefix} start --cwd . --goal ${quoteCliValue(importedTaskQueue.selectedTask.title)} --json`,
         reason: `imported work item ${importedTaskQueue.selectedTask.workItemId} is ready to start`,
         selectedTask: importedTaskQueue.selectedTask,
-        allowedCommands: allowedGuidanceBootstrapCommands(),
+        allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
         blockedCommands: blockedMutationCommands()
       };
     }
     return {
       status: 'needs-guidance-start',
-      command: 'node atm.mjs orient --cwd . --json',
+      command: `${commandPrefix} orient --cwd . --json`,
       reason: 'no active guidance session is recorded',
-      allowedCommands: allowedGuidanceBootstrapCommands(),
+      allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
       blockedCommands: blockedMutationCommands()
     };
   }
   if (!runtime.lastEvidenceAt) {
     return {
       status: 'needs-evidence',
-      command: `node atm.mjs handoff summarize --task ${runtime.currentTaskId} --json`,
+      command: `${commandPrefix} handoff summarize --task ${runtime.currentTaskId} --json`,
       reason: 'the current governed task does not have recorded evidence yet',
-      allowedCommands: allowedGuidanceBootstrapCommands(),
+      allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
       blockedCommands: blockedMutationCommands()
     };
   }
   if (!runtime.lastHandoffAt) {
     return {
       status: 'needs-handoff',
-      command: `node atm.mjs handoff summarize --task ${runtime.currentTaskId} --json`,
+      command: `${commandPrefix} handoff summarize --task ${runtime.currentTaskId} --json`,
       reason: 'the current governed task does not have a handoff summary yet',
-      allowedCommands: allowedGuidanceBootstrapCommands(),
+      allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
       blockedCommands: blockedMutationCommands()
     };
   }
@@ -118,7 +119,7 @@ export function decideRuntimeNextAction(
       status: 'incident-safe-mode',
       command: 'git status',
       reason: 'Cross-task mutation incident detected: files owned by another active task or evidence have been modified, deleted, or staged. ATM has entered incident-safe mode.',
-      allowedCommands: ['git status', 'git diff', 'node atm.mjs doctor', 'node atm.mjs tasks status'],
+      allowedCommands: ['git status', 'git diff', `${commandPrefix} doctor`, `${commandPrefix} tasks status`],
       blockedCommands: ['*']
     };
   }
@@ -127,7 +128,7 @@ export function decideRuntimeNextAction(
       status: 'needs-validation',
       command: 'npm run validate:full',
       reason: `doctor reported a failing check: ${failedCheckName}`,
-      allowedCommands: allowedGuidanceBootstrapCommands(),
+      allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
       blockedCommands: blockedMutationCommands()
     };
   }
@@ -135,7 +136,7 @@ export function decideRuntimeNextAction(
     status: 'ready',
     command: 'npm test',
     reason: 'runtime state, governance state, and engineering checks are all green',
-    allowedCommands: allowedGuidanceBootstrapCommands(),
+    allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
     blockedCommands: blockedMutationCommands()
   };
 }
