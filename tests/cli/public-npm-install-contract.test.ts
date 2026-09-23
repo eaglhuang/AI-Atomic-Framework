@@ -108,11 +108,42 @@ try {
   });
   const entrypoint = path.join(consumer, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'atm.mjs');
   assert.ok(existsSync(entrypoint), 'local candidate install must expose the frozen atm entrypoint');
-  const runAtm = (...args: string[]) => {
-    const result = spawnSync(process.execPath, [entrypoint, ...args], { cwd: adopter, encoding: 'utf8', windowsHide: true });
+  const runAtmAt = (cwd: string, ...args: string[]) => {
+    const result = spawnSync(process.execPath, [entrypoint, ...args], { cwd, encoding: 'utf8', windowsHide: true });
     assert.equal(result.status, 0, `local candidate ${args.join(' ')} failed: ${result.stdout}${result.stderr}`);
     return `${result.stdout}${result.stderr}`;
   };
+  const runAtm = (...args: string[]) => runAtmAt(adopter, ...args);
+
+  // Exercise the published entrypoint's suggested command in a genuinely fresh
+  // consumer. A smoke that only proves `next` itself starts can miss a dead-end
+  // command that assumes a repository-local atm.mjs or an existing npm script.
+  const firstUse = path.join(localSmokeRoot, 'first-use-consumer');
+  mkdirSync(firstUse, { recursive: true });
+  execFileSync(npm, ['install', '--ignore-scripts', '--prefix', firstUse, tarball], {
+    cwd: localSmokeRoot, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
+  });
+  const runNpmExecAt = (...args: string[]) => spawnSync(npm, ['exec', '--', 'atm', ...args], {
+    cwd: firstUse, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
+  });
+  const init = runNpmExecAt('init', '--adopt', 'default');
+  assert.equal(init.status, 0, `npm exec atm init failed: ${init.stdout}${init.stderr}`);
+  const firstNext = runNpmExecAt('next', '--json');
+  assert.equal(firstNext.status, 1, `fresh ATM onboarding should request one recovery action: ${firstNext.stdout}${firstNext.stderr}`);
+  const firstNextJson = JSON.parse(`${firstNext.stdout}${firstNext.stderr}`);
+  assert.equal(firstNextJson.evidence.runnerMode.mode, 'npm-package');
+  assert.equal(firstNextJson.evidence.nextAction.command, 'npm exec -- atm atm-chart render --cwd . --json');
+  const recovery = runNpmExecAt('atm-chart', 'render', '--cwd', '.', '--json');
+  assert.equal(recovery.status, 0, `npm nextAction recovery command failed: ${recovery.stdout}${recovery.stderr}`);
+  const readyNext = runNpmExecAt('next', '--json');
+  assert.equal(readyNext.status, 0, `next should be ready after onboarding recovery: ${readyNext.stdout}${readyNext.stderr}`);
+  const readyNextJson = JSON.parse(`${readyNext.stdout}${readyNext.stderr}`);
+  assert.equal(readyNextJson.evidence.nextAction.command, 'npm test --if-present');
+  const optionalTest = spawnSync(npm, ['test', '--if-present'], {
+    cwd: firstUse, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
+  });
+  assert.equal(optionalTest.status, 0, `optional test command must not fail when the consumer has no test script: ${optionalTest.stdout}${optionalTest.stderr}`);
+
   runAtm('bootstrap', '--cwd', adopter, '--task', 'public runtime chart smoke', '--json');
   runAtm('atm-chart', 'render', '--cwd', adopter, '--json');
   runAtm('atm-chart', 'verify', '--cwd', adopter, '--json');
