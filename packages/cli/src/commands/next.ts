@@ -308,6 +308,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
     const unscopedGuidance = buildPromptGuidanceNextResult({
       cwd: options.cwd,
       actor: options.agent,
+      commandPrefix: governanceCommandPrefix(process.argv[1] ?? null),
       taskIntent,
       integrationBootstrap,
       runtimeAdapterReadiness
@@ -348,6 +349,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
     profile.flush('prompt-required');
     return withRunnerMode(buildPromptRequiredNextResult({
       cwd: options.cwd,
+      commandPrefix: governanceCommandPrefix(process.argv[1] ?? null),
       claimRequested: Boolean(options.claim),
       importedTaskQueue,
       integrationBootstrap,
@@ -399,6 +401,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
   const promptGuidanceResult = buildPromptGuidanceNextResult({
     cwd: options.cwd,
     actor: options.agent,
+    commandPrefix: governanceCommandPrefix(process.argv[1] ?? null),
     taskIntent,
     integrationBootstrap,
     runtimeAdapterReadiness
