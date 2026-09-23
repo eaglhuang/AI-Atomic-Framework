@@ -45,6 +45,8 @@ assert.equal(npmRecovery.command, 'npm exec -- atm bootstrap --cwd . --task "Boo
 assert.ok(npmRecovery.allowedCommands.includes('npm exec -- atm orient --cwd . --json'));
 const npmOnboardingRecovery = decideRuntimeNextAction({ config: true }, 'onboarding-lifecycle', emptyQueue, 'npm exec -- atm');
 assert.equal(npmOnboardingRecovery.command, 'npm exec -- atm atm-chart render --cwd . --json');
+const npmReady = decideRuntimeNextAction({ config: true, currentTaskId: 'TASK-1', lastEvidenceAt: 'now', lastHandoffAt: 'now' }, null, emptyQueue, 'npm exec -- atm');
+assert.equal(npmReady.command, 'npm test --if-present');
 
 const inputProbe = { probe: 'value', nested: { count: 1 } };
 assert.equal(channelStrategyPreservesInput(inputProbe, () => selectQuickfixChannel()), true);

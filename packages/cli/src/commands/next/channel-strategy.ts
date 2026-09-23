@@ -134,7 +134,7 @@ export function decideRuntimeNextAction(
   }
   return {
     status: 'ready',
-    command: 'npm test',
+    command: commandPrefix === 'npm exec -- atm' ? 'npm test --if-present' : 'npm test',
     reason: 'runtime state, governance state, and engineering checks are all green',
     allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
     blockedCommands: blockedMutationCommands()
