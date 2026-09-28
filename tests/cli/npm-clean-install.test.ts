@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runGuide } from '../../packages/cli/src/commands/guide.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const validator = path.join(root, 'scripts', 'validate-npm-clean-install.ts');
@@ -54,6 +56,21 @@ assert.match(workflow, /PUBLIC_WORKSPACES=\(/, 'release workflow must declare th
 assert.match(workflow, /for workspace in "\$\{PUBLIC_WORKSPACES\[@\]\}"; do/, 'release workflow must iterate the explicit public workspace closure');
 assert.match(workflow, /npm view "\$workspace@\$release_version" version --json/, 'release workflow must skip versions already published during a recovery rerun');
 assert.doesNotMatch(workflow, /npm publish --workspaces/, 'release workflow must not publish example workspaces');
+
+const guideCwd = mkdtempSync(path.join(os.tmpdir(), 'atm-npm-guide-prefix-'));
+const originalEntrypoint = process.argv[1];
+try {
+  process.argv[1] = path.join(guideCwd, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'atm.mjs');
+  const guide = runGuide(['--goal', 'A minimal first-run workflow.', '--cwd', guideCwd]) as { evidence?: { nextCommand?: string } };
+  assert.equal(
+    guide.evidence?.nextCommand,
+    'npm exec -- atm orient --cwd . --json',
+    'guide --goal must emit a command that runs through the installed npm package'
+  );
+} finally {
+  process.argv[1] = originalEntrypoint;
+  rmSync(guideCwd, { recursive: true, force: true });
+}
 
 // The npm product is a single self-contained CLI tarball. The publish closure
 // is the one authority for what may reach npm, and the workflow must neither

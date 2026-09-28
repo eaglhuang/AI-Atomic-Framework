@@ -129,8 +129,23 @@ function describeAdoptionResidue(adoptionRoot: string): string {
   return `left ${residue.length} file(s) behind: ${residue.slice(0, 8).join(', ')}${residue.length > 8 ? ` (+${residue.length - 8} more)` : ''}`;
 }
 
-function assertAdoptionSucceeds(binPath: string, tempRoot: string, expectedVersion: string): void {
-  const adoptionRoot = path.join(tempRoot, 'adoption-probe');
+function runEmittedNpmCommand(command: string, expectedCommand: string, cwd: string, label: string): any {
+  if (command !== expectedCommand) fail(`${label} emitted ${JSON.stringify(command)} instead of ${JSON.stringify(expectedCommand)}`);
+  const result = spawnSync(command, { cwd, encoding: 'utf8', shell: true });
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+  if (result.status !== 0) fail(`${label} failed with exit ${result.status}: ${output.split('\n').slice(0, 8).join(' ')}`);
+  if (/ERR_MODULE_NOT_FOUND|Cannot find (module|package)/.test(output)) {
+    fail(`${label} could not resolve the installed runtime: ${output.split('\n').slice(0, 8).join(' ')}`);
+  }
+  try {
+    return JSON.parse(result.stdout ?? '');
+  } catch (error) {
+    fail(`${label} did not emit JSON: ${String(error)}; ${output.split('\n').slice(0, 8).join(' ')}`);
+  }
+}
+
+function assertAdoptionSucceeds(binPath: string, installRoot: string, expectedVersion: string): void {
+  const adoptionRoot = path.join(installRoot, 'adoption-probe');
   mkdirSync(adoptionRoot, { recursive: true });
   run('git', ['init', '--quiet', '.'], adoptionRoot);
 
@@ -186,6 +201,30 @@ function assertAdoptionSucceeds(binPath: string, tempRoot: string, expectedVersi
   if (!existsSync(routerReference)) {
     fail(`atm integration add codex omitted required router companion file ${path.relative(adoptionRoot, routerReference).replace(/\\/g, '/')}`);
   }
+
+  // The public npm first-run path must remain executable from an adopter repo:
+  // next emits guide, guide emits orient, and both commands must resolve from
+  // the installed package without relying on a repository-local atm.mjs.
+  const goal = 'Show a minimal first-run workflow.';
+  const next = spawnSync(binPath, ['next', '--prompt', goal, '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  const nextText = `${next.stdout ?? ''}${next.stderr ?? ''}`;
+  if (next.status !== 0) fail(`atm next failed after clean install: ${nextText.split('\n').slice(0, 8).join(' ')}`);
+  const nextResult = JSON.parse(next.stdout ?? '');
+  if (nextResult.evidence?.runnerMode?.mode !== 'npm-package') {
+    fail(`atm next did not recognize the installed npm runner: ${JSON.stringify(nextResult.evidence?.runnerMode)}`);
+  }
+  const guide = runEmittedNpmCommand(
+    nextResult.evidence?.nextAction?.command,
+    `npm exec -- atm guide --goal "${goal}" --cwd . --json`,
+    adoptionRoot,
+    'atm next -> guide'
+  );
+  runEmittedNpmCommand(
+    guide.evidence?.nextCommand,
+    'npm exec -- atm orient --cwd . --json',
+    adoptionRoot,
+    'atm guide -> orient'
+  );
 }
 
 if (publishedPackages.length === 0) {
@@ -292,7 +331,7 @@ try {
       if (snapshotTree(installRoot) !== beforeCreate) {
         fail('installed atm create --dry-run mutated the fixture repository');
       }
-      assertAdoptionSucceeds(binPath, tempRoot, installedManifest.version);
+      assertAdoptionSucceeds(binPath, installRoot, installedManifest.version);
     }
   }
   console.log(JSON.stringify({
