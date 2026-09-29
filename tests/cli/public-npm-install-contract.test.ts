@@ -31,6 +31,9 @@ assert.match(validatorSource, /atm-chart-render/, 'public npm validator must exe
 assert.match(validatorSource, /atm-chart-verify/, 'public npm validator must exercise chart verification');
 assert.match(validatorSource, /requiredSuccessCommandFailures/, 'public npm validator must report required command failures');
 assert.match(validatorSource, /coreWorkflowPassed/, 'public npm validator must report core workflow status');
+assert.match(validatorSource, /runFirstUseChain\(bin, consumer\)/, 'public npm validator must execute the first-use workflow in its clean consumer');
+assert.match(validatorSource, /generated command is not runnable from a clean npm install/, 'public npm validator must reject unusable generated commands');
+assert.match(validatorSource, /'first-use'/, 'first-use workflow must be a required successful public smoke command');
 
 const candidateValidatorSource = await import('node:fs').then(({ readFileSync }) => readFileSync(new URL('../../scripts/validate-candidate-npm-install.ts', import.meta.url), 'utf8'));
 assert.match(candidateValidatorSource, /--candidate-tarball/, 'candidate validator must accept an explicit tarball');
@@ -55,13 +58,13 @@ for (const status of ['installed', 'replaced', 'unchanged', 'skipped-existing-di
   assert.equal(resolveBootstrapCommandPrefix(status), 'node atm.mjs', `${status} must keep the pinned-runner command`);
 }
 
-const live = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.0', '--record-blocked', '--measurement-runs', '1'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
+const live = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.2', '--record-blocked', '--measurement-runs', '1'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
 const liveProof = JSON.parse(live.trim().split(/\r?\n/).at(-1)!);
 assert.equal(liveProof.validation.cleanConsumer, true);
 assert.equal(liveProof.validation.usedWorkspaceLink, false);
 assert.equal(liveProof.validation.versionOnlySmoke, false);
 assert.equal(liveProof.validation.commandMatrixComplete, true);
-assert.deepEqual(liveProof.validation.requiredSuccessCommands, ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create']);
+assert.deepEqual(liveProof.validation.requiredSuccessCommands, ['version', 'doctor', 'first-use', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create']);
 assert.equal(liveProof.validation.moduleResolutionFailures, 0);
 assert.equal(liveProof.validation.allCommandsExecuted, true);
 if (liveProof.status === 'verified') {
@@ -72,6 +75,7 @@ if (liveProof.status === 'verified') {
   assert.equal(liveProof.validation.coreWorkflowPassed, false);
   assert.equal(liveProof.validation.passed, false);
   assert.ok(liveProof.validation.requiredSuccessCommandFailures.length > 0);
+  assert.ok(liveProof.validation.requiredSuccessCommandFailures.includes('first-use'), 'broken published first-use journey must fail proof even when simple smoke commands pass');
 }
 
 const oversized = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.0-beta.4', '--record-blocked'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
