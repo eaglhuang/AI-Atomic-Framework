@@ -9,13 +9,13 @@ Start with this line when a user has given you a concrete request:
 
 {{RECOMMENDED_PROMPT}}
 
-If the request says to finish all task cards, a whole plan, a task family, or multiple tasks, you must let `next --prompt` route it as `recommendedChannel: "batch"` and then use `node atm.mjs batch checkpoint --actor <id> --json` after delivering the current queue head. Do not manually loop over `tasks reserve/promote/claim/close`.
+If the request says to finish all task cards, a whole plan, a task family, or multiple tasks, you must let `{{ATM_COMMAND_PREFIX}} next --prompt` route it as `recommendedChannel: "batch"` and then use `{{ATM_COMMAND_PREFIX}} batch checkpoint --actor <id> --json` after delivering the current queue head. Do not manually loop over `tasks reserve/promote/claim/close`.
 
-Use `node atm.mjs next --json` only as read-only repository orientation when there is no current user prompt.
+Use `{{ATM_COMMAND_PREFIX}} next --json` only as read-only repository orientation when there is no current user prompt.
 
 First-contact behavior:
 
-1. For user-requested task work, run `node atm.mjs next --prompt "<current user prompt>" --json`; use `node atm.mjs next --json` only as read-only orientation when no user prompt is available.
+1. For user-requested task work, run `{{ATM_COMMAND_PREFIX}} next --prompt "<current user prompt>" --json`; use `{{ATM_COMMAND_PREFIX}} next --json` only as read-only orientation when no user prompt is available.
 2. If the ATM result returns an `ATM_USER_NOTICE` message or `evidence.userNotice`, show that notice to the user in natural language before running the returned next action.
 3. If an existing host instruction references a missing local document, mention the missing file once and continue with the ATM route.
 4. After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
@@ -23,14 +23,14 @@ First-contact behavior:
 Editor integration self-check:
 
 1. If `.atm/config.json` exists, confirm this editor already has its repo-local ATM entry files before trusting ATM skill routing.
-2. If the current editor entry file is missing, install the matching adapter immediately with `node atm.mjs integration add <editor-id> --json`, then verify it with `node atm.mjs integration verify <editor-id> --json`.
+2. If the current editor entry file is missing, install the matching adapter immediately with `{{ATM_COMMAND_PREFIX}} integration add <editor-id> --json`, then verify it with `{{ATM_COMMAND_PREFIX}} integration verify <editor-id> --json`.
 3. Expected primary entry files:
-   - `codex`: `integrations/codex-skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add codex --json`
-   - `claude-code`: `.claude/skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add claude-code --json`
-   - `cursor`: `.cursor/rules/skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add cursor --json`
-   - `copilot`: `.github/instructions/atm-governance-router.instructions.md` via `node atm.mjs integration add copilot --json`
-   - `gemini`: `.gemini/commands/atm-governance-router.toml` via `node atm.mjs integration add gemini --json`
-   - `antigravity`: `GEMINI.md` via `node atm.mjs integration add antigravity --json`
+   - `codex`: `integrations/codex-skills/atm-governance-router/SKILL.md` via `{{ATM_COMMAND_PREFIX}} integration add codex --json`
+   - `claude-code`: `.claude/skills/atm-governance-router/SKILL.md` via `{{ATM_COMMAND_PREFIX}} integration add claude-code --json`
+   - `cursor`: `.cursor/rules/skills/atm-governance-router/SKILL.md` via `{{ATM_COMMAND_PREFIX}} integration add cursor --json`
+   - `copilot`: `.github/instructions/atm-governance-router.instructions.md` via `{{ATM_COMMAND_PREFIX}} integration add copilot --json`
+   - `gemini`: `.gemini/commands/atm-governance-router.toml` via `{{ATM_COMMAND_PREFIX}} integration add gemini --json`
+   - `antigravity`: `GEMINI.md` via `{{ATM_COMMAND_PREFIX}} integration add antigravity --json`
 4. Google-side coverage has two entry shapes: `gemini` installs Gemini CLI command files under `.gemini/commands`, while `antigravity` installs the Antigravity editor entry `GEMINI.md` and `.agents/skills`. If the current Google editor is Antigravity, verify/install `antigravity`, not only `gemini`.
 
 Python-only runtime self-check:

@@ -2,37 +2,15 @@ import path from 'node:path';
 import { describeBuildReleaseHygienePolicy } from '../build-release-hygiene.ts';
 import { inspectRunnerSourceDrift } from '../framework-development/closure-packet-schema.ts';
 import { message } from '../shared.ts';
+import { classifyRunnerMode, governanceCommandPrefix } from '../shared/atm-cli-entrypoint.ts';
 import type { PlanningRootWarning } from './planning-root-preference.ts';
 
-export type RunnerModeClass = 'frozen' | 'npm-package' | 'source-first' | 'source-import' | 'unknown';
+export { classifyRunnerMode, governanceCommandPrefix } from '../shared/atm-cli-entrypoint.ts';
+export type { RunnerModeClass } from '../shared/atm-cli-entrypoint.ts';
 
 export function normalizeRelativePath(root: string, entryPath: string): string {
   const relative = path.relative(root, entryPath).replace(/\\/g, '/');
   return relative && !relative.startsWith('..') ? relative : entryPath.replace(/\\/g, '/');
-}
-
-export function classifyRunnerMode(entrypoint: string | null): RunnerModeClass {
-  if (!entrypoint) return 'unknown';
-  const normalized = entrypoint.replace(/\\/g, '/');
-  if (normalized.includes('node_modules/@ai-atomic-framework/cli/')
-    || normalized.endsWith('node_modules/.bin/atm')
-    || normalized.endsWith('node_modules/.bin/atm.cmd')) return 'npm-package';
-  if (normalized === 'atm.dev.mjs') return 'source-first';
-  if (normalized === 'atm.mjs'
-    || normalized === 'release/atm-onefile/atm.mjs'
-    || normalized === 'packages/cli/dist/atm.js'
-    || normalized === 'release/atm-root-drop/atm.mjs'
-    || normalized.includes('/atm-onefile-cache/')) {
-    return 'frozen';
-  }
-  if (normalized.startsWith('scripts/') || normalized.includes('/scripts/') || normalized.includes('/packages/cli/src/')) {
-    return 'source-import';
-  }
-  return 'unknown';
-}
-
-export function governanceCommandPrefix(entrypoint: string | null): string {
-  return classifyRunnerMode(entrypoint) === 'npm-package' ? 'npm exec -- atm' : 'node atm.mjs';
 }
 
 export function describeRunnerMode(cwd: string) {
