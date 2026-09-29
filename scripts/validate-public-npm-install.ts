@@ -185,13 +185,21 @@ type FirstUseCommandResult = {
 };
 
 function parseCommandJson(result: ReturnType<typeof spawnSync>): FirstUseCommandResult | null {
-  const output = String(result.stdout ?? '').trim();
-  if (!output) return null;
-  try {
-    return JSON.parse(output) as FirstUseCommandResult;
-  } catch {
-    return null;
+  const stdout = String(result.stdout ?? '').trim();
+  const stderr = String(result.stderr ?? '').trim();
+  for (const output of [stdout, stderr, `${stdout}${stderr}`, `${stderr}${stdout}`]) {
+    if (!output) continue;
+    try {
+      return JSON.parse(output) as FirstUseCommandResult;
+    } catch {
+      // CLI JSON may be emitted on either stream, including on non-zero status.
+    }
   }
+  return null;
+}
+
+function commandOutput(result: ReturnType<typeof spawnSync>): string {
+  return `${String(result.stdout ?? '')}${String(result.stderr ?? '')}`.trim().slice(0, 600);
 }
 
 function runFirstUseChain(bin: string, cwd: string): Record<string, unknown> {
@@ -233,7 +241,7 @@ function runFirstUseChain(bin: string, cwd: string): Record<string, unknown> {
     }
     current = parseCommandJson(refreshed);
     if (!current) {
-      return { exitCode: refreshed.status ?? 1, passed: false, reachedReady: false, steps, failure: 'next did not return parseable JSON after generated action' };
+      return { exitCode: refreshed.status ?? 1, passed: false, reachedReady: false, steps, failure: `next did not return parseable JSON after generated action: ${commandOutput(refreshed)}` };
     }
     ready = refreshed.status === 0 && ['ready', 'no-work'].includes(current.evidence?.nextAction?.status ?? '');
   }

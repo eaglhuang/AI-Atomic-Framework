@@ -33,6 +33,7 @@ assert.match(validatorSource, /requiredSuccessCommandFailures/, 'public npm vali
 assert.match(validatorSource, /coreWorkflowPassed/, 'public npm validator must report core workflow status');
 assert.match(validatorSource, /runFirstUseChain\(bin, consumer\)/, 'public npm validator must execute the first-use workflow in its clean consumer');
 assert.match(validatorSource, /generated command is not runnable from a clean npm install/, 'public npm validator must reject unusable generated commands');
+assert.match(validatorSource, /const stderr = String\(result\.stderr/, 'first-use proof must parse command JSON from either output stream');
 assert.match(validatorSource, /'first-use'/, 'first-use workflow must be a required successful public smoke command');
 
 const candidateValidatorSource = await import('node:fs').then(({ readFileSync }) => readFileSync(new URL('../../scripts/validate-candidate-npm-install.ts', import.meta.url), 'utf8'));
