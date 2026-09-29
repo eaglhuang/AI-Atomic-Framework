@@ -47,6 +47,7 @@ import {
   readUnknownFile,
   relativePathFrom,
   renderTemplate,
+  resolveBootstrapCommandPrefix,
   resolveRepoPath,
   sha256Bytes,
   withJsonExtension,
@@ -166,6 +167,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     ensureDirectory(directoryPath, cwd, created, unchanged);
   }
   const pinnedRunner = installPinnedRunner(cwd, force, created, unchanged);
+  const commandPrefix = resolveBootstrapCommandPrefix(pinnedRunner.status);
 
   stores.documentIndex.initialize?.();
   stores.shardStore.initialize?.();
@@ -177,7 +179,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   stores.contextBudgetGuard?.initialize?.();
   stores.contextSummaryStore?.initialize?.();
 
-  const recommendedPrompt = createRecommendedPrompt(taskId);
+  const recommendedPrompt = createRecommendedPrompt(taskId, commandPrefix);
   const projectProbe = probeRepository(cwd, recommendedPrompt);
   const defaultGuards = createDefaultGuards(projectProbe);
   const defaultContextBudgetPolicy = createDefaultContextBudgetPolicy(projectProbe.generatedAt ?? new Date().toISOString());
@@ -202,7 +204,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     summary: 'Default ATM bootstrap pack created and linked to evidence, context budget, and the next continuation prompt.',
     nextActions: [
       `Read .atm/history/tasks/${taskId}.json and .atm/runtime/profile/default.md.`,
-      'Run node atm.mjs next --prompt "<current user prompt>" --json, show ATM_USER_NOTICE or evidence.userNotice if present, then execute the returned next action.',
+      `Run ${commandPrefix} next --prompt "<current user prompt>" --json, show ATM_USER_NOTICE or evidence.userNotice if present, then execute the returned next action.`,
       'Record the first smoke artifact, log, evidence, and handoff before closing the work item.'
     ],
     artifactPaths: ['.atm/history/artifacts', '.atm/history/logs', '.atm/history/reports'],
@@ -212,7 +214,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     handoffKind: 'bootstrap',
     continuationGoal: 'Resume bootstrap from the generated task, profile, evidence, and budget surfaces.',
     resumePrompt: recommendedPrompt,
-    resumeCommand: ['node', 'atm.mjs', 'next', '--prompt', '<current user prompt>', '--json'],
+    resumeCommand: [...commandPrefix.split(' '), 'next', '--prompt', '<current user prompt>', '--json'],
     budgetDecision: bootstrapBudgetEvaluation.decision,
     hardStop: bootstrapBudgetEvaluation.decision === 'hard-stop'
   };
@@ -221,7 +223,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     summaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath)
   };
   const bootstrapEvidence = {
-    ...createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths),
+    ...createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths, recommendedPrompt),
     pinnedRunner,
     contextBudgetReportPath: normalizeRelativePath(contextBudgetReportPath),
     contextBudgetSummaryPath: bootstrapBudgetEvaluation.decision === 'pass' ? null : normalizeRelativePath(contextBudgetSummaryPath),
@@ -237,7 +239,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   writeJson(paths.projectProbePath, projectProbe, cwd, force, created, unchanged);
   writeJson(paths.defaultGuardsPath, defaultGuards, cwd, force, created, unchanged);
   writeJson(paths.contextBudgetPolicyPath, defaultContextBudgetPolicy, cwd, force, created, unchanged);
-  writeJson(paths.taskPath, createBootstrapTask(taskId, taskTitle, projectProbe, paths), cwd, force, created, unchanged);
+  writeJson(paths.taskPath, createBootstrapTask(taskId, taskTitle, projectProbe, paths, recommendedPrompt), cwd, force, created, unchanged);
   writeJson(paths.lockPath, createBootstrapLock(taskId, paths), cwd, force, created, unchanged);
   writeJson(paths.evidencePath, bootstrapEvidence, cwd, force, created, unchanged);
   writeJson(resolveRepoPath(cwd, contextBudgetReportPath), {
@@ -262,6 +264,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
 
   const templateTokens = {
     RECOMMENDED_PROMPT: recommendedPrompt,
+    ATM_COMMAND_PREFIX: commandPrefix,
     BOOTSTRAP_TASK_PATH: relativePathFrom(cwd, paths.taskPath),
     BOOTSTRAP_LOCK_PATH: relativePathFrom(cwd, paths.lockPath),
     BOOTSTRAP_PROFILE_PATH: relativePathFrom(cwd, paths.profilePath),
@@ -362,8 +365,8 @@ export function createOfficialBootstrapCommand(commandCwd = '.'): string {
   return `node atm.mjs bootstrap --cwd ${commandCwd} --task "${defaultBootstrapTaskTitle}"`;
 }
 
-export function createRecommendedPrompt(taskId = defaultBootstrapTaskId): string {
-  return `Read README.md if present, then run \`node atm.mjs next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`node atm.mjs next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and ${runtimeEvidenceBundleRelativePath(taskId)} only as supporting runtime state.`;
+export function createRecommendedPrompt(taskId = defaultBootstrapTaskId, commandPrefix = 'node atm.mjs'): string {
+  return `Read README.md if present, then run \`${commandPrefix} next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`${commandPrefix} next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and ${runtimeEvidenceBundleRelativePath(taskId)} only as supporting runtime state.`;
 }
 
 export function createSelfHostingAlphaPrompt(): string {
@@ -531,7 +534,7 @@ function createBootstrapPaths(cwd: string, taskId: string) {
   };
 }
 
-function createBootstrapTask(taskId: string, taskTitle: string, projectProbe: Readonly<Record<string, unknown>>, paths: ReturnType<typeof createBootstrapPaths>) {
+function createBootstrapTask(taskId: string, taskTitle: string, projectProbe: Readonly<Record<string, unknown>>, paths: ReturnType<typeof createBootstrapPaths>, recommendedPrompt: string) {
   return {
     schemaVersion: 'atm.workItem.v0.1',
     id: taskId,
@@ -552,7 +555,7 @@ function createBootstrapTask(taskId: string, taskTitle: string, projectProbe: Re
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.defaultGuardsPath)
     ],
     evidencePath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.evidencePath),
-    nextPrompt: createRecommendedPrompt(taskId)
+    nextPrompt: recommendedPrompt
   };
 }
 
@@ -577,7 +580,7 @@ function createBootstrapLock(taskId: string, paths: ReturnType<typeof createBoot
   };
 }
 
-function createBootstrapEvidence(taskId: string, projectProbe: Readonly<Record<string, unknown>>, defaultGuards: { guards: readonly { id: string }[] }, paths: ReturnType<typeof createBootstrapPaths>) {
+function createBootstrapEvidence(taskId: string, projectProbe: Readonly<Record<string, unknown>>, defaultGuards: { guards: readonly { id: string }[] }, paths: ReturnType<typeof createBootstrapPaths>, recommendedPrompt: string) {
   return {
     schemaVersion: 'atm.evidence.v0.1',
     taskId,
@@ -585,7 +588,7 @@ function createBootstrapEvidence(taskId: string, projectProbe: Readonly<Record<s
     summary: 'Default ATM bootstrap pack created.',
     repositoryKind: projectProbe.repositoryKind,
     packageManager: projectProbe.packageManager,
-    recommendedPrompt: createRecommendedPrompt(),
+    recommendedPrompt,
     guardIds: defaultGuards.guards.map((guard) => guard.id),
     artifactDirectories: [
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.directories.artifacts),

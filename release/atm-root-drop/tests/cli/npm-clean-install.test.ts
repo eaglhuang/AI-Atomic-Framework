@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runGuide } from '../../packages/cli/src/commands/guide.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const validator = path.join(root, 'scripts', 'validate-npm-clean-install.ts');
@@ -55,6 +57,21 @@ assert.match(workflow, /for workspace in "\$\{PUBLIC_WORKSPACES\[@\]\}"; do/, 'r
 assert.match(workflow, /npm view "\$workspace@\$release_version" version --json/, 'release workflow must skip versions already published during a recovery rerun');
 assert.doesNotMatch(workflow, /npm publish --workspaces/, 'release workflow must not publish example workspaces');
 
+const guideCwd = mkdtempSync(path.join(os.tmpdir(), 'atm-npm-guide-prefix-'));
+const originalEntrypoint = process.argv[1];
+try {
+  process.argv[1] = path.join(guideCwd, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'atm.mjs');
+  const guide = runGuide(['--goal', 'A minimal first-run workflow.', '--cwd', guideCwd]) as { evidence?: { nextCommand?: string } };
+  assert.equal(
+    guide.evidence?.nextCommand,
+    'npm exec -- atm orient --cwd . --json',
+    'guide --goal must emit a command that runs through the installed npm package'
+  );
+} finally {
+  process.argv[1] = originalEntrypoint;
+  rmSync(guideCwd, { recursive: true, force: true });
+}
+
 // The npm product is a single self-contained CLI tarball. The publish closure
 // is the one authority for what may reach npm, and the workflow must neither
 // omit a member of it nor list a workspace outside it.
@@ -101,5 +118,8 @@ assert.doesNotMatch(publicFacadeSource, /agent-pack['"`]/, 'the bounded adopter 
 const guideSource = readFileSync(path.join(root, 'packages', 'cli', 'src', 'commands', 'guide.ts'), 'utf8');
 assert.match(guideSource, /start performs the required orientation internally/, 'guidance must use the existing start orientation instead of requiring a duplicate orient command');
 assert.match(guideSource, /prerequisiteCommands: \[\]/, 'legacy guidance must not rescan the repository before start');
+const rootAgentTemplate = readFileSync(path.join(root, 'templates', 'root-drop', 'AGENTS.md'), 'utf8');
+assert.doesNotMatch(rootAgentTemplate, /node atm\.mjs/i, 'the generated adopter instructions must not hard-code a repository-root runner');
+assert.match(rootAgentTemplate, /\{\{ATM_COMMAND_PREFIX\}\} integration add codex --json/, 'adopter integration guidance must use the selected runtime entrypoint');
 
 console.log('[npm-clean-install:test] ok');

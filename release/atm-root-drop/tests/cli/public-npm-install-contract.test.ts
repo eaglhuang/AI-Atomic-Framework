@@ -1,6 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { strict as assert } from 'node:assert';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,6 +31,10 @@ assert.match(validatorSource, /atm-chart-render/, 'public npm validator must exe
 assert.match(validatorSource, /atm-chart-verify/, 'public npm validator must exercise chart verification');
 assert.match(validatorSource, /requiredSuccessCommandFailures/, 'public npm validator must report required command failures');
 assert.match(validatorSource, /coreWorkflowPassed/, 'public npm validator must report core workflow status');
+assert.match(validatorSource, /runFirstUseChain\(bin, consumer\)/, 'public npm validator must execute the first-use workflow in its clean consumer');
+assert.match(validatorSource, /generated command is not runnable from a clean npm install/, 'public npm validator must reject unusable generated commands');
+assert.match(validatorSource, /const stderr = String\(result\.stderr/, 'first-use proof must parse command JSON from either output stream');
+assert.match(validatorSource, /'first-use'/, 'first-use workflow must be a required successful public smoke command');
 
 const candidateValidatorSource = await import('node:fs').then(({ readFileSync }) => readFileSync(new URL('../../scripts/validate-candidate-npm-install.ts', import.meta.url), 'utf8'));
 assert.match(candidateValidatorSource, /--candidate-tarball/, 'candidate validator must accept an explicit tarball');
@@ -49,13 +53,19 @@ assert.match(candidateValidatorSource, /readExplicitTarballMetadata/, 'explicit 
 assert.match(candidateValidatorSource, /unpackedSize: files\.reduce/, 'explicit tarball metadata must record unpacked bytes');
 assert.match(candidateValidatorSource, /missing package\/package\.json/, 'explicit tarball metadata must fail closed without package manifest');
 
-const live = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.0', '--record-blocked', '--measurement-runs', '1'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
+const { resolveBootstrapCommandPrefix } = await import('../../packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts');
+assert.equal(resolveBootstrapCommandPrefix('source-unavailable'), 'npm exec -- atm');
+for (const status of ['installed', 'replaced', 'unchanged', 'skipped-existing-different'] as const) {
+  assert.equal(resolveBootstrapCommandPrefix(status), 'node atm.mjs', `${status} must keep the pinned-runner command`);
+}
+
+const live = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.2', '--record-blocked', '--measurement-runs', '1'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
 const liveProof = JSON.parse(live.trim().split(/\r?\n/).at(-1)!);
 assert.equal(liveProof.validation.cleanConsumer, true);
 assert.equal(liveProof.validation.usedWorkspaceLink, false);
 assert.equal(liveProof.validation.versionOnlySmoke, false);
 assert.equal(liveProof.validation.commandMatrixComplete, true);
-assert.deepEqual(liveProof.validation.requiredSuccessCommands, ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create']);
+assert.deepEqual(liveProof.validation.requiredSuccessCommands, ['version', 'doctor', 'first-use', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create']);
 assert.equal(liveProof.validation.moduleResolutionFailures, 0);
 assert.equal(liveProof.validation.allCommandsExecuted, true);
 if (liveProof.status === 'verified') {
@@ -66,6 +76,7 @@ if (liveProof.status === 'verified') {
   assert.equal(liveProof.validation.coreWorkflowPassed, false);
   assert.equal(liveProof.validation.passed, false);
   assert.ok(liveProof.validation.requiredSuccessCommandFailures.length > 0);
+  assert.ok(liveProof.validation.requiredSuccessCommandFailures.includes('first-use'), 'broken published first-use journey must fail proof even when simple smoke commands pass');
 }
 
 const oversized = execFileSync(npm, ['run', 'validate:public-npm-install', '--', '--package', '@ai-atomic-framework/cli', '--version', '0.1.0-beta.4', '--record-blocked'], { encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
@@ -86,9 +97,23 @@ try {
   // --ignore-scripts also skips prepack, so a fresh checkout would pack the
   // tracked subset of dist rather than the package that would ship. Build the
   // CLI closure first.
-  execFileSync(process.execPath, ['--strip-types', path.join(root, 'scripts', 'build-package-dist.ts')], {
-    cwd: root, encoding: 'utf8', windowsHide: true
-  });
+  const packageDirs = readdirSync(path.join(root, 'packages'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && existsSync(path.join(root, 'packages', entry.name, 'package.json')))
+    .map((entry) => path.join(root, 'packages', entry.name, 'dist'));
+  const workspaceBuildReady = packageDirs.every((distRoot) => existsSync(distRoot));
+  const buildScript = path.join(root, 'scripts', 'build-package-dist.ts');
+  if (workspaceBuildReady) {
+    execFileSync(process.execPath, ['--strip-types', buildScript, '--package', 'packages/plugin-governance-local'], {
+      cwd: root, encoding: 'utf8', windowsHide: true
+    });
+    execFileSync(process.execPath, ['--strip-types', buildScript, '--package', 'packages/cli'], {
+      cwd: root, encoding: 'utf8', windowsHide: true
+    });
+  } else {
+    execFileSync(process.execPath, ['--strip-types', buildScript], {
+      cwd: root, encoding: 'utf8', windowsHide: true
+    });
+  }
   const packed = JSON.parse(execFileSync(npm, [
     'pack', '--workspace', '@ai-atomic-framework/cli', '--ignore-scripts', '--pack-destination', localSmokeRoot,
     '--json', '--loglevel', 'silent'
@@ -102,11 +127,148 @@ try {
   });
   const entrypoint = path.join(consumer, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'atm.mjs');
   assert.ok(existsSync(entrypoint), 'local candidate install must expose the frozen atm entrypoint');
-  const runAtm = (...args: string[]) => {
-    const result = spawnSync(process.execPath, [entrypoint, ...args], { cwd: adopter, encoding: 'utf8', windowsHide: true });
+  const runAtmAt = (cwd: string, ...args: string[]) => {
+    const result = spawnSync(process.execPath, [entrypoint, ...args], { cwd, encoding: 'utf8', windowsHide: true });
     assert.equal(result.status, 0, `local candidate ${args.join(' ')} failed: ${result.stdout}${result.stderr}`);
     return `${result.stdout}${result.stderr}`;
   };
+  const runAtm = (...args: string[]) => runAtmAt(adopter, ...args);
+
+  // Exercise the published entrypoint's suggested command in a genuinely fresh
+  // consumer. A smoke that only proves `next` itself starts can miss a dead-end
+  // command that assumes a repository-local atm.mjs or an existing npm script.
+  const firstUse = path.join(localSmokeRoot, 'first-use-consumer');
+  mkdirSync(firstUse, { recursive: true });
+  execFileSync(npm, ['install', '--ignore-scripts', '--prefix', firstUse, tarball], {
+    cwd: localSmokeRoot, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
+  });
+  const runNpmExecAt = (...args: string[]) => spawnSync(npm, ['exec', '--', 'atm', ...args], {
+    cwd: firstUse, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
+  });
+
+  const tokenizeCommand = (command: string) => [...command.matchAll(/"([^"]*)"|'([^']*)'|(\S+)/g)]
+    .map((match) => match[1] ?? match[2] ?? match[3]);
+  const runGeneratedNpmCommand = (command: string) => {
+    const tokens = tokenizeCommand(command);
+    assert.equal(tokens[0], 'npm', `generated first-use command must start with npm: ${command}`);
+    return spawnSync(npm, tokens.slice(1), {
+      cwd: firstUse, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
+    });
+  };
+
+  const bootstrapNext = runNpmExecAt('next', '--json');
+  assert.equal(bootstrapNext.status, 1, `fresh npm install should request bootstrap: ${bootstrapNext.stdout}${bootstrapNext.stderr}`);
+  const lifecycle: Array<{ command: string; status: number }> = [
+    { command: 'npm exec -- atm next --json', status: bootstrapNext.status ?? -1 }
+  ];
+  const bootstrapNextJson = JSON.parse(`${bootstrapNext.stdout}${bootstrapNext.stderr}`);
+  assert.equal(bootstrapNextJson.evidence.runnerMode.mode, 'npm-package');
+  assert.match(bootstrapNextJson.evidence.nextAction.command, /^npm exec -- atm bootstrap /);
+  const bootstrap = runGeneratedNpmCommand(bootstrapNextJson.evidence.nextAction.command);
+  lifecycle.push({ command: bootstrapNextJson.evidence.nextAction.command, status: bootstrap.status ?? -1 });
+  assert.equal(bootstrap.status, 0, `generated bootstrap command failed: ${bootstrap.stdout}${bootstrap.stderr}`);
+
+  const agents = readFileSync(path.join(firstUse, 'AGENTS.md'), 'utf8');
+  const generatedNextMatch = agents.match(/then run `([^`]+)` from the repository root before task work/);
+  assert.ok(generatedNextMatch, 'bootstrap-generated AGENTS.md must contain an executable first-use next command');
+  const generatedNextCommand = generatedNextMatch[1].replace('<current user prompt>', 'public npm first-use contract');
+  assert.match(generatedNextCommand, /^npm exec -- atm next --prompt /);
+  const generatedNext = runGeneratedNpmCommand(generatedNextCommand);
+  assert.ok(generatedNext.status === 0 || generatedNext.status === 1, `generated AGENTS command failed to start ATM: ${generatedNext.stdout}${generatedNext.stderr}`);
+  const generatedNextJson = JSON.parse(`${generatedNext.stdout}${generatedNext.stderr}`);
+  lifecycle.push({ command: generatedNextCommand, status: generatedNext.status ?? -1 });
+  assert.equal(generatedNextJson.evidence.runnerMode.mode, 'npm-package');
+  assert.ok(!/ERR_MODULE_NOT_FOUND|Cannot find module/.test(`${generatedNext.stdout}${generatedNext.stderr}`));
+  let current = generatedNextJson;
+  let ready = generatedNext.status === 0 && ['ready', 'no-work'].includes(current.evidence?.nextAction?.status);
+  for (let step = 0; !ready && step < 5; step += 1) {
+    const action = current.evidence?.nextAction?.command;
+    assert.equal(typeof action, 'string', `next response must provide an executable action before ready: ${JSON.stringify(current)}`);
+    const actionResult = runGeneratedNpmCommand(action);
+    lifecycle.push({ command: action, status: actionResult.status ?? -1 });
+    assert.equal(actionResult.status, 0, `generated first-use action failed (${action}): ${actionResult.stdout}${actionResult.stderr}`);
+    assert.ok(!/ERR_MODULE_NOT_FOUND|Cannot find module/.test(`${actionResult.stdout}${actionResult.stderr}`));
+    const nextResult = runNpmExecAt('next', '--json');
+    lifecycle.push({ command: 'npm exec -- atm next --json', status: nextResult.status ?? -1 });
+    assert.ok(nextResult.status === 0 || nextResult.status === 1, `next failed before ready: ${nextResult.stdout}${nextResult.stderr}`);
+    current = JSON.parse(`${nextResult.stdout}${nextResult.stderr}`);
+    assert.equal(current.evidence.runnerMode.mode, 'npm-package');
+    assert.ok(!/ERR_MODULE_NOT_FOUND|Cannot find module/.test(`${nextResult.stdout}${nextResult.stderr}`));
+    ready = nextResult.status === 0 && ['ready', 'no-work'].includes(current.evidence?.nextAction?.status);
+  }
+  assert.ok(ready, `generated npm first-use actions did not reach ready/no-work within five steps: ${JSON.stringify(lifecycle)}`);
+  const readyCommand = current.evidence?.nextAction?.command;
+  assert.equal(readyCommand, 'npm test --if-present', `ready lifecycle must expose the next normal action: ${JSON.stringify(current)}`);
+  const readyAction = runGeneratedNpmCommand(readyCommand);
+  lifecycle.push({ command: readyCommand, status: readyAction.status ?? -1 });
+  assert.equal(readyAction.status, 0, `generated ready action failed: ${readyAction.stdout}${readyAction.stderr}`);
+  assert.ok(lifecycle.length >= 4, `first-use receipt must include generated command chain: ${JSON.stringify(lifecycle)}`);
+  console.log(`[public-npm-install-contract:first-use-chain] ${JSON.stringify(lifecycle)}`);
+
+  const { buildPromptGuidanceNextResult, buildPromptRequiredNextResult } = await import('../../packages/cli/src/commands/next/prompt-guidance-result.ts');
+  const { createDeterministicTaskIntent } = await import('../../packages/cli/src/commands/next/route-resolution/intent.ts');
+  const { inspectIntegrationBootstrap } = await import('../../packages/cli/src/commands/integration.ts');
+  const { inspectRuntimeAdapterReadiness } = await import('../../packages/cli/src/commands/runtime-adapter-readiness.ts');
+  const routeContext = {
+    cwd: root,
+    commandPrefix: 'npm exec -- atm',
+    integrationBootstrap: inspectIntegrationBootstrap(root),
+    runtimeAdapterReadiness: inspectRuntimeAdapterReadiness(root)
+  };
+  const guidanceFor = (prompt: string) => buildPromptGuidanceNextResult({
+    ...routeContext,
+    taskIntent: createDeterministicTaskIntent(prompt)
+  })!;
+  const journalingRoute = guidanceFor('請把 ATM friction 寫入 backlog，並稽核已完成治理計畫');
+  const journalingActionCommand = (journalingRoute.evidence as any).nextAction.command as string;
+  assert.equal((journalingRoute.evidence as any).nextAction.status, 'journaling-ready');
+  assert.match(journalingActionCommand, /^npm exec -- atm guide first-layer --json$/);
+  const journalingAction = runGeneratedNpmCommand(journalingActionCommand);
+  assert.equal(journalingAction.status, 0, `generated journaling command failed: ${journalingAction.stdout}${journalingAction.stderr}`);
+
+  const quickfixRoute = guidanceFor('Quick fix a typo in src/example.ts');
+  const quickfixAction = (quickfixRoute.evidence as any).nextAction;
+  assert.equal(quickfixAction.status, 'quickfix-ready');
+  assert.match(quickfixAction.command, /^npm exec -- atm next --claim /);
+  assert.ok(quickfixAction.allowedCommands.every((command: string) => command.startsWith('npm exec -- atm ')));
+  const quickfixCommand = quickfixAction.command.replace('<id>', 'public-npm-contract');
+  const quickfixCommandResult = runGeneratedNpmCommand(quickfixCommand);
+  assert.ok(quickfixCommandResult.status === 0 || quickfixCommandResult.status === 1, `generated quickfix command did not invoke ATM: ${quickfixCommandResult.stdout}${quickfixCommandResult.stderr}`);
+  assert.ok(!/ERR_MODULE_NOT_FOUND|Cannot find module/.test(`${quickfixCommandResult.stdout}${quickfixCommandResult.stderr}`));
+
+  const frameworkRoute = guidanceFor('Improve ATM framework routing');
+  const frameworkAction = (frameworkRoute.evidence as any).nextAction;
+  assert.equal(frameworkAction.status, 'framework-temp-claim-required');
+  assert.match(frameworkAction.command, /^node atm\.mjs framework-mode claim /);
+  assert.ok(frameworkAction.allowedCommands.every((command: string) => command.startsWith('node atm.mjs ')));
+  const frameworkStatusTokens = tokenizeCommand(frameworkAction.allowedCommands[1]);
+  assert.equal(frameworkStatusTokens[0], 'node');
+  const frameworkStatusAction = spawnSync(process.execPath, [path.join(root, frameworkStatusTokens[1]), ...frameworkStatusTokens.slice(2)], {
+    cwd: root, encoding: 'utf8', windowsHide: true
+  });
+  assert.equal(frameworkStatusAction.status, 0, `generated framework status command failed: ${frameworkStatusAction.stdout}${frameworkStatusAction.stderr}`);
+
+  const promptRequiredRoute = buildPromptRequiredNextResult({
+    ...routeContext,
+    claimRequested: false,
+    importedTaskQueue: {
+      taskStorePath: '.atm/history/tasks', openTaskCount: 1, selectedTask: null, claimableTask: null, promptScope: null,
+      tasks: [{ workItemId: 'TASK-SMOKE-0001', title: 'Prompt required smoke', status: 'open', closedAt: null,
+        closedByActor: null, closurePacket: null, lastTransitionId: null, lastTransitionAt: null, taskPath: '.atm/history/tasks/TASK-SMOKE-0001.json',
+        milestone: null, dependencies: [], format: 'json', sourcePlanPath: null, nearbyPlanPaths: [], scopePaths: [], targetRepo: null,
+        planningRepo: null, allowPlanningMirror: false, planningReadOnlyPaths: [], planningMirrorPaths: [], targetAllowedFiles: [],
+        closureAuthority: null, activeClaimActorId: null, activeClaimLaneSessionId: null, activeClaimIntent: null }]
+    }
+  });
+  const promptRequiredAction = (promptRequiredRoute.evidence as any).nextAction;
+  assert.equal(promptRequiredAction.status, 'prompt-required');
+  assert.match(promptRequiredAction.command, /^npm exec -- atm next --prompt /);
+  assert.ok(promptRequiredAction.allowedCommands.every((command: string) => command.startsWith('npm exec -- atm ')));
+  const promptRequiredCommand = promptRequiredAction.command.replace('<current user prompt>', 'a bounded smoke task');
+  const promptRequiredActionResult = runGeneratedNpmCommand(promptRequiredCommand);
+  assert.ok(promptRequiredActionResult.status === 0 || promptRequiredActionResult.status === 1);
+  assert.ok(!/ERR_MODULE_NOT_FOUND|Cannot find module/.test(`${promptRequiredActionResult.stdout}${promptRequiredActionResult.stderr}`));
+
   runAtm('bootstrap', '--cwd', adopter, '--task', 'public runtime chart smoke', '--json');
   runAtm('atm-chart', 'render', '--cwd', adopter, '--json');
   runAtm('atm-chart', 'verify', '--cwd', adopter, '--json');

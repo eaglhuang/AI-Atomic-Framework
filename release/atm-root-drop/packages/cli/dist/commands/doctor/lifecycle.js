@@ -2,8 +2,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { computeSha256ForFile } from '../../_vendor/core/dist/hash-lock/hash-lock.js';
 import { message, relativePathFrom } from '../shared.js';
+import { governanceCommandPrefix } from '../shared/atm-cli-entrypoint.js';
 import { readJsonIfExists } from './utilities.js';
 export function checkOnboardingLifecycle(root, runtime) {
+    const commandPrefix = governanceCommandPrefix(process.argv[1] ?? null);
     const configPresent = existsSync(path.join(root, '.atm', 'config.json'));
     const atmChartPath = path.join(root, '.atm', 'memory', 'atm-chart.md');
     const welcomeLineagePath = path.join(root, '.atm', 'runtime', 'welcome.lineage.json');
@@ -15,7 +17,7 @@ export function checkOnboardingLifecycle(root, runtime) {
             welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
             atmChartFreshness: 'not-applicable',
             welcomeRecorded: false,
-            recommendedAction: 'node atm.mjs bootstrap --cwd . --task "Bootstrap ATM in this repository"'
+            recommendedAction: `${commandPrefix} bootstrap --cwd . --task "Bootstrap ATM in this repository" --json`
         };
     }
     const defaultGuardsPath = path.join(root, runtime.paths.defaultGuardsPath);
@@ -36,7 +38,7 @@ export function checkOnboardingLifecycle(root, runtime) {
             welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
             atmChartFreshness: 'optional-before-adoption',
             welcomeRecorded: Boolean(welcomeLineage),
-            recommendedAction: 'node atm.mjs init --adopt default --cwd .'
+            recommendedAction: `${commandPrefix} init --adopt default --cwd . --json`
         };
     }
     if (!defaultGuardsPresent) {
@@ -48,7 +50,7 @@ export function checkOnboardingLifecycle(root, runtime) {
             welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
             atmChartFreshness: 'guards-missing',
             welcomeRecorded: Boolean(welcomeLineage),
-            recommendedAction: 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
+            recommendedAction: `${commandPrefix} bootstrap --cwd . --force --task "Bootstrap ATM in this repository" --json`
         };
     }
     if (!atmChartPresent) {
@@ -60,7 +62,7 @@ export function checkOnboardingLifecycle(root, runtime) {
             welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
             atmChartFreshness: 'missing',
             welcomeRecorded: Boolean(welcomeLineage),
-            recommendedAction: 'node atm.mjs atm-chart render --cwd .'
+            recommendedAction: `${commandPrefix} atm-chart render --cwd . --json`
         };
     }
     const atmChartFrontmatter = readATMChartFrontmatter(atmChartPath);
@@ -78,7 +80,7 @@ export function checkOnboardingLifecycle(root, runtime) {
         currentSourceGuardsSha256: currentGuardsHash,
         welcomeRecorded,
         welcomeCount: Number(welcomeLineage?.welcomeCount ?? 0),
-        recommendedAction: atmChartFresh ? 'node atm.mjs welcome --cwd .' : 'node atm.mjs atm-chart render --cwd .'
+        recommendedAction: atmChartFresh ? `${commandPrefix} welcome --cwd . --json` : `${commandPrefix} atm-chart render --cwd . --json`
     };
 }
 export function createVersionSummaryMessages(versionSummary) {

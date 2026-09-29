@@ -2172,6 +2172,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/runtime-adapter-readiness.js",
     "release/atm-root-drop/packages/cli/dist/commands/self-host-alpha.js",
     "release/atm-root-drop/packages/cli/dist/commands/shared.js",
+    "release/atm-root-drop/packages/cli/dist/commands/shared/atm-cli-entrypoint.js",
     "release/atm-root-drop/packages/cli/dist/commands/shared/command-manifest.js",
     "release/atm-root-drop/packages/cli/dist/commands/shared/command-spec-output.js",
     "release/atm-root-drop/packages/cli/dist/commands/shared/identity-normalization.js",
@@ -3016,6 +3017,7 @@
     "release/atm-root-drop/packages/cli/src/commands/runtime-adapter-readiness.ts",
     "release/atm-root-drop/packages/cli/src/commands/self-host-alpha.ts",
     "release/atm-root-drop/packages/cli/src/commands/shared.ts",
+    "release/atm-root-drop/packages/cli/src/commands/shared/atm-cli-entrypoint.ts",
     "release/atm-root-drop/packages/cli/src/commands/shared/command-manifest.ts",
     "release/atm-root-drop/packages/cli/src/commands/shared/command-spec-output.ts",
     "release/atm-root-drop/packages/cli/src/commands/shared/identity-normalization.ts",
@@ -6260,7 +6262,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 6224,
+    "unchanged": 6226,
     "removed": 0
   },
   "buildMode": "full",
@@ -21360,7 +21362,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.js",
-        "digest": "a120ef7943aa6131ef2edf32827d2868e2c4590bafea9249275a65ea854166f8",
+        "digest": "4cef91148e3f7cc87e2db920832aca0287412e08448cac78ec1cf0c992f8264b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.js"
@@ -21369,7 +21371,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/implementation.js",
-        "digest": "54c509f090a33308ac951410e12a731c12c15e9857047d38af59d1540c0ac56f",
+        "digest": "d9598c7229e4013ea7181262b6e8135d505f04d45fc2986b71b362084a46521c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/implementation.js"
@@ -23088,7 +23090,7 @@
       },
       {
         "path": "packages/cli/dist/commands/doctor/lifecycle.js",
-        "digest": "e5ae8c0fd89360530282b8b4446e78bc422a2584621c3b96d83a71f6d8d5e0d7",
+        "digest": "b8d7ee2bc4c2fa06e046317cbabd7d87ace2d50b9be4f57502c75b86062ef8d7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/doctor/lifecycle.js"
@@ -24195,7 +24197,7 @@
       },
       {
         "path": "packages/cli/dist/commands/guide.js",
-        "digest": "f2e9668d1b6a143ba983aa2557739e220caa070a31805e5e34a7b0c797b05348",
+        "digest": "92350c8c754095f711bd27cec9aefb914670ca89bd902ebf0ecc497cc263393d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/guide.js"
@@ -24789,7 +24791,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next.js",
-        "digest": "1ad0af9957f2072170e4562c15413ef4bd821367d6b82c378b7bfed4e6da6f70",
+        "digest": "1ee43cffd9c8381bd6a2e351f703ce55204159faf2312f2e5085bc5ff700cdf7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next.js"
@@ -24816,7 +24818,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/channel-strategy.js",
-        "digest": "1fb7c4fc4ec23535f59eb5e9ab510714437d69e2892d5fe8874a0e28e7470f8b",
+        "digest": "55a3749f413425cd0b2d26bdba5961b3bb0827249c04fec66e2c967809a912f0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/channel-strategy.js"
@@ -25086,7 +25088,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/prompt-guidance-result.js",
-        "digest": "812bff2f2c12c2a2e415d531564631730423ed4eefcfad50d504562d84babe79",
+        "digest": "88ab82f334e48f11e59beb4c8fc796e8bcdeb35d8a4d81d8a5bf1f2a8b700c50",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/prompt-guidance-result.js"
@@ -25221,7 +25223,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/runner-mode.js",
-        "digest": "e4ea1ac50a3ddb31bf618f7c4e77ebb927a895827e9f62e3b346cc206f7df7c7",
+        "digest": "c60243b5b2f995e9f5e3476fca0d2528823f9de37e610f2676dc4045562957f1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/runner-mode.js"
@@ -25531,6 +25533,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/shared.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/shared/atm-cli-entrypoint.js",
+        "digest": "965fb057bcf9b536e84e7b4617405d9638e1f67837af7ce13b1e2bad4fbd70dd",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/shared/atm-cli-entrypoint.js"
         ],
         "replaceable": true
       },
@@ -28227,7 +28238,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/layout/templates/root-drop/AGENTS.md",
-        "digest": "d7a72c62a9ee0dcc75f43c4e36aab4d8994e18f134b6bf4fff92559ed9ee2258",
+        "digest": "2a081605c7cb26f618342fdec800b769d64ed15a5e260f18e56b01e79e271e1b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/layout/templates/root-drop/AGENTS.md"
@@ -28236,7 +28247,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "3284e95794cec581e6db63930b42f9ba83d758b1d2cdeebefdaeee01375d687c",
+        "digest": "a47bdbbb06d792c19515f9bedfacc9a221ef63a9a42834065e325a155cc71387",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -28245,7 +28256,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "5a4445baf183c71c66f663bcbbee314876378407af3f999f9b5e71417d8307f7",
+        "digest": "48a99ced3aa74ea1c3d0e9e369aae46492b8faec72f3060dc9842272339fb688",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -28632,7 +28643,7 @@
       },
       {
         "path": "packages/cli/dist/templates/root-drop/AGENTS.md",
-        "digest": "d7a72c62a9ee0dcc75f43c4e36aab4d8994e18f134b6bf4fff92559ed9ee2258",
+        "digest": "2a081605c7cb26f618342fdec800b769d64ed15a5e260f18e56b01e79e271e1b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/templates/root-drop/AGENTS.md"
@@ -30054,7 +30065,7 @@
       },
       {
         "path": "packages/cli/src/commands/doctor/lifecycle.ts",
-        "digest": "970316d97e35fe1f8a15146e5d6781301a021220aa1643d206240819d35dc5e0",
+        "digest": "0624052deff290a0f2a5ec2cec959367f5dcbfb0191c06b66068324e7c858090",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/doctor/lifecycle.ts"
@@ -31530,7 +31541,7 @@
       },
       {
         "path": "packages/cli/src/commands/guide.ts",
-        "digest": "97f0e85b69f1407d148697c0fd631ae7f402279f8cf4c122c1969481d3050d63",
+        "digest": "499cf9dcb16843ea9c4011c190ec9ea0d226e30b9f37633116956c70a4f074f6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/guide.ts"
@@ -32232,7 +32243,7 @@
       },
       {
         "path": "packages/cli/src/commands/next.ts",
-        "digest": "34ede02c37434ec07058ab6e7346f25b6ac328a42a14b5d650ed3bb14741aa28",
+        "digest": "7c61ab849b3141188b29f00829ba0d89e9a5802977041b87d271f1f7439c5c07",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next.ts"
@@ -32250,7 +32261,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
-        "digest": "27adeeb83e51c9c28dc860251763cf1dd1a3ae2acc75920cdbe45d3e39e74acc",
+        "digest": "fc6d6f268d346b92657d3f87bc3cea751c2e6dabf29812edeae71dc7a7c864d8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts"
@@ -32349,7 +32360,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
-        "digest": "afac2a840fc35bb977b1a00630efd23b883a345cd98e7b4340d57cc461095d72",
+        "digest": "dd0ef0d1b67ab3c16223ed4c1c01223d99db3fa839773a8a33369dfd951d2e9a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts"
@@ -32412,7 +32423,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/channel-strategy.ts",
-        "digest": "79afdf1f13377a2aee8a80af17853aee9ace5280bc53f682fc1f3ae9913d7b74",
+        "digest": "96889a47aef452d9f0541f30b08588f251aca58968ff3a7d7079f94773fdabb5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/channel-strategy.ts"
@@ -32682,7 +32693,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/prompt-guidance-result.ts",
-        "digest": "de07140afebe07fd88af9cf6798dcd2fd3b8cbc41d33d0b5ba148a526ebb4b2c",
+        "digest": "ab4b16c4ecd33eef966ee8a1d59af2d8de9b86a81464bd3a39056f28d8c48574",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/prompt-guidance-result.ts"
@@ -32817,7 +32828,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/runner-mode.ts",
-        "digest": "858604eb2536f13c193cbc7969145681803d8017088a2c1f424766cb7e4aa580",
+        "digest": "960fd1e0a9010c7ec0212ca32b082b00d61142747ed3ce43f2e3255d483f8af0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/runner-mode.ts"
@@ -33127,6 +33138,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/shared.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/shared/atm-cli-entrypoint.ts",
+        "digest": "90e29f46bef99def299d74d0867acbd80f835fed2e160e9c77ebe965bd26d5a8",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/shared/atm-cli-entrypoint.ts"
         ],
         "replaceable": true
       },
@@ -44553,7 +44573,7 @@
       },
       {
         "path": "packages/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.js",
-        "digest": "a120ef7943aa6131ef2edf32827d2868e2c4590bafea9249275a65ea854166f8",
+        "digest": "4cef91148e3f7cc87e2db920832aca0287412e08448cac78ec1cf0c992f8264b",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.js"
@@ -44562,7 +44582,7 @@
       },
       {
         "path": "packages/plugin-governance-local/dist/bootstrap/bootstrap/implementation.js",
-        "digest": "54c509f090a33308ac951410e12a731c12c15e9857047d38af59d1540c0ac56f",
+        "digest": "d9598c7229e4013ea7181262b6e8135d505f04d45fc2986b71b362084a46521c",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/dist/bootstrap/bootstrap/implementation.js"
@@ -44679,7 +44699,7 @@
       },
       {
         "path": "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
-        "digest": "a72af00e5b3d4309cd9f588e0a66296c8a698029ed67df693dc7e3b96ba22e7f",
+        "digest": "bbf392b2d8a934ac4b2f648965947d3ba80408f3995d3111bb28c724051a2df8",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts"
@@ -44688,7 +44708,7 @@
       },
       {
         "path": "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
-        "digest": "196affc574c17ca553dcf65b100fe471aa0f5a264e2f728c111d47bbeb59a958",
+        "digest": "3828a20a6c1f6a8e5d73e11c4d0f4316aa1f69c44d0bd6cbbd0bfb6c35984e07",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts"
@@ -44724,7 +44744,7 @@
       },
       {
         "path": "packages/plugin-governance-local/src/bootstrap/types.ts",
-        "digest": "4836c1433b40e06ad8bf5b9d2c232e8757114b5f9cddf5e6df95b8ee19c47fb7",
+        "digest": "a2fb645bad377228f250999de817212e1f5ab37183c422fd9026b1611e4da03a",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/src/bootstrap/types.ts"
@@ -49125,7 +49145,7 @@
       },
       {
         "path": "scripts/run-cli-test-sweep.ts",
-        "digest": "50d16f20da7f63b85b01f5ce57d7be3c73b60314d2a53e0b9ea09ad9fb062ac6",
+        "digest": "f0a2d1b6590dc3e39435c553ad3c2efddce61d9d5ded757df922d990845cedb7",
         "origin": "source",
         "inputPaths": [
           "scripts/run-cli-test-sweep.ts"
@@ -49134,7 +49154,7 @@
       },
       {
         "path": "scripts/run-paired-ab-v4.ts",
-        "digest": "599b4fbcc6dc4ed98a2e9c4a82597e620e7314f6d0bedcdcd31696f75eef5532",
+        "digest": "d328ca15243503f98cfed81683d62f7a48f78237d139425bc8e066803b92d31c",
         "origin": "source",
         "inputPaths": [
           "scripts/run-paired-ab-v4.ts"
@@ -50502,7 +50522,7 @@
       },
       {
         "path": "scripts/validate-npm-clean-install.ts",
-        "digest": "65137841753c48f1c5b43a464436df912a628f27641c439f0393d996f0c0ff52",
+        "digest": "8f5766d9ab3983adc289dc572a35b5c19bb4df12eb42bc575a3291a2ce1204ba",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-npm-clean-install.ts"
@@ -51042,7 +51062,7 @@
       },
       {
         "path": "scripts/validate-public-npm-install.ts",
-        "digest": "69ee2141b7ffe40a43c2b266f572bd633a0f4757fb88a6e44372e4f6f338b5d4",
+        "digest": "084b5eaa7833301a3d2e66711350d941330ca5611efac3ee9a6108107a2d8b8e",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-public-npm-install.ts"
@@ -52932,7 +52952,7 @@
       },
       {
         "path": "templates/root-drop/AGENTS.md",
-        "digest": "d7a72c62a9ee0dcc75f43c4e36aab4d8994e18f134b6bf4fff92559ed9ee2258",
+        "digest": "2a081605c7cb26f618342fdec800b769d64ed15a5e260f18e56b01e79e271e1b",
         "origin": "source",
         "inputPaths": [
           "templates/root-drop/AGENTS.md"
@@ -54633,7 +54653,7 @@
       },
       {
         "path": "tests/cli/cli-test-sweep.test.ts",
-        "digest": "d52062dabb98acd93c90fcd2adb086b5fcbebbefb055eb03442e1fda6ec4451d",
+        "digest": "74f82180829fd6eb1398e5ba1f147ae28c375073c63b7a22d3744415ab4199cb",
         "origin": "source",
         "inputPaths": [
           "tests/cli/cli-test-sweep.test.ts"
@@ -56082,7 +56102,7 @@
       },
       {
         "path": "tests/cli/npm-clean-install.test.ts",
-        "digest": "fb33e2942eb2581466bc068bd3c8c201ba248d3749f4f6a3679386bd9be7c8bc",
+        "digest": "2db17f6dcf89d028bc7e01ab29c5cc4dbe482cd57b528c4ff925fadeb5f11722",
         "origin": "source",
         "inputPaths": [
           "tests/cli/npm-clean-install.test.ts"
@@ -56154,7 +56174,7 @@
       },
       {
         "path": "tests/cli/paired-ab-v4-safety-controller.test.ts",
-        "digest": "a89cb58cf17cd1e006d22bd7a42a314035f991429e542cddb1f4d8e02b352952",
+        "digest": "b50d5b153be7d78aab6ccd2423b0672e890826f86024a33a63b2fbaa47813399",
         "origin": "source",
         "inputPaths": [
           "tests/cli/paired-ab-v4-safety-controller.test.ts"
@@ -57414,7 +57434,7 @@
       },
       {
         "path": "tests/cli/public-npm-install-contract.test.ts",
-        "digest": "daed59541cf2f3529f728b7aa7c94b04ae4980251fe37574b29150433f0c024c",
+        "digest": "c8ac474ce16b31cbbd446c61d471011ec68ac18dcd47a840e71bf6754a7540ba",
         "origin": "source",
         "inputPaths": [
           "tests/cli/public-npm-install-contract.test.ts"
@@ -62282,7 +62302,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:a616b3106a163fd947ad9335c70a142da5ebbceca6cc7fd0bf779ac50ec1815c"
+    "treeDigest": "sha256:771cedbec507ee811d0621a0b5b65348ac400b6e6665376899adddb4b7654194"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -62822,6 +62842,7 @@
       "packages/cli/src/commands/runtime-adapter-readiness.ts",
       "packages/cli/src/commands/self-host-alpha.ts",
       "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/shared/atm-cli-entrypoint.ts",
       "packages/cli/src/commands/shared/command-manifest.ts",
       "packages/cli/src/commands/shared/command-spec-output.ts",
       "packages/cli/src/commands/shared/identity-normalization.ts",
@@ -63834,7 +63855,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:555e8f4418a6354e3f21b89cd86004c2b855f5e0ff3f42fe1e7e079e4bc04582"
+    "digest": "sha256:fa45d045259154902b57aab4b3699776cc3e256fd34b0b6af3c6ab3f0b18fd4e"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -65980,6 +66001,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/runtime-adapter-readiness.js",
       "release/atm-root-drop/packages/cli/dist/commands/self-host-alpha.js",
       "release/atm-root-drop/packages/cli/dist/commands/shared.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared/atm-cli-entrypoint.js",
       "release/atm-root-drop/packages/cli/dist/commands/shared/command-manifest.js",
       "release/atm-root-drop/packages/cli/dist/commands/shared/command-spec-output.js",
       "release/atm-root-drop/packages/cli/dist/commands/shared/identity-normalization.js",
@@ -66824,6 +66846,7 @@
       "release/atm-root-drop/packages/cli/src/commands/runtime-adapter-readiness.ts",
       "release/atm-root-drop/packages/cli/src/commands/self-host-alpha.ts",
       "release/atm-root-drop/packages/cli/src/commands/shared.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared/atm-cli-entrypoint.ts",
       "release/atm-root-drop/packages/cli/src/commands/shared/command-manifest.ts",
       "release/atm-root-drop/packages/cli/src/commands/shared/command-spec-output.ts",
       "release/atm-root-drop/packages/cli/src/commands/shared/identity-normalization.ts",
@@ -70070,22 +70093,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:b4afca87258cc3a5578bf3a4d68f84da9d78a3723cb9b4c68e61b49d38569a38",
-  "sealedSourceCommit": "8d72c255886704e9a220ae07bfeda8e7737c5b09",
+  "buildInputsTreeHash": "sha256:698ca510282707c1db4cc68469665612e1ea1ee469403097449ece58e2281d02",
+  "sealedSourceCommit": "f7c79d9bcb8998958b8bc840897f93d3182e55fe",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:64d673ba692c4ff24dceef3fd780298d7130026c4c127ab994b6f2a644f43e84",
-  "tsBuildCacheDigest": "sha256:39d989a88ed23c5999101f6431b2654f80b1a21cdab6767a52da81ecd8479a2b",
+  "incrementalPlanDigest": "sha256:fde78eff52a9a7fd3e0a903af2b9d88ee4f2e95d25a4690c0eae7bd5ed39b7e0",
+  "tsBuildCacheDigest": "sha256:8572fca953a95b5860c3fc18a4dbd5c5a0cc228c885d7b5969fed56905bf2a95",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 54,
-    "skipDecision": 56,
-    "worktreeSetup": 9716,
-    "typescriptBuild": 10893,
-    "rootDropReleaseAssembly": 30170,
-    "onefileReleaseAssembly": 17806,
-    "artifactSync": 5002,
+    "inputHashCalculation": 46,
+    "skipDecision": 54,
+    "worktreeSetup": 13427,
+    "typescriptBuild": 17082,
+    "rootDropReleaseAssembly": 30825,
+    "onefileReleaseAssembly": 19179,
+    "artifactSync": 5015,
     "cleanup": 0,
-    "totalElapsed": 79439
+    "totalElapsed": 93253
   }
 }

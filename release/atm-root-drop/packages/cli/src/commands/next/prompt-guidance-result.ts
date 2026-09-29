@@ -16,18 +16,20 @@ import type { NextActionLike } from './next-action-assembly.ts';
 export function buildPromptGuidanceNextResult(input: {
   readonly cwd: string;
   readonly actor?: string;
+  readonly commandPrefix?: string;
   readonly taskIntent: TaskIntent | null;
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
   const prompt = input.taskIntent?.userPrompt?.trim();
   if (!prompt || input.taskIntent?.taskScopeMentioned === true) return null;
+  const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
   if (isJournalingPrompt(prompt)) return buildJournalingPromptResult(input, prompt);
   const quickfixScope = resolveQuickfixScope(prompt);
   if (isQuickfixPrompt(prompt) && quickfixScope.length > 0) {
     const nextAction: NextActionLike = {
       status: 'quickfix-ready',
-      command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(prompt)} --json`,
+      command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(prompt)} --json`,
       reason: 'the prompt looks like a small targeted fix with path-like scope, so ATM can use the fast quickfix channel',
       recommendedChannel: 'fast',
       riskLevel: 'low',
@@ -42,7 +44,7 @@ export function buildPromptGuidanceNextResult(input: {
         ownFiles: quickfixScope
       }),
       allowedFiles: quickfixScope,
-      allowedCommands: allowedGuidanceBootstrapCommands(),
+      allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
       blockedCommands: blockedMutationCommands()
     };
     return makeResult({
@@ -76,7 +78,10 @@ export function buildPromptGuidanceNextResult(input: {
     if (!frameworkRepoIdentity.isFrameworkRepo) {
       return buildGeneralPromptGuidanceResult(input, prompt);
     }
-    const claimCommand = buildFrameworkTempClaimCommand([], prompt);
+    // Framework-only commands are intentionally absent from the adopter npm
+    // surface; a framework checkout must use its repository-local runner.
+    const frameworkCommandPrefix = commandPrefix === 'npm exec -- atm' ? 'node atm.mjs' : commandPrefix;
+    const claimCommand = buildFrameworkTempClaimCommand([], prompt).replace(/^node atm\.mjs/, frameworkCommandPrefix);
     const nextAction: NextActionLike = {
       status: 'framework-temp-claim-required',
       command: claimCommand,
@@ -102,8 +107,8 @@ export function buildPromptGuidanceNextResult(input: {
       }),
       allowedCommands: [
         claimCommand,
-        'node atm.mjs framework-mode status --json',
-        'node atm.mjs guard framework-development --json'
+        `${frameworkCommandPrefix} framework-mode status --json`,
+        `${frameworkCommandPrefix} guard framework-development --json`
       ],
       blockedCommands: [
         'editing framework critical files before framework-mode claim',
@@ -143,14 +148,15 @@ function buildJournalingPromptResult(
   input: Parameters<typeof buildPromptGuidanceNextResult>[0],
   prompt: string
 ) {
+  const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
   const nextAction: NextActionLike = {
     status: 'journaling-ready',
-    command: 'node atm.mjs guide first-layer --json',
+    command: `${commandPrefix} guide first-layer --json`,
     reason: 'the prompt explicitly records ATM backlog or optimization work, so ATM routes to the first-layer backlog contract instead of atom discovery',
     recommendedChannel: null,
     riskLevel: 'low',
     governanceReadiness: buildGovernanceReadinessHint(input.cwd, { channel: null, prompt, actorId: input.actor }),
-    allowedCommands: ['node atm.mjs guide first-layer --json', 'node atm.mjs next --prompt "<current user prompt>" --json'],
+    allowedCommands: [`${commandPrefix} guide first-layer --json`, `${commandPrefix} next --prompt "<current user prompt>" --json`],
     blockedCommands: ['node atm.mjs guide create-atom --json for an explicit backlog or bug-record request']
   };
   return makeResult({
@@ -178,9 +184,10 @@ function buildGeneralPromptGuidanceResult(
   input: Parameters<typeof buildPromptGuidanceNextResult>[0],
   prompt: string
 ) {
+  const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
   const nextAction: NextActionLike = {
     status: 'prompt-guidance-required',
-    command: `node atm.mjs guide --goal ${quoteCliValue(prompt)} --cwd . --json`,
+    command: `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`,
     reason: 'the user supplied a prompt that is not task-scoped, so ATM routes guidance from that prompt instead of reusing stale global guidance',
     recommendedChannel: null,
     riskLevel: 'medium',
@@ -189,7 +196,7 @@ function buildGeneralPromptGuidanceResult(
       prompt,
       actorId: input.actor
     }),
-    allowedCommands: allowedGuidanceBootstrapCommands(),
+    allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
     blockedCommands: blockedMutationCommands(),
     ...buildNonPlaybookRouteHints(input.cwd, prompt, { includeWorktreeDetails: false })
   };
@@ -220,15 +227,17 @@ function buildGeneralPromptGuidanceResult(
 
 export function buildPromptRequiredNextResult(input: {
   readonly cwd: string;
+  readonly commandPrefix?: string;
   readonly claimRequested: boolean;
   readonly importedTaskQueue: ImportedTaskQueue;
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
+  const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
   const candidatePreview = input.importedTaskQueue.tasks.slice(0, 12).map(toTaskCandidateView);
   const nextAction: NextActionLike = {
     status: 'prompt-required',
-    command: 'node atm.mjs next --prompt "<current user prompt>" --json',
+    command: `${commandPrefix} next --prompt "<current user prompt>" --json`,
     reason: 'task cards exist, but no current user prompt was provided; ATM will not choose a global task or batch by accident',
     recommendedChannel: null,
     riskLevel: 'medium',
@@ -236,8 +245,8 @@ export function buildPromptRequiredNextResult(input: {
     candidates: candidatePreview,
     batchInstruction: 'If the user asked for all task cards, a whole plan, or multiple tasks, rerun with the original prompt so ATM can return recommendedChannel=batch and require batch checkpoint.',
     allowedCommands: [
-      'node atm.mjs next --prompt "<current user prompt>" --json',
-      'node atm.mjs next --claim --actor <id> --prompt "<current user prompt>" --auto-intent --json'
+      `${commandPrefix} next --prompt "<current user prompt>" --json`,
+      `${commandPrefix} next --claim --actor <id> --prompt "<current user prompt>" --auto-intent --json`
     ],
     blockedCommands: [
       'manual tasks claim/close loops without prompt-scoped next',

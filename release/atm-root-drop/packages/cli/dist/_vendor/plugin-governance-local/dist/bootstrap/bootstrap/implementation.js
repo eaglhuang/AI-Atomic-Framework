@@ -6,7 +6,7 @@ import { createDefaultGuards } from '../../default-guards.js';
 import { createLocalGovernanceStores } from '../../stores.js';
 import { createContextBudgetSummary, createDefaultContextBudgetPolicy, evaluateContextBudget, estimateContextBudgetTokens, sanitizeBudgetFileId } from '../budget.js';
 import { createContinuationRunReport, createContinuationSummaryRecord, renderContextSummaryMarkdown } from '../prompt.js';
-import { ensureDirectory, installPinnedRunner, normalizeRelativePath, patchReadmeEntry, probeRepository, readProjectName, relativePathFrom, renderTemplate, resolveRepoPath, sha256Bytes, writeAgentInstructionsTemplate, writeJson, writeRootDropScripts, writeTemplate, writeText } from './bootstrap-support.js';
+import { ensureDirectory, installPinnedRunner, normalizeRelativePath, patchReadmeEntry, probeRepository, readProjectName, relativePathFrom, renderTemplate, resolveBootstrapCommandPrefix, resolveRepoPath, sha256Bytes, writeAgentInstructionsTemplate, writeJson, writeRootDropScripts, writeTemplate, writeText } from './bootstrap-support.js';
 const defaultBootstrapTaskId = 'BOOTSTRAP-0001';
 const defaultBootstrapTaskTitle = 'Bootstrap ATM in this repository';
 const currentLayoutVersion = 2;
@@ -106,6 +106,7 @@ export function adoptLocalGovernanceBundle(cwd, options = {}) {
         ensureDirectory(directoryPath, cwd, created, unchanged);
     }
     const pinnedRunner = installPinnedRunner(cwd, force, created, unchanged);
+    const commandPrefix = resolveBootstrapCommandPrefix(pinnedRunner.status);
     stores.documentIndex.initialize?.();
     stores.shardStore.initialize?.();
     stores.artifactStore.initialize?.();
@@ -115,7 +116,7 @@ export function adoptLocalGovernanceBundle(cwd, options = {}) {
     stores.evidenceStore.initialize?.();
     stores.contextBudgetGuard?.initialize?.();
     stores.contextSummaryStore?.initialize?.();
-    const recommendedPrompt = createRecommendedPrompt(taskId);
+    const recommendedPrompt = createRecommendedPrompt(taskId, commandPrefix);
     const projectProbe = probeRepository(cwd, recommendedPrompt);
     const defaultGuards = createDefaultGuards(projectProbe);
     const defaultContextBudgetPolicy = createDefaultContextBudgetPolicy(projectProbe.generatedAt ?? new Date().toISOString());
@@ -140,7 +141,7 @@ export function adoptLocalGovernanceBundle(cwd, options = {}) {
         summary: 'Default ATM bootstrap pack created and linked to evidence, context budget, and the next continuation prompt.',
         nextActions: [
             `Read .atm/history/tasks/${taskId}.json and .atm/runtime/profile/default.md.`,
-            'Run node atm.mjs next --prompt "<current user prompt>" --json, show ATM_USER_NOTICE or evidence.userNotice if present, then execute the returned next action.',
+            `Run ${commandPrefix} next --prompt "<current user prompt>" --json, show ATM_USER_NOTICE or evidence.userNotice if present, then execute the returned next action.`,
             'Record the first smoke artifact, log, evidence, and handoff before closing the work item.'
         ],
         artifactPaths: ['.atm/history/artifacts', '.atm/history/logs', '.atm/history/reports'],
@@ -150,7 +151,7 @@ export function adoptLocalGovernanceBundle(cwd, options = {}) {
         handoffKind: 'bootstrap',
         continuationGoal: 'Resume bootstrap from the generated task, profile, evidence, and budget surfaces.',
         resumePrompt: recommendedPrompt,
-        resumeCommand: ['node', 'atm.mjs', 'next', '--prompt', '<current user prompt>', '--json'],
+        resumeCommand: [...commandPrefix.split(' '), 'next', '--prompt', '<current user prompt>', '--json'],
         budgetDecision: bootstrapBudgetEvaluation.decision,
         hardStop: bootstrapBudgetEvaluation.decision === 'hard-stop'
     };
@@ -159,7 +160,7 @@ export function adoptLocalGovernanceBundle(cwd, options = {}) {
         summaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath)
     };
     const bootstrapEvidence = {
-        ...createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths),
+        ...createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths, recommendedPrompt),
         pinnedRunner,
         contextBudgetReportPath: normalizeRelativePath(contextBudgetReportPath),
         contextBudgetSummaryPath: bootstrapBudgetEvaluation.decision === 'pass' ? null : normalizeRelativePath(contextBudgetSummaryPath),
@@ -174,7 +175,7 @@ export function adoptLocalGovernanceBundle(cwd, options = {}) {
     writeJson(paths.projectProbePath, projectProbe, cwd, force, created, unchanged);
     writeJson(paths.defaultGuardsPath, defaultGuards, cwd, force, created, unchanged);
     writeJson(paths.contextBudgetPolicyPath, defaultContextBudgetPolicy, cwd, force, created, unchanged);
-    writeJson(paths.taskPath, createBootstrapTask(taskId, taskTitle, projectProbe, paths), cwd, force, created, unchanged);
+    writeJson(paths.taskPath, createBootstrapTask(taskId, taskTitle, projectProbe, paths, recommendedPrompt), cwd, force, created, unchanged);
     writeJson(paths.lockPath, createBootstrapLock(taskId, paths), cwd, force, created, unchanged);
     writeJson(paths.evidencePath, bootstrapEvidence, cwd, force, created, unchanged);
     writeJson(resolveRepoPath(cwd, contextBudgetReportPath), {
@@ -198,6 +199,7 @@ export function adoptLocalGovernanceBundle(cwd, options = {}) {
     }
     const templateTokens = {
         RECOMMENDED_PROMPT: recommendedPrompt,
+        ATM_COMMAND_PREFIX: commandPrefix,
         BOOTSTRAP_TASK_PATH: relativePathFrom(cwd, paths.taskPath),
         BOOTSTRAP_LOCK_PATH: relativePathFrom(cwd, paths.lockPath),
         BOOTSTRAP_PROFILE_PATH: relativePathFrom(cwd, paths.profilePath),
@@ -267,8 +269,8 @@ export function adoptLocalGovernanceBundle(cwd, options = {}) {
 export function createOfficialBootstrapCommand(commandCwd = '.') {
     return `node atm.mjs bootstrap --cwd ${commandCwd} --task "${defaultBootstrapTaskTitle}"`;
 }
-export function createRecommendedPrompt(taskId = defaultBootstrapTaskId) {
-    return `Read README.md if present, then run \`node atm.mjs next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`node atm.mjs next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and ${runtimeEvidenceBundleRelativePath(taskId)} only as supporting runtime state.`;
+export function createRecommendedPrompt(taskId = defaultBootstrapTaskId, commandPrefix = 'node atm.mjs') {
+    return `Read README.md if present, then run \`${commandPrefix} next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`${commandPrefix} next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and ${runtimeEvidenceBundleRelativePath(taskId)} only as supporting runtime state.`;
 }
 export function createSelfHostingAlphaPrompt() {
     return 'Read README.md if present, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, `node atm.mjs next --json` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action.';
@@ -420,7 +422,7 @@ function createBootstrapPaths(cwd, taskId) {
         charterInvariantsPath: path.join(atmRoot, 'charter', 'charter-invariants.json')
     };
 }
-function createBootstrapTask(taskId, taskTitle, projectProbe, paths) {
+function createBootstrapTask(taskId, taskTitle, projectProbe, paths, recommendedPrompt) {
     return {
         schemaVersion: 'atm.workItem.v0.1',
         id: taskId,
@@ -441,7 +443,7 @@ function createBootstrapTask(taskId, taskTitle, projectProbe, paths) {
             relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.defaultGuardsPath)
         ],
         evidencePath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.evidencePath),
-        nextPrompt: createRecommendedPrompt(taskId)
+        nextPrompt: recommendedPrompt
     };
 }
 function createBootstrapLock(taskId, paths) {
@@ -464,7 +466,7 @@ function createBootstrapLock(taskId, paths) {
         ]
     };
 }
-function createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths) {
+function createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths, recommendedPrompt) {
     return {
         schemaVersion: 'atm.evidence.v0.1',
         taskId,
@@ -472,7 +474,7 @@ function createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths) {
         summary: 'Default ATM bootstrap pack created.',
         repositoryKind: projectProbe.repositoryKind,
         packageManager: projectProbe.packageManager,
-        recommendedPrompt: createRecommendedPrompt(),
+        recommendedPrompt,
         guardIds: defaultGuards.guards.map((guard) => guard.id),
         artifactDirectories: [
             relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.directories.artifacts),

@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { classifyGuidanceIntent, buildFirstLayerCommandContract, loadHostIntentLexicon, probeProject, recordGuidanceIntentPhrase } from '../_vendor/core/dist/guidance/index.js';
 import { getCommandSpec, listCommandSpecs } from './command-specs.js';
+import { governanceCommandPrefix } from './next/runner-mode.js';
 import { glossaryEntries } from './glossary-data.js';
 import { CliError, makeHelpResult, makeResult, message } from './shared.js';
 const supportedGuideIntents = ['overview', 'first-layer', 'create-atom', 'create-map', 'bootstrap', 'glossary', 'help', 'learn', 'install-skill'];
@@ -211,6 +212,8 @@ function buildFirstLayerGuide() {
     };
 }
 function buildGoalGuide(cwd, goal) {
+    const commandPrefix = governanceCommandPrefix(process.argv[1] ?? null);
+    const useCurrentRunner = (command) => command.replace(/^node atm\.mjs(?=\s|$)/, commandPrefix);
     const orientation = probeProject(cwd);
     const hostLexicon = loadHostIntentLexicon(cwd);
     const classification = classifyGuidanceIntent(goal, {
@@ -226,11 +229,11 @@ function buildGoalGuide(cwd, goal) {
         : classification.matchedIntent;
     const hasConfigHotspot = orientation.configLegacyHotspots.length > 0;
     const legacyStartCommand = hasConfigHotspot
-        ? `node atm.mjs start --cwd . --goal ${quoteCliValue(goal)} --legacy-flow --json`
-        : `node atm.mjs start --cwd . --goal ${quoteCliValue(goal)} --target-file <legacy-file> --release-blocker <trunk-symbols> --legacy-flow --json`;
+        ? useCurrentRunner(`node atm.mjs start --cwd . --goal ${quoteCliValue(goal)} --legacy-flow --json`)
+        : useCurrentRunner(`node atm.mjs start --cwd . --goal ${quoteCliValue(goal)} --target-file <legacy-file> --release-blocker <trunk-symbols> --legacy-flow --json`);
     const nextCommand = routeIntent === 'legacy-atomization'
         ? legacyStartCommand
-        : classification.nextCommand.replace('"<goal>"', quoteCliValue(goal));
+        : useCurrentRunner(classification.nextCommand.replace('"<goal>"', quoteCliValue(goal)));
     const readFirst = routeIntent === 'legacy-atomization'
         ? ['README.md', 'docs/ATOM_GENERATOR.md', 'docs/LIFECYCLE.md']
         : routeIntent === 'legacy-candidate-ranking'

@@ -45,7 +45,7 @@ import {
 } from './next/channel-strategy.ts';
 import { buildGovernanceReadinessHintContract, type GovernanceChannel } from './next/governance-readiness.ts';
 import { buildTaskScopedClaimCommand } from './next/task-scoped-claim-command.ts';
-import { withRunnerMode } from './next/runner-mode.ts';
+import { governanceCommandPrefix, withRunnerMode } from './next/runner-mode.ts';
 import {
   ensureDecisionTrail,
   readQueueHeadTaskId,
@@ -308,6 +308,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
     const unscopedGuidance = buildPromptGuidanceNextResult({
       cwd: options.cwd,
       actor: options.agent,
+      commandPrefix: governanceCommandPrefix(process.argv[1] ?? null),
       taskIntent,
       integrationBootstrap,
       runtimeAdapterReadiness
@@ -348,6 +349,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
     profile.flush('prompt-required');
     return withRunnerMode(buildPromptRequiredNextResult({
       cwd: options.cwd,
+      commandPrefix: governanceCommandPrefix(process.argv[1] ?? null),
       claimRequested: Boolean(options.claim),
       importedTaskQueue,
       integrationBootstrap,
@@ -399,6 +401,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
   const promptGuidanceResult = buildPromptGuidanceNextResult({
     cwd: options.cwd,
     actor: options.agent,
+    commandPrefix: governanceCommandPrefix(process.argv[1] ?? null),
     taskIntent,
     integrationBootstrap,
     runtimeAdapterReadiness
@@ -453,7 +456,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
   profile.mark('detect-governance-runtime');
   const doctorChecks = doctor.evidence.checks as Array<{ name: string; ok: boolean }>;
   const failed = doctorChecks.find((check) => check.ok !== true);
-  const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue);
+  const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null));
   const userNotice = buildFirstUseUserNotice(nextAction);
   profile.flush('default-next');
   return withRunnerMode(makeResult({

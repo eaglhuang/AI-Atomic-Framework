@@ -12,6 +12,7 @@ import {
   type GuidanceIntentStatus
 } from '../../../core/src/guidance/index.ts';
 import { getCommandSpec, listCommandSpecs } from './command-specs.ts';
+import { governanceCommandPrefix } from './next/runner-mode.ts';
 import { glossaryEntries } from './glossary-data.ts';
 import { CliError, makeHelpResult, makeResult, message } from './shared.ts';
 
@@ -233,6 +234,8 @@ function buildFirstLayerGuide() {
 }
 
 function buildGoalGuide(cwd: string, goal: string) {
+  const commandPrefix = governanceCommandPrefix(process.argv[1] ?? null);
+  const useCurrentRunner = (command: string) => command.replace(/^node atm\.mjs(?=\s|$)/, commandPrefix);
   const orientation = probeProject(cwd);
   const hostLexicon = loadHostIntentLexicon(cwd);
   const classification = classifyGuidanceIntent(goal, {
@@ -248,11 +251,11 @@ function buildGoalGuide(cwd: string, goal: string) {
     : classification.matchedIntent;
   const hasConfigHotspot = orientation.configLegacyHotspots.length > 0;
   const legacyStartCommand = hasConfigHotspot
-    ? `node atm.mjs start --cwd . --goal ${quoteCliValue(goal)} --legacy-flow --json`
-    : `node atm.mjs start --cwd . --goal ${quoteCliValue(goal)} --target-file <legacy-file> --release-blocker <trunk-symbols> --legacy-flow --json`;
+    ? useCurrentRunner(`node atm.mjs start --cwd . --goal ${quoteCliValue(goal)} --legacy-flow --json`)
+    : useCurrentRunner(`node atm.mjs start --cwd . --goal ${quoteCliValue(goal)} --target-file <legacy-file> --release-blocker <trunk-symbols> --legacy-flow --json`);
   const nextCommand = routeIntent === 'legacy-atomization'
     ? legacyStartCommand
-    : classification.nextCommand.replace('"<goal>"', quoteCliValue(goal));
+    : useCurrentRunner(classification.nextCommand.replace('"<goal>"', quoteCliValue(goal)));
   const readFirst = routeIntent === 'legacy-atomization'
     ? ['README.md', 'docs/ATOM_GENERATOR.md', 'docs/LIFECYCLE.md']
     : routeIntent === 'legacy-candidate-ranking'
