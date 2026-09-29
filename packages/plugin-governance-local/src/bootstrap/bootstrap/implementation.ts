@@ -264,6 +264,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
 
   const templateTokens = {
     RECOMMENDED_PROMPT: recommendedPrompt,
+    ATM_COMMAND_PREFIX: commandPrefix,
     BOOTSTRAP_TASK_PATH: relativePathFrom(cwd, paths.taskPath),
     BOOTSTRAP_LOCK_PATH: relativePathFrom(cwd, paths.lockPath),
     BOOTSTRAP_PROFILE_PATH: relativePathFrom(cwd, paths.profilePath),
