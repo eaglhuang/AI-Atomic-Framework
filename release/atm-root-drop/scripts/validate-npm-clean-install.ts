@@ -33,7 +33,7 @@ function fail(message: string): never {
 }
 
 function run(command: string, args: string[], cwd: string): string {
-  const result = spawnSync(command, args, { cwd, encoding: 'utf8', shell: process.platform === 'win32' });
+  const result = spawnSync(command, args, { cwd, encoding: 'utf8', shell: process.platform === 'win32', maxBuffer: 64 * 1024 * 1024 });
   if (result.status !== 0) fail(`${command} ${args.join(' ')} failed: ${result.stderr || result.stdout}`);
   return result.stdout;
 }
@@ -120,6 +120,18 @@ function assertNoEscapingSpecifiers(packageSpec: PackageSpec): void {
 const REQUIRED_ROOT_DROP_SCRIPTS = ['atm-next', 'atm-orient', 'atm-create', 'atm-lock', 'atm-evidence', 'atm-upgrade-scan', 'atm-handoff'] as const;
 const REQUIRED_ROUTER_REFERENCE = path.join('references', 'index.md');
 
+function installedCliEntrypoint(installRoot: string): string {
+  return path.join(installRoot, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'atm.mjs');
+}
+
+function runInstalledCli(packageInstallRoot: string, cwd: string, args: string[]) {
+  return spawnSync(process.execPath, [installedCliEntrypoint(packageInstallRoot), ...args], {
+    cwd,
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024
+  });
+}
+
 function describeAdoptionResidue(adoptionRoot: string): string {
   const residue = listFiles(adoptionRoot)
     .map((filePath) => path.relative(adoptionRoot, filePath).replace(/\\/g, '/'))
@@ -131,7 +143,7 @@ function describeAdoptionResidue(adoptionRoot: string): string {
 
 function runEmittedNpmCommand(command: string, expectedCommand: string, cwd: string, label: string): any {
   if (command !== expectedCommand) fail(`${label} emitted ${JSON.stringify(command)} instead of ${JSON.stringify(expectedCommand)}`);
-  const result = spawnSync(command, { cwd, encoding: 'utf8', shell: true });
+  const result = spawnSync(command, { cwd, encoding: 'utf8', shell: true, maxBuffer: 64 * 1024 * 1024 });
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
   if (result.status !== 0) fail(`${label} failed with exit ${result.status}: ${output.split('\n').slice(0, 8).join(' ')}`);
   if (/ERR_MODULE_NOT_FOUND|Cannot find (module|package)/.test(output)) {
@@ -144,16 +156,14 @@ function runEmittedNpmCommand(command: string, expectedCommand: string, cwd: str
   }
 }
 
-function assertDefaultAdoptionRecoverySucceeds(binPath: string, installRoot: string): void {
-  const adoptionRoot = path.join(installRoot, 'default-adoption-recovery-probe');
+function assertDefaultAdoptionRecoverySucceeds(installRoot: string, tarball: string): void {
+  const adoptionRoot = path.join(path.dirname(installRoot), 'default-adoption-recovery');
   mkdirSync(adoptionRoot, { recursive: true });
+  run('npm', ['init', '--yes'], adoptionRoot);
+  run('npm', ['install', '--ignore-scripts', '--no-save', tarball], adoptionRoot);
   run('git', ['init', '--quiet', '.'], adoptionRoot);
 
-  const init = spawnSync(binPath, ['init', '--adopt', 'default', '--integration', 'codex', '--cwd', adoptionRoot, '--json'], {
-    cwd: adoptionRoot,
-    encoding: 'utf8',
-    shell: process.platform === 'win32'
-  });
+  const init = runInstalledCli(adoptionRoot, adoptionRoot, ['init', '--adopt', 'default', '--integration', 'codex', '--cwd', adoptionRoot, '--json']);
   const initText = `${init.stdout ?? ''}${init.stderr ?? ''}`;
   if (init.status !== 0 || /"ok":\s*false/.test(initText)) {
     fail(`atm init --adopt default failed after a clean install: ${initText.split('\n').slice(0, 8).join(' ')}`);
@@ -166,14 +176,14 @@ function assertDefaultAdoptionRecoverySucceeds(binPath: string, installRoot: str
     fail('npm adopter AGENTS.md still emits the absent repository-root atm.mjs command');
   }
 
-  const doctor = spawnSync(binPath, ['doctor', '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  const doctor = runInstalledCli(adoptionRoot, adoptionRoot, ['doctor', '--json']);
   if (doctor.status !== 0) {
     const doctorText = `${doctor.stdout ?? ''}${doctor.stderr ?? ''}`;
     let doctorResult: any;
     try {
-      doctorResult = JSON.parse(doctor.stdout ?? '');
+      doctorResult = JSON.parse(doctor.stdout?.trim() ? doctor.stdout : doctor.stderr ?? '');
     } catch (error) {
-      fail(`atm doctor emitted invalid JSON after default adoption: ${String(error)}; ${doctorText.split('\n').slice(0, 8).join(' ')}`);
+      fail(`atm doctor emitted invalid JSON after default adoption: ${String(error)}; exit=${doctor.status}; spawnError=${doctor.error?.message ?? 'none'}; stdoutChars=${doctor.stdout?.length ?? 0}; stderrChars=${doctor.stderr?.length ?? 0}; ${doctorText.split('\n').slice(0, 8).join(' ')}`);
     }
     if (!(doctorResult.diagnostics?.errorCodes ?? []).includes('ATM_DOCTOR_ONBOARDING_STALE')) {
       fail(`atm doctor failed outside the expected onboarding refresh: ${doctorText.split('\n').slice(0, 8).join(' ')}`);
@@ -185,14 +195,14 @@ function assertDefaultAdoptionRecoverySucceeds(binPath: string, installRoot: str
       adoptionRoot,
       'npm adopter doctor onboarding recovery'
     );
-    const refreshedDoctor = spawnSync(binPath, ['doctor', '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+    const refreshedDoctor = runInstalledCli(adoptionRoot, adoptionRoot, ['doctor', '--json']);
     if (refreshedDoctor.status !== 0) {
       fail(`atm doctor remained blocked after its emitted recovery command: ${`${refreshedDoctor.stdout ?? ''}${refreshedDoctor.stderr ?? ''}`.split('\n').slice(0, 8).join(' ')}`);
     }
   }
 
   const goal = 'Show a minimal first-run workflow.';
-  const next = spawnSync(binPath, ['next', '--prompt', goal, '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  const next = runInstalledCli(adoptionRoot, adoptionRoot, ['next', '--prompt', goal, '--json']);
   if (next.status !== 0) fail(`atm next failed after default adoption: ${`${next.stdout ?? ''}${next.stderr ?? ''}`.split('\n').slice(0, 8).join(' ')}`);
   const nextResult = JSON.parse(next.stdout ?? '');
   if (nextResult.evidence?.runnerMode?.mode !== 'npm-package') {
@@ -212,12 +222,11 @@ function assertDefaultAdoptionRecoverySucceeds(binPath: string, installRoot: str
   );
 }
 
-function assertAdoptionSucceeds(binPath: string, installRoot: string, expectedVersion: string): void {
-  const adoptionRoot = path.join(installRoot, 'adoption-probe');
-  mkdirSync(adoptionRoot, { recursive: true });
+function assertAdoptionSucceeds(installRoot: string, expectedVersion: string, tarball: string): void {
+  const adoptionRoot = installRoot;
   run('git', ['init', '--quiet', '.'], adoptionRoot);
 
-  const init = spawnSync(binPath, ['init', '--cwd', adoptionRoot, '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  const init = runInstalledCli(installRoot, adoptionRoot, ['init', '--cwd', adoptionRoot, '--json']);
   const initText = `${init.stdout ?? ''}${init.stderr ?? ''}`;
   if (init.status !== 0 || /"ok":\s*false/.test(initText)) {
     // A failed adoption that still wrote files leaves the adopter with a
@@ -245,7 +254,7 @@ function assertAdoptionSucceeds(binPath: string, installRoot: string, expectedVe
   if (missingScripts.length > 0) {
     fail(`atm init reported success but the adopted repository is incomplete; missing ${missingScripts.length} root-drop script(s): ${missingScripts.slice(0, 6).join(', ')}`);
   }
-  const doctor = spawnSync(binPath, ['doctor', '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  const doctor = runInstalledCli(installRoot, adoptionRoot, ['doctor', '--json']);
   if (doctor.status !== 0) {
     fail(`atm doctor failed in a freshly initialized adopter: ${`${doctor.stdout ?? ''}${doctor.stderr ?? ''}`.split('\n').slice(0, 8).join(' ')}`);
   }
@@ -254,7 +263,7 @@ function assertAdoptionSucceeds(binPath: string, installRoot: string, expectedVe
   // companion file. Verify the real installation path rather than merely
   // checking the tarball's file list, because an adapter can otherwise copy
   // SKILL.md while silently dropping its companion tree.
-  const integration = spawnSync(binPath, ['integration', 'add', 'codex', '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  const integration = runInstalledCli(installRoot, adoptionRoot, ['integration', 'add', 'codex', '--json']);
   const integrationText = `${integration.stdout ?? ''}${integration.stderr ?? ''}`;
   if (integration.status !== 0 || /"ok":\s*false/.test(integrationText)) {
     fail(`atm integration add codex failed after a clean install: ${integrationText.split('\n').slice(0, 8).join(' ')}`);
@@ -274,7 +283,7 @@ function assertAdoptionSucceeds(binPath: string, installRoot: string, expectedVe
   // next emits guide, guide emits orient, and both commands must resolve from
   // the installed package without relying on a repository-local atm.mjs.
   const goal = 'Show a minimal first-run workflow.';
-  const next = spawnSync(binPath, ['next', '--prompt', goal, '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  const next = runInstalledCli(installRoot, adoptionRoot, ['next', '--prompt', goal, '--json']);
   const nextText = `${next.stdout ?? ''}${next.stderr ?? ''}`;
   if (next.status !== 0) fail(`atm next failed after clean install: ${nextText.split('\n').slice(0, 8).join(' ')}`);
   const nextResult = JSON.parse(next.stdout ?? '');
@@ -293,7 +302,7 @@ function assertAdoptionSucceeds(binPath: string, installRoot: string, expectedVe
     adoptionRoot,
     'atm guide -> orient'
   );
-  assertDefaultAdoptionRecoverySucceeds(binPath, installRoot);
+  assertDefaultAdoptionRecoverySucceeds(installRoot, tarball);
 }
 
 if (publishedPackages.length === 0) {
@@ -377,8 +386,7 @@ try {
         fail(`atm --version must report the installed tarball version ${installedManifest.version}: ${versionText.split('\n').slice(0, 8).join(' ')}`);
       }
       const beforeCreate = snapshotTree(installRoot);
-      const installedCliEntrypoint = path.join(installRoot, 'node_modules', ...packageSpec.name.split('/'), 'dist', 'npm-runtime', 'atm.mjs');
-      const create = spawnSync(process.execPath, [installedCliEntrypoint,
+      const create = spawnSync(process.execPath, [installedCliEntrypoint(installRoot),
         'create', '--bucket', 'CORE', '--title', 'SmokeAtom',
         '--description', 'Installed runtime smoke',
         '--logical-name', 'atom.smoke.installed', '--dry-run', '--json'
@@ -400,7 +408,7 @@ try {
       if (snapshotTree(installRoot) !== beforeCreate) {
         fail('installed atm create --dry-run mutated the fixture repository');
       }
-      assertAdoptionSucceeds(binPath, installRoot, installedManifest.version);
+      assertAdoptionSucceeds(installRoot, installedManifest.version, tarball);
     }
   }
   console.log(JSON.stringify({
