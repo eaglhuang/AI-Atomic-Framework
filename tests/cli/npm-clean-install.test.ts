@@ -118,5 +118,8 @@ assert.doesNotMatch(publicFacadeSource, /agent-pack['"`]/, 'the bounded adopter 
 const guideSource = readFileSync(path.join(root, 'packages', 'cli', 'src', 'commands', 'guide.ts'), 'utf8');
 assert.match(guideSource, /start performs the required orientation internally/, 'guidance must use the existing start orientation instead of requiring a duplicate orient command');
 assert.match(guideSource, /prerequisiteCommands: \[\]/, 'legacy guidance must not rescan the repository before start');
+const rootAgentTemplate = readFileSync(path.join(root, 'templates', 'root-drop', 'AGENTS.md'), 'utf8');
+assert.doesNotMatch(rootAgentTemplate, /node atm\.mjs/i, 'the generated adopter instructions must not hard-code a repository-root runner');
+assert.match(rootAgentTemplate, /\{\{ATM_COMMAND_PREFIX\}\} integration add codex --json/, 'adopter integration guidance must use the selected runtime entrypoint');
 
 console.log('[npm-clean-install:test] ok');

@@ -144,6 +144,74 @@ function runEmittedNpmCommand(command: string, expectedCommand: string, cwd: str
   }
 }
 
+function assertDefaultAdoptionRecoverySucceeds(binPath: string, installRoot: string): void {
+  const adoptionRoot = path.join(installRoot, 'default-adoption-recovery-probe');
+  mkdirSync(adoptionRoot, { recursive: true });
+  run('git', ['init', '--quiet', '.'], adoptionRoot);
+
+  const init = spawnSync(binPath, ['init', '--adopt', 'default', '--integration', 'codex', '--cwd', adoptionRoot, '--json'], {
+    cwd: adoptionRoot,
+    encoding: 'utf8',
+    shell: process.platform === 'win32'
+  });
+  const initText = `${init.stdout ?? ''}${init.stderr ?? ''}`;
+  if (init.status !== 0 || /"ok":\s*false/.test(initText)) {
+    fail(`atm init --adopt default failed after a clean install: ${initText.split('\n').slice(0, 8).join(' ')}`);
+  }
+
+  const agentsPath = path.join(adoptionRoot, 'AGENTS.md');
+  if (!existsSync(agentsPath)) fail('atm init --adopt default did not generate AGENTS.md');
+  const agents = readFileSync(agentsPath, 'utf8');
+  if (/node atm\.mjs/i.test(agents)) {
+    fail('npm adopter AGENTS.md still emits the absent repository-root atm.mjs command');
+  }
+
+  const doctor = spawnSync(binPath, ['doctor', '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  if (doctor.status !== 0) {
+    const doctorText = `${doctor.stdout ?? ''}${doctor.stderr ?? ''}`;
+    let doctorResult: any;
+    try {
+      doctorResult = JSON.parse(doctor.stdout ?? '');
+    } catch (error) {
+      fail(`atm doctor emitted invalid JSON after default adoption: ${String(error)}; ${doctorText.split('\n').slice(0, 8).join(' ')}`);
+    }
+    if (!(doctorResult.diagnostics?.errorCodes ?? []).includes('ATM_DOCTOR_ONBOARDING_STALE')) {
+      fail(`atm doctor failed outside the expected onboarding refresh: ${doctorText.split('\n').slice(0, 8).join(' ')}`);
+    }
+    const recoveryCommand = doctorResult.evidence?.recommendedAction;
+    runEmittedNpmCommand(
+      recoveryCommand,
+      'npm exec -- atm atm-chart render --cwd . --json',
+      adoptionRoot,
+      'npm adopter doctor onboarding recovery'
+    );
+    const refreshedDoctor = spawnSync(binPath, ['doctor', '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+    if (refreshedDoctor.status !== 0) {
+      fail(`atm doctor remained blocked after its emitted recovery command: ${`${refreshedDoctor.stdout ?? ''}${refreshedDoctor.stderr ?? ''}`.split('\n').slice(0, 8).join(' ')}`);
+    }
+  }
+
+  const goal = 'Show a minimal first-run workflow.';
+  const next = spawnSync(binPath, ['next', '--prompt', goal, '--json'], { cwd: adoptionRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  if (next.status !== 0) fail(`atm next failed after default adoption: ${`${next.stdout ?? ''}${next.stderr ?? ''}`.split('\n').slice(0, 8).join(' ')}`);
+  const nextResult = JSON.parse(next.stdout ?? '');
+  if (nextResult.evidence?.runnerMode?.mode !== 'npm-package') {
+    fail(`default adopter next did not recognize the npm entrypoint: ${JSON.stringify(nextResult.evidence?.runnerMode)}`);
+  }
+  const guide = runEmittedNpmCommand(
+    nextResult.evidence?.nextAction?.command,
+    `npm exec -- atm guide --goal "${goal}" --cwd . --json`,
+    adoptionRoot,
+    'default adopter atm next -> guide'
+  );
+  runEmittedNpmCommand(
+    guide.evidence?.nextCommand,
+    'npm exec -- atm orient --cwd . --json',
+    adoptionRoot,
+    'default adopter atm guide -> orient'
+  );
+}
+
 function assertAdoptionSucceeds(binPath: string, installRoot: string, expectedVersion: string): void {
   const adoptionRoot = path.join(installRoot, 'adoption-probe');
   mkdirSync(adoptionRoot, { recursive: true });
@@ -225,6 +293,7 @@ function assertAdoptionSucceeds(binPath: string, installRoot: string, expectedVe
     adoptionRoot,
     'atm guide -> orient'
   );
+  assertDefaultAdoptionRecoverySucceeds(binPath, installRoot);
 }
 
 if (publishedPackages.length === 0) {
