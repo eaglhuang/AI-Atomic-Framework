@@ -4,9 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { emitGateTelemetryEvent } from '../../packages/core/src/telemetry/index.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tmp = mkdtempSync(path.join(os.tmpdir(), 'atm-gate-telemetry-coverage-'));
+const completeTmp = mkdtempSync(path.join(os.tmpdir(), 'atm-gate-telemetry-complete-'));
 
 try {
   const coverage = runAtm(['telemetry', '--cwd', tmp, '--coverage-report', '--json']);
@@ -16,6 +18,9 @@ try {
   assert.equal(coverageJson.evidence.rawDataPolicy.runtimeStorage, '.atm/runtime/telemetry/**');
   assert.equal(coverageJson.evidence.rawDataPolicy.rawTelemetryCommitted, false);
   assert.equal(coverageJson.evidence.m2PreflightVerdict, 'inconclusive');
+  const unobservedRoute = coverageJson.evidence.requiredNodes.find((node: { nodeId: string }) => node.nodeId === 'next-preflight-guard-doctor');
+  assert.equal(unobservedRoute.m2Comparable, false);
+  assert.ok(unobservedRoute.missingTelemetry.includes('observedEvents'));
 
   const families = coverageJson.evidence.requiredNodes.map((node: { nodeFamily: string }) => node.nodeFamily);
   assert.ok(families.includes('claim/reservation/lane presence'));
@@ -27,6 +32,51 @@ try {
   assert.equal(validator.coverageStatus, 'not-yet-covered');
   assert.equal(validator.sourceAvailability, 'partial');
   assert.ok(validator.missingTelemetry.includes('validatorId'));
+
+  emitGateTelemetryEvent(tmp, {
+    gate: 'next',
+    checkId: 'next.route-resolution',
+    result: 'block',
+    reasonClass: 'block',
+    actorId: 'unknown',
+    taskId: null,
+    laneSessionId: null,
+    errorCode: null,
+    failureEnvelopeRef: null,
+    command: 'next --prompt <redacted>'
+  });
+  const deficient = runAtm(['telemetry', '--cwd', tmp, '--coverage-report', '--json']);
+  assert.equal(deficient.status, 0, deficient.combined);
+  const deficientJson = JSON.parse(deficient.stdout);
+  const deficientRoute = deficientJson.evidence.requiredNodes.find((node: { nodeId: string }) => node.nodeId === 'next-preflight-guard-doctor');
+  assert.equal(deficientRoute.m2Comparable, false);
+  assert.ok(deficientRoute.missingCorrelationKeys.includes('actorId'));
+  assert.ok(deficientRoute.missingCorrelationKeys.includes('taskId'));
+  assert.ok(deficientRoute.missingCorrelationKeys.includes('laneSessionId'));
+  assert.ok(deficientRoute.missingTelemetry.includes('blockReason'));
+  assert.ok(deficientRoute.missingTelemetry.includes('blockErrorCode'));
+  assert.ok(deficientRoute.missingTelemetry.includes('failureEnvelopeRef'));
+
+  emitGateTelemetryEvent(completeTmp, {
+    gate: 'next',
+    checkId: 'next.route-resolution',
+    result: 'block',
+    reasonClass: 'wip-intersection',
+    errorCode: 'ATM_NEXT_DIRTY_WIP_INTERSECTION',
+    actorId: 'adjudication-fixture-actor',
+    taskId: 'TASK-TELEMETRY-FIXTURE-0001',
+    laneSessionId: 'telemetry-fixture-lane',
+    runId: 'telemetry-fixture-run',
+    failureEnvelopeRef: 'fixture:failure-envelope-1',
+    command: 'next --prompt <redacted>'
+  });
+  const complete = runAtm(['telemetry', '--cwd', completeTmp, '--coverage-report', '--json']);
+  assert.equal(complete.status, 0, complete.combined);
+  const completeJson = JSON.parse(complete.stdout);
+  const completeRoute = completeJson.evidence.requiredNodes.find((node: { nodeId: string }) => node.nodeId === 'next-preflight-guard-doctor');
+  assert.equal(completeRoute.m2Comparable, true);
+  assert.deepEqual(completeRoute.missingCorrelationKeys, []);
+  assert.deepEqual(completeRoute.missingTelemetry, []);
 
   const preflight = runAtm(['telemetry', '--cwd', tmp, '--m2-preflight', '--json']);
   assert.equal(preflight.status, 0, preflight.combined);
@@ -45,6 +95,7 @@ try {
   assert.ok(taskSummaryJson.evidence.historyDigest.startsWith('sha256:'));
 } finally {
   rmSync(tmp, { recursive: true, force: true });
+  rmSync(completeTmp, { recursive: true, force: true });
 }
 
 console.log('ok - tests/cli/gate-telemetry-coverage-repair.test.ts');

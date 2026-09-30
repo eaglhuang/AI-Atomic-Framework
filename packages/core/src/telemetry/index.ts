@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync,
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import type { TelemetryCorrelationFields, TelemetryTimingFields } from './observation.ts';
+import { assessObservedNodeCoverage } from './observed-coverage.ts';
 import {
   mergeCompactCorrelation,
   mergeReports,
@@ -113,6 +114,7 @@ export interface GateTelemetryEvent extends Required<Pick<TelemetryTimingFields,
   readonly eligible: boolean;
   readonly result: GateTelemetryResult;
   readonly reasonClass: string;
+  readonly errorCode?: string | null;
   readonly laneSessionId?: string | null;
   readonly taskId?: string | null;
   readonly batchId?: string | null;
@@ -215,7 +217,10 @@ export const canonicalGateTelemetryRequiredNodes: readonly GateTelemetryRequired
 
 export function buildGateTelemetryRegistryCoverageReport(cwd: string): GateTelemetryRegistryCoverageReport {
   const historyEvents = readHistoryEvents(path.join(cwd, gateTelemetryHistoryRelativePath));
-  const requiredNodes = canonicalGateTelemetryRequiredNodes;
+  const runtimeEvents = readRuntimeEvents(path.join(cwd, gateTelemetryRuntimeRelativePath, 'gate-events'));
+  const observedEvents = [...historyEvents.valid, ...runtimeEvents.valid]
+    .filter((event) => event.eligible && event.source === 'runtime');
+  const requiredNodes = canonicalGateTelemetryRequiredNodes.map((node) => assessObservedNodeCoverage(node, observedEvents));
   const m2Comparable = requiredNodes.every((node) => node.m2Comparable);
   return {
     schemaId: 'atm.gateTelemetryRegistryCoverageReport.v1',
@@ -229,12 +234,12 @@ export function buildGateTelemetryRegistryCoverageReport(cwd: string): GateTelem
       }))
     }),
     historyDigest: digestJson({
-      eventCount: historyEvents.valid.length,
-      checkIds: [...new Set(historyEvents.valid.map((event) => event.checkId))].sort()
+      eventCount: observedEvents.length,
+      checkIds: [...new Set(observedEvents.map((event) => event.checkId))].sort()
     }),
     requiredNodes,
     droppedEvents: 0,
-    malformedEvents: historyEvents.malformed,
+    malformedEvents: historyEvents.malformed + runtimeEvents.malformed,
     m2Comparable,
     m2PreflightVerdict: m2Comparable ? 'ready' : 'inconclusive',
     rawDataPolicy: {
@@ -333,6 +338,7 @@ export function emitGateTelemetryEvent(cwd: string, input: Partial<GateTelemetry
       eligible: input.eligible ?? true,
       result: input.result,
       reasonClass: input.reasonClass ?? input.result,
+      errorCode: input.errorCode ?? null,
       durationMs: Math.max(0, input.durationMs ?? 0),
       actorId: input.actorId ?? process.env.ATM_ACTOR_ID ?? 'unknown',
       runId,
@@ -496,7 +502,7 @@ function coverageNode(
   consumerIds: readonly string[],
   missingTelemetry: readonly string[]
 ): GateTelemetryRequiredNodeCoverage {
-  const requiredCorrelationKeys = ['runId', 'laneSessionId', 'taskId', 'configDigest'];
+  const requiredCorrelationKeys = ['runId', 'laneSessionId', 'taskId', 'actorId', 'configDigest'];
   return {
     nodeId,
     nodeFamily,
