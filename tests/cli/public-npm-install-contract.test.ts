@@ -40,6 +40,8 @@ assert.match(validatorSource, /'first-use'/, 'first-use workflow must be a requi
 
 const candidateValidatorSource = await import('node:fs').then(({ readFileSync }) => readFileSync(new URL('../../scripts/validate-candidate-npm-install.ts', import.meta.url), 'utf8'));
 assert.match(candidateValidatorSource, /runFirstUseChain\(bin, consumer\)/, 'candidate proof must execute the same first-use journey');
+assert.doesNotMatch(candidateValidatorSource, /let result = spawnSync\(bin, commandArgs/, 'candidate smoke must not invoke stateful commands before its measurement loop');
+assert.doesNotMatch(candidateValidatorSource, /startupMs\.push\(0\)/, 'candidate timings must come from actual measured invocations');
 assert.match(candidateValidatorSource, /const coreWorkflowCommandNames = \[[^\n]*'first-use'/, 'first-use failure must block candidate acceptance');
 assert.match(candidateValidatorSource, /--candidate-tarball/, 'candidate validator must accept an explicit tarball');
 assert.match(candidateValidatorSource, /atm\.candidateNpmInstallProof\.v1/, 'candidate validator must use a separate receipt schema');

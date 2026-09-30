@@ -262,15 +262,9 @@ function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs:
   for (const [name, ...rawCommandArgs] of smokeCommands) {
     const commandArgs = rawCommandArgs.map((argument) => argument === 'WORKFLOW_PLACEHOLDER' ? workflow : argument);
     const startupMs: number[] = [];
-    let result = spawnSync(bin, commandArgs, {
-      cwd: consumer,
-      encoding: 'utf8',
-      shell: process.platform === 'win32',
-      windowsHide: true
-    });
-    // Measure the first invocation as well; additional repetitions are only
-    // needed for the version command to keep the smoke lane inexpensive.
-    startupMs.push(0);
+    let result!: ReturnType<typeof spawnSync>;
+    // Execute every invocation inside the measurement loop; an unmeasured
+    // warm-up duplicates stateful bootstrap/create commands unnecessarily.
     const repeatCount = name === 'version' ? runs : 1;
     for (let index = 0; index < repeatCount; index += 1) {
       const started = performance.now();
@@ -282,7 +276,6 @@ function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs:
       });
       startupMs.push(performance.now() - started);
     }
-    startupMs.shift();
     const combined = `${result.stdout ?? ''}${result.stderr ?? ''}`;
     const moduleResolutionFailure = /ERR_MODULE_NOT_FOUND|MODULE_NOT_FOUND|Cannot find module/i.test(combined);
     smoke[name] = {
