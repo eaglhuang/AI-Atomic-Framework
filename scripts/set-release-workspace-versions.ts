@@ -78,6 +78,32 @@ export function synchronizeReleaseWorkspaceVersions(root: string, releaseVersion
       changed.push('compatibility-matrix.json');
     }
   }
+  const skewPath = path.join(root, 'scripts', 'skew-matrix.config.json');
+  if (existsSync(skewPath)) {
+    const skew = JSON.parse(readFileSync(skewPath, 'utf8'));
+    const previousTrain = skew.releaseTrain?.frameworkVersion;
+    if (typeof previousTrain !== 'string' || !skew.axes) {
+      throw new Error('skew matrix is missing release train or axes');
+    }
+    const localPaths = new Set(manifestPaths.map((manifestPath) => path.relative(root, path.dirname(manifestPath)).replaceAll('\\', '/')));
+    let didChange = previousTrain !== frameworkVersion;
+    skew.releaseTrain.frameworkVersion = frameworkVersion;
+    for (const entries of Object.values(skew.axes)) {
+      if (!Array.isArray(entries)) throw new Error('skew matrix axes must be arrays');
+      for (const entry of entries) {
+        // Only current local-workspace entries follow the train; historical
+        // version-skew fixtures retain their intentionally different versions.
+        if (localPaths.has(entry.packagePath) && entry.version === previousTrain && entry.version !== frameworkVersion) {
+          entry.version = frameworkVersion;
+          didChange = true;
+        }
+      }
+    }
+    if (didChange) {
+      writeFileSync(skewPath, `${JSON.stringify(skew, null, 2)}\n`, 'utf8');
+      changed.push('scripts/skew-matrix.config.json');
+    }
+  }
   return changed;
 }
 

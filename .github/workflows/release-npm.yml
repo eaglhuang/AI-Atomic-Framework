@@ -88,6 +88,9 @@ jobs:
       - name: Validate bridge minor policy
         run: node --experimental-strip-types scripts/validate-bridge-minor.ts --mode validate
 
+      - name: Validate projected version skew
+        run: node --experimental-strip-types scripts/validate-skew-matrix.ts --mode validate
+
       - name: Typecheck
         run: npm run typecheck
 
