@@ -1,10 +1,11 @@
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { build, type Plugin } from 'esbuild';
 import ts from 'typescript';
 import { embeddedATMChartSchemaAssets } from '../packages/cli/src/commands/atm-chart/constants.ts';
+import { encodeCommandSpecModule } from './lib/cli-npm-command-spec-codec.ts';
 
 const OMITTED_PUBLIC_ASSETS = [
   /^_vendor\/agent-pack-claude-code\/templates\//,
@@ -37,7 +38,7 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = 
       platform: 'node',
       target: 'node24',
       packages: 'external',
-      plugins: [preserveModuleIdentityPlugin(sourceDistRoot)],
+      plugins: [compressedCommandSpecsPlugin(sourceDistRoot), preserveModuleIdentityPlugin(sourceDistRoot)],
       legalComments: 'none',
       logLevel: 'silent'
     });
@@ -123,6 +124,20 @@ function emitDeclarationFromSource(sourcePath: string): string {
     throw new Error(`CLI declaration generation failed: ${errors.map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')).join('; ')}`);
   }
   return result.outputText;
+}
+
+function compressedCommandSpecsPlugin(sourceDistRoot: string): Plugin {
+  const registryPath = path.join(sourceDistRoot, 'commands', 'command-specs.js');
+  return {
+    name: 'atm-compressed-command-specs',
+    setup(buildApi) {
+      buildApi.onLoad({ filter: /[/\\]commands[/\\]command-specs\.js$/ }, async (args) => {
+        if (path.resolve(args.path) !== registryPath) return null;
+        const registry = await import(pathToFileURL(registryPath).href);
+        return { contents: encodeCommandSpecModule(registry.commandSpecs), loader: 'js' };
+      });
+    }
+  };
 }
 
 function preserveModuleIdentityPlugin(sourceDistRoot: string): Plugin {
