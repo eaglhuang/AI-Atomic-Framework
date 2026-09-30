@@ -1,3 +1,4 @@
+import { runFirstUseChain } from './lib/npm-first-use.ts';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -226,8 +227,8 @@ type SmokeResult = {
 const legacySmokeCommandNames = ['version', 'doctor', 'next', 'tasks'] as const;
 // The candidate gate runs the same core workflow the public matrix measures;
 // create was missing here, which is how a broken create reached 0.1.1.
-const coreWorkflowCommandNames = ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
-const candidateSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
+const coreWorkflowCommandNames = ['version', 'doctor', 'first-use', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
+const candidateSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'first-use', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
 
 const smokeCommands = [
   ['version', '--version', '--json'],
@@ -294,6 +295,19 @@ function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs:
       outputSha256: createHash('sha256').update(combined).digest('hex')
     };
   }
+  const firstUseStarted = performance.now();
+  const firstUse = runFirstUseChain(bin, consumer);
+  const firstUseMs = performance.now() - firstUseStarted;
+  smoke['first-use'] = {
+    ...firstUse,
+    exitCode: Number(firstUse.exitCode),
+    commandExecuted: (firstUse.steps as Array<{ exitCode: number | null }>)[0]?.exitCode !== null,
+    moduleResolutionFailure: /ERR_MODULE_NOT_FOUND|MODULE_NOT_FOUND|Cannot find module/i.test(String(firstUse.failure ?? '')),
+    startupMs: [firstUseMs],
+    p50Ms: firstUseMs,
+    p95Ms: firstUseMs,
+    outputSha256: createHash('sha256').update(JSON.stringify(firstUse)).digest('hex')
+  };
   return { installMs, smoke, bin, dependencyFootprint };
 }
 
@@ -370,7 +384,7 @@ try {
     validation: {
       cleanConsumer: false,
       usedWorkspaceLink: false,
-      commandMatrix: smokeCommands.map(([name]) => name),
+      commandMatrix: [...candidateSmokeCommandNames],
       commandMatrixComplete: false,
       versionOnlySmoke: false,
       requiredSuccessCommands: [...coreWorkflowCommandNames],
