@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import os from 'node:os';
 import path from 'node:path';
 import { synchronizeReleaseWorkspaceVersions } from '../../scripts/set-release-workspace-versions.ts';
+import { releaseVersionSourcesAreCompatible } from '../../scripts/lib/release-version-compatibility.ts';
 
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-release-workspace-versions-'));
 
@@ -34,6 +35,24 @@ try {
   assert.equal(cli.devDependencies['@scope/core'], '0.1.0');
 
   assert.deepEqual(synchronizeReleaseWorkspaceVersions(root, '0.1.0-beta.0'), [], 'second pass must be idempotent');
+  const matrixPath = path.join(root, 'compatibility-matrix.json');
+  const matrix = { releaseTrain: { frameworkVersion: '0.1.0', defaultChartVersion: '0.1.0' }, supported: ['keep'] };
+  writeFileSync(matrixPath, JSON.stringify(matrix), 'utf8');
+  assert.equal(releaseVersionSourcesAreCompatible({ releaseTag: 'v0.1.3', rootPackageVersion: '0.1.3', releaseTrainVersion: '0.1.0' }), false);
+  assert.ok(synchronizeReleaseWorkspaceVersions(root, '0.1.3').includes('compatibility-matrix.json'));
+  const projected = JSON.parse(readFileSync(matrixPath, 'utf8'));
+  assert.equal(projected.releaseTrain.frameworkVersion, '0.1.3');
+  assert.equal(projected.releaseTrain.defaultChartVersion, '0.1.0');
+  assert.deepEqual(projected.supported, ['keep']);
+  assert.equal(releaseVersionSourcesAreCompatible({ releaseTag: 'v0.1.3', rootPackageVersion: '0.1.3', releaseTrainVersion: projected.releaseTrain.frameworkVersion }), true);
+  assert.deepEqual(synchronizeReleaseWorkspaceVersions(root, '0.1.3'), []);
+  synchronizeReleaseWorkspaceVersions(root, '0.1.4-beta.0');
+  assert.equal(JSON.parse(readFileSync(matrixPath, 'utf8')).releaseTrain.frameworkVersion, '0.1.4');
+  assert.throws(() => synchronizeReleaseWorkspaceVersions(root, 'invalid'), /valid release version/);
+  const workflow = readFileSync(new URL('../../.github/workflows/release-npm.yml', import.meta.url), 'utf8');
+  const compatibilityStep = workflow.split('- name: Validate release version compatibility')[1]?.split('- name:')[0] ?? '';
+  assert.ok(!compatibilityStep.includes('if:'), 'dry-run must execute the same release compatibility gate');
+  assert.ok(compatibilityStep.includes('$ATM_RELEASE_TAG'), 'dry-run must validate its simulated release version');
   console.log('[release-workspace-versions:test] ok');
 } finally {
   rmSync(root, { recursive: true, force: true });

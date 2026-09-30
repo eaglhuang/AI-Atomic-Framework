@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { releaseVersionBase } from './lib/release-version-compatibility.ts';
 
 const PUBLISHED_DEPENDENCY_FIELDS = ['dependencies', 'optionalDependencies', 'peerDependencies'] as const;
 
@@ -35,7 +36,8 @@ function packageManifestPaths(root: string): string[] {
  * stable version that does not exist yet.
  */
 export function synchronizeReleaseWorkspaceVersions(root: string, releaseVersion: string): string[] {
-  if (!releaseVersion) throw new Error('release version is required');
+  const frameworkVersion = releaseVersionBase(releaseVersion);
+  if (!frameworkVersion) throw new Error('valid release version is required');
 
   const manifestPaths = packageManifestPaths(root);
   const workspaceNames = new Set(
@@ -60,6 +62,20 @@ export function synchronizeReleaseWorkspaceVersions(root: string, releaseVersion
     if (didChange) {
       writeManifest(manifestPath, manifest);
       changed.push(path.relative(root, manifestPath).replaceAll('\\', '/'));
+    }
+  }
+  // npm version updates manifests, not the compatibility metadata bundled
+  // into the runtime. Project the same train before building release artifacts.
+  const matrixPath = path.join(root, 'compatibility-matrix.json');
+  if (existsSync(matrixPath)) {
+    const matrix = JSON.parse(readFileSync(matrixPath, 'utf8'));
+    if (!matrix.releaseTrain || typeof matrix.releaseTrain.frameworkVersion !== 'string') {
+      throw new Error('compatibility matrix is missing releaseTrain.frameworkVersion');
+    }
+    if (matrix.releaseTrain.frameworkVersion !== frameworkVersion) {
+      matrix.releaseTrain.frameworkVersion = frameworkVersion;
+      writeFileSync(matrixPath, `${JSON.stringify(matrix, null, 2)}\n`, 'utf8');
+      changed.push('compatibility-matrix.json');
     }
   }
   return changed;
