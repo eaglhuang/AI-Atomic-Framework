@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { synchronizeReleaseWorkspaceVersions } from '../../scripts/set-release-workspace-versions.ts';
 import { releaseVersionSourcesAreCompatible } from '../../scripts/lib/release-version-compatibility.ts';
+import { releaseCompatibilityGateIsRequired } from '../../scripts/lib/release-workflow-contract.ts';
 
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-release-workspace-versions-'));
 
@@ -50,6 +51,15 @@ try {
   assert.equal(JSON.parse(readFileSync(matrixPath, 'utf8')).releaseTrain.frameworkVersion, '0.1.4');
   assert.throws(() => synchronizeReleaseWorkspaceVersions(root, 'invalid'), /valid release version/);
   const workflow = readFileSync(new URL('../../.github/workflows/release-npm.yml', import.meta.url), 'utf8');
+  assert.equal(releaseCompatibilityGateIsRequired(workflow), true);
+  for (const mutation of [
+    workflow.replace('Validate release version compatibility', 'Removed compatibility gate'),
+    workflow.replace('- name: Validate release version compatibility', '- name: Validate release version compatibility\n        if: false'),
+    workflow.replace('- name: Validate release version compatibility', '- name: Validate release version compatibility\n        continue-on-error: true'),
+    workflow.replace('--release-tag "$ATM_RELEASE_TAG"', '--release-tag "$GITHUB_REF_NAME"'),
+    workflow.replace('echo "ATM_RELEASE_TAG=v$version"', 'echo "OTHER_TAG=v$version"'),
+    workflow.replace('Publish public workspace closure', 'Removed publication boundary')
+  ]) assert.equal(releaseCompatibilityGateIsRequired(mutation), false);
   const compatibilityStep = workflow.split('- name: Validate release version compatibility')[1]?.split('- name:')[0] ?? '';
   assert.ok(!compatibilityStep.includes('if:'), 'dry-run must execute the same release compatibility gate');
   assert.ok(compatibilityStep.includes('$ATM_RELEASE_TAG'), 'dry-run must validate its simulated release version');
