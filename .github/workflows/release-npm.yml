@@ -83,9 +83,13 @@ jobs:
           # before the first package has been published.
           npm version "$version" --workspaces --include-workspace-root --no-git-tag-version --no-workspaces-update --allow-same-version
           node --experimental-strip-types scripts/set-release-workspace-versions.ts --version "$version"
+          echo "ATM_RELEASE_TAG=v$version" >> "$GITHUB_ENV"
 
       - name: Validate bridge minor policy
         run: node --experimental-strip-types scripts/validate-bridge-minor.ts --mode validate
+
+      - name: Validate projected version skew
+        run: node --experimental-strip-types scripts/validate-skew-matrix.ts --mode validate
 
       - name: Typecheck
         run: npm run typecheck
@@ -145,9 +149,8 @@ jobs:
         run: node --experimental-strip-types scripts/validate-npm-clean-install.ts
 
       - name: Validate release version compatibility
-        if: ${{ github.event_name != 'workflow_dispatch' }}
         shell: bash
-        run: node --experimental-strip-types scripts/validate-version-compatibility.ts --mode validate --release-tag "$GITHUB_REF_NAME"
+        run: node --experimental-strip-types scripts/validate-version-compatibility.ts --mode validate --release-tag "$ATM_RELEASE_TAG"
 
       - name: Resolve npm dist-tag
         shell: bash
