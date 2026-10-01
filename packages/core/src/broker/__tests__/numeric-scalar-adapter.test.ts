@@ -78,10 +78,30 @@ function testSetIfCurrentApplies() {
   console.log('ok: set-if-current applies on match, throws on stale');
 }
 
+function testMixedExtremesConflict() {
+  const parsed = numericScalarAdapter.parse(makeFile('{"x":5,"y":5}'));
+  const max = numericScalarAdapter.normalize(makeRequest({ requestId: 'max', op: 'max', target: 'x', value: 10 }));
+  const min = numericScalarAdapter.normalize(makeRequest({ requestId: 'min', op: 'min', target: 'x', value: 0 }));
+  for (const mutations of [[max, min], [min, max]]) {
+    assert.equal(numericScalarAdapter.canMerge(mutations, parsed).verdict, 'conflict');
+    assert.throws(() => numericScalarAdapter.merge(mutations, parsed));
+  }
+  const distinct = { ...min, target: 'y' };
+  assert.equal(numericScalarAdapter.canMerge([max, distinct], parsed).verdict, 'mergeable');
+  assert.deepEqual(numericScalarAdapter.merge([max, distinct], parsed).value, { values: { x: 10, y: 0 } });
+  const min2 = { ...min, requestId: 'min2', value: 3 };
+  for (const mutations of [[min, min2], [min2, min]]) {
+    assert.equal(numericScalarAdapter.canMerge(mutations, parsed).verdict, 'commutative-merge');
+    assert.equal((numericScalarAdapter.merge(mutations, parsed).value as any).values.x, 0);
+  }
+  console.log('ok: mixed extremes conflict in both orders; distinct scalars and pure min remain parallel');
+}
+
 testTwoIncrementsCommutativeMerge();
 testIncrementDecrementNetDelta();
 testIncrementPlusSetIfCurrentConflict();
 testMaxMinBehavior();
+testMixedExtremesConflict();
 testSetIfCurrentApplies();
 
 console.log('all numeric-scalar-adapter tests passed');
