@@ -125,7 +125,7 @@ function buildSerializabilityProof(input) {
 }
 function composeTransactionalMutationsUnchecked(files, requests, adapters) {
     const outputFiles = new Map(files.map((file) => [normalizePath(file.filePath), { ...file }]));
-    for (const [filePath, group] of groupRequests(requests)) {
+    for (const [filePath, group] of groupRequests(requests, true)) {
         const file = outputFiles.get(filePath);
         if (!file)
             continue;
@@ -139,9 +139,9 @@ function composeTransactionalMutationsUnchecked(files, requests, adapters) {
     }
     return [...outputFiles.values()].sort((left, right) => left.filePath.localeCompare(right.filePath));
 }
-function groupRequests(requests) {
+function groupRequests(requests, preserveOrder = false) {
     const groups = new Map();
-    for (const request of [...requests].sort(compareRequests)) {
+    for (const request of preserveOrder ? requests : [...requests].sort(compareRequests)) {
         const filePath = normalizePath(request.filePath);
         const group = groups.get(filePath) ?? [];
         group.push(request);

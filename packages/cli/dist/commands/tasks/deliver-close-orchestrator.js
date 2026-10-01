@@ -19,6 +19,7 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
         throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks deliver-and-close requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
     }
     const actorId = resolvedActor.actorId;
+    const runGit = dependencies.runGit ?? runAtmGit;
     const taskPath = taskPathFor(options.cwd, options.taskId);
     if (!existsSync(taskPath)) {
         throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
@@ -65,6 +66,27 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
             });
         }
         deliveryCommitSha = resolved;
+        if (options.dryRun) {
+            return makeResult({
+                ok: true,
+                command: 'tasks',
+                cwd: options.cwd,
+                messages: [message('info', 'ATM_DELIVER_AND_CLOSE_DRY_RUN', `[dry-run] tasks deliver-and-close for ${options.taskId}: would close task as done against existing delivery commit ${resolved} and create the governance commit.`, {
+                        taskId: options.taskId,
+                        actorId,
+                        dryRun: true,
+                        deliveryCommitSha: resolved
+                    })],
+                evidence: {
+                    action: 'deliver-and-close',
+                    dryRun: true,
+                    taskId: options.taskId,
+                    actorId,
+                    deliveryCommitSha: resolved,
+                    wouldAutoStage: []
+                }
+            });
+        }
     }
     else {
         const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument, options.cwd, options.taskId);
@@ -99,7 +121,7 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
         process.env.ATM_BATCH_DELIVER_AND_CLOSE = '1';
         let deliveryResult;
         try {
-            deliveryResult = await runAtmGit([
+            deliveryResult = await runGit([
                 'commit',
                 '--cwd', options.cwd,
                 '--actor', actorId,
@@ -199,7 +221,7 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
     }
     const validGovernanceFiles = uniqueStrings(governanceFiles.filter(Boolean));
     const closureMessage = `chore(${options.taskId}): governance close task with delivery evidence`;
-    const closureResult = await runAtmGit([
+    const closureResult = await runGit([
         'commit',
         '--cwd', options.cwd,
         '--actor', actorId,
@@ -211,12 +233,42 @@ export async function runTasksDeliverAndClose(argv, dependencies) {
     const closureCommitSha = closureResult.ok
         ? String(closureResult.evidence?.commitSha ?? '')
         : null;
+    if (!closureResult.ok) {
+        const retryGovernanceCommitCommand = `node atm.mjs git commit --actor ${actorId} --task ${options.taskId} --message "${closureMessage}" --auto-stage --json`;
+        return makeResult({
+            ok: false,
+            command: 'tasks',
+            cwd: options.cwd,
+            messages: [
+                message('error', 'ATM_DELIVER_AND_CLOSE_GOVERNANCE_COMMIT_PENDING', `tasks deliver-and-close: task ${options.taskId} is closed against delivery commit ${deliveryCommitSha}, but the governance commit was refused. Only the governance commit remains: ${retryGovernanceCommitCommand}`, {
+                    taskId: options.taskId,
+                    actorId,
+                    deliveryCommitSha,
+                    governanceFiles: validGovernanceFiles,
+                    retryGovernanceCommitCommand
+                }),
+                ...closureResult.messages
+            ],
+            evidence: {
+                action: 'deliver-and-close',
+                phase: 'closed-governance-commit-pending',
+                taskId: options.taskId,
+                actorId,
+                deliveryCommitSha,
+                closureCommitSha: null,
+                autoStagedFiles,
+                governanceFiles: validGovernanceFiles,
+                retryGovernanceCommitCommand,
+                closeResult: closeResult.evidence
+            }
+        });
+    }
     return makeResult({
         ok: true,
         command: 'tasks',
         cwd: options.cwd,
         messages: [
-            message('info', 'ATM_DELIVER_AND_CLOSE_OK', `Task ${options.taskId} delivered and closed. Delivery commit: ${deliveryCommitSha}. Governance commit: ${closureCommitSha ?? '(staged but not committed)'}.`, {
+            message('info', 'ATM_DELIVER_AND_CLOSE_OK', `Task ${options.taskId} delivered and closed. Delivery commit: ${deliveryCommitSha}. Governance commit: ${closureCommitSha}.`, {
                 taskId: options.taskId,
                 actorId,
                 deliveryCommitSha,

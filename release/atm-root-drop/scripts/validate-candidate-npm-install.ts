@@ -1,3 +1,4 @@
+import { runFirstUseChain } from './lib/npm-first-use.ts';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -6,6 +7,7 @@ import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
+import { withPrivateCliNpmPackage } from './lib/private-cli-npm-package.ts';
 
 type Args = {
   candidateDir: string;
@@ -190,26 +192,21 @@ function measureDependencyFootprint(consumer: string): DependencyFootprint {
   };
 }
 
-function packCandidate(args: Args, packRoot: string): { metadata: PackMetadata; tarball: string; source: string } {
+async function packCandidate(args: Args, packRoot: string): Promise<{ metadata: PackMetadata; tarball: string; source: string }> {
   mkdirSync(packRoot, { recursive: true });
   if (args.candidateTarball) {
     const tarball = path.join(packRoot, path.basename(args.candidateTarball));
     writeFileSync(tarball, readFileSync(args.candidateTarball));
     return { metadata: readExplicitTarballMetadata(tarball), tarball, source: 'explicit-tarball' };
   }
-  // --ignore-scripts keeps the consumer install honest, but it also skips
-  // prepack, so the pack would ship whatever dist happens to sit in the
-  // checkout. A fresh clone carries only the tracked subset (dist/schemas is
-  // generated and ignored), which produced a tarball whose atm create failed.
-  // Build the candidate first so the gate measures the package it would publish.
-  execFileSync(process.execPath, ['--strip-types', path.join(root, 'scripts', 'build-package-dist.ts')], {
-    cwd: root,
-    stdio: ['ignore', 'pipe', 'pipe'],
-    encoding: 'utf8'
-  });
-  const metadata = parsePackMetadata(runNpm([
-    'pack', args.candidateDir, '--ignore-scripts', '--pack-destination', packRoot, '--json', '--loglevel', 'silent'
+  // The build lane prepares dist once. Validation bundles privately instead
+  // of rebuilding shared outputs while other readers are running.
+  const packDirectory = (directory: string) => parsePackMetadata(runNpm([
+    'pack', directory, '--ignore-scripts', '--pack-destination', packRoot, '--json', '--loglevel', 'silent'
   ], root));
+  const metadata = args.candidateDir === path.join(root, 'packages', 'cli')
+    ? await withPrivateCliNpmPackage(root, async packageRoot => packDirectory(packageRoot))
+    : packDirectory(args.candidateDir);
   return { metadata, tarball: path.join(packRoot, metadata.filename as string), source: 'candidate-directory' };
 }
 
@@ -226,8 +223,8 @@ type SmokeResult = {
 const legacySmokeCommandNames = ['version', 'doctor', 'next', 'tasks'] as const;
 // The candidate gate runs the same core workflow the public matrix measures;
 // create was missing here, which is how a broken create reached 0.1.1.
-const coreWorkflowCommandNames = ['version', 'doctor', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
-const candidateSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
+const coreWorkflowCommandNames = ['version', 'doctor', 'first-use', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
+const candidateSmokeCommandNames = ['version', 'doctor', 'next', 'tasks', 'first-use', 'bootstrap', 'atm-chart-render', 'atm-chart-verify', 'create'] as const;
 
 const smokeCommands = [
   ['version', '--version', '--json'],
@@ -261,15 +258,9 @@ function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs:
   for (const [name, ...rawCommandArgs] of smokeCommands) {
     const commandArgs = rawCommandArgs.map((argument) => argument === 'WORKFLOW_PLACEHOLDER' ? workflow : argument);
     const startupMs: number[] = [];
-    let result = spawnSync(bin, commandArgs, {
-      cwd: consumer,
-      encoding: 'utf8',
-      shell: process.platform === 'win32',
-      windowsHide: true
-    });
-    // Measure the first invocation as well; additional repetitions are only
-    // needed for the version command to keep the smoke lane inexpensive.
-    startupMs.push(0);
+    let result!: ReturnType<typeof spawnSync>;
+    // Execute every invocation inside the measurement loop; an unmeasured
+    // warm-up duplicates stateful bootstrap/create commands unnecessarily.
     const repeatCount = name === 'version' ? runs : 1;
     for (let index = 0; index < repeatCount; index += 1) {
       const started = performance.now();
@@ -281,7 +272,6 @@ function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs:
       });
       startupMs.push(performance.now() - started);
     }
-    startupMs.shift();
     const combined = `${result.stdout ?? ''}${result.stderr ?? ''}`;
     const moduleResolutionFailure = /ERR_MODULE_NOT_FOUND|MODULE_NOT_FOUND|Cannot find module/i.test(combined);
     smoke[name] = {
@@ -294,6 +284,19 @@ function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs:
       outputSha256: createHash('sha256').update(combined).digest('hex')
     };
   }
+  const firstUseStarted = performance.now();
+  const firstUse = runFirstUseChain(bin, consumer);
+  const firstUseMs = performance.now() - firstUseStarted;
+  smoke['first-use'] = {
+    ...firstUse,
+    exitCode: Number(firstUse.exitCode),
+    commandExecuted: (firstUse.steps as Array<{ exitCode: number | null }>)[0]?.exitCode !== null,
+    moduleResolutionFailure: /ERR_MODULE_NOT_FOUND|MODULE_NOT_FOUND|Cannot find module/i.test(String(firstUse.failure ?? '')),
+    startupMs: [firstUseMs],
+    p50Ms: firstUseMs,
+    p95Ms: firstUseMs,
+    outputSha256: createHash('sha256').update(JSON.stringify(firstUse)).digest('hex')
+  };
   return { installMs, smoke, bin, dependencyFootprint };
 }
 
@@ -308,7 +311,7 @@ function writeProof(args: Args, proof: Record<string, unknown>): void {
 const args = parseArgs();
 const tempRoot = mkdtempSync(path.join(tmpdir(), 'atm-candidate-install-'));
 try {
-  const packed = packCandidate(args, path.join(tempRoot, 'pack'));
+  const packed = await packCandidate(args, path.join(tempRoot, 'pack'));
   const smokeRun = runSmoke(packed.tarball, tempRoot, args.measurementRuns);
   const files = packed.metadata.files ?? [];
   const moduleResolutionFailures = Object.values(smokeRun.smoke).filter((entry) => entry.moduleResolutionFailure).length;
@@ -370,7 +373,7 @@ try {
     validation: {
       cleanConsumer: false,
       usedWorkspaceLink: false,
-      commandMatrix: smokeCommands.map(([name]) => name),
+      commandMatrix: [...candidateSmokeCommandNames],
       commandMatrixComplete: false,
       versionOnlySmoke: false,
       requiredSuccessCommands: [...coreWorkflowCommandNames],

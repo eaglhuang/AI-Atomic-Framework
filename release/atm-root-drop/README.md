@@ -1,12 +1,13 @@
 # AI-Atomic-Framework
 
-[![Release v0.9.0-alpha.1](https://img.shields.io/badge/Release-v0.9.0--alpha.1-2563eb.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.9.0-alpha.1)
+[![Paper snapshot v0.9.0-alpha.1](https://img.shields.io/badge/Paper%20snapshot-v0.9.0--alpha.1-2563eb.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.9.0-alpha.1)
 [![arXiv 2607.00041](https://img.shields.io/badge/arXiv-2607.00041-b31b1b.svg)](https://arxiv.org/abs/2607.00041)
 [![Paper Landing](https://img.shields.io/badge/Paper-Landing%20Page-b91c1c.svg)](https://eaglhuang.github.io/AI-learning-notes/atm_pre_write_admission_paper_en.html)
 [![CI](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-0f172a.svg)](LICENSE)
-[![Node 24](https://img.shields.io/badge/Node-24-1f6feb.svg)](package.json)
-[![npm](https://img.shields.io/badge/npm-create--atm-cb3837.svg)](https://www.npmjs.com/)
+[![Node 20+ adopters, 24 contributors](https://img.shields.io/badge/Node-20%2B%20adopters%20%7C%2024%20contributors-1f6feb.svg)](docs/ATM_AI_FIRST_5_MIN.md)
+[![npm create-atm](https://img.shields.io/npm/v/create-atm?label=npm%20create-atm&color=cb3837)](https://www.npmjs.com/package/create-atm)
+[![npm @ai-atomic-framework/cli](https://img.shields.io/npm/v/@ai-atomic-framework/cli?label=npm%20cli&color=cb3837)](https://www.npmjs.com/package/@ai-atomic-framework/cli)
 [![6 Agent Integrations](https://img.shields.io/badge/Integrations-6-0ea5e9.svg)](docs/AGENT_PACK_ONBOARDING.md)
 [![Onefile Release](https://img.shields.io/badge/Release-Onefile-16a34a.svg)](release/atm-onefile/atm.mjs)
 [![Root Drop Release](https://img.shields.io/badge/Release-Root--Drop-22c55e.svg)](release/atm-root-drop/)
@@ -23,6 +24,8 @@ The best part is that humans do not need to drive the machinery. In an ATM-enabl
 ATM is not another chat agent or workflow app. It is the operating contract for the multi-agent era: a way for people and agents to produce stable, reviewable software together instead of relying on prompt memory, ad hoc conventions, or merge-time cleanup.
 ATM is not just an atom runner. It is the route, scope, evidence, close, and handoff contract around AI-assisted work.
 
+> New AI agent? Read [`docs/ATM_AI_FIRST_5_MIN.md`](docs/ATM_AI_FIRST_5_MIN.md) only: `welcome --json`, then `next --prompt "<user request>" --json`. The rest of `docs/` is advanced material.
+>
 > For AI agents: use the repo-local ATM skill or integration when available. The skill should translate the user's request into the governed ATM route and preserve the returned playbook, scope, validation, and evidence.
 
 Captain/dispatch entry gate: if the user asks for Captain, Coordinator, dispatch, task cards, sidecars, subagents, delegation, condition review, or closeout work, route the request through `ai-role-router` when available, then through `atm-dispatch` before drafting instructions, delegating work, or reviewing another agent. State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal sidecar is the default; External dispatch is opt-in; external write is forbidden unless the user explicitly grants write authority and scope.
@@ -114,9 +117,11 @@ Use one official distribution:
 
 | Distribution | Use when |
 | --- | --- |
-| `release/atm-root-drop/` | You want the portable multi-file bundle. |
-| `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime. |
 | npm `create-atm` | You want the lowest-friction starter route. |
+| `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime (copy it, then `node atm.mjs bootstrap --json`). |
+| `release/atm-root-drop/` | You want the portable multi-file bundle. |
+
+Which version to pin: pin the npm package version (`@ai-atomic-framework/cli`, `create-atm`); `welcome --json` reports the same `frameworkVersion`. Git tags such as `v0.9.0-alpha.1` mark paper snapshots, not the installable product.
 
 The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let the local skill or integration call `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested governed work.
 
@@ -131,6 +136,8 @@ Read README.md if present, then run "node atm.mjs next --prompt \"<current user 
 The skill-first path is preferred when an integration exists. This fallback instruction keeps the same governance route visible for agents, shells, and editors that do not yet expose the friendly skill wrapper.
 
 ## For AI Agents
+
+New to ATM? Start with [`docs/ATM_AI_FIRST_5_MIN.md`](docs/ATM_AI_FIRST_5_MIN.md).
 
 When you enter an ATM repository for user-requested work:
 

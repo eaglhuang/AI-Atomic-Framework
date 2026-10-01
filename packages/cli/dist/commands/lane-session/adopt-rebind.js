@@ -1,7 +1,8 @@
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { listActorWorkSessions, upsertActorWorkSession } from '../actor-session.js';
 import { parseClaimRecord } from '../tasks/task-ledger-readers.js';
+import { writeTaskDocumentWithTransition } from '../tasks/close-helpers/task-transition-writer.js';
 export function rebindLifecycleAfterLaneAdopt(input) {
     const cwd = path.resolve(input.cwd);
     const nowIso = input.timestamp ?? new Date().toISOString();
@@ -97,7 +98,10 @@ function rebindTaskClaimLane(input) {
         return null;
     if (claim.laneSession && claim.laneSession.laneSessionId !== input.laneId)
         return null;
+    // Start from the raw claim so fields the reader does not model (for example
+    // intent) survive the rebind; only the owner and lane binding change.
     const nextClaim = {
+        ...parsed.claim,
         ...claim,
         actorId: input.actorId,
         laneSession: {
@@ -108,6 +112,21 @@ function rebindTaskClaimLane(input) {
         }
     };
     parsed.claim = nextClaim;
-    writeFileSync(absolutePath, `${JSON.stringify(parsed, null, 2)}\n`, 'utf8');
+    if (parsed.owner === claim.actorId)
+        parsed.owner = input.actorId;
+    // Write through the governed transition writer so the claim rebind, its
+    // transition event and the ledger hash land together; a raw write left
+    // lastTransitionId pointing at an event whose taskSha256 no longer matched.
+    const previousStatus = typeof parsed.status === 'string' ? parsed.status : null;
+    writeTaskDocumentWithTransition({
+        cwd: input.cwd,
+        taskPath: absolutePath,
+        taskId: input.taskId,
+        taskDocument: parsed,
+        action: 'adopt',
+        actorId: input.actorId,
+        previousStatus,
+        command: `node atm.mjs lane adopt ${input.laneId} --actor ${input.actorId} --json`
+    });
     return { leaseId: claim.leaseId };
 }

@@ -1,9 +1,10 @@
 {
   "publishClosure": {
     "schemaId": "atm.npmPublishClosure.v1",
-    "rationale": "The npm product is a single self-contained CLI tarball. Every other workspace stays a build-time input whose runtime output ships vendored inside packages/cli/dist/_vendor, so it is skeleton-validated here but never published.",
+    "rationale": "Publish the self-contained CLI and its small create-atm onboarding entrypoint. Other workspaces remain build-time inputs vendored into the CLI runtime.",
     "publishedPackages": [
-      "@ai-atomic-framework/cli"
+      "@ai-atomic-framework/cli",
+      "create-atm"
     ]
   },
   "packages": [
@@ -204,3 +205,4 @@
     }
   ]
 }
+

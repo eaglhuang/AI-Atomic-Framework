@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { copyFileSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 const report = JSON.parse(readFileSync('docs/reports/plan-3x-4x-charter-current-verdict.json', 'utf8'));
 
@@ -21,6 +23,19 @@ assert.deepEqual(report.invariantChecks.map((entry: any) => entry.invariantId), 
 // The current-verdict projection must be refreshable from the same canonical
 // charter inputs it validates; otherwise a legitimate charter amendment makes
 // the final certificate permanently stale.
-execFileSync('node', ['--strip-types', 'scripts/validate-four-plan-charter-current-verdict.ts', '--mode', 'write'], { stdio: 'pipe' });
-execFileSync('node', ['--strip-types', 'scripts/validate-four-plan-charter-current-verdict.ts'], { stdio: 'pipe' });
+const isolatedRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-charter-current-verdict-'));
+const isolatedReport = path.join(isolatedRoot, 'charter-current-verdict.json');
+try {
+  copyFileSync('docs/reports/plan-3x-4x-charter-current-verdict.json', isolatedReport);
+  execFileSync('node', [
+    '--strip-types', 'scripts/validate-four-plan-charter-current-verdict.ts',
+    '--mode', 'write', '--input', isolatedReport
+  ], { stdio: 'pipe' });
+  execFileSync('node', [
+    '--strip-types', 'scripts/validate-four-plan-charter-current-verdict.ts',
+    '--input', isolatedReport
+  ], { stdio: 'pipe' });
+} finally {
+  rmSync(isolatedRoot, { recursive: true, force: true });
+}
 console.log('four-plan-charter-current-verdict.test.ts: ok');

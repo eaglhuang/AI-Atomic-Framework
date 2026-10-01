@@ -3,6 +3,7 @@ import type { ActiveWriteIntent, WriteBrokerRegistryDocument, WriteIntent } from
 import { cleanupStale, registerIntent, releaseTask, renewIntentLease } from './registry.ts';
 import {
   createBrokerRegistryStore,
+  BrokerRegistryStoreError,
   type BrokerRegistrySnapshot,
   type BrokerRegistryStore,
   type BrokerRegistryWriteReceipt
@@ -35,6 +36,10 @@ export interface BrokerTransactionAuthority {
     readonly lane: ActiveWriteIntent['lane'];
     readonly ttlSeconds?: number;
     readonly admissionOverride?: ActiveWriteIntent['admission'];
+    readonly resolveRegistration?: (doc: WriteBrokerRegistryDocument) => {
+      readonly lane: ActiveWriteIntent['lane'];
+      readonly admissionOverride?: ActiveWriteIntent['admission'];
+    };
     readonly idempotencyKey?: string;
   }): BrokerTransactionReceipt;
   heartbeat(input: {
@@ -80,7 +85,8 @@ export function createBrokerTransactionAuthority(registryPath: string): BrokerTr
           actorId: input.intent.actorId,
           operation: 'register'
         });
-        return registerIntent(doc, input.intent, input.lane, input.ttlSeconds, input.admissionOverride);
+        const registration = input.resolveRegistration?.(doc) ?? input;
+        return registerIntent(doc, input.intent, registration.lane, input.ttlSeconds, registration.admissionOverride);
       }
     }),
     heartbeat: (input) => commitBrokerRegistryTransaction({
@@ -135,14 +141,30 @@ export function assertSameTaskLaneFence(input: {
   );
 }
 
-export function commitBrokerRegistryTransaction(input: {
+type BrokerTransactionInput = {
   readonly store: BrokerRegistryStore;
   readonly operation: BrokerTransactionOperation;
   readonly taskId: string;
   readonly actorId: string;
   readonly idempotencyKey: string;
   readonly mutate: (doc: WriteBrokerRegistryDocument) => WriteBrokerRegistryDocument;
-}): BrokerTransactionReceipt {
+};
+
+export function commitBrokerRegistryTransaction(input: BrokerTransactionInput): BrokerTransactionReceipt {
+  // Rebase only pure registry mutations, never reuse a stale admission decision.
+  // Yield briefly to the short compare/write section; permanent errors fail immediately.
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return commitBrokerRegistryTransactionOnce(input);
+    } catch (error) {
+      if (!(error instanceof BrokerRegistryStoreError)
+        || error.code !== 'ATM_BROKER_REGISTRY_CAS_CONFLICT' || attempt >= 7) throw error;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1);
+    }
+  }
+}
+
+function commitBrokerRegistryTransactionOnce(input: BrokerTransactionInput): BrokerTransactionReceipt {
   const base = input.store.read();
   const transactionId = buildBrokerTransactionId(input.operation, input.taskId, input.actorId, input.idempotencyKey);
   if (base.lastTransactionId === transactionId) {

@@ -180,6 +180,11 @@ export function normalizeCommandRunInput(value, label) {
     };
     return {
         ...normalized,
+        ...(Object.hasOwn(value, 'processExitStatus') ? {
+            processExitStatus: typeof value.processExitStatus === 'number' ? value.processExitStatus : null,
+            processSignal: typeof value.processSignal === 'string' ? value.processSignal : null,
+            processError: typeof value.processError === 'string' ? value.processError : null
+        } : {}),
         canonicalObservation: buildCommandRunObservation(normalized)
     };
 }

@@ -85,10 +85,14 @@ export function describeIntegrationInstallHint(bootstrap: ReturnType<typeof insp
     installCommand: adapter.installCommand,
     verifyCommand: adapter.verifyCommand
   }));
+  // Name one runnable command so an agent can act on the hint without reading the adapter list.
+  const currentEditorInstall = bootstrap.currentEditorAdapter?.installCommand ?? null;
+  const requiredCommand = currentEditorInstall ?? 'node atm.mjs integration add <editor-id> --json';
   if (bootstrap.reason === 'current-editor-missing' && bootstrap.currentEditorAdapter) {
     return {
-      text: `ATM runtime is ready, but the current editor (${bootstrap.currentEditorAdapter.displayName}) is missing its repo-local ATM integration. Install it before relying on ATM entry skills.`,
+      text: `ATM runtime is ready, but the current editor (${bootstrap.currentEditorAdapter.displayName}) is missing its repo-local ATM integration. Run ${requiredCommand} before relying on ATM entry skills.`,
       data: {
+        requiredCommand,
         reason: bootstrap.reason,
         currentEditorId: bootstrap.currentEditorId,
         currentEditorDetectedFrom: bootstrap.currentEditorDetectedFrom,
@@ -99,8 +103,9 @@ export function describeIntegrationInstallHint(bootstrap: ReturnType<typeof insp
     };
   }
   return {
-    text: 'ATM runtime is ready, but no repo-local editor integration is installed yet. Install the adapter for the editor you are using before relying on ATM entry skills.',
+    text: `ATM runtime is ready, but no repo-local editor integration is installed yet. Run ${requiredCommand} for the editor you are using (for example cursor, claude-code, codex) before relying on ATM entry skills.`,
     data: {
+      requiredCommand,
       reason: bootstrap.reason,
       currentEditorId: bootstrap.currentEditorId,
       currentEditorDetectedFrom: bootstrap.currentEditorDetectedFrom,

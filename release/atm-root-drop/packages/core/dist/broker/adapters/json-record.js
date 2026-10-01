@@ -96,14 +96,18 @@ export const jsonRecordAdapter = {
     },
     canMerge(mutations, _parsed) {
         const keys = new Map();
+        const targets = [];
         const collisions = [];
         for (const mutation of mutations) {
             const key = jsonPointerConflictKey(mutation.filePath, mutation.target);
-            if (keys.has(key.key)) {
+            const segments = pointerSegments(mutation.target);
+            if (targets.some((other) => other.slice(0, Math.min(other.length, segments.length))
+                .every((segment, index) => segment === segments[index]))) {
                 collisions.push(key);
             }
             else {
                 keys.set(key.key, key);
+                targets.push(segments);
             }
         }
         if (collisions.length > 0) {
@@ -112,7 +116,7 @@ export const jsonRecordAdapter = {
                 specVersion: '0.1.0',
                 migration: brokerAdapterMigration(),
                 verdict: 'conflict',
-                reason: 'two or more JSON record mutations target the same pointer; record edits are not commutative',
+                reason: 'JSON record mutations target identical or ancestor/descendant pointers; record edits are not commutative',
                 conflictKeys: collisions
             };
         }
@@ -156,7 +160,9 @@ export const jsonRecordAdapter = {
         return { filePath: parsed.filePath, value: root };
     },
     serialize(parsed) {
-        return `${JSON.stringify(parsed.value, null, 2)}\n`;
+        return `${JSON.stringify(parsed.value, (_key, value) => value && typeof value === 'object' && !Array.isArray(value)
+            ? Object.fromEntries(Object.entries(value).sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0))
+            : value, 2)}\n`;
     },
     validate(file) {
         try {

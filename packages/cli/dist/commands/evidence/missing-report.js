@@ -159,21 +159,28 @@ export function assessEvidenceFreshness(input) {
         rerunPlan
     };
 }
+// The current verdict for a gate is decided by observation time, not by
+// whether a pass ever existed or by array position: a pass only counts while
+// no failed run of the same gate was observed at or after it. Records keep
+// the full history; this function only answers "what is true now".
 export function classifyValidatorEvidenceState(bundle, gate) {
     const rank = { pass: 3, stale: 2, 'diagnostic-only': 1 };
-    let bestPositive = null;
-    let sawFailedRun = false;
+    const positives = [];
+    let latestFailure = null;
     for (const record of bundle) {
         const passes = readRecordValidationPasses(record);
         const commandRuns = collectRecordCommandRuns(record);
+        const recordObservedAt = readObservationTime(record.createdAt, Number.NEGATIVE_INFINITY);
         if (passes.includes(gate)) {
-            const proof = commandRuns.some((run) => isCommandRunProof(run));
+            const proofRuns = commandRuns.filter((run) => isCommandRunProof(run));
             const freshness = readRecordFreshness(record);
-            const state = (freshness === 'fresh' && proof)
+            const state = (freshness === 'fresh' && proofRuns.length > 0)
                 ? 'pass'
-                : proof ? 'stale' : 'diagnostic-only';
-            if (!bestPositive || rank[state] > rank[bestPositive])
-                bestPositive = state;
+                : proofRuns.length > 0 ? 'stale' : 'diagnostic-only';
+            const observedAt = proofRuns.length > 0
+                ? Math.max(...proofRuns.map((run) => readRunObservationTime(run, recordObservedAt)))
+                : recordObservedAt;
+            positives.push({ state, observedAt });
         }
         for (const run of commandRuns) {
             const runValidators = Array.isArray(run.validators)
@@ -184,15 +191,32 @@ export function classifyValidatorEvidenceState(bundle, gate) {
             const cmd = typeof run.command === 'string' ? run.command : '';
             const matches = runValidators.includes(gate) || canonicalizeValidatorIdentity(cmd) === gate;
             const exitCode = run.exitCode;
-            if (matches && typeof exitCode === 'number' && exitCode !== 0)
-                sawFailedRun = true;
+            if (matches && typeof exitCode === 'number' && exitCode !== 0) {
+                const observedAt = readRunObservationTime(run, recordObservedAt);
+                if (latestFailure === null || observedAt > latestFailure)
+                    latestFailure = observedAt;
+            }
         }
     }
-    if (bestPositive === 'pass')
-        return 'pass';
-    if (sawFailedRun)
+    let bestPositive = null;
+    for (const positive of positives) {
+        if (latestFailure !== null && positive.observedAt <= latestFailure)
+            continue;
+        if (!bestPositive || rank[positive.state] > rank[bestPositive])
+            bestPositive = positive.state;
+    }
+    if (bestPositive)
+        return bestPositive;
+    if (latestFailure !== null)
         return 'failed-run';
-    return bestPositive ?? 'absent';
+    return 'absent';
+}
+function readRunObservationTime(run, fallback) {
+    return readObservationTime(run.finishedAt ?? run.generatedAt ?? run.startedAt, fallback);
+}
+function readObservationTime(value, fallback) {
+    const parsed = typeof value === 'string' ? Date.parse(value) : Number.NaN;
+    return Number.isFinite(parsed) ? parsed : fallback;
 }
 export function buildMissingValidatorFinding(gate, state, taskId, actor, runnerKind, expectedCommand = resolveValidatorExpectedCommand(gate)) {
     const requiredCommand = buildAutoEvidenceRequiredCommand(taskId, actor, expectedCommand, gate, runnerKind);

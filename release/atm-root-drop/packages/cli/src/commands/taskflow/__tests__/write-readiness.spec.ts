@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildTaskflowCloseWriteReadinessHint } from '../write-readiness.ts';
+import { runTaskflow } from '../../taskflow.ts';
+import { makeDualRepoCloseFixture } from './dryrun/fixtures.ts';
 
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
@@ -287,5 +289,52 @@ assert.ok(
   telemetryObligationHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_TELEMETRY_OBLIGATION_INCOMPLETE'),
   'taskflow preview must block an undeclared telemetry seal'
 );
+
+const bundleInput = {
+  cwd: repo, taskId: 'TASK-WRITE-0001', actorId: 'validator',
+  taskDocument: { status: 'done', claim: { state: 'released', actorId: 'validator', leaseId: 'lease-1' } },
+  declaredFiles: ['src/app.ts'],
+  closebackPlan: { writerBoundary: { planningMirrorPath: null }, closebackPathResolution: null,
+    historicalDeliveryGate: { required: false } } as any,
+  historicalDeliveryRefs: [],
+  planningAuthorityDeliveryGate: { required: false, ok: false, repoRoot: null, matchedFiles: [], reason: null }
+};
+for (const preview of [
+  { failClosed: true, scopeAmendment: { required: false } },
+  { failClosed: false, scopeAmendment: { required: true, reason: 'declared daily file excluded', candidateFiles: ['daily/issues/smoke.json'] } }
+]) {
+  const blockedBundle = buildTaskflowCloseWriteReadinessHint({ ...bundleInput,
+    previewCommitBundle: { targetDeliveryFiles: ['src/app.ts'], ...preview } });
+  assert.equal(blockedBundle.status, 'blocked');
+  assert.ok(blockedBundle.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE'),
+    'preview must expose the existing bundle rejection before attempting a write');
+}
+const completeBundle = buildTaskflowCloseWriteReadinessHint({ ...bundleInput,
+  previewCommitBundle: { targetDeliveryFiles: ['src/app.ts'], failClosed: false, scopeAmendment: { required: false } } });
+assert.equal(completeBundle.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE'), false,
+  'a complete bundle must not gain a false bundle blocker');
+
+const cliFixture = await makeDualRepoCloseFixture('incomplete-bundle-preview');
+const cliTaskPath = path.join(cliFixture.targetRepo, '.atm/history/tasks', `${cliFixture.taskId}.json`);
+const cliTask = JSON.parse(readFileSync(cliTaskPath, 'utf8'));
+cliTask.deliverables = ['outside-scope/undeclared.txt'];
+writeJson(cliTaskPath, cliTask);
+const taskBefore = readFileSync(cliTaskPath, 'utf8');
+const planningBefore = readFileSync(cliFixture.planPath, 'utf8');
+for (const surface of ['pre-close', 'close']) {
+  const result = await runTaskflow([surface, '--cwd', cliFixture.targetRepo,
+    '--task', cliFixture.taskId, '--actor', 'validator', '--json']) as any;
+  assert.equal(result.evidence.governedCommitBundle.failClosed, true);
+  assert.equal(result.ok, false, `${surface} must not report an incomplete bundle as successful`);
+  assert.equal(result.evidence.writeReadinessHint.status, 'blocked');
+  assert.ok(result.evidence.writeReadinessHint.blockers.some(
+    (blocker: { code: string }) => blocker.code === 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE'));
+  assert.equal(readFileSync(cliTaskPath, 'utf8'), taskBefore, 'preview must not mutate the task');
+  assert.equal(readFileSync(cliFixture.planPath, 'utf8'), planningBefore, 'preview must not mutate the planning card');
+  for (const cwd of [cliFixture.targetRepo, cliFixture.planningRepo]) {
+    assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd, encoding: 'utf8' }).trim(), '',
+      'preview must not stage either repository');
+  }
+}
 
 console.log('ok: write readiness spec passed');
