@@ -220,6 +220,18 @@ export function resolveStoredPlanningPath(cwd: string, storedPath: string): Stor
     };
   }
 
+  // A concrete target file wins over an ambiguous legacy planning-relative
+  // name. Adopter directory names are not a framework-owned allowlist.
+  if (!legacyExternal && !path.isAbsolute(normalizedStored) && isPathUnderDirectory(cwd, repoLocalAbsolute) && existsSync(repoLocalAbsolute)) {
+    return {
+      storedPath: normalizedStored,
+      absolutePath: repoLocalAbsolute,
+      planningRoot: null,
+      planningRelativePath: null,
+      isExternalPlanning: false
+    };
+  }
+
   if (!legacyExternal && !path.isAbsolute(normalizedStored)) {
     for (const planningRoot of config.effectiveRoots) {
       const candidate = path.resolve(planningRoot, normalizedStored);
@@ -248,7 +260,7 @@ export function resolveStoredPlanningPath(cwd: string, storedPath: string): Stor
     absolutePath,
     planningRoot: null,
     planningRelativePath: null,
-    isExternalPlanning: legacyExternal || looksLikeLegacyExternalPlanningStoredPath(normalizedStored)
+    isExternalPlanning: legacyExternal || !isPathUnderDirectory(cwd, absolutePath)
   };
 }
 
@@ -321,13 +333,6 @@ export function shouldReportPlanningRootMissing(input: {
   const config = resolvePlanningRepoRootConfig(input.cwd);
   if (config.resolvedConfigRoots.length > 0) return null;
   return buildPlanningRootMissingDiagnostic(input.cwd);
-}
-
-function looksLikeLegacyExternalPlanningStoredPath(storedPath: string): boolean {
-  if (storedPath.startsWith('../')) return true;
-  if (isPlanningRootDocStoredPath(storedPath)) return true;
-  if (TARGET_REPO_ROOT_PREFIXES.some((prefix) => storedPath.startsWith(prefix))) return false;
-  return looksLikePlanningRootRelativePath(storedPath);
 }
 
 function isPathUnderDirectory(root: string, target: string): boolean {
