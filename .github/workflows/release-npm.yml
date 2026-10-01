@@ -263,6 +263,7 @@ jobs:
       # skipped rather than silently passing) and never uses
       # --record-blocked, so a real registry defect fails the workflow.
       - name: Verify public npm registry post-publish
+        timeout-minutes: 10
         if: ${{ always() && !cancelled() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
         shell: bash
         run: |
