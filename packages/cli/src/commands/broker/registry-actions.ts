@@ -12,7 +12,7 @@ import {
   cleanupStale
 } from '../../../../core/src/broker/registry.ts';
 import { cleanupBrokerRuntimeSnapshots } from '../../../../core/src/broker/lifecycle.ts';
-import { createBrokerTransactionAuthority } from '../../../../core/src/broker/transaction-authority.ts';
+import { commitBrokerRegistryTransaction, createBrokerTransactionAuthority, assertSameTaskLaneFence } from '../../../../core/src/broker/transaction-authority.ts';
 import { calculateBrokerDecision } from '../../../../core/src/broker/decision.ts';
 import { composeBrokerProposals } from '../../../../core/src/broker/compose.ts';
 import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../../../core/src/broker/steward.ts';
@@ -97,10 +97,8 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
 
     const newIntent = readBrokerWriteIntent(intentFilePath, options.intentFile);
     assertBrokerRegisterCliParity(newIntent, options);
-    let registry = cleanupStale(loadRegistry(registryPath));
-    const decision = calculateBrokerDecision(newIntent, registry);
-    const conflictMatrix = decision.conflictMatrix;
-    const isDecisionSafe = decision.verdict === 'parallel-safe' || decision.verdict === 'serial';
+    let registry = cleanupStale(loadRegistry(registryPath, { persistCleanup: false }));
+    let decision = calculateBrokerDecision(newIntent, registry);
 
     // 即使決策是 blocked，我們依然將其以 blocked 狀態註冊進去
     const authority = createBrokerTransactionAuthority(registryPath);
@@ -109,9 +107,15 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       lane: decision.lane,
       ttlSeconds: options.ttlSeconds,
       admissionOverride: decision.admission,
+      resolveRegistration: (doc) => {
+        decision = calculateBrokerDecision(newIntent, cleanupStale(doc));
+        return { lane: decision.lane, admissionOverride: decision.admission };
+      },
       idempotencyKey: `broker-register:${newIntent.taskId}:${newIntent.actorId}`
     });
     registry = authority.read().document;
+    const conflictMatrix = decision.conflictMatrix;
+    const isDecisionSafe = decision.verdict === 'parallel-safe' || decision.verdict === 'serial';
     const queueUpdate = updateSharedSurfaceQueues({
       queuePath: sharedQueuePath,
       intent: newIntent,
@@ -121,7 +125,18 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
     const queueAdmission = resolveSharedSurfaceQueueAdmission({ intent: newIntent, queues: queueUpdate.queues });
     const isBrokerSafe = isDecisionSafe || queueAdmission.status === 'queue-head' || queueAdmission.status === 'queued-private-work';
     if (queueAdmission.status === 'queued-private-work' || queueAdmission.status === 'queue-head') {
-      registry = replaceIntentLane(registry, newIntent.taskId, 'direct-brokered');
+      commitBrokerRegistryTransaction({
+        store: authority.store,
+        operation: 'register',
+        taskId: newIntent.taskId,
+        actorId: newIntent.actorId,
+        idempotencyKey: `broker-queue-lane:${transactionReceipt.transactionId}`,
+        mutate: (doc) => {
+          assertSameTaskLaneFence({ doc, taskId: newIntent.taskId, actorId: newIntent.actorId, operation: 'register' });
+          return replaceIntentLane(doc, newIntent.taskId, 'direct-brokered');
+        }
+      });
+      registry = authority.read().document;
     }
     const freezes = createSharedSurfaceFreezeRecords({
       existing: readSharedSurfaceFreezeRecords(sharedFreezePath),
@@ -129,7 +144,6 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       waitingIntent: newIntent
     });
     writeSharedSurfaceFreezeRecords(sharedFreezePath, freezes);
-    saveRegistry(registryPath, registry);
     syncTeamRunRearbitrationSnapshots(options.cwd, registry, newIntent.taskId, newIntent.actorId);
 
     return makeResult({
