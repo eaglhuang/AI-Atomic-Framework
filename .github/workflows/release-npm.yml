@@ -33,6 +33,10 @@ permissions:
   id-token: write
   issues: write
 
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+
 jobs:
   publish:
     name: Publish npm packages
