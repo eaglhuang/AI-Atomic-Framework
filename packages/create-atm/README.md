@@ -8,7 +8,7 @@
 npx create-atm test-app --agent claude-code
 ```
 
-The command creates `test-app`, runs `atm bootstrap`, renders `.atm/memory/atm-chart.md`, and installs the requested agent pack. Agent packs are opt-in; running without `--agent` initializes the ATM project and rule chart only.
+The command creates `test-app`, runs `atm bootstrap`, renders `.atm/memory/atm-chart.md`, and installs the requested editor integration with `atm integration add <editor-id>`. Integrations are opt-in; running without `--agent` initializes the ATM project and rule chart only.
 
 ```bash
 npx create-atm test-app
