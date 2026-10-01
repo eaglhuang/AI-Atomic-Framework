@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { readFileSync } from 'node:fs';
 import { publicCliCommandNames, publicCliCommandRunners, runPublicCli } from '../../packages/cli/src/atm-public.ts';
 
 async function invoke(args: string[]) {
@@ -12,6 +13,24 @@ async function invoke(args: string[]) {
   const exitCode = await runPublicCli([...args, '--json'], io);
   return { exitCode, stdout, stderr, result: JSON.parse(stdout || stderr) };
 }
+
+test('public version reuses one source observation and preserves drift warnings', async () => {
+  const source = readFileSync(new URL('../../packages/cli/src/atm-public.ts', import.meta.url), 'utf8');
+  assert.match(source, /const runnerSourceDrift = runnerMode\.sourceDrift;/,
+    'version must not independently repeat the source inventory');
+  for (const alias of ['--version', '-v']) {
+    const { exitCode, stderr, result } = await invoke([alias]);
+    assert.equal(exitCode, 0);
+    assert.equal(stderr, '');
+    assert.equal(result.command, 'version');
+    const drift = result.evidence.runnerSourceDrift;
+    assert.equal(drift.schemaId, 'atm.runnerSourceDrift.v1');
+    assert.deepEqual(drift, result.evidence.runnerMode.sourceDrift);
+    const warning = result.messages.find((entry: { code: string }) => entry.code === 'ATM_RUNNER_SOURCE_DRIFT');
+    assert.equal(Boolean(warning), drift.syncRequired);
+    if (warning) assert.deepEqual(warning.data, drift);
+  }
+});
 
 test('public help advertises exactly the executable command registry', async () => {
   assert.equal(publicCliCommandNames.length, 21, 'preserve the existing public surface');
@@ -45,3 +64,4 @@ for (const name of ['toString', 'constructor', 'valueOf', 'hasOwnProperty', '__p
     });
   }
 }
+

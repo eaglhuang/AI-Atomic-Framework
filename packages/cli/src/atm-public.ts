@@ -5,7 +5,6 @@ import { getCommandSpec } from './commands/command-specs.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
-import { inspectRunnerSourceDrift } from './commands/framework-development/closure-packet-schema.ts';
 import { describeRunnerMode } from './commands/next/runner-mode.ts';
 import { runNext } from './commands/next.ts';
 import { runDoctor } from './commands/doctor.ts';
@@ -213,7 +212,7 @@ function createPublicHelpResult(cwd: string) {
 function createVersionResult(cwd: string) {
   const version = readFrameworkVersion();
   const runnerMode = describeRunnerMode(cwd);
-  const runnerSourceDrift = inspectRunnerSourceDrift(cwd);
+  const runnerSourceDrift = runnerMode.sourceDrift;
   return makeResult({
     ok: true,
     command: 'version',
