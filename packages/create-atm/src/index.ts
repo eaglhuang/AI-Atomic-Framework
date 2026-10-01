@@ -73,6 +73,9 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
   ];
   if (options.agent) {
     plannedSteps.push({ name: `integration add ${options.agent}`, args: ['integration', 'add', options.agent, '--cwd', targetRoot, '--json'] });
+    if (options.agent === 'codex') {
+      plannedSteps.push({ name: 'guide install-skill host', args: ['guide', 'install-skill', '--target', 'host', '--cwd', targetRoot, '--json'] });
+    }
   }
   if (atmExecution.source === 'target-dependency') {
     plannedSteps.push({ name: 'first-use next', args: ['next', '--cwd', targetRoot, '--json'] });
@@ -295,3 +298,4 @@ const isDirectRun = process.argv[1]
 if (isDirectRun) {
   process.exitCode = runCreateAtm();
 }
+

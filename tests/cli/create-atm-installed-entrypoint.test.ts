@@ -1,6 +1,7 @@
+
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
@@ -22,15 +23,28 @@ function fixture(layout = 'dist/npm-runtime', failAt = '', installFails = false)
   writeFileSync(path.join(cli, layout, 'index.js'), 'export {};');
   const calls = path.join(root, 'calls.jsonl');
   writeFileSync(path.join(cli, layout, 'atm.mjs'), `
-import { appendFileSync } from 'node:fs';
+import { appendFileSync, cpSync, mkdirSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 const args = process.argv.slice(2);
 appendFileSync(${JSON.stringify(calls)}, JSON.stringify(args) + '\\n');
+if (args[0] === 'integration' && args[1] === 'add' && args[2] === 'codex') {
+  const corpus = path.join(args[args.indexOf('--cwd') + 1], 'integrations/codex-skills/atm-governance-router');
+  mkdirSync(corpus, { recursive: true });
+  writeFileSync(path.join(corpus, 'SKILL.md'), 'router-v1');
+  mkdirSync(path.join(corpus, 'references'), { recursive: true });
+  writeFileSync(path.join(corpus, 'references/index.md'), 'reference-v1');
+}
+if (args[0] === 'guide' && args[1] === 'install-skill') {
+  const target = args[args.indexOf('--cwd') + 1];
+  cpSync(path.join(target, 'integrations/codex-skills/atm-governance-router'), path.join(target, '.agents/skills/atm-governance-router'), { recursive: true });
+}
 process.exitCode = args[0] === ${JSON.stringify(failAt)} ? 7 : 0;
 `);
   const npmCli = path.join(root, 'npm-cli.js');
   writeFileSync(npmCli, `
 import { cpSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+const args = process.argv.slice(2);
 if (${JSON.stringify(installFails)}) process.exit(9);
 const target = process.cwd();
 cpSync(${JSON.stringify(cli)}, path.join(target, 'node_modules/@ai-atomic-framework/cli'), { recursive: true });
@@ -70,10 +84,12 @@ for (const layout of ['dist/npm-runtime', 'dist']) {
       assert.equal(result.evidence.atmEntrypointSource, 'target-dependency');
       assert.equal(result.evidence.runtimeVersion, '1.2.3');
       assert.deepEqual(f.recorded().map((args) => args.slice(0, args[0] === 'bootstrap' ? 1 : 2)),
-        [['bootstrap'], ['atm-chart', 'render'], ['integration', 'add'], ['next', '--cwd']]);
+        [['bootstrap'], ['atm-chart', 'render'], ['integration', 'add'], ['guide', 'install-skill'], ['next', '--cwd']]);
       assert.equal(f.recorded()[2][2], 'codex');
       const target = path.join(f.root, 'project');
       assert.equal(JSON.parse(readFileSync(path.join(target, 'package.json'), 'utf8')).dependencies['@ai-atomic-framework/cli'], '1.2.3');
+      assert.equal(readFileSync(path.join(target, '.agents/skills/atm-governance-router/SKILL.md'), 'utf8'), 'router-v1');
+      assert.equal(readFileSync(path.join(target, '.agents/skills/atm-governance-router/references/index.md'), 'utf8'), 'reference-v1');
       rmSync(path.join(f.root, 'node_modules'), { recursive: true, force: true });
       const firstUse = spawnSync(process.execPath, [path.join(target, 'atm.mjs'), 'next', '--json'], { cwd: target, encoding: 'utf8' });
       assert.equal(firstUse.status, 0, firstUse.stderr);
@@ -115,3 +131,4 @@ test('npm bin symlink executes help rather than silently exiting', (t) => {
     assert.match(child.stdout, /Usage: create-atm/);
   } finally { rmSync(f.root, { recursive: true, force: true }); }
 });
+
