@@ -13,10 +13,10 @@ const OMITTED_PUBLIC_ASSETS = [
 ] as const;
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export async function buildCliNpmRuntime(options: { repositoryRoot?: string; outputRoot?: string } = {}) {
+export async function buildCliNpmRuntime(options: { repositoryRoot?: string; sourceDistRoot?: string; outputRoot?: string } = {}) {
   const root = path.resolve(options.repositoryRoot ?? repositoryRoot);
   const packageRoot = path.join(root, 'packages', 'cli');
-  const sourceDistRoot = path.join(packageRoot, 'dist');
+  const sourceDistRoot = path.resolve(options.sourceDistRoot ?? path.join(packageRoot, 'dist'));
   const defaultRuntimeRoot = path.join(sourceDistRoot, 'npm-runtime');
   const runtimeRoot = path.resolve(options.outputRoot ?? defaultRuntimeRoot);
   const contains = (parent: string, child: string) => {
@@ -196,4 +196,3 @@ function listFiles(directory: string): string[] {
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   await buildCliNpmRuntime();
 }
-
