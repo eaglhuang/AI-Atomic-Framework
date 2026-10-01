@@ -282,7 +282,16 @@ export function evaluateTaskDeliverableGate(input: {
 }
 
 export function stageTaskCloseArtifacts(cwd: string, files: readonly (string | null | undefined)[]) {
-  const normalizedFiles = uniqueStrings(files.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean));
+  const normalizedFiles = uniqueStrings(files.map((entry) => {
+    if (typeof entry !== 'string' || !entry.trim()) return '';
+    const relative = relativePathFrom(cwd, path.resolve(cwd, entry.trim())).replace(/\\/g, '/');
+    if (!relative.startsWith('.atm/runtime/evidence-ledger/bundles/')) return entry.trim();
+    const manifest = `.atm/history/evidence/${path.basename(relative, '.json')}.bundle-manifest.json`;
+    if (!existsSync(path.join(cwd, manifest))) {
+      throw new Error(`Cannot stage runtime evidence without its durable bundle manifest: ${manifest}`);
+    }
+    return manifest;
+  }).filter(Boolean));
   if (normalizedFiles.length === 0) return;
   execFileSync('git', ['add', '--', ...normalizedFiles], {
     cwd,
