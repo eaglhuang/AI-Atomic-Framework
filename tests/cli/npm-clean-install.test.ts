@@ -72,11 +72,10 @@ try {
   rmSync(guideCwd, { recursive: true, force: true });
 }
 
-// The npm product is a single self-contained CLI tarball. The publish closure
+// The npm product is a self-contained CLI plus its small adoption starter. The publish closure
 // is the one authority for what may reach npm, and the workflow must neither
 // omit a member of it nor list a workspace outside it.
-assert.equal(publishedPackages.length, 1, 'the fixture must declare exactly one published package');
-assert.deepEqual(publishedPackages, ['@ai-atomic-framework/cli']);
+assert.deepEqual(publishedPackages, ['@ai-atomic-framework/cli', 'create-atm'], 'only the CLI and its adoption starter may be published');
 for (const packageName of publishedPackages) {
   assert.ok(workflow.includes(`"${packageName}"`), `release workflow must include ${packageName}`);
 }
@@ -123,3 +122,4 @@ assert.doesNotMatch(rootAgentTemplate, /node atm\.mjs/i, 'the generated adopter 
 assert.match(rootAgentTemplate, /\{\{ATM_COMMAND_PREFIX\}\} integration add codex --json/, 'adopter integration guidance must use the selected runtime entrypoint');
 
 console.log('[npm-clean-install:test] ok');
+
