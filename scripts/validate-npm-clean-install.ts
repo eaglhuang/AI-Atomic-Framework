@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
@@ -305,6 +305,51 @@ function assertAdoptionSucceeds(installRoot: string, expectedVersion: string, ta
   assertDefaultAdoptionRecoverySucceeds(installRoot, tarball);
 }
 
+function assertStarterAdoptionSucceeds(installRoot: string, cliTarball: string, version: string): void {
+  const hostRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-starter-candidate-'));
+  const npmCli = [process.env.npm_execpath,
+    path.join(path.dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js'),
+    path.resolve(path.dirname(process.execPath), '../lib/node_modules/npm/bin/npm-cli.js')
+  ].find((entry) => entry && existsSync(entry));
+  if (!npmCli) fail('candidate starter verification requires the installed npm-cli.js');
+  try {
+    // Substitute only the candidate registry artifact. All target install,
+    // bootstrap, integration, skill and first-use commands execute real code.
+    const installer = path.join(hostRoot, 'npm-cli.js');
+    writeFileSync(installer, `
+const { spawnSync } = require('node:child_process');
+const { readFileSync, writeFileSync } = require('node:fs');
+const args = process.argv.slice(2);
+if (args[0] !== 'install' || !args.at(-1).startsWith('@ai-atomic-framework/cli@')) process.exit(2);
+const child = spawnSync(process.execPath, [${JSON.stringify(npmCli)}, ...args.slice(0, -1), ${JSON.stringify(cliTarball)}], { stdio: 'inherit' });
+if (child.status !== 0) process.exit(child.status ?? 1);
+const manifest = JSON.parse(readFileSync('package.json', 'utf8'));
+const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
+manifest.dependencies['@ai-atomic-framework/cli'] = ${JSON.stringify(version)};
+lock.packages[''].dependencies['@ai-atomic-framework/cli'] = ${JSON.stringify(version)};
+writeFileSync('package.json', JSON.stringify(manifest));
+writeFileSync('package-lock.json', JSON.stringify(lock));
+`);
+    const starter = path.join(installRoot, 'node_modules/create-atm/dist/index.js');
+    const result = spawnSync(process.execPath, [starter, 'project', '--agent', 'codex', '--cwd', hostRoot, '--json'], {
+      encoding: 'utf8', timeout: 180_000, env: { ...process.env, npm_execpath: installer }
+    });
+    if (result.status !== 0) fail(`candidate starter first use failed: ${result.stdout}${result.stderr}`);
+    const payload = JSON.parse(result.stdout);
+    if (payload.ok !== true || payload.evidence?.runtimeVersion !== version
+      || payload.evidence?.atmEntrypointSource !== 'target-dependency') fail('starter did not retain the exact candidate target runtime');
+    const target = path.join(hostRoot, 'project');
+    for (const relative of ['SKILL.md', 'references/index.md']) {
+      if (!existsSync(path.join(target, '.agents/skills/atm-governance-router', relative))) fail(`starter omitted native skill ${relative}`);
+    }
+    rmSync(installRoot, { recursive: true, force: true });
+    const independent = spawnSync(process.execPath, [path.join(target, 'atm.mjs'), 'next', '--json'], { cwd: target, encoding: 'utf8', timeout: 30_000 });
+    if (independent.status !== 0 || JSON.parse(independent.stdout).ok !== true) fail(`target failed after consumer removal: ${independent.stdout}${independent.stderr}`);
+  } finally {
+    rmSync(hostRoot, { recursive: true, force: true });
+  }
+}
+
 if (publishedPackages.length === 0) {
   fail('tests/package-skeleton.fixture.json must declare publishClosure.publishedPackages');
 }
@@ -346,15 +391,18 @@ try {
     assertAllowedFiles(entry, packageSpec);
   }
 
-  // Each published tarball is installed on its own, never alongside its
-  // siblings, so a cross-package resolution can never be satisfied by accident.
+  // The CLI remains isolated. The starter has an explicit CLI dependency,
+  // satisfied by the exact same-release artifact before registry publication.
   for (const packageSpec of publishedPackages) {
     const tarball = path.join(tempRoot, byName.get(packageSpec.name).filename);
     if (!existsSync(tarball)) fail(`npm pack did not create the ${packageSpec.name} tarball`);
     const installRoot = path.join(tempRoot, `clean-install-${packageSpec.name.replace(/[^a-z0-9]+/gi, '-')}`);
     mkdirSync(installRoot, { recursive: true });
     run('npm', ['init', '--yes'], installRoot);
-    run('npm', ['install', '--ignore-scripts', '--no-save', tarball], installRoot);
+    const cliEntry = byName.get('@ai-atomic-framework/cli');
+    const candidateDependencies = packageSpec.name === 'create-atm'
+      ? [path.join(tempRoot, cliEntry.filename)] : [];
+    run('npm', ['install', '--ignore-scripts', '--no-save', ...candidateDependencies, tarball], installRoot);
     if (!packageSpec.bin) continue;
     const bin = process.platform === 'win32' ? `${packageSpec.bin}.cmd` : packageSpec.bin;
     const binPath = path.join(installRoot, 'node_modules', '.bin', bin);
@@ -369,11 +417,14 @@ try {
         fail(`${packageSpec.bin} ${smokeArgs.join(' ')} could not resolve its own runtime after a clean install: ${smokeText.split('\n').slice(0, 6).join(' ')}`);
       }
       if (packageSpec.name === 'create-atm') {
-        if (smoke.status !== 0 && smoke.status !== 1) fail(`create-atm --help exited ${smoke.status}`);
+        if (smoke.status !== 0) fail(`create-atm --help exited ${smoke.status}`);
         if (!smokeText.includes('Usage: create-atm')) fail('create-atm did not expose its usage text after clean install');
       } else if (smoke.status !== 0) {
         fail(`${packageSpec.bin} ${smokeArgs.join(' ')} failed after clean install: ${smokeText}`);
       }
+    }
+    if (packageSpec.name === 'create-atm') {
+      assertStarterAdoptionSucceeds(installRoot, path.join(tempRoot, cliEntry.filename), cliEntry.version);
     }
     if (packageSpec.name === '@ai-atomic-framework/cli') {
       const installedManifest = JSON.parse(readFileSync(path.join(installRoot, 'node_modules', ...packageSpec.name.split('/'), 'package.json'), 'utf8')) as { version?: unknown };
@@ -417,8 +468,14 @@ try {
     skeletonPackages: fixture.packages.length,
     publishedPackages: publishedPackages.map((packageSpec) => packageSpec.name),
     isolatedInstall: true,
+    starterValidation: publishedNames.has('create-atm') ? {
+      candidateCliTarball: true,
+      registryPublishVerified: false,
+      consumerRemovalVerified: true
+    } : null,
     adoptionVerified: true
   }, null, 2));
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
+
