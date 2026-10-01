@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   observeCommandRunRecords,
   observeProcessExecution,
+  normalizeProcessOutcome,
   type ObservedProcessExecution
 } from '../observed-source-loader.ts';
 import {
@@ -83,8 +84,8 @@ export function runEvidenceRun(argv: string[]) {
     }
   });
   const finishedAtMs = Date.now();
-  const exitCode = result.status ?? (result.error ? 1 : 0);
-  const commandOk = exitCode === 0 && !result.error;
+  const outcome = normalizeProcessOutcome(result);
+  const { exitCode, commandOk } = outcome;
   const observedCommandOutcome = observeEvidenceRunProcess({
     command: common.command,
     exitCode,
@@ -163,6 +164,7 @@ export function runEvidenceRun(argv: string[]) {
     ...(baseResult?.evidence ?? {}),
     tddCycle: receipt,
     tddObservation: {
+      ...outcome,
       phase: tdd.phase,
       caseId: tdd.caseId,
       exitCode,
