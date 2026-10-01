@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { withPrivateCliNpmPackage } from '../../scripts/lib/private-cli-npm-package.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -100,30 +101,10 @@ assert.equal(failedClosed, true, 'unpublished package must fail closed without -
 // version-only or module-resolution check.
 const localSmokeRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-public-runtime-chart-'));
 try {
-  // --ignore-scripts also skips prepack, so a fresh checkout would pack the
-  // tracked subset of dist rather than the package that would ship. Build the
-  // CLI closure first.
-  const packageDirs = readdirSync(path.join(root, 'packages'), { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(path.join(root, 'packages', entry.name, 'package.json')))
-    .map((entry) => path.join(root, 'packages', entry.name, 'dist'));
-  const workspaceBuildReady = packageDirs.every((distRoot) => existsSync(distRoot));
-  const buildScript = path.join(root, 'scripts', 'build-package-dist.ts');
-  if (workspaceBuildReady) {
-    execFileSync(process.execPath, ['--strip-types', buildScript, '--package', 'packages/plugin-governance-local'], {
-      cwd: root, encoding: 'utf8', windowsHide: true
-    });
-    execFileSync(process.execPath, ['--strip-types', buildScript, '--package', 'packages/cli'], {
-      cwd: root, encoding: 'utf8', windowsHide: true
-    });
-  } else {
-    execFileSync(process.execPath, ['--strip-types', buildScript], {
-      cwd: root, encoding: 'utf8', windowsHide: true
-    });
-  }
-  const packed = JSON.parse(execFileSync(npm, [
-    'pack', '--workspace', '@ai-atomic-framework/cli', '--ignore-scripts', '--pack-destination', localSmokeRoot,
+  const packed = await withPrivateCliNpmPackage(root, async packageRoot => JSON.parse(execFileSync(npm, [
+    'pack', packageRoot, '--ignore-scripts', '--pack-destination', localSmokeRoot,
     '--json', '--loglevel', 'silent'
-  ], { cwd: root, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' }).trim());
+  ], { cwd: root, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' }).trim()));
   const tarball = path.join(localSmokeRoot, packed[0].filename);
   const consumer = path.join(localSmokeRoot, 'consumer');
   const adopter = path.join(consumer, 'adopter');

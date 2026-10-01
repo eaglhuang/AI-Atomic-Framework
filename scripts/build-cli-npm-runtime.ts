@@ -13,23 +13,30 @@ const OMITTED_PUBLIC_ASSETS = [
 ] as const;
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = {}) {
+export async function buildCliNpmRuntime(options: { repositoryRoot?: string; outputRoot?: string } = {}) {
   const root = path.resolve(options.repositoryRoot ?? repositoryRoot);
   const packageRoot = path.join(root, 'packages', 'cli');
   const sourceDistRoot = path.join(packageRoot, 'dist');
-  const runtimeRoot = path.join(sourceDistRoot, 'npm-runtime');
-  const entryPath = path.join(sourceDistRoot, '.npm-runtime-entry.mjs');
-  try {
+  const defaultRuntimeRoot = path.join(sourceDistRoot, 'npm-runtime');
+  const runtimeRoot = path.resolve(options.outputRoot ?? defaultRuntimeRoot);
+  const contains = (parent: string, child: string) => {
+    const relative = path.relative(parent, child);
+    return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
+  };
+  if (runtimeRoot !== defaultRuntimeRoot && (contains(runtimeRoot, sourceDistRoot) || contains(sourceDistRoot, runtimeRoot))) {
+    throw new Error('Private npm runtime output must not overlap source dist');
+  }
+  {
     rmSync(runtimeRoot, { recursive: true, force: true });
     mkdirSync(runtimeRoot, { recursive: true });
-    writeFileSync(entryPath, [
+    const entrySource = [
       "export * from './index.js';",
       "export { runPublicCli as runCli, publicCliCommandNames } from './atm-public.js';",
       ''
-    ].join('\n'), 'utf8');
+    ].join('\n');
 
     await build({
-      entryPoints: [entryPath],
+      stdin: { contents: entrySource, resolveDir: sourceDistRoot, sourcefile: '.npm-runtime-entry.mjs', loader: 'js' },
       outfile: path.join(runtimeRoot, 'runtime.mjs'),
       bundle: true,
       minify: true,
@@ -56,7 +63,7 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = 
       : emitDeclarationFromSource(path.join(packageRoot, 'src', 'index.ts'));
     writeFileSync(path.join(runtimeRoot, 'index.d.ts'), declaration, 'utf8');
 
-    copyRuntimeAssets(sourceDistRoot, path.join(runtimeRoot, 'layout'), runtimeRoot);
+    copyRuntimeAssets(sourceDistRoot, path.join(runtimeRoot, 'layout'), defaultRuntimeRoot);
     const files = listFiles(runtimeRoot)
       .map((file) => ({
         path: path.relative(runtimeRoot, file).replace(/\\/g, '/'),
@@ -94,8 +101,6 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string } = 
     writeFileSync(path.join(runtimeRoot, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
     console.log(`[build-cli-npm-runtime] built ${manifest.fileCount} files / ${manifest.totalBytes} bytes at ${path.relative(root, runtimeRoot)}`);
     return manifest;
-  } finally {
-    rmSync(entryPath, { force: true });
   }
 }
 
@@ -124,6 +129,7 @@ function emitDeclarationFromSource(sourcePath: string): string {
   }
   return result.outputText;
 }
+
 
 function preserveModuleIdentityPlugin(sourceDistRoot: string): Plugin {
   const normalizedRoot = path.resolve(sourceDistRoot);
@@ -190,3 +196,4 @@ function listFiles(directory: string): string[] {
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   await buildCliNpmRuntime();
 }
+
