@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -33,7 +33,10 @@ interface AtmExecutionPlan {
   readonly command: string;
   readonly argsPrefix: readonly string[];
   readonly display: string;
-  readonly source: 'source-tree' | 'packaged-dependency' | 'npm-dist-tag';
+  readonly source: 'source-tree' | 'packaged-dependency' | 'npm-dist-tag' | 'target-dependency';
+  readonly cwd?: string;
+  readonly env?: NodeJS.ProcessEnv;
+  readonly runtimeVersion?: string;
 }
 
 interface StepResult {
@@ -57,7 +60,13 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
   const distTag = resolveCreateAtmDistTag(options.tag);
   writeDistTagSelection(targetRoot, distTag);
 
-  const atmExecution = resolveAtmExecutionPlan(distTag.requestedTag);
+  let atmExecution = resolveAtmExecutionPlan(distTag.requestedTag);
+  const steps: StepResult[] = [];
+  if (atmExecution.source !== 'source-tree') {
+    const runtime = installTargetRuntime(targetRoot, distTag.npmPackageSpec);
+    steps.push(runtime.step);
+    if (runtime.execution) atmExecution = runtime.execution;
+  }
   const plannedSteps = [
     { name: 'bootstrap', args: ['bootstrap', '--cwd', targetRoot, '--json'] },
     { name: 'atm-chart render', args: ['atm-chart', 'render', '--cwd', targetRoot, '--json'] }
@@ -65,8 +74,10 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
   if (options.agent) {
     plannedSteps.push({ name: `integration add ${options.agent}`, args: ['integration', 'add', options.agent, '--cwd', targetRoot, '--json'] });
   }
-  const steps: StepResult[] = [];
-  for (const step of plannedSteps) {
+  if (atmExecution.source === 'target-dependency') {
+    plannedSteps.push({ name: 'first-use next', args: ['next', '--cwd', targetRoot, '--json'] });
+  }
+  for (const step of steps.some((entry) => entry.exitCode !== 0) ? [] : plannedSteps) {
     const result = runAtmStep(step.name, atmExecution, step.args);
     steps.push(result);
     if (result.exitCode !== 0) break;
@@ -87,6 +98,7 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
       agent: options.agent ?? null,
       atmEntrypoint: atmExecution.display,
       atmEntrypointSource: atmExecution.source,
+      runtimeVersion: atmExecution.runtimeVersion ?? null,
       distTag,
       durationMs: Date.now() - startedAt,
       steps: steps.map((step) => ({
@@ -99,6 +111,41 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
 
   writePayload(payload, options.json);
   return failedStep ? failedStep.exitCode : 0;
+}
+
+function installTargetRuntime(targetRoot: string, packageSpec: string): { step: StepResult; execution?: AtmExecutionPlan } {
+  writeFileSync(path.join(targetRoot, 'package.json'), `${JSON.stringify({ private: true, type: 'module' }, null, 2)}\n`);
+  const npmCli = process.env.npm_execpath?.endsWith('npm-cli.js')
+    ? process.env.npm_execpath
+    : path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+  const npmExecution: AtmExecutionPlan = existsSync(npmCli)
+    ? { command: process.execPath, argsPrefix: [npmCli], display: 'npm', source: 'npm-dist-tag', cwd: targetRoot }
+    : { command: 'npm', argsPrefix: [], display: 'npm', source: 'npm-dist-tag', cwd: targetRoot };
+  const step = runAtmStep('runtime install', npmExecution, ['install', '--save-exact', '--ignore-scripts', '--no-audit', '--no-fund', packageSpec]);
+  if (step.exitCode !== 0) return { step };
+  try {
+    const packageRoot = path.join(targetRoot, 'node_modules', '@ai-atomic-framework', 'cli');
+    const installed = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'), 'utf8'));
+    const manifest = JSON.parse(readFileSync(path.join(targetRoot, 'package.json'), 'utf8'));
+    const lock = JSON.parse(readFileSync(path.join(targetRoot, 'package-lock.json'), 'utf8'));
+    if (installed.name !== '@ai-atomic-framework/cli' || typeof installed.version !== 'string'
+      || manifest.dependencies?.[installed.name] !== installed.version
+      || lock.packages?.['node_modules/@ai-atomic-framework/cli']?.version !== installed.version
+      || typeof installed.bin?.atm !== 'string') throw new Error('Target runtime is not an exact locked official CLI dependency.');
+    const binPath = realpathSync(path.resolve(packageRoot, installed.bin.atm));
+    const relative = path.relative(realpathSync(packageRoot), binPath);
+    if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) throw new Error('Target CLI bin is outside its package.');
+    const launcher = path.join(targetRoot, 'atm.mjs');
+    const importPath = `./${path.relative(targetRoot, binPath).replace(/\\/g, '/')}`;
+    writeFileSync(launcher, `#!/usr/bin/env node\nimport ${JSON.stringify(importPath)};\n`);
+    return { step, execution: {
+      command: process.execPath, argsPrefix: [launcher], display: 'node atm.mjs', source: 'target-dependency',
+      runtimeVersion: installed.version, cwd: targetRoot,
+      env: { ...process.env, ATM_PINNED_RUNNER_SOURCE: launcher }
+    } };
+  } catch (error) {
+    return { step: { ...step, exitCode: 1, stderr: error instanceof Error ? error.message : String(error) } };
+  }
 }
 
 function parseArgs(argv: readonly string[]): CreateAtmOptions {
@@ -214,7 +261,10 @@ function runAtmStep(name: string, atmExecution: AtmExecutionPlan, args: readonly
   const startedAt = Date.now();
   const child = spawnSync(atmExecution.command, [...atmExecution.argsPrefix, ...args], {
     encoding: 'utf8',
-    windowsHide: true
+    windowsHide: true,
+    cwd: atmExecution.cwd,
+    env: atmExecution.env,
+    timeout: 180_000
   });
   return {
     name,
