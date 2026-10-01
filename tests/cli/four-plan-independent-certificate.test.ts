@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import Ajv2020 from 'ajv/dist/2020.js';
 import {
@@ -322,7 +322,8 @@ assert.ok(
 );
 
 // The committed certificate: assert that it is internally honest and bound to
-// the remote as it is right now, not that it says complete.
+// the fetched remote snapshot, not that it says complete. Live network
+// freshness belongs to certificate production, not this offline unit test.
 const report = JSON.parse(readFileSync('docs/reports/plan-3x-4x-independent-certificate.json', 'utf8'));
 assert.equal(validateSchema(report), true, JSON.stringify(validateSchema.errors));
 const reportVerdict = validateFourPlanIndependentCertificate(report);
@@ -337,21 +338,26 @@ assert.equal(report.overallVerdict, report.status === 'proven' ? 'complete' : 'n
 assert.equal(report.releaseAuthorized, report.status === 'proven');
 assert.equal(report.releaseAuthorized, report.diagnostics.length === 0);
 
-const liveOriginMain = execFileSync('git', ['ls-remote', 'origin', 'refs/heads/main'], { encoding: 'utf8' }).trim().split(/\s+/)[0];
-assert.match(String(liveOriginMain), /^[0-9a-f]{40}$/, 'the remote must be reachable to judge certificate freshness');
+const liveOriginMain = execFileSync('git', ['rev-parse', 'refs/remotes/origin/main'], { encoding: 'utf8' }).trim();
+assert.match(String(liveOriginMain), /^[0-9a-f]{40}$/, 'the fetched origin/main snapshot must be available');
 const recordedOriginMain = String(report.provenance.originMain);
 assert.match(recordedOriginMain, /^[0-9a-f]{40}$/, 'the certificate must record the remote SHA it was compiled against');
 const remoteSurface = report.releaseSurfaces.find((entry: any) => entry.surfaceId === 'origin-main');
 assert.equal(remoteSurface?.observedDigest, recordedOriginMain, 'the remote surface and the provenance must describe the same observation');
 
+function classifyAncestry(status: number | null): 'ancestor' | 'diverged' | 'unknown' {
+  return status === 0 ? 'ancestor' : status === 1 ? 'diverged' : 'unknown';
+}
+assert.equal(classifyAncestry(0), 'ancestor');
+assert.equal(classifyAncestry(1), 'diverged');
+assert.equal(classifyAncestry(128), 'unknown', 'missing objects are not evidence of divergence');
+assert.equal(classifyAncestry(null), 'unknown', 'failed or interrupted processes are inconclusive');
+
 if (recordedOriginMain !== liveOriginMain) {
-  let recordedIsAncestor = false;
-  try {
-    execFileSync('git', ['merge-base', '--is-ancestor', recordedOriginMain, liveOriginMain], { stdio: 'ignore' });
-    recordedIsAncestor = true;
-  } catch {
-    recordedIsAncestor = false;
-  }
+  const ancestry = spawnSync('git', ['merge-base', '--is-ancestor', recordedOriginMain, liveOriginMain], { encoding: 'utf8' });
+  const relation = classifyAncestry(ancestry.status);
+  assert.notEqual(relation, 'unknown', `certificate ancestry unavailable: ${ancestry.error?.message ?? ancestry.stderr}; fetch the recorded and observed commits without changing HEAD`);
+  const recordedIsAncestor = relation === 'ancestor';
   if (!recordedIsAncestor && report.releaseAuthorized) {
     assert.equal(
       report.overallVerdict,
