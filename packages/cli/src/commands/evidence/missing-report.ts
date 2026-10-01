@@ -285,20 +285,28 @@ export function assessEvidenceFreshness(input: {
   };
 }
 
+// The current verdict for a gate is decided by observation time, not by
+// whether a pass ever existed or by array position: a pass only counts while
+// no failed run of the same gate was observed at or after it. Records keep
+// the full history; this function only answers "what is true now".
 export function classifyValidatorEvidenceState(bundle: readonly Record<string, unknown>[], gate: string): ValidatorEvidenceState {
   const rank: Record<string, number> = { pass: 3, stale: 2, 'diagnostic-only': 1 };
-  let bestPositive: 'pass' | 'stale' | 'diagnostic-only' | null = null;
-  let sawFailedRun = false;
+  const positives: { state: 'pass' | 'stale' | 'diagnostic-only'; observedAt: number }[] = [];
+  let latestFailure: number | null = null;
   for (const record of bundle) {
     const passes = readRecordValidationPasses(record);
     const commandRuns = collectRecordCommandRuns(record);
+    const recordObservedAt = readObservationTime(record.createdAt, Number.NEGATIVE_INFINITY);
     if (passes.includes(gate)) {
-      const proof = commandRuns.some((run) => isCommandRunProof(run));
+      const proofRuns = commandRuns.filter((run) => isCommandRunProof(run));
       const freshness = readRecordFreshness(record);
-      const state: 'pass' | 'stale' | 'diagnostic-only' = (freshness === 'fresh' && proof)
+      const state: 'pass' | 'stale' | 'diagnostic-only' = (freshness === 'fresh' && proofRuns.length > 0)
         ? 'pass'
-        : proof ? 'stale' : 'diagnostic-only';
-      if (!bestPositive || rank[state] > rank[bestPositive]) bestPositive = state;
+        : proofRuns.length > 0 ? 'stale' : 'diagnostic-only';
+      const observedAt = proofRuns.length > 0
+        ? Math.max(...proofRuns.map((run) => readRunObservationTime(run, recordObservedAt)))
+        : recordObservedAt;
+      positives.push({ state, observedAt });
     }
     for (const run of commandRuns) {
       const runValidators = Array.isArray((run as { validators?: unknown }).validators)
@@ -309,12 +317,29 @@ export function classifyValidatorEvidenceState(bundle: readonly Record<string, u
       const cmd = typeof (run as { command?: unknown }).command === 'string' ? (run as { command: string }).command : '';
       const matches = runValidators.includes(gate) || canonicalizeValidatorIdentity(cmd) === gate;
       const exitCode = (run as { exitCode?: unknown }).exitCode;
-      if (matches && typeof exitCode === 'number' && exitCode !== 0) sawFailedRun = true;
+      if (matches && typeof exitCode === 'number' && exitCode !== 0) {
+        const observedAt = readRunObservationTime(run, recordObservedAt);
+        if (latestFailure === null || observedAt > latestFailure) latestFailure = observedAt;
+      }
     }
   }
-  if (bestPositive === 'pass') return 'pass';
-  if (sawFailedRun) return 'failed-run';
-  return bestPositive ?? 'absent';
+  let bestPositive: 'pass' | 'stale' | 'diagnostic-only' | null = null;
+  for (const positive of positives) {
+    if (latestFailure !== null && positive.observedAt <= latestFailure) continue;
+    if (!bestPositive || rank[positive.state] > rank[bestPositive]) bestPositive = positive.state;
+  }
+  if (bestPositive) return bestPositive;
+  if (latestFailure !== null) return 'failed-run';
+  return 'absent';
+}
+
+function readRunObservationTime(run: Record<string, unknown>, fallback: number): number {
+  return readObservationTime(run.finishedAt ?? run.generatedAt ?? run.startedAt, fallback);
+}
+
+function readObservationTime(value: unknown, fallback: number): number {
+  const parsed = typeof value === 'string' ? Date.parse(value) : Number.NaN;
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 export function buildMissingValidatorFinding(
