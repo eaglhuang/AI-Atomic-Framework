@@ -36,6 +36,7 @@ export type NextActionLike = {
   teamRecommendation?: NextActionTeamRecommendationLike | null;
   allowedCommands?: readonly string[];
   blockedCommands?: readonly string[];
+  suggestedRoutes?: readonly { readonly when: string; readonly channel: string | null; readonly command: string }[];
   missingEvidence?: readonly string[];
   requiredCommand?: string | null;
   closure?: {
