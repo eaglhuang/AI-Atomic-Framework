@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {
   buildValidationReceiptInput,
@@ -8,12 +9,11 @@ import {
   MICRO_EVIDENCE_RECEIPT_SCHEMA_ID
 } from '../../packages/core/src/evidence/validation-receipt.ts';
 
-const CWD = process.cwd();
-const SCOPE_PATHS = ['packages/core/src/evidence/validation-receipt.ts'];
+const CWD = mkdtempSync(path.join(os.tmpdir(), 'atm-receipt-hard-gate-'));
+const SCOPE_PATHS = ['scope.txt'];
 
-// Clean up test store before running
-const TEST_STORE = path.join(CWD, '.atm', 'runtime', 'validation-receipts');
-try { rmSync(TEST_STORE, { recursive: true, force: true }); } catch {}
+try {
+writeFileSync(path.join(CWD, SCOPE_PATHS[0]), 'receipt scope fixture\n');
 
 // 1. Valid execution with positive case and assertion count succeeds
 {
@@ -33,6 +33,7 @@ try { rmSync(TEST_STORE, { recursive: true, force: true }); } catch {}
   assert.equal(receipt.ok, true);
   assert.equal(receipt.result.caseCount, 5);
   assert.equal(receipt.result.assertionCount, 12);
+  assert.equal(receipt.scope.files[0].missing, false);
 
   writeValidationReceipt(CWD, receipt);
 
@@ -172,3 +173,7 @@ try { rmSync(TEST_STORE, { recursive: true, force: true }); } catch {}
 }
 
 console.log('validator-execution-receipt-hard-gate.test.ts passed');
+} finally {
+  rmSync(CWD, { recursive: true, force: true });
+}
+
