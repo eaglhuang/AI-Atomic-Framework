@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
-import { createRequire } from 'node:module';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -59,11 +58,18 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
   writeDistTagSelection(targetRoot, distTag);
 
   const atmExecution = resolveAtmExecutionPlan(distTag.requestedTag);
-  const steps: StepResult[] = [];
-  steps.push(runAtmStep('bootstrap', atmExecution, ['bootstrap', '--cwd', targetRoot, '--json']));
-  steps.push(runAtmStep('atm-chart render', atmExecution, ['atm-chart', 'render', '--cwd', targetRoot, '--json']));
+  const plannedSteps = [
+    { name: 'bootstrap', args: ['bootstrap', '--cwd', targetRoot, '--json'] },
+    { name: 'atm-chart render', args: ['atm-chart', 'render', '--cwd', targetRoot, '--json'] }
+  ];
   if (options.agent) {
-    steps.push(runAtmStep(`agent-pack install ${options.agent}`, atmExecution, ['agent-pack', 'install', '--id', options.agent, '--cwd', targetRoot, '--json']));
+    plannedSteps.push({ name: `integration add ${options.agent}`, args: ['integration', 'add', options.agent, '--cwd', targetRoot, '--json'] });
+  }
+  const steps: StepResult[] = [];
+  for (const step of plannedSteps) {
+    const result = runAtmStep(step.name, atmExecution, step.args);
+    steps.push(result);
+    if (result.exitCode !== 0) break;
   }
 
   const failedStep = steps.find((step) => step.exitCode !== 0);
@@ -164,11 +170,9 @@ function writeDistTagSelection(targetRoot: string, selection: CreateAtmDistTagSe
 }
 
 function resolveAtmExecutionPlan(tag: CreateAtmDistTag): AtmExecutionPlan {
-  const require = createRequire(import.meta.url);
   try {
-    const cliIndexPath = require.resolve('@ai-atomic-framework/cli');
-    const packageRoot = path.resolve(path.dirname(cliIndexPath), '..');
-    const packagedEntrypoint = path.join(packageRoot, 'dist', 'atm.mjs');
+    const cliIndexPath = fileURLToPath(import.meta.resolve('@ai-atomic-framework/cli'));
+    const packagedEntrypoint = path.join(path.dirname(cliIndexPath), 'atm.mjs');
     if (existsSync(packagedEntrypoint) && tag === 'latest') {
       return {
         command: process.execPath,
@@ -235,7 +239,7 @@ function writePayload(payload: CreateAtmPayload, json: boolean): void {
 }
 
 const isDirectRun = process.argv[1]
-  ? path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+  ? realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))
   : false;
 
 if (isDirectRun) {
