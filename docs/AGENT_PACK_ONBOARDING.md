@@ -2,7 +2,7 @@
 
 Agent pack onboarding is ATM's first-touch experience for a repository that wants AI agents to discover the governed workflow quickly. It belongs to the Agent Operating Layer and remains separate from `packages/core` contracts.
 
-The goal is simple: a new agent should learn the local ATM route before editing files, see the active rule summary, and keep all governed actions moving through `node atm.mjs next --json`.
+The goal is simple: a new agent should learn the local ATM route before editing files, see the active rule summary, and keep all governed actions moving through `node atm.mjs next --prompt "<current user prompt>" --json` (or `node atm.mjs next --json` for read-only orientation).
 
 Terminology boundary: ATM is the product, framework, CLI, and governance workflow. AI-Atomic-Framework is only this repository name; do not call ATM AAF.
 
@@ -44,7 +44,7 @@ A typical adopter flow is:
 2. Ask the agent to read the repository entry guidance.
 3. Run `node atm.mjs welcome --json` or the plain text `welcome` command for orientation.
 4. Run `node atm.mjs atm-chart render` when the chart is missing or stale.
-5. Run `node atm.mjs next --json`, show `ATM_USER_NOTICE` or `evidence.userNotice` if present, then execute the returned command.
+5. Run `node atm.mjs next --prompt "<current user prompt>" --json` for the user request (`next --json` only for read-only orientation), show `ATM_USER_NOTICE` or `evidence.userNotice` if present, then execute the returned command.
 6. After onboarding or refresh commands finish, return to the user original request and continue the actual work.
 
 The welcome command may summarize state, but the deterministic router remains `next`.
@@ -127,5 +127,5 @@ Command-level smoke checks should continue to include:
 node atm.mjs welcome --json
 node atm.mjs atm-chart render --json
 node atm.mjs atm-chart verify --json
-node atm.mjs next --json
+node atm.mjs next --prompt "<current user prompt>" --json
 ```

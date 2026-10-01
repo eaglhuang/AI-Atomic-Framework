@@ -9,7 +9,7 @@ ATM upstream development uses npm only for the alpha route. Run `npm install`, `
 ## Official Single-Entry Prompt
 
 ```text
-Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action.
+Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. Use "node atm.mjs next --json" only as read-only orientation when no user prompt is available. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action.
 ```
 
 ## Alpha Checklist
