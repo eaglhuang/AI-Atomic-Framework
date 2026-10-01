@@ -14,6 +14,22 @@ export interface ObservedProcessExecution {
   readonly processError: string | null;
 }
 
+/** Missing status is not a successful exit; retain termination facts. */
+export function normalizeProcessOutcome(result: {
+  readonly status: number | null;
+  readonly signal?: string | null;
+  readonly error?: Error;
+}) {
+  const commandOk = result.status === 0 && !result.signal && !result.error;
+  return {
+    exitCode: commandOk ? 0 : result.status !== null && result.status !== 0 ? result.status : 1,
+    commandOk,
+    processExitStatus: result.status,
+    processSignal: result.signal ?? null,
+    processError: result.error?.message ?? null
+  };
+}
+
 export interface ObservedCommandRunRecord {
   readonly command: string;
   readonly exitCode: number;

@@ -188,6 +188,11 @@ export function normalizeCommandRunInput(value: unknown, label: string): Command
   };
   return {
     ...normalized,
+    ...(Object.hasOwn(value, 'processExitStatus') ? {
+      processExitStatus: typeof value.processExitStatus === 'number' ? value.processExitStatus : null,
+      processSignal: typeof value.processSignal === 'string' ? value.processSignal : null,
+      processError: typeof value.processError === 'string' ? value.processError : null
+    } : {}),
     canonicalObservation: buildCommandRunObservation(normalized)
   };
 }
