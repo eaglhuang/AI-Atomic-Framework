@@ -260,7 +260,17 @@ function writeAtomicUtf8(filePath: string, content: string): void {
     fsyncSync(fd);
     closeSync(fd);
     fd = null;
-    renameSync(tempPath, filePath);
+    // Windows readers may briefly prevent replacement even with one writer.
+    // Keep the prepared file and exclusion; never retry a different mutation.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        renameSync(tempPath, filePath);
+        break;
+      } catch (error) {
+        if (process.platform !== 'win32' || (error as NodeJS.ErrnoException).code !== 'EPERM' || attempt >= 7) throw error;
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1);
+      }
+    }
     fsyncDirectory(dir);
   } catch (error) {
     if (fd !== null) {

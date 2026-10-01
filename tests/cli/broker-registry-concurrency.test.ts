@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import fs, { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
+import { syncBuiltinESMExports } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 import { createBrokerTransactionAuthority, type WriteIntent } from '../../packages/core/src/index.ts';
@@ -144,6 +145,35 @@ try {
   const retriedIds = new Set(store.read().document.activeIntents.map((intent) => intent.taskId));
   assert.ok(retriedIds.has(retryIntent.taskId));
   assert.ok(retriedIds.has(competitorIntent.taskId));
+  if (process.platform === 'win32') {
+    const originalRename = fs.renameSync;
+    let renameAttempts = 0;
+    let failuresBeforeSuccess = 2;
+    fs.renameSync = (from, to) => {
+      assert.equal(existsSync(lockPath), true, 'Rename retries must retain writer exclusion');
+      if (renameAttempts++ < failuresBeforeSuccess) throw Object.assign(new Error('fixture reader holds replacement'), { code: 'EPERM' });
+      originalRename(from, to);
+    };
+    syncBuiltinESMExports();
+    try {
+      authority.register({ intent: makeIntent(count + 11), lane: 'direct-brokered', idempotencyKey: 'transient-reader' });
+      assert.equal(renameAttempts, 3);
+      assert.ok(store.read().document.activeIntents.some((intent) => intent.taskId === makeIntent(count + 11).taskId));
+      assert.equal(existsSync(lockPath), false);
+      const beforeFailure = store.read().digest;
+      renameAttempts = 0;
+      failuresBeforeSuccess = Infinity;
+      assert.throws(() => authority.register({ intent: makeIntent(count + 12), lane: 'direct-brokered', idempotencyKey: 'permanent-rename-failure' }),
+        (error: unknown) => (error as NodeJS.ErrnoException).code === 'EPERM');
+      assert.equal(renameAttempts, 8, 'Permanent permission failures must stop at the retry bound');
+      assert.equal(store.read().digest, beforeFailure, 'Failed replacement must preserve the exact registry');
+      assert.equal(existsSync(lockPath), false);
+      assert.equal(fs.readdirSync(tempRoot).some((name) => name.includes('.tmp-')), false);
+    } finally {
+      fs.renameSync = originalRename;
+      syncBuiltinESMExports();
+    }
+  }
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
