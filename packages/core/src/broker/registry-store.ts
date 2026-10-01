@@ -145,6 +145,39 @@ export function writeBrokerRegistrySnapshot(
     readonly now?: string;
   }
 ): BrokerRegistryWriteReceipt {
+  // Rename is atomic, but comparing a generation before rename is not CAS.
+  // Keep only the compare/write interval exclusive; never reclaim another writer.
+  mkdirSync(dirname(registryPath), { recursive: true });
+  const lockPath = `${registryPath}.write-lock`;
+  let lockFd: number;
+  try {
+    lockFd = openSync(lockPath, 'wx');
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+    throw registryStoreError('ATM_BROKER_REGISTRY_CAS_CONFLICT', {
+      kind: 'stale-generation',
+      registryPath,
+      message: 'Broker registry has an active compare/write operation; reread and revalidate before retrying.'
+    });
+  }
+  try {
+    writeFileSync(lockFd, JSON.stringify({ pid: process.pid, transactionId: input.transactionId, registryPath }), 'utf8');
+    return writeExclusiveBrokerRegistrySnapshot(registryPath, input);
+  } finally {
+    closeSync(lockFd);
+    rmSync(lockPath);
+  }
+}
+
+function writeExclusiveBrokerRegistrySnapshot(
+  registryPath: string,
+  input: {
+    readonly base: BrokerRegistrySnapshot;
+    readonly next: WriteBrokerRegistryDocument;
+    readonly transactionId: string;
+    readonly now?: string;
+  }
+): BrokerRegistryWriteReceipt {
   const current = existsSync(registryPath) ? readBrokerRegistrySnapshot(registryPath) : input.base;
   if (current.digest !== input.base.digest || current.generation !== input.base.generation) {
     throw registryStoreError('ATM_BROKER_REGISTRY_CAS_CONFLICT', {
@@ -227,7 +260,17 @@ function writeAtomicUtf8(filePath: string, content: string): void {
     fsyncSync(fd);
     closeSync(fd);
     fd = null;
-    renameSync(tempPath, filePath);
+    // Windows readers may briefly prevent replacement even with one writer.
+    // Keep the prepared file and exclusion; never retry a different mutation.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        renameSync(tempPath, filePath);
+        break;
+      } catch (error) {
+        if (process.platform !== 'win32' || (error as NodeJS.ErrnoException).code !== 'EPERM' || attempt >= 7) throw error;
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1);
+      }
+    }
     fsyncDirectory(dir);
   } catch (error) {
     if (fd !== null) {
