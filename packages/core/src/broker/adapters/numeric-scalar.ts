@@ -46,7 +46,8 @@ function parsedValues(parsed: ParsedDocument): Record<string, number> {
 /**
  * Numeric scalar adapter (TASK-CID-0096). Files hold a flat map of
  * scalarKey -> number. increment/decrement are commutative (net delta applied);
- * max/min are commutative among themselves; set-if-current is NOT commutative
+ * max-only and min-only groups are commutative; mixing min/max is not.
+ * set-if-current is NOT commutative
  * and conflicts with anything else on the same scalar. Scope is 'scalar'.
  */
 export const numericScalarAdapter: FileMutationAdapter = {
@@ -101,7 +102,7 @@ export const numericScalarAdapter: FileMutationAdapter = {
       }
       const ops = new Set(bucket.map((mutation) => mutation.op));
       const allAdditive = [...ops].every((op) => COMMUTATIVE_ADDITIVE.has(op));
-      const allExtreme = [...ops].every((op) => COMMUTATIVE_EXTREME.has(op));
+      const allExtreme = ops.size === 1 && [...ops].every((op) => COMMUTATIVE_EXTREME.has(op));
       if (allAdditive || allExtreme) {
         sawCommutativeGroup = true;
       } else {
