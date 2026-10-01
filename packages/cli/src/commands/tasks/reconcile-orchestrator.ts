@@ -197,16 +197,23 @@ export async function runTasksReconcile(argv: string[]): Promise<CommandResult> 
   }
 
   const evidencePath = evidencePathForTask(options.cwd, options.taskId);
+  // Always append the delivery attestation; existing (real) evidence records are kept as-is.
+  const attestation = buildHistoricalReconcileEvidenceEnvelope({
+    taskId: options.taskId,
+    commitSha,
+    actorId,
+    artifactPaths: taskDeclaredFiles,
+    now: new Date().toISOString()
+  });
   if (!existsSync(evidencePath)) {
     mkdirSync(path.dirname(evidencePath), { recursive: true });
-    const envelope = buildHistoricalReconcileEvidenceEnvelope({
-      taskId: options.taskId,
-      commitSha,
-      actorId,
-      artifactPaths: taskDeclaredFiles,
-      now: new Date().toISOString()
-    });
-    writeFileSync(evidencePath, `${JSON.stringify(normalizeSha256FieldsDeep(envelope), null, 2)}\n`, 'utf8');
+    writeFileSync(evidencePath, `${JSON.stringify(normalizeSha256FieldsDeep(attestation), null, 2)}\n`, 'utf8');
+  } else {
+    const existing = readJsonRecord(evidencePath);
+    if (existing && Array.isArray(existing.evidence)) {
+      const envelope = { ...existing, updatedAt: attestation.updatedAt, evidence: [...existing.evidence, ...attestation.evidence] };
+      writeFileSync(evidencePath, `${JSON.stringify(envelope, null, 2)}\n`, 'utf8');
+    }
   }
 
   let closurePacketPath: string | null = null;
