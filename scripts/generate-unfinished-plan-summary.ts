@@ -252,8 +252,14 @@ function extractTaskIds(text: string): string[] {
   return [...new Set(matches.map((match) => normalizeTaskId(match)))];
 }
 
+// `taskCards` is what the summary shows (unfinished cards); `existingTaskIds`
+// is every formal card regardless of status. A README row is "README-only"
+// only when no formal card exists at all, so a done card is never reopened as
+// a missing card. Existence uses the same case-insensitive rule as
+// `taskIdsEqual`, because README rows are matched case-insensitively.
 function buildLaneSummariesWithOverlay(
   taskCards: readonly TaskCardEntry[],
+  existingTaskIds: ReadonlySet<string>,
   readmeRows: readonly ReadmeRowEntry[],
   overlayEntries: readonly OverlayEntry[]
 ): LaneSummary[] {
@@ -282,7 +288,7 @@ function buildLaneSummariesWithOverlay(
   return laneKeys.map((laneKey) => {
     const laneTasks = (taskMap.get(laneKey) ?? []).slice().sort(compareTaskCards);
     const laneReadme = (readmeMap.get(laneKey) ?? [])
-      .filter((row) => !laneTasks.some((task) => task.taskId === row.taskId))
+      .filter((row) => !existingTaskIds.has(row.taskId.toLowerCase()))
       .slice()
       .sort(compareReadmeRows);
     const laneOverlay = (overlayMap.get(laneKey) ?? []).slice().sort((left, right) => left.taskId.localeCompare(right.taskId));
@@ -510,10 +516,11 @@ async function main() {
   const taskCardPaths = allFiles.filter((filePath) => filePath.endsWith('.task.md'));
   const readmePaths = allFiles.filter((filePath) => path.basename(filePath).toLowerCase() === 'readme.md' && path.basename(path.dirname(filePath)).toLowerCase() === 'tasks');
 
-  const taskCards = taskCardPaths
+  const allTaskCards = taskCardPaths
     .map((filePath) => parseTaskCard(filePath, laneMetadataByKey))
-    .filter((entry): entry is TaskCardEntry => entry !== null)
-    .filter((entry) => !isCompletedStatus(entry.normalizedStatus));
+    .filter((entry): entry is TaskCardEntry => entry !== null);
+  const existingTaskIds = new Set(allTaskCards.map((entry) => entry.taskId.toLowerCase()));
+  const taskCards = allTaskCards.filter((entry) => !isCompletedStatus(entry.normalizedStatus));
 
   const readmeRows = readmePaths.flatMap((filePath) => parseReadmeTables(filePath, laneMetadataByKey));
   const overlay = loadOverlay(options.overlayPath);
@@ -521,7 +528,7 @@ async function main() {
     ? extractTaskIds(readFileSync(options.handoffPath, 'utf8'))
     : [];
 
-  const lanes = buildLaneSummariesWithOverlay(taskCards, readmeRows, overlay.entries);
+  const lanes = buildLaneSummariesWithOverlay(taskCards, existingTaskIds, readmeRows, overlay.entries);
   const markdown = renderMarkdown(options, lanes, handoffTaskIds, overlay.sources);
   mkdirSync(path.dirname(options.outPath), { recursive: true });
   writeFileSync(options.outPath, markdown, 'utf8');
