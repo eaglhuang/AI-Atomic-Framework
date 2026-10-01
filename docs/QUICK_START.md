@@ -54,8 +54,13 @@ node atm.mjs self-host-alpha --verify --json
 
 ```bash
 node atm.mjs doctor --json
+# Before user-requested work: route the request itself.
+node atm.mjs next --prompt "<current user prompt>" --json
+# Orientation only, when there is no user request yet.
 node atm.mjs next --json
 ```
+
+In a repository that already has task cards, `next --json` without a prompt answers `prompt-required` (`ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING`); that is expected, not a failure. Re-run with `--prompt`.
 
 Use `npm run validate:quick` for the lightest smoke lane. When you want `quick` to follow the files you actually touched, run `npm run validate:quick:changed`. Use `npm run validate:standard` for the broader governance suite before push or CI when you need wider confidence, and `npm run validate:full` for the heaviest release-grade sweep.
 
