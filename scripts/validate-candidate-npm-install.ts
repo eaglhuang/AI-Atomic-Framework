@@ -7,6 +7,7 @@ import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
+import { withPrivateCliNpmPackage } from './lib/private-cli-npm-package.ts';
 
 type Args = {
   candidateDir: string;
@@ -191,26 +192,21 @@ function measureDependencyFootprint(consumer: string): DependencyFootprint {
   };
 }
 
-function packCandidate(args: Args, packRoot: string): { metadata: PackMetadata; tarball: string; source: string } {
+async function packCandidate(args: Args, packRoot: string): Promise<{ metadata: PackMetadata; tarball: string; source: string }> {
   mkdirSync(packRoot, { recursive: true });
   if (args.candidateTarball) {
     const tarball = path.join(packRoot, path.basename(args.candidateTarball));
     writeFileSync(tarball, readFileSync(args.candidateTarball));
     return { metadata: readExplicitTarballMetadata(tarball), tarball, source: 'explicit-tarball' };
   }
-  // --ignore-scripts keeps the consumer install honest, but it also skips
-  // prepack, so the pack would ship whatever dist happens to sit in the
-  // checkout. A fresh clone carries only the tracked subset (dist/schemas is
-  // generated and ignored), which produced a tarball whose atm create failed.
-  // Build the candidate first so the gate measures the package it would publish.
-  execFileSync(process.execPath, ['--strip-types', path.join(root, 'scripts', 'build-package-dist.ts')], {
-    cwd: root,
-    stdio: ['ignore', 'pipe', 'pipe'],
-    encoding: 'utf8'
-  });
-  const metadata = parsePackMetadata(runNpm([
-    'pack', args.candidateDir, '--ignore-scripts', '--pack-destination', packRoot, '--json', '--loglevel', 'silent'
+  // The build lane prepares dist once. Validation bundles privately instead
+  // of rebuilding shared outputs while other readers are running.
+  const packDirectory = (directory: string) => parsePackMetadata(runNpm([
+    'pack', directory, '--ignore-scripts', '--pack-destination', packRoot, '--json', '--loglevel', 'silent'
   ], root));
+  const metadata = args.candidateDir === path.join(root, 'packages', 'cli')
+    ? await withPrivateCliNpmPackage(root, async packageRoot => packDirectory(packageRoot))
+    : packDirectory(args.candidateDir);
   return { metadata, tarball: path.join(packRoot, metadata.filename as string), source: 'candidate-directory' };
 }
 
@@ -315,7 +311,7 @@ function writeProof(args: Args, proof: Record<string, unknown>): void {
 const args = parseArgs();
 const tempRoot = mkdtempSync(path.join(tmpdir(), 'atm-candidate-install-'));
 try {
-  const packed = packCandidate(args, path.join(tempRoot, 'pack'));
+  const packed = await packCandidate(args, path.join(tempRoot, 'pack'));
   const smokeRun = runSmoke(packed.tarball, tempRoot, args.measurementRuns);
   const files = packed.metadata.files ?? [];
   const moduleResolutionFailures = Object.values(smokeRun.smoke).filter((entry) => entry.moduleResolutionFailure).length;
