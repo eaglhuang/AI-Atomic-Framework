@@ -180,6 +180,8 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
   declaredFiles: readonly string[];
   closebackPlan: TaskflowClosebackPlan;
   previewCommitBundle: {
+    failClosed?: boolean;
+    scopeAmendment?: { readonly required: boolean; readonly reason?: string | null; readonly candidateFiles?: readonly string[] };
     targetRepo?: { stageFiles: readonly string[] };
     targetDeliveryFiles: readonly string[];
     targetGovernanceFiles?: readonly string[];
@@ -197,6 +199,16 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
   };
 }): TaskflowCloseWriteReadinessHint {
   const blockers: TaskflowCloseKnownBlocker[] = [];
+  // Reuse the bundle's decision; preview must not advertise a write that the
+  // existing commit-bundle admission already rejects.
+  if (input.previewCommitBundle.failClosed || input.previewCommitBundle.scopeAmendment?.required) {
+    blockers.push({
+      code: 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE',
+      summary: input.previewCommitBundle.scopeAmendment?.reason ?? 'The governed commit bundle is incomplete; inspect its exclusions before close --write.',
+      requiredCommand: null,
+      files: input.previewCommitBundle.scopeAmendment?.candidateFiles
+    });
+  }
   // `tasks close` builds a closure packet through this same gate.  Evaluate it
   // before advertising taskflow close as ready, so dry-run cannot be greener
   // than the eventual write path.

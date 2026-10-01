@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { sortProposalsForCompose } from './merge-plan.js';
@@ -362,8 +362,23 @@ function normalizePath(value) {
 }
 function resolveInsideRoot(root, relativePath) {
     const targetPath = path.resolve(root, relativePath);
-    const relative = path.relative(root, targetPath);
-    if (relative.startsWith('..') || path.isAbsolute(relative))
+    const outside = (base, target) => {
+        const relative = path.relative(base, target);
+        return relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative);
+    };
+    if (outside(root, targetPath))
         return null;
-    return targetPath;
+    // Resolve directory junctions as well as file symlinks before reading or writing.
+    // Return the physical target, not the alias checked above. Concurrent directory
+    // replacement still requires stronger filesystem isolation, not a lexical gate.
+    if (!existsSync(targetPath))
+        return targetPath;
+    try {
+        const physicalRoot = realpathSync(root);
+        const physicalTarget = realpathSync(targetPath);
+        return outside(physicalRoot, physicalTarget) ? null : physicalTarget;
+    }
+    catch {
+        return null;
+    }
 }

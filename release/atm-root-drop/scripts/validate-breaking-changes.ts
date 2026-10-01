@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { releaseCompatibilityGateIsRequired } from './lib/release-workflow-contract.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode') ? process.argv[process.argv.indexOf('--mode') + 1] : 'validate';
@@ -45,7 +46,7 @@ for (const templateVersion of matrix.agentTemplateVersions ?? []) {
   }
 }
 
-assert(releaseWorkflow.includes('scripts/validate-version-compatibility.ts --mode validate --release-tag "$GITHUB_REF_NAME"'), 'release workflow must validate tag/package/matrix version compatibility before publish');
+assert(releaseCompatibilityGateIsRequired(releaseWorkflow), 'release workflow must require tag/package/matrix compatibility after version projection and before publish');
 assert(releaseWorkflow.indexOf('Set npm package versions from tag') < releaseWorkflow.indexOf('Validate release version compatibility'), 'release version compatibility must run after package versions are set from tag');
 assert(releaseWorkflow.indexOf('Set npm package versions from tag') < releaseWorkflow.indexOf('Build release artifacts'), 'release artifacts must be built after tag versions are injected');
 assert(releaseWorkflow.indexOf('Set npm package versions from tag') < releaseWorkflow.indexOf('Verify npm package contents'), 'package contents must be verified after tag versions are injected');

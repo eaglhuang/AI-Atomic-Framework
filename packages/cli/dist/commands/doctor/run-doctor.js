@@ -225,6 +225,14 @@ export async function runDoctor(argv) {
         ...(runnerSourceDrift.syncRequired
             ? [message('warning', 'ATM_RUNNER_SOURCE_DRIFT', runnerSourceDrift.advisory, runnerSourceDrift)]
             : []),
+        // The frozen onefile runner keeps package-dist green, but a framework
+        // contributor still needs built packages for atm.dev.mjs and workspace tests.
+        ...(repoIdentity.isFrameworkRepo && missingDist.length > 0
+            ? [message('warning', 'ATM_PACKAGE_DIST_MISSING', `${missingDist.length} workspace package(s) have no built dist; run npm run build before source-first validation or workspace tests.`, {
+                    missingDist,
+                    requiredCommand: 'npm run build'
+                })]
+            : []),
         ...(!runnerPublication.ok && runnerPublication.code
             ? [message('error', runnerPublication.code, 'A sealed runner publication has no complete governed terminal disposition.', runnerPublication)]
             : []),

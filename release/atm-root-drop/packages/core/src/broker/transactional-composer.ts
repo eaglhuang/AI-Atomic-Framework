@@ -208,7 +208,7 @@ function composeTransactionalMutationsUnchecked(
   adapters: readonly FileMutationAdapter[]
 ): readonly FileDescriptor[] {
   const outputFiles = new Map(files.map((file) => [normalizePath(file.filePath), { ...file }]));
-  for (const [filePath, group] of groupRequests(requests)) {
+  for (const [filePath, group] of groupRequests(requests, true)) {
     const file = outputFiles.get(filePath);
     if (!file) continue;
     const adapter = adapters.find((candidate) => candidate.supports(file));
@@ -221,9 +221,9 @@ function composeTransactionalMutationsUnchecked(
   return [...outputFiles.values()].sort((left, right) => left.filePath.localeCompare(right.filePath));
 }
 
-function groupRequests(requests: readonly MutationRequest[]): Map<string, MutationRequest[]> {
+function groupRequests(requests: readonly MutationRequest[], preserveOrder = false): Map<string, MutationRequest[]> {
   const groups = new Map<string, MutationRequest[]>();
-  for (const request of [...requests].sort(compareRequests)) {
+  for (const request of preserveOrder ? requests : [...requests].sort(compareRequests)) {
     const filePath = normalizePath(request.filePath);
     const group = groups.get(filePath) ?? [];
     group.push(request);

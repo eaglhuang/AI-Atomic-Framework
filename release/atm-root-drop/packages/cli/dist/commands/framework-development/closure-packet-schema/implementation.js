@@ -440,11 +440,13 @@ else {
 } if (packet.evidenceFreshness !== 'fresh') {
     missing.push('evidenceFreshness');
 } return { ok: missing.length === 0 && invalidFormat.length === 0, missing, invalidFormat }; }
-export function normalizeUpstreamEvidenceForTask(cwd, taskId) { const evidenceAbsolute = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`); const evidencePath = relativePathFrom(cwd, evidenceAbsolute); if (!existsSync(evidenceAbsolute)) {
+export // A preview only reports whether normalization would change the evidence file; it never writes it.
+ function normalizeUpstreamEvidenceForTask(cwd, taskId, options) { const evidenceAbsolute = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`); const evidencePath = relativePathFrom(cwd, evidenceAbsolute); if (!existsSync(evidenceAbsolute)) {
     return { evidencePath, changed: false };
 } const parsed = readJsonIfExists(evidenceAbsolute); if (!parsed)
     return { evidencePath, changed: false }; const normalized = normalizeSha256FieldsDeep(parsed); const before = `${JSON.stringify(parsed, null, 2)}\n`; const after = `${JSON.stringify(normalized, null, 2)}\n`; if (before !== after) {
-    writeFileSync(evidenceAbsolute, after, 'utf8');
+    if (options.write)
+        writeFileSync(evidenceAbsolute, after, 'utf8');
     return { evidencePath, changed: true };
 } return { evidencePath, changed: false }; }
 function collectTaskScopeFiles(cwd, scopeTaskId) { const scopeFiles = new Set(); const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${scopeTaskId}.json`); const taskDocument = readJsonIfExists(taskPath); if (!taskDocument)
@@ -708,7 +710,7 @@ export function repairClosurePacketForTask(input) { const cwd = path.resolve(inp
         const recoveryCommand = `node atm.mjs tasks reconcile --task ${taskId} --actor ${actorId} --delivery-commit ${deliveryCommit} --json`;
         throw new CliError('ATM_CLOSURE_REPAIR_IMPOSSIBLE', `Closure packet not found for ${taskId} and cannot be reconstructed automatically because close transition metadata is missing.`, { exitCode: 1, details: { taskId, missingSegments, requiredCommand: recoveryCommand, remediation: 'Use the reconcile command to sync the historical commit and build closeout provenance.' } });
     }
-} const upstreamEvidence = normalizeUpstreamEvidenceForTask(cwd, taskId); const scopeTaskId = normalizeOptionalString(input.scopeTaskId); const scopeFiles = scopeTaskId ? collectTaskScopeFiles(cwd, scopeTaskId) : null; const terminalTargetScopedRepair = scopeTaskId === taskId && taskDocument?.status === 'done'; const trackedDirtyFiles = readTrackedChangedFiles(cwd).filter((entry) => entry !== packetPath && entry !== gitHeadEvidencePath && !entry.startsWith('.atm/runtime/')); const trackedChangeStatuses = readTrackedChangeStatuses(cwd); const terminalCloseEventDeletions = trackedDirtyFiles.filter((entry) => isScopedTerminalCloseEventDeletion({ entry, taskId, scopeTaskId, taskDocument, status: trackedChangeStatuses.get(entry) ?? null })); const scopeWarnings = []; const blockingDirtyFiles = scopeFiles ? trackedDirtyFiles.filter((entry) => { if (terminalCloseEventDeletions.includes(entry)) {
+} const upstreamEvidence = normalizeUpstreamEvidenceForTask(cwd, taskId, { write: !input.dryRun }); const scopeTaskId = normalizeOptionalString(input.scopeTaskId); const scopeFiles = scopeTaskId ? collectTaskScopeFiles(cwd, scopeTaskId) : null; const terminalTargetScopedRepair = scopeTaskId === taskId && taskDocument?.status === 'done'; const trackedDirtyFiles = readTrackedChangedFiles(cwd).filter((entry) => entry !== packetPath && entry !== gitHeadEvidencePath && !entry.startsWith('.atm/runtime/')); const trackedChangeStatuses = readTrackedChangeStatuses(cwd); const terminalCloseEventDeletions = trackedDirtyFiles.filter((entry) => isScopedTerminalCloseEventDeletion({ entry, taskId, scopeTaskId, taskDocument, status: trackedChangeStatuses.get(entry) ?? null })); const scopeWarnings = []; const blockingDirtyFiles = scopeFiles ? trackedDirtyFiles.filter((entry) => { if (terminalCloseEventDeletions.includes(entry)) {
     return false;
 } if (isTaskCloseGovernanceCriticalPath(entry, taskId) || (!terminalTargetScopedRepair && pathOverlapsTaskScope(entry, scopeFiles))) {
     return true;

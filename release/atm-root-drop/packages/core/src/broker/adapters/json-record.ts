@@ -123,13 +123,18 @@ export const jsonRecordAdapter: FileMutationAdapter = {
 
   canMerge(mutations: readonly NormalizedMutation[], _parsed: ParsedDocument): MergeDecision {
     const keys = new Map<string, ConflictKey>();
+    const targets: string[][] = [];
     const collisions: ConflictKey[] = [];
     for (const mutation of mutations) {
       const key = jsonPointerConflictKey(mutation.filePath, mutation.target);
-      if (keys.has(key.key)) {
+      const segments = pointerSegments(mutation.target);
+      if (targets.some((other) =>
+        other.slice(0, Math.min(other.length, segments.length))
+          .every((segment, index) => segment === segments[index]))) {
         collisions.push(key);
       } else {
         keys.set(key.key, key);
+        targets.push(segments);
       }
     }
     if (collisions.length > 0) {
@@ -138,7 +143,7 @@ export const jsonRecordAdapter: FileMutationAdapter = {
         specVersion: '0.1.0',
         migration: brokerAdapterMigration(),
         verdict: 'conflict',
-        reason: 'two or more JSON record mutations target the same pointer; record edits are not commutative',
+        reason: 'JSON record mutations target identical or ancestor/descendant pointers; record edits are not commutative',
         conflictKeys: collisions
       };
     }
@@ -181,7 +186,10 @@ export const jsonRecordAdapter: FileMutationAdapter = {
   },
 
   serialize(parsed: ParsedDocument): string {
-    return `${JSON.stringify(parsed.value, null, 2)}\n`;
+    return `${JSON.stringify(parsed.value, (_key, value) =>
+      value && typeof value === 'object' && !Array.isArray(value)
+        ? Object.fromEntries(Object.entries(value).sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0))
+        : value, 2)}\n`;
   },
 
   validate(file: FileDescriptor): ValidationResult {

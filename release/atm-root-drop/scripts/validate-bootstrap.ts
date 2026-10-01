@@ -227,8 +227,15 @@ try {
   writeFileSync(path.join(hostRepo, 'articles', 'index.html'), '<!doctype html><html><body><p>Article list</p></body></html>\n', 'utf8');
   writeFileSync(path.join(hostRepo, 'assets', 'css', 'site.css'), 'body { font-family: serif; }\n', 'utf8');
 
+  // First contact happens before bootstrap: that next must route to bootstrap and carry the first-use notice.
+  const preBootstrapNext = runAtm(['next', '--cwd', hostRepo], hostRepo);
+  const preBootstrapAction = preBootstrapNext.parsed.nextAction ?? preBootstrapNext.parsed.evidence?.nextAction;
+  assert(preBootstrapAction?.status === 'needs-bootstrap', 'next before bootstrap must request bootstrap');
+  assertFirstUseNotice(preBootstrapNext);
+
   const bootstrap = runAtm(['bootstrap', '--cwd', hostRepo, '--task', 'Bootstrap static site'], hostRepo);
   assert(bootstrap.exitCode === 0, 'bootstrap must exit 0');
+  assert(bootstrap.parsed.evidence.atmChart?.status === 'rendered', 'bootstrap must render the ATMChart');
   assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true');
   assert(bootstrap.parsed.evidence.adoptedProfile === 'default', 'bootstrap must report adoptedProfile=default');
   assert(bootstrap.parsed.evidence.pinnedRunner?.status === 'installed', 'bootstrap must report pinned runner installed');
@@ -284,10 +291,9 @@ try {
   assertPinnedRunner(hostRepo);
   const firstNext = runAtm(['next', '--cwd', hostRepo], hostRepo);
   const firstNextAction = firstNext.parsed.nextAction ?? firstNext.parsed.evidence?.nextAction;
-  assert(firstNext.exitCode === 1, 'next before ATMChart render must exit with non-ready status');
-  assert(firstNextAction?.status === 'needs-onboarding-refresh', 'next before ATMChart render must request onboarding refresh');
-  assert(firstNextAction?.afterNextAction?.includes('original request'), 'onboarding refresh next action must tell agents to resume the original request');
-  assertFirstUseNotice(firstNext);
+  // Bootstrap renders the ATMChart, so the first next after bootstrap needs no separate onboarding refresh.
+  assert(firstNextAction?.status !== 'needs-onboarding-refresh', 'next right after bootstrap must not require a separate ATMChart render');
+  assert(typeof firstNextAction?.command === 'string' && firstNextAction.command.length > 0, 'next right after bootstrap must emit a governed next action');
 
   const profile = readFileSync(path.join(hostRepo, '.atm', 'runtime', 'profile', 'default.md'), 'utf8');
   assert(!profile.includes('{{'), 'default profile must not leak unresolved template placeholders');

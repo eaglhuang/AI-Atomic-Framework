@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { withPrivateCliNpmPackage } from '../../scripts/lib/private-cli-npm-package.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -32,11 +33,17 @@ assert.match(validatorSource, /atm-chart-verify/, 'public npm validator must exe
 assert.match(validatorSource, /requiredSuccessCommandFailures/, 'public npm validator must report required command failures');
 assert.match(validatorSource, /coreWorkflowPassed/, 'public npm validator must report core workflow status');
 assert.match(validatorSource, /runFirstUseChain\(bin, consumer\)/, 'public npm validator must execute the first-use workflow in its clean consumer');
-assert.match(validatorSource, /generated command is not runnable from a clean npm install/, 'public npm validator must reject unusable generated commands');
-assert.match(validatorSource, /const stderr = String\(result\.stderr/, 'first-use proof must parse command JSON from either output stream');
+const firstUseSource = readFileSync(path.join(root, 'scripts/lib/npm-first-use.ts'), 'utf8');
+assert.match(validatorSource, /import \{ runFirstUseChain \} from '.\/lib\/npm-first-use.ts'/, 'public proof must use the shared first-use validator');
+assert.match(firstUseSource, /generated command is not runnable from a clean npm install/, 'shared validator must reject unusable generated commands');
+assert.match(firstUseSource, /const stderr = String\(result\.stderr/, 'first-use proof must parse command JSON from either output stream');
 assert.match(validatorSource, /'first-use'/, 'first-use workflow must be a required successful public smoke command');
 
 const candidateValidatorSource = await import('node:fs').then(({ readFileSync }) => readFileSync(new URL('../../scripts/validate-candidate-npm-install.ts', import.meta.url), 'utf8'));
+assert.match(candidateValidatorSource, /runFirstUseChain\(bin, consumer\)/, 'candidate proof must execute the same first-use journey');
+assert.doesNotMatch(candidateValidatorSource, /let result = spawnSync\(bin, commandArgs/, 'candidate smoke must not invoke stateful commands before its measurement loop');
+assert.doesNotMatch(candidateValidatorSource, /startupMs\.push\(0\)/, 'candidate timings must come from actual measured invocations');
+assert.match(candidateValidatorSource, /const coreWorkflowCommandNames = \[[^\n]*'first-use'/, 'first-use failure must block candidate acceptance');
 assert.match(candidateValidatorSource, /--candidate-tarball/, 'candidate validator must accept an explicit tarball');
 assert.match(candidateValidatorSource, /atm\.candidateNpmInstallProof\.v1/, 'candidate validator must use a separate receipt schema');
 assert.match(candidateValidatorSource, /versionOnlySmoke: false/, 'candidate validator must reject version-only evidence');
@@ -94,30 +101,10 @@ assert.equal(failedClosed, true, 'unpublished package must fail closed without -
 // version-only or module-resolution check.
 const localSmokeRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-public-runtime-chart-'));
 try {
-  // --ignore-scripts also skips prepack, so a fresh checkout would pack the
-  // tracked subset of dist rather than the package that would ship. Build the
-  // CLI closure first.
-  const packageDirs = readdirSync(path.join(root, 'packages'), { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(path.join(root, 'packages', entry.name, 'package.json')))
-    .map((entry) => path.join(root, 'packages', entry.name, 'dist'));
-  const workspaceBuildReady = packageDirs.every((distRoot) => existsSync(distRoot));
-  const buildScript = path.join(root, 'scripts', 'build-package-dist.ts');
-  if (workspaceBuildReady) {
-    execFileSync(process.execPath, ['--strip-types', buildScript, '--package', 'packages/plugin-governance-local'], {
-      cwd: root, encoding: 'utf8', windowsHide: true
-    });
-    execFileSync(process.execPath, ['--strip-types', buildScript, '--package', 'packages/cli'], {
-      cwd: root, encoding: 'utf8', windowsHide: true
-    });
-  } else {
-    execFileSync(process.execPath, ['--strip-types', buildScript], {
-      cwd: root, encoding: 'utf8', windowsHide: true
-    });
-  }
-  const packed = JSON.parse(execFileSync(npm, [
-    'pack', '--workspace', '@ai-atomic-framework/cli', '--ignore-scripts', '--pack-destination', localSmokeRoot,
+  const packed = await withPrivateCliNpmPackage(root, async packageRoot => JSON.parse(execFileSync(npm, [
+    'pack', packageRoot, '--ignore-scripts', '--pack-destination', localSmokeRoot,
     '--json', '--loglevel', 'silent'
-  ], { cwd: root, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' }).trim());
+  ], { cwd: root, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' }).trim()));
   const tarball = path.join(localSmokeRoot, packed[0].filename);
   const consumer = path.join(localSmokeRoot, 'consumer');
   const adopter = path.join(consumer, 'adopter');

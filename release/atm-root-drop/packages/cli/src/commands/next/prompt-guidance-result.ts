@@ -185,10 +185,28 @@ function buildGeneralPromptGuidanceResult(
   prompt: string
 ) {
   const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
+  const guideCommand = `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`;
+  // A first request in a new repository is rarely task-scoped. Name the one
+  // claimable shortcut (the fast quickfix channel, which needs a path-like
+  // scope) next to guidance, so an agent is not sent through
+  // guide -> orient -> start before it can claim anything.
+  const suggestedRoutes = [
+    {
+      when: 'small change where you can name the files to edit (replace <path>)',
+      channel: 'fast',
+      command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt} in <path>`)} --json`
+    },
+    {
+      when: 'larger or unclear work',
+      channel: null,
+      command: guideCommand
+    }
+  ];
   const nextAction: NextActionLike = {
     status: 'prompt-guidance-required',
-    command: `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`,
-    reason: 'the user supplied a prompt that is not task-scoped, so ATM routes guidance from that prompt instead of reusing stale global guidance',
+    command: guideCommand,
+    reason: 'the user supplied a prompt that is not task-scoped, so ATM routes guidance from that prompt instead of reusing stale global guidance; for a small change with known files, suggestedRoutes[0] claims the fast quickfix channel directly',
+    suggestedRoutes,
     recommendedChannel: null,
     riskLevel: 'medium',
     governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
@@ -210,8 +228,9 @@ function buildGeneralPromptGuidanceResult(
       userNotice,
       input.integrationBootstrap,
       input.runtimeAdapterReadiness,
-      message('info', 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED', 'ATM routed next-action guidance from the current prompt instead of stale global state.', {
-        command: nextAction.command
+      message('info', 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED', 'ATM routed next-action guidance from the current prompt instead of stale global state. For a small change with known files, use suggestedRoutes[0] to claim the fast quickfix channel.', {
+        command: nextAction.command,
+        suggestedRoutes
       })
     ),
     evidence: {

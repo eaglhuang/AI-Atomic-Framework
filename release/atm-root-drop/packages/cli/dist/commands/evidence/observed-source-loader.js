@@ -1,5 +1,16 @@
 import { createHash } from 'node:crypto';
 import { collectObservedEvidence, createReaderObservedEvidenceSource } from '../../_vendor/core/dist/evidence/observed-source-adapters.js';
+/** Missing status is not a successful exit; retain termination facts. */
+export function normalizeProcessOutcome(result) {
+    const commandOk = result.status === 0 && !result.signal && !result.error;
+    return {
+        exitCode: commandOk ? 0 : result.status !== null && result.status !== 0 ? result.status : 1,
+        commandOk,
+        processExitStatus: result.status,
+        processSignal: result.signal ?? null,
+        processError: result.error?.message ?? null
+    };
+}
 /**
  * The sole CLI adapter from a spawned process to the observed-evidence
  * contract.  Callers provide the process result, never a pass/fail claim.

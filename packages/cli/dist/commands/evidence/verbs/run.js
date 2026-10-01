@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { observeCommandRunRecords, observeProcessExecution } from '../observed-source-loader.js';
+import { observeCommandRunRecords, observeProcessExecution, normalizeProcessOutcome } from '../observed-source-loader.js';
 import { evaluateTddPhaseReceipt } from '../../../_vendor/core/dist/evidence/tdd-cycle.js';
 import { evaluateValidationContract } from '../../../_vendor/core/dist/evidence/validation-contract.js';
 import { CliError, makeResult, message } from '../../shared.js';
@@ -39,18 +39,20 @@ export function runEvidenceRun(argv) {
         ? ['-NoProfile', '-Command', common.command]
         : ['-c', common.command];
     const startedAtMs = Date.now();
+    const childEnvironment = {
+        ...process.env,
+        ATM_ACTOR_ID: common.actorId ?? process.env.ATM_ACTOR_ID,
+        ATM_TASK_ID: common.taskId
+    };
+    delete childEnvironment.ATM_LANE_SESSION_ID;
     const result = spawnSync(shell, shellArgs, {
         cwd: path.resolve(common.cwd),
         encoding: 'utf8',
-        env: {
-            ...process.env,
-            ATM_ACTOR_ID: common.actorId ?? process.env.ATM_ACTOR_ID,
-            ATM_TASK_ID: common.taskId
-        }
+        env: childEnvironment
     });
     const finishedAtMs = Date.now();
-    const exitCode = result.status ?? (result.error ? 1 : 0);
-    const commandOk = exitCode === 0 && !result.error;
+    const outcome = normalizeProcessOutcome(result);
+    const { exitCode, commandOk } = outcome;
     const observedCommandOutcome = observeEvidenceRunProcess({
         command: common.command,
         exitCode,
@@ -76,11 +78,29 @@ export function runEvidenceRun(argv) {
         assertionCount: tdd.assertionCount,
         expectedRedPredicate: tdd.expectedRedPredicate
     });
+    if (!receipt.valid) {
+        throw new CliError('ATM_TDD_PHASE_RECEIPT_INVALID', `TDD ${tdd.phase} receipt invalid for case ${tdd.caseId}.`, {
+            exitCode: 2,
+            details: { receipt, exitCode, durationMs: Math.max(0, finishedAtMs - startedAtMs),
+                stdoutSha256: hashString(result.stdout ?? ''),
+                stderrSha256: hashString(result.stderr ?? ''), baseError: null }
+        });
+    }
+    const execution = Object.freeze({
+        command: common.command,
+        ...outcome,
+        stdoutSha256: `sha256:${hashString(result.stdout ?? '')}`,
+        stderrSha256: `sha256:${hashString(result.stderr ?? '')}`,
+        startedAt: new Date(startedAtMs).toISOString(),
+        finishedAt: new Date(finishedAtMs).toISOString(),
+        generatedAt: new Date(finishedAtMs).toISOString(),
+        durationMs: Math.max(0, finishedAtMs - startedAtMs)
+    });
     let baseResult = null;
     let baseError = null;
     if (tdd.phase === 'green' || commandOk) {
         try {
-            baseResult = runEvidenceRunBase(baseArgv);
+            baseResult = runEvidenceRunBase(baseArgv, execution);
         }
         catch (error) {
             if (error instanceof CliError)
@@ -98,7 +118,7 @@ export function runEvidenceRun(argv) {
                 'failure',
                 '--summary',
                 `TDD red observation for ${tdd.caseId}`
-            ]);
+            ], execution);
         }
         catch (error) {
             if (error instanceof CliError)
@@ -107,19 +127,6 @@ export function runEvidenceRun(argv) {
                 throw error;
         }
     }
-    if (!receipt.valid) {
-        throw new CliError('ATM_TDD_PHASE_RECEIPT_INVALID', `TDD ${tdd.phase} receipt invalid for case ${tdd.caseId}.`, {
-            exitCode: 2,
-            details: {
-                receipt,
-                exitCode,
-                durationMs: Math.max(0, finishedAtMs - startedAtMs),
-                stdoutSha256: hashString(result.stdout ?? ''),
-                stderrSha256: hashString(result.stderr ?? ''),
-                baseError: baseError?.code ?? null
-            }
-        });
-    }
     if (tdd.phase === 'green' && baseError) {
         throw baseError;
     }
@@ -127,6 +134,7 @@ export function runEvidenceRun(argv) {
         ...(baseResult?.evidence ?? {}),
         tddCycle: receipt,
         tddObservation: {
+            ...outcome,
             phase: tdd.phase,
             caseId: tdd.caseId,
             exitCode,

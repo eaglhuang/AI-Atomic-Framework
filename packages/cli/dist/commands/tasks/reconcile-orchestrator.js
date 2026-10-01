@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../_vendor/plugin-governance-local/dist/index.js';
@@ -14,7 +13,7 @@ import { readGitScalar } from './task-git-helpers.js';
 import { evidencePathForTask } from '../evidence/evidence-store.js';
 import { closureEvidenceContextForTask } from '../evidence/closure-evidence-context.js';
 import { parseClaimRecord } from './task-ledger-readers.js';
-import { taskPathFor } from './task-file-io-helpers.js';
+import { readJsonRecord, taskPathFor } from './task-file-io-helpers.js';
 import { buildHistoricalDeliveryProvenance } from './historical-delivery.js';
 import { createClosureTransitionMetadata } from './task-transition-helpers.js';
 import { extractTaskCloseDeclaredFiles, evaluateTaskDeliverableGate, stageTaskCloseArtifacts } from './close-helpers/close-artifact-staging.js';
@@ -163,42 +162,24 @@ export async function runTasksReconcile(argv) {
         }
     }
     const evidencePath = evidencePathForTask(options.cwd, options.taskId);
+    // Always append the delivery attestation; existing (real) evidence records are kept as-is.
+    const attestation = buildHistoricalReconcileEvidenceEnvelope({
+        taskId: options.taskId,
+        commitSha,
+        actorId,
+        artifactPaths: taskDeclaredFiles,
+        now: new Date().toISOString()
+    });
     if (!existsSync(evidencePath)) {
         mkdirSync(path.dirname(evidencePath), { recursive: true });
-        const requiredPasses = uniqueStrings((frameworkStatus?.requiredGates ?? [
-            'typecheck',
-            'validate:cli',
-            'validate:git-head-evidence'
-        ]).filter((gate) => gate === 'typecheck' || gate.startsWith('validate:')));
-        const envelope = {
-            taskId: options.taskId,
-            updatedAt: new Date().toISOString(),
-            evidence: [
-                {
-                    evidenceKind: 'validation',
-                    summary: `Historical reconcile sync completed for ${options.taskId} against commit ${commitSha}.`,
-                    artifactPaths: taskDeclaredFiles,
-                    producedBy: actorId,
-                    createdAt: new Date().toISOString(),
-                    evidenceFreshness: 'fresh',
-                    validationPasses: requiredPasses,
-                    commandRuns: [
-                        {
-                            command: `git show ${commitSha}`,
-                            cwd: relativePathFrom(options.cwd, options.cwd) || '.',
-                            exitCode: 0,
-                            stdoutSha256: `sha256:${createHash('sha256').update(commitSha).digest('hex')}`,
-                            stderrSha256: `sha256:${createHash('sha256').update('reconcile').digest('hex')}`
-                        }
-                    ],
-                    details: {
-                        action: 'reconcile',
-                        deliveryCommit: commitSha
-                    }
-                }
-            ]
-        };
-        writeFileSync(evidencePath, `${JSON.stringify(normalizeSha256FieldsDeep(envelope), null, 2)}\n`, 'utf8');
+        writeFileSync(evidencePath, `${JSON.stringify(normalizeSha256FieldsDeep(attestation), null, 2)}\n`, 'utf8');
+    }
+    else {
+        const existing = readJsonRecord(evidencePath);
+        if (existing && Array.isArray(existing.evidence)) {
+            const envelope = { ...existing, updatedAt: attestation.updatedAt, evidence: [...existing.evidence, ...attestation.evidence] };
+            writeFileSync(evidencePath, `${JSON.stringify(envelope, null, 2)}\n`, 'utf8');
+        }
     }
     let closurePacketPath = null;
     let packet = null;
@@ -353,6 +334,28 @@ export async function runTasksReconcile(argv) {
         }
     });
 }
-function uniqueStrings(values) {
-    return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
+// A historical reconcile only attests which commit delivered the task. It never
+// ran any validator, so it must not record validation passes, fresh evidence,
+// or a command run standing in for one; required gates stay missing until a
+// real run (or a sealed receipt) supplies them.
+export function buildHistoricalReconcileEvidenceEnvelope(input) {
+    return {
+        taskId: input.taskId,
+        updatedAt: input.now,
+        evidence: [
+            {
+                evidenceKind: 'validation',
+                evidenceType: 'historical-attestation',
+                summary: `Historical reconcile attested delivery of ${input.taskId} by commit ${input.commitSha}; no validator was executed.`,
+                artifactPaths: input.artifactPaths,
+                producedBy: input.actorId,
+                createdAt: input.now,
+                evidenceFreshness: 'historical-reference',
+                details: {
+                    action: 'reconcile',
+                    deliveryCommit: input.commitSha
+                }
+            }
+        ]
+    };
 }

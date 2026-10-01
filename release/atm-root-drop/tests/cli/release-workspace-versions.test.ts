@@ -3,6 +3,8 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import os from 'node:os';
 import path from 'node:path';
 import { synchronizeReleaseWorkspaceVersions } from '../../scripts/set-release-workspace-versions.ts';
+import { releaseVersionSourcesAreCompatible } from '../../scripts/lib/release-version-compatibility.ts';
+import { releaseCompatibilityGateIsRequired } from '../../scripts/lib/release-workflow-contract.ts';
 
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-release-workspace-versions-'));
 
@@ -34,6 +36,51 @@ try {
   assert.equal(cli.devDependencies['@scope/core'], '0.1.0');
 
   assert.deepEqual(synchronizeReleaseWorkspaceVersions(root, '0.1.0-beta.0'), [], 'second pass must be idempotent');
+  const matrixPath = path.join(root, 'compatibility-matrix.json');
+  const matrix = { releaseTrain: { frameworkVersion: '0.1.0', defaultChartVersion: '0.1.0' }, supported: ['keep'] };
+  writeFileSync(matrixPath, JSON.stringify(matrix), 'utf8');
+  assert.equal(releaseVersionSourcesAreCompatible({ releaseTag: 'v0.1.3', rootPackageVersion: '0.1.3', releaseTrainVersion: '0.1.0' }), false);
+  assert.ok(synchronizeReleaseWorkspaceVersions(root, '0.1.3').includes('compatibility-matrix.json'));
+  const projected = JSON.parse(readFileSync(matrixPath, 'utf8'));
+  assert.equal(projected.releaseTrain.frameworkVersion, '0.1.3');
+  assert.equal(projected.releaseTrain.defaultChartVersion, '0.1.0');
+  assert.deepEqual(projected.supported, ['keep']);
+  assert.equal(releaseVersionSourcesAreCompatible({ releaseTag: 'v0.1.3', rootPackageVersion: '0.1.3', releaseTrainVersion: projected.releaseTrain.frameworkVersion }), true);
+  assert.deepEqual(synchronizeReleaseWorkspaceVersions(root, '0.1.3'), []);
+  synchronizeReleaseWorkspaceVersions(root, '0.1.4-beta.0');
+  assert.equal(JSON.parse(readFileSync(matrixPath, 'utf8')).releaseTrain.frameworkVersion, '0.1.4');
+  assert.throws(() => synchronizeReleaseWorkspaceVersions(root, 'invalid'), /valid release version/);
+  mkdirSync(path.join(root, 'scripts'), { recursive: true });
+  const skewPath = path.join(root, 'scripts', 'skew-matrix.config.json');
+  writeFileSync(skewPath, JSON.stringify({
+    releaseTrain: { frameworkVersion: '0.1.4', atmChartVersion: '0.1.0' },
+    axes: { cli: [
+      { packagePath: 'packages/cli', version: '0.1.4' },
+      { packagePath: 'packages/cli', version: '0.1.0' },
+      { packagePath: 'external/package', version: '0.1.4' }
+    ] }
+  }), 'utf8');
+  assert.ok(synchronizeReleaseWorkspaceVersions(root, '0.1.5-beta.0').includes('scripts/skew-matrix.config.json'));
+  const skew = JSON.parse(readFileSync(skewPath, 'utf8'));
+  assert.equal(skew.releaseTrain.frameworkVersion, '0.1.5');
+  assert.equal(skew.releaseTrain.atmChartVersion, '0.1.0');
+  assert.deepEqual(skew.axes.cli.map((entry: { version: string }) => entry.version), ['0.1.5', '0.1.0', '0.1.4']);
+  assert.deepEqual(synchronizeReleaseWorkspaceVersions(root, '0.1.5-beta.0'), []);
+  const workflow = readFileSync(new URL('../../.github/workflows/release-npm.yml', import.meta.url), 'utf8');
+  assert.equal(releaseCompatibilityGateIsRequired(workflow), true);
+  for (const mutation of [
+    workflow.replace('Validate release version compatibility', 'Removed compatibility gate'),
+    workflow.replace('- name: Validate release version compatibility', '- name: Validate release version compatibility\n        if: false'),
+    workflow.replace('- name: Validate release version compatibility', '- name: Validate release version compatibility\n        continue-on-error: true'),
+    workflow.replace('--release-tag "$ATM_RELEASE_TAG"', '--release-tag "$GITHUB_REF_NAME"'),
+    workflow.replace('echo "ATM_RELEASE_TAG=v$version"', 'echo "OTHER_TAG=v$version"'),
+    workflow.replace('Publish public workspace closure', 'Removed publication boundary')
+  ]) assert.equal(releaseCompatibilityGateIsRequired(mutation), false);
+  const compatibilityStep = workflow.split('- name: Validate release version compatibility')[1]?.split('- name:')[0] ?? '';
+  assert.ok(workflow.indexOf('Validate projected version skew') < workflow.indexOf('Publish public workspace closure'));
+  assert.ok(workflow.includes('scripts/validate-skew-matrix.ts --mode validate'));
+  assert.ok(!compatibilityStep.includes('if:'), 'dry-run must execute the same release compatibility gate');
+  assert.ok(compatibilityStep.includes('$ATM_RELEASE_TAG'), 'dry-run must validate its simulated release version');
   console.log('[release-workspace-versions:test] ok');
 } finally {
   rmSync(root, { recursive: true, force: true });

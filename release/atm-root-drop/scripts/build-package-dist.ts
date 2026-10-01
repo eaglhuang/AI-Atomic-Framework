@@ -7,7 +7,23 @@ import { writeTextWithRetry } from './lib/windows-write-retry.ts';
 import { buildCliNpmRuntime } from './build-cli-npm-runtime.ts';
 import { embeddedATMChartSchemaAssets } from '../packages/cli/src/commands/atm-chart/constants.ts';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const argumentPath = (name: string): string | undefined => {
+  const index = process.argv.indexOf(name);
+  if (index < 0) return undefined;
+  const value = process.argv[index + 1];
+  if (!value || value.startsWith('--')) throw new Error(`${name} requires a path`);
+  return path.resolve(value);
+};
+const root = argumentPath('--repository-root') ?? path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const privateOutputRoot = argumentPath('--output-root');
+const outputRoot = privateOutputRoot ?? root;
+const contains = (parent: string, child: string): boolean => {
+  const relative = path.relative(parent, child);
+  return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
+};
+if (privateOutputRoot && (contains(root, outputRoot) || contains(outputRoot, root))) {
+  throw new Error('Private package output must not overlap repository sources');
+}
 const CLI_PACKAGE_DIR = 'packages/cli';
 const VENDOR_DIRNAME = '_vendor';
 // Runtime commands may resolve these schemas through the framework root at
@@ -115,9 +131,9 @@ function ensureDir(filePath: string): void {
 
 function copyDeclarations(packageDir: string): void {
   const typeRoot = path.join(root, '.types', packageDir, 'src');
-  const distRoot = path.join(root, packageDir, 'dist');
+  const distRoot = path.join(outputRoot, packageDir, 'dist');
   for (const declarationEntrypoint of declaredDeclarationEntrypoints(packageDir)) {
-    const absoluteEntrypoint = path.join(root, packageDir, declarationEntrypoint);
+    const absoluteEntrypoint = path.join(outputRoot, packageDir, declarationEntrypoint);
     const declarationSource = path.join(typeRoot, declarationEntrypoint.replace(/^dist\//, ''));
     if (existsSync(declarationSource)) {
       ensureDir(absoluteEntrypoint);
@@ -178,7 +194,7 @@ export function markExecutable(filePath: string): void {
 
 function buildPackage(packageDir: string, mode: 'full' | 'incremental'): void {
   const srcRoot = path.join(root, packageDir, 'src');
-  const distRoot = path.join(root, packageDir, 'dist');
+  const distRoot = path.join(outputRoot, packageDir, 'dist');
   if (mode === 'full') {
     rmSync(distRoot, { recursive: true, force: true });
   }
@@ -233,7 +249,7 @@ function buildPackage(packageDir: string, mode: 'full' | 'incremental'): void {
   }
   if (packageDir === 'packages/integrations-core') {
     const templateSource = path.join(root, 'templates', 'skills');
-    const templateTarget = path.join(root, packageDir, 'templates', 'skills');
+    const templateTarget = path.join(outputRoot, packageDir, 'templates', 'skills');
     rmSync(path.dirname(templateTarget), { recursive: true, force: true });
     for (const filePath of listFiles(templateSource)) {
       const target = path.join(templateTarget, path.relative(templateSource, filePath));
@@ -254,7 +270,7 @@ const mode = onlyPackage || onlyPackages ? 'incremental' : 'full';
 for (const packageDir of packageDirs) buildPackage(packageDir, mode);
 if (packageDirs.includes(CLI_PACKAGE_DIR)) {
   buildCliRuntimeClosure();
-  await buildCliNpmRuntime({ repositoryRoot: root });
+  await buildCliNpmRuntime({ repositoryRoot: root, sourceDistRoot: path.join(outputRoot, CLI_PACKAGE_DIR, 'dist') });
   assertCliArtifactBudget();
 }
 console.log(`[build-package-dist] built ${packageDirs.length} packages (${mode})`);
@@ -266,7 +282,7 @@ function assertCliArtifactBudget(): void {
     atmArtifactBudget?: { budget?: { maxPackedBytes?: number; maxPackedEntries?: number; maxInstalledPathChars?: number } }
   };
   const budget = packageJson.atmArtifactBudget?.budget;
-  const runtimeRoot = path.join(root, CLI_PACKAGE_DIR, 'dist', 'npm-runtime');
+  const runtimeRoot = path.join(outputRoot, CLI_PACKAGE_DIR, 'dist', 'npm-runtime');
   const files = listFiles(runtimeRoot);
   const bytes = files.reduce((total, filePath) => total + statSync(filePath).size, 0);
   if (!budget || !Number.isInteger(budget.maxPackedBytes) || !Number.isInteger(budget.maxPackedEntries)) {
@@ -286,7 +302,7 @@ function assertCliArtifactBudget(): void {
   const installedPrefix = `node_modules/${packageJson.name ?? '@ai-atomic-framework/cli'}/`;
   const longest = files
     .map((filePath) => ({
-      chars: installedPrefix.length + path.relative(path.join(root, CLI_PACKAGE_DIR), filePath).split(path.sep).join('/').length,
+        chars: installedPrefix.length + path.relative(path.join(outputRoot, CLI_PACKAGE_DIR), filePath).split(path.sep).join('/').length,
       filePath
     }))
     .sort((left, right) => right.chars - left.chars)[0];
@@ -297,7 +313,7 @@ function assertCliArtifactBudget(): void {
   if (longest && longest.chars > (maxInstalledPathChars as number)) {
     throw new Error(
       `CLI npm-runtime exceeds the installed path budget: ${longest.chars}/${maxInstalledPathChars} characters `
-      + `for ${path.relative(root, longest.filePath)}. On Windows this leaves a project directory only `
+      + `for ${path.relative(outputRoot, longest.filePath)}. On Windows this leaves a project directory only `
       + `${260 - longest.chars - 1} characters, down from ${260 - (maxInstalledPathChars as number) - 1}. `
       + 'Shorten the path rather than raising the cap.'
     );
@@ -336,7 +352,7 @@ type EscapingReference = {
 
 function packageOwnerOf(absolutePath: string): string | null {
   const normalized = absolutePath.replace(/\\/g, '/');
-  const packagesRoot = `${root.replace(/\\/g, '/')}/packages/`;
+  const packagesRoot = `${outputRoot.replace(/\\/g, '/')}/packages/`;
   if (!normalized.startsWith(packagesRoot)) return null;
   const packageName = normalized.slice(packagesRoot.length).split('/')[0];
   return packageName || null;
@@ -394,7 +410,7 @@ function replaceSpecifier(source: string, specifier: string, replacement: string
 }
 
 function buildCliRuntimeClosure(): void {
-  const cliDist = path.join(root, CLI_PACKAGE_DIR, 'dist');
+  const cliDist = path.join(outputRoot, CLI_PACKAGE_DIR, 'dist');
   const vendorRoot = path.join(cliDist, VENDOR_DIRNAME);
   rmSync(vendorRoot, { recursive: true, force: true });
   if (!existsSync(cliDist)) return;
@@ -415,7 +431,10 @@ function buildCliRuntimeClosure(): void {
     const packageName = pending.shift()!;
     let copiedForPackage = 0;
     for (const publishRoot of publishRootsOf(packageName)) {
-      const sourceRoot = path.join(root, 'packages', packageName, publishRoot);
+      const generatedRoot = path.join(outputRoot, 'packages', packageName, publishRoot);
+      const sourceRoot = publishRoot === 'dist' || existsSync(generatedRoot)
+        ? generatedRoot
+        : path.join(root, 'packages', packageName, publishRoot);
       if (!existsSync(sourceRoot)) {
         throw new Error(`CLI runtime closure requires built workspace output: packages/${packageName}/${publishRoot}`);
       }
@@ -440,7 +459,7 @@ function buildCliRuntimeClosure(): void {
     if (!/\.[cm]?js$/.test(vendorFile)) continue;
     const relativeToVendor = path.relative(vendorRoot, vendorFile);
     const vendoredPackage = relativeToVendor.split(path.sep)[0]!;
-    const originalFile = path.join(root, 'packages', vendoredPackage, path.relative(path.join(vendorRoot, vendoredPackage), vendorFile));
+    const originalFile = path.join(outputRoot, 'packages', vendoredPackage, path.relative(path.join(vendorRoot, vendoredPackage), vendorFile));
     const cliReferences = escapingPackageReferences(originalFile, originalFile).filter((reference) => reference.packageName === 'cli');
     if (cliReferences.length === 0) continue;
     let source = readFileSync(vendorFile, 'utf8');
@@ -462,7 +481,7 @@ function buildCliRuntimeClosure(): void {
       const vendorTarget = path.join(
         vendorRoot,
         reference.packageName,
-        path.relative(path.join(root, 'packages', reference.packageName), reference.absoluteTarget)
+        path.relative(path.join(outputRoot, 'packages', reference.packageName), reference.absoluteTarget)
       );
       let rewritten = path.relative(path.dirname(filePath), vendorTarget).replace(/\\/g, '/');
       if (!rewritten.startsWith('.')) rewritten = `./${rewritten}`;
