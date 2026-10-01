@@ -399,11 +399,15 @@ function buildLearnGuide(cwd: string, phrase: string, learnedIntent: GuidanceInt
 
 function buildInstallSkillGuide(cwd: string, target: 'host' | 'codex', skillsRoot: string | null, force: boolean) {
   const frameworkRoot = resolveFrameworkRoot();
-  const sourcePath = path.join(frameworkRoot, 'integrations', 'codex-skills', governanceRouterSkillName);
+  const bundledSourcePath = path.join(frameworkRoot, 'integrations', 'codex-skills', governanceRouterSkillName);
+  const hostSourcePath = path.join(cwd, 'integrations', 'codex-skills', governanceRouterSkillName);
+  const sourcePath = target === 'host' && existsSync(path.join(hostSourcePath, 'SKILL.md'))
+    ? hostSourcePath
+    : bundledSourcePath;
   if (!existsSync(path.join(sourcePath, 'SKILL.md'))) {
-    throw new CliError('ATM_GUIDE_SKILL_NOT_FOUND', `Bundled skill was not found: ${sourcePath}`, {
+    throw new CliError('ATM_GUIDE_SKILL_NOT_FOUND', `Skill source was not found: ${sourcePath}`, {
       exitCode: 2,
-      details: { sourcePath }
+      details: { sourcePath, target }
     });
   }
 
