@@ -12,6 +12,8 @@ try {
   process.env.NODE_ENV = 'test';
   process.chdir(root);
   const io = { stdout: { write() {} }, stderr: { write() {} } } as any;
+  assert.notEqual(await runPublicCli(['unsupported-command', '--dry-run', '--json'], io), 0);
+  assert.deepEqual(readdirSync(root), [], 'dry-run errors must not persist telemetry or mutate target');
   const exitCode = await runPublicCli(['tasks', 'unsupported-action', '--actor', 'test-actor', '--task', 'TEST-001', '--json'], io);
   assert.notEqual(exitCode, 0);
   const dir = path.join(root, '.atm/runtime/telemetry/gate-events');

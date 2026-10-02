@@ -6,6 +6,8 @@ export function recordCommandGateTelemetry(
   result: { readonly ok: boolean; readonly cwd?: string; readonly messages?: readonly { readonly level?: string; readonly code?: string }[] },
   argv: readonly string[] = []
 ) {
+  // Diagnostics must not violate a command's no-write dry-run contract.
+  if (argv.includes('--dry-run')) return { ok: true, skipped: true } as const;
   const option = (flag: string) => {
     const index = argv.indexOf(flag);
     const value = index >= 0 ? argv[index + 1] : argv.find(value => value.startsWith(`${flag}=`))?.slice(flag.length + 1);
