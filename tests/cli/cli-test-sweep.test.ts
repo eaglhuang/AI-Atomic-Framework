@@ -60,5 +60,14 @@ const committedTests = execFileSync('git', ['ls-files', committed.testDir], { cw
   .split('\n').filter((file) => file.endsWith('.test.ts')).map((file) => path.basename(file));
 assert.deepEqual(validateConfig(committed, committedTests), []);
 
+// Recovery must never sweep away pre-existing tracked/untracked user work.
+const stashBefore = git('stash', 'list').toString();
+writeFileSync(path.join(fixture, 'tracked.txt'), 'user WIP\n');
+writeFileSync(path.join(fixture, 'user-untracked.txt'), 'untracked WIP\n');
+await assert.rejects(runSweep(fixture, config, ['pass.test.ts', 'writer.test.ts']), /clean.*worktree/i);
+assert.equal(readFileSync(path.join(fixture, 'tracked.txt'), 'utf8'), 'user WIP\n');
+assert.equal(readFileSync(path.join(fixture, 'user-untracked.txt'), 'utf8'), 'untracked WIP\n');
+assert.equal(git('stash', 'list').toString(), stashBefore, 'user stash history must remain unchanged');
+
 rmSync(fixture, { recursive: true, force: true });
 console.log('[cli-test-sweep.test] ok');
