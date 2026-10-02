@@ -108,7 +108,7 @@ export async function runPublicCli(
         availableCommands: [...publicCliCommandNames].sort()
       }
     }));
-    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }
@@ -127,7 +127,7 @@ export async function runPublicCli(
         messages: [message('error', 'ATM_RELEASE_INTEGRITY_FAILED', 'Bundled ATM release integrity check failed; refusing to run non-read-only commands.', { mode: trustIntegrity.mode })],
         evidence: { trustIntegrity }
       }));
-      recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
       writeResult(result, io.stderr, outputFormat);
       return result.exitCode;
     }
@@ -148,7 +148,7 @@ export async function runPublicCli(
       })],
       evidence: { knownBadStatus }
     }));
-    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }
@@ -156,7 +156,7 @@ export async function runPublicCli(
   try {
     const rawResult = await runner(commandArgs);
     const result = enrichCommandResult(rawResult as CommandResult);
-    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
   } catch (error) {
@@ -172,7 +172,7 @@ export async function runPublicCli(
       messages: [message('error', cliError.code, cliError.message, cliError.details)],
       evidence: { publicSurface: 'adopter-core' }
     }), { cliErrorExitCode: cliError.exitCode });
-    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }

@@ -16,7 +16,7 @@ export function recordCommandGateTelemetry(
   const error = result.messages?.find(entry => entry.level === 'error');
   const gateResult: GateTelemetryResult = result.ok ? 'pass' : error ? 'block'
     : result.messages?.some(entry => entry.level === 'warn') ? 'warn' : 'block';
-  return emitGateTelemetryEvent(result.cwd || option('--cwd') || cwd, {
+  return emitGateTelemetryEvent(cwd, {
     gate: commandName, checkId: commandGateCheckId(commandName), result: gateResult,
     reasonClass: error?.code ?? gateResult, errorCode: error?.code ?? null,
     durationMs: Number(process.hrtime.bigint() - startedAt) / 1_000_000,

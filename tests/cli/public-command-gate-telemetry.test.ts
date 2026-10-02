@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { runPublicCli } from '../../packages/cli/src/atm-public.ts';
 import { selectEligibleRuntimeEvents } from '../../packages/core/src/telemetry/observed-coverage.ts';
+import { recordCommandGateTelemetry } from '../../packages/cli/src/telemetry/command-gate.ts';
 
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-public-telemetry-'));
 const previous = process.cwd();
@@ -38,6 +39,9 @@ try {
   assert.equal(early[0].errorCode, 'ATM_CLI_UNKNOWN_COMMAND');
   assert.equal(early[0].taskId, null);
   assert.equal(early[0].source, 'fixture');
+  const otherCwd = path.join(root, 'other-target');
+  recordCommandGateTelemetry(root, 'destination-boundary', process.hrtime.bigint(), { ok: true, cwd: otherCwd }, ['--cwd', otherCwd]);
+  assert.equal(existsSync(otherCwd), false, 'shared recorder cannot redirect caller-owned storage using result or argv');
   console.log('[public-command-gate-telemetry] ok');
 } finally {
   process.chdir(previous);
