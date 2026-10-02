@@ -150,8 +150,13 @@ async function main(): Promise<void> {
     return;
   }
   // Writes made by tests are discarded between batches, so a dirty worktree would lose work.
-  if (worktreeState(root).size > 0) {
-    console.error('the CLI test sweep needs a clean worktree: it attributes and discards the writes tests make');
+  const initialDirtyPaths = [...worktreeState(root)].sort();
+  if (initialDirtyPaths.length > 0) {
+    console.error([
+      'the CLI test sweep needs a clean worktree: it attributes and discards the writes tests make',
+      'Initial dirty paths:',
+      ...initialDirtyPaths.map((entry) => `  ${entry}`),
+    ].join('\n'));
     process.exitCode = 1;
     return;
   }
