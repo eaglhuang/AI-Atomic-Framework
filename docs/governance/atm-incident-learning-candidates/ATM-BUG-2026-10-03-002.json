@@ -1,0 +1,103 @@
+{
+  "schemaId": "atm.incidentLearningCandidate.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial evidence-bounded candidate for benchmark-evidence integrity incident."
+  },
+  "candidateId": "ilc-0243b4a89f3601d2",
+  "sourceIncident": {
+    "reportedAt": "2026-10-02T17:08:50Z",
+    "repo": "AI-Atomic-Framework",
+    "backlogItemId": "ATM-BUG-2026-10-03-002",
+    "taskId": "ATM-GOV-0243"
+  },
+  "symptom": "A report and closure path present a paired A/B performance verdict as pass even though the generator derives makespan from policy constants and synthetic operation counts; the real paired-analysis test retains an inconclusive verdict.",
+  "evidence": {
+    "availability": "available",
+    "reproductionRefs": [
+      "scripts/run-paired-ab-v4.ts:deriveTiming/buildSummary",
+      "scripts/paired-ab-v4-cell-workload.ts",
+      "scripts/validate-atm-2-1-closure.ts:A/B reportContains check",
+      "tests/cli/real-paired-ab-v4.test.ts"
+    ],
+    "receiptRefs": [
+      "docs/reports/atm-2-1-paired-ab-v4.md",
+      "docs/reports/atm-2-1-final-closure.md"
+    ],
+    "invariantRefs": [],
+    "acceptanceRefs": [
+      "ATM product goal: externally rerunnable A/B evidence must measure actual outcomes",
+      "ATM-GOV-0243 historical acceptance: paired A/B performance benchmark"
+    ]
+  },
+  "publicSeam": "The generated paired A/B report and ATM-GOV-0225 closure validation path.",
+  "stateTransition": {
+    "from": "Synthetic workload generator emits receipts with measured child-process durations.",
+    "to": "Derived policy timings are used for makespan and a Markdown string check can accept a pass without validating measured receipts."
+  },
+  "observedFactors": [
+    "The child workload computes a deterministic checksum loop rather than executing ATM's two governed workflows.",
+    "Recorded command durationMs is not the source used by deriveTiming or buildSummary metrics.",
+    "The report validator checks prose values rather than recomputing from raw structured inputs.",
+    "A separate real-paired analysis test requires an inconclusive result pending supplemental samples."
+  ],
+  "breadthHypotheses": {
+    "upstreamDownstream": [
+      "Audit other benchmark report validators for text matching where structured recomputation is required.",
+      "Trace benchmark summaries into task closure packets and product-proof claims."
+    ],
+    "samePolicyCallers": [
+      "Inspect other consumers of policyProfiles, derived timing segments, and benchmark verdicts."
+    ],
+    "siblingAdapters": [],
+    "adjacentTransitions": [
+      "Synthetic safety test to generated report to closure-validator pass transition."
+    ],
+    "sharedInvariants": [
+      "Performance claims must be attributable to actual measurements and independently reproducible."
+    ]
+  },
+  "depthHypotheses": {
+    "boundary": [
+      "Verify the metrics consume measured treatment/control makespan rather than modeled values."
+    ],
+    "negative": [
+      "Change or remove raw measurement receipts and prove the validator fails closed."
+    ],
+    "rollback": [],
+    "retry": [
+      "Repeat the same sealed workload and preserve first-run failures separately from retries."
+    ],
+    "concurrency": [
+      "Measure control and treatment under matched resource limits and declared contention."
+    ],
+    "mutation": [
+      "Mutate synthetic policy constants while holding raw measurements fixed; a valid measurement-based verdict must not change."
+    ],
+    "propertyMetamorphic": [
+      "Changing measured control/treatment durations should change recomputed metrics; changing report prose alone must never create a pass."
+    ],
+    "independentOracle": [
+      "Require a custodian or independent executor to rerun the sealed protocol and attest the raw result digest."
+    ]
+  },
+  "disposition": {
+    "rootCauseHint": "Confirmed evidence-path mismatch: measured subprocess durations are recorded, but performance metrics are generated from modeled profiles and a report-text validator.",
+    "familyHint": "benchmark-evidence-integrity",
+    "recommendedAction": "open-task-card",
+    "unknowns": [
+      "Whether an external valid A/B run exists outside the inspected repository evidence.",
+      "Which sealed workload and independent-role specification should govern the replacement benchmark.",
+      "Whether the historical report numbers were intended as simulation-only or were interpreted as real rollout evidence by downstream consumers."
+    ]
+  },
+  "authorityLimits": {
+    "cannotAuthorizeMerge": true,
+    "cannotDeclareFixSuccess": true,
+    "cannotExcludeTests": true,
+    "cannotCloseTask": true,
+    "doesNotCreateSecondBacklog": true
+  }
+}
