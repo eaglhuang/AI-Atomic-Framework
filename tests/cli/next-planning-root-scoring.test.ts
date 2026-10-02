@@ -3,7 +3,9 @@ import fs from 'node:fs';
 import { syncBuiltinESMExports } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
+import { performance } from 'node:perf_hooks';
 import { resolvePromptScopedTaskRoute, scoreTaskForIntent } from '../../packages/cli/src/commands/next/route-resolution/matching.ts';
+import { resolveCandidatePlanningRoots } from '../../packages/cli/src/commands/next/planning-root-preference.ts';
 import type { TaskIntent } from '../../packages/cli/src/commands/next/intent-normalizers.ts';
 import type { ImportedTaskSummary } from '../../packages/cli/src/commands/next/route-predicates.ts';
 
@@ -47,6 +49,24 @@ try {
   const refreshed = resolvePromptScopedTaskRoute(cwd, tasks, intent)!;
   assert.equal(scans, 1, 'a later operation refreshes discovery; no global stale cache');
   assert.ok(refreshed.selectedTasks.every(task => task.matchReasons?.includes('canonical-planning-root')));
+  const baselineMs: number[] = [];
+  const optimizedMs: number[] = [];
+  for (let run = 0; run < 12; run++) {
+    let started = performance.now();
+    for (const task of tasks) scoreTaskForIntent(cwd, task, intent);
+    if (run > 1) baselineMs.push(performance.now() - started);
+    started = performance.now();
+    const roots = resolveCandidatePlanningRoots(cwd).roots;
+    for (const task of tasks) scoreTaskForIntent(cwd, task, intent, roots);
+    if (run > 1) optimizedMs.push(performance.now() - started);
+  }
+  const median = (samples: number[]) => samples.sort((a, b) => a - b)[Math.floor(samples.length / 2)];
+  console.log(JSON.stringify({
+    benchmark: '100 task scoring; same process and fixture; warm-up excluded; alternating baseline/optimized',
+    baselineMedianMs: median(baselineMs), optimizedMedianMs: median(optimizedMs),
+    reductionPercent: Number(((1 - median(optimizedMs) / median(baselineMs)) * 100).toFixed(1)),
+    baselinePlanningRootScans: 100, optimizedPlanningRootScans: 1
+  }));
   console.log('next planning-root scoring: parity and operation-scoped discovery passed');
 } finally {
   fs.readdirSync = originalReadDir;
