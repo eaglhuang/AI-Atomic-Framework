@@ -146,12 +146,12 @@ export function listPromptScopedExternalTaskCardFiles(
   return uniqueSorted(Array.from(output));
 }
 
-export function isTaskPathUnderPreferredPlanningRoots(cwd: string, taskPath: string): boolean {
+export function isTaskPathUnderPreferredPlanningRoots(cwd: string, taskPath: string, planningRoots?: readonly string[]): boolean {
   const absoluteTaskPath = path.resolve(cwd, taskPath);
-  const resolution = resolveCandidatePlanningRoots(cwd, {
+  const roots = planningRoots ?? resolveCandidatePlanningRoots(cwd, {
     configuredRoots: readConfiguredPlanningRoots(cwd)
-  });
-  return resolution.roots.some((root) => absoluteTaskPath.startsWith(`${root}${path.sep}`));
+  }).roots;
+  return roots.some((root) => absoluteTaskPath.startsWith(`${root}${path.sep}`));
 }
 
 function planFileMatchesPrompt(cwd: string, planPath: string, intent: TaskIntent): boolean {
