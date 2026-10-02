@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { commandGateCheckId, emitGateTelemetryEvent, type GateTelemetryResult } from '../../core/src/telemetry/index.ts';
+import { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
+export { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
@@ -266,7 +267,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
   try {
     const rawResult = await runner(commandArgs);
     const result = enrichCommandResult(rawResult as CommandResult);
-    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result);
+    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
   } catch (error) {
@@ -282,36 +283,10 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       messages: [message('error', cliError.code, cliError.message, cliError.details)],
       evidence: {}
     }), { cliErrorExitCode: cliError.exitCode });
-    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result);
+    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }
-}
-
-export function recordCommandGateTelemetry(
-  cwd: string,
-  commandName: string,
-  startedAt: bigint,
-  result: { readonly ok: boolean; readonly messages?: readonly { readonly level?: string }[] }
-) {
-  const checkId = commandGateCheckId(commandName);
-  const elapsedMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
-  const gateResult: GateTelemetryResult = result.ok
-    ? 'pass'
-    : result.messages?.some((entry) => entry.level === 'warn')
-      ? 'warn'
-      : 'block';
-  emitGateTelemetryEvent(cwd, {
-    gate: commandName,
-    checkId,
-    result: gateResult,
-    reasonClass: gateResult,
-    durationMs: elapsedMs,
-    command: commandName,
-    runnerVersion: readFrameworkVersion(),
-    workloadId: `cli-command:${commandName}`,
-    source: 'runtime'
-  });
 }
 
 

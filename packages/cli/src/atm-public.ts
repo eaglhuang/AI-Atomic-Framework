@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import path from 'node:path';
+import { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
 import { fileURLToPath } from 'node:url';
 import { getCommandSpec } from './commands/command-specs.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
@@ -148,9 +149,11 @@ export async function runPublicCli(
     return result.exitCode;
   }
 
+  const commandStartedAt = process.hrtime.bigint();
   try {
     const rawResult = await runner(commandArgs);
     const result = enrichCommandResult(rawResult as CommandResult);
+    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
   } catch (error) {
@@ -166,6 +169,7 @@ export async function runPublicCli(
       messages: [message('error', cliError.code, cliError.message, cliError.details)],
       evidence: { publicSurface: 'adopter-core' }
     }), { cliErrorExitCode: cliError.exitCode });
+    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }

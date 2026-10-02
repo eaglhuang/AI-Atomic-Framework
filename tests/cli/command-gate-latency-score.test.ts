@@ -99,7 +99,9 @@ try {
   const cliReport = spawnSync(process.execPath, ['--strip-types', path.join(root, 'packages', 'cli', 'src', 'atm.ts'), 'telemetry', '--cwd', runtimeRepo, '--report', '--include-runtime', '--json'], { cwd: root, encoding: 'utf8' });
   assert.equal(cliReport.status, 0, cliReport.stderr || cliReport.stdout);
   const cliReportJson = JSON.parse(cliReport.stdout);
-  assert.equal(cliReportJson.evidence.latencyScore.observedCount, 1);
+  // The fixture sample and the real telemetry command are both observed in
+  // the requested cwd; the report command records itself after this snapshot.
+  assert.equal(cliReportJson.evidence.latencyScore.observedCount, 2);
   assert.equal(cliReportJson.evidence.latencyScore.inventoryCount, listCommandSpecs().length);
   assert.equal(cliReportJson.evidence.latencyScore.scores.find((score: { key: string }) => score.key === 'next.route-resolution').p50Ms, 13);
   assert.match(cliReportJson.evidence.latencyMarkdown, /Unknown values mean no real sample was available/);
