@@ -111,8 +111,8 @@ jobs:
           # mirror, so retain the generated release artifacts for this CI job.
           ATM_RETAIN_RELEASE_ARTIFACTS: '1'
         run: |
-          node --experimental-strip-types scripts/build-package-dist.ts
-          node --experimental-strip-types scripts/build-root-drop-release.ts
+          # This entrypoint builds package-dist and reconciles root-drop once.
+          # Separate invocations would rebuild the same closure again.
           node --experimental-strip-types scripts/build-onefile-release.ts
 
       - name: Build release integrity manifest
