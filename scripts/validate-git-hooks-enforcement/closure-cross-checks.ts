@@ -85,9 +85,14 @@ writeFileSync(path.join(closureRepo, 'scripts', 'reconcile-close-window.test.mjs
 ].join('\n') + '\n', 'utf8');
 const reconcileValidation = parsePayload(runCli(closureRepo, ['evidence', 'run', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--command', 'node scripts/reconcile-close-window.test.mjs', '--validators', 'reconcile-close-window', '--runner-kind', 'dev-source', '--json']));
 assert(reconcileValidation.ok === true, 'reconcile fixture must execute and record its real validation');
-for (const gate of ['typecheck', 'validate:cli', 'validate:git-head-evidence']) {
+const closureValidations = [
+  { gate: 'typecheck', command: 'node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit' },
+  { gate: 'validate:cli', command: 'node --experimental-strip-types scripts/validate-cli.ts --mode fast' },
+  { gate: 'validate:git-head-evidence', command: 'node --experimental-strip-types scripts/validate-git-head-evidence.ts --mode validate' }
+];
+for (const { gate, command } of closureValidations) {
   console.log(`[git-hooks-enforcement] recording real closure validation: ${gate}`);
-  const validation = spawnSync(process.execPath, ['atm.dev.mjs', 'evidence', 'run', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--command', `npm run ${gate}`, '--validators', gate, '--runner-kind', 'dev-source', '--json'], { cwd: closureRepo, encoding: 'utf8', timeout: 120000 });
+  const validation = spawnSync(process.execPath, ['atm.dev.mjs', 'evidence', 'run', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--command', command, '--validators', gate, '--runner-kind', 'dev-source', '--json'], { cwd: closureRepo, encoding: 'utf8', timeout: 120000 });
   assert(!validation.error && validation.status === 0, `closure validation ${gate} must pass: ${validation.stdout}\n${validation.stderr}`);
   assert(parsePayload(validation).ok === true, `closure validation ${gate} must record real evidence`);
 }
