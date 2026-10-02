@@ -294,6 +294,7 @@ export async function runTasksReconcile(argv: string[]): Promise<CommandResult> 
   });
 
   const reconcileCommand = `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --json`;
+  const reconcileEvidencePath = relativePathFrom(options.cwd, evidencePath);
   const reconcileWriteResult = await executeTaskCloseTransaction({
     cwd: options.cwd,
     taskId: options.taskId,
@@ -320,17 +321,16 @@ export async function runTasksReconcile(argv: string[]): Promise<CommandResult> 
         command: reconcileCommand
       });
       return { transitionPath, closurePacketPath };
-    }
+    },
+    stageArtifacts: result => stageTaskCloseArtifacts(options.cwd, [
+      relativePathFrom(options.cwd, taskPath),
+      reconcileEvidencePath,
+      result.transitionPath,
+      result.closurePacketPath
+    ])
   });
   const transitionPath = reconcileWriteResult.transitionPath;
   closurePacketPath = reconcileWriteResult.closurePacketPath ?? closurePacketPath;
-  const reconcileEvidencePath = relativePathFrom(options.cwd, evidencePath);
-  stageTaskCloseArtifacts(options.cwd, [
-    relativePathFrom(options.cwd, taskPath),
-    reconcileEvidencePath,
-    transitionPath,
-    closurePacketPath
-  ]);
   if (currentClaim && currentClaim.state === 'active') {
     const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
     await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, currentClaim.actorId));
@@ -409,4 +409,3 @@ export function buildHistoricalReconcileEvidenceEnvelope(input: {
     ]
   };
 }
-
