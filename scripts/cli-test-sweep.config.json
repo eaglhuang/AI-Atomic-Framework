@@ -53,18 +53,5 @@
       "disposition": "triage"
     }
   ],
-  "serial": [
-    {
-      "test": "public-npm-install-contract.test.ts",
-      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
-    },
-    {
-      "test": "runner-sync-incremental-build-dogfood.test.ts",
-      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
-    },
-    {
-      "test": "runner-sync-incremental-build.test.ts",
-      "detail": "Drives the shared package-dist / root-drop release build under the repository root. These builds write the same packages/cli/dist and release/** trees, so running two of them at once makes one overwrite the other's half-written output and the build exits non-zero. They must run one at a time."
-    }
-  ]
+  "serial": []
 }
