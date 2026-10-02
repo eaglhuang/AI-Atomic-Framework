@@ -28,6 +28,14 @@ try {
   assert.equal(command[0].source, 'fixture');
   assert.equal(command[0].reasonClass, command[0].errorCode);
   assert.equal(selectEligibleRuntimeEvents(command).events.length, 0, 'declared tests cannot count as production coverage');
+  assert.notEqual(await runPublicCli(['unsupported-command', '--json'], io), 0);
+  const allEvents = readdirSync(dir, { recursive: true }).filter(file => String(file).endsWith('.jsonl'))
+    .flatMap(file => readFileSync(path.join(dir, String(file)), 'utf8').trim().split('\n').map(line => JSON.parse(line)));
+  const early = allEvents.filter(event => event.command === 'unsupported-command');
+  assert.equal(early.length, 1, 'early refusal is recorded once');
+  assert.equal(early[0].errorCode, 'ATM_CLI_UNKNOWN_COMMAND');
+  assert.equal(early[0].taskId, null);
+  assert.equal(early[0].source, 'fixture');
   console.log('[public-command-gate-telemetry] ok');
 } finally {
   process.chdir(previous);

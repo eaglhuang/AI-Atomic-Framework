@@ -192,6 +192,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
     return result.exitCode;
   }
 
+  const commandStartedAt = process.hrtime.bigint();
   const runner = cliCommandRunners[commandName];
   if (!runner) {
     const result = enrichCommandResult(makeResult({
@@ -203,6 +204,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         commands: Object.keys(cliCommandRunners)
       }
     }));
+    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }
@@ -239,6 +241,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         messages: [message('error', 'ATM_RELEASE_INTEGRITY_FAILED', 'Bundled ATM release integrity check failed; refusing to run non-read-only commands.', { mode: trustIntegrity.mode })],
         evidence: { trustIntegrity }
       }));
+      recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
       writeResult(result, io.stderr, outputFormat);
       return result.exitCode;
     }
@@ -259,11 +262,11 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       })],
       evidence: { knownBadStatus }
     }));
+    recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }
 
-  const commandStartedAt = process.hrtime.bigint();
   try {
     const rawResult = await runner(commandArgs);
     const result = enrichCommandResult(rawResult as CommandResult);
