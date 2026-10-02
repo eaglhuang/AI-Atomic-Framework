@@ -16,10 +16,11 @@ export function recordCommandGateTelemetry(
     : result.messages?.some(entry => entry.level === 'warn') ? 'warn' : 'block';
   return emitGateTelemetryEvent(result.cwd || option('--cwd') || cwd, {
     gate: commandName, checkId: commandGateCheckId(commandName), result: gateResult,
-    reasonClass: gateResult, errorCode: error?.code ?? null,
+    reasonClass: error?.code ?? gateResult, errorCode: error?.code ?? null,
     durationMs: Number(process.hrtime.bigint() - startedAt) / 1_000_000,
     actorId: option('--actor') ?? undefined, taskId: option('--task'),
     command: commandName, runnerVersion: readFrameworkVersion(),
-    workloadId: `cli-command:${commandName}`, source: 'runtime'
+    workloadId: `cli-command:${commandName}`,
+    source: process.env.NODE_ENV === 'test' || argv.includes('--emit-fixture') ? 'fixture' : 'runtime'
   });
 }
