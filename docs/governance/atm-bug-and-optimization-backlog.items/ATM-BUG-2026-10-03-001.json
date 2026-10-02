@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-10-03-001",
+  "date": "2026-10-03",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P2",
+  "status": "Open; control-flow defect confirmed, runtime reproduction pending",
+  "area": "Task-scoped commit readiness",
+  "finding": "The task-scoped staging readiness check can classify an already staged in-scope deletion as unstaged and return ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED. The generic readStagedFiles helper excludes D, while worktree dirty discovery includes deleted paths.",
+  "expectedBehavior": "A staged in-scope deletion is recognized as staged and can proceed through governed commit readiness without a redundant staging instruction; out-of-scope deletion checks and exact index restoration remain intact.",
+  "evidenceOrRepro": "Static control-flow evidence at HEAD 899a3f687f6f0aaa9fbcec5ae7002ca96e6fdebb: packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts readStagedFiles uses --diff-filter=ACMRT; task-scope-staging.ts inspectTaskScopedUnstagedCommit compares dirty files with that list; listTaskScopedWorktreeDirtyFiles uses git diff --name-only, which includes deleted paths; commit-task-scoped-branch.ts returns ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED for staging-required. This exact readiness scenario has not yet been run as a runtime reproduction. The existing git-commit-failure-index-restoration test passes but covers index rollback, not this readiness check.",
+  "followUp": "Add a focused regression test for a staged-only in-scope deletion and correct the shared staged-path classification without weakening scope checks. Re-run the focused test and relevant commit-bundle tests. Before sealed runner rebuild/commit, preserve and reconcile the existing 10 modified packages/cli/dist files; do not overwrite them implicitly."
+}
