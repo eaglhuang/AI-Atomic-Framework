@@ -30,6 +30,9 @@ try {
   writeFileSync(launcher, renderOnefileRuntime({ payloadBase64: compressed.toString('base64'), payloadSha256: digest, frameworkVersion: '0.0.0', payloadFiles: files }));
   run();
   run();
+  // Equal-length corruption is still detected: existence and size are insufficient.
+  writeFileSync(path.join(cache, 'atm.mjs'), '// altered payload');
+  run();
   writeFileSync(path.join(cache, 'packages/cli/dist/atm.js'), "export async function runCli() { console.log('TAMPERED'); return 0; }");
   run();
   rmSync(path.join(cache, 'packages/cli/package.json'));
