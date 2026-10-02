@@ -2,11 +2,21 @@ import { mkdirSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { assert, createCommandRun, fixture, parsePayload, root, runCli, runGit, tempRoot, writeHistoricalRestorePacket, writeReadyFixtureTask } from './context.ts';
 import { materializeValidatorFixture } from '../lib/validator-fixture.ts';
+import { spawnSync } from 'node:child_process';
 
 export function runClosureCrossChecks(noHooksDir: string) {
 const closureRepo = path.join(tempRoot, 'closure-cross-check');
 mkdirSync(closureRepo, { recursive: true });
 materializeValidatorFixture(root, closureRepo, fixture);
+materializeValidatorFixture(root, closureRepo, {
+  ...fixture,
+  runtimeIdentities: [],
+  planningCards: [],
+  copyEntries: ['.gitignore', 'AGENTS.md', 'LICENSE', 'CONTRIBUTING.md', 'turbo.json', '.agents', 'integrations', 'docs/governance', 'docs/AGENT_PACK_ONBOARDING.md', 'docs/HOST_GOVERNANCE_INTEGRATION.md', 'docs/ARCHITECTURE.md', 'docs/ECOSYSTEM_POSITIONING.md', 'tests', 'fixtures', 'atomic_workbench/atomization-coverage/path-to-atom-map-shards'].map((source) => ({ source }))
+});
+console.log('[git-hooks-enforcement] installing isolated closure fixture dependencies');
+const dependencies = spawnSync('npm', ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: closureRepo, encoding: 'utf8', shell: process.platform === 'win32', timeout: 120000 });
+assert(!dependencies.error && dependencies.status === 0, `closure fixture dependencies must install: ${dependencies.stderr}`);
 runGit(closureRepo, ['init']);
 runGit(closureRepo, ['config', 'user.email', 'atm@example.invalid']);
 runGit(closureRepo, ['config', 'user.name', 'ATM Hook Validator']);
@@ -46,7 +56,7 @@ const reconcileDeliveryCommit = parsePayload(runCli(closureRepo, ['git', 'commit
 assert(reconcileDeliveryCommit.ok === true, 'reconcile hook fixture delivery commit must report ok=true');
 const reconcileDeliverySha = String(reconcileDeliveryCommit.evidence?.commitSha ?? '');
 assert(reconcileDeliverySha.length > 0, 'reconcile hook fixture delivery commit must return commit sha');
-const reconcileApproval = parsePayload(runCli(closureRepo, [
+const reconcileApprovalArgs = [
   'emergency',
   'approve',
   '--cwd', closureRepo,
@@ -56,11 +66,36 @@ const reconcileApproval = parsePayload(runCli(closureRepo, [
   '--approval-text', 'Human approved reconcile hook fixture backend repair',
   '--reason', 'Validator fixture exercises the protected reconcile close-window contract.',
   '--json'
-]));
+];
+const reconcileApproval = parsePayload(runCli(closureRepo, reconcileApprovalArgs));
 assert(reconcileApproval.ok === true, 'reconcile hook fixture emergency approval must report ok=true');
 const reconcileApprovalLease = String(reconcileApproval.evidence?.lease?.leaseId ?? reconcileApproval.evidence?.approval?.leaseId ?? reconcileApproval.evidence?.leaseId ?? '');
 assert(reconcileApprovalLease.length > 0, 'reconcile hook fixture emergency approval must return a lease id');
-const reconcileClose = parsePayload(runCli(closureRepo, ['tasks', 'reconcile', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--emergency-approval', reconcileApprovalLease, '--json']));
+const reconcileArgs = ['tasks', 'reconcile', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--emergency-approval', reconcileApprovalLease, '--json'];
+const reconcileWithoutValidation = runCli(closureRepo, reconcileArgs, { allowFailure: true });
+assert(reconcileWithoutValidation.status === 1, 'historical delivery alone must not satisfy closure validation');
+const missingValidationPayload = parsePayload(reconcileWithoutValidation);
+assert((missingValidationPayload.messages ?? []).some((entry: any) => entry.code === 'ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID'), 'missing real validation must fail with the closure packet contract error');
+mkdirSync(path.join(closureRepo, 'scripts'), { recursive: true });
+writeFileSync(path.join(closureRepo, 'scripts', 'reconcile-close-window.test.mjs'), [
+  "import assert from 'node:assert/strict';",
+  "import { readFileSync } from 'node:fs';",
+  "assert.equal(readFileSync('packages/core/src/reconcile-close-window.ts', 'utf8'), 'export const reconcileCloseWindow = true;\\n');",
+  "console.log('reconcile close-window: 1 case, 1 assertion passed');"
+].join('\n') + '\n', 'utf8');
+const reconcileValidation = parsePayload(runCli(closureRepo, ['evidence', 'run', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--command', 'node scripts/reconcile-close-window.test.mjs', '--validators', 'reconcile-close-window', '--runner-kind', 'dev-source', '--json']));
+assert(reconcileValidation.ok === true, 'reconcile fixture must execute and record its real validation');
+for (const gate of ['typecheck', 'validate:cli', 'validate:git-head-evidence']) {
+  console.log(`[git-hooks-enforcement] recording real closure validation: ${gate}`);
+  const validation = spawnSync(process.execPath, ['atm.dev.mjs', 'evidence', 'run', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--command', `npm run ${gate}`, '--validators', gate, '--runner-kind', 'dev-source', '--json'], { cwd: closureRepo, encoding: 'utf8', timeout: 120000 });
+  assert(!validation.error && validation.status === 0, `closure validation ${gate} must pass: ${validation.stdout}\n${validation.stderr}`);
+  assert(parsePayload(validation).ok === true, `closure validation ${gate} must record real evidence`);
+}
+const validatedReconcileApproval = parsePayload(runCli(closureRepo, reconcileApprovalArgs));
+const validatedReconcileLease = String(validatedReconcileApproval.evidence?.lease?.leaseId ?? validatedReconcileApproval.evidence?.approval?.leaseId ?? validatedReconcileApproval.evidence?.leaseId ?? '');
+assert(validatedReconcileApproval.ok === true && validatedReconcileLease.length > 0, 'positive reconcile must acquire its own one-use approval');
+reconcileArgs[reconcileArgs.indexOf('--emergency-approval') + 1] = validatedReconcileLease;
+const reconcileClose = parsePayload(runCli(closureRepo, reconcileArgs));
 assert(reconcileClose.ok === true, 'reconcile hook close step must report ok=true');
 const reconcilePreCommit = runCli(closureRepo, ['hook', 'pre-commit', '--cwd', closureRepo, '--json'], {
   env: {
@@ -74,7 +109,8 @@ assert(reconcilePreCommit.status === 0, 'pre-commit hook must accept reconcile c
 assert(parsePayload(runCli(closureRepo, ['git-hooks', 'install', '--framework-required', '--json'])).ok === true, 'reconcile child-hook fixture must install git hooks before native child commit');
 const reconcileStagedBeforeChildCommit = String(runGit(closureRepo, ['diff', '--cached', '--name-only']).stdout || '').trim().split(/\r?\n/).filter(Boolean);
 assert(reconcileStagedBeforeChildCommit.includes('.atm/history/evidence/TASK-X-RECONCILE.closure-packet.json'), 'reconcile parent pre-commit must keep the closure packet staged for the child hook');
-assert(reconcileStagedBeforeChildCommit.includes('.atm/runtime/evidence-ledger/bundles/TASK-X-RECONCILE.json'), 'reconcile parent pre-commit must keep the runtime task evidence bundle staged for the child hook');
+assert(reconcileStagedBeforeChildCommit.includes('.atm/history/evidence/TASK-X-RECONCILE.bundle-manifest.json'), 'reconcile parent pre-commit must keep the durable evidence manifest staged');
+assert(!reconcileStagedBeforeChildCommit.includes('.atm/runtime/evidence-ledger/bundles/TASK-X-RECONCILE.json'), 'reconcile must not stage runtime evidence');
 assert(reconcileStagedBeforeChildCommit.includes('.atm/history/evidence/git-head.json'), 'reconcile parent pre-commit must stage git-head evidence for the child hook handoff');
 const reconcileChildCommit = runGit(closureRepo, ['commit', '-m', 'close reconcile hook fixture window'], {
   allowFailure: true,
@@ -88,7 +124,8 @@ const reconcileChildCommit = runGit(closureRepo, ['commit', '-m', 'close reconci
 assert(reconcileChildCommit.status === 0, `reconcile child git commit must succeed after parent pre-commit refresh without stale git-head evidence failure\nstdout:\n${reconcileChildCommit.stdout || ''}\nstderr:\n${reconcileChildCommit.stderr || ''}`);
 const reconcileChildTouchedPaths = String(runGit(closureRepo, ['show', '--pretty=', '--name-only', 'HEAD']).stdout || '').trim().split(/\r?\n/).filter(Boolean);
 assert(reconcileChildTouchedPaths.includes('.atm/history/evidence/TASK-X-RECONCILE.closure-packet.json'), 'reconcile child commit must include the closure packet staged by the parent pre-commit');
-assert(reconcileChildTouchedPaths.includes('.atm/runtime/evidence-ledger/bundles/TASK-X-RECONCILE.json'), 'reconcile child commit must include the reconciled runtime task evidence bundle');
+assert(reconcileChildTouchedPaths.includes('.atm/history/evidence/TASK-X-RECONCILE.bundle-manifest.json'), 'reconcile child commit must include the durable evidence manifest');
+assert(!reconcileChildTouchedPaths.includes('.atm/runtime/evidence-ledger/bundles/TASK-X-RECONCILE.json'), 'reconcile child commit must not include runtime evidence');
 assert(reconcileChildTouchedPaths.includes('.atm/history/evidence/git-head.json'), 'reconcile child commit must persist git-head evidence generated by the parent pre-commit');
 runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
 runGit(closureRepo, ['checkout', '--', 'packages/core/src/reconcile-close-window.ts']);
