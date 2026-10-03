@@ -5,6 +5,7 @@ import {
   inspectFrameworkTempLockProjection,
   type FrameworkTempLockProjection,
 } from './framework-temp-lock-projection.ts';
+import { readActiveQuickfixLock } from '../work-channels.ts';
 
 /**
  * Resolves the one lock-backed authority that can publish a temporary
@@ -63,7 +64,9 @@ export function resolveFrameworkCommitAuthorityContext(input: {
   const capability = resolution.capability;
   return {
     usesFrameworkClaimCommit: capability !== null,
-    frameworkClaimRequired: !input.taskExists,
+    // An active quickfix lock owned by the committing actor is the fast
+    // channel's own commit authority; pre-commit bounds it to allowedFiles.
+    frameworkClaimRequired: !input.taskExists && readActiveQuickfixLock(input.cwd)?.actorId !== input.actorId,
     frameworkClaimFiles: capability?.allowedFiles ?? null,
     frameworkClaimTaskId: capability?.taskId ?? null,
     frameworkClaimResolution: resolution.summary,

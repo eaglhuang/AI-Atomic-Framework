@@ -303,6 +303,9 @@ jobs:
           release_version="${GITHUB_REF_NAME#v}"
           starter_root=$(mktemp -d)
           trap 'rm -rf "$starter_root"' EXIT
+          # Run outside the repository: inside the workspace root npm resolves the
+          # local create-atm workspace and never links the published bin.
+          cd "$starter_root"
           npm exec --yes --package "create-atm@$release_version" -- create-atm project --agent codex --tag "$NPM_DIST_TAG" --cwd "$starter_root" --json > "$starter_root/result.json"
           jq -e --arg version "$release_version" '.ok == true and .evidence.atmEntrypointSource == "target-dependency" and .evidence.runtimeVersion == $version' "$starter_root/result.json"
           test -s "$starter_root/project/.agents/skills/atm-governance-router/SKILL.md"
