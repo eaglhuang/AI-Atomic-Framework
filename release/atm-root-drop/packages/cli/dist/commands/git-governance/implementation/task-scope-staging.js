@@ -10,6 +10,7 @@ import { extractTaskDeclaredFiles } from "../../tasks/task-import-validators.js"
 import { extractGovernanceTaskIdFromPath, normalizeRelativePath, pathMatchesTaskScope, uniqueSorted, } from "../commit-scope-policy.js";
 import { quoteCliValue, } from "../../shared.js";
 import { parseTaskClaim } from './identity-check-command.js';
+import { listTaskDeclaredIgnoredWorktreeFiles } from './task-ignored-deliverable-discovery.js';
 export function inspectTaskScopedStagedGovernanceBundle(cwd, taskId, taskDocument) {
     const stagedFiles = readStagedFiles(cwd);
     const claim = parseTaskClaim(taskDocument.claim);
@@ -292,7 +293,8 @@ export function autoStageFrameworkClaimFiles(cwd, actorId, apply = true, claimed
     const stagedFiles = new Set(readStagedFiles(cwd));
     const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(cwd);
     const ownerScope = { cwd, currentTaskId: frameworkTempTaskId(actorId) };
-    const candidates = uniqueSorted(listTaskScopedWorktreeDirtyFiles(cwd).filter((filePath) => {
+    const ignoredDeclaredFiles = listTaskDeclaredIgnoredWorktreeFiles(cwd, [...claimedFiles]);
+    const candidates = uniqueSorted(listTaskScopedWorktreeDirtyFiles(cwd, [...claimedFiles], releaseGeneratedArtifacts).filter((filePath) => {
         const normalized = normalizeRelativePath(filePath);
         const exactClaim = [...claimedFiles].some((scope) => normalizeRelativePath(scope) === normalized);
         return !stagedFiles.has(filePath)
@@ -356,17 +358,13 @@ export function inspectFrameworkScopedUnstagedCommit(cwd, actorId, claimedFilesO
         requiredCommand: buildTaskScopedStagingRequiredCommand(cwd, inScopeDirtyFiles),
     };
 }
-export function listTaskScopedWorktreeDirtyFiles(cwd) {
-    const files = new Set();
-    for (const filePath of readGitNameOnly(cwd, ["diff", "--name-only"])) {
-        files.add(filePath);
-    }
-    for (const filePath of readGitNameOnly(cwd, [
-        "ls-files",
-        "-o",
-        "--exclude-standard",
-    ])) {
-        files.add(filePath);
+export function listTaskScopedWorktreeDirtyFiles(cwd, ignoredScope = [], releaseGeneratedArtifacts = new Set()) {
+    const files = new Set([...readGitNameOnly(cwd, ["diff", "--name-only"]), ...readGitNameOnly(cwd, ["ls-files", "-o", "--exclude-standard"])]);
+    for (const filePath of listTaskDeclaredIgnoredWorktreeFiles(cwd, ignoredScope)) {
+        const normalized = normalizeRelativePath(filePath);
+        const exactClaim = ignoredScope.some((scope) => normalizeRelativePath(scope) === normalized);
+        if (exactClaim || (!normalized.startsWith('release/') && !normalized.startsWith('packages/cli/dist/')) || releaseGeneratedArtifacts.has(normalized))
+            files.add(filePath);
     }
     return uniqueSorted([...files]);
 }
