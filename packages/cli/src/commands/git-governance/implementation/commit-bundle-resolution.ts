@@ -1,3 +1,4 @@
+import { isGeneratedReportPath, isPreservedForeignBootstrapReport } from '../../shared/bootstrap-report-provenance.ts';
 import {
   isCommitAttributionSideEffectPath,
   isIgnorableTaskScopedDirtySideEffect,
@@ -89,7 +90,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   // The normal commit transaction restores this snapshot on both success and
   // failure, so the caller's index remains lossless.
   const wipGovernanceStagedFiles = input.wip && input.apply
-    ? stagedFiles.filter((filePath: LegacyValue) => isWipGovernanceStatePath(filePath))
+    ? stagedFiles.filter((filePath: LegacyValue) => isWipGovernanceStatePath(filePath) && !isGeneratedReportPath(filePath))
     : [];
   let wipGovernanceSnapshotPath: string | null = null;
   if (wipGovernanceStagedFiles.length > 0) {
@@ -187,6 +188,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     listTaskOwnedProtectedOverrideAuditFiles(input.cwd, input.taskId),
   );
   const dirtyFiles = uniqueSorted([
+    ...stagedFiles.filter(isGeneratedReportPath),
     ...listTaskScopedWorktreeDirtyFiles(input.cwd),
     ...listTaskDeclaredIgnoredWorktreeFiles(input.cwd, declaredScope),
     ...taskOwnedProtectedOverrideAudits,
@@ -241,7 +243,8 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     reconciledResidueReport.blockAndExplain
       .filter((entry: LegacyValue) =>
         entry.ownerTaskId?.trim().toUpperCase() !== input.taskId.toUpperCase()
-        && isDeferrableForeignGovernanceResidue(input.taskId, entry)
+        && (isDeferrableForeignGovernanceResidue(input.taskId, entry)
+          || isPreservedForeignBootstrapReport(input.cwd, input.taskId, entry.path))
         && !stagedSet.has(normalizeRelativePath(entry.path)),
       )
       .map((entry: LegacyValue) => normalizeRelativePath(entry.path)),
@@ -289,6 +292,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     ...taskOwnedProtectedOverrideAudits,
   ]).filter(
     (filePath: LegacyValue) =>
+      !preservedForeignUnstagedResidue.has(normalizeRelativePath(filePath)) &&
       (!input.wip || !isWipGovernanceStatePath(filePath)) &&
       (taskOwnedProtectedOverrideAudits.has(normalizeRelativePath(filePath)) ||
         !isRuntimeCommitSideEffect(filePath)) &&
