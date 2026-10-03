@@ -4,6 +4,7 @@ import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync,
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 const fixture = mkdtempSync(path.join(os.tmpdir(), 'atm-declaration-cleanup-'));
 try {
@@ -45,6 +46,10 @@ try {
     assert.match(readFileSync(path.join(dist, 'index.d.ts'), 'utf8'), /from ['"]\.\/value\.js['"]/);
     assert.match(readFileSync(path.join(dist, 'value.d.ts'), 'utf8'), /export declare const value = 2/);
   }
+  const consumer = path.join(packedRoot, 'consumer.ts');
+  writeFileSync(consumer, "import { value } from './dist/index.js';\nconst checked: 2 = value;\nexport { checked };\n");
+  const program = ts.createProgram([consumer], { noEmit: true, strict: true, types: [], target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler });
+  assert.deepEqual(ts.getPreEmitDiagnostics(program).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')), [], 'consumer resolves emitted declaration closure');
 } finally {
   rmSync(fixture, { recursive: true, force: true });
 }
