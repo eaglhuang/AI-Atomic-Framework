@@ -29,6 +29,7 @@ try {
   assert.ok(gitignore.startsWith('node_modules/\n'), 'user rules are kept');
   assert.match(gitignore, /^\.atm\/runtime\/locks\/$/m);
   assert.match(gitignore, /^\.atm\/runtime\/quickfix-lock\.json$/m);
+  assert.match(gitignore, /^node_modules\/$/m, 'the installed ATM CLI dependency is ignored');
 
   assert.equal((await atm(cwd, ['bootstrap'])).json.evidence.gitignore.status, 'existing');
   assert.equal(readFileSync(path.join(cwd, '.gitignore'), 'utf8'), gitignore, 'a second bootstrap does not duplicate the block');
