@@ -27,8 +27,8 @@ export function closureEvidenceContextForTask(cwd: string, taskId: string) {
         command: run.command,
         cwd: typeof run.cwd === 'string' && run.cwd.trim() ? run.cwd : (relativePathFrom(cwd, cwd) || '.'),
         exitCode: run.exitCode,
-        stdoutSha256: String(run.stdoutSha256),
-        stderrSha256: String(run.stderrSha256),
+        stdoutSha256: String(run.stdoutSha256).toLowerCase(),
+        stderrSha256: String(run.stderrSha256).toLowerCase(),
         runnerVersion: typeof run.runnerVersion === 'string' && run.runnerVersion.trim()
           ? run.runnerVersion
           : readFrameworkVersion(cwd)

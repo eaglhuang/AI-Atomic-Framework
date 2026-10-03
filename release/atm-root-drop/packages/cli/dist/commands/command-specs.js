@@ -5,6 +5,7 @@ import atomizeSpec from './command-specs/atomize.spec.js';
 import baselineSpec from './command-specs/baseline.spec.js';
 import batchSpec from './command-specs/batch.spec.js';
 import bootstrapSpec from './command-specs/bootstrap.spec.js';
+import setupSpec from './command-specs/setup.spec.js';
 import budgetSpec from './command-specs/budget.spec.js';
 import cacheSpec from './command-specs/cache.spec.js';
 import cleanupSpec from './command-specs/cleanup.spec.js';
@@ -72,6 +73,7 @@ function withVisibility(spec, visibility = 'public') {
     });
 }
 export const commandSpecs = Object.freeze({
+    setup: setupSpec,
     actor: actorSpec,
     'agent-pack': agentPackSpec,
     'atom-capsule': withVisibility(atomCapsuleSpec, 'internal'),

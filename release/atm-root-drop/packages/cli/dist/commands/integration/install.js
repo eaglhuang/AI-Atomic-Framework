@@ -11,7 +11,7 @@ export async function installIntegrationAdapter(repositoryRoot, adapterId, optio
     const existingTargetFiles = dryRunInstall.manifest.files
         .map((fileRecord) => fileRecord.path)
         .filter((filePath) => existsSync(path.join(repositoryRoot, filePath)));
-    if (options.force !== true && options.dryRun !== true) {
+    if (options.force !== true && options.dryRun !== true && options.merge !== true) {
         if (existsSync(absoluteManifestPath)) {
             throw new CliError('ATM_INTEGRATION_ALREADY_INSTALLED', `Integration adapter ${adapter.id} already has a manifest. Use --force to reinstall.`, {
                 details: {

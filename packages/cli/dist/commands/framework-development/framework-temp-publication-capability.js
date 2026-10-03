@@ -2,6 +2,7 @@ import { pathMatchesWriteScope } from '../../_vendor/core/dist/broker/write-scop
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { inspectFrameworkTempLockProjection, } from './framework-temp-lock-projection.js';
+import { readActiveQuickfixLock } from '../work-channels.js';
 /** Resolves the framework-only commit surface without exposing lock details to callers. */
 export function resolveFrameworkCommitAuthorityContext(input) {
     const laneSessionId = process.env.ATM_LANE_SESSION_ID ?? null;
@@ -11,7 +12,9 @@ export function resolveFrameworkCommitAuthorityContext(input) {
     const capability = resolution.capability;
     return {
         usesFrameworkClaimCommit: capability !== null,
-        frameworkClaimRequired: !input.taskExists,
+        // An active quickfix lock owned by the committing actor is the fast
+        // channel's own commit authority; pre-commit bounds it to allowedFiles.
+        frameworkClaimRequired: !input.taskExists && readActiveQuickfixLock(input.cwd)?.actorId !== input.actorId,
         frameworkClaimFiles: capability?.allowedFiles ?? null,
         frameworkClaimTaskId: capability?.taskId ?? null,
         frameworkClaimResolution: resolution.summary,
