@@ -38,7 +38,7 @@ Freshness is part of the contract. If the source guards or schema hashes change,
 
 ## First-Touch Flow
 
-The source-branch `setup` command provides a combined onboarding path for an existing project. It requires a built runner containing this unreleased feature; it must not be assumed available in the currently published npm packages.
+The `setup` command provides a combined onboarding path for an existing project. It ships in `@ai-atomic-framework/cli` 0.1.8 and later; keep the runner at a stable location because the project's generated `atm.mjs` points back to it.
 
 ```bash
 node /absolute/path/to/atm.mjs setup --cwd /path/to/project --json
