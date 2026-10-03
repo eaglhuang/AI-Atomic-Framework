@@ -129,23 +129,39 @@ function ensureDir(filePath: string): void {
   mkdirSync(path.dirname(filePath), { recursive: true });
 }
 
-function copyDeclarations(packageDir: string): void {
+function copyDeclarations(packageDir: string): Set<string> {
   const typeRoot = path.join(root, '.types', packageDir, 'src');
   const distRoot = path.join(outputRoot, packageDir, 'dist');
+  const retained = new Set<string>();
   for (const declarationEntrypoint of declaredDeclarationEntrypoints(packageDir)) {
     const absoluteEntrypoint = path.join(outputRoot, packageDir, declarationEntrypoint);
     const declarationSource = path.join(typeRoot, declarationEntrypoint.replace(/^dist\//, ''));
     if (existsSync(declarationSource)) {
       ensureDir(absoluteEntrypoint);
       copyFileSync(declarationSource, absoluteEntrypoint);
+      retained.add(path.relative(distRoot, absoluteEntrypoint).replace(/\\/g, '/'));
       continue;
     }
-    if (existsSync(absoluteEntrypoint)) continue;
-    const sourceName = path.basename(declarationEntrypoint, '.d.ts');
-    // Incremental caches may survive while a fresh sealed worktree has no hydrated .types output.
-    ensureDir(absoluteEntrypoint);
-    writeFileSync(absoluteEntrypoint, `export * from '../src/${sourceName}.ts';\n`, 'utf8');
+    const srcRoot = path.join(root, packageDir, 'src');
+    const sourcePath = path.join(srcRoot, declarationEntrypoint.replace(/^dist\//, '').replace(/\.d\.ts$/, '.ts'));
+    const program = ts.createProgram([sourcePath], {
+      target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      declaration: true, emitDeclarationOnly: true, skipLibCheck: true,
+      allowImportingTsExtensions: true, rootDir: srcRoot, outDir: distRoot
+    });
+    const emitted = program.emit(undefined, (fileName, data, _bom, _error, sources) => {
+      const original = sources?.[0]?.fileName;
+      if (!original || !contains(srcRoot, original) || !fileName.endsWith('.d.ts')) return;
+      ensureDir(fileName);
+      writeTextIfChanged(fileName, rewriteRelativeImports(data, original));
+      retained.add(path.relative(distRoot, fileName).replace(/\\/g, '/'));
+    });
+    if (emitted.emitSkipped || !existsSync(absoluteEntrypoint)) {
+      throw new Error(`Declaration generation failed for ${packageDir}/${declarationEntrypoint}`);
+    }
   }
+  return retained;
 }
 
 function declaredDeclarationEntrypoints(packageDir: string): readonly string[] {
@@ -233,8 +249,9 @@ function buildPackage(packageDir: string, mode: 'full' | 'incremental'): void {
     expectedOutputs.add('atm.mjs');
     writeCliEntrypointWrapper(distRoot);
   }
-  copyDeclarations(packageDir);
-  const declaredDeclarations = new Set(declaredDeclarationEntrypoints(packageDir));
+  const emittedDeclarations = copyDeclarations(packageDir);
+  const declaredDeclarations = new Set(declaredDeclarationEntrypoints(packageDir)
+    .map((entry) => path.relative(distRoot, path.join(outputRoot, packageDir, entry)).replace(/\\/g, '/')));
   for (const filePath of listFiles(distRoot)) {
     const relative = path.relative(distRoot, filePath).replace(/\\/g, '/');
     if (relative.split('/').includes('__tests__') || /\.test\.d\.ts$/.test(relative)) {
@@ -242,7 +259,7 @@ function buildPackage(packageDir: string, mode: 'full' | 'incremental'): void {
       continue;
     }
     if (relative.endsWith('.d.ts')) {
-      if (!declaredDeclarations.has(relative)) unlinkSync(filePath);
+      if (!declaredDeclarations.has(relative) && !emittedDeclarations.has(relative)) unlinkSync(filePath);
       continue;
     }
     if (!expectedOutputs.has(relative)) unlinkSync(filePath);
