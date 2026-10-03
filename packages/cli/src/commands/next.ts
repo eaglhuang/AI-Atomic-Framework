@@ -45,7 +45,7 @@ import {
 } from './next/channel-strategy.ts';
 import { buildGovernanceReadinessHintContract, type GovernanceChannel } from './next/governance-readiness.ts';
 import { buildTaskScopedClaimCommand } from './next/task-scoped-claim-command.ts';
-import { governanceCommandPrefix, withRunnerMode } from './next/runner-mode.ts';
+import { classifyRunnerMode, governanceCommandPrefix, withRunnerMode } from './next/runner-mode.ts';
 import {
   ensureDecisionTrail,
   readQueueHeadTaskId,
@@ -456,7 +456,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
   profile.mark('detect-governance-runtime');
   const doctorChecks = doctor.evidence.checks as Array<{ name: string; ok: boolean }>;
   const failed = doctorChecks.find((check) => check.ok !== true);
-  const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null));
+  const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null), classifyRunnerMode(process.argv[1] ?? null));
   const userNotice = buildFirstUseUserNotice(nextAction);
   profile.flush('default-next');
   return withRunnerMode(makeResult({

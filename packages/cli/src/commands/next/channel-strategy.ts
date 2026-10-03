@@ -1,3 +1,4 @@
+import type { RunnerModeClass } from '../shared/atm-cli-entrypoint.ts';
 import type { ImportedTaskQueue } from './route-predicates.ts';
 import { quoteCliValue } from './view-projections.ts';
 
@@ -47,7 +48,8 @@ export function decideRuntimeNextAction(
   runtime: Record<string, unknown>,
   failedCheckName: string | null | undefined,
   importedTaskQueue: ImportedTaskQueue,
-  commandPrefix = 'node atm.mjs'
+  commandPrefix = 'node atm.mjs',
+  runnerMode: RunnerModeClass = 'frozen'
 ): RuntimeNextAction {
   if (runtime.migrationNeeded || runtime.hasV1 && runtime.hasV2 === false) {
     return {
@@ -134,7 +136,7 @@ export function decideRuntimeNextAction(
   }
   return {
     status: 'ready',
-    command: commandPrefix === 'npm exec -- atm' ? 'npm test --if-present' : 'npm test',
+    command: runnerMode === 'npm-package' ? 'npm test --if-present' : 'npm test',
     reason: 'runtime state, governance state, and engineering checks are all green',
     allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
     blockedCommands: blockedMutationCommands()
