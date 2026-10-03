@@ -58,6 +58,7 @@ import {
 } from "../../shared.ts";
 
 import { parseTaskClaim } from './identity-check-command.ts';
+import { listTaskDeclaredIgnoredWorktreeFiles } from './task-ignored-deliverable-discovery.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
@@ -403,8 +404,9 @@ export function autoStageFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyVa
   const stagedFiles = new Set(readStagedFiles(cwd));
   const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(cwd);
   const ownerScope = { cwd, currentTaskId: frameworkTempTaskId(actorId) };
+  const ignoredDeclaredFiles = listTaskDeclaredIgnoredWorktreeFiles(cwd, [...claimedFiles]);
   const candidates = uniqueSorted(
-    listTaskScopedWorktreeDirtyFiles(cwd).filter(
+    listTaskScopedWorktreeDirtyFiles(cwd, [...claimedFiles], releaseGeneratedArtifacts).filter(
       (filePath: LegacyValue) => {
         const normalized = normalizeRelativePath(filePath);
         const exactClaim = [...claimedFiles].some(
@@ -522,17 +524,12 @@ export function inspectFrameworkScopedUnstagedCommit(cwd: LegacyValue, actorId: 
   };
 }
 
-export function listTaskScopedWorktreeDirtyFiles(cwd: LegacyValue) {
-  const files = new Set<string>();
-  for (const filePath of readGitNameOnly(cwd, ["diff", "--name-only"])) {
-    files.add(filePath);
-  }
-  for (const filePath of readGitNameOnly(cwd, [
-    "ls-files",
-    "-o",
-    "--exclude-standard",
-  ])) {
-    files.add(filePath);
+export function listTaskScopedWorktreeDirtyFiles(cwd: LegacyValue, ignoredScope: readonly string[] = [], releaseGeneratedArtifacts: ReadonlySet<string> = new Set()) {
+  const files = new Set([...readGitNameOnly(cwd, ["diff", "--name-only"]), ...readGitNameOnly(cwd, ["ls-files", "-o", "--exclude-standard"])]);
+  for (const filePath of listTaskDeclaredIgnoredWorktreeFiles(cwd, ignoredScope)) {
+    const normalized = normalizeRelativePath(filePath);
+    const exactClaim = ignoredScope.some((scope) => normalizeRelativePath(scope) === normalized);
+    if (exactClaim || (!normalized.startsWith('release/') && !normalized.startsWith('packages/cli/dist/')) || releaseGeneratedArtifacts.has(normalized)) files.add(filePath);
   }
   return uniqueSorted([...files]);
 }
