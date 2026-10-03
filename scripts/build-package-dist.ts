@@ -133,13 +133,22 @@ function copyDeclarations(packageDir: string): Set<string> {
   const typeRoot = path.join(root, '.types', packageDir, 'src');
   const distRoot = path.join(outputRoot, packageDir, 'dist');
   const retained = new Set<string>();
+  let cacheCopied = false;
   for (const declarationEntrypoint of declaredDeclarationEntrypoints(packageDir)) {
     const absoluteEntrypoint = path.join(outputRoot, packageDir, declarationEntrypoint);
     const declarationSource = path.join(typeRoot, declarationEntrypoint.replace(/^dist\//, ''));
     if (existsSync(declarationSource)) {
-      ensureDir(absoluteEntrypoint);
-      copyFileSync(declarationSource, absoluteEntrypoint);
-      retained.add(path.relative(distRoot, absoluteEntrypoint).replace(/\\/g, '/'));
+      if (!cacheCopied) {
+        for (const cachedFile of listFiles(typeRoot).filter((file) => file.endsWith('.d.ts'))) {
+          const relative = path.relative(typeRoot, cachedFile);
+          const target = path.join(distRoot, relative);
+          const original = path.join(root, packageDir, 'src', relative.replace(/\.d\.ts$/, '.ts'));
+          ensureDir(target);
+          writeTextIfChanged(target, rewriteRelativeImports(readFileSync(cachedFile, 'utf8'), original));
+          retained.add(relative.replace(/\\/g, '/'));
+        }
+        cacheCopied = true;
+      }
       continue;
     }
     const srcRoot = path.join(root, packageDir, 'src');
