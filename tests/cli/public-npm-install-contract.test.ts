@@ -5,6 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { withPrivateCliNpmPackage } from '../../scripts/lib/private-cli-npm-package.ts';
+import { resolveFirstUseArguments } from '../../scripts/lib/npm-first-use.ts';
+import { governanceCommandPrefix } from '../../packages/cli/src/commands/shared/atm-cli-entrypoint.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -136,10 +138,23 @@ try {
   const tokenizeCommand = (command: string) => [...command.matchAll(/"([^"]*)"|'([^']*)'|(\S+)/g)]
     .map((match) => match[1] ?? match[2] ?? match[3]);
   const runGeneratedNpmCommand = (command: string) => {
+    if (command.startsWith('node ')) {
+      const bin = path.join(firstUse, 'node_modules', '.bin', process.platform === 'win32' ? 'atm.cmd' : 'atm');
+      const argv = resolveFirstUseArguments(command, bin, 'public npm first-use contract');
+      assert.ok(argv, `generated command must name this installed runtime and an allowed onboarding action: ${command}`);
+      return spawnSync(process.execPath, [path.join(firstUse, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'atm.mjs'), ...argv], {
+        cwd: firstUse, encoding: 'utf8', windowsHide: true
+      });
+    }
     const tokens = tokenizeCommand(command);
-    assert.equal(tokens[0], 'npm', `generated first-use command must start with npm: ${command}`);
-    return spawnSync(npm, tokens.slice(1), {
-      cwd: firstUse, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
+    if (command === 'npm test --if-present') {
+      return spawnSync(npm, ['test', '--if-present'], {
+        cwd: firstUse, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
+      });
+    }
+    assert.deepEqual(tokens.slice(0, 4), ['npm', 'exec', '--', 'atm'], `legacy guidance must name the installed ATM CLI: ${command}`);
+    return spawnSync(process.execPath, [path.join(firstUse, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'atm.mjs'), ...tokens.slice(4)], {
+      cwd: firstUse, encoding: 'utf8', windowsHide: true
     });
   };
 
@@ -150,7 +165,9 @@ try {
   ];
   const bootstrapNextJson = JSON.parse(`${bootstrapNext.stdout}${bootstrapNext.stderr}`);
   assert.equal(bootstrapNextJson.evidence.runnerMode.mode, 'npm-package');
-  assert.match(bootstrapNextJson.evidence.nextAction.command, /^npm exec -- atm bootstrap /);
+  const firstUseEntry = bootstrapNextJson.evidence.runnerMode.entrypoint;
+  assert.equal(bootstrapNextJson.evidence.nextAction.command,
+    `${governanceCommandPrefix(path.resolve(firstUse, firstUseEntry))} bootstrap --cwd . --task "Bootstrap ATM in this repository"`);
   const bootstrap = runGeneratedNpmCommand(bootstrapNextJson.evidence.nextAction.command);
   lifecycle.push({ command: bootstrapNextJson.evidence.nextAction.command, status: bootstrap.status ?? -1 });
   assert.equal(bootstrap.status, 0, `generated bootstrap command failed: ${bootstrap.stdout}${bootstrap.stderr}`);
