@@ -29,8 +29,8 @@ try {
   const packedRoot = path.dirname(dist);
   copyFileSync(path.join(pkg, 'package.json'), path.join(packedRoot, 'package.json'));
   const npmCli = process.env.npm_execpath ?? path.join(path.dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js');
-  assert.ok(existsSync(npmCli), 'installed npm CLI entrypoint exists');
-  const pack = JSON.parse(execFileSync(process.execPath, [npmCli, 'pack', '--ignore-scripts', '--json', '--pack-destination', fixture], { cwd: packedRoot, encoding: 'utf8' }));
+  if (process.platform === 'win32') assert.ok(existsSync(npmCli), 'installed npm CLI entrypoint exists');
+  const pack = JSON.parse(execFileSync(process.platform === 'win32' ? process.execPath : 'npm', [...(process.platform === 'win32' ? [npmCli] : []), 'pack', '--ignore-scripts', '--json', '--pack-destination', fixture], { cwd: packedRoot, encoding: 'utf8' }));
   assert.ok(pack[0].files.some((file: { path: string }) => file.path === 'dist/index.d.ts'), 'archive contains declared type entrypoint');
   assert.ok(!pack[0].files.some((file: { path: string }) => file.path === 'dist/stale.d.ts'));
   rmSync(types, { recursive: true, force: true });
