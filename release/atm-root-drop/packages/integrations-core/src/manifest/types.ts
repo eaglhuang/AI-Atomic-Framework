@@ -28,6 +28,8 @@ export interface IntegrationInstallContext {
   readonly now?: string;
   readonly dryRun?: boolean;
   readonly manifestPath?: string;
+  /** Preserve user files and reconcile only digest-verified ATM content. */
+  readonly merge?: boolean;
 }
 
 export interface IntegrationSourceFile {

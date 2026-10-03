@@ -93,6 +93,7 @@ export function createIntegrationContext(repositoryRoot, adapter, options) {
         actor: options.actor,
         now: options.now,
         dryRun: options.dryRun,
+        merge: options.merge,
         manifestPath: manifestPathForIntegration(adapter.id)
     };
 }

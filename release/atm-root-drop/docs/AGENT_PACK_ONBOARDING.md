@@ -38,9 +38,21 @@ Freshness is part of the contract. If the source guards or schema hashes change,
 
 ## First-Touch Flow
 
+The source-branch `setup` command provides a combined onboarding path for an existing project. It requires a built runner containing this unreleased feature; it must not be assumed available in the currently published npm packages.
+
+```bash
+node /absolute/path/to/atm.mjs setup --cwd /path/to/project --json
+```
+
+Without `--cwd`, an interactive terminal asks for the target project. Setup selects all detected supported integrations. Use `--agents <comma-separated-ids>` to override selection or `--agents none` for CLI-only setup. If no integration is detected, noninteractive setup requires an explicit selection. Add `--dry-run` to inspect the plan and conflicts without writing.
+
+Discovery uses configuration paths and explicit editor environment hints, not proof of installation, authentication, or an active agent session. Setup composes bootstrap, integration installation and verification, and welcome; it does not introduce another task model. Existing user-owned integration content is preserved or reported as a conflict rather than overwritten with `--force`.
+
+The same external runner can target multiple repositories with `--cwd`. Governance state remains target-local, and bootstrap may install a pinned local onefile. When an installed npm CLI has no standalone onefile, setup creates a project launcher referencing the existing shared CLI; that installation must remain available at its stable location. After onboarding succeeds, continue the original user request through `next --prompt` and its returned playbook.
+
 A typical adopter flow is:
 
-1. Place an ATM distribution in the target repository root.
+1. Select the target repository and an official ATM distribution, either stored externally and invoked with `--cwd` or embedded in the target root.
 2. Ask the agent to read the repository entry guidance.
 3. Run `node atm.mjs welcome --json` or the plain text `welcome` command for orientation.
 4. Run `node atm.mjs atm-chart render` when the chart is missing or stale.

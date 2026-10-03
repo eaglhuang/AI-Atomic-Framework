@@ -5,6 +5,7 @@ import { TEAM_DIRECT_API_PROVIDER_IDS } from '../../../../core/src/team-runtime/
 import { readJsonFile, CliError, resolveValue } from '../shared.ts';
 import { createIntegrationAdapter, createIntegrationContext, isKnownIntegrationAdapter, manifestPathForIntegration } from './adapters.ts';
 import type { InstallManifestWithTeamRuntimeCapabilities } from './types.ts';
+import { verifyCodexHostBridge } from '../setup/codex-bridge.ts';
 
 export type IntegrationSourceParityMode = 'full' | 'deferred';
 
@@ -172,6 +173,12 @@ export async function verifyInstalledManifest(
 ) {
   const sourceParity = options.sourceParity ?? 'full';
   const manifest = preloadedManifest ?? readIntegrationManifest(repositoryRoot, adapter.id);
+  if (adapter.id === 'codex' && manifest.metadata?.nativeBridgeManifest) {
+    const host = await verifyCodexHostBridge(repositoryRoot);
+    if (!host.ok) return createManifestHealthReport({ ok: false, status: 'drift', manifestPath, adapterId: adapter.id,
+      findings: [{ level: 'error', code: 'native-bridge-drift', path: String(manifest.metadata.nativeBridgeManifest), message: host.reason }],
+      driftedFiles: [String(manifest.metadata.nativeBridgeManifest)], staleFields: [], sourceParity });
+  }
   const verifyReport = await resolveValue(adapter.verify(createIntegrationContext(repositoryRoot, adapter, {}), manifest));
   if (!verifyReport.ok) {
     return createManifestHealthReport({
@@ -280,8 +287,11 @@ export function compareManifestParity(installed: InstallManifest, expected: Inst
   if (installed.targetDir !== expected.targetDir) {
     changedFields.push('targetDir');
   }
-  const installedMetadata = JSON.stringify(installed.metadata ?? {});
-  const expectedMetadata = JSON.stringify(expected.metadata ?? {});
+  // Ownership metadata describes the local wrapper, not generated source.
+  // The adapter's verify pass above has already checked the owned block hash.
+  const sourceMetadata = (manifest: InstallManifest) => Object.fromEntries(Object.entries(manifest.metadata ?? {}).filter(([key]) => key !== 'managedBlocks' && key !== 'nativeBridgeManifest'));
+  const installedMetadata = JSON.stringify(sourceMetadata(installed));
+  const expectedMetadata = JSON.stringify(sourceMetadata(expected));
   if (installedMetadata !== expectedMetadata) {
     changedFields.push('metadata');
   }

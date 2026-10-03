@@ -1,6 +1,8 @@
 import path from 'node:path';
-import { existsSync } from 'node:fs';
-import { CliError, makeResult, message, parseArgsForCommand, resolveValue } from '../shared.js';
+import { existsSync, readFileSync } from 'node:fs';
+import { CliError, makeResult, message, parseArgsForCommand, resolveValue, writeJsonFile } from '../shared.js';
+import { codexBridgeManifest, codexHostBridge } from '../setup/codex-bridge.js';
+import { validateOwnershipManifest } from '../../_vendor/integrations-core/dist/manifest/safe-install.js';
 import { getCommandSpec } from '../command-specs.js';
 import { installAtmPrePushHook, uninstallAtmPrePushHook, verifyAtmPrePushHook } from '../git.js';
 import { inspectTeamRuntimeBackendCapabilities, readIntegrationManifest, verifyInstalledManifest } from './health.js';
@@ -8,6 +10,7 @@ import { createIntegrationListResult } from './list.js';
 import { installIntegrationAdapter } from './install.js';
 import { asOptionalString, createIntegrationAdapter, createIntegrationContext, describeAdapter, manifestPathForIntegration, requireAdapterId } from './adapters.js';
 import { collectAdapterParity } from './adapter-parity.js';
+import { safeIntegrationHooks } from './safe-hooks.js';
 async function loadIntegrationHooks() {
     return import('../integration-hooks.js');
 }
@@ -121,17 +124,32 @@ export async function runIntegration(argv) {
         });
     }
     if (action === 'add') {
+        if (parsed.options.merge === true && parsed.options.force === true)
+            throw new CliError('ATM_CLI_USAGE', '--merge and --force are mutually exclusive.', { exitCode: 2 });
+        if (parsed.options.merge === true)
+            await safeIntegrationHooks(cwd, requireAdapterId(adapterId, action), true);
+        const nativeBridge = parsed.options.merge === true && adapterId === 'codex' ? codexHostBridge(cwd) : null;
+        if (nativeBridge)
+            await nativeBridge.install({ repositoryRoot: cwd, manifestPath: codexBridgeManifest, dryRun: true, merge: true });
         const report = await installIntegrationAdapter(cwd, requireAdapterId(adapterId, action), {
             actor: asOptionalString(parsed.options.actor),
             now: asOptionalString(parsed.options.at),
             dryRun: parsed.options.dryRun === true,
-            force: parsed.options.force === true
+            force: parsed.options.force === true,
+            merge: parsed.options.merge === true
         });
         const hookInstallReport = parsed.options.dryRun === true || (adapterId !== 'copilot' && adapterId !== 'claude-code')
             ? null
-            : (await loadIntegrationHooks()).installEditorIntegrationHooks(cwd, adapterId, { force: true });
+            : parsed.options.merge === true
+                ? await safeIntegrationHooks(cwd, adapterId, false)
+                : (await loadIntegrationHooks()).installEditorIntegrationHooks(cwd, adapterId, { force: true });
+        if (nativeBridge && parsed.options.dryRun !== true) {
+            await nativeBridge.install({ repositoryRoot: cwd, manifestPath: codexBridgeManifest, merge: true });
+            const updated = { ...report.manifest, metadata: { ...report.manifest.metadata, nativeBridgeManifest: codexBridgeManifest } };
+            writeJsonFile(path.join(cwd, report.manifestPath), updated);
+        }
         return makeResult({
-            ok: true,
+            ok: hookInstallReport?.ok !== false,
             command: 'integration',
             cwd,
             messages: [
@@ -150,10 +168,13 @@ export async function runIntegration(argv) {
         const adapter = createIntegrationAdapter(requireAdapterId(adapterId, action));
         const manifestPath = manifestPathForIntegration(adapter.id);
         const verifyReport = await verifyInstalledManifest(cwd, manifestPath, adapter);
+        const hostManifestPath = '.atm/integrations/codex.host.json';
+        const hostVerify = adapter.id === 'codex' && existsSync(path.join(cwd, hostManifestPath))
+            ? await resolveValue(adapter.verify({ repositoryRoot: cwd, manifestPath: hostManifestPath }, JSON.parse(readFileSync(path.join(cwd, hostManifestPath), 'utf8')))) : null;
         const hookVerifyReport = adapter.id === 'copilot' || adapter.id === 'claude-code'
             ? (await loadIntegrationHooks()).verifyEditorIntegrationHooks(cwd, adapter.id)
             : null;
-        const ok = verifyReport.ok && (hookVerifyReport?.ok ?? true);
+        const ok = verifyReport.ok && (hookVerifyReport?.ok ?? true) && (hostVerify?.ok ?? true);
         return makeResult({
             ok,
             command: 'integration',
@@ -175,7 +196,8 @@ export async function runIntegration(argv) {
                 staleFields: verifyReport.staleFields,
                 teamRuntimeCapabilities: verifyReport.teamRuntimeCapabilities,
                 teamRuntimeBackendReadiness: inspectTeamRuntimeBackendCapabilities(cwd),
-                hookVerifyReport
+                hookVerifyReport,
+                hostVerify
             }
         });
     }
@@ -183,7 +205,15 @@ export async function runIntegration(argv) {
         const adapter = createIntegrationAdapter(requireAdapterId(adapterId, action));
         const manifestPath = manifestPathForIntegration(adapter.id);
         const manifest = readIntegrationManifest(cwd, adapter.id);
+        const hostManifestPath = '.atm/integrations/codex.host.json';
+        const hostManifest = adapter.id === 'codex' && existsSync(path.join(cwd, hostManifestPath))
+            ? JSON.parse(readFileSync(path.join(cwd, hostManifestPath), 'utf8')) : null;
+        if (hostManifest && (hostManifest.schemaId !== 'atm.integrationInstallManifest' || hostManifest.adapterId !== 'codex' || !Array.isArray(hostManifest.files)))
+            throw new CliError('ATM_INTEGRATION_INVALID_OWNERSHIP', 'Repair the Codex host manifest before removing either projection.');
+        if (hostManifest)
+            validateOwnershipManifest(hostManifest);
         const uninstallReport = await resolveValue(adapter.uninstall(createIntegrationContext(cwd, adapter, {}), manifest));
+        const hostUninstall = hostManifest ? await resolveValue(adapter.uninstall({ repositoryRoot: cwd, manifestPath: hostManifestPath }, hostManifest)) : null;
         return makeResult({
             ok: uninstallReport.ok,
             command: 'integration',
@@ -195,7 +225,8 @@ export async function runIntegration(argv) {
                 manifestPath,
                 removedFiles: uninstallReport.removedFiles,
                 preservedFiles: uninstallReport.preservedFiles,
-                findings: uninstallReport.findings
+                findings: uninstallReport.findings,
+                hostUninstall
             }
         });
     }

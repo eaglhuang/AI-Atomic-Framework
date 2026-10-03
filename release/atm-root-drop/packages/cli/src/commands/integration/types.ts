@@ -24,4 +24,5 @@ export interface InstallIntegrationOptions {
   readonly now?: string;
   readonly dryRun?: boolean;
   readonly force?: boolean;
+  readonly merge?: boolean;
 }
