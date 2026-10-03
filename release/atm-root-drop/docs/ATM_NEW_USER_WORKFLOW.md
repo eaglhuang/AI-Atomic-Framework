@@ -1,5 +1,7 @@
 # ATM New User Workflow
 
+> Advanced guide. If you are an AI agent starting work in an ATM repository, read [ATM_AI_FIRST_5_MIN.md](ATM_AI_FIRST_5_MIN.md) first; this guide covers the two-repository taskflow with a `taskflow.profile.json`.
+
 A friendly guide for the first day with ATM. Read this once and you will know how to take a single sentence — *"I want users to export a CSV report"* — and turn it into a task that opens, runs, validates, and closes across two repos, without ever hand-editing governance files.
 
 ## Who this guide is for

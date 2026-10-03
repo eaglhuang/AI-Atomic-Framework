@@ -3,7 +3,6 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { buildOnefileRelease } from './build-onefile-release.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -28,7 +27,7 @@ function readJson(filePath: string) {
 function buildPair(tempRoot: string, label: string) {
   const rootDropRoot = path.join(tempRoot, label, 'atm-root-drop');
   const onefileRoot = path.join(tempRoot, label, 'atm-onefile');
-  buildRootDropRelease({ repositoryRoot: root, releaseRoot: rootDropRoot });
+  // Onefile assembly builds package-dist and reconciles this root-drop itself.
   buildOnefileRelease({ repositoryRoot: root, rootDropRoot, outputRoot: onefileRoot });
   return {
     rootDropManifest: path.join(rootDropRoot, 'release-manifest.json'),

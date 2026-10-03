@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { commandGateCheckId, emitGateTelemetryEvent } from './_vendor/core/dist/telemetry/index.js';
+import { recordCommandGateTelemetry } from './telemetry/command-gate.js';
+export { recordCommandGateTelemetry } from './telemetry/command-gate.js';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.js';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.js';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.js';
@@ -183,6 +184,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         writeResult(result, io.stdout, outputFormat);
         return result.exitCode;
     }
+    const commandStartedAt = process.hrtime.bigint();
     const runner = cliCommandRunners[commandName];
     if (!runner) {
         const result = enrichCommandResult(makeResult({
@@ -194,6 +196,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
                 commands: Object.keys(cliCommandRunners)
             }
         }));
+        recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
         writeResult(result, io.stderr, outputFormat);
         return result.exitCode;
     }
@@ -228,6 +231,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
                 messages: [message('error', 'ATM_RELEASE_INTEGRITY_FAILED', 'Bundled ATM release integrity check failed; refusing to run non-read-only commands.', { mode: trustIntegrity.mode })],
                 evidence: { trustIntegrity }
             }));
+            recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
             writeResult(result, io.stderr, outputFormat);
             return result.exitCode;
         }
@@ -247,14 +251,14 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
                 })],
             evidence: { knownBadStatus }
         }));
+        recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
         writeResult(result, io.stderr, outputFormat);
         return result.exitCode;
     }
-    const commandStartedAt = process.hrtime.bigint();
     try {
         const rawResult = await runner(commandArgs);
         const result = enrichCommandResult(rawResult);
-        recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result);
+        recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
         writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
         return result.exitCode;
     }
@@ -271,30 +275,10 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
             messages: [message('error', cliError.code, cliError.message, cliError.details)],
             evidence: {}
         }), { cliErrorExitCode: cliError.exitCode });
-        recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result);
+        recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
         writeResult(result, io.stderr, outputFormat);
         return result.exitCode;
     }
-}
-export function recordCommandGateTelemetry(cwd, commandName, startedAt, result) {
-    const checkId = commandGateCheckId(commandName);
-    const elapsedMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
-    const gateResult = result.ok
-        ? 'pass'
-        : result.messages?.some((entry) => entry.level === 'warn')
-            ? 'warn'
-            : 'block';
-    emitGateTelemetryEvent(cwd, {
-        gate: commandName,
-        checkId,
-        result: gateResult,
-        reasonClass: gateResult,
-        durationMs: elapsedMs,
-        command: commandName,
-        runnerVersion: readFrameworkVersion(),
-        workloadId: `cli-command:${commandName}`,
-        source: 'runtime'
-    });
 }
 function createGlobalHelpResult(cwd) {
     const commands = listCommandSpecs()

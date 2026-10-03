@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import path from 'node:path';
+import { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
 import { fileURLToPath } from 'node:url';
 import { getCommandSpec } from './commands/command-specs.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
@@ -92,6 +93,7 @@ export async function runPublicCli(
     return writeHelp(targetCommand, commandArgs, io, outputFormat);
   }
 
+  const commandStartedAt = process.hrtime.bigint();
   const runner = Object.hasOwn(publicCliCommandRunners, commandName)
     ? publicCliCommandRunners[commandName]
     : undefined;
@@ -106,6 +108,7 @@ export async function runPublicCli(
         availableCommands: [...publicCliCommandNames].sort()
       }
     }));
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }
@@ -124,6 +127,7 @@ export async function runPublicCli(
         messages: [message('error', 'ATM_RELEASE_INTEGRITY_FAILED', 'Bundled ATM release integrity check failed; refusing to run non-read-only commands.', { mode: trustIntegrity.mode })],
         evidence: { trustIntegrity }
       }));
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
       writeResult(result, io.stderr, outputFormat);
       return result.exitCode;
     }
@@ -144,6 +148,7 @@ export async function runPublicCli(
       })],
       evidence: { knownBadStatus }
     }));
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }
@@ -151,6 +156,7 @@ export async function runPublicCli(
   try {
     const rawResult = await runner(commandArgs);
     const result = enrichCommandResult(rawResult as CommandResult);
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
   } catch (error) {
@@ -166,6 +172,7 @@ export async function runPublicCli(
       messages: [message('error', cliError.code, cliError.message, cliError.details)],
       evidence: { publicSurface: 'adopter-core' }
     }), { cliErrorExitCode: cliError.exitCode });
+    recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, io.stderr, outputFormat);
     return result.exitCode;
   }

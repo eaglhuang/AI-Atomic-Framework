@@ -225,7 +225,9 @@ async function loadExecutor(repositoryRoot, descriptor, fieldName) {
 }
 async function invokeExecutor(executor, input, context, fieldName, caseId) {
     try {
-        return await executor(input, context);
+        // Each implementation observes the same original values, not another
+        // executor's mutations; snapshot output before the next executor runs.
+        return structuredClone(await executor(structuredClone(input), structuredClone(context)));
     }
     catch (error) {
         throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_EXECUTOR_FAILED', `${fieldName} failed while running ${caseId}.`, {

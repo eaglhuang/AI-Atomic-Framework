@@ -8,6 +8,7 @@ import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { finalizeBuildReleaseHygiene } from './build-release-hygiene.ts';
 import { assertPayloadLauncherIsNotNested } from './launcher-entrypoint-guards.ts';
 import { renderOnefileFastVersionRuntime } from './onefile-fast-version-runtime.ts';
+import { renderCacheIntegrityRuntime } from './onefile-cache-integrity-runtime.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rootDropReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
@@ -29,11 +30,11 @@ export function buildOnefileRelease(options: any = {}) {
   assertPayloadLauncherIsNotNested(path.join(rootDropRoot, 'atm.mjs'));
 
   const payloadFiles = collectPayloadFiles(rootDropRoot);
-  const payloadInputManifestHash = digestJson(payloadFiles.map((file: any) => ({
+  const payloadInputManifestHash = digestJson({ launcherTemplate: renderOnefileRuntime.toString(), cacheTemplate: renderCacheIntegrityRuntime.toString(), files: payloadFiles.map((file: any) => ({
     path: file.path,
     mode: file.mode,
     dataDigest: createHash('sha256').update(file.dataBase64).digest('hex')
-  })));
+  })) });
   const existingManifest = existsSync(path.join(outputRoot, 'release-manifest.json'))
     ? JSON.parse(readFileSync(path.join(outputRoot, 'release-manifest.json'), 'utf8')) as Record<string, unknown>
     : null;
@@ -65,6 +66,7 @@ export function buildOnefileRelease(options: any = {}) {
   const runtimeSource = renderOnefileRuntime({
     payloadBase64,
     payloadSha256,
+    payloadFiles,
     frameworkVersion
   });
 
@@ -294,9 +296,9 @@ function digestJson(value: unknown): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 }
 
-function renderOnefileRuntime({ payloadBase64, payloadSha256, frameworkVersion }: any) {
+export function renderOnefileRuntime({ payloadBase64, payloadSha256, frameworkVersion, payloadFiles }: any) {
   return `#!/usr/bin/env node
-import { chmodSync, existsSync, mkdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, lstatSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { createHash } from 'node:crypto';
@@ -371,10 +373,7 @@ function extractionLockRoot(cacheRoot) {
   return \`\${cacheRoot}.lock\`;
 }
 
-function isExtractedRootReady(cacheRoot) {
-  return existsSync(path.join(cacheRoot, '.payload-ready.json'))
-    && existsSync(path.join(cacheRoot, 'atm.mjs'));
-}
+${renderCacheIntegrityRuntime(payloadFiles)}
 
 function tryAcquireExtractionLock(lockRoot) {
   try {

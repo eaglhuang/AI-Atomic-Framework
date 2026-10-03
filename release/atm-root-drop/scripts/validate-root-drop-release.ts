@@ -31,7 +31,7 @@ function runAtm(cwd: any, args: any) {
   });
   const payload = (result.stdout || result.stderr || '').trim();
   return {
-    exitCode: result.status ?? 0,
+    exitCode: result.error || result.signal ? 1 : (result.status ?? 1),
     parsed: payload ? JSON.parse(payload) : {}
   };
 }

@@ -90,6 +90,7 @@ for (const packageSpec of fixture.packages) {
 
 // A clean isolated install is only a release gate if the release actually runs
 // it before publishing, so the workflow wiring is asserted, not assumed.
+assert.match(workflow, /name: Verify public npm registry post-publish\r?\n\s+if:[^\n]+\n\s+timeout-minutes: 10\r?\n/, 'registry visibility checks must have a ten-minute wall-clock bound, including npm query time');
 const smokeIndex = workflow.indexOf('scripts/validate-npm-clean-install.ts');
 const publishIndex = workflow.indexOf('Publish public workspace closure');
 assert.ok(smokeIndex > -1, 'release workflow must run the clean-install smoke validator');

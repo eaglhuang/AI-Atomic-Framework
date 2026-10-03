@@ -104,8 +104,11 @@ export function resolvePromptScopedTaskRoute(
   }
   const handoffRoute = resolveHandoffResumeTaskRoute(cwd, tasks, taskIntent);
   if (handoffRoute) return handoffRoute;
+  const planningRoots = (planningRootResolution ?? resolveCandidatePlanningRoots(cwd, {
+    configuredRoots: readConfiguredPlanningRoots(cwd)
+  })).roots;
   const scored = tasks
-    .map((task) => scoreTaskForIntent(cwd, task, taskIntent))
+    .map((task) => scoreTaskForIntent(cwd, task, taskIntent, planningRoots))
     .filter((task) => (task.matchScore ?? 0) > 0)
     .sort(compareScoredTasks);
   const hasExplicitScopeHints = taskIntent.mentionedTaskIds.length > 0
@@ -350,7 +353,7 @@ export function assertPromptBatchDoesNotConflict(input: {
   }
 }
 
-export function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: TaskIntent): ImportedTaskSummary {
+export function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: TaskIntent, planningRoots?: readonly string[]): ImportedTaskSummary {
   const prompt = normalizeSearchText(intent.userPrompt ?? '');
   const reasons: string[] = [];
   let score = 0;
@@ -415,7 +418,7 @@ export function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, inten
     score += 10;
     reasons.push('task-card-surface');
   }
-  if (task.taskPath && isTaskPathUnderPreferredPlanningRoots(cwd, task.taskPath)) {
+  if (task.taskPath && isTaskPathUnderPreferredPlanningRoots(cwd, task.taskPath, planningRoots)) {
     score += 15;
     reasons.push('canonical-planning-root');
   }
