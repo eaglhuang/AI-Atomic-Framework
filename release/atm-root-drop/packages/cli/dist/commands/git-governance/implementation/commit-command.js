@@ -13,6 +13,7 @@ import { resolveFrameworkHookTaskId } from './framework-hook-identity.js';
 import { executeGitCommit } from './commit-execution.js';
 import { resolveFrameworkCommitAuthorityContext } from '../../framework-development/framework-temp-publication-capability.js';
 import { assertFrameworkCommitClaimAuthority } from './framework-commit-claim-guard.js';
+import { autoStageQuickfixLockFiles } from './quickfix-auto-stage.js';
 import { assertDryRunReachedNoExecutor, resolveDryRunPurity } from './dry-run-purity.js';
 import { routeFrameworkClaimCommitBranch } from './commit-framework-branch.js';
 import { routeTaskScopedCommitBranch } from './commit-task-scoped-branch.js';
@@ -64,6 +65,9 @@ export function runGitCommit(options) {
     // lane, not a request to infer framework authority from the shared index.
     if (options.recordOnlyCommit !== true) {
         assertFrameworkCommitClaimAuthority({ actorId, laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null, authority: { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution } });
+    }
+    if (!taskDocument && !usesFrameworkClaimCommit && options.autoStage && !options.dryRun) {
+        autoStageQuickfixLockFiles(options.cwd, actorId);
     }
     const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
     const stagedMirrorSync = options.taskId

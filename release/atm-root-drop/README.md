@@ -58,6 +58,24 @@ That matters more as teams move from one AI helper to many cooperating agents. A
 
 ## 60-Second Start
 
+Start with the project you want ATM to govern. One shared ATM runner can serve multiple existing repositories through `--cwd`; each target keeps its own governance state and evidence.
+
+The source-branch `setup` command combines project selection, bootstrap, integration discovery, installation, verification, and welcome. It is not yet released on npm. Use a built runner from a revision containing `setup`; the npm `latest` packages observed on 2026-10-03 are `@ai-atomic-framework/cli@0.1.7` and `create-atm@0.1.7`, which are a separate distribution.
+
+In an interactive terminal, run:
+
+```bash
+node /absolute/path/to/atm.mjs setup
+```
+
+ATM asks which project should receive the setup. For an explicit target:
+
+```bash
+node /absolute/path/to/atm.mjs setup --cwd /path/to/project --json
+```
+
+Setup selects all supported integrations it detects. If none are detected, interactive mode asks you to choose; noninteractive mode requires `--agents <ids>` or `--agents none`. See [Add ATM to an existing repository](#add-atm-to-an-existing-repository) for selection and preview options.
+
 The fastest way to start is to let the AI use ATM for you.
 
 ### Case: give an agent one bounded task
@@ -89,8 +107,10 @@ Create a new ATM-enabled repository named test-app for my editor, then show me t
 The agent can use the starter behind the scenes, install the selected agent integration, and make the local ATM skill visible. If you want the underlying command, it is:
 
 ```bash
-npx create-atm test-app --agent codex
+npx create-atm test-app --agent <editor-id>
 ```
+
+Replace `<editor-id>` with a supported integration ID. This new-project starter is separate from the source-branch `setup` flow for existing projects.
 
 After that, the first useful test is still human-sized:
 
@@ -112,6 +132,35 @@ npm run bench:admission:paper -- --seed 20260625
 ```
 
 ### Add ATM to an existing repository
+
+The source-branch `setup` command requires a built runner containing this unreleased feature; do not assume the currently published npm packages provide it. Keep the runner at a stable external location and select the target explicitly:
+
+```bash
+node /absolute/path/to/atm.mjs setup --cwd /path/to/project --json
+```
+
+Setup detects supported configuration paths and explicit editor environment hints, selects all detected integrations, checks for conflicts, bootstraps the target, installs and verifies the selected integrations, and runs welcome. Detection does not establish that an agent is installed, authenticated, or currently running.
+
+Supported integration IDs are `claude-code`, `codex`, `copilot`, `cursor`, `gemini`, and `antigravity`. Override detection with a comma-separated selection, or choose `none` for CLI-only setup:
+
+```bash
+node /absolute/path/to/atm.mjs setup --cwd /path/to/project --agents cursor,gemini --json
+node /absolute/path/to/atm.mjs setup --cwd /path/to/project --agents none --json
+node /absolute/path/to/atm.mjs setup --cwd /path/to/project --agents cursor,gemini --dry-run --json
+```
+
+The last command previews the target and integration conflicts without writing. Existing user-owned integration content is preserved or reported as a conflict; setup does not overwrite it with `--force`. Setup writes only to the selected project, not global agent configuration. Review a reported conflict, then rerun the returned recovery command. File checks are optimistic preconditions, not an operating-system transaction against arbitrary concurrent writers.
+
+Use the same runner with a different `--cwd` for another project. Each target retains its own tasks, locks, configuration, and evidence. Bootstrap may install a pinned onefile in the target. An installed npm CLI without a standalone onefile creates a small project launcher referencing that shared CLI installation; keep it at a stable location. If it moves, restore the original location, or inspect and rename the generated project `atm.mjs` to a retained backup before rerunning setup from the new installation. Setup preserves a differing existing launcher and does not automatically rebind it. Shared invocation does not imply a zero-copy installation in every distribution. After successful setup, follow the returned next command and route the user's actual request through `next --prompt`.
+
+For distributions without `setup`, bootstrap and integration installation remain separate steps:
+
+```bash
+node /absolute/path/to/atm.mjs bootstrap --cwd /path/to/project --json
+node /absolute/path/to/atm.mjs integration add <editor-id> --cwd /path/to/project --json
+node /absolute/path/to/atm.mjs integration verify <editor-id> --cwd /path/to/project --json
+node /absolute/path/to/atm.mjs welcome --cwd /path/to/project --json
+```
 
 Use one official distribution:
 
@@ -227,6 +276,7 @@ The Default Governance Bundle is the official default experience, but it is not 
 | `node atm.mjs next --prompt "<current user prompt>" --json` | Recommend the next official ATM action for the current user request. |
 | `node atm.mjs next --json` | Read-only repository orientation when no user prompt is available. |
 | `node atm.mjs welcome --json` | Summarize ATMChart, integration health, and the next ATM action for first-touch onboarding. |
+| `node atm.mjs setup --cwd <project> --json` | Source-branch onboarding: discover, safely install, and verify integrations in one selected project. Not yet released on npm. |
 | `node atm.mjs doctor --json` | Inspect engineering readiness, layout health, trust signals, version compatibility, and integration drift. |
 | `node atm.mjs atm-chart render --json` | Render `.atm/memory/atm-chart.md` from guard sources and schema hashes. |
 | `node atm.mjs atm-chart verify --json` | Verify ATMChart freshness and version compatibility. |

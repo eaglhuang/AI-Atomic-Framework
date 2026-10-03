@@ -13,6 +13,7 @@ import atomizeSpec from './command-specs/atomize.spec.ts';
 import baselineSpec from './command-specs/baseline.spec.ts';
 import batchSpec from './command-specs/batch.spec.ts';
 import bootstrapSpec from './command-specs/bootstrap.spec.ts';
+import setupSpec from './command-specs/setup.spec.ts';
 import budgetSpec from './command-specs/budget.spec.ts';
 import cacheSpec from './command-specs/cache.spec.ts';
 import cleanupSpec from './command-specs/cleanup.spec.ts';
@@ -82,6 +83,7 @@ function withVisibility<T extends Record<string, unknown>>(spec: T, visibility: 
 }
 
 export const commandSpecs = Object.freeze({
+  setup: setupSpec,
   actor: actorSpec,
   'agent-pack': agentPackSpec,
   'atom-capsule': withVisibility(atomCapsuleSpec, 'internal'),

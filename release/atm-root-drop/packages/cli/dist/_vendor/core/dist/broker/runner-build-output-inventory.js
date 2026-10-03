@@ -205,7 +205,14 @@ function listDirtyPaths(cwd) {
             return [];
         return String(result.stdout ?? '').split(/\r?\n/).map(normalizePath).filter(Boolean);
     };
-    return uniquePaths([...collect(['diff', '--name-only']), ...collect(['diff', '--name-only', '--cached'])]);
+    // Publication consumers observe porcelain status, including raw worktree
+    // changes hidden by Git's text normalization. Use the same path set both
+    // before and after the build so observation never silently grants ownership.
+    const status = spawnSync('git', ['status', '--porcelain', '--untracked-files=all'], { cwd, encoding: 'utf8' });
+    const statusPaths = (status.status ?? 1) === 0
+        ? String(status.stdout ?? '').split(/\r?\n/).map((line) => line.length >= 4 ? line.slice(3).replace(/\\/g, '/').trim() : '').filter(Boolean)
+        : [];
+    return uniquePaths([...collect(['diff', '--name-only']), ...collect(['diff', '--name-only', '--cached']), ...statusPaths]);
 }
 export function pathMatchesScope(filePath, allowedFiles) {
     const normalizedFile = normalizePath(filePath).toLowerCase();

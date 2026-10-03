@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import path from 'node:path';
-import { recordCommandGateTelemetry } from './telemetry/command-gate.js';
+import { recordCommandGateTelemetry } from './commands/setup/telemetry.js';
 import { fileURLToPath } from 'node:url';
 import { getCommandSpec } from './commands/command-specs.js';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.js';
@@ -24,7 +24,9 @@ import { runAtmGit } from './commands/git-governance.js';
 import { runIntegration } from './commands/integration.js';
 import { runPlan } from './commands/plan.js';
 import { runActor } from './commands/actor.js';
+import { runIdentity } from './commands/identity.js';
 import { runBootstrap } from './commands/bootstrap-entry.js';
+import { runSetup } from './commands/setup.js';
 import { runStart } from './commands/start.js';
 import { runTasks } from './commands/tasks.js';
 import { runATMChart } from './commands/atm-chart.js';
@@ -51,7 +53,10 @@ export const publicCliCommandRunners = {
     integration: runIntegration,
     plan: runPlan,
     actor: runActor,
+    // git commit's ATM_GIT_COMMIT_IDENTITY_MISSING remediation runs identity set.
+    identity: runIdentity,
     bootstrap: runBootstrap,
+    setup: runSetup,
     start: runStart,
     tasks: runTasks,
     'atm-chart': runATMChart
@@ -61,7 +66,7 @@ export async function runPublicCli(argv = process.argv.slice(2), io = { stdout: 
     applyOutputProjectionFlagsFromArgv(argv);
     const [commandName, ...rawCommandArgs] = argv;
     const outputFormat = selectOutputFormat(argv, io);
-    const commandArgs = stripFormatFlags(rawCommandArgs);
+    const commandArgs = commandName === 'setup' ? rawCommandArgs : stripFormatFlags(rawCommandArgs);
     if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
         const result = enrichCommandResult(createPublicHelpResult(process.cwd()));
         writeResult(result, io.stdout, outputFormat);
