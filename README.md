@@ -60,7 +60,13 @@ That matters more as teams move from one AI helper to many cooperating agents. A
 
 Start with the project you want ATM to govern. One shared ATM runner can serve multiple existing repositories through `--cwd`; each target keeps its own governance state and evidence.
 
-The source-branch `setup` command combines project selection, bootstrap, integration discovery, installation, verification, and welcome. It is not yet released on npm. Use a built runner from a revision containing `setup`; the npm `latest` packages observed on 2026-10-03 are `@ai-atomic-framework/cli@0.1.7` and `create-atm@0.1.7`, which are a separate distribution.
+The `setup` command combines project selection, bootstrap, integration discovery, installation, verification, and welcome. It ships in `@ai-atomic-framework/cli` 0.1.8 and later. Install the CLI once at a stable location outside your projects; each project's generated `atm.mjs` points back to that runner, so moving or deleting it breaks the projects it set up:
+
+```bash
+npm install --prefix ~/atm-runner @ai-atomic-framework/cli@latest
+```
+
+The runner entry is then `~/atm-runner/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs`.
 
 In an interactive terminal, run:
 
@@ -110,7 +116,7 @@ The agent can use the starter behind the scenes, install the selected agent inte
 npx create-atm test-app --agent <editor-id>
 ```
 
-Replace `<editor-id>` with a supported integration ID. This new-project starter is separate from the source-branch `setup` flow for existing projects.
+Replace `<editor-id>` with a supported integration ID. This new-project starter is separate from the `setup` flow for existing projects.
 
 After that, the first useful test is still human-sized:
 
@@ -133,7 +139,7 @@ npm run bench:admission:paper -- --seed 20260625
 
 ### Add ATM to an existing repository
 
-The source-branch `setup` command requires a built runner containing this unreleased feature; do not assume the currently published npm packages provide it. Keep the runner at a stable external location and select the target explicitly:
+`setup` requires `@ai-atomic-framework/cli` 0.1.8 or later. Keep the runner at a stable external location (see [60-Second Start](#60-second-start)) and select the target explicitly:
 
 ```bash
 node /absolute/path/to/atm.mjs setup --cwd /path/to/project --json
@@ -276,7 +282,7 @@ The Default Governance Bundle is the official default experience, but it is not 
 | `node atm.mjs next --prompt "<current user prompt>" --json` | Recommend the next official ATM action for the current user request. |
 | `node atm.mjs next --json` | Read-only repository orientation when no user prompt is available. |
 | `node atm.mjs welcome --json` | Summarize ATMChart, integration health, and the next ATM action for first-touch onboarding. |
-| `node atm.mjs setup --cwd <project> --json` | Source-branch onboarding: discover, safely install, and verify integrations in one selected project. Not yet released on npm. |
+| `node atm.mjs setup --cwd <project> --json` | Onboarding for an existing project: discover, safely install, and verify integrations in one selected project. Requires CLI 0.1.8+. |
 | `node atm.mjs doctor --json` | Inspect engineering readiness, layout health, trust signals, version compatibility, and integration drift. |
 | `node atm.mjs atm-chart render --json` | Render `.atm/memory/atm-chart.md` from guard sources and schema hashes. |
 | `node atm.mjs atm-chart verify --json` | Verify ATMChart freshness and version compatibility. |
