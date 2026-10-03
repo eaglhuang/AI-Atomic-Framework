@@ -13,7 +13,7 @@ function uniqueSorted(values) {
     return [...new Set(values)].sort((left, right) => left.localeCompare(right));
 }
 export function readStagedFiles(cwd) {
-    return uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only', '--diff-filter=ACMRT'])
+    return uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only', '--diff-filter=ACMRTD'])
         .map(normalizeRelativePath)
         .filter(Boolean));
 }

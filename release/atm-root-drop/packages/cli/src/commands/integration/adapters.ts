@@ -107,6 +107,7 @@ export function createIntegrationContext(repositoryRoot: string, adapter: Integr
     actor: options.actor,
     now: options.now,
     dryRun: options.dryRun,
+    merge: options.merge,
     manifestPath: manifestPathForIntegration(adapter.id)
   };
 }

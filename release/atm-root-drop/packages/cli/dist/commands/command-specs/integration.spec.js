@@ -20,6 +20,7 @@ export default defineCommandSpec({
         { flag: '--files', value: 'csv', summary: 'Comma-separated paths for pre-tool hook evaluation.' },
         { flag: '--dry-run', summary: 'Preview integration install without writing files.' },
         { flag: '--force', summary: 'Overwrite existing manifests and target files.' },
+        { flag: '--merge', summary: 'Safely reconcile digest-verified ATM content while preserving user-owned files; conflicts fail closed.' },
         commonJsonOption,
         commonPrettyOption,
         commonHelpOption

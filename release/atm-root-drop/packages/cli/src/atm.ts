@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
+import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
 export { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
@@ -18,6 +18,7 @@ import { runATMChart } from './commands/atm-chart.ts';
 import { runBaseline } from './commands/baseline.ts';
 import { runBatch } from './commands/batch.ts';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
+import { runSetup } from './commands/setup.ts';
 import { runBudget } from './commands/budget.ts';
 import { runCandidates } from './commands/candidates.ts';
 import { runCreate } from './commands/create.ts';
@@ -84,6 +85,7 @@ export const cliCommandRunners: Record<string, CliRunner> = {
   baseline: runBaseline,
   batch: runBatch,
   bootstrap: runBootstrap,
+  setup: runSetup,
   budget: runBudget,
   candidates: runCandidates,
   create: runCreate,
@@ -152,7 +154,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
   applyOutputProjectionFlagsFromArgv(argv);
   const [commandName, ...rawCommandArgs] = argv;
   const outputFormat = selectOutputFormat(argv, io);
-  const commandArgs = stripFormatFlags(rawCommandArgs);
+  const commandArgs = commandName === 'setup' ? rawCommandArgs : stripFormatFlags(rawCommandArgs);
 
   if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
     const result = enrichCommandResult(createGlobalHelpResult(process.cwd()));

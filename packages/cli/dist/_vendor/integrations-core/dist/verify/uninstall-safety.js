@@ -8,16 +8,41 @@
  * files are removed. The manifest file itself is hash-checked before
  * deletion.
  */
-import { existsSync, rmSync } from 'node:fs';
-import { formatInstallManifest, normalizeManifestPath, resolveRepositoryPath, sha256Bytes, sha256File } from '../manifest/schema.js';
+import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { assertUnchanged, losslessUtf8, managedBlock, readManagedBlocks, safeInstallPath, validateOwnershipManifest } from '../manifest/safe-install.js';
+import { formatInstallManifest, normalizeManifestPath, sha256Bytes, sha256File } from '../manifest/schema.js';
 export function uninstallManifestFiles(adapterId, context, manifest) {
+    validateOwnershipManifest(manifest);
     const findings = [];
     const removedFiles = [];
     const preservedFiles = [];
+    const blocks = readManagedBlocks(manifest);
+    const peerFiles = collectPeerOwnership(context);
+    for (const file of manifest.files) {
+        const target = safeInstallPath(context.repositoryRoot, file.path);
+        if (existsSync(target) && blocks[file.path])
+            managedBlock(losslessUtf8(readFileSync(target)), blocks[file.path]);
+    }
     for (const fileRecord of manifest.files) {
-        const absolutePath = resolveRepositoryPath(context.repositoryRoot, fileRecord.path);
+        const absolutePath = safeInstallPath(context.repositoryRoot, fileRecord.path);
         if (!existsSync(absolutePath)) {
             findings.push(createFinding('warning', 'file-missing', fileRecord.path, 'Installed file was already missing.'));
+            continue;
+        }
+        if (blocks[fileRecord.path]) {
+            const bytes = readFileSync(absolutePath);
+            const text = losslessUtf8(bytes);
+            const block = managedBlock(text, blocks[fileRecord.path]);
+            if (block && sha256Bytes(block.content) === fileRecord.sha256) {
+                assertUnchanged(context.repositoryRoot, fileRecord.path, bytes);
+                writeFileSync(absolutePath, text.slice(0, block.start) + text.slice(block.end));
+                findings.push(createFinding('info', 'file-ok', fileRecord.path, 'Removed only the ATM-owned block; user content was preserved.'));
+            }
+            else {
+                findings.push(createFinding('warning', 'hash-mismatch', fileRecord.path, 'Modified ATM block was preserved.'));
+            }
+            preservedFiles.push(fileRecord.path);
             continue;
         }
         const currentDigest = sha256File(absolutePath);
@@ -26,11 +51,16 @@ export function uninstallManifestFiles(adapterId, context, manifest) {
             preservedFiles.push(fileRecord.path);
             continue;
         }
+        if (peerFiles.has(fileRecord.path)) {
+            preservedFiles.push(fileRecord.path);
+            findings.push(createFinding('info', 'file-ok', fileRecord.path, 'Preserved a file still owned by another project integration manifest.'));
+            continue;
+        }
         rmSync(absolutePath, { force: true });
         removedFiles.push(fileRecord.path);
     }
     const manifestPath = normalizeManifestPath(context.manifestPath ?? '.atm/integrations/manifest.json');
-    const absoluteManifestPath = resolveRepositoryPath(context.repositoryRoot, manifestPath);
+    const absoluteManifestPath = safeInstallPath(context.repositoryRoot, manifestPath);
     if (existsSync(absoluteManifestPath)) {
         const expectedManifestDigest = sha256Bytes(formatInstallManifest(manifest));
         const actualManifestDigest = sha256File(absoluteManifestPath);
@@ -53,6 +83,27 @@ export function uninstallManifestFiles(adapterId, context, manifest) {
     };
 }
 // ─── Private helpers ───────────────────────────────────────────────────────
+function collectPeerOwnership(context) {
+    const files = new Set();
+    const directory = safeInstallPath(context.repositoryRoot, '.atm/integrations');
+    if (!existsSync(directory))
+        return files;
+    const own = path.resolve(context.repositoryRoot, context.manifestPath ?? '.atm/integrations/manifest.json');
+    for (const name of readdirSync(directory).filter(entry => entry.endsWith('.manifest.json') || entry === 'codex.host.json' || entry === 'manifest.json')) {
+        const candidate = safeInstallPath(context.repositoryRoot, `.atm/integrations/${name}`);
+        if (candidate === own)
+            continue;
+        const other = JSON.parse(losslessUtf8(readFileSync(candidate)));
+        validateOwnershipManifest(other);
+        for (const entry of other.files) {
+            if (!entry || typeof entry.path !== 'string' || normalizeManifestPath(entry.path) !== entry.path) {
+                throw new Error(`ATM_INTEGRATION_INVALID_OWNERSHIP: invalid peer file in ${name}`);
+            }
+            files.add(entry.path); // Stale peer digests still represent live ownership.
+        }
+    }
+    return files;
+}
 function createFinding(level, code, filePath, message) {
     return {
         level,

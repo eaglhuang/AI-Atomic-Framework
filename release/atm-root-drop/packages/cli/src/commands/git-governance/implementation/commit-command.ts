@@ -32,6 +32,7 @@ import { resolveFrameworkHookTaskId } from './framework-hook-identity.ts';
 import { executeGitCommit } from './commit-execution.ts';
 import { resolveFrameworkCommitAuthorityContext } from '../../framework-development/framework-temp-publication-capability.ts';
 import { assertFrameworkCommitClaimAuthority } from './framework-commit-claim-guard.ts';
+import { autoStageQuickfixLockFiles } from './quickfix-auto-stage.ts';
 import { assertDryRunReachedNoExecutor, resolveDryRunPurity } from './dry-run-purity.ts';
 import { routeFrameworkClaimCommitBranch } from './commit-framework-branch.ts';
 import { routeTaskScopedCommitBranch } from './commit-task-scoped-branch.ts';
@@ -119,6 +120,10 @@ const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, f
 // lane, not a request to infer framework authority from the shared index.
 if (options.recordOnlyCommit !== true) {
   assertFrameworkCommitClaimAuthority({ actorId, laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null, authority: { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution } });
+}
+
+if (!taskDocument && !usesFrameworkClaimCommit && options.autoStage && !options.dryRun) {
+  autoStageQuickfixLockFiles(options.cwd, actorId);
 }
 
 const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;

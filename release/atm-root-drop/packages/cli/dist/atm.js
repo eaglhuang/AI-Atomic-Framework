@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { recordCommandGateTelemetry } from './telemetry/command-gate.js';
+import { recordCommandGateTelemetry } from './commands/setup/telemetry.js';
 export { recordCommandGateTelemetry } from './telemetry/command-gate.js';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.js';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.js';
@@ -17,6 +17,7 @@ import { runATMChart } from './commands/atm-chart.js';
 import { runBaseline } from './commands/baseline.js';
 import { runBatch } from './commands/batch.js';
 import { runBootstrap } from './commands/bootstrap-entry.js';
+import { runSetup } from './commands/setup.js';
 import { runBudget } from './commands/budget.js';
 import { runCandidates } from './commands/candidates.js';
 import { runCreate } from './commands/create.js';
@@ -81,6 +82,7 @@ export const cliCommandRunners = {
     baseline: runBaseline,
     batch: runBatch,
     bootstrap: runBootstrap,
+    setup: runSetup,
     budget: runBudget,
     candidates: runCandidates,
     create: runCreate,
@@ -148,7 +150,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
     applyOutputProjectionFlagsFromArgv(argv);
     const [commandName, ...rawCommandArgs] = argv;
     const outputFormat = selectOutputFormat(argv, io);
-    const commandArgs = stripFormatFlags(rawCommandArgs);
+    const commandArgs = commandName === 'setup' ? rawCommandArgs : stripFormatFlags(rawCommandArgs);
     if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
         const result = enrichCommandResult(createGlobalHelpResult(process.cwd()));
         writeResult(result, io.stdout, outputFormat);
