@@ -21,6 +21,12 @@ assert.ok(productStart >= 0 && dogfoodStart > productStart, 'workflow must decla
 assert.match(workflow, /release_candidate:/, 'workflow_dispatch must support release-candidate burn-in runs');
 assert.match(workflow, /run-name: Product CI burn-in/, 'workflow runs must expose their burn-in classification');
 const productJob = workflow.slice(productStart, dogfoodStart);
+for (const [name, job] of [['Product CI', productJob], ['ATM Dogfood', workflow.slice(dogfoodStart)]]) {
+  const checkout = job.match(/uses: actions\/checkout@v4\s*\r?\n([\s\S]*?)(?=\r?\n      - name:)/)?.[1];
+  assert.ok(checkout, `${name} must retain a checkout step`);
+  assert.match(checkout, /fetch-depth: 0/, `${name} must preserve full commit ancestry`);
+  assert.match(checkout, /filter: blob:none/, `${name} must avoid eagerly transferring unused historical blobs`);
+}
 assert.match(productJob, /name: Product CI/);
 assert.doesNotMatch(productJob, /\bneeds:/, 'Product CI must be independent of dogfood diagnostics');
 for (const command of ['npm ci', 'npm run build -- --validation-only', 'npm run typecheck', 'npx eslint scripts/validate-ci-product-lane.ts tests/cli/ci-product-lane-contract.test.ts', 'ci-product-lane-contract.test.ts', 'run-cli-test-sweep.ts', 'npm test', 'validate-package-skeleton.ts', 'npm run validate:package-install', 'npm pack --workspaces --dry-run', 'npm ci --ignore-scripts']) {
