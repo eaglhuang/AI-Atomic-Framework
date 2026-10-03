@@ -15,8 +15,9 @@ export function uniq(values: readonly string[] | undefined | null): StringSet {
 export function collectTags(requestId: string): { scenarios: string[]; tasks: string[] } {
   const parts = requestId.split(':');
   const result = { scenarios: new Set<string>(), tasks: new Set<string>() };
-  if (parts.length >= 2 && parts[0] === 'bench') {
-    result.scenarios.add(parts[1] ?? 'n/a');
+  const scenario = parseScenarioTag(requestId);
+  if (scenario !== null) {
+    result.scenarios.add(scenario);
   }
   for (const part of parts) {
     if (part.startsWith('TASK-')) {
@@ -32,7 +33,7 @@ export function collectTags(requestId: string): { scenarios: string[]; tasks: st
 export function parseScenarioTag(requestId: string): string | null {
   const parts = requestId.split(':');
   if (parts.length >= 2 && parts[0] === 'bench') {
-    return parts[1] ?? null;
+    return parts[1]?.trim() || null;
   }
   return null;
 }
@@ -93,4 +94,3 @@ export function collectTagsFromExperiment(requestId: string): { scenarios: strin
     tasks: [parseTaskIdHint(requestId)].filter((value) => Boolean(value)) as string[]
   };
 }
-
