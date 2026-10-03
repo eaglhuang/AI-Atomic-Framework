@@ -36,6 +36,7 @@ export function buildChannelPlaybook(input) {
     const fastClaimLabel = input.fastClaimLabel?.trim() || 'quickfix lock';
     const closeOps = buildTaskflowCloseOperatorCommands(taskId, actor);
     if (input.channel === 'fast') {
+        const commitCommand = `node atm.mjs git commit --actor ${actor} --message "<message>" --auto-stage --json`;
         return {
             schemaId: 'atm.channelPlaybook.v1',
             channel: 'fast',
@@ -43,10 +44,13 @@ export function buildChannelPlaybook(input) {
             mustFollow: true,
             summary: 'Use this only for small, low-risk edits. It is not a task-card closure path.',
             steps: [
-                `Run: ${defaultClaimCommand}`,
+                input.fastClaimActive
+                    ? `The ${fastClaimLabel} is already active from this response; do not run the claim again.`
+                    : `Run: ${defaultClaimCommand}`,
                 'Edit only the allowed files returned by ATM.',
                 'Run the smallest relevant validator for the touched file.',
-                'Commit only the real non-.atm diff with the ATM git wrapper; auto-stage is bounded by the quickfix lock.'
+                `Run: ${commitCommand}`,
+                'If the commit returns ATM_GIT_COMMIT_IDENTITY_MISSING, run its requiredCommand once with your git user.name and user.email, then rerun the commit.'
             ],
             doNot: [
                 'Do not edit .atm/history/**.',
@@ -55,10 +59,10 @@ export function buildChannelPlaybook(input) {
                 'Do not run a separate git add; --auto-stage performs the bounded staging step.'
             ],
             commandSequence: [
-                defaultClaimCommand,
+                ...(input.fastClaimActive ? [] : [defaultClaimCommand]),
                 '<edit allowed files>',
                 '<run focused validator>',
-                `node atm.mjs git commit --actor ${actor} --message "<message>" --auto-stage --json`
+                commitCommand
             ],
             commitTiming: 'Commit after the focused validator passes. The ATM wrapper auto-stages only the quickfix-allowed files and governed provenance; bare `git commit` is for read-only inspection or non-governed maintenance only.',
             governedGitEntrypoint: {
