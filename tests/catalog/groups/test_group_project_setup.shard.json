@@ -1,0 +1,13 @@
+{
+  "schemaId": "atm.testCaseGroup.v1",
+  "specVersion": "0.1.0",
+  "groupId": "test_group_project_setup",
+  "theme": "Vendor-neutral project setup and safe integration ownership",
+  "resourceKey": "project-setup",
+  "maintainers": ["atm-integrations"],
+  "cases": [
+    { "caseId": "test_project_setup_detection", "semanticKey": "project_setup_detection", "command": "node --strip-types --test tests/cli/setup-detection.test.ts", "responsibility": "task-required", "coversAcceptance": ["all supported agents", "configuration evidence", "no vendor guessing"] },
+    { "caseId": "test_project_setup_composition", "semanticKey": "project_setup_composition", "command": "node --strip-types --test tests/cli/setup-install.test.ts", "responsibility": "task-required", "coversAcceptance": ["explicit target", "native entries", "isolated project state", "safe recovery"] },
+    { "caseId": "test_project_setup_merge", "semanticKey": "project_setup_merge", "command": "node --strip-types --test tests/cli/integration-safe-merge.test.ts", "responsibility": "task-required", "coversAcceptance": ["preserve user files", "idempotency", "shared ownership", "path safety"] }
+  ]
+}
