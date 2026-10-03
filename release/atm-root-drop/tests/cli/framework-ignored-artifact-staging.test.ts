@@ -18,7 +18,7 @@ try {
   git('init', '-q');
   git('config', 'user.name', 'ATM fixture');
   git('config', 'user.email', 'atm@example.invalid');
-  write('.gitignore', 'release/\n');
+  write('.gitignore', 'release/\ngenerated/\n');
   write('release/atm-root-drop/release-manifest.json', JSON.stringify({
     generatedFiles: ['release/atm-root-drop/packages/integrations-core/dist/manifest/safe-install.js']
   }));
@@ -36,6 +36,19 @@ try {
 
   const exactClaim = autoStageFrameworkClaimFiles(root, 'atm-stage-test', false, [sibling]);
   assert.deepEqual(exactClaim, [sibling], 'an exact ignored path claim remains an explicit authorization');
+
+  write('generated/declared.js', 'export const declared = true;\n');
+  write('generated/sibling.js', 'export const sibling = true;\n');
+  assert.deepEqual(
+    autoStageFrameworkClaimFiles(root, 'atm-stage-test', false, ['generated/']),
+    [],
+    'a generic directory claim must not absorb ignored files absent from the manifest',
+  );
+  assert.deepEqual(
+    autoStageFrameworkClaimFiles(root, 'atm-stage-test', false, ['generated/declared.js']),
+    ['generated/declared.js'],
+    'an exact generic ignored file claim remains supported',
+  );
 } finally {
   rmSync(root, { recursive: true, force: true });
 }

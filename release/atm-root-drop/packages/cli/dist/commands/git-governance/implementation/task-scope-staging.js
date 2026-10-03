@@ -293,7 +293,6 @@ export function autoStageFrameworkClaimFiles(cwd, actorId, apply = true, claimed
     const stagedFiles = new Set(readStagedFiles(cwd));
     const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(cwd);
     const ownerScope = { cwd, currentTaskId: frameworkTempTaskId(actorId) };
-    const ignoredDeclaredFiles = listTaskDeclaredIgnoredWorktreeFiles(cwd, [...claimedFiles]);
     const candidates = uniqueSorted(listTaskScopedWorktreeDirtyFiles(cwd, [...claimedFiles], releaseGeneratedArtifacts).filter((filePath) => {
         const normalized = normalizeRelativePath(filePath);
         const exactClaim = [...claimedFiles].some((scope) => normalizeRelativePath(scope) === normalized);
@@ -363,7 +362,7 @@ export function listTaskScopedWorktreeDirtyFiles(cwd, ignoredScope = [], release
     for (const filePath of listTaskDeclaredIgnoredWorktreeFiles(cwd, ignoredScope)) {
         const normalized = normalizeRelativePath(filePath);
         const exactClaim = ignoredScope.some((scope) => normalizeRelativePath(scope) === normalized);
-        if (exactClaim || (!normalized.startsWith('release/') && !normalized.startsWith('packages/cli/dist/')) || releaseGeneratedArtifacts.has(normalized))
+        if (exactClaim || releaseGeneratedArtifacts.has(normalized))
             files.add(filePath);
     }
     return uniqueSorted([...files]);
