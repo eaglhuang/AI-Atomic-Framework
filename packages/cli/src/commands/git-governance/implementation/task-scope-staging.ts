@@ -329,7 +329,7 @@ export function readActiveFrameworkClaimFiles(cwd: LegacyValue, actorId: LegacyV
 }
 
 export function readReleaseGeneratedArtifactPaths(cwd: LegacyValue) {
-  const generated = new Set();
+  const generated = new Set<string>();
   for (const manifestPath of [
     path.join(cwd, "release", "atm-root-drop", "release-manifest.json"),
     path.join(cwd, "release", "atm-onefile", "release-manifest.json"),
@@ -524,7 +524,7 @@ export function inspectFrameworkScopedUnstagedCommit(cwd: LegacyValue, actorId: 
   };
 }
 
-export function listTaskScopedWorktreeDirtyFiles(cwd: LegacyValue, ignoredScope: readonly string[] = [], releaseGeneratedArtifacts: ReadonlySet<string> = new Set()) {
+export function listTaskScopedWorktreeDirtyFiles(cwd: LegacyValue, ignoredScope: readonly string[] = [], releaseGeneratedArtifacts: ReadonlySet<string> = new Set<string>()) {
   const files = new Set([...readGitNameOnly(cwd, ["diff", "--name-only"]), ...readGitNameOnly(cwd, ["ls-files", "-o", "--exclude-standard"])]);
   for (const filePath of listTaskDeclaredIgnoredWorktreeFiles(cwd, ignoredScope)) {
     const normalized = normalizeRelativePath(filePath);
