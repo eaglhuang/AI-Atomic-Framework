@@ -47,7 +47,8 @@ export function tryBuildQuickfixClaimResult(input: {
       playbook: buildChannelPlaybook({
         channel: 'fast',
         originalPrompt: input.promptText,
-        actorPlaceholder: resolvedActor.actorId
+        actorPlaceholder: resolvedActor.actorId,
+        fastClaimActive: true
       }),
       quickfixLock
     };
