@@ -24,6 +24,7 @@ import { runAtmGit } from './commands/git-governance.ts';
 import { runIntegration } from './commands/integration.ts';
 import { runPlan } from './commands/plan.ts';
 import { runActor } from './commands/actor.ts';
+import { runIdentity } from './commands/identity.ts';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
 import { runStart } from './commands/start.ts';
 import { runTasks } from './commands/tasks.ts';
@@ -54,6 +55,8 @@ export const publicCliCommandRunners: Record<string, CliRunner> = {
   integration: runIntegration,
   plan: runPlan,
   actor: runActor,
+  // git commit's ATM_GIT_COMMIT_IDENTITY_MISSING remediation runs identity set.
+  identity: runIdentity,
   bootstrap: runBootstrap,
   start: runStart,
   tasks: runTasks,
