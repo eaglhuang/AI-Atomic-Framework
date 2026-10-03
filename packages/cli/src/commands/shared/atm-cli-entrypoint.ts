@@ -20,6 +20,20 @@ export function classifyRunnerMode(entrypoint: string | null): RunnerModeClass {
   return 'unknown';
 }
 
-export function governanceCommandPrefix(entrypoint: string | null): string {
-  return classifyRunnerMode(entrypoint) === 'npm-package' ? 'npm exec -- atm' : 'node atm.mjs';
+export function governanceCommandPrefix(entrypoint: string | null, platform = process.platform): string {
+  if (entrypoint && classifyRunnerMode(entrypoint) === 'npm-package') {
+    // A shared installation need not be a dependency of the selected project.
+    // Reuse the executing entrypoint; npm exec may otherwise fetch an unrelated
+    // package named "atm" or fail when the consumer is offline.
+    const runtime = path.isAbsolute(entrypoint) || path.win32.isAbsolute(entrypoint)
+      ? entrypoint : path.resolve(entrypoint);
+    // Windows command guidance targets PowerShell; single-quoted literals do
+    // not expand dollar expressions or environment variables.
+    const quoted = /^[A-Za-z0-9_@./:-]+$/.test(runtime) ? runtime
+      : platform === 'win32' ? `'${runtime.replace(/'/g, "''")}'`
+      : `'${runtime.replace(/'/g, `'"'"'`)}'`;
+    return `node ${quoted}`;
+  }
+  return 'node atm.mjs';
 }
+import path from 'node:path';
