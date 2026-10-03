@@ -1,3 +1,4 @@
+import { evidencePathForTask } from '../../evidence/evidence-store.js';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
@@ -578,6 +579,7 @@ export function closeJournalPath(cwd, taskId) { return path.join(cwd, '.atm-temp
 export async function executeTaskCloseTransaction(input) { const journalPath = closeJournalPath(input.cwd, input.taskId); mkdirSync(path.dirname(journalPath), { recursive: true }); writeFileSync(journalPath, `${JSON.stringify({ schemaId: 'atm.closeJournal.v1', taskId: input.taskId, phase: input.phase, status: 'staging', startedAt: new Date().toISOString() }, null, 2)}\n`, 'utf8'); const rolledBackArtifacts = []; let transitionAbsolute = null; try {
     const result = await input.runWrites();
     transitionAbsolute = path.resolve(input.cwd, result.transitionPath);
+    await input.stageArtifacts?.(result);
     writeFileSync(journalPath, `${JSON.stringify({ schemaId: 'atm.closeJournal.v1', taskId: input.taskId, phase: input.phase, status: 'committed', committedAt: new Date().toISOString(), transitionPath: result.transitionPath, closurePacketPath: result.closurePacketPath }, null, 2)}\n`, 'utf8');
     unlinkSync(journalPath);
     return result;
@@ -1115,7 +1117,7 @@ function classifyRepairUpstreamStatus(cwd) { const branch = runGitLines(cwd, ['r
 function resolveClosurePacketPath(cwd, taskId) { const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`); const taskDocument = readJsonIfExists(taskPath); const declaredPath = normalizeOptionalString(taskDocument?.closurePacket ?? taskDocument?.closure_packet); if (declaredPath)
     return normalizeRelativePath(declaredPath); return normalizeRelativePath(path.join('.atm', 'history', 'evidence', `${taskId}.closure-packet.json`)); }
 function sameStringSet(left, right) { const normalize = (values) => [...new Set(values.map((value) => String(value).trim()).filter(Boolean))].sort(); return JSON.stringify(normalize(left)) === JSON.stringify(normalize(right)); }
-function readClosureEvidenceContext(cwd, taskId) { const evidencePath = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`); const records = flattenEvidenceRecords(readJsonIfExists(evidencePath)); const commandRuns = dedupeCommandRuns(records.flatMap((record) => extractEvidenceCommandRuns(record, cwd))); const validationPasses = uniqueSorted(records.flatMap(extractValidationPasses)); const evidenceFreshness = resolveEvidenceFreshness(records); return { commandRuns, validationPasses, evidenceFreshness }; }
+function readClosureEvidenceContext(cwd, taskId) { const runtimePath = evidencePathForTask(cwd, taskId); const evidencePath = existsSync(runtimePath) ? runtimePath : path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`); const records = flattenEvidenceRecords(readJsonIfExists(evidencePath)); const commandRuns = dedupeCommandRuns(records.flatMap((record) => extractEvidenceCommandRuns(record, cwd))); const validationPasses = uniqueSorted(records.flatMap(extractValidationPasses)); const evidenceFreshness = resolveEvidenceFreshness(records); return { commandRuns, validationPasses, evidenceFreshness }; }
 function flattenEvidenceRecords(value) { if (!value)
     return []; if (Array.isArray(value.evidence)) {
     return value.evidence.filter((entry) => Boolean(entry) && typeof entry === 'object' && !Array.isArray(entry));

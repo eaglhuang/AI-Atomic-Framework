@@ -82,7 +82,15 @@ export function isClean(result: TestResult): boolean {
 
 function worktreeState(root: string): Set<string> {
   const out = spawnSync('git', ['status', '--porcelain', '--untracked-files=all'], { cwd: root, encoding: 'utf8' });
+  if (out.error || out.status !== 0) throw new Error('Cannot verify clean sweep worktree: ' + (out.error?.message ?? out.stderr));
   return new Set(out.stdout.split('\n').filter(Boolean));
+}
+
+function preserveBatchChanges(root: string): void {
+  const result = spawnSync('git', ['stash', 'push', '--include-untracked', '--quiet'], { cwd: root, encoding: 'utf8' });
+  if (result.error || result.status !== 0) throw new Error('Sweep recovery failed; changes preserved in place: ' + (result.error?.message ?? result.stderr));
+  // Keep the recovery stash: never drop a stash that might include a concurrent
+  // writer's changes, or an older user stash when creation failed.
 }
 
 function runOne(root: string, testDir: string, test: string, timeoutMs: number): Promise<Omit<TestResult, 'dirtied'>> {
@@ -109,6 +117,9 @@ export async function runSweep(root: string, config: SweepConfig, only?: readonl
   for (let index = 0; index < tests.length; index += config.concurrency) {
     const batch = tests.slice(index, index + config.concurrency);
     const before = worktreeState(root);
+    if (attempt === 'initial' && before.size > 0) {
+      throw new Error('CLI sweep requires a clean dedicated worktree; existing WIP is preserved. Use an isolated test checkout.');
+    }
     const batchStarted = Date.now();
     const outcomes = await Promise.all(batch.map((test) => runOne(root, testDir, test, config.timeoutMs)));
     const added = [...worktreeState(root)].filter((line) => !before.has(line));
@@ -124,14 +135,12 @@ export async function runSweep(root: string, config: SweepConfig, only?: readonl
       for (const outcome of outcomes) results.push({ ...outcome, dirtied: batch.length === 1 ? added : [] });
       continue;
     }
-    spawnSync('git', ['stash', 'push', '--include-untracked', '--quiet'], { cwd: root });
-    spawnSync('git', ['stash', 'drop', '--quiet'], { cwd: root });
+    preserveBatchChanges(root);
     for (const test of batch) {
       const [single] = await runSweep(root, config, [test], options, 'retry');
       results.push(single);
       if (single.dirtied.length) {
-        spawnSync('git', ['stash', 'push', '--include-untracked', '--quiet'], { cwd: root });
-        spawnSync('git', ['stash', 'drop', '--quiet'], { cwd: root });
+        preserveBatchChanges(root);
       }
     }
   }
@@ -150,8 +159,13 @@ async function main(): Promise<void> {
     return;
   }
   // Writes made by tests are discarded between batches, so a dirty worktree would lose work.
-  if (worktreeState(root).size > 0) {
-    console.error('the CLI test sweep needs a clean worktree: it attributes and discards the writes tests make');
+  const initialDirtyPaths = [...worktreeState(root)].sort();
+  if (initialDirtyPaths.length > 0) {
+    console.error([
+      'the CLI test sweep needs a clean worktree: it attributes and discards the writes tests make',
+      'Initial dirty paths:',
+      ...initialDirtyPaths.map((entry) => `  ${entry}`),
+    ].join('\n'));
     process.exitCode = 1;
     return;
   }

@@ -36,7 +36,7 @@ function runOnefile(entrypointPath: any, cwd: any, args: any, extraEnv: Record<s
   });
   const payload = (result.stdout || result.stderr || '').trim();
   return {
-    exitCode: result.status ?? 0,
+    exitCode: result.error || result.signal ? 1 : (result.status ?? 1),
     parsed: payload ? JSON.parse(payload) : {}
   };
 }
@@ -136,6 +136,19 @@ try {
   assert(existsSync(staleCommandSpec), 'onefile build must refresh an existing stale root-drop snapshot');
   assert(existsSync(path.join(rootDrop.releaseRoot, governanceRouterSkillRelativePath)), 'root-drop source for onefile must include governance router skill');
   assert(existsSync(release.outputFilePath), 'onefile build must emit release/atm-onefile/atm.mjs');
+
+  // Exercise the generated launcher, not just the runtime renderer fixture.
+  // This cache belongs solely to this validator's temporary workspace.
+  const integrityCacheBase = path.join(tempRoot, 'integrity-cache');
+  const integrityEnv = { ATM_ONEFILE_CACHE_ROOT: integrityCacheBase };
+  const coldIntegrity = runOnefile(release.outputFilePath, tempRoot, ['tasks', 'list', '--json'], integrityEnv);
+  const cachedCli = path.join(integrityCacheBase, release.payloadSha256, 'packages', 'cli', 'dist', 'atm.js');
+  const originalCli = readFileSync(cachedCli);
+  writeFileSync(cachedCli, 'export async function runCli() { console.log(JSON.stringify({command:"tampered-cache"})); return 0; }\n');
+  const restoredIntegrity = runOnefile(release.outputFilePath, tempRoot, ['tasks', 'list', '--json'], integrityEnv);
+  assert(restoredIntegrity.parsed.command !== 'tampered-cache', 'generated onefile must never execute corrupted cache bytes');
+  assert(restoredIntegrity.exitCode === coldIntegrity.exitCode, 'cache repair must preserve original command outcome');
+  assert(readFileSync(cachedCli).equals(originalCli), 'cache repair must restore the exact sealed CLI bytes');
 
   // TASK-RFT-0015 regression guard: the payload must never embed release/**.
   // A nested release/atm-onefile/atm.mjs makes the extracted launcher recurse
