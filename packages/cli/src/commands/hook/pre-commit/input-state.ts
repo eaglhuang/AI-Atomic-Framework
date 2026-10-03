@@ -35,7 +35,7 @@ function uniqueSorted(values: readonly string[]): readonly string[] {
 }
 
 export function readStagedFiles(cwd: string): readonly string[] {
-  return uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only', '--diff-filter=ACMRT'])
+  return uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only', '--diff-filter=ACMRTD'])
     .map(normalizeRelativePath)
     .filter(Boolean));
 }
