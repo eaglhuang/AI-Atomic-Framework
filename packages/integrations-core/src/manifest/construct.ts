@@ -7,7 +7,7 @@
  * manifest creation, static adapter factory, and the install
  * source-file writer.
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   formatInstallManifest,
@@ -31,6 +31,7 @@ import type {
 } from './types.ts';
 import { verifyManifestFiles } from '../verify/verify-installed.ts';
 import { uninstallManifestFiles } from '../verify/uninstall-safety.ts';
+import { assertUnchanged, losslessUtf8, planSafeFile, safeInstallPath } from './safe-install.ts';
 
 export function createInstallManifest(input: CreateInstallManifestInput): InstallManifest {
   return {
@@ -125,7 +126,13 @@ function installSourceFiles(input: {
   readonly sourceFiles: readonly IntegrationSourceFile[];
   readonly targetDirectory: string;
 }): IntegrationInstallResult {
-  const installedAt = input.context.now ?? new Date().toISOString();
+  const manifestPath = normalizeManifestPath(input.context.manifestPath ?? '.atm/integrations/manifest.json');
+  const merge = input.context.merge === true;
+  const manifestAbsolute = merge ? safeInstallPath(input.context.repositoryRoot, manifestPath) : resolveRepositoryPath(input.context.repositoryRoot, manifestPath);
+  const previousManifestBytes = merge && existsSync(manifestAbsolute) ? readFileSync(manifestAbsolute) : null;
+  const previous = previousManifestBytes ? JSON.parse(losslessUtf8(previousManifestBytes)) as InstallManifest : undefined;
+  if (previous && (previous.adapterId !== input.adapterId || !Array.isArray(previous.files))) throw new Error('ATM_INTEGRATION_INVALID_OWNERSHIP: invalid previous manifest');
+  const installedAt = previous?.installedAt ?? input.context.now ?? new Date().toISOString();
   const manifestFiles = input.sourceFiles.map((sourceFile) => {
     const manifestPath = combineManifestPath(input.targetDirectory, sourceFile.relativePath);
     return createManifestFileRecord({
@@ -135,7 +142,14 @@ function installSourceFiles(input: {
       fileFormat: sourceFile.fileFormat ?? input.defaultFileFormat
     });
   });
-  const manifest = createInstallManifest({
+  const plans = merge ? input.sourceFiles.map((sourceFile, index) => planSafeFile({
+    root: input.context.repositoryRoot, file: manifestFiles[index].path,
+    content: sourceFile.content, adapterId: input.adapterId, previous
+  })) : [];
+  const blocks = Object.fromEntries(plans.flatMap((plan, index) => plan.block ? [[manifestFiles[index].path, input.adapterId]] : []));
+  const backupPaths = plans.map((plan, index) => plan.previous && !plan.previous.equals(plan.bytes)
+    ? safeInstallPath(input.context.repositoryRoot, `.atm/integrations/backups/${input.adapterId}/${sha256Bytes(plan.previous).slice(7)}/${manifestFiles[index].path}`) : null);
+  const manifest = { ...previous, ...createInstallManifest({
     adapterId: input.adapterId,
     adapterVersion: input.adapterVersion,
     installedAt,
@@ -144,25 +158,39 @@ function installSourceFiles(input: {
     files: manifestFiles,
     metadata: {
       sourceFileCount: input.sourceFiles.length,
-      ...buildSkillProjectionManifestMetadata(input.sourceFiles, input.defaultFileFormat, input.targetDirectory)
+      ...buildSkillProjectionManifestMetadata(input.sourceFiles, input.defaultFileFormat, input.targetDirectory),
+      ...(Object.keys(blocks).length ? { managedBlocks: JSON.stringify(blocks) } : {}),
+      ...(previous?.metadata?.nativeBridgeManifest ? { nativeBridgeManifest: previous.metadata.nativeBridgeManifest } : {})
     }
-  });
-  const manifestPath = normalizeManifestPath(input.context.manifestPath ?? '.atm/integrations/manifest.json');
-  const writtenFiles = manifest.files.map((fileRecord) => fileRecord.path);
+  }) };
+  const writtenFiles = manifest.files.filter((_, index) => !merge || !plans[index].previous?.equals(plans[index].bytes)).map((file) => file.path);
 
   if (input.context.dryRun !== true) {
+    if (merge) {
+      assertUnchanged(input.context.repositoryRoot, manifestPath, previousManifestBytes);
+      plans.forEach((plan, index) => assertUnchanged(input.context.repositoryRoot, manifest.files[index].path, plan.previous));
+    }
     input.sourceFiles.forEach((sourceFile, index) => {
       const fileRecord = manifest.files[index];
       if (!fileRecord) {
         return;
       }
       const absolutePath = resolveRepositoryPath(input.context.repositoryRoot, fileRecord.path);
+      if (merge && plans[index].previous?.equals(plans[index].bytes)) return;
+      if (merge) assertUnchanged(input.context.repositoryRoot, fileRecord.path, plans[index].previous);
+      if (merge && plans[index].previous) {
+        const backup = backupPaths[index]!;
+        mkdirSync(path.dirname(backup), { recursive: true });
+        if (!existsSync(backup)) writeFileSync(backup, plans[index].previous!, { flag: 'wx' });
+      }
       mkdirSync(path.dirname(absolutePath), { recursive: true });
-      writeFileSync(absolutePath, sourceFile.content);
+      writeFileSync(absolutePath, merge ? plans[index].bytes : sourceFile.content);
     });
     const absoluteManifestPath = resolveRepositoryPath(input.context.repositoryRoot, manifestPath);
     mkdirSync(path.dirname(absoluteManifestPath), { recursive: true });
-    writeFileSync(absoluteManifestPath, formatInstallManifest(manifest));
+    const serialized = formatInstallManifest(manifest);
+    if (merge) assertUnchanged(input.context.repositoryRoot, manifestPath, previousManifestBytes);
+    if (!previousManifestBytes || previousManifestBytes.toString('utf8') !== serialized) writeFileSync(absoluteManifestPath, serialized);
   }
 
   return {

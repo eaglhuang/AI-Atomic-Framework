@@ -88,7 +88,7 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string; sou
       publicCommands: [
         'next', 'doctor', 'guide', 'init', 'create', 'taskflow', 'welcome',
         'status', 'verify', 'orient', 'evidence', 'lock', 'broker', 'git',
-        'integration', 'plan', 'actor', 'identity', 'bootstrap', 'start', 'tasks', 'atm-chart'
+        'integration', 'plan', 'actor', 'identity', 'bootstrap', 'setup', 'start', 'tasks', 'atm-chart'
       ],
       omittedPublicAssets: OMITTED_PUBLIC_ASSETS.map((pattern) => pattern.source),
       embeddedRuntimeAssets: Object.entries(embeddedATMChartSchemaAssets)

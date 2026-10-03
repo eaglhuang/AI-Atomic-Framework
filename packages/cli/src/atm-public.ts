@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import path from 'node:path';
-import { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
+import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
 import { fileURLToPath } from 'node:url';
 import { getCommandSpec } from './commands/command-specs.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
@@ -26,6 +26,7 @@ import { runPlan } from './commands/plan.ts';
 import { runActor } from './commands/actor.ts';
 import { runIdentity } from './commands/identity.ts';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
+import { runSetup } from './commands/setup.ts';
 import { runStart } from './commands/start.ts';
 import { runTasks } from './commands/tasks.ts';
 import { runATMChart } from './commands/atm-chart.ts';
@@ -58,6 +59,7 @@ export const publicCliCommandRunners: Record<string, CliRunner> = {
   // git commit's ATM_GIT_COMMIT_IDENTITY_MISSING remediation runs identity set.
   identity: runIdentity,
   bootstrap: runBootstrap,
+  setup: runSetup,
   start: runStart,
   tasks: runTasks,
   'atm-chart': runATMChart
@@ -72,7 +74,7 @@ export async function runPublicCli(
   applyOutputProjectionFlagsFromArgv(argv);
   const [commandName, ...rawCommandArgs] = argv;
   const outputFormat = selectOutputFormat(argv, io);
-  const commandArgs = stripFormatFlags(rawCommandArgs);
+  const commandArgs = commandName === 'setup' ? rawCommandArgs : stripFormatFlags(rawCommandArgs);
 
   if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
     const result = enrichCommandResult(createPublicHelpResult(process.cwd()));
