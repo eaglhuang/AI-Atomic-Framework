@@ -29,7 +29,11 @@ export const adopterRuntimeIgnorePatterns = [
   '.atm/runtime/git-commit-attempts/',
   '.atm/history/guidance/',
   '.atm/history/reports/',
-  '.atm-temp/'
+  '.atm-temp/',
+  // create-atm installs the ATM CLI into the project; an unignored
+  // node_modules turns the first `git add -A` into a dependency commit
+  // (and fails on Windows long paths).
+  'node_modules/'
 ] as const;
 
 export function ensureAdopterGitignore(cwd: string) {
