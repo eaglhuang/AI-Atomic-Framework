@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdtempSync, rmSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,7 +20,19 @@ function run(cwd: string, args: string[]) {
 
 function cleanCopy(source: string, label: string) {
   const cwd = mkdtempSync(path.join(os.tmpdir(), `atm-${label}-`));
-  cpSync(source, path.join(cwd, path.basename(source) === 'atm.mjs' ? 'atm.mjs' : ''), { recursive: true });
+  // Ignore local generated extras: they can hide a missing shipped dependency.
+  const inventory = spawnSync('git', ['ls-files', '-z', '--', path.relative(repoRoot, source)], {
+    cwd: repoRoot, encoding: 'utf8',
+  });
+  assert.equal(inventory.status, 0, inventory.stderr);
+  const files = inventory.stdout.split('\0').filter(Boolean);
+  assert.ok(files.length > 0, `No tracked release files for ${source}`);
+  for (const file of files) {
+    const absolute = path.join(repoRoot, file);
+    const destination = path.join(cwd, path.basename(source) === 'atm.mjs' ? 'atm.mjs' : path.relative(source, absolute));
+    mkdirSync(path.dirname(destination), { recursive: true });
+    cpSync(absolute, destination);
+  }
   spawnSync('git', ['init', '-q'], { cwd });
   return cwd;
 }
