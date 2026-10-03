@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -10,7 +10,7 @@ import { runAtmGit } from '../../../packages/cli/src/commands/git-governance.ts'
 import { issueTaskImportAdmissionTicket } from '../../../packages/cli/src/commands/tasks/task-work-admission-import.ts';
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-export const tempDir = path.resolve(root, '.atm-temp-test-git-commit-task-scoped-staging');
+export const tempDir = mkdtempSync(path.join(root, '.atm-temp-test-git-commit-task-scoped-staging-'));
 
 /**
  * Windows can retain a handle briefly after the final Git/CLI subprocess in

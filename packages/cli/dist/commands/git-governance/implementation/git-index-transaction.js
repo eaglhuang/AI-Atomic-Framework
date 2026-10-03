@@ -66,7 +66,7 @@ export function readStagedFiles(cwd) {
             "diff",
             "--cached",
             "--name-only",
-            "--diff-filter=ACMRT",
+            "--diff-filter=ACMRTD",
         ])
             .split(/\r?\n/)
             .map(normalizeRelativePath)
