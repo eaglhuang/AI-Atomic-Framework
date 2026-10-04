@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runGuide } from '../../packages/cli/src/commands/guide.ts';
+import { governanceCommandPrefix } from '../../packages/cli/src/commands/shared/atm-cli-entrypoint.ts';
+import { resolveFirstUseArguments } from '../../scripts/lib/npm-first-use.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const validator = path.join(root, 'scripts', 'validate-npm-clean-install.ts');
@@ -64,12 +67,36 @@ try {
   const guide = runGuide(['--goal', 'A minimal first-run workflow.', '--cwd', guideCwd]) as { evidence?: { nextCommand?: string } };
   assert.equal(
     guide.evidence?.nextCommand,
-    'npm exec -- atm orient --cwd . --json',
+    `${governanceCommandPrefix(process.argv[1])} orient --cwd . --json`,
     'guide --goal must emit a command that runs through the installed npm package'
   );
 } finally {
   process.argv[1] = originalEntrypoint;
   rmSync(guideCwd, { recursive: true, force: true });
+}
+
+const commandFixture = mkdtempSync(path.join(os.tmpdir(), "atm npm '$() command-"));
+try {
+  const packageRoot = path.join(commandFixture, 'node_modules/@ai-atomic-framework/cli');
+  const runtime = path.join(packageRoot, 'dist/npm-runtime/atm.mjs');
+  const bin = path.join(commandFixture, 'node_modules/.bin', process.platform === 'win32' ? 'atm.cmd' : 'atm');
+  mkdirSync(path.dirname(runtime), { recursive: true }); mkdirSync(path.dirname(bin), { recursive: true });
+  writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify({ name: '@ai-atomic-framework/cli', bin: { atm: 'dist/npm-runtime/atm.mjs' } }));
+  writeFileSync(runtime, 'console.log(JSON.stringify(process.argv.slice(2)))');
+  if (process.platform === 'win32') writeFileSync(bin, 'fixture'); else symlinkSync(runtime, bin);
+  const suffix = 'bootstrap --cwd . --task "Bootstrap ATM in this repository"';
+  const command = `${governanceCommandPrefix(runtime)} ${suffix}`;
+  const argv = resolveFirstUseArguments(command, bin);
+  assert.deepEqual(argv, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository']);
+  // Execute from outside the installed package, without a shell.
+  const elsewhere = spawnSync(process.execPath, [runtime, ...argv!], { cwd: os.tmpdir(), encoding: 'utf8' });
+  assert.equal(elsewhere.status, 0, elsewhere.stderr);
+  assert.deepEqual(JSON.parse(elsewhere.stdout), argv);
+  assert.equal(resolveFirstUseArguments(`node /untrusted/atm.mjs ${suffix}`, bin), null);
+  assert.equal(resolveFirstUseArguments(`${command}; echo unexpected`, bin), null);
+  assert.equal(resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} arbitrary --json`, bin), null);
+} finally {
+  rmSync(commandFixture, { recursive: true, force: true });
 }
 
 // The npm product is a self-contained CLI plus its small adoption starter. The publish closure

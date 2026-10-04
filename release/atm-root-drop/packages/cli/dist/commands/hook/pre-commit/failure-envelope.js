@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isPreservedForeignBootstrapReport } from '../../shared/bootstrap-report-provenance.js';
 import { buildFrameworkStaleCleanupCommand, isFrameworkStaleLockReleasable } from '../../framework-development.js';
 import { normalizeRelativePath } from '../git-index-diagnostics.js';
 const INVARIANT_TASK_AUDIT_CODES = new Set([
@@ -226,6 +227,8 @@ export function selectActionableResidueFindings(input) {
             // anything actually staged into this commit still blocks.
             const owner = finding.ownerTaskId?.trim().toUpperCase() ?? null;
             const stagedHere = staged.has(normalizeRelativePath(finding.path));
+            if (!stagedHere && isPreservedForeignBootstrapReport(input.cwd, taskId, finding.path))
+                return false;
             if (!stagedHere && owner && owner !== taskId
                 && !ownersWithNonDeferrableForeignResidue.has(owner)
                 && isDeferrableForeignGovernanceResidue(finding)
@@ -236,6 +239,10 @@ export function selectActionableResidueFindings(input) {
             return true;
         }
         if (staged.has(normalizeRelativePath(finding.path)))
+            return true;
+        // Unknown or modified report content has no ownership proof. Only the
+        // verified bootstrap branch above may preserve it without blocking.
+        if (/^\.atm\/history\/reports\/.+\.json$/.test(normalizeRelativePath(finding.path)))
             return true;
         return taskId !== null && finding.ownerTaskId?.trim().toUpperCase() === taskId;
     });

@@ -1,3 +1,4 @@
+import { governanceCommandPrefix } from '../packages/cli/src/commands/shared/atm-cli-entrypoint.ts';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
@@ -141,9 +142,11 @@ function describeAdoptionResidue(adoptionRoot: string): string {
   return `left ${residue.length} file(s) behind: ${residue.slice(0, 8).join(', ')}${residue.length > 8 ? ` (+${residue.length - 8} more)` : ''}`;
 }
 
-function runEmittedNpmCommand(command: string, expectedCommand: string, cwd: string, label: string): any {
+function runEmittedNpmCommand(command: string, expectedArgs: string[], packageInstallRoot: string, cwd: string, label: string): any {
+  const runtime = installedCliEntrypoint(packageInstallRoot);
+  const expectedCommand = `${governanceCommandPrefix(runtime)} ${expectedArgs.map(arg => /\s/.test(arg) ? JSON.stringify(arg) : arg).join(' ')}`;
   if (command !== expectedCommand) fail(`${label} emitted ${JSON.stringify(command)} instead of ${JSON.stringify(expectedCommand)}`);
-  const result = spawnSync(command, { cwd, encoding: 'utf8', shell: true, maxBuffer: 64 * 1024 * 1024 });
+  const result = spawnSync(process.execPath, [runtime, ...expectedArgs], { cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
   if (result.status !== 0) fail(`${label} failed with exit ${result.status}: ${output.split('\n').slice(0, 8).join(' ')}`);
   if (/ERR_MODULE_NOT_FOUND|Cannot find (module|package)/.test(output)) {
@@ -191,7 +194,8 @@ function assertDefaultAdoptionRecoverySucceeds(installRoot: string, tarball: str
     const recoveryCommand = doctorResult.evidence?.recommendedAction;
     runEmittedNpmCommand(
       recoveryCommand,
-      'npm exec -- atm atm-chart render --cwd . --json',
+      ['atm-chart', 'render', '--cwd', '.', '--json'],
+      adoptionRoot,
       adoptionRoot,
       'npm adopter doctor onboarding recovery'
     );
@@ -210,13 +214,15 @@ function assertDefaultAdoptionRecoverySucceeds(installRoot: string, tarball: str
   }
   const guide = runEmittedNpmCommand(
     nextResult.evidence?.nextAction?.command,
-    `npm exec -- atm guide --goal "${goal}" --cwd . --json`,
+    ['guide', '--goal', goal, '--cwd', '.', '--json'],
+    adoptionRoot,
     adoptionRoot,
     'default adopter atm next -> guide'
   );
   runEmittedNpmCommand(
     guide.evidence?.nextCommand,
-    'npm exec -- atm orient --cwd . --json',
+    ['orient', '--cwd', '.', '--json'],
+    adoptionRoot,
     adoptionRoot,
     'default adopter atm guide -> orient'
   );
@@ -292,13 +298,15 @@ function assertAdoptionSucceeds(installRoot: string, expectedVersion: string, ta
   }
   const guide = runEmittedNpmCommand(
     nextResult.evidence?.nextAction?.command,
-    `npm exec -- atm guide --goal "${goal}" --cwd . --json`,
+    ['guide', '--goal', goal, '--cwd', '.', '--json'],
+    installRoot,
     adoptionRoot,
     'atm next -> guide'
   );
   runEmittedNpmCommand(
     guide.evidence?.nextCommand,
-    'npm exec -- atm orient --cwd . --json',
+    ['orient', '--cwd', '.', '--json'],
+    installRoot,
     adoptionRoot,
     'atm guide -> orient'
   );

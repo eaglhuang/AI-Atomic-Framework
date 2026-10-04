@@ -17,7 +17,7 @@ export function blockedMutationCommands() {
         'apply without human review approval'
     ];
 }
-export function decideRuntimeNextAction(runtime, failedCheckName, importedTaskQueue, commandPrefix = 'node atm.mjs') {
+export function decideRuntimeNextAction(runtime, failedCheckName, importedTaskQueue, commandPrefix = 'node atm.mjs', runnerMode = 'frozen') {
     if (runtime.migrationNeeded || runtime.hasV1 && runtime.hasV2 === false) {
         return {
             status: 'needs-bootstrap',
@@ -103,7 +103,7 @@ export function decideRuntimeNextAction(runtime, failedCheckName, importedTaskQu
     }
     return {
         status: 'ready',
-        command: commandPrefix === 'npm exec -- atm' ? 'npm test --if-present' : 'npm test',
+        command: runnerMode === 'npm-package' ? 'npm test --if-present' : 'npm test',
         reason: 'runtime state, governance state, and engineering checks are all green',
         allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
         blockedCommands: blockedMutationCommands()

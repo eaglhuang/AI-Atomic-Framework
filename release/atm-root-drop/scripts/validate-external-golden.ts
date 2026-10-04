@@ -25,7 +25,9 @@ function assert(condition: any, message: any) {
 function runAtm(cwd: any, args: any) {
   const result = spawnSync(process.execPath, [path.join(cwd, 'atm.mjs'), ...args], {
     cwd,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    // Some golden payloads exceed spawnSync's 1 MiB default and were truncated.
+    maxBuffer: 64 * 1024 * 1024
   });
   const payload = (result.stdout || result.stderr || '').trim();
   return {
