@@ -28,6 +28,13 @@ export const adopterRuntimeIgnorePatterns = [
   '.atm/runtime/incidents/',
   '.atm/runtime/write-broker.registry.json',
   '.atm/runtime/git-commit-attempts/',
+  // Per-claim lanes, close transactions and broker queues appear during a
+  // normal task claim and close.
+  '.atm/runtime/lane-sessions/',
+  '.atm/runtime/close-transactions/',
+  '.atm/runtime/broker-intents/',
+  '.atm/runtime/broker-shared-surface-freezes.json',
+  '.atm/runtime/broker-shared-surface-queues.json',
   '.atm-temp/',
   // create-atm installs the ATM CLI into the project; an unignored
   // node_modules turns the first `git add -A` into a dependency commit
