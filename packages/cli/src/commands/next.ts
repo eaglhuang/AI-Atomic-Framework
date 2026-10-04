@@ -59,7 +59,7 @@ import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './i
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { describeActorResolution, resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.ts';
-import { assertSourceFirstRunnerReadOnlyAction, buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
+import { assertSourceFirstRunnerReadOnlyAction, buildFrameworkTempClaimCommand, createFrameworkModeStatus, detectFrameworkRepoIdentity } from './framework-development.ts';
 import { classifyTaskDelivery, type TaskDeliveryClassification } from './task-intent.ts';
 import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../core/src/broker/lifecycle.ts';
 import { describeRestrictedExecutionPolicy } from '../../../core/src/team-agents/restricted-execution-gateway.ts';
@@ -456,7 +456,13 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
   profile.mark('detect-governance-runtime');
   const doctorChecks = doctor.evidence.checks as Array<{ name: string; ok: boolean }>;
   const failed = doctorChecks.find((check) => check.ok !== true);
-  const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null), classifyRunnerMode(process.argv[1] ?? null));
+  const nextAction = decideRuntimeNextAction(
+    runtime, failed?.name ?? null, importedTaskQueue,
+    governanceCommandPrefix(process.argv[1] ?? null),
+    classifyRunnerMode(process.argv[1] ?? null),
+    detectFrameworkRepoIdentity(options.cwd).isFrameworkRepo ? 'framework' : 'adopter',
+    existsSync(path.join(options.cwd, 'package.json'))
+  );
   const userNotice = buildFirstUseUserNotice(nextAction);
   profile.flush('default-next');
   return withRunnerMode(makeResult({
