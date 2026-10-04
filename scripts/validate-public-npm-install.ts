@@ -1,5 +1,5 @@
-import { runFirstUseChain } from './lib/npm-first-use.ts';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { runCleanNpmConsumerCommand, runFirstUseChain } from './lib/npm-first-use.ts';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -209,7 +209,7 @@ function runSmoke(tarball: string, root: string, label: string, runs: number) {
     let commandExecuted = true;
     for (let i = 0; i < (name === 'version' ? runs : 1); i += 1) {
       const started = performance.now();
-      const result = spawnSync(bin, argv, { cwd: consumer, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
+      const result = runCleanNpmConsumerCommand(bin, argv, consumer);
       commandRuns.push(performance.now() - started);
       exitCode = result.status ?? 1;
       combined = `${result.stdout ?? ''}${result.stderr ?? ''}`;
