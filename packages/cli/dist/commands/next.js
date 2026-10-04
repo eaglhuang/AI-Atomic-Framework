@@ -3,7 +3,7 @@ import { readActiveGuidanceSession, toGuidanceNextAction } from '../_vendor/core
 import { buildFirstUseUserNotice } from './first-use-notice.js';
 import { runDoctor } from './doctor.js';
 import { decideRuntimeNextAction } from './next/channel-strategy.js';
-import { governanceCommandPrefix, withRunnerMode } from './next/runner-mode.js';
+import { classifyRunnerMode, governanceCommandPrefix, withRunnerMode } from './next/runner-mode.js';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.js';
 import { inspectIntegrationBootstrap } from './integration.js';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
@@ -248,7 +248,7 @@ async function runNextRoute(argv) {
     profile.mark('detect-governance-runtime');
     const doctorChecks = doctor.evidence.checks;
     const failed = doctorChecks.find((check) => check.ok !== true);
-    const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null));
+    const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null), classifyRunnerMode(process.argv[1] ?? null));
     const userNotice = buildFirstUseUserNotice(nextAction);
     profile.flush('default-next');
     return withRunnerMode(makeResult({

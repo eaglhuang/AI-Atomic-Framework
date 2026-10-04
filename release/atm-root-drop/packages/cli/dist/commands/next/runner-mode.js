@@ -14,7 +14,7 @@ export function describeRunnerMode(cwd) {
     const entrypointPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
     const entrypoint = entrypointPath ? normalizeRelativePath(root, entrypointPath) : null;
     const mode = classifyRunnerMode(entrypoint);
-    const commandPrefix = governanceCommandPrefix(entrypoint);
+    const commandPrefix = governanceCommandPrefix(entrypointPath);
     const sourceDrift = inspectRunnerSourceDrift(cwd);
     return {
         schemaId: 'atm.runnerMode.v1',

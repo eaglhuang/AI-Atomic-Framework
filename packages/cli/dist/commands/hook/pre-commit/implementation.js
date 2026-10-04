@@ -63,6 +63,7 @@ export function runPreCommitHook(cwd) {
         stagedFiles
     });
     const actionableResidueFindings = selectActionableResidueFindings({
+        cwd: root,
         findings: [...transactionReconciledResidueReport.blockAndExplain, ...transactionReconciledResidueReport.manualReview.filter((entry) => isActionableManualResidue(entry.path))],
         stagedFiles,
         committingTaskId: residueTaskId,

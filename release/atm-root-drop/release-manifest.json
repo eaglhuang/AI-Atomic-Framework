@@ -2512,6 +2512,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/setup/telemetry.js",
     "release/atm-root-drop/packages/cli/dist/commands/shared.js",
     "release/atm-root-drop/packages/cli/dist/commands/shared/atm-cli-entrypoint.js",
+    "release/atm-root-drop/packages/cli/dist/commands/shared/bootstrap-report-provenance.js",
     "release/atm-root-drop/packages/cli/dist/commands/shared/command-manifest.js",
     "release/atm-root-drop/packages/cli/dist/commands/shared/command-spec-output.js",
     "release/atm-root-drop/packages/cli/dist/commands/shared/identity-normalization.js",
@@ -3371,6 +3372,7 @@
     "release/atm-root-drop/packages/cli/src/commands/setup/telemetry.ts",
     "release/atm-root-drop/packages/cli/src/commands/shared.ts",
     "release/atm-root-drop/packages/cli/src/commands/shared/atm-cli-entrypoint.ts",
+    "release/atm-root-drop/packages/cli/src/commands/shared/bootstrap-report-provenance.ts",
     "release/atm-root-drop/packages/cli/src/commands/shared/command-manifest.ts",
     "release/atm-root-drop/packages/cli/src/commands/shared/command-spec-output.ts",
     "release/atm-root-drop/packages/cli/src/commands/shared/identity-normalization.ts",
@@ -6143,6 +6145,7 @@
     "release/atm-root-drop/tests/cli/evidence-tdd-single-execution.test.ts",
     "release/atm-root-drop/tests/cli/evidence-write-lock-concurrency.test.ts",
     "release/atm-root-drop/tests/cli/export-github-ci-attempts.test.ts",
+    "release/atm-root-drop/tests/cli/external-adoption-regressions.test.ts",
     "release/atm-root-drop/tests/cli/external-benchmark-decision.test.ts",
     "release/atm-root-drop/tests/cli/external-benchmark-executor.test.ts",
     "release/atm-root-drop/tests/cli/external-benchmark-isolation.test.ts",
@@ -6976,7 +6979,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 6940,
+    "unchanged": 6943,
     "removed": 0
   },
   "buildMode": "full",
@@ -25676,7 +25679,7 @@
       },
       {
         "path": "packages/cli/dist/commands/bootstrap-gitignore.js",
-        "digest": "0310b86c1e91a1f08bfa414c5ef989253f8f0f4a3b02febd11c968db53d4e509",
+        "digest": "9e2eac9d333a541a5268198ff3ce63b4fb71e584cd6d4d36a256f2857a36da57",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/bootstrap-gitignore.js"
@@ -27134,7 +27137,7 @@
       },
       {
         "path": "packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
-        "digest": "d5e3451569fc3ad9b8c1cf496f3b172530c56b2645429ff32c772629163f0851",
+        "digest": "7595d4f6643352ef831ee52b561fe20066a471a0f73163df08dcb8946b2b3759",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js"
@@ -27422,7 +27425,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
-        "digest": "f615b1c09c0b75e9eb4a73932c9984c8476babd527c40181eccdda84dcabc062",
+        "digest": "d8493fe738e1842041a28a96276579df3d98f7df4dbce0b9694adf06617b1098",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js"
@@ -28052,7 +28055,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/failure-envelope.js",
-        "digest": "d3bae92967653e8af0d59819c5ed18ff3a5705273bd0bd253afb057cea006e8e",
+        "digest": "1a2eb15de44380bf657b7aca74f24dba4a4f5dc82e808c3a820a6a50d285ada2",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/failure-envelope.js"
@@ -28079,7 +28082,7 @@
       },
       {
         "path": "packages/cli/dist/commands/hook/pre-commit/implementation.js",
-        "digest": "c827e33843fb6a4fdae2fe591a77ba51f952720dacf91da1f1b756fa0b6af46b",
+        "digest": "f842878e5121397b762780cddbd6e6517d5169807104e50df8f17511351136cd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/hook/pre-commit/implementation.js"
@@ -28484,7 +28487,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next.js",
-        "digest": "1ee43cffd9c8381bd6a2e351f703ce55204159faf2312f2e5085bc5ff700cdf7",
+        "digest": "02eef126ba0659c11276aa0a983d04927229924257e00f3e7717ca94422bd086",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next.js"
@@ -28511,7 +28514,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/channel-strategy.js",
-        "digest": "55a3749f413425cd0b2d26bdba5961b3bb0827249c04fec66e2c967809a912f0",
+        "digest": "7f9a5aaf87719af5e8f26766a91a68dc9190ed8b1fb7ef09784cdf362b3d3002",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/channel-strategy.js"
@@ -28916,7 +28919,7 @@
       },
       {
         "path": "packages/cli/dist/commands/next/runner-mode.js",
-        "digest": "c60243b5b2f995e9f5e3476fca0d2528823f9de37e610f2676dc4045562957f1",
+        "digest": "4b7b94a1b14d3aeb2609c5c2fb60441af135e960c839edbf32aedf2a9bcaf9b2",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/next/runner-mode.js"
@@ -29303,10 +29306,19 @@
       },
       {
         "path": "packages/cli/dist/commands/shared/atm-cli-entrypoint.js",
-        "digest": "965fb057bcf9b536e84e7b4617405d9638e1f67837af7ce13b1e2bad4fbd70dd",
+        "digest": "c99b84c14a99b1bf54f84f763c5b7edb275641efa8f5a6d1c1657a9b69dd35b1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/shared/atm-cli-entrypoint.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/shared/bootstrap-report-provenance.js",
+        "digest": "d0e42866ba1f8d37bba8ff261067b659d88da819b509fd469393d14e105599cf",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/shared/bootstrap-report-provenance.js"
         ],
         "replaceable": true
       },
@@ -32012,7 +32024,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "e39940642654cdff73443a3aef5f79c9b3f1ef53f63be7d65d1f25e196b3566a",
+        "digest": "2c605f7341ca065aa734adc18f48dde8fd4711265f288bd34fb16bfd29946880",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -32021,7 +32033,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "707c5729d8a17eb6c4ba3eae78fc6f78c383814adf4e5ffed1697fdc5504d7b5",
+        "digest": "33f5e35f88d39b364d3bc9525b84541c8d7aceefb2edaef87f60c5629f3e47ec",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -32759,7 +32771,7 @@
       },
       {
         "path": "packages/cli/src/commands/bootstrap-gitignore.ts",
-        "digest": "48e319dc2fafecd0d275e46ffb28ec73df38ae7f47d7cb49fe75f31c3d0eef45",
+        "digest": "cb79ac8d1b31b5a3551cc6a1e6b4ad8372f98046e2c26765cd36bd1b7ff5440b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/bootstrap-gitignore.ts"
@@ -34388,7 +34400,7 @@
       },
       {
         "path": "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
-        "digest": "f2ce1e079f19c421d7ea4c7455d0c3cbbf4a0a3685f763d65474867a5b484a9b",
+        "digest": "776cbad2beced87b8ea8d2ad70bfa96c45109f22f3a39b4f40446e322a67a7b6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts"
@@ -34757,7 +34769,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
-        "digest": "02a27edacdf9cd87d393e1e4456c2249ba8474732ff8a5f7ef112bab106aba54",
+        "digest": "b502ca2eb262e395f60f86f9719188b04dc1bf48916124050c1df2755d2843e4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts"
@@ -35576,7 +35588,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts",
-        "digest": "c331039e662aa9dedc30fc27c925cedb535fbf4038d611d2c9b3617205f3324b",
+        "digest": "346cdfcdfcdea0b1ebde6cb2e2bed9b44c4621e27b382538537c27e3bed29916",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/failure-envelope.ts"
@@ -35612,7 +35624,7 @@
       },
       {
         "path": "packages/cli/src/commands/hook/pre-commit/implementation.ts",
-        "digest": "a59c77c235691ce4d65b2203af98a53653de4442bc3929a3f43882d97b7f2d5b",
+        "digest": "ff872aee60cdc440d1431a508ba5901144a0b0e6a496cc3e1faf3cf5a2be7967",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/hook/pre-commit/implementation.ts"
@@ -36062,7 +36074,7 @@
       },
       {
         "path": "packages/cli/src/commands/next.ts",
-        "digest": "7c61ab849b3141188b29f00829ba0d89e9a5802977041b87d271f1f7439c5c07",
+        "digest": "e5a957fd32b9f3fd7f7b306b6ecbb2f6781b82bb3cd572aca441b3e0e55315b6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next.ts"
@@ -36080,7 +36092,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
-        "digest": "fc6d6f268d346b92657d3f87bc3cea751c2e6dabf29812edeae71dc7a7c864d8",
+        "digest": "7e58018ef10d1320f9a6524cb8d4685ccb02c71afc5f7bfa4cbcfc1728ce50c4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts"
@@ -36179,7 +36191,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
-        "digest": "dd0ef0d1b67ab3c16223ed4c1c01223d99db3fa839773a8a33369dfd951d2e9a",
+        "digest": "73fbb76a864851bda1aeb818fedad15e8698ef186cf4f10f31906645f7d2b67b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts"
@@ -36242,7 +36254,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/channel-strategy.ts",
-        "digest": "96889a47aef452d9f0541f30b08588f251aca58968ff3a7d7079f94773fdabb5",
+        "digest": "6288612211f58cb33bc8465a37b4922cd4c4197254f445662ad6bf42fe7f9602",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/channel-strategy.ts"
@@ -36647,7 +36659,7 @@
       },
       {
         "path": "packages/cli/src/commands/next/runner-mode.ts",
-        "digest": "960fd1e0a9010c7ec0212ca32b082b00d61142747ed3ce43f2e3255d483f8af0",
+        "digest": "368489a25a4202c42ce2319150d6c055d716223f52060bf763a6fd41aa70dc94",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/next/runner-mode.ts"
@@ -37034,10 +37046,19 @@
       },
       {
         "path": "packages/cli/src/commands/shared/atm-cli-entrypoint.ts",
-        "digest": "90e29f46bef99def299d74d0867acbd80f835fed2e160e9c77ebe965bd26d5a8",
+        "digest": "09b2371e6608dbcfa099e852516cf80865f50ca15467548652973fc1e785b41f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/shared/atm-cli-entrypoint.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/shared/bootstrap-report-provenance.ts",
+        "digest": "8da780609009586ee835ecb68cda0f1f6c5a2e1f4ee78926dd4f70e95b3b6817",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/shared/bootstrap-report-provenance.ts"
         ],
         "replaceable": true
       },
@@ -55556,7 +55577,7 @@
       },
       {
         "path": "scripts/lib/npm-first-use.ts",
-        "digest": "b6a92fc861b14a9acb762fff0cbca8fb8b9d4c9f821de752f0812608a699aa19",
+        "digest": "afb2d98e62f8fc76762a07eee033a69232cbca232fc8b73b3508003341515634",
         "origin": "source",
         "inputPaths": [
           "scripts/lib/npm-first-use.ts"
@@ -56771,7 +56792,7 @@
       },
       {
         "path": "scripts/validate-external-golden.ts",
-        "digest": "2973b16bea3e1f270573ad738fa9539767255e79ff42a4fc86568dcea1651173",
+        "digest": "3957629aeb3fea749b9dda5f39231b1041c0c65117bac5a9d7b20c8132d898de",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-external-golden.ts"
@@ -57293,7 +57314,7 @@
       },
       {
         "path": "scripts/validate-npm-clean-install.ts",
-        "digest": "614ed28ea46b080ae667260ff834a89d867364541f875519990687ddad4e9408",
+        "digest": "d48727c84f76197875b40df6a3b1524f1e7cb50a780736fe78ed2b81c6156953",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-npm-clean-install.ts"
@@ -61100,7 +61121,7 @@
       },
       {
         "path": "tests/cli/bootstrap-adopter-gitignore.test.ts",
-        "digest": "442d2c8af0fc01d32a405dbe6d42b7a5b5542bc628308c10e74a31d6651df65a",
+        "digest": "ea34f88eb380ae7df4b7a6b706a0ee2b410d41307c0f9c50e9256169ab51d973",
         "origin": "source",
         "inputPaths": [
           "tests/cli/bootstrap-adopter-gitignore.test.ts"
@@ -61977,6 +61998,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/export-github-ci-attempts.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/external-adoption-regressions.test.ts",
+        "digest": "fcb9ed53681eb4b91c2bd654992f164ddb105e884c95636ed7dd8441d1d62b2d",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/external-adoption-regressions.test.ts"
         ],
         "replaceable": true
       },
@@ -63089,7 +63119,7 @@
       },
       {
         "path": "tests/cli/npm-clean-install.test.ts",
-        "digest": "5d0c9202b504fa7b70d21e201d5a8311f836e3d07bdf99654db7df3cc43f337b",
+        "digest": "1c024ea5872c205149b47babaddafdb7f39f28432938809d7e0ac57635cfb8d1",
         "origin": "source",
         "inputPaths": [
           "tests/cli/npm-clean-install.test.ts"
@@ -64475,7 +64505,7 @@
       },
       {
         "path": "tests/cli/public-npm-install-contract.test.ts",
-        "digest": "f509b85b627a7dbfaa78d29856865d9a7f978205b29d1af6b1a672e663d249b0",
+        "digest": "9cf1560e5556cc196357f698b0aa260cc8977915238347d2729f77e532cfdc64",
         "origin": "source",
         "inputPaths": [
           "tests/cli/public-npm-install-contract.test.ts"
@@ -69442,7 +69472,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:20d6fd9621fdea867b2b55f3b980fe7d9628ce783a2cd01f5d7a65c35d71b589"
+    "treeDigest": "sha256:2b1b54689da2cfd37bd6251ca49b264c405c694ae39983403a374a791849e6a8"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -69996,6 +70026,7 @@
       "packages/cli/src/commands/setup/telemetry.ts",
       "packages/cli/src/commands/shared.ts",
       "packages/cli/src/commands/shared/atm-cli-entrypoint.ts",
+      "packages/cli/src/commands/shared/bootstrap-report-provenance.ts",
       "packages/cli/src/commands/shared/command-manifest.ts",
       "packages/cli/src/commands/shared/command-spec-output.ts",
       "packages/cli/src/commands/shared/identity-normalization.ts",
@@ -71010,7 +71041,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:03c9639ad79e274f55e6e09b79a83b7de75263090d33841b07f3336c570550c5"
+    "digest": "sha256:197ed468a7f594d3eb0af9114ab2cc8ce089e8c5645c335b20bcd35c4f308105"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -73496,6 +73527,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/setup/telemetry.js",
       "release/atm-root-drop/packages/cli/dist/commands/shared.js",
       "release/atm-root-drop/packages/cli/dist/commands/shared/atm-cli-entrypoint.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared/bootstrap-report-provenance.js",
       "release/atm-root-drop/packages/cli/dist/commands/shared/command-manifest.js",
       "release/atm-root-drop/packages/cli/dist/commands/shared/command-spec-output.js",
       "release/atm-root-drop/packages/cli/dist/commands/shared/identity-normalization.js",
@@ -74355,6 +74387,7 @@
       "release/atm-root-drop/packages/cli/src/commands/setup/telemetry.ts",
       "release/atm-root-drop/packages/cli/src/commands/shared.ts",
       "release/atm-root-drop/packages/cli/src/commands/shared/atm-cli-entrypoint.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared/bootstrap-report-provenance.ts",
       "release/atm-root-drop/packages/cli/src/commands/shared/command-manifest.ts",
       "release/atm-root-drop/packages/cli/src/commands/shared/command-spec-output.ts",
       "release/atm-root-drop/packages/cli/src/commands/shared/identity-normalization.ts",
@@ -77127,6 +77160,7 @@
       "release/atm-root-drop/tests/cli/evidence-tdd-single-execution.test.ts",
       "release/atm-root-drop/tests/cli/evidence-write-lock-concurrency.test.ts",
       "release/atm-root-drop/tests/cli/export-github-ci-attempts.test.ts",
+      "release/atm-root-drop/tests/cli/external-adoption-regressions.test.ts",
       "release/atm-root-drop/tests/cli/external-benchmark-decision.test.ts",
       "release/atm-root-drop/tests/cli/external-benchmark-executor.test.ts",
       "release/atm-root-drop/tests/cli/external-benchmark-isolation.test.ts",
@@ -77962,22 +77996,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:53da05b27adb67606d81f193f49f1b5c6fbc0490b6df651bd4c90117de5a1a84",
-  "sealedSourceCommit": "cfeb576bd0adc702a4f57df2ef30e32e2cb6f2c5",
+  "buildInputsTreeHash": "sha256:0c65470f2456b32100bc56e8f2f0e597ae76624fef48461727121f06ca392be5",
+  "sealedSourceCommit": "4b0ba58c348c1ca694608dab77267ef96187a112",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:9783d768f9ad67d3b766803b5469094ba350c7bd9d175d9904be1bff2768c48c",
-  "tsBuildCacheDigest": "sha256:ce46bda50a14fe13b3a761d0d95cc2c7f5ff4e0496847ca9d5ea80e61650e93c",
+  "incrementalPlanDigest": "sha256:85cec1c885d679f32bca74e5979ab126160b43962d618fcdd6812bc7197a8d00",
+  "tsBuildCacheDigest": "sha256:aba207ec171b722b86782dace0be8fd845ea28db915770d652501f8a51381b89",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 73,
-    "skipDecision": 58,
-    "worktreeSetup": 9364,
-    "typescriptBuild": 28805,
-    "rootDropReleaseAssembly": 49430,
-    "onefileReleaseAssembly": 35368,
-    "artifactSync": 6477,
+    "inputHashCalculation": 48,
+    "skipDecision": 60,
+    "worktreeSetup": 9917,
+    "typescriptBuild": 31817,
+    "rootDropReleaseAssembly": 52621,
+    "onefileReleaseAssembly": 35817,
+    "artifactSync": 6602,
     "cleanup": 0,
-    "totalElapsed": 166635
+    "totalElapsed": 178619
   }
 }
