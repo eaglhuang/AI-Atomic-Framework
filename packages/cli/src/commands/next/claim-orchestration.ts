@@ -489,7 +489,9 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       taskId: claimableTask.workItemId,
       queueHeadTaskId: batchRun?.currentTaskId ?? claimableTask.workItemId,
       originalPrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
-      actorPlaceholder: resolvedActor.actorId
+      actorPlaceholder: resolvedActor.actorId,
+      claimActive: true,
+      laneSessionId: laneSession?.laneSessionId ?? null
     }),
     deliveryPrinciple: buildTaskDeliveryPrinciple({
       channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
