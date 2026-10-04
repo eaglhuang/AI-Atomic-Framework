@@ -276,7 +276,7 @@ try {
   runAtm('bootstrap', '--cwd', adopter, '--task', 'public runtime chart smoke', '--json');
   runAtm('atm-chart', 'render', '--cwd', adopter, '--json');
   runAtm('atm-chart', 'verify', '--cwd', adopter, '--json');
-  const installedLayout = path.join(consumer, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'layout');
+  const installedLayout = path.join(consumer, 'node_modules', '@ai-atomic-framework', 'cli', 'dist', 'npm-runtime', 'data');
   for (const schemaPath of [
     'schemas/atomic-spec.schema.json'
   ]) {

@@ -51,6 +51,8 @@ export function resolveATMChartSchemaSource(relativeSchemaPath: string): {
 export function resolveATMChartSchemaPath(relativeSchemaPath: string): string {
   const candidates = [
     path.join(frameworkRoot, relativeSchemaPath),
+    path.join(frameworkRoot, 'dist', 'npm-runtime', 'data', relativeSchemaPath),
+    path.join(frameworkRoot, 'data', relativeSchemaPath),
     path.join(frameworkRoot, 'dist', 'npm-runtime', 'layout', relativeSchemaPath),
     path.join(frameworkRoot, 'layout', relativeSchemaPath)
   ];

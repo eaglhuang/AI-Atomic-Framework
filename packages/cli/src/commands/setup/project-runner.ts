@@ -31,13 +31,16 @@ export function sharedProjectLauncher(runtime: string): string {
 export function verifiedNpmRuntime(moduleUrl: string): string {
   const moduleFile = fileURLToPath(moduleUrl);
   const root = path.resolve(path.dirname(moduleFile), '../../..');
-  if (path.relative(root, moduleFile).split(path.sep).join('/') !== 'layout/commands/setup/project-runner.js') {
+  const moduleRelativePath = path.relative(root, moduleFile).split(path.sep).join('/');
+  if (!['data', 'layout'].some(layout => moduleRelativePath === `${layout}/commands/setup/project-runner.js`)) {
     throw new Error('ATM_SETUP_RUNNER_MISSING: use the installed ATM package or an official onefile runner.');
   }
   const manifest = JSON.parse(readFileSync(path.join(root, 'manifest.json'), 'utf8'));
+  const layoutRoot = manifest.layoutRoot ?? 'layout';
   const packageRoot = path.resolve(root, '../..');
   const pkg = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'), 'utf8'));
   if (pkg.name !== '@ai-atomic-framework/cli' || pkg.bin?.atm !== 'dist/npm-runtime/atm.mjs'
+    || !['data', 'layout'].includes(layoutRoot) || moduleRelativePath !== `${layoutRoot}/commands/setup/project-runner.js`
     || manifest.schemaId !== 'atm.cliNpmRuntimeManifest.v1' || manifest.moduleIdentity !== 'original-dist-relative-url'
     || manifest.entrypoints?.bin !== 'atm.mjs' || manifest.entrypoints?.runtime !== 'runtime.mjs'
     || !Array.isArray(manifest.files)) throw new Error('ATM_SETUP_RUNTIME_IDENTITY_INVALID: shared package identity is inconsistent.');

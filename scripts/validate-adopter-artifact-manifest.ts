@@ -37,6 +37,9 @@ if (forbidden.length > 0) fail(`CLI dist contains forbidden adopter files: ${for
 for (const required of ['atm.mjs', 'runtime.mjs', 'index.js', 'index.d.ts', 'manifest.json']) {
   if (!relative.includes(required)) fail(`CLI npm runtime is missing ${required}.`);
 }
+const manifest = JSON.parse(readFileSync(path.join(runtimeRoot, 'manifest.json'), 'utf8'));
+const layoutRoot = manifest.layoutRoot ?? 'layout';
+if (!['data', 'layout'].includes(layoutRoot)) fail('CLI npm runtime has an unsupported layout root.');
 // Adoption templates are a runtime data asset: `atm init` walks up from the
 // loaded module until it finds templates/root-drop, so inside the tarball that
 // walk has to terminate in dist/. Compare against the authored template tree
@@ -47,8 +50,8 @@ const authoredTemplateRoot = path.join(root, 'templates', 'root-drop');
 if (existsSync(authoredTemplateRoot)) {
   const bundledTemplates = new Set(
     relative
-      .filter((file) => file.startsWith('layout/templates/root-drop/'))
-      .map((file) => file.slice('layout/templates/root-drop/'.length))
+      .filter((file) => file.startsWith(`${layoutRoot}/templates/root-drop/`))
+      .map((file) => file.slice(`${layoutRoot}/templates/root-drop/`.length))
   );
   const missingTemplates = filesUnder(authoredTemplateRoot)
     .map((file) => path.relative(authoredTemplateRoot, file).replace(/\\/g, '/'))
@@ -57,7 +60,6 @@ if (existsSync(authoredTemplateRoot)) {
     fail(`CLI dist is missing ${missingTemplates.length} adoption template file(s) that atm init needs after a clean install: ${missingTemplates.slice(0, 6).join(', ')}`);
   }
 }
-const manifest = JSON.parse(readFileSync(path.join(runtimeRoot, 'manifest.json'), 'utf8'));
 if (manifest.schemaId !== 'atm.cliNpmRuntimeManifest.v1' || manifest.moduleIdentity !== 'original-dist-relative-url') {
   fail('CLI npm runtime manifest must seal the bundled module-identity contract.');
 }
@@ -66,10 +68,34 @@ const unlisted = relative.filter((file) => file !== 'manifest.json' && !listedPa
 if (unlisted.length > 0) fail(`CLI npm runtime contains unlisted files: ${unlisted.slice(0, 8).join(', ')}`);
 const unexplained = (manifest.files ?? []).filter((entry: any) => !['runtime-entrypoint', 'immutable-runtime-asset'].includes(entry.kind));
 if (unexplained.length > 0) fail(`CLI npm runtime contains files without a runtime reason: ${unexplained.slice(0, 8).map((entry: any) => entry.path).join(', ')}`);
+// A shipped Skill's companion tree is part of its runtime contract. Compare
+// the authored inventory, not a hand-kept list of current reference filenames;
+// only select Skills whose entry template is included in this distribution.
+const skillAssetPrefix = `${layoutRoot}/_vendor/integrations-core/templates/skills/`;
+const authoredSkillsRoot = path.join(root, 'templates/skills');
+let skillCompanionFiles = 0;
+if (existsSync(authoredSkillsRoot)) {
+  for (const skill of readdirSync(authoredSkillsRoot).filter(file => file.endsWith('.skill.md'))) {
+    if (!relative.includes(`${skillAssetPrefix}${skill}`)) continue;
+    const companionDirectory = skill.replace(/\.skill\.md$/, '.files');
+    for (const sourcePath of filesUnder(path.join(authoredSkillsRoot, companionDirectory))) {
+      const assetPath = skillAssetPrefix + path.relative(authoredSkillsRoot, sourcePath).replace(/\\/g, '/');
+      if (!relative.includes(assetPath)) fail(`CLI npm runtime is missing a shipped Skill companion: ${assetPath}.`);
+      const bytes = readFileSync(sourcePath);
+      const entry = (manifest.files ?? []).find((candidate: any) => candidate.path === assetPath);
+      const digest = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+      if (!entry || entry.kind !== 'immutable-runtime-asset' || entry.bytes !== bytes.length || entry.sha256 !== digest
+        || !readFileSync(path.join(runtimeRoot, assetPath)).equals(bytes)) {
+        fail(`CLI npm runtime Skill companion differs from its source or manifest: ${assetPath}.`);
+      }
+      skillCompanionFiles += 1;
+    }
+  }
+}
 for (const assetPath of [
-  'layout/templates/atom.spec.template.json',
-  'layout/templates/atom.test.template.ts',
-  'layout/schemas/atomic-spec.schema.json'
+  `${layoutRoot}/templates/atom.spec.template.json`,
+  `${layoutRoot}/templates/atom.test.template.ts`,
+  `${layoutRoot}/schemas/atomic-spec.schema.json`
 ]) {
   const entry = (manifest.files ?? []).find((candidate: any) => candidate.path === assetPath);
   if (!entry || entry.kind !== 'immutable-runtime-asset') {
@@ -108,5 +134,6 @@ console.log(JSON.stringify({
   files: entries,
   bytes,
   caps: cap,
-  forbiddenCount: forbidden.length
+  forbiddenCount: forbidden.length,
+  skillCompanionFiles
 }, null, 2));
