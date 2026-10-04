@@ -57,6 +57,16 @@ assert.deepEqual(extractTaskRootHintsFromPrompt('Continue TASK-NEWS tasks', []),
 assert.deepEqual(extractTaskFamilyRootHintsFromPrompt('Continue NEWS tasks'), ['TASK-NEWS']);
 assert.deepEqual(extractTaskIdReferencesFromPrompt('Inspect ATM-BUG-2026-10-04-003'), []);
 
+for (const handoffPrompt of [
+  'Read .atm/history/handoff/WORKSPACE-UNFINISHED-WORK.md and continue.',
+  'Read `.atm/history/handoff/workspace-unfinished-work.md` and continue.',
+  'Resume from handoff.md.'
+]) {
+  const handoffIntent = createDeterministicTaskIntent(handoffPrompt);
+  assert.equal(handoffIntent.taskScopeMentioned, true, 'recognized handoff documents must reach the handoff task route');
+  assert.deepEqual(handoffIntent.mentionedTaskIds, [], 'a handoff filename must not fabricate task IDs');
+}
+
 const intent = createDeterministicTaskIntent(newsletterPrompt);
 assert.deepEqual(intent.mentionedTaskIds, [], 'real newsletter prompt must not invent a task ID');
 assert.deepEqual(intent.taskRootHints, [], 'real newsletter prompt must not invent task roots');

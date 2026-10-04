@@ -3,6 +3,7 @@ import path from 'node:path';
 import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
 import { fileURLToPath } from 'node:url';
 import { getCommandSpec } from './commands/command-specs.ts';
+import { withUnsupportedOptionHints } from './commands/shared/usage-error-hints.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
@@ -176,7 +177,7 @@ export async function runPublicCli(
       ok: false,
       command: commandName,
       cwd: process.cwd(),
-      messages: [message('error', cliError.code, cliError.message, cliError.details)],
+      messages: [message('error', cliError.code, cliError.message, withUnsupportedOptionHints(commandName, commandArgs, cliError.message, cliError.details))],
       evidence: { publicSurface: 'adopter-core' }
     }), { cliErrorExitCode: cliError.exitCode });
     recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);

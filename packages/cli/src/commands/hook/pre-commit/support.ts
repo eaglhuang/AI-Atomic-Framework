@@ -40,7 +40,7 @@ import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '.
 import { normalizeRelativePath, runGit, runGitScalar } from '../git-index-diagnostics.ts';
 import { normalizeOptionalText, readGitObjectText, readJsonText } from '../commit-range-guard.ts';
 import { readStagedFiles } from './input-state.ts';
-import { resolveCandidateAttribution, resolveCandidateAttributionAuthority } from '../../git-governance/implementation/candidate-attribution.ts';
+import { inspectCandidateAttributionDependency, resolveCandidateAttributionAuthority } from '../../git-governance/implementation/candidate-attribution.ts';
 import { resolveCommittedTaskContext } from './committed-task-context.ts';
 export const INVARIANT_TASK_AUDIT_CODES = new Set([ 'ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST' ]);
 const textFileExtensions = new Set([ '.cjs', '.css', '.html', '.js', '.json', '.jsx', '.md', '.mjs', '.ps1', '.sh', '.ts', '.tsx', '.txt', '.yaml', '.yml' ]);
@@ -336,14 +336,9 @@ const knownStagedTaskIds = stagedTaskIds.filter((candidate) => taskLedgerEntryEx
 const pendingBatchCheckpointTaskId = resolvePendingBatchCheckpointTaskId(cwd, stagedFiles);
 const findings = [];
 const suggestedTaskId = pendingBatchCheckpointTaskId ?? (knownStagedTaskIds.length === 1 ? knownStagedTaskIds[0] : knownStagedTaskIds[0] ?? null);
-const actorRegistryState = inspectTrackedActorRegistryState(cwd);
-const candidateAttribution = resolveCandidateAttribution({ cwd, taskId, actorId, laneSessionId: normalizeOptionalText(process.env.ATM_COMMIT_LANE_SESSION_ID), phase: 'candidate', candidateFiles: stagedFiles });
-const candidateAuthority = resolveCandidateAttributionAuthority({ cwd, taskId, actorId, laneSessionId: normalizeOptionalText(process.env.ATM_COMMIT_LANE_SESSION_ID) }, stagedFiles);
-const independentAttribution = candidateAttribution.ok && candidateAuthority.ok;
-if ((actorRegistryState.blocking || candidateAttribution.registryChanged) && !independentAttribution) { const governedRecoveryCommand = suggestedTaskId ? `node atm.mjs git commit --actor <id> --task ${suggestedTaskId} --message "<summary>" --json` : `node atm.mjs git commit --actor <id> --message "<summary>" --json`;
-findings.push({ code: 'ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED', source: 'commit-attribution', detail: `Tracked actor registry ${actorRegistryState.path} has ${actorRegistryState.status === 'mixed' ? 'both staged and unstaged' : 'unstaged'} changes. Governed node atm.mjs git commit can auto-stage that tracked registry when it belongs to the governed commit surface, but bare git commit cannot. Re-run through the ATM wrapper or restore the drift first.`, requiredCommand: governedRecoveryCommand, classification: 'current-task' });
-return { ok: false, findings };
-} if (!actorId && !taskId && !sessionId) { if (stagedTaskIds.length > 0) { const wrapperRequired = { code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED', source: 'commit-attribution', detail: 'Staged ATM task/evidence changes must commit through node atm.mjs git commit so ATM can bind author, session, claim, and trailers consistently. Direct git commit remains valid for read-only git and non-governed maintenance.', requiredCommand: suggestedTaskId ? `node atm.mjs git commit --actor <id> --task ${suggestedTaskId} --message "<summary>" --json` : 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json', classification: 'current-task' };
+const { candidateAttribution, independentAttribution, failure } = inspectCandidateAttributionDependency({ cwd, taskId, actorId, laneSessionId: normalizeOptionalText(process.env.ATM_COMMIT_LANE_SESSION_ID), candidateFiles: stagedFiles, suggestedTaskId });
+if (failure) return failure;
+if (!actorId && !taskId && !sessionId) { if (stagedTaskIds.length > 0) { const wrapperRequired = { code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED', source: 'commit-attribution', detail: 'Staged ATM task/evidence changes must commit through node atm.mjs git commit so ATM can bind author, session, claim, and trailers consistently. Direct git commit remains valid for read-only git and non-governed maintenance.', requiredCommand: suggestedTaskId ? `node atm.mjs git commit --actor <id> --task ${suggestedTaskId} --message "<summary>" --json` : 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json', classification: 'current-task' };
 return { ok: false, findings: [wrapperRequired] };
 } return { ok: true, findings };
 } const effectiveTaskId = taskId ?? pendingBatchCheckpointTaskId ?? (knownStagedTaskIds.length === 1 ? knownStagedTaskIds[0] : null);

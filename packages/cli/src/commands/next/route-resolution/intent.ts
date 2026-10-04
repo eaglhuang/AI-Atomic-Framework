@@ -72,7 +72,7 @@ import {
   uniqueSorted
 } from '../view-projections.ts';
 
-import { extractTaskFamilyRootHintsFromPrompt, extractTaskIdReferencesFromPrompt, expandTaskIdReferenceAliases, extractTaskRootHintsFromPrompt } from './matching.ts';
+import { extractTaskFamilyRootHintsFromPrompt, extractTaskIdReferencesFromPrompt, expandTaskIdReferenceAliases, extractTaskRootHintsFromPrompt, isHandoffPrompt } from './matching.ts';
 import { inspectImportedTaskQueue } from './queue-inspection.ts';
 
 export type NextClaimIntent = 'write' | 'closeout-only';
@@ -177,6 +177,8 @@ export function createDeterministicTaskIntent(prompt: string, explicitTaskIds: r
     || mentionedPlanPaths.length > 0
     || taskRootHints.length > 0
     || queueRequested
+    // Handoff routing reads task references from the document, not its filename.
+    || isHandoffPrompt(prompt)
     || /\u4efb\u52d9\u5361|task\s*card|task[-_ ]?asa|\u8a08\u756b\u66f8/i.test(prompt));
   return {
     schemaId: 'atm.taskIntent.v1',

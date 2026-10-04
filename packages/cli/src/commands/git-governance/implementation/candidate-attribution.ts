@@ -4,7 +4,7 @@ import { existsSync, lstatSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { checkWorkAdmissionTicket } from '../../../../../core/src/broker/work-admission-ticket.ts';
 import { pathMatchesWriteScope } from '../../../../../core/src/broker/write-scope-policy.ts';
-import { actorRegistryRelativePath, readRuntimeIdentityForActor } from '../../actor-registry.ts';
+import { actorRegistryRelativePath, inspectTrackedActorRegistryState, readRuntimeIdentityForActor } from '../../actor-registry.ts';
 import { frameworkTempPublicationCapabilityCovers, resolveFrameworkTempPublicationCapability } from '../../framework-development/framework-temp-publication-capability.ts';
 import { evaluateLaneCapability } from '../../lane-session/capability-authority.ts';
 import { inspectReferencedLaneSession } from '../../lane-session/resolve.ts';
@@ -173,4 +173,27 @@ export function resolveCandidateAttribution(input: CandidateAttributionInput & {
   } catch {
     return finish(false, false, true, null, 'Actor registry inspection failed or found malformed or unmerged metadata.', null);
   }
+}
+
+/** Hook adapter for the same candidate-bound decision. Keeping this complete
+ * dependency check here avoids separate membership and identity rules in the
+ * already large pre-commit orchestration module. */
+export function inspectCandidateAttributionDependency(input: CandidateAttributionInput & {
+  readonly candidateFiles: readonly string[];
+  readonly suggestedTaskId?: string | null;
+}) {
+  const registry = inspectTrackedActorRegistryState(input.cwd);
+  const candidateAttribution = resolveCandidateAttribution({ ...input, phase: 'candidate' });
+  const authority = resolveCandidateAttributionAuthority(input, input.candidateFiles);
+  const independentAttribution = candidateAttribution.ok && authority.ok;
+  const requiredCommand = input.suggestedTaskId
+    ? `node atm.mjs git commit --actor <id> --task ${input.suggestedTaskId} --message "<summary>" --json`
+    : 'node atm.mjs git commit --actor <id> --message "<summary>" --json';
+  const failure = (registry.blocking || candidateAttribution.registryChanged) && !independentAttribution
+    ? { ok: false, findings: [{
+      code: 'ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED', source: 'commit-attribution', classification: 'current-task', requiredCommand,
+      detail: `Tracked actor registry ${registry.path} has ${registry.status === 'mixed' ? 'both staged and unstaged' : 'unstaged'} changes. Governed node atm.mjs git commit can auto-stage that tracked registry when it belongs to the governed commit surface, but bare git commit cannot. Re-run through the ATM wrapper or restore the drift first.`,
+    }] }
+    : null;
+  return { candidateAttribution, independentAttribution, failure };
 }

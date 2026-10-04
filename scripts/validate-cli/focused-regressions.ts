@@ -77,6 +77,7 @@ export function fastFocusedRegressionTests(): NodeScriptTestSpec[] {
     ['setup-install', 'tests/cli/setup-install.test.ts'],
     ['normal-close-operator-convergence', 'tests/cli/normal-close-operator-convergence.test.ts'],
     ['next-task-hint-paths', 'tests/cli/next-task-hint-paths.test.ts'],
+    ['handoff-resume-route', 'tests/cli/handoff-resume-route.test.ts'],
     ['planning-root-canonical-preference', 'scripts/validate-planning-root-canonical-preference.ts'],
     ['residue-diagnostics', 'packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts'],
     ['validate-cli-historical-delivery', 'tests/cli/validate-cli-historical-delivery.test.ts'],
