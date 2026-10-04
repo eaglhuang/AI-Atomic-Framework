@@ -198,7 +198,8 @@ export function buildChannelPlaybook(input: {
       'Do not manually claim before next --claim.',
       'Do not call tasks close directly for normal closeback; taskflow close owns the operator lane.',
       'Do not run taskflow close --write before dry-run/pre-close when blockers are unknown.',
-      'Do not commit task closure separately from the deliverable it proves.'
+      'Do not commit task closure separately from the deliverable it proves.',
+      'Do not add a separate delivery commit before or after a successful taskflow close --write; it owns the normal closure commit.'
     ],
     commandSequence: [
       ...(input.claimActive ? [] : [defaultClaimCommand]),
@@ -206,9 +207,7 @@ export function buildChannelPlaybook(input: {
       `node atm.mjs evidence run --task ${taskId} --actor ${actor}${lane} --command "<validator>" --validators "<validator>" --json`,
       closeOps.preClose,
       closeOps.dryRun,
-      closeOps.write,
-      `git add <deliverables> .atm/history/tasks/${taskId}.json .atm/history/evidence/${taskId}.bundle-manifest.json .atm/history/task-events/${taskId}/`,
-      `node atm.mjs git commit --actor ${actor} --task ${taskId}${lane} --message "<scope>: complete ${taskId}" --json`
+      closeOps.write
     ],
     closePreview: {
       schemaId: 'atm.taskflowClosePreviewPlaybook.v1',
@@ -217,9 +216,9 @@ export function buildChannelPlaybook(input: {
       writeCommand: closeOps.write,
       hintField: 'evidence.writeReadinessHint.blockers[].requiredCommand'
     },
-    commitTiming: 'Commit only after taskflow close --write succeeds and the governed bundle is committed.',
+    commitTiming: 'taskflow close --write commits the deliverables and governance bundle as part of the governed close. Do not add a separate normal delivery commit. An explicit stage-only result or interrupted close must follow its returned recovery command; WIP commits and other channels retain their own playbooks.',
     governedGitEntrypoint: {
-      preferredCommand: `node atm.mjs git commit --actor ${actor} --task <task-id> --message "<scope>: complete <task-id>" --json`,
+      preferredCommand: closeOps.write,
       directGitPolicy: 'Use taskflow close --write for normal closure. Bare git commit is not banned globally, but governed task/evidence bundles must use the ATM wrapper.',
       fallbackFields: ['copyableCommitCommand', 'hostGitCompatibilityGuidance']
     }

@@ -1,4 +1,7 @@
 import { execFileSync } from 'node:child_process';
+import { closeSync, copyFileSync, existsSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 /**
  * ATM-GOV-0369 amendment 1 — restore the index after a refused commit.
@@ -34,22 +37,17 @@ export interface IndexRestorationOutcome {
   readonly verified: boolean;
 }
 
-function git(cwd: string, args: readonly string[]): string {
+function git(cwd: string, args: readonly string[], env = process.env): string {
   const executable = process.env.ATM_GIT_EXECUTABLE || 'git';
   return execFileSync(executable, ['-C', cwd, ...args], {
     encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+    stdio: ['ignore', 'pipe', 'pipe'], env
   });
 }
 
 function readIndexEntries(cwd: string): Map<string, IndexEntry> {
   const entries = new Map<string, IndexEntry>();
-  let output = '';
-  try {
-    output = git(cwd, ['ls-files', '-s']);
-  } catch {
-    return entries;
-  }
+  const output = git(cwd, ['ls-files', '-s']);
   for (const line of output.split(/\r?\n/)) {
     // `<mode> <object> <stage>\t<path>`
     const separator = line.indexOf('\t');
@@ -89,8 +87,10 @@ function diffPaths(
  */
 export function restoreIndexToSnapshot(
   cwd: string,
-  snapshot: IndexRestorationSnapshot
+  snapshot: IndexRestorationSnapshot,
+  ownership?: { readonly paths: readonly string[]; readonly expected: IndexRestorationSnapshot }
 ): IndexRestorationOutcome {
+  if (ownership) return restoreOwnedIndexEntries(cwd, snapshot, ownership);
   const changed = diffPaths(snapshot.entries, readIndexEntries(cwd));
   if (changed.length === 0) {
     return { restoredPaths: [], residualPaths: [], verified: true };
@@ -117,4 +117,51 @@ export function restoreIndexToSnapshot(
     residualPaths,
     verified: residualPaths.length === 0
   };
+}
+
+/** Restore only declared operation writes that still equal their observed
+ * post-write entry. Hold Git's real index lock across comparison and atomic
+ * publication, so a concurrent writer cannot slip between the two checks. */
+function restoreOwnedIndexEntries(cwd: string, snapshot: IndexRestorationSnapshot, ownership: { readonly paths: readonly string[]; readonly expected: IndexRestorationSnapshot }): IndexRestorationOutcome {
+  const paths = [...new Set(ownership.paths)].sort();
+  if (paths.length === 0) return { restoredPaths: [], residualPaths: [], verified: true };
+  const indexPath = path.resolve(cwd, git(cwd, ['rev-parse', '--git-path', 'index']).trim());
+  const lockPath = `${indexPath}.lock`;
+  let descriptor: number | null = null;
+  let ownsLock = false;
+  let tempDir: string | null = null;
+  const restoredPaths: string[] = [];
+  const residualPaths: string[] = [];
+  try {
+    descriptor = openSync(lockPath, 'wx');
+    ownsLock = true;
+    const current = readIndexEntries(cwd);
+    const changed = paths.filter((file) => !sameEntry(snapshot.entries.get(file), current.get(file)));
+    if (!changed.length) return { restoredPaths, residualPaths, verified: true };
+    tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-owned-index-rollback-'));
+    const candidate = path.join(tempDir, 'index');
+    const env = { ...process.env, GIT_INDEX_FILE: candidate };
+    if (existsSync(indexPath)) copyFileSync(indexPath, candidate); else git(cwd, ['read-tree', '--empty'], env);
+    for (const file of changed) {
+      const expected = ownership.expected.entries.get(file);
+      const original = snapshot.entries.get(file);
+      if (!sameEntry(current.get(file), expected) || (original && original.stage !== '0') || (expected && expected.stage !== '0')) { residualPaths.push(file); continue; }
+      if (original) git(cwd, ['update-index', '--add', '--cacheinfo', `${original.mode},${original.objectId},${file}`], env);
+      else git(cwd, ['update-index', '--force-remove', '--', file], env);
+      restoredPaths.push(file);
+    }
+    if (restoredPaths.length) {
+      writeFileSync(descriptor, readFileSync(candidate));
+      closeSync(descriptor); descriptor = null;
+      renameSync(lockPath, indexPath);
+      ownsLock = false;
+    }
+    return { restoredPaths, residualPaths, verified: residualPaths.length === 0 };
+  } catch {
+    return { restoredPaths: [], residualPaths: paths, verified: false };
+  } finally {
+    if (descriptor !== null) closeSync(descriptor);
+    if (ownsLock) rmSync(lockPath, { force: true });
+    if (tempDir) rmSync(tempDir, { recursive: true, force: true });
+  }
 }

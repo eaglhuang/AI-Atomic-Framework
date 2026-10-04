@@ -66,6 +66,8 @@ export function applyLiveIndexRollbackAfterCommitError(input: {
   readonly headAdvancedDuringAttempt: boolean;
   readonly indexRestorationSnapshot: IndexRestorationSnapshot | null;
   readonly liveIndexSnapshotBeforeAttempt: LegacyValue;
+  readonly operationOwnedPaths?: readonly string[];
+  readonly expectedOperationIndex?: IndexRestorationSnapshot;
 }): {
   readonly indexRestoration: IndexRestorationOutcome | null;
   readonly liveIndexResidueRollback: readonly string[];
@@ -74,17 +76,13 @@ export function applyLiveIndexRollbackAfterCommitError(input: {
     return { indexRestoration: null, liveIndexResidueRollback: [] };
   }
   const indexRestoration = input.indexRestorationSnapshot
-    ? restoreIndexToSnapshot(input.cwd, input.indexRestorationSnapshot)
+    ? restoreIndexToSnapshot(input.cwd, input.indexRestorationSnapshot, { paths: input.operationOwnedPaths ?? [], expected: input.expectedOperationIndex ?? input.indexRestorationSnapshot })
     : null;
   return {
     indexRestoration,
     liveIndexResidueRollback: Array.from(
       new Set([
         ...(indexRestoration?.restoredPaths ?? []),
-        ...rollbackNewlyStagedLiveIndexResidue(
-          input.cwd,
-          input.liveIndexSnapshotBeforeAttempt,
-        ),
       ]),
     ).sort(),
   };
@@ -95,7 +93,9 @@ let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesAc
 // ATM-GOV-0369 amendment 1: the boundary that can fail owns its own
 // pre-operation snapshot, so restoration never depends on a caller
 // remembering to take one.
-const indexRestorationSnapshotBeforeCommitAttempt = captureIndexRestorationSnapshot(options.cwd);
+const indexRestorationSnapshotBeforeCommitAttempt = context.liveIndexRestorationSnapshotBeforeCommitAttempt ?? captureIndexRestorationSnapshot(options.cwd);
+let expectedOperationIndex = captureIndexRestorationSnapshot(options.cwd);
+const operationOwnedPaths = new Set<string>(autoStagedFrameworkPaths ?? []);
 try {
     withBranchCommitQueueLock(
       {
@@ -155,6 +155,8 @@ try {
           hookTaskId,
           autoStagedFrameworkPaths,
         });
+        if (candidate.preStagedEvidence?.evidencePath) operationOwnedPaths.add(candidate.preStagedEvidence.evidencePath);
+        expectedOperationIndex = captureIndexRestorationSnapshot(options.cwd);
         // executeHookBypassCommitBoundary( is reached inside executeCommitAttempt
         // only after withBranchCommitQueueLock admits this branch commit window.
         protectedOverrideAudit = executeCommitAttempt({
@@ -195,11 +197,13 @@ try {
       headShaBeforeCommit &&
       headShaAfterFailure !== headShaBeforeCommit,
     );
-    const { liveIndexResidueRollback } = applyLiveIndexRollbackAfterCommitError({
+    const { liveIndexResidueRollback, indexRestoration } = applyLiveIndexRollbackAfterCommitError({
       cwd: options.cwd,
       headAdvancedDuringAttempt,
       indexRestorationSnapshot: indexRestorationSnapshotBeforeCommitAttempt,
       liveIndexSnapshotBeforeAttempt: liveIndexSnapshotBeforeCommitAttempt,
+      operationOwnedPaths: [...operationOwnedPaths],
+      expectedOperationIndex,
     });
     const gitHeadEvidenceRollback = headAdvancedDuringAttempt
       ? false
@@ -263,6 +267,7 @@ try {
       retryCommand,
       copyableCommitCommand: rawCopyableCommitCommand,
       liveIndexResidueRollback,
+      indexRestoration,
     });
     if (
       error instanceof CliError &&
