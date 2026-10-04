@@ -52,6 +52,7 @@ The claim response's playbook lists every later command with `--lane-session <id
 - Run the validators the playbook names and record them with `node atm.mjs evidence run ... --json`.
 - For the normal task-card lane, `taskflow close --write` commits the deliverables and governance bundle as part of the governed close. Do not add a separate delivery commit before or after it. If identity is missing, follow its `identity set` recovery command.
 - Follow the playbook through `taskflow pre-close`, `taskflow close` dry-run, and the ready `--write` command. Explicit stage-only or interrupted-close results must follow their returned recovery commands; WIP, fast, and batch lanes retain their own playbooks. Do not edit `.atm/` files by hand.
+- If the user drops the request, run `node atm.mjs taskflow abandon --task <TASK-ID> --actor <id> --reason "<why>" --write --json` (with the playbook's `--lane-session`). It marks the card and ledger abandoned and commits all of the task's records; do not leave a backend `tasks abandon` uncommitted.
 - Report the changed files and the evidence path to the user.
 
 ## Which version to pin
