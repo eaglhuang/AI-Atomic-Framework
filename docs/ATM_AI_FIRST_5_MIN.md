@@ -34,10 +34,24 @@ node atm.mjs next --prompt "<the user's request>" --json
 - Read `evidence.nextAction.playbook` and the returned scope before editing.
 - Execute the single command ATM returns (for example a claim), then do the work inside the allowed files.
 
+### Ordinary work without a task card
+
+Bootstrap gives every project a `taskflow.profile.json`, so you can open the task card yourself. Turn the request into a title, a one-paragraph goal, the files you will change, and the command that proves the change, then:
+
+```bash
+node atm.mjs taskflow open --write --actor <id> --title "<title>" --goal "<goal>" --scope-path "<file>,<file>" --validator "<command>" --json
+node atm.mjs next --claim --actor <id> --task <TASK-ID> --auto-intent --json
+```
+
+The card is written to `docs/tasks/<TASK-ID>.task.md` and is your delivery contract: edit only its `scopePaths`, and open another card instead of widening the scope. Planning repositories are only for developing ATM itself.
+
+The claim response's playbook lists every later command with `--lane-session <id>` already appended. Keep that flag: each shell starts without the claim's lane, and mutations without it are refused.
+
 ## 4. Leave evidence and finish
 
 - Run the validators the playbook names and record them with `node atm.mjs evidence run ... --json`.
-- Close through the command the playbook gives you; do not edit `.atm/` files by hand.
+- Commit with `node atm.mjs git commit --task <TASK-ID> ... --lane-session <id> --json`. The first commit may ask you to run `identity set` once.
+- Close through the command the playbook gives you (`taskflow close` dry-run, then the `--write` command its `writeReadinessHint` names); do not edit `.atm/` files by hand.
 - Report the changed files and the evidence path to the user.
 
 ## Which version to pin
