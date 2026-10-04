@@ -36,7 +36,7 @@ assert.match(validatorSource, /requiredSuccessCommandFailures/, 'public npm vali
 assert.match(validatorSource, /coreWorkflowPassed/, 'public npm validator must report core workflow status');
 assert.match(validatorSource, /runFirstUseChain\(bin, consumer\)/, 'public npm validator must execute the first-use workflow in its clean consumer');
 const firstUseSource = readFileSync(path.join(root, 'scripts/lib/npm-first-use.ts'), 'utf8');
-assert.match(validatorSource, /import \{ runFirstUseChain \} from '.\/lib\/npm-first-use.ts'/, 'public proof must use the shared first-use validator');
+assert.match(validatorSource, /import \{[^}]*\brunFirstUseChain\b[^}]*\} from '.\/lib\/npm-first-use.ts'/, 'public proof must use the shared first-use validator');
 assert.match(firstUseSource, /generated command is not runnable from a clean npm install/, 'shared validator must reject unusable generated commands');
 assert.match(firstUseSource, /const stderr = String\(result\.stderr/, 'first-use proof must parse command JSON from either output stream');
 assert.match(validatorSource, /'first-use'/, 'first-use workflow must be a required successful public smoke command');
