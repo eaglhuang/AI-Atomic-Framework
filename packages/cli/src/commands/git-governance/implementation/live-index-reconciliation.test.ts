@@ -13,8 +13,9 @@
 // contractEdge: live-index-reconciliation-transaction
 
 import assert from 'node:assert/strict';
+import { syncBuiltinESMExports } from 'node:module';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
+import fs, { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -23,6 +24,42 @@ import { runWithSealedTaskScopedCommitIndex } from './sealed-commit-attribution.
 import { withTaskScopedCommitIndex } from './git-index-transaction.ts';
 import { applyLiveIndexRollbackAfterCommitError } from './commit-execution.ts';
 import { captureIndexRestorationSnapshot, restoreIndexToSnapshot } from './index-restoration.ts';
+
+// Failure rollback owns only declared writes and compares their exact
+// post-write entries while holding the real Git index lock.
+{
+  const root = mkdtempSync(path.join(os.tmpdir(), 'atm-owned-rollback-cas-'));
+  try {
+    git(root, ['init', '-q']); git(root, ['config', 'user.name', 'CAS Test']); git(root, ['config', 'user.email', 'cas@example.invalid']);
+    writeFileSync(path.join(root, 'owned.txt'), 'before'); writeFileSync(path.join(root, 'foreign.txt'), 'before');
+    git(root, ['add', '.']); git(root, ['commit', '-qm', 'fixture']);
+    const before = captureIndexRestorationSnapshot(root);
+    writeFileSync(path.join(root, 'owned.txt'), 'operation'); git(root, ['add', 'owned.txt']);
+    const expected = captureIndexRestorationSnapshot(root);
+    writeFileSync(path.join(root, 'foreign.txt'), 'concurrent'); git(root, ['add', 'foreign.txt']);
+    const foreign = git(root, ['rev-parse', ':foreign.txt']);
+    const restored = restoreIndexToSnapshot(root, before, { paths: ['owned.txt'], expected });
+    assert.deepEqual(restored.restoredPaths, ['owned.txt']); assert.equal(git(root, ['rev-parse', ':foreign.txt']), foreign);
+    git(root, ['add', 'owned.txt']);
+    writeFileSync(path.join(root, 'owned.txt'), 'concurrent owned-path bytes'); git(root, ['add', 'owned.txt']);
+    const concurrent = git(root, ['rev-parse', ':owned.txt']);
+    const retained = restoreIndexToSnapshot(root, before, { paths: ['owned.txt'], expected });
+    assert.equal(retained.verified, false); assert.deepEqual(retained.residualPaths, ['owned.txt']); assert.equal(git(root, ['rev-parse', ':owned.txt']), concurrent);
+    const lock = path.join(root, '.git/index.lock');
+    writeFileSync(lock, 'foreign lock');
+    assert.equal(restoreIndexToSnapshot(root, before, { paths: ['owned.txt'], expected }).verified, false);
+    assert.equal(readFileSync(lock, 'utf8'), 'foreign lock'); rmSync(lock);
+    const expectedConcurrent = captureIndexRestorationSnapshot(root);
+    const rename = fs.renameSync;
+    try {
+      fs.renameSync = () => { throw new Error('simulated rename denial'); }; syncBuiltinESMExports();
+      const failure = restoreIndexToSnapshot(root, before, { paths: ['owned.txt'], expected: expectedConcurrent });
+      assert.equal(failure.verified, false); assert.equal(existsSync(lock), false, 'owned lock must be removed after rename failure');
+    } finally { fs.renameSync = rename; syncBuiltinESMExports(); }
+    assert.equal(git(root, ['rev-parse', ':owned.txt']), concurrent);
+    assert.equal(git(root, ['rev-parse', ':foreign.txt']), foreign);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+}
 import { CliError } from '../../shared.ts';
 import {
   LIVE_INDEX_HISTORICAL_RECOVERY_SCHEMA_ID,

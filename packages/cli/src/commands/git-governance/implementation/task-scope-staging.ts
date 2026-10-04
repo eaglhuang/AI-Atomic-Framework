@@ -294,7 +294,6 @@ export function resolveTaskDeclaredScope(cwd: LegacyValue, taskId: LegacyValue, 
       ...extractStringList(claim.files),
       ...extractStringList(taskDocument.targetAllowedFiles),
       ...extractTaskDeclaredFiles(taskDocument),
-      ...listCommitAttributionSideEffectPaths(cwd),
       ...listTaskOwnedProtectedOverrideAuditFiles(cwd, taskId),
     ]),
   );

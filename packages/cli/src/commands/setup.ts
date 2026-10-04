@@ -12,7 +12,7 @@ import { codexBridgeManifest, codexHostBridge } from './setup/codex-bridge.ts';
 import { safeIntegrationHooks } from './integration/safe-hooks.ts';
 import { preflightBootstrap } from './setup/bootstrap-preflight.ts';
 import { setupRunnerPath } from './setup/runner.ts';
-import { ensureSetupProjectRunner } from './setup/project-runner.ts';
+import { ensureSetupProjectRunner, preflightSetupProjectRunner } from './setup/project-runner.ts';
 
 export interface SetupInput {
   readonly interactive?: boolean;
@@ -54,6 +54,7 @@ export async function runSetup(argv: string[], input: SetupInput = {}) {
   const recoveryArgs = [runner, 'setup', '--cwd', cwd, '--agents', agents.length ? agents.join(',') : 'none', '--json'];
   try {
     preflightBootstrap(cwd);
+    preflightSetupProjectRunner(cwd);
     // Plan every adapter before bootstrap writes any configuration that could
     // alter detection. No --force is used, including on repeat installations.
     for (const id of agents) {

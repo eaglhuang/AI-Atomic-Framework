@@ -1,7 +1,9 @@
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { syncBuiltinESMExports } from 'node:module';
+import { installPinnedRunner } from '../../packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts';
+import fs, { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { runSetup } from '../../packages/cli/src/commands/setup.ts';
@@ -10,7 +12,7 @@ import { compareManifestParity } from '../../packages/cli/src/commands/integrati
 import { createIntegrationAdapter } from '../../packages/cli/src/commands/integration/adapters.ts';
 import { runIntegration } from '../../packages/cli/src/commands/integration/run.ts';
 import { setupRunnerPath } from '../../packages/cli/src/commands/setup/runner.ts';
-import { ensureSetupProjectRunner, sharedProjectLauncher } from '../../packages/cli/src/commands/setup/project-runner.ts';
+import { ensureSetupProjectRunner, preflightSetupProjectRunner, sharedProjectLauncher } from '../../packages/cli/src/commands/setup/project-runner.ts';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { InstallManifest } from '../../packages/integrations-core/src/index.ts';
@@ -21,6 +23,19 @@ function fixture(t: { after(fn: () => void): void }) {
   const project = path.join(root, 'project'), homeDir = path.join(root, 'home');
   mkdirSync(project); mkdirSync(homeDir);
   return { root, project, homeDir, input: { interactive: false, detection: { homeDir, env: {} } } };
+}
+
+function snapshotTree(root: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  function walk(directory: string) {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const absolute = path.join(directory, entry.name), relative = path.relative(root, absolute);
+      if (entry.isSymbolicLink()) result[relative] = `link:${fs.readlinkSync(absolute)}`;
+      else if (entry.isDirectory()) { result[relative] = 'directory'; walk(absolute); }
+      else result[relative] = createHash('sha256').update(readFileSync(absolute)).digest('hex');
+    }
+  }
+  walk(root); return result;
 }
 
 test('noninteractive and JSON modes never prompt or silently choose cwd', async t => {
@@ -231,6 +246,22 @@ for (const layoutRoot of ['data', 'layout']) test(`npm ${layoutRoot} fallback la
   writeFileSync(path.join(runtimeRoot, 'runtime.mjs'), '// fixture bundled runtime');
   writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify({ name: '@ai-atomic-framework/cli', bin: { atm: 'dist/npm-runtime/atm.mjs' } }));
   writeFileSync(path.join(runtimeRoot, 'manifest.json'), JSON.stringify({ schemaId: 'atm.cliNpmRuntimeManifest.v1', moduleIdentity: 'original-dist-relative-url', ...(layoutRoot === 'data' ? { layoutRoot } : {}), entrypoints: { bin: 'atm.mjs', runtime: 'runtime.mjs' }, files: ['atm.mjs', 'runtime.mjs'].map(name => ({path:name,sha256:`sha256:${createHash('sha256').update(readFileSync(path.join(runtimeRoot,name))).digest('hex')}`})) }));
+  const plan = preflightSetupProjectRunner(f.project, moduleUrl, null);
+  assert.equal(plan.runtime, runtime);
+  assert.deepEqual(readdirSync(f.project), [], 'npm preflight must not write or bootstrap');
+  // A competing file arrives immediately after the planner observes absence.
+  const target = path.join(f.project, 'atm.mjs'); const exists = fs.existsSync; let checks = 0;
+  t.mock.method(fs, 'existsSync', (file: Parameters<typeof exists>[0]) => {
+    const present = exists(file);
+    if (String(file) === target && ++checks === 2 && !present) writeFileSync(target, 'concurrent foreign launcher');
+    return present;
+  });
+  syncBuiltinESMExports();
+  try {
+    assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', moduleUrl), /RUNNER_CONFLICT/);
+    assert.equal(readFileSync(target, 'utf8'), 'concurrent foreign launcher');
+    assert.equal(exists(path.join(f.project, 'bootstrap-called.json')), false, 'rejected runner must not be bootstrapped');
+  } finally { t.mock.restoreAll(); syncBuiltinESMExports(); rmSync(target); }
   const first = ensureSetupProjectRunner(f.project, 'source-unavailable', moduleUrl);
   assert.equal(first.mode, 'shared-npm-runtime');
   const file = path.join(f.project, 'atm.mjs'); const bytes = readFileSync(file);
@@ -241,9 +272,11 @@ for (const layoutRoot of ['data', 'layout']) test(`npm ${layoutRoot} fallback la
   assert.equal(receipt.cwd, f.project); assert.equal(receipt.source, file);
   const newPackage = path.join(f.root, 'new-installation'); cpSync(packageRoot, newPackage, { recursive: true });
   const newModuleUrl = pathToFileURL(path.join(newPackage, 'dist/npm-runtime', layoutRoot, 'commands/setup/project-runner.js')).href;
+  assert.throws(() => preflightSetupProjectRunner(f.project, newModuleUrl, null), /RUNNER_CONFLICT/);
   assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', newModuleUrl), /RUNNER_CONFLICT/);
   assert.deepEqual(readFileSync(file), bytes);
   rmSync(runtime);
+  assert.throws(() => preflightSetupProjectRunner(f.project, newModuleUrl, null), /RUNNER_CONFLICT/);
   assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', newModuleUrl), /RUNNER_CONFLICT/);
   const child = spawnSync(process.execPath, [file, 'next', '--json'], { cwd: f.project, encoding: 'utf8' });
   assert.equal(child.status, 1); assert.match(child.stderr, /ATM_SHARED_RUNTIME_MISSING/);
@@ -254,6 +287,7 @@ for (const layoutRoot of ['data', 'layout']) test(`npm ${layoutRoot} fallback la
   assert.equal(readFileSync(file, 'utf8'), sharedProjectLauncher(path.join(newPackage, 'dist/npm-runtime/atm.mjs')));
   writeFileSync(file, readFileSync(file, 'utf8') + '// user edit\n');
   const edited = readFileSync(file);
+  assert.throws(() => preflightSetupProjectRunner(f.project, newModuleUrl, null), /RUNNER_CONFLICT/);
   assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', newModuleUrl), /RUNNER_CONFLICT/);
   assert.deepEqual(readFileSync(file), edited);
 });
@@ -278,23 +312,32 @@ for (const layoutRoot of ['data', 'layout']) test(`npm ${layoutRoot} launcher re
     { files: [...files, files[0]] }
   ]) {
     writeFileSync(path.join(runtimeRoot, 'manifest.json'), JSON.stringify({ ...manifest, ...change }));
+    assert.throws(() => preflightSetupProjectRunner(f.project, moduleUrl, null), /RUNTIME_IDENTITY_INVALID/);
+    assert.deepEqual(readdirSync(f.project), []);
     assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', moduleUrl), /RUNTIME_IDENTITY_INVALID/);
     assert.equal(existsSync(path.join(f.project, 'atm.mjs')), false);
   }
   writeFileSync(path.join(runtimeRoot, 'manifest.json'), JSON.stringify(manifest));
   for (const name of ['atm.mjs', 'runtime.mjs']) {
     writeFileSync(path.join(runtimeRoot, name), '// tampered');
+    assert.throws(() => preflightSetupProjectRunner(f.project, moduleUrl, null), /RUNTIME_IDENTITY_INVALID/);
+    assert.deepEqual(readdirSync(f.project), []);
     assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', moduleUrl), /RUNTIME_IDENTITY_INVALID/);
     writeFileSync(path.join(runtimeRoot, name), '// fixture');
   }
   assert.equal(existsSync(path.join(f.project, 'atm.mjs')), false);
 });
 
-test('a different existing project runner is preserved and never reported ready', async t => {
+for (const dryRun of [false, true]) test(`a different existing project runner rejects before any writes (dryRun=${dryRun})`, async t => {
   const f = fixture(t); const file = path.join(f.project, 'atm.mjs'); const original = '// user-owned unrelated runner\n';
   writeFileSync(file, original);
-  const result = await runSetup(['--cwd', f.project, '--agents', 'none', '--json'], f.input);
+  writeFileSync(path.join(f.project, 'README.md'), '# Existing project\n');
+  mkdirSync(path.join(f.project, 'assets'));
+  writeFileSync(path.join(f.project, 'assets/retained.bin'), Buffer.from([0, 255, 128, 7]));
+  const before = snapshotTree(f.project);
+  const result = await runSetup(['--cwd', f.project, '--agents', 'none', ...(dryRun ? ['--dry-run'] : []), '--json'], f.input);
   assert.equal(result.ok, false); assert.match(String(result.evidence.failure), /RUNNER_CONFLICT/);
+  assert.deepEqual(snapshotTree(f.project), before, 'rejected setup must preserve every path and file digest');
   assert.equal(readFileSync(file, 'utf8'), original);
   assert.equal(result.evidence.nextCommand, null);
 });
@@ -303,4 +346,30 @@ test('source fallback refuses arbitrary invocation identity before writing a lau
   const f = fixture(t);
   assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable'), /RUNNER_MISSING/);
   assert.equal(existsSync(path.join(f.project, 'atm.mjs')), false);
+});
+
+for (const kind of ['directory', 'symlink', 'non-UTF-8']) test(`launcher ${kind} is rejected without changing the project`, async t => {
+  const f = fixture(t); const file = path.join(f.project, 'atm.mjs');
+  if (kind === 'directory') mkdirSync(file);
+  if (kind === 'symlink') { writeFileSync(path.join(f.root, 'foreign.mjs'), 'foreign'); symlinkSync(path.join(f.root, 'foreign.mjs'), file); }
+  if (kind === 'non-UTF-8') writeFileSync(file, Buffer.from([0xff, 0xfe, 0x61]));
+  const before = readdirSync(f.project);
+  for (const dryRun of [false, true]) {
+    const result = await runSetup(['--cwd', f.project, '--agents', 'none', ...(dryRun ? ['--dry-run'] : []), '--json'], f.input).catch(error => ({ ok: false, evidence: { failure: String(error) } }));
+    assert.equal(result.ok, false); assert.deepEqual(readdirSync(f.project), before);
+  }
+  if (kind === 'non-UTF-8') assert.deepEqual(readFileSync(file), Buffer.from([0xff, 0xfe, 0x61]));
+  if (kind === 'symlink') assert.equal(readFileSync(path.join(f.root, 'foreign.mjs'), 'utf8'), 'foreign');
+});
+
+test('pinned runner exclusive creation preserves a file arriving at the write boundary', t => {
+  const f = fixture(t); const file = path.join(f.project, 'atm.mjs');
+  mkdirSync(path.join(f.project, '.atm/runtime'), { recursive: true });
+  const copy = fs.copyFileSync;
+  t.mock.method(fs, 'copyFileSync', (source: Parameters<typeof copy>[0], target: Parameters<typeof copy>[1], flags?: number) => { writeFileSync(file, 'concurrent foreign launcher'); return copy(source, target, flags); });
+  syncBuiltinESMExports();
+  try {
+    assert.throws(() => installPinnedRunner(f.project, false, [], []), /RUNNER_CONFLICT/);
+    assert.equal(readFileSync(file, 'utf8'), 'concurrent foreign launcher');
+  } finally { t.mock.restoreAll(); syncBuiltinESMExports(); }
 });

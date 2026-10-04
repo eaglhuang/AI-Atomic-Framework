@@ -50,8 +50,8 @@ The claim response's playbook lists every later command with `--lane-session <id
 ## 4. Leave evidence and finish
 
 - Run the validators the playbook names and record them with `node atm.mjs evidence run ... --json`.
-- Commit with `node atm.mjs git commit --task <TASK-ID> ... --lane-session <id> --json`. The first commit may ask you to run `identity set` once.
-- Close through the command the playbook gives you (`taskflow close` dry-run, then the `--write` command its `writeReadinessHint` names); do not edit `.atm/` files by hand.
+- For the normal task-card lane, `taskflow close --write` commits the deliverables and governance bundle as part of the governed close. Do not add a separate delivery commit before or after it. If identity is missing, follow its `identity set` recovery command.
+- Follow the playbook through `taskflow pre-close`, `taskflow close` dry-run, and the ready `--write` command. Explicit stage-only or interrupted-close results must follow their returned recovery commands; WIP, fast, and batch lanes retain their own playbooks. Do not edit `.atm/` files by hand.
 - Report the changed files and the evidence path to the user.
 
 ## Which version to pin
