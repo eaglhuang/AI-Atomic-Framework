@@ -104,10 +104,17 @@ export interface TaskflowOpenPrerequisiteInput {
   writeRequested: boolean;
 }
 
+/** `openerPath: "atm:builtin"` selects ATM's own opener: taskflow open
+ * generates the card with tasks new and imports it, exactly as it does for a
+ * declared host opener, so a single-repository adopter needs no opener script. */
+export const BUILTIN_TASKFLOW_OPENER = 'atm:builtin';
+
 export function buildDelegationContract(profile: TaskflowProfileV1 | null): TaskflowDelegationContract {
   const openerPath = profile?.delegation?.openerPath?.trim() || null;
   const hostOpenerAvailable = openerPath !== null;
-  const describeOnly = profile?.delegation?.writerInvocation?.describeOnly !== false;
+  const describeOnly = openerPath === BUILTIN_TASKFLOW_OPENER
+    ? false
+    : profile?.delegation?.writerInvocation?.describeOnly !== false;
   const invocable = hostOpenerAvailable && !describeOnly;
   const policy = normalizePolicy(profile?.delegation?.policy ?? null, describeOnly, hostOpenerAvailable);
 
@@ -133,7 +140,7 @@ export function collectMissingPrerequisites(input: TaskflowOpenPrerequisiteInput
   if (!input.profile?.delegation?.openerPath?.trim()) {
     missing.push('delegation.openerPath');
   }
-  if (input.profile && input.profile.delegation.writerInvocation?.describeOnly !== false) {
+  if (input.profile && input.profile.delegation.openerPath?.trim() !== BUILTIN_TASKFLOW_OPENER && input.profile.delegation.writerInvocation?.describeOnly !== false) {
     missing.push('delegation.writerInvocation.invoke');
   }
   const delegation = buildDelegationContract(input.profile);

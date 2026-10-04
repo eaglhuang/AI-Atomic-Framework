@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
 export { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
+import { applyLaneSessionFlagFromArgv } from './commands/shared/lane-session-flag.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
@@ -151,6 +152,7 @@ export const cliCommandRunners: Record<string, CliRunner> = {
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
+  argv = applyLaneSessionFlagFromArgv(argv);
   applyOutputProjectionFlagsFromArgv(argv);
   const [commandName, ...rawCommandArgs] = argv;
   const outputFormat = selectOutputFormat(argv, io);

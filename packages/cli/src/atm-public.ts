@@ -7,6 +7,7 @@ import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, make
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 import { describeRunnerMode } from './commands/next/runner-mode.ts';
+import { applyLaneSessionFlagFromArgv } from './commands/shared/lane-session-flag.ts';
 import { runNext } from './commands/next.ts';
 import { runDoctor } from './commands/doctor.ts';
 import { runGuide } from './commands/guide.ts';
@@ -71,6 +72,7 @@ export async function runPublicCli(
   argv = process.argv.slice(2),
   io = { stdout: process.stdout, stderr: process.stderr }
 ) {
+  argv = applyLaneSessionFlagFromArgv(argv);
   applyOutputProjectionFlagsFromArgv(argv);
   const [commandName, ...rawCommandArgs] = argv;
   const outputFormat = selectOutputFormat(argv, io);
