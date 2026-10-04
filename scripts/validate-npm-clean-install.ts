@@ -454,7 +454,9 @@ try {
       if (create.status !== 0) {
         fail(`installed atm create --dry-run failed: ${createText}`);
       }
-      const installedLayout = path.join(installRoot, 'node_modules', ...packageSpec.name.split('/'), 'dist', 'npm-runtime', 'layout');
+      const installedRuntime = path.join(installRoot, 'node_modules', ...packageSpec.name.split('/'), 'dist', 'npm-runtime');
+      const runtimeManifest = JSON.parse(readFileSync(path.join(installedRuntime, 'manifest.json'), 'utf8'));
+      const installedLayout = path.join(installedRuntime, runtimeManifest.layoutRoot ?? 'layout');
       for (const assetPath of [
         'templates/atom.spec.template.json',
         'templates/atom.test.template.ts',
@@ -486,4 +488,3 @@ try {
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
-

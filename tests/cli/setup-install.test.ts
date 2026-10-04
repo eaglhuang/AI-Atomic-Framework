@@ -222,15 +222,15 @@ test('process CLI missing target and dry-run never write the launch directory or
   }
 });
 
-test('npm fallback launcher records metadata through bootstrap and is safe to rerun', t => {
+for (const layoutRoot of ['data', 'layout']) test(`npm ${layoutRoot} fallback launcher records metadata through bootstrap and is safe to rerun`, t => {
   const f = fixture(t); const packageRoot = path.join(f.root, 'official-package');
   const runtimeRoot = path.join(packageRoot, 'dist/npm-runtime'); mkdirSync(runtimeRoot, { recursive: true });
   const runtime = path.join(runtimeRoot, 'atm.mjs');
-  const moduleUrl = pathToFileURL(path.join(runtimeRoot, 'layout/commands/setup/project-runner.js')).href;
+  const moduleUrl = pathToFileURL(path.join(runtimeRoot, layoutRoot, 'commands/setup/project-runner.js')).href;
   writeFileSync(runtime, `import { writeFileSync } from 'node:fs';\nif (process.argv[2] !== 'bootstrap' || !process.env.ATM_PINNED_RUNNER_SOURCE) process.exit(2);\nwriteFileSync(${JSON.stringify(path.join(f.project, 'bootstrap-called.json'))}, JSON.stringify({cwd:process.cwd(),source:process.env.ATM_PINNED_RUNNER_SOURCE}));\nprocess.stdout.write(JSON.stringify({ok:true}));\n`);
   writeFileSync(path.join(runtimeRoot, 'runtime.mjs'), '// fixture bundled runtime');
   writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify({ name: '@ai-atomic-framework/cli', bin: { atm: 'dist/npm-runtime/atm.mjs' } }));
-  writeFileSync(path.join(runtimeRoot, 'manifest.json'), JSON.stringify({ schemaId: 'atm.cliNpmRuntimeManifest.v1', moduleIdentity: 'original-dist-relative-url', entrypoints: { bin: 'atm.mjs', runtime: 'runtime.mjs' }, files: ['atm.mjs', 'runtime.mjs'].map(name => ({path:name,sha256:`sha256:${createHash('sha256').update(readFileSync(path.join(runtimeRoot,name))).digest('hex')}`})) }));
+  writeFileSync(path.join(runtimeRoot, 'manifest.json'), JSON.stringify({ schemaId: 'atm.cliNpmRuntimeManifest.v1', moduleIdentity: 'original-dist-relative-url', ...(layoutRoot === 'data' ? { layoutRoot } : {}), entrypoints: { bin: 'atm.mjs', runtime: 'runtime.mjs' }, files: ['atm.mjs', 'runtime.mjs'].map(name => ({path:name,sha256:`sha256:${createHash('sha256').update(readFileSync(path.join(runtimeRoot,name))).digest('hex')}`})) }));
   const first = ensureSetupProjectRunner(f.project, 'source-unavailable', moduleUrl);
   assert.equal(first.mode, 'shared-npm-runtime');
   const file = path.join(f.project, 'atm.mjs'); const bytes = readFileSync(file);
@@ -240,7 +240,7 @@ test('npm fallback launcher records metadata through bootstrap and is safe to re
   const receipt = JSON.parse(readFileSync(path.join(f.project, 'bootstrap-called.json'), 'utf8'));
   assert.equal(receipt.cwd, f.project); assert.equal(receipt.source, file);
   const newPackage = path.join(f.root, 'new-installation'); cpSync(packageRoot, newPackage, { recursive: true });
-  const newModuleUrl = pathToFileURL(path.join(newPackage, 'dist/npm-runtime/layout/commands/setup/project-runner.js')).href;
+  const newModuleUrl = pathToFileURL(path.join(newPackage, 'dist/npm-runtime', layoutRoot, 'commands/setup/project-runner.js')).href;
   assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', newModuleUrl), /RUNNER_CONFLICT/);
   assert.deepEqual(readFileSync(file), bytes);
   rmSync(runtime);
@@ -256,6 +256,38 @@ test('npm fallback launcher records metadata through bootstrap and is safe to re
   const edited = readFileSync(file);
   assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', newModuleUrl), /RUNNER_CONFLICT/);
   assert.deepEqual(readFileSync(file), edited);
+});
+
+for (const layoutRoot of ['data', 'layout']) test(`npm ${layoutRoot} launcher rejects inconsistent identity and integrity before writing`, t => {
+  const f = fixture(t); const packageRoot = path.join(f.root, 'package');
+  const runtimeRoot = path.join(packageRoot, 'dist/npm-runtime'); mkdirSync(runtimeRoot, { recursive: true });
+  const moduleUrl = pathToFileURL(path.join(runtimeRoot, layoutRoot, 'commands/setup/project-runner.js')).href;
+  const pkg = { name: '@ai-atomic-framework/cli', bin: { atm: 'dist/npm-runtime/atm.mjs' } };
+  writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify(pkg));
+  const files = ['atm.mjs', 'runtime.mjs'].map(name => {
+    writeFileSync(path.join(runtimeRoot, name), '// fixture');
+    return { path: name, sha256: `sha256:${createHash('sha256').update('// fixture').digest('hex')}` };
+  });
+  const manifest = { schemaId: 'atm.cliNpmRuntimeManifest.v1', moduleIdentity: 'original-dist-relative-url', layoutRoot,
+    entrypoints: { bin: 'atm.mjs', runtime: 'runtime.mjs' }, files };
+  for (const change of [
+    { moduleIdentity: 'unsupported' }, { layoutRoot: '../data' },
+    { layoutRoot: layoutRoot === 'data' ? 'layout' : 'data' },
+    { entrypoints: { bin: 'other.mjs', runtime: 'runtime.mjs' } },
+    { entrypoints: { bin: 'atm.mjs', runtime: 'other.mjs' } },
+    { files: [...files, files[0]] }
+  ]) {
+    writeFileSync(path.join(runtimeRoot, 'manifest.json'), JSON.stringify({ ...manifest, ...change }));
+    assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', moduleUrl), /RUNTIME_IDENTITY_INVALID/);
+    assert.equal(existsSync(path.join(f.project, 'atm.mjs')), false);
+  }
+  writeFileSync(path.join(runtimeRoot, 'manifest.json'), JSON.stringify(manifest));
+  for (const name of ['atm.mjs', 'runtime.mjs']) {
+    writeFileSync(path.join(runtimeRoot, name), '// tampered');
+    assert.throws(() => ensureSetupProjectRunner(f.project, 'source-unavailable', moduleUrl), /RUNTIME_IDENTITY_INVALID/);
+    writeFileSync(path.join(runtimeRoot, name), '// fixture');
+  }
+  assert.equal(existsSync(path.join(f.project, 'atm.mjs')), false);
 });
 
 test('a different existing project runner is preserved and never reported ready', async t => {
