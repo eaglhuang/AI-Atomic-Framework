@@ -312,6 +312,30 @@ jobs:
           test -s "$starter_root/project/.agents/skills/atm-governance-router/references/index.md"
           (cd "$starter_root/project" && node atm.mjs next --json)
 
+          # The published starter must carry an AI through its own local task
+          # card end to end, every command in a fresh process and the claim
+          # lane passed only as the playbook's --lane-session.
+          cd "$starter_root/project"
+          git init -q 2>/dev/null || true
+          git config user.name "Release Starter"
+          git config user.email release-starter@example.invalid
+          git add -A && git commit -qm init --no-verify
+          node atm.mjs taskflow open --write --actor starter --title "Add greeting" --goal "Print a greeting." --scope-path src/greet.mjs,scripts/check-greet.mjs --validator "node scripts/check-greet.mjs" --json > "$starter_root/open.json"
+          task_id=$(ls docs/tasks/*.task.md | head -n 1 | xargs -n1 basename | sed 's/\.task\.md$//')
+          node atm.mjs identity set --actor starter --git-name "Release Starter" --git-email release-starter@example.invalid --json > /dev/null
+          node atm.mjs next --claim --actor starter --task "$task_id" --auto-intent --json > "$starter_root/claim.json"
+          lane=$(jq -r '.evidence.nextAction.playbook.closePreview.writeCommand' "$starter_root/claim.json" | grep -o -- '--lane-session [^ ]*' | cut -d' ' -f2)
+          test -n "$lane"
+          mkdir -p src scripts
+          printf "export const greeting = 'hello';\n" > src/greet.mjs
+          printf "import { greeting } from '../src/greet.mjs';\nif (greeting !== 'hello') process.exit(1);\nconsole.log('greet: 1 case passed');\n" > scripts/check-greet.mjs
+          node atm.mjs git commit --actor starter --task "$task_id" --message "feat: greeting" --auto-stage --lane-session "$lane" --json > /dev/null
+          node atm.mjs evidence run --task "$task_id" --actor starter --command "node scripts/check-greet.mjs" --validators "node scripts/check-greet.mjs" --lane-session "$lane" --json > /dev/null
+          delivery=$(git rev-parse HEAD)
+          node atm.mjs taskflow close --task "$task_id" --actor starter --historical-delivery "$delivery" --write --lane-session "$lane" --json > "$starter_root/close.json"
+          jq -e '.ok == true' "$starter_root/close.json"
+          grep -q '^status: done$' "docs/tasks/$task_id.task.md"
+
       - name: Attach public registry post-publish proof
         if: ${{ always() && !cancelled() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
         uses: actions/upload-artifact@v4
