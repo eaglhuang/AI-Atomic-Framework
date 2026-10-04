@@ -5,6 +5,7 @@ import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
 export { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { applyLaneSessionFlagFromArgv } from './commands/shared/lane-session-flag.ts';
+import { withUnsupportedOptionHints } from './commands/shared/usage-error-hints.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
@@ -287,7 +288,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       ok: false,
       command: commandName,
       cwd: process.cwd(),
-      messages: [message('error', cliError.code, cliError.message, cliError.details)],
+      messages: [message('error', cliError.code, cliError.message, withUnsupportedOptionHints(commandName, commandArgs, cliError.message, cliError.details))],
       evidence: {}
     }), { cliErrorExitCode: cliError.exitCode });
     recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
