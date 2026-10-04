@@ -4,8 +4,9 @@ import path from 'node:path';
 const startMarker = '# ATM runtime state (managed by ATM bootstrap):start';
 const endMarker = '# ATM runtime state (managed by ATM bootstrap):end';
 
-// Same per-machine runtime and session outputs the ATM framework repository
-// ignores. Without them an adopter's first `git status` lists locks,
+// The per-machine runtime and session outputs the ATM framework repository
+// ignores. .atm/history/** stays tracked: it is the durable governance record
+// (task-import reports, evidence) that governed commits stage. Without them an adopter's first `git status` lists locks,
 // telemetry and session files as untracked work.
 export const adopterRuntimeIgnorePatterns = [
   '.atm/runtime/telemetry/',
@@ -27,9 +28,11 @@ export const adopterRuntimeIgnorePatterns = [
   '.atm/runtime/incidents/',
   '.atm/runtime/write-broker.registry.json',
   '.atm/runtime/git-commit-attempts/',
-  '.atm/history/guidance/',
-  '.atm/history/reports/',
-  '.atm-temp/'
+  '.atm-temp/',
+  // create-atm installs the ATM CLI into the project; an unignored
+  // node_modules turns the first `git add -A` into a dependency commit
+  // (and fails on Windows long paths).
+  'node_modules/'
 ] as const;
 
 export function ensureAdopterGitignore(cwd: string) {
