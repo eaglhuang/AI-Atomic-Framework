@@ -44,12 +44,14 @@ try {
     'the built-in opener refuses a card without scope and validators');
   const open = atm(cwd, ['taskflow', 'open', '--write', '--actor', 'newcomer', '--title', 'Add dark mode toggle',
     '--goal', 'Users can switch the settings page to dark mode.',
-    '--scope-path', 'src/settings.js,scripts/check-settings.mjs', '--validator', 'node scripts/check-settings.mjs']);
+    '--scope-path', 'src\\settings.js,./scripts/check-settings.mjs', '--validator', 'node scripts/check-settings.mjs']);
   assert.equal(open.exitCode, 0, JSON.stringify(open.json.messages));
   const taskId = 'TASK-SHOP-0001';
   const cardPath = path.join(cwd, 'docs', 'tasks', `${taskId}.task.md`);
   const card = readFileSync(cardPath, 'utf8');
   assert.match(card, /^owner: newcomer$/m);
+  assert.match(card, /^  - "src\/settings\.js"$/m, 'Windows separators are normalized');
+  assert.match(card, /^  - "scripts\/check-settings\.mjs"$/m, 'a leading ./ is dropped');
   assert.match(card, /^target_repo: shop$/m);
   assert.doesNotMatch(card, /AI-Atomic-Framework|atm-core|RFT-M|tests\/main\.test\.ts/, 'the adopter card carries no framework-repository values');
 
