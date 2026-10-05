@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import childProcess, { execFileSync } from 'node:child_process';
+import { syncBuiltinESMExports } from 'node:module';
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -16,13 +17,16 @@ const registry = '.atm/catalog/registry/actors.json';
 const actor = { actorId: 'isolation-actor', actorKind: 'ai-agent', displayName: 'Isolation Test', gitName: 'Isolation Test', gitEmail: 'isolation@example.invalid' };
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-attribution-isolation-'));
 const oldEnv = { ...process.env };
-const git = (...args: string[]) => execFileSync('git', args, { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+const git = (...args: string[]) => execFileSync('git', args, { cwd: repo, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 const put = (file: string, content: string) => { mkdirSync(path.dirname(path.join(repo, file)), { recursive: true }); writeFileSync(path.join(repo, file), content); };
 const registryText = (extra: unknown[]) => JSON.stringify({ schemaId: 'atm.actorRegistry', specVersion: '0.1.0', actors: [actor, ...extra] }) + '\n';
 try {
   delete process.env.ATM_LANE_SESSION_ID;
   git('init', '-q'); git('config', 'user.name', actor.gitName); git('config', 'user.email', actor.gitEmail);
   put('src/owned.ts', 'export const value = 1;\n'); put(registry, registryText([]));
+  // A real 28k-entry index (>5 MiB) exercises every wrapper snapshot, including
+  // preparation, failure rollback, retry and foreign partial-stage retention.
+  for (let index = 0; index < 28_000; index += 1) put(`padding/${String(index).padStart(5, '0')}-${'x'.repeat(130)}.txt`, 'unchanged fixture\n');
   const now = new Date().toISOString();
   const taskId = 'TASK-ISOLATION';
   const task = {
@@ -32,6 +36,7 @@ try {
   };
   put(`.atm/history/tasks/${taskId}.json`, JSON.stringify(task));
   git('add', '.'); git('commit', '-qm', 'fixture');
+  assert(Buffer.byteLength(git('ls-files', '--stage', '-z')) > 5 * 1024 * 1024);
   put(registry, registryText([{ actorId: 'foreign-staged', actorKind: 'ai-agent', displayName: 'Foreign' }])); git('add', '--', registry);
   put(registry, registryText([{ actorId: 'foreign-staged', actorKind: 'ai-agent', displayName: 'Foreign' }, { actorId: 'foreign-unstaged', actorKind: 'ai-agent', displayName: 'Foreign WIP' }]));
   put('src/owned.ts', 'export const value = 2;\n');
@@ -99,6 +104,19 @@ if (process.env.ATM_TEST_FOREIGN_STAGING_ON_FAILURE === '1') {
   chmodSync(path.join(repo, '.git/hooks/pre-commit'), 0o755);
   put('src/owned.ts', 'export const value = 3;\n');
   const wrapper = ['commit', '--cwd', repo, '--actor', actor.actorId, '--task', taskId, '--message', 'wrapper isolation', '--auto-stage', '--defer-foreign-staged', '--json'];
+  const beforeMalformed = { head: git('rev-parse', 'HEAD'), index: git('ls-files', '--stage', '-z'), registry: readFileSync(path.join(repo, registry), 'utf8') };
+  const originalExec = childProcess.execFileSync;
+  try {
+    childProcess.execFileSync = ((executable, args, options) => {
+      if (Array.isArray(args) && args.includes('ls-files') && args.includes('-z') && args.includes('--stage')) return Buffer.from('100644 ' + 'a'.repeat(40) + ' 0\tvalid\0truncated');
+      return originalExec(executable, args as readonly string[], options);
+    }) as typeof execFileSync;
+    syncBuiltinESMExports();
+    await assert.rejects(() => runAtmGit(wrapper), (error: any) => error.code === 'ATM_GIT_COMMIT_FAILED' && error.details.nestedFailure.boundary === 'index-snapshot');
+  } finally { childProcess.execFileSync = originalExec; syncBuiltinESMExports(); }
+  assert.equal(git('rev-parse', 'HEAD'), beforeMalformed.head);
+  assert.equal(git('ls-files', '--stage', '-z'), beforeMalformed.index);
+  assert.equal(readFileSync(path.join(repo, registry), 'utf8'), beforeMalformed.registry);
   const success = await runAtmGit(wrapper);
   assert.equal(success.ok, true, 'real wrapper commit with successful bound-session Git attribution hook');
   assert.equal(git('rev-parse', `HEAD:${registry}`), before.head);

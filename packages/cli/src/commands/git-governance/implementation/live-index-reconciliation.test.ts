@@ -14,7 +14,7 @@
 
 import assert from 'node:assert/strict';
 import { syncBuiltinESMExports } from 'node:module';
-import { execFileSync } from 'node:child_process';
+import childProcess, { execFileSync } from 'node:child_process';
 import fs, { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -103,6 +103,46 @@ function sealedOwnedBundle(root: string, content: string) {
   write(root, 'owned.txt', content);
   const blobId = git(root, ['hash-object', '-w', '--', 'owned.txt']);
   return sealCommitBundle({ entries: [{ path: 'owned.txt', mode: '100644', blobId, provenance: 'task-scope' }] });
+}
+
+// Whole-index rollback retains lossless path identities and fails closed if a
+// fresh snapshot cannot be captured while it holds Git's index lock.
+// Windows cannot create these exact worktree names; parser coverage is portable.
+if (process.platform !== 'win32') {
+  const root = repository();
+  const owned = ' owned\tline\nwith space ';
+  const foreign = 'foreign\\雪\tname ';
+  try {
+    write(root, owned, 'original owned'); write(root, foreign, 'original foreign');
+    git(root, ['add', '--', owned, foreign]);
+    const before = captureIndexRestorationSnapshot(root);
+    write(root, owned, 'operation'); git(root, ['add', '--', owned]);
+    const expected = captureIndexRestorationSnapshot(root);
+    write(root, foreign, 'concurrent staged'); git(root, ['add', '--', foreign]);
+    write(root, foreign, 'concurrent unstaged');
+    const foreignEntry = captureIndexRestorationSnapshot(root).entries.get(foreign);
+    const restored = restoreIndexToSnapshot(root, before, { paths: [owned], expected });
+    assert.equal(restored.verified, true);
+    assert.deepEqual(restored.restoredPaths, [owned]);
+    assert.deepEqual(captureIndexRestorationSnapshot(root).entries.get(owned), before.entries.get(owned));
+    assert.deepEqual(captureIndexRestorationSnapshot(root).entries.get(foreign), foreignEntry);
+    assert.equal(readFileSync(path.join(root, foreign), 'utf8'), 'concurrent unstaged');
+    assert.equal(readFileSync(path.join(root, owned), 'utf8'), 'operation', 'rollback affects the index, not the worktree');
+    const indexBytes = readFileSync(path.join(root, '.git/index'));
+    const originalExec = childProcess.execFileSync;
+    try {
+      childProcess.execFileSync = ((executable, args, options) => {
+        if (Array.isArray(args) && args.includes('ls-files')) throw Object.assign(new Error('snapshot timeout'), { code: 'ETIMEDOUT' });
+        return originalExec(executable, args as readonly string[], options);
+      }) as typeof execFileSync;
+      syncBuiltinESMExports();
+      const refused = restoreIndexToSnapshot(root, before, { paths: [owned], expected });
+      assert.equal(refused.verified, false);
+      assert.deepEqual(refused.residualPaths, [owned]);
+    } finally { childProcess.execFileSync = originalExec; syncBuiltinESMExports(); }
+    assert.deepEqual(readFileSync(path.join(root, '.git/index')), indexBytes);
+    assert.equal(existsSync(path.join(root, '.git/index.lock')), false, 'failed snapshot must release only its own index lock');
+  } finally { rmSync(root, { recursive: true, force: true }); }
 }
 
 function commit(

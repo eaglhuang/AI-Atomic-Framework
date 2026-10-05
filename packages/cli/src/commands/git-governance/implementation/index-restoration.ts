@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { closeSync, copyFileSync, existsSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { readCompleteIndexSnapshot } from './index-snapshot-read.ts';
 
 /**
  * ATM-GOV-0369 amendment 1 — restore the index after a refused commit.
@@ -46,18 +47,7 @@ function git(cwd: string, args: readonly string[], env = process.env): string {
 }
 
 function readIndexEntries(cwd: string): Map<string, IndexEntry> {
-  const entries = new Map<string, IndexEntry>();
-  const output = git(cwd, ['ls-files', '-s']);
-  for (const line of output.split(/\r?\n/)) {
-    // `<mode> <object> <stage>\t<path>`
-    const separator = line.indexOf('\t');
-    if (separator === -1) continue;
-    const [mode, objectId, stage] = line.slice(0, separator).split(/\s+/);
-    const filePath = line.slice(separator + 1).trim();
-    if (!mode || !objectId || !filePath) continue;
-    entries.set(filePath, { mode, objectId, stage: stage ?? '0' });
-  }
-  return entries;
+  return readCompleteIndexSnapshot(cwd);
 }
 
 export function captureIndexRestorationSnapshot(cwd: string): IndexRestorationSnapshot {
