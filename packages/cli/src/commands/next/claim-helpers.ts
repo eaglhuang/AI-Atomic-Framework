@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { runBroker } from '../broker.ts';
 import { CliError } from '../shared.ts';
+import { describeMissingGitBase } from '../shared/git-base-remediation.ts';
 import { prepareTaskForClaim } from '../tasks/public-surface.ts';
 import { projectGovernanceSharedSurfacesFromPaths } from '../../../../core/src/broker/global-resource-projection.ts';
 import { normalizeTaskRouteStatus } from './intent-normalizers.ts';
@@ -48,7 +49,7 @@ export async function registerPreClaimBrokerTransaction(input: {
   const head = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: input.cwd, encoding: 'utf8' });
   const baseCommit = head.status === 0 ? head.stdout.trim() : '';
   if (!baseCommit) {
-    throw new CliError('ATM_BROKER_TRANSACTION_BASE_MISSING', 'next --claim requires a resolvable HEAD before registering its Broker transaction.', { exitCode: 1 });
+    throw new CliError('ATM_BROKER_TRANSACTION_BASE_MISSING', 'next --claim requires a resolvable HEAD before registering its Broker transaction.', { exitCode: 1, details: describeMissingGitBase(input.cwd).details });
   }
   const intent = buildPreClaimWriteIntent({
     taskId: input.taskId,
