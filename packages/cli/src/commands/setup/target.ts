@@ -8,6 +8,20 @@ const outputRoots = ['.atm', '.agents', '.claude', '.cursor', '.github', '.gemin
 
 /** Setup never turns the default project-local operation into a global write. */
 export function validateSetupTarget(candidate: string, home = homedir(), env = process.env): string {
+  const root = validateProjectTargetLocation(candidate, home, env);
+  assertNoSymlinkPath(root);
+  if (existsSync(root) && !lstatSync(root).isDirectory()) throw new CliError('ATM_SETUP_INVALID_TARGET', 'The setup target must be a directory.', { exitCode: 2 });
+  for (const entry of outputRoots) inspect(path.join(root, entry));
+  for (const entry of ['AGENTS.md', 'README.md']) {
+    const file = path.join(root, entry);
+    if (existsSync(file) && lstatSync(file).isFile()) losslessUtf8(readFileSync(file));
+  }
+  return root;
+}
+
+/** Shared shallow location policy. Metadata inspection must not recurse through
+ * setup's write preflight merely to classify an explicitly selected target. */
+export function validateProjectTargetLocation(candidate: string, home = homedir(), env = process.env): string {
   const root = path.resolve(candidate);
   const configRoots = [
     ...['.atm', '.agents', '.claude', '.codex', '.cursor', '.copilot', '.gemini'].map(entry => path.join(home, entry)),
@@ -16,13 +30,6 @@ export function validateSetupTarget(candidate: string, home = homedir(), env = p
   if (isSameOrWithin(root, path.parse(root).root, false) || isSameOrWithin(root, home, false)
     || configRoots.some(entry => isSameOrWithin(root, entry))) {
     throw new CliError('ATM_SETUP_UNSAFE_TARGET', 'Select a project directory, not a home, filesystem root, or global agent configuration directory.', { exitCode: 2 });
-  }
-  assertNoSymlinkPath(root);
-  if (existsSync(root) && !lstatSync(root).isDirectory()) throw new CliError('ATM_SETUP_INVALID_TARGET', 'The setup target must be a directory.', { exitCode: 2 });
-  for (const entry of outputRoots) inspect(path.join(root, entry));
-  for (const entry of ['AGENTS.md', 'README.md']) {
-    const file = path.join(root, entry);
-    if (existsSync(file) && lstatSync(file).isFile()) losslessUtf8(readFileSync(file));
   }
   return root;
 }

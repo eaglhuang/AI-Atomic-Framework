@@ -76,6 +76,8 @@ export function fastFocusedRegressionTests(): NodeScriptTestSpec[] {
     ['index-snapshot-read', 'packages/cli/src/commands/git-governance/implementation/index-snapshot-read.test.ts'],
     ['candidate-attribution', 'packages/cli/src/commands/git-governance/implementation/candidate-attribution.test.ts'],
     ['setup-install', 'tests/cli/setup-install.test.ts'],
+    ['first-run-entry', 'tests/cli/first-run-entry.test.ts'],
+    ['first-run-skill-parity', 'tests/cli/first-run-skill-parity.test.ts'],
     ['normal-close-operator-convergence', 'tests/cli/normal-close-operator-convergence.test.ts'],
     ['next-task-hint-paths', 'tests/cli/next-task-hint-paths.test.ts'],
     ['handoff-resume-route', 'tests/cli/handoff-resume-route.test.ts'],

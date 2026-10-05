@@ -3,6 +3,7 @@ import path from 'node:path';
 import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
 import { fileURLToPath } from 'node:url';
 import { getCommandSpec } from './commands/command-specs.ts';
+import { createFirstRunContract, resolveFirstRunRuntime, rootHelpSubcommand } from './commands/first-run.ts';
 import { withUnsupportedOptionHints } from './commands/shared/usage-error-hints.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
@@ -80,7 +81,7 @@ export async function runPublicCli(
   const commandArgs = commandName === 'setup' ? rawCommandArgs : stripFormatFlags(rawCommandArgs);
 
   if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
-    const result = enrichCommandResult(createPublicHelpResult(process.cwd()));
+    const result = enrichCommandResult(createPublicHelpResult(process.cwd(), rawCommandArgs));
     writeResult(result, io.stdout, outputFormat);
     return result.exitCode;
   }
@@ -92,9 +93,9 @@ export async function runPublicCli(
   }
 
   if (commandName === 'help') {
-    const targetCommand = commandArgs.find((arg) => !arg.startsWith('-'));
+    const targetCommand = rootHelpSubcommand(commandArgs);
     if (!targetCommand) {
-      const result = enrichCommandResult(createPublicHelpResult(process.cwd()));
+      const result = enrichCommandResult(createPublicHelpResult(process.cwd(), rawCommandArgs));
       writeResult(result, io.stdout, outputFormat);
       return result.exitCode;
     }
@@ -208,7 +209,7 @@ function writeHelp(
   return result.exitCode;
 }
 
-function createPublicHelpResult(cwd: string) {
+function createPublicHelpResult(cwd: string, argv: readonly string[] = []) {
   return makeResult({
     ok: true,
     command: 'help',
@@ -216,6 +217,7 @@ function createPublicHelpResult(cwd: string) {
     messages: [message('info', 'ATM_CLI_HELP', 'Use "node atm.mjs <command> --help" for command details.')],
     evidence: {
       publicSurface: 'adopter-core',
+      firstRun: createFirstRunContract(argv, resolveFirstRunRuntime(publicCliCommandNames, import.meta.url)),
       commands: [...publicCliCommandNames]
         .map((command) => ({ command, summary: getCommandSpec(command)?.summary ?? 'Published adopter command' }))
         .sort((left, right) => left.command.localeCompare(right.command)),

@@ -366,6 +366,13 @@ export function loadProfile(profilePath: string): TaskflowProfileV1 {
     );
   }
 
+  return validateProfile(raw);
+}
+
+/** Validate an already-read snapshot without reopening its source path. */
+export function validateProfile(value: unknown): TaskflowProfileV1 {
+  const raw = value as TaskflowProfileV1 | null;
+
   if (!raw || typeof raw !== 'object') {
     throw new CliError(
       'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',

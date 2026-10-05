@@ -104,6 +104,7 @@ if (!process.exitCode) {
   assert(typeof packageModule.createStaticIntegrationAdapter === 'function', 'missing createStaticIntegrationAdapter helper');
   assert(typeof packageModule.createCodexSkillsAdapter === 'function', 'missing createCodexSkillsAdapter reference factory');
   assert(packageModule.atmFirstCommand === 'node atm.mjs next --prompt "$ARGUMENTS" --json', 'first command constant mismatch');
+  assert(packageModule.atmFirstRunCommand === 'node atm.mjs --help --cwd . --prompt "$ARGUMENTS" --json', 'first-run command constant mismatch');
   assert(packageModule.atmPromptScopedFirstCommand === 'node atm.mjs next --prompt "$ARGUMENTS" --json', 'prompt-scoped first command constant mismatch');
   assert(packageModule.atmIntentScopedFirstCommand === 'node atm.mjs next --intent .atm/runtime/task-intent.json --json', 'intent-scoped first command constant mismatch');
   assert(packageModule.charterInvariantsPlaceholder === '{{CHARTER_INVARIANTS}}', 'charter invariants placeholder mismatch');
@@ -137,6 +138,7 @@ if (!process.exitCode) {
   for (const adapterSpec of adapterSpecs) {
     exerciseAdapter(adapterSpec, validateManifest, fixtureManifest, packageModule.sha256Bytes, minimumEntryIds, {
       defaultFirstCommand: packageModule.atmFirstCommand,
+      firstRunCommand: packageModule.atmFirstRunCommand,
       promptScopedFirstCommand: packageModule.atmPromptScopedFirstCommand,
       intentScopedFirstCommand: packageModule.atmIntentScopedFirstCommand
     });
@@ -177,7 +179,7 @@ function exerciseAdapter(
   fixtureManifest: any,
   sha256Bytes: (input: string | Uint8Array) => string,
   minimumEntryIds: readonly string[],
-  firstCommands: { readonly defaultFirstCommand: string; readonly promptScopedFirstCommand: string; readonly intentScopedFirstCommand: string }
+  firstCommands: { readonly defaultFirstCommand: string; readonly firstRunCommand: string; readonly promptScopedFirstCommand: string; readonly intentScopedFirstCommand: string }
 ) {
   const adapter = adapterSpec.adapter;
   assert(adapter.id === adapterSpec.id, `${adapterSpec.id} adapter id mismatch`);
@@ -234,11 +236,11 @@ function exerciseAdapter(
         assert(installedContent.includes('INV-ATM-001'), `${adapterSpec.id} file missing rendered charter invariants: ${fileRecord.path}`);
       }
       if (adapterSpec.requireFirstCommand && isPrimaryEntry) {
+        const expectedCommands = isFirstRunIntegrationEntry(fileRecord.path)
+          ? [firstCommands.firstRunCommand]
+          : [firstCommands.defaultFirstCommand, firstCommands.promptScopedFirstCommand, firstCommands.intentScopedFirstCommand];
         assert(
-          installedContent.includes(firstCommands.defaultFirstCommand)
-            || installedContent.includes(firstCommands.promptScopedFirstCommand)
-            || installedContent.includes(firstCommands.promptScopedFirstCommand.replaceAll('"', '\\"'))
-            || installedContent.includes(firstCommands.intentScopedFirstCommand),
+          expectedCommands.some((command) => installedContent.includes(command) || installedContent.includes(command.replaceAll('"', '\\"'))),
           `${adapterSpec.id} file missing first command: ${fileRecord.path}`
         );
       }
@@ -284,6 +286,12 @@ function isPrimaryIntegrationEntry(filePath: string) {
     || normalizedPath.endsWith('.instructions.md')
     || normalizedPath.endsWith('.prompt.md')
     || normalizedPath.endsWith('.toml');
+}
+
+function isFirstRunIntegrationEntry(filePath: string) {
+  const normalizedPath = filePath.replace(/\\/g, '/');
+  return normalizedPath === 'GEMINI.md'
+    || /(?:^|\/)atm-governance-router(?:\/SKILL\.md|\.instructions\.md|\.prompt\.md|\.toml)$/.test(normalizedPath);
 }
 
 function requiresActorIdentityHandoffGate(filePath: string) {
