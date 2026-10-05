@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
 export { recordCommandGateTelemetry } from './telemetry/command-gate.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
+import { createFirstRunContract, resolveFirstRunRuntime, rootHelpSubcommand } from './commands/first-run.ts';
 import { applyLaneSessionFlagFromArgv } from './commands/shared/lane-session-flag.ts';
 import { withUnsupportedOptionHints } from './commands/shared/usage-error-hints.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
@@ -160,7 +161,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
   const commandArgs = commandName === 'setup' ? rawCommandArgs : stripFormatFlags(rawCommandArgs);
 
   if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
-    const result = enrichCommandResult(createGlobalHelpResult(process.cwd()));
+    const result = enrichCommandResult(createGlobalHelpResult(process.cwd(), rawCommandArgs));
     writeResult(result, io.stdout, outputFormat);
     return result.exitCode;
   }
@@ -172,9 +173,9 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
   }
 
   if (commandName === 'help') {
-    const targetCommand = commandArgs.find((arg) => !arg.startsWith('-'));
+    const targetCommand = rootHelpSubcommand(commandArgs);
     if (!targetCommand) {
-      const result = enrichCommandResult(createGlobalHelpResult(process.cwd()));
+      const result = enrichCommandResult(createGlobalHelpResult(process.cwd(), rawCommandArgs));
       writeResult(result, io.stdout, outputFormat);
       return result.exitCode;
     }
@@ -298,7 +299,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
 }
 
 
-function createGlobalHelpResult(cwd: string) {
+function createGlobalHelpResult(cwd: string, argv: readonly string[] = []) {
   const commands = listCommandSpecs()
     .map((spec) => ({ command: spec.name, summary: spec.summary }))
     .sort((left, right) => left.command.localeCompare(right.command));
@@ -309,6 +310,7 @@ function createGlobalHelpResult(cwd: string) {
     messages: [message('info', 'ATM_CLI_HELP', 'Use "node atm.mjs <command> --help" for command details.')],
     evidence: {
       commands,
+      firstRun: createFirstRunContract(argv, resolveFirstRunRuntime(Object.keys(cliCommandRunners), import.meta.url)),
       outputModes: ['json', 'pretty']
     }
   });
