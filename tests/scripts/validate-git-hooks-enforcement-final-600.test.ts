@@ -25,6 +25,20 @@ if (!facade.includes("import './validate-git-hooks-enforcement/main.ts';")) {
   throw new Error('validate-git-hooks-enforcement facade must delegate to the extracted main module');
 }
 
+const closureCrossChecks = readFileSync(path.join(root, 'scripts/validate-git-hooks-enforcement/closure-cross-checks.ts'), 'utf8');
+for (const requiredFixtureEntry of [
+  "'.atm/charter'",
+  "'.claude/skills'",
+  "'.cursor/rules/skills'",
+  "'.gemini/commands'",
+  "'GEMINI.md'",
+  "'docs/ANTIGRAVITY_INTEGRATION.md'"
+]) {
+  if (!closureCrossChecks.includes(requiredFixtureEntry)) {
+    throw new Error(`closure cross-check fixture must retain ${requiredFixtureEntry} for first-run skill parity`);
+  }
+}
+
 const ownerShard = readFileSync(
   path.join(root, 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json'),
   'utf8'
