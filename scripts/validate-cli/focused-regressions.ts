@@ -73,6 +73,7 @@ export function fastFocusedRegressionTests(): NodeScriptTestSpec[] {
     ['integration-raw-git-command-guard', 'tests/cli/integration-raw-git-command-guard.test.ts'],
     ['planning-root-preference', 'packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts'],
     ['git-commit-attribution-isolation', 'tests/cli/git-commit-attribution-isolation.test.ts'],
+    ['index-snapshot-read', 'packages/cli/src/commands/git-governance/implementation/index-snapshot-read.test.ts'],
     ['candidate-attribution', 'packages/cli/src/commands/git-governance/implementation/candidate-attribution.test.ts'],
     ['setup-install', 'tests/cli/setup-install.test.ts'],
     ['normal-close-operator-convergence', 'tests/cli/normal-close-operator-convergence.test.ts'],

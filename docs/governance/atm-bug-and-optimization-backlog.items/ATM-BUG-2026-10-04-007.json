@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-10-04-007",
+  "date": "2026-10-04",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Source repair in validation; publication pending",
+  "area": "Governed commit / complete large-index snapshot and rollback",
+  "finding": "The whole-index restoration snapshot used Node's default 1 MiB child-process output buffer, so ordinary commits in a large repository failed with ENOBUFS before a complete snapshot could be captured. Line-based parsing also trimmed or misread quoted and control-character filenames, silently skipped malformed rows, and could collapse unmerged stages into one entry.",
+  "expectedBehavior": "Capture the complete NUL-delimited stage-zero index under finite process, byte and entry budgets. Preserve exact path identities, modes and object IDs; fail closed for process failures, truncation, malformed or unrepresentable records without publishing a partial snapshot. Keep existing operation-owned compare-and-swap rollback and foreign staging preservation unchanged.",
+  "evidenceOrRepro": "The 28,000-entry, 5,572,000-byte index-snapshot fixture fails with ENOBUFS on the prior reader and succeeds with the bounded reader. Focused tests cover strict NUL framing, UTF-8 and path identity, byte/entry limits, process failure prefixes, unmerged rejection, unusual-name rollback, foreign staging and lock cleanup. The real governed-wrapper attribution regression runs on a 28,000-file repository with malformed-capture refusal, successful commits, hook failure, concurrent foreign staging and retry. See docs/governance/git-index-snapshot-contract.md for the exact supported boundary.",
+  "followUp": "Complete independent source review, static checks, standard and full CLI validation, clean installed-candidate acceptance, exact-head PR CI and postmerge verification before claiming delivery. This snapshot change does not expand every path-scoped CLI parser or publish npm. Preserve existing attempt receipts and inspect HEAD before retrying a wrapper failure."
+}
