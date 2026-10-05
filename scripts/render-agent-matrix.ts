@@ -9,6 +9,8 @@ import { cursorPack } from '../packages/agent-pack-cursor/src/index.ts';
 import { geminiPack } from '../packages/agent-pack-gemini/src/index.ts';
 import { windsurfPack } from '../packages/agent-pack-windsurf/src/index.ts';
 import { supportedAgentProfiles } from '../packages/cli/src/commands/agent-confidence.ts';
+import { availableAdapters } from '../packages/cli/src/commands/integration/adapters.ts';
+import { atmFirstRunCommand } from '../packages/integrations-core/src/index.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -38,38 +40,12 @@ const confidenceAdapterByProfileId: Record<string, string> = {
   'openai-assistants-api': 'n/a'
 };
 
-const officialIntegrationAdapters = [
-  {
-    adapterId: 'claude-code',
-    managedRoots: '`.claude/skills`',
-    fileFormats: 'SKILL.md',
-    firstCommand: '`node atm.mjs next --json`'
-  },
-  {
-    adapterId: 'codex',
-    managedRoots: '`integrations/codex-skills`',
-    fileFormats: 'SKILL.md',
-    firstCommand: '`node atm.mjs next --json`'
-  },
-  {
-    adapterId: 'copilot',
-    managedRoots: '`.github`, `.github/instructions`, `.github/prompts`',
-    fileFormats: 'Markdown',
-    firstCommand: '`node atm.mjs next --json`'
-  },
-  {
-    adapterId: 'cursor',
-    managedRoots: '`.cursor/rules/skills`',
-    fileFormats: 'Markdown',
-    firstCommand: '`node atm.mjs next --json`'
-  },
-  {
-    adapterId: 'gemini',
-    managedRoots: '`.gemini/commands`',
-    fileFormats: 'TOML',
-    firstCommand: '`node atm.mjs next --json`'
-  }
-] as const;
+const officialIntegrationAdapters = availableAdapters(root).map((adapter) => ({
+  adapterId: adapter.id,
+  managedRoots: `\`${adapter.targetDir}\``,
+  fileFormats: adapter.fileFormat,
+  firstCommand: `\`${atmFirstRunCommand}\``
+}));
 
 interface AgentPackMatrixRow {
   readonly agent: string;
@@ -118,11 +94,11 @@ export function renderAgentMatrixMarkdown(): string {
     '',
     '## Agent Pack Registry Matrix',
     '',
-    '| Agent | Pack ID | Agent Target | Managed Target Roots | File Formats | Managed Files | First Command | Source Hash |',
+    '| Agent | Pack ID | Agent Target | Managed Target Roots | File Formats | Managed Files | Operational Command | Source Hash |',
     '| --- | --- | --- | --- | --- | ---: | --- | --- |',
     ...packRows.map((row) => `| ${row.agent} | \`${row.packId}\` | \`${row.agentTarget}\` | ${row.managedRoots} | ${row.fileFormats} | ${row.managedFiles} | ${row.firstCommand} | ${row.sourceHash} |`),
     '',
-    'Every generated agent entry routes the first operational action back to `node atm.mjs next --json`; agent packs are onboarding wrappers, not a second governance protocol.',
+    'Agent packs are onboarding wrappers, not a second governance protocol. This table retains their existing operational command metadata. When a pack includes the governance router Skill, follow its first-run inspection before executing the selected operational command.',
     '',
     '## Integration Adapter Registry Matrix',
     '',
@@ -131,6 +107,8 @@ export function renderAgentMatrixMarkdown(): string {
     '| Adapter ID | Managed Target Roots | File Formats | First Command | CLI Lifecycle |',
     '| --- | --- | --- | --- | --- |',
     ...officialIntegrationAdapters.map((adapter) => `| \`${adapter.adapterId}\` | ${adapter.managedRoots} | ${adapter.fileFormats} | ${adapter.firstCommand} | list/add/verify/remove |`),
+    '',
+    'These rows come from the installed adapter registry. They describe programmatic entry contracts, not proof that an AI model automatically selects a Skill.',
     '',
     '## Advisory Confidence Profiles',
     '',

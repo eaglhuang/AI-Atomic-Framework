@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,10 +10,34 @@ import { createIntegrationAdapter, primaryEntryPathByAdapterId } from '../../pac
 import { codexHostBridge, codexBridgeManifest, verifyCodexHostBridge } from '../../packages/cli/src/commands/setup/codex-bridge.ts';
 import { supportedAgentIds } from '../../packages/cli/src/commands/setup/detection.ts';
 import { atmFirstRunCommand, atmPromptScopedFirstCommand } from '../../packages/integrations-core/src/index.ts';
+import { readSkillGuidanceClosure } from '../../scripts/lib/skill-guidance-closure.ts';
+import { renderAgentMatrixMarkdown } from '../../scripts/render-agent-matrix.ts';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const expectedReference = readFileSync(path.join(root, 'packages/integrations-core/templates/skills/atm-governance-router.files/references/advanced-governance.md'), 'utf8');
 const digest = (text: string) => createHash('sha256').update(text).digest('hex');
+
+test('guidance contract checks follow explicit source references and reject missing or escaping targets', t => {
+  const fixture = mkdtempSync(path.join(tmpdir(), 'atm-guidance-closure-'));
+  t.after(() => rmSync(fixture, { recursive: true, force: true }));
+  const project = path.join(fixture, 'project'); mkdirSync(project);
+  const entry = path.join(project, 'router.skill.md');
+  writeFileSync(entry, 'Legacy inline governance\n');
+  assert.equal(readSkillGuidanceClosure(project, entry).text, 'Legacy inline governance\n');
+  writeFileSync(entry, '[Advanced governed routes]({{REFERENCE_ROOT}}/advanced-governance.md)\n');
+  assert.throws(() => readSkillGuidanceClosure(project, entry));
+  const refs = path.join(project, 'router.files/references'); mkdirSync(refs, { recursive: true });
+  const reference = path.join(refs, 'advanced-governance.md'); writeFileSync(reference, 'Required rule\n');
+  assert.match(readSkillGuidanceClosure(project, entry).text, /Required rule/);
+  const outside = path.join(fixture, 'outside.md'); writeFileSync(outside, 'Outside content\n');
+  writeFileSync(entry, '[Advanced governed routes](../outside.md)\n');
+  assert.throws(() => readSkillGuidanceClosure(project, entry), /repository-local/);
+  if (process.platform !== 'win32') {
+    writeFileSync(entry, '[Advanced governed routes]({{REFERENCE_ROOT}}/advanced-governance.md)\n');
+    rmSync(reference); symlinkSync(outside, reference);
+    assert.throws(() => readSkillGuidanceClosure(project, entry), /repository-local/);
+  }
+});
 
 function inspectEntry(project: string, relativeEntry: string) {
   const entry = path.join(project, relativeEntry); const body = readFileSync(entry, 'utf8');
@@ -81,9 +105,21 @@ test('Codex native bridge has the same linked source contract and ownership safe
   assert.ok(existsSync(path.join(project, '.agents/skills/atm-governance-router/references/index.md')));
 });
 
-test('official integration validator verifies the installed first-run and specialist commands', () => {
-  const output = execFileSync(process.execPath, ['--strip-types', path.join(root, 'scripts/validate-integration-adapter.ts'), '--mode', 'validate'], { cwd: root, encoding: 'utf8', timeout: 30_000, maxBuffer: 2 * 1024 * 1024 });
-  assert.match(output, /\[integration-adapter:validate\] ok/);
+for (const validator of ['integration-adapter', 'guide', 'captain-dispatch-protocol']) {
+  test(`official ${validator} validator verifies the retained first-run and governed-route contracts`, () => {
+    const output = execFileSync(process.execPath, ['--strip-types', path.join(root, `scripts/validate-${validator}.ts`), '--mode', 'validate'], { cwd: root, encoding: 'utf8', timeout: 30_000, maxBuffer: 2 * 1024 * 1024 });
+    assert.ok(output.includes(`[${validator}:validate] ok`));
+  });
+}
+
+test('public matrix derives all six adapter entry commands while retaining separate legacy packs', () => {
+  const matrix = renderAgentMatrixMarkdown();
+  for (const id of supportedAgentIds) {
+    const row = matrix.split('\n').find(line => line.startsWith(`| \`${id}\` |`));
+    assert.ok(row?.includes(atmFirstRunCommand), `${id} matrix entry must match the runtime-aware command`);
+  }
+  assert.match(matrix, /Windsurf/);
+  assert.match(matrix, /not proof that an AI model automatically selects a Skill/);
 });
 
 test('entry stays thin while advanced obligations remain shipped, without claiming model auto-selection', () => {
