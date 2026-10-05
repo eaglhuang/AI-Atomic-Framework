@@ -54,10 +54,10 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
     return 0;
   }
   const options = parseArgs(argv);
+  const distTag = resolveCreateAtmDistTag(options.tag, argv.includes('--tag'));
   const targetRoot = path.resolve(options.cwd, options.projectName);
   ensureCreatableTarget(targetRoot);
   mkdirSync(targetRoot, { recursive: true });
-  const distTag = resolveCreateAtmDistTag(options.tag);
   writeDistTagSelection(targetRoot, distTag);
 
   let atmExecution = resolveAtmExecutionPlan(distTag.requestedTag);
@@ -131,6 +131,10 @@ function installTargetRuntime(targetRoot: string, packageSpec: string): { step: 
     const installed = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'), 'utf8'));
     const manifest = JSON.parse(readFileSync(path.join(targetRoot, 'package.json'), 'utf8'));
     const lock = JSON.parse(readFileSync(path.join(targetRoot, 'package-lock.json'), 'utf8'));
+    const requestedVersion = packageSpec.slice(packageSpec.lastIndexOf('@') + 1);
+    if (!['latest', 'next', 'beta', 'lts'].includes(requestedVersion) && installed.version !== requestedVersion) {
+      throw new Error('Installed CLI version does not match the starter dependency.');
+    }
     if (installed.name !== '@ai-atomic-framework/cli' || typeof installed.version !== 'string'
       || manifest.dependencies?.[installed.name] !== installed.version
       || lock.packages?.['node_modules/@ai-atomic-framework/cli']?.version !== installed.version
@@ -197,18 +201,27 @@ function ensureCreatableTarget(targetRoot: string): void {
   }
 }
 
-function resolveCreateAtmDistTag(tag: CreateAtmDistTag): CreateAtmDistTagSelection {
+function resolveCreateAtmDistTag(tag: CreateAtmDistTag, explicitTag: boolean): CreateAtmDistTagSelection {
   const table: Record<CreateAtmDistTag, Omit<CreateAtmDistTagSelection, 'schemaVersion' | 'requestedTag' | 'npmPackageSpec' | 'source'>> = {
     latest: { tier: 'stable', expectedCliPrerelease: null },
     next: { tier: 'beta', expectedCliPrerelease: 'beta' },
     beta: { tier: 'experimental', expectedCliPrerelease: 'alpha' },
     lts: { tier: 'lts', expectedCliPrerelease: null }
   };
+  let packageVersion: string = tag;
+  if (!explicitTag) {
+    const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+    const declared = manifest.dependencies?.['@ai-atomic-framework/cli'];
+    if (typeof declared !== 'string' || !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(declared)) {
+      throwUsage('create-atm must declare an exact CLI dependency; use --tag explicitly to select a release channel.');
+    }
+    packageVersion = declared;
+  }
   return {
     schemaVersion: 'atm.distTagSelection.v0.1',
     requestedTag: tag,
     ...table[tag],
-    npmPackageSpec: `@ai-atomic-framework/cli@${tag}`,
+    npmPackageSpec: `@ai-atomic-framework/cli@${packageVersion}`,
     source: 'create-atm'
   };
 }
