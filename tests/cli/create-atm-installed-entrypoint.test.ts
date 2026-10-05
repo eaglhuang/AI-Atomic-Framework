@@ -27,6 +27,7 @@ import { appendFileSync, cpSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 const args = process.argv.slice(2);
 appendFileSync(${JSON.stringify(calls)}, JSON.stringify(args) + '\\n');
+if (args[0] === 'bootstrap') writeFileSync(path.join(args[args.indexOf('--cwd') + 1], '.gitignore'), 'node_modules/\\n');
 if (args[0] === 'integration' && args[1] === 'add' && args[2] === 'codex') {
   const corpus = path.join(args[args.indexOf('--cwd') + 1], 'integrations/codex-skills/atm-governance-router');
   mkdirSync(corpus, { recursive: true });
@@ -56,7 +57,8 @@ writeFileSync(manifestPath, JSON.stringify(manifest));
 writeFileSync(path.join(target, 'package-lock.json'), JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/@ai-atomic-framework/cli': { version: '1.2.3' } } }));
 `);
   return { root, starter, calls, invoke(args: string[]) {
-    return spawnSync(process.execPath, [starter, ...args, '--cwd', root, '--json'], { encoding: 'utf8', env: { ...process.env, npm_execpath: npmCli } });
+    return spawnSync(process.execPath, [starter, ...args, '--cwd', root, '--json'], { encoding: 'utf8', env: { ...process.env, npm_execpath: npmCli,
+      GIT_AUTHOR_NAME: 'Fixture', GIT_AUTHOR_EMAIL: 'fixture@example.invalid', GIT_COMMITTER_NAME: 'Fixture', GIT_COMMITTER_EMAIL: 'fixture@example.invalid' } });
   }, recorded() {
     return readFileSync(calls, 'utf8').trim().split('\n').map((line) => JSON.parse(line) as string[]);
   } };
@@ -79,7 +81,7 @@ for (const layout of ['dist/npm-runtime', 'dist']) {
     const f = fixture(layout);
     try {
       const child = f.invoke(['project', '--agent', 'codex']);
-      assert.equal(child.status, 0, child.stderr);
+      assert.equal(child.status, 0, child.stderr + child.stdout);
       const result = JSON.parse(child.stdout);
       assert.equal(result.ok, true);
       assert.equal(result.evidence.atmEntrypointSource, 'target-dependency');
@@ -118,12 +120,74 @@ for (const failAt of ['bootstrap', 'atm-chart']) {
   });
 }
 
+test('successful starter creates exactly one target-local initial commit', () => {
+  const f = fixture();
+  try {
+    const child = spawnSync(process.execPath, [f.starter, 'project', '--cwd', f.root, '--json'], {
+      encoding: 'utf8', env: { ...process.env, npm_execpath: path.join(f.root, 'npm-cli.js'),
+        GIT_AUTHOR_NAME: 'Fixture', GIT_AUTHOR_EMAIL: 'fixture@example.invalid',
+        GIT_COMMITTER_NAME: 'Fixture', GIT_COMMITTER_EMAIL: 'fixture@example.invalid' }
+    });
+    assert.equal(child.status, 0, child.stderr + child.stdout);
+    const target = path.join(f.root, 'project');
+    const count = spawnSync('git', ['rev-list', '--count', 'HEAD'], { cwd: target, encoding: 'utf8' });
+    assert.equal(count.status, 0, count.stderr);
+    assert.equal(count.stdout.trim(), '1');
+    const tracked = spawnSync('git', ['ls-files'], { cwd: target, encoding: 'utf8' });
+    assert.match(tracked.stdout, /package-lock\.json/);
+    assert.doesNotMatch(tracked.stdout, /node_modules/);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
 test('explicit latest opts into the floating channel', () => {
   const f = fixture();
   try {
     const child = f.invoke(['project', '--tag', 'latest']);
     assert.equal(child.status, 0, child.stderr);
     assert.equal(JSON.parse(child.stdout).evidence.distTag.npmPackageSpec, '@ai-atomic-framework/cli@latest');
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test('initial commit ignores inherited Git placement and preserves the parent repository', () => {
+  const f = fixture();
+  const identity = { GIT_AUTHOR_NAME: 'Fixture', GIT_AUTHOR_EMAIL: 'fixture@example.invalid', GIT_COMMITTER_NAME: 'Fixture', GIT_COMMITTER_EMAIL: 'fixture@example.invalid' };
+  try {
+    const parentGit = (...args: string[]) => spawnSync('git', args, { cwd: f.root, encoding: 'utf8', env: { ...process.env, ...identity } });
+    assert.equal(parentGit('init', '--quiet').status, 0);
+    writeFileSync(path.join(f.root, '.gitignore'), 'node_modules/\nnpm-cli.js\n');
+    writeFileSync(path.join(f.root, 'parent.txt'), 'parent baseline');
+    assert.equal(parentGit('add', '.gitignore', 'parent.txt').status, 0);
+    assert.equal(parentGit('commit', '-m', 'parent baseline').status, 0);
+    const head = parentGit('rev-parse', 'HEAD').stdout;
+    writeFileSync(path.join(f.root, 'parent.txt'), 'parent staged WIP');
+    assert.equal(parentGit('add', 'parent.txt').status, 0);
+    const staged = parentGit('diff', '--cached').stdout;
+    const child = spawnSync(process.execPath, [f.starter, 'project', '--cwd', f.root, '--json'], {
+      encoding: 'utf8', env: { ...process.env, ...identity, npm_execpath: path.join(f.root, 'npm-cli.js'),
+        GIT_DIR: path.join(f.root, '.git'), GIT_WORK_TREE: f.root, GIT_INDEX_FILE: path.join(f.root, '.git/index') }
+    });
+    assert.equal(child.status, 0, child.stderr + child.stdout);
+    assert.equal(parentGit('rev-parse', 'HEAD').stdout, head);
+    assert.equal(parentGit('diff', '--cached').stdout, staged);
+    assert.equal(existsSync(path.join(f.root, 'project/.git')), true);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test('missing Git identity preserves generated files without staging or a commit', () => {
+  const f = fixture();
+  try {
+    const env: NodeJS.ProcessEnv = { ...process.env, npm_execpath: path.join(f.root, 'npm-cli.js'), GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: path.join(f.root, 'absent-config') };
+    for (const key of ['GIT_AUTHOR_NAME', 'GIT_AUTHOR_EMAIL', 'GIT_COMMITTER_NAME', 'GIT_COMMITTER_EMAIL', 'EMAIL', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
+    const child = spawnSync(process.execPath, [f.starter, 'project', '--cwd', f.root, '--json'], { encoding: 'utf8', env });
+    assert.equal(child.status, 1);
+    const payload = JSON.parse(child.stdout);
+    assert.equal(payload.ok, false);
+    assert.match(payload.messages[0].text, /Configure Git user.name and user.email/);
+    const target = path.join(f.root, 'project');
+    assert.equal(existsSync(path.join(target, 'package-lock.json')), true);
+    const index = spawnSync('git', ['ls-files'], { cwd: target, encoding: 'utf8', env });
+    assert.equal(index.stdout, '');
+    assert.notEqual(spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: target, env }).status, 0);
   } finally { rmSync(f.root, { recursive: true, force: true }); }
 });
 

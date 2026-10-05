@@ -85,6 +85,7 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
     steps.push(result);
     if (result.exitCode !== 0) break;
   }
+  if (steps.every((step) => step.exitCode === 0)) steps.push(createInitialCommit(targetRoot));
 
   const failedStep = steps.find((step) => step.exitCode !== 0);
   const payload = {
@@ -93,7 +94,7 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
     cwd: options.cwd,
     messages: [
       failedStep
-        ? { level: 'error', code: 'ATM_CREATE_FAILED', text: `create-atm failed at step: ${failedStep.name}` }
+        ? { level: 'error', code: 'ATM_CREATE_FAILED', text: `create-atm failed at step: ${failedStep.name}${failedStep.name === 'initial commit' ? `. ${failedStep.stderr.trim()}` : ''}` }
         : { level: 'info', code: 'ATM_CREATE_READY', text: `ATM governance project created at ${targetRoot}` }
     ],
     evidence: {
@@ -114,6 +115,30 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
 
   writePayload(payload, options.json);
   return failedStep ? failedStep.exitCode : 0;
+}
+
+function createInitialCommit(targetRoot: string): StepResult {
+  const startedAt = Date.now();
+  const env = { ...process.env };
+  for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES']) delete env[key];
+  const run = (...args: string[]) => spawnSync('git', ['-C', targetRoot, ...args], { encoding: 'utf8', env, windowsHide: true, timeout: 30_000 });
+  const result = (exitCode: number, stderr: string, stdout = ''): StepResult => ({ name: 'initial commit', exitCode, stderr, stdout, durationMs: Date.now() - startedAt });
+  const init = run('init', '--quiet');
+  if (init.status !== 0) return result(init.status ?? 1, init.stderr || init.error?.message || 'Git initialization failed.');
+  const top = run('rev-parse', '--show-toplevel');
+  if (top.status !== 0 || realpathSync(top.stdout.trim()) !== realpathSync(targetRoot)) return result(1, 'Git root does not match the new project; no files were staged.');
+  const name = run('config', 'user.name').stdout.trim();
+  const email = run('config', 'user.email').stdout.trim();
+  if ((!name && (!env.GIT_AUTHOR_NAME || !env.GIT_COMMITTER_NAME)) || (!email && (!env.GIT_AUTHOR_EMAIL || !env.GIT_COMMITTER_EMAIL))) {
+    return result(1, 'Configure Git user.name and user.email, then create the initial commit in the generated project. Generated files are preserved.');
+  }
+  if (existsSync(path.join(targetRoot, 'node_modules')) && run('check-ignore', '--quiet', 'node_modules').status !== 0) {
+    return result(1, 'Project dependencies are not ignored; no files were staged.');
+  }
+  const add = run('add', '--all', '--', '.');
+  if (add.status !== 0) return result(add.status ?? 1, add.stderr || 'Initial staging failed.');
+  const commit = run('commit', '-m', 'chore: initialize ATM project');
+  return result(commit.status ?? 1, commit.stderr || commit.error?.message || '', commit.stdout);
 }
 
 function installTargetRuntime(targetRoot: string, packageSpec: string): { step: StepResult; execution?: AtmExecutionPlan } {
