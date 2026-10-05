@@ -81,6 +81,7 @@ try {
   assert.equal(close.exitCode, 0, JSON.stringify(close.json.messages));
   assert.equal(readJson(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`)).status, 'done');
   assert.match(readFileSync(cardPath, 'utf8'), /^status: done$/m);
+  assert.equal(git(cwd, ['status', '--porcelain', '--untracked-files=all']).stdout.trim(), '', 'the closed task leaves no uncommitted or untracked ATM record');
 } finally {
   rmSync(root, { recursive: true, force: true });
 }
