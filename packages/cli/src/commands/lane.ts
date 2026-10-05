@@ -203,25 +203,17 @@ function runLaneHeartbeat(options: ParsedLaneOptions) {
   });
   if (!heartbeat.ok) {
     const details = {
+      laneFingerprint: capabilityFingerprint(laneId, 'lane'),
       status: heartbeat.session?.status ?? null,
       ttlPhaseBefore: heartbeat.ttlPhaseBefore
     };
     if (heartbeat.reason === 'not-found') {
-      throw new CliError('ATM_LANE_SESSION_NOT_FOUND', 'Lane session was not found.', {
-        exitCode: 1,
-        details: { laneFingerprint: capabilityFingerprint(laneId, 'lane'), status: details.status, ttlPhaseBefore: details.ttlPhaseBefore }
-      });
+      throw new CliError('ATM_LANE_SESSION_NOT_FOUND', 'Lane session was not found.', { exitCode: 1, details });
     }
     if (heartbeat.reason === 'expired') {
-      throw new CliError('ATM_LANE_SESSION_HEARTBEAT_EXPIRED', 'Lane session is expired and cannot be heartbeated.', {
-        exitCode: 1,
-        details: { laneFingerprint: capabilityFingerprint(laneId, 'lane'), status: details.status, ttlPhaseBefore: details.ttlPhaseBefore }
-      });
+      throw new CliError('ATM_LANE_SESSION_HEARTBEAT_EXPIRED', 'Lane session is expired and cannot be heartbeated.', { exitCode: 1, details });
     }
-    throw new CliError('ATM_LANE_SESSION_HEARTBEAT_CLOSED', 'Lane session is closed and cannot be heartbeated.', {
-      exitCode: 1,
-      details: { laneFingerprint: capabilityFingerprint(laneId, 'lane'), status: details.status, ttlPhaseBefore: details.ttlPhaseBefore }
-    });
+    throw new CliError('ATM_LANE_SESSION_HEARTBEAT_CLOSED', 'Lane session is closed and cannot be heartbeated.', { exitCode: 1, details });
   }
   const event = appendLaneSessionEvent({
     cwd: options.cwd,
