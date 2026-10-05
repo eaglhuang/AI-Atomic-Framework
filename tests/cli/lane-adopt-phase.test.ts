@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runLane } from '../../packages/cli/src/commands/lane.ts';
 import { mintLaneSession } from '../../packages/cli/src/commands/lane-session/store.ts';
+import { laneFingerprint } from '../../packages/cli/src/commands/lane-session/redaction.ts';
 import { upsertActorWorkSession } from '../../packages/cli/src/commands/actor-session.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-lane-adopt-phase-'));
@@ -37,13 +38,29 @@ try {
     timestamp: new Date().toISOString()
   });
 
-  assert.throws(
-    () => runLane(['adopt', fresh.session.laneId, '--cwd', repo, '--actor', 'agent-b', '--json']),
-    (error: unknown) => {
+  const assertRedactedLaneError = (run: () => unknown, code: string, laneId: string): void => {
+    assert.throws(run, (error: unknown) => {
       assert.ok(error && typeof error === 'object');
-      assert.equal((error as { code?: string }).code, 'ATM_LANE_SESSION_NOT_STALE');
+      const candidate = error as { code?: string; message?: string; details?: Record<string, unknown> };
+      assert.equal(candidate.code, code);
+      const output = JSON.stringify({ message: candidate.message, details: candidate.details });
+      assert.ok(!output.includes(laneId), `error output must not expose lane id ${laneId}`);
+      const fingerprint = laneFingerprint(laneId);
+      assert.ok(fingerprint);
+      assert.ok(output.includes(fingerprint), 'error output should retain a correlatable lane fingerprint');
       return true;
-    }
+    });
+  };
+
+  assertRedactedLaneError(
+    () => runLane(['adopt', fresh.session.laneId, '--cwd', repo, '--actor', 'agent-b', '--json']),
+    'ATM_LANE_SESSION_NOT_STALE',
+    fresh.session.laneId
+  );
+  assertRedactedLaneError(
+    () => runLane(['heartbeat', 'lane-heartbeat-secret', '--cwd', repo, '--actor', 'agent-a', '--json']),
+    'ATM_LANE_SESSION_NOT_FOUND',
+    'lane-heartbeat-secret'
   );
 
   const staleStamp = new Date(Date.now() - 60_000).toISOString();
