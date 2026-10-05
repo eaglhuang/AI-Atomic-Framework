@@ -45,7 +45,9 @@ try {
       assert.equal(candidate.code, code);
       const output = JSON.stringify({ message: candidate.message, details: candidate.details });
       assert.ok(!output.includes(laneId), `error output must not expose lane id ${laneId}`);
-      assert.ok(output.includes(laneFingerprint(laneId)), 'error output should retain a correlatable lane fingerprint');
+      const fingerprint = laneFingerprint(laneId);
+      assert.ok(fingerprint);
+      assert.ok(output.includes(fingerprint), 'error output should retain a correlatable lane fingerprint');
       return true;
     });
   };
