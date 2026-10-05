@@ -5,9 +5,10 @@ const startMarker = '# ATM runtime state (managed by ATM bootstrap):start';
 const endMarker = '# ATM runtime state (managed by ATM bootstrap):end';
 
 // The per-machine runtime and session outputs the ATM framework repository
-// ignores. .atm/history/** stays tracked: it is the durable governance record
-// (task-import reports, evidence) that governed commits stage. Without them an adopter's first `git status` lists locks,
-// telemetry and session files as untracked work.
+// ignores. .atm/history/** stays tracked (tasks, events, evidence are the
+// durable governance record governed commits stage) except the transient
+// task-import reports. Without them an adopter's first `git status` lists
+// locks, telemetry and session files as untracked work.
 export const adopterRuntimeIgnorePatterns = [
   '.atm/runtime/telemetry/',
   '.atm/runtime/guidance/',
@@ -35,6 +36,11 @@ export const adopterRuntimeIgnorePatterns = [
   '.atm/runtime/broker-intents/',
   '.atm/runtime/broker-shared-surface-freezes.json',
   '.atm/runtime/broker-shared-surface-queues.json',
+  // Rewritten on every command; a tracked copy leaves the worktree dirty.
+  '.atm/runtime/version-cache.json',
+  // ATM classifies task-import reports as transient (auto-clean-safe);
+  // the framework repository ignores .atm/history/reports/ as well.
+  '.atm/history/reports/task-import/',
   '.atm-temp/',
   // create-atm installs the ATM CLI into the project; an unignored
   // node_modules turns the first `git add -A` into a dependency commit
