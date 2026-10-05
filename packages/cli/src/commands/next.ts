@@ -1,3 +1,4 @@
+import { withActiveClaimResume } from './next/active-claim-resume.ts';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync, type Dirent } from 'node:fs';
 import path from 'node:path';
@@ -213,7 +214,7 @@ export async function runNext(argv: string[]): Promise<NextCommandResult> {
   const verbose = Array.isArray(argv) && argv.includes('--verbose');
   const routeArgv = verbose ? argv.filter((arg) => arg !== '--verbose') : argv;
   const result = await runNextRoute(routeArgv);
-  return withRestrictedExecutionGuidance(verbose ? result : compactNextRouteResult(result));
+  return withActiveClaimResume(routeArgv, withRestrictedExecutionGuidance(verbose ? result : compactNextRouteResult(result)));
 }
 
 /**
