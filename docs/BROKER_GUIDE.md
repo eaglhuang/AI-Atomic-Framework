@@ -10,7 +10,7 @@ CID terminology used by this guide:
 
 ## Write Intents and Decisions
 
-`packages/core/src/broker/types.ts` defines `WriteIntent` (task, actor, base commit, target files, atom refs, shared surfaces, requested lane) and `BrokerDecision`. `calculateBrokerDecision(newIntent, registry)` in `decision.ts` checks the new intent against all active intents and returns one of four primary verdicts:
+`packages/core/src/broker/types.ts` defines `WriteIntent` (task, actor, base commit, target files, atom refs, shared surfaces, requested lane) and `BrokerDecision`. `calculateBrokerDecision(newIntent, registry)` checks active intents and pending native serial tickets:
 
 | Verdict | Lane | Meaning |
 |---|---|---|
@@ -18,6 +18,39 @@ CID terminology used by this guide:
 | `needs-physical-split` | `deterministic-composer` | Same physical file but CID-disjoint; routed to the composer |
 | `blocked-cid-conflict` | `blocked` | Atom ID or semantic CID collision with an active intent |
 | `blocked-shared-surface` | `blocked` | Generator / projection / registry / validator / artifact collision |
+| `serial` | `serial` | A cold logical write collision or earlier conflicting native ticket must wait before mutation |
+
+## Native Cold Serial Queue
+
+Cold means neither writer declares a proposal-first trigger, submitted proposal summary, or hot-file metadata. With `requestedLane: "auto"`, a cold same-atom/CID collision on a shared write surface, or a proven overlapping source range, selects `lane: "serial"` and canonical admission `disposition: "queue"`. Explicit `requestedLane: "serial"` also permits a conservative same-file fallback when bounds are unavailable. A requested lane never overrides a lease, read dependency, shared-surface guard, or hot/proposal-first route.
+
+The compose boundary remains explicit:
+
+- Disjoint files and disjoint bounded cold regions remain parallel eligible
+- Unbounded same-file work with distinct atoms and automatic lane selection remains composer-routed
+- Compatible bounded proposal regions retain deterministic composition
+- Hot/proposal-first overlapping regions retain their existing fail-closed re-arbitration behavior
+- Reads and independent private preparation do not acquire native serial tickets
+
+`calculateBrokerDecision` and `evaluateBrokerAdmission` are pure previews. Durable admission occurs through `createBrokerTransactionAuthority(...).register(...)`, also used by `broker register`. Queue tickets live in the existing write-broker registry's `serialQueue`, under the same original-snapshot CAS transaction as registration and release. A waiter is not an `activeIntents` writer lease.
+
+Tickets retain an owner, exact scope digest, committed monotonic sequence, original intent, blockers, enqueue/eligibility/grant times and expiry. FIFO is conflict-local: an unrelated resource can proceed, while a multi-resource request cannot jump earlier overlapping tickets. Enqueue, eligibility, grant, cancellation, release and expiry events are distinct. Repeated submissions retain ticket identity and order. A live writer must finish/release before queuing a changed scope, avoiding hold-and-wait cycles.
+
+### Release and resume
+
+Release only makes the next conflicting ticket **eligible for revalidation**. It never grants an old intent automatically. The eligible window is at most 30 seconds, bounded by the original queue lifetime. Expired/cancelled tickets release their place. A granted ticket becomes terminal when its matching writer lease expires or is released; retained terminal history and events are bounded.
+
+1. Submit the prepared write intent with `broker register --task <task> --actor <owner> --intent-file <intent.json> --json`
+2. If `evidence.admission.disposition` is `queue`, retain its ticket ID and inspect `broker status --json`. The result has `writeAuthorized: false`; CLI `ok: false` prevents legacy consumers from treating accepted queue placement as permission to write
+3. The active owner runs `broker release --task <task> --actor <owner> --json`. Queue-related release/cancellation requires the explicit owner
+4. Re-read current source and refresh the intent's base commit, preserving its exact write/read/region/proposal scope. Run `broker register --task <task> --actor <owner> --intent-file <refreshed-intent.json> --queue-ticket <ticket-id> --json`
+5. Proceed only after canonical direct/proposal admission and the existing downstream write checks succeed. The CLI checks the actual repository HEAD again during each CAS retry. The core API requires `currentBaseCommit` or a `resolveCurrentBaseCommit` reader on resume
+
+Scope changes require cancelling the old ticket and submitting a new intent; changing the base alone never authorizes broader paths or atoms. Resume repeats the current lease, read/write, shared-surface and FIFO checks. A replay of a successful resume can confirm its still-live, exact-scope grant without renewing the lease or emitting another grant. Queue admission does not apply a patch or replace file-preimage/content-hash CAS, validators, or steward controls. A new base commit is not proof that an old patch remains valid.
+
+`broker status` exposes `serialQueueTickets[].position`, `waitMs`, `blockerIntentIds`, expiry and an authority digest. `evidence.admission.metrics.queueWaitMs` and `queuePosition` are available to a native consumer. Registry events establish eligibility and grant order. Status and decision commands do not persist cleanup; explicit cleanup and lifecycle writes use original-snapshot CAS. A crashed process that leaves the registry's compare/write lock remains fail-closed and needs governed recovery; automatic lock theft is not part of this queue.
+
+The bounded equivalent benchmark is `node --strip-types scripts/validate-broker-native-serial-queue.ts`. It includes six simultaneous real CLI enqueue processes, restart/resume/release through separate processes, native wait telemetry, preserved FIFO grants and no lost counter updates. It never retries `true-conflict` in a harness overlay. Its reported wall/wait times include CLI process startup and are diagnostic measurements, not throughput claims or a performance comparison.
 
 ## Proposal-Gated Admission v1
 
@@ -126,7 +159,7 @@ Fail-closed rules:
 
 - Do not promote an adapter to `parallel-safe` just because `enclose()` is missing or returned `null`.
 - Use enclosure evidence only to refine a Layer 1 boundary; never widen symbol identity or CID scope from an absent capability.
-- If the broker already has a stronger verdict, keep that verdict: atom/CID overlap remains `blocked-cid-conflict`, shared-surface overlap remains `blocked-shared-surface`, and ambiguous same-file overlap stays on the deterministic-composer path (`needs-physical-split`) instead of being upgraded to optimistic parallel admission.
+- If the broker already has a stronger verdict, keep that verdict: cold logical overlap queues before write, protected atom/read conflicts remain blocked, shared-surface overlap remains `blocked-shared-surface`, and automatic ambiguous same-file overlap stays composer-routed instead of becoming optimistic parallel admission.
 - Record missing or null enclosure as evidence of the fallback path so the lane remains auditable.
 
 Because `@ai-atomic-framework/plugin-sdk` depends on core, the bridge declares a structural `BridgeAtomCandidate` mirror instead of importing the SDK type; plugin-sdk `AtomCandidate` values are directly assignable (covered by `__tests__/candidate-bridge.test.ts`).

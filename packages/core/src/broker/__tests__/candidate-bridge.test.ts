@@ -178,10 +178,10 @@ function testCidConflictScenario() {
   const intentB = candidatesToWriteIntent([makeCandidate()], { taskId: 'TASK-B', actorId: 'agent-b', baseCommit: 'abc123' });
 
   const decision = calculateBrokerDecision(intentB, registryWith([toActiveIntent(intentA, 'intent-a')]));
-  assert.equal(decision.verdict, 'blocked-cid-conflict');
-  assert.equal(decision.lane, 'blocked');
+  assert.equal(decision.verdict, 'serial');
+  assert.equal(decision.lane, 'serial');
   assert.ok(decision.conflicts.some((conflict) => conflict.kind === 'cid'));
-  console.log('ok: CID conflict scenario (same candidate in two tasks is blocked)');
+  console.log('ok: cold CID conflict scenario reaches native serial admission');
 }
 
 function testFileOverlapScenario() {

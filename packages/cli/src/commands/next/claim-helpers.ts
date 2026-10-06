@@ -66,6 +66,16 @@ export async function registerPreClaimBrokerTransaction(input: {
   const evidence = result && typeof result === 'object' && 'evidence' in result
     ? (result.evidence as Record<string, unknown>)
     : null;
+  const admission = evidence?.admission as { disposition?: string; ticket?: { queue?: unknown }; decisionReason?: string } | undefined;
+  // Empty legacy claim metadata carries no file-write authority. A native ticket,
+  // including an owner/scope mismatch, must still block that metadata-only route.
+  const metadataOnly = intent.targetFiles.length === 0 && !admission?.ticket?.queue;
+  if (admission?.disposition === 'queue' || (admission?.disposition === 'revalidate' && !metadataOnly)) {
+    throw new CliError('ATM_NEXT_CLAIM_BLOCKED', admission.decisionReason ?? 'Native broker ticket must be revalidated before task claim.', {
+      exitCode: 1, details: { taskId: input.taskId, brokerAdmission: admission,
+        requiredCommand: evidence?.resumeCommand ?? 'node atm.mjs broker status --json', writeAuthorized: false }
+    });
+  }
   const queueAdmission = evidence?.queueAdmission;
   if (!queueAdmission || typeof queueAdmission !== 'object' || !('status' in queueAdmission)) {
     throw new CliError('ATM_BROKER_TRANSACTION_INVALID', 'Broker pre-claim registration returned no canonical queue admission.', { exitCode: 1 });

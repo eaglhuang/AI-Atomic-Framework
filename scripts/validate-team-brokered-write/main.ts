@@ -248,8 +248,9 @@ export async function runTeamBrokeredWriteValidator() {
       writePaths: [sharedFile]
     });
     check(blockedResult.ok === false, 'CID conflict must fail closed before team run');
-    check(blockedResult.evidence.chosenLane === 'blocked', 'CID conflict must choose blocked lane');
-    check(blockedResult.evidence.decision.verdict === 'blocked-cid-conflict', 'CID conflict must record blocked-cid-conflict verdict');
+    check(blockedResult.evidence.chosenLane === 'serial', 'cold CID conflict must choose the non-executable serial lane');
+    check(blockedResult.evidence.decision.verdict === 'serial', 'cold CID conflict must record the native serial verdict');
+    check(blockedResult.evidence.safeToStart === false, 'a serial queue decision must not authorize Team execution');
 
     const safeResult = evaluateTeamBrokerLane({
       cwd: tempRoot,
