@@ -1,6 +1,8 @@
 import { calculateBrokerDecision } from '../decision.ts';
 import { evaluateConflictMatrix } from '../conflict-matrix.ts';
 import { createHash } from 'node:crypto';
+import { resolveSerialAdmission } from '../serial-queue/admission.ts';
+import { ownsExactActiveSerialScope } from '../serial-queue/policy.ts';
 import type {
   BrokerAdmissionDisposition,
   BrokerAdmissionPolicy,
@@ -60,27 +62,33 @@ export function evaluateBrokerAdmission(
   policy: BrokerAdmissionPolicy
 ): BrokerAdmissionResult {
   const authorized = policy.resolutionAuthorizedTaskIds ?? new Set<string>();
-  const effectiveRegistry = authorized.size === 0
+  const authorizedRegistry = authorized.size === 0
     ? registry
     : {
       ...registry,
       activeIntents: registry.activeIntents.filter((intent) => !authorized.has(intent.taskId.trim().toUpperCase()))
     };
-  const decision = calculateBrokerDecision(request.intent, effectiveRegistry);
-  const disposition = selectDisposition(request, decision, policy);
+  const serial = resolveSerialAdmission(request.intent, authorizedRegistry, policy.serialQueueResume, policy.nowMs ?? Date.now());
+  const effectiveRegistry = serial.registry;
+  const decision = calculateBrokerDecision(request.intent, effectiveRegistry, serial.revalidatedTicketId);
+  const selected = selectDisposition(request, decision, policy);
+  const holdingScopeChange = selected === 'queue' && effectiveRegistry.activeIntents.some((active) =>
+    active.taskId === request.intent.taskId && active.actorId === request.intent.actorId && !ownsExactActiveSerialScope(request.intent, active));
+  // Explicit queue revalidation never weakens active lease, read, or shared-surface guards.
+  const disposition = holdingScopeChange ? 'revalidate' : selected === 'true-conflict' || selected === 'revalidate' ? selected : serial.disposition ?? selected;
   const conflictMatrix = decision.conflictMatrix ?? evaluateConflictMatrix(request.intent, effectiveRegistry.activeIntents, {
     currentEpoch: effectiveRegistry.currentEpoch
   });
   const arbitrationVerdict = canonicalArbitration(disposition);
   const gates = conflictMatrix.gateResults.map((gate) => {
     if (
-      disposition === 'compose'
+      (disposition === 'compose' || disposition === 'queue')
       && (gate.gate === 'atom-id' || gate.gate === 'atom-cid' || gate.gate === 'file-range')
     ) {
       return {
         ...gate,
         status: 'watch' as const,
-        detail: `${gate.detail} Bounded proposal evidence refines this risk signal to compose routing.`
+        detail: `${gate.detail} Canonical admission routes this risk to ${disposition}; no direct write is authorized.`
       };
     }
     if (disposition === 'true-conflict' && decision.conflicts.some((conflict) => conflict.kind === 'file-range')) {
@@ -101,14 +109,17 @@ export function evaluateBrokerAdmission(
   const nowMs = policy.nowMs ?? startedAtMs;
   return {
     schemaId: 'atm.brokerAdmissionResult.v1',
+    ...(serial.privateWork && serial.queue && (disposition === 'direct' || disposition === 'proposal-required')
+      ? { privateWork: { queueTicketId: serial.queue.ticketId, allowedFiles: request.intent.targetFiles } } : {}),
     disposition,
     decision,
-    decisionReason: decision.reason,
+    decisionReason: holdingScopeChange ? 'Finish and release the existing write lease before queuing a changed scope; holding it would deadlock earlier waiters.' : serial.reason ?? decision.reason,
     ticket: {
       schemaId: 'atm.brokerTicket.v1',
-      ticketId: `broker-admission-${ticketDigest}`,
+      ticketId: serial.queue?.ticketId ?? `broker-admission-${ticketDigest}`,
       taskId: request.intent.taskId,
-      state: ticketState(disposition)
+      state: ticketState(disposition),
+      ...(serial.queue ? { queue: serial.queue } : {})
     },
     trace: {
       schemaId: 'atm.brokerAdmissionTrace.v1',
@@ -118,7 +129,7 @@ export function evaluateBrokerAdmission(
     commandManifests: [{
       schemaId: 'atm.commandManifest.v1',
       action: actionFor(disposition),
-      argv: []
+      argv: disposition === 'queue' || disposition === 'revalidate' ? ['broker', 'status', '--json'] : []
     }],
     evidenceRefs: policy.evidenceRefs ?? [],
     metrics: {
@@ -130,7 +141,8 @@ export function evaluateBrokerAdmission(
       trueConflicts: disposition === 'true-conflict' ? 1 : 0,
       queueDecisions: disposition === 'queue' ? 1 : 0,
       revalidateDecisions: disposition === 'revalidate' ? 1 : 0,
-      manualInterventionCount: disposition === 'true-conflict' ? 1 : 0
+      manualInterventionCount: disposition === 'true-conflict' ? 1 : 0,
+      ...(serial.queue ? { queueWaitMs: serial.queue.waitMs, queuePosition: serial.queue.position } : {})
     }
   };
 }

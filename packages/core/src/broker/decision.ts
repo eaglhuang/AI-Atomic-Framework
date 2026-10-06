@@ -12,6 +12,7 @@ import { evaluateProposalOverlap, shouldRefineProposalScopedCidConflict } from '
 import { hasSharedWriteSurface } from './decision/surfaces.ts';
 import { withFailureReason } from './decision/failure.ts';
 import { findResourceOverlapMatches, type ResourceOverlapMatch } from './resource-overlap.ts';
+import { coldSerialBlockers, pendingSerialDecision, serialDecision } from './decision/serial.ts';
 
 function formatSharedSurfaceDetail(axis: string, match: ResourceOverlapMatch, activeTaskId: string): string {
   const keyDisplay = match.leftKey === match.rightKey ? `'${match.leftKey}'` : `'${match.leftKey}' vs active '${match.rightKey}'`;
@@ -21,7 +22,8 @@ function formatSharedSurfaceDetail(axis: string, match: ResourceOverlapMatch, ac
 
 export function calculateBrokerDecision(
   newIntent: WriteIntent,
-  registry: WriteBrokerRegistryDocument
+  registry: WriteBrokerRegistryDocument,
+  revalidatedSerialTicketId?: string
 ): BrokerDecision {
   const conflicts: ConflictDetail[] = [];
   const taskId = newIntent.taskId;
@@ -169,6 +171,10 @@ export function calculateBrokerDecision(
   }
 
   if (conflicts.length > 0) {
+    const blockers = coldSerialBlockers(newIntent, registry);
+    if (blockers.length > 0 && !conflictMatrix.conflicts.some((conflict) => conflict.kind === 'read-set')) {
+      return serialDecision(newIntent, baseAdmission, conflictMatrix, 'Cold logical write conflict is queued before mutation.', blockers, conflicts);
+    }
     const decompositionRequest = maybeBuildCidConflictDecompositionRequest(newIntent, registry.activeIntents);
     const decision: BrokerDecision = {
       schemaId: 'atm.brokerDecision.v1',
@@ -191,6 +197,9 @@ export function calculateBrokerDecision(
     return withFailureReason(decision);
   }
 
+  const pendingDecision = pendingSerialDecision(newIntent, registry, baseAdmission, conflictMatrix, revalidatedSerialTicketId);
+  if (pendingDecision) return pendingDecision;
+
   const proposalOverlapDecision = evaluateProposalOverlap(newIntent, registry.activeIntents, baseAdmission, conflictMatrix);
   if (proposalOverlapDecision) {
     return proposalOverlapDecision;
@@ -199,6 +208,11 @@ export function calculateBrokerDecision(
   // 3. Physical file overlap checks
   const fileOverlapResult = evaluatePhysicalOverlap(newIntent, registry.activeIntents);
   if (fileOverlapResult != null) {
+    const blockers = coldSerialBlockers(newIntent, registry);
+    if (blockers.length > 0) {
+      return { ...serialDecision(newIntent, baseAdmission, conflictMatrix, 'Cold overlapping write region is queued before mutation.', blockers, fileOverlapResult.conflicts),
+        ...(fileOverlapResult.decompositionRequest ? { decompositionRequest: fileOverlapResult.decompositionRequest } : {}) };
+    }
     const decision: BrokerDecision = {
       schemaId: 'atm.brokerDecision.v1',
       specVersion: '0.1.0',

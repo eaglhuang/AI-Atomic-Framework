@@ -219,12 +219,12 @@ function testCidConflictScenario() {
   });
 
   const decision = calculateBrokerDecision(conflictingIntent, registryWith([toActiveIntent(active, 'intent-a')]));
-  assert.equal(decision.verdict, 'blocked-cid-conflict');
-  assert.equal(decision.lane, 'blocked');
+  assert.equal(decision.verdict, 'serial');
+  assert.equal(decision.lane, 'serial');
   assert.ok(decision.conflicts.some((conflict) => conflict.kind === 'cid'));
   assert.equal(decision.failureReason?.blockingLayer, 'cid');
   assert.equal(decision.failureReason?.recommendedRoute, 'serialize');
-  console.log('ok: CID conflict on the same write surface is blocked');
+  console.log('ok: cold CID conflict on the same write surface is queued before write');
 }
 
 function testFileOverlapScenario() {

@@ -23,6 +23,7 @@ export default defineCommandSpec({
     { flag: '--task', value: 'id', summary: 'Task ID to register or release.' },
     { flag: '--actor', value: 'id', summary: 'Actor id for register payload parity checks or runtime activate.' },
     { flag: '--intent-file', value: 'path', summary: 'Path to WriteIntent JSON payload.' },
+    { flag: '--queue-ticket', value: 'id', summary: 'Explicitly revalidate an eligible native serial ticket using the unchanged scope and current repository HEAD.' },
     { flag: '--ttl-seconds', value: 'number', summary: 'TTL lease duration in seconds for registering write intent.' },
     { flag: '--sealed-source-sha', value: 'sha', summary: 'Sealed source SHA for broker runner-sync enqueue.' },
     { flag: '--surface', value: 'path', summary: 'Release surface path for broker runner-sync enqueue. Repeatable.' },

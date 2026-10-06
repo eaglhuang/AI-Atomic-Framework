@@ -1,0 +1,146 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0129",
+  "updatedAt": "2026-10-06T15:44:06.890Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "check:encoding:touched",
+    "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+    "node --strip-types tests/cli/git-record-commit.test.ts",
+    "validate:evidence-ledger-boundary"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a6061e2ab3e497eed912f212b3293c8797100189d18a15b54e175d233cf438fd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts"
+      ],
+      "generatedAt": "2026-10-06T04:38:37.059Z",
+      "startedAt": "2026-10-06T04:38:36.379Z",
+      "finishedAt": "2026-10-06T04:38:37.059Z",
+      "durationMs": 680,
+      "runnerKind": "dev-source",
+      "sourceCommit": "05a0fa223c4119cbed38afe5f4e2fe795a763b5f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "generatedAt": "2026-10-06T04:39:49.530Z",
+      "startedAt": "2026-10-06T04:39:03.967Z",
+      "finishedAt": "2026-10-06T04:39:49.530Z",
+      "durationMs": 45563,
+      "runnerKind": "dev-source",
+      "sourceCommit": "05a0fa223c4119cbed38afe5f4e2fe795a763b5f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/git-record-commit.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:02b1d8b606a3c548ce1bcea20e2bbd776cf6624fc6abb9d871f27e0b03f89ac4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-record-commit.test.ts"
+      ],
+      "generatedAt": "2026-10-06T04:40:01.782Z",
+      "startedAt": "2026-10-06T04:39:51.148Z",
+      "finishedAt": "2026-10-06T04:40:01.782Z",
+      "durationMs": 10634,
+      "runnerKind": "dev-source",
+      "sourceCommit": "05a0fa223c4119cbed38afe5f4e2fe795a763b5f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9108f9ccf893c402de2625e80a69bcfd0816f7dbe0310acf4af71f2a165e3553",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts"
+      ],
+      "generatedAt": "2026-10-06T04:40:05.329Z",
+      "startedAt": "2026-10-06T04:40:03.389Z",
+      "finishedAt": "2026-10-06T04:40:05.329Z",
+      "durationMs": 1940,
+      "runnerKind": "dev-source",
+      "sourceCommit": "05a0fa223c4119cbed38afe5f4e2fe795a763b5f",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:831fe10372fa52a511e3900971e3bd375f62f694ea1c988c2dd23edf49773523",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched"
+      ],
+      "generatedAt": "2026-10-06T04:40:08.929Z",
+      "startedAt": "2026-10-06T04:40:06.863Z",
+      "finishedAt": "2026-10-06T04:40:08.929Z",
+      "durationMs": 2066,
+      "runnerKind": "dev-source",
+      "sourceCommit": "05a0fa223c4119cbed38afe5f4e2fe795a763b5f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "generatedAt": "2026-10-06T04:46:14.429Z",
+      "startedAt": "2026-10-06T04:45:29.112Z",
+      "finishedAt": "2026-10-06T04:46:14.429Z",
+      "durationMs": 45317,
+      "runnerKind": "dev-source",
+      "sourceCommit": "05a0fa223c4119cbed38afe5f4e2fe795a763b5f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a6061e2ab3e497eed912f212b3293c8797100189d18a15b54e175d233cf438fd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts"
+      ],
+      "generatedAt": "2026-10-06T14:56:39.319Z",
+      "startedAt": "2026-10-06T14:56:37.659Z",
+      "finishedAt": "2026-10-06T14:56:39.319Z",
+      "durationMs": 1660,
+      "runnerKind": "dev-source",
+      "sourceCommit": "d60ef96a827a2d9a62cf1a5f613603d435353420",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-evidence-ledger-boundary.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:30d4fad196056e1cfaae75a1cfbb38effebd70a68c7a3ca6dc7a7e53270b3c42",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:evidence-ledger-boundary"
+      ],
+      "generatedAt": "2026-10-06T15:44:06.889Z",
+      "startedAt": "2026-10-06T15:44:03.399Z",
+      "finishedAt": "2026-10-06T15:44:06.889Z",
+      "durationMs": 3490,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "b05f018344e7f861f8de3898206b16446c88d5fe",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
