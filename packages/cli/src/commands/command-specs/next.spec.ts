@@ -14,7 +14,8 @@ export default defineCommandSpec({
     commonCwdOption,
     { flag: '--claim', summary: 'Start the selected fast/normal/batch route and create the required runtime state.' },
     { flag: '--actor', value: 'id', summary: 'Actor id used for next --claim (or set ATM_ACTOR_ID).' },
-    { flag: '--allow-stale-runner', summary: 'Allow a human-approved runner-recovery lease to perform only the claim lifecycle while frozen runner publication is unavailable.' },
+    { flag: '--allow-stale-runner', summary: 'Allow a human-approved runner-recovery lease to perform only the claim lifecycle while frozen runner publication is unavailable. This does not imply WIP adoption.' },
+    { flag: '--adopt-unowned-wip', summary: 'With --claim and one explicit --task only, adopt unowned dirty WIP within the declared task scope. No --files, --tasks, --prompt or --intent override; foreign owners remain protected.' },
     { flag: '--emergency-approval', value: 'leaseId', summary: 'Emergency lease required with --allow-stale-runner for a recovery claim.' },
     { flag: '--auto-intent', summary: 'For next --claim task routes, auto-resolve write vs closeout-only from in-scope dirty files and whether deliverables already landed in HEAD.' },
     { flag: '--claim-intent', value: 'mode', summary: 'Override claim mode for next --claim: write or closeout-only/no-more-mutation.' },
@@ -44,6 +45,7 @@ export default defineCommandSpec({
     'node atm.mjs next --intent .atm/runtime/task-intent.json --json',
     'node atm.mjs next --cwd <host-repo> --json',
     'node atm.mjs next --claim --actor codex-main --task TASK-ABC-0001 --auto-intent --json',
+    'node atm.mjs next --claim --actor codex-main --task TASK-ABC-0001 --adopt-unowned-wip --auto-intent --json',
     'node atm.mjs next --claim --actor codex-main --task TASK-ABC-0001 --files packages/core/src/index.ts --claim-intent write --json',
     'node atm.mjs next --claim --actor codex-main --prompt "implement TASK-ABC-0001" --auto-intent --json',
     'node atm.mjs next --claim --actor codex-main --task TASK-ABC-0001 --claim-intent closeout-only --json'
