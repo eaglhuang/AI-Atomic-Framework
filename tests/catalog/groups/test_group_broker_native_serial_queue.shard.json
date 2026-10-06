@@ -6,8 +6,13 @@
   "resourceKey": "broker.native-serial-queue",
   "maintainers": ["atom-core-broker"],
   "cases": [
-    { "caseId": "test_broker_native_serial_queue_core_contract", "semanticKey": "cold_conflict_fifo_eligibility_is_not_write_authority", "command": "node --strip-types tests/core/broker-native-serial-queue.test.ts", "responsibility": "task-required", "coversAcceptance": ["ACC-1", "ACC-2", "ACC-3", "ACC-4", "ACC-7"] },
-    { "caseId": "test_broker_native_serial_queue_cli_contract", "semanticKey": "native_serial_queue_cli_and_admission_share_one_verdict", "command": "node --strip-types tests/cli/broker-native-serial-queue.test.ts", "responsibility": "task-required", "coversAcceptance": ["ACC-1", "ACC-3", "ACC-4", "ACC-6", "ACC-7"] },
-    { "caseId": "test_broker_native_serial_queue_multiprocess_cas", "semanticKey": "durable_fifo_admission_preserves_original_snapshot_cas", "command": "node --strip-types tests/cli/broker-native-serial-concurrency.test.ts", "responsibility": "task-required", "coversAcceptance": ["ACC-2", "ACC-4", "ACC-5", "ACC-7"] }
+    { "caseId": "test_int_broker_native_serial_queue_core_contract", "semanticKey": "cold_conflict_fifo_eligibility_is_not_write_authority", "command": "node --strip-types tests/core/broker-native-serial-queue.test.ts", "responsibility": "task-required", "coversAcceptance": ["ACC-1", "ACC-2", "ACC-3", "ACC-4", "ACC-7"] },
+    { "caseId": "test_int_broker_native_serial_queue_cli_contract", "semanticKey": "native_serial_queue_cli_and_admission_share_one_verdict", "command": "node --strip-types tests/cli/broker-native-serial-queue.test.ts", "responsibility": "task-required", "coversAcceptance": ["ACC-1", "ACC-3", "ACC-4", "ACC-6", "ACC-7"] },
+    { "caseId": "test_int_broker_native_serial_queue_multiprocess_cas", "semanticKey": "durable_fifo_admission_preserves_original_snapshot_cas", "command": "node --strip-types tests/cli/broker-native-serial-concurrency.test.ts", "responsibility": "task-required", "coversAcceptance": ["ACC-2", "ACC-4", "ACC-5", "ACC-7"] }
+  ],
+  "legacyAliases": [
+    { "legacyCaseId": "test_broker_native_serial_queue_core_contract", "canonicalCaseId": "test_int_broker_native_serial_queue_core_contract" },
+    { "legacyCaseId": "test_broker_native_serial_queue_cli_contract", "canonicalCaseId": "test_int_broker_native_serial_queue_cli_contract" },
+    { "legacyCaseId": "test_broker_native_serial_queue_multiprocess_cas", "canonicalCaseId": "test_int_broker_native_serial_queue_multiprocess_cas" }
   ]
 }

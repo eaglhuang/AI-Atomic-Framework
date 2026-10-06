@@ -33,6 +33,14 @@ try {
     return await broker(['register', '--cwd', root, '--task', intent.taskId, '--actor', intent.actorId, '--intent-file', file,
       ...(ticket ? ['--queue-ticket', ticket] : [])]);
   };
+  const metadataClaim = await registerPreClaimBrokerTransaction({ cwd: root, taskId: 'METADATA', actorId: 'metadata-owner', targetFiles: [] });
+  assert.equal((metadataClaim.queueAdmission as { status: string }).status, 'queued-blocked',
+    'legacy metadata-only claim keeps its non-executable admission result');
+  const metadataRegistry = JSON.parse(readFileSync(path.join(root, '.atm/runtime/write-broker.registry.json'), 'utf8'));
+  assert.deepEqual(metadataRegistry.activeIntents[0].resourceKeys.files, [], 'legacy claim metadata must not authorize any file');
+  assert.deepEqual(metadataRegistry.activeIntents[0].resourceKeys.atomIds, [], 'legacy claim metadata must not authorize any atom');
+  assert.equal(metadataRegistry.serialQueue?.tickets.length ?? 0, 0);
+  await broker(['release', '--cwd', root, '--task', 'METADATA', '--actor', 'metadata-owner']);
   assert.equal((await register(a)).ok, true);
   const queued = await register(b);
   assert.equal(queued.evidence.admission?.disposition, 'queue');
@@ -41,6 +49,12 @@ try {
   assert.equal(queued.evidence.serialQueue.position, 1);
   const ticket = queued.evidence.admission.ticket.ticketId;
   const registryPath = path.join(root, '.atm/runtime/write-broker.registry.json');
+  const beforeMetadataClaim = JSON.parse(readFileSync(registryPath, 'utf8'));
+  await assert.rejects(() => registerPreClaimBrokerTransaction({ cwd: root, taskId: b.taskId, actorId: b.actorId, targetFiles: [] }),
+    (error: { code?: string }) => error.code === 'ATM_NEXT_CLAIM_BLOCKED');
+  const afterMetadataClaim = JSON.parse(readFileSync(registryPath, 'utf8'));
+  assert.deepEqual(afterMetadataClaim.activeIntents, beforeMetadataClaim.activeIntents, 'metadata-only claim cannot acquire a pending native scope');
+  assert.deepEqual(afterMetadataClaim.serialQueue, beforeMetadataClaim.serialQueue, 'metadata-only claim cannot erase a pending native ticket');
   const beforeStatus = readFileSync(registryPath, 'utf8');
   const status = await broker(['status', '--cwd', root]);
   assert.equal(status.evidence.serialQueueTickets[0].ticketId, ticket);
