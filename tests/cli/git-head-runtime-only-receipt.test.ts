@@ -61,7 +61,7 @@ try {
   git('add', '--', 'product.txt');
   const stagedTree = git('write-tree');
   ensureGovernedGitHeadEvidenceStagedForCommit(repo, 'fixture-agent');
-  const hookReceipt = writeStagedGitHeadEvidence(repo, ['product.txt']);
+  const hookReceipt = writeStagedGitHeadEvidence(repo, ['product.txt'], []);
   assert.equal(hookReceipt.ok, true);
   assert.equal(git('write-tree'), stagedTree, 'wrapper and hook must not alter the staged tree');
   assert.equal(git('diff', '--cached', '--name-only'), 'product.txt');
