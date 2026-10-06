@@ -104,7 +104,7 @@ const decision = calculateBrokerDecision(intent, registry);
 
 Behavior:
 
-- **Deterministic `atomCid`** - SHA-256 of the canonical candidate contract `(kind || symbol || sourcePaths || detectionMethod)`, where `sourcePaths` is the deduplicated, sorted union of the candidate's `filePath` and `suggestedSourcePaths`. The same candidate yields the same CID across runs, which is what lets the broker detect two agents claiming the same semantic unit.
+- **Deterministic `atomCid` (`cid.v2`)** - SHA-256 of `(cid.v2 || languageId || sourcePaths || kind || symbol || ordinal)`, where `sourcePaths` is the deduplicated, sorted union of the candidate's `filePath` and `suggestedSourcePaths`, and `languageId` is inferred from the file extension when absent. Line numbers and `detectionMethod` are not part of the identity, so inserting lines above an atom or upgrading the detector keeps its CID. `normalizeDerivedCandidates` merges consecutive same-name candidates (TypeScript overloads) and assigns a source-order `ordinal` only to remaining same-kind, same-symbol duplicates in one file; `computeAtomContentVersion` tracks body changes separately with LF-normalized hashing. The same code always yields the same CID, which is what lets the broker detect two agents claiming the same semantic unit.
 - **`atomId`** - uses the candidate's `suggestedAtomId` when present, otherwise falls back to `ATM-AUTO-<cid-prefix>`.
 - **`targetFiles`** - deduplicated, sorted union of each candidate's `filePath` and `suggestedSourcePaths`.
 - **`sharedSurfaces`** - empty by default; pass `ctx.sharedSurfaces` to declare generators, projections, registries, validators, or artifacts.
