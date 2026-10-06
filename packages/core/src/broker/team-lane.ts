@@ -293,8 +293,8 @@ export function resolveTeamBrokerLane(decision: BrokerDecision): {
     chosenLane: decision.lane === 'serial' ? 'serial' : 'direct-brokered',
     stewardId: null,
     composerPath: null,
-    safeToStart: true,
-    blockedReasons: []
+    safeToStart: decision.lane !== 'serial',
+    blockedReasons: decision.lane === 'serial' ? [decision.reason] : []
   };
 }
 

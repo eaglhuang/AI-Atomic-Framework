@@ -4,6 +4,8 @@ import type {
   WriteBrokerRegistryDocument,
   WriteIntent
 } from '../types.ts';
+import type { SerialQueueObservation } from '../serial-queue/contracts.ts';
+import type { SerialQueueResume } from '../serial-queue/admission.ts';
 
 export type BrokerAdmissionDisposition =
   | 'direct'
@@ -18,6 +20,7 @@ export interface BrokerAdmissionRequest {
 }
 
 export interface BrokerAdmissionPolicy {
+  readonly serialQueueResume?: SerialQueueResume;
   readonly preferProposalForBoundedWork?: boolean;
   readonly resolutionAuthorizedTaskIds?: ReadonlySet<string>;
   readonly evidenceRefs?: readonly string[];
@@ -36,6 +39,7 @@ export interface BrokerAdmissionTicket {
   readonly ticketId: string;
   readonly taskId: string;
   readonly state: 'execute-now' | 'proposal' | 'compose' | 'queue' | 'revalidate' | 'blocked';
+  readonly queue?: SerialQueueObservation;
 }
 
 export interface BrokerAdmissionCommandManifest {
@@ -54,6 +58,8 @@ export interface BrokerAdmissionMetrics {
   readonly queueDecisions: number;
   readonly revalidateDecisions: number;
   readonly manualInterventionCount: number;
+  readonly queueWaitMs?: number;
+  readonly queuePosition?: number;
 }
 
 export interface BrokerAdmissionResult {
@@ -66,6 +72,7 @@ export interface BrokerAdmissionResult {
   readonly commandManifests: readonly BrokerAdmissionCommandManifest[];
   readonly evidenceRefs: readonly string[];
   readonly metrics: BrokerAdmissionMetrics;
+  readonly privateWork?: { readonly queueTicketId: string; readonly allowedFiles: readonly string[] };
 }
 
 export type BrokerAdmissionRegistry = WriteBrokerRegistryDocument;

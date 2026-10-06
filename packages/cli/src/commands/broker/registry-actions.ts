@@ -2,6 +2,9 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import { evaluateBrokerAdmission } from '../../../../core/src/broker/admission/evaluate-broker-admission.ts';
+import { observeSerialTicket } from '../../../../core/src/broker/serial-queue/queue.ts';
 import { CliError, makeResult, message } from '../shared.ts';
 import {
   loadRegistry,
@@ -107,6 +110,11 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       lane: decision.lane,
       ttlSeconds: options.ttlSeconds,
       admissionOverride: decision.admission,
+      queueTicketId: options.queueTicketId ?? undefined,
+      resolveCurrentBaseCommit: () => {
+        const head = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: options.cwd, encoding: 'utf8' });
+        return head.status === 0 ? head.stdout.trim() : null;
+      },
       resolveRegistration: (doc) => {
         decision = calculateBrokerDecision(newIntent, cleanupStale(doc));
         return { lane: decision.lane, admissionOverride: decision.admission };
@@ -114,15 +122,22 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       idempotencyKey: `broker-register:${newIntent.taskId}:${newIntent.actorId}`
     });
     registry = authority.read().document;
+    const admission = transactionReceipt.admission;
+    decision = admission?.decision ?? decision;
     const conflictMatrix = decision.conflictMatrix;
-    const isDecisionSafe = decision.verdict === 'parallel-safe' || decision.verdict === 'serial';
+    const isDecisionSafe = decision.verdict === 'parallel-safe' && admission?.disposition !== 'revalidate';
     const queueUpdate = updateSharedSurfaceQueues({
       queuePath: sharedQueuePath,
       intent: newIntent,
       registry,
       shouldQueue: shouldQueueSharedSurface(decision)
     });
-    const queueAdmission = resolveSharedSurfaceQueueAdmission({ intent: newIntent, queues: queueUpdate.queues });
+    const queueAdmission = admission?.privateWork
+      ? { status: 'queued-private-work', queuedSharedPaths: registry.serialQueue?.tickets.find((entry) => entry.ticketId === admission.privateWork.queueTicketId)?.intent.targetFiles ?? [],
+          allowedFiles: admission.privateWork.allowedFiles, reason: 'Only the disjoint private scope is admitted; the original native ticket remains queued.' }
+      : admission?.disposition === 'queue' || admission?.disposition === 'revalidate'
+      ? { status: 'queued-blocked', queuedSharedPaths: newIntent.targetFiles, allowedFiles: [], reason: admission.decisionReason }
+      : resolveSharedSurfaceQueueAdmission({ intent: newIntent, queues: queueUpdate.queues });
     const isBrokerSafe = isDecisionSafe || queueAdmission.status === 'queue-head' || queueAdmission.status === 'queued-private-work';
     if (queueAdmission.status === 'queued-private-work' || queueAdmission.status === 'queue-head') {
       commitBrokerRegistryTransaction({
@@ -160,6 +175,11 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       ],
       evidence: {
         decision,
+        admission,
+        writeAuthorized: isBrokerSafe && admission?.disposition !== 'queue' && admission?.disposition !== 'revalidate',
+        writeAuthorizedFiles: isBrokerSafe ? admission?.privateWork?.allowedFiles ?? newIntent.targetFiles : [],
+        ...(admission?.ticket.queue ? { serialQueue: admission.ticket.queue,
+          resumeCommand: `node atm.mjs broker register --cwd ${JSON.stringify(options.cwd)} --task ${newIntent.taskId} --actor ${newIntent.actorId} --intent-file ${JSON.stringify(options.intentFile)} --queue-ticket ${admission.ticket.ticketId} --json` } : {}),
         transactionReceipt,
         queueAdmission,
         registryPath: '.atm/runtime/write-broker.registry.json',
@@ -210,8 +230,9 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
     }
 
     const newIntent = readBrokerWriteIntent(intentFilePath, options.intentFile);
-    const registry = cleanupStale(loadRegistry(registryPath));
-    const decision = calculateBrokerDecision(newIntent, registry);
+    const registry = cleanupStale(loadRegistry(registryPath, { persistCleanup: false }));
+    const admission = evaluateBrokerAdmission({ intent: newIntent }, registry, {});
+    const decision = admission.decision;
 
     return makeResult({
       ok: true,
@@ -221,13 +242,14 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
         message('info', 'ATM_BROKER_DECISION', `Calculated broker decision: verdict '${decision.verdict}', lane '${decision.lane}', admission '${decision.admission?.state ?? 'not-required'}'`)
       ],
       evidence: {
-        decision
+        decision,
+        admission
       }
     });
   }
 
   if (options.action === 'status') {
-    const registry = cleanupStale(loadRegistry(registryPath));
+    const registry = cleanupStale(loadRegistry(registryPath, { persistCleanup: false }));
     const sharedSurfaceQueues = readSharedSurfaceQueues(sharedQueuePath);
     const sharedSurfaceFreezes = readSharedSurfaceFreezeRecords(sharedFreezePath);
     const effectiveIntents = registry.activeIntents.map((activeIntent) =>
@@ -248,6 +270,8 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       evidence: {
         registryPath: '.atm/runtime/write-broker.registry.json',
         activeIntents: registry.activeIntents,
+        serialQueue: registry.serialQueue ?? null,
+        serialQueueTickets: (registry.serialQueue?.tickets ?? []).map((ticket) => observeSerialTicket(registry, ticket)),
         effectiveIntents,
         admissionStates: registry.activeIntents.map((intent) => ({
           taskId: intent.taskId,
@@ -269,7 +293,11 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
     }
     const releaseTaskId = options.task;
     const authority = createBrokerTransactionAuthority(registryPath);
-    const existingActor = authority.read().document.activeIntents.find((intent) => intent.taskId === releaseTaskId)?.actorId ?? options.actorId ?? 'system';
+    const beforeRelease = authority.read().document;
+    if (beforeRelease.serialQueue && !options.actorId) {
+      throw new CliError('ATM_CLI_USAGE', 'Native serial queue release or cancellation requires --actor <owner-id>.', { exitCode: 2 });
+    }
+    const existingActor = options.actorId ?? beforeRelease.activeIntents.find((intent) => intent.taskId === releaseTaskId)?.actorId ?? 'system';
     const transactionReceipt = authority.release({
       taskId: releaseTaskId,
       actorId: existingActor,
@@ -310,6 +338,7 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
         registryPath: '.atm/runtime/write-broker.registry.json',
         releasedTask: releaseTaskId,
         transactionReceipt,
+        serialQueue: registry.serialQueue ?? null,
         sharedSurfaceQueues: updatedQueues,
         runnerSyncStewardRelease: runnerSyncRelease,
         sharedSurfaceFreezes: freezes,
@@ -343,9 +372,8 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
   }
 
   if (options.action === 'cleanup') {
-    let registry = cleanupStale(loadRegistry(registryPath));
-    registry = cleanupStale(registry);
-    saveRegistry(registryPath, registry);
+    // loadRegistry cleans and persists against its original snapshot with CAS.
+    const registry = loadRegistry(registryPath);
     const runtimeCleanup = cleanupBrokerRuntimeSnapshots({
       cwd: options.cwd,
       activeTaskIds: registry.activeIntents.map((intent) => intent.taskId)
@@ -360,6 +388,7 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       ],
       evidence: {
         registryPath: '.atm/runtime/write-broker.registry.json',
+        serialQueue: registry.serialQueue ?? null,
         runtimeCleanup
       }
     });

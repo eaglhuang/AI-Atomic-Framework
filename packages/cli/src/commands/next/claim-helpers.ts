@@ -66,6 +66,13 @@ export async function registerPreClaimBrokerTransaction(input: {
   const evidence = result && typeof result === 'object' && 'evidence' in result
     ? (result.evidence as Record<string, unknown>)
     : null;
+  const admission = evidence?.admission as { disposition?: string; ticket?: unknown; decisionReason?: string } | undefined;
+  if (admission?.disposition === 'queue' || admission?.disposition === 'revalidate') {
+    throw new CliError('ATM_NEXT_CLAIM_BLOCKED', admission.decisionReason ?? 'Native broker ticket must be revalidated before task claim.', {
+      exitCode: 1, details: { taskId: input.taskId, brokerAdmission: admission,
+        requiredCommand: evidence?.resumeCommand ?? 'node atm.mjs broker status --json', writeAuthorized: false }
+    });
+  }
   const queueAdmission = evidence?.queueAdmission;
   if (!queueAdmission || typeof queueAdmission !== 'object' || !('status' in queueAdmission)) {
     throw new CliError('ATM_BROKER_TRANSACTION_INVALID', 'Broker pre-claim registration returned no canonical queue admission.', { exitCode: 1 });

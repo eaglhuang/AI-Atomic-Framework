@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { evaluateTeamBrokerLane, projectTeamBrokerRearbitrationSnapshot } from '../team-lane.ts';
+import { evaluateTeamBrokerLane, projectTeamBrokerRearbitrationSnapshot, resolveTeamBrokerLane } from '../team-lane.ts';
 import { registerIntent } from '../registry.ts';
 
 function testHotFileRequiresProposalFirstAdmission() {
@@ -135,4 +135,8 @@ function testRearbitrationProjectionCapturesEffectiveDecision() {
 testHotFileRequiresProposalFirstAdmission();
 testBoundedRegionProducesStableSyntheticAtomCid();
 testRearbitrationProjectionCapturesEffectiveDecision();
+assert.equal(resolveTeamBrokerLane({ schemaId: 'atm.brokerDecision.v1', specVersion: '0.1.0',
+  migration: { strategy: 'none', fromVersion: null, notes: 'native queue guard' },
+  intentId: 'queued', taskId: 'queued-task', verdict: 'serial', lane: 'serial', conflicts: [],
+  applyMethod: 'none', reason: 'Await explicit revalidation of the eligible queue ticket.' }).safeToStart, false);
 console.log('team lane tests: ok');
