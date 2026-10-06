@@ -250,6 +250,13 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
   const claimIntent = claimIntentExtraction.claimIntent;
   const autoIntent = claimIntentExtraction.autoIntent;
   const allowStaleRunner = argv.includes('--allow-stale-runner');
+  // TASK-ASP-0007: --atoms reserves derived atoms at claim time (an intent
+  // ceiling, not an exclusive guarantee); commit-time confirmation decides.
+  const atomsIndex = argv.indexOf('--atoms');
+  const claimAtoms = atomsIndex >= 0
+    ? String(argv[atomsIndex + 1] ?? '').split(',').map((entry) => entry.trim()).filter(Boolean)
+    : [];
+  if (atomsIndex >= 0) argv = argv.filter((_, index) => index !== atomsIndex && index !== atomsIndex + 1);
   const emergencyApprovalIndex = argv.indexOf('--emergency-approval');
   const emergencyApproval = emergencyApprovalIndex >= 0
     ? argv[emergencyApprovalIndex + 1] ?? null
@@ -369,6 +376,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
       autoIntent,
       forceClaim: Boolean(options.force),
       claimFiles: options.files,
+      claimAtoms,
       allowStaleRunner,
       emergencyApproval,
       adoptUnownedWip: adoption.enabled,

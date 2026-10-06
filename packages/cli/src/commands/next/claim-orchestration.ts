@@ -30,7 +30,7 @@ import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessH
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
 import { evaluateSameTaskClaimOwnership, resolveSameActorClaimLaneSessionId, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts'; import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
-export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly allowStaleRunner?: boolean; readonly emergencyApproval?: string | null; readonly adoptUnownedWip?: boolean; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
+export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly claimAtoms?: readonly string[]; readonly allowStaleRunner?: boolean; readonly emergencyApproval?: string | null; readonly adoptUnownedWip?: boolean; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
   const claimStartedAt = Date.now();
   const claimLatencyPhases: Array<{ readonly phase: string; readonly durationMs: number }> = [];
   const claimIntent: NextClaimIntent = input.claimIntent ?? 'write';
@@ -301,7 +301,8 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       cwd: input.cwd,
       taskId: claimableTask.workItemId,
       actorId: resolvedActor.actorId,
-      targetFiles: claimAllowedFiles
+      targetFiles: claimAllowedFiles,
+      atoms: input.claimAtoms ?? []
     });
     preClaimBrokerTransaction = transaction;
     const queueAdmission = transaction.queueAdmission as BrokerQueueAdmission;

@@ -17,6 +17,7 @@ export default defineCommandSpec({
     { flag: '--allow-stale-runner', summary: 'Allow a human-approved runner-recovery lease to perform only the claim lifecycle while frozen runner publication is unavailable. This does not imply WIP adoption.' },
     { flag: '--adopt-unowned-wip', summary: 'With --claim and one explicit --task only, adopt unowned dirty WIP within the declared task scope. No --files, --tasks, --prompt or --intent override; foreign owners remain protected.' },
     { flag: '--emergency-approval', value: 'leaseId', summary: 'Emergency lease required with --allow-stale-runner for a recovery claim.' },
+    { flag: '--atoms', value: 'symbols', summary: 'For next --claim: comma-separated symbols in the task scope files to reserve as derived atoms (an intent ceiling, not an exclusive guarantee). Tasks that reserve disjoint atoms of one file are admitted in parallel; the governed commit confirms the atoms the staged diff actually touched. Symbols that do not exist yet are confirmed at commit time.' },
     { flag: '--auto-intent', summary: 'For next --claim task routes, auto-resolve write vs closeout-only from in-scope dirty files and whether deliverables already landed in HEAD.' },
     { flag: '--claim-intent', value: 'mode', summary: 'Override claim mode for next --claim: write or closeout-only/no-more-mutation.' },
     { flag: '--closeout-only', summary: 'Alias for --claim-intent closeout-only on next --claim.' },
