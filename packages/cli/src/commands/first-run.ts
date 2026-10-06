@@ -1,6 +1,6 @@
+import { resolveRuntimePackage } from './shared/runtime-build-identity.ts';
 import { existsSync, realpathSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { readIdentityJson, inspectFrameworkIdentity } from '../../../core/src/project/framework-identity.ts';
 import { getCommandSpec } from './command-specs.ts';
 import { supportedAgentIds } from './setup/detection.ts';
@@ -56,22 +56,9 @@ export function resolveFirstRunRuntime(commandNames: readonly string[], moduleUr
   entrypoint = process.argv[1], env = process.env): FirstRunRuntime {
   const commands = Object.fromEntries(entryCommands.filter(name => commandNames.includes(name))
     .map(name => [name, (getCommandSpec(name)?.options ?? []).map(option => option.flag).filter(flag => entryFlags.has(flag))]));
-  let cursor = path.dirname(fileURLToPath(moduleUrl));
-  let installationRoot: string | null = null;
-  let version: string | null = null;
-  while (true) {
-    const pkg = readIdentityJson(path.join(cursor, 'package.json'));
-    if (pkg?.name === '@ai-atomic-framework/cli') {
-      installationRoot = cursor;
-      version = typeof pkg.version === 'string' && /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(pkg.version) ? pkg.version : null;
-      break;
-    }
-    // Never use an arbitrary ancestor project's name/version as runtime facts.
-    if (pkg) break;
-    const parent = path.dirname(cursor);
-    if (parent === cursor) break;
-    cursor = parent;
-  }
+  const packageIdentity = resolveRuntimePackage(moduleUrl);
+  const installationRoot = packageIdentity?.installationRoot ?? null;
+  const version = packageIdentity?.version ?? null;
   let runner: string | null = null;
   if (installationRoot && entrypoint) {
     const actual = canonical(entrypoint);

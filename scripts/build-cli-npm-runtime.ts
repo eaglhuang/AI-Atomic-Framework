@@ -1,3 +1,4 @@
+import { writeBuildIdentity, treeFiles, sourceIdentity } from './release-artifact-manifest.ts';
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -16,6 +17,7 @@ const RUNTIME_LAYOUT_ROOT = 'data';
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export async function buildCliNpmRuntime(options: { repositoryRoot?: string; sourceDistRoot?: string; outputRoot?: string } = {}) {
   const root = path.resolve(options.repositoryRoot ?? repositoryRoot);
+  const buildSourceSnapshot = JSON.stringify(sourceIdentity(root));
   const packageRoot = path.join(root, 'packages', 'cli');
   const sourceDistRoot = path.resolve(options.sourceDistRoot ?? path.join(packageRoot, 'dist'));
   const defaultRuntimeRoot = path.join(sourceDistRoot, 'npm-runtime');
@@ -65,6 +67,9 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string; sou
     writeFileSync(path.join(runtimeRoot, 'index.d.ts'), declaration, 'utf8');
 
     copyRuntimeAssets(sourceDistRoot, path.join(runtimeRoot, RUNTIME_LAYOUT_ROOT), defaultRuntimeRoot);
+    if (JSON.stringify(sourceIdentity(root)) !== buildSourceSnapshot) throw new Error('Source inputs changed during npm runtime build');
+    const packageVersion = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'), 'utf8')).version as string;
+    writeBuildIdentity(root, runtimeRoot, '@ai-atomic-framework/cli', packageVersion, treeFiles(runtimeRoot));
     const files = listFiles(runtimeRoot)
       .map((file) => ({
         path: path.relative(runtimeRoot, file).replace(/\\/g, '/'),

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { readRuntimeBuildIdentity } from './commands/shared/runtime-build-identity.ts';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
@@ -332,6 +333,7 @@ function createVersionResult(cwd: string) {
     ],
     evidence: {
       frameworkVersion: version,
+      runtimeBuildIdentity: readRuntimeBuildIdentity(import.meta.url),
       runnerMode,
       runnerSourceDrift
     }

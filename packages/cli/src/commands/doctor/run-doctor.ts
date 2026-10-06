@@ -1,3 +1,4 @@
+import { readRuntimeBuildIdentity } from '../shared/runtime-build-identity.ts';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { runHashPlaceholderAudit } from '../hash-placeholder-audit.ts';
@@ -362,6 +363,7 @@ export async function runDoctor(argv: readonly string[]) {
     cwd: root,
     messages,
     evidence: {
+      runtimeBuildIdentity: readRuntimeBuildIdentity(import.meta.url),
       checks,
       packageManager: 'npm',
       packageCount: packageDirs.length,

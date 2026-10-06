@@ -1,3 +1,4 @@
+import { writeBuildIdentity, treeFiles, sourceIdentity } from './release-artifact-manifest.ts';
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -307,12 +308,19 @@ const packageDirs = readdirSync(path.join(root, 'packages'), { withFileTypes: tr
   .filter((packageDir) => !onlyPackage || packageDir === onlyPackage || packageDir.endsWith(`/${onlyPackage}`))
   .filter((packageDir) => !onlyPackages || onlyPackages.has(packageDir) || onlyPackages.has(packageDir.replace(/^packages\//, '')));
 
+const buildSourceSnapshot = JSON.stringify(sourceIdentity(root));
 const mode = onlyPackage || onlyPackages ? 'incremental' : 'full';
 for (const packageDir of packageDirs) buildPackage(packageDir, mode);
 if (packageDirs.includes(CLI_PACKAGE_DIR)) {
   buildCliRuntimeClosure();
+  const cliDist = path.join(outputRoot, CLI_PACKAGE_DIR, 'dist');
   await buildCliNpmRuntime({ repositoryRoot: root, sourceDistRoot: path.join(outputRoot, CLI_PACKAGE_DIR, 'dist') });
+  writeBuildIdentity(root, cliDist, '@ai-atomic-framework/cli', JSON.parse(readFileSync(path.join(root, CLI_PACKAGE_DIR, 'package.json'), 'utf8')).version, treeFiles(cliDist).filter(file => !file.includes(`${path.sep}npm-runtime${path.sep}`) && path.basename(file) !== 'build-identity.json'));
   assertCliArtifactBudget();
+}
+if (packageDirs.includes('packages/create-atm')) {
+  const starterDist = path.join(outputRoot, 'packages/create-atm/dist');
+  writeBuildIdentity(root, starterDist, 'create-atm', JSON.parse(readFileSync(path.join(root, 'packages/create-atm/package.json'), 'utf8')).version, treeFiles(starterDist).filter(file => path.basename(file) !== 'build-identity.json'));
 }
 for (const packageDir of packageDirs) {
   for (const entrypoint of declaredDeclarationEntrypoints(packageDir)) {
@@ -321,6 +329,7 @@ for (const packageDir of packageDirs) {
     }
   }
 }
+if (JSON.stringify(sourceIdentity(root)) !== buildSourceSnapshot) throw new Error('Source inputs changed during package build; discard output and rebuild');
 console.log(`[build-package-dist] built ${packageDirs.length} packages (${mode})`);
 
 function assertCliArtifactBudget(): void {
