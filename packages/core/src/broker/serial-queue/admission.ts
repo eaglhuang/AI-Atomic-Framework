@@ -1,8 +1,7 @@
 import type { WriteBrokerRegistryDocument, WriteIntent } from '../types.ts';
 import type { SerialQueueObservation } from './contracts.ts';
 import { observeSerialTicket, refreshSerialQueue } from './queue.ts';
-import { ownsExactActiveSerialScope, serialScopeDigest } from './policy.ts';
-import { hasSerialReadDependency } from './policy.ts';
+import { hasSerialReadDependency, ownsExactActiveSerialScope, serialScopeDigest } from './policy.ts';
 import { resourceListsOverlap } from '../resource-overlap.ts';
 
 export interface SerialQueueResume {
