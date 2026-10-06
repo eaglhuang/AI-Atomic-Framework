@@ -16,6 +16,7 @@ import {
 } from '../../scripts/run-sealed-runner-build.ts';
 
 const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-junction-'));
+try {
 const hostRoot = path.join(fixtureRoot, 'host-repo');
 const worktreeRoot = path.join(fixtureRoot, 'sealed-worktree');
 const hostNodeModules = path.join(hostRoot, 'node_modules');
@@ -72,3 +73,7 @@ console.log(JSON.stringify({
   plainTreeRemoved: true,
   unlinkBeforeRemove: true
 }, null, 2));
+} finally {
+  // This fixture owns its root. Never follow its junctions into external data.
+  removeTreeWithoutFollowingLinks(fixtureRoot);
+}
