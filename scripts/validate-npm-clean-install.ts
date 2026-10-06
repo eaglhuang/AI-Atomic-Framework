@@ -340,7 +340,17 @@ writeFileSync('package-lock.json', JSON.stringify(lock));
 `);
     const starter = path.join(installRoot, 'node_modules/create-atm/dist/index.js');
     const result = spawnSync(process.execPath, [starter, 'project', '--agent', 'codex', '--cwd', hostRoot, '--json'], {
-      encoding: 'utf8', timeout: 180_000, env: { ...process.env, npm_execpath: installer }
+      encoding: 'utf8', timeout: 180_000, env: {
+        ...process.env,
+        npm_execpath: installer,
+        // The generated project is disposable test data. Supply deterministic
+        // identity here so this smoke exercises the successful initial-commit
+        // path without weakening create-atm's real-user identity requirement.
+        GIT_AUTHOR_NAME: 'ATM Release Smoke',
+        GIT_AUTHOR_EMAIL: 'atm-release-smoke@example.invalid',
+        GIT_COMMITTER_NAME: 'ATM Release Smoke',
+        GIT_COMMITTER_EMAIL: 'atm-release-smoke@example.invalid'
+      }
     });
     if (result.status !== 0) fail(`candidate starter first use failed: ${result.stdout}${result.stderr}`);
     const payload = JSON.parse(result.stdout);
