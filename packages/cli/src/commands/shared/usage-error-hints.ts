@@ -18,7 +18,8 @@ export function withUnsupportedOptionHints(
   const flag = text.match(/does not support option (--[\w-]+)/)?.[1];
   const spec = flag ? getCommandSpec(commandName) : null;
   if (!flag || !spec) return details;
-  const path = commandArgs.filter((arg) => !arg.startsWith('-')).slice(0, 2);
+  const firstFlag = commandArgs.findIndex((arg) => arg.startsWith('-'));
+  const path = (firstFlag < 0 ? commandArgs : commandArgs.slice(0, firstFlag)).slice(0, 2);
   const options = (spec.options ?? []) as readonly SpecOption[];
   const flags = options
     .filter((option) => !option.subcommands || option.subcommands.some((name) => path.includes(name)))
@@ -30,7 +31,9 @@ export function withUnsupportedOptionHints(
     .sort((left, right) => left.distance - right.distance)[0];
   return {
     unsupportedFlag: flag,
-    ...(nearest && nearest.distance <= 3 ? { didYouMean: nearest.candidate } : {}),
+    ...(nearest && nearest.distance === 0
+      ? { flagNotAcceptedHere: `${flag} is a known ${commandName} flag but ${path.join(' ') || commandName} does not accept it; follow the examples below.` }
+      : nearest && nearest.distance <= 3 ? { didYouMean: nearest.candidate } : {}),
     ...(examples.length > 0 ? { examples } : {}),
     ...(flags.length <= 15 ? { allowedFlags: flags } : {}),
     helpCommand: `node atm.mjs ${commandName} --help --json`,
@@ -38,7 +41,7 @@ export function withUnsupportedOptionHints(
   };
 }
 
-function editDistance(left: string, right: string): number {
+export function editDistance(left: string, right: string): number {
   const row = Array.from({ length: right.length + 1 }, (_, index) => index);
   for (let i = 1; i <= left.length; i += 1) {
     let previous = row[0];
