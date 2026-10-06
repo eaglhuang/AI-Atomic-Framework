@@ -4,7 +4,6 @@ import {
   isIgnorableTaskScopedDirtySideEffect,
   isRuntimeCommitSideEffect,
   resolveGitExecutable,
-  shouldStageGovernedGitHeadEvidenceBeforeCommit,
 } from './git-process-port.ts';
 import {
   findCloseCommitWindowCoveringPaths,
@@ -12,10 +11,7 @@ import {
   readActiveCloseCommitWindows,
 } from "../../framework-development.ts";
 import { isReleasedGeneratedBundleSafeToClean, planReleasedResidueTransaction, readGeneratedResidueTaskDisposition, reconcileReleasedResidueReport } from '../../tasks/generated-residue-policy.ts';
-import {
-  gitHeadEvidencePath,
-  gitHeadEvidencePaths,
-} from "../../git-head-evidence.ts";
+import { gitHeadEvidencePaths } from "../../git-head-evidence.ts";
 import { readResolutionAuthorizedForeignTaskIds } from "../../broker-conflict-resolution.ts";
 import { mergeSealedCommitBundles, sealCommitBundleFromCandidateIndex, sealCommitBundleFromLiveIndex, withWorktreeCandidateIndex } from "./sealed-commit-attribution.ts";
 import {
@@ -429,14 +425,10 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     stageCandidates,
     uniqueSorted,
   });
-  const commitFilesWithGovernanceEvidence =
-    shouldStageGovernedGitHeadEvidenceBeforeCommit(commitFiles)
-      ? uniqueSorted([...commitFiles, gitHeadEvidencePath])
-      : commitFiles;
   let protectedGovernanceStateReport = inspectProtectedGovernanceStateDestructiveChanges({
     cwd: input.cwd,
     taskId: input.taskId,
-    commitFiles: commitFilesWithGovernanceEvidence,
+    commitFiles,
     authorizedGeneratedResidueDeletions: autoCleanedResidue.map((entry: LegacyValue) => entry.path),
   });
   const closeoutOnlyMutationFiles =
@@ -500,7 +492,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   }
   const liveSealedBundle = sealCommitBundleFromLiveIndex({
     cwd: input.cwd,
-    paths: commitFilesWithGovernanceEvidence,
+    paths: commitFiles,
     provenance: "task-scope",
   });
   const sealedBundle = input.autoStage && stageCandidates.length > 0
@@ -512,7 +504,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
           cwd: input.cwd,
           taskId: input.taskId,
           env,
-          commitFiles: commitFilesWithGovernanceEvidence,
+          commitFiles,
           authorizedGeneratedResidueDeletions: autoCleanedResidue.map((entry: LegacyValue) => entry.path),
         });
         return mergeSealedCommitBundles(
@@ -575,7 +567,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     stageFiles: input.autoStage
       ? uniqueSorted([...stageCandidates, ...inScopeStagedFiles, ...inScopeStagedDeletions])
       : inScopeUnstagedDirty,
-    commitFiles: commitFilesWithGovernanceEvidence,
+    commitFiles,
     skippedExternalDirtyFiles: uniqueSorted(skippedExternalDirtyFiles),
     unexpectedStagedTasks,
     gitIndexOwnership,
