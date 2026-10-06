@@ -1,14 +1,13 @@
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { gitHeadEvidencePath, gitHeadEvidencePaths } from '../../git-head-evidence.ts';
-import { appendGitHeadEvidenceJsonl } from '../../git-governance/implementation/git-head-evidence-transaction.ts';
+import { gitHeadEvidencePaths } from '../../git-head-evidence.ts';
+import { appendGitHeadEvidenceJsonl, hasMatchingWorktreeGitHeadEvidence } from '../../git-governance/implementation/git-head-evidence-transaction.ts';
 import { readFrameworkVersion } from '../../shared.ts';
 import { hookProvider, hookContractVersion } from '../git-hooks-installer.ts';
 import { normalizeRelativePath, runGit, runGitLines } from '../git-index-diagnostics.ts';
 import type { CommandRunReport } from '../pre-push.ts';
 import {
-  findFutureCommitEvidenceMatchInWorktree,
   normalizeOptionalText,
   readCurrentHeadForFutureCommit,
   readGitObjectText,
@@ -175,20 +174,21 @@ export function writeStagedGitHeadEvidence(cwd: string, stagedFiles: readonly st
   const treeSha = readStagedTreeWithoutEvidence(cwd);
   const parentCommitShas = readCurrentHeadForFutureCommit(cwd);
   const generatedAt = new Date().toISOString();
-  const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
-  const existingMatch = findFutureCommitEvidenceMatchInWorktree(cwd, treeSha, parentCommitShas);
+  const evidenceAbsolute = path.join(cwd, gitHeadEvidencePaths.runtimeJsonl);
+  const existingMatch = treeSha
+    ? hasMatchingWorktreeGitHeadEvidence(cwd, treeSha, parentCommitShas)
+    : false;
   if (existingMatch) {
-    const addResult = runGit(cwd, ['add', '--', gitHeadEvidencePath]);
     return {
-      evidencePath: gitHeadEvidencePath,
+      evidencePath: null,
+      runtimeEvidencePath: gitHeadEvidencePaths.runtimeJsonl,
       treeSha,
       parentCommitShas,
-      gitAddExitCode: addResult.exitCode,
-      ok: addResult.exitCode === 0,
+      gitAddExitCode: 0,
+      ok: true,
       reusedExisting: true
     };
   }
-  mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
   const payload = {
     schemaVersion: 'atm.gitHeadEvidence.v0.1',
     evidence: [
@@ -204,7 +204,7 @@ export function writeStagedGitHeadEvidence(cwd: string, stagedFiles: readonly st
             treeSha,
             parentCommitShas,
             stagedPathCount: stagedFiles.length,
-            evidencePath: gitHeadEvidencePath,
+            evidencePath: gitHeadEvidencePaths.runtimeJsonl,
             generatedAt
           },
           hookContractVersion,
@@ -214,13 +214,13 @@ export function writeStagedGitHeadEvidence(cwd: string, stagedFiles: readonly st
     ]
   };
   appendGitHeadEvidenceJsonl(evidenceAbsolute, payload);
-  const addResult = runGit(cwd, ['add', '--', gitHeadEvidencePath]);
   return {
-    evidencePath: gitHeadEvidencePath,
+    evidencePath: null,
+    runtimeEvidencePath: gitHeadEvidencePaths.runtimeJsonl,
     treeSha,
     parentCommitShas,
-    gitAddExitCode: addResult.exitCode,
-    ok: addResult.exitCode === 0
+    gitAddExitCode: 0,
+    ok: true
   };
 }
 
