@@ -11,6 +11,7 @@ import {
 import { pathMatchesWriteScope } from '../../../core/src/broker/write-scope-policy.ts';
 import { evaluateTaskWorkAdmissionGate, evaluateWorkAdmissionGate, readWorkAdmissionTicket, resolveWorkAdmissionTicket } from './git-governance/work-admission-check.ts';
 import { makeResult, message } from './shared.ts';
+import { confirmDerivedAtoms, recordConfirmedDerivedAtoms } from './shared/derived-atom-occupancy.ts';
 import {
   captureGitHeadEvidencePreparation,
   evaluateGitGovernanceCheck,
@@ -82,16 +83,67 @@ export async function runAtmGit(argv: string[]) {
       evidence: { action, taskId, workAdmission: { decision: gate.decision, receipt: null } }
     });
   }
+  // TASK-ASP-0008: confirm the derived atoms this commit actually touches.
+  // Only a real overlap with another task's reserved/confirmed atom blocks;
+  // derivation failures never block (the change simply stays file-level).
+  const derivedAtoms = action === 'commit' ? safeConfirmDerivedAtoms(cwd, taskId, files, argv.includes('--auto-stage')) : null;
+  if (derivedAtoms && derivedAtoms.conflicts.length > 0) {
+    const holders = [...new Set(derivedAtoms.conflicts.map((conflict) => conflict.taskId))];
+    return makeResult({
+      ok: false,
+      command: 'git',
+      cwd,
+      messages: [message('error', 'ATM_GIT_DERIVED_ATOM_CONFLICT', `This commit changes code that active task(s) ${holders.join(', ')} reserved or already changed. Wait for them to close, or coordinate through the broker.`, {
+        taskId,
+        conflicts: derivedAtoms.conflicts,
+        requiredCommand: 'node atm.mjs broker status --json'
+      })],
+      evidence: { action, taskId, derivedAtomConfirmation: summarizeDerivedAtoms(derivedAtoms), workAdmission: { decision: gate.decision, receipt: gate.receipt } }
+    });
+  }
   const governedArgv = action === 'commit' && ticket
     ? appendWorkAdmissionTrailer(argv, ticket.ticketId, ticket.ticketDigest)
     : argv;
   const result = await runAtmGitImplementation(governedArgv);
+  const recorded = derivedAtoms && result.ok !== false && derivedAtoms.refs.length > 0
+    ? safeRecordDerivedAtoms(cwd, taskId, actorId, derivedAtoms.refs)
+    : false;
   return {
     ...result,
     evidence: {
       ...(result.evidence ?? {}),
+      ...(derivedAtoms ? { derivedAtomConfirmation: { ...summarizeDerivedAtoms(derivedAtoms), recordedOnBrokerIntent: recorded } } : {}),
       workAdmission: { decision: gate.decision, receipt: gate.receipt }
     }
+  };
+}
+
+function safeConfirmDerivedAtoms(cwd: string, taskId: string, files: readonly string[], autoStage: boolean) {
+  try {
+    return confirmDerivedAtoms({ cwd, taskId, files, source: autoStage ? 'worktree' : 'index' });
+  } catch {
+    return null;
+  }
+}
+
+function safeRecordDerivedAtoms(cwd: string, taskId: string, actorId: string, refs: Parameters<typeof recordConfirmedDerivedAtoms>[0]['refs']) {
+  try {
+    return recordConfirmedDerivedAtoms({ cwd, taskId, actorId, refs });
+  } catch {
+    return false;
+  }
+}
+
+function summarizeDerivedAtoms(confirmation: NonNullable<ReturnType<typeof confirmDerivedAtoms>>) {
+  return {
+    files: confirmation.files.map((file) => ({
+      filePath: file.filePath,
+      fileLevel: file.fileLevel,
+      preambleAdditive: file.preambleAdditive,
+      atoms: file.touched.map((atom) => ({ symbol: atom.symbol, kind: atom.kind, atomCid: atom.atomCid }))
+    })),
+    skippedFiles: confirmation.skippedFiles,
+    conflicts: confirmation.conflicts
   };
 }
 

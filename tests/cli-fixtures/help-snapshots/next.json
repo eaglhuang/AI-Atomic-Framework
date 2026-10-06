@@ -33,6 +33,11 @@
                         "summary":  "Emergency lease required with --allow-stale-runner for a recovery claim."
                     },
                     {
+                        "flag":  "--atoms",
+                        "value":  "symbols",
+                        "summary":  "For next --claim: comma-separated symbols in the task scope files to reserve as derived atoms (an intent ceiling, not an exclusive guarantee). Tasks that reserve disjoint atoms of one file are admitted in parallel; the governed commit confirms the atoms the staged diff actually touched. Symbols that do not exist yet are confirmed at commit time."
+                    },
+                    {
                         "flag":  "--auto-intent",
                         "summary":  "For next --claim task routes, auto-resolve write vs closeout-only from in-scope dirty files and whether deliverables already landed in HEAD."
                     },
