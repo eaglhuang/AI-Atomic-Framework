@@ -108,17 +108,21 @@ for (const assetPath of [
   }
 }
 
-const packed = spawnSync('npm', ['pack', '.', '--dry-run', '--json'], {
-  cwd: cliRoot,
-  encoding: 'utf8',
-  shell: process.platform === 'win32'
-});
-if (packed.status !== 0) fail(`npm pack dry-run failed: ${packed.stderr || packed.stdout}`);
-const jsonStart = packed.stdout.trimStart().startsWith('[') && !packed.stdout.trimStart().startsWith('[build-')
-  ? packed.stdout.indexOf('[')
-  : packed.stdout.lastIndexOf('\n[') + 1;
-if (jsonStart < 0) fail(`npm pack dry-run did not emit JSON: ${packed.stdout}`);
-const packEntry = JSON.parse(packed.stdout.slice(jsonStart))[0];
+const artifactFlag = process.argv.indexOf('--artifact-manifest');
+let packEntry: { unpackedSize?: number; entryCount?: number };
+if (artifactFlag >= 0) {
+  const { readReleaseManifest } = await import('./release-artifact-manifest.ts');
+  const release = readReleaseManifest(path.resolve(process.argv[artifactFlag + 1]));
+  const artifact = release.artifacts.find(entry => entry.name === '@ai-atomic-framework/cli');
+  if (!artifact) fail('Sealed release does not contain the CLI');
+  packEntry = artifact;
+} else {
+  const packed = spawnSync('npm', ['pack', '.', '--ignore-scripts', '--dry-run', '--json'], {
+    cwd: cliRoot, encoding: 'utf8', shell: process.platform === 'win32'
+  });
+  if (packed.status !== 0) fail(`npm pack dry-run failed: ${packed.stderr || packed.stdout}`);
+  packEntry = JSON.parse(packed.stdout)[0];
+}
 const bytes = Number(packEntry?.unpackedSize ?? 0);
 const entries = Number(packEntry?.entryCount ?? 0);
 const cap = budget.budget;

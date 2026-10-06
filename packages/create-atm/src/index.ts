@@ -14,6 +14,7 @@ interface CreateAtmOptions {
   readonly projectName: string;
   readonly cwd: string;
   readonly agent?: string;
+  readonly cliVersion?: string;
   readonly tag: CreateAtmDistTag;
   readonly json: boolean;
 }
@@ -50,11 +51,11 @@ interface StepResult {
 export function runCreateAtm(argv = process.argv.slice(2)) {
   const startedAt = Date.now();
   if (argv.includes('--help') || argv.includes('-h')) {
-    process.stdout.write('Usage: create-atm <project-name> [--agent <pack-id>] [--cwd <dir>] [--json]\n');
+    process.stdout.write('Usage: create-atm <project-name> [--agent <pack-id>] [--cwd <dir>] [--tag latest|next|beta|lts] [--cli-version <exact-semver>] [--json]\n');
     return 0;
   }
   const options = parseArgs(argv);
-  const distTag = resolveCreateAtmDistTag(options.tag, argv.includes('--tag'));
+  const distTag = resolveCreateAtmDistTag(options.tag, argv.includes('--tag'), options.cliVersion);
   const targetRoot = path.resolve(options.cwd, options.projectName);
   ensureCreatableTarget(targetRoot);
   mkdirSync(targetRoot, { recursive: true });
@@ -62,7 +63,7 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
 
   let atmExecution = resolveAtmExecutionPlan(distTag.requestedTag);
   const steps: StepResult[] = [];
-  if (atmExecution.source !== 'source-tree') {
+  if (options.cliVersion || atmExecution.source !== 'source-tree') {
     const runtime = installTargetRuntime(targetRoot, distTag.npmPackageSpec);
     steps.push(runtime.step);
     if (runtime.execution) atmExecution = runtime.execution;
@@ -182,15 +183,21 @@ function installTargetRuntime(targetRoot: string, packageSpec: string): { step: 
 
 function parseArgs(argv: readonly string[]): CreateAtmOptions {
   const args = [...argv];
+  if (args.some(arg => arg.startsWith('--cli-version='))) throwUsage('Use --cli-version <exact-semver>; inline values are not supported.');
   const projectName = args.find((arg) => !arg.startsWith('-'));
   if (!projectName) {
-    throwUsage('Usage: create-atm <project-name> [--agent <pack-id>] [--cwd <dir>] [--json]');
+    throwUsage('Usage: create-atm <project-name> [--agent <pack-id>] [--cwd <dir>] [--tag latest|next|beta|lts] [--cli-version <exact-semver>] [--json]');
   }
+  const tag = parseDistTag(readOption(args, '--tag') ?? 'latest');
+  const versionArg = readOption(args, '--cli-version');
+  if (args.filter(arg => arg === '--cli-version').length > 1) throwUsage('--cli-version may only be provided once.');
+  const cliVersion = versionArg === undefined ? undefined : parseExactCliVersion(versionArg, tag);
   return {
     projectName,
     cwd: path.resolve(readOption(args, '--cwd') ?? process.cwd()),
     agent: readOption(args, '--agent'),
-    tag: parseDistTag(readOption(args, '--tag') ?? 'latest'),
+    tag,
+    cliVersion,
     json: args.includes('--json') || !process.stdout.isTTY
   };
 }
@@ -202,6 +209,18 @@ function readOption(args: readonly string[], name: string): string | undefined {
   if (!value || value.startsWith('-')) {
     throwUsage(`${name} requires a value.`);
   }
+  return value;
+}
+
+export function parseExactCliVersion(value: string, tag: CreateAtmDistTag): string {
+  const match = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/.exec(value);
+  const prerelease = match?.[4]?.split('.') ?? [];
+  if (!match || prerelease.some(part => /^\d+$/.test(part) && !/^(0|[1-9]\d*)$/.test(part))) throwUsage('--cli-version requires one exact semver, not a tag, range, package, path or URL.');
+  const allowed = tag === 'latest' ? prerelease.length === 0
+    : tag === 'next' ? prerelease[0] === 'beta'
+    : tag === 'beta' ? prerelease[0] === 'alpha'
+    : prerelease.length === 0 || prerelease[0] === 'lts';
+  if (!allowed) throwUsage(`--cli-version prerelease does not match the ${tag} release channel.`);
   return value;
 }
 
@@ -226,15 +245,15 @@ function ensureCreatableTarget(targetRoot: string): void {
   }
 }
 
-function resolveCreateAtmDistTag(tag: CreateAtmDistTag, explicitTag: boolean): CreateAtmDistTagSelection {
+function resolveCreateAtmDistTag(tag: CreateAtmDistTag, explicitTag: boolean, cliVersion?: string): CreateAtmDistTagSelection {
   const table: Record<CreateAtmDistTag, Omit<CreateAtmDistTagSelection, 'schemaVersion' | 'requestedTag' | 'npmPackageSpec' | 'source'>> = {
     latest: { tier: 'stable', expectedCliPrerelease: null },
     next: { tier: 'beta', expectedCliPrerelease: 'beta' },
     beta: { tier: 'experimental', expectedCliPrerelease: 'alpha' },
     lts: { tier: 'lts', expectedCliPrerelease: null }
   };
-  let packageVersion: string = tag;
-  if (!explicitTag) {
+  let packageVersion: string = cliVersion ?? tag;
+  if (!explicitTag && cliVersion === undefined) {
     const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
     const declared = manifest.dependencies?.['@ai-atomic-framework/cli'];
     if (typeof declared !== 'string' || !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(declared)) {
@@ -336,4 +355,3 @@ const isDirectRun = process.argv[1]
 if (isDirectRun) {
   process.exitCode = runCreateAtm();
 }
-

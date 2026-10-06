@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { readRuntimeBuildIdentity } from './commands/shared/runtime-build-identity.ts';
 import path from 'node:path';
 import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
 import { fileURLToPath } from 'node:url';
@@ -240,7 +241,7 @@ function createVersionResult(cwd: string) {
         ? [message('warning', 'ATM_RUNNER_SOURCE_DRIFT', runnerSourceDrift.advisory, runnerSourceDrift)]
         : [])
     ],
-    evidence: { frameworkVersion: version, runnerMode, runnerSourceDrift, publicSurface: 'adopter-core' }
+    evidence: { frameworkVersion: version, runtimeBuildIdentity: readRuntimeBuildIdentity(import.meta.url), runnerMode, runnerSourceDrift, publicSurface: 'adopter-core' }
   });
 }
 

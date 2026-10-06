@@ -69,6 +69,9 @@ jobs:
           # create a token-based .npmrc here; that would silently select the
           # legacy NPM_TOKEN path and make the configured publisher unused.
 
+      - name: Install npm with OIDC dist-tag support
+        run: npm install --global npm@11.21.0 --registry https://registry.npmjs.org
+
       - name: Install dependencies
         run: npm ci
 
@@ -139,10 +142,11 @@ jobs:
         run: npm run validate:release-prepublish -- --run-id "release-prepublish-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" --prior-evidence .atm/runtime/release-prepublish-prior-evidence.json
 
       - name: Verify npm package contents
-        run: npm pack --workspaces --dry-run
+        # Seal once; all later gates and publication consume these exact bytes.
+        run: node --experimental-strip-types scripts/build-release-artifacts.ts --output release/npm-artifacts
 
       - name: Verify adopter artifact budget
-        run: node --experimental-strip-types scripts/validate-adopter-artifact-manifest.ts
+        run: node --experimental-strip-types scripts/validate-adopter-artifact-manifest.ts --artifact-manifest release/npm-artifacts/manifest.json
 
       # Hard publish gate. The published CLI is packed and installed on its own
       # in a clean directory, with no sibling workspace present, and then run.
@@ -150,7 +154,7 @@ jobs:
       # workspace closure happened to be installed alongside it; an isolated
       # install is the only check that can observe that class of defect.
       - name: Clean-install npx smoke (publish gate)
-        run: node --experimental-strip-types scripts/validate-npm-clean-install.ts
+        run: node --experimental-strip-types scripts/validate-npm-clean-install.ts --artifact-manifest release/npm-artifacts/manifest.json
 
       - name: Validate release version compatibility
         shell: bash
@@ -196,153 +200,22 @@ jobs:
             });
 
       - name: Publish public workspace closure
+        # Immutable candidate publication, public verification, then promotion
         shell: bash
         run: |
-          # Publish the CLI before its create-atm onboarding entrypoint.
-          # Other workspaces remain build-time inputs. This list
-          # must stay identical to publishClosure.publishedPackages in
-          # tests/package-skeleton.fixture.json; validate-release-trust fails the
-          # release if the two drift or if a non-closure workspace reappears here.
-          PUBLIC_WORKSPACES=(
-            "@ai-atomic-framework/cli"
-            "create-atm"
-          )
-          release_version="${GITHUB_REF_NAME#v}"
-          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
-            release_version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
-          fi
+          dry_run=()
+          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then dry_run=(--dry-run); fi
+          node --experimental-strip-types scripts/release-candidate.ts \
+            --manifest release/npm-artifacts/manifest.json \
+            --target-tag "$NPM_DIST_TAG" "${dry_run[@]}"
 
-          publish_workspace() {
-            local workspace="$1"
-            local attempt=1
-            local output
-
-            while (( attempt <= 3 )); do
-              if output=$(npm publish --workspace "$workspace" --include-workspace-root=false --access public --provenance --tag "$NPM_DIST_TAG" 2>&1); then
-                printf '%s\n' "$output"
-                return 0
-              fi
-
-              printf '%s\n' "$output" >&2
-              if grep -Eq 'npm error (code E429|429 Too Many Requests)' <<<"$output" && (( attempt < 3 )); then
-                local delay=$((attempt * 30))
-                echo "npm rate limit while publishing $workspace; retrying once after ${delay}s (attempt $((attempt + 1))/3)."
-                sleep "$delay"
-                ((attempt++))
-                continue
-              fi
-
-              return 1
-            done
-          }
-
-          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
-            for workspace in "${PUBLIC_WORKSPACES[@]}"; do
-              npm publish --workspace "$workspace" --include-workspace-root=false --access public --provenance --tag "$NPM_DIST_TAG" --dry-run
-            done
-          else
-            for workspace in "${PUBLIC_WORKSPACES[@]}"; do
-              if npm view "$workspace@$release_version" version --json >/dev/null 2>&1; then
-                echo "Skipping $workspace@$release_version; that exact version is already published."
-                continue
-              fi
-
-              publish_workspace "$workspace"
-              sleep 3
-            done
-          fi
-      # Fail-closed post-publish registry gate (TASK-PRF-0054). Pre-publish
-      # candidate checks above answer "is the file we are about to publish
-      # correct?"; this step answers "is the file the market actually
-      # received still correct?" The two questions are not interchangeable,
-      # so this step re-installs the exact tagged version from the live
-      # public registry (never mutable `latest`) into a clean consumer and
-      # runs the complete core-workflow matrix, not a `--version`-only smoke.
-      # It never runs on workflow_dispatch/dry-run (the `if` below matches
-      # the job-level dry-run gate, so GitHub Actions reports this step as
-      # skipped rather than silently passing) and never uses
-      # --record-blocked, so a real registry defect fails the workflow.
-      - name: Verify public npm registry post-publish
-        if: ${{ always() && !cancelled() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
-        timeout-minutes: 10
-        shell: bash
-        run: |
-          release_version="${GITHUB_REF_NAME#v}"
-          mkdir -p release
-          # npm answers `publish` before the version is readable from the
-          # registry; v0.1.1's gate ran seconds after publish and failed with
-          # "registry metadata lookup failed". Wait for the exact version and
-          # its dist-tag to be visible, bounded, and fail closed on timeout.
-          visible=false
-          for attempt in $(seq 1 40); do
-            published=$(npm view "@ai-atomic-framework/cli@$release_version" version 2>/dev/null || true)
-            tagged=$(npm view @ai-atomic-framework/cli "dist-tags.$NPM_DIST_TAG" 2>/dev/null || true)
-            starter_published=$(npm view "create-atm@$release_version" version 2>/dev/null || true)
-            starter_tagged=$(npm view create-atm "dist-tags.$NPM_DIST_TAG" 2>/dev/null || true)
-            if [[ "$published" == "$release_version" && "$tagged" == "$release_version" && "$starter_published" == "$release_version" && "$starter_tagged" == "$release_version" ]]; then
-              visible=true
-              break
-            fi
-            echo "registry not yet serving $release_version on $NPM_DIST_TAG (attempt $attempt/40)"
-            sleep 15
-          done
-          if [[ "$visible" != "true" ]]; then
-            echo "::error::CLI and starter release $release_version were not both visible on dist-tag $NPM_DIST_TAG within 10 minutes"
-            exit 1
-          fi
-          node --experimental-strip-types scripts/validate-public-npm-install.ts \
-            --package @ai-atomic-framework/cli \
-            --version "$release_version" \
-            --require-default-tag \
-            --output release/public-npm-install-post-publish-proof.md
-
-      - name: Verify public starter first use
-        if: ${{ success() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
-        shell: bash
-        run: |
-          release_version="${GITHUB_REF_NAME#v}"
-          starter_root=$(mktemp -d)
-          trap 'rm -rf "$starter_root"' EXIT
-          # Run outside the repository: inside the workspace root npm resolves the
-          # local create-atm workspace and never links the published bin.
-          cd "$starter_root"
-          npm exec --yes --package "create-atm@$release_version" -- create-atm project --agent codex --tag "$NPM_DIST_TAG" --cwd "$starter_root" --json > "$starter_root/result.json"
-          jq -e --arg version "$release_version" '.ok == true and .evidence.atmEntrypointSource == "target-dependency" and .evidence.runtimeVersion == $version' "$starter_root/result.json"
-          test -s "$starter_root/project/.agents/skills/atm-governance-router/SKILL.md"
-          test -s "$starter_root/project/.agents/skills/atm-governance-router/references/index.md"
-          (cd "$starter_root/project" && node atm.mjs next --json)
-
-          # The published starter must carry an AI through its own local task
-          # card end to end, every command in a fresh process and the claim
-          # lane passed only as the playbook's --lane-session.
-          cd "$starter_root/project"
-          git init -q 2>/dev/null || true
-          git config user.name "Release Starter"
-          git config user.email release-starter@example.invalid
-          git add -A && git commit -qm init --no-verify
-          node atm.mjs taskflow open --write --actor starter --title "Add greeting" --goal "Print a greeting." --scope-path src/greet.mjs,scripts/check-greet.mjs --validator "node scripts/check-greet.mjs" --json > "$starter_root/open.json"
-          task_id=$(ls docs/tasks/*.task.md | head -n 1 | xargs -n1 basename | sed 's/\.task\.md$//')
-          node atm.mjs identity set --actor starter --git-name "Release Starter" --git-email release-starter@example.invalid --json > /dev/null
-          node atm.mjs next --claim --actor starter --task "$task_id" --auto-intent --json > "$starter_root/claim.json"
-          lane=$(jq -r '.evidence.nextAction.playbook.closePreview.writeCommand' "$starter_root/claim.json" | grep -o -- '--lane-session [^ ]*' | cut -d' ' -f2)
-          test -n "$lane"
-          mkdir -p src scripts
-          printf "export const greeting = 'hello';\n" > src/greet.mjs
-          printf "import { greeting } from '../src/greet.mjs';\nif (greeting !== 'hello') process.exit(1);\nconsole.log('greet: 1 case passed');\n" > scripts/check-greet.mjs
-          node atm.mjs git commit --actor starter --task "$task_id" --message "feat: greeting" --auto-stage --lane-session "$lane" --json > /dev/null
-          node atm.mjs evidence run --task "$task_id" --actor starter --command "node scripts/check-greet.mjs" --validators "node scripts/check-greet.mjs" --lane-session "$lane" --json > /dev/null
-          delivery=$(git rev-parse HEAD)
-          node atm.mjs taskflow close --task "$task_id" --actor starter --historical-delivery "$delivery" --write --lane-session "$lane" --json > "$starter_root/close.json"
-          jq -e '.ok == true' "$starter_root/close.json"
-          grep -q '^status: done$' "docs/tasks/$task_id.task.md"
-
-      - name: Attach public registry post-publish proof
-        if: ${{ always() && !cancelled() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
+      - name: Attach immutable artifacts and promotion proof
+        if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: public-npm-install-post-publish-proof
-          path: release/public-npm-install-post-publish-proof.md
-          if-no-files-found: warn
+          name: npm-release-artifact-parity
+          path: release/npm-artifacts
+          if-no-files-found: error
 
       - name: Post-publish full validation
         if: ${{ always() && !cancelled() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
@@ -362,4 +235,7 @@ jobs:
           files: |
             release/integrity.json
             release/sbom.json
+            release/npm-artifacts/*.tgz
+            release/npm-artifacts/manifest.json
+            release/npm-artifacts/proof/promotion.json
 
