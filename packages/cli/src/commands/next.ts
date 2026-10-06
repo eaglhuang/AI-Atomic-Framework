@@ -207,6 +207,7 @@ export {
 export { buildActiveWorkSummary } from './next/playbook-projection.ts';
 
 import { compactNextRouteResult } from './next/result-compaction.ts';
+import { extractUnownedWipAdoption } from './next/unowned-wip-adoption.ts';
 
 export type NextCommandResult = CommandResult;
 
@@ -239,6 +240,8 @@ function withRestrictedExecutionGuidance(result: NextCommandResult): NextCommand
 }
 
 async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
+  const adoption = extractUnownedWipAdoption(argv);
+  argv = adoption.argv;
   const profile = createNextProfiler();
   // TASK-CID-0024: --claim-intent is a next-only claim flag; extract it before
   // the shared option parser so the rest of the surface stays unchanged.
@@ -368,6 +371,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
       claimFiles: options.files,
       allowStaleRunner,
       emergencyApproval,
+      adoptUnownedWip: adoption.enabled,
       taskIntent,
       importedTaskQueue,
       integrationBootstrap,
