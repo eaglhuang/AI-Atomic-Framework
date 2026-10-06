@@ -1,0 +1,435 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0129",
+  "title": "Stop writing runtime git-head evidence into Git history",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "ACC-1: A real governed commit in a fresh temporary Git repository records new git-head evidence only under the runtime-local telemetry store. No new tracked `.atm/history/evidence/git-head.json` or `git-head.jsonl` is written.",
+    "ACC-2: Task-scoped candidate preparation, index staging, record-bundle inspection, and pre-commit hook all agree on the runtime-only boundary. The test inspects both `git diff --cached` and the resulting commit tree; neither contains a newly generated git-head runtime receipt. Remove the currently tracked mutable `.atm/history/evidence/git-head.json` from HEAD in the same scoped delivery.",
+    "ACC-3: The actual commit retains existing actor/task `ATM-*` trailers and normal Git author/committer, parent, and tree metadata; removing the runtime receipt does not weaken attribution or required closeout evidence.",
+    "ACC-4: Any consumer that still needs a historical git-head snapshot can read a legacy fixture without writing, staging, or refreshing it. Runtime-only mode is the default for new observations.",
+    "ACC-5: Update the existing evidence-ledger documentation and focused test catalog for the changed boundary. Report current tracked receipt bytes/count and expected future-growth reduction separately; do not claim that historical Git objects were removed."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-head-evidence.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-candidate-preparation.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
+    "packages/cli/src/commands/git-governance/work-admission-check.ts",
+    "packages/cli/src/commands/hook/pre-commit/input-state.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "packages/core/src/broker/work-admission-ticket.ts",
+    "tests/cli/git-head-runtime-only-receipt.test.ts",
+    "scripts/test-catalog.config.json",
+    "docs/EVIDENCE_LEDGER.md",
+    ".atm/history/evidence/git-head.json"
+  ],
+  "scopePaths": [
+    ".atm/history/evidence/git-head.json",
+    "packages/cli/src/commands/git-head-evidence.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+    "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-candidate-preparation.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+    "packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
+    "packages/cli/src/commands/git-governance/work-admission-check.ts",
+    "packages/cli/src/commands/hook/pre-commit/input-state.ts",
+    "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "packages/core/src/broker/work-admission-ticket.ts",
+    "tests/cli/git-head-runtime-only-receipt.test.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "tests/cli/git-record-commit.test.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "scripts/test-catalog.config.json",
+    "docs/EVIDENCE_LEDGER.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "node --strip-types tests/cli/git-record-commit.test.ts",
+    "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "node --strip-types scripts/validate-evidence-ledger-boundary.ts",
+    "npm run check:encoding:touched"
+  ],
+  "planningRepo": "C:/Users/User/3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Restore the prior writer/stager behavior and tracked current snapshot in one revert; do not rewrite history or delete legacy evidence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-head-evidence-path-policy",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/EVIDENCE_LEDGER.md"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.git-head-evidence-path-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-head-evidence.ts",
+        "disposition": "inline",
+        "inlineReason": "Owner's first-principles directive prioritizes reducing retained complexity; reuse the existing evidence-path seam, add no new abstraction or gate, and extract only if doing so reduces total code and runtime cost."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../../../../3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0129-stop-writing-runtime-git-head-evidence-into-git-history.task.md",
+    "sectionTitle": "TASK-PRF-0129",
+    "headingLine": 148,
+    "hash": "849e4ad4e5babde1",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "../../../../3KLife/docs/ai_atomic_framework/atm-product-proof/tasks/TASK-PRF-0129-stop-writing-runtime-git-head-evidence-into-git-history.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:849e4ad4e5babde1d7358e8b2eee0ed68f62344d2efb633080044ae4ec76783f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-06T04:17:20.178Z"
+    }
+  },
+  "importedAt": "2026-10-06T04:17:20.178Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [
+      "TASK-PRF-0010"
+    ],
+    "startConditions": [],
+    "softRelations": [
+      "ATM-GOV-0416",
+      "TASK-PRF-0092",
+      "TASK-PRF-0093"
+    ],
+    "changedPublicSeams": [
+      "git-head-runtime-evidence-write-boundary",
+      "governed-commit-provenance"
+    ],
+    "causalImpactEdges": [
+      "new-runtime-git-head-evidence-is-not-committed",
+      "git-metadata-retains-task-and-actor-provenance",
+      "legacy-tracked-receipts-remain-readable"
+    ],
+    "parallelFrontierInputs": [
+      "git-head-evidence-writer-inventory",
+      "commit-candidate-path-inventory",
+      "current-tracked-evidence-footprint"
+    ],
+    "validatorReferences": [
+      "test_prf_git_head_runtime_evidence_is_not_tracked_20261006",
+      "test_prf_git_commit_provenance_without_runtime_receipt_20261006",
+      "test_prf_git_head_legacy_read_compatibility_20261006"
+    ],
+    "phaseOwner": "phase-runtime-evidence-boundary"
+  },
+  "testContributions": [
+    {
+      "caseId": "test_prf_git_head_runtime_evidence_is_not_tracked_20261006",
+      "targetGroupId": "null",
+      "semanticKey": "git_head_runtime_only",
+      "coversAcceptance": [
+        "ACC-1",
+        "ACC-2"
+      ],
+      "coversImpactEdges": [
+        "new-runtime-git-head-evidence-is-not-committed"
+      ],
+      "expectedRedPredicate": "A real governed commit writes or stages a git-head runtime receipt under .atm/history/evidence.",
+      "contributionResourceKey": "git-head-evidence-store",
+      "responsibility": "task-required",
+      "dependencyEdge": "commit-operation-to-runtime-evidence",
+      "contractEdge": "git-head-runtime-evidence-write-boundary",
+      "resourceKey": "temporary-git-index-and-tree"
+    },
+    {
+      "caseId": "test_prf_git_commit_provenance_without_runtime_receipt_20261006",
+      "targetGroupId": "null",
+      "semanticKey": "git_commit_provenance_without_receipt",
+      "coversAcceptance": [
+        "ACC-3"
+      ],
+      "coversImpactEdges": [
+        "git-metadata-retains-task-and-actor-provenance"
+      ],
+      "expectedRedPredicate": "Removing the runtime receipt removes actor or task attribution from the actual commit metadata/trailers.",
+      "contributionResourceKey": "governed-commit-provenance",
+      "responsibility": "task-required",
+      "dependencyEdge": "commit-metadata-to-provenance",
+      "contractEdge": "governed-commit-provenance",
+      "resourceKey": "temporary-git-commit"
+    },
+    {
+      "caseId": "test_prf_git_head_legacy_read_compatibility_20261006",
+      "targetGroupId": "null",
+      "semanticKey": "git_head_legacy_read_compatibility",
+      "coversAcceptance": [
+        "ACC-4"
+      ],
+      "coversImpactEdges": [
+        "legacy-tracked-receipts-remain-readable"
+      ],
+      "expectedRedPredicate": "A previously written legacy tracked receipt can no longer be read where a compatibility consumer still requires it.",
+      "contributionResourceKey": "git-head-legacy-reader",
+      "responsibility": "task-required",
+      "dependencyEdge": "legacy-receipt-to-compatible-reader",
+      "contractEdge": "git-head-legacy-read-compatibility",
+      "resourceKey": "legacy-fixture-receipt"
+    },
+    {
+      "caseId": "test_prf_git_head_boundary_footprint_20261006",
+      "targetGroupId": "null",
+      "semanticKey": "git_head_boundary_footprint",
+      "coversAcceptance": [
+        "ACC-5"
+      ],
+      "coversImpactEdges": [
+        "new-runtime-git-head-evidence-is-not-committed"
+      ],
+      "expectedRedPredicate": "The evidence documentation or test catalog omits the runtime-only boundary, or tracked-history bytes are conflated with future-growth reduction.",
+      "contributionResourceKey": "git-head-evidence-boundary-report",
+      "responsibility": "task-required",
+      "dependencyEdge": "runtime-evidence-boundary-to-measurement",
+      "contractEdge": "git-head-runtime-evidence-write-boundary",
+      "resourceKey": "tracked-evidence-inventory"
+    }
+  ],
+  "requiredTestCaseIds": [
+    "test_prf_git_head_runtime_evidence_is_not_tracked_20261006",
+    "test_prf_git_commit_provenance_without_runtime_receipt_20261006",
+    "test_prf_git_head_legacy_read_compatibility_20261006",
+    "test_prf_git_head_boundary_footprint_20261006"
+  ],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies",
+      "atomizationImpact",
+      "testContributions",
+      "requiredTestCaseIds",
+      "advisoryTestCaseIds",
+      "phaseTestCaseIds"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-06T15-46-22-476Z-close-2026816e730c",
+  "lastTransitionAt": "2026-10-06T15:46:22.476Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-10-06T04:19:11.128Z",
+  "promotedAt": "2026-10-06T04:19:11.134Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-bcd3658586ef",
+    "claimedAt": "2026-10-06T04:19:11.139Z",
+    "heartbeatAt": "2026-10-06T15:46:22.473Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0129.json",
+      ".atm/history/evidence/git-head.json",
+      "docs/EVIDENCE_LEDGER.md",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-candidate-preparation.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+      "packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/input-state.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "scripts/test-catalog.config.json",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-head-runtime-only-receipt.test.ts",
+      "tests/cli/git-record-commit.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261006154512-codex-gpt-5.4-mini-a85c962a82",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261006154512-codex-gpt-5.4-mini-a85c962a82\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-06T04:19:11.139Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-3bde8f3557840a52",
+    "ticketDigest": "sha256:3bde8f3557840a52e7960f6de5c7ec41ad997f4a5450f7bef6e88db1ed255002",
+    "taskId": "TASK-PRF-0129",
+    "origin": "claim",
+    "actorId": "codex-gpt-5.4-mini",
+    "laneSessionId": "lane-20261006154512-codex-gpt-5.4-mini-a85c962a82",
+    "claimGeneration": "lease-bcd3658586ef",
+    "issuedAt": "2026-10-06T15:45:12.002Z",
+    "expiresAt": "2026-10-06T16:15:12.002Z",
+    "scopeDigest": "sha256:b3b02d30c0a7e3dc4fcc634c5773cfd5624f6c44ea8e227f5c58c99524081938",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-06T15:45:12.002Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0129.*",
+          ".atm/history/evidence/git-head.json",
+          ".atm/history/task-events/TASK-PRF-0129/**",
+          ".atm/history/tasks/TASK-PRF-0129.json",
+          "docs/EVIDENCE_LEDGER.md",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+          "packages/cli/src/commands/git-governance/implementation/commit-candidate-preparation.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+          "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+          "packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
+          "packages/cli/src/commands/git-governance/work-admission-check.ts",
+          "packages/cli/src/commands/git-head-evidence.ts",
+          "packages/cli/src/commands/git-index-ownership.ts",
+          "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+          "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+          "packages/cli/src/commands/hook/pre-commit/input-state.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+          "packages/core/src/broker/work-admission-ticket.ts",
+          "scripts/test-catalog.config.json",
+          "tests/cli/git-commit-task-scoped-staging.test.ts",
+          "tests/cli/git-head-runtime-only-receipt.test.ts",
+          "tests/cli/git-record-commit.test.ts"
+        ],
+        "digest": "sha256:dcd2028a0d838db36f89b40ae6b22bfa8fb963e5869716b73be184fedd567ca8"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20261006041911-codex-gpt-5.4-mini-TASK-PRF-0129-730e39b26c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0129",
+    "batchId": null,
+    "scopeKey": "tasks-400645b35c19",
+    "queueId": "queue-53c57770bfe0947d",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-PRF-0129.*",
+      ".atm/history/task-events/TASK-PRF-0129/**",
+      ".atm/history/tasks/TASK-PRF-0129.json",
+      "docs/EVIDENCE_LEDGER.md",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "packages/cli/src/commands/git-governance/implementation/commit-candidate-preparation.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-index-transaction.ts",
+      "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
+      "packages/cli/src/commands/git-governance/implementation/record-bundle-inspection.ts",
+      "packages/cli/src/commands/git-governance/work-admission-check.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/git-index-ownership.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "packages/cli/src/commands/hook/pre-commit/input-state.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/work-admission-ticket.ts",
+      "scripts/test-catalog.config.json",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-head-runtime-only-receipt.test.ts",
+      "tests/cli/git-record-commit.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "34702f20c3441f32c7ccfbd9eb53965f0726fd3418cad5ea2afdde5f48e108c5",
+    "actorId": "codex-gpt-5.4-mini",
+    "sessionId": "session-20261006041911-codex-gpt-5.4-mini-TASK-PRF-0129-730e39b26c",
+    "laneSession": {
+      "laneSessionId": "lane-20261006041911-codex-gpt-5.4-mini-dd8e6875d4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261006041911-codex-gpt-5.4-mini-dd8e6875d4\""
+    },
+    "createdAt": "2026-10-06T04:19:17.583Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-06T15:46:22.473Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20261006041911-codex-gpt-5.4-mini-TASK-PRF-0129-730e39b26c",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0129.closure-packet.json"
+}
