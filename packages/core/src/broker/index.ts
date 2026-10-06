@@ -44,3 +44,4 @@ export * from './semantic-contract.ts';
 export * from './semantic-adjudication/index.ts';
 export * from './transactional-composer.ts';
 export * from './test-case-contribution.ts';
+export * from './derived-atoms.ts';

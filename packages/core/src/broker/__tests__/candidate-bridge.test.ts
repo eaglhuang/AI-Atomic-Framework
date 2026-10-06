@@ -130,7 +130,14 @@ function testDeterministicAtomCid() {
   assert.notEqual(first, differentSymbol);
 
   const differentMethod = computeCandidateAtomCid(makeCandidate({ detectionMethod: 'ast' }));
-  assert.notEqual(first, differentMethod);
+  assert.equal(first, differentMethod, 'upgrading the detector must not change atom identity');
+
+  const differentKind = computeCandidateAtomCid(makeCandidate({ kind: 'class' }));
+  assert.notEqual(first, differentKind);
+  const differentOrdinal = computeCandidateAtomCid(makeCandidate({ ordinal: 1 }));
+  assert.notEqual(first, differentOrdinal);
+  const differentPath = computeCandidateAtomCid(makeCandidate({ filePath: 'src/other.ts', suggestedSourcePaths: undefined }));
+  assert.notEqual(first, differentPath);
 
   const reorderedPaths = computeCandidateAtomCid(makeCandidate({
     suggestedSourcePaths: ['src/z.ts', 'src/a.ts']
@@ -147,16 +154,13 @@ function testDeterministicAtomCid() {
 
 function testLineBoundedAtomCid() {
   const first = computeCandidateAtomCid(makeCandidate());
-  const diffStartLine = computeCandidateAtomCid(makeCandidate({ lineStart: 10 }));
-  const diffEndLine = computeCandidateAtomCid(makeCandidate({ lineEnd: 20 }));
-  const bothLines = computeCandidateAtomCid(makeCandidate({ lineStart: 3, lineEnd: 7 }));
+  const shifted = computeCandidateAtomCid(makeCandidate({ lineStart: 10, lineEnd: 16 }));
+  const grown = computeCandidateAtomCid(makeCandidate({ lineEnd: 20 }));
 
-  assert.notEqual(first, diffStartLine);
-  assert.notEqual(first, diffEndLine);
-  assert.notEqual(diffStartLine, bothLines);
-  assert.notEqual(diffEndLine, bothLines);
+  assert.equal(first, shifted, 'inserting lines above an atom must not change its CID (cid.v2)');
+  assert.equal(first, grown, 'editing the body must not change its CID (cid.v2)');
   assert.ok(first.length === 64);
-  console.log('ok: line-bounded candidates generate distinct deterministic CIDs');
+  console.log('ok: cid.v2 identity is independent of line numbers');
 }
 
 function testParallelSafeScenario() {
