@@ -4,7 +4,7 @@ import { inspectIntegrationBootstrap } from '../integration.ts';
 import { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
 import { makeResult, message } from '../shared.ts';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, selectQuickfixChannel } from './channel-strategy.ts';
-import { buildNonPlaybookRouteHints, resolveQuickfixScope } from './route-resolution.ts';
+import { buildNonPlaybookRouteHints, buildPromptSuggestedRoutes, resolveQuickfixScope } from './route-resolution.ts';
 import { isJournalingPrompt, type TaskIntent } from './intent-normalizers.ts';
 import { isQuickfixPrompt } from '../work-channels.ts';
 import { type ImportedTaskQueue, isFrameworkMaintenancePrompt } from './route-predicates.ts';
@@ -186,22 +186,7 @@ function buildGeneralPromptGuidanceResult(
 ) {
   const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
   const guideCommand = `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`;
-  // A first request in a new repository is rarely task-scoped. Name the one
-  // claimable shortcut (the fast quickfix channel, which needs a path-like
-  // scope) next to guidance, so an agent is not sent through
-  // guide -> orient -> start before it can claim anything.
-  const suggestedRoutes = [
-    {
-      when: 'small change where you can name the files to edit (replace <path>)',
-      channel: 'fast',
-      command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt} in <path>`)} --json`
-    },
-    {
-      when: 'larger or unclear work',
-      channel: null,
-      command: guideCommand
-    }
-  ];
+  const suggestedRoutes = buildPromptSuggestedRoutes(prompt, commandPrefix);
   const nextAction: NextActionLike = {
     status: 'prompt-guidance-required',
     command: guideCommand,
