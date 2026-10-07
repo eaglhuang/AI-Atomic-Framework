@@ -12,6 +12,7 @@ import { pathMatchesWriteScope } from '../../../core/src/broker/write-scope-poli
 import { evaluateTaskWorkAdmissionGate, evaluateWorkAdmissionGate, readWorkAdmissionTicket, resolveWorkAdmissionTicket } from './git-governance/work-admission-check.ts';
 import { makeResult, message } from './shared.ts';
 import { confirmDerivedAtoms, recordConfirmedDerivedAtoms } from './shared/derived-atom-occupancy.ts';
+import { requireGitRepository } from './shared/git-base-remediation.ts';
 import {
   captureGitHeadEvidencePreparation,
   evaluateGitGovernanceCheck,
@@ -49,6 +50,9 @@ export async function runAtmGit(argv: string[]) {
   const action = argv.find((entry) => entry === 'commit' || entry === 'push' || entry === 'attest') ?? '';
   if (action === 'attest') {
     return recordHistoricalWorkAdmissionAttestation(argv);
+  }
+  if (action === 'commit' || action === 'push') {
+    requireGitRepository(readOption(argv, '--cwd') ?? process.cwd(), `git ${action}`);
   }
   const taskId = readOption(argv, '--task');
   if (!taskId || (action !== 'commit' && action !== 'push')) {

@@ -14,6 +14,7 @@ import type { inspectIntegrationBootstrap } from '../integration.ts';
 import type { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
 import type { NextActionLike } from './next-action-assembly.ts';
 import { editDistance } from '../shared/usage-error-hints.ts';
+import { requireGitRepository } from '../shared/git-base-remediation.ts';
 
 export function tryBuildQuickfixClaimResult(input: {
   readonly cwd: string;
@@ -33,6 +34,8 @@ export function tryBuildQuickfixClaimResult(input: {
     if (!resolvedActor) {
       throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
     }
+    // A quickfix ends in a governed commit; refuse before taking the lock.
+    requireGitRepository(input.cwd, 'next --claim');
     const quickfixLock = writeQuickfixLock({
       cwd: input.cwd,
       actorId: resolvedActor.actorId,
