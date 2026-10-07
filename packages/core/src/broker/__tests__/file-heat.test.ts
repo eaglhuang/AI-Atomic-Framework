@@ -7,11 +7,15 @@ import {
   coolTemperature,
   createEmptyFileHeatLedger,
   decideHotPath,
+  EXPERIENCE_CANDIDATE_STREAK,
   heatBumpForGap,
+  listHottestFiles,
   loadFileHeatLedger,
   readLearnedTemperature,
   recordFileTouch,
+  resetFileHeat,
   resolveEffectiveTemperature,
+  resolveFileHeatFrozen,
   resolveFileHeatMode,
   saveFileHeatLedger,
   type FileHeatLedger
@@ -22,9 +26,9 @@ const T0 = Date.parse('2026-10-07T00:00:00.000Z');
 const at = (offsetMs: number) => new Date(T0 + offsetMs);
 const FILE = 'packages/core/src/cold-file.ts';
 
-function touches(sequence: readonly { readonly actorId: string; readonly atMs: number }[]): FileHeatLedger {
+function touches(sequence: readonly { readonly actorId: string; readonly atMs: number; readonly taskId?: string }[]): FileHeatLedger {
   return sequence.reduce(
-    (ledger, touch) => recordFileTouch(ledger, { path: FILE, actorId: touch.actorId, now: at(touch.atMs) }),
+    (ledger, touch) => recordFileTouch(ledger, { path: FILE, actorId: touch.actorId, taskId: touch.taskId, now: at(touch.atMs) }),
     createEmptyFileHeatLedger()
   );
 }
@@ -57,7 +61,18 @@ function testSameActorRapidEditsDoNotHeat() {
   assert.equal(ledger.entries[FILE]?.temperature, 0);
   const receipt = buildFileHeatReceipt({ mode: 'hybrid', ledger, taskId: 'TASK-X', paths: [FILE], now: at(1_500) });
   assert.equal(receipt.files[0]?.hot, false);
-  console.log('ok: same-actor rapid edits stay cold');
+  // One task re-evaluated under another actor label (planner, then coordinator) is not contention.
+  const sameTask = touches([
+    { actorId: 'team-planner', taskId: 'TASK-1', atMs: 0 },
+    { actorId: 'coordinator-1', taskId: 'TASK-1', atMs: 500 }
+  ]);
+  assert.equal(sameTask.entries[FILE]?.temperature, 0);
+  const distinctTasks = touches([
+    { actorId: 'team-planner', taskId: 'TASK-1', atMs: 0 },
+    { actorId: 'coordinator-1', taskId: 'TASK-2', atMs: 500 }
+  ]);
+  assert.equal(distinctTasks.entries[FILE]?.temperature, 100);
+  console.log('ok: same-actor rapid edits and same-task re-evaluation stay cold');
 }
 
 function testCoolDownIsSlowerThanHeatUp() {
@@ -76,10 +91,10 @@ function testCoolDownIsSlowerThanHeatUp() {
 }
 
 function testModes() {
-  assert.equal(resolveFileHeatMode(undefined), 'hybrid');
-  assert.equal(resolveFileHeatMode('STATIC'), 'static');
+  assert.equal(resolveFileHeatMode(undefined), 'static');
+  assert.equal(resolveFileHeatMode('HYBRID'), 'hybrid');
   assert.equal(resolveFileHeatMode('learned'), 'learned');
-  assert.equal(resolveFileHeatMode('bogus'), 'hybrid');
+  assert.equal(resolveFileHeatMode('bogus'), 'static');
 
   const contended = touches([{ actorId: 'a', atMs: 0 }, { actorId: 'b', atMs: 1_000 }]);
   const legacy = 'packages/cli/src/commands/broker.ts';
@@ -141,12 +156,16 @@ function testTeamLaneReceiptAndStaticParity() {
     readOnly
   });
 
-  // static: cold file never takes the hot path and the ledger is not written.
-  const staticResult = evaluate('TASK-S', 'a', 0, 'static');
+  // static: contention is observed, but routing keeps the basename behavior.
+  evaluate('TASK-S1', 's1', 0, 'static');
+  assert.equal(existsSync(fileHeatPath), true);
+  const staticResult = evaluate('TASK-S2', 's2', 1_000, 'static');
   assert.equal(staticResult.evidence.fileHeat?.mode, 'static');
   assert.equal(staticResult.evidence.fileHeat?.files[0]?.temperature, 0);
+  assert.equal(staticResult.evidence.fileHeat?.files[0]?.observedTemperature, 100);
+  assert.equal(staticResult.evidence.fileHeat?.files[0]?.hot, false);
   assert.equal(staticResult.evidence.admission.trigger, 'not-required');
-  assert.equal(existsSync(fileHeatPath), false);
+  rmSync(fileHeatPath, { force: true });
 
   // hybrid: two distinct actors one second apart heat the file to 100 → proposal-first.
   const first = evaluate('TASK-A', 'a', 0, 'hybrid');
@@ -166,6 +185,72 @@ function testTeamLaneReceiptAndStaticParity() {
   console.log('ok: team lane emits heat receipt; static mode keeps basename behavior');
 }
 
+function testSustainedHotFlagsExperienceCandidate() {
+  const sequence = [{ actorId: 'a', atMs: 0 }];
+  for (let index = 1; index <= EXPERIENCE_CANDIDATE_STREAK; index += 1) {
+    sequence.push({ actorId: index % 2 === 0 ? 'a' : 'b', atMs: index * 1_000 });
+  }
+  const ledger = touches(sequence);
+  assert.equal(ledger.entries[FILE]?.hotStreak, EXPERIENCE_CANDIDATE_STREAK);
+  const now = at(EXPERIENCE_CANDIDATE_STREAK * 1_000);
+  assert.equal(buildFileHeatReceipt({ mode: 'hybrid', ledger, taskId: 'T', paths: [FILE], now }).files[0]?.experienceCandidate, true);
+  // The candidate is a review nudge, not routing, so it is reported in static mode too.
+  assert.equal(buildFileHeatReceipt({ mode: 'static', ledger, taskId: 'T', paths: [FILE], now }).files[0]?.experienceCandidate, true);
+  // One cold same-actor touch after a long idle breaks the streak.
+  const cooled = recordFileTouch(ledger, { path: FILE, actorId: 'a', now: at(10 * 60 * 60_000) });
+  assert.equal(cooled.entries[FILE]?.hotStreak, 0);
+  console.log('ok: sustained heat flags an experience-loop candidate');
+}
+
+function testStatusAndReset() {
+  const other = 'packages/core/src/other.ts';
+  let ledger = touches([{ actorId: 'a', atMs: 0 }, { actorId: 'b', atMs: 4_000 }]);
+  ledger = recordFileTouch(ledger, { path: other, actorId: 'a', now: at(0) });
+  ledger = recordFileTouch(ledger, { path: other, actorId: 'b', now: at(1_000) });
+  const status = listHottestFiles(ledger, at(4_000));
+  assert.deepEqual(status.map((entry) => [entry.path, entry.temperature]), [[other, 100], [FILE, 20]]);
+  assert.equal(listHottestFiles(ledger, at(4_000), 1).length, 1);
+
+  const partial = resetFileHeat(ledger, [other]);
+  assert.deepEqual(partial.removed, [other]);
+  assert.deepEqual(Object.keys(partial.ledger.entries), [FILE]);
+  const all = resetFileHeat(ledger);
+  assert.deepEqual(all.removed, [FILE, other].sort());
+  assert.deepEqual(all.ledger.entries, {});
+  console.log('ok: status lists hottest first and reset drops learned heat');
+}
+
+function testFrozenLedgerIsReplayStable() {
+  assert.equal(resolveFileHeatFrozen('1'), true);
+  assert.equal(resolveFileHeatFrozen(undefined), false);
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-file-heat-frozen-'));
+  const fileHeatPath = path.join(tempDir, 'file-heat.json');
+  const registryPath = path.join(tempDir, 'write-broker.registry.json');
+  saveFileHeatLedger(fileHeatPath, touches([{ actorId: 'a', atMs: 0 }, { actorId: 'b', atMs: 4_000 }]));
+  const frozenLedger = loadFileHeatLedger(fileHeatPath);
+  const replay = () => evaluateTeamBrokerLane({
+    cwd: tempDir,
+    taskId: 'TASK-REPLAY',
+    actorId: 'c',
+    task: { workItemId: 'TASK-REPLAY', title: 'replay' },
+    writePaths: [FILE],
+    registryPath,
+    fileHeatPath,
+    fileHeatMode: 'hybrid',
+    fileHeatFrozen: true,
+    now: at(5_000)
+  }).evidence.fileHeat;
+  const first = replay();
+  assert.equal(first?.frozen, true);
+  assert.equal(first?.files[0]?.temperature, 20);
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    assert.deepEqual(replay(), first);
+  }
+  assert.deepEqual(loadFileHeatLedger(fileHeatPath), frozenLedger);
+  rmSync(tempDir, { recursive: true, force: true });
+  console.log('ok: frozen ledger replays identically and is never written');
+}
+
 testGapTableBumpsAndClamp();
 testSameActorRapidEditsDoNotHeat();
 testCoolDownIsSlowerThanHeatUp();
@@ -173,4 +258,7 @@ testModes();
 testStableBernoulli();
 testLedgerRoundTripAndCorruptFallback();
 testTeamLaneReceiptAndStaticParity();
+testSustainedHotFlagsExperienceCandidate();
+testStatusAndReset();
+testFrozenLedgerIsReplayStable();
 console.log('file heat tests: ok');

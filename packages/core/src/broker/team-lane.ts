@@ -7,6 +7,7 @@ import {
   LEGACY_HOT_FILE_BASENAMES,
   loadFileHeatLedger,
   recordFileTouch,
+  resolveFileHeatFrozen,
   resolveFileHeatMode,
   saveFileHeatLedger,
   type FileHeatMode,
@@ -324,6 +325,8 @@ export function evaluateTeamBrokerLane(input: {
   readonly readOnly?: boolean;
   readonly fileHeatPath?: string;
   readonly fileHeatMode?: FileHeatMode;
+  /** Read the heat ledger without recording touches (ATM_HEAT_FREEZE=1), for replay-stable runs. */
+  readonly fileHeatFrozen?: boolean;
   readonly now?: Date;
 }): TeamBrokerLaneResult {
   const registryPath = input.registryPath ?? path.join(path.resolve(input.cwd), DEFAULT_BROKER_REGISTRY_RELATIVE_PATH);
@@ -382,7 +385,7 @@ function normalizeTeamTargetFiles(writePaths: readonly string[]): string[] {
     .sort((left, right) => left.localeCompare(right));
 }
 
-/** Records this intent's touches (unless read-only or static) and returns the heat receipt used for admission. */
+/** Records this intent's touches (unless read-only or frozen) and returns the heat receipt used for admission. */
 function evaluateTeamFileHeat(input: {
   readonly cwd: string;
   readonly taskId: string;
@@ -391,22 +394,24 @@ function evaluateTeamFileHeat(input: {
   readonly readOnly?: boolean;
   readonly fileHeatPath?: string;
   readonly fileHeatMode?: FileHeatMode;
+  readonly fileHeatFrozen?: boolean;
   readonly now?: Date;
 }): FileHeatReceipt {
   const mode = input.fileHeatMode ?? resolveFileHeatMode();
+  const frozen = input.fileHeatFrozen ?? resolveFileHeatFrozen();
   const now = input.now ?? new Date();
   const ledgerPath = input.fileHeatPath ?? path.join(path.resolve(input.cwd), DEFAULT_FILE_HEAT_RELATIVE_PATH);
   const targetFiles = normalizeTeamTargetFiles(input.writePaths);
   let ledger = loadFileHeatLedger(ledgerPath);
-  if (mode !== 'static') {
+  if (!frozen) {
     for (const filePath of targetFiles) {
-      ledger = recordFileTouch(ledger, { path: filePath, actorId: input.actorId, now });
+      ledger = recordFileTouch(ledger, { path: filePath, actorId: input.actorId, taskId: input.taskId, now });
     }
     if (input.readOnly !== true && targetFiles.length > 0) {
       saveFileHeatLedger(ledgerPath, ledger);
     }
   }
-  return buildFileHeatReceipt({ mode, ledger, taskId: input.taskId, paths: targetFiles, now });
+  return buildFileHeatReceipt({ mode, ledger, taskId: input.taskId, paths: targetFiles, now, frozen });
 }
 
 export function buildTeamBrokerEvidence(result: TeamBrokerLaneResult): TeamBrokerLaneEvidence {
