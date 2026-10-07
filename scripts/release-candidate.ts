@@ -140,6 +140,14 @@ function main() {
     const tags = JSON.parse(runNpm(['view', artifact.name, 'dist-tags', '--json'])) as Tags;
     if (tags[candidateTag] !== artifact.version) throw new Error(`Candidate tag mismatch: ${artifact.name}`);
   };
+  // npm serves dist-tag reads through a CDN that lags writes, so a read right
+  // after our own add/rm can still show the old value. Every tag write waits,
+  // bounded, until it is visible; later read-after-write checks then hold.
+  const readTags = (name: string) => JSON.parse(runNpm(['view', name, 'dist-tags', '--json'])) as Tags;
+  const awaitTag = (name: string, tag: string, expected: string | undefined) => {
+    const deadline = Date.now() + 3 * 60_000;
+    while (readTags(name)[tag] !== expected && Date.now() < deadline) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5_000);
+  };
   const attemptPath = path.join(proofDirectory, `promotion-attempt-${randomUUID()}.jsonl`);
   const io: CandidateIO = {
     preflight: candidateTag => {
@@ -152,6 +160,14 @@ function main() {
       const probeJournal = path.join(proofDirectory, `preflight-attempt-${randomUUID()}.jsonl`);
       const probeRecord = (event: Record<string, unknown>) => writeFileSync(probeJournal, `${JSON.stringify(event)}\n`, { flag: 'a' });
       const probeTag = `preflight-${candidateTag}-${randomUUID().slice(0, 8)}`;
+      // Releases are serialized by the workflow concurrency group, so any
+      // probe tag already present was left behind by an earlier failed run.
+      for (const artifact of manifest.artifacts) {
+        for (const stale of Object.keys(io.tags(artifact.name)).filter(tag => tag.startsWith('preflight-candidate-'))) {
+          io.removeTag(artifact.name, stale);
+          probeRecord({ status: 'removed-stale', package: artifact.name, tag: stale });
+        }
+      }
       for (const artifact of manifest.artifacts) {
         const tags = io.tags(artifact.name);
         const version = tags.latest ?? Object.values(tags)[0];
@@ -169,7 +185,7 @@ function main() {
         }
       }
     },
-    tags: name => JSON.parse(runNpm(['view', name, 'dist-tags', '--json'])) as Tags,
+    tags: readTags,
     publish: (artifact, candidateTag) => {
       verifyLocal();
       const existing = spawnSync(npm, ['view', `${artifact.name}@${artifact.version}`, '--json', '--registry', PUBLIC_REGISTRY, '--prefer-online'], { encoding: 'utf8', shell: process.platform === 'win32' });
@@ -202,8 +218,8 @@ function main() {
       run('bash', ['scripts/validate-public-starter.sh', manifest.version, value('--target-tag'), manifestPath]);
       verifyLocal();
     },
-    setTag: (name, version, tag) => { runNpm(['dist-tag', 'add', `${name}@${version}`, tag]); },
-    removeTag: (name, tag) => { runNpm(['dist-tag', 'rm', name, tag]); },
+    setTag: (name, version, tag) => { runNpm(['dist-tag', 'add', `${name}@${version}`, tag]); awaitTag(name, tag, version); },
+    removeTag: (name, tag) => { runNpm(['dist-tag', 'rm', name, tag]); awaitTag(name, tag, undefined); },
     record: receipt => {
       // Append-only attempt journals preserve original previous tags across a
       // crash and retry; promotion.json is only a convenient latest summary.
