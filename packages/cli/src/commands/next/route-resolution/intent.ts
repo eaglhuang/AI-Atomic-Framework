@@ -17,7 +17,6 @@ import { buildPromptScopedQueueClaimCommand } from '../prompt-scope-resolution.t
 import { readConfiguredPlanningRoots, shouldReportPlanningRootMissing } from '../../planning-repo-root.ts';
 import { resolveCandidatePlanningRoots } from '../planning-root-preference.ts';
 import { bootstrapTaskId } from '../../governance-runtime.ts';
-import { isQuickfixPrompt } from '../../work-channels.ts';
 import { CliError, parseJsonText, quoteCliValue } from '../../shared.ts';
 import {
   abandonTaskQueue,
@@ -32,6 +31,7 @@ import {
 import {
   extractPathLikeStringsFromPrompt,
   isPathAllowedByScope,
+  isQuickfixPrompt,
   listActiveBatchRuns,
   readActiveBatchRun,
   repairBatchRunFromQueue
@@ -258,6 +258,50 @@ export function extractPromptFileTokens(prompt: string): readonly string[] {
       if (!extension || entry.length <= extension.length + 1) return false;
       return /[\\/]/.test(entry) || PROMPT_FILE_EXTENSIONS.has(extension);
     }));
+}
+
+/**
+ * A first request in a new repository is rarely task-scoped. Name the one
+ * claimable shortcut (the fast quickfix channel, which needs a path-like
+ * scope) next to guidance, so an agent is not sent through
+ * guide -> orient -> start before it can claim anything. Files the prompt
+ * already names are used as that scope instead of a <path> placeholder.
+ */
+export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node atm.mjs') {
+  const files = extractPromptFileTokens(prompt);
+  return [
+    files.length > 0
+      ? {
+        when: `small change limited to ${files.join(', ')}`,
+        channel: 'fast',
+        command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt}`)} --json`
+      }
+      : {
+        when: 'small change where you can name the files to edit (replace <path>)',
+        channel: 'fast',
+        command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt} in <path>`)} --json`
+      },
+    {
+      when: 'larger or unclear work',
+      channel: null,
+      command: `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`
+    }
+  ];
+}
+
+/**
+ * Rerunning the same prompt cannot find a task that does not exist. A file
+ * named in an ordinary request ("fix the typo in README.md") is not a task
+ * card, so a scope miss offers the same claimable routes as an unscoped prompt.
+ */
+export function buildTaskScopeNotFoundRoute(prompt: string | null | undefined, planningRootMissing: { readonly detail: string; readonly requiredCommand: string } | null) {
+  if (planningRootMissing) return { command: planningRootMissing.requiredCommand, reason: planningRootMissing.detail };
+  const suggestedRoutes = buildPromptSuggestedRoutes(prompt?.trim() || '<current user prompt>');
+  return {
+    command: suggestedRoutes[1].command,
+    reason: 'the prompt mentions task scope, but no matching ATM task card or ledger task was found; if this is ordinary work rather than an ATM task card, use suggestedRoutes',
+    suggestedRoutes
+  };
 }
 
 export function extractPromptPathHints(prompt: string): readonly string[] {

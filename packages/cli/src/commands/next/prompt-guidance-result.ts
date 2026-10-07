@@ -4,9 +4,8 @@ import { inspectIntegrationBootstrap } from '../integration.ts';
 import { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
 import { makeResult, message } from '../shared.ts';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, selectQuickfixChannel } from './channel-strategy.ts';
-import { buildNonPlaybookRouteHints, resolveQuickfixScope } from './route-resolution.ts';
+import { buildNonPlaybookRouteHints, buildPromptSuggestedRoutes, resolveQuickfixScope } from './route-resolution.ts';
 import { isJournalingPrompt, type TaskIntent } from './intent-normalizers.ts';
-import { extractPromptFileTokens } from './route-resolution/intent.ts';
 import { isQuickfixPrompt } from '../work-channels.ts';
 import { type ImportedTaskQueue, isFrameworkMaintenancePrompt } from './route-predicates.ts';
 import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages } from './playbook-projection.ts';
@@ -179,35 +178,6 @@ function buildJournalingPromptResult(
       runtimeAdapterReadiness: input.runtimeAdapterReadiness
     }
   });
-}
-
-/**
- * A first request in a new repository is rarely task-scoped. Name the one
- * claimable shortcut (the fast quickfix channel, which needs a path-like
- * scope) next to guidance, so an agent is not sent through
- * guide -> orient -> start before it can claim anything. Files the prompt
- * already names are used as that scope instead of a <path> placeholder.
- */
-export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node atm.mjs') {
-  const files = extractPromptFileTokens(prompt);
-  return [
-    files.length > 0
-      ? {
-        when: `small change limited to ${files.join(', ')}`,
-        channel: 'fast',
-        command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt}`)} --json`
-      }
-      : {
-        when: 'small change where you can name the files to edit (replace <path>)',
-        channel: 'fast',
-        command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt} in <path>`)} --json`
-      },
-    {
-      when: 'larger or unclear work',
-      channel: null,
-      command: `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`
-    }
-  ];
 }
 
 function buildGeneralPromptGuidanceResult(
