@@ -1,6 +1,17 @@
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { calculateBrokerDecision } from './decision.ts';
+import {
+  buildFileHeatReceipt,
+  DEFAULT_FILE_HEAT_RELATIVE_PATH,
+  LEGACY_HOT_FILE_BASENAMES,
+  loadFileHeatLedger,
+  recordFileTouch,
+  resolveFileHeatMode,
+  saveFileHeatLedger,
+  type FileHeatMode,
+  type FileHeatReceipt
+} from './file-heat.ts';
 import { buildVirtualAtomInUseRegistry, cleanupStale, loadRegistry, type VirtualAtomInUseRegistryDocument } from './registry.ts';
 import { readGitHeadCommit } from './steward.ts';
 import {
@@ -33,7 +44,6 @@ import type {
 
 export const DEFAULT_TEAM_STEWARD_ID = 'neutral-write-steward';
 export const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = '.atm/runtime/write-broker.registry.json';
-const HOT_FILE_BASENAMES = new Set(['tasks.ts', 'next.ts', 'evidence.ts', 'hook.ts', 'team.ts', 'broker.ts']);
 
 export type TeamBrokerChosenLane =
   | 'direct-brokered'
@@ -59,6 +69,7 @@ export interface TeamBrokerLaneEvidence {
   readonly safeToStart: boolean;
   readonly blockedReasons: readonly string[];
   readonly rearbitration?: TeamBrokerRearbitrationSnapshot;
+  readonly fileHeat?: FileHeatReceipt;
 }
 
 export interface TeamBrokerLaneResult {
@@ -205,12 +216,16 @@ export function buildTeamWriteIntent(input: {
   readonly actorId: string;
   readonly task: unknown;
   readonly writePaths: readonly string[];
+  /** When supplied, hot files follow the heat receipt instead of the static basename set. */
+  readonly fileHeat?: FileHeatReceipt;
 }): WriteIntent {
   const task = input.task as Record<string, unknown> | null;
   const baseCommit = readGitHeadCommit(path.resolve(input.cwd)) ?? 'unknown-base-commit';
-  const targetFiles = [...new Set(input.writePaths.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
-    .sort((left, right) => left.localeCompare(right));
-  const hotFiles = targetFiles.filter((entry) => HOT_FILE_BASENAMES.has(path.posix.basename(entry)));
+  const targetFiles = normalizeTeamTargetFiles(input.writePaths);
+  const heatHotPaths = input.fileHeat ? new Set(input.fileHeat.files.filter((entry) => entry.hot).map((entry) => entry.path)) : null;
+  const hotFiles = targetFiles.filter((entry) => heatHotPaths
+    ? heatHotPaths.has(entry)
+    : LEGACY_HOT_FILE_BASENAMES.has(path.posix.basename(entry)));
   const proposalAdmission = deriveTeamProposalAdmission(task, hotFiles);
 
   return {
@@ -307,9 +322,13 @@ export function evaluateTeamBrokerLane(input: {
   readonly registryPath?: string;
   /** When true, never persist broker-registry cleanup during evaluation (team plan --read-only). */
   readonly readOnly?: boolean;
+  readonly fileHeatPath?: string;
+  readonly fileHeatMode?: FileHeatMode;
+  readonly now?: Date;
 }): TeamBrokerLaneResult {
   const registryPath = input.registryPath ?? path.join(path.resolve(input.cwd), DEFAULT_BROKER_REGISTRY_RELATIVE_PATH);
-  const writeIntent = buildTeamWriteIntent(input);
+  const fileHeat = evaluateTeamFileHeat(input);
+  const writeIntent = buildTeamWriteIntent({ ...input, fileHeat });
   const registry = cleanupStale(loadRegistry(registryPath, { persistCleanup: input.readOnly !== true }));
   const virtualAtomInUseRegistry = buildVirtualAtomInUseRegistry(registry);
   const decision = calculateBrokerDecision(writeIntent, registry);
@@ -348,13 +367,46 @@ export function evaluateTeamBrokerLane(input: {
     stewardId: resolution.stewardId,
     composerPath: resolution.composerPath,
     safeToStart: resolution.safeToStart,
-    blockedReasons: resolution.blockedReasons
+    blockedReasons: resolution.blockedReasons,
+    fileHeat
   };
 
   return {
     ok: resolution.safeToStart,
     evidence
   };
+}
+
+function normalizeTeamTargetFiles(writePaths: readonly string[]): string[] {
+  return [...new Set(writePaths.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+}
+
+/** Records this intent's touches (unless read-only or static) and returns the heat receipt used for admission. */
+function evaluateTeamFileHeat(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly writePaths: readonly string[];
+  readonly readOnly?: boolean;
+  readonly fileHeatPath?: string;
+  readonly fileHeatMode?: FileHeatMode;
+  readonly now?: Date;
+}): FileHeatReceipt {
+  const mode = input.fileHeatMode ?? resolveFileHeatMode();
+  const now = input.now ?? new Date();
+  const ledgerPath = input.fileHeatPath ?? path.join(path.resolve(input.cwd), DEFAULT_FILE_HEAT_RELATIVE_PATH);
+  const targetFiles = normalizeTeamTargetFiles(input.writePaths);
+  let ledger = loadFileHeatLedger(ledgerPath);
+  if (mode !== 'static') {
+    for (const filePath of targetFiles) {
+      ledger = recordFileTouch(ledger, { path: filePath, actorId: input.actorId, now });
+    }
+    if (input.readOnly !== true && targetFiles.length > 0) {
+      saveFileHeatLedger(ledgerPath, ledger);
+    }
+  }
+  return buildFileHeatReceipt({ mode, ledger, taskId: input.taskId, paths: targetFiles, now });
 }
 
 export function buildTeamBrokerEvidence(result: TeamBrokerLaneResult): TeamBrokerLaneEvidence {
