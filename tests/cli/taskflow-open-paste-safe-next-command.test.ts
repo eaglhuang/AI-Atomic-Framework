@@ -11,7 +11,7 @@ import { getCommandSpec } from '../../packages/cli/src/commands/command-specs.ts
 import { parseArgsForCommand } from '../../packages/cli/src/commands/shared.ts';
 
 type Hint = { status: string; nextCommand: string | null; nextCommandShell?: string; missingPrerequisites: string[] };
-type OpenResult = { ok: boolean; writeEnabled: boolean; writeReadinessHint: Hint; evidence: { writeReadinessHint: Hint; hostPolicyDecision?: { taskId: string; outputPath: string } } };
+type OpenResult = { ok: boolean; writeEnabled: boolean; writeReadinessHint: Hint; messages: { code: string; data?: { requiredCommand?: string } }[]; evidence: { writeReadinessHint: Hint; nextAction?: { status: string; command: string }; hostPolicyDecision?: { taskId: string; outputPath: string } } };
 
 function fixture(t: TestContext, builtin = false) {
   const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-open-command-'));
@@ -208,4 +208,33 @@ test('a separately constructed trusted built-in write still preserves scope norm
   assert.equal(result.ok, true);
   const task = JSON.parse(readFileSync(path.join(cwd, '.atm/history/tasks/TASK-GOVERNED-0001.json'), 'utf8'));
   assert.deepEqual(task.scopePaths, ['hello.txt']);
+  const claimCommand = result.evidence.nextAction?.command;
+  assert.equal(result.evidence.nextAction?.status, 'task-opened');
+  assert.ok(claimCommand);
+  assert.match(claimCommand, /^node atm\.mjs next --claim /);
+  assert.match(claimCommand, /--task TASK-GOVERNED-0001 --json$/);
+  assert.equal(result.evidence.writeReadinessHint.nextCommand, claimCommand);
+  assert.equal(result.messages.find(message => message.code === 'ATM_TASKFLOW_OPEN_WRITE_ORCHESTRATED')?.data?.requiredCommand, claimCommand);
+  assert.equal(result.writeReadinessHint.nextCommandShell, undefined);
+  assert.equal(result.evidence.writeReadinessHint.nextCommandShell, undefined);
+});
+
+test('dry-run formatter suppression and shell metadata do not describe upstream post-open claim hints', async t => {
+  const { cwd, profilePath } = fixture(t, true); seedGit(cwd);
+  const args = ['--cwd', cwd, '--profile', profilePath, '--actor', 'newcomer',
+    '--scope-path', './hello.txt', '--validator', 'test -f hello.txt', '--title', 'API_TOKEN=synthetic-only'];
+  const preview = await open(['open', '--dry-run', ...args]);
+  assert.equal(preview.writeReadinessHint.nextCommand, null);
+  assert.equal(preview.writeReadinessHint.status, 'incomplete');
+  assert.equal(preview.writeReadinessHint.nextCommandShell, 'posix-sh');
+  // Construct trusted fixture argv separately; never execute a returned hint.
+  const written = await open(['open', '--write', ...args]);
+  assert.equal(written.ok, true);
+  assert.equal(written.evidence.nextAction?.status, 'task-opened');
+  assert.equal(written.evidence.writeReadinessHint.status, 'ready');
+  assert.deepEqual(written.evidence.writeReadinessHint.missingPrerequisites, []);
+  assert.equal(written.evidence.writeReadinessHint.nextCommand, written.evidence.nextAction?.command);
+  assert.equal(written.evidence.writeReadinessHint.nextCommandShell, undefined);
+  assert.equal(written.writeReadinessHint.nextCommandShell, undefined);
+  assert.equal(JSON.stringify(written.evidence.writeReadinessHint).includes('synthetic-only'), false);
 });
