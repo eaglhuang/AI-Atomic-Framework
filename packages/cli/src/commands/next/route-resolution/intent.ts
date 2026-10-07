@@ -17,6 +17,7 @@ import { buildPromptScopedQueueClaimCommand } from '../prompt-scope-resolution.t
 import { readConfiguredPlanningRoots, shouldReportPlanningRootMissing } from '../../planning-repo-root.ts';
 import { resolveCandidatePlanningRoots } from '../planning-root-preference.ts';
 import { bootstrapTaskId } from '../../governance-runtime.ts';
+import { isQuickfixPrompt } from '../../work-channels.ts';
 import { CliError, parseJsonText, quoteCliValue } from '../../shared.ts';
 import {
   abandonTaskQueue,
@@ -155,7 +156,10 @@ function readTaskIntentFile(cwd: string, intentPath: string): TaskIntent {
 export function createDeterministicTaskIntent(prompt: string, explicitTaskIds: readonly string[] = []): TaskIntent {
   const journalingPrompt = isJournalingPrompt(prompt);
   const mentionedTaskIds = journalingPrompt ? [] : uniqueSorted(extractTaskIdReferencesFromPrompt(prompt).flatMap((entry) => expandTaskIdReferenceAliases(entry)));
-  const mentionedPlanPaths = journalingPrompt ? [] : uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
+  // In a quick fix ("fix the typo in README.md") a Markdown file is the file
+  // to edit, not a plan document, unless the prompt also names a task card.
+  const quickfixFileEdit = isQuickfixPrompt(prompt) && !/任務卡|task\s*card|計畫書/i.test(prompt);
+  const mentionedPlanPaths = journalingPrompt || quickfixFileEdit ? [] : extractPromptFileTokens(prompt).filter((entry) => /\.md$/i.test(entry));
   const targetRepoHints = uniqueSorted([
     ...(/AI-Atomic-Framework|ATM\s*framework|ATM\s*\u6846\u67b6|ATM\u6846\u67b6|\u539f\u5b50\u6846\u67b6/i.test(prompt) ? ['AI-Atomic-Framework'] : [])
   ]);
@@ -230,6 +234,30 @@ export function matchesTaskContinuationVerb(prompt: string): boolean {
 
 export function detectRequestedTaskAction(prompt: string): RequestedTaskAction | null {
   return TASK_ACTION_LEXICON.find((entry) => entry.pattern.test(prompt))?.action ?? null;
+}
+
+// File extensions a prompt token must end with to count as a file reference
+// when it has no directory part ("README.md" yes, "item.price" no).
+const PROMPT_FILE_EXTENSIONS = new Set(['md', 'mdx', 'txt', 'json', 'jsonc', 'yml', 'yaml', 'toml', 'js', 'jsx', 'mjs', 'cjs', 'ts', 'tsx', 'mts', 'cts', 'py', 'cs', 'java', 'go', 'rs', 'rb', 'php', 'c', 'h', 'cpp', 'hpp', 'css', 'scss', 'html', 'vue', 'svelte', 'sh', 'ps1', 'sql', 'xml', 'csv']);
+
+/**
+ * Whitespace-delimited file references in a prompt, plus quoted paths that
+ * contain spaces. Unlike extractPromptPathHints, surrounding sentence words
+ * are never glued onto the path ("Fix the typo in README.md" -> README.md).
+ */
+export function extractPromptFileTokens(prompt: string): readonly string[] {
+  // A quote inside a word ("don't") does not open a quoted path.
+  const quotedPattern = /(?<![A-Za-z0-9])["'`]([^"'`\r\n]+)["'`](?![A-Za-z0-9])/g;
+  const quoted = [...prompt.matchAll(quotedPattern)].map((match) => match[1].trim());
+  const words = prompt.replace(quotedPattern, ' ').split(/[\s"'`,;，。、：；「」（）]+/);
+  return uniqueSorted([...quoted, ...words]
+    .map((entry) => entry.replace(/^[([{<]+|[)\]}>.:!?]+$/g, ''))
+    .filter((entry) => !/^[a-z][a-z0-9+.-]*:\/\//i.test(entry))
+    .filter((entry) => {
+      const extension = /\.([A-Za-z0-9]+)$/.exec(entry)?.[1]?.toLowerCase();
+      if (!extension || entry.length <= extension.length + 1) return false;
+      return /[\\/]/.test(entry) || PROMPT_FILE_EXTENSIONS.has(extension);
+    }));
 }
 
 export function extractPromptPathHints(prompt: string): readonly string[] {

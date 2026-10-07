@@ -14,6 +14,7 @@ import type { NextDecisionTrailEntry } from './match-and-sort.ts';
 import type { inspectIntegrationBootstrap } from '../integration.ts';
 import type { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
 import { quoteCliValue, toTaskCandidateView } from './view-projections.ts';
+import { buildPromptSuggestedRoutes } from './prompt-guidance-result.ts';
 import { makeResult, message } from '../shared.ts';
 import {
   buildActiveWorkSummary,
@@ -133,10 +134,15 @@ export function buildPromptScopedNextResult(input: {
         }
       });
     }
+    // Rerunning the same prompt cannot find a task that does not exist. A file
+    // named in an ordinary request ("fix the typo in README.md") is not a task
+    // card, so offer the same claimable routes as an unscoped prompt.
+    const suggestedRoutes = planningRootMissing ? undefined : buildPromptSuggestedRoutes(input.taskIntent?.userPrompt?.trim() || '<current user prompt>');
     const nextAction = {
       status: planningRootMissing ? 'planning-root-missing' : 'task-scope-not-found',
-      command: planningRootMissing?.requiredCommand ?? 'node atm.mjs next --prompt "<current user prompt>" --json',
-      reason: planningRootMissing?.detail ?? 'the prompt mentions task scope, but no matching ATM task card or ledger task was found',
+      command: planningRootMissing?.requiredCommand ?? suggestedRoutes?.[1]?.command ?? 'node atm.mjs next --prompt "<current user prompt>" --json',
+      reason: planningRootMissing?.detail ?? 'the prompt mentions task scope, but no matching ATM task card or ledger task was found; if this is ordinary work rather than an ATM task card, use suggestedRoutes',
+      suggestedRoutes,
       taskIntent: input.taskIntent,
       candidates: [],
       planningRootMissing,
