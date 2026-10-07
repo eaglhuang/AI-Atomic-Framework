@@ -25,6 +25,8 @@ try {
   const activeLane = '.atm/runtime/lane-sessions/lane-active-task.json';
   const freshDoneLane = '.atm/runtime/lane-sessions/lane-fresh-done-task.json';
   const malformedLane = '.atm/runtime/lane-sessions/lane-malformed.json';
+  const missingTaskLane = '.atm/runtime/lane-sessions/lane-missing-task.json';
+  const unreadableTaskLane = '.atm/runtime/lane-sessions/lane-unreadable-task.json';
   writeFileSync(path.join(taskHistory, 'TASK-LANE-DONE.json'), JSON.stringify({ taskId: 'TASK-LANE-DONE', status: 'done' }));
   writeFileSync(path.join(taskHistory, 'TASK-LANE-ACTIVE.json'), JSON.stringify({ taskId: 'TASK-LANE-ACTIVE', status: 'in-progress' }));
   const laneDocument = (laneId: string, taskId: string, status: 'active', expiresAt: string) => ({
@@ -39,6 +41,9 @@ try {
   writeFileSync(path.join(root, activeLane), JSON.stringify(laneDocument('lane-active-task', 'TASK-LANE-ACTIVE', 'active', '2999-01-01T00:00:00.000Z')));
   writeFileSync(path.join(root, freshDoneLane), JSON.stringify(laneDocument('lane-fresh-done-task', 'TASK-LANE-DONE', 'active', '2999-01-01T00:00:00.000Z')));
   writeFileSync(path.join(root, malformedLane), JSON.stringify({ ...laneDocument('lane-malformed', 'TASK-LANE-DONE', 'active', '2000-01-01T00:00:00.000Z'), status: 'unknown' }));
+  writeFileSync(path.join(root, missingTaskLane), JSON.stringify(laneDocument('lane-missing-task', 'TASK-MISSING', 'active', '2000-01-01T00:00:00.000Z')));
+  writeFileSync(path.join(root, unreadableTaskLane), JSON.stringify(laneDocument('lane-unreadable-task', 'TASK-UNREADABLE', 'active', '2000-01-01T00:00:00.000Z')));
+  writeFileSync(path.join(taskHistory, 'TASK-UNREADABLE.json'), '{invalid JSON');
 
   const gitHead = '.atm/history/evidence/git-head.jsonl';
   const gitHeadAbsolute = path.join(root, gitHead);
@@ -63,6 +68,10 @@ try {
   assert.equal(freshDoneLaneFinding.recommendedAction, 'keep-active-owner', 'a live lane remains active even when its prior task is terminal');
   const malformedLaneFinding = diagnose.evidence.report.entries.find((entry: any) => entry.path === malformedLane);
   assert.equal(malformedLaneFinding.recommendedAction, 'manual-review', 'malformed lane lifecycle data must fail closed');
+  for (const lanePath of [missingTaskLane, unreadableTaskLane]) {
+    const finding = diagnose.evidence.report.entries.find((entry: any) => entry.path === lanePath);
+    assert.equal(finding.recommendedAction, 'manual-review', 'unknown task status cannot prove that task-owned residue is disposable');
+  }
 
   const applied = runCleanup(['apply', '--cwd', root]) as any;
   assert.equal(applied.ok, true);
@@ -71,6 +80,8 @@ try {
   assert.equal(existsSync(path.join(root, activeLane)), true, 'cleanup apply must preserve active lane sessions');
   assert.equal(existsSync(path.join(root, freshDoneLane)), true, 'cleanup apply must preserve a live lane linked to a terminal prior task');
   assert.equal(existsSync(path.join(root, malformedLane)), true, 'cleanup apply must preserve malformed lane documents');
+  assert.equal(existsSync(path.join(root, missingTaskLane)), true, 'cleanup must preserve lane sessions whose task is missing');
+  assert.equal(existsSync(path.join(root, unreadableTaskLane)), true, 'cleanup must preserve lane sessions whose task cannot be read');
   assert.doesNotThrow(() => execFileSync('git', ['diff', '--quiet', '--', gitHead], { cwd: root, stdio: 'ignore' }),
     'cleanup apply must restore receipt-classified hook evidence to Git-clean state');
   assert.equal(applied.evidence.report.actions.some((entry: any) => entry.path === gitHead && entry.action === 'restore' && entry.applied === true), true,

@@ -45,10 +45,13 @@ export function analyzeLaneSessionResidue(
   const taskStatus = ownerTaskId ? readTaskStatus(ownerTaskId) : null;
   const activeTask = Boolean(taskStatus && !['abandoned', 'cancelled', 'canceled', 'closed', 'done', 'released'].includes(taskStatus.toLowerCase()));
   const ended = inspection.availability === 'released' || inspection.availability === 'expired';
-  const safeToRemove = ended && !activeTask;
+  const taskOwnershipResolved = !ownerTaskId || Boolean(taskStatus);
+  const safeToRemove = ended && taskOwnershipResolved && !activeTask;
   const reason = safeToRemove
     ? 'Lane session is released or TTL-expired without an active task owner; its runtime authority is disposable.'
-    : activeTask
+    : !taskOwnershipResolved
+      ? `Lane session task ${ownerTaskId} is missing or unreadable; preserve it for owner reconciliation.`
+      : activeTask
       ? `Lane session belongs to non-terminal task ${ownerTaskId}; preserve it for owner reconciliation.`
       : 'Lane session is still within its active lifetime; preserve it.';
   const ownerState: LaneResidueOwnerState = inspection.availability === 'available'
