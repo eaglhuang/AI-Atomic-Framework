@@ -361,6 +361,12 @@ export async function runTeamBrokeredWriteValidator() {
     ], tempRoot);
     check(registerHotFirst.exitCode === 0 && registerHotFirst.parsed.ok === true, `first hot writer register must succeed: ${JSON.stringify(registerHotFirst.parsed)}`);
     check((registerHotFirst.parsed.evidence as Record<string, unknown>)?.decision, 'broker register must report decision evidence for first hot writer');
+    check((registerHotFirst.parsed.evidence as Record<string, unknown>)?.writeAuthorized === false, 'proposal-only registration must not authorize writes');
+    check(((registerHotFirst.parsed.evidence as Record<string, unknown>)?.writeAuthorizedFiles as unknown[])?.length === 0,
+      'proposal-only registration must expose no authorized write files');
+    const metadataOnlyLane = evaluateTeamBrokerLane({ cwd: tempRoot, taskId: hotFirstTaskId, actorId: 'coordinator-1',
+      task: hotFirstTask, writePaths: [hotSharedFile] });
+    check(metadataOnlyLane.ok === false && metadataOnlyLane.evidence.safeToStart === false, 'registered metadata must still block team start');
 
     const brokerStatusAfterFirst = await runAtm(['broker', 'status'], tempRoot);
     check(brokerStatusAfterFirst.exitCode === 0 && brokerStatusAfterFirst.parsed.ok === true, 'broker status must succeed after first hot writer registers');
@@ -396,7 +402,9 @@ export async function runTeamBrokeredWriteValidator() {
       writePaths: [hotSharedFile]
     });
     check(hotOverlapLane.ok === false, 'overlapping second writer must be blocked before write');
-    check(hotOverlapLane.evidence.decision.verdict === 'blocked-active-lease', 'overlap conflict must block at active lease admission stage');
+    check(hotOverlapLane.evidence.decision.verdict === 'serial', 'ready hot overlap must wait through native serial admission');
+    check(hotOverlapLane.evidence.decision.queueReason === 'provisional-overlap', 'hot overlap must explain the native parking reason');
+    check(hotOverlapLane.evidence.decision.applyMethod === 'none', 'native parking cannot authorize an apply method');
     check(hotOverlapLane.evidence.admission.state === 'blocked-before-write', 'overlapping second writer must emit blocked-before-write state');
 
     const parkSeedIntent = buildTeamWriteIntent({
@@ -490,7 +498,9 @@ export async function runTeamBrokeredWriteValidator() {
       registryPath: sameOwnerRegistryPath
     });
     check(sameOwnerBlockLane.ok === false, 'same-owner overlapping bounded regions must fail closed');
-    check(sameOwnerBlockLane.evidence.decision.verdict === 'blocked-cid-conflict', 'same-owner overlapping bounded regions must remain blocked-cid-conflict');
+    check(sameOwnerBlockLane.evidence.decision.verdict === 'serial', 'ready same-owner overlap must queue without write permission');
+    check(sameOwnerBlockLane.evidence.decision.queueReason === 'hot-write-conflict', 'same-owner overlap must preserve its logical conflict reason');
+    check(sameOwnerBlockLane.evidence.decision.applyMethod === 'none', 'same-owner parking cannot authorize an apply method');
     check(sameOwnerBlockLane.evidence.admission.state === 'blocked-before-write', 'same-owner overlapping bounded regions must emit blocked-before-write state');
     check(Boolean(sameOwnerBlockLane.evidence.decision.decompositionRequest), 'same-owner overlapping bounded regions must emit a split suggestion');
     check(sameOwnerBlockLane.evidence.decision.decompositionRequest?.suggestionKind === 'coarse-owner-map-split', 'same-owner overlapping bounded regions must classify the suggestion as coarse-owner-map-split');

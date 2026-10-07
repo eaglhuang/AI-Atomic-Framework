@@ -20,6 +20,8 @@ export interface BrokerAdmissionRequest {
 }
 
 export interface BrokerAdmissionPolicy {
+  /** Lost-response replay observes an existing lease; it cannot create or renew one. */
+  readonly requireLiveRegistration?: boolean;
   readonly serialQueueResume?: SerialQueueResume;
   readonly preferProposalForBoundedWork?: boolean;
   readonly resolutionAuthorizedTaskIds?: ReadonlySet<string>;

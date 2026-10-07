@@ -39,7 +39,7 @@ const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
 
 export interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | 'parallel-admission' | 'replay' | 'post-compose-semantic-validation' | null;
+  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | 'parallel-admission' | 'replay' | 'heat-status' | 'heat-reset' | 'post-compose-semantic-validation' | null;
   readonly candidateFile: string | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;

@@ -1,6 +1,7 @@
 import type { WriteIntent } from '../types.ts';
 
 export type SerialQueueState = 'queued' | 'eligible' | 'granted' | 'released' | 'cancelled' | 'expired';
+export type SerialQueueReason = 'cold-write-conflict' | 'hot-write-conflict' | 'provisional-overlap' | 'fifo-predecessor';
 
 export interface SerialQueueTicket {
   readonly ticketId: string;
@@ -15,6 +16,9 @@ export interface SerialQueueTicket {
   readonly grantedAt: number | null;
   readonly expiresAt: number;
   readonly blockerIntentIds: readonly string[];
+  /** Additive: absent on legacy cold-only documents. */
+  readonly reason?: SerialQueueReason;
+  readonly blockerTaskIds?: readonly string[];
 }
 
 export interface SerialQueueEvent {
@@ -25,6 +29,8 @@ export interface SerialQueueEvent {
   readonly at: number;
   readonly waitMs: number;
   readonly blockerIntentIds: readonly string[];
+  readonly reason?: SerialQueueReason;
+  readonly blockerTaskIds?: readonly string[];
 }
 
 export interface SerialQueueDocument {
@@ -42,6 +48,8 @@ export interface SerialQueueObservation {
   readonly position: number;
   readonly waitMs: number;
   readonly blockerIntentIds: readonly string[];
+  readonly reason: SerialQueueReason;
+  readonly blockerTaskIds: readonly string[];
   readonly expiresAt: number;
   readonly authorityDigest: string;
   readonly writeAuthorized: false;

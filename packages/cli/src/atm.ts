@@ -81,6 +81,7 @@ import { runHealthReport } from './commands/health-report.ts';
 import { runTaskflow } from './commands/taskflow.ts';
 import { runTaskView } from './commands/task-view.ts';
 import { runWriteTicket } from './commands/write-ticket.ts';
+import { applyProjectRootRedirect } from './commands/shared/project-root.ts';
 
 type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandResult | object;
 export const cliCommandRunners: Record<string, CliRunner> = {
@@ -157,6 +158,7 @@ export const cliCommandRunners: Record<string, CliRunner> = {
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
   argv = applyLaneSessionFlagFromArgv(argv);
   applyOutputProjectionFlagsFromArgv(argv);
+  applyProjectRootRedirect(argv);
   const [commandName, ...rawCommandArgs] = argv;
   const outputFormat = selectOutputFormat(argv, io);
   const commandArgs = commandName === 'setup' ? rawCommandArgs : stripFormatFlags(rawCommandArgs);
