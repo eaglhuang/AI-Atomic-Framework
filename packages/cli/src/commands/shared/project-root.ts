@@ -35,8 +35,13 @@ function isWithin(parent: string, child: string): boolean {
  * Apply the project-root redirect for a CLI invocation. Only runs when the
  * invocation left the directory implicit (no `--cwd`) or pointed `--cwd` at
  * the process directory itself (`--cwd .`, as many printed commands do).
+ * Install-style commands target the directory they are run in by design, so
+ * they are never redirected.
  */
+const installCommands = new Set(['init', 'bootstrap', 'setup', 'self-host-alpha']);
+
 export function applyProjectRootRedirect(argv: readonly string[]): string | null {
+  if (installCommands.has(argv[0] ?? '')) return null;
   const cwdIndex = argv.indexOf('--cwd');
   const explicit = cwdIndex >= 0 ? argv[cwdIndex + 1] : undefined;
   if (explicit !== undefined && path.resolve(explicit) !== path.resolve(process.cwd())) return null;

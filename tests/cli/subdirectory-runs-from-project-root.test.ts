@@ -36,6 +36,13 @@ try {
   }
   assert.equal(existsSync(path.join(project, 'src', '.atm')), false, 'no nested .atm was created');
 
+  // Install-style commands keep targeting the directory they run in.
+  const sandbox = path.join(project, 'src', 'sandbox');
+  mkdirSync(sandbox);
+  atmIn(sandbox, ['init']);
+  assert.ok(existsSync(path.join(sandbox, '.atm', 'config.json')), 'init in a subdirectory initializes that subdirectory');
+  rmSync(path.join(sandbox, '.atm'), { recursive: true, force: true });
+
   // An explicit, different --cwd is respected.
   const explicit = atmIn(project, ['next', '--cwd', path.join(project, 'src')]);
   assert.ok(same(explicit.cwd, path.join(project, 'src')));
