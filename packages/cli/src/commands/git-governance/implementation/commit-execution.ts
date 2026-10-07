@@ -260,7 +260,7 @@ try {
           ? error.code
           : isCommitTimeoutFailure
             ? "ATM_GIT_COMMIT_TIMEOUT"
-            : "UNKNOWN",
+            : readAtmErrorCode(error) ?? "UNKNOWN",
       errorSummary: hookFailureSummary
         ?? (error instanceof Error ? error.message.slice(0, 500) : String(error)),
       statusCommand,
@@ -361,6 +361,15 @@ try {
               nestedAttemptStatus.liveIndexResidueRollback ?? null,
           }
         : null;
+    // Retrying cannot help when there is nothing to commit, so say so instead
+    // of pointing at an opaque nested failure and the same retry command.
+    if (!headAdvancedDuringAttempt && readAtmErrorCode(error) === "ATM_COMMIT_ATTRIBUTION_EMPTY_BUNDLE") {
+      throw new CliError(
+        "ATM_GIT_COMMIT_NOTHING_TO_COMMIT",
+        "Nothing to commit: none of the files this commit may include has a change. Edit the claimed files first; if the change already landed in an earlier commit, there is nothing left to commit.",
+        { exitCode: 1, details: { actorId, taskId: options.taskId, headShaBeforeCommit, commitAttemptStatusPath, statusCommand, gitHeadEvidenceRollback } },
+      );
+    }
     throw new CliError(
       "ATM_GIT_COMMIT_FAILED",
       hookFailureSummary ?? "ATM git commit wrapper failed.",
@@ -520,4 +529,10 @@ return makeResult({
       protectedOverrideOutcome,
     },
   });
+}
+
+/** Coded errors from the commit path keep their ATM code in the attempt record. */
+function readAtmErrorCode(error: unknown): string | null {
+  const code = (error as { code?: unknown } | null)?.code;
+  return typeof code === "string" && code.startsWith("ATM_") ? code : null;
 }
