@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'broker',
   summary: 'Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, parallel admission policy, and inspect the local write-broker registry.',
   positional: [
-    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | post-compose-semantic-validation', required: true },
+    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | heat-status | heat-reset | post-compose-semantic-validation', required: true },
     { name: 'proposal-action', summary: 'create | list | show | validate', required: false },
     { name: 'steward-action', summary: 'plan | apply', required: false },
     { name: 'runtime-action', summary: 'activate', required: false },
@@ -26,7 +26,7 @@ export default defineCommandSpec({
     { flag: '--queue-ticket', value: 'id', summary: 'Explicitly revalidate an eligible native serial ticket using the unchanged scope and current repository HEAD.' },
     { flag: '--ttl-seconds', value: 'number', summary: 'TTL lease duration in seconds for registering write intent.' },
     { flag: '--sealed-source-sha', value: 'sha', summary: 'Sealed source SHA for broker runner-sync enqueue.' },
-    { flag: '--surface', value: 'path', summary: 'Release surface path for broker runner-sync enqueue. Repeatable.' },
+    { flag: '--surface', value: 'path', summary: 'Release surface path for broker runner-sync enqueue, or file path for broker heat-reset. Repeatable.' },
     { flag: '--steward-work-id', value: 'id', summary: 'Runner-sync steward work id to release after one coalesced build.' },
     { flag: '--receipt-ref', value: 'path', summary: 'Runner-sync build/publication receipt path used when releasing a steward entry or reconciling one verified stale receipt.' },
     { flag: '--receipt-digest', value: 'sha256', summary: 'Runner-sync build/publication receipt digest used when releasing a steward entry.' },
@@ -97,6 +97,8 @@ export default defineCommandSpec({
     'node atm.mjs broker parallel-admission reset --actor worker-1 --receipt-digest sha256:<digest> --json',
     'node atm.mjs broker replay status --json',
     'node atm.mjs broker replay run --json',
-    'node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json'
+    'node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json',
+    'node atm.mjs broker heat-status --json',
+    'node atm.mjs broker heat-reset --actor worker-1 --surface packages/core/src/broker/team-lane.ts --json'
   ]
 });

@@ -14,6 +14,7 @@ export * from './steward.ts';
 export * from './steward-transactional-apply.ts';
 export * from './patch-candidate-materializer.ts';
 export * from './post-compose-semantic-validation-policy.ts';
+export * from './file-heat.ts';
 export * from './team-lane.ts';
 export * from './lifecycle.ts';
 export * from './orphan-cleanup.ts';

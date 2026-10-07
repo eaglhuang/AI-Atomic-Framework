@@ -28,6 +28,7 @@ export const adopterRuntimeIgnorePatterns = [
   '.atm/runtime/evidence-ledger/',
   '.atm/runtime/incidents/',
   '.atm/runtime/write-broker.registry.json',
+  '.atm/runtime/file-heat.json',
   '.atm/runtime/git-commit-attempts/',
   // Per-claim lanes, close transactions and broker queues appear during a
   // normal task claim and close.
