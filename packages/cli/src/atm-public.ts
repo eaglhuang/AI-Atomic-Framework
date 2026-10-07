@@ -34,6 +34,7 @@ import { runSetup } from './commands/setup.ts';
 import { runStart } from './commands/start.ts';
 import { runTasks } from './commands/tasks.ts';
 import { runATMChart } from './commands/atm-chart.ts';
+import { applyProjectRootRedirect } from './commands/shared/project-root.ts';
 
 type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandResult | object;
 
@@ -77,6 +78,7 @@ export async function runPublicCli(
 ) {
   argv = applyLaneSessionFlagFromArgv(argv);
   applyOutputProjectionFlagsFromArgv(argv);
+  applyProjectRootRedirect(argv);
   const [commandName, ...rawCommandArgs] = argv;
   const outputFormat = selectOutputFormat(argv, io);
   const commandArgs = commandName === 'setup' ? rawCommandArgs : stripFormatFlags(rawCommandArgs);
