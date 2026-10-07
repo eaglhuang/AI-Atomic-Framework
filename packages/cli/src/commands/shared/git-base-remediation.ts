@@ -32,5 +32,5 @@ export function describeMissingGitBase(cwd: string): { readonly hasHead: boolean
 export function requireGitRepository(cwd: string, command: string): void {
   const base = describeMissingGitBase(cwd);
   if (base.hasHead || base.details.gitRepository !== false) return;
-  throw new CliError('ATM_GIT_REPOSITORY_MISSING', `${command} needs a Git repository, and this directory is not one yet. Run the requiredCommand, then rerun ${command}.`, { exitCode: 2, details: base.details });
+  throw new CliError('ATM_GIT_REPOSITORY_MISSING', `${command} needs a Git repository, and this directory is not one yet. Run the requiredCommand, then rerun ${command}.`, { exitCode: 1, details: base.details });
 }
