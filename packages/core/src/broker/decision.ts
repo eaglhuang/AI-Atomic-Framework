@@ -273,7 +273,9 @@ export function calculateBrokerDecision(
       baseAdmission.requiresProposal ? 'provisional-write-lease' : 'write-admitted',
       {
         reason: baseAdmission.requiresProposal
-          ? 'Proposal-first lane is active; broker recorded a provisional write lease before final admission.'
+          ? baseAdmission.summarySubmitted
+            ? 'Proposal-first lane is active; broker recorded a provisional write lease before final admission.'
+            : 'Proposal-only registration is available; submit the required summary before write authority.'
           : 'No proposal-first trigger is active; direct brokered write is admitted.'
       }
     )

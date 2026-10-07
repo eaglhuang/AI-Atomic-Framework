@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { mock } from 'node:test';
 import { calculateBrokerDecision } from '../../packages/core/src/broker/decision.ts';
 import { evaluateBrokerAdmission } from '../../packages/core/src/broker/admission/evaluate-broker-admission.ts';
 import { createEmptyBrokerRegistryDocument } from '../../packages/core/src/broker/registry-store.ts';
@@ -99,6 +100,46 @@ try {
   assert.equal(normalized.register({ intent: duplicateHot, lane: 'serial', queueTicketId: normalizedTicket,
     currentBaseCommit: duplicateHot.baseCommit }).admission?.ticket.queue?.state, 'granted', 'normalized proposal metadata must match its own lease');
 
+  const proposalOnly = createBrokerTransactionAuthority(path.join(root, 'proposal-only.json'));
+  const initialProposal = { ...first, proposalAdmission: { ...first.proposalAdmission!, summarySubmitted: false } };
+  const metadata = proposalOnly.register({ intent: initialProposal, lane: 'direct-brokered' });
+  assert.equal(metadata.admission?.decision.admission?.state, 'proposal-submitted');
+  assert.equal(resolveTeamBrokerLane(metadata.admission!.decision).safeToStart, false);
+  assert.equal(proposalOnly.read().document.activeIntents[0].admission?.summarySubmitted, false);
+  const waitingForProposal = proposalOnly.register({ intent: second, lane: 'serial' }).admission!.ticket.ticketId;
+  assert.equal(proposalOnly.read().document.serialQueue!.tickets[0].state, 'queued');
+  assert.throws(() => proposalOnly.register({ intent: { ...first, actorId: 'foreign-owner' }, lane: 'direct-brokered' }), /ATM_BROKER_SAME_TASK_LANE_FENCE/);
+  assert.equal(proposalOnly.register({ intent: initialProposal, lane: 'direct-brokered', queueTicketId: 'missing-ticket',
+    currentBaseCommit: initialProposal.baseCommit }).admission?.disposition, 'revalidate');
+  const widenedReady = { ...first, proposalAdmission: { ...first.proposalAdmission!, boundedRegions: [
+    { filePath: 'src/broker.ts', lineStart: 1, lineEnd: 50 }
+  ] } };
+  assert.equal(proposalOnly.register({ intent: widenedReady, lane: 'direct-brokered' }).admission?.disposition, 'revalidate');
+  const rejectedUpgrades: WriteIntent[] = [
+    { ...first, baseCommit: 'different-base' },
+    { ...first, targetFiles: [...first.targetFiles, 'extra.ts'] },
+    { ...first, atomRefs: [{ ...first.atomRefs[0], atomCid: 'changed-cid' }] },
+    { ...first, readAtoms: second.atomRefs },
+    { ...first, sharedSurfaces: { ...first.sharedSurfaces, registries: ['extra-registry'] } },
+    { ...first, proposalAdmission: { ...first.proposalAdmission!, trigger: 'not-required' } },
+    { ...first, proposalAdmission: { ...first.proposalAdmission!, hotFiles: ['different.ts'] } }
+  ];
+  for (const changed of rejectedUpgrades) {
+    assert.equal(proposalOnly.register({ intent: changed, lane: 'direct-brokered' }).admission?.disposition, 'revalidate');
+    assert.equal(proposalOnly.read().document.activeIntents[0].admission?.summarySubmitted, false, 'failed upgrade must leave metadata unchanged');
+  }
+  assert.equal(ownsExactActiveSerialScope(first, proposalOnly.read().document.activeIntents[0]), false,
+    'readiness upgrade must not weaken strict grant/replay equality');
+  const readyDecision = calculateBrokerDecision(first, proposalOnly.read().document);
+  assert.equal(readyDecision.verdict, 'parallel-safe', 'exact incumbent readiness upgrade must not wait behind its own later waiter');
+  const upgraded = proposalOnly.register({ intent: first, lane: readyDecision.lane, admissionOverride: readyDecision.admission });
+  assert.equal(upgraded.admission?.decision.admission?.state, 'provisional-write-lease');
+  assert.equal(proposalOnly.register({ intent: initialProposal, lane: 'direct-brokered' }).admission?.disposition, 'revalidate');
+  assert.equal(proposalOnly.read().document.activeIntents[0].admission?.summarySubmitted, true, 'readiness downgrade must not rewrite an existing writer');
+  proposalOnly.release({ taskId: first.taskId, actorId: first.actorId });
+  assert.equal(proposalOnly.register({ intent: second, lane: 'serial', queueTicketId: waitingForProposal,
+    currentBaseCommit: second.baseCommit }).admission?.ticket.queue?.state, 'granted');
+
   const disjointAuthority = createBrokerTransactionAuthority(path.join(root, 'disjoint.json'));
   disjointAuthority.register({ intent: first, lane: initial.lane, admissionOverride: initial.admission });
   const disjointTicket = disjointAuthority.register({ intent: second, lane: 'serial' }).admission!.ticket.ticketId;
@@ -169,12 +210,12 @@ try {
 
   const originalNow = Date.now;
   let now = originalNow();
-  Date.now = () => now;
+  mock.timers.enable({ apis: ['Date'], now });
   try {
     const expired = createBrokerTransactionAuthority(path.join(root, 'expired.json'));
     expired.register({ intent: first, lane: initial.lane, ttlSeconds: 1, admissionOverride: initial.admission });
     const expiryTicket = expired.register({ intent: second, lane: 'serial' }).admission!.ticket.ticketId;
-    now += 2000;
+    mock.timers.setTime(now += 2000);
     const afterExpiry = expired.register({ intent: second, lane: 'serial', queueTicketId: expiryTicket, currentBaseCommit: second.baseCommit });
     assert.equal(afterExpiry.admission?.ticket.queue?.state, 'granted', 'lease expiry wakes and revalidates inside the original CAS');
     assert.deepEqual(expired.read().document.activeIntents.map((entry) => entry.taskId), [second.taskId]);
@@ -182,24 +223,38 @@ try {
     const replayExpired = createBrokerTransactionAuthority(path.join(root, 'replay-expired.json'));
     const originalInput = { intent: first, lane: initial.lane, ttlSeconds: 1, admissionOverride: initial.admission };
     replayExpired.register(originalInput);
-    now += 2000;
+    mock.timers.setTime(now += 2000);
     const expiredReplay = replayExpired.register(originalInput);
     assert.equal(expiredReplay.status, 'idempotent-replay');
     assert.equal(expiredReplay.admission?.disposition, 'revalidate');
     assert.equal(replayExpired.read().document.activeIntents.length, 0, 'lost-response replay must not resurrect an expired writer');
+
+    const metadataReplay = createBrokerTransactionAuthority(path.join(root, 'metadata-replay.json'));
+    const metadataInput = { intent: initialProposal, lane: 'direct-brokered' as const, ttlSeconds: 1 };
+    metadataReplay.register(metadataInput);
+    mock.timers.setTime(now += 2000);
+    assert.equal(metadataReplay.register(metadataInput).admission?.disposition, 'revalidate');
+    assert.equal(metadataReplay.read().document.activeIntents.length, 0, 'expired metadata replay cannot recreate a reservation');
+    const expiredUpgrade = createBrokerTransactionAuthority(path.join(root, 'expired-upgrade.json'));
+    expiredUpgrade.register(metadataInput);
+    expiredUpgrade.register({ intent: second, lane: 'serial' });
+    mock.timers.setTime(now += 2000);
+    assert.equal(expiredUpgrade.register({ intent: first, lane: 'direct-brokered' }).admission?.disposition, 'queue',
+      'expired metadata cannot use the upgrade exemption to jump a waiting owner');
+    assert.equal(expiredUpgrade.read().document.activeIntents.length, 0);
 
     const unrelatedReplay = createBrokerTransactionAuthority(path.join(root, 'unrelated-replay.json'));
     const other = { ...intent('OTHER'), targetFiles: ['other.ts'], proposalAdmission: undefined };
     unrelatedReplay.register({ intent: other, lane: 'direct-brokered', ttlSeconds: 1 });
     unrelatedReplay.register({ intent: first, lane: initial.lane, admissionOverride: initial.admission });
     const liveEpoch = unrelatedReplay.read().document.activeIntents.find((entry) => entry.taskId === first.taskId)!.leaseEpoch;
-    now += 2000;
+    mock.timers.setTime(now += 2000);
     assert.equal(unrelatedReplay.register({ intent: first, lane: initial.lane, admissionOverride: initial.admission }).status, 'idempotent-replay');
     assert.equal(unrelatedReplay.read().document.activeIntents[0].leaseEpoch, liveEpoch, 'unrelated cleanup must not renew a replayed writer');
     unrelatedReplay.register({ intent: other, lane: 'direct-brokered', ttlSeconds: 1 });
     unrelatedReplay.heartbeat({ taskId: first.taskId, actorId: first.actorId });
     const heartbeatEpoch = unrelatedReplay.read().document.activeIntents.find((entry) => entry.taskId === first.taskId)!.leaseEpoch;
-    now += 2000;
+    mock.timers.setTime(now += 2000);
     assert.equal(unrelatedReplay.heartbeat({ taskId: first.taskId, actorId: first.actorId }).status, 'idempotent-replay');
     assert.equal(unrelatedReplay.read().document.activeIntents[0].leaseEpoch, heartbeatEpoch, 'cleanup must not replay heartbeat mutation');
 
@@ -207,14 +262,14 @@ try {
     expiringHead.register({ intent: first, lane: initial.lane, admissionOverride: initial.admission });
     expiringHead.register({ intent: second, lane: 'serial', ttlSeconds: 1 });
     const tail = expiringHead.register({ intent: third, lane: 'serial' }).admission!.ticket.ticketId;
-    now += 2000;
+    mock.timers.setTime(now += 2000);
     expiringHead.release({ taskId: first.taskId, actorId: first.actorId });
     assert.equal(expiringHead.read().document.serialQueue!.tickets.find((entry) => entry.taskId === second.taskId)!.state, 'expired');
     assert.equal(expiringHead.read().document.serialQueue!.tickets.find((entry) => entry.ticketId === tail)!.state, 'eligible');
     expiringHead.release({ taskId: third.taskId, actorId: third.actorId });
     assert.equal(expiringHead.read().document.serialQueue!.tickets.find((entry) => entry.ticketId === tail)!.state, 'cancelled');
   } finally {
-    Date.now = originalNow;
+    mock.timers.reset();
   }
 } finally {
   rmSync(root, { recursive: true, force: true });

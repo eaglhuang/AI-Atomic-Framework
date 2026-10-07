@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { evaluateBrokerAdmission } from '../../../../core/src/broker/admission/evaluate-broker-admission.ts';
 import { observeSerialTicket } from '../../../../core/src/broker/serial-queue/queue.ts';
+import { ownsExactActiveSerialScope } from '../../../../core/src/broker/serial-queue/policy.ts';
 import { CliError, makeResult, message } from '../shared.ts';
 import {
   loadRegistry,
@@ -142,6 +143,11 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
     const privateOnly = queueAdmission.status === 'queued-private-work';
     const isBrokerSafe = proposalReady && (isDecisionSafe || privateOnly
       || (queueAdmission.status === 'queue-head' && admission?.disposition !== 'compose'));
+    const proposalRegistrationAccepted = !proposalReady && decision.verdict === 'parallel-safe'
+      && admission?.disposition === 'proposal-required' && registry.activeIntents.some((active) =>
+        active.taskId === newIntent.taskId && active.actorId === newIntent.actorId && active.baseCommit === newIntent.baseCommit
+        && ownsExactActiveSerialScope(newIntent, active)
+        && active.admission?.state === 'proposal-submitted' && active.admission.summarySubmitted === false);
     // A composer may prepare its explicitly allowed private subset, but that
     // must not promote the full shared/composer intent into a direct lane.
     if (isBrokerSafe && admission?.disposition !== 'compose' && (privateOnly || queueAdmission.status === 'queue-head')) {
@@ -167,12 +173,12 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
     syncTeamRunRearbitrationSnapshots(options.cwd, registry, newIntent.taskId, newIntent.actorId);
 
     return makeResult({
-      ok: isBrokerSafe,
+      ok: isBrokerSafe || proposalRegistrationAccepted,
       command: 'broker',
       cwd: options.cwd,
       messages: [
         message(
-          isBrokerSafe ? 'info' : 'error',
+          isBrokerSafe || proposalRegistrationAccepted ? 'info' : 'error',
           'ATM_BROKER_REGISTERED',
           `Write intent registered with verdict '${decision.verdict}', lane '${decision.lane}', queue '${queueAdmission.status}', and admission '${decision.admission?.state ?? 'not-required'}'. Arbitration matrix verdict: '${conflictMatrix?.arbitrationVerdict ?? 'n/a'}'. Broker verdicts override Coordinator decisions inside broker-governed conflict domains; Coordinator remains local outside them.`,
           { decision, queueAdmission }
@@ -181,6 +187,7 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       evidence: {
         decision,
         admission,
+        proposalRegistrationAccepted,
         writeAuthorized: isBrokerSafe && admission?.disposition !== 'queue' && admission?.disposition !== 'revalidate',
         writeAuthorizedFiles: isBrokerSafe ? privateOnly ? queueAdmission.allowedFiles : admission?.privateWork?.allowedFiles ?? newIntent.targetFiles : [],
         ...(admission?.ticket.queue ? { serialQueue: admission.ticket.queue,

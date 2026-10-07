@@ -105,10 +105,21 @@ export function createBrokerTransactionAuthority(registryPath: string): BrokerTr
         admission = evaluate(doc);
         let next = refreshSerialQueue(doc);
         const own = pendingSerialTickets(next).find((ticket) => ticket.taskId === input.intent.taskId);
-        if (admission.decision.admission?.requiresProposal && !admission.decision.admission.summarySubmitted) return next;
+        if (admission.decision.admission?.requiresProposal && !admission.decision.admission.summarySubmitted) {
+          // Preserve the established proposal-only first registration. It is
+          // observable metadata, not write permission or a native wait ticket.
+          const existing = next.activeIntents.find((active) => active.taskId === input.intent.taskId);
+          const unchangedMetadata = existing?.admission?.state === 'proposal-submitted' && !existing.admission.summarySubmitted
+            && existing.baseCommit === input.intent.baseCommit && ownsExactActiveSerialScope(input.intent, existing);
+          if (!own && !input.queueTicketId && (!existing || unchangedMetadata) && admission.disposition === 'proposal-required'
+            && admission.decision.verdict === 'parallel-safe' && admission.decision.admission.state === 'proposal-submitted') {
+            return registerIntent(next, input.intent, admission.decision.lane, input.ttlSeconds, admission.decision.admission);
+          }
+          return next;
+        }
         if (admission.privateWork) return refreshSerialQueue(registerIntent(next, input.intent, admission.decision.lane, input.ttlSeconds, admission.decision.admission));
         if (admission.disposition === 'revalidate' && doc.activeIntents.some((active) => active.taskId === input.intent.taskId
-          && active.actorId === input.intent.actorId && !ownsExactActiveSerialScope(input.intent, active))) return next;
+          && active.actorId === input.intent.actorId && (!ownsExactActiveSerialScope(input.intent, active) || active.baseCommit !== input.intent.baseCommit))) return next;
         if (admission.disposition === 'queue') {
           const lease = input.intent.leaseBounds?.requestedSeconds ?? input.ttlSeconds ?? 1800;
           const max = input.intent.leaseBounds?.maxSeconds ?? input.ttlSeconds ?? 1800;

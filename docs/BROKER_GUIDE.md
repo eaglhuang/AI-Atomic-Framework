@@ -65,6 +65,8 @@ This path preserves the existing hard boundaries:
 - Parked and eligible tickets are not writer leases. A granted composer ticket is still not direct-write permission
 - A lost-response replay observes an exact live registration. Cleanup may persist expiry and eligibility, but replay never renews or resurrects a writer
 
+An initial conflict-free hot intent can still register proposal-only metadata with `ok: true` and admission state `proposal-submitted`. It has `writeAuthorized: false` and no authorized write files; team start remains blocked. The same owner may submit its summary for the identical live scope and base without waiting behind later tickets. This monotonic readiness upgrade does not widen scope or relax the strict grant/replay comparison.
+
 `BrokerDecision.queueReason` identifies `cold-write-conflict`, `hot-write-conflict`, `provisional-overlap` or `fifo-predecessor`. Persisted tickets, observations and transition events expose the original reason and `blockerTaskIds`, alongside `blockerIntentIds`, position and wait time. Older cold-only queue documents remain readable. A pure preview's reason does not mean a ticket was persisted; use the transaction receipt from `broker register`.
 
 PR197's heat receipt remains the classification source for team intents. Static remains the default. Frozen hybrid/learned modes and the selected proposal scope use the same admission rules. Resume reuses the ticket's selected intent instead of recomputing heat and silently changing its scope. Team planning stays a preview; native admission is performed by the transactional registration/claim route. Waiting never authorizes a provider start, runtime write or task close.

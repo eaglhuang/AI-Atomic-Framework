@@ -67,11 +67,21 @@ export function serialScopesConflict(left: WriteIntent, right: WriteIntent): boo
 export function serialPredecessors(intent: WriteIntent, doc: WriteBrokerRegistryDocument, now = Date.now()): readonly SerialQueueTicket[] {
   // An already admitted writer does not wait behind its own later waiters.
   // This exemption cannot authorize an expansion into a queued resource.
-  if (doc.activeIntents.some((entry) => ownsExactActiveSerialScope(intent, entry))) return [];
+  if (doc.activeIntents.some((entry) => ownsExactActiveSerialScope(intent, entry) || isProposalReadinessUpgrade(intent, entry, now))) return [];
   const pending = pendingSerialTickets(doc, now);
   const own = pending.find((entry) => entry.taskId === intent.taskId);
   return pending.filter((entry) => entry.taskId !== intent.taskId && (!own || entry.sequence < own.sequence)
     && serialScopesConflict(intent, entry.intent));
+}
+
+/** Only the incumbent's monotonic readiness upgrade may precede its later waiters. */
+export function isProposalReadinessUpgrade(intent: WriteIntent, active: ActiveWriteIntent, now: number): boolean {
+  const admission = active.admission;
+  const expiresAt = Date.parse(active.expiresAt ?? '');
+  if (!admission?.requiresProposal || admission.state !== 'proposal-submitted' || admission.summarySubmitted
+    || intent.proposalAdmission?.summarySubmitted !== true || active.baseCommit !== intent.baseCommit
+    || !Number.isFinite(expiresAt) || expiresAt <= now) return false;
+  return ownsExactActiveSerialScope(intent, { ...active, admission: { ...admission, summarySubmitted: true } });
 }
 
 export function ownsExactActiveSerialScope(intent: WriteIntent, active: ActiveWriteIntent): boolean {

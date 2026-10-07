@@ -83,10 +83,12 @@ try {
         baseHash: unready.baseCommit, reason: 'retained legacy fixture', releaseCondition: 'governed release', queuedAt: new Date().toISOString() }] }]
   }));
   const legacy = await register(unready);
-  assert.equal(legacy.ok, false, 'legacy queue-head cannot bypass the proposal prerequisite');
+  assert.equal(legacy.ok, true, 'initial proposal-only metadata registration remains accepted');
   assert.equal(legacy.evidence.writeAuthorized, false);
   assert.deepEqual(legacy.evidence.writeAuthorizedFiles, []);
-  assert.equal(JSON.parse(readFileSync(registryPath, 'utf8')).activeIntents.some((entry: { taskId: string }) => entry.taskId === unready.taskId), false);
+  const unreadyMetadata = JSON.parse(readFileSync(registryPath, 'utf8')).activeIntents.find((entry: { taskId: string }) => entry.taskId === unready.taskId);
+  assert.equal(unreadyMetadata.admission.state, 'proposal-submitted', 'legacy queue state must not promote metadata into a writer');
+  assert.equal(unreadyMetadata.admission.summarySubmitted, false);
   const legacyCold = (taskId: string, files: string[]) => ({ ...make(taskId), baseCommit: git('rev-parse', 'HEAD'),
     targetFiles: files, atomRefs: [], proposalAdmission: undefined });
   await register(legacyCold('COLD-OWNER', ['shared.ts', 'owner-private.ts']));
