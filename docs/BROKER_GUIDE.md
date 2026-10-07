@@ -18,7 +18,7 @@ CID terminology used by this guide:
 | `needs-physical-split` | `deterministic-composer` | Same physical file but CID-disjoint; routed to the composer |
 | `blocked-cid-conflict` | `blocked` | Atom ID or semantic CID collision with an active intent |
 | `blocked-shared-surface` | `blocked` | Generator / projection / registry / validator / artifact collision |
-| `serial` | `serial` | A cold logical write collision or earlier conflicting native ticket must wait before mutation |
+| `serial` | `serial` | A ready cold/hot logical write collision or earlier conflicting native ticket must wait before mutation |
 
 ## Native Cold Serial Queue
 
@@ -29,7 +29,7 @@ The compose boundary remains explicit:
 - Disjoint files and disjoint bounded cold regions remain parallel eligible
 - Unbounded same-file work with distinct atoms and automatic lane selection remains composer-routed
 - Compatible bounded proposal regions retain deterministic composition
-- Hot/proposal-first overlapping regions retain their existing fail-closed re-arbitration behavior
+- Ready hot/proposal-first overlapping regions use native parking, with no write authority while waiting
 - Reads and independent private preparation do not acquire native serial tickets
 
 `calculateBrokerDecision` and `evaluateBrokerAdmission` are pure previews. Durable admission occurs through `createBrokerTransactionAuthority(...).register(...)`, also used by `broker register`. Queue tickets live in the existing write-broker registry's `serialQueue`, under the same original-snapshot CAS transaction as registration and release. A waiter is not an `activeIntents` writer lease.
@@ -44,13 +44,34 @@ Release only makes the next conflicting ticket **eligible for revalidation**. It
 2. If `evidence.admission.disposition` is `queue`, retain its ticket ID and inspect `broker status --json`. The result has `writeAuthorized: false`; CLI `ok: false` prevents legacy consumers from treating accepted queue placement as permission to write
 3. The active owner runs `broker release --task <task> --actor <owner> --json`. Queue-related release/cancellation requires the explicit owner
 4. Re-read current source and refresh the intent's base commit, preserving its exact write/read/region/proposal scope. Run `broker register --task <task> --actor <owner> --intent-file <refreshed-intent.json> --queue-ticket <ticket-id> --json`
-5. Proceed only after canonical direct/proposal admission and the existing downstream write checks succeed. The CLI checks the actual repository HEAD again during each CAS retry. The core API requires `currentBaseCommit` or a `resolveCurrentBaseCommit` reader on resume
+5. Proceed only through the returned canonical lane and its existing downstream checks. Direct/proposal admission retains its normal write requirements. A `compose` result consumes the eligible ticket into a composer-owned lease, keeps CLI `writeAuthorized: false`, and requires the normal proposal/composer/steward path before applying content. Release completes either lane. The CLI checks the actual repository HEAD again during each CAS retry. The core API requires `currentBaseCommit` or a `resolveCurrentBaseCommit` reader on resume
 
 Scope changes require cancelling the old ticket and submitting a new intent; changing the base alone never authorizes broader paths or atoms. Resume repeats the current lease, read/write, shared-surface and FIFO checks. A replay of a successful resume can confirm its still-live, exact-scope grant without renewing the lease or emitting another grant. Queue admission does not apply a patch or replace file-preimage/content-hash CAS, validators, or steward controls. A new base commit is not proof that an old patch remains valid.
 
 `broker status` exposes `serialQueueTickets[].position`, `waitMs`, `blockerIntentIds`, expiry and an authority digest. `evidence.admission.metrics.queueWaitMs` and `queuePosition` are available to a native consumer. Registry events establish eligibility and grant order. Status and decision commands do not persist cleanup; explicit cleanup and lifecycle writes use original-snapshot CAS. A crashed process that leaves the registry's compare/write lock remains fail-closed and needs governed recovery; automatic lock theft is not part of this queue.
 
 The bounded equivalent benchmark is `node --strip-types scripts/validate-broker-native-serial-queue.ts`. It includes six simultaneous real CLI enqueue processes, restart/resume/release through separate processes, native wait telemetry, preserved FIFO grants and no lost counter updates. It never retries `true-conflict` in a harness overlay. Its reported wall/wait times include CLI process startup and are diagnostic measurements, not throughput claims or a performance comparison.
+
+## Native Hot-Conflict Parking
+
+A submitted proposal with a proven overlapping write region or material atom/CID write conflict receives canonical `disposition: "queue"`, rather than a terminal `true-conflict` solely because another hot writer still holds the resource. The incoming writer waits; the incumbent's provisional lease is not revoked or silently paused. The same registry, conflict-local FIFO, CAS transaction, release/expiry wakeup and explicit current-base resume API serve cold and hot tickets.
+
+This path preserves the existing hard boundaries:
+
+- Missing proposal summaries cannot enter FIFO through an earlier ticket or acquire a writer through legacy shared-queue state
+- Read dependencies, shared-surface conflicts, malformed lease/fencing state and owner/scope/base mismatch still fail closed
+- Compatible bounded proposals stay composer-routed, including when a queued writer becomes eligible beside disjoint composer work
+- Unknown bounds remain conservative. Every active writer and shared target file is compared before an apparent disjoint region can justify composition
+- Parked and eligible tickets are not writer leases. A granted composer ticket is still not direct-write permission
+- A lost-response replay observes an exact live registration. Cleanup may persist expiry and eligibility, but replay never renews or resurrects a writer
+
+`BrokerDecision.queueReason` identifies `cold-write-conflict`, `hot-write-conflict`, `provisional-overlap` or `fifo-predecessor`. Persisted tickets, observations and transition events expose the original reason and `blockerTaskIds`, alongside `blockerIntentIds`, position and wait time. Older cold-only queue documents remain readable. A pure preview's reason does not mean a ticket was persisted; use the transaction receipt from `broker register`.
+
+PR197's heat receipt remains the classification source for team intents. Static remains the default. Frozen hybrid/learned modes and the selected proposal scope use the same admission rules. Resume reuses the ticket's selected intent instead of recomputing heat and silently changing its scope. Team planning stays a preview; native admission is performed by the transactional registration/claim route. Waiting never authorizes a provider start, runtime write or task close.
+
+Run `node --strip-types scripts/validate-broker-native-hot-queue.ts` for the bounded hot acceptance fixture. It covers seven simultaneous contenders behind one incumbent, explicit native ticket resume, FIFO grants, duplicate-resume CAS, expiry, cancellation, proposal readiness, mixed cold/hot work and current-base checks. Its target is all eight valid fixture writers completing with no terminal-conflict retry overlay, duplicate grants or lost counter updates. Reported wait/wall time includes CLI startup and is an observation, not a throughput promise.
+
+This fixture is not the separate atm-bench seed-42, 50-trial, eight-agent workload. That workload must still be run with `--hot-retry` disabled before claiming its acceptance threshold. Native ticket resume is the API, not an overlay that catches and retries terminal conflicts. Queue safety does not make a stale writer that skips composition/preimage checks safe.
 
 ## Proposal-Gated Admission v1
 
@@ -75,7 +96,7 @@ Admission states:
 | `write-admitted` | Direct broker path is fully admitted |
 | `composer-routed` | Same-file work is routed to the deterministic composer before live write |
 | `blocked-before-write` | Broker blocked the lane before apply-time mutation |
-| `parked-for-rearbitration` | Existing writer must pause so broker can rearbitrate |
+| `parked-for-rearbitration` | Incoming proposal needs composer rearbitration; this legacy state alone is not a durable queue ticket or an incumbent pause |
 | `applied` | Governed write reached the final applied state |
 
 Current v1 rule boundary:
@@ -83,8 +104,8 @@ Current v1 rule boundary:
 - Proposal gating is conditional escalation, not the default for every file.
 - Existing direct broker flows stay valid when `trigger = not-required`.
 - Hot-file and overlap-risk lanes can carry proposal-first evidence without changing the envelope shape used by downstream evidence capture.
-- When two writers still share the same coarse owner map, bounded-region proposal evidence may refine that owner-level conflict: disjoint regions can route to composer, overlapping regions remain blocked.
-- Blocked same-owner overlaps may also emit a structured split suggestion (`decompositionRequest.suggestedAtoms`) so the map curator can promote the coarse owner map into finer child atoms without guessing the first cut by hand.
+- When two writers still share the same coarse owner map, bounded-region proposal evidence may refine that owner-level conflict: disjoint regions can route to composer, ready overlapping writers queue before mutation.
+- Queued or blocked same-owner overlaps may also emit a structured split suggestion (`decompositionRequest.suggestedAtoms`) so the map curator can promote the coarse owner map into finer child atoms without guessing the first cut by hand.
 - The curator bridge now treats that broker split suggestion as a review-only atom-map patch draft, pointing at the owner shard plus projection rebuild path, so reviewers can approve a concrete split patch before the next collision reuses the same coarse owner map.
 
 ## Candidate Bridge (TASK-ASP-0004)

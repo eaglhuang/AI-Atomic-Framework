@@ -177,6 +177,8 @@ export interface BrokerDecision {
   readonly stewardId?: string | null;
   readonly applyMethod: 'patch-apply' | 'ast-rewrite' | 'git-three-way-fallback' | 'steward-authored-final-patch' | 'none';
   readonly reason: string;
+  /** Explains waiting, never grants write authority or proves ticket persistence. */
+  readonly queueReason?: import('./serial-queue/contracts.ts').SerialQueueReason;
   readonly admission?: ProposalAdmissionEvidence;
   readonly failureReason?: BrokerDecisionFailureReason;
 }

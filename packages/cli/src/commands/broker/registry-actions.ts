@@ -103,7 +103,7 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
     let registry = cleanupStale(loadRegistry(registryPath, { persistCleanup: false }));
     let decision = calculateBrokerDecision(newIntent, registry);
 
-    // 即使決策是 blocked，我們依然將其以 blocked 狀態註冊進去
+    // Transaction authority persists native waits without installing a writer.
     const authority = createBrokerTransactionAuthority(registryPath);
     const transactionReceipt = authority.register({
       intent: newIntent,
@@ -125,7 +125,8 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
     const admission = transactionReceipt.admission;
     decision = admission?.decision ?? decision;
     const conflictMatrix = decision.conflictMatrix;
-    const isDecisionSafe = decision.verdict === 'parallel-safe' && admission?.disposition !== 'revalidate';
+    const proposalReady = !decision.admission?.requiresProposal || decision.admission.summarySubmitted;
+    const isDecisionSafe = proposalReady && decision.verdict === 'parallel-safe' && admission?.disposition !== 'revalidate';
     const queueUpdate = updateSharedSurfaceQueues({
       queuePath: sharedQueuePath,
       intent: newIntent,
@@ -138,8 +139,12 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       : admission?.disposition === 'queue' || admission?.disposition === 'revalidate'
       ? { status: 'queued-blocked', queuedSharedPaths: newIntent.targetFiles, allowedFiles: [], reason: admission.decisionReason }
       : resolveSharedSurfaceQueueAdmission({ intent: newIntent, queues: queueUpdate.queues });
-    const isBrokerSafe = isDecisionSafe || queueAdmission.status === 'queue-head' || queueAdmission.status === 'queued-private-work';
-    if (queueAdmission.status === 'queued-private-work' || queueAdmission.status === 'queue-head') {
+    const privateOnly = queueAdmission.status === 'queued-private-work';
+    const isBrokerSafe = proposalReady && (isDecisionSafe || privateOnly
+      || (queueAdmission.status === 'queue-head' && admission?.disposition !== 'compose'));
+    // A composer may prepare its explicitly allowed private subset, but that
+    // must not promote the full shared/composer intent into a direct lane.
+    if (isBrokerSafe && admission?.disposition !== 'compose' && (privateOnly || queueAdmission.status === 'queue-head')) {
       commitBrokerRegistryTransaction({
         store: authority.store,
         operation: 'register',
@@ -177,7 +182,7 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
         decision,
         admission,
         writeAuthorized: isBrokerSafe && admission?.disposition !== 'queue' && admission?.disposition !== 'revalidate',
-        writeAuthorizedFiles: isBrokerSafe ? admission?.privateWork?.allowedFiles ?? newIntent.targetFiles : [],
+        writeAuthorizedFiles: isBrokerSafe ? privateOnly ? queueAdmission.allowedFiles : admission?.privateWork?.allowedFiles ?? newIntent.targetFiles : [],
         ...(admission?.ticket.queue ? { serialQueue: admission.ticket.queue,
           resumeCommand: `node atm.mjs broker register --cwd ${JSON.stringify(options.cwd)} --task ${newIntent.taskId} --actor ${newIntent.actorId} --intent-file ${JSON.stringify(options.intentFile)} --queue-ticket ${admission.ticket.ticketId} --json` } : {}),
         transactionReceipt,
