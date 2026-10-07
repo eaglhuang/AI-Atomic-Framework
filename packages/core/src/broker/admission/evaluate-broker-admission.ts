@@ -2,7 +2,7 @@ import { calculateBrokerDecision } from '../decision.ts';
 import { evaluateConflictMatrix } from '../conflict-matrix.ts';
 import { createHash } from 'node:crypto';
 import { resolveSerialAdmission } from '../serial-queue/admission.ts';
-import { ownsExactActiveSerialScope } from '../serial-queue/policy.ts';
+import { isProposalReadinessUpgrade, ownsExactActiveSerialScope } from '../serial-queue/policy.ts';
 import type {
   BrokerAdmissionDisposition,
   BrokerAdmissionPolicy,
@@ -74,8 +74,21 @@ export function evaluateBrokerAdmission(
   const selected = selectDisposition(request, decision, policy);
   const holdingScopeChange = selected === 'queue' && effectiveRegistry.activeIntents.some((active) =>
     active.taskId === request.intent.taskId && active.actorId === request.intent.actorId && !ownsExactActiveSerialScope(request.intent, active));
+  const proposalRegistrationChange = effectiveRegistry.activeIntents.some((active) => {
+    if (active.taskId !== request.intent.taskId || active.actorId !== request.intent.actorId || !active.admission?.requiresProposal) return false;
+    if (active.admission.state === 'proposal-submitted' && !active.admission.summarySubmitted) {
+      const unchangedMetadata = request.intent.proposalAdmission?.summarySubmitted === false
+        && active.baseCommit === request.intent.baseCommit && ownsExactActiveSerialScope(request.intent, active);
+      return !unchangedMetadata && !isProposalReadinessUpgrade(request.intent, active, policy.nowMs ?? Date.now());
+    }
+    return active.admission.summarySubmitted && request.intent.proposalAdmission?.summarySubmitted !== true;
+  });
+  const replayWithoutLease = policy.requireLiveRegistration === true && !effectiveRegistry.activeIntents.some((active) =>
+    ownsExactActiveSerialScope(request.intent, active) && active.baseCommit === request.intent.baseCommit
+    && !!active.expiresAt && Date.parse(active.expiresAt) > (policy.nowMs ?? Date.now()));
   // Explicit queue revalidation never weakens active lease, read, or shared-surface guards.
-  const disposition = holdingScopeChange ? 'revalidate' : selected === 'true-conflict' || selected === 'revalidate' ? selected : serial.disposition ?? selected;
+  const disposition = holdingScopeChange || proposalRegistrationChange || replayWithoutLease ? 'revalidate'
+    : selected === 'true-conflict' || selected === 'revalidate' ? selected : serial.disposition ?? selected;
   const conflictMatrix = decision.conflictMatrix ?? evaluateConflictMatrix(request.intent, effectiveRegistry.activeIntents, {
     currentEpoch: effectiveRegistry.currentEpoch
   });
@@ -113,7 +126,9 @@ export function evaluateBrokerAdmission(
       ? { privateWork: { queueTicketId: serial.queue.ticketId, allowedFiles: request.intent.targetFiles } } : {}),
     disposition,
     decision,
-    decisionReason: holdingScopeChange ? 'Finish and release the existing write lease before queuing a changed scope; holding it would deadlock earlier waiters.' : serial.reason ?? decision.reason,
+    decisionReason: replayWithoutLease ? 'The committed registration no longer has its exact live lease; replay does not acquire or renew authority.'
+      : proposalRegistrationChange ? 'Proposal-only metadata can only become ready at the same live base and scope; downgrade or scope changes require release/revalidation.'
+      : holdingScopeChange ? 'Finish and release the existing write lease before queuing a changed scope; holding it would deadlock earlier waiters.' : serial.reason ?? decision.reason,
     ticket: {
       schemaId: 'atm.brokerTicket.v1',
       ticketId: serial.queue?.ticketId ?? `broker-admission-${ticketDigest}`,
