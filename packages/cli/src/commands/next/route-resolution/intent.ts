@@ -282,9 +282,16 @@ export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node
         command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt} in <path>`)} --json`
       },
     {
-      when: 'larger or unclear work',
+      when: 'unclear what the work involves',
       channel: null,
       command: `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`
+    },
+    // Guidance alone loops back to next for larger work; the exit is a task
+    // card of your own, then next --claim --task <TASK-ID>.
+    {
+      when: 'larger work: open a task card that names the files and the validator command, then claim it with next --claim --task <TASK-ID>',
+      channel: 'task-card',
+      command: `${commandPrefix} taskflow open --write --actor <id> --title ${quoteCliValue(prompt.length > 72 ? `${prompt.slice(0, 69)}...` : prompt)} --goal ${quoteCliValue(prompt)} --scope-path ${quoteCliValue(files.length > 0 ? files.join(',') : '<files>')} --validator "<command>" --json`
     }
   ];
 }
