@@ -26,7 +26,7 @@ import { normalizeTaskRouteStatus, type TaskIntent } from './intent-normalizers.
 import { canTaskBePreparedForClaim, isTaskAlreadyActivelyClaimed, type ImportedTaskQueue, type ImportedTaskSummary } from './route-predicates.ts';
 import { quoteCliValue, uniqueSorted } from './view-projections.ts';
 import { resolveQuickfixScope, findActiveBatchRunForIntent, findActiveTaskQueueForIntent, assertPromptBatchDoesNotConflict, reconcilePromptScopeRuntimeForClaim, inspectImportedTaskQueue, createDeterministicTaskIntent, checkPendingTaskArtifactScopeExpansion } from './route-resolution.ts';
-import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath } from './playbook-projection.ts';
+import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath, readTaskValidators } from './playbook-projection.ts';
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
 import { evaluateSameTaskClaimOwnership, resolveSameActorClaimLaneSessionId, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts'; import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
@@ -493,7 +493,8 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       originalPrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
       actorPlaceholder: resolvedActor.actorId,
       claimActive: true,
-      laneSessionId: laneSession?.laneSessionId ?? null
+      laneSessionId: laneSession?.laneSessionId ?? null,
+      validators: readTaskValidators(taskPathFor(input.cwd, claimableTask.workItemId))
     }),
     deliveryPrinciple: buildTaskDeliveryPrinciple({
       channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
