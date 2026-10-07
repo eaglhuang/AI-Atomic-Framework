@@ -1,5 +1,16 @@
 // @ts-nocheck
+import { readFileSync } from 'node:fs';
 import { quoteCliValue } from '../view-projections.ts';
+
+/** Validator commands a claimed task card declares, read from its ledger record. */
+export function readTaskValidators(taskPath: string): readonly string[] {
+  try {
+    const validators = JSON.parse(readFileSync(taskPath, 'utf8')).validators;
+    return Array.isArray(validators) ? validators.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim()) : [];
+  } catch {
+    return [];
+  }
+}
 
 function buildTaskflowCloseOperatorCommands(taskId: string, actor: string, lane = '') {
   const id = taskId || '<task-id>';
@@ -49,6 +60,8 @@ export function buildChannelPlaybook(input: {
   /** Lane minted by that claim; agents run each command in a fresh shell, so
    * later mutations carry it as --lane-session instead of an exported env. */
   readonly laneSessionId?: string | null;
+  /** Validators the claimed card declares; each gets its own evidence run. */
+  readonly validators?: readonly string[] | null;
 }) {
   const actor = input.actorPlaceholder ?? '<id>';
   const prompt = input.originalPrompt?.trim() || '<current user prompt>';
@@ -204,7 +217,7 @@ export function buildChannelPlaybook(input: {
     commandSequence: [
       ...(input.claimActive ? [] : [defaultClaimCommand]),
       '<implement task deliverables>',
-      `node atm.mjs evidence run --task ${taskId} --actor ${actor}${lane} --command "<validator>" --validators "<validator>" --json`,
+      ...(input.validators?.length ? input.validators : ['<validator>']).map((validator) => `node atm.mjs evidence run --task ${taskId} --actor ${actor}${lane} --command ${quoteCliValue(validator)} --validators ${quoteCliValue(validator)} --json`),
       closeOps.preClose,
       closeOps.dryRun,
       closeOps.write
