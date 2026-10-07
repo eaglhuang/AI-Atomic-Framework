@@ -34,4 +34,9 @@ assert.match(candidate, /promotion-attempt-/);
 assert.match(candidate, /flag: 'a'/);
 assert.match(workflow, /npm@11\.21\.0/);
 assert.match(candidate, /io\.preflight\(candidateTag\)/);
+// npm dist-tag reads lag writes behind the CDN: every tag write waits until it
+// is visible, and probe tags left by an earlier failed run are swept first.
+assert.match(candidate, /setTag: \(name, version, tag\) => \{ runNpm\(\['dist-tag', 'add'.*awaitTag\(name, tag, version\)/);
+assert.match(candidate, /removeTag: \(name, tag\) => \{ runNpm\(\['dist-tag', 'rm'.*awaitTag\(name, tag, undefined\)/);
+assert.match(candidate, /startsWith\('preflight-candidate-'\)/);
 console.log('[release-public-registry-gate.test] ok');
