@@ -3,7 +3,8 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import os from 'node:os';
 import path from 'node:path';
 import { sortProposalsForCompose } from './merge-plan.ts';
-import { applyUnifiedPatch } from './unified-patch.ts';
+import { composeTextPatchesAgainstBase, type BaseCompositionResult, type StewardCompositionBlock } from './steward-base-composer.ts';
+import { applyUnifiedPatch, UnifiedPatchApplicationError } from './unified-patch.ts';
 import type {
   CompositionFileSlice,
   CompositionMemberAttribution,
@@ -61,6 +62,8 @@ export function buildPatchProposalComposition(input: {
 }): {
   readonly plan: TransactionalCompositionPlan;
   readonly outputFiles: readonly FileDescriptor[];
+  /** Set when a file cannot be composed against its base; nothing may be written then. */
+  readonly blocked: StewardCompositionBlock | null;
 } {
   const sorted = sortProposalsForCompose(input.proposals);
   const byFile = new Map<string, PatchProposal[]>();
@@ -73,10 +76,18 @@ export function buildPatchProposalComposition(input: {
   const fileSlices: CompositionFileSlice[] = [];
   const attribution: CompositionMemberAttribution[] = [];
   const selectedIds: string[] = [];
+  let blocked: StewardCompositionBlock | null = null;
+  let checkedPermutationCount = 0;
   for (const [filePath, proposals] of [...byFile].sort((left, right) => left[0].localeCompare(right[0]))) {
     const targetPath = path.resolve(input.cwd, filePath);
     const before = readFileSync(targetPath, 'utf8');
-    const after = composeProposalPatchesAgainstImmutableBase(before, proposals);
+    const composed = composeProposalPatchesAgainstImmutableBase(filePath, before, proposals);
+    if (!composed.ok) {
+      blocked = composed.block;
+      break;
+    }
+    checkedPermutationCount += composed.checkedPermutationCount;
+    const after = composed.content;
     for (const proposal of proposals) {
       selectedIds.push(proposal.proposalId);
       attribution.push({
@@ -108,16 +119,18 @@ export function buildPatchProposalComposition(input: {
     baseTree: 'in-memory',
     outputTree: 'in-memory',
     bounded: true,
-    selectedRequestIds: selectedIds.sort((left, right) => left.localeCompare(right)),
+    selectedRequestIds: blocked ? [] : selectedIds.sort((left, right) => left.localeCompare(right)),
     skippedRequestIds: [],
-    blockedRequestIds: [],
+    blockedRequestIds: blocked ? [...new Set(sorted.map((proposal) => proposal.proposalId))].sort((left, right) => left.localeCompare(right)) : [],
     fileSlices: fileSlices.sort((left, right) => left.filePath.localeCompare(right.filePath)),
     memberAttribution: attribution.sort((left, right) => left.requestId.localeCompare(right.requestId)),
     serializabilityProof: {
-      legalSerialOrder: selectedIds.sort((left, right) => left.localeCompare(right)),
-      permutationStable: true,
+      legalSerialOrder: blocked ? [] : selectedIds.sort((left, right) => left.localeCompare(right)),
+      // Each file is rendered under every checked proposal order; a differing
+      // render blocks the composition, so reaching here means it was stable.
+      permutationStable: blocked === null,
       equivalentOutputHash: outputDigest,
-      checkedPermutationCount: Math.max(1, selectedIds.length)
+      checkedPermutationCount: Math.max(1, checkedPermutationCount)
     },
     rollback: {
       strategy: 'discard-temp-tree',
@@ -129,47 +142,51 @@ export function buildPatchProposalComposition(input: {
   };
   return {
     plan,
-    outputFiles: outputFiles.sort((left, right) => left.filePath.localeCompare(right.filePath))
+    outputFiles: blocked ? [] : outputFiles.sort((left, right) => left.filePath.localeCompare(right.filePath)),
+    blocked
   };
 }
 
 /**
  * Compose each proposal against the same immutable source bytes.  Text patches
- * normally retain strict ordered unified-patch semantics.  JSON-pointer
- * proposals are different: their declared pointers describe disjoint semantic
- * slices, so applying their textual hunks one after another can make the
- * second hunk's surrounding context stale despite a conflict-free intent.
+ * go through the base composer, which resolves every hunk against the base and
+ * fails closed on overlap.  JSON-pointer proposals are different: their
+ * declared pointers describe disjoint semantic slices, so they are merged as
+ * JSON values and fall back to the text route on any hidden mutation.
  */
-function composeProposalPatchesAgainstImmutableBase(before: string, proposals: readonly PatchProposal[]): string {
+function composeProposalPatchesAgainstImmutableBase(filePath: string, before: string, proposals: readonly PatchProposal[]): BaseCompositionResult {
+  const textRoute = () => composeTextPatchesAgainstBase(filePath, before, proposals);
   const pointers = proposals.map((proposal) => declaredSingleJsonPointer(proposal));
   const useJsonPointerComposition = pointers.every((pointer): pointer is string => pointer !== null)
     && new Set(pointers).size === pointers.length;
-  if (!useJsonPointerComposition) {
-    return proposals.reduce((content, proposal) => applyUnifiedPatch(content, proposal.patch), before);
-  }
+  if (!useJsonPointerComposition) return textRoute();
 
   let baseDocument: unknown;
   try {
     baseDocument = JSON.parse(before);
   } catch {
-    return proposals.reduce((content, proposal) => applyUnifiedPatch(content, proposal.patch), before);
+    return textRoute();
   }
-  if (!isJsonObject(baseDocument)) {
-    return proposals.reduce((content, proposal) => applyUnifiedPatch(content, proposal.patch), before);
-  }
+  if (!isJsonObject(baseDocument)) return textRoute();
 
   const composed = structuredClone(baseDocument) as Record<string, unknown>;
   for (const [index, proposal] of proposals.entries()) {
     const pointer = pointers[index] as string;
-    const patched = JSON.parse(applyUnifiedPatch(before, proposal.patch)) as unknown;
+    let patched: unknown;
+    try {
+      patched = JSON.parse(applyUnifiedPatch(before, proposal.patch)) as unknown;
+    } catch (error) {
+      if (!(error instanceof UnifiedPatchApplicationError) && !(error instanceof SyntaxError)) throw error;
+      return textRoute();
+    }
     if (!isJsonObject(patched) || !isOnlyDeclaredPointerMutation(baseDocument, patched, pointer)) {
       // A JSON anchor is an authority boundary, never a hint: any hidden
       // mutation falls back to the strict text route and fails closed if stale.
-      return proposals.reduce((content, entry) => applyUnifiedPatch(content, entry.patch), before);
+      return textRoute();
     }
     setJsonPointer(composed, pointer, readJsonPointer(patched, pointer));
   }
-  return `${JSON.stringify(composed, null, 2)}\n`;
+  return { ok: true, content: `${JSON.stringify(composed, null, 2)}\n`, checkedPermutationCount: 1 };
 }
 
 function declaredSingleJsonPointer(proposal: PatchProposal): string | null {
