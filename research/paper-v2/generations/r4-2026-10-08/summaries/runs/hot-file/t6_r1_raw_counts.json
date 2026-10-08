@@ -1,0 +1,2166 @@
+{
+  "meta": {
+    "created": "2026-10-07",
+    "purpose": "A4 T6/R1 denominator audit raw integer counts from existing export/summary.json",
+    "sources": [
+      "runs/hf-*/export/summary.json",
+      "runs/v017-hf-*/export/summary.json",
+      "runs/hot-file/summary.json (aggregate cross-check)",
+      "runs/v017/hot_summary.json (aggregate cross-check)"
+    ],
+    "note_64_9_percent": "lost_update_rate_of_commits = lost/commits (NOT lost/intents). Field name in aggregate summary.json.",
+    "note_48_79_percent": "Review R1 computed 172.7/354 ≈ 48.79% using intents_per_rep as denominator; that is a different rate (lost/offered), not the published 64.9%."
+  },
+  "matrices": {
+    "oct6_h1-a8": {
+      "control": {
+        "label": "oct6_h1-a8/control",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-control-h1-a8-r1",
+            "mode": "control",
+            "intents": 354,
+            "commits": 354,
+            "pass": 101,
+            "oracle_fail": 253,
+            "lost": 253,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 286,
+            "duration_ms": 2531,
+            "decision_hist": {
+              "direct_write": 354
+            },
+            "lost_over_commits": 0.714689,
+            "lost_over_intents": 0.714689,
+            "pass_over_intents": 0.285311
+          },
+          {
+            "run_id": "hf-control-h1-a8-r2",
+            "mode": "control",
+            "intents": 354,
+            "commits": 354,
+            "pass": 101,
+            "oracle_fail": 253,
+            "lost": 253,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 286,
+            "duration_ms": 2530,
+            "decision_hist": {
+              "direct_write": 354
+            },
+            "lost_over_commits": 0.714689,
+            "lost_over_intents": 0.714689,
+            "pass_over_intents": 0.285311
+          },
+          {
+            "run_id": "hf-control-h1-a8-r3",
+            "mode": "control",
+            "intents": 354,
+            "commits": 354,
+            "pass": 101,
+            "oracle_fail": 253,
+            "lost": 253,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 287,
+            "duration_ms": 2528,
+            "decision_hist": {
+              "direct_write": 354
+            },
+            "lost_over_commits": 0.714689,
+            "lost_over_intents": 0.714689,
+            "pass_over_intents": 0.285311
+          }
+        ],
+        "sums": {
+          "lost": 759,
+          "commits": 1062,
+          "intents": 1062,
+          "pass": 303,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 253.0,
+          "commits": 354.0,
+          "pass": 101.0,
+          "rejects": 0.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.714689,
+          "mean_of_per_run_lost_over_commits": 0.714689,
+          "ratio_of_sums_lost_over_intents": 0.714689,
+          "mean_lost_over_intents_per_rep": 0.714689,
+          "ratio_of_sums_pass_over_intents": 0.285311
+        }
+      },
+      "native": {
+        "label": "oct6_h1-a8/native",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-native-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 267,
+            "pass": 267,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 87,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2559,
+            "decision_hist": {
+              "composer_merge": 205,
+              "hot_provisional": 62,
+              "reject": 87
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.754237
+          },
+          {
+            "run_id": "hf-native-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 269,
+            "pass": 269,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 85,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2553,
+            "decision_hist": {
+              "composer_merge": 213,
+              "hot_provisional": 56,
+              "reject": 85
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.759887
+          },
+          {
+            "run_id": "hf-native-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 274,
+            "pass": 274,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 80,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2560,
+            "decision_hist": {
+              "composer_merge": 212,
+              "hot_provisional": 62,
+              "reject": 80
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.774011
+          }
+        ],
+        "sums": {
+          "lost": 0,
+          "commits": 810,
+          "intents": 1062,
+          "pass": 810,
+          "rejects": 252
+        },
+        "means": {
+          "lost": 0.0,
+          "commits": 270.0,
+          "pass": 270.0,
+          "rejects": 84.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.0,
+          "mean_of_per_run_lost_over_commits": 0.0,
+          "ratio_of_sums_lost_over_intents": 0.0,
+          "mean_lost_over_intents_per_rep": 0.0,
+          "ratio_of_sums_pass_over_intents": 0.762712
+        }
+      },
+      "loop": {
+        "label": "oct6_h1-a8/loop",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-loop-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 354,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2991,
+            "decision_hist": {
+              "composer_merge": 303,
+              "hot_provisional": 51
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 1.0
+          },
+          {
+            "run_id": "hf-loop-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 354,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2844,
+            "decision_hist": {
+              "composer_merge": 302,
+              "hot_provisional": 52
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 1.0
+          },
+          {
+            "run_id": "hf-loop-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 354,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2922,
+            "decision_hist": {
+              "composer_merge": 294,
+              "hot_provisional": 60
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 1.0
+          }
+        ],
+        "sums": {
+          "lost": 0,
+          "commits": 1062,
+          "intents": 1062,
+          "pass": 1062,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 0.0,
+          "commits": 354.0,
+          "pass": 354.0,
+          "rejects": 0.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.0,
+          "mean_of_per_run_lost_over_commits": 0.0,
+          "ratio_of_sums_lost_over_intents": 0.0,
+          "mean_lost_over_intents_per_rep": 0.0,
+          "ratio_of_sums_pass_over_intents": 1.0
+        }
+      },
+      "nativestale": {
+        "label": "oct6_h1-a8/nativestale",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-nativestale-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 263,
+            "pass": 94,
+            "oracle_fail": 169,
+            "lost": 169,
+            "rejects": 91,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2549,
+            "decision_hist": {
+              "composer_merge": 207,
+              "hot_provisional": 56,
+              "reject": 91
+            },
+            "lost_over_commits": 0.642586,
+            "lost_over_intents": 0.477401,
+            "pass_over_intents": 0.265537
+          },
+          {
+            "run_id": "hf-nativestale-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 265,
+            "pass": 95,
+            "oracle_fail": 170,
+            "lost": 170,
+            "rejects": 89,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2558,
+            "decision_hist": {
+              "composer_merge": 203,
+              "hot_provisional": 62,
+              "reject": 89
+            },
+            "lost_over_commits": 0.641509,
+            "lost_over_intents": 0.480226,
+            "pass_over_intents": 0.268362
+          },
+          {
+            "run_id": "hf-nativestale-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 270,
+            "pass": 91,
+            "oracle_fail": 179,
+            "lost": 179,
+            "rejects": 84,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2566,
+            "decision_hist": {
+              "reject": 84,
+              "hot_provisional": 62,
+              "composer_merge": 208
+            },
+            "lost_over_commits": 0.662963,
+            "lost_over_intents": 0.50565,
+            "pass_over_intents": 0.257062
+          }
+        ],
+        "sums": {
+          "lost": 518,
+          "commits": 798,
+          "intents": 1062,
+          "pass": 280,
+          "rejects": 264
+        },
+        "means": {
+          "lost": 172.667,
+          "commits": 266.0,
+          "pass": 93.333,
+          "rejects": 88.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.649123,
+          "mean_of_per_run_lost_over_commits": 0.649019,
+          "ratio_of_sums_lost_over_intents": 0.487759,
+          "mean_lost_over_intents_per_rep": 0.487759,
+          "ratio_of_sums_pass_over_intents": 0.263653
+        }
+      },
+      "loopstale": {
+        "label": "oct6_h1-a8/loopstale",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-loopstale-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 129,
+            "oracle_fail": 225,
+            "lost": 225,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2966,
+            "decision_hist": {
+              "composer_merge": 295,
+              "hot_provisional": 59
+            },
+            "lost_over_commits": 0.635593,
+            "lost_over_intents": 0.635593,
+            "pass_over_intents": 0.364407
+          },
+          {
+            "run_id": "hf-loopstale-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 123,
+            "oracle_fail": 231,
+            "lost": 231,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2868,
+            "decision_hist": {
+              "composer_merge": 297,
+              "hot_provisional": 57
+            },
+            "lost_over_commits": 0.652542,
+            "lost_over_intents": 0.652542,
+            "pass_over_intents": 0.347458
+          },
+          {
+            "run_id": "hf-loopstale-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 118,
+            "oracle_fail": 236,
+            "lost": 236,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2839,
+            "decision_hist": {
+              "composer_merge": 299,
+              "hot_provisional": 55
+            },
+            "lost_over_commits": 0.666667,
+            "lost_over_intents": 0.666667,
+            "pass_over_intents": 0.333333
+          }
+        ],
+        "sums": {
+          "lost": 692,
+          "commits": 1062,
+          "intents": 1062,
+          "pass": 370,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 230.667,
+          "commits": 354.0,
+          "pass": 123.333,
+          "rejects": 0.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.651601,
+          "mean_of_per_run_lost_over_commits": 0.651601,
+          "ratio_of_sums_lost_over_intents": 0.651601,
+          "mean_lost_over_intents_per_rep": 0.651601,
+          "ratio_of_sums_pass_over_intents": 0.348399
+        }
+      },
+      "mock": {
+        "label": "oct6_h1-a8/mock",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-mock-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 282,
+            "pass": 282,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 72,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2530,
+            "decision_hist": {
+              "reject": 72,
+              "admit": 66,
+              "hot_provisional": 107,
+              "composer_merge": 109
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.79661
+          },
+          {
+            "run_id": "hf-mock-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 281,
+            "pass": 281,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 73,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2528,
+            "decision_hist": {
+              "reject": 73,
+              "admit": 65,
+              "hot_provisional": 106,
+              "composer_merge": 110
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.793785
+          },
+          {
+            "run_id": "hf-mock-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 282,
+            "pass": 282,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 72,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2528,
+            "decision_hist": {
+              "reject": 72,
+              "admit": 66,
+              "hot_provisional": 107,
+              "composer_merge": 109
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.79661
+          }
+        ],
+        "sums": {
+          "lost": 0,
+          "commits": 845,
+          "intents": 1062,
+          "pass": 845,
+          "rejects": 217
+        },
+        "means": {
+          "lost": 0.0,
+          "commits": 281.667,
+          "pass": 281.667,
+          "rejects": 72.333,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.0,
+          "mean_of_per_run_lost_over_commits": 0.0,
+          "ratio_of_sums_lost_over_intents": 0.0,
+          "mean_lost_over_intents_per_rep": 0.0,
+          "ratio_of_sums_pass_over_intents": 0.795669
+        }
+      }
+    },
+    "oct6_h1-a6": {
+      "control": {
+        "label": "oct6_h1-a6/control",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-control-h1-a6-r1",
+            "mode": "control",
+            "intents": 269,
+            "commits": 269,
+            "pass": 98,
+            "oracle_fail": 171,
+            "lost": 171,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 203,
+            "duration_ms": 2536,
+            "decision_hist": {
+              "direct_write": 269
+            },
+            "lost_over_commits": 0.635688,
+            "lost_over_intents": 0.635688,
+            "pass_over_intents": 0.364312
+          },
+          {
+            "run_id": "hf-control-h1-a6-r2",
+            "mode": "control",
+            "intents": 269,
+            "commits": 269,
+            "pass": 96,
+            "oracle_fail": 173,
+            "lost": 173,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 202,
+            "duration_ms": 2537,
+            "decision_hist": {
+              "direct_write": 269
+            },
+            "lost_over_commits": 0.643123,
+            "lost_over_intents": 0.643123,
+            "pass_over_intents": 0.356877
+          },
+          {
+            "run_id": "hf-control-h1-a6-r3",
+            "mode": "control",
+            "intents": 269,
+            "commits": 269,
+            "pass": 97,
+            "oracle_fail": 172,
+            "lost": 172,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 202,
+            "duration_ms": 2534,
+            "decision_hist": {
+              "direct_write": 269
+            },
+            "lost_over_commits": 0.639405,
+            "lost_over_intents": 0.639405,
+            "pass_over_intents": 0.360595
+          }
+        ],
+        "sums": {
+          "lost": 516,
+          "commits": 807,
+          "intents": 807,
+          "pass": 291,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 172.0,
+          "commits": 269.0,
+          "pass": 97.0,
+          "rejects": 0.0,
+          "intents": 269.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.639405,
+          "mean_of_per_run_lost_over_commits": 0.639405,
+          "ratio_of_sums_lost_over_intents": 0.639405,
+          "mean_lost_over_intents_per_rep": 0.639405,
+          "ratio_of_sums_pass_over_intents": 0.360595
+        }
+      },
+      "nativestale": {
+        "label": "oct6_h1-a6/nativestale",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-nativestale-h1-a6-r1",
+            "mode": "atm",
+            "intents": 269,
+            "commits": 207,
+            "pass": 92,
+            "oracle_fail": 115,
+            "lost": 115,
+            "rejects": 62,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2550,
+            "decision_hist": {
+              "composer_merge": 137,
+              "reject": 62,
+              "hot_provisional": 70
+            },
+            "lost_over_commits": 0.555556,
+            "lost_over_intents": 0.427509,
+            "pass_over_intents": 0.342007
+          },
+          {
+            "run_id": "hf-nativestale-h1-a6-r2",
+            "mode": "atm",
+            "intents": 269,
+            "commits": 210,
+            "pass": 95,
+            "oracle_fail": 115,
+            "lost": 115,
+            "rejects": 59,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2549,
+            "decision_hist": {
+              "composer_merge": 139,
+              "reject": 59,
+              "hot_provisional": 71
+            },
+            "lost_over_commits": 0.547619,
+            "lost_over_intents": 0.427509,
+            "pass_over_intents": 0.35316
+          },
+          {
+            "run_id": "hf-nativestale-h1-a6-r3",
+            "mode": "atm",
+            "intents": 269,
+            "commits": 212,
+            "pass": 93,
+            "oracle_fail": 119,
+            "lost": 119,
+            "rejects": 57,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2545,
+            "decision_hist": {
+              "composer_merge": 139,
+              "reject": 57,
+              "hot_provisional": 73
+            },
+            "lost_over_commits": 0.561321,
+            "lost_over_intents": 0.442379,
+            "pass_over_intents": 0.345725
+          }
+        ],
+        "sums": {
+          "lost": 349,
+          "commits": 629,
+          "intents": 807,
+          "pass": 280,
+          "rejects": 178
+        },
+        "means": {
+          "lost": 116.333,
+          "commits": 209.667,
+          "pass": 93.333,
+          "rejects": 59.333,
+          "intents": 269.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.554849,
+          "mean_of_per_run_lost_over_commits": 0.554832,
+          "ratio_of_sums_lost_over_intents": 0.432466,
+          "mean_lost_over_intents_per_rep": 0.432466,
+          "ratio_of_sums_pass_over_intents": 0.346964
+        }
+      },
+      "loopstale": {
+        "label": "oct6_h1-a6/loopstale",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-loopstale-h1-a6-r1",
+            "mode": "atm",
+            "intents": 269,
+            "commits": 269,
+            "pass": 126,
+            "oracle_fail": 143,
+            "lost": 143,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2841,
+            "decision_hist": {
+              "composer_merge": 201,
+              "hot_provisional": 68
+            },
+            "lost_over_commits": 0.531599,
+            "lost_over_intents": 0.531599,
+            "pass_over_intents": 0.468401
+          },
+          {
+            "run_id": "hf-loopstale-h1-a6-r2",
+            "mode": "atm",
+            "intents": 269,
+            "commits": 269,
+            "pass": 121,
+            "oracle_fail": 148,
+            "lost": 148,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2744,
+            "decision_hist": {
+              "composer_merge": 200,
+              "hot_provisional": 69
+            },
+            "lost_over_commits": 0.550186,
+            "lost_over_intents": 0.550186,
+            "pass_over_intents": 0.449814
+          },
+          {
+            "run_id": "hf-loopstale-h1-a6-r3",
+            "mode": "atm",
+            "intents": 269,
+            "commits": 269,
+            "pass": 121,
+            "oracle_fail": 148,
+            "lost": 148,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2735,
+            "decision_hist": {
+              "composer_merge": 200,
+              "hot_provisional": 69
+            },
+            "lost_over_commits": 0.550186,
+            "lost_over_intents": 0.550186,
+            "pass_over_intents": 0.449814
+          }
+        ],
+        "sums": {
+          "lost": 439,
+          "commits": 807,
+          "intents": 807,
+          "pass": 368,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 146.333,
+          "commits": 269.0,
+          "pass": 122.667,
+          "rejects": 0.0,
+          "intents": 269.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.54399,
+          "mean_of_per_run_lost_over_commits": 0.54399,
+          "ratio_of_sums_lost_over_intents": 0.54399,
+          "mean_lost_over_intents_per_rep": 0.54399,
+          "ratio_of_sums_pass_over_intents": 0.45601
+        }
+      }
+    },
+    "oct6_h08-a8": {
+      "control": {
+        "label": "oct6_h08-a8/control",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-control-h08-a8-r1",
+            "mode": "control",
+            "intents": 354,
+            "commits": 354,
+            "pass": 114,
+            "oracle_fail": 240,
+            "lost": 240,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 261,
+            "duration_ms": 2533,
+            "decision_hist": {
+              "direct_write": 354
+            },
+            "lost_over_commits": 0.677966,
+            "lost_over_intents": 0.677966,
+            "pass_over_intents": 0.322034
+          },
+          {
+            "run_id": "hf-control-h08-a8-r2",
+            "mode": "control",
+            "intents": 354,
+            "commits": 354,
+            "pass": 112,
+            "oracle_fail": 242,
+            "lost": 242,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 263,
+            "duration_ms": 2533,
+            "decision_hist": {
+              "direct_write": 354
+            },
+            "lost_over_commits": 0.683616,
+            "lost_over_intents": 0.683616,
+            "pass_over_intents": 0.316384
+          },
+          {
+            "run_id": "hf-control-h08-a8-r3",
+            "mode": "control",
+            "intents": 354,
+            "commits": 354,
+            "pass": 114,
+            "oracle_fail": 240,
+            "lost": 240,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 261,
+            "duration_ms": 2531,
+            "decision_hist": {
+              "direct_write": 354
+            },
+            "lost_over_commits": 0.677966,
+            "lost_over_intents": 0.677966,
+            "pass_over_intents": 0.322034
+          }
+        ],
+        "sums": {
+          "lost": 722,
+          "commits": 1062,
+          "intents": 1062,
+          "pass": 340,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 240.667,
+          "commits": 354.0,
+          "pass": 113.333,
+          "rejects": 0.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.679849,
+          "mean_of_per_run_lost_over_commits": 0.679849,
+          "ratio_of_sums_lost_over_intents": 0.679849,
+          "mean_lost_over_intents_per_rep": 0.679849,
+          "ratio_of_sums_pass_over_intents": 0.320151
+        }
+      },
+      "nativestale": {
+        "label": "oct6_h08-a8/nativestale",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-nativestale-h08-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 295,
+            "pass": 102,
+            "oracle_fail": 193,
+            "lost": 193,
+            "rejects": 59,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2568,
+            "decision_hist": {
+              "composer_merge": 212,
+              "hot_provisional": 57,
+              "reject": 59,
+              "admit": 26
+            },
+            "lost_over_commits": 0.654237,
+            "lost_over_intents": 0.545198,
+            "pass_over_intents": 0.288136
+          },
+          {
+            "run_id": "hf-nativestale-h08-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 290,
+            "pass": 103,
+            "oracle_fail": 187,
+            "lost": 187,
+            "rejects": 64,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2572,
+            "decision_hist": {
+              "composer_merge": 205,
+              "hot_provisional": 59,
+              "reject": 64,
+              "admit": 26
+            },
+            "lost_over_commits": 0.644828,
+            "lost_over_intents": 0.528249,
+            "pass_over_intents": 0.29096
+          },
+          {
+            "run_id": "hf-nativestale-h08-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 291,
+            "pass": 105,
+            "oracle_fail": 186,
+            "lost": 186,
+            "rejects": 63,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2565,
+            "decision_hist": {
+              "composer_merge": 207,
+              "hot_provisional": 57,
+              "reject": 63,
+              "admit": 27
+            },
+            "lost_over_commits": 0.639175,
+            "lost_over_intents": 0.525424,
+            "pass_over_intents": 0.29661
+          }
+        ],
+        "sums": {
+          "lost": 566,
+          "commits": 876,
+          "intents": 1062,
+          "pass": 310,
+          "rejects": 186
+        },
+        "means": {
+          "lost": 188.667,
+          "commits": 292.0,
+          "pass": 103.333,
+          "rejects": 62.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.646119,
+          "mean_of_per_run_lost_over_commits": 0.64608,
+          "ratio_of_sums_lost_over_intents": 0.532957,
+          "mean_lost_over_intents_per_rep": 0.532957,
+          "ratio_of_sums_pass_over_intents": 0.291902
+        }
+      },
+      "loopstale": {
+        "label": "oct6_h08-a8/loopstale",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "hf-loopstale-h08-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 156,
+            "oracle_fail": 198,
+            "lost": 198,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2785,
+            "decision_hist": {
+              "composer_merge": 257,
+              "hot_provisional": 58,
+              "admit": 39
+            },
+            "lost_over_commits": 0.559322,
+            "lost_over_intents": 0.559322,
+            "pass_over_intents": 0.440678
+          },
+          {
+            "run_id": "hf-loopstale-h08-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 157,
+            "oracle_fail": 197,
+            "lost": 197,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2755,
+            "decision_hist": {
+              "composer_merge": 260,
+              "hot_provisional": 55,
+              "admit": 39
+            },
+            "lost_over_commits": 0.556497,
+            "lost_over_intents": 0.556497,
+            "pass_over_intents": 0.443503
+          },
+          {
+            "run_id": "hf-loopstale-h08-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 154,
+            "oracle_fail": 200,
+            "lost": 200,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2797,
+            "decision_hist": {
+              "composer_merge": 253,
+              "hot_provisional": 62,
+              "admit": 39
+            },
+            "lost_over_commits": 0.564972,
+            "lost_over_intents": 0.564972,
+            "pass_over_intents": 0.435028
+          }
+        ],
+        "sums": {
+          "lost": 595,
+          "commits": 1062,
+          "intents": 1062,
+          "pass": 467,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 198.333,
+          "commits": 354.0,
+          "pass": 155.667,
+          "rejects": 0.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.560264,
+          "mean_of_per_run_lost_over_commits": 0.560264,
+          "ratio_of_sums_lost_over_intents": 0.560264,
+          "mean_lost_over_intents_per_rep": 0.560264,
+          "ratio_of_sums_pass_over_intents": 0.439736
+        }
+      }
+    },
+    "v017_h1-a8": {
+      "control": {
+        "label": "v017_h1-a8/control",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "v017-hf-control-h1-a8-r1",
+            "mode": "control",
+            "intents": 354,
+            "commits": 354,
+            "pass": 101,
+            "oracle_fail": 253,
+            "lost": 253,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 285,
+            "duration_ms": 2531,
+            "decision_hist": {
+              "direct_write": 354
+            },
+            "lost_over_commits": 0.714689,
+            "lost_over_intents": 0.714689,
+            "pass_over_intents": 0.285311
+          },
+          {
+            "run_id": "v017-hf-control-h1-a8-r2",
+            "mode": "control",
+            "intents": 354,
+            "commits": 354,
+            "pass": 101,
+            "oracle_fail": 253,
+            "lost": 253,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 286,
+            "duration_ms": 2529,
+            "decision_hist": {
+              "direct_write": 354
+            },
+            "lost_over_commits": 0.714689,
+            "lost_over_intents": 0.714689,
+            "pass_over_intents": 0.285311
+          },
+          {
+            "run_id": "v017-hf-control-h1-a8-r3",
+            "mode": "control",
+            "intents": 354,
+            "commits": 354,
+            "pass": 101,
+            "oracle_fail": 253,
+            "lost": 253,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 286,
+            "duration_ms": 2529,
+            "decision_hist": {
+              "direct_write": 354
+            },
+            "lost_over_commits": 0.714689,
+            "lost_over_intents": 0.714689,
+            "pass_over_intents": 0.285311
+          }
+        ],
+        "sums": {
+          "lost": 759,
+          "commits": 1062,
+          "intents": 1062,
+          "pass": 303,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 253.0,
+          "commits": 354.0,
+          "pass": 101.0,
+          "rejects": 0.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.714689,
+          "mean_of_per_run_lost_over_commits": 0.714689,
+          "ratio_of_sums_lost_over_intents": 0.714689,
+          "mean_lost_over_intents_per_rep": 0.714689,
+          "ratio_of_sums_pass_over_intents": 0.285311
+        }
+      },
+      "native": {
+        "label": "v017_h1-a8/native",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "v017-hf-native-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 266,
+            "pass": 266,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 88,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2567,
+            "decision_hist": {
+              "composer_merge": 209,
+              "hot_provisional": 57,
+              "reject": 88
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.751412
+          },
+          {
+            "run_id": "v017-hf-native-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 270,
+            "pass": 270,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 84,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2563,
+            "decision_hist": {
+              "reject": 84,
+              "hot_provisional": 62,
+              "composer_merge": 208
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.762712
+          },
+          {
+            "run_id": "v017-hf-native-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 266,
+            "pass": 266,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 88,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2562,
+            "decision_hist": {
+              "composer_merge": 202,
+              "hot_provisional": 64,
+              "reject": 88
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.751412
+          }
+        ],
+        "sums": {
+          "lost": 0,
+          "commits": 802,
+          "intents": 1062,
+          "pass": 802,
+          "rejects": 260
+        },
+        "means": {
+          "lost": 0.0,
+          "commits": 267.333,
+          "pass": 267.333,
+          "rejects": 86.667,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.0,
+          "mean_of_per_run_lost_over_commits": 0.0,
+          "ratio_of_sums_lost_over_intents": 0.0,
+          "mean_lost_over_intents_per_rep": 0.0,
+          "ratio_of_sums_pass_over_intents": 0.755179
+        }
+      },
+      "loop": {
+        "label": "v017_h1-a8/loop",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "v017-hf-loop-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 354,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 3048,
+            "decision_hist": {
+              "composer_merge": 295,
+              "hot_provisional": 59
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 1.0
+          },
+          {
+            "run_id": "v017-hf-loop-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 354,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 3037,
+            "decision_hist": {
+              "composer_merge": 305,
+              "hot_provisional": 49
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 1.0
+          },
+          {
+            "run_id": "v017-hf-loop-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 354,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 3060,
+            "decision_hist": {
+              "composer_merge": 298,
+              "hot_provisional": 56
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 1.0
+          }
+        ],
+        "sums": {
+          "lost": 0,
+          "commits": 1062,
+          "intents": 1062,
+          "pass": 1062,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 0.0,
+          "commits": 354.0,
+          "pass": 354.0,
+          "rejects": 0.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.0,
+          "mean_of_per_run_lost_over_commits": 0.0,
+          "ratio_of_sums_lost_over_intents": 0.0,
+          "mean_lost_over_intents_per_rep": 0.0,
+          "ratio_of_sums_pass_over_intents": 1.0
+        }
+      },
+      "nativestale": {
+        "label": "v017_h1-a8/nativestale",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "v017-hf-nativestale-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 264,
+            "pass": 94,
+            "oracle_fail": 170,
+            "lost": 170,
+            "rejects": 90,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2555,
+            "decision_hist": {
+              "composer_merge": 206,
+              "hot_provisional": 58,
+              "reject": 90
+            },
+            "lost_over_commits": 0.643939,
+            "lost_over_intents": 0.480226,
+            "pass_over_intents": 0.265537
+          },
+          {
+            "run_id": "v017-hf-nativestale-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 265,
+            "pass": 91,
+            "oracle_fail": 174,
+            "lost": 174,
+            "rejects": 89,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2560,
+            "decision_hist": {
+              "composer_merge": 211,
+              "hot_provisional": 54,
+              "reject": 89
+            },
+            "lost_over_commits": 0.656604,
+            "lost_over_intents": 0.491525,
+            "pass_over_intents": 0.257062
+          },
+          {
+            "run_id": "v017-hf-nativestale-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 256,
+            "pass": 90,
+            "oracle_fail": 166,
+            "lost": 166,
+            "rejects": 98,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2563,
+            "decision_hist": {
+              "composer_merge": 207,
+              "hot_provisional": 49,
+              "reject": 98
+            },
+            "lost_over_commits": 0.648438,
+            "lost_over_intents": 0.468927,
+            "pass_over_intents": 0.254237
+          }
+        ],
+        "sums": {
+          "lost": 510,
+          "commits": 785,
+          "intents": 1062,
+          "pass": 275,
+          "rejects": 277
+        },
+        "means": {
+          "lost": 170.0,
+          "commits": 261.667,
+          "pass": 91.667,
+          "rejects": 92.333,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.649682,
+          "mean_of_per_run_lost_over_commits": 0.64966,
+          "ratio_of_sums_lost_over_intents": 0.480226,
+          "mean_lost_over_intents_per_rep": 0.480226,
+          "ratio_of_sums_pass_over_intents": 0.258945
+        }
+      },
+      "loopstale": {
+        "label": "v017_h1-a8/loopstale",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "v017-hf-loopstale-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 129,
+            "oracle_fail": 225,
+            "lost": 225,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 3078,
+            "decision_hist": {
+              "composer_merge": 291,
+              "hot_provisional": 63
+            },
+            "lost_over_commits": 0.635593,
+            "lost_over_intents": 0.635593,
+            "pass_over_intents": 0.364407
+          },
+          {
+            "run_id": "v017-hf-loopstale-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 123,
+            "oracle_fail": 231,
+            "lost": 231,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2892,
+            "decision_hist": {
+              "composer_merge": 303,
+              "hot_provisional": 51
+            },
+            "lost_over_commits": 0.652542,
+            "lost_over_intents": 0.652542,
+            "pass_over_intents": 0.347458
+          },
+          {
+            "run_id": "v017-hf-loopstale-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 354,
+            "pass": 135,
+            "oracle_fail": 219,
+            "lost": 219,
+            "rejects": 0,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 3189,
+            "decision_hist": {
+              "composer_merge": 288,
+              "hot_provisional": 66
+            },
+            "lost_over_commits": 0.618644,
+            "lost_over_intents": 0.618644,
+            "pass_over_intents": 0.381356
+          }
+        ],
+        "sums": {
+          "lost": 675,
+          "commits": 1062,
+          "intents": 1062,
+          "pass": 387,
+          "rejects": 0
+        },
+        "means": {
+          "lost": 225.0,
+          "commits": 354.0,
+          "pass": 129.0,
+          "rejects": 0.0,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.635593,
+          "mean_of_per_run_lost_over_commits": 0.635593,
+          "ratio_of_sums_lost_over_intents": 0.635593,
+          "mean_lost_over_intents_per_rep": 0.635593,
+          "ratio_of_sums_pass_over_intents": 0.364407
+        }
+      },
+      "mock": {
+        "label": "v017_h1-a8/mock",
+        "n_reps": 3,
+        "per_run": [
+          {
+            "run_id": "v017-hf-mock-h1-a8-r1",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 281,
+            "pass": 281,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 73,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2526,
+            "decision_hist": {
+              "reject": 73,
+              "admit": 64,
+              "hot_provisional": 108,
+              "composer_merge": 109
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.793785
+          },
+          {
+            "run_id": "v017-hf-mock-h1-a8-r2",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 280,
+            "pass": 280,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 74,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2529,
+            "decision_hist": {
+              "reject": 74,
+              "admit": 65,
+              "hot_provisional": 108,
+              "composer_merge": 107
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.79096
+          },
+          {
+            "run_id": "v017-hf-mock-h1-a8-r3",
+            "mode": "atm",
+            "intents": 354,
+            "commits": 283,
+            "pass": 283,
+            "oracle_fail": 0,
+            "lost": 0,
+            "rejects": 71,
+            "timeouts": 0,
+            "racy": 0,
+            "duration_ms": 2529,
+            "decision_hist": {
+              "reject": 71,
+              "admit": 65,
+              "hot_provisional": 110,
+              "composer_merge": 108
+            },
+            "lost_over_commits": 0.0,
+            "lost_over_intents": 0.0,
+            "pass_over_intents": 0.799435
+          }
+        ],
+        "sums": {
+          "lost": 0,
+          "commits": 844,
+          "intents": 1062,
+          "pass": 844,
+          "rejects": 218
+        },
+        "means": {
+          "lost": 0.0,
+          "commits": 281.333,
+          "pass": 281.333,
+          "rejects": 72.667,
+          "intents": 354.0
+        },
+        "aggregation": {
+          "ratio_of_sums_lost_over_commits": 0.0,
+          "mean_of_per_run_lost_over_commits": 0.0,
+          "ratio_of_sums_lost_over_intents": 0.0,
+          "mean_lost_over_intents_per_rep": 0.0,
+          "ratio_of_sums_pass_over_intents": 0.794727
+        }
+      }
+    }
+  },
+  "aggregate_crosscheck": {
+    "oct6_hot_file_summary": {
+      "h1-a8": {
+        "control": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 101,
+          "lost_updates_per_rep": 253,
+          "lost_update_rate_of_commits": 0.7147,
+          "success_rate_of_intents": 0.2853,
+          "rejects_per_rep": 0,
+          "runs": [
+            "hf-control-h1-a8-r1",
+            "hf-control-h1-a8-r2",
+            "hf-control-h1-a8-r3"
+          ]
+        },
+        "native": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 270,
+          "oracle_pass_per_rep": 270,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 0.7627,
+          "rejects_per_rep": 84,
+          "runs": [
+            "hf-native-h1-a8-r1",
+            "hf-native-h1-a8-r2",
+            "hf-native-h1-a8-r3"
+          ]
+        },
+        "loop": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 354,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 1,
+          "rejects_per_rep": 0,
+          "runs": [
+            "hf-loop-h1-a8-r1",
+            "hf-loop-h1-a8-r2",
+            "hf-loop-h1-a8-r3"
+          ]
+        },
+        "nativestale": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 266,
+          "oracle_pass_per_rep": 93.3,
+          "lost_updates_per_rep": 172.7,
+          "lost_update_rate_of_commits": 0.6491,
+          "success_rate_of_intents": 0.2637,
+          "rejects_per_rep": 88,
+          "runs": [
+            "hf-nativestale-h1-a8-r1",
+            "hf-nativestale-h1-a8-r2",
+            "hf-nativestale-h1-a8-r3"
+          ]
+        },
+        "loopstale": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 123.3,
+          "lost_updates_per_rep": 230.7,
+          "lost_update_rate_of_commits": 0.6516,
+          "success_rate_of_intents": 0.3484,
+          "rejects_per_rep": 0,
+          "runs": [
+            "hf-loopstale-h1-a8-r1",
+            "hf-loopstale-h1-a8-r2",
+            "hf-loopstale-h1-a8-r3"
+          ]
+        },
+        "mock": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 281.7,
+          "oracle_pass_per_rep": 281.7,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 0.7957,
+          "rejects_per_rep": 72.3,
+          "runs": [
+            "hf-mock-h1-a8-r1",
+            "hf-mock-h1-a8-r2",
+            "hf-mock-h1-a8-r3"
+          ]
+        }
+      },
+      "h1-a6": {
+        "control": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 269,
+          "oracle_pass_per_rep": 97,
+          "lost_updates_per_rep": 172,
+          "lost_update_rate_of_commits": 0.6394,
+          "success_rate_of_intents": 0.3606,
+          "rejects_per_rep": 0,
+          "runs": [
+            "hf-control-h1-a6-r1",
+            "hf-control-h1-a6-r2",
+            "hf-control-h1-a6-r3"
+          ]
+        },
+        "native": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 210,
+          "oracle_pass_per_rep": 210,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 0.7807,
+          "rejects_per_rep": 59,
+          "runs": [
+            "hf-native-h1-a6-r1",
+            "hf-native-h1-a6-r2",
+            "hf-native-h1-a6-r3"
+          ]
+        },
+        "loop": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 269,
+          "oracle_pass_per_rep": 269,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 1,
+          "rejects_per_rep": 0,
+          "runs": [
+            "hf-loop-h1-a6-r1",
+            "hf-loop-h1-a6-r2",
+            "hf-loop-h1-a6-r3"
+          ]
+        },
+        "nativestale": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 209.7,
+          "oracle_pass_per_rep": 93.3,
+          "lost_updates_per_rep": 116.3,
+          "lost_update_rate_of_commits": 0.5548,
+          "success_rate_of_intents": 0.347,
+          "rejects_per_rep": 59.3,
+          "runs": [
+            "hf-nativestale-h1-a6-r1",
+            "hf-nativestale-h1-a6-r2",
+            "hf-nativestale-h1-a6-r3"
+          ]
+        },
+        "loopstale": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 269,
+          "oracle_pass_per_rep": 122.7,
+          "lost_updates_per_rep": 146.3,
+          "lost_update_rate_of_commits": 0.544,
+          "success_rate_of_intents": 0.456,
+          "rejects_per_rep": 0,
+          "runs": [
+            "hf-loopstale-h1-a6-r1",
+            "hf-loopstale-h1-a6-r2",
+            "hf-loopstale-h1-a6-r3"
+          ]
+        }
+      },
+      "h08-a8": {
+        "control": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 113.3,
+          "lost_updates_per_rep": 240.7,
+          "lost_update_rate_of_commits": 0.6798,
+          "success_rate_of_intents": 0.3202,
+          "rejects_per_rep": 0,
+          "runs": [
+            "hf-control-h08-a8-r1",
+            "hf-control-h08-a8-r2",
+            "hf-control-h08-a8-r3"
+          ]
+        },
+        "native": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 286,
+          "oracle_pass_per_rep": 286,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 0.8079,
+          "rejects_per_rep": 68,
+          "runs": [
+            "hf-native-h08-a8-r1",
+            "hf-native-h08-a8-r2",
+            "hf-native-h08-a8-r3"
+          ]
+        },
+        "loop": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 354,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 1,
+          "rejects_per_rep": 0,
+          "runs": [
+            "hf-loop-h08-a8-r1",
+            "hf-loop-h08-a8-r2",
+            "hf-loop-h08-a8-r3"
+          ]
+        },
+        "nativestale": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 292,
+          "oracle_pass_per_rep": 103.3,
+          "lost_updates_per_rep": 188.7,
+          "lost_update_rate_of_commits": 0.6461,
+          "success_rate_of_intents": 0.2919,
+          "rejects_per_rep": 62,
+          "runs": [
+            "hf-nativestale-h08-a8-r1",
+            "hf-nativestale-h08-a8-r2",
+            "hf-nativestale-h08-a8-r3"
+          ]
+        },
+        "loopstale": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 155.7,
+          "lost_updates_per_rep": 198.3,
+          "lost_update_rate_of_commits": 0.5603,
+          "success_rate_of_intents": 0.4397,
+          "rejects_per_rep": 0,
+          "runs": [
+            "hf-loopstale-h08-a8-r1",
+            "hf-loopstale-h08-a8-r2",
+            "hf-loopstale-h08-a8-r3"
+          ]
+        }
+      }
+    },
+    "v017_hot_summary_h1_a8": {
+      "control": {
+        "intents_per_rep": 354,
+        "commits_per_rep": 354,
+        "oracle_pass_per_rep": 101,
+        "lost_updates_per_rep": 253,
+        "lost_update_rate_of_commits": 0.7147,
+        "success_rate_of_intents": 0.2853,
+        "rejects_per_rep": 0,
+        "runs": [
+          "v017-hf-control-h1-a8-r1",
+          "v017-hf-control-h1-a8-r2",
+          "v017-hf-control-h1-a8-r3"
+        ]
+      },
+      "native": {
+        "intents_per_rep": 354,
+        "commits_per_rep": 267.3,
+        "oracle_pass_per_rep": 267.3,
+        "lost_updates_per_rep": 0,
+        "lost_update_rate_of_commits": 0,
+        "success_rate_of_intents": 0.7552,
+        "rejects_per_rep": 86.7,
+        "runs": [
+          "v017-hf-native-h1-a8-r1",
+          "v017-hf-native-h1-a8-r2",
+          "v017-hf-native-h1-a8-r3"
+        ]
+      },
+      "loop": {
+        "intents_per_rep": 354,
+        "commits_per_rep": 354,
+        "oracle_pass_per_rep": 354,
+        "lost_updates_per_rep": 0,
+        "lost_update_rate_of_commits": 0,
+        "success_rate_of_intents": 1,
+        "rejects_per_rep": 0,
+        "runs": [
+          "v017-hf-loop-h1-a8-r1",
+          "v017-hf-loop-h1-a8-r2",
+          "v017-hf-loop-h1-a8-r3"
+        ]
+      },
+      "nativestale": {
+        "intents_per_rep": 354,
+        "commits_per_rep": 261.7,
+        "oracle_pass_per_rep": 91.7,
+        "lost_updates_per_rep": 170,
+        "lost_update_rate_of_commits": 0.6497,
+        "success_rate_of_intents": 0.2589,
+        "rejects_per_rep": 92.3,
+        "runs": [
+          "v017-hf-nativestale-h1-a8-r1",
+          "v017-hf-nativestale-h1-a8-r2",
+          "v017-hf-nativestale-h1-a8-r3"
+        ]
+      },
+      "loopstale": {
+        "intents_per_rep": 354,
+        "commits_per_rep": 354,
+        "oracle_pass_per_rep": 129,
+        "lost_updates_per_rep": 225,
+        "lost_update_rate_of_commits": 0.6356,
+        "success_rate_of_intents": 0.3644,
+        "rejects_per_rep": 0,
+        "runs": [
+          "v017-hf-loopstale-h1-a8-r1",
+          "v017-hf-loopstale-h1-a8-r2",
+          "v017-hf-loopstale-h1-a8-r3"
+        ]
+      },
+      "mock": {
+        "intents_per_rep": 354,
+        "commits_per_rep": 281.3,
+        "oracle_pass_per_rep": 281.3,
+        "lost_updates_per_rep": 0,
+        "lost_update_rate_of_commits": 0,
+        "success_rate_of_intents": 0.7947,
+        "rejects_per_rep": 72.7,
+        "runs": [
+          "v017-hf-mock-h1-a8-r1",
+          "v017-hf-mock-h1-a8-r2",
+          "v017-hf-mock-h1-a8-r3"
+        ]
+      }
+    },
+    "v017_hot_summary": {
+      "h1-a8": {
+        "control": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 101,
+          "lost_updates_per_rep": 253,
+          "lost_update_rate_of_commits": 0.7147,
+          "success_rate_of_intents": 0.2853,
+          "rejects_per_rep": 0,
+          "runs": [
+            "v017-hf-control-h1-a8-r1",
+            "v017-hf-control-h1-a8-r2",
+            "v017-hf-control-h1-a8-r3"
+          ]
+        },
+        "native": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 267.3,
+          "oracle_pass_per_rep": 267.3,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 0.7552,
+          "rejects_per_rep": 86.7,
+          "runs": [
+            "v017-hf-native-h1-a8-r1",
+            "v017-hf-native-h1-a8-r2",
+            "v017-hf-native-h1-a8-r3"
+          ]
+        },
+        "loop": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 354,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 1,
+          "rejects_per_rep": 0,
+          "runs": [
+            "v017-hf-loop-h1-a8-r1",
+            "v017-hf-loop-h1-a8-r2",
+            "v017-hf-loop-h1-a8-r3"
+          ]
+        },
+        "nativestale": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 261.7,
+          "oracle_pass_per_rep": 91.7,
+          "lost_updates_per_rep": 170,
+          "lost_update_rate_of_commits": 0.6497,
+          "success_rate_of_intents": 0.2589,
+          "rejects_per_rep": 92.3,
+          "runs": [
+            "v017-hf-nativestale-h1-a8-r1",
+            "v017-hf-nativestale-h1-a8-r2",
+            "v017-hf-nativestale-h1-a8-r3"
+          ]
+        },
+        "loopstale": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 129,
+          "lost_updates_per_rep": 225,
+          "lost_update_rate_of_commits": 0.6356,
+          "success_rate_of_intents": 0.3644,
+          "rejects_per_rep": 0,
+          "runs": [
+            "v017-hf-loopstale-h1-a8-r1",
+            "v017-hf-loopstale-h1-a8-r2",
+            "v017-hf-loopstale-h1-a8-r3"
+          ]
+        },
+        "mock": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 281.3,
+          "oracle_pass_per_rep": 281.3,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 0.7947,
+          "rejects_per_rep": 72.7,
+          "runs": [
+            "v017-hf-mock-h1-a8-r1",
+            "v017-hf-mock-h1-a8-r2",
+            "v017-hf-mock-h1-a8-r3"
+          ]
+        }
+      },
+      "h1-a6": {
+        "control": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 269,
+          "oracle_pass_per_rep": 96,
+          "lost_updates_per_rep": 173,
+          "lost_update_rate_of_commits": 0.6431,
+          "success_rate_of_intents": 0.3569,
+          "rejects_per_rep": 0,
+          "runs": [
+            "v017-hf-control-h1-a6-r1",
+            "v017-hf-control-h1-a6-r2",
+            "v017-hf-control-h1-a6-r3"
+          ]
+        },
+        "native": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 205.3,
+          "oracle_pass_per_rep": 205.3,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 0.7633,
+          "rejects_per_rep": 63.7,
+          "runs": [
+            "v017-hf-native-h1-a6-r1",
+            "v017-hf-native-h1-a6-r2",
+            "v017-hf-native-h1-a6-r3"
+          ]
+        },
+        "loop": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 269,
+          "oracle_pass_per_rep": 269,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 1,
+          "rejects_per_rep": 0,
+          "runs": [
+            "v017-hf-loop-h1-a6-r1",
+            "v017-hf-loop-h1-a6-r2",
+            "v017-hf-loop-h1-a6-r3"
+          ]
+        },
+        "nativestale": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 209.3,
+          "oracle_pass_per_rep": 96,
+          "lost_updates_per_rep": 113.3,
+          "lost_update_rate_of_commits": 0.5414,
+          "success_rate_of_intents": 0.3569,
+          "rejects_per_rep": 59.7,
+          "runs": [
+            "v017-hf-nativestale-h1-a6-r1",
+            "v017-hf-nativestale-h1-a6-r2",
+            "v017-hf-nativestale-h1-a6-r3"
+          ]
+        },
+        "loopstale": {
+          "intents_per_rep": 269,
+          "commits_per_rep": 269,
+          "oracle_pass_per_rep": 121.7,
+          "lost_updates_per_rep": 147.3,
+          "lost_update_rate_of_commits": 0.5477,
+          "success_rate_of_intents": 0.4523,
+          "rejects_per_rep": 0,
+          "runs": [
+            "v017-hf-loopstale-h1-a6-r1",
+            "v017-hf-loopstale-h1-a6-r2",
+            "v017-hf-loopstale-h1-a6-r3"
+          ]
+        }
+      },
+      "h08-a8": {
+        "control": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 113.7,
+          "lost_updates_per_rep": 240.3,
+          "lost_update_rate_of_commits": 0.6789,
+          "success_rate_of_intents": 0.3211,
+          "rejects_per_rep": 0,
+          "runs": [
+            "v017-hf-control-h08-a8-r1",
+            "v017-hf-control-h08-a8-r2",
+            "v017-hf-control-h08-a8-r3"
+          ]
+        },
+        "native": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 284.7,
+          "oracle_pass_per_rep": 284.7,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 0.8041,
+          "rejects_per_rep": 69.3,
+          "runs": [
+            "v017-hf-native-h08-a8-r1",
+            "v017-hf-native-h08-a8-r2",
+            "v017-hf-native-h08-a8-r3"
+          ]
+        },
+        "loop": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 354,
+          "lost_updates_per_rep": 0,
+          "lost_update_rate_of_commits": 0,
+          "success_rate_of_intents": 1,
+          "rejects_per_rep": 0,
+          "runs": [
+            "v017-hf-loop-h08-a8-r1",
+            "v017-hf-loop-h08-a8-r2",
+            "v017-hf-loop-h08-a8-r3"
+          ]
+        },
+        "nativestale": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 295,
+          "oracle_pass_per_rep": 145.3,
+          "lost_updates_per_rep": 149.7,
+          "lost_update_rate_of_commits": 0.5073,
+          "success_rate_of_intents": 0.4105,
+          "rejects_per_rep": 59,
+          "runs": [
+            "v017-hf-nativestale-h08-a8-r1",
+            "v017-hf-nativestale-h08-a8-r2",
+            "v017-hf-nativestale-h08-a8-r3"
+          ]
+        },
+        "loopstale": {
+          "intents_per_rep": 354,
+          "commits_per_rep": 354,
+          "oracle_pass_per_rep": 193.7,
+          "lost_updates_per_rep": 160.3,
+          "lost_update_rate_of_commits": 0.4529,
+          "success_rate_of_intents": 0.5471,
+          "rejects_per_rep": 0,
+          "runs": [
+            "v017-hf-loopstale-h08-a8-r1",
+            "v017-hf-loopstale-h08-a8-r2",
+            "v017-hf-loopstale-h08-a8-r3"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "arm": "git_three_way",
+    "arm_role": "baseline_git",
+    "correct": 15,
+    "lost": 0,
+    "committed": 15,
+    "blocked": 0,
+    "wall_clock_ms": 718.46,
+    "cas_retry_sum": 0,
+    "mean_lock_wait_ms": 0,
+    "mean_overhead_ms": 111.78,
+    "max_batch": 3,
+    "conflict_batches": 0,
+    "fold_method": "pairwise_left_fold_shared_base"
+  },
+  {
+    "arm": "steward",
+    "arm_role": "main_method",
+    "correct": 15,
+    "lost": 0,
+    "committed": 15,
+    "blocked": 0,
+    "wall_clock_ms": 573.91,
+    "cas_retry_sum": 3,
+    "mean_lock_wait_ms": 0,
+    "mean_overhead_ms": 60.56,
+    "max_batch": 2,
+    "conflict_batches": 0,
+    "fold_method": null
+  },
+  {
+    "arm": "occ",
+    "arm_role": "baseline_occ",
+    "correct": 15,
+    "lost": 0,
+    "committed": 15,
+    "blocked": 0,
+    "wall_clock_ms": 178.92,
+    "cas_retry_sum": 6,
+    "mean_lock_wait_ms": 0,
+    "mean_overhead_ms": 13.32,
+    "max_batch": 0,
+    "conflict_batches": 0,
+    "fold_method": null
+  },
+  {
+    "arm": "file_lock",
+    "arm_role": "baseline_serial",
+    "correct": 15,
+    "lost": 0,
+    "committed": 15,
+    "blocked": 0,
+    "wall_clock_ms": 218.48,
+    "cas_retry_sum": 9,
+    "mean_lock_wait_ms": 8.1,
+    "mean_overhead_ms": 20.52,
+    "max_batch": 0,
+    "conflict_batches": 0,
+    "fold_method": null
+  }
+]
